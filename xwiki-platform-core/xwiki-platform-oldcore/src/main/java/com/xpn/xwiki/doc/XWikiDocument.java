@@ -6299,17 +6299,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public XWikiAttachment getAttachment(String filename)
     {
         XWikiAttachment output = this.attachmentList.getByFilename(filename);
-        if (output != null) {
-            return output;
-        }
-
-        for (XWikiAttachment attach : getAttachmentList()) {
-            if (attach.getFilename().startsWith(filename + ".")) {
-                return attach;
+        if (output == null && filename != null) {
+            for (XWikiAttachment attach : getAttachmentList()) {
+                if (attach.getFilename().startsWith(filename + ".")) {
+                    output = attach;
+                    break;
+                }
             }
         }
-
-        return null;
+        return output;
     }
 
     /**

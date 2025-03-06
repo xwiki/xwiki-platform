@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -302,7 +302,7 @@ class AsynchronousEventStoreTest
     @Test
     void getQueueSize() throws InterruptedException
     {
-        assertEquals(0, this.store.getQueueSize());
+        assertEquals(0, this.store.getQueueSizeDelta());
 
         // Lock, add an event and wait for the lock to be in place in the store thread
         this.store.lock.lock();
@@ -310,23 +310,23 @@ class AsynchronousEventStoreTest
         try {
             this.store.saveEvent(event(""));
             Thread.sleep(10);
-            assertEquals(0, this.store.getQueueSize());
+            assertEquals(0, this.store.getQueueSizeDelta());
 
             this.store.saveEvent(event("id1"));
 
-            assertEquals(1, this.store.getQueueSize());
+            assertEquals(1, this.store.getQueueSizeDelta());
 
             this.store.saveEvent(event("id2"));
 
-            assertEquals(2, this.store.getQueueSize());
+            assertEquals(2, this.store.getQueueSizeDelta());
 
             this.store.deleteEvent(event("id3"));
 
-            assertEquals(1, this.store.getQueueSize());
+            assertEquals(1, this.store.getQueueSizeDelta());
 
             this.store.deleteEvent("id4");
 
-            assertEquals(0, this.store.getQueueSize());
+            assertEquals(0, this.store.getQueueSizeDelta());
         } finally {
             this.store.lock.unlock();
         }

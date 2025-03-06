@@ -204,7 +204,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
      * @since 12.7.1
      * @since 12.6.2
      */
-    public int getQueueSize()
+    public int getQueueSizeDelta()
     {
         int size = 0;
         for (EventStoreTask<?, ?> task : this.queue) {
@@ -221,6 +221,12 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         }
 
         return size;
+    }
+
+    @Override
+    public Optional<Long> getQueueSize()
+    {
+        return Optional.of((long) this.queue.size());
     }
 
     private <O, I> CompletableFuture<O> addTask(I input, EventStoreTaskType type)

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -52,7 +53,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * The default implementation of {@link EventStore} dispatching the event in the various enabled stores.
- * 
+ *
  * @version $Id$
  * @since 12.4RC1
  */
@@ -451,5 +452,17 @@ public class DefaultEventStore implements EventStore, Initializable
         }
 
         return List.of();
+    }
+
+    @Override
+    public Optional<Long> getQueueSize()
+    {
+        Optional<Long> storeCount = Optional.ofNullable(this.store).flatMap(EventStore::getQueueSize);
+        Optional<Long> legacyStoreCount = Optional.ofNullable(this.legacyStore).flatMap(EventStore::getQueueSize);
+
+        return Stream.of(storeCount, legacyStoreCount)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .reduce(Long::sum);
     }
 }

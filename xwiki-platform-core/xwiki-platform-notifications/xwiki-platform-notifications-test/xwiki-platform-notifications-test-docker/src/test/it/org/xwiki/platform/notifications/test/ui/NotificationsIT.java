@@ -26,6 +26,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
 import org.xwiki.platform.notifications.test.po.NotificationWatchButtonElement;
@@ -172,6 +173,19 @@ class NotificationsIT
             setup.createPage(space, "Page" + i, "Simple content", "Simple title");
         }
         setup.createPage(space, "DTP", "Deletion test page", "Deletion test content");
+
+        // Switch to superadmin to wait for the events queues to be fully processed before checking the notification's display with user 2.
+        setup.loginAsSuperAdmin();
+        DocumentReference queueSizeReference =
+            new DocumentReference("QueueSize", testReference.getLastSpaceReference());
+        setup.createPage(queueSizeReference,
+            "{{velocity}}$services.eventstream.getQueueSize(){{/velocity}}");
+
+        setup.getDriver().waitUntilCondition(input -> {
+            setup.gotoPage(queueSizeReference, "get", "outputSyntax=plain&forceeload=" + System.currentTimeMillis());
+            String content = setup.getDriver().findElement(By.tagName("body")).getText();
+            return content.equals("0");
+        });
 
         // Check that the badge is showing «20+»
         setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);

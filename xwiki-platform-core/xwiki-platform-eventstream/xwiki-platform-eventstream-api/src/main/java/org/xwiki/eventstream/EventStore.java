@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * Save and access store events.
- * 
+ *
  * @version $Id$
  * @since 12.4RC1
  */
@@ -172,5 +172,17 @@ public interface EventStore
     default List<EventStatus> getEventStatuses(Collection<Event> events, Collection<String> entityIds) throws Exception
     {
         return List.of();
+    }
+
+    /**
+     * @return the queue size wrapped in the {@link Optional} of the event store it exists, {@link Optional#empty()}
+     *     otherwise
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    default Optional<Long> getQueueSize()
+    {
+        return Optional.empty();
     }
 }

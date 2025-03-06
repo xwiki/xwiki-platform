@@ -117,12 +117,6 @@ public class ScopeNotificationFilterExpressionGenerator
         while (it.hasNext()) {
             ScopeNotificationFilterPreference pref = it.next();
 
-            // We will handle "page only" filters afterwards (but only for pref that are stored in the database
-            // and loaded by the default user profile)
-            if (isPageOnly(pref)) {
-                continue;
-            }
-
             // For each exclusive filter, we want to generate a query to black list the location with a white list of
             // sub locations.
             // Ex:   "wiki1:Space1" is blacklisted but:
@@ -134,10 +128,6 @@ public class ScopeNotificationFilterExpressionGenerator
 
             // Children are a list of inclusive filters located under the current one.
             for (ScopeNotificationFilterPreference childFilter : pref.getChildren()) {
-                // We will handle "page only" filters afterwards
-                if (isPageOnly(childFilter)) {
-                    continue;
-                }
                 // child filter is something like "event.location = A.B"
                 filterNode = filterNode.or(generateNode(childFilter));
             }
@@ -171,11 +161,6 @@ public class ScopeNotificationFilterExpressionGenerator
         while (it.hasNext()) {
             ScopeNotificationFilterPreference pref = it.next();
 
-            // We will handle "page only" filters afterwards
-            if (isPageOnly(pref)) {
-                continue;
-            }
-
             if (topNode == null) {
                 topNode = generateNode(pref);
             } else {
@@ -192,18 +177,6 @@ public class ScopeNotificationFilterExpressionGenerator
         }
 
         return topNode;
-    }
-
-    private boolean isPageOnly(ScopeNotificationFilterPreference pref)
-    {
-        // We make sure we only handle preferences that come from "userProfile" that are actually saved in the database
-        // as NotificationFilterPreferences.
-        // For example, a preference that comes from the watchlist bridge is not stored in the database, so we have to
-        // handle it without using the subquery mechanism that we can see in
-        // filterExpression(Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format,
-        //    NotificationFilterType type, DocumentReference user).
-        return StringUtils.isNotBlank(pref.getPageOnly())
-            && pref.getEventTypes().isEmpty();
     }
 
     private AbstractOperatorNode generateNode(ScopeNotificationFilterPreference scopeNotificationFilterPreference)

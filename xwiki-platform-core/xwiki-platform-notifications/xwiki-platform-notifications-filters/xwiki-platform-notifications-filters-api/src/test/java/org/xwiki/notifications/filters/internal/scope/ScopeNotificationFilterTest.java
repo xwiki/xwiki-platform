@@ -275,8 +275,11 @@ class ScopeNotificationFilterTest
 
         // Test 1
         String result = this.scopeNotificationFilter.filterExpression(user, filterPreferences, preference).toString();
-        assertEquals("((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\") "
-                + "AND DATE >= \""+ new Date(0).toString() + "\")", result);
+        String expectedResult = String.format("(((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\") "
+            + "AND DATE >= \"%s\") "
+            + "OR ((WIKI = \"wikiA\" AND PAGE = \"wikiA:SpaceM.DocumentN\") "
+            + "AND DATE >= \"%s\"))", new Date(0), new Date(99000));
+        assertEquals(expectedResult, result);
 
         // Test with wikiA:SpaceE (filtered by γ & ζ)
         Event event1 = mock(Event.class);
@@ -413,8 +416,10 @@ class ScopeNotificationFilterTest
 
         // Test 1
         String result = this.scopeNotificationFilter.filterExpression(user, filterPreferences, preference).toString();
-        assertEquals("((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\") "
-            + "AND DATE >= \""+ new Date(0).toString() + "\")", result);
+        String expectedResult = String.format("(NOT ((WIKI = \"wikiA\" AND PAGE = \"wikiA:SpaceM.DocumentN\")) "
+            + "AND ((WIKI = \"wikiA\" AND SPACE STARTS WITH \"wikiA:SpaceB\") "
+            + "AND DATE >= \"%s\"))", new Date(0));
+        assertEquals(expectedResult, result);
 
         // Test with wikiA:SpaceE -> should not be filtered since inclusive filter is ignored
         Event event1 = mock(Event.class);

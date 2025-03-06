@@ -266,15 +266,10 @@
 
     a {
       color: inherit;
-      display: block;
-      text-align: center;
-    }
-
-    .previewWrapper {
       display: flex;
-      align-items: flex-end;
-      height: 150px;
-      justify-content: center;
+      flex-direction: column;
+        height: 100%;
+        justify-content: space-evenly;
     }
 
     img {

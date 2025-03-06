@@ -271,6 +271,11 @@
         height: 100%;
         justify-content: space-evenly;
     }
+    
+    .previewWrapper {
+      justify-content: center;
+      display: flex;
+    }
 
     img {
       object-fit: contain;

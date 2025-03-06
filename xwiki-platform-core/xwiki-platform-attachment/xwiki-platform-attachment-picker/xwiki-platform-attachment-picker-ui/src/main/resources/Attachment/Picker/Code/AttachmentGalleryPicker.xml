@@ -268,8 +268,8 @@
       color: inherit;
       display: flex;
       flex-direction: column;
-        height: 100%;
-        justify-content: space-evenly;
+      height: 100%;
+      justify-content: space-evenly;
     }
 
     .previewWrapper {

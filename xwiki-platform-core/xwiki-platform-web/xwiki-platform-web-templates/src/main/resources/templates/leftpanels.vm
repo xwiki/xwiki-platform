@@ -18,6 +18,9 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
+#if(!$request.getParameter("forceLeftPanels"))
+  <button id="leftPanelsToggle" class="btn btn-default" title="$services.localization.render('panels.column.toggler.left.label')">$services.icon.renderHTML('caret-right')</button>
+#end
 <div id="leftPanels" class="panels left panel-width-$!{leftPanelsWidth}"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
 ## Global Variable
 #set($xwikiPanelWidth = $leftPanelsWidth)
@@ -28,6 +31,8 @@
     $services.rendering.render($panelUix.execute(), "html/5.0")
   #end
 #end
+## We set the handle as the last element so that it's "above" any panel content.
+<div role="button" tabindex="0" class="ui-resizable-handle ui-resizable-e" title="$escapetool.xml($services.localization.render('panels.column.left.resizeHandle.hint'))"></div>
 </div>
 #end
 #set($xwikiPanelWidth = "Medium")

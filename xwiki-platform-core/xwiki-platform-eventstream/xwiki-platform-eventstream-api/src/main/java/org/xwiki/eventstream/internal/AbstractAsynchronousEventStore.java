@@ -223,6 +223,12 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         return size;
     }
 
+    @Override
+    public Optional<Long> getEventQueueSize()
+    {
+        return Optional.of((long) this.queue.size());
+    }
+
     private <O, I> CompletableFuture<O> addTask(I input, EventStoreTaskType type)
     {
         // Remember a few standard things from the context

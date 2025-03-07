@@ -32,6 +32,7 @@ import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Script services for the Event Stream Module.
@@ -84,5 +85,17 @@ public class EventStreamScriptService implements ScriptService
     public long getEventCount() throws EventStreamException
     {
         return this.eventStore.search(new SimpleEventQuery(0, 0)).getTotalHits();
+    }
+
+    /**
+     * @return the queue size wrapped of the event store it exists, {@code null} otherwise
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    @Unstable
+    public Long getEventQueueSize()
+    {
+        return this.eventStore.getEventQueueSize().orElse(null);
     }
 }

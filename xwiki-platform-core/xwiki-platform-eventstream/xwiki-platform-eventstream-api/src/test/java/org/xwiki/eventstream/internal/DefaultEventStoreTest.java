@@ -35,6 +35,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -44,7 +45,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link DefaultEventStore}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
@@ -187,5 +188,26 @@ public class DefaultEventStoreTest
 
         verify(this.store).prefilterEvent(EVENT);
         verify(this.legacyStore).prefilterEvent(EVENT);
+    }
+
+    @Test
+    void getEventQueueSizeNoCount()
+    {
+        assertEquals(Optional.empty(), this.defaultStore.getEventQueueSize());
+    }
+
+    @Test
+    void getEventQueueSizeOneCount()
+    {
+        when(this.store.getEventQueueSize()).thenReturn(Optional.of(1L));
+        assertEquals(Optional.of(1L), this.defaultStore.getEventQueueSize());
+    }
+
+    @Test
+    void getEventQueueSizeTwoCounts()
+    {
+        when(this.store.getEventQueueSize()).thenReturn(Optional.of(1L));
+        when(this.legacyStore.getEventQueueSize()).thenReturn(Optional.of(2L));
+        assertEquals(Optional.of(3L), this.defaultStore.getEventQueueSize());
     }
 }

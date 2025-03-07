@@ -208,47 +208,50 @@ require(['jquery', 'jquery-ui'], function($) {
 });
 
 require(['jquery'], function($) {
-  let rightToggler = $("#rightPanelsToggler");
-  let leftToggler = $("#leftPanelsToggler");
+  let rightToggler = $("#rightPanelsToggle");
+  let leftToggler = $("#leftPanelsToggle");
 
   /* The body update hides completely the panel column. We want to make sure the panel column is visible for the whole
   animation before hiding it. */
   let updateBody = function (isRight, newExpandedState) {
-    let controlledBody = $('body.content');
+    let body = $('body.content');
+    // The JQuery UI handles defined above add an inline style on the body to work.
+    // This inline style is reset when the panel is collapsed.
+    body.removeAttr('style');
     if (isRight) {
       if (newExpandedState) {
         // We remove the hideright class
-        if (controlledBody.hasClass('hidelefthideright')) {
-          controlledBody.removeClass('hidelefthideright');
-          controlledBody.addClass('hideleft');
+        if (body.hasClass('hidelefthideright')) {
+          body.removeClass('hidelefthideright');
+          body.addClass('hideleft');
         } else {
-          controlledBody.removeClass('hideright');
+          body.removeClass('hideright');
         }
       } else {
         // We add the hideright class
-        if (controlledBody.hasClass('hideleft')) {
-          controlledBody.addClass('hidelefthideright');
-          controlledBody.removeClass('hideleft');
+        if (body.hasClass('hideleft')) {
+          body.addClass('hidelefthideright');
+          body.removeClass('hideleft');
         } else {
-          controlledBody.addClass('hideright');
+          body.addClass('hideright');
         }
       }
     } else {
       if (newExpandedState) {
         // We remove the hideleft class
-        if (controlledBody.hasClass('hidelefthideright')) {
-          controlledBody.removeClass('hidelefthideright');
-          controlledBody.addClass('hideright');
+        if (body.hasClass('hidelefthideright')) {
+          body.removeClass('hidelefthideright');
+          body.addClass('hideright');
         } else {
-          controlledBody.removeClass('hideleft');
+          body.removeClass('hideleft');
         }
       } else {
         // We add the hideleft class
-        if (controlledBody.hasClass('hideright')) {
-          controlledBody.addClass('hidelefthideright');
-          controlledBody.removeClass('hideright');
+        if (body.hasClass('hideright')) {
+          body.addClass('hidelefthideright');
+          body.removeClass('hideright');
         } else {
-          controlledBody.addClass('hideleft');
+          body.addClass('hideleft');
         }
       }
     }
@@ -269,11 +272,7 @@ require(['jquery'], function($) {
       } else {
         panels = $('#leftPanels');
       }
-      panels.on('transitionend', function () {
-        updateBody(isRight, newExpandedState);
-        // Remove this listener after one call.
-        panels.off('transitionend');
-      });
+      updateBody(isRight, newExpandedState);
     }
   }
 

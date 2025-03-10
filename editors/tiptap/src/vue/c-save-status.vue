@@ -23,14 +23,7 @@ import { CIcon, Size } from "@xwiki/cristal-icons";
 import { ref } from "vue";
 import type { Ref } from "vue";
 
-const props = withDefaults(
-  defineProps<{
-    autoSaver: AutoSaver;
-  }>(),
-  {
-    autoSaver: undefined,
-  },
-);
+const { autoSaver } = defineProps<{ autoSaver: AutoSaver }>();
 
 interface StatusInfo {
   id: string;
@@ -57,7 +50,7 @@ const statuses: { [key: number]: StatusInfo } = {
 };
 
 const status: Ref<StatusInfo> = ref(statuses[AutoSaverStatus.SAVED.valueOf()]);
-props.autoSaver.on("statusChange", (value: AutoSaverStatus) => {
+autoSaver.on("statusChange", (value: AutoSaverStatus) => {
   status.value = statuses[value.valueOf()];
 });
 </script>

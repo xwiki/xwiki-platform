@@ -5,6 +5,7 @@ import eslintPluginImport from "eslint-plugin-import";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import eslintPluginTsdoc from "eslint-plugin-tsdoc";
 import pluginVue from "eslint-plugin-vue";
+import globals from "globals";
 import parser from "vue-eslint-parser";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -39,6 +40,9 @@ export default [
         // This is required to avoid ecmaVersion < 2015 error or 'import' / 'export' error
         ecmaVersion: 2015,
         sourceType: "module",
+      },
+      globals: {
+        ...globals.browser,
       },
     },
     plugins: { import: eslintPluginImport },

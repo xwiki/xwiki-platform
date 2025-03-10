@@ -31,15 +31,7 @@ import { CIcon, Size } from "@xwiki/cristal-icons";
 import { ref } from "vue";
 import type { Ref } from "vue";
 
-const props = withDefaults(
-  defineProps<{
-    provider: HocuspocusProvider;
-  }>(),
-  {
-    provider: undefined,
-  },
-);
-const provider = props.provider;
+const { provider } = defineProps<{ provider: HocuspocusProvider }>();
 
 const status: Ref<WebSocketStatus> = ref(WebSocketStatus.Disconnected);
 provider.on("status", (event: onStatusParameters) => {

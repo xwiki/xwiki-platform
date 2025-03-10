@@ -167,38 +167,38 @@
 /* Styles for the panel column handles.. */
 
 #leftPanelsToggle, #rightPanelsToggle {
-  /*We make sure it doesn't get over the content. */
+  /* We make sure it doesn't get over the content. */
   max-width: @grid-gutter-width - 4px;
   background-color: @breadcrumb-bg;
   border: 0;
   box-shadow: none;
   .text-muted;
-  /*By default, those buttons are hidden.*/
+  /* By default, those buttons are hidden. */
   visibility: hidden;
   opacity: 0;
-  /* Smoothen out the apparition and disparition of the togglers in the UI.*/
+  /* Smoothen out the apparition and disparition of the togglers in the UI. */
   transition: visibility .2s ease-in-out, opacity .2s ease-in-out;
-  /* They are fixed on the page, always midway through. */
+  /* They are fixed on the page, always at the very top of their parent #contentcontainer.
+    We use the same top-margin as #leftPanels and #rightPanels so that the carets are aligned with
+    the first panel title at first. */
   position: fixed;
-  top: @navbar-height + 2em;
-  /* Make sure the toggler are displayed above the panels. */
+  margin-top: 15px;
+  /* Make sure the toggles are displayed above the panel content. */
   z-index: 1;
-  /* Smoothen out state transition when expanding and collapsing the panel. */
+  /* Smoothen out the state transition when expanding and collapsing the panel. */
   & > * {
     transition: transform .2s;
   }
 }
 
-/* We only allow the panel column togglers when the screen is large enough to support the columns next to the content.
+/* We only allow the panel column toggles when the screen is large enough to support the columns next to the content.
 It would not make sense on mobile. 
 A niche weird interaction that would make this style behave unexpectedly is: hide one column, reduce the screen width 
 (e.g. rotate the phone) and the panels are not here and cannot be displayed again until the screen width is increased 
-again (because the toggler is hidden). */
+again or the page is reloaded (because the toggler is hidden until then). */
 @media (min-width: @screen-md-min) {
-  /* The panel element does not extend downward enough to select the hover zone directly. 
-  Instead we decide to show the togglers when either of the columns are hovered. 
-  It makes the selector a bit complex, but as long as we rely on the bootstrap columns for the layout, we have floating 
-  columns, that cannot be correctly extended vertically without complex/brittle computation... */
+  /* The panel toggle is quite small. Since it's hidden by default, we need to give it proper conditions for showing up.
+  We show the toggles when either of the panel columns are hovered.  */
   #leftPanelsToggle[aria-expanded="false"],
   #contentcontainer:hover #contentcolumn:not(:hover) ~ #leftPanelsToggle,
   #leftPanelsToggle:has(+ #leftPanels:focus-within),
@@ -210,43 +210,35 @@ again (because the toggler is hidden). */
   }
 }
 
-body#body #leftPanelsToggle {
-  left: 0;
-  border-radius: 0 @border-radius-small @border-radius-small 0;
-  & > * {
-    transform: rotate(180deg);
-  }
-
-  &[aria-expanded="false"] {
-    & + #leftPanels {
-      transition: right 0.2s;
-      right: 100%;
-    }
-
-    & > * {
-      transform: rotate(0);
-    }
-  }
-}
-
 body#body #rightPanelsToggle {
-  /* Merge the button with the panel. */
+  /* Merge the button with the side of the screen. */
   right: 0;
   border-radius: @border-radius-small 0 0 @border-radius-small;
-  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
+  
+  /* Default state has the caret pointing right. */
   & > * {
     transform: rotate(0);
   }
+  
+  /* When the panel is closed, we want the caret pointing left. ie 'right-caret' rotated 180deg */
+  &[aria-expanded="false"] > * {
+    transform: rotate(180deg);
+  }
+}
 
-  &[aria-expanded="false"] {
-    & + #rightPanels {
-      transition: left 0.2s;
-      left: 100%;
-    }
-
-    & > * {
-      transform: rotate(180deg);
-    }
+body#body #leftPanelsToggle {
+  /* Merge the button with the side of the screen. */
+  left: 0;
+  border-radius: 0 @border-radius-small @border-radius-small 0;
+  
+  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
+  & > * {
+    transform: rotate(180deg);
+  }
+  
+  /* When the panel is closed, we want the caret pointing right. */
+  &[aria-expanded="false"] > * {
+    transform: rotate(0);
   }
 }
 

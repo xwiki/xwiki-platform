@@ -46,7 +46,7 @@
     "eslint-plugin-vue": "9.32.0",
     "happy-dom": "17.1.8",
     "nx": "20.5.0",
-    "prettier": "3.5.2",
+    "prettier": "3.5.3",
     "rimraf": "6.0.1",
     "typescript": "5.8.2",
     "vite": "6.2.1",

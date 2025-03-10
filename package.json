@@ -43,7 +43,7 @@
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-prettier": "5.2.3",
     "eslint-plugin-tsdoc": "0.4.0",
-    "eslint-plugin-vue": "9.32.0",
+    "eslint-plugin-vue": "9.33.0",
     "happy-dom": "17.3.0",
     "nx": "20.5.0",
     "prettier": "3.5.3",

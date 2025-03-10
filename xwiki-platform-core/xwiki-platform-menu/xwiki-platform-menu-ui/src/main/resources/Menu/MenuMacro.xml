@@ -979,11 +979,12 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
   .clearfix;
   background-color: @header-default-bg;
   border-color: @header-default-border;
-  .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
   min-height: @header-height;
   &amp; .navbar-toggle {
     float: left;
     padding-left: 15px;
+    padding-top: 0;
+    padding-bottom: 0;
     &amp; .icon-bar {
       background-color: @header-default-link-color;
       transition: .3s ease all;

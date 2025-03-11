@@ -89,6 +89,7 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo" table="xwikircs">
+        <meta attribute="xwiki-compressed"/>
         <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
             <key-property name="docId" column="XWR_DOCID" type="long" />
             <key-property name="version1" column="XWR_VERSION1" type="integer" />

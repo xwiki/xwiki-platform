@@ -47,7 +47,7 @@ public final class HqlQueryUtils
      */
     public static boolean isShortFormStatement(String statement)
     {
-        return StringUtils.startsWithAny(statement.trim().toLowerCase(), ",", "from", "where", "order");
+        return StringUtils.startsWithAny(statement.trim().toLowerCase(), ",", "where ", "order by");
     }
 
     /**

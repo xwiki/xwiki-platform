@@ -120,9 +120,10 @@ require(['jquery'], function($) {
     });
   });
 });
-/* Panel column interactivity.
+/*
+  Panel column interactivity.
   This script makes sure they are resizable using the mouse.
-  */
+*/
 require(['jquery', 'jquery-ui'], function($) {
   let resizeCustomFunctionLeft = function(event, ui) {
     // We remove the default inline CSS properties.

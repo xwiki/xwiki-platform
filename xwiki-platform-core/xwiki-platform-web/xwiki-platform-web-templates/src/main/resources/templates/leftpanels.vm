@@ -29,7 +29,8 @@
   #end
 #end
 ## We set the handle as the last element so that it's "above" any panel content.
-<div role="button" tabindex="0" class="ui-resizable-handle ui-resizable-e" title="$escapetool.xml($services.localization.render('panels.column.left.resizeHandle.hint'))"></div>
+<div role="button" tabindex="0" class="ui-resizable-handle ui-resizable-e"
+  title="$escapetool.xml($services.localization.render('panels.column.left.resizeHandle.hint'))"></div> 
 </div>
 #end
 #set($xwikiPanelWidth = "Medium")

@@ -29,6 +29,7 @@
   #end
 #end
 ## We set the handle as the last element so that it's "above" any panel content.
-<div role="button" tabindex="0" class="ui-resizable-handle ui-resizable-w" title="$escapetool.xml($services.localization.render('panels.column.right.resizeHandle.hint'))"></div>
+<div role="button" tabindex="0" class="ui-resizable-handle ui-resizable-w"
+  title="$escapetool.xml($services.localization.render('panels.column.right.resizeHandle.hint'))"></div>
 </div>
 #end

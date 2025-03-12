@@ -76,10 +76,10 @@ public class DownloadRevAction extends DownloadAction
                 ResourceReference resourceReference =
                     Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
                 args = new Object[] { resourceReference };
-                message = "No attachment found in {0}";
+                message = "No attachment found for resource [{0}]";
             } else {
                 args = new Object[] { filename };
-                message = "Attachment {0} not found";
+                message = "Attachment [{0}] not found";
             }
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, message, null, args);

@@ -409,7 +409,7 @@ class InplaceEditIT
         // Verify that the restored selection is visible (inside the viewport).
         assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height / 2));
 
-        sourceTextArea.sendKeys(Keys.PAGE_DOWN, Keys.UP, Keys.UP);
+        sourceTextArea.sendKeys(Keys.PAGE_DOWN, Keys.PAGE_DOWN, Keys.UP, Keys.UP);
         sourceTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME));
 
         // Switch back to WYSIWYG mode.

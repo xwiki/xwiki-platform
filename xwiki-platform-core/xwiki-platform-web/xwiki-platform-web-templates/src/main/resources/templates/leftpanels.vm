@@ -29,6 +29,8 @@
   #end
 #end
 ## We set the handle as the last element so that it's "above" any panel content.
+## For some reason, JQuery UI resizable doesn't work with button handles.
+## Using a div with some accessibility markup as a compromise here.
 <div role="button" tabindex="0" class="ui-resizable-handle ui-resizable-e"
   title="$escapetool.xml($services.localization.render('panels.column.left.resizeHandle.hint'))"></div> 
 </div>

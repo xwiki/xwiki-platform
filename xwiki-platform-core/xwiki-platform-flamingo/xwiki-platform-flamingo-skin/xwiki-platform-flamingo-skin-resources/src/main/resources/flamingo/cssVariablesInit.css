@@ -71,7 +71,7 @@
 ## Those should all be defined in variables.less and variablesInit.vm
 ## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
 ## The key is their name and the value is the string representing the value in CSS syntax.
-## The equivalent LESS variables should be available in: xwiki-platform-flamingo-skin-resources-->variablesInit.vm
+## The equivalent LESS variables should be available in: xwiki-platform-flamingo-skin-resources-->variables.less
 #set($xsVariables = {
 "figure-caption-font-size": "90%",
 "figure-caption-color": "var(--text-muted)",

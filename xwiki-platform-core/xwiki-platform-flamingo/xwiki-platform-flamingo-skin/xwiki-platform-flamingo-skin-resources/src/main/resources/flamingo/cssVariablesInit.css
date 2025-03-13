@@ -35,6 +35,7 @@
 ## List of Bootstrap variables we need to give default values for XWiki standard variables
 ## We make sure font-size-base is set in em since it's a more powerful and reliable unit for font sizes
 ## The key is their name and the value is the string representing the value in CSS syntax.
+## The equivalent LESS variables are available in: xwiki-platform-bootstrap-->variables.less
 #set($bootstrapVariables = {
 "btn-danger-color" : "#fff",
 "btn-default-border" : "#ccc",
@@ -69,8 +70,8 @@
 ## List of all the variables set in XWiki standard for various purposes.
 ## Those should all be defined in variables.less and variablesInit.vm
 ## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
-## The default for these CSS values is directly taken from variablesInit.vm
 ## The key is their name and the value is the string representing the value in CSS syntax.
+## The equivalent LESS variables should be available in: xwiki-platform-flamingo-skin-resources-->variablesInit.vm
 #set($xsVariables = {
 "figure-caption-font-size": "90%",
 "figure-caption-color": "var(--text-muted)",
@@ -131,137 +132,29 @@
 "brand-danger": "#cc3333"
 })
 
-#template('colorThemeInit.vm')
+## Retrieve the lists of variables for the old ColorTheme and Flamingo ColorTheme
+#template('variablelist.vm')
+## If you want to update the values set for the old colortheme, see colorThemeInit.vm, a source of truth shared 
+## with LESS variables defined in xwiki-platform-flamingo-skin-resources -> variablesInit.vm -> initFromOldColorTheme
+## A couple variables are excluded from the set, we do not port them to CSS
+#set($excludeFromOldColorThemeMapping = ['xwiki-panel-header-bg', 'xwiki-panel-header-text'])
+#foreach($excludedVariable in $excludeFromOldColorThemeMapping)
+  #set($discard = $oldColorThemeVariables.remove($excludedVariable))
+#end
 
-#set($variablesOldColorTheme = {
-"text-color": $theme.textColor,
-"link-color": $theme.linkColor,
-"headings-color": $theme.titleColor,
-"body-bg": $theme.pageBackgroundColor,
-"nav-tabs-border-color": $theme.borderColor,
-"nav-tabs-active-link-hover-border-color": $theme.borderColor,
-"pagination-border": $theme.borderColor,
-"pagination-hover-border": $theme.borderColor,
-"pagination-disabled-border": $theme.borderColor,
-"list-group-border": $theme.borderColor,
-"thumbnail-border": $theme.borderColor,
-"input-border": $theme.borderColor,
-
-"navbar-default-toggle-border-color": $theme.borderColor,
-"navbar-default-bg": $theme.menuBackgroundColor,
-"navbar-default-link-color": $theme.menuLinkColor,
-"navbar-default-link-disabled-color": $theme.menuContentLinkColor,
-"navbar-default-link-active-bg": $theme.menuBackgroundColor,
-"navbar-default-link-active-color": $theme.menuLinkColor,
-"navbar-default-link-hover-bg": $theme.menuBackgroundColor$,
-"navbar-default-link-hover-color": $theme.menuLinkColor,
-"dropdown-bg": $theme.pageContentBackgroundColor,
-"dropdown-link-color": $theme.textColor,
-"dropdown-link-hover-bg": $theme.submenuContentBackgroundColor,
-"dropdown-link-hover-color": $theme.textColor,
-
-"btn-primary-color": $theme.buttonPrimaryTextColor,
-"btn-primary-bg": $theme.buttonPrimaryBackgroundColor,
-"btn-default-color": $theme.buttonSecondaryTextColor,
-"btn-default-bg": $theme.buttonSecondaryBackgroundColor,
-"btn-success-color": $theme.menuAddEntryLinkColor,
-"btn-success-bg": $theme.menuAddEntryBackgroundColor,
-"nav-tabs-active-link-hover-bg": $theme.pageContentBackgroundColor,
-"nav-link-hover-bg": $theme.highlightColor,
-"brand-primary": $theme.buttonPrimaryBackgroundColor,
-"brand-success": $theme.notificationSuccessColor,
-"brand-info": $theme.notificationInfoColor,
-"brand-warning": $theme.notificationWarningColor,
-"brand-danger": $theme.notificationErrorColor,
-"panel-bg": $theme.panelBackgroundColor,
-"panel-default-text": $theme.panelTextColor,
-"panel-header-bg": $theme.panelHeaderBackgroundColor,
-"panel-header-text": $theme.panelHeaderTextColor,
-"xwiki-border-color": $theme.borderColor,
-"panel-header-bg": $theme.panelHeaderBackgroundColor,
-"panel-header-text": $theme.panelHeaderTextColor,
-"xwiki-page-content-bg": $theme.pageContentBackgroundColor,
-"xwiki-background-secondary-color": $theme.backgroundSecondaryColor,
-"xwiki-page-header-bg-color": $theme.pageHeaderBackgroundColor,
-"xwiki-page-header-bg-image": $theme.headerBackgroundImage,
-"xwiki-page-header-bg-position": $theme.headerBackgroundPosition
-})
-
-## We merge those maps into one long list. 
+## We merge the three maps into one list. 
 ## We allow different values from different maps for the same variable. This is an extra fallback in case the first
 ## doesn't work. This could be the case for defaults that rely on other variables.
-## Values will follow CSS cascading order (last one wins).
-#set($variableValueSets = [$variablesOldColorTheme, $bootstrapVariables, $xsVariables])
+## Values follow CSS cascading order (last one wins).
+#set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariables])
 
-## List of all the variables available to customize directly in the Flamingo theme editor.
-## These mappings will not always end up in the initialization of a CSS variable.
+## $flamingoColorThemeVariables is the list of all the variables available to customize directly in the Flamingo 
+## theme editor. These mappings will not always end up in the initialization of a CSS variable.
+## If you want to update the values set for the flamingo colortheme, see the colortheme xml,
+## a source of truth shared with LESS variables, defined in xwiki-platform-flamingo-theme-ui
 ## To make sure all of those variables are still available even when not set in the colortheme,
-## check that they all appear in another map with a proper default value above.
-## The key is the name and the value is the CSS type of the variable.
-#set($colorThemeVariables = {
-"text-color": "color",
-"body-bg": "color",
-"xwiki-page-content-bg" : "color",
-"link-color": "color",
-"brand-primary": "color",
-"brand-success": "color",
-"brand-info": "color",
-"brand-warning": "color",
-"brand-danger": "color",
-"headings-color": "color",
-"component-active-color" : "color",
-"component-active-bg" : "color",
-"font-family-base": "text",
-"font-family-sans-serif": "text",
-"font-family-serif": "text",
-"font-family-monospace": "font",
-"btn-font-weight" : "size",
-"btn-default-color" : "color",
-"btn-default-bg" : "color",
-"btn-primary-color" : "color",
-"btn-primary-bg" : "color",
-"btn-success-color" : "color",
-"btn-success-bg" : "color",
-"btn-info-color" : "color",
-"btn-info-bg" : "color",
-"btn-warning-color" : "color",
-"btn-warning-bg" : "color",
-"btn-danger-color" : "color",
-"btn-danger-bg" : "color",
-"btn-default-border" : "color",
-"navbar-default-color" : "color",
-"navbar-default-bg" : "color",
-"navbar-default-link-color" : "color",
-"navbar-default-link-hover-color" : "color",
-"navbar-default-link-hover-bg" : "color",
-"navbar-default-link-active-color" : "color",
-"navbar-default-link-active-bg": "color",
-"navbar-height" : "size",
-"dropdown-bg" : "color",
-"dropdown-border" : "color",
-"dropdown-link-color" : "color",
-"dropdown-link-hover-color" : "color",
-"dropdown-link-hover-bg" : "color",
-"dropdown-divider-bg" : "color",
-"input-bg" : "color",
-"input-border" : "color",
-"input-color" : "color",
-"input-border-focus" : "color",
-"input-color-placeholder" : "color",
-"legend-color" : "color",
-"legend-border-color": "color",
-"panel-bg" : "color",
-"panel-default-text" : "color",
-"panel-header-text" : "color",
-"breadcrumb-bg": "color",
-"breadcrumb-color": "color",
-"breadcrumb-link-color": "color",
-"breadcrumb-separator": "escapedText",
-"table-bg": "color",
-"table-bg-hover": "color",
-"table-border-color": "color"
-})
-
+## we make sure that they all appear in another mapping above.
+## The key is the name and the value is a type for the variable.
 ######################
 ## Generation
 ######################
@@ -286,17 +179,17 @@
   #end
 #end
 
-## Create CSS variables for each colorTheme variable that is set.
+## Create CSS variables for each flamingo colorTheme variable that is set.
 ## Right now we have the variable type info for all of those, but we don't use those yet.
 ## Those values will override anything already declared in the XS/bootstrap defaults.
-#foreach($property in $colorThemeVariables.keySet())
+#foreach($property in $flamingoColorThemeVariables.keySet())
 #set($value = $themeDoc.getValue($property, $themeObj))
 #if("$!value" != '')
 ## If the value we want to set is a LESS variables, we make sure to convert it into a CSS variable.
 #if($stringtool.startsWith($!value, '@'))
 #set($value = 'var(--' + $stringtool.substring($value, 1) + ')')
 #end
-#set($propertyType = $colorThemeVariables.get($property))
+#set($propertyType = $flamingoColorThemeVariables.get($property))
 ## For now we only use `string` variables, because it's the easiest to setup and because it's 100% compatible with 
 ## LESS variables. We could use the extra info we have on the variable types to use the @property syntax later.
 #if($propertyType == 'escapedText')

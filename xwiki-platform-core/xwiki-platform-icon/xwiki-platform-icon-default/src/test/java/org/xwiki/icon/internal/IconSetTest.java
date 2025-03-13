@@ -19,7 +19,7 @@
  */
 package org.xwiki.icon.internal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.icon.IconSet;
 
 import static org.junit.Assert.assertEquals;
@@ -30,10 +30,10 @@ import static org.junit.Assert.assertEquals;
  * @since 6.3RC1
  * @version $Id$
  */
-public class IconSetTest
+class IconSetTest
 {
     @Test
-    public void simpleTest() throws Exception
+    void simpleTest()
     {
         IconSet iconSet = new IconSet("myIconSet");
         assertEquals("myIconSet", iconSet.getName());

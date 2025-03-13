@@ -143,9 +143,9 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
 
             // Notify with an empty anchorId if there's new mentions without an anchor.
             if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
-                DisplayStyle displayStyle = findDisplayStyle(newMentions, reference, "");
-                addNewMention(ret, null,
-                    new MentionNotificationParameter(reference, "", displayStyle));
+                DisplayStyle displayStyle = findDisplayStyle(newMentions, reference, null);
+                addNewMention(ret, type,
+                    new MentionNotificationParameter(reference, null, displayStyle));
             }
 
             // Notify all new mentions with new anchors.

@@ -17,49 +17,139 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-#requiredRightsDialog .rights-visualization {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+#template('colorThemeInit.vm')
+
+#required-rights-dialog {
+  container-type: inline-size;
+  container-name: required-rights-dialog;
 }
 
-#requiredRightsDialog .rights-visualization label.suggested {
-    border: 4px solid green;
+#required-rights-dialog .enforce-selection ul {
+  color: $theme.textSecondaryColor;
 }
 
-#requiredRightsDialog .rights-visualization label.suggested-review {
-    border: 4px dashed green;
+#required-rights-dialog .enforce-selection:has(input[value="1"]:checked) + .rights-selection {
+  display: block;
 }
 
-#requiredRightsDialog .rights-visualization label.active {
-    text-decoration: underline;
+#required-rights-dialog .rights-selection {
+  background-color: $theme.panelBackgroundColor;
+  color: $theme.panelTextColor;
+  display: none;
+  margin: 0 -0.5em 10px;
+  padding: 0.5em;
 }
 
-.box.requiredrights-warning {
-    display: flex;
-    align-items: baseline;
+#required-rights-dialog .rights-selection ul {
+  list-style-type: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(max-content, 1fr));
+  gap: 0.5em;
+  margin: 0;
+  padding: 0;
+  /* TODO: this doesn't seem to work to align the text vertically. */
+  align-items: center;
 }
 
-.box.requiredrights-warning p {
-    flex-grow: 1;
+#required-rights-dialog .rights-selection li {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-template-columns: subgrid;
+  /* Make the list item span 2 rows in the parent grid */
+  grid-row: span 2;
+  grid-column: span 1;
 }
 
-#required-rights-results .panel-heading {
-    padding: 0.7em;
+#required-rights-dialog .rights-selection li p {
+  margin: 0;
+  color: $theme.textSecondaryColor;
 }
 
-#required-rights-results .panel-group {
-    margin-bottom: 0.5em;
+#required-rights-dialog .rights-selection li p button.tip {
+  border-radius: 2em;
+  padding: 0.2em 0.5em;
+  border: none;
+  background-color: $theme.textSecondaryColor;
+  color: $theme.pageContentBackgroundColor;
 }
 
-#required-rights-results .panel-title a .fa {
-    width: 0.5em;
+#required-rights-dialog .rights-selection li .label-wrapper {
+  border: 2px solid transparent;
+  border-radius: 2em;
+  padding: 2px;
 }
 
-#required-rights-results .panel-title a[aria-expanded="false"] .icon-expanded {
-    display: none;
+#required-rights-dialog .rights-selection li .label-wrapper label {
+  background-color: $theme.pageContentBackgroundColor;
+  color: $theme.textColor;
+  border: 2px solid $theme.pageContentBackgroundColor;
+  border-radius: 2em;
+  padding: 0.5em 1em;
+  display: block;
+  margin: 0;
 }
 
-#required-rights-results .panel-title a[aria-expanded="true"] .icon-collapsed {
-    display: none;
+#required-rights-dialog .rights-selection li .label-wrapper label:has(input:checked) {
+  /* TODO: use color theme variables when available */
+  background-color: #e1f1f9;
+  color: #31708f;
+  border-color: #2f70a7;
+}
+
+#required-rights-dialog .rights-selection li.required .label-wrapper {
+  border-color: $theme.borderColor;
+}
+
+#required-rights-dialog .rights-selection li.required .label-wrapper:has(input:checked) {
+  border-color: #2f70a7;
+}
+
+#required-rights-dialog .rights-selection li.maybe-required .label-wrapper {
+  border-color: $theme.borderColor;
+  border-style: dashed;
+}
+
+#required-rights-dialog .rights-selection li.maybe-required .label-wrapper:has(input:checked) {
+  border-color: #2f70a7;
+}
+
+#required-rights-dialog #required-rights-results .panel-heading {
+  padding: 0.7em;
+}
+
+#required-rights-dialog #required-rights-results .panel-group {
+  margin-bottom: 0.5em;
+}
+
+#required-rights-dialog .panel-title a .fa, .required-rights-advanced-toggle .fa {
+  width: 0.5em;
+}
+
+#required-rights-dialog a[aria-expanded="false"] .icon-expanded {
+  display: none;
+}
+
+#required-rights-dialog a[aria-expanded="true"] .icon-collapsed {
+  display: none;
+}
+
+@container required-rights-dialog (max-width: 42em) {
+  #required-rights-dialog .rights-selection ul {
+    grid-template-columns: repeat(2, minmax(max-content, 1fr));
+    grid-template-rows: repeat(auto-fill, 1fr);
+  }
+
+  #required-rights-dialog .rights-selection li {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+}
+
+.box.requiredrights-warning > div {
+  display: flex;
+  align-items: baseline;
+}
+
+.box.requiredrights-warning > div :first-child {
+  flex-grow: 1;
 }

@@ -17,10 +17,11 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-<div class="box warningmessage requiredrights-warning">
-    <p><span class="messagetype">$escapetool.xml($services.localization.render('warning')): </span>
-        $escapetool.xml($services.localization.render('security.requiredrights.ui.missingRequiredRightsWarning'))</p>
-    <button class="btn btn-default" type="button" data-xwiki-requiredrights-dialog="show">
-        $escapetool.xml($services.localization.render('security.requiredrights.ui.reviewRequiredRightsButton'))
-    </button>
-</div>
+##!source.syntax=xwiki/2.1
+{{warning cssClass="requiredrights-warning"}}
+{{translation key="security.requiredrights.ui.missingRequiredRightsWarning" /}}
+
+{{html clean="false"}}<button class="btn btn-default" type="button" data-xwiki-requiredrights-dialog="show"
+>{{/html}}{{translation key="security.requiredrights.ui.reviewRequiredRightsButton" /}}{{html
+    clean="false"}}</button>{{/html}}
+{{/warning}}

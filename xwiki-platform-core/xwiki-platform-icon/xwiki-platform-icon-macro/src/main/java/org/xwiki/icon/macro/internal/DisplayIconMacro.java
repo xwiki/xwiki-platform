@@ -19,8 +19,8 @@
  */
 package org.xwiki.icon.macro.internal;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
@@ -40,14 +39,12 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.async.internal.AbstractExecutedContentMacro;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.FormatBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReferenceSerializer;
 
 /**
@@ -82,6 +79,10 @@ public class DisplayIconMacro extends AbstractExecutedContentMacro<DisplayIconMa
 
     @Inject
     private DocumentContextExecutor documentContextExecutor;
+    
+    private final IconParser iconParser = new IconParser();
+
+    private final IconSetRetriever iconSetRetriever = new IconSetRetriever();
 
     /**
      * Default constructor.
@@ -100,12 +101,14 @@ public class DisplayIconMacro extends AbstractExecutedContentMacro<DisplayIconMa
         List<Block> result;
 
         try {
-            IconSet iconSet = getIconSet(parameters);
+            IconSet iconSet = iconSetRetriever.getIconSet(parameters, this.iconSetManager, this.documentAccessBridge, 
+                this.contextualAuthorization);
 
             if (iconSet == null) {
                 result = List.of();
             } else {
-                XDOM iconBlock = parseIcon(parameters, context, iconSet);
+                XDOM iconBlock = iconParser.parseIcon(parameters, context, iconSet, 
+                    this.parser, this.defaultEntityReferenceSerializer, this.iconRenderer);
 
                 BlockAsyncRendererConfiguration rendererConfiguration =
                     createBlockAsyncRendererConfiguration(null, iconBlock, null, context);
@@ -142,59 +145,16 @@ public class DisplayIconMacro extends AbstractExecutedContentMacro<DisplayIconMa
             throw new MacroExecutionException("Failed parsing and executing the icon.", e);
         }
 
+        if (parameters.getTextAlternative() != null) {
+            // We complete the icon with a text alternative for screen readers.
+            Block textAltBlock = new FormatBlock();
+            textAltBlock.addChild(new WordBlock(parameters.getTextAlternative()));
+            textAltBlock.setParameter("class", "sr-only");
+            ArrayList<Block> updatedList = new ArrayList<>(result);
+            updatedList.add(textAltBlock);
+            result = List.copyOf(updatedList);
+        }
+
         return result;
-    }
-
-    private XDOM parseIcon(DisplayIconMacroParameters parameters, MacroTransformationContext context, IconSet iconSet)
-        throws IconException, MacroExecutionException
-    {
-        String iconContent = this.iconRenderer.render(parameters.getName(), iconSet);
-        MetaData metaData = null;
-
-        if (iconSet.getSourceDocumentReference() != null) {
-            String stringReference =
-                this.defaultEntityReferenceSerializer.serialize(iconSet.getSourceDocumentReference());
-            metaData = new MetaData(Map.of(MetaData.SOURCE, stringReference));
-        }
-
-        XDOM iconXDOM = this.parser.parse(iconContent, Syntax.XWIKI_2_1, context, false, metaData, true);
-        if (!context.isInline()) {
-            // Wrap the children of the XDOM in a paragraph. We don't ask the parser to produce block content as
-            // icons should always be inline, and some icons are defined as raw inline HTML.
-            Block wrapper = new ParagraphBlock(iconXDOM.getChildren());
-            iconXDOM.setChildren(List.of(wrapper));
-        }
-        return iconXDOM;
-    }
-
-    private IconSet getIconSet(DisplayIconMacroParameters parameters) throws IconException, MacroExecutionException
-    {
-        IconSet iconSet;
-
-        if (parameters.getIconSet() == null) {
-            iconSet = this.iconSetManager.getCurrentIconSet();
-        } else {
-            iconSet = this.iconSetManager.getIconSet(parameters.getIconSet());
-        }
-
-        // Check if the current user can access the icon theme. If not, fall back to the default icon theme or throw
-        // an exception when the fallback is disabled.
-        if (iconSet != null && iconSet.getSourceDocumentReference() != null
-            && !this.contextualAuthorization.hasAccess(Right.VIEW, iconSet.getSourceDocumentReference()))
-        {
-            if (parameters.isFallback()) {
-                iconSet = null;
-            } else {
-                throw new MacroExecutionException(
-                    String.format("Current user [%s] doesn't have view rights on the icon set's document [%s]",
-                        this.documentAccessBridge.getCurrentUserReference(), iconSet.getSourceDocumentReference()));
-            }
-        }
-
-        if (parameters.isFallback() && (iconSet == null || !iconSet.hasIcon(parameters.getName()))) {
-            iconSet = this.iconSetManager.getDefaultIconSet();
-        }
-
-        return iconSet;
     }
 }

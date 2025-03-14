@@ -544,7 +544,7 @@
     #set($discard = $map.put('params', $sqlParams))
   #end
   #set($discard = $map.put('reqNo', $numbertool.toNumber($request.reqNo).intValue()))
-  #if("$!request.tagcloud" == 'true')
+  #if("$!request.tagcloud" != 'false')
     #gridresult_buildTagCloudJSON($map)
   #end
   #gridresult_buildRowsJSON($map)

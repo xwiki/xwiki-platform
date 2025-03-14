@@ -120,4 +120,24 @@ require(['jquery'], function($) {
     });
   });
 });
+/*
+  Panel column interactivity.
+  This script makes sure they are resizable using the mouse.
+*/
+require(['jquery', 'jquery-ui'], function($) {
+  let resizeCustomFunction = function(columnPosition, event, ui) {
+    // We remove the default inline CSS properties.
+    ui.element.attr('style', '');
+    // We set the one we want when displayed in the flex layout.
+    document.body.style.setProperty('--panel-column-' + columnPosition + '-width', ui.size.width + 'px');
+  };
+  $("#rightPanels").resizable({
+    handles: 'w',
+    resize: resizeCustomFunction.bind(null, 'right')
+  });
+  $( "#leftPanels" ).resizable({
+    handles: 'e',
+    resize: resizeCustomFunction.bind(null, 'left')
+  });
+});
 

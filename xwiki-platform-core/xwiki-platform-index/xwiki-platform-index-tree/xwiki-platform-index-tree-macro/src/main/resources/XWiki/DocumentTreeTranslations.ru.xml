@@ -95,11 +95,11 @@ index.documentTree.documentSortDisplayer.field=Поле сортировки
 index.documentTree.documentSortDisplayer.field.default=---
 index.documentTree.documentSortDisplayer.field.title=Название
 index.documentTree.documentSortDisplayer.field.date=Дата последнего изменения
-### Missing: index.documentTree.documentSortDisplayer.field.creationDate=Creation date
-### Missing: index.documentTree.documentSortDisplayer.order=Sort order
-### Missing: index.documentTree.documentSortDisplayer.order.default=---
-### Missing: index.documentTree.documentSortDisplayer.order.asc=Ascending
-### Missing: index.documentTree.documentSortDisplayer.order.desc=Descending
+index.documentTree.documentSortDisplayer.field.creationDate=Дата создания
+index.documentTree.documentSortDisplayer.order=Порядок сортировки
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=По возрастанию
+index.documentTree.documentSortDisplayer.order.desc=По убыванию
 
 ## Deprecated translation keys
 

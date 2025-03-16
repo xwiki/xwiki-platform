@@ -56,11 +56,11 @@ admin.repository=Репозиторий расширений
 
 ## Supporters
 repository.supporter.sheet.description=Эта страница управляет отображением страниц ExtensionSupporter в режимах просмотра и редактирования.
-### Missing: repository.supporter.sheet.noObject=The current page doesn't have the expected ExtensionSupporter object.
+repository.supporter.sheet.noObject=На текущей странице отсутствует ожидаемый объект ExtensionSupporter.
 ### Missing: repository.supporter.sheet.createplan=Add
-### Missing: repository.supporter.sheet.plans=Plans
+repository.supporter.sheet.plans=Планы
 ### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
-### Missing: ExtensionCode.ExtensionSupporterClass_doc.title=Name
+ExtensionCode.ExtensionSupporterClass_doc.title=Название
 ### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
 ### Missing: ExtensionCode.ExtensionSupporterClass_url=URL
 ### Missing: ExtensionCode.ExtensionSupporterClass_email=Email

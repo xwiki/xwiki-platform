@@ -65,13 +65,13 @@ ExtensionCode.ExtensionSupporterClass_summary=Сводка
 ExtensionCode.ExtensionSupporterClass_url=URL
 ExtensionCode.ExtensionSupporterClass_email=Электронная почта
 ExtensionCode.ExtensionSupporterClass_content=Подробности
-### Missing: ExtensionCode.ExtensionSupporterClass_active=Active
+ExtensionCode.ExtensionSupporterClass_active=Активный
 
 ## Support plans
-### Missing: repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
-### Missing: repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
+repository.supportplan.sheet.description=Эта страница управляет отображением страниц ExtensionSupportPlan в режимах просмотра и редактирования.
+repository.supportplan.sheet.noObject=На текущей странице отсутствует ожидаемый объект ExtensionSupportPlan.
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
-### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
+ExtensionCode.ExtensionSupportPlanClass_doc.title=Название
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_url=URL

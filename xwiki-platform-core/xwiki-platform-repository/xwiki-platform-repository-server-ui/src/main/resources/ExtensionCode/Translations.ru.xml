@@ -72,11 +72,11 @@ repository.supportplan.sheet.description=Эта страница управля�
 repository.supportplan.sheet.noObject=На текущей странице отсутствует ожидаемый объект ExtensionSupportPlan.
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Название
-### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
-### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
-### Missing: ExtensionCode.ExtensionSupportPlanClass_url=URL
-### Missing: ExtensionCode.ExtensionSupportPlanClass_content=Details
-### Missing: ExtensionCode.ExtensionSupportPlanClass_active=Active
-### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+ExtensionCode.ExtensionSupportPlanClass_supporter=Поставщик
+ExtensionCode.ExtensionSupportPlanClass_summary=Сводка
+ExtensionCode.ExtensionSupportPlanClass_url=URL
+ExtensionCode.ExtensionSupportPlanClass_content=Подробности
+ExtensionCode.ExtensionSupportPlanClass_active=Активный
+ExtensionCode.ExtensionSupportPlanClass_paying=Оплата
 </content>
 </xwikidoc>

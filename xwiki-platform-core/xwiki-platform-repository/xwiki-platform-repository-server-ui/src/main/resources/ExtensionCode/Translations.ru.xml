@@ -61,10 +61,10 @@ repository.supporter.sheet.noObject=На текущей странице отс�
 repository.supporter.sheet.plans=Планы
 ### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
 ExtensionCode.ExtensionSupporterClass_doc.title=Название
-### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
-### Missing: ExtensionCode.ExtensionSupporterClass_url=URL
-### Missing: ExtensionCode.ExtensionSupporterClass_email=Email
-### Missing: ExtensionCode.ExtensionSupporterClass_content=Details
+ExtensionCode.ExtensionSupporterClass_summary=Сводка
+ExtensionCode.ExtensionSupporterClass_url=URL
+ExtensionCode.ExtensionSupporterClass_email=Электронная почта
+ExtensionCode.ExtensionSupporterClass_content=Подробности
 ### Missing: ExtensionCode.ExtensionSupporterClass_active=Active
 
 ## Support plans

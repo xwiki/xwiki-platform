@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Название
 extension.repository.summary=Комментарий
 extension.repository.type=Тип
@@ -49,5 +49,34 @@ extension.repository.rating=Рейтинг
 extension.repository.installedCount=Количество установок
 
 ## Administration UI
-admin.repository=Репозиторий расширений</content>
+admin.repository=Репозиторий расширений
+
+## Support
+### Missing: repository.support.createsupporter=Register
+
+## Supporters
+repository.supporter.sheet.description=Эта страница управляет отображением страниц ExtensionSupporter в режимах просмотра и редактирования.
+### Missing: repository.supporter.sheet.noObject=The current page doesn't have the expected ExtensionSupporter object.
+### Missing: repository.supporter.sheet.createplan=Add
+### Missing: repository.supporter.sheet.plans=Plans
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+### Missing: ExtensionCode.ExtensionSupporterClass_doc.title=Name
+### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
+### Missing: ExtensionCode.ExtensionSupporterClass_url=URL
+### Missing: ExtensionCode.ExtensionSupporterClass_email=Email
+### Missing: ExtensionCode.ExtensionSupporterClass_content=Details
+### Missing: ExtensionCode.ExtensionSupporterClass_active=Active
+
+## Support plans
+### Missing: repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
+### Missing: repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
+### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
+### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
+### Missing: ExtensionCode.ExtensionSupportPlanClass_url=URL
+### Missing: ExtensionCode.ExtensionSupportPlanClass_content=Details
+### Missing: ExtensionCode.ExtensionSupportPlanClass_active=Active
+### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+</content>
 </xwikidoc>

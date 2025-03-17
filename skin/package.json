@@ -61,7 +61,7 @@
     "@xwiki/cristal-dsapi": "workspace:*",
     "ts-essentials": "10.0.4",
     "typescript": "5.8.2",
-    "vite": "6.2.1",
+    "vite": "6.2.2",
     "vitest": "3.0.8",
     "vitest-mock-extended": "3.0.1",
     "vue-tsc": "2.2.8"

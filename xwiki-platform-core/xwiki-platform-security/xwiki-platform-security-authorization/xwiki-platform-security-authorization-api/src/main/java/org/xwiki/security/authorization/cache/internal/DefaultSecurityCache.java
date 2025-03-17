@@ -19,6 +19,7 @@
  */
 package org.xwiki.security.authorization.cache.internal;
 
+import java.lang.invoke.VarHandle;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
@@ -83,14 +85,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     @Inject
     private Logger logger;
 
-    /** Fair read-write lock used for fair scheduling of cache access. */
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
-
-    /** Fair read lock. */
-    private final Lock readLock = readWriteLock.readLock();
-
     /** Fair write lock. */
-    private final Lock writeLock = readWriteLock.writeLock();
+    private final Lock writeLock = new ReentrantLock(true);
 
     private final ReadWriteLock invalidationReadWriteLock = new ReentrantReadWriteLock(true);
 
@@ -635,7 +631,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getEntry(SecurityReference reference)
     {
-        return getInternal(getEntryKey(reference));
+        return getInternal(getEntryKey(reference), true);
     }
 
     /**
@@ -646,7 +642,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getEntry(UserSecurityReference userReference, SecurityReference reference)
     {
-        return getInternal(getEntryKey(userReference, reference));
+        // Access entries aren't in the internal entries, so no reason to check them.
+        return getInternal(getEntryKey(userReference, reference), false);
     }
 
     /**
@@ -657,46 +654,47 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getShadowEntry(SecurityReference userReference, SecurityReference wiki)
     {
-        return getInternal(getShadowEntryKey(userReference, wiki));
+        return getInternal(getShadowEntryKey(userReference, wiki), true);
     }
 
     /**
      * Get a security cache entry from the cache or the internal map. In the latter case, the entry is re-inserted
-     * into the cache. This method can be called without locking, it uses the read lock internally.
+     * into the cache. This method can be called without locking.
      *
      * @param key the key of the entry to retrieve
+     * @param checkInternalEntries if the method should try finding the item in the internal entries and re-insert it
+     * into the cache if found. This acquires the write lock of the cache.
      * @throws IllegalStateException if the entry has been disposed (this should never happen)
      * @return the entry corresponding to the given key, null if none is available in the cache
      */
-    private SecurityCacheEntry getInternal(String key)
+    private SecurityCacheEntry getInternal(String key, boolean checkInternalEntries)
     {
-        readLock.lock();
-        try {
-            SecurityCacheEntry result = cache.get(key);
-            if (result == null) {
+        // It is okay to get the entry without locking as the cache itself is thread-safe. We never modify the part of
+        // the entry that is returned directly, and we fully initialize the cache entry before inserting it into the
+        // cache. The only case where we modify entries is when we're upgrading a page entry to a user entry. In
+        // this case, we are careful to first set group information and then mark the entry as a user entry. So when
+        // trying to get group information, we can be sure that group information has been set and isn't modified
+        // anymore when the entry is a user entry.
+        SecurityCacheEntry result = cache.get(key);
+        if (result == null && checkInternalEntries) {
+            try {
+                this.writeLock.lock();
                 // Try to get the entry from the internal map which may have, e.g., parents that are no longer in the
                 // cache but still referenced by entries in the cache.
-                // Synchronize to avoid concurrent modification of the map as get() may trigger the eviction of
-                // garbage collected entries. All other operations are done under the write lock.
-                synchronized (this.internalEntries) {
-                    result = this.internalEntries.get(key);
-                }
+                // Synchronize under the write lock to avoid concurrent modification of the map as get() may trigger
+                // the eviction of garbage collected entries, so all operations are performed under this lock.
+                result = this.internalEntries.get(key);
 
                 if (result != null) {
                     // Try re-inserting the entry into the cache to give it another chance of being stored directly.
                     this.cache.set(key, result);
                 }
+            } finally {
+                this.writeLock.unlock();
             }
-
-            if (result != null && result.disposed) {
-                throw new IllegalCacheStateException(
-                    String.format("Entry [%s] has been disposed without being removed from the cache.", result));
-            }
-
-            return result;
-        } finally {
-            readLock.unlock();
         }
+
+        return result;
     }
 
     /**
@@ -718,7 +716,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     private boolean isAlreadyInserted(String key, SecurityEntry entry, Collection<GroupSecurityReference> groups)
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
-        SecurityCacheEntry oldEntry = getInternal(key);
+        // Always check in the internal entries as this method is called under the write lock and thus the overhead
+        // is low.
+        SecurityCacheEntry oldEntry = getInternal(key, true);
         if (oldEntry != null) {
             if (!oldEntry.getEntry().equals(entry)) {
                 // Another thread has inserted an entry which is different from this entry!
@@ -730,7 +730,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             }
             // If the user/group has been completed
             if (oldEntry.updateParentGroups(groups)) {
-                // Upgrade it to a user/group entry
+                // Upgrade it to a user/group entry. Ensure that all writes up until now (that set the actual group
+                // information) become visible to other threads before marking this security cache entry as a user
+                // entry.
+                VarHandle.fullFence();
                 oldEntry.entry = entry;
             }
 
@@ -886,7 +889,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     SecurityEntry get(String entryKey)
     {
-        SecurityCacheEntry entry = getInternal(entryKey);
+        SecurityCacheEntry entry = getInternal(entryKey, true);
         return (entry != null) ? entry.getEntry() : null;
     }
 

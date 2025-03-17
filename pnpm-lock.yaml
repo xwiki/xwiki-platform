@@ -733,8 +733,8 @@ importers:
         specifier: workspace:*
         version: link:../backend-api
       fast-xml-parser:
-        specifier: 5.0.8
-        version: 5.0.8
+        specifier: 5.0.9
+        version: 5.0.9
       inversify:
         specifier: 7.1.0
         version: 7.1.0(reflect-metadata@0.2.2)
@@ -6552,8 +6552,8 @@ packages:
   fast-uri@3.0.2:
     resolution: {integrity: sha512-GR6f0hD7XXyNJa25Tb9BuIdN0tdr+0BMi6/CJPH3wJO1JjNG3n/VsSw38AwRdKZABm8lGbPfakLRkYzx2V9row==}
 
-  fast-xml-parser@5.0.8:
-    resolution: {integrity: sha512-qY8NiI5L8ff00F2giyICiJxSSKHO52tC36LJqx2JtvGyAd5ZfehC/l4iUVVHpmpIa6sM9N5mneSLHQG2INGoHA==}
+  fast-xml-parser@5.0.9:
+    resolution: {integrity: sha512-2mBwCiuW3ycKQQ6SOesSB8WeF+fIGb6I/GG5vU5/XEptwFFhp9PE8b9O7fbs2dpq9fXn4ULR3UsfydNUCntf5A==}
     hasBin: true
 
   fastq@1.18.0:
@@ -11860,7 +11860,7 @@ snapshots:
 
   fast-uri@3.0.2: {}
 
-  fast-xml-parser@5.0.8:
+  fast-xml-parser@5.0.9:
     dependencies:
       strnum: 2.0.5
 

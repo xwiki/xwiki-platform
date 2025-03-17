@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-// eslint-disable-next-line import/no-named-as-default
 import Dexie from "dexie";
 import type { Table } from "dexie";
 

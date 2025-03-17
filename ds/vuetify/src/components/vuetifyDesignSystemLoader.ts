@@ -21,7 +21,6 @@
 import { registerAsyncComponent } from "@xwiki/cristal-api";
 import { injectable } from "inversify";
 import { createVuetify } from "vuetify";
-// eslint-disable-next-line import/namespace
 import * as components from "vuetify/components";
 import { VCol, VContainer, VRow, VTextField } from "vuetify/components";
 

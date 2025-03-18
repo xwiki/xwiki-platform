@@ -123,12 +123,12 @@
        {{error}}
         #if($recips.size() == 1)
           ## The email address given is invalid and will not be sent to.
-          $services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid')
+          $services.rendering.escape($services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid'), 'xwiki/2.1')
         #else
           #if($invalid.size() &gt; 1)
-            $services.localization.render('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()])
+            $services.rendering.escape($services.localization.render('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()]), 'xwiki/2.1')
           #else
-            $services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid')
+            $services.rendering.escape($services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid'), 'xwiki/2.1')
           #end
         #end
        {{/error}}

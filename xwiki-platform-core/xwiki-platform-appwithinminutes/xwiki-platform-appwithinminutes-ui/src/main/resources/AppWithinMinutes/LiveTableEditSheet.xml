@@ -337,7 +337,7 @@
   #updateAndSaveIcon()
   #if ($action == 'save')
     #if ($errorMessage)
-      {{error}}$errorMessage{{/error}}
+      {{error}}$services.rendering.escape($errorMessage, 'xwiki/2.1'){{/error}}
     #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())

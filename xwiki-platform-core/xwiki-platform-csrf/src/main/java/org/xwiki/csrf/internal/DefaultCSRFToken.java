@@ -141,7 +141,9 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         }
 
         // Return the current token if it exists, or generate a new one and return it.
-        return this.tokens.computeIfAbsent(key, documentReference -> newToken());
+        String token = this.tokens.computeIfAbsent(key, documentReference -> newToken());
+        this.logger.warn("Requesting token for key [{}] value: [{}]", key, token);
+        return token;
     }
 
     private String newToken()

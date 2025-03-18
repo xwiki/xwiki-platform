@@ -106,6 +106,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             return authenticator;
         }
 
+        LOGGER.warn("Getting authenticator, before init user principal: [{}]", context.getRequest().getUserPrincipal());
         try {
             XWiki xwiki = context.getWiki();
 

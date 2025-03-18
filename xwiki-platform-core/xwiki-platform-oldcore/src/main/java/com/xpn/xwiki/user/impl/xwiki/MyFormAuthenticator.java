@@ -166,6 +166,12 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                         principal = new SimplePrincipal(context.getWikiId() + ":" + principal.getName());
                     }
 
+                    LOGGER.warn("COOKIE login with username [{}] but session contains [{}] and principal is [{}]. "
+                            + "Session is [{}]",
+                        principal.getName(),
+                        request.getSession().getAttribute(SecurityRequestWrapper.PRINCIPAL_SESSION_KEY),
+                        request.getUserPrincipal(),
+                        request.getSession().getId());
                     request.setUserPrincipal(principal);
 
                     this.getUserAuthenticatedEventNotifier().notify(principal.getName());
@@ -184,6 +190,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         // process login form submittal
         if ((this.loginSubmitPattern != null) && request.getMatchableURL().endsWith(this.loginSubmitPattern)) {
             String username = convertUsername(request.getParameter(FORM_USERNAME), context);
+            LOGGER.warn("Get username [{}] from form ", username);
             String password = request.getParameter(FORM_PASSWORD);
             String rememberme = request.getParameter(FORM_REMEMBERME);
             rememberme = (rememberme == null) ? "false" : rememberme;
@@ -216,18 +223,29 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
             authenticationFailureManager.resetAuthenticationFailureCounter(username);
 
+            LOGGER.warn("New login with username [{}] but session contains [{}] and principal is [{}]. Session is [{}]",
+                username,
+                request.getSession().getAttribute(SecurityRequestWrapper.PRINCIPAL_SESSION_KEY),
+                request.getUserPrincipal(),
+                request.getSession().getId());
+
             // invalidate old session if the user was already authenticated, and they logged in as a different user
             if (request.getUserPrincipal() != null && !username.equals(request.getRemoteUser())) {
+                LOGGER.warn("Invalidating session");
                 request.getSession().invalidate();
             }
+
+
 
             // manage persistent login info, if persistent login management is enabled
             if (this.persistentLoginManager != null) {
                 // did the user request that their login be persistent?
                 if (rememberme != null) {
+                    LOGGER.warn("Call rememberLogin with user [{}]", username);
                     // remember login
                     this.persistentLoginManager.rememberLogin(request, response, username, password);
                 } else {
+                    LOGGER.warn("Call forgetLogin with user [{}]", username);
                     // forget login
                     this.persistentLoginManager.forgetLogin(request, response);
                 }
@@ -239,6 +257,12 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             }
 
             request.setUserPrincipal(principal);
+
+            LOGGER.warn("After setting user principal. User session is [{}] and user principal is [{}] HttpSession is"
+                    + " [{}]",
+                request.getSession().getAttribute(SecurityRequestWrapper.PRINCIPAL_SESSION_KEY),
+                request.getUserPrincipal(),
+                request.getSession().getId());
 
             this.getUserAuthenticatedEventNotifier().notify(principal.getName());
 

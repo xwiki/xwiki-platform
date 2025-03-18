@@ -104,7 +104,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     private final AtomicBoolean invalidationInProgress = new AtomicBoolean();
 
     /** Fair write lock. */
-    private final Lock writeLock = new ReentrantLock(true);
+    private final Lock writeLock = new ReentrantLock();
 
     private final ReadWriteLock invalidationReadWriteLock = new ReentrantReadWriteLock(true);
 

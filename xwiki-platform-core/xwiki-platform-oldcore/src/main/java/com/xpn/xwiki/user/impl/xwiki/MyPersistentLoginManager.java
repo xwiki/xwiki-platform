@@ -337,6 +337,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         // if (cookie.getMaxAge() < 0) {
         // cookieValue.append("; Discard");
         // }
+        LOGGER.warn("Answering Set-Cookie [{}]", cookieValue);
         response.addHeader("Set-Cookie", cookieValue.toString());
     }
 

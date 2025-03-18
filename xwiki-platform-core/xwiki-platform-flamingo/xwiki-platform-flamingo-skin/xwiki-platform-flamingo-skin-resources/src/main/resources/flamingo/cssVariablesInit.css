@@ -75,7 +75,6 @@
 #set($xsVariables = {
 "figure-caption-font-size": "90%",
 "figure-caption-color": "var(--text-muted)",
-"loginFormMaxWidth": "450px",
 "login-form-max-width": "450px",
 "target-size-minimum": "24px",
 "target-size-recommended": "44px",

@@ -671,13 +671,17 @@
       &lt;div class="wizard-body"&gt;
       {{/html}}
         #if($request.deleteOk)
+        
           {{success}}
             {{html}}$services.localization.render('platform.wiki.create.wizard.step.cleaningup.success', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"]){{/html}}
           {{/success}}
+          
         #else
+        
           {{error}}
             {{html}}$services.localization.render('platform.wiki.create.wizard.step.cleaningup.error', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"]){{/html}}
           {{/error}}
+          
         #end
         {{html clean="false"}}
       &lt;/div&gt;

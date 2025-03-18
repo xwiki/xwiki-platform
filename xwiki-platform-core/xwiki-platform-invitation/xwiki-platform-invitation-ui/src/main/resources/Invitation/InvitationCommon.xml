@@ -123,12 +123,12 @@
        {{error}}
         #if($recips.size() == 1)
           ## The email address given is invalid and will not be sent to.
-          $escapetool.xml($services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid'))
+          $services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid')
         #else
           #if($invalid.size() &gt; 1)
-            $escapetool.xml($services.localization.render('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()]))
+            $services.localization.render('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()])
           #else
-            $escapetool.xml($services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid'))
+            $services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid')
           #end
         #end
        {{/error}}

@@ -87,7 +87,7 @@ class MoveStatusPagesTest extends PageTest
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         this.componentManager.registerComponent(ScriptService.class, "job", this.jobScriptService);
         when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
-            .then(invocationOnMock -> { return invocationOnMock.getArgument(0) + "Icon";});
+            .then(invocationOnMock -> invocationOnMock.getArgument(0) + "Icon");
     }
 
     @Test

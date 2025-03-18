@@ -36,6 +36,7 @@
 ## We make sure font-size-base is set in em since it's a more powerful and reliable unit for font sizes
 ## The key is their name and the value is the string representing the value in CSS syntax.
 ## The equivalent LESS variables are available in: xwiki-platform-bootstrap-->variables.less
+## The font-size-base unit should be discussed, whether we settle on a rem or em unit.
 #set($bootstrapVariables = {
 "btn-danger-color" : "#fff",
 "btn-default-border" : "#ccc",
@@ -54,7 +55,7 @@
 "font-family-sans-serif": '"Helvetica Neue", Helvetica, Arial, sans-serif',
 "font-family-serif": 'Georgia, "Times New Roman", Times, serif',
 "font-family-monospace": 'Georgia, "Times New Roman", Times, serif',
-"font-size-base": "1em",
+"font-size-base": "1rem",
 "grid-gutter-width": "30px",
 "input-bg" : "#fff",
 "legend-color" : "#333",

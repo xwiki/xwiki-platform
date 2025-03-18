@@ -31,6 +31,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -415,7 +416,7 @@ public class TestUtils
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.
             // Also recache the CSRF token
-            String destUrl = getURL("XWiki", "Register", "register");
+            String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
             getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
 
             if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
@@ -1490,8 +1491,8 @@ public class TestUtils
     private void recacheSecretTokenWhenOnRegisterPage()
     {
         try {
-            WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
-            this.secretToken = tokenInput.getAttribute("value");
+            WebElement htmlElement = getDriver().findElement(By.tagName("html"));
+            this.secretToken = htmlElement.getDomAttribute("data-xwiki-form-token");
         } catch (NoSuchElementException exception) {
             // Something is really wrong if this happens.
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");

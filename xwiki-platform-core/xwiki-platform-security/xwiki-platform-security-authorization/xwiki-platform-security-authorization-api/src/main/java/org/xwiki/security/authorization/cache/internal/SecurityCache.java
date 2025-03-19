@@ -121,8 +121,6 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      * @return the invalidation counter. This value must be retrieved before loading any data for an entry to the
      * security cache and then passed when adding the entry to the cache.
      *
-     * @since 16.4.7
-     * @since 16.10.6
      * @since 17.2.0RC1
      */
     long getInvalidationCounter();

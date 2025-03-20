@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.api;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -76,6 +78,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -222,6 +225,23 @@ class DocumentTest
                 assertEquals("Comment", ((BaseProperty) obj.get("comment")).getValue());
             }
         }
+    }
+
+    @Test
+    void removeAttachment() throws IOException
+    {
+        XWikiContext context = new XWikiContext();
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
+
+        doc.setAttachment("filename.ext", new ByteArrayInputStream("content".getBytes()), context);
+
+        Document apiDocument = new Document(doc, context);
+
+        Attachment removedAttachment = apiDocument.removeAttachment("filename.ext");
+
+        assertNotNull(removedAttachment);
+        assertEquals("filename.ext", removedAttachment.getFilename());
+        assertNull(apiDocument.getAttachment("filename.ext"));
     }
 
     @Test

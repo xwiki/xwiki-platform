@@ -1880,6 +1880,25 @@ public class Document extends Api
         }
     }
 
+    /**
+     * @param filename the name of the attachment
+     * @return the attachment with the given filename or null if the attachment does not exist
+     * @since 17.2.0RC1
+     */
+    public Attachment removeAttachment(String filename)
+    {
+        XWikiAttachment attachment = getDoc().getAttachment(filename);
+        if (attachment != null) {
+            attachment = this.doc.removeAttachment(attachment);
+
+            if (attachment != null) {
+                return new Attachment(this, attachment, getXWikiContext());
+            }
+        }
+
+        return null;
+    }
+
     public List<Delta> getContentDiff(Document origdoc, Document newdoc)
         throws XWikiException, DifferentiationFailedException
     {

@@ -18,6 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+// eslint-disable-next-line import/no-unresolved
+import "reflect-metadata";
 import { restoreOrCreateWindow } from "./mainWindow";
 import { loadFile } from "./reload";
 import "./security-restrictions";

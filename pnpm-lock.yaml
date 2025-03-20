@@ -3298,6 +3298,9 @@ importers:
       electron:
         specifier: 35.0.1
         version: 35.0.1
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
     devDependencies:
       '@types/node':
         specifier: 22.13.10

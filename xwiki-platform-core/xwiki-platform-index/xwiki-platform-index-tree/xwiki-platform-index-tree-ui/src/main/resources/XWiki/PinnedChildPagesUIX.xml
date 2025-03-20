@@ -877,7 +877,7 @@ require([
     <property>
       <parameters>order=10
 tabName=pinnedChildPages
-title=Pinned Child Pages
+title=index.pinnedChildPages.title
 right=edit</parameters>
     </property>
     <property>

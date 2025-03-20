@@ -190,7 +190,7 @@ configs.forEach(
       expect(await editorContent.getAttribute("data-placeholder")).toEqual(
         "Type '/' to show the available actions"
       );
-      expect(editorContent).toBeEmpty();
+      expect(await editorContent.textContent()).toBe("");
     });
 
 

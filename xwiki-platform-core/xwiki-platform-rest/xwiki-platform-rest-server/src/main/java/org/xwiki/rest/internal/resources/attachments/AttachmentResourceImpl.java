@@ -113,6 +113,8 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
 
             XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
                 Utils.getXWikiContext(componentManager));
+            // Avoid modifying the cache document
+            xwikiDocument = xwikiDocument.clone();
             XWikiAttachment baseXWikiAttachment = xwikiDocument.getAttachment(attachmentName);
 
             xwikiDocument.removeAttachment(baseXWikiAttachment);

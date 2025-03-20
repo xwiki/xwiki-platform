@@ -68,12 +68,7 @@ class NavigationPanelIT
         AppWithinMinutesHomePage.gotoPage().deleteApplication(appName);
 
         // Configure the Navigation Panel to exclude top level application pages.
-        // The pin buttons added in the tree need quite a lot of refactoring to be fully WCAG compliant.
-        // For now we just ignore the WCAG validation on this page
-        Boolean wcagValidationIsEnabled = setup.getWCAGUtils().getWCAGContext().isWCAGEnabled();
-        setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(false);
         NavigationPanelAdministrationPage navigationPanelAdminPage = NavigationPanelAdministrationPage.gotoPage();
-        setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(wcagValidationIsEnabled);
         navigationPanelAdminPage.excludeTopLevelApplicationPages(true);
         navigationPanelAdminPage.save();
 

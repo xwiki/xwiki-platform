@@ -26,7 +26,11 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -36,6 +40,7 @@ import org.xwiki.component.manager.ComponentManager;
  * Extends {@link ServletContainer} to add XWiki specific pieces.
  * <ul>
  * <li>Injection of XWikiResource components</li>
+ * <li>Make sure "+" is decoded like it used to before Jersey</li>
  * </ul>
  * 
  * @version $Id$
@@ -56,7 +61,40 @@ public class XWikiRESTServlet extends HttpServlet
             initializeCountainer(req.getServletContext());
         }
 
-        this.container.service(req, res);
+        // Only HTTP requests are supported
+        if (!(req instanceof HttpServletRequest && res instanceof HttpServletResponse)) {
+            throw new ServletException("non-HTTP request or response");
+        }
+
+        // Make sure "+" is decoded like it used to before Jersey
+        HttpServletRequest httpRequest = (HttpServletRequest) req;
+        String requestURI = httpRequest.getRequestURI();
+        if (StringUtils.contains(requestURI, '+')) {
+            String encodedRequestURI = encodePlus(requestURI);
+            @SuppressWarnings("java:S1149")
+            StringBuffer encodedRequestUrl = new StringBuffer(encodePlus(httpRequest.getRequestURL().toString()));
+            httpRequest = new HttpServletRequestWrapper(httpRequest)
+            {
+                @Override
+                public String getRequestURI()
+                {
+                    return encodedRequestURI;
+                }
+
+                @Override
+                public StringBuffer getRequestURL()
+                {
+                    return encodedRequestUrl;
+                }
+            };
+        }
+
+        this.container.service(httpRequest, res);
+    }
+
+    private String encodePlus(String path)
+    {
+        return path.replace("+", "%20");
     }
 
     private synchronized void initializeCountainer(ServletContext servletContext) throws ServletException

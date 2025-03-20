@@ -34,7 +34,6 @@ import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 
@@ -47,7 +46,7 @@ import org.xwiki.environment.Environment;
 @Component
 @Named("xwikiproperties")
 @Singleton
-public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSource implements Initializable
+public class XWikiPropertiesConfigurationSource extends AbstractCommonsConfigurationSource
 {
     private static final String XWIKI_PROPERTIES_FILE = "xwiki.properties";
 
@@ -68,6 +67,8 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
     @Override
     public void initialize() throws InitializationException
     {
+        super.initialize();
+
         setConfiguration(loadConfiguration());
     }
 

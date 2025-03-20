@@ -28,7 +28,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -88,10 +87,11 @@ public class SecurityCachePerformanceTestScriptService implements ScriptService
     /**
      * Perform a stress test on the security cache. The results are logged.
      *
+     * @param users the names of the users to use for the test
      * @return an empty string if everything is okay, a list of errors otherwise
      * @throws InterruptedException if the test is interrupted.
      */
-    public String perform() throws InterruptedException
+    public String perform(List<String> users) throws InterruptedException
     {
         XWikiContext context = this.contextProvider.get();
 
@@ -100,10 +100,6 @@ public class SecurityCachePerformanceTestScriptService implements ScriptService
         List<DocumentReference> allPages = createSpaces(parentSpace, 2);
 
         // Define user references
-        List<String> users = IntStream.range(0, 20)
-            .mapToObj(i -> "User" + i)
-            .toList();
-
         SpaceReference userSpaceReference = new SpaceReference("xwiki", "XWiki");
 
         List<DocumentReference> userReferences = users.stream()

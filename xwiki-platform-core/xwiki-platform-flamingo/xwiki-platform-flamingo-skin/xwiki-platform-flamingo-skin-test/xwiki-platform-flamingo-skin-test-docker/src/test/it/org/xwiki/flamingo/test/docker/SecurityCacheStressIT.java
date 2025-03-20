@@ -25,6 +25,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
@@ -47,9 +48,11 @@ class SecurityCacheStressIT
 {
     private static final String STREE_TEST_SCRIPT = """
         {{velocity wiki="false"}}
-        $services.securityCachePerformanceTest.perform()
+        $services.securityCachePerformanceTest.perform(%s)
         {{/velocity}}
         """;
+
+    private static final String QUOTE = "\"";
 
     @Test
     void stressTest(TestUtils testUtils) throws Exception
@@ -58,15 +61,18 @@ class SecurityCacheStressIT
 
         // Create 20 users.
         List<String> users = IntStream.range(0, 20)
-            .mapToObj(i -> "User" + i)
+            .mapToObj(i -> "SecurityCacheStressITUser" + i)
             .toList();
         for (String user : users) {
             testUtils.createUser(user, user, null);
         }
 
+        String usersParameter =
+            "[" + users.stream().map(u -> QUOTE + u + QUOTE).collect(Collectors.joining(", ")) + "]";
+
         String stressTestName = "securityCacheStressTest";
         testUtils.rest().savePage(new DocumentReference("xwiki", List.of("Test", "Execute"), stressTestName),
-            STREE_TEST_SCRIPT, "Security Cache Stress Test");
+            STREE_TEST_SCRIPT.formatted(usersParameter), "Security Cache Stress Test");
         String baseURL = StringUtils.removeEnd(testUtils.rest().getBaseURL(), "rest");
         String viewURL = baseURL + "bin/get/Test/Execute/" + stressTestName + "?outputSyntax=plain";
 

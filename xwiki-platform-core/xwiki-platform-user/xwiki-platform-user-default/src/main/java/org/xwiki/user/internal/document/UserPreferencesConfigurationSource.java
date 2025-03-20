@@ -94,6 +94,12 @@ public class UserPreferencesConfigurationSource extends AbstractConfigurationSou
     }
 
     @Override
+    public List<String> getKeys(String prefix)
+    {
+        return getConfigurationSource().getKeys(prefix);
+    }
+
+    @Override
     public boolean containsKey(String key)
     {
         return getConfigurationSource().containsKey(key);
@@ -103,6 +109,12 @@ public class UserPreferencesConfigurationSource extends AbstractConfigurationSou
     public boolean isEmpty()
     {
         return getConfigurationSource().isEmpty();
+    }
+
+    @Override
+    public boolean isEmpty(String prefix)
+    {
+        return getConfigurationSource().isEmpty(prefix);
     }
 
     @Override

@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.configuration2.Configuration;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.properties.ConverterManager;
 
 /**
  * Wrap a Commons Configuration instance into a XWiki {@link ConfigurationSource}. This allows us to reuse the
@@ -39,13 +39,11 @@ import org.xwiki.properties.ConverterManager;
  * @version $Id$
  * @since 1.6M1
  */
-public class CommonsConfigurationSource implements ConfigurationSource
+public class CommonsConfigurationSource extends AbstractPropertiesConfigurationSource
 {
-    /**
-     * Component used for performing type conversions.
-     */
     @Inject
-    protected ConverterManager converterManager;
+    @Named("system")
+    private ConfigurationSource systemConfigurationSource;
 
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -63,17 +61,30 @@ public class CommonsConfigurationSource implements ConfigurationSource
 
     @Override
     @SuppressWarnings("unchecked")
+    public <T> T getProperty(String key)
+    {
+        if (this.systemConfigurationSource.containsKey(key)) {
+            return this.systemConfigurationSource.getProperty(key);
+        } else {
+            this.lock.readLock().lock();
+
+            try {
+                return (T) getConfiguration().getProperty(key);
+            } finally {
+                this.lock.readLock().unlock();
+            }
+        }
+    }
+
+    @Override
     public <T> T getProperty(String key, T defaultValue)
     {
         T result;
-        if (containsKey(key)) {
-            if (defaultValue != null) {
-                return getProperty(key, (Class<T>) defaultValue.getClass());
-            } else {
-                return getProperty(key);
-            }
+
+        if (this.systemConfigurationSource.containsKey(key)) {
+            result = this.systemConfigurationSource.getProperty(key, defaultValue);
         } else {
-            result = defaultValue;
+            result = super.getProperty(key, defaultValue);
         }
 
         return result;
@@ -81,40 +92,28 @@ public class CommonsConfigurationSource implements ConfigurationSource
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T getProperty(String key)
-    {
-        this.lock.readLock().lock();
-
-        try {
-            return (T) getConfiguration().getProperty(key);
-        } finally {
-            this.lock.readLock().unlock();
-        }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, Class<T> valueClass)
     {
-        T result = null;
+        T result;
 
-        try {
-            if (String.class == valueClass) {
-                result = (T) getString(key);
-            } else if (List.class.isAssignableFrom(valueClass)) {
-                result = (T) getList(key);
-            } else if (Properties.class.isAssignableFrom(valueClass)) {
-                result = (T) getProperties(key);
-            } else {
-                Object value = getProperty(key);
-                if (value != null) {
-                    result = this.converterManager.convert(valueClass, value);
+        if (this.systemConfigurationSource.containsKey(key)) {
+            result = this.systemConfigurationSource.getProperty(key, valueClass);
+        } else {
+            try {
+                if (String.class == valueClass) {
+                    result = (T) getString(key);
+                } else if (List.class.isAssignableFrom(valueClass)) {
+                    result = (T) getList(key);
+                } else if (Properties.class.isAssignableFrom(valueClass)) {
+                    result = (T) getProperties(key);
+                } else {
+                    result = getConvertedProperty(key, valueClass, null);
                 }
+            } catch (org.apache.commons.configuration2.ex.ConversionException
+                | org.xwiki.properties.converter.ConversionException e) {
+                throw new org.xwiki.configuration.ConversionException(
+                    "Key [" + key + "] is not compatible with type [" + valueClass.getName() + "]", e);
             }
-        } catch (org.apache.commons.configuration2.ex.ConversionException
-            | org.xwiki.properties.converter.ConversionException e) {
-            throw new org.xwiki.configuration.ConversionException(
-                "Key [" + key + "] is not compatible with type [" + valueClass.getName() + "]", e);
         }
 
         return result;
@@ -154,30 +153,42 @@ public class CommonsConfigurationSource implements ConfigurationSource
     }
 
     @Override
+    public boolean containsKey(String key)
+    {
+        if (this.systemConfigurationSource.containsKey(key)) {
+            return true;
+        } else {
+            this.lock.readLock().lock();
+
+            try {
+                return getConfiguration().containsKey(key);
+            } finally {
+                this.lock.readLock().unlock();
+            }
+        }
+    }
+
+    @Override
     public List<String> getKeys()
+    {
+        return getKeys("");
+    }
+
+    @Override
+    public List<String> getKeys(String prefix)
     {
         this.lock.readLock().lock();
 
         try {
             List<String> keysList = new ArrayList<>();
-            Iterator<String> keys = getConfiguration().getKeys();
-            while (keys.hasNext()) {
-                keysList.add(keys.next());
+            for (Iterator<String> keys = getConfiguration().getKeys(); keys.hasNext();) {
+                String key = keys.next();
+                if (key.startsWith(prefix)) {
+                    keysList.add(key);
+                }
             }
 
             return keysList;
-        } finally {
-            this.lock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public boolean containsKey(String key)
-    {
-        this.lock.readLock().lock();
-
-        try {
-            return getConfiguration().containsKey(key);
         } finally {
             this.lock.readLock().unlock();
         }
@@ -190,6 +201,25 @@ public class CommonsConfigurationSource implements ConfigurationSource
 
         try {
             return getConfiguration().isEmpty();
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public boolean isEmpty(String prefix)
+    {
+        this.lock.readLock().lock();
+
+        try {
+            for (Iterator<String> keys = getConfiguration().getKeys(); keys.hasNext();) {
+                String key = keys.next();
+                if (key.startsWith(prefix)) {
+                    return false;
+                }
+            }
+
+            return true;
         } finally {
             this.lock.readLock().unlock();
         }

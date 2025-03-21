@@ -173,8 +173,7 @@
   border: 0;
   box-shadow: none;
   .text-muted;
-  /* By default, those buttons are hidden. */
-  visibility: hidden;
+  /* By default, those buttons are hidden visually but never hidden in the DOM. */
   opacity: 0;
   /* Smoothen out the apparition and disparition of the togglers in the UI. */
   transition: visibility .2s ease-in-out, opacity .2s ease-in-out;
@@ -202,10 +201,11 @@ again or the page is reloaded (because the toggler is hidden until then). */
   #leftPanelsToggle[aria-expanded="false"],
   #contentcontainer:hover #contentcolumn:not(:hover) ~ #leftPanelsToggle,
   #leftPanelsToggle:has(+ #leftPanels:focus-within),
+  #leftPanelsToggle:hover, #leftPanelsToggle:focus,
   #rightPanelsToggle[aria-expanded="false"],
   #contentcontainer:hover #contentcolumn:not(:hover) ~ #rightPanelsToggle,
-  #rightPanelsToggle:has(+ #rightPanels:focus-within) {
-    visibility: visible;
+  #rightPanelsToggle:has(+ #rightPanels:focus-within),
+  #rightPanelsToggle:hover, #rightPanelsToggle:focus {
     opacity: 1;
   }
 }

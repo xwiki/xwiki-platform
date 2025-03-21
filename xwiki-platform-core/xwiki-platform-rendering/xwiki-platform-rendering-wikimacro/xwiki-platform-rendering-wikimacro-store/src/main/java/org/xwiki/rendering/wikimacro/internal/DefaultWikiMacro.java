@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -30,22 +29,17 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.AbstractAsyncContentBaseObjectWikiComponent;
-import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.MacroPreparationException;
-import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import com.xpn.xwiki.objects.BaseObject;
@@ -154,23 +148,6 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
             }
         }
     }
-
-    @Override
-    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
-    {
-        ContentDescriptor contentDescriptor = getDescriptor().getContentDescriptor();
-        if (contentDescriptor == null || !contentDescriptor.getType().equals(Block.LIST_BLOCK_TYPE)) {
-            try {
-                return this.plainTextParser.parse(new StringReader(macroContent));
-            } catch (ParseException e) {
-                throw new RenderingException("Error while parsing the macro content in plain text.", e);
-            }
-        } else {
-            return parseWiki(macroContent, null, false, inline);
-        }
-    }
-
-    
 
     @Override
     public MacroDescriptor getDescriptor()

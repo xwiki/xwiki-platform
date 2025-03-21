@@ -47,7 +47,7 @@
 #end
 #set ($defaultTab = {
   'tabName': 'children',
-  'title': $services.localization.render('docextra.children'),
+  'title': 'docextra.children',
   'content': $parentChildrenContent
 })
 #set ($discard = $tabs.add($defaultTab))
@@ -83,7 +83,11 @@
   <div class="floatcontainer">
     <ul class="xwikitabbar">
       #foreach ($tab in $tabs)
-        <li id="xwiki$tab['tabName']"#if($view == $tab['tabName']) class="active"#end><a href="$doc.getURL('view',"viewer=children&view=$tab['tabName']&$!param")">$tab['title']</a></li>
+        <li id="xwiki$tab['tabName']"#if($view == $tab['tabName']) class="active"#end>
+          <a href="$doc.getURL('view',"viewer=children&view=$tab['tabName']&$!param")">
+            $services.localization.render($tab['title'])
+          </a>
+        </li>
       #end
     </ul>
   </div>

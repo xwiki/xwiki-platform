@@ -92,31 +92,28 @@
       }
 
       if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
+        // Update the source text area height after leaving the full screen mode.
         editor.on('maximize', function(event) {
-          // Update the height of the source text area after leaving the full screen mode and center the selection.
-          if (event.data !== CKEDITOR.TRISTATE_ON && editor.mode === 'source') {
-            centerSourceAreaSelectionVertically(editor);
+          if (editor.mode === 'source' && event.data !== CKEDITOR.TRISTATE_ON) {
+            updateSourceAreaHeight(editor);
           }
         });
 
-        require(['centerTextAreaSelectionVertically'], function($) {
-          editor.on('modeReady', function() {
-            if (editor.mode === 'source') {
-              // Update the text area height after the HTML to Wiki Syntax conversion is done.
-              // Then try to center the text selection vertically, if needed.
-              centerSourceAreaSelectionVertically(editor);
-            }
-          });
+        // Update the source text area height after the HTML to Wiki Syntax conversion is done.
+        editor.on('modeReady', function() {
+          if (editor.mode === 'source') {
+            updateSourceAreaHeight(editor);
+          }
         });
-
-        var centerSourceAreaSelectionVertically = function(editor) {
-          $(editor.editable().$).trigger('input').centerTextAreaSelectionVertically({padding: 65});
-        };
       }
     }
   });
 
-  var SourceEditable = CKEDITOR.tools.createClass({
+  function updateSourceAreaHeight(editor) {
+    $(editor.editable().$).trigger('input');
+  }
+
+  const SourceEditable = CKEDITOR.tools.createClass({
     base: CKEDITOR.editable,
     proto: {
       setData: function(data) {
@@ -149,24 +146,24 @@
 
   // Credits: https://stackoverflow.com/a/25621277
   // The text area needs to be the only child of its parent in order for this to work.
-  var initAutoHeight = function(textArea, initialHeight, isEnabled) {
-    var autoHeight = function(textArea) {
-      var $textArea = $(textArea);
-      // Set the text area height on its parent (wrapper) in order to reserve the vertical space that the text area
-      // currently takes so that the page layout doesn't change while we compute the updated text area height. If we
-      // don't do this then the page vertical scroll position changes after we update the text area height and this
-      // makes the caret "jump" up or down which is very annoying.
-      $textArea.parent().css('min-height', $textArea.height() + 'px');
-      // Update the text area height.
-      $textArea.css({
-        'height': 'auto',
-        'overflow-y': 'hidden'
-      }).height(textArea.scrollHeight);
-      // Restore the parent (wrapper) styles.
-      $textArea.parent().css('min-height', '');
-      return $textArea;
-    };
-    var $textArea = isEnabled() ? (
+  function autoHeight(textArea) {
+    const $textArea = $(textArea);
+    // Set the text area height on its parent (wrapper) in order to reserve the vertical space that the text area
+    // currently takes so that the page layout doesn't change while we compute the updated text area height. If we
+    // don't do this then the page vertical scroll position changes after we update the text area height and this
+    // makes the caret "jump" up or down which is very annoying.
+    $textArea.parent().css('min-height', $textArea.height() + 'px');
+    // Update the text area height.
+    $textArea.css({
+      'height': 'auto',
+      'overflow-y': 'visible'
+    }).height(textArea.scrollHeight);
+    // Restore the parent (wrapper) styles.
+    $textArea.parent().css('min-height', '');
+    return $textArea;
+  }
+  function initAutoHeight(textArea, initialHeight, isEnabled) {
+    const $textArea = isEnabled() ? (
       initialHeight ? $(textArea).height(initialHeight) : autoHeight(textArea)
     ) : $(textArea);
     // Make sure we don't register the input listener twice.
@@ -175,68 +172,5 @@
         autoHeight(this);
       }
     });
-  };
+  }
 })();
-
-define('centerTextAreaSelectionVertically', ['jquery', 'scrollUtils'], function($, scrollUtils) {
-  /**
-   * Tries to center vertically the start of the text area selection within the first parent that has vertical scroll
-   * bar.
-   */
-  var centerTextAreaSelectionVertically = function(textArea, settings) {
-    var verticalScrollParent = scrollUtils.getVerticalScrollParent(textArea);
-    if (verticalScrollParent) {
-      var relativeTopOffset = scrollUtils.getRelativeTopOffset(textArea, verticalScrollParent);
-      var selectionTopOffset = getSelectionTopOffset(textArea);
-      // Compute the vertical distance from the start of the scroll parent to the start of the text selection.
-      var selectionPosition = relativeTopOffset + selectionTopOffset;
-      if (!settings.padding ||
-          !scrollUtils.isCenteredVertically(verticalScrollParent, settings.padding, selectionPosition)) {
-        // Center the selection by removing half of the scroll parent height (i.e. half of the visible vertical space)
-        // from the selection position. If this is a negative value then the browser will use 0 instead.
-        var scrollTop = selectionPosition - (verticalScrollParent.clientHeight / 2);
-        verticalScrollParent.scrollTop = scrollTop;
-      }
-    }
-  };
-
-  var getSelectionTopOffset = function(textArea) {
-    // Save the selection because we need to restore it at the end.
-    var selection = {
-      start: textArea.selectionStart,
-      end: textArea.selectionEnd
-    };
-
-    // Save the value because we need to restore it at the end.
-    var value = textArea.value;
-
-    // Save the original styles before we change them, so that we can restore them at the end.
-    var originalStyles = {};
-    ['height', 'overflowY'].forEach(function(style) {
-      originalStyles[style] = textArea.style[style] || '';
-    });
-
-    // Determine the height of the text area content before the selection.
-    var $textArea = $(textArea).css({
-      'height': 0,
-      'overflow-y': 'hidden'
-    }).val(value.substring(0, selection.start));
-
-    var topOffset = textArea.scrollHeight;
-
-    // Reset the styles, the value and the selection.
-    $textArea.css(originalStyles).val(value);
-    textArea.setSelectionRange(selection.start, selection.end);
-
-    return topOffset;
-  };
-
-  $.fn.centerTextAreaSelectionVertically = function(settings) {
-    settings = settings || {};
-    return this.filter('textarea').each(function() {
-      centerTextAreaSelectionVertically(this, settings);
-    });
-  };
-
-  return $;
-});

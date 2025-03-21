@@ -829,6 +829,14 @@ public class XWikiDocumentTest
     }
 
     @Test
+    void getAttachmentWhenNull() throws Exception
+    {
+        this.document.setAttachment("file.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        assertNull(this.document.getAttachment(null));
+    }
+
+    @Test
     void getAttachment() throws Exception
     {
         this.document.setAttachment("file.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
@@ -836,16 +844,20 @@ public class XWikiDocumentTest
         this.document.setAttachment("file2.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
             this.oldcore.getXWikiContext());
         assertNotNull(this.document.getAttachment("file.txt"));
+        assertEquals("file.txt", this.document.getAttachment("file.txt").getFilename());
+        assertEquals("file.txt", this.document.getAttachment("file").getFilename());
     }
-    
+
     @Test
-    void getAttachmentWithExtension() throws Exception
+    void getAttachmentWithFileExtension() throws Exception
     {
         this.document.setAttachment("file2.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
             this.oldcore.getXWikiContext());
         this.document.setAttachment("file.txt.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
             this.oldcore.getXWikiContext());
         assertNotNull(this.document.getAttachment("file.txt"));
+        assertEquals("file.txt.txt", this.document.getAttachment("file.txt.txt").getFilename());
+        assertEquals("file.txt.txt", this.document.getAttachment("file.txt").getFilename());
     }
 
     @Test

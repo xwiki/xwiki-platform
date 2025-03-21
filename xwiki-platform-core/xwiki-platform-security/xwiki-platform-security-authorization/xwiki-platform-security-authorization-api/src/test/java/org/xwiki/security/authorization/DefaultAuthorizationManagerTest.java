@@ -17,45 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc;
+package org.xwiki.security.authorization;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.security.authorization.AuthorizationManager.SUPERADMIN_USER;
 
 /**
- * Unit test for {@link AttachmentDiff}.
+ * Test of {@link DefaultAuthorizationManager}.
  *
  * @version $Id$
- * @since 5.0M2
  */
-class AttachmentDiffTest
+@ComponentTest
+class DefaultAuthorizationManagerTest
 {
+    @InjectMockComponents
+    private DefaultAuthorizationManager defaultAuthorizationManager;
+
     @Test
-    void toStringWhenVersionsNotNull()
+    void isSuperAdminExpectTrue()
     {
-        AttachmentDiff diff = new AttachmentDiff("filename", "1.1", "1.2");
-        assertEquals("filename: 1.1 \u21E8 1.2", diff.toString());
+        assertTrue(
+            this.defaultAuthorizationManager.isSuperAdmin(
+                new DocumentReference("s1", "Space", SUPERADMIN_USER)));
     }
 
     @Test
-    void toStringWhenNoOriginalVersion()
+    void isSuperAdminExpectFalse()
     {
-        AttachmentDiff diff = new AttachmentDiff("filename", null, "1.1");
-        assertEquals("filename: () \u21E8 1.1", diff.toString());
-    }
-
-    @Test
-    void toStringWhenNoNewVersion()
-    {
-        AttachmentDiff diff = new AttachmentDiff("filename", "1.1", null);
-        assertEquals("filename: 1.1 \u21E8 ()", diff.toString());
-    }
-
-    @Test
-    void toStringWhenNoVersions()
-    {
-        AttachmentDiff diff = new AttachmentDiff("filename", null, null);
-        assertEquals("filename: () \u21E8 ()", diff.toString());
+        assertFalse(
+            this.defaultAuthorizationManager.isSuperAdmin(new DocumentReference("xwiki", "XWiki", "Admin")));
     }
 }

@@ -64,7 +64,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 13.4RC1
  * @since 12.10.8
  */
-@UITest
+@UITest(
+    properties = {
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class RegisterIT
 {
     private AbstractRegistrationPage setUp(TestUtils testUtils, boolean isModal, boolean closeWiki,

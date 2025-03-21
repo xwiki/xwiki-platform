@@ -101,6 +101,8 @@ public class SpacesResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(reference);
         this.testUtils.rest().savePage(reference, "content " + getTestMethodName(), "title " + getTestMethodName());
 
+        this.solrUtils.waitEmptyQueue();
+
         GetMethod getMethod = executeGet(String.format("%s?q=somethingthatcannotpossiblyexist",
             buildURI(SpaceSearchResource.class, getWiki(), Arrays.asList(getTestClassName()))));
         Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());

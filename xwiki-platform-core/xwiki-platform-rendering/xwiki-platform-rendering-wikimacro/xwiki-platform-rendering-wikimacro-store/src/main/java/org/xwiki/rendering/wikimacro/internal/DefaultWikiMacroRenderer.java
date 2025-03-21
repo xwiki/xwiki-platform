@@ -254,8 +254,6 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     private String macroContent;
 
-    private boolean macroContentPrepared;
-
     private boolean inline;
 
     private Syntax targetSyntax;

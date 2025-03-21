@@ -50,6 +50,10 @@
      Once this file is migrated to native CSS, this hack can be removed. */
   &.hideleft {
     -/**/-panel-column-left-width: 0;
+    
+    & #leftPanels {
+      display: none;
+    }
   }
 
   &.panel-left-width-Small {
@@ -62,6 +66,10 @@
 
   &.hideright {
     -/**/-panel-column-right-width: 0;
+
+    & #rightPanels {
+      display: none;
+    }
   }
 
   &.panel-right-width-Small {
@@ -75,6 +83,10 @@
   &.hidelefthideright {
     -/**/-panel-column-left-width: 0;
     -/**/-panel-column-right-width: 0;
+
+    & #leftPanels, & #rightPanels {
+      display: none;
+    }
   }
 
   /* We use CSS flex to display the default column sizes.

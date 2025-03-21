@@ -140,7 +140,7 @@
       &lt;button class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"
       title="$services.localization.render('watchlist.notification.tooltip')"&gt;
         &lt;span class="sr-only"&gt;
-          $services.localization.render('core.menu.toggleNavigation')
+          $services.localization.render('notifications.alerts.toggle.hint')
         &lt;/span&gt;
         $services.icon.renderHTML('bell')
       &lt;/button&gt;

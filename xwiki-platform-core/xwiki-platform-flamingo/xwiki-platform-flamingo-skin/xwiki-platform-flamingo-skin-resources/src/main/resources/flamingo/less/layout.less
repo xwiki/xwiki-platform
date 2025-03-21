@@ -161,32 +161,38 @@
   padding: 0;
   cursor: col-resize;
   min-width: 0;
-  width: 0;
-  border-width: 1px;
+  /* With this width, there should be just enough space to fit the handle on the side of the panel 
+    without it going over panel content. */
+  width: 14px;
+  border: 0;
   border-radius: 0;
-  border-style: solid;
+  /* We want those handles to display above any regular content. The style should be discreete. */
+  z-index: 1;
 }
 
 #leftPanels > .ui-resizable-e {
   right: 0;
-  margin-left: 5px;
+  /* We want the click zone to be large, but the display to be discreete. 
+    80% of the button is transparent and the 20% on the right are highlighted on hover. */
+  background-image: linear-gradient( 90deg, transparent 0%, transparent 80%, @navbar-default-bg 80%, @navbar-default-bg 80%);
 }
 
 #rightPanels > .ui-resizable-w {
   left: 0;
-  margin-right: 5px;
+  /* We want the click zone to be large, but the display to be discreete. 
+    80% of the button is transparent and the 20% on the left are highlighted on hover. */
+  background-image: linear-gradient( -90deg, transparent 0%, transparent 80%, @navbar-default-bg 80%, @navbar-default-bg 80%);
 }
 
 #rightPanels > .ui-resizable-w:focus,
 #rightPanels > .ui-resizable-w:hover,
 #rightPanels > .ui-resizable-w:active,
+#rightPanels.ui-resizable-resizing > .ui-resizable-w,
 #leftPanels > .ui-resizable-e:focus,
 #leftPanels > .ui-resizable-e:hover,
-#leftPanels > .ui-resizable-e:active {
-  opacity: 1;
-  border-color: @navbar-default-bg;
-  margin-left: 0;
-  margin-right: 0;
+#leftPanels > .ui-resizable-e:active,
+#leftPanels.ui-resizable-resizing > .ui-resizable-e {
+  opacity: 1
 }
 
 #xwikicontent {

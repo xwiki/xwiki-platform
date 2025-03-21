@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.code;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -138,7 +139,13 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     {
         List<Block> result = getPreparedResult(context.getCurrentMacroBlock());
         if (result != null) {
-            return result;
+            // Clone the prepared content before it's used
+            List<Block> clonedResult = new ArrayList<>(result.size());
+            for (Block block : result) {
+                clonedResult.add(block.clone());
+            }
+
+            return clonedResult;
         }
 
         return highlight(parameters, inputContent, context);

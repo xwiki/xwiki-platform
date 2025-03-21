@@ -44,8 +44,8 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Validate {@link CodeMacro}.
@@ -94,6 +94,7 @@ class CodeMacroTest
         context.setCurrentMacroBlock(block);
         List<Block> result = this.macro.execute(new CodeMacroParameters(), "content", context);
 
-        assertSame(prepared.get(0), result.get(0).getChildren().get(0));
+        assertEquals(prepared.get(0), result.get(0).getChildren().get(0));
+        assertNotSame(prepared.get(0), result.get(0).getChildren().get(0));
     }
 }

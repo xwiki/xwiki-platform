@@ -84,7 +84,7 @@ require(['jquery'], function($) {
       });
       // Close drawer when clicking on a close button inside it
       drawerContainer.find('.drawer-close').on('click', closeDrawer);
-      
+
       drawerContainer.on('drawer' + index + '.opened', function (event) {
         // We use the drawer-transitioning class to make sure the transition to 
         // slide in is not shortcut when showing the modal
@@ -151,7 +151,7 @@ require(['jquery', 'jquery-ui'], function($) {
   }
   applyLocalStorageValues(left);
   applyLocalStorageValues(right);
-  
+
   let resizeCustomFunction = function(side, event, ui) {
     // We remove the default inline CSS properties.
     ui.element.attr('style', '');
@@ -166,7 +166,7 @@ require(['jquery', 'jquery-ui'], function($) {
     handles: 'e',
     resize: resizeCustomFunction.bind(null, left)
   });
-  
+
   let savePanelWidthInLocalStorage = function(event) {
     // We only update the local storage when the user ends its session on the page
     if (!document.hidden) return;

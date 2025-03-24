@@ -120,24 +120,72 @@ require(['jquery'], function($) {
     });
   });
 });
+
 /*
   Panel column interactivity.
   This script makes sure they are resizable using the mouse.
 */
 require(['jquery', 'jquery-ui'], function($) {
-  let resizeCustomFunction = function(columnPosition, event, ui) {
+  let localStoragePrefix = 'xwiki-panel-width-';
+  let [right,left] = ['right','left'];
+  let initialPanelColumnWidth = {
+    right: parseInt(window.getComputedStyle(document.documentElement).getPropertyValue('--panel-column-right-width')),
+    left: parseInt(window.getComputedStyle(document.documentElement).getPropertyValue('--panel-column-left-width'))
+  };
+  // In order to avoid code duplication, a lot of code has been segmented in functions hereafter.
+  let valueIsSimilarToDefault = function (valueString, side) {
+    let diff = Math.abs(parseInt(valueString) - initialPanelColumnWidth[side])
+    // If the value provided is not a number or the difference is lower than 24px, we assume they are about the same.
+    // This 24px threshold was picked arbitrarily.
+    return !diff || diff < 24;
+  };
+  let storageValueIsSimilarToDefault = function (side) {
+    return valueIsSimilarToDefault(localStorage.getItem(localStoragePrefix + side), side);
+  }
+  let applyLocalStorageValues = function(side) {
+    // We only update the value from local storage if this new value is significantly different from the default
+    if (!storageValueIsSimilarToDefault(side)) {
+      document.body.style.setProperty('--panel-column-' + side + '-width',
+        localStorage.getItem(localStoragePrefix + side));
+    }
+  }
+  applyLocalStorageValues(left);
+  applyLocalStorageValues(right);
+  
+  let resizeCustomFunction = function(side, event, ui) {
     // We remove the default inline CSS properties.
     ui.element.attr('style', '');
     // We set the one we want when displayed in the flex layout.
-    document.body.style.setProperty('--panel-column-' + columnPosition + '-width', ui.size.width + 'px');
+    document.body.style.setProperty('--panel-column-' + side + '-width', ui.size.width + 'px');
   };
   $("#rightPanels").resizable({
     handles: 'w',
-    resize: resizeCustomFunction.bind(null, 'right')
+    resize: resizeCustomFunction.bind(null, right)
   });
   $( "#leftPanels" ).resizable({
     handles: 'e',
-    resize: resizeCustomFunction.bind(null, 'left')
+    resize: resizeCustomFunction.bind(null, left)
   });
+  
+  let savePanelWidthInLocalStorage = function(event) {
+    // We only update the local storage when the user ends its session on the page
+    if (!document.hidden) return;
+    let currentValueIsSimilarToDefault = function (side) {
+      return valueIsSimilarToDefault(document.body.style.getPropertyValue('--panel-column-' + side + '-width'), side);
+    }
+    let updateLocalStorageValueForSide = function (side) {
+      // We only update the local storage when the last value is different enough from the default value.
+      if (!currentValueIsSimilarToDefault(side)) {
+        localStorage.setItem(localStoragePrefix + side,
+          document.body.style.getPropertyValue('--panel-column-' + side + '-width'));
+      } else {
+        // If the values are similar, we remove whatever was stored in the localStorage.
+        localStorage.removeItem(localStoragePrefix + side);
+      }
+    }
+    updateLocalStorageValueForSide(left);
+    updateLocalStorageValueForSide(right);
+  }
+  Event.observe(window, 'visibilitychange', savePanelWidthInLocalStorage);
 });
 

@@ -33,8 +33,6 @@ import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,9 +49,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(extraJARs = {
     "org.xwiki.platform:xwiki-platform-search-solr-query"
-}, properties = {
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
 })
 class AttachmentGalleryPickerMacroIT
 {
@@ -85,7 +80,7 @@ class AttachmentGalleryPickerMacroIT
         attachmentsPane.waitForUploadToFinish("textcontent.txt");
 
         // Waits for the uploaded files to be indexed before continuing.
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Reload the page to see the file after the uploads and solr indexing.
         setup.getDriver().navigate().refresh();
@@ -153,12 +148,5 @@ class AttachmentGalleryPickerMacroIT
         assertThat(picker3Attachments.subList(0, 2), containsInAnyOrder("image1.png", "image2.png"));
         testPicker3.setSearch("textcontent").waitUntilAttachmentsCount(count -> count == 0);
         testPicker3.waitNoResultMessageDisplayed();
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 }

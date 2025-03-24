@@ -19,7 +19,9 @@
  */
 define('entityResourceSuggesterTranslationKeys', [], [
   'doc.placeholder',
-  'attach.placeholder'
+  'attach.placeholder',
+  'create.resolvedInSpace',
+  'create.fullyResolvedInput'
 ]);
 
 define('entityResourceSuggester', [
@@ -35,19 +37,53 @@ define('entityResourceSuggester', [
       input: input,
       nb: 8
     }).done(function(response) {
+      let suggestions = [];
       if (response.documentElement) {
-        var results = response.getElementsByTagName('rs');
-        var suggestions = [];
+        let results = response.getElementsByTagName('rs');
+        let containsExactMatch = false;
         for (var i = 0; i < results.length; i++) {
-          suggestions.push(convertSearchResultToResource(results.item(i), entityType, base));
+          let result = convertSearchResultToResource(results.item(i), entityType, base);
+          containsExactMatch = result.entityReference === input;
+          suggestions.push(result);
         }
-        deferred.resolve(suggestions);
+        if (!containsExactMatch) {
+          suggestCreateDocument(input, base, suggestions, deferred);
+        } else {
+          deferred.resolve(suggestions);
+        }
       } else {
-        deferred.resolve([]);
+        suggestCreateDocument(input, base, suggestions, deferred);
+        deferred.resolve(suggestions);
       }
     }).fail(function() {
       deferred.resolve([]);
     });
+  };
+
+  var suggestCreateDocument = function(input, base, suggestions, deferred) {
+    $.post(new XWiki.Document('LinkNameStrategyHelper', 'CKEditor').getURL('get'), {
+      outputSyntax: 'plain',
+      input: input,
+      base: XWiki.Model.serialize(base)
+    }).done(function(data) {
+      data.forEach(function (item) {
+        suggestions.push(createDocumentFromLinkNameStrategyHelperResult(item, base));
+      });
+      deferred.resolve(suggestions);
+    }).fail(function(data) {
+      console.error("Error while loading creation link response", data);
+      deferred.resolve(suggestions);
+    });
+  };
+
+  var createDocumentFromLinkNameStrategyHelperResult = function (item, base) {
+    var entityReference = XWiki.Model.resolve(item.reference, XWiki.EntityType.DOCUMENT);
+    return {
+      reference: $resource.convertEntityReferenceToResourceReference(entityReference, base),
+      entityReference: entityReference,
+      title: translations.get('create.' + item.type),
+      location: item.location
+    };
   };
 
   var convertSearchResultToResource = function(result, expectedEntityType, base) {

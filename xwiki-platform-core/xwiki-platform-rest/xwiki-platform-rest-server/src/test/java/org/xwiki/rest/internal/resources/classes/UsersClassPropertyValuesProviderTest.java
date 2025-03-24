@@ -28,6 +28,8 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -54,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -96,15 +99,18 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
             .thenReturn("url/to/noavatar.png");
     }
 
-    @Test
-    public void getValuesLocal() throws Exception
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void getValuesLocal(boolean hasAccess) throws Exception
     {
+        when(this.authorizationManager.hasAccess(any(), any())).thenReturn(hasAccess);
+
         when(this.wikiUserManager.getUserScope(this.classReference.getWikiReference().getName()))
             .thenReturn(UserScope.LOCAL_ONLY);
 
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.allowedValuesQuery.execute())
-            .thenReturn(Collections.singletonList(new Object[]{ aliceReference, " Alice One " }));
+            .thenReturn(Collections.singletonList(new Object[] { aliceReference, " Alice One " }));
         when(this.xcontext.getWiki().getDocument(aliceReference, this.xcontext))
             .thenReturn(mock(XWikiDocument.class, "alice"));
 
@@ -114,7 +120,7 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         DocumentReference bobReference = new DocumentReference("wiki", "Users", "Bob");
         when(this.usedValuesQuery.getFilters()).thenReturn(filters);
         when(this.usedValuesQuery.execute())
-            .thenReturn(Arrays.asList(new Object[]{ bobReference, 17L }, new Object[]{ aliceReference, 3L }));
+            .thenReturn(Arrays.asList(new Object[] { bobReference, 17L }, new Object[] { aliceReference, 3L }));
 
         EntityReferenceSerializer<String> compactSerializer =
             this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "compact");
@@ -153,8 +159,12 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         assertEquals(17L, values.getPropertyValues().get(1).getMetaData().get("count"));
         assertTrue(values.getPropertyValues().get(1).getMetaData().get("icon") instanceof Map);
         Map icon = (Map) values.getPropertyValues().get(1).getMetaData().get("icon");
-        assertEquals("url/to/bob/avatar", icon.get("url"));
-        assertEquals("IMAGE", icon.get("iconSetType"));
+        if (hasAccess) {
+            assertEquals("url/to/bob/avatar", icon.get("url"));
+            assertEquals("IMAGE", icon.get("iconSetType"));
+        } else {
+            assertEquals("user", mockingDetails(icon).getMockCreationSettings().getMockName().toString());
+        }
         assertEquals("url/to/bob", values.getPropertyValues().get(1).getMetaData().get("url"));
 
         verify(this.allowedValuesQuery, never()).setWiki(any(String.class));

@@ -46,7 +46,11 @@
   #end
 #end
 <div id="companylogo">
-  <a href="$!xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference)" title="Home" rel="home" #if(!$displayPageHeader)class="navbar-brand"#end>
-    <img src="$!logourl" alt="Wiki Logo"/>
+  <a href="$!xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference)" rel="home" ##
+    title="$escapetool.xml($services.localization.render('core.document.header.logo.anchor.text'))" ##
+    #if(!$displayPageHeader)class="navbar-brand"#end>##
+    <span class="sr-only">$services.localization.render('core.document.header.logo.anchor.text')</span>
+    <img src="$!logourl" ##
+      alt="$escapetool.xml($services.localization.render('core.document.header.logo.image.text'))"/>##
   </a>
 </div>

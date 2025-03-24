@@ -191,4 +191,4 @@
 ** **##queryString##**: Необов'язковий рядок запиту для визначення параметрів, які будуть додані до цільової адреси посилання та використані у відтвореній URL-адресі. Наприклад: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## створює цільову адресу ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: Необов'язкове ім'я прив'язки, що вказує на прив'язку, визначену в посиланні. Зверніть увагу, що в XWiki прив'язки створюються автоматично для заголовків і зображень. Наприклад: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produces target address ##http:~/~/domain.com/path#HTableOfContents##
 ** **##target##**: Необов'язковий параметр, який дозволяє відкрити цільове посилання в новому вікні. Наприклад: ##target="~_blank"##</content>
-  </xwikidoc>
+</xwikidoc>

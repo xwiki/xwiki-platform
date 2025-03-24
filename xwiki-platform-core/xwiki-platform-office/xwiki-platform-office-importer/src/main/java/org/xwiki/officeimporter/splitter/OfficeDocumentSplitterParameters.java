@@ -20,7 +20,6 @@
 package org.xwiki.officeimporter.splitter;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Parameters that control how an office document is split.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10.2
  * @since 15.0RC1
  */
-@Unstable
 public class OfficeDocumentSplitterParameters
 {
     private int[] headingLevelsToSplit = new int[] {1};

@@ -57,8 +57,14 @@ public class AllIT
     }
 
     @Nested
-    @DisplayName("Spaces UI")
-    class NestedSpacesIT extends SpacesIT
+    @DisplayName("Pinned Pages UI")
+    class NestedPinnedPagesIT extends PinnedPagesIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Document Tree Macro")
+    class NestedDocumentTreeMacroIT extends DocumentTreeMacroIT
     {
     }
 }

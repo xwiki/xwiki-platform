@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
@@ -52,9 +51,6 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
 
     @Inject
     private SolrDocumentMigration120900000 solrDocumentMigration120900000;
-
-    @Inject
-    private Logger logger;
 
     @Override
     protected void createSchema() throws SolrException

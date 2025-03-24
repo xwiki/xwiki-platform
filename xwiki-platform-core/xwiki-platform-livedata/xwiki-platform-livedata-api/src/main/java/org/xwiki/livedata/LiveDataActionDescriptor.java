@@ -34,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @since 13.0
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LiveDataActionDescriptor extends BaseDescriptor
+public class LiveDataActionDescriptor extends BaseDescriptor implements InitializableLiveDataElement
 {
     /**
      * The action pretty name.
@@ -187,9 +187,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
         this.urlProperty = urlProperty;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.icon == null) {

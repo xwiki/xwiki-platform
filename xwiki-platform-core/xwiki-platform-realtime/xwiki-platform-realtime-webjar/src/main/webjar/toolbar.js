@@ -58,7 +58,7 @@ define('xwiki-realtime-toolbar', [
     return $('<div class="rt-user-list"></div>').attr('id', uid()).appendTo($container)[0];
   }
 
-  const userDisplayMode = Config.toolbarUserlist;
+  const userDisplayMode = Config.toolbarUserlist || 'both';
   function getOtherUsers(myUserId, userList, usersData) {
     return userList.map(function(userId) {
       // Collect the user data.
@@ -95,7 +95,7 @@ define('xwiki-realtime-toolbar', [
       'data-id': user.id,
       'data-reference': user.reference
     });
-    if (userDisplayMode === undefined || userDisplayMode === 'name' || userDisplayMode === 'both') {
+    if (userDisplayMode === 'name' || userDisplayMode === 'both') {
       userDisplay.text(user.name);
     }
     if (userDisplayMode === 'avatar' || userDisplayMode === 'both') {
@@ -154,13 +154,6 @@ define('xwiki-realtime-toolbar', [
     const spinner = createSpinner(toolbar.find('.rt-toolbar-rightside'));
     const lagElement = createLagElement(toolbar.find('.rt-toolbar-rightside'));
     let userData = config.userData;
-    const changeNameID = config.changeNameID;
-
-    // Check if the user is allowed to change their name.
-    if (changeNameID) {
-      // Create the button and update the element containing the user list.
-      userListElement = createChangeName($container, userListElement, changeNameID);
-    }
 
     let connected = false;
     userList.change.push(function(newUserData) {

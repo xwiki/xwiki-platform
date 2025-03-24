@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Task for removing WatchListClass xobjects from page. This task should only be triggered when
- * {@link R160000000XWIKI17243DataMigration} has been done.
+ * {@link R160300000XWIKI17243DataMigration} has been done.
  * Note that this task might also create an autowatch xobject to get the new property if it's not defined, as we use
  * to fallback on the autowatch property defined in the WatchListClass xobject.
  *

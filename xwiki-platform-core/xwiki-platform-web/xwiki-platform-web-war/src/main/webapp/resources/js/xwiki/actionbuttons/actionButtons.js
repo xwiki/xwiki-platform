@@ -528,8 +528,15 @@ var XWiki = (function(XWiki) {
         var content =  new Element('div', {'class': 'modal-popup', 'id': 'csrf-warning-modal'});
         var buttonsDiv =  new Element('div');
 
-        // the confirmation message contains some double quotes that should be escaped.
-        content.insert("$escapetool.json($services.localization.render('csrf.confirmation'))");
+        content.insert("<p>$services.localization.render('csrf.confirmation.status')</p>" +
+          "<p>$services.localization.render('csrf.confirmation.possibleReasons.description')</p>" +
+          "<ul><li>$services.localization.render('csrf.confirmation.possibleReasons.firstReason')</li>" +
+          "<li>$services.localization.render('csrf.confirmation.possibleReasons.secondReason')</li>" +
+          "<li>$services.localization.render('csrf.confirmation.possibleReasons.thirdReason')</li></ul>" +
+          "<p class='force-underline'>" +
+          "$services.localization.render('csrf.confirmation.unsure', ['<a href=\"http://jira.xwiki.org/\">', '</a>'])" +
+          "</p>" +
+          "<p>$services.localization.render('csrf.confirmation.question', ['<strong>', '</strong>'])</p>");
         content.insert(new Element('br'));
         var buttonCreate = new Element('button', {'class': 'btn btn-default', 'id': 'force-save-csrf'});
         buttonCreate.insert("$services.localization.render('yes')");
@@ -613,7 +620,9 @@ var XWiki = (function(XWiki) {
         require(['jquery'], function ($) {
           var action = $('input[name=warningConflictAction]:checked').val();
           getConflictIds().map(retrieveDecisions);
-          $('#previewDiffModal').modal('hide');
+          // Store the selected action so that others listening to the modal hide event can know how the modal was
+          // closed (i.e. whether the merge conflict was resolved or not).
+          $('#previewDiffModal').data('action', action).modal('hide');
           if (action === "reload") {
             self.reloadEditor();
           } else {
@@ -696,7 +705,8 @@ var XWiki = (function(XWiki) {
           }
           $(response.responseText).appendTo('body');
           radioToogleClass();
-          $('#previewDiffModal').modal('show');
+          // Set the action to cancel by default before showing the modal.
+          $('#previewDiffModal').data('action', 'cancel').modal('show');
 
           // We want to remove the html of the modal and the backdrop when the modal is closed.
           $('#previewDiffModal').on('hidden.bs.modal', function (e) {

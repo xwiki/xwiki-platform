@@ -49,6 +49,16 @@ import org.xwiki.search.solr.XWikiSolrCore;
 public class SolrSchemaUtils
 {
     /**
+     * The name of the type used to store the version of the core schema.
+     */
+    public static final String SOLR_TYPENAME_CVERSION = "__cversion";
+
+    /**
+     * The name of the attribute holding the version value.
+     */
+    public static final String SOLR_VERSIONFIELDTYPE_VALUE = "defVal";
+
+    /**
      * Contains data of a solr core schema.
      *
      * @version $Id$

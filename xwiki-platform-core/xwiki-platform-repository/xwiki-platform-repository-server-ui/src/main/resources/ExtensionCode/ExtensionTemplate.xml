@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="ExtensionCode.ExtensionTemplate" locale="">
+<xwikidoc version="1.5" reference="ExtensionCode.ExtensionTemplate" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionTemplate</name>
   <language/>
@@ -54,9 +54,12 @@
       <allowednamespaces>
         <cache>0</cache>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>allowednamespaces</name>
         <number>26</number>
@@ -91,9 +94,12 @@
       <authors>
         <cache>0</cache>
         <customDisplay>{{include reference="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>authors</name>
         <number>7</number>
@@ -114,10 +120,13 @@
         <cache>0</cache>
         <classname>ExtensionCode.ExtensionCategoryClass</classname>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText/>
         <hint/>
         <idField>id</idField>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>category</name>
         <number>16</number>
@@ -160,6 +169,7 @@
         <number>5</number>
         <picker>0</picker>
         <prettyName>Description</prettyName>
+        <restricted>0</restricted>
         <rows>50</rows>
         <size>75</size>
         <unmodifiable>0</unmodifiable>
@@ -170,9 +180,12 @@
       <features>
         <cache>0</cache>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>features</name>
         <number>8</number>
@@ -227,6 +240,7 @@
         <number>13</number>
         <picker>0</picker>
         <prettyName>Prerequisites &amp; Additional Installation Instructions</prettyName>
+        <restricted>0</restricted>
         <rows>15</rows>
         <size>75</size>
         <unmodifiable>0</unmodifiable>
@@ -272,6 +286,7 @@
         <number>27</number>
         <picker>0</picker>
         <prettyName>Issue Management URL</prettyName>
+        <restricted>0</restricted>
         <rows>1</rows>
         <size>100</size>
         <unmodifiable>0</unmodifiable>
@@ -296,9 +311,12 @@
       <licenseName>
         <cache>0</cache>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText/>
         <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>licenseName</name>
         <number>10</number>
@@ -332,9 +350,12 @@
       <properties>
         <cache>0</cache>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>properties</name>
         <number>17</number>
@@ -400,6 +421,7 @@
         <number>25</number>
         <picker>0</picker>
         <prettyName>Sources connection</prettyName>
+        <restricted>0</restricted>
         <rows>1</rows>
         <size>100</size>
         <unmodifiable>0</unmodifiable>
@@ -417,6 +439,7 @@
         <number>26</number>
         <picker>0</picker>
         <prettyName>Sources dev connection</prettyName>
+        <restricted>0</restricted>
         <rows>1</rows>
         <size>100</size>
         <unmodifiable>0</unmodifiable>
@@ -449,6 +472,7 @@
         <number>24</number>
         <picker>0</picker>
         <prettyName>Source</prettyName>
+        <restricted>0</restricted>
         <rows>1</rows>
         <size>100</size>
         <unmodifiable>0</unmodifiable>
@@ -470,14 +494,45 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </summary>
+      <supportPlans>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>checkbox</displayType>
+        <freeText/>
+        <hint/>
+        <idField/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>supportPlans</name>
+        <number>28</number>
+        <picker>0</picker>
+        <prettyName>Support plans</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>1</size>
+        <sort/>
+        <sql>select docPlan.fullName, concat(docSupporter.title, ' &gt; ', docPlan.title) FROM XWikiDocument docPlan, XWikiDocument docSupporter, BaseObject as plan, BaseObject as supporter, StringProperty as planSupporter WHERE docPlan.fullName = plan.name and plan.className = 'ExtensionCode.ExtensionSupportPlanClass' and docPlan.fullName &lt;&gt; 'ExtensionCode.ExtensionSupportPlanTemplate' and docSupporter.fullName = supporter.name and supporter.className = 'ExtensionCode.ExtensionSupporterClass' and docSupporter.fullName &lt;&gt; 'ExtensionCode.ExtensionSupporterTemplate' and plan.id=planSupporter.id.id and planSupporter.id.name='supporter' and planSupporter.value=docSupporter.fullName</sql>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </supportPlans>
       <type>
         <cache>0</cache>
         <classname>ExtensionCode.ExtensionTypeClass</classname>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText/>
         <hint/>
         <idField>id</idField>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>type</name>
         <number>2</number>
@@ -520,6 +575,7 @@
         <number>6</number>
         <picker>0</picker>
         <prettyName>Website</prettyName>
+        <restricted>0</restricted>
         <rows>1</rows>
         <size>100</size>
         <unmodifiable>0</unmodifiable>
@@ -596,6 +652,9 @@
     </property>
     <property>
       <summary/>
+    </property>
+    <property>
+      <supportPlans/>
     </property>
     <property>
       <type/>

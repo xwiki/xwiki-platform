@@ -90,6 +90,9 @@ public class CurrentUserPropertyResourceImpl extends XWikiResource implements Cu
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
+            // Clone the document to avoid modifying the cache directly
+            userDocument = userDocument.clone();
+
             BaseObject object = userDocument.getXObject(USER_REFERENCE);
             if (object == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);

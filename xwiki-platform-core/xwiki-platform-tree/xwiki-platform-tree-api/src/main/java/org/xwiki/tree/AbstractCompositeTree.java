@@ -35,7 +35,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public abstract class AbstractCompositeTree extends AbstractTree
 {
-    protected final Map<String, TreeNode> treeNodeByNodeType = new HashMap<String, TreeNode>();
+    protected final Map<String, TreeNode> treeNodeByNodeType = new HashMap<>();
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
@@ -70,7 +70,7 @@ public abstract class AbstractCompositeTree extends AbstractTree
             treeNode = this.treeNodeByNodeType.get(parts[0]);
             if (treeNode != null) {
                 // Update the node properties.
-                treeNode.getProperties().putAll(getProperties());
+                treeNode = withSameProperties(treeNode);
             }
         }
         return treeNode;

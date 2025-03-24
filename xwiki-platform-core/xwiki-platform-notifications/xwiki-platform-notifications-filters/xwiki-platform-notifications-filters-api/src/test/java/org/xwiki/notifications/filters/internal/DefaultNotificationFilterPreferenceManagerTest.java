@@ -24,29 +24,24 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,13 +57,11 @@ public class DefaultNotificationFilterPreferenceManagerTest
     @InjectMockComponents
     private DefaultNotificationFilterPreferenceManager filterPreferenceManager;
 
-    private DocumentReference testUser;
-
     @MockComponent
-    private NotificationFilterPreferenceProvider testProvider;
+    @Named("cached")
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
-    @InjectComponentManager
-    private MockitoComponentManager componentManager;
+    private DocumentReference testUser;
 
     @BeforeEach
     public void setUp() throws Exception
@@ -82,7 +75,8 @@ public class DefaultNotificationFilterPreferenceManagerTest
         NotificationFilterPreference filterPreference1 = mock(NotificationFilterPreference.class);
         NotificationFilterPreference filterPreference2 = mock(NotificationFilterPreference.class);
 
-        when(testProvider.getFilterPreferences(testUser)).thenReturn(Sets.newSet(filterPreference1, filterPreference2));
+        when(filterPreferencesModelBridge.getFilterPreferences(testUser))
+            .thenReturn(Sets.newSet(filterPreference1, filterPreference2));
 
         Collection<NotificationFilterPreference> resultSet = filterPreferenceManager.getFilterPreferences(testUser);
 
@@ -146,44 +140,7 @@ public class DefaultNotificationFilterPreferenceManagerTest
     void deleteFilterPreference() throws Exception
     {
         filterPreferenceManager.deleteFilterPreference(testUser, "myFilter");
-
-        verify(testProvider).deleteFilterPreferences(testUser, Set.of("myFilter"));
-    }
-
-    @Test
-    void deleteFilterPreferenceProviderException() throws Exception
-    {
-        String providerName1 = "providerName1";
-        String providerName2 = "providerName2";
-
-        NotificationFilterPreferenceProvider provider1 =
-            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName1);
-        NotificationFilterPreferenceProvider provider2 =
-            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName2);
-
-        String filterId = "filterId";
-        doThrow(new NotificationException("error provider1")).when(provider1).deleteFilterPreferences(testUser,
-            Set.of(filterId));
-        filterPreferenceManager.deleteFilterPreference(testUser, filterId);
-        verify(testProvider).deleteFilterPreferences(testUser, Set.of(filterId));
-        verify(provider1).deleteFilterPreferences(testUser, Set.of(filterId));
-        verify(provider2).deleteFilterPreferences(testUser, Set.of(filterId));
-
-        doThrow(new NotificationException("error provider2")).when(provider2).deleteFilterPreferences(testUser,
-            Set.of(filterId));
-        filterPreferenceManager.deleteFilterPreference(testUser, filterId);
-        verify(testProvider, times(2)).deleteFilterPreferences(testUser, Set.of(filterId));
-        verify(provider1, times(2)).deleteFilterPreferences(testUser, Set.of(filterId));
-        verify(provider2, times(2)).deleteFilterPreferences(testUser, Set.of(filterId));
-
-        doThrow(new NotificationException("error testprovider")).when(testProvider).deleteFilterPreferences(testUser,
-            Set.of(filterId));
-        NotificationException notificationException = assertThrows(NotificationException.class,
-                () -> filterPreferenceManager.deleteFilterPreference(testUser, filterId));
-        assertEquals("Error when trying to remove filter preferences [filterId] for user [wiki:test.user] - "
-            + "All providers called failed, see exceptions: [NotificationException: error testprovider,"
-            + "NotificationException: error provider1,NotificationException: error provider2].",
-            notificationException.getMessage());
+        verify(filterPreferencesModelBridge).deleteFilterPreference(testUser, "myFilter");
     }
 
     @Test
@@ -194,20 +151,15 @@ public class DefaultNotificationFilterPreferenceManagerTest
         filterPreferenceManager.setFilterPreferenceEnabled(new WikiReference("foo"), "myFilter3", true);
         filterPreferenceManager.setFilterPreferenceEnabled(new WikiReference("foo"), "myFilter4", false);
 
-        verify(testProvider).setFilterPreferenceEnabled(testUser, "myFilter1", true);
-        verify(testProvider).setFilterPreferenceEnabled(testUser, "myFilter2", false);
-        verify(testProvider).setFilterPreferenceEnabled(new WikiReference("foo"), "myFilter3", true);
-        verify(testProvider).setFilterPreferenceEnabled(new WikiReference("foo"), "myFilter4", false);
+        verify(filterPreferencesModelBridge).setFilterPreferenceEnabled(testUser, "myFilter1", true);
+        verify(filterPreferencesModelBridge).setFilterPreferenceEnabled(testUser, "myFilter2", false);
+        verify(filterPreferencesModelBridge).setFilterPreferenceEnabled(new WikiReference("foo"), "myFilter3", true);
+        verify(filterPreferencesModelBridge).setFilterPreferenceEnabled(new WikiReference("foo"), "myFilter4", false);
     }
 
     @Test
     void setStartDateForUser() throws Exception
     {
-        NotificationFilterPreferenceProvider provider1 =
-            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, "provider1");
-        NotificationFilterPreferenceProvider provider2 =
-            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, "provider2");
-
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
         Date date = new Date();
 
@@ -215,8 +167,7 @@ public class DefaultNotificationFilterPreferenceManagerTest
         filterPreferenceManager.setStartDateForUser(user, date);
 
         // Checks
-        verify(provider1).setStartDateForUser(eq(user), eq(date));
-        verify(provider2).setStartDateForUser(eq(user), eq(date));
+        verify(filterPreferencesModelBridge).setStartDateForUser(eq(user), eq(date));
     }
 
     @Test
@@ -227,20 +178,7 @@ public class DefaultNotificationFilterPreferenceManagerTest
         NotificationFilterPreference pref2 = mock(NotificationFilterPreference.class, "pref2");
         NotificationFilterPreference pref3 = mock(NotificationFilterPreference.class, "pref3");
 
-        String providerName1 = "providerName1";
-        String providerName2 = "providerName2";
-
-        NotificationFilterPreferenceProvider provider1 =
-            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName1);
-        NotificationFilterPreferenceProvider provider2 =
-            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName2);
-
-        when(pref1.getProviderHint()).thenReturn(providerName1);
-        when(pref2.getProviderHint()).thenReturn(providerName2);
-        when(pref3.getProviderHint()).thenReturn(providerName1);
-
         this.filterPreferenceManager.saveFilterPreferences(user, Set.of(pref1, pref2, pref3));
-        verify(provider1).saveFilterPreferences(user, Set.of(pref1, pref3));
-        verify(provider2).saveFilterPreferences(user, Set.of(pref2));
+        verify(filterPreferencesModelBridge).saveFilterPreferences(user, Set.of(pref1, pref2, pref3));
     }
 }

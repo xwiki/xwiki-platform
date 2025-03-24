@@ -53,7 +53,25 @@ public abstract class AbstractTreeNode implements TreeNode
     @Named("context")
     protected Provider<ComponentManager> contextComponentManagerProvider;
 
-    private final Map<String, Object> properties = new HashMap<String, Object>();
+    private final Map<String, Object> properties = new HashMap<>();
+
+    private final String type;
+
+    protected AbstractTreeNode()
+    {
+        this(null);
+    }
+
+    protected AbstractTreeNode(String type)
+    {
+        this.type = type;
+    }
+
+    @Override
+    public String getType()
+    {
+        return this.type;
+    }
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
@@ -131,5 +149,12 @@ public abstract class AbstractTreeNode implements TreeNode
         int start = Math.min(Math.max(offset, 0), list.size());
         int end = Math.max(Math.min(start + limit, list.size()), start);
         return list.subList(start, end);
+    }
+
+    protected TreeNode withSameProperties(TreeNode treeNode)
+    {
+        treeNode.getProperties().clear();
+        treeNode.getProperties().putAll(getProperties());
+        return treeNode;
     }
 }

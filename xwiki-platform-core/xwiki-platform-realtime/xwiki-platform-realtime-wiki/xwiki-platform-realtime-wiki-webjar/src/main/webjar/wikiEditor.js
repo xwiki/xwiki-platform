@@ -18,13 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-wikiEditor', [
-  'xwiki-realtime-config',
-  'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
   'xwiki-realtime-userData',
-  'xwiki-realtime-typingTests',
-  'json.sortify',
   'xwiki-realtime-textCursor',
   'xwiki-realtime-interface',
   'xwiki-realtime-saver',
@@ -33,8 +29,7 @@ define('xwiki-realtime-wikiEditor', [
   'jquery'
 ], function(
   /* jshint maxparams:false */
-  realtimeConfig, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, JSONSortify, TextCursor, Interface, Saver,
-    ChainPad, Crypto, $
+  Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $
 ) {
   'use strict';
 
@@ -217,13 +212,15 @@ define('xwiki-realtime-wikiEditor', [
       };
 
       function createSaver(info) {
-        const saver = new Saver({
+        return new Saver({
           editorType: editorId,
           editorName: 'Wiki',
           userList: info.userList,
           userName: editorConfig.user.name,
           network: info.network,
           channel: eventsChannel,
+          // This function displays a message notifying users that there was a merge.
+          showNotification: Interface.createMergeMessageElement(toolbar.toolbar.find('.rt-toolbar-rightside')),
           setTextValue: function(newText, toConvert, callback) {
             setValueWithCursor(newText);
             callback();
@@ -232,25 +229,12 @@ define('xwiki-realtime-wikiEditor', [
           getTextValue: function() {
             return editor.getValue();
           },
-          getSaveValue: function() {
-            return {
-              content: editor.getValue()
-            };
-          },
           getTextAtCurrentRevision: function() {
             return $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'}))).then(data => {
               return data.content;
             });
-          },
-          safeCrash: function(reason, debugLog) {
-            module.onAbort(null, reason, debugLog);
           }
         });
-        // This function displays a message notifying users that there was a merge.
-        saver._lastSaved.mergeMessage = Interface.createMergeMessageElement(
-          toolbar.toolbar.find('.rt-toolbar-rightside'));
-        saver.setLastSavedContent(editor.getValue());
-        return saver;
       }
 
       var realtimeOptions = {
@@ -325,7 +309,7 @@ define('xwiki-realtime-wikiEditor', [
           }
         },
 
-        onAbort: function(info, reason, debug) {
+        onAbort: function() {
           console.log('Aborting the session!');
           module.chainpad.abort();
           module.leaveChannel();
@@ -334,9 +318,6 @@ define('xwiki-realtime-wikiEditor', [
           toolbar.failed();
           toolbar.toolbar.remove();
           userData.stop?.();
-          if (reason || debug) {
-            ErrorBox.show(reason || 'disconnected', debug);
-          }
         },
 
         beforeReconnecting: function (callback) {
@@ -347,14 +328,14 @@ define('xwiki-realtime-wikiEditor', [
 
         onConnectionChange: function(info) {
           console.log('Connection status: ' + info.state);
-          toolbar.failed();
+          initializing = true;
           if (info.state) {
-            ErrorBox.hide();
-            initializing = true;
+            // Reconnecting.
             toolbar.reconnecting(info.myId);
           } else {
+            // Disconnected.
+            toolbar.failed();
             module.setEditable(false);
-            ErrorBox.show('disconnected');
           }
         }
       };
@@ -366,9 +347,8 @@ define('xwiki-realtime-wikiEditor', [
       editorConfig.setRealtimeEnabled(true);
 
       function onChangeHandler() {
-        // We can't destroy the dialog here because sometimes it's impossible to take an action during a merge conflict.
-        module.saver.setLocalEditFlag(true);
         realtimeOptions.onLocal();
+        module.saver.contentModifiedLocally();
       }
       editor.onChange(onChangeHandler);
     };

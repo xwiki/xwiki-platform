@@ -407,8 +407,8 @@
       <code>{{velocity}}
 #if (!$services.notification.areEmailsEnabled())
   {{warning}}
-    {{localization key="notifications.settings.email.disabled" /}}
-  {{warning}}
+    {{translation key="notifications.settings.email.disabled" /}}
+  {{/warning}}
 #elseif (!$xcontext.userReference)
   {{info}}
     {{translation key="notifications.settings.email.forGuest" /}}

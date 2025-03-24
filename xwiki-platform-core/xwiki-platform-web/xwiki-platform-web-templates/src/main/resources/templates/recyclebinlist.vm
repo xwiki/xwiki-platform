@@ -72,7 +72,7 @@
          #end
          </td>
          #if ($canRestore)
-           <td><a href="$xwiki.getURL($dd.fullName, 'undelete', "id=${dd.id}&amp;showBatch=true")">$!{dd.batchId}</a></td>
+           <td>#if("$!{dd.batchId}" != "")<a href="$xwiki.getURL($dd.fullName, 'undelete', "id=${dd.id}&amp;showBatch=true")">$!{dd.batchId}</a>#end</td>
          #end
          <td>
            #if($canRestore)

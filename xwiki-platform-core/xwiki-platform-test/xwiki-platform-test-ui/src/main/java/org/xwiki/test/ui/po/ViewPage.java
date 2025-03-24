@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
@@ -135,12 +136,17 @@ public class ViewPage extends BasePage
         clickWantedLink(new DocumentReference("xwiki", spaceName, pageName), waitForTemplateDisplay);
     }
 
+    public CreatePagePage clickWantedLink(EntityReference reference)
+    {
+        return clickWantedLink(reference, true).get();
+    }
+
     /**
      * Clicks on a wanted link in the page.
      *
      * @since 7.2M2
      */
-    public void clickWantedLink(EntityReference reference, boolean waitForTemplateDisplay)
+    public Optional<CreatePagePage> clickWantedLink(EntityReference reference, boolean waitForTemplateDisplay)
     {
         WebElement brokenLink = getDriver().findElement(
             By.xpath("//span[@class='wikicreatelink']/a[contains(@href,'/create/" + getUtil().getURLFragment(reference)
@@ -150,8 +156,11 @@ public class ViewPage extends BasePage
             // Ensure that the template choice popup is displayed. Since this is done using JS we need to wait till
             // it's displayed. For that we wait on the Create button since that would mean the template radio buttons
             // will all have been displayed.
-            getDriver().waitUntilElementIsVisible(By.xpath("//div[@class='modal-popup']//input[@type='submit']"));
+            getDriver().waitUntilElementIsVisible(
+                By.xpath("//div[@class='modal-dialog']//form[@id='create']//button[@type='submit']"));
+            return Optional.of(new CreatePagePage());
         }
+        return Optional.empty();
     }
 
     public BreadcrumbElement getBreadcrumb()

@@ -277,7 +277,7 @@ class NotificationCustomFiltersQueryHelperTest
             + "nfp.user like :constraint_0) or (nfp.pageOnly like :constraint_1 or nfp.page like :constraint_1 or "
             + "nfp.wiki like :constraint_1 or nfp.user like :constraint_1) or (nfp.pageOnly = :constraint_2 or "
             + "nfp.page = :constraint_2 or nfp.wiki = :constraint_2 or nfp.user = :constraint_2)) and "
-            + "length(nfp.allEventTypes) = 0 and nfp.enabled = 1 and length(nfp.pageOnly) > 0 and "
+            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and length(nfp.pageOnly) > 0 and "
             + "nfp.filterType = :filterType";
 
         Query query = mock(Query.class);
@@ -387,7 +387,7 @@ class NotificationCustomFiltersQueryHelperTest
             + "nfp.user like :constraint_0) or (nfp.pageOnly like :constraint_1 or nfp.page like :constraint_1 or "
             + "nfp.wiki like :constraint_1 or nfp.user like :constraint_1) or (nfp.pageOnly = :constraint_2 or "
             + "nfp.page = :constraint_2 or nfp.wiki = :constraint_2 or nfp.user = :constraint_2)) and "
-            + "length(nfp.allEventTypes) = 0 and nfp.enabled = 1 and length(nfp.pageOnly) > 0 and "
+            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and length(nfp.pageOnly) > 0 and "
             + "nfp.filterType = :filterType";
 
         Query query = mock(Query.class);
@@ -504,7 +504,7 @@ class NotificationCustomFiltersQueryHelperTest
             + "nfp.user like :constraint_0) or (nfp.pageOnly like :constraint_1 or nfp.page like :constraint_1 or "
             + "nfp.wiki like :constraint_1 or nfp.user like :constraint_1) or (nfp.pageOnly = :constraint_2 or "
             + "nfp.page = :constraint_2 or nfp.wiki = :constraint_2 or nfp.user = :constraint_2)) and "
-            + "length(nfp.allEventTypes) = 0 and nfp.enabled = 1 and length(nfp.pageOnly) > 0 and "
+            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and length(nfp.pageOnly) > 0 and "
             + "nfp.filterType = :filterType "
             + "order by nfp.pageOnly asc, nfp.page asc, nfp.wiki asc, nfp.user asc, nfp.enabled desc, "
             + "nfp.emailEnabled asc, nfp.alertEnabled desc";
@@ -630,7 +630,7 @@ class NotificationCustomFiltersQueryHelperTest
             + "nfp.user like :constraint_0) or (nfp.pageOnly like :constraint_1 or nfp.page like :constraint_1 or "
             + "nfp.wiki like :constraint_1 or nfp.user like :constraint_1) or (nfp.pageOnly = :constraint_2 or "
             + "nfp.page = :constraint_2 or nfp.wiki = :constraint_2 or nfp.user = :constraint_2)) and "
-            + "length(nfp.allEventTypes) = 0 and nfp.enabled = 1 and length(nfp.pageOnly) > 0 and "
+            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and length(nfp.pageOnly) > 0 and "
             + "nfp.filterType = :filterType";
 
         Query query = mock(Query.class);

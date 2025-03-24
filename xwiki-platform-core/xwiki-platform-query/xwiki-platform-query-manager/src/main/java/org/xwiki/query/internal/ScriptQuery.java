@@ -59,12 +59,12 @@ public class ScriptQuery implements SecureQuery
     /**
      * Used to retrieve {@link org.xwiki.query.QueryFilter} implementations.
      */
-    private ComponentManager componentManager;
+    private final ComponentManager componentManager;
 
     /**
      * The wrapped {@link Query}.
      */
-    private Query query;
+    private final Query query;
 
     private boolean switchAuthor;
 
@@ -177,9 +177,9 @@ public class ScriptQuery implements SecureQuery
     }
 
     @Override
-    public Query bindValue(String var, Object val)
+    public Query bindValue(String variable, Object val)
     {
-        this.query.bindValue(var, val);
+        this.query.bindValue(variable, val);
         return this;
     }
 
@@ -205,9 +205,9 @@ public class ScriptQuery implements SecureQuery
     }
 
     @Override
-    public QueryParameter bindValue(String var)
+    public QueryParameter bindValue(String variable)
     {
-        QueryParameter parameter = this.query.bindValue(var);
+        QueryParameter parameter = this.query.bindValue(variable);
         return new ScriptQueryParameter(this, parameter);
     }
 

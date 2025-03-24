@@ -18,13 +18,19 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template('notification/macros.vm')
+
+#set($linkColor = '#2f6faf')
+#set($breadcrumbBackground = '#f5f5f5')
+#set($breadcrumbColor = '#707070')
+#set($mutedColor = '#656565')
+#set($borderColor = '#e8e8e8')
 #**
  * Display a styled link
  * @param $url URL of the link
  * @param $linkText text of the link
  *#
 #macro(link $url $linkText)
-  <a color="#0088CC" style="color: #0088CC; text-decoration: none;" href="$escapetool.xml($url)">$linkText</a>
+  <a style="color: ${linkColor}; text-decoration: none;" href="$escapetool.xml($url)">$linkText</a>
 #end
 #**
  * Display a little avatar of the user
@@ -65,18 +71,18 @@
 #end
 
 #macro(displayNotificationSkeleton $leftCell $rightCell)
-  <table width="100%">
+  <table style="width: 100%">
     <tr>
       ###
       ### Left cell
       ###
-      <td width="25%" style="width: 25%; vertical-align: top;" valign="top">
+      <td style="width: 25%; vertical-align: top;">
         $leftCell
       </td>
       ###
       ### Right cell
       ###
-      <td style="vertical-align: top;" valign="top">
+      <td style="vertical-align: top;">
         $rightCell
       </td>
     </tr>
@@ -95,9 +101,9 @@
 
 #macro(displayNotificationPage $event)
   <div>
-    <div style="background-color: #f5f5f5; color: #777777; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
+    <div style="background-color: ${breadcrumbBackground}; color: ${breadcrumbColor}; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
       #template('hierarchy_macros.vm')
-      #hierarchy($event.document, {'id': 'hierarchy', 'limit': 5, 'treeNavigation': false, 'plain': true})
+      #hierarchy($event.document, {'id': 'hierarchy', 'treeNavigation': false, 'plain': true})
     </div>
     #set ($document = $xwiki.getDocument($event.document))
     ## See `#displayNotificationEvent()` in `templates/notification/macros.vm` to understand why we don't use escape
@@ -113,7 +119,7 @@
 
 #macro(displayNotificationDate $event)
   <div>
-    <small style="color: #777777; font-size: 0.8em;">
+    <small style="color: #767676; font-size: 0.8em;">
       $escapetool.xml($services.date.displayTimeAgo($event.dates.get(0)))
     </small>
   </div>
@@ -147,7 +153,7 @@
   #if ("$!services.notification.preferences.getDiffType($emailUser)" != 'NOTHING')
     #set ($basicTypes = ['update', 'create'])
     #set ($compositeEventType = $event.type)
-    <table width="100%" style="margin: 5px 0; font-size: 0.8em; border-top: 1px dashed #e8e8e8">
+    <table style="width: 100%; margin: 5px 0; font-size: 0.8em; border-top: 1px dashed #e8e8e8">
       #foreach ($ev in $event.events)
         ## Display the event only on some conditions.
         ## See: https://jira.xwiki.org/browse/XWIKI-14846
@@ -158,8 +164,8 @@
             #set ($description = $ev.type)
           #end
           <tr style="vertical-align: top;">
-            <td width="33%" style="overflow: hidden;">#displayEmailNotificationEventUser($ev.user)</td>
-            <td width="45%">$escapetool.xml($description)</td>
+            <td style="width: 33%; overflow: hidden;">#displayEmailNotificationEventUser($ev.user)</td>
+            <td style="width: 33%">$escapetool.xml($description)</td>
             <td>
               #if ($diffUrl!='')
                 #link($diffUrl, $escapetool.xml($xwiki.formatDate($ev.date)))
@@ -205,10 +211,10 @@
         ##set($result = $result.replaceAll('<dt', '<dt style="font-size: 1.2em; fontw-weight: bold;"'))
         #set($result = $result.replaceAll('<ins>', '<ins style="background-color: #99ff99; text-decoration: none;">'))
         #set($result = $result.replaceAll('<del>', '<del style="background-color: #ff9999; text-decoration: none;">'))
-        #set($result = $result.replaceAll('class="diff-header"', 'style="border: 1px solid #E8E8E8; border-left: 5px solid #E8E8E8; color: #656565; padding: .5em .2em;"'))
-        #set($result = $result.replaceAll('class="diff-container"', 'style="border: 1px solid #E8E8E8; font-family: Monospace; overflow: auto;"'))
-        #set($result = $result.replaceAll('class="diff-line-number"', 'style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;"'))
-        #set($result = $result.replaceAll('diff-line-meta"', '" style="background-color: #eee; color: rgba(101, 101, 101, 0.5); font-family: Monospace; padding: .4em .5em;"'))
+        #set($result = $result.replaceAll('class="diff-header"', "style='border: 1px solid ${borderColor}; border-left: 5px solid ${borderColor}; color: ${mutedColor}; padding: .5em .2em;'"))
+        #set($result = $result.replaceAll('class="diff-container"', "style='border: 1px solid ${borderColor}; font-family: Monospace; overflow: auto;'"))
+        #set($result = $result.replaceAll('class="diff-line-number"', "style='border-right: 1px solid ${borderColor}; color: ${mutedColor}; font-family: Monospace; text-align: right; vertical-align: top;'"))
+        #set($result = $result.replaceAll('diff-line-meta"', """ style='background-color: #eee; color: ${mutedColor}; font-family: Monospace; padding: .4em .5em;'"))
         #set($result = $result.replaceAll('<dd>', '<dd style="margin-left: 0">'))
         $result
       #end
@@ -243,22 +249,14 @@
    * Display a line of the table of content and its children if any
    *#
   #macro(displaySortedEventTOC $ev)
-    #if ($ev.event.events.get(0).application == 'MessageStream')
-      #define ($user)
-        #set ($userRef = $ev.event.events.get(0).user)
-        #displayUserAvatar($userRef) $xwiki.getPlainUserName($userRef)
-      #end
-      #set ($title = $services.localization.render('messagestream.notification.email.tocItem', [$user]))
-    #else
-      #set ($discard = $displayedDocuments.add($ev.event.document))
-      #set ($document = $xwiki.getDocument($ev.event.document))
-      ## See `#displayNotificationEvent()` in `templates/notification/macros.vm` to understand why we don't use escape
-      ## tools to display the title.
-      #set ($title = $document.displayTitle)
-    #end
-    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: #ccc;">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $title)
+    #set ($discard = $displayedDocuments.add($ev.event.document))
+    #set ($document = $xwiki.getDocument($ev.event.document))
+    ## See `#displayNotificationEvent()` in `templates/notification/macros.vm` to understand why we don't use escape
+    ## tools to display the title.
+    #set ($title = $document.displayTitle)
+    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: ${borderColor};">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $title)
       #if ($ev.hasChildren())
-        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 20px;">
+        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed ${borderColor}; margin-left: 20px;">
         #foreach ($child in $ev.children)
           #displaySortedEventTOC($child)
         #end
@@ -274,8 +272,8 @@
     #set ($sortedEventList = $element.value)
     #if ($wiki != '')
       #set ($wikiDescriptor = $services.wiki.getById($wiki))
-      <li style="margin: 10px 0;"><img src="cid:NEWiki.png" alt="•" style="width: 10px;"/> $escapetool.xml($wikiDescriptor.prettyName)
-        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 5px;">
+      <li style="margin: 10px 0;"><img src="cid:NEWiki.png" alt="" style="width: 10px;"/> $escapetool.xml($wikiDescriptor.prettyName)
+        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed ${borderColor}; margin-left: 5px;">
           #foreach ($ev in $sortedEventList)
             #displaySortedEventTOC($ev)
           #end
@@ -302,7 +300,6 @@
 #macro(displaySortedEvent $sortedEvent)
   #set ($id = $escapetool.xml($sortedEvent.event.events.get(0).id))
   <div class="notification" style="border-top: 1px dashed #E8E8E8;" id="$id">
-    <a name="$id"></a>
     $sortedEvent.html
   </div>
   #foreach ($ev in $sortedEvent.eventsWithTheSameDocument)
@@ -329,17 +326,4 @@
     $messageEvent.body
   </blockquote>
   #displayNotificationDate($event)
-#end
-
-#**
- * Display the plain text version of a message notification
- *#
-#macro(displayPlainMessageNotification $compositeEvent $translationKey)
-#set ($messageEvent = $compositeEvent.events[0])
-$services.localization.render('messagestream.descriptors.applicationName'):
-  $services.localization.render($translationKey, [$xwiki.getPlainUserName($messageEvent.user)])
-  ---
-  $messageEvent.body
-  ---
-  $compositeEvent.dates.get(0)
 #end

@@ -20,9 +20,15 @@
 package org.xwiki.notifications.filters.watch;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.apache.commons.compress.utils.Sets;
+import org.apache.commons.lang3.tuple.Pair;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -31,7 +37,8 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
-import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Reference to a user to watch.
@@ -41,25 +48,29 @@ import org.xwiki.notifications.preferences.internal.UserProfileNotificationPrefe
  */
 public class WatchedUserReference implements WatchedEntityReference
 {
-    private String userId;
+    private final String userId;
 
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+    private final ComponentManager componentManager;
 
-    private EventUserFilterPreferencesGetter preferencesGetter;
+    private final NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+
+    private final EventUserFilterPreferencesGetter preferencesGetter;
+    private final UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     /**
      * Construct a WatchedUserReference.
      * @param userId id of the user to watch.
-     * @param preferencesGetter the instance of EventUserFilterPreferencesGetter
-     * @param notificationFilterPreferenceManager the notification filter manager
-     * @since 10.9
+     * @param componentManager the component manager for loading needed components
      */
-    public WatchedUserReference(String userId, EventUserFilterPreferencesGetter preferencesGetter,
-            NotificationFilterPreferenceManager notificationFilterPreferenceManager)
+    public WatchedUserReference(String userId, ComponentManager componentManager) throws ComponentLookupException
     {
         this.userId = userId;
-        this.preferencesGetter = preferencesGetter;
-        this.notificationFilterPreferenceManager = notificationFilterPreferenceManager;
+        this.componentManager = componentManager;
+        this.preferencesGetter = this.componentManager.getInstance(EventUserFilterPreferencesGetter.class);
+        this.notificationFilterPreferenceManager =
+            this.componentManager.getInstance(NotificationFilterPreferenceManager.class);
+        this.userReferenceSerializer = componentManager.getInstance(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
     }
 
     @Override
@@ -68,6 +79,28 @@ public class WatchedUserReference implements WatchedEntityReference
         return preferencesGetter.isUserFollowed(userId,
                 notificationFilterPreferenceManager.getFilterPreferences(userReference),
                 null);
+    }
+
+    @Override
+    public WatchedStatus getWatchedStatus(UserReference userReference) throws NotificationException
+    {
+        DocumentReference userDocReference = this.userReferenceSerializer.serialize(userReference);
+        WatchedStatus watchedStatus = WatchedStatus.NOT_SET;
+        if (isWatched(userDocReference)) {
+            watchedStatus = WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
+        } else if (preferencesGetter.isUserExcluded(userId,
+            notificationFilterPreferenceManager.getFilterPreferences(userDocReference),
+            null)) {
+            watchedStatus = WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS;
+        }
+        return watchedStatus;
+    }
+
+    @Override
+    public Optional<Pair<EntityReference, WatchedStatus>> getFirstFilteredAncestor(UserReference userReference)
+        throws NotificationException
+    {
+        return Optional.empty();
     }
 
     @Override
@@ -96,8 +129,6 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
-        filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
-        filterPreference.setActive(true);
         filterPreference.setStartingDate(new Date());
         filterPreference.setUser(userId);
 
@@ -113,8 +144,6 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setFilterType(NotificationFilterType.EXCLUSIVE);
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
-        filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
-        filterPreference.setActive(false);
         filterPreference.setStartingDate(new Date());
         filterPreference.setUser(userId);
 

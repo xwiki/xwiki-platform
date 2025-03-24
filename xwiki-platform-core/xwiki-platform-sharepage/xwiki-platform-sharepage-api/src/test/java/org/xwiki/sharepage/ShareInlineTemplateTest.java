@@ -71,7 +71,7 @@ class ShareInlineTemplateTest extends PageTest
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         String result = templateManager.render("shareinline.vm");
 
-        assertTrue(result.contains("<div class=\"infomessage\">core.viewers.share.send.success [john]</div>"));
+        assertTrue(result.contains("<div class=\"box infomessage\">core.viewers.share.send.success [john]</div>"));
     }
 
     @Test

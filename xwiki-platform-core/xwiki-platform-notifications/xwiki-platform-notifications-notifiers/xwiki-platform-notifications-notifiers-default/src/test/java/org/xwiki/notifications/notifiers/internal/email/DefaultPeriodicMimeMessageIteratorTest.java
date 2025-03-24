@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -61,6 +62,7 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,6 +75,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -130,6 +133,11 @@ class DefaultPeriodicMimeMessageIteratorTest
     @MockComponent
     private NotificationConfiguration notificationConfiguration;
 
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    private XWikiContext context;
+
     @BeforeComponent
     void beforeComponent(MockitoComponentManager componentManager) throws Exception
     {
@@ -146,6 +154,8 @@ class DefaultPeriodicMimeMessageIteratorTest
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
         when(this.mailSenderConfiguration.getFromAddress()).thenReturn("xwiki@xwiki.org");
         when(this.documentReferenceResolver.resolve(eq(TEMPLATE_REFERENCE), any())).thenReturn(TEMPLATE_REFERENCE);
+        this.context = mock(XWikiContext.class);
+        when(this.contextProvider.get()).thenReturn(this.context);
     }
 
     @Test
@@ -165,7 +175,7 @@ class DefaultPeriodicMimeMessageIteratorTest
         when(this.documentAccessBridge.getProperty(userB, userClass, 0, "email")).thenReturn("bad email");
         when(this.documentAccessBridge.getProperty(userC, userClass, 0, "email")).thenReturn("userC@xwiki.org");
         when(this.serializer.serialize(userA)).thenReturn("xwiki:XWiki.UserA");
-        when(this.serializer.serialize(userB)).thenReturn("xwiki:XWiki.UserA");
+        when(this.serializer.serialize(userB)).thenReturn("xwiki:XWiki.UserB");
         when(this.serializer.serialize(userC)).thenReturn("xwiki:XWiki.UserC");
 
         CompositeEvent compositeEvent1UserA = mock(CompositeEvent.class);
@@ -289,6 +299,10 @@ class DefaultPeriodicMimeMessageIteratorTest
 
         // Verify
         verify(this.serializer, never()).serialize(userB);
+        verify(this.context, times(2)).setUserReference(userA);
+        verify(this.context, never()).setUserReference(userB);
+        verify(this.context).setUserReference(userC);
+        verify(this.context, times(3)).setUserReference(null);
 
         assertEquals(this.iterator, this.iterator.iterator());
     }

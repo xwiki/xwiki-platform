@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration of the authentication properties.
@@ -65,7 +64,6 @@ public interface AuthenticationConfiguration
      * @since 15.5.1
      * @since 15.6
      */
-    @Unstable
     default List<String> getCookieDomains()
     {
         return List.of();
@@ -81,7 +79,7 @@ public interface AuthenticationConfiguration
      */
     default String getValidationKey()
     {
-        return RandomStringUtils.random(32);
+        return RandomStringUtils.secure().next(32);
     }
 
     /**
@@ -95,6 +93,6 @@ public interface AuthenticationConfiguration
      */
     default String getEncryptionKey()
     {
-        return RandomStringUtils.random(32);
+        return RandomStringUtils.secure().next(32);
     }
 }

@@ -118,6 +118,8 @@ public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
 
             Map<String, String> groupParameters = new HashMap<>();
             groupParameters.put("class", ("gallery " + StringUtils.defaultString(parameters.getClassNames())).trim());
+            // Disable lightbox for the gallery macro since the two features are very similar and it produces confusion.
+            groupParameters.put("data-xwiki-lightbox", "false");
             if (inlineStyle.length() > 0) {
                 groupParameters.put("style", inlineStyle.toString());
             }

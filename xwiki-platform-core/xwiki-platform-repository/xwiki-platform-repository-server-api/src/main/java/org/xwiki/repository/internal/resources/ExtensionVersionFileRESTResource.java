@@ -27,7 +27,6 @@ import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -77,7 +76,6 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Named("org.xwiki.repository.internal.resources.ExtensionVersionFileRESTResource")
 @Path(Resources.EXTENSION_VERSION_FILE)
-@Singleton
 public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResource
 {
     @Inject
@@ -168,7 +166,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             response.type(type);
 
             BaseObject extensionObject = getExtensionObject(extensionDocument);
-            String extensionType = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+            String extensionType = this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
             response.entity(entity.getContent());
             response.header("Content-Disposition",
                 "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");

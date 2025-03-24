@@ -107,7 +107,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #foreach($appName in $outputList)
     ##
     ## Make sure the current user has permission to edit the configurable application.
-    #set($userHasAccessToDocument = $xcontext.hasAccessLevel('edit', $appName))
+    ## Unless we are in the page administration which is never about modifying the application configuration page
+    #set($userHasAccessToDocument = $level == '.page' || $xcontext.hasAccessLevel('edit', $appName))
     ##
     ## If the document was not last saved by a user with edit privilege on this page
     ## then we can't safely display the page but we should warn the viewer.
@@ -195,32 +196,23 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
         #set($formId = "${section.toLowerCase()}_${app.getFullName()}")
         #set($escapedAppName = $escapetool.xml($app.getFullName()))
         #foreach($configurableObj in $configurableObjs)
-          ## Execute the content code if any
-          ## FIXME: we have to do that before the title before of the dropPermissions
-          #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
-          #if($codeToExecute != '')
-            #set($codeToExecuteResult = $configurableObj.display('codeToExecute', 'view', false))
+          #set ($heading = $app.getValue('heading', $configurableObj))
+          #set ($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+          ## If linkPrefix is set, then we will make each property label a link which starts with that prefix.
+          #set ($linkPrefix = "$!app.getValue('linkPrefix', $configurableObj)")
+          #if (!$app.restricted)
+            #set ($evaluatedConfigurableObj = $configurableObj.evaluate())
+            #set ($heading = $evaluatedConfigurableObj.heading)
+            #set ($linkPrefix = $evaluatedConfigurableObj.linkPrefix)
           #end
           ## Display the header if one exists.
-          #set($heading = $app.getValue('heading', $configurableObj))
           #if($heading &amp;&amp; $heading != '')
-            ## This application should not run with programming rights because it evaluates code which may not be trustworthy.
-            ## Removing the next line will open a security hole.
-            ## Can't use $configurableObj.display('heading', 'view', false) to have proper heading id (because of the html macro)
-            ## FIXME: find a cleaner solution
-            #set($void = $doc.dropPermissions())
-            #if ($services.security.authorization.hasAccess("script",
-              $app.authors.effectiveMetadataAuthor, $app.documentReference) &amp;&amp; !$app.restricted)
-              #set($evaluatedHeading = "#evaluate($heading)")
-            #else
-              #set($evaluatedHeading = $heading)
-            #end
-            == $services.rendering.escape($evaluatedHeading, 'xwiki/2.1') ==
+            == $services.rendering.escape($heading, 'xwiki/2.1') ==
           #end
           ## Display code to execute
-          #if($codeToExecute != '')
+          #if ($codeToExecute != '')
             (%class="codeToExecute"%)(((##
-              $codeToExecuteResult
+              $configurableObj.display('codeToExecute', 'view', false)
             )))
           #end
           ##
@@ -229,9 +221,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #if(!$propertiesToShow || $propertiesToShow.getClass().getName().indexOf('List') == -1)
             #set($propertiesToShow = [])
           #end
-          ##
-          ## If linkPrefix is set, then we will make each property label a link which starts with that prefix.
-          #set($linkPrefix = "$!app.getValue('linkPrefix', $configurableObj)")
           ##
           ## If the Configurable object specifies a configuration class, use it,
           ## otherwise assume custom forms are used instead.

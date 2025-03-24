@@ -54,4 +54,12 @@ class EntityChannelTest
         channels.add(bob);
         assertEquals(2, channels.size());
     }
+
+    @Test
+    void toStringTest()
+    {
+        EntityChannel alice =
+            new EntityChannel(new DocumentReference("foo", "Some", "Page"), List.of("en", "content", "wiki"), "123456");
+        assertEquals("entity = [foo:Some.Page], path = [[en], [content], [wiki]], key = [123456]", alice.toString());
+    }
 }

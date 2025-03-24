@@ -30,8 +30,10 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests basic page and space creation.
@@ -198,6 +200,22 @@ class CreatePageAndSpaceIT
         EditPage editPage = new EditPage();
 
         assertEquals("${escapetool.h}if()", editPage.getDocumentTitle());
+    }
+
+    @Test
+    @Order(4)
+    void createTopLevelPageFromWantedLink(TestUtils setup, TestReference reference) throws Exception
+    {
+        DocumentReference topLevelDoc = new DocumentReference("xwiki", "TopLevelWantedLink", "WebHome");
+        setup.rest().delete(topLevelDoc);
+        ViewPage page = setup.createPage(reference, "[[TopLevelWantedLink>>xwiki:TopLevelWantedLink.WebHome]]");
+        CreatePagePage createPagePage = page.clickWantedLink(topLevelDoc);
+        createPagePage.clickCreate();
+        WikiEditPage editPage = new WikiEditPage();
+        editPage.sendKeys("Some new content");
+        page = editPage.clickSaveAndView();
+        assertEquals("Some new content", page.getContent());
+        assertTrue(page.getBreadcrumb().hasPathElement("TopLevelWantedLink", true, true));
     }
 
     // TODO: Add a test for the input validation.

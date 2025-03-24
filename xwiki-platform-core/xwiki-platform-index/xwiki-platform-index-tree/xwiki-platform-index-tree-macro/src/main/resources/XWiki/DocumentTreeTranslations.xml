@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.6" reference="XWiki.DocumentTreeTranslations" locale="">
   <web>XWiki</web>
   <name>DocumentTreeTranslations</name>
   <language/>
@@ -82,9 +82,27 @@ rendering.macro.documentTree.parameter.limit.name=Limit
 rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
 rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
+rendering.macro.documentTree.parameter.sortDocumentsBy.name=Sort pages by
+rendering.macro.documentTree.parameter.sortDocumentsBy.description=The page field used to sort the child pages, followed by the sort order.
+
+rendering.macro.children.name=Children
+rendering.macro.children.description=Displays a tree of children pages of the current page
+rendering.macro.children.parameter.sort.name=Sort by
+rendering.macro.children.parameter.sort.description=The page field used to sort the child pages, followed by the sort order.
 
 index.documentTree.empty=No pages found
 index.documentTree.more={0} more ...
+index.documentTree.addDocument=New page...
+
+index.documentTree.documentSortDisplayer.field=Sort field
+index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.title=Title
+index.documentTree.documentSortDisplayer.field.date=Last modification date
+index.documentTree.documentSortDisplayer.field.creationDate=Creation date
+index.documentTree.documentSortDisplayer.order=Sort order
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=Ascending
+index.documentTree.documentSortDisplayer.order.desc=Descending
 
 ## Deprecated translation keys
 
@@ -109,6 +127,8 @@ rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

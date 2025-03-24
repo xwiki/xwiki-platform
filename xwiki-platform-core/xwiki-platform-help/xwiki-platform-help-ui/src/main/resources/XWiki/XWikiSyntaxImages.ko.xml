@@ -136,4 +136,4 @@
 *** **##alt##**: 브라우저가 이미지를 표시할 수 없는 경우 표시해야 하는 텍스트를 정의하는 매개변수입니다. 이것은 필수 HTML 속성 이므로 XWiki는 ##alt## 매개변수가 정의되지 않은 경우 파일 이름을 대신 사용합니다. 예: ##alt="img.png"##
 *** **추가**: 더 많은 속성을 포함하는 HTML ##&lt;img&gt;## 태그 에 대한 더 자세한 설명을 검토할 수 있습니다. [[ HTML 표준에서&gt;&gt;https:// html .spec.whatwg.org /다중 페이지/임베디드 콘텐츠. html #the-img-요소]].
 ** **##queryString##**: 참조 이미지에 대한 다운로드 링크를 생성할 때 쿼리가 서버에 전달되도록 허용합니다. 예: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"##(**##keepAspectRatio=true##는 ## 외에 ##width## 및 ##height## 매개변수가 지정된 경우 실패합니다. 쿼리문자열##!**)</content>
-  </xwikidoc>
+</xwikidoc>

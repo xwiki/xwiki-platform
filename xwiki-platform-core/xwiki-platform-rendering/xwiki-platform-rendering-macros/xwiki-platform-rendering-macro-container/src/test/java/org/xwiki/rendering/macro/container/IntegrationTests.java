@@ -19,15 +19,12 @@
  */
 package org.xwiki.rendering.macro.container;
 
-import java.util.Map;
-
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.runner.RunWith;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.skinx.SkinExtension;
-import org.xwiki.test.jmock.MockingComponentManager;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -36,23 +33,13 @@ import org.xwiki.test.jmock.MockingComponentManager;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-public class IntegrationTests
+@AllComponents
+@Scope(pattern = "macrocontainer.*")
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager componentManager) throws Exception
+    @Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
     {
-        Mockery mockery = new JUnit4Mockery();
-
-        final SkinExtension ssfxMock = componentManager.registerMockComponent(mockery, SkinExtension.class, "ssfx");
-
-        mockery.checking(new Expectations()
-        {
-            {
-                String cssPath = "uicomponents/container/columns.css";
-                allowing(ssfxMock).use(with(cssPath));
-                allowing(ssfxMock).use(with(cssPath), with(any(Map.class)));
-            }
-        });
+        componentManager.registerMockComponent(SkinExtension.class, "ssfx");
     }
 }

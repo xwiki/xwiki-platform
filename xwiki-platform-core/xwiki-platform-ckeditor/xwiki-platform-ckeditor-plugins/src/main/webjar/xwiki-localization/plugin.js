@@ -30,6 +30,16 @@
           return getTranslation.apply(editor, arguments);
         }
       };
+
+      // Useful to know which document translation is currently being edited.
+      editor.getContentLocale = () => {
+        // Check if the content language is specified in the form containing this editor instance.
+        // Note that the language field holds the real locale of the edited document.
+        const languageField = editor.element?.$.closest('form, .form, body')?.querySelector('input[name="language"]');
+        // Fallback on the locale of the current document, specified on the HTML element. Note that this is the raw
+        // locale not the real locale, i.e. the value is empty for the default document translation.
+        return languageField ? languageField.value : (document.documentElement.dataset.xwikiLocale || '');
+      };
     }
   });
 

@@ -31,11 +31,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -60,17 +62,20 @@ class CreateInlinePageTest extends PageTest
 
     private static final String ERROR_MESSAGE_CLASS = "errormessage";
 
+    @Inject
     private VelocityManager velocityManager;
 
     @Inject
     private TemplateManager templateManager;
 
     @BeforeEach
-    void setup() throws Exception
+    void setup()
     {
-        this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
         // Set an empty list of recommended template providers to avoid a Velocity error.
         this.velocityManager.getVelocityContext().put("recommendedTemplateProviders", List.of());
+
+        // Set a context document to avoid problems
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("xwiki", "space", "page")));
     }
 
     /**
@@ -92,7 +97,11 @@ class CreateInlinePageTest extends PageTest
         Document document = Jsoup.parse(this.templateManager.render(CREATE_INLINE_VM));
         Element errormessage = document.getElementsByClass(ERROR_MESSAGE_CLASS).first();
         assertNotNull(errormessage);
-        String expectedMessage = String.format("entitynamevalidation.create.invalidname [%s]", DOCUMENT_REFERENCE);
+        String expectedMessage = String.format("entitynamevalidation.create.invalidNameError [%s] "
+            + "entitynamevalidation.create.invalidName.possibleSolution "
+            + "entitynamevalidation.create.invalidName.strategyInfo "
+            + "[entitynamevalidation.${currentStrategy}.name, entitynamevalidation.${currentStrategy}.usage]",
+            DOCUMENT_REFERENCE);
         assertEquals(expectedMessage, errormessage.text());
     }
 

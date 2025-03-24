@@ -200,6 +200,7 @@
       "panel-header-text" : "color",
       "breadcrumb-bg": "color",
       "breadcrumb-color": "color",
+      "breadcrumb-link-color": "color",
       "breadcrumb-separator": "escapedText",
       "table-bg": "color",
       "table-bg-hover": "color",

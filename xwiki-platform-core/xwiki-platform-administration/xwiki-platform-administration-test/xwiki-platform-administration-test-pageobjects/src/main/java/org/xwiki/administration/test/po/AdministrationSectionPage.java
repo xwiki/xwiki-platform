@@ -35,9 +35,6 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class AdministrationSectionPage extends ViewPage
 {
-    @FindBy(xpath = "//input[@type='submit'][@name='formactionsac']")
-    private WebElement saveButton;
-
     /**
      * There's no id to get only the admin page content so getting the main content area (which includes the
      * breadcrumb and title) is the best we can do, until we add some id for the content of admin pages.
@@ -52,11 +49,29 @@ public class AdministrationSectionPage extends ViewPage
     @FindBy(xpath = "//div[@id='admin-page-content']")
     private WebElement formContainer;
 
-    private final String section;
+    private String section;
+
+    /**
+     * See {@link #AdministrationSectionPage(String, boolean)}.
+     */
+    private boolean asyncSave;
 
     public AdministrationSectionPage(String section)
     {
+        this(section, false);
+    }
+
+    /**
+     * @param section the name of the section in the Admin UI vertical menu
+     * @param asyncSave whether the save button in the administration section page executes the save async or not. If
+     *        you're not using a {@code ConfigurableClass} with a custom {@code codeToExecute} then asyncSave should
+     *        be false. This is until we make all admin sections save async.
+     * @since 16.6.0RC1
+     */
+    public AdministrationSectionPage(String section, boolean asyncSave)
+    {
         this.section = section;
+        this.asyncSave = asyncSave;
     }
 
     public static AdministrationSectionPage gotoPage(String section)
@@ -113,14 +128,25 @@ public class AdministrationSectionPage extends ViewPage
 
     public void clickSave()
     {
-        // Many administration sections are still submitted synchronously so we can't wait by default. There are also
-        // some administration sections that are submitted asynchronously but they use a custom success message.
-        clickSave(false);
+        // Note: There are some administration sections that are submitted asynchronously, but they use a custom
+        // success message. For these cases, their PO should override the {@link #clickSave(boolean)} method to perform
+        // the wait themselves.
+        clickSave(this.asyncSave);
     }
 
+    /**
+     * The only reason to call with wait as false is when the admin section is using a custom success message. See
+     * {@link #clickSave()}'s implementation.
+     */
     public void clickSave(boolean wait)
     {
-        this.saveButton.click();
+        WebElement saveButton;
+        if (this.asyncSave) {
+            saveButton = getDriver().findElement(By.xpath("//input[@type='submit'][@name='action_saveandcontinue']"));
+        } else {
+            saveButton = getDriver().findElement(By.xpath("//input[@type='submit'][@name='formactionsac']"));
+        }
+        saveButton.click();
 
         if (wait) {
             // Wait until the page is really saved.

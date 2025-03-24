@@ -42,7 +42,8 @@ class WatchedLocationStateTest
         for (int i = 1; i < 999; i++) {
             Date startingDate = new Date(timeInMillis + i);
             assertNotEquals(expectedDate, startingDate);
-            Date obtainedStartingDate = new WatchedLocationState(false, startingDate).getStartingDate();
+            Date obtainedStartingDate =
+                new WatchedLocationState(WatchedLocationState.WatchedState.NOT_SET, startingDate).getStartingDate();
             assertEquals(expectedDate, obtainedStartingDate,
                 String.format("Expected [%s] and got [%s]", expectedDate.getTime(), obtainedStartingDate.getTime()));
         }

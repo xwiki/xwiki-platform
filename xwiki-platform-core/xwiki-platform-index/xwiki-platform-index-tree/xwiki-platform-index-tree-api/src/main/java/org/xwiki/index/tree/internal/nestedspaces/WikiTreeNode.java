@@ -21,14 +21,18 @@ package org.xwiki.index.tree.internal.nestedspaces;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -45,13 +49,35 @@ import org.xwiki.query.QueryException;
 @Component
 @Named("wiki/nestedSpaces")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class WikiTreeNode extends org.xwiki.index.tree.internal.nestedpages.WikiTreeNode
+public class WikiTreeNode extends AbstractEntityTreeNode
 {
+    /**
+     * Default constructor.
+     */
+    public WikiTreeNode()
+    {
+        super("wiki");
+    }
+
     @Override
-    protected List<? extends EntityReference> getChildren(WikiReference wikiReference, int offset, int limit)
+    public List<String> getChildren(String nodeId, int offset, int limit)
+    {
+        EntityReference wikiReference = resolve(nodeId);
+        if (wikiReference != null && wikiReference.getType() == EntityType.WIKI) {
+            try {
+                return serialize(getChildren(new WikiReference(wikiReference), offset, limit));
+            } catch (QueryException e) {
+                this.logger.warn("Failed to retrieve the children of [{}]. Root cause [{}].", nodeId,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private List<? extends EntityReference> getChildren(WikiReference wikiReference, int offset, int limit)
         throws QueryException
     {
-        List<String> constraints = new ArrayList<String>();
+        List<String> constraints = new ArrayList<>();
         constraints.add("parent is null");
         if (!areHiddenEntitiesShown()) {
             constraints.add("hidden <> true");
@@ -64,7 +90,7 @@ public class WikiTreeNode extends org.xwiki.index.tree.internal.nestedpages.Wiki
         query.setOffset(offset);
         query.setLimit(limit);
 
-        List<SpaceReference> spaceReferences = new ArrayList<SpaceReference>();
+        List<SpaceReference> spaceReferences = new ArrayList<>();
         for (Object result : query.execute()) {
             String name = (String) result;
             spaceReferences.add(new SpaceReference(name, wikiReference));
@@ -74,8 +100,28 @@ public class WikiTreeNode extends org.xwiki.index.tree.internal.nestedpages.Wiki
     }
 
     @Override
-    protected int getChildCount(WikiReference wikiReference) throws QueryException
+    public int getChildCount(String nodeId)
+    {
+        EntityReference wikiReference = resolve(nodeId);
+        if (wikiReference != null && wikiReference.getType() == EntityType.WIKI) {
+            try {
+                return getChildCount(new WikiReference(wikiReference));
+            } catch (QueryException e) {
+                this.logger.warn("Failed to count the children of [{}]. Root cause [{}].", nodeId,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+        return 0;
+    }
+
+    private int getChildCount(WikiReference wikiReference) throws QueryException
     {
         return getChildSpacesCount(wikiReference);
+    }
+
+    @Override
+    public String getParent(String nodeId)
+    {
+        return FARM_NODE_ID;
     }
 }

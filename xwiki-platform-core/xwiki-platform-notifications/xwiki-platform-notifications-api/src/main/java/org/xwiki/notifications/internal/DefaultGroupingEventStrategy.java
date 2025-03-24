@@ -46,11 +46,11 @@ public class DefaultGroupingEventStrategy implements GroupingEventStrategy
 
     private static final class BestSimilarity
     {
-        public int value;
+        private int value;
 
-        public CompositeEvent compositeEvent;
+        private CompositeEvent compositeEvent;
 
-        public Event event;
+        private Event event;
 
         public boolean isCompositeEventCompatibleWith(Event event)
         {

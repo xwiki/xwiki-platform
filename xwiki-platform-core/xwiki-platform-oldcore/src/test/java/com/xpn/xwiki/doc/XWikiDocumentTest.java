@@ -38,6 +38,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageReference;
@@ -48,8 +49,11 @@ import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -102,6 +106,9 @@ public class XWikiDocumentTest
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
 
     private static final String DOCWIKI = "Wiki";
 
@@ -591,7 +598,7 @@ public class XWikiDocumentTest
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         assertEquals(
-            "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
+            "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' aria-label='core.model.xclass.editClassProperty.textAlternative' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
             this.document.display("string", "edit", this.oldcore.getXWikiContext()));
 
         assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
@@ -627,7 +634,7 @@ public class XWikiDocumentTest
 
         assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
         assertEquals(
-            "{pre}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
+            "{pre}<input size='30' id='Space.Page_0_string' aria-label='core.model.xclass.editClassProperty.textAlternative' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
             this.document.display("string", "edit", this.oldcore.getXWikiContext()));
 
         assertEquals("<p>area</p>", this.document.display("area", "view", this.oldcore.getXWikiContext()));
@@ -644,7 +651,7 @@ public class XWikiDocumentTest
 
         assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
         assertEquals(
-            "<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>",
+            "<input size='30' id='Space.Page_0_string' aria-label='core.model.xclass.editClassProperty.textAlternative' value='string' name='Space.Page_0_string' type='text'/>",
             this.document.display("string", "edit", this.oldcore.getXWikiContext()));
 
         assertEquals("<p>area</p>", this.document.display("area", "view", this.oldcore.getXWikiContext()));
@@ -737,7 +744,8 @@ public class XWikiDocumentTest
     @Test
     void testRenderedTitleWhenVelocityError() throws XWikiVelocityException
     {
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(same(Right.SCRIPT), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(same(Right.SCRIPT), same(EntityType.DOCUMENT), any(), any())).thenReturn(true);
 
         this.document.setContent("Some content");
         this.document.setTitle("some content that generate a velocity error");
@@ -821,6 +829,14 @@ public class XWikiDocumentTest
     }
 
     @Test
+    void getAttachmentWhenNull() throws Exception
+    {
+        this.document.setAttachment("file.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
+            this.oldcore.getXWikiContext());
+        assertNull(this.document.getAttachment(null));
+    }
+
+    @Test
     void getAttachment() throws Exception
     {
         this.document.setAttachment("file.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
@@ -828,16 +844,20 @@ public class XWikiDocumentTest
         this.document.setAttachment("file2.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
             this.oldcore.getXWikiContext());
         assertNotNull(this.document.getAttachment("file.txt"));
+        assertEquals("file.txt", this.document.getAttachment("file.txt").getFilename());
+        assertEquals("file.txt", this.document.getAttachment("file").getFilename());
     }
-    
+
     @Test
-    void getAttachmentWithExtension() throws Exception
+    void getAttachmentWithFileExtension() throws Exception
     {
         this.document.setAttachment("file2.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
             this.oldcore.getXWikiContext());
         this.document.setAttachment("file.txt.txt", IOUtils.toInputStream("", Charset.defaultCharset()),
             this.oldcore.getXWikiContext());
         assertNotNull(this.document.getAttachment("file.txt"));
+        assertEquals("file.txt.txt", this.document.getAttachment("file.txt.txt").getFilename());
+        assertEquals("file.txt.txt", this.document.getAttachment("file.txt").getFilename());
     }
 
     @Test

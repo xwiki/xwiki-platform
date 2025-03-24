@@ -387,19 +387,18 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
             List<String> setPropertyNames = new ArrayList<>();
             BaseObject baseObject = getBaseObject();
             if (baseObject != null) {
+                XWikiDocument modifiedDocument = baseObject.getOwnerDocument().clone();
+                // Find the object to modify back in the cloned document.
+                baseObject = modifiedDocument.getXObject(baseObject.getReference());
+
                 XWikiContext xcontext = this.xcontextProvider.get();
                 BaseClass baseClass = baseObject.getXClass(xcontext);
                 for (Map.Entry<String, Object> entry : properties.entrySet()) {
                     setBaseProperty(entry.getKey(), entry.getValue(), baseObject, baseClass);
                     setPropertyNames.add(entry.getKey());
                 }
-                DocumentReference documentReference = getFailsafeDocumentReference();
-                if (documentReference != null) {
-                    xcontext.getWiki().saveDocument(getDocument(), String.format("Set properties: %s",
-                        StringUtils.join(setPropertyNames, ',')), xcontext);
-                } else {
-                    // The configuration document doesn't exist, don't do anything
-                }
+                xcontext.getWiki().saveDocument(modifiedDocument, String.format("Set properties: %s",
+                    StringUtils.join(setPropertyNames, ',')), xcontext);
             }
         } catch (Exception e) {
             throw new ConfigurationSaveException(String.format("Failed to set properties [%s] in document [%s]'s [%s] "

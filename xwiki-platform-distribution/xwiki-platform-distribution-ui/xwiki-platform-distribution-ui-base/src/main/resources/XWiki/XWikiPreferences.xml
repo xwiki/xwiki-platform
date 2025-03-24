@@ -1171,6 +1171,30 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </title>
+    <underline>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <freeText>forbidden</freeText>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
+      <name>underline</name>
+      <number>12</number>
+      <picker>1</picker>
+      <prettyName>Underline links</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort>none</sort>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>OnlyInlineLinks|Yes|No</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </underline>
     <upload_maxsize>
       <customDisplay/>
       <disabled>0</disabled>
@@ -2652,6 +2676,30 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </title>
+      <underline>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>underline</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>Underline links</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>OnlyInlineLinks|Yes|No</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </underline>
       <upload_maxsize>
         <customDisplay/>
         <disabled>0</disabled>
@@ -2891,7 +2939,12 @@ Your account on ${wikiname} has been successfully activated. You can now login a
 ## We verify that we don't display RSS feeds on the login page since it causes problems if these feeds are
 ## protected. In addition it makes the login redirect to the feeds page in some cases.
 #if($doc.fullName != "XWiki.XWikiLogin")
-&lt;link rel="alternate" type="application/rss+xml" title="Wiki Feed RSS" href="$xwiki.getURL('Main.WebRss', 'view', 'xpage=rdf')" /&gt;
+## TODO: replace this hack with a call to a proper API to get the URL of the notification RSS (or at the very least an API to get the based URL of the REST endpoint)
+#set ($rssURL = $services.rest.url($services.model.createDocumentReference($xcontext.database, 'Main', 'WebHome')))
+#set ($rssURL = "${rssURL.substring(0, $rssURL.indexOf('/rest'))}/rest/notifications/rss")
+#set ($rssURL = "${rssURL}?userId=$!escapetool.url($services.model.serialize($xcontext.userReference, 'default'))")
+#set ($rssURL = "${rssURL}&amp;count=50&amp;useUserPreferences=false&amp;displayOwnEvents=true")
+&lt;link rel="alternate" type="application/rss+xml" title="Wiki Feed RSS" href="$rssURL" /&gt;
 &lt;link rel="alternate" type="application/rss+xml" title="Blog RSS Feed" href="$xwiki.getURL('Blog.GlobalBlogRss', 'view', 'xpage=plain')" /&gt;
 #end</meta>
     </property>
@@ -2972,6 +3025,9 @@ Your account on ${wikiname} has been successfully activated. You can now login a
     </property>
     <property>
       <title>$tdoc.getRenderedTitle('plain/1.0') - XWiki</title>
+    </property>
+    <property>
+      <underline>OnlyInlineLinks</underline>
     </property>
     <property>
       <upload_maxsize>107374182400</upload_maxsize>

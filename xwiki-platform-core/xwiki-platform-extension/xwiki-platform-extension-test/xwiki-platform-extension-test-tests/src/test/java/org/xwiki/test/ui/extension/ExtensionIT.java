@@ -38,6 +38,9 @@ import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.DefaultExtensionIssueManagement;
 import org.xwiki.extension.DefaultExtensionScm;
 import org.xwiki.extension.DefaultExtensionScmConnection;
+import org.xwiki.extension.DefaultExtensionSupportPlan;
+import org.xwiki.extension.DefaultExtensionSupportPlans;
+import org.xwiki.extension.DefaultExtensionSupporter;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
@@ -106,7 +109,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 
         // Double check that the XWiki Extension Repository is empty.
         ExtensionsSearchResult searchResult =
-            getUtil().rest().getResource("repository/search", Collections.singletonMap("number", new Object[] { 1 }));
+            getUtil().rest().getResource("repository/search", Collections.singletonMap("number", new Object[] {1}));
         assertEquals(0, searchResult.getTotalHits());
     }
 
@@ -291,7 +294,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         getRepositoryTestUtils().addExtension(extension);
         getRepositoryTestUtils().waitUntilReady();
 
-        // Check that the Recommended Extensions are displayed by default.
+        // Check that the Supported Extensions are displayed by default.
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoPage();
         Select repositorySelect = adminPage.getSearchBar().getRepositorySelect();
         assertEquals("Available Extensions", repositorySelect.getFirstSelectedOption().getText());
@@ -970,22 +973,24 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
     }
 
     /**
-     * Make sure recommended extension are properly filtered.
+     * Make sure supported extensions are properly filtered.
      */
     @Test
-    public void testFilterRecommended() throws Exception
+    public void testFilterSupported() throws Exception
     {
-        // Add recommended extension
-        ExtensionId recommendedExtensionId = new ExtensionId("alice-xar-extension", "1.3");
-        TestExtension recommendedExtension = getRepositoryTestUtils().getTestExtension(recommendedExtensionId, "xar");
-        recommendedExtension.setRecommended(true);
-        getRepositoryTestUtils().addExtension(recommendedExtension);
+        // Add supported extension
+        ExtensionId supportedExtensionId = new ExtensionId("alice-xar-extension", "1.3");
+        TestExtension supportedExtension = getRepositoryTestUtils().getTestExtension(supportedExtensionId, "xar");
+        DefaultExtensionSupporter supporter = new DefaultExtensionSupporter("Supporter", null);
+        DefaultExtensionSupportPlan supportPlan =
+            new DefaultExtensionSupportPlan(supporter, "Support Plan", null, true);
+        supportedExtension.setSupportPlans(new DefaultExtensionSupportPlans(List.of(supportPlan)));
+        getRepositoryTestUtils().addExtension(supportedExtension);
 
-        // Add not recommended extension
-        ExtensionId notRecommendedExtensionId = new ExtensionId("bob-xar-extension", "2.5-milestone-2");
-        TestExtension notRecommendedExtension =
-            getRepositoryTestUtils().getTestExtension(notRecommendedExtensionId, "xar");
-        getRepositoryTestUtils().addExtension(notRecommendedExtension);
+        // Add not supported extension
+        ExtensionId notSupportedExtensionId = new ExtensionId("bob-xar-extension", "2.5-milestone-2");
+        TestExtension notSupportedExtension = getRepositoryTestUtils().getTestExtension(notSupportedExtensionId, "xar");
+        getRepositoryTestUtils().addExtension(notSupportedExtension);
 
         // Make sure everything is ready
         getRepositoryTestUtils().waitUntilReady();
@@ -997,18 +1002,18 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 
         // Empty search
         SearchResultsPane searchResults = adminPage.getSearchResults();
-        assertNotNull(searchResults.getExtension(recommendedExtensionId));
-        assertNull(searchResults.getExtension(notRecommendedExtensionId));
+        assertNotNull(searchResults.getExtension(supportedExtensionId));
+        assertNull(searchResults.getExtension(notSupportedExtensionId));
 
-        // Search among recommended extensions
+        // Search among supported extensions
         SimpleSearchPane searchBar = adminPage.getSearchBar();
         searchResults = searchBar.search("alice-xar-extension");
-        assertNotNull(searchResults.getExtension(recommendedExtensionId));
-        assertNull(searchResults.getExtension(notRecommendedExtensionId));
+        assertNotNull(searchResults.getExtension(supportedExtensionId));
+        assertNull(searchResults.getExtension(notSupportedExtensionId));
 
         // Fallback on all extensions
         searchResults = searchBar.search("bob-xar-extension");
-        assertNull(searchResults.getExtension(recommendedExtensionId));
-        assertNotNull(searchResults.getExtension(notRecommendedExtensionId));
+        assertNull(searchResults.getExtension(supportedExtensionId));
+        assertNotNull(searchResults.getExtension(notSupportedExtensionId));
     }
 }

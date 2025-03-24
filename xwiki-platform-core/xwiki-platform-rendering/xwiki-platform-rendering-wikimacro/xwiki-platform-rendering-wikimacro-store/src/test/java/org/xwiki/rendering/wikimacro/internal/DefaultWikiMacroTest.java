@@ -62,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
@@ -129,7 +130,8 @@ class DefaultWikiMacroTest
 
         this.oldcore.getSpyXWiki().saveDocument(this.wikiMacroDocument, this.oldcore.getXWikiContext());
 
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(same(Right.PROGRAM), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(same(Right.PROGRAM), isNull(), any(), any()))
+            .thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.PROGRAM))).thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.SCRIPT))).thenReturn(true);
         when(this.oldcore.getMockRightService().hasProgrammingRights(any())).thenReturn(true);
@@ -704,5 +706,26 @@ class DefaultWikiMacroTest
         //@formatter:on
 
         assertEquals(expect, printer.toString());
+    }
+
+    @Test
+    void wikiMacroParameterWithDefaultValueContext() throws Exception
+    {
+        String defaultValue = "{{velocity}}$xcontext.sdoc{{/velocity}}";
+        List<WikiMacroParameterDescriptor> parameterDescriptors = List.of(new WikiMacroParameterDescriptor("param",
+            "Test parameter", false, defaultValue, Block.LIST_BLOCK_TYPE));
+
+        registerWikiMacro("defaultmacro", "{{wikimacroparameter name=\"param\"/}}", Syntax.XWIKI_2_1,
+            parameterDescriptors);
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(
+            new StringReader("{{defaultmacro /}} {{defaultmacro param=\"Outside: %s\" /}}".formatted(defaultValue)),
+            Syntax.XWIKI_2_1, Syntax.PLAIN_1_0, printer);
+
+        assertEquals("space.macroPage Outside: sspace.sdoc", printer.toString());
+
     }
 }

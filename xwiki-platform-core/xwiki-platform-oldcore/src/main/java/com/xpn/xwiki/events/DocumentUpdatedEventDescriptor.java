@@ -42,7 +42,7 @@ public class DocumentUpdatedEventDescriptor extends AbstractXWikiRecordableEvent
     public static final String EVENT_TYPE = DocumentEventType.UPDATE;
 
     /**
-     * Construct an DocumentUpdatedEventDescriptor.
+     * Construct a DocumentUpdatedEventDescriptor.
      */
     public DocumentUpdatedEventDescriptor()
     {

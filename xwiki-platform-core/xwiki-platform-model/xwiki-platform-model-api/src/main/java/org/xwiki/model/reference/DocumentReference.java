@@ -27,11 +27,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to a document (wiki, space and document names).
@@ -72,7 +75,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     }
 
     /**
-     * Clone an DocumentReference, but replace one of the parent in the chain by a new one.
+     * Clone a DocumentReference, but replace one of the parent in the chain by a new one.
      *
      * @param reference the reference that is cloned
      * @param oldReference the old parent that will be replaced
@@ -133,7 +136,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     public DocumentReference(String wikiName, String spaceName, String pageName, String language)
     {
         this(pageName, new SpaceReference(spaceName, new WikiReference(wikiName)),
-            (language == null) ? null : new Locale(language));
+            (language == null) ? null : LocaleUtils.toLocale(language));
     }
 
     /**
@@ -210,7 +213,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     }
 
     /**
-     * Clone an DocumentReference, but use the specified parent for its new parent.
+     * Clone a DocumentReference, but use the specified parent for its new parent.
      *
      * @param reference the reference to clone
      * @param parent the new parent to use
@@ -376,6 +379,35 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     public DocumentReference withoutLocale()
     {
         return getLocale() != null ? new DocumentReference(this, (Locale) null) : this;
+    }
+
+    /**
+     * Retrieve a {@link DocumentReference} from an {@link EntityReference} by extracting it and performing checks.
+     * If the provided entity reference doesn't contain a reference to a document (e.g. it's a wiki reference) then it
+     * returns an empty result.
+     * @param entityReference the reference for which to extract the document reference
+     * @return the extracted {@link DocumentReference} or an empty optional.
+     * @since 16.6.0RC1
+     * @since 16.4.2
+     * @since 15.10.12
+     */
+    @Unstable
+    public static Optional<DocumentReference> extractDocument(EntityReference entityReference)
+    {
+        Optional<DocumentReference> result = Optional.empty();
+        if (entityReference != null) {
+            if (entityReference instanceof DocumentReference) {
+                result = Optional.of((DocumentReference) entityReference);
+            } else {
+                EntityReference extractedRef = entityReference.extractReference(EntityType.DOCUMENT);
+                if (extractedRef instanceof DocumentReference) {
+                    result = Optional.of((DocumentReference) extractedRef);
+                } else if (extractedRef != null) {
+                    result = Optional.of(new DocumentReference(extractedRef));
+                }
+            }
+        }
+        return result;
     }
 
     @Override

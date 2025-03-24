@@ -31,9 +31,9 @@ import org.xwiki.configuration.ConfigurationSource;
 /**
  * Composite Configuration Source that looks in the following sources in that order:
  * <ul>
- * <li>user preferences wiki page</li>
- * <li>space preferences wiki page</li>
- * <li>wiki preferences wiki page</li>
+ * <li>current user preferences wiki page</li>
+ * <li>current space preferences wiki page and all its parent spaces preferences pages</li>
+ * <li>current wiki preferences wiki page</li>
  * <li>xwiki properties file (xwiki.properties)</li>
  * </ul>
  * Should be used when a configuration can be overridden by the user in his/her profile.

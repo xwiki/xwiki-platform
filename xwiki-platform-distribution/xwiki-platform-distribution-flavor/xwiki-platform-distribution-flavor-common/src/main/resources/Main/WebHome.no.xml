@@ -54,7 +54,7 @@ Bruk {{displayIcon name="home"/}} brødsmulene som ligger over tittelen for å /
 Du kan også bruke [[Sandbox &gt;&gt;Sandbox.WebHome]] for mer demoinnhold og generelt et sted å eksperimentere med wikifunksjonene.
 
  {{box}}
-Lær mer om hvordan du bruker XWiki med [[Komme i gang guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
+Lær mer om hvordan du bruker XWiki med [[Komme i gang guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
 {{/box}}
 
 (%class="row"%)(((
@@ -63,7 +63,7 @@ Lær mer om hvordan du bruker XWiki med [[Komme i gang guide&gt;&gt;http://www.x
 
 For å utvide kraften og funksjonalitetene til wikien din med funksjonene //du// trenger, kan du gå over til [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] der du kan søke etter og installere utvidelser.
 
-Hvis du vil bla gjennom 900+ fellesskapsbidragte utvidelser som er tilgjengelige for XWiki, kan du gå til [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]].
+Hvis du vil bla gjennom 900+ fellesskapsbidragte utvidelser som er tilgjengelige for XWiki, kan du gå til [[Extensions Repository&gt;&gt;https://extensions.xwiki.org]].
 )))
 (%class="col-xs-12 col-sm-6"%)(((
 == Lag din applikasjon ==

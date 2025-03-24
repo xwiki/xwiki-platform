@@ -29,7 +29,6 @@ import org.xwiki.extension.index.IndexedExtensionQuery;
 import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various script APIs related to indexed extensions.
@@ -83,7 +82,6 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
      * @since 15.5RC1
      */
     @SuppressWarnings("unchecked")
-    @Unstable
     public <S extends ScriptService> S get(String serviceName)
     {
         return (S) this.scriptServiceManager.get(

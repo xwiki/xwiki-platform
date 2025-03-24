@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.URLSecurityManager;
 
 /**
@@ -42,7 +41,6 @@ import org.xwiki.url.URLSecurityManager;
 @Component
 @Named("security.url")
 @Singleton
-@Unstable
 public class URLSecurityScriptService implements ScriptService
 {
     @Inject

@@ -20,10 +20,14 @@
 package org.xwiki.flamingo.test.docker;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -32,6 +36,7 @@ import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -57,15 +62,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     // Add the FileUploadPlugin which is needed by the test to upload attachment files
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.Execute\\..*"
 })
 class AttachmentIT
 {
     private static final String FIRST_ATTACHMENT = "SmallAttachment.txt";
 
     private static final String SECOND_ATTACHMENT = "SmallAttachment2.txt";
-
-    private static final String ESCAPED_ATTACHMENT = "<strong>EscapedAttachment.txt";
 
     private static final String IMAGE_ATTACHMENT = "image.gif";
 
@@ -445,19 +449,24 @@ class AttachmentIT
 
     @Test
     @Order(9)
-    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration)
+    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference) throws IOException
     {
         setup.loginAsSuperAdmin();
+
+        // We shouldn't store files with special characters in the repository, since some filesystems don't support it.
+        // Instead, we create the file during the test.
+        Path unescapedFile = Files.createTempFile("<strong>", null);
+        String unescapedFileName = unescapedFile.getFileName().toString();
+
         setup.createPage(testReference, "Empty content");
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
 
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, ESCAPED_ATTACHMENT).getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish(ESCAPED_ATTACHMENT);
+        attachmentsPane.setFileToUpload(unescapedFile.toString(), true);
+        attachmentsPane.waitForUploadToFinish(unescapedFileName);
         attachmentsPane.clickHideProgress();
 
-        assertTrue(attachmentsPane.attachmentExistsByFileName(ESCAPED_ATTACHMENT));
-        attachmentsPane.deleteAttachmentByFileByName(ESCAPED_ATTACHMENT);
+        assertTrue(attachmentsPane.attachmentExistsByFileName(unescapedFileName));
+        attachmentsPane.deleteAttachmentByFileByName(unescapedFileName);
     }
 
     private String getAttachmentsMacroContent(DocumentReference docRef)
@@ -471,5 +480,29 @@ class AttachmentIT
         sb.append("{{/velocity}}");
 
         return sb.toString();
+    }
+
+    @Test
+    @Order(10)
+    void attachmentContentLocation(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        setup.createPage(testReference, "", "");
+
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, FIRST_ATTACHMENT).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(FIRST_ATTACHMENT);
+        assertTrue(attachmentsPane.attachmentExistsByFileName(FIRST_ATTACHMENT));
+
+        // Make sure the content of the attachment is actually referencing the last version in the history storage
+        assertEquals("fv1.1.txt",
+            StringUtils.substringAfterLast(setup.executeWikiPlain(
+                """
+                    {{groovy}}
+                      println xwiki.getDocument('%s').document.getAttachment('%s').getAttachmentContent(xcontext.context).storageFile
+                    {{/groovy}}
+                    """
+                    .formatted(setup.serializeReference(testReference), FIRST_ATTACHMENT),
+                Syntax.XWIKI_2_1), '/'));
     }
 }

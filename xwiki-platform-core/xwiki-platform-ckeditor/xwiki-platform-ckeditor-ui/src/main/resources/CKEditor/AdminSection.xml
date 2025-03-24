@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.AdminSection" locale="">
+<xwikidoc version="1.6" reference="CKEditor.AdminSection" locale="">
   <web>CKEditor</web>
   <name>AdminSection</name>
   <language/>
@@ -51,7 +51,6 @@
 {{velocity}}
 {{html clean="false"}}
 #set ($discard = $xwiki.ssx.use('CKEditor.AdminSection'))
-#set ($discard = $xwiki.jsx.use('CKEditor.AdminSection'))
 #set ($configDoc = $xwiki.getDocument('CKEditor.Config'))
 &lt;form id="ckeditorConfig" method="post" action="$configDoc.getURL('save')" class="xform"
     data-editorId="ckeditor" data-label="CKEditor"&gt;
@@ -331,9 +330,6 @@
       <configurationClass/>
     </property>
     <property>
-      <configureGlobally>1</configureGlobally>
-    </property>
-    <property>
       <displayBeforeCategory/>
     </property>
     <property>
@@ -359,154 +355,6 @@
     </property>
     <property>
       <sectionOrder/>
-    </property>
-  </object>
-  <object>
-    <name>CKEditor.AdminSection</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>0635d088-9d33-4370-b387-411f20e3e963</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <restricted>0</restricted>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>require(['jquery', 'bootstrap'], function($) {
-  var adminPageContent = $('#admin-page-content');
-  var forms = adminPageContent.find('form');
-  // Check if we need to enhance the WYSIWYG administration section with tabs (one tab for each editor).
-  if (forms.length &lt; 2 || forms.is('#wysiwyg')) {
-    // Either there is only one editor available or the WYSIWYG administration section handles the tabs itself
-    // (XWiki 9.2RC1+). Leave the administration page as it is.
-    // This JavaScript code is executed after the page has been loaded so in order to avoid flickering UI we hide the
-    // page content from CSS and restore it back here.
-    adminPageContent.addClass('visible');
-    return;
-  }
-
-  var formIdToEditorName = {
-    'wysiwyg_XWiki.WysiwygEditorConfig': 'GWT',
-    'ckeditorConfig': 'CKEditor'
-  };
-
-  // Use tabs to configure each of the available editors.
-  var editorTabList = $('&lt;ul class="nav nav-tabs" role="tablist"&gt;&lt;/ul&gt;').prependTo(adminPageContent);
-  var editorTabContent = $('&lt;div class="tab-content"&gt;').insertAfter(editorTabList);
-  forms.each(function() {
-    // The Bootstrap Tab plugin uses the tab id in a CSS selector and since dot is a special character we need to avoid
-    // it (the Tab plugin expects a valid id string and so it doesn't perform any escaping).
-    var tabId = $(this).attr('id').replace('.', '_') + '_tab';
-    // Add the tab name.
-    var formId = $(this).attr('id');
-    var tabName = formIdToEditorName[formId] || formId;
-    $('&lt;li role="presentation"&gt;&lt;a role="tab" data-toggle="tab"&gt;&lt;/a&gt;&lt;/li&gt;').appendTo(editorTabList)
-      .find('a').attr({
-        'href': '#' + tabId,
-        'data-editorId': tabName.toLowerCase()
-      }).text(tabName)
-      .on('click', function(event) {
-        event.preventDefault();
-        $(this).tab('show');
-      });
-    // Add the tab content.
-    $('&lt;div role="tabpanel" class="tab-pane"&gt;&lt;/div&gt;').attr('id', tabId).appendTo(editorTabContent)
-      .append($(this).closest('#admin-page-content &gt; *'));
-  });
-
-  // Show the configuration for the active editor, or the first one if none is active.
-  var activeTab = editorTabList.find('a[data-editorId="$!services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id"]');
-  if (!activeTab.length) {
-    activeTab = editorTabList.find('a').first();
-  }
-  activeTab.tab('show');
-});</code>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
     </property>
   </object>
   <object>
@@ -615,26 +463,8 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>/* Hide the page content until the JavaScript code is loaded and executed. Also hide unnecessary headings.
-  This is not needed anymore starting with XWiki 9.2RC1. */
-#admin-page-content &gt; form,
-#admin-page-content &gt; .codeToExecute,
-#admin-page-content &gt; h1.wikigeneratedheader,
-#admin-page-content &gt; h2.wikigeneratedheader {
-  display: none;
-}
-#admin-page-content.visible &gt; form,
-#admin-page-content.visible &gt; .codeToExecute {
-  display: block;
-}
-
-.tab-content .ckeditor-config {
+      <code>.tab-content .ckeditor-config {
   margin-top: 1em;
-}
-
-/* Fix the styles that come from the GWT editor section (XWiki &lt;9.2RC1). */
-form.xform .ckeditor-config dd input[type="text"] {
-  width: 100% !important;
 }</code>
     </property>
     <property>

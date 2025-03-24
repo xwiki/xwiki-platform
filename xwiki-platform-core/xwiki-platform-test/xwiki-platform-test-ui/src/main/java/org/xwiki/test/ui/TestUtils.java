@@ -31,6 +31,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -188,6 +189,8 @@ public class TestUtils
      * @since 9.5RC1
      */
     public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
+
+    private static final String MAIN_WIKI_NAME = "xwiki";
 
     private static PersistentTestContext context;
 
@@ -413,7 +416,7 @@ public class TestUtils
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.
             // Also recache the CSRF token
-            String destUrl = getURL("XWiki", "Register", "register");
+            String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
             getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
 
             if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
@@ -1076,6 +1079,16 @@ public class TestUtils
     }
 
     /**
+     * @since 16.8.0RC1
+     * @since 16.4.5
+     * @since 15.10.14
+     */
+    public String serializeLocalReference(EntityReference reference)
+    {
+        return localReferenceSerializer.serialize(reference);
+    }
+
+    /**
      * Accesses the URL to delete the specified space.
      *
      * @param space the name of the space to delete
@@ -1189,7 +1202,10 @@ public class TestUtils
         if (locale != null) {
             queryString += "&language=" + locale;
         }
-        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment);
+        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+        String wikiName = (wikiReference != null) ? wikiReference.getName() : null;
+        return getURL(wikiName, action, extractListFromReference(reference).toArray(new String[] {}), queryString,
+        fragment);
     }
 
     /**
@@ -1208,12 +1224,48 @@ public class TestUtils
      */
     public String executeWiki(String wikiContent, Syntax wikiSyntax) throws Exception
     {
+        return executeWiki(wikiContent, wikiSyntax, null);
+    }
+
+    /**
+     * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
+     */
+    public String executeWikiPlain(String wikiContent, Syntax wikiSyntax) throws Exception
+    {
+        Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("outputSyntax", "plain");
+
+        return executeWiki(wikiContent, wikiSyntax, queryParameters);
+    }
+
+    /**
+     * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
+     */
+    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters) throws Exception
+    {
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
+        // Remember the current credentials
+        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
 
-        return executeAndGetBodyAsString(reference, null);
+        try {
+            // Make sure the page is saved with superadmin author
+            setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
+
+            // Save the page with the content to execute
+            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
+        } finally {
+            // Restore initial credentials
+            setDefaultCredentials(currentCredentials);
+        }
+
+        // Execute the content and return the result
+        return executeAndGetBodyAsString(reference, queryParameters);
     }
 
     /**
@@ -1304,7 +1356,13 @@ public class TestUtils
      */
     public String getBaseBinURL(String wiki)
     {
-        return getBaseURL() + ((StringUtils.isEmpty(wiki) || wiki.equals("xwiki")) ? "bin/" : "wiki/" + wiki + '/');
+        String wikiName = MAIN_WIKI_NAME;
+        if (!StringUtils.isEmpty(wiki)) {
+            wikiName = wiki;
+        } else if (!StringUtils.isEmpty(this.currentWiki)) {
+            wikiName = this.currentWiki;
+        }
+        return getBaseURL() + (wikiName.equals(MAIN_WIKI_NAME) ? "bin/" : "wiki/" + wikiName + '/');
     }
 
     /**
@@ -1312,7 +1370,7 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString)
     {
-        return getURL(action, path, queryString, null);
+        return getURL(null, action, path, queryString, null);
     }
 
     /**
@@ -1320,7 +1378,17 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString, String fragment)
     {
-        StringBuilder builder = new StringBuilder(getBaseBinURL());
+        return getURL(null, action, path, queryString, fragment);
+    }
+
+    /**
+     * @since 16.10.0RC1
+     * @since 15.10.14
+     * @since 16.4.6
+     */
+    public String getURL(String wikiName, String action, String[] path, String queryString, String fragment)
+    {
+        StringBuilder builder = new StringBuilder(getBaseBinURL(wikiName));
 
         if (!StringUtils.isEmpty(action)) {
             builder.append(action).append('/');
@@ -1423,8 +1491,8 @@ public class TestUtils
     private void recacheSecretTokenWhenOnRegisterPage()
     {
         try {
-            WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
-            this.secretToken = tokenInput.getAttribute("value");
+            WebElement htmlElement = getDriver().findElement(By.tagName("html"));
+            this.secretToken = htmlElement.getDomAttribute("data-xwiki-form-token");
         } catch (NoSuchElementException exception) {
             // Something is really wrong if this happens.
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
@@ -1446,6 +1514,20 @@ public class TestUtils
             return "";
         }
         return this.secretToken;
+    }
+
+    /**
+     * Sets the secret token used for CSRF protection. Use this method to restore a token that was previously saved. If
+     * you want to cache the current token you should use {@link #recacheSecretToken()} instead.
+     *
+     * @param secretToken the new secret token to use
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void setSecretToken(String secretToken)
+    {
+        this.secretToken = secretToken;
     }
 
     /**
@@ -2718,7 +2800,7 @@ public class TestUtils
          */
         public void savePage(EntityReference reference) throws Exception
         {
-            savePage(reference, null, null, null, null);
+            savePage(reference, null, null, null, null, false);
         }
 
         /**
@@ -2726,14 +2808,14 @@ public class TestUtils
          */
         public void savePage(EntityReference reference, String content, String title) throws Exception
         {
-            savePage(reference, content, null, title, null);
+            savePage(reference, content, null, title, null, false);
         }
 
         /**
          * @since 7.3M1
          */
         public void savePage(EntityReference reference, String content, String syntaxId, String title,
-            String parentFullPageName) throws Exception
+            String parentFullPageName, boolean isHidden) throws Exception
         {
             Page page = page(reference);
 
@@ -2749,6 +2831,7 @@ public class TestUtils
             if (parentFullPageName != null) {
                 page.setParent(parentFullPageName);
             }
+            page.setHidden(isHidden);
 
             save(page, true);
         }
@@ -2781,7 +2864,8 @@ public class TestUtils
             // Make sure the page exist (object add fail otherwise)
             // TODO: improve object add API to allow adding an object in a page that does not yet exist
             if (!exists(documentReference)) {
-                savePage(documentReference);
+                boolean isHidden = "WebPreferences".equals(documentReference.getName());
+                savePage(documentReference, null, null, null, null, isHidden);
             }
 
             // Create the object

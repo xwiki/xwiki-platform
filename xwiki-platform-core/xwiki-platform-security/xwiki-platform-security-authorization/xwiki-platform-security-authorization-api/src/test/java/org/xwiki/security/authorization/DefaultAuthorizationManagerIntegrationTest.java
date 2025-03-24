@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,7 @@ import org.mockito.stubbing.Answer;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
@@ -55,6 +58,10 @@ import org.xwiki.security.authorization.cache.internal.DefaultSecurityCacheLoade
 import org.xwiki.security.authorization.cache.internal.TestCache;
 import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
 import org.xwiki.security.authorization.internal.DefaultAuthorizationSettler;
+import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.security.authorization.testwikis.SecureTestEntity;
 import org.xwiki.security.authorization.testwikis.TestAccessRule;
 import org.xwiki.security.authorization.testwikis.TestDefinition;
@@ -87,6 +94,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.Right.ADMIN;
 import static org.xwiki.security.authorization.Right.COMMENT;
@@ -112,7 +120,7 @@ import static org.xwiki.security.authorization.Right.values;
     DefaultStringEntityReferenceSerializer.class, DefaultEntityReferenceProvider.class, DefaultModelConfiguration.class,
     AuthorizationManagerConfiguration.class, DefaultSecurityReferenceFactory.class, DefaultSecurityCacheLoader.class,
     DefaultAuthorizationSettler.class, DefaultAuthorizationManager.class, DefaultSymbolScheme.class,
-    EntityReferenceFactory.class})
+    EntityReferenceFactory.class, DocumentRequiredRightsChecker.class })
 class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTestCase
 {
     @InjectMockComponents
@@ -129,6 +137,9 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     @MockComponent
     private UserBridge userBridge;
 
+    @MockComponent
+    private ModelContext modelContext;
+
     /** Mocked securityEntryReader */
     @MockComponent
     private SecurityEntryReader securityEntryReader;
@@ -137,11 +148,16 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     @MockComponent
     private SecurityCacheRulesInvalidator securityCacheRulesInvalidator;
 
+    @MockComponent
+    private DocumentRequiredRightsManager documentRequiredRightsManager;
+
     /** Mocked cache */
     private TestCache<Object> cache;
 
     /** Factory for security reference */
     private SecurityReferenceFactory securityReferenceFactory;
+
+    private DocumentReference currentEntityReference = new DocumentReference("xwiki", "Page", "Space");
 
     @BeforeComponent
     void initializeMocks() throws Exception
@@ -168,6 +184,7 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     {
         securityReferenceFactory = componentManager.getInstance(SecurityReferenceFactory.class);
         authorizationManager = componentManager.getInstance(AuthorizationManager.class);
+        when(this.modelContext.getCurrentEntityReference()).thenReturn(currentEntityReference);
     }
 
     /**
@@ -402,6 +419,23 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             }
         });
 
+        when(this.documentRequiredRightsManager.getRequiredRights(any())).then(invocation -> {
+            DocumentReference documentReference = invocation.getArgument(0);
+
+            TestEntity testEntity = testDefinition.searchEntity(documentReference);
+
+            if (testEntity instanceof TestDocument testDocument) {
+                return Optional.of(new DocumentRequiredRights(testDocument.isEnforceRequiredRights(),
+                    testDocument.getRequiredRights().stream()
+                        // TODO: adjust the scope of the required right?
+                        .map(testRequiredRight -> new DocumentRequiredRight(testRequiredRight.getRight(),
+                            testRequiredRight.getScope()))
+                        .collect(Collectors.toUnmodifiableSet())));
+            } else {
+                return Optional.empty();
+            }
+        });
+
         return testDefinition;
     }
 
@@ -440,7 +474,96 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
         // Any Local user on another subwiki
         assertAccess(null, getUser("a local user", "any SubWiki"),
             getDoc("an another subwiki", "anySpace", "any Other SubWiki"));
+    }
 
+    @Test
+    void requiredRights() throws Exception
+    {
+        initialiseWikiMock("requiredRights");
+        DocumentReference simpleDoc = getXDoc("simpleDocument", "space");
+        DocumentReference enforcedDoc = getXDoc("enforcedDocument", "space");
+        DocumentReference scriptDoc = getXDoc("scriptDocument", "space");
+        DocumentReference adminDoc = getXDoc("adminDocument", "space");
+        DocumentReference programmingDoc = getXDoc("programmingDocument", "space");
+        DocumentReference fakeProgrammingDoc = getXDoc("fakeProgrammingDocument", "space");
+
+        DocumentReference viewUser = getXUser("viewUser");
+        DocumentReference editUser = getXUser("editUser");
+        DocumentReference scriptUser = getXUser("scriptUser");
+        DocumentReference wikiAdminUser = getXUser("wikiAdminUser");
+        DocumentReference spaceAdminUser = getXUser("spaceAdminUser");
+        DocumentReference programmingUser = getXUser("programmingUser");
+
+        // The view user cannot edit any of the documents but view all of them.
+        for (DocumentReference doc : List.of(simpleDoc, enforcedDoc, scriptDoc, adminDoc, programmingDoc,
+            fakeProgrammingDoc)) {
+            assertAccess(new RightSet(VIEW, COMMENT, REGISTER, LOGIN), viewUser, doc);
+        }
+
+        // All users with edit right can edit all documents that don't enforce specific rights.
+        for (DocumentReference doc : List.of(simpleDoc, enforcedDoc, fakeProgrammingDoc)) {
+            assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN), editUser, doc);
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN), spaceAdminUser,
+                doc);
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN), scriptUser, doc);
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN), wikiAdminUser, doc);
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM,
+                    CREATE_WIKI),
+                programmingUser, doc);
+        }
+
+        // Edit user cannot edit documents that enforce more rights.
+        for (DocumentReference doc : List.of(scriptDoc, adminDoc, programmingDoc)) {
+            assertAccess(new RightSet(VIEW, COMMENT, REGISTER, LOGIN), editUser, doc);
+        }
+
+        // The script and space admin user can edit the script document.
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN), scriptUser, scriptDoc);
+        assertAccess(new RightSet(VIEW, SCRIPT, COMMENT, REGISTER, LOGIN), scriptUser, adminDoc);
+        assertAccess(new RightSet(VIEW, SCRIPT, COMMENT, REGISTER, LOGIN), scriptUser, programmingDoc);
+
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN), spaceAdminUser,
+            scriptDoc);
+        assertAccess(new RightSet(VIEW, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), spaceAdminUser, adminDoc);
+        assertAccess(new RightSet(VIEW, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), spaceAdminUser,
+            programmingDoc);
+
+        // The wiki admin user can edit the script and admin documents.
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), wikiAdminUser,
+            scriptDoc);
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), wikiAdminUser,
+            adminDoc);
+        assertAccess(new RightSet(VIEW, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), wikiAdminUser,
+            programmingDoc);
+
+        // The programming user can edit all documents.
+        for (DocumentReference doc : List.of(scriptDoc, adminDoc, programmingDoc)) {
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM,
+                CREATE_WIKI), programmingUser, doc);
+        }
+
+        DocumentReference subWikiAdmin = getUser("subWikiAdmin", "SubWiki");
+        DocumentReference subWikiAdminDocument = getDoc("adminDocument", "subWikiSpace", "SubWiki");
+
+        // Both main wiki and subwiki admin have edit access on the subwiki document.
+        for (DocumentReference user : List.of(wikiAdminUser, subWikiAdmin)) {
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN), user,
+                subWikiAdminDocument);
+        }
+    }
+
+    @Test
+    void verifyNeedsAuthentication() throws Exception
+    {
+        initialiseWikiMock("emptyWikis");
+        when(this.xWikiBridge.needsAuthentication(VIEW)).thenReturn(true);
+        DocumentReference documentReference = getXDoc("an empty main wiki", "anySpace");
+        assertFalse(authorizationManager.hasAccess(VIEW, null, documentReference));
+        verify(this.modelContext).setCurrentEntityReference(documentReference);
+        verify(this.modelContext).setCurrentEntityReference(currentEntityReference);
+
+        when(this.xWikiBridge.needsAuthentication(VIEW)).thenReturn(false);
+        assertTrue(authorizationManager.hasAccess(VIEW, null, documentReference));
     }
 
     @Test

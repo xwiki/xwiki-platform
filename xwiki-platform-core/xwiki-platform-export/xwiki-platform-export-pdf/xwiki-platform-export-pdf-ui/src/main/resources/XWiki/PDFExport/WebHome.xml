@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.PDFExport.WebHome" locale="">
+<xwikidoc version="1.6" reference="XWiki.PDFExport.WebHome" locale="">
   <web>XWiki.PDFExport</web>
   <name>WebHome</name>
   <language/>
@@ -302,7 +302,6 @@ require([
       .text(l10n['export.pdf.generator.checking'])
       .prepend(renderIcon(config.icons.spinner));
     return fetch(XWiki.currentDocument.getURL('get', $.param({
-      outputSyntax: 'plain',
       sheet: 'XWiki.PDFExport.WebHome',
       data: 'serverSidePrintingAvailable',
     }))).then(response =&gt; response.json()).then(data =&gt; {
@@ -372,7 +371,6 @@ require([
     });
     const locale = document.documentElement.getAttribute('lang') || '';
     data.push(
-      {name: 'outputSyntax', value: 'plain'},
       {name: 'sheet', value: 'XWiki.PDFExport.WebHome'},
       {name: 'action', value: 'export'},
       {name: 'form_token', value: xwikiMeta.form_token},
@@ -399,7 +397,6 @@ require([
         return {
           url: XWiki.currentDocument.getURL('get'),
           data: {
-            outputSyntax: 'plain',
             sheet: 'XWiki.PDFExport.WebHome',
             data: 'jobStatus',
             jobId: jobId.join('/')
@@ -418,7 +415,6 @@ require([
 
   const cancelPDFExportJob = (jobId) =&gt; {
     return Promise.resolve($.post(XWiki.currentDocument.getURL('get'), {
-      outputSyntax: 'plain',
       sheet: 'XWiki.PDFExport.WebHome',
       action: 'cancel',
       form_token: xwikiMeta.form_token,
@@ -426,7 +422,7 @@ require([
     }));
   };
 
-  const showPrintPreviewModal = function(jobId) {
+  const showPrintPreviewModal = function({jobId, language}) {
     return new Promise((resolve, reject) =&gt; {
       const iframe = $('&lt;iframe/&gt;').css({
         // The load event is not fired if we hide it completely with display:none.
@@ -476,7 +472,8 @@ require([
         // Asynchronous rendering is disabled by default on the export action so we need to force it.
         async: true,
         sheet: 'XWiki.PDFExport.Sheet',
-        jobId: jobId.join('/')
+        jobId: jobId.join('/'),
+        language
       // We add the query string and hash (fragment identifier) from the current URL because they can contain
       // information used by the JavaScript code (e.g. the state of the live table and live data components).
       }) + '&amp;' + window.location.search.substring(1)) + window.location.hash;
@@ -485,7 +482,19 @@ require([
   };
 
   const exportToPDF = function(data) {
-    return runPDFExportJob(data).then(job =&gt; {
+    // The HTTP requests that start the PDF export job and load the print preview have the language specified in the
+    // query string which changes the current locale. We need to restore the original locale after the export is done.
+    // This is the original locale we need to restore.
+    const uiLanguage = $('html').attr('lang');
+    const language = data.find(entry =&gt; entry.name === 'language')?.value || uiLanguage;
+    const restoreLanguage = () =&gt; {
+      if (language !== uiLanguage) {
+        // Make an additional request to restore the original locale. We're using sendBeacon because this can happen
+        // right before the user is redirected to the generated PDF (when the PDF is generated server-side).
+        navigator.sendBeacon(`${XWiki.contextPath}/rest?language=${encodeURIComponent(uiLanguage)}`);
+      }
+    };
+    return runPDFExportJob(data).finally(restoreLanguage).then(job =&gt; {
       // Remove the exception name from the start of the error message to make it less technical.
       const lastError = ((job.lastError || '') + '').replace(/^\w+Exception: /, '');
       if (job.canceled) {
@@ -506,7 +515,7 @@ require([
             {timeout : 10});
         }
         // Show the Print Preview modal in order for the user to be able to save the result as PDF.
-        return showPrintPreviewModal(job.id);
+        return showPrintPreviewModal({jobId: job.id, language}).finally(restoreLanguage);
       }
     })
   };
@@ -792,7 +801,7 @@ require([
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

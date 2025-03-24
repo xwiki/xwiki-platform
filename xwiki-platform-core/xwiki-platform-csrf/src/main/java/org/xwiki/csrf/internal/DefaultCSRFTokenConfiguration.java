@@ -52,6 +52,6 @@ public class DefaultCSRFTokenConfiguration implements CSRFTokenConfiguration
     public boolean isEnabled()
     {
         String key = PREFIX + "enabled";
-        return this.configuration.getProperty(key, Boolean.TRUE).booleanValue();
+        return this.configuration.getProperty(key, Boolean.TRUE);
     }
 }

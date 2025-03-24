@@ -1,2 +1,3 @@
+org.xwiki.tree.internal.DefaultCompositeTreeNodeGroup
 org.xwiki.tree.internal.EntityTreeNodeIdConverter
 org.xwiki.tree.script.TreeScriptService

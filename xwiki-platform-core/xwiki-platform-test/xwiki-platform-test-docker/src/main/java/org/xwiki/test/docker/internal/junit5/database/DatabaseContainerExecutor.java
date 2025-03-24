@@ -19,9 +19,11 @@
  */
 package org.xwiki.test.docker.internal.junit5.database;
 
+import java.lang.module.ModuleDescriptor;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -132,14 +134,6 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         commands.setProperty("character-set-server", "utf8mb4");
         commands.setProperty("collation-server", "utf8mb4_bin");
 
-        if (!isMySQL55x(testConfiguration)) {
-            commands.setProperty("explicit-defaults-for-timestamp", "1");
-        }
-        // MySQL 8.x has changed the default authentication plugin value so we need to explicitly configure it to get
-        // the native password mechanism.
-        if (isMySQL8xPlus(testConfiguration)) {
-            commands.setProperty("default-authentication-plugin", "mysql_native_password");
-        }
         databaseContainer.withCommand(mergeCommands(commands, testConfiguration.getDatabaseCommands()));
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
@@ -184,29 +178,6 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         }
     }
 
-    private boolean isMySQL55x(TestConfiguration testConfiguration)
-    {
-        return testConfiguration.getDatabaseTag() != null && testConfiguration.getDatabaseTag().startsWith("5.5");
-    }
-
-    private boolean isMySQL8xPlus(TestConfiguration testConfiguration)
-    {
-        boolean isMySQL8xPlus;
-        if (testConfiguration.getDatabaseTag() != null) {
-            isMySQL8xPlus = testConfiguration.getDatabaseTag().equals("latest")
-                || extractMajor(testConfiguration.getDatabaseTag()) >= 8;
-        } else {
-            // No tag specific, this means we use "latest" and thus that it's mysql 8+
-            isMySQL8xPlus = true;
-        }
-        return isMySQL8xPlus;
-    }
-
-    private int extractMajor(String version)
-    {
-        return Integer.valueOf(StringUtils.substringBefore(version, "."));
-    }
-
     private void startMariaDBContainer(TestConfiguration testConfiguration) throws Exception
     {
         JdbcDatabaseContainer<?> databaseContainer;
@@ -241,7 +212,20 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             testConfiguration);
 
         databaseContainer.addEnv("POSTGRES_ROOT_PASSWORD", DBPASSWORD);
-        databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
+        // Postgres 17 adds the builtin locale which we prefer over the libc locale as it is OS-independent.
+        // See https://postgresql.verite.pro/blog/2024/07/01/pg17-utf8-collation.html for a longer discussion.
+        ModuleDescriptor.Version builtinVersion = ModuleDescriptor.Version.parse("17");
+        String localeArgument;
+        // Check if the database tag starts with a number and that version is below 17, otherwise assume that the
+        // version is at least 17 (e.g., when "latest" is specified).
+        if (NumberUtils.isCreatable(StringUtils.substring(testConfiguration.getDatabaseTag(), 0, 1))
+            && ModuleDescriptor.Version.parse(testConfiguration.getDatabaseTag()).compareTo(builtinVersion) < 0)
+        {
+            localeArgument = "--locale=C.utf8";
+        } else {
+            localeArgument = "--locale-provider=builtin --locale=C.UTF-8";
+        }
+        databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8 " + localeArgument);
 
         startDatabaseContainer(databaseContainer, 5432, testConfiguration);
     }

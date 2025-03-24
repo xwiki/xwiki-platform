@@ -21,6 +21,7 @@ package org.xwiki.model.internal.reference.comparator;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -80,11 +81,11 @@ public class DocumentReferenceComparator implements Comparator<DocumentReference
 
     private int compareReferenceChains(EntityReference alice, EntityReference bob)
     {
-        Iterator<EntityReference> aliceIterator = alice.getReversedReferenceChain().iterator();
-        Iterator<EntityReference> bobIterator = bob.getReversedReferenceChain().iterator();
+        Iterator<EntityReference> aliceIterator = getPath(alice).iterator();
+        Iterator<EntityReference> bobIterator = getPath(bob).iterator();
         // The number of components in an entity reference can vary (e.g. for nested pages).
         while (aliceIterator.hasNext() && bobIterator.hasNext()) {
-            int diff = aliceIterator.next().getName().compareTo(bobIterator.next().getName());
+            int diff = compareSiblingEntities(aliceIterator.next(), bobIterator.next());
             if (diff != 0) {
                 return diff;
             }
@@ -97,6 +98,28 @@ public class DocumentReferenceComparator implements Comparator<DocumentReference
             return -1;
         }
         return 0;
+    }
+
+    /**
+     * @param entityReference the entity reference for which to get the path
+     * @return the path from the root of the entity hierarchy to the specified entity (including it)
+     */
+    protected List<EntityReference> getPath(EntityReference entityReference)
+    {
+        return entityReference.getReversedReferenceChain();
+    }
+
+    /**
+     * Compares two entities that have the same parent.
+     *
+     * @param alice the first entity
+     * @param bob the second entity
+     * @return a negative integer, zero, or a positive integer as the first entity is less than, equal to, or greater
+     *         than the second entity
+     */
+    protected int compareSiblingEntities(EntityReference alice, EntityReference bob)
+    {
+        return alice.getName().compareTo(bob.getName());
     }
 
     private int compareLocales(DocumentReference alice, DocumentReference bob)

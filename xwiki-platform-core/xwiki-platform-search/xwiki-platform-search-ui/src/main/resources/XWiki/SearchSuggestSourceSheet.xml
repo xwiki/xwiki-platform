@@ -58,7 +58,7 @@
       $doc.display($property.name, 'edit', $object)
     #end
     ## $object is not hard typed to be an object, it's also sometimes a map, henceforth the weird looking condition on
-    ## this next line. Detailed explanations => https://github.com/xwiki/xwiki-platform/pull/2816#discussion_r1489621617
+    ## this next line. Detailed explanations =&gt; https://github.com/xwiki/xwiki-platform/pull/2816#discussion_r1489621617
     &lt;label#if ($editing &amp;&amp; $object!={}) for="${prefix}$property.name"#end&gt;
       $property.translatedPrettyName
     &lt;/label&gt;

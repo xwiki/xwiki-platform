@@ -24,7 +24,7 @@
 ## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
 #set ($docTreeConfig = {
   'exclusions': $collectiontool.set,
-  'filters': [],
+  'filters': ['pinnedChildPages'],
   'filterByClass': '',
   'filterHiddenDocuments': true,
   'hierarchyMode': 'reference',
@@ -44,7 +44,8 @@
   'showTerminalDocuments': true,
   'showTranslations': true,
   'showWikiPrettyName': true,
-  'showWikis': false
+  'showWikis': false,
+  'sortDocumentsBy': ''
 })
 
 #macro (documentTree $options)
@@ -91,7 +92,9 @@
     #end
   #end
   #set ($editable = $macro.options.remove('readOnly') != 'true')
-  #set ($macro.options.dragAndDrop = $editable)
+  #if ("$!macro.options.dragAndDrop" == '')
+    #set ($macro.options.dragAndDrop = $editable)
+  #end
   #set ($macro.options.contextMenu = $editable)
   #set ($isFullWidthAvailable = $macro.options.remove('compact') != 'true')
   #set ($macro.options.icons = $isFullWidthAvailable)

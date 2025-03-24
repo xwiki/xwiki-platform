@@ -104,7 +104,7 @@ public class LocalPageReference extends AbstractLocalizedEntityReference
     }
 
     /**
-     * Clone an DocumentVersionReference, but use the specified parent for its new parent.
+     * Clone a DocumentVersionReference, but use the specified parent for its new parent.
      *
      * @param reference the reference to clone
      * @param parent the new parent to use

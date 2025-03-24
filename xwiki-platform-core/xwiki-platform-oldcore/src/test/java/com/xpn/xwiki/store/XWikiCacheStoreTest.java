@@ -19,15 +19,21 @@
  */
 package com.xpn.xwiki.store;
 
+import java.io.ByteArrayInputStream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.internal.MapCache;
 import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -36,16 +42,14 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.isCacheConfiguration;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -56,9 +60,12 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 @ComponentList(UidStringEntityReferenceSerializer.class)
 class XWikiCacheStoreTest
-{    
+{
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private Cache<XWikiDocument> cache;
 
@@ -71,12 +78,12 @@ class XWikiCacheStoreTest
         this.oldcore.getMocker().registerMockComponent(ObservationManager.class);
 
         CacheManager cacheManager = this.oldcore.getMocker().registerMockComponent(CacheManager.class);
-        cache = mock(Cache.class);
-        when(cacheManager.<XWikiDocument>createNewCache(isCacheConfiguration("xwiki.store.pagecache"))).thenReturn(
-            cache);
-        existCache = mock(Cache.class);
-        when(cacheManager.<Boolean>createNewCache(isCacheConfiguration("xwiki.store.pageexistcache"))).thenReturn(
-            existCache);
+        this.cache = new MapCache<>();
+        when(cacheManager.<XWikiDocument>createNewCache(isCacheConfiguration("xwiki.store.pagecache")))
+            .thenReturn(this.cache);
+        this.existCache = new MapCache<>();
+        when(cacheManager.<Boolean>createNewCache(isCacheConfiguration("xwiki.store.pageexistcache")))
+            .thenReturn(existCache);
     }
 
     @Test
@@ -96,29 +103,50 @@ class XWikiCacheStoreTest
             store.loadXWikiDoc(new XWikiDocument(reference), this.oldcore.getXWikiContext());
 
         assertFalse(existingDocument.isNew());
-        verify(this.cache).set(eq("4:wiki5:space4:page0:"), any(XWikiDocument.class));
-        verify(this.existCache).set("4:wiki5:space4:page0:", Boolean.TRUE);
-        verify(this.cache).get(any());
-        verify(this.existCache).get(any());
+        assertTrue(existingDocument.isCached());
+        assertSame(existingDocument, this.cache.get("4:wiki5:space4:page0:"));
+        assertTrue(this.existCache.get("4:wiki5:space4:page0:"));
 
-        verifyNoMoreInteractions(this.cache);
-        verifyNoMoreInteractions(this.existCache);
-
-        XWikiDocument notExistingDocument =
-            store.loadXWikiDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "nopage")),
-                this.oldcore.getXWikiContext());
+        XWikiDocument notExistingDocument = store.loadXWikiDoc(
+            new XWikiDocument(new DocumentReference("otherwiki", "space", "nopage")), this.oldcore.getXWikiContext());
 
         assertTrue(notExistingDocument.isNew());
 
         // Make sure only the existing document has been put in the cache
-        verify(this.cache).set(eq("4:wiki5:space4:page0:"), any(XWikiDocument.class));
-        verify(this.existCache).set("4:wiki5:space4:page0:", Boolean.TRUE);
-        verify(this.existCache).set("4:wiki5:space6:nopage0:", Boolean.FALSE);
-        verify(this.cache, times(2)).get(any());
-        verify(this.existCache, times(2)).get(any());
+        assertSame(existingDocument, this.cache.get("4:wiki5:space4:page0:"));
+        assertTrue(this.existCache.get("4:wiki5:space4:page0:"));
+        assertFalse(this.existCache.get("4:wiki5:space6:nopage0:"));
 
-        verifyNoMoreInteractions(this.cache);
-        verifyNoMoreInteractions(this.existCache);
+        store.saveXWikiDoc(existingDocument, this.oldcore.getXWikiContext());
+
+        assertNull(this.cache.get("4:wiki5:space4:page0:"));
+        assertFalse(existingDocument.isCached());
+    }
+
+    @Test
+    void loadXWikiDocWhenModified() throws Exception
+    {
+        // Save a document
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        XWikiDocument documentReference = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.oldcore.getSpyXWiki().saveDocument(documentReference, this.oldcore.getXWikiContext());
+
+        XWikiCacheStore store = new XWikiCacheStore(this.oldcore.getMockStore(), this.oldcore.getXWikiContext());
+
+        XWikiDocument cacheDocument = store.loadXWikiDoc(documentReference, this.oldcore.getXWikiContext());
+
+        assertFalse(cacheDocument.isMetaDataDirty());
+
+        assertSame(cacheDocument, store.loadXWikiDoc(documentReference, this.oldcore.getXWikiContext()));
+
+        cacheDocument.setAttachment("file.ext", new ByteArrayInputStream("content".getBytes()),
+            this.oldcore.getXWikiContext());
+
+        assertEquals("Abusive modification of the cached document [wiki:space.page()]", this.logCapture.getMessage(0));
+
+        assertTrue(cacheDocument.isMetaDataDirty());
+
+        assertNotSame(cacheDocument, store.loadXWikiDoc(documentReference, this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -139,7 +167,7 @@ class XWikiCacheStoreTest
 
         assertThrows(XWikiException.class, () -> store.saveXWikiDoc(document, this.oldcore.getXWikiContext(), true));
 
-        verify(this.cache).remove("4:wiki5:space4:page0:");
-        verify(this.existCache).remove("4:wiki5:space4:page0:");
+        assertNull(this.cache.get("4:wiki5:space4:page0:"));
+        assertNull(this.existCache.get("4:wiki5:space4:page0:"));
     }
 }

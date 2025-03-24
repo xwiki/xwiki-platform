@@ -43,6 +43,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
@@ -60,6 +61,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Component
 @Named("R151002000XWIKI21448")
 @Singleton
+@Unstable
 public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigration
 {
     private static final int BATCH_SIZE = 100;

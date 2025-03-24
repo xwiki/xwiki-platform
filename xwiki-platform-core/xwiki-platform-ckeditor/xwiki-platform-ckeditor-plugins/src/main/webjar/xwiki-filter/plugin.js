@@ -42,57 +42,6 @@
 
   CKEDITOR.plugins.add('xwiki-filter', {
     init: function(editor) {
-      var replaceEmptyLinesWithEmptyParagraphs = {
-        elements: {
-          div: function(element) {
-            if (element.attributes['class'] === 'wikimodel-emptyline') {
-              element.name = 'p';
-              delete element.attributes['class'];
-              // Skip the subsequent rules as we changed the element name.
-              return element;
-            }
-          }
-        }
-      };
-
-      var replaceEmptyParagraphsWithEmptyLines = {
-        elements: {
-          p: function(element) {
-            var index = element.getIndex();
-            // Empty lines are used to separate blocks of content so normally they are not the first or the last child.
-            // See CKEDITOR-87: Table copy-pasted from a Word file into CKEditor does not display properly on page view.
-            if (index > 0 && index < element.parent.children.length - 1 && isEmptyParagraph(element)) {
-              element.name = 'div';
-              element.attributes['class'] = 'wikimodel-emptyline';
-              // Skip the subsequent rules as we changed the element name.
-              return element;
-            }
-          },
-          // We need a separate rule to clean the empty line after the block filter rule adds the space char.
-          div: function(element) {
-            if (element.attributes['class'] === 'wikimodel-emptyline') {
-              while (element.children.length > 0) {
-                element.children[0].remove();
-              }
-            }
-          }
-        }
-      };
-
-      var isEmptyParagraph = function(paragraph) {
-        var children = paragraph.children;
-        for (var i = 0; i < children.length; i++) {
-          var child = children[i];
-          // Ignore the BR element if it's the last child.
-          if ((child.type === CKEDITOR.NODE_ELEMENT && !(child.name === 'br' && i === children.length - 1)) ||
-              // Ignore white-space in text nodes. It seems the text node value is HTML encoded..
-              (child.type === CKEDITOR.NODE_TEXT && CKEDITOR.tools.htmlDecode(child.value).trim() !== '')) {
-            return false;
-          }
-        }
-        return true;
-      };
-
       // Discard the HTML markup that is not needed in the wiki syntax conversion. This way we prevent unexpected
       // conversion errors caused by such markup.
       var submitOnlySignificantContent = {
@@ -126,27 +75,6 @@
         }
       };
 
-      var isScriptAllowed = function(script) {
-        return script && script.name === 'script' && (
-          script.attributes['data-wysiwyg'] === 'true' ||
-          (typeof script.attributes.src === 'string' && script.attributes.src.indexOf('wysiwyg=true') > 0)
-        );
-      };
-
-      var unprotectAllowedScripts = {
-        comment: function(comment) {
-          var prefix = '{cke_protected}%3Cscript%20';
-          if (comment.substr(0, prefix.length) === prefix) {
-            var fragment = CKEDITOR.htmlParser.fragment.fromHtml('<script ' +
-              decodeURIComponent(comment.substr(prefix.length)));
-            var script = fragment.children[0];
-            if (isScriptAllowed(script)) {
-              return script;
-            }
-          }
-        }
-      };
-
       // Filter the editor input.
       var dataFilter = editor.dataProcessor && editor.dataProcessor.dataFilter;
       if (dataFilter) {
@@ -167,6 +95,26 @@
       // parser is called in both cases. Priority 1 is needed to ensure our listener is called before the HTML parser
       // (which has priority 5).
       editor.on('toHtml', escapeStyleContent, null, null, 1);
+      // Remove data-widget attributes on images, as otherwise they might be badly interpreted as another type of
+      // widget, leading to CKEditor crashing.
+      editor.on('toHtml', (event) => {
+        event.data.dataValue.filter(new CKEDITOR.htmlParser.filter({
+          elements: {
+            img: function (element) {
+              const dataWidgetAttribute = element.attributes['data-widget'];
+              const dataCkeUploadIdAttribute = element.attributes['data-cke-upload-id'];
+              const isUploadImageWidget = dataWidgetAttribute === 'uploadimage';
+              // Cleanup data-widget attributes on images. Except for 'uploadimage' which is only cleaned up when
+              // the image is not currently being uploaded (i.e., has a data-cke-upload-id attribute)
+              if (!isUploadImageWidget || dataCkeUploadIdAttribute === undefined)
+              {
+                delete element.attributes['data-widget'];
+              }
+            }
+          }
+        }));
+        // We must use a priority below 8 to make sure our filter is executed before widgets are upcasted.
+      }, null, null, 7);
       editor.on('toDataFormat', escapeStyleContent, null, null, 1);
 
       // Transform <font color="..." face="..."> into <span style="color: ...; font-family: ...">.
@@ -261,7 +209,10 @@
           }
           return textNodes;
         };
-        var textNodesBefore = getSiblingTextNodes(node.getChild(offset - 1), 'getPrevious');
+        // When the direction is 'getPrevious', getSiblingTextNodes returns an array of DOM Nodes in reverse order.
+        // The maybeFixNonBreakingSpace method expects both arrays to be in the actual DOM order.
+        // This is why we need to reverse the textNodesBefore array.
+        var textNodesBefore = getSiblingTextNodes(node.getChild(offset - 1), 'getPrevious').reverse();
         var textNodesAfter = getSiblingTextNodes(node.getChild(offset), 'getNext');
         return this.maybeFixNonBreakingSpace(textNodesBefore, textNodesAfter);
       } else if (node.type === CKEDITOR.NODE_TEXT) {
@@ -317,6 +268,104 @@
       }
     }
   });
+
+  const replaceEmptyLinesWithEmptyParagraphs = {
+    elements: {
+      div: function(element) {
+        if (element.attributes['class'] === 'wikimodel-emptyline') {
+          element.name = 'p';
+          delete element.attributes['class'];
+          // Skip the subsequent rules as we changed the element name.
+          return element;
+        }
+      }
+    }
+  };
+
+  const replaceEmptyParagraphsWithEmptyLines = {
+    elements: {
+      p: function(element) {
+        // Empty lines are used to separate blocks of content so normally they are not the first or the last child.
+        // See CKEDITOR-87: Table copy-pasted from a Word file into CKEditor does not display properly on page view.
+        if (!isFirstOrLast(element) && isEmptyParagraph(element)) {
+          element.name = 'div';
+          element.attributes['class'] = 'wikimodel-emptyline';
+          // Skip the subsequent rules as we changed the element name.
+          return element;
+        }
+      },
+      // We need a separate rule to clean the empty line after the block filter rule adds the space char.
+      div: function(element) {
+        if (element.attributes['class'] === 'wikimodel-emptyline') {
+          while (element.children.length > 0) {
+            element.children[0].remove();
+          }
+        }
+      }
+    }
+  };
+
+  // We have to ignore the CKEditor special elements (like the hidden selection marker inserted when you select a
+  // widget) when determining if an element is the first or the last child. Otherwise the editor's output data is
+  // different for instance if a widget is selected or not, which causes conflicts while editing in realtime.
+  function isFirstOrLast(element) {
+    let previous = element.previous;
+    while (isCKEditorSpecialElement(previous)) {
+      previous = previous.previous;
+    }
+
+    if (previous) {
+      let next = element.next;
+      while (isCKEditorSpecialElement(next)) {
+        next = next.next;
+      }
+
+      // Is the last element.
+      return !next;
+    } else {
+      // Is the first element.
+      return true;
+    }
+  }
+
+  function isCKEditorSpecialElement(element) {
+    return element?.attributes?.['data-cke-temp'];
+  }
+
+  function isEmptyParagraph(paragraph) {
+    const children = paragraph.children;
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      // Ignore the BR element if it's the last child.
+      if ((child.type === CKEDITOR.NODE_ELEMENT && !(child.name === 'br' && i === children.length - 1)) ||
+          // Ignore white-space in text nodes. It seems the text node value is HTML encoded..
+          (child.type === CKEDITOR.NODE_TEXT && CKEDITOR.tools.htmlDecode(child.value).trim() !== '')) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function isScriptAllowed(script) {
+    return script && script.name === 'script' && (
+      script.attributes['data-wysiwyg'] === 'true' ||
+      (typeof script.attributes.src === 'string' && script.attributes.src.indexOf('wysiwyg=true') > 0)
+    );
+  }
+
+  const unprotectAllowedScripts = {
+    comment: function(comment) {
+      const prefix = '{cke_protected}%3Cscript%20';
+      if (comment.substr(0, prefix.length) === prefix) {
+        const fragment = CKEDITOR.htmlParser.fragment.fromHtml('<script ' +
+          decodeURIComponent(comment.substr(prefix.length)));
+        const script = fragment.children[0];
+        if (isScriptAllowed(script)) {
+          return script;
+        }
+      }
+    }
+  };
 
   const domParser = new DOMParser();
   function escapeStyleContent(event) {

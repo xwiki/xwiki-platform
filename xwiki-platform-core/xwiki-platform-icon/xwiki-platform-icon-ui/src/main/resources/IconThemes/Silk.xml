@@ -198,6 +198,7 @@ plus-square = bullet_toggle_plus
 filter = find
 fast-backward = control_rewind
 arrow_in = arrow_in
+reposition = reposition
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept

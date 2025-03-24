@@ -206,6 +206,8 @@ public class XWikiDocumentMockitoTest
         QueryFilter hiddenFilter = this.oldcore.getMocker().registerMockComponent(QueryFilter.class, "hidden");
 
         when(query.setLimit(7)).thenReturn(query);
+        when(query.setOffset(3)).thenReturn(query);
+        when(query.setWiki(DOCWIKI)).thenReturn(query);
 
         List<String> result = Arrays.asList("X.y", "A.b");
         when(query.<String>execute()).thenReturn(result);
@@ -216,6 +218,7 @@ public class XWikiDocumentMockitoTest
         verify(query).addFilter(hiddenFilter);
         verify(query).setLimit(7);
         verify(query).setOffset(3);
+        verify(query).setWiki(DOCWIKI);
 
         assertEquals(2, childrenReferences.size());
         assertEquals(new DocumentReference("wiki", "X", "y"), childrenReferences.get(0));
@@ -565,6 +568,17 @@ public class XWikiDocumentMockitoTest
 
         assertEquals("2.2", this.document.getVersion());
         assertNull(this.document.getPreviousVersion());
+    }
+
+    @Test
+    void testCloneIdentical()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
+        document.setChangeTracked(true);
+
+        XWikiDocument clonedDocument = document.clone();
+
+        assertTrue(clonedDocument.isChangeTracked());
     }
 
     @Test
@@ -1804,5 +1818,44 @@ public class XWikiDocumentMockitoTest
 
         assertEquals(Set.of(backlink1, backlink21.withoutLocale()),
             new HashSet<>(doc.getBackLinkedReferences(this.oldcore.getXWikiContext())));
+    }
+
+    @Test
+    void getXClassDoesNotChangeDirtyFlagWhenEmpty()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+
+        document.setMetaDataDirty(false);
+        document.setContentDirty(false);
+
+        BaseClass xClass = document.getXClass();
+
+        assertNotNull(xClass);
+
+        assertFalse(xClass.isDirty());
+        assertFalse(document.isMetaDataDirty());
+        assertFalse(document.isContentDirty());
+    }
+
+    @Test
+    void hidden()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+
+        document.setHidden(false);
+        document.setMetaDataDirty(false);
+
+        assertFalse(document.isHidden());
+        assertFalse(document.isMetaDataDirty());
+
+        document.setHidden(true);
+
+        assertTrue(document.isMetaDataDirty());
+
+        document.setMetaDataDirty(false);
+
+        document.setHidden(true);
+
+        assertFalse(document.isMetaDataDirty());
     }
 }

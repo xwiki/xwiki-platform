@@ -209,13 +209,18 @@
 ##--------------------------------------------------------------------------
 #set ($pages = $tdoc.includedPages)
 #if($pages.size() != 0)
-  {{html clean="false"}}&lt;dt&gt;{{/html}}$services.localization.render('panels.documentInformation.includesCount', [$pages.size()]){{html clean="false"}}&lt;/dt&gt;{{/html}}
+  {{html clean="false"}}&lt;dt&gt;$escapetool.xml($services.localization.render('panels.documentInformation.includesCount', [$pages.size()]))&lt;/dt&gt;{{/html}}
+
+  {{html clean="false"}}&lt;dd&gt;{{/html}}
+
   #foreach ($page in $pages)
     #set ($pageLink = $services.rendering.escape($page, 'xwiki/2.1'))
     #set ($pageName = $services.rendering.escape($services.rendering.escape($page, 'xwiki/2.1'), 'xwiki/2.1'))
     #set ($alt = $services.rendering.escape($services.localization.render('panels.documentInformation.editIncluded', [$page]), 'xwiki/2.1'))
-    {{html clean="false"}}&lt;dd&gt;{{/html}}[[$pageName&gt;&gt;$pageLink]] [[[[image:icon:page_white_edit||alt="$alt"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]{{html clean="false"}}&lt;/dd&gt;{{/html}}
+    * [[$pageName&gt;&gt;$pageLink]] [[[[image:icon:page_white_edit||alt="$alt"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
   #end
+
+  {{html clean="false"}}&lt;/dd&gt;{{/html}}
 #end
 ##--------------------------------------------------------------------------
 {{/velocity}}</content>

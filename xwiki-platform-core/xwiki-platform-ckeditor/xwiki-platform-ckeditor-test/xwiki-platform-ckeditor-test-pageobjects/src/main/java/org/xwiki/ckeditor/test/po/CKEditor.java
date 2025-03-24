@@ -23,6 +23,7 @@ import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseElement;
@@ -125,8 +126,7 @@ public class CKEditor extends BaseElement
      */
     public RichTextAreaElement getRichTextArea(boolean wait)
     {
-        // The in-line frame element is renewed while editing (e.g. when a macro is inserted) so we can't cache it.
-        return new RichTextAreaElement(getContentContainer(), wait);
+        return new RichTextAreaElement(this, wait);
     }
 
     /**
@@ -134,8 +134,10 @@ public class CKEditor extends BaseElement
      */
     public WebElement getSourceTextArea()
     {
-        return (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].editable().$;",
-            this.name);
+        WebElement sourceTextArea =
+            (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].editable().$;", this.name);
+        getDriver().waitUntilCondition(ExpectedConditions.domPropertyToBe(sourceTextArea, "readOnly", "false"));
+        return sourceTextArea;
     }
 
     protected WebElement getContentContainer()

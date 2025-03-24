@@ -49,9 +49,13 @@ public class SolrClientInstance extends AbstractSolrInstance
     public void initialize() throws InitializationException
     {
         try {
-            this.server = this.solr.getClient(CORE_NAME);
+            this.server = this.solr.getCore(CORE_NAME);
         } catch (SolrException e) {
             throw new InitializationException("Failed to create the solr client for core [search]", e);
+        }
+
+        if (this.server == null) {
+            throw new InitializationException("No core with name [" + CORE_NAME + "] could be found");
         }
     }
 }

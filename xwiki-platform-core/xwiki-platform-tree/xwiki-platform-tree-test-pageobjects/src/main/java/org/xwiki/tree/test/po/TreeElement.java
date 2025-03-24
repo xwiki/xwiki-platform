@@ -25,10 +25,8 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -116,15 +114,12 @@ public class TreeElement extends BaseElement
         // being initialized, so its presence guarantees that the tree initialization has started.
         getDriver().waitUntilElementIsVisible(this.element, By.cssSelector(".jstree-container-ul"));
         // Wait for the root node to be loaded.
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                // The tree element is marked as busy while the tree nodes are being loaded.
-                return !Boolean.valueOf(element.getAttribute("aria-busy"));
-            }
-        });
+        getDriver().waitUntilCondition(driver ->
+            // The tree element is marked as busy while the tree nodes are being loaded.
+            !Boolean.parseBoolean(this.element.getAttribute("aria-busy"))
+                // Check if there is any descendant of the element that is marked as busy.
+                && this.element.findElements(By.cssSelector("[aria-busy = 'true']")).isEmpty()
+        );
         return this;
     }
 

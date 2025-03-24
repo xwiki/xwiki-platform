@@ -44,8 +44,6 @@ import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ConfirmationPage;
@@ -759,7 +757,7 @@ class DeletePageIT
         testUtils.createPage(newTargetReference, "", "New target");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -775,7 +773,7 @@ class DeletePageIT
         // Verify that a redirect was added and the link was updated.
         viewPage = testUtils.gotoPage(reference);
         assertEquals("New target", this.viewPage.getDocumentTitle());
-        assertEquals("[[Link>>doc:NewTarget.WebHome]]",
+        assertEquals("[[Link>>doc:xwiki:NewTarget.WebHome]]",
             testUtils.rest().<Page>get(backlinkDocumentReference).getContent());
     }
 
@@ -798,7 +796,7 @@ class DeletePageIT
         testUtils.createPage(backlinkDocReference, backlinkDocContent, "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Delete page without specifying a new target.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -828,7 +826,7 @@ class DeletePageIT
         TestConfiguration testConfiguration) throws Exception
     {
         DocumentReference childReference = new DocumentReference("Child", parentReference.getLastSpaceReference());
-        String childFullName = testUtils.serializeReference(childReference).split(":")[1];
+        String childFullName = testUtils.serializeLocalReference(childReference);
         DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
         DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
 
@@ -838,10 +836,10 @@ class DeletePageIT
         // Create backlinks to the parent and the child page.
         String format = "[[Parent>>doc:%s]] [[Child>>doc:%s]]";
         testUtils.createPage(backlinkDocReference,
-            String.format(format, testUtils.serializeReference(parentReference), childFullName), "Backlink document");
+            String.format(format, testUtils.serializeLocalReference(parentReference), childFullName), "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Delete parent page with affectChildren and newTarget (updateLinks and autoRedirect enabled).
         ViewPage parentPage = testUtils.gotoPage(parentReference);
@@ -857,18 +855,11 @@ class DeletePageIT
         // Verify that there is no redirect on the child page and backlink was not altered.
         assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
         String newContent =
-            String.format(format, testUtils.serializeReference(newTargetReference).split(":")[1], childFullName);
+            String.format(format, testUtils.serializeLocalReference(newTargetReference), childFullName);
         assertEquals(newContent, testUtils.rest().<Page>get(backlinkDocReference).getContent());
         parentPage = testUtils.gotoPage(parentReference);
         assertEquals("New target", parentPage.getDocumentTitle());
         ViewPage childPage = testUtils.gotoPage(childReference);
         assertEquals("Child", childPage.getDocumentTitle());
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 }

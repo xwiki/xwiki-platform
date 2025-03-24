@@ -219,6 +219,8 @@ div.suggestItems .hide-button {
     display: flex;
     flex-flow: row wrap;
     gap: 1em;
+    /* Same as `.xform dl dt` */
+    margin-top: floor(@font-size-base * 1.4);
   }
 }
 
@@ -405,6 +407,11 @@ dl.export-tree-legend dt + dd {
   flex-basis: 100%;
   display: flex;
   justify-content: space-between;
+}
+
+/* Make sure the right change arrow stays on the right even when the left one is not here. */
+#changes-arrows-box:not(:has(> .changes-arrow-left)) {
+  justify-content: right;
 }
 
 .changes-body > .changes-body-header {

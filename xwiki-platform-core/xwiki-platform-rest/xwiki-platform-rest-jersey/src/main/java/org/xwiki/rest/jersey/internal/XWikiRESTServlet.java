@@ -21,12 +21,16 @@ package org.xwiki.rest.jersey.internal;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -36,10 +40,14 @@ import org.xwiki.component.manager.ComponentManager;
  * Extends {@link ServletContainer} to add XWiki specific pieces.
  * <ul>
  * <li>Injection of XWikiResource components</li>
+ * <li>Make sure "+" is decoded like it used to before Jersey</li>
  * </ul>
+ * <p>
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
- * @since 16.2.0RC1
+ * @since 17.0.0RC1
  */
 public class XWikiRESTServlet extends HttpServlet
 {
@@ -56,7 +64,40 @@ public class XWikiRESTServlet extends HttpServlet
             initializeCountainer(req.getServletContext());
         }
 
-        this.container.service(req, res);
+        // Only HTTP requests are supported
+        if (!(req instanceof HttpServletRequest && res instanceof HttpServletResponse)) {
+            throw new ServletException("non-HTTP request or response");
+        }
+
+        // Make sure "+" is decoded like it used to before Jersey
+        HttpServletRequest httpRequest = (HttpServletRequest) req;
+        String requestURI = httpRequest.getRequestURI();
+        if (StringUtils.contains(requestURI, '+')) {
+            String encodedRequestURI = encodePlus(requestURI);
+            @SuppressWarnings("java:S1149")
+            StringBuffer encodedRequestUrl = new StringBuffer(encodePlus(httpRequest.getRequestURL().toString()));
+            httpRequest = new HttpServletRequestWrapper(httpRequest)
+            {
+                @Override
+                public String getRequestURI()
+                {
+                    return encodedRequestURI;
+                }
+
+                @Override
+                public StringBuffer getRequestURL()
+                {
+                    return encodedRequestUrl;
+                }
+            };
+        }
+
+        this.container.service(httpRequest, res);
+    }
+
+    private String encodePlus(String path)
+    {
+        return path.replace("+", "%20");
     }
 
     private synchronized void initializeCountainer(ServletContext servletContext) throws ServletException

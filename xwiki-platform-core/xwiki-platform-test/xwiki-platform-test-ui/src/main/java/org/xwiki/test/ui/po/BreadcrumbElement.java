@@ -43,10 +43,21 @@ public class BreadcrumbElement extends BaseElement
 
     public List<String> getPath()
     {
-        List<WebElement> pathElements = getDriver().findElementsWithoutWaiting(this.container, By.tagName("li"));
+        // Look for direct children because each path element may toggle a breadcrumb tree which has nested list items.
+        List<WebElement> pathElements =
+            getDriver().findElementsWithoutWaiting(this.container, By.cssSelector(":scope > li"));
         List<String> path = new ArrayList<>();
         for (WebElement pathElement : pathElements) {
-            path.add(pathElement.getText());
+            List<WebElement> links = getDriver().findElementsWithoutWaiting(pathElement, By.cssSelector(":scope > a"));
+            // If the path element has a link then we include only its label (because the path element may contains also
+            // text that is "visible" only to screen readers, e.g. from the button that toggles the breadcrumb tree).
+            // Even if "sr-only" text is not displayed it is still included in the output of getText() because it's not
+            // really hidden (check its CSS).
+            if (links.isEmpty()) {
+                path.add(pathElement.getText());
+            } else {
+                path.add(links.get(0).getText());
+            }
         }
         return path;
     }

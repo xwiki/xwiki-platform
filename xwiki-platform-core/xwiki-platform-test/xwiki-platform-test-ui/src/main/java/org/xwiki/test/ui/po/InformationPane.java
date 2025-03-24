@@ -36,6 +36,8 @@ public class InformationPane extends BaseElement
 {
     private static final By ORIGINAL_LOCALE_SELECTOR = By.cssSelector("dd[data-key='originalLocale']");
 
+    private static final String INFORMATION_TAB_ID = "Informationtab";
+
     @FindBy(id = "informationcontent")
     private WebElement pane;
 
@@ -100,7 +102,7 @@ public class InformationPane extends BaseElement
 
     /**
      * Clicks on the translation link that corresponds to the given locale.
-     * 
+     *
      * @param locale the locale to click on
      * @since 12.10.6
      * @since 13.2RC1
@@ -112,7 +114,7 @@ public class InformationPane extends BaseElement
 
     /**
      * Clicks on the translation link with the specified label (locale pretty name).
-     * 
+     *
      * @param label the locale pretty name
      * @since 12.10.6
      * @since 13.2RC1
@@ -130,5 +132,27 @@ public class InformationPane extends BaseElement
     public DocumentSyntaxPropertyPane editSyntax()
     {
         return new DocumentSyntaxPropertyPane().clickEdit();
+    }
+
+    /**
+     * @return {@code true} if the information tab is found, {@code false} otherwise
+     * @since 16.4.7
+     * @since 16.10.4
+     * @since 17.1.0RC1
+     */
+    public boolean exists()
+    {
+        return getDriver().findElements(By.id(INFORMATION_TAB_ID)).size() == 1;
+    }
+
+    /**
+     * @return {@code true} if the information tab is not found, {@code false} otherwise
+     * @since 16.4.7
+     * @since 16.10.4
+     * @since 17.1.0RC1
+     */
+    public boolean doesNotExist()
+    {
+        return getDriver().findElements(By.id(INFORMATION_TAB_ID)).isEmpty();
     }
 }

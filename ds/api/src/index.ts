@@ -18,6 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { navigationTreePropsDefaults } from "./XNavigationTree";
+import { navigationTreeSelectPropsDefaults } from "./XNavigationTreeSelect";
 import {
   ButtonHTMLAttributes,
   DefineComponent,
@@ -114,6 +116,8 @@ export type {
   TabProps,
   TextFieldProps,
 };
+
+export { navigationTreePropsDefaults, navigationTreeSelectPropsDefaults };
 
 // Inspired from what shoelace is doing to expose the types of their web components in Vue.
 declare module "vue" {

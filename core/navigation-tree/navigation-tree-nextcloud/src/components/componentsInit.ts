@@ -75,6 +75,7 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
             },
           }).href,
           has_children: subdirectories.some((d2) => d2.startsWith(`${d}/`)),
+          is_terminal: false,
         });
       }
     }
@@ -124,7 +125,7 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
     return subdirectories;
   }
 
-  getParentNodesId(page?: DocumentReference): Array<string> {
+  getParentNodesId(page: DocumentReference): Array<string> {
     return getParentNodesIdFromPath(page);
   }
 

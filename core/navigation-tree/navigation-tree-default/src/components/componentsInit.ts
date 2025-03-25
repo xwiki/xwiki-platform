@@ -49,7 +49,7 @@ class DefaultNavigationTreeSource implements NavigationTreeSource {
     return [];
   }
 
-  getParentNodesId(page?: DocumentReference): Array<string> {
+  getParentNodesId(page: DocumentReference): Array<string> {
     return getParentNodesIdFromPath(page);
   }
 }

@@ -27,6 +27,20 @@ import type { NavigationTreeNode } from "@xwiki/cristal-navigation-tree-api";
 type NavigationTreeProps = {
   clickAction?: (node: NavigationTreeNode) => void;
   currentPageReference?: DocumentReference;
+  /**
+   * Whether to include terminal pages in the tree (default: true).
+   * @since 0.16
+   */
+  includeTerminals?: boolean;
+};
+
+/**
+ * Default props values for NavigationTree implementations.
+ * @since 0.16
+ */
+const navigationTreePropsDefaults = {
+  includeTerminals: true,
 };
 
 export type { NavigationTreeProps };
+export { navigationTreePropsDefaults };

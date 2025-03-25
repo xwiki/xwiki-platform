@@ -80,9 +80,12 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
     return navigationTree;
   }
 
-  getParentNodesId(page?: DocumentReference): Array<string> {
+  getParentNodesId(
+    page: DocumentReference,
+    includeTerminal: boolean = true,
+  ): Array<string> {
     const result = [];
-    if (page && page.space) {
+    if (page.space) {
       let currentParent = "";
       for (const parent of page.space!.names) {
         currentParent += parent;
@@ -90,7 +93,7 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
         result.push(`document:xwiki:${currentParent}.WebHome`);
         currentParent += ".";
       }
-      if (page.name != "WebHome") {
+      if (page.name != "WebHome" && includeTerminal) {
         result.push(
           `document:xwiki:${this.referenceSerializer.serialize(page)}`,
         );
@@ -158,6 +161,7 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
             },
           }).href,
           has_children: treeNode.children,
+          is_terminal: !treeNode.id.endsWith(".WebHome"),
         });
       }
     }

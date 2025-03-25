@@ -80,6 +80,7 @@ class FileSystemNavigationTreeSource implements NavigationTreeSource {
             (await fileSystemStorage.listChildren(id)).filter(
               (c: string) => c != "attachments",
             ).length > 0,
+          is_terminal: false,
         });
       }
     }
@@ -87,7 +88,7 @@ class FileSystemNavigationTreeSource implements NavigationTreeSource {
     return navigationTree;
   }
 
-  getParentNodesId(page?: DocumentReference): Array<string> {
+  getParentNodesId(page: DocumentReference): Array<string> {
     return getParentNodesIdFromPath(page);
   }
 }

@@ -50,6 +50,7 @@ const items = useTemplateRef<any[]>("items");
 const props = defineProps<{
   node: NavigationTreeNode;
   clickAction?: OnClickAction;
+  includeTerminals?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -73,7 +74,7 @@ async function lazyLoadChildren() {
   if (!current.value?.lazy) {
     return;
   }
-  nodes.value.push(...(await treeSource.getChildNodes(props.node.id)));
+  nodes.value.push(...(await getChildNodes(props.node.id)));
 
   // If the node doesn't have any children, we still need to add one item
   // temporarily to disable the loading state.
@@ -137,7 +138,7 @@ async function onDocumentUpdate(parents: string[]) {
     if (nodes.value[i].id == parents[0]) {
       if (parents.length == 1) {
         // Page update
-        const newItems = await treeSource.getChildNodes(props.node.id);
+        const newItems = await getChildNodes(props.node.id);
         for (const newItem of newItems) {
           if (newItem.id == nodes.value[i].id) {
             nodes.value[i].label = newItem.label;
@@ -157,7 +158,7 @@ async function onDocumentUpdate(parents: string[]) {
     // We don't do anything because this node will be loaded lazily anyway.
     return;
   }
-  const newItems = await treeSource.getChildNodes(props.node.id);
+  const newItems = await getChildNodes(props.node.id);
   newItemsLoop: for (const newItem of newItems) {
     for (const i of nodes.value.keys()) {
       if (newItem.id == nodes.value[i].id) {
@@ -166,6 +167,12 @@ async function onDocumentUpdate(parents: string[]) {
     }
     nodes.value.push(newItem);
   }
+}
+
+async function getChildNodes(id: string) {
+  return (await treeSource.getChildNodes(id)).filter(
+    (c) => props.includeTerminals || !c.is_terminal,
+  );
 }
 </script>
 
@@ -193,6 +200,7 @@ async function onDocumentUpdate(parents: string[]) {
       slot="children"
       :node="item"
       :click-action="clickAction"
+      :include-terminals="includeTerminals"
       @selection-change="onSelectionChange"
     >
     </x-navigation-tree-item>

@@ -112,6 +112,7 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
                         tree: Array<{ type: string }>;
                       }
                     ).tree.some((n) => n.type == "tree"),
+                    is_terminal: false,
                   };
                 }
               },
@@ -126,7 +127,7 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
     return navigationTree;
   }
 
-  getParentNodesId(page?: DocumentReference): Array<string> {
+  getParentNodesId(page: DocumentReference): Array<string> {
     return getParentNodesIdFromPath(page);
   }
 }

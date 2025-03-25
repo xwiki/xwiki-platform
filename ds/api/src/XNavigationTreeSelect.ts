@@ -31,6 +31,20 @@ type NavigationTreeSelectProps = {
   help?: string;
   currentPageReference?: DocumentReference;
   modelValue?: SpaceReference;
+  /**
+   * Whether to include terminal pages as select options (default: false).
+   * @since 0.16
+   */
+  includeTerminals?: boolean;
+};
+
+/**
+ * Default props values for NavigationTreeSelect implementations.
+ * @since 0.16
+ */
+const navigationTreeSelectPropsDefaults = {
+  includeTerminals: false,
 };
 
 export type { NavigationTreeSelectProps };
+export { navigationTreeSelectPropsDefaults };

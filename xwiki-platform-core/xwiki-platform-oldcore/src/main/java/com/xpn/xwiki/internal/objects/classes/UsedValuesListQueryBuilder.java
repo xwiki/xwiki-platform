@@ -103,10 +103,11 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
     @Override
     public Query build(ListClass listClass) throws QueryException
     {
-        String statement = String.format("select %1$s, count(*) as unfilterable0 " + "from BaseObject as obj, %2$s "
+        String statement = String.format("select %1$s, str(%1$s) as unfilterable1 "
+            + "from BaseObject as obj, %2$s "
             + "where obj.className = :className and obj.name <> :templateName"
-            + " and prop.id.id = obj.id and prop.id.name = :propertyName " + "group by %1$s "
-            + "order by count(*) desc", getSelectColumnAndFromTable(listClass));
+            + " and prop.id.id = obj.id and prop.id.name = :propertyName "
+            + "order by unfilterable1 desc", getSelectColumnAndFromTable(listClass));
         Query query = this.queryManager.createQuery(statement, Query.HQL);
         bindParameterValues(query, listClass);
         query.addFilter(new ViewableValueFilter(listClass));

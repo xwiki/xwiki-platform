@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -32,9 +34,13 @@ import org.xwiki.component.wiki.internal.AbstractAsyncContentBaseObjectWikiCompo
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
 import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
@@ -55,6 +61,9 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponent
     implements WikiMacro, NestedScriptMacroEnabled, WikiMacroConstants
 {
+    @Inject
+    private MacroContentParser contentParser;
+
     /**
      * The {@link MacroDescriptor} for this macro.
      */
@@ -112,6 +121,17 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         }
 
         return result instanceof CompositeBlock ? result.getChildren() : Arrays.asList(result);
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        if (macroBlock.getContent() != null) {
+            ContentDescriptor contentDescriptor = getDescriptor().getContentDescriptor();
+            if (contentDescriptor != null && contentDescriptor.getType().equals(Block.LIST_BLOCK_TYPE)) {
+                this.contentParser.prepareContentWiki(macroBlock);
+            }
+        }
     }
 
     /**

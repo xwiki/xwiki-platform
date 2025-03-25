@@ -1,3 +1,4 @@
+/*!
 ## ---------------------------------------------------------------------------
 ## See the NOTICE file distributed with this work for additional
 ## information regarding copyright ownership.
@@ -98,7 +99,7 @@
 "min-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 2))",
 "max-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 2))",
 "min-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 1))",
-"max-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))", 
+"max-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))",
 "min-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), -1))",
 "max-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))",
 "min-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))",
@@ -132,7 +133,7 @@
 
 ## Retrieve the lists of variables for the old ColorTheme and Flamingo ColorTheme
 #template('variablelist.vm')
-## If you want to update the values set for the old colortheme, see colorThemeInit.vm, a source of truth shared 
+## If you want to update the values set for the old colortheme, see colorThemeInit.vm, a source of truth shared
 ## with LESS variables defined in xwiki-platform-flamingo-skin-resources -> variablesInit.vm -> initFromOldColorTheme
 ## A couple variables are excluded from the set, we do not port them to CSS
 #set($excludeFromOldColorThemeMapping = ['xwiki-panel-header-bg', 'xwiki-panel-header-text'])
@@ -140,13 +141,13 @@
   #set($discard = $oldColorThemeVariables.remove($excludedVariable))
 #end
 
-## We merge the three maps into one list. 
+## We merge the three maps into one list.
 ## We allow different values from different maps for the same variable. This is an extra fallback in case the first
 ## doesn't work. This could be the case for defaults that rely on other variables.
 ## Values follow CSS cascading order (last one wins).
 #set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariables])
 
-## $flamingoColorThemeVariables is the list of all the variables available to customize directly in the Flamingo 
+## $flamingoColorThemeVariables is the list of all the variables available to customize directly in the Flamingo
 ## theme editor. These mappings will not always end up in the initialization of a CSS variable.
 ## If you want to update the values set for the flamingo colortheme, see the colortheme xml,
 ## a source of truth shared with LESS variables, defined in xwiki-platform-flamingo-theme-ui
@@ -157,7 +158,8 @@
 ## Generation
 ######################
 
-## We use a tan/arctan2 hack to get a proper unitless viewport width. This hack can be avoided when the CSS Values and 
+#define($css)
+## We use a tan/arctan2 hack to get a proper unitless viewport width. This hack can be avoided when the CSS Values and
 ## Units module Level 4 is accepted and supported in browsers.
 ## https://drafts.csswg.org/css-values/#calc-type-checking
 @property --100vw {
@@ -188,7 +190,7 @@
 #set($value = 'var(--' + $stringtool.substring($value, 1) + ')')
 #end
 #set($propertyType = $flamingoColorThemeVariables.get($property))
-## For now we only use `string` variables, because it's the easiest to setup and because it's 100% compatible with 
+## For now we only use `string` variables, because it's the easiest to setup and because it's 100% compatible with
 ## LESS variables. We could use the extra info we have on the variable types to use the @property syntax later.
 #if($propertyType == 'escapedText')
 --$property: "$escapetool.javascript($!value)";
@@ -198,3 +200,5 @@
 #end
 #end
 }
+#end
+*/$!css

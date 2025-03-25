@@ -34,6 +34,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
@@ -88,6 +89,9 @@ class DefaultWikiMacroFactoryTest
 
     @MockComponent
     private ContentParser contentParser;
+
+    @MockComponent
+    private MacroContentParser macroContentParser;
 
     @MockComponent
     @Named("macro")

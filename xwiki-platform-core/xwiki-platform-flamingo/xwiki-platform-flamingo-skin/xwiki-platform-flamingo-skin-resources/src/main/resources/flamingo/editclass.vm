@@ -125,7 +125,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
  * Inline form for adding a new property to the class.
  *#
 #macro(addPropertyForm)
-  <div id="add_xproperty" class="add_xproperty">
+  <div id="add_xproperty" class="add-xproperty">
     <div>
       $services.icon.renderHTML('add')
       <label for="propname" class="property-name-label">$services.localization.render('core.editors.class.addProperty.name.label')</label>

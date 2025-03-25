@@ -19,7 +19,6 @@
  */
 package org.xwiki.user.test.po;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -140,7 +139,7 @@ public class ChangePasswordPage extends BasePage
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
-            public Boolean apply(@Nullable WebDriver webDriver)
+            public Boolean apply(WebDriver webDriver)
             {
                 return isDisplayed(By.cssSelector(VALIDATION_ERROR_MESSAGE_SELECTOR))
                     || isDisplayed(By.cssSelector(ERROR_MESSAGE_SELECTOR))

@@ -3435,6 +3435,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     /**
      * @return true if the document is a new one (i.e. it has never been saved) or false otherwise
      */
+    @Override
     public boolean isNew()
     {
         return this.isNew;

@@ -36,6 +36,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.dom4j.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
@@ -81,6 +83,7 @@ import com.xpn.xwiki.web.EditForm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -129,6 +132,9 @@ public class XWikiDocumentMockitoTest
     @MockComponent
     @Named("compactwiki/document")
     private UserReferenceSerializer<String> compactWikiUserReferenceSerializer;
+
+    @MockComponent
+    private ContentParser parser;
 
     @MockComponent
     private LinkStore linkStore;
@@ -571,14 +577,40 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    void testCloneIdentical()
+    void testCloneIdentical() throws IllegalAccessException
     {
-        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
-        document.setChangeTracked(true);
+        XWikiDocument initialDocument = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
 
-        XWikiDocument clonedDocument = document.clone();
+        initialDocument.setContent("content");
+        initialDocument.setChangeTracked(true);
+
+        XWikiDocument clonedDocument = initialDocument.clone();
 
         assertTrue(clonedDocument.isChangeTracked());
+        assertSame(initialDocument.getContent(), clonedDocument.getContent());
+        assertSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+
+        initialDocument.setContent("new content");
+
+        assertNotEquals(initialDocument.getContent(), clonedDocument.getContent());
+        assertEquals(initialDocument.getSyntax(), clonedDocument.getSyntax());
+        assertNotSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+
+        clonedDocument = initialDocument.clone();
+
+        assertTrue(clonedDocument.isChangeTracked());
+        assertSame(initialDocument.getContent(), clonedDocument.getContent());
+        assertSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+
+        initialDocument.setSyntax(Syntax.XWIKI_2_0);
+
+        assertEquals(initialDocument.getContent(), clonedDocument.getContent());
+        assertNotEquals(initialDocument.getSyntax(), clonedDocument.getSyntax());
+        assertNotSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
     }
 
     @Test

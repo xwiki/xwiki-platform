@@ -1328,6 +1328,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param content the content of the document
      * @param syntax the syntax of the content
      * @since 17.2.0
+     * @since 16.10.6
      */
     public void setContent(String content, Syntax syntax)
     {

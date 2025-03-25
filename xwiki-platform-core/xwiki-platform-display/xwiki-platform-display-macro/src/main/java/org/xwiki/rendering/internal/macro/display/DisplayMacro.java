@@ -93,6 +93,11 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
                 e);
         }
 
+        // Step 2b: Make sure the page exists
+        if (documentBridge.isNew()) {
+            return List.of();
+        }
+
         // Step 3: Check right
         if (!this.contextualAuthorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
             throw new MacroExecutionException(

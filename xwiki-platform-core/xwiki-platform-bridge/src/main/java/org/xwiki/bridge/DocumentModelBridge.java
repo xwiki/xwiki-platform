@@ -236,7 +236,8 @@ public interface DocumentModelBridge
 
     /**
      * @return true if the document is a new one (i.e. it has never been saved) or false otherwise
-     * @since 17.2.0RC1
+     * @since 17.2.0
+     * @since 16.10.6
      */
     default boolean isNew()
     {

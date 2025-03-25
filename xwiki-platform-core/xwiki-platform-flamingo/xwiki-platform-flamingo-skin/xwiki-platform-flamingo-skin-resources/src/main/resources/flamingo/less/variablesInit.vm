@@ -65,7 +65,7 @@
     #if($operationsOnThemeVariables.keySet().contains($variableName))
       #set($variableValue = $operationsOnThemeVariables.get($variableName).replace('__variablevalue__',$variableValue))
     #end
-    @$variableName : $variableValue;
+    @$variableName: $variableValue;
   #end
 #end
 

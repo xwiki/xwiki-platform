@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-github-authentication",
+  "name": "@xwiki/cristal-authentication-server",
   "version": "0.15.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "github-authentication",
+    "directory": "authentication-server",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "bugs": {

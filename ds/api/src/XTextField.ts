@@ -42,6 +42,21 @@ type TextFieldProps = {
    * @since 0.15
    */
   readonly?: boolean;
+  /**
+   * Type of content.
+   * @since 0.16
+   */
+  type?:
+    | "date"
+    | "datetime-local"
+    | "email"
+    | "number"
+    | "password"
+    | "search"
+    | "tel"
+    | "text"
+    | "time"
+    | "url";
 };
 
 export type { TextFieldProps };

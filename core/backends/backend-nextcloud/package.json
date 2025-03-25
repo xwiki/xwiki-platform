@@ -23,9 +23,9 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
-    "@xwiki/cristal-authentication-nextcloud": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
     "fast-xml-parser": "5.0.9",
     "inversify": "7.1.0"

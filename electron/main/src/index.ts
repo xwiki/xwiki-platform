@@ -26,6 +26,7 @@ import "./security-restrictions";
 import loadBrowser from "@xwiki/cristal-browser-electron/main";
 import { load as loadConfiguration } from "@xwiki/cristal-configuration-electron-main";
 import { load as loadGitHubAuthentication } from "@xwiki/cristal-electron-authentication-github-main";
+import { load as loadNextcloudAuthentication } from "@xwiki/cristal-electron-authentication-nextcloud-main";
 import { load as loadXWikiAuthentication } from "@xwiki/cristal-electron-authentication-xwiki-main";
 // @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
 import load from "@xwiki/cristal-electron-storage/main";
@@ -75,6 +76,7 @@ app
     restoreOrCreateWindow().then((w) => {
       loadBrowser(w);
       loadGitHubAuthentication(w, loadFile);
+      loadNextcloudAuthentication(w, loadFile);
       loadXWikiAuthentication(w, loadFile);
     });
     /**

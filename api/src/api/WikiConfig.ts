@@ -37,6 +37,12 @@ export interface WikiConfig {
    * @since 0.15
    */
   authenticationBaseURL?: string;
+  /**
+   * Authentication Manager component to use.
+   * By default, resolves to configuration type.
+   * @since 0.16
+   */
+  authenticationManager?: string;
   homePage: string;
   storage: Storage;
   serverRendering: boolean;

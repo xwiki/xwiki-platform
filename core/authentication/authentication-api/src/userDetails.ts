@@ -32,4 +32,9 @@ export interface UserDetails {
    * @since 0.14
    */
   avatar?: string;
+  /**
+   * Username of the user.
+   * @since 0.16
+   */
+  username?: string;
 }

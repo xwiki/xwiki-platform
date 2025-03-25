@@ -31,6 +31,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-authentication-github": "workspace:*",
+    "@xwiki/cristal-authentication-nextcloud": "workspace:*",
     "@xwiki/cristal-authentication-xwiki": "workspace:*",
     "@xwiki/cristal-browser-default": "workspace:*",
     "@xwiki/cristal-configuration-api": "workspace:*",

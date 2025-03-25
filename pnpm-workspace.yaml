@@ -17,6 +17,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 packages:
   - "api"
+  - "authentication-server"
   - "core/alerts/*"
   - "core/attachments/*"
   - "core/authentication/*"
@@ -54,6 +55,7 @@ packages:
   - "editors/tiptap"
   - "electron"
   - "electron/authentication/authentication-github/*"
+  - "electron/authentication/authentication-nextcloud/*"
   - "electron/authentication/authentication-xwiki/*"
   - "electron/main"
   - "electron/preload"
@@ -64,7 +66,6 @@ packages:
   - "electron/link-suggest/*"
   - "extension-manager"
   - "extensions/menubuttons"
-  - "github-authentication"
   - "lib"
   - "macros"
   - "realtime"

@@ -158,10 +158,10 @@ export class GitHubAuthenticationManager implements AuthenticationManager {
       },
     };
     const {
-      data: { html_url, name, avatar_url },
+      data: { login, html_url, name, avatar_url },
     } = await axios.get(userinfoUrl, data);
 
-    return { profile: html_url, name, avatar: avatar_url };
+    return { profile: html_url, username: login, name, avatar: avatar_url };
   }
 
   async logout(): Promise<void> {

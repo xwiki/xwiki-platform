@@ -1,0 +1,47 @@
+{
+  "name": "@xwiki/cristal-electron-authentication-nextcloud-preload",
+  "version": "0.15.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "electron/authentication/authentication-nextcloud/authentication-nextcloud-preload",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.json && vite build",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run"
+  },
+  "dependencies": {
+    "@xwiki/cristal-authentication-api": "workspace:*"
+  },
+  "peerDependencies": {
+    "electron": "35.0.1"
+  },
+  "devDependencies": {
+    "@xwiki/cristal-dev-config": "workspace:*",
+    "typescript": "5.8.2",
+    "vite": "6.2.2"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.umd.js",
+    "types": "./dist/index.d.ts"
+  }
+}

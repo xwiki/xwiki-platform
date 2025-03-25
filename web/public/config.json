@@ -97,7 +97,7 @@
     "homePage": "home",
     "designSystem": "vuetify",
     "realtimeURL": "http://localhost:15681/collaboration",
-    "authenticationBaseURL": "http://localhost:15682"
+    "authenticationBaseURL": "http://localhost:15682/github"
   },
   "GitHubSL": {
     "name": "GitHubSL",
@@ -109,17 +109,31 @@
     "homePage": "home",
     "designSystem": "shoelace",
     "realtimeURL": "http://localhost:15681/collaboration",
-    "authenticationBaseURL": "http://localhost:15682"
+    "authenticationBaseURL": "http://localhost:15682/github"
   },
   "Nextcloud": {
     "name": "Nextcloud",
     "configType": "Nextcloud",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "http://localhost:9292/",
+    "baseURL": "http://localhost:9292",
     "baseRestURL": "http://localhost:9292/remote.php/dav/files",
     "designSystem": "shoelace",
     "homePage": "home",
-    "realtimeURL": "http://localhost:15681/collaboration"
+    "realtimeURL": "http://localhost:15681/collaboration",
+    "authenticationBaseURL": "http://localhost:15682/nextcloud",
+    "authenticationManager": "Nextcloud/oauth2"
+  },
+  "NextcloudBasic": {
+    "name": "NextcloudBasic",
+    "configType": "Nextcloud",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "http://localhost:9292",
+    "baseRestURL": "http://localhost:9292/remote.php/dav/files",
+    "designSystem": "shoelace",
+    "homePage": "home",
+    "realtimeURL": "http://localhost:15681/collaboration",
+    "authenticationManager": "Nextcloud/basic"
   }
 }

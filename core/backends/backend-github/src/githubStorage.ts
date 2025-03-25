@@ -104,7 +104,10 @@ export class GitHubStorage extends AbstractStorage {
 
     if (response.status >= 200 && response.status < 300) {
       const json = await response.json();
-      const { date, username } = await this.getLastEditDetails(page, revision);
+      const { date, name, username } = await this.getLastEditDetails(
+        page,
+        revision,
+      );
 
       return Object.assign(new DefaultPageData(), {
         ...json,
@@ -115,7 +118,7 @@ export class GitHubStorage extends AbstractStorage {
           (await this.authenticationManagerProvider.get()?.isAuthenticated()) ??
           false,
         lastModificationDate: date,
-        lastAuthor: { name: username },
+        lastAuthor: { name, username },
       });
     } else {
       return undefined;
@@ -356,7 +359,7 @@ export class GitHubStorage extends AbstractStorage {
   private async getLastEditDetails(
     page: string,
     revision?: string,
-  ): Promise<{ date: Date; username: string }> {
+  ): Promise<{ date: Date; username: string; name: string }> {
     if (revision) {
       const commitsUrl = new URL(
         `${this.wikiConfig.baseRestURL}/commits/${revision}`,
@@ -369,12 +372,13 @@ export class GitHubStorage extends AbstractStorage {
         },
       });
       const jsonCommitsResponse: {
-        commit: { author: { name: string; date: string } };
+        commit: { author: { login: string; name: string; date: string } };
       } = await commitsResponse.json();
 
       return {
         date: new Date(jsonCommitsResponse.commit.author.date),
-        username: jsonCommitsResponse.commit.author.name,
+        username: jsonCommitsResponse.commit.author.login,
+        name: jsonCommitsResponse.commit.author.name,
       };
     } else {
       const commitsUrl = new URL(`${this.wikiConfig.baseRestURL}/commits`);
@@ -390,12 +394,13 @@ export class GitHubStorage extends AbstractStorage {
         },
       });
       const jsonCommitsResponse: Array<{
-        commit: { author: { name: string; date: string } };
+        commit: { author: { login: string; name: string; date: string } };
       }> = await commitsResponse.json();
 
       return {
         date: new Date(jsonCommitsResponse[0].commit.author.date),
-        username: jsonCommitsResponse[0].commit.author.name,
+        username: jsonCommitsResponse[0].commit.author.login,
+        name: jsonCommitsResponse[0].commit.author.name,
       };
     }
   }

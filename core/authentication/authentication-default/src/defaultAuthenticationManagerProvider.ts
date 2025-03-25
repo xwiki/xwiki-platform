@@ -37,7 +37,10 @@ class DefaultAuthenticationManagerProvider
   constructor(@inject("CristalApp") private cristalApp: CristalApp) {}
 
   get(type?: string): AuthenticationManager | undefined {
-    const resolvedType = type || this.cristalApp.getWikiConfig().getType();
+    const resolvedType =
+      type ??
+      this.cristalApp.getWikiConfig().authenticationManager ??
+      this.cristalApp.getWikiConfig().getType();
     try {
       return this.cristalApp
         .getContainer()

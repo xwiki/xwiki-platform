@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { ComponentInit as NextcloudAuthenticationUIComponentInit } from "@xwiki/cristal-authentication-nextcloud-ui";
 import { ComponentInit as NextcloudPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-nextcloud";
 import { ComponentInit as NextcloudLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-nextcloud";
 import { ComponentInit as ModelReferenceNextcloudComponentInit } from "@xwiki/cristal-model-reference-nextcloud";
@@ -26,6 +27,7 @@ import { ComponentInit as NextcloudNavigationTreeComponentInit } from "@xwiki/cr
 import type { Container } from "inversify";
 
 export function load(container: Container) {
+  new NextcloudAuthenticationUIComponentInit(container);
   new NextcloudLinkSuggestComponentInit(container);
   new NextcloudPageHierarchyComponentInit(container);
   new NextcloudNavigationTreeComponentInit(container);

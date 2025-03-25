@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-authentication-nextcloud": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "inversify": "7.1.0"

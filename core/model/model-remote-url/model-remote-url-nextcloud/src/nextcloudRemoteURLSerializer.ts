@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { USERNAME } from "@xwiki/cristal-authentication-nextcloud";
 import {
   AttachmentReference,
   DocumentReference,
@@ -45,13 +44,13 @@ class NextcloudRemoteURLSerializer implements RemoteURLSerializer {
       case EntityType.DOCUMENT: {
         const documentReference = reference as DocumentReference;
         const spaces = documentReference.space?.names.join("/");
-        return `${this.getBaseRestURL()}/${USERNAME}/.cristal/${spaces}/${documentReference.name}`;
+        return `${this.getBaseRestURL()}/${documentReference.space?.wiki?.name}/.cristal/${spaces}/${documentReference.name}`;
       }
       case EntityType.ATTACHMENT: {
         const attachmentReference = reference as AttachmentReference;
         const documentReference = attachmentReference.document;
         const spaces = documentReference.space?.names.map(encodeURI).join("/");
-        return `${this.getBaseRestURL()}/${USERNAME}/.cristal/${spaces}/${documentReference.name}/attachments/${attachmentReference.name}`;
+        return `${this.getBaseRestURL()}/${documentReference.space?.wiki?.name}/.cristal/${spaces}/${documentReference.name}/attachments/${attachmentReference.name}`;
       }
     }
   }

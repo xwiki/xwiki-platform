@@ -18,15 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { config } from "./config";
+import { config } from "../config";
 import express from "express";
-import type { Request, Response } from "express";
+import type { Request, Response, Router } from "express";
 
-const app = express();
+export const router: Router = express.Router();
 
-app.get("/device-login", async (_req: Request, res: Response) => {
-  const deviceLoginUrl = new URL(config.GITHUB_DEVICE_LOGIN_URL);
-  deviceLoginUrl.searchParams.set("client_id", config.GITHUB_APP_CLIENT_ID);
+router.get("/device-login", async (_req: Request, res: Response) => {
+  const deviceLoginUrl = new URL(config.github.DEVICE_LOGIN_URL);
+  deviceLoginUrl.searchParams.set("client_id", config.github.APP_CLIENT_ID);
 
   const deviceLoginResponse = await fetch(deviceLoginUrl, {
     method: "POST",
@@ -38,14 +38,14 @@ app.get("/device-login", async (_req: Request, res: Response) => {
   res.send(await deviceLoginResponse.text());
 });
 
-app.get(
+router.get(
   "/device-verify",
   async (
     req: Request<unknown, unknown, unknown, { device_code: string }>,
     res: Response,
   ) => {
-    const deviceVerifyUrl = new URL(config.GITHUB_DEVICE_VERIFY_URL);
-    deviceVerifyUrl.searchParams.set("client_id", config.GITHUB_APP_CLIENT_ID);
+    const deviceVerifyUrl = new URL(config.github.DEVICE_VERIFY_URL);
+    deviceVerifyUrl.searchParams.set("client_id", config.github.APP_CLIENT_ID);
     deviceVerifyUrl.searchParams.set("device_code", req.query.device_code);
     deviceVerifyUrl.searchParams.set(
       "grant_type",
@@ -62,13 +62,3 @@ app.get(
     res.send(await deviceVerifyResponse.text());
   },
 );
-
-let port = 15682;
-const env_port = parseInt(process.env.GITHUB_AUTH_HTTP_PORT || "");
-if (!isNaN(env_port) && env_port > 0) {
-  port = env_port;
-}
-
-app.listen(port, () => {
-  console.log(`Application is running on http://localhost:${port}`);
-});

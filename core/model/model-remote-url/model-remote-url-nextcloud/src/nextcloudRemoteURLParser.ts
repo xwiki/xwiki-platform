@@ -18,12 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { USERNAME } from "@xwiki/cristal-authentication-nextcloud";
 import {
   AttachmentReference,
   DocumentReference,
   EntityReference,
   SpaceReference,
+  WikiReference,
 } from "@xwiki/cristal-model-api";
 import { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 import { inject, injectable } from "inversify";
@@ -38,7 +38,7 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
     if (urlStr.includes("://") && !urlStr.startsWith(baseRestURL)) {
       return undefined;
     }
-    urlStr = urlStr.replace(`${baseRestURL}/${USERNAME}/.cristal/`, "");
+    urlStr = urlStr.replace(baseRestURL, "");
     const segments = this.computeSegments(urlStr);
 
     if (
@@ -49,13 +49,15 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
         segments[segments.length - 1],
         this.buildDocumentReference(
           segments[segments.length - 3],
-          segments.splice(0, segments.length - 3),
+          segments[0],
+          segments.splice(2, segments.length - 3),
         ),
       );
     } else {
       return this.buildDocumentReference(
         segments[segments.length - 1],
-        segments.splice(0, segments.length - 1),
+        segments[0],
+        segments.splice(2, segments.length - 1),
       );
     }
   }
@@ -74,11 +76,12 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
 
   private buildDocumentReference(
     documentReferenceName: string,
+    username: string,
     spaces: string[],
   ) {
     return new DocumentReference(
       documentReferenceName,
-      new SpaceReference(undefined, ...spaces),
+      new SpaceReference(new WikiReference(username), ...spaces),
     );
   }
 

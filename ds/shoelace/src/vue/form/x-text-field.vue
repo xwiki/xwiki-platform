@@ -16,7 +16,7 @@ const input = defineModel<string>();
     :autofocus.attr="autofocus"
     :value="input"
     :readonly="readonly"
-    type="text"
+    :type="type ?? 'text'"
     @input="input = $event.target.value"
   ></sl-input>
 </template>

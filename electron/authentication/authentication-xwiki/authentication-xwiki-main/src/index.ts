@@ -141,10 +141,10 @@ export function load(
         },
       };
       const {
-        data: { profile, name },
+        data: { profile, name, picture, preferred_username },
       } = await axios.get(userinfoUrl, data);
 
-      return { profile, name };
+      return { profile, username: preferred_username, name, avatar: picture };
     },
   );
   ipcMain.handle("authentication:xwiki:authorizationValue", () => {

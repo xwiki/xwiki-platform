@@ -21,6 +21,7 @@
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-configuration-electron-main": "workspace:*",
     "@xwiki/cristal-electron-authentication-github-main": "workspace:*",
+    "@xwiki/cristal-electron-authentication-nextcloud-main": "workspace:*",
     "@xwiki/cristal-electron-authentication-xwiki-main": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "electron": "35.0.1",

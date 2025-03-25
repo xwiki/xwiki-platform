@@ -20,6 +20,7 @@
 
 import { CristalAppLoader, defaultComponentsList } from "@xwiki/cristal-lib";
 import { ComponentInit as AuthenticationGitHubComponentInit } from "@xwiki/cristal-authentication-github";
+import { ComponentInit as AuthenticationNextcloudComponentInit } from "@xwiki/cristal-authentication-nextcloud";
 import { ComponentInit as AuthenticationXWikiComponentInit } from "@xwiki/cristal-authentication-xwiki";
 import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-default";
 import { loadConfig } from "@xwiki/cristal-configuration-web";
@@ -43,6 +44,7 @@ CristalAppLoader.init(
     await defaultComponentsList(container, configuration);
     new BrowserComponentInit(container);
     new AuthenticationGitHubComponentInit(container);
+    new AuthenticationNextcloudComponentInit(container);
     new AuthenticationXWikiComponentInit(container);
   },
 );

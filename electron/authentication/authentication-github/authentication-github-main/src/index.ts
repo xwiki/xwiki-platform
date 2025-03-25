@@ -105,10 +105,10 @@ export function load(
         },
       };
       const {
-        data: { html_url, name, avatar_url },
+        data: { login, html_url, name, avatar_url },
       } = await axios.get(userinfoUrl, data);
 
-      return { profile: html_url, name, avatar: avatar_url };
+      return { profile: html_url, username: login, name, avatar: avatar_url };
     },
   );
   ipcMain.handle("authentication:github:authorizationValue", () => {

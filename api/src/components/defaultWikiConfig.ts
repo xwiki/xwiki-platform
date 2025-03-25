@@ -48,6 +48,14 @@ export class DefaultWikiConfig implements WikiConfig {
    * @since 0.15
    */
   authenticationBaseURL?: string;
+
+  /**
+   * Authentication Manager component to use.
+   * By default, resolves to configuration type.
+   * @since 0.16
+   */
+  authenticationManager?: string;
+
   // @ts-expect-error homePage is temporarily undefined during class
   // initialization
   public homePage: string;
@@ -83,13 +91,18 @@ export class DefaultWikiConfig implements WikiConfig {
     serverRendering: boolean,
     designSystem: string,
     offline: boolean,
-    optional?: { realtimeURL?: string; authenticationBaseURL?: string },
+    optional?: {
+      realtimeURL?: string;
+      authenticationBaseURL?: string;
+      authenticationManager?: string;
+    },
   ): void {
     this.name = name;
     this.baseURL = baseURL;
     this.baseRestURL = baseRestURL;
     this.realtimeURL = optional?.realtimeURL;
     this.authenticationBaseURL = optional?.authenticationBaseURL;
+    this.authenticationManager = optional?.authenticationManager;
     this.homePage = homePage;
     this.serverRendering = serverRendering;
     this.designSystem = designSystem;
@@ -104,6 +117,7 @@ export class DefaultWikiConfig implements WikiConfig {
     this.baseRestURL = configObject.baseRestURL;
     this.realtimeURL = configObject.realtimeURL;
     this.authenticationBaseURL = configObject.authenticationBaseURL;
+    this.authenticationManager = configObject.authenticationManager;
     this.homePage = configObject.homePage;
     this.serverRendering = configObject.serverRendering;
     this.offline = configObject.offline;

@@ -181,6 +181,7 @@ class XWikiPageRevisionManager implements PageRevisionManager {
 
       return {
         name: user,
+        username: jsonResponse.pageName,
         profile: this.cristalApp.getRouter().resolve({
           name: "view",
           params: {

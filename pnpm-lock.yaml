@@ -127,6 +127,28 @@ importers:
         specifier: 2.2.8
         version: 2.2.8(typescript@5.8.2)
 
+  authentication-server:
+    dependencies:
+      express:
+        specifier: 4.21.2
+        version: 4.21.2
+    devDependencies:
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
+      esbuild:
+        specifier: 0.25.1
+        version: 0.25.1
+      tsx:
+        specifier: 4.19.3
+        version: 4.19.3
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+      vite:
+        specifier: 6.2.2
+        version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
+
   core/alerts/alerts-api:
     dependencies:
       vue:
@@ -531,16 +553,124 @@ importers:
         version: 2.2.8(typescript@5.8.2)
 
   core/authentication/authentication-nextcloud:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../authentication-api
+      '@xwiki/cristal-authentication-nextcloud-state':
+        specifier: workspace:*
+        version: link:../authentication-nextcloud-state
+      async-lock:
+        specifier: 1.4.1
+        version: 1.4.1
+      axios:
+        specifier: 1.8.3
+        version: 1.8.3
+      inversify:
+        specifier: 7.1.0
+        version: 7.1.0(reflect-metadata@0.2.2)
+      js-cookie:
+        specifier: 3.0.5
+        version: 3.0.5
     devDependencies:
+      '@types/async-lock':
+        specifier: 1.4.2
+        version: 1.4.2
+      '@types/js-cookie':
+        specifier: 3.0.6
+        version: 3.0.6
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
       typescript:
         specifier: 5.8.2
         version: 5.8.2
       vite:
         specifier: 6.2.2
         version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
+
+  core/authentication/authentication-nextcloud-state:
+    dependencies:
+      inversify:
+        specifier: 7.1.0
+        version: 7.1.0(reflect-metadata@0.2.2)
+      vue:
+        specifier: 3.5.13
+        version: 3.5.13(typescript@5.8.2)
+    devDependencies:
+      '@types/js-cookie':
+        specifier: 3.0.6
+        version: 3.0.6
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+      vite:
+        specifier: 6.2.2
+        version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
+
+  core/authentication/authentication-nextcloud-ui:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../authentication-api
+      '@xwiki/cristal-authentication-nextcloud-state':
+        specifier: workspace:*
+        version: link:../authentication-nextcloud-state
+      '@xwiki/cristal-uiextension-api':
+        specifier: workspace:*
+        version: link:../../uiextension/uiextension-api
+      inversify:
+        specifier: 7.1.0
+        version: 7.1.0(reflect-metadata@0.2.2)
+      vue:
+        specifier: 3.5.13
+        version: 3.5.13(typescript@5.8.2)
+      vue-i18n:
+        specifier: 11.1.2
+        version: 11.1.2(vue@3.5.13(typescript@5.8.2))
+    devDependencies:
+      '@vue/test-utils':
+        specifier: 2.4.6
+        version: 2.4.6
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/cristal-dev-test-utils':
+        specifier: workspace:*
+        version: link:../../../dev/test-utils
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+      vite:
+        specifier: 6.2.2
+        version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
+      vitest:
+        specifier: 3.0.8
+        version: 3.0.8(@types/debug@4.1.12)(@types/node@22.13.10)(happy-dom@17.4.4)(tsx@4.19.3)(yaml@2.7.0)
+      vue-tsc:
+        specifier: 2.2.8
+        version: 2.2.8(typescript@5.8.2)
 
   core/authentication/authentication-ui:
     dependencies:
@@ -720,15 +850,15 @@ importers:
 
   core/backends/backend-nextcloud:
     dependencies:
+      '@xwiki/cristal-alerts-api':
+        specifier: workspace:*
+        version: link:../../alerts/alerts-api
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
       '@xwiki/cristal-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
-      '@xwiki/cristal-authentication-nextcloud':
-        specifier: workspace:*
-        version: link:../../authentication/authentication-nextcloud
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../backend-api
@@ -1560,9 +1690,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/cristal-authentication-nextcloud':
+      '@xwiki/cristal-authentication-api':
         specifier: workspace:*
-        version: link:../../authentication/authentication-nextcloud
+        version: link:../../authentication/authentication-api
       '@xwiki/cristal-link-suggest-api':
         specifier: workspace:*
         version: link:../link-suggest-api
@@ -1988,9 +2118,6 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../../api
-      '@xwiki/cristal-authentication-nextcloud':
-        specifier: workspace:*
-        version: link:../../../authentication/authentication-nextcloud
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model-api
@@ -2162,9 +2289,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/cristal-authentication-nextcloud':
+      '@xwiki/cristal-authentication-api':
         specifier: workspace:*
-        version: link:../../authentication/authentication-nextcloud
+        version: link:../../authentication/authentication-api
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
@@ -3090,6 +3217,87 @@ importers:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.2)
 
+  electron/authentication/authentication-nextcloud/authentication-nextcloud-main:
+    dependencies:
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../../../../core/authentication/authentication-api
+      axios:
+        specifier: 1.8.3
+        version: 1.8.3
+      electron:
+        specifier: 35.0.1
+        version: 35.0.1
+      electron-store:
+        specifier: 10.0.1
+        version: 10.0.1
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+      vite:
+        specifier: 6.2.2
+        version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
+
+  electron/authentication/authentication-nextcloud/authentication-nextcloud-preload:
+    dependencies:
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../../../../core/authentication/authentication-api
+      electron:
+        specifier: 35.0.1
+        version: 35.0.1
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+      vite:
+        specifier: 6.2.2
+        version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
+
+  electron/authentication/authentication-nextcloud/authentication-nextcloud-renderer:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../../api
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../../../../core/authentication/authentication-api
+      '@xwiki/cristal-authentication-nextcloud-state':
+        specifier: workspace:*
+        version: link:../../../../core/authentication/authentication-nextcloud-state
+      async-lock:
+        specifier: 1.4.1
+        version: 1.4.1
+      inversify:
+        specifier: 7.1.0
+        version: 7.1.0(reflect-metadata@0.2.2)
+    devDependencies:
+      '@types/async-lock':
+        specifier: 1.4.2
+        version: 1.4.2
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+      vite:
+        specifier: 6.2.2
+        version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
+      vue:
+        specifier: 3.5.13
+        version: 3.5.13(typescript@5.8.2)
+
   electron/authentication/authentication-xwiki/authentication-xwiki-main:
     dependencies:
       '@xwiki/cristal-authentication-api':
@@ -3289,6 +3497,9 @@ importers:
       '@xwiki/cristal-electron-authentication-github-main':
         specifier: workspace:*
         version: link:../authentication/authentication-github/authentication-github-main
+      '@xwiki/cristal-electron-authentication-nextcloud-main':
+        specifier: workspace:*
+        version: link:../authentication/authentication-nextcloud/authentication-nextcloud-main
       '@xwiki/cristal-electron-authentication-xwiki-main':
         specifier: workspace:*
         version: link:../authentication/authentication-xwiki/authentication-xwiki-main
@@ -3320,6 +3531,9 @@ importers:
       '@xwiki/cristal-electron-authentication-github-preload':
         specifier: workspace:*
         version: link:../authentication/authentication-github/authentication-github-preload
+      '@xwiki/cristal-electron-authentication-nextcloud-preload':
+        specifier: workspace:*
+        version: link:../authentication/authentication-nextcloud/authentication-nextcloud-preload
       '@xwiki/cristal-electron-authentication-xwiki-preload':
         specifier: workspace:*
         version: link:../authentication/authentication-xwiki/authentication-xwiki-preload
@@ -3351,6 +3565,9 @@ importers:
       '@xwiki/cristal-electron-authentication-github-renderer':
         specifier: workspace:*
         version: link:../authentication/authentication-github/authentication-github-renderer
+      '@xwiki/cristal-electron-authentication-nextcloud-renderer':
+        specifier: workspace:*
+        version: link:../authentication/authentication-nextcloud/authentication-nextcloud-renderer
       '@xwiki/cristal-electron-authentication-xwiki-renderer':
         specifier: workspace:*
         version: link:../authentication/authentication-xwiki/authentication-xwiki-renderer
@@ -3497,28 +3714,6 @@ importers:
         specifier: 2.2.8
         version: 2.2.8(typescript@5.8.2)
 
-  github-authentication:
-    dependencies:
-      express:
-        specifier: 4.21.2
-        version: 4.21.2
-    devDependencies:
-      '@types/express':
-        specifier: 5.0.0
-        version: 5.0.0
-      esbuild:
-        specifier: 0.25.1
-        version: 0.25.1
-      tsx:
-        specifier: 4.19.3
-        version: 4.19.3
-      typescript:
-        specifier: 5.8.2
-        version: 5.8.2
-      vite:
-        specifier: 6.2.2
-        version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
-
   lib:
     dependencies:
       '@xwiki/cristal-alerts-default':
@@ -3542,6 +3737,9 @@ importers:
       '@xwiki/cristal-authentication-github-ui':
         specifier: workspace:*
         version: link:../core/authentication/authentication-github-ui
+      '@xwiki/cristal-authentication-nextcloud-ui':
+        specifier: workspace:*
+        version: link:../core/authentication/authentication-nextcloud-ui
       '@xwiki/cristal-authentication-ui':
         specifier: workspace:*
         version: link:../core/authentication/authentication-ui
@@ -4093,6 +4291,9 @@ importers:
       '@xwiki/cristal-authentication-github':
         specifier: workspace:*
         version: link:../core/authentication/authentication-github
+      '@xwiki/cristal-authentication-nextcloud':
+        specifier: workspace:*
+        version: link:../core/authentication/authentication-nextcloud
       '@xwiki/cristal-authentication-xwiki':
         specifier: workspace:*
         version: link:../core/authentication/authentication-xwiki
@@ -5193,6 +5394,9 @@ packages:
 
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
+
+  '@types/async-lock@1.4.2':
+    resolution: {integrity: sha512-HlZ6Dcr205BmNhwkdXqrg2vkFMN2PluI7Lgr8In3B3wE5PiQHhjRqtW/lGdVU9gw+sM0JcIDx2AN+cW8oSWIcw==}
 
   '@types/body-parser@1.19.5':
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}
@@ -8270,10 +8474,6 @@ packages:
     resolution: {integrity: sha512-WPS/HvHQTYnHisLo9McqBHOJk2FkHO/tlpvldyrnem4aeQp4hai3gythswg6p01oSoTl58rcpiFAjF2br2Ak2A==}
     engines: {node: '>= 0.4'}
 
-  side-channel@1.0.6:
-    resolution: {integrity: sha512-fDW/EZ6Q9RiO8eFG8Hj+7u/oW+XrPTIChwCOM2+th2A6OblDtYYIpve9m+KvI9Z4C9qSEXlaGR6bTEYHReuglA==}
-    engines: {node: '>= 0.4'}
-
   side-channel@1.1.0:
     resolution: {integrity: sha512-ZX99e6tRweoUXqR+VBrslhda51Nh5MTQwou5tnUDgbtyM0dBgmhEDtWGP/xbKn6hqfPRHujUNwz5fy/wbbhnpw==}
     engines: {node: '>= 0.4'}
@@ -10108,6 +10308,8 @@ snapshots:
       tslib: 2.8.1
 
   '@types/argparse@1.0.38': {}
+
+  '@types/async-lock@1.4.2': {}
 
   '@types/body-parser@1.19.5':
     dependencies:
@@ -13448,7 +13650,7 @@ snapshots:
 
   qs@6.13.0:
     dependencies:
-      side-channel: 1.0.6
+      side-channel: 1.1.0
 
   quansync@0.2.7: {}
 
@@ -13777,13 +13979,6 @@ snapshots:
       get-intrinsic: 1.2.7
       object-inspect: 1.13.3
       side-channel-map: 1.0.1
-
-  side-channel@1.0.6:
-    dependencies:
-      call-bind: 1.0.8
-      es-errors: 1.3.0
-      get-intrinsic: 1.2.7
-      object-inspect: 1.13.3
 
   side-channel@1.1.0:
     dependencies:

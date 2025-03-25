@@ -24,12 +24,15 @@ import {
   PageAttachment,
   PageData,
 } from "@xwiki/cristal-api";
-import { PASSWORD, USERNAME } from "@xwiki/cristal-authentication-nextcloud";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 import { XMLParser } from "fast-xml-parser";
 import { inject, injectable } from "inversify";
+import type { AlertsServiceProvider } from "@xwiki/cristal-alerts-api";
 import type { Logger } from "@xwiki/cristal-api";
-import type { UserDetails } from "@xwiki/cristal-authentication-api";
+import type {
+  AuthenticationManagerProvider,
+  UserDetails,
+} from "@xwiki/cristal-authentication-api";
 
 /**
  * Access Nextcloud storage through http.
@@ -43,7 +46,13 @@ export class NextcloudStorage extends AbstractStorage {
   private readonly ATTACHMENTS = "attachments";
   private initBaseContentCalled: boolean = false;
 
-  constructor(@inject("Logger") logger: Logger) {
+  constructor(
+    @inject("Logger") logger: Logger,
+    @inject("AuthenticationManagerProvider")
+    private authenticationManagerProvider: AuthenticationManagerProvider,
+    @inject("AlertsServiceProvider")
+    private readonly alertsServiceProvider: AlertsServiceProvider,
+  ) {
     super(logger, "storage.components.nextcloudStorage");
   }
 
@@ -59,20 +68,31 @@ export class NextcloudStorage extends AbstractStorage {
 
   // eslint-disable-next-line max-statements
   async getPageContent(page: string): Promise<PageData | undefined> {
-    await this.initBaseContent();
+    const username = (
+      await this.authenticationManagerProvider.get()?.getUserDetails()
+    )?.username;
+    if (!username) {
+      const pageData = new DefaultPageData();
+      // TODO: Fix CRISTAL-383 (Error messages in Storages are not translated)
+      pageData.html = "Not logged-in.";
+      pageData.canEdit = false;
+      return pageData;
+    }
+
+    await this.initBaseContent(username!);
     const baseRestURL = this.getWikiConfig().baseRestURL;
     try {
       const response = await fetch(
-        `${baseRestURL}/${USERNAME}/.cristal/${page}/page.json`,
+        `${baseRestURL}/${username}/.cristal/${page}/page.json`,
         {
           method: "GET",
-          headers: this.getBaseHeaders(),
+          headers: await this.getCredentials(),
         },
       );
 
       if (response.status >= 200 && response.status < 300) {
         const { lastModificationDate, lastAuthor } =
-          await this.getLastEditDetails(page);
+          await this.getLastEditDetails(page, username!);
 
         const json = await response.json();
 
@@ -98,22 +118,24 @@ export class NextcloudStorage extends AbstractStorage {
 
   private async getLastEditDetails(
     page: string,
+    username: string,
   ): Promise<{ lastModificationDate?: Date; lastAuthor?: UserDetails }> {
     let lastModificationDate: Date | undefined;
     let lastAuthor: UserDetails | undefined;
     const response = await fetch(
-      `${this.getWikiConfig().baseRestURL}/${USERNAME}/.cristal/${page}/page.json`,
+      `${this.getWikiConfig().baseRestURL}/${username}/.cristal/${page}/page.json`,
       {
         body: `<?xml version="1.0" encoding="UTF-8"?>
           <d:propfind xmlns:d="DAV:">
             <d:prop xmlns:oc="http://owncloud.org/ns">
               <d:getlastmodified />
+              <oc:owner-id />
               <oc:owner-display-name />
             </d:prop>
           </d:propfind>`,
         method: "PROPFIND",
         headers: {
-          ...this.getBaseHeaders(),
+          ...(await this.getCredentials()),
           Accept: "application/json",
         },
       },
@@ -129,6 +151,7 @@ export class NextcloudStorage extends AbstractStorage {
         lastModificationDate = new Date(Date.parse(modified));
       }
       lastAuthor = {
+        username: prop["oc:owner-id"],
         name: prop["oc:owner-display-name"],
       };
     }
@@ -139,10 +162,17 @@ export class NextcloudStorage extends AbstractStorage {
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
   // eslint-disable-next-line max-statements
   async getAttachments(page: string): Promise<AttachmentsData | undefined> {
-    const response = await fetch(this.getAttachmentsBasePath(page), {
+    const username = (
+      await this.authenticationManagerProvider.get()?.getUserDetails()
+    )?.username;
+    if (!username) {
+      return undefined;
+    }
+
+    const response = await fetch(this.getAttachmentsBasePath(page, username!), {
       method: "PROPFIND",
       headers: {
-        ...this.getBaseHeaders(),
+        ...(await this.getCredentials()),
         Depth: "1",
         Accept: "application/json",
       },
@@ -157,7 +187,7 @@ export class NextcloudStorage extends AbstractStorage {
       for (let i = 0; i < responses.length; i++) {
         const dresponse = responses[i];
         if (dresponse.getElementsByTagName("d:getcontenttype").length > 0) {
-          attachments.push(this.parseAttachment(dresponse));
+          attachments.push(this.parseAttachment(dresponse, username!));
         }
       }
 
@@ -171,12 +201,19 @@ export class NextcloudStorage extends AbstractStorage {
     page: string,
     name: string,
   ): Promise<PageAttachment | undefined> {
+    const username = (
+      await this.authenticationManagerProvider.get()?.getUserDetails()
+    )?.username;
+    if (!username) {
+      return undefined;
+    }
+
     const propfindResponse = await fetch(
-      this.getAttachmentBasePath(name, page),
+      this.getAttachmentBasePath(name, page, username!),
       {
         method: "PROPFIND",
         headers: {
-          ...this.getBaseHeaders(),
+          ...(await this.getCredentials()),
           Depth: "1",
           Accept: "application/json",
         },
@@ -187,33 +224,40 @@ export class NextcloudStorage extends AbstractStorage {
       const text = await propfindResponse.text();
       const data = new window.DOMParser().parseFromString(text, "text/xml");
       const response = data.getElementsByTagName("d:response")[0];
-      return this.parseAttachment(response);
+      return this.parseAttachment(response, username!);
     } else {
       return undefined;
     }
   }
 
-  private getAttachmentsBasePath(page: string) {
-    return `${this.getWikiConfig().baseRestURL}/${USERNAME}/.cristal/${page}/${this.ATTACHMENTS}`;
+  private getAttachmentsBasePath(page: string, username: string) {
+    return `${this.getWikiConfig().baseRestURL}/${username}/.cristal/${page}/${this.ATTACHMENTS}`;
   }
 
-  private getAttachmentBasePath(name: string, page: string) {
-    return `${this.getAttachmentsBasePath(page)}/${name}`;
+  private getAttachmentBasePath(name: string, page: string, username: string) {
+    return `${this.getAttachmentsBasePath(page, username)}/${name}`;
   }
 
   async save(page: string, content: string, title: string): Promise<unknown> {
+    const username = (
+      await this.authenticationManagerProvider.get()?.getUserDetails()
+    )?.username;
+    if (!username) {
+      return;
+    }
+
     // Splits the page reference along the / and create intermediate directories
     // for each segment, expect the last one where the content and title are
     // persisted.
     const directories = page.split("/");
 
     // Create the root directory. We also need to create all intermediate directories.
-    const rootURL = `${this.getWikiConfig().baseRestURL}/${USERNAME}/.cristal`;
+    const rootURL = `${this.getWikiConfig().baseRestURL}/${username}/.cristal`;
     await this.createIntermediateDirectories(rootURL, directories);
 
     await fetch(`${rootURL}/${directories.join("/")}/page.json`, {
       method: "PUT",
-      headers: this.getBaseHeaders(),
+      headers: await this.getCredentials(),
       body: JSON.stringify({
         source: content,
         name: title,
@@ -240,23 +284,43 @@ export class NextcloudStorage extends AbstractStorage {
   }
 
   async saveAttachments(page: string, files: File[]): Promise<unknown> {
-    return Promise.all(files.map((file) => this.saveAttachment(page, file)));
+    const username = (
+      await this.authenticationManagerProvider.get()?.getUserDetails()
+    )?.username;
+    if (!username) {
+      // TODO: Fix CRISTAL-383 (Error messages in Storages are not translated)
+      this.alertsServiceProvider
+        .get()
+        .error(
+          `Could not save attachments for page ${page}, the user is not properly logged-in.`,
+        );
+      return undefined;
+    }
+
+    return Promise.all(
+      files.map((file) => this.saveAttachment(page, file, username!)),
+    );
   }
 
-  private async saveAttachment(page: string, file: File): Promise<unknown> {
+  private async saveAttachment(
+    page: string,
+    file: File,
+    username: string,
+  ): Promise<unknown> {
     const directories = page.split("/");
 
     // Create the root directory. We also need to create all intermediate directories.
-    const rootURL = `${this.getWikiConfig().baseRestURL}/${USERNAME}/.cristal`;
+    const rootURL = `${this.getWikiConfig().baseRestURL}/${username}/.cristal`;
     await this.createIntermediateDirectories(rootURL, [
       ...directories,
       this.ATTACHMENTS,
     ]);
 
-    const fileURL = this.getAttachmentsBasePath(page) + "/" + file.name;
+    const fileURL =
+      this.getAttachmentsBasePath(page, username) + "/" + file.name;
     await fetch(fileURL, {
       method: "PUT",
-      headers: this.getBaseHeaders(),
+      headers: await this.getCredentials(),
       body: file,
     });
     return;
@@ -276,10 +340,17 @@ export class NextcloudStorage extends AbstractStorage {
   }
 
   async delete(page: string): Promise<{ success: boolean; error?: string }> {
-    const rootURL = `${this.getWikiConfig().baseRestURL}/${USERNAME}/.cristal`;
+    const username = (
+      await this.authenticationManagerProvider.get()?.getUserDetails()
+    )?.username;
+    if (!username) {
+      return { success: false, error: "Not logged-in." };
+    }
+
+    const rootURL = `${this.getWikiConfig().baseRestURL}/${username}/.cristal`;
     const success = await fetch(`${rootURL}/${page}`, {
       method: "DELETE",
-      headers: this.getBaseHeaders(),
+      headers: await this.getCredentials(),
     }).then(async (response) => {
       if (response.ok) {
         return { success: true };
@@ -302,18 +373,22 @@ export class NextcloudStorage extends AbstractStorage {
   private async createDirectory(currentTarget: string) {
     await fetch(currentTarget, {
       method: "MKCOL",
-      headers: this.getBaseHeaders(),
+      headers: await this.getCredentials(),
     });
   }
 
-  private getBaseHeaders() {
-    // TODO: the authentication is currently hardcoded.
-    return {
-      Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}`,
-    };
+  private async getCredentials(): Promise<{ Authorization?: string }> {
+    const authorizationHeader = await this.authenticationManagerProvider
+      .get()
+      ?.getAuthorizationHeader();
+    const headers: { Authorization?: string } = {};
+    if (authorizationHeader) {
+      headers["Authorization"] = authorizationHeader;
+    }
+    return headers;
   }
 
-  private parseAttachment(element: Element): PageAttachment {
+  private parseAttachment(element: Element, username: string): PageAttachment {
     const id = element.getElementsByTagName("d:href")[0].textContent!;
     const mimetype =
       element.getElementsByTagName("d:getcontenttype")[0].textContent!;
@@ -324,7 +399,7 @@ export class NextcloudStorage extends AbstractStorage {
       element.getElementsByTagName("d:getlastmodified")[0].textContent!,
     );
     const segments = id.split("/");
-    const href = `${this.getWikiConfig().baseRestURL}/${USERNAME}/${segments.slice(5).join("/")}`;
+    const href = `${this.getWikiConfig().baseRestURL}/${username}/${segments.slice(5).join("/")}`;
     const reference = segments[segments.length - 1];
 
     return {
@@ -339,15 +414,15 @@ export class NextcloudStorage extends AbstractStorage {
     };
   }
 
-  private async initBaseContent() {
+  private async initBaseContent(username: string) {
     if (!this.initBaseContentCalled) {
       this.initBaseContentCalled = true;
       const baseRestURL = this.getWikiConfig().baseRestURL;
-      const headers = this.getBaseHeaders();
+      const headers = await this.getCredentials();
       try {
-        const res = await fetch(`${baseRestURL}/${USERNAME}/.cristal`, {
+        const res = await fetch(`${baseRestURL}/${username}/.cristal`, {
           method: "GET",
-          headers,
+          headers: headers,
         });
         // if .cristal does not exist, initialize it with a default content.
         if (res.status === 404) {

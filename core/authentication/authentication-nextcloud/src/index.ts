@@ -18,8 +18,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-// TODO: replace with an actual authentication for nextcloud, see CRISTAL-267
-const USERNAME = "test";
-const PASSWORD = "test";
+import { NextcloudBasicAuthenticationManager } from "./NextcloudBasicAuthenticationManager";
+import { NextcloudOAuth2AuthenticationManager } from "./NextcloudOAuth2AuthenticationManager";
+import { NextcloudAuthenticationState } from "@xwiki/cristal-authentication-nextcloud-state";
+import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
+import type { Container } from "inversify";
 
-export { PASSWORD, USERNAME };
+export class ComponentInit {
+  constructor(container: Container) {
+    container
+      .bind<AuthenticationManager>("AuthenticationManager")
+      .to(NextcloudBasicAuthenticationManager)
+      .inSingletonScope()
+      .whenNamed("Nextcloud/basic");
+    container
+      .bind<AuthenticationManager>("AuthenticationManager")
+      .to(NextcloudOAuth2AuthenticationManager)
+      .inSingletonScope()
+      .whenNamed("Nextcloud/oauth2");
+    container
+      .bind<NextcloudAuthenticationState>(NextcloudAuthenticationState)
+      .toSelf()
+      .inSingletonScope();
+  }
+}

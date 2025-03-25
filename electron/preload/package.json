@@ -20,6 +20,7 @@
   "dependencies": {
     "@xwiki/cristal-configuration-electron-preload": "workspace:*",
     "@xwiki/cristal-electron-authentication-github-preload": "workspace:*",
+    "@xwiki/cristal-electron-authentication-nextcloud-preload": "workspace:*",
     "@xwiki/cristal-electron-authentication-xwiki-preload": "workspace:*"
   },
   "devDependencies": {

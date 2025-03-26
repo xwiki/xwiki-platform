@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -731,10 +732,11 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         return macroBlock;
     }
 
-    private XDOM parseWiki(String macroContent, boolean inline) throws RenderingException
+    private XDOM parseWiki(String macroContent, Syntax syntax, boolean transform, boolean inline)
+        throws RenderingException
     {
         try {
-            return this.contentParser.parse(macroContent, this.syncContext, false, inline);
+            return this.contentParser.parse(macroContent, syntax, this.syncContext, transform, null, inline);
         } catch (MacroExecutionException e) {
             throw new RenderingException("Failed to parse the passed content", e);
         }
@@ -750,7 +752,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
                 throw new RenderingException("Error while parsing the macro content in plain text.", e);
             }
         } else {
-            return parseWiki(macroContent, inline);
+            return parseWiki(macroContent, null, false, inline);
         }
     }
 
@@ -795,7 +797,13 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
                 throw new MacroExecutionException("Error while parsing the macro parameter content in plain.", e);
             }
         } else {
-            return parseWiki(macroParameterContent, inline);
+            boolean executeWithMacroAuthor =
+                Objects.equals(macroParameterContent, parameterDescriptor.getDefaultValue());
+            if (executeWithMacroAuthor) {
+                return parseWiki(macroParameterContent, this.wikimacro.getSourceSyntax(), true, inline);
+            } else {
+                return parseWiki(macroParameterContent, null, false, inline);
+            }
         }
     }
 

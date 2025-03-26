@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -224,8 +225,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             }
         }
 
-        this.xClassReference = ref;
-        this.xClassReferenceCache = null;
+        if (!Objects.equals(this.xClassReference, ref)) {
+            this.xClassReference = ref;
+            this.xClassReferenceCache = null;
+
+            setDirty(true);
+        }
     }
 
     /**
@@ -265,7 +270,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         addField(name, property);
         if (property instanceof BaseProperty) {
-            ((BaseProperty) property).setObject(this);
             ((BaseProperty) property).setName(name);
         }
     }
@@ -537,9 +541,15 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         this.fields.put(name, element);
 
-        if (element instanceof BaseElement) {
-            ((BaseElement) element).setOwnerDocument(getOwnerDocument());
+        if (element instanceof BaseElement baseElement) {
+            baseElement.setOwnerDocument(getOwnerDocument());
+
+            if (element instanceof BaseProperty baseProperty) {
+                baseProperty.setObject(this);
+            }
         }
+
+        setDirty(true);
     }
 
     public void removeField(String name)
@@ -548,6 +558,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         if (field != null) {
             this.fields.remove(name);
             this.fieldsToRemove.add(field);
+
+            setDirty(true);
         }
     }
 
@@ -646,6 +658,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             cfields.put(entry.getKey(), prop);
         }
         collection.setFields(cfields);
+
+        collection.setDirty(isDirty());
 
         return collection;
     }

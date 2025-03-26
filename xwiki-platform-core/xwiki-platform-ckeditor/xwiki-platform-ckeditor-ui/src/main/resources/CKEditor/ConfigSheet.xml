@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.ConfigSheet" locale="">
+<xwikidoc version="1.6" reference="CKEditor.ConfigSheet" locale="">
   <web>CKEditor</web>
   <name>ConfigSheet</name>
   <language/>
@@ -56,26 +56,6 @@
   #set ($isTemporaryAttachmentSupported = "$!services.temporaryAttachments" != '')
   #set ($htmlSyntax = ${services.wysiwyg.HTMLSyntax.toIdString()|'annotatedxhtml/1.0'})
   #set ($isHTML5 = !$htmlSyntax.equals('annotatedxhtml/1.0'))
-  ## Verify if the office import feature is supported.
-  ##
-  ## It's not enough to check if the Office server is connected because the 'importOfficeAttachment' API is available
-  ## only since XWiki 9.8 (see XWIKI-14739) while the CKEditor Integration extension can be installed on older versions
-  ## of XWiki where the users won't be able to import office documents from the CKEditor even if the Office server is
-  ## connected. On these older versions the users will have to use the Create Page dialog with the Page from Office
-  ## option.
-  ##
-  ## We check if the 'importOfficeAttachment' API is available by trying to import an attachment that doesn't exist
-  ## using the Office Viewer macro, which should output an error message saying that the attachment doesn't exist. This
-  ## way the Office server is not actually called so there's no risk of slowing down or blocking the CKEditor load (see
-  ## CKEDITOR-294).
-  #set ($missingAttachmentReference = $services.model.resolveAttachment('CKEditor.OfficeImporter@doesNotExist.txt'))
-  #set ($officeServerConnected = $services.officemanager.isConnected())
-  #if ("$!officeServerConnected" == '')
-    ## Before XWiki 12.3 and 11.10.5
-    #set ($officeServerConnected = $services.officemanager.serverState == 'Connected')
-  #end
-  #set ($officeImportSupported = $officeServerConnected &amp;&amp;
-    "$!services.wysiwyg.importOfficeAttachment($missingAttachmentReference, {'useOfficeViewer': true})" != '')
   ## Global default configuration that doesn't depend on the edited content and that needs Velocity code for evaluation.
   ## Static global configuration (that doesn't need Velocity) should be put in config.js . The default instance level
   ## configuration is in EditSheet.
@@ -84,7 +64,7 @@
     'htmlSyntax': $htmlSyntax,
     'stylesSet': "#if ($isHTML5)html5#{else}html4#end",
     'xwiki-office': {
-      'enabled': $officeImportSupported
+      'enabled': $services.officemanager.isConnected()
     },
     'xwiki-realtime': {
       'stylesheets': [

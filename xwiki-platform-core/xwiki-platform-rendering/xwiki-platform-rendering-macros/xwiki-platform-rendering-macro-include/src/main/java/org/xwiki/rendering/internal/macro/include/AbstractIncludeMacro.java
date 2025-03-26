@@ -121,8 +121,7 @@ public abstract class AbstractIncludeMacro<P> extends AbstractMacro<P>
                             xdom.replaceChild(sectionChildren.subList(1, sectionChildren.size()),
                                 sectionOrHeaderBlock));
                 } else {
-                    List<Block> headerChildren = sectionOrHeaderBlock.getChildren();
-                    xdom.replaceChild(headerChildren.subList(1, headerChildren.size()), sectionOrHeaderBlock);
+                    xdom.removeBlock(sectionOrHeaderBlock);
                 }
             });
     }

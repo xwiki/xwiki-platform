@@ -24,6 +24,7 @@ import java.net.URL;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -165,8 +166,14 @@ public class PDFExportOptionsModal extends BaseModal
         // Use a bigger timeout (60s) because the PDF export might have to fetch the headless Chrome Docker image,
         // create the container and start it (if it's the first PDF export).
         // Note that the timeout was previously 30s which was too little for the CI.
-        new WebDriverWait(getDriver(), Duration.ofSeconds(60))
-            .until((ExpectedCondition<Boolean>) driver -> !currentURL.equals(driver.getCurrentUrl()));
+        new WebDriverWait(getDriver(), Duration.ofSeconds(60)).until((ExpectedCondition<Boolean>) driver -> {
+            try {
+                return !currentURL.equals(driver.getCurrentUrl());
+            } catch (WebDriverException e) {
+                // Getting the current URL fails if the browser is about to load a new web page. Let's try again later.
+                return false;
+            }
+        });
 
         // The browser used for running the test might be on a different machine than the one running XWiki and the test
         // code itself so we can't always use the same URL as the browser to download the PDF file.

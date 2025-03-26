@@ -21,6 +21,7 @@ package com.xpn.xwiki.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
@@ -43,6 +45,10 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.filter.output.DefaultWriterOutputTarget;
+import org.xwiki.filter.output.OutputTarget;
+import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
@@ -1419,10 +1425,24 @@ public class Document extends Api
 
     public String getXMLContent() throws XWikiException
     {
-        String xml = this.doc.getXMLContent(getXWikiContext());
-        return getXWikiContext().getUtil().substitute("s/<email>.*?<\\/email>/<email>********<\\/email>/goi",
-            getXWikiContext().getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
-                xml));
+        StringWriter writer = new StringWriter();
+        OutputTarget outputTarget = new DefaultWriterOutputTarget(writer);
+
+        DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
+        documentProperties.setWithWikiDocumentContentHTML(true);
+        documentProperties.setWithWikiAttachmentsContent(false);
+        documentProperties.setWithJRCSRevisions(false);
+        documentProperties.setWithRevisions(false);
+        documentProperties.setExcludedPropertyTypes(Set.of("Email", "Password"));
+
+        // Output
+        XAROutputProperties xarProperties = new XAROutputProperties();
+        xarProperties.setPreserveVersion(false);
+        xarProperties.setTarget(outputTarget);
+
+        this.doc.toXML(documentProperties, xarProperties);
+
+        return writer.toString();
     }
 
     public String toXML() throws XWikiException
@@ -1858,6 +1878,25 @@ public class Document extends Api
         } else {
             return new Attachment(this, attach, getXWikiContext());
         }
+    }
+
+    /**
+     * @param filename the name of the attachment
+     * @return the attachment with the given filename or null if the attachment does not exist
+     * @since 17.2.0RC1
+     */
+    public Attachment removeAttachment(String filename)
+    {
+        XWikiAttachment attachment = getDoc().getAttachment(filename);
+        if (attachment != null) {
+            attachment = this.doc.removeAttachment(attachment);
+
+            if (attachment != null) {
+                return new Attachment(this, attachment, getXWikiContext());
+            }
+        }
+
+        return null;
     }
 
     public List<Delta> getContentDiff(Document origdoc, Document newdoc)
@@ -3194,6 +3233,9 @@ public class Document extends Api
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newReference the reference to the new document
      * @throws XWikiException in case of an error
@@ -3224,7 +3266,9 @@ public class Document extends Api
      * <p>
      * Note: links without a space are renamed with the space added and all documents which have the document being
      * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
-     * </p>
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
@@ -3239,6 +3283,9 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
@@ -3266,6 +3313,9 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newReference the reference to the new document
      * @param backlinkDocumentNames the list of reference to documents to parse and for which links will be modified to

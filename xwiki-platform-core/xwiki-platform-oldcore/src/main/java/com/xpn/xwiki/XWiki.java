@@ -1131,6 +1131,7 @@ public class XWiki implements EventListener
         return entityResourceReference;
     }
 
+    @Deprecated(since = "17.0.0RC1")
     public static URL getRequestURL(XWikiRequest request) throws XWikiException
     {
         return HttpServletUtils.getSourceURL(request);
@@ -1458,6 +1459,9 @@ public class XWiki implements EventListener
 
             if (documentReference.getWikiReference().getName().equals(context.getWikiId())) {
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+
+                // Avoid modifying the cached document
+                document = document.clone();
 
                 if (initializer.updateDocument(document)) {
                     saveDocument(document,
@@ -3229,6 +3233,7 @@ public class XWiki implements EventListener
      * @return A list of language codes, in the client preference order; might be empty if the header is not well
      *         formed.
      */
+    @Deprecated(since = "17.0.0RC1")
     private List<String> getAcceptedLanguages(XWikiRequest request)
     {
         List<String> result = new ArrayList<String>();
@@ -4305,14 +4310,15 @@ public class XWiki implements EventListener
         DocumentReference groupClassReference = getGroupClass(context).getDocumentReference();
 
         // Make sure the user is not already part of the group
-        if (groupDoc.getXObject(groupClassReference, "member", userName,
-            false) == null) {
+        if (groupDoc.getXObject(groupClassReference, "member", userName, false) == null) {
+            XWikiDocument modifiedDocument = groupDoc.clone();
             BaseObject memberObject =
-                groupDoc.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
+                modifiedDocument.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()),
+                    context);
 
             memberObject.setStringValue("member", userName);
 
-            saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
+            saveDocument(modifiedDocument, localizePlainOrKey("core.comment.addedUserToGroup"), context);
         }
     }
 
@@ -5727,6 +5733,7 @@ public class XWiki implements EventListener
     /**
      * @since 2.3M1
      */
+    @Deprecated(since = "17.0.0RC1")
     public DocumentReference getDocumentReference(XWikiRequest request, XWikiContext context)
     {
         DocumentReference reference;
@@ -5793,6 +5800,7 @@ public class XWiki implements EventListener
         return path.substring(segment.length());
     }
 
+    @Deprecated(since = "17.0.0RC1")
     public boolean prepareDocuments(XWikiRequest request, XWikiContext context, VelocityContext vcontext)
         throws XWikiException
     {

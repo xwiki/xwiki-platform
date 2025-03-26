@@ -31,6 +31,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -415,7 +416,7 @@ public class TestUtils
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.
             // Also recache the CSRF token
-            String destUrl = getURL("XWiki", "Register", "register");
+            String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
             getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
 
             if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
@@ -1257,7 +1258,7 @@ public class TestUtils
             setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
 
             // Save the page with the content to execute
-            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
+            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
         } finally {
             // Restore initial credentials
             setDefaultCredentials(currentCredentials);
@@ -1490,8 +1491,8 @@ public class TestUtils
     private void recacheSecretTokenWhenOnRegisterPage()
     {
         try {
-            WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
-            this.secretToken = tokenInput.getAttribute("value");
+            WebElement htmlElement = getDriver().findElement(By.tagName("html"));
+            this.secretToken = htmlElement.getDomAttribute("data-xwiki-form-token");
         } catch (NoSuchElementException exception) {
             // Something is really wrong if this happens.
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
@@ -2799,7 +2800,7 @@ public class TestUtils
          */
         public void savePage(EntityReference reference) throws Exception
         {
-            savePage(reference, null, null, null, null);
+            savePage(reference, null, null, null, null, false);
         }
 
         /**
@@ -2807,14 +2808,14 @@ public class TestUtils
          */
         public void savePage(EntityReference reference, String content, String title) throws Exception
         {
-            savePage(reference, content, null, title, null);
+            savePage(reference, content, null, title, null, false);
         }
 
         /**
          * @since 7.3M1
          */
         public void savePage(EntityReference reference, String content, String syntaxId, String title,
-            String parentFullPageName) throws Exception
+            String parentFullPageName, boolean isHidden) throws Exception
         {
             Page page = page(reference);
 
@@ -2830,6 +2831,7 @@ public class TestUtils
             if (parentFullPageName != null) {
                 page.setParent(parentFullPageName);
             }
+            page.setHidden(isHidden);
 
             save(page, true);
         }
@@ -2862,7 +2864,8 @@ public class TestUtils
             // Make sure the page exist (object add fail otherwise)
             // TODO: improve object add API to allow adding an object in a page that does not yet exist
             if (!exists(documentReference)) {
-                savePage(documentReference);
+                boolean isHidden = "WebPreferences".equals(documentReference.getName());
+                savePage(documentReference, null, null, null, null, isHidden);
             }
 
             // Create the object

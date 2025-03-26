@@ -57,8 +57,8 @@ import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.job.IndexerJob;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
-import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
+import org.xwiki.search.solr.internal.metadata.XWikiSolrInputDocument;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.store.ReadyIndicator;
 
@@ -501,7 +501,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
                 switch (operation) {
                     case INDEX:
-                        LengthSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
+                        XWikiSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
                         if (solrDocument != null) {
                             solrInstance.add(solrDocument);
                             length += solrDocument.getLength();
@@ -599,7 +599,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
      * @throws ExecutionContextException
      */
-    private LengthSolrInputDocument getSolrDocument(EntityReference reference)
+    private XWikiSolrInputDocument getSolrDocument(EntityReference reference)
         throws SolrIndexerException, IllegalArgumentException, ExecutionContextException
     {
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());

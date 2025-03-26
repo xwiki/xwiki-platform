@@ -106,7 +106,7 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * @param {Range[]} ranges the DOM selection ranges to restore; if not specified, the last saved text selection is
      *   restored
      */
-    restoreSelection(ranges) {
+    async restoreSelection(ranges) {
       throw new Error('Not implemented!');
     }
 

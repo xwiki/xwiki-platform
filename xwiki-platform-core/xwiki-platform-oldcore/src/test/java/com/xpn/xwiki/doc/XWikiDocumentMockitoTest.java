@@ -36,6 +36,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.dom4j.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
@@ -81,6 +83,7 @@ import com.xpn.xwiki.web.EditForm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -129,6 +132,9 @@ public class XWikiDocumentMockitoTest
     @MockComponent
     @Named("compactwiki/document")
     private UserReferenceSerializer<String> compactWikiUserReferenceSerializer;
+
+    @MockComponent
+    private ContentParser parser;
 
     @MockComponent
     private LinkStore linkStore;
@@ -206,6 +212,8 @@ public class XWikiDocumentMockitoTest
         QueryFilter hiddenFilter = this.oldcore.getMocker().registerMockComponent(QueryFilter.class, "hidden");
 
         when(query.setLimit(7)).thenReturn(query);
+        when(query.setOffset(3)).thenReturn(query);
+        when(query.setWiki(DOCWIKI)).thenReturn(query);
 
         List<String> result = Arrays.asList("X.y", "A.b");
         when(query.<String>execute()).thenReturn(result);
@@ -216,6 +224,7 @@ public class XWikiDocumentMockitoTest
         verify(query).addFilter(hiddenFilter);
         verify(query).setLimit(7);
         verify(query).setOffset(3);
+        verify(query).setWiki(DOCWIKI);
 
         assertEquals(2, childrenReferences.size());
         assertEquals(new DocumentReference("wiki", "X", "y"), childrenReferences.get(0));
@@ -565,6 +574,43 @@ public class XWikiDocumentMockitoTest
 
         assertEquals("2.2", this.document.getVersion());
         assertNull(this.document.getPreviousVersion());
+    }
+
+    @Test
+    void testCloneIdentical() throws IllegalAccessException
+    {
+        XWikiDocument initialDocument = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
+
+        initialDocument.setContent("content");
+        initialDocument.setChangeTracked(true);
+
+        XWikiDocument clonedDocument = initialDocument.clone();
+
+        assertTrue(clonedDocument.isChangeTracked());
+        assertSame(initialDocument.getContent(), clonedDocument.getContent());
+        assertSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+
+        initialDocument.setContent("new content");
+
+        assertNotEquals(initialDocument.getContent(), clonedDocument.getContent());
+        assertEquals(initialDocument.getSyntax(), clonedDocument.getSyntax());
+        assertNotSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+
+        clonedDocument = initialDocument.clone();
+
+        assertTrue(clonedDocument.isChangeTracked());
+        assertSame(initialDocument.getContent(), clonedDocument.getContent());
+        assertSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+
+        initialDocument.setSyntax(Syntax.XWIKI_2_0);
+
+        assertEquals(initialDocument.getContent(), clonedDocument.getContent());
+        assertNotEquals(initialDocument.getSyntax(), clonedDocument.getSyntax());
+        assertNotSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
     }
 
     @Test
@@ -1804,5 +1850,44 @@ public class XWikiDocumentMockitoTest
 
         assertEquals(Set.of(backlink1, backlink21.withoutLocale()),
             new HashSet<>(doc.getBackLinkedReferences(this.oldcore.getXWikiContext())));
+    }
+
+    @Test
+    void getXClassDoesNotChangeDirtyFlagWhenEmpty()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+
+        document.setMetaDataDirty(false);
+        document.setContentDirty(false);
+
+        BaseClass xClass = document.getXClass();
+
+        assertNotNull(xClass);
+
+        assertFalse(xClass.isDirty());
+        assertFalse(document.isMetaDataDirty());
+        assertFalse(document.isContentDirty());
+    }
+
+    @Test
+    void hidden()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+
+        document.setHidden(false);
+        document.setMetaDataDirty(false);
+
+        assertFalse(document.isHidden());
+        assertFalse(document.isMetaDataDirty());
+
+        document.setHidden(true);
+
+        assertTrue(document.isMetaDataDirty());
+
+        document.setMetaDataDirty(false);
+
+        document.setHidden(true);
+
+        assertFalse(document.isMetaDataDirty());
     }
 }

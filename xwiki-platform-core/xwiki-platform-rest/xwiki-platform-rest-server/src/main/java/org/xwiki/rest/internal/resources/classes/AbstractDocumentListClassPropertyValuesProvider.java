@@ -39,6 +39,8 @@ import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -60,6 +62,9 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
 
     @Inject
     protected IconManager iconManager;
+
+    @Inject
+    protected ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Inject
     @Named("compact")
@@ -92,7 +97,7 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
         DocumentReference documentReference = this.documentReferenceResolver.resolve(reference, propertyReference);
 
         PropertyValue propertyValue = null;
-        if (exists(documentReference)) {
+        if (this.contextualAuthorizationManager.hasAccess(Right.VIEW, documentReference) && exists(documentReference)) {
             propertyValue = super.getValue(propertyReference, documentReference);
         }
 

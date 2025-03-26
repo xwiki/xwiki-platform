@@ -101,6 +101,6 @@ class EffectiveAuthorSetterListenerTest
 
         this.listener.onEvent(new ActionExecutingEvent(), null, null);
 
-        verify(this.request).setProperty("com.xpn.xwiki.web.XWikiRequest#effectiveAuthor", this.effectiveAuthor);
+        verify(this.request).setProperty(Request.ATTRIBUTE_EFFECTIVE_AUTHOR, this.effectiveAuthor);
     }
 }

@@ -21,6 +21,7 @@ package org.xwiki.appwithinminutes.test.ui;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -62,14 +63,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 class UserClassFieldIT
 {
     private static final String ADMIN_NAME = "Admin";
-
     private static final String ADMIN_AVATAR = "user";
+    private static final String USER_PREFIX = UserClassFieldIT.class.getSimpleName();
 
-    @BeforeEach
-    void setUp(TestUtils setup, TestReference testReference) throws Exception
+    @BeforeAll
+    void beforeAll(TestUtils setup) throws Exception
     {
         setup.createAdminUser();
-        // Create 2 users.
+        // Create 2 specific users.
         setup.createUserAndLogin("tmortagne", "tmortagne", "first_name", "Thomas", "last_name", "Mortagne", "avatar",
             "tmortagne.png");
         setup.attachFile("XWiki", "tmortagne", "tmortagne.png",
@@ -78,6 +79,25 @@ class UserClassFieldIT
             "Enygma2002.png");
         setup.attachFile("XWiki", "Enygma2002", "Enygma2002.png",
             UserClassFieldIT.class.getResourceAsStream("/appwithinminutes/Enygma2002.png"), false);
+
+        // Create 15 mock users just to test the request limits
+        for (int i = 0; i < 15; i++) {
+            createUser(setup, String.valueOf(i));
+        }
+        createUser(setup, "XXX");
+        createUser(setup, "YYY");
+        createUser(setup, "ZZZ");
+    }
+
+    private void createUser(TestUtils setup, String userSuffix)
+    {
+        String userId = String.format("%s_%s", USER_PREFIX, userSuffix);
+        setup.createUser(userId, userId, null);
+    }
+
+    @BeforeEach
+    void setUp(TestUtils setup, TestReference testReference)
+    {
         setup.loginAsSuperAdmin();
         setup.deleteSpace(testReference.getLastSpaceReference());
     }
@@ -159,6 +179,12 @@ class UserClassFieldIT
         assertEquals(singletonList("XWiki.Admin"), userPicker.getValues());
     }
 
+    /*
+    Note that this test does perform checks on the behaviour of the suggester, but it doesn't actually check the
+    behaviour of the query itself: since we don't save the application, the query is performed on the
+    AppWithinMinutes.Users property field which doesn't contain the same values than when saving a property for
+    multiple select. So we test that specific behaviour in the next test saveAndInitalSelection.
+     */
     @Test
     @Order(3)
     void multipleSelection(TestReference testReference)
@@ -232,8 +258,11 @@ class UserClassFieldIT
         assertUserSuggestion(selectedUsers.get(1), ADMIN_NAME, "Admin", ADMIN_AVATAR);
         assertEquals(asList("XWiki.tmortagne", "XWiki.Admin"), userPicker.getValues());
 
+        List<SuggestionElement> suggestions = userPicker.sendKeys("XXX").waitForSuggestions().getSuggestions();
+        assertEquals(1, suggestions.size());
+
         // We should be able to input free text also.
-        userPicker.sendKeys("foobar").waitForSuggestions().selectTypedText();
+        userPicker.clear().sendKeys("foobar").waitForSuggestions().selectTypedText();
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 

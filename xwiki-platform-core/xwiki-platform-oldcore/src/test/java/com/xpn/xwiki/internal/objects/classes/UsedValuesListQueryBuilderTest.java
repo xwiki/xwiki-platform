@@ -35,9 +35,11 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -69,6 +71,9 @@ class UsedValuesListQueryBuilderTest
     @MockComponent
     @Named("local")
     EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    @MockComponent
+    private HibernateStore hibernateStore;
 
     private ListClass listClass;
 
@@ -107,6 +112,29 @@ class UsedValuesListQueryBuilderTest
         when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
 
+        verify(this.queryManager).createQuery("select prop.value, count(*) as unfilterable0 "
+            + "from BaseObject as obj, StringProperty as prop "
+            + "where obj.className = :className and obj.name <> :templateName and "
+            + "prop.id.id = obj.id and prop.id.name = :propertyName "
+            + "group by prop.value "
+            + "order by unfilterable0 desc", Query.HQL);
+        verify(query).bindValue("className", "Blog.BlogPostClass");
+        verify(query).bindValue("propertyName", "category");
+        verify(query).bindValue("templateName", "Blog.BlogPostTemplate");
+        verify(query).setWiki("apps");
+    }
+
+    @Test
+    void buildForStringPropertyWithOracle() throws Exception
+    {
+        listClass.setMultiSelect(false);
+
+        Query query = mock(Query.class);
+        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+        when(this.hibernateStore.getDatabaseProductName()).thenReturn(DatabaseProduct.ORACLE);
+
+        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
+
         verify(this.queryManager).createQuery("select prop.value, str(prop.value) as unfilterable1 "
             + "from BaseObject as obj, StringProperty as prop "
             + "where obj.className = :className and obj.name <> :templateName and "
@@ -128,6 +156,25 @@ class UsedValuesListQueryBuilderTest
         when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
 
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
+        verify(this.queryManager).createQuery("select listItem, count(*) as unfilterable0 "
+            + "from BaseObject as obj, DBStringListProperty as prop join prop.list listItem "
+            + "where obj.className = :className and obj.name <> :templateName and "
+            + "prop.id.id = obj.id and prop.id.name = :propertyName "
+            + "group by listItem "
+            + "order by unfilterable0 desc", Query.HQL);
+    }
+
+    @Test
+    void buildForDBStringListPropertyWithOracle() throws Exception
+    {
+        listClass.setMultiSelect(true);
+        listClass.setRelationalStorage(true);
+
+        Query query = mock(Query.class);
+        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+        when(this.hibernateStore.getDatabaseProductName()).thenReturn(DatabaseProduct.ORACLE);
+
+        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
         verify(this.queryManager).createQuery("select listItem, str(listItem) as unfilterable1 "
             + "from BaseObject as obj, DBStringListProperty as prop join prop.list listItem "
             + "where obj.className = :className and obj.name <> :templateName and "
@@ -143,6 +190,25 @@ class UsedValuesListQueryBuilderTest
 
         Query query = mock(Query.class);
         when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+
+        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
+        verify(this.queryManager).createQuery("select prop.textValue, count(*) as unfilterable0 "
+            + "from BaseObject as obj, StringListProperty as prop "
+            + "where obj.className = :className and obj.name <> :templateName and "
+            + "prop.id.id = obj.id and prop.id.name = :propertyName "
+            + "group by prop.textValue "
+            + "order by unfilterable0 desc", Query.HQL);
+    }
+
+    @Test
+    void buildForStringListPropertyWithOracle() throws Exception
+    {
+        listClass.setMultiSelect(true);
+        listClass.setRelationalStorage(false);
+
+        Query query = mock(Query.class);
+        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+        when(this.hibernateStore.getDatabaseProductName()).thenReturn(DatabaseProduct.ORACLE);
 
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
         verify(this.queryManager).createQuery("select prop.textValue, str(prop.textValue) as unfilterable1 "

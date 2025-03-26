@@ -838,8 +838,8 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
   padding: .2em;
   margin-left: auto;
   background-color: $theme.highlightColor;
-  border-radius: 7px; /* Same value as @border-radius-base from Flamingo. */
-  font-size: 0.8em;
+  border-radius: var(--border-radius-base);
+  font-size: var(--font-size-small);
   align-self: center;
 }
 

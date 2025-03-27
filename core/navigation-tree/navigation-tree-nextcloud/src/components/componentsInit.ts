@@ -105,9 +105,11 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
     const subdirectories: Array<string> = [];
     try {
       const config = this.cristalApp.getWikiConfig();
-      const rootUrl = `${config.baseRestURL}${
-        config.storageRoot ?? `/files/${username}/.cristal`
-      }`.replace("${username}", username);
+      const rootUrl = new URL(
+        `${config.baseRestURL}${
+          config.storageRoot ?? `/files/${username}/.cristal`
+        }`.replace("${username}", username),
+      );
       const response = await fetch(`${rootUrl}/${directory}`, {
         method: "PROPFIND",
         headers: {
@@ -127,12 +129,13 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
         if (response.getElementsByTagName("d:collection").length > 0) {
           const urlFragments = response
             .getElementsByTagName("d:href")[0]
-            .textContent!.split("/");
+            .textContent!.replace(rootUrl.pathname, "")
+            .split("/");
           const subdirectory = urlFragments[urlFragments.length - 2];
 
           // Remove attachments folders
           if (subdirectory !== "attachments") {
-            subdirectories.push(urlFragments.slice(6, -1).join("/"));
+            subdirectories.push(urlFragments.slice(1, -1).join("/"));
           }
         }
       }

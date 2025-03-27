@@ -362,6 +362,13 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Default Comment implementation -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-comment-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- ********************************************************************** -->
     <!-- Plugins, hard to install as extensions (we need to get rid of all that) -->

@@ -399,14 +399,15 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #end
 #else
 #if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 1)
-  #set($comments = $doc.getComments())
+  #set($comments = $services.comment.comments($doc, true))
 #else
-  #set($comments = $doc.getComments(false))
+  #set($comments = $services.comment.comments($doc, false))
 #end
 ##
 ##
 <div id="commentscontent" class="xwikiintracontent">
   <div id="_comments">
+## TODO: the thread creation should be part of the new comment API.
 #if($comments.size() > 0)
   #set($rootKey = "-1")
   #set($commentThreads = {})

@@ -25,6 +25,20 @@ import type { Logger } from "../api/logger";
 import type { Storage } from "../api/storage";
 import type { WrappingStorage } from "../api/wrappingStorage";
 
+type ConfigObjectType = {
+  name: string;
+  baseURL: string;
+  baseRestURL: string;
+  homePage: string;
+  serverRendering: boolean;
+  designSystem: string;
+  offline: boolean;
+  realtimeURL?: string;
+  authenticationBaseURL?: string;
+  authenticationManager?: string;
+  storageRoot?: string;
+};
+
 @injectable()
 export class DefaultWikiConfig implements WikiConfig {
   // @ts-expect-error name is temporarily undefined during class
@@ -72,6 +86,13 @@ export class DefaultWikiConfig implements WikiConfig {
   // initialization
   public offline: boolean;
   public offlineSetup: boolean;
+
+  /**
+   * Root location to store pages.
+   * @since 0.16
+   */
+  storageRoot?: string;
+
   // @ts-expect-error cristal is temporarily undefined during class
   // initialization
   public cristal: CristalApp;
@@ -95,33 +116,23 @@ export class DefaultWikiConfig implements WikiConfig {
       realtimeURL?: string;
       authenticationBaseURL?: string;
       authenticationManager?: string;
+      storageRoot?: string;
     },
   ): void {
-    this.name = name;
-    this.baseURL = baseURL;
-    this.baseRestURL = baseRestURL;
-    this.realtimeURL = optional?.realtimeURL;
-    this.authenticationBaseURL = optional?.authenticationBaseURL;
-    this.authenticationManager = optional?.authenticationManager;
-    this.homePage = homePage;
-    this.serverRendering = serverRendering;
-    this.designSystem = designSystem;
-    this.offline = offline;
+    Object.assign<WikiConfig, ConfigObjectType>(this, {
+      name,
+      baseURL,
+      baseRestURL,
+      homePage,
+      serverRendering,
+      designSystem,
+      offline,
+      ...optional,
+    });
   }
 
-  // TODO get rid of any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setConfigFromObject(configObject: any): void {
-    this.name = configObject.name;
-    this.baseURL = configObject.baseURL;
-    this.baseRestURL = configObject.baseRestURL;
-    this.realtimeURL = configObject.realtimeURL;
-    this.authenticationBaseURL = configObject.authenticationBaseURL;
-    this.authenticationManager = configObject.authenticationManager;
-    this.homePage = configObject.homePage;
-    this.serverRendering = configObject.serverRendering;
-    this.offline = configObject.offline;
-    this.designSystem = configObject.designSystem;
+  setConfigFromObject(configObject: ConfigObjectType): void {
+    Object.assign<WikiConfig, ConfigObjectType>(this, configObject);
   }
 
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.

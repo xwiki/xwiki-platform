@@ -117,12 +117,13 @@
     "serverRendering": false,
     "offline": false,
     "baseURL": "http://localhost:9292",
-    "baseRestURL": "http://localhost:9292/remote.php/dav/files",
+    "baseRestURL": "http://localhost:9292/remote.php/dav",
     "designSystem": "shoelace",
     "homePage": "home",
     "realtimeURL": "http://localhost:15681/collaboration",
     "authenticationBaseURL": "http://localhost:15682/nextcloud",
-    "authenticationManager": "Nextcloud/oauth2"
+    "authenticationManager": "Nextcloud/oauth2",
+    "storageRoot": "/files/${username}/.cristal"
   },
   "NextcloudBasic": {
     "name": "NextcloudBasic",
@@ -130,10 +131,11 @@
     "serverRendering": false,
     "offline": false,
     "baseURL": "http://localhost:9292",
-    "baseRestURL": "http://localhost:9292/remote.php/dav/files",
+    "baseRestURL": "http://localhost:9292/remote.php/dav",
     "designSystem": "shoelace",
     "homePage": "home",
     "realtimeURL": "http://localhost:15681/collaboration",
-    "authenticationManager": "Nextcloud/basic"
+    "authenticationManager": "Nextcloud/basic",
+    "storageRoot": "/files/${username}/.cristal"
   }
 }

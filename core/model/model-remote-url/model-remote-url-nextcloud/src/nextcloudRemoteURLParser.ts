@@ -34,30 +34,49 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
   constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
 
   parse(urlStr: string): EntityReference | undefined {
-    const baseRestURL = this.getWikiConfig().baseRestURL;
-    if (urlStr.includes("://") && !urlStr.startsWith(baseRestURL)) {
+    const config = this.getWikiConfig();
+
+    // urlMatch will contain either:
+    //   - [<matchedRemoteUrl>, <username>, <resourceSegments>]
+    //   - [<macthedRemoteUrl>, <resourceSegments>] (if no "${username}" in storageRoot)
+    //   - undefined (if match failed)
+    const urlMatch = [
+      ...urlStr.matchAll(
+        new RegExp(
+          `^${config.baseRestURL}${
+            config.storageRoot ?? "/files/${username}/.cristal"
+          }/(.*)`.replace("${username}", "([^/]*)"),
+          "g",
+        ),
+      ),
+    ][0];
+
+    if (urlMatch === undefined) {
       return undefined;
     }
-    urlStr = urlStr.replace(baseRestURL, "");
+    urlStr = urlMatch[urlMatch.length - 1];
     const segments = this.computeSegments(urlStr);
 
     if (
       segments.length >= 3 &&
       segments[segments.length - 2] == "attachments"
     ) {
-      return new AttachmentReference(
-        segments[segments.length - 1],
-        this.buildDocumentReference(
-          segments[segments.length - 3],
-          segments[0],
-          segments.splice(2, segments.length - 3),
-        ),
+      return this.buildAttachmentReference(
+        segments,
+        urlMatch.length == 3 ? urlMatch[1].toString() : undefined,
+      );
+    } else if (
+      segments.length >= 2 &&
+      segments[segments.length - 1] == "page.json"
+    ) {
+      return this.buildDocumentReference(
+        segments.slice(0, segments.length - 1),
+        urlMatch.length == 3 ? urlMatch[1].toString() : undefined,
       );
     } else {
-      return this.buildDocumentReference(
-        segments[segments.length - 1],
-        segments[0],
-        segments.splice(2, segments.length - 1),
+      return this.buildSpaceReference(
+        segments,
+        urlMatch.length == 3 ? urlMatch[1].toString() : undefined,
       );
     }
   }
@@ -74,14 +93,36 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
     return segments;
   }
 
+  private buildAttachmentReference(
+    segments: string[],
+    username: string | undefined,
+  ) {
+    return new AttachmentReference(
+      segments[segments.length - 1],
+      this.buildDocumentReference(
+        segments.slice(0, segments.length - 2),
+        username,
+      ),
+    );
+  }
+
   private buildDocumentReference(
-    documentReferenceName: string,
-    username: string,
-    spaces: string[],
+    segments: string[],
+    username: string | undefined,
   ) {
     return new DocumentReference(
-      documentReferenceName,
-      new SpaceReference(new WikiReference(username), ...spaces),
+      segments[segments.length - 1],
+      this.buildSpaceReference(
+        segments.slice(0, segments.length - 1),
+        username,
+      ),
+    );
+  }
+
+  private buildSpaceReference(spaces: string[], username: string | undefined) {
+    return new SpaceReference(
+      username ? new WikiReference(username) : undefined,
+      ...spaces,
     );
   }
 

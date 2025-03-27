@@ -49,9 +49,11 @@ export class NextcloudLinkSuggestService implements LinkSuggestService {
       return [];
     }
 
-    const baseRestURL = this.cristalApp
-      .getWikiConfig()
-      .baseRestURL.replace(/\/files$/, "");
+    const config = this.cristalApp.getWikiConfig();
+    const storageRoot = (
+      config.storageRoot ?? `/files/${username}/.cristal`
+    ).replace("${username}", username);
+
     const options = {
       method: "SEARCH",
       headers: {
@@ -74,7 +76,7 @@ export class NextcloudLinkSuggestService implements LinkSuggestService {
          </d:select>
          <d:from>
              <d:scope>
-                 <d:href>/files/${username}/.cristal</d:href>
+                 <d:href>${storageRoot}</d:href>
                  <d:depth>infinity</d:depth>
              </d:scope>
          </d:from>
@@ -93,7 +95,7 @@ export class NextcloudLinkSuggestService implements LinkSuggestService {
 
     const attachmentsSegment = "/attachments/";
     try {
-      const response = await fetch(baseRestURL, options);
+      const response = await fetch(config.baseRestURL, options);
       const txt = await response.text();
       const xml = new window.DOMParser().parseFromString(txt, "text/xml");
       const responseNodes = xml.getElementsByTagName("d:response");

@@ -37,7 +37,8 @@ import type {
 /**
  * Access Nextcloud storage through http.
  * Read and write files to a ~/.cristal directory where all persistent data is
- * stored.
+ * stored, unless the "storageRoot" configuration option has been set to
+ * another directory.
  *
  * @since 0.9
  */
@@ -66,6 +67,13 @@ export class NextcloudStorage extends AbstractStorage {
     return "";
   }
 
+  private getRootUrl(username: string) {
+    const config = this.getWikiConfig();
+    return `${config.baseRestURL}${
+      config.storageRoot ?? `/files/${username}/.cristal`
+    }`.replace("${username}", username);
+  }
+
   // eslint-disable-next-line max-statements
   async getPageContent(page: string): Promise<PageData | undefined> {
     const username = (
@@ -80,10 +88,9 @@ export class NextcloudStorage extends AbstractStorage {
     }
 
     await this.initBaseContent(username!);
-    const baseRestURL = this.getWikiConfig().baseRestURL;
     try {
       const response = await fetch(
-        `${baseRestURL}/${username}/.cristal/${page}/page.json`,
+        `${this.getRootUrl(username!)}/${page}/page.json`,
         {
           method: "GET",
           headers: await this.getCredentials(),
@@ -123,7 +130,7 @@ export class NextcloudStorage extends AbstractStorage {
     let lastModificationDate: Date | undefined;
     let lastAuthor: UserDetails | undefined;
     const response = await fetch(
-      `${this.getWikiConfig().baseRestURL}/${username}/.cristal/${page}/page.json`,
+      `${this.getRootUrl(username!)}/${page}/page.json`,
       {
         body: `<?xml version="1.0" encoding="UTF-8"?>
           <d:propfind xmlns:d="DAV:">
@@ -187,7 +194,7 @@ export class NextcloudStorage extends AbstractStorage {
       for (let i = 0; i < responses.length; i++) {
         const dresponse = responses[i];
         if (dresponse.getElementsByTagName("d:getcontenttype").length > 0) {
-          attachments.push(this.parseAttachment(dresponse, username!));
+          attachments.push(this.parseAttachment(dresponse));
         }
       }
 
@@ -224,14 +231,14 @@ export class NextcloudStorage extends AbstractStorage {
       const text = await propfindResponse.text();
       const data = new window.DOMParser().parseFromString(text, "text/xml");
       const response = data.getElementsByTagName("d:response")[0];
-      return this.parseAttachment(response, username!);
+      return this.parseAttachment(response);
     } else {
       return undefined;
     }
   }
 
   private getAttachmentsBasePath(page: string, username: string) {
-    return `${this.getWikiConfig().baseRestURL}/${username}/.cristal/${page}/${this.ATTACHMENTS}`;
+    return `${this.getRootUrl(username!)}/${page}/${this.ATTACHMENTS}`;
   }
 
   private getAttachmentBasePath(name: string, page: string, username: string) {
@@ -252,7 +259,7 @@ export class NextcloudStorage extends AbstractStorage {
     const directories = page.split("/");
 
     // Create the root directory. We also need to create all intermediate directories.
-    const rootURL = `${this.getWikiConfig().baseRestURL}/${username}/.cristal`;
+    const rootURL = this.getRootUrl(username!);
     await this.createIntermediateDirectories(rootURL, directories);
 
     await fetch(`${rootURL}/${directories.join("/")}/page.json`, {
@@ -310,7 +317,7 @@ export class NextcloudStorage extends AbstractStorage {
     const directories = page.split("/");
 
     // Create the root directory. We also need to create all intermediate directories.
-    const rootURL = `${this.getWikiConfig().baseRestURL}/${username}/.cristal`;
+    const rootURL = this.getRootUrl(username!);
     await this.createIntermediateDirectories(rootURL, [
       ...directories,
       this.ATTACHMENTS,
@@ -347,7 +354,7 @@ export class NextcloudStorage extends AbstractStorage {
       return { success: false, error: "Not logged-in." };
     }
 
-    const rootURL = `${this.getWikiConfig().baseRestURL}/${username}/.cristal`;
+    const rootURL = this.getRootUrl(username!);
     const success = await fetch(`${rootURL}/${page}`, {
       method: "DELETE",
       headers: await this.getCredentials(),
@@ -388,7 +395,7 @@ export class NextcloudStorage extends AbstractStorage {
     return headers;
   }
 
-  private parseAttachment(element: Element, username: string): PageAttachment {
+  private parseAttachment(element: Element): PageAttachment {
     const id = element.getElementsByTagName("d:href")[0].textContent!;
     const mimetype =
       element.getElementsByTagName("d:getcontenttype")[0].textContent!;
@@ -399,7 +406,7 @@ export class NextcloudStorage extends AbstractStorage {
       element.getElementsByTagName("d:getlastmodified")[0].textContent!,
     );
     const segments = id.split("/");
-    const href = `${this.getWikiConfig().baseRestURL}/${username}/${segments.slice(5).join("/")}`;
+    const href = `${this.getWikiConfig().baseURL}${id}`;
     const reference = segments[segments.length - 1];
 
     return {
@@ -417,10 +424,9 @@ export class NextcloudStorage extends AbstractStorage {
   private async initBaseContent(username: string) {
     if (!this.initBaseContentCalled) {
       this.initBaseContentCalled = true;
-      const baseRestURL = this.getWikiConfig().baseRestURL;
       const headers = await this.getCredentials();
       try {
-        const res = await fetch(`${baseRestURL}/${username}/.cristal`, {
+        const res = await fetch(this.getRootUrl(username!), {
           method: "GET",
           headers: headers,
         });

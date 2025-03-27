@@ -104,18 +104,19 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
 
     const subdirectories: Array<string> = [];
     try {
-      const response = await fetch(
-        `${this.cristalApp.getWikiConfig().baseRestURL}/${username}/.cristal/${directory}`,
-        {
-          method: "PROPFIND",
-          headers: {
-            Authorization: (await this.authenticationManagerProvider
-              .get()!
-              .getAuthorizationHeader())!,
-            Depth: "2",
-          },
+      const config = this.cristalApp.getWikiConfig();
+      const rootUrl = `${config.baseRestURL}${
+        config.storageRoot ?? `/files/${username}/.cristal`
+      }`.replace("${username}", username);
+      const response = await fetch(`${rootUrl}/${directory}`, {
+        method: "PROPFIND",
+        headers: {
+          Authorization: (await this.authenticationManagerProvider
+            .get()!
+            .getAuthorizationHeader())!,
+          Depth: "2",
         },
-      );
+      });
 
       const text = await response.text();
       const data = new window.DOMParser().parseFromString(text, "text/xml");

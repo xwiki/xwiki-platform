@@ -48,6 +48,11 @@ export interface WikiConfig {
   serverRendering: boolean;
   designSystem: string;
   offline: boolean;
+  /**
+   * Root location to store pages.
+   * @since 0.16
+   */
+  storageRoot?: string;
 
   setConfig(
     name: string,

@@ -528,19 +528,22 @@
 #if($noReadableName)
   #set($displayName = $userName)
 #end
-#set($headline = $services.localization.render('core.register.successful.welcome', [$displayName]))
+#set($headline = $escapetool.xml($services.localization.render('core.register.successful.welcome', [$displayName, 
+'__headlinesmall__'])))
 #set($userLink = $xwiki.getUserName("$userSpace$userName"))
 #set($successAndLogin = $services.localization.render('core.register.successful.successandlogin'))
 [[image:registration_success_hero.svg||data-xwiki-image-style-alignment="center" height="50vh"]]
+#define($headlineSmall)
+#if(!$noReadableName)
+&lt;small&gt;($escapetool.xml($userName))
+&lt;/small&gt;
+#end
+#end
+#set($headline = $headline.replaceFirst('__headlinesmall__',$!headlineSmall))
 
 {{html}}
 &lt;div class="registration-success-headline"&gt;
-  &lt;h2&gt;$escapetool.xml($headline) &lt;/h2&gt;
-  #if(!$noReadableName)
-  &lt;p class="registration-success-subtitle"&gt;
-    ($escapetool.xml($userName))
-  &lt;/p&gt;
-  #end
+  &lt;h2&gt;$headline &lt;/h2&gt;
 &lt;/div&gt;
 &lt;p class="registration-success-hint"&gt;
   $escapetool.xml($successAndLogin)
@@ -664,10 +667,6 @@
   display: flex;
   align-items: baseline;
   justify-content: center;
-}
-
-.registration-success-headline &gt; .registration-success-subtitle {
-  display: block;
 }
 
 .registration-success-hint {

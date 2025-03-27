@@ -30,6 +30,7 @@ Disallow: /xwiki/bin/propenable/
 Disallow: /xwiki/bin/propdelete/
 Disallow: /xwiki/bin/objectadd/
 Disallow: /xwiki/bin/commentadd/
+Disallow: /xwiki/bin/commentdelete/
 Disallow: /xwiki/bin/commentsave/
 Disallow: /xwiki/bin/objectsync/
 Disallow: /xwiki/bin/objectremove/

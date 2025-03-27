@@ -881,6 +881,7 @@
                 **/validation/XWikiDefaultValidation.java,
                 **/validation/XWikiValidationInterface.java,
                 **/validation/XWikiValidationStatus.java,
+                **/web/AbstractObjectRemoveAction.java,
                 **/web/AdminAction.java,
                 **/web/AttachAction.java,
                 **/web/CancelAction.java,

@@ -398,10 +398,45 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #error($services.localization.render('core.viewers.comments.edit.notFound'))
   #end
 #else
+#set($comments = $doc.getComments())
+
+## Build a map on the form Date -> List<Comment object>
+## We also keep the set of keys when we have multiple comments at same date just to order them later (it should be a
+## very rare case but let's ensure we keep a deterministic order)
+#set ($commentMap = {})
+#set ($keysWithMultipleComments = $collectiontool.getSet())
+#foreach ($comment in $comments)
+  #set ($key = $comment.date)
+  #if ($commentMap.containsKey($key))
+    #set ($discard = $commentMap.get($key).add($comment))
+    #set ($discard = $keysWithMultipleComments.add($key))
+  #else
+    #set ($discard = $commentMap.put($key, [$comment]))
+  #end
+#end
+
+## We perform an ascending ordering of the keys
+#set ($orderedKeys = $collectiontool.getLinkedList())
+#set ($discard = $orderedKeys.addAll($commentMap.keySet()))
+#set ($discard = $collectiontool.sortModifiable($orderedKeys))
+
 #if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 1)
-  #set($comments = $doc.getComments())
+  #set ($orderSuffix = ":asc")
 #else
-  #set($comments = $doc.getComments(false))
+  #set ($orderSuffix = ":desc")
+  #set ($discard = $collectiontool.reverseModifiable($orderedKeys))
+#end
+
+## Ensure to order list with multiple entries if needed
+#foreach ($keyMultipleComment in $keysWithMultipleComments)
+  #set ($reorderedList = $collectiontool.sort($commentMap.get($keyMultipleComment), "number$orderSuffix"))
+  #set ($discard = $commentMap.put($keyMultipleComment, $reorderedList))
+#end
+
+## Finally obtained an ordered list
+#set ($comments = $collectiontool.getLinkedList())
+#foreach ($commentKey in $orderedKeys)
+  #set ($discard = $comments.addAll($commentMap.get($commentKey)))
 #end
 ##
 ##

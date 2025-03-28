@@ -124,6 +124,8 @@ public class DefaultIOService implements IOService
             // now get the document with that name
             XWikiContext deprecatedContext = getXWikiContext();
             XWikiDocument document = deprecatedContext.getWiki().getDocument(documentFullName, deprecatedContext);
+            // Avoid modifying the cached document
+            document = document.clone();
             // create a new object in this document to hold the annotation
             // Make sure to use a relative reference when creating the XObject, since we can`t use absolute references
             // for an object's class. This avoids ugly log warning messages.

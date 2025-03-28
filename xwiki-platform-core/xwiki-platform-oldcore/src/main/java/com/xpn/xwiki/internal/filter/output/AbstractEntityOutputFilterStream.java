@@ -77,6 +77,10 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
     protected DocumentReferenceResolver<EntityReference> documentEntityResolver;
 
     @Inject
+    @Named("current")
+    protected EntityReferenceResolver<EntityReference> currentEntityResolver;
+
+    @Inject
     @Named("user/current")
     protected DocumentReferenceResolver<EntityReference> userEntityResolver;
 
@@ -253,17 +257,51 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
         return (EntityReference) reference;
     }
 
+    /**
+     * @return the reference to use as basis to result the current reference
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    protected EntityReference getDefaultReference()
+    {
+        if (this.properties != null && this.properties.getDefaultReference() != null) {
+            return this.properties.getDefaultReference();
+        }
+
+        return null;
+    }
+
+    /**
+     * @return the absolute document reference deduced from the current reference
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    protected DocumentReference resolveCurrentDocumentReference()
+    {
+        return this.documentEntityResolver.resolve(this.currentEntityReference, getDefaultReference());
+    }
+
+    /**
+     * @return the absolute version of the current reference
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    protected EntityReference resolveCurrentEntityReference()
+    {
+        return this.currentEntityReference != null ? this.currentEntityResolver.resolve(this.currentEntityReference,
+            this.currentEntityReference.getType(), getDefaultReference()) : null;
+    }
+
     protected DocumentReference getDocumentReference(String key, FilterEventParameters parameters,
         DocumentReference def)
     {
         Object reference = get(Object.class, key, parameters, def, false, false);
 
         if (reference != null && !(reference instanceof DocumentReference)) {
-            if (reference instanceof EntityReference) {
-                reference =
-                    this.documentEntityResolver.resolve((EntityReference) reference, this.currentEntityReference);
+            if (reference instanceof EntityReference entityReference) {
+                reference = this.documentEntityResolver.resolve(entityReference, resolveCurrentEntityReference());
             } else {
-                reference = this.documentStringResolver.resolve(reference.toString(), this.currentEntityReference);
+                reference = this.documentStringResolver.resolve(reference.toString(), resolveCurrentEntityReference());
             }
         }
 

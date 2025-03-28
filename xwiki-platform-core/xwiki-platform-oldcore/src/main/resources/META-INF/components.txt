@@ -64,7 +64,7 @@ com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
 com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.TagClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiAllGroupDocumentInitializer
-com.xpn.xwiki.internal.mandatory.XWikiCommentsDocumentInitializer
+org.xwiki.platform.comment.internal.XWikiCommentsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiGlobalRightsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiGroupsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer

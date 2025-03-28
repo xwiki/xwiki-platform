@@ -1,0 +1,2 @@
+org.xwiki.platform.comment.internal.DefaultCommentManager
+org.xwiki.platform.comment.internal.XWikiCommentsDocumentInitializer

@@ -260,21 +260,23 @@ class UserClassFieldIT
 
         List<SuggestionElement> suggestions = userPicker.sendKeys("XXX").waitForSuggestions().getSuggestions();
         assertEquals(1, suggestions.size());
+        suggestions.get(0).select();
 
         // We should be able to input free text also.
-        userPicker.clear().sendKeys("foobar").waitForSuggestions().selectTypedText();
+        userPicker.sendKeys("foobar").waitForSuggestions().selectTypedText();
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
         userPicker = new SuggestClassFieldEditPane("user1").getPicker();
         selectedUsers = userPicker.getSelectedSuggestions();
-        assertEquals(3, selectedUsers.size());
-        assertUserSuggestion(selectedUsers.get(2), "foobar", "foobar", null);
-        assertEquals(asList("XWiki.tmortagne", "XWiki.Admin", "foobar"), userPicker.getValues());
+        assertEquals(4, selectedUsers.size());
+        assertUserSuggestion(selectedUsers.get(3), "foobar", "foobar", null);
+        assertEquals(asList("XWiki.tmortagne", "XWiki.Admin", "XWiki." + USER_PREFIX +"_XXX", "foobar"),
+            userPicker.getValues());
 
         // Delete the fake user.
-        selectedUsers.get(2).delete();
-        assertEquals(2, userPicker.getSelectedSuggestions().size());
+        selectedUsers.get(3).delete();
+        assertEquals(3, userPicker.getSelectedSuggestions().size());
 
         // Delete all selected users.
         userPicker.clearSelectedSuggestions();

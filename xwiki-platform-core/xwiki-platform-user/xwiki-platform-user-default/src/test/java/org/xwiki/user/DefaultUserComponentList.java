@@ -40,8 +40,8 @@ import org.xwiki.user.internal.document.NormalUserPreferencesConfigurationSource
 import org.xwiki.user.internal.document.SecureUserDocumentUserPropertiesResolver;
 import org.xwiki.user.internal.document.UserPreferencesConfigurationSource;
 import org.xwiki.user.internal.group.DefaultGroupManager;
-import org.xwiki.user.internal.group.GroupsCache;
-import org.xwiki.user.internal.group.MembersCache;
+import org.xwiki.user.internal.group.MemberGroupsCache;
+import org.xwiki.user.internal.group.GroupMembersCache;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -75,8 +75,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     NormalUserConfigurationSourceAuthorization.class,
     // Group Script Service
     DefaultGroupManager.class,
-    GroupsCache.class,
-    MembersCache.class,
+    MemberGroupsCache.class,
+    GroupMembersCache.class,
     SpacesConfigurationSource.class
 })
 @Inherited

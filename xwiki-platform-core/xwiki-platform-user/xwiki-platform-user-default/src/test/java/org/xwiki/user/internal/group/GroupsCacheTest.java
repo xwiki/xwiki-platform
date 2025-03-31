@@ -55,7 +55,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
- * Validate {@link GroupsCache}.
+ * Validate {@link MemberGroupsCache}.
  * 
  * @version $Id$
  */
@@ -64,7 +64,7 @@ import static org.mockito.Mockito.when;
 public class GroupsCacheTest
 {
     @InjectMockComponents
-    private GroupsCache groupsCache;
+    private MemberGroupsCache groupsCache;
 
     @MockComponent
     private CacheManager cacheManager;

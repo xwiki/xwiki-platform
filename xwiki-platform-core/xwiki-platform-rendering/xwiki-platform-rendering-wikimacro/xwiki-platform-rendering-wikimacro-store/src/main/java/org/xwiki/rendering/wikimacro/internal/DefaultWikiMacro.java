@@ -71,6 +71,8 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
 
     private int macroPriority;
 
+    private boolean executionIsolated;
+
     /**
      * Constructs a new {@link DefaultWikiMacro}.
      * 
@@ -85,6 +87,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
 
         this.descriptor = descriptor;
         this.macroPriority = baseObject.getIntValue(MACRO_PRIORITY_PROPERTY, 1000);
+        this.executionIsolated = baseObject.getIntValue(MACRO_EXECUTION_ISOLATED_PROPERTY, 0) == 1;
     }
 
     @Override
@@ -207,5 +210,11 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     boolean isCacheAllowed()
     {
         return this.cacheAllowed;
+    }
+
+    @Override
+    public boolean isExecutionIsolated(WikiMacroParameters parameters, String content)
+    {
+        return this.executionIsolated;
     }
 }

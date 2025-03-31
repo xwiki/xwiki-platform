@@ -271,4 +271,10 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     {
         return (List<Block>) macroBlock.getAttribute(ATTRIBUTE_PREPARE_RESULT);
     }
+
+    @Override
+    public boolean isExecutionIsolated(CodeMacroParameters parameters, String content)
+    {
+        return true;
+    }
 }

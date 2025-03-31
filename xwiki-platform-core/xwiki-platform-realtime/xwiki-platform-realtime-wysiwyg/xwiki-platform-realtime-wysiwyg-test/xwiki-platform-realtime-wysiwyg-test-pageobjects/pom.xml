@@ -37,6 +37,11 @@
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-realtime-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- The realtime WYSIWYG editor is based on CKEditor. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

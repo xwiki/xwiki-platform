@@ -52,13 +52,6 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * @returns {Element} the DOM element that represents the toolbar of the editor
-     */
-    getToolBar() {
-      throw new Error('Not implemented!');
-    }
-
-    /**
      * Update the edited content as a result of a remote change.
      *
      * @param {Function} updater a function that takes the current content of the editor, modifies it and returns the

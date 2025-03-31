@@ -21,7 +21,6 @@ package org.xwiki.realtime.wysiwyg.test.po;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -70,12 +69,12 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
         public String getAvatarURL()
         {
-            return getFromEditedContent(() -> getContainer().getAttribute("src"));
+            return getFromEditedContent(() -> getContainer().getDomAttribute("src"));
         }
 
         public String getAvatarHint()
         {
-            return getFromEditedContent(() -> getContainer().getAttribute("title"));
+            return getFromEditedContent(() -> getContainer().getDomAttribute("title"));
         }
 
         public Point getLocation()
@@ -137,8 +136,8 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
      */
     public List<CoeditorPosition> getCoeditorPositions()
     {
-        return getFromEditedContent(() -> getDriver().findElementsWithoutWaiting(By.className("rt-user-position")).stream()
-            .map(element -> element.getAttribute("id")).map(CoeditorPosition::new).collect(Collectors.toList()));
+        return getFromEditedContent(() -> getDriver().findElementsWithoutWaiting(By.className("rt-user-position"))
+            .stream().map(element -> element.getDomAttribute("id")).map(CoeditorPosition::new).toList());
     }
 
     /**

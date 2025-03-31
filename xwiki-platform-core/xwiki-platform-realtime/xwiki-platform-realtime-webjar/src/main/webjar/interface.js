@@ -55,31 +55,5 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
     return $('input.realtime-allow[type="checkbox"]');
   }
 
-  function createMergeMessageElement(container) {
-    const $merges = $('<div class="realtime-merge"></div>').attr('id', uid()).prependTo(container);
-
-    let timeout;
-
-    // Drop a method into the lastSaved object which handles messages.
-    return function (messageKey, args) {
-      // Keep multiple message sequences from fighting over resources.
-      clearTimeout(timeout);
-
-      const formattedMessage = Messages.get(messageKey, ...args);
-
-      console.debug(formattedMessage);
-
-      // Set the message, handle all types.
-      $merges.text(formattedMessage);
-
-      // Clear the message box in 10 seconds (1.5s message fadeout time).
-      timeout = setTimeout(function() {
-        $merges.fadeOut(1500, function() {
-          $merges.empty().show();
-        });
-      }, 10000);
-    };
-  }
-
-  return {uid, realtimeAllowed, createAllowRealtimeCheckbox, getAllowRealtimeCheckbox, createMergeMessageElement};
+  return {uid, realtimeAllowed, createAllowRealtimeCheckbox, getAllowRealtimeCheckbox};
 });

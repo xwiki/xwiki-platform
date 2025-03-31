@@ -23,7 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.model.reference.EntityReference;
@@ -106,8 +109,9 @@ public abstract class AbstractCKEditorIT
 
     protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)
     {
-        if (setup.isInWYSIWYGEditMode() || setup.isInWikiEditMode()) {
-            new WikiEditPage().clickCancel();
+        if (StringUtils.isNotEmpty(setup.getEditMode())) {
+            // Use the cancel shortcut key to leave the edit mode.
+            setup.getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
         }
     }
 

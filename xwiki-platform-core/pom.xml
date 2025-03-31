@@ -175,6 +175,7 @@
     <module>xwiki-platform-chart</module>
     <module>xwiki-platform-ckeditor</module>
     <module>xwiki-platform-classloader</module>
+    <module>xwiki-platform-comment</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
     <module>xwiki-platform-container</module>

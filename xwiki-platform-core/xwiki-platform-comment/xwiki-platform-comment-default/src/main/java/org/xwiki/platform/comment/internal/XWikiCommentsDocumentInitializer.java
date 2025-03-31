@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.mandatory;
+package org.xwiki.platform.comment.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,6 +27,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.RegexEntityReference;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.internal.mandatory.AbstractCommentsDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;

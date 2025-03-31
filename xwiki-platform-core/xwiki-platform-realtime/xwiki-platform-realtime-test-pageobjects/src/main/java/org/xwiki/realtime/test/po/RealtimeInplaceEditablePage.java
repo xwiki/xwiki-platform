@@ -17,37 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.realtime.wysiwyg.test.po;
+package org.xwiki.realtime.test.po;
 
-import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.edit.test.po.InplaceEditablePage;
 
 /**
- * Represents the realtime CKEditor.
+ * Represents the Inplace Edit Mode with realtime enabled.
  * 
  * @version $Id$
- * @since 15.5.4
- * @since 15.9
+ * @since 16.10.6
+ * @since 17.3.0RC1
  */
-public class RealtimeCKEditor extends CKEditor
+public class RealtimeInplaceEditablePage extends InplaceEditablePage
 {
+    private RealtimeEditToolbar toolbar;
+
     /**
-     * Default constructor.
+     * @return the edit mode toolbar, holding the button to save the changes
      */
-    public RealtimeCKEditor()
+    public RealtimeEditToolbar getToolbar()
     {
-        super("content");
-        waitToLoad();
+        return this.toolbar;
     }
 
     @Override
-    public RealtimeRichTextAreaElement getRichTextArea()
+    public RealtimeInplaceEditablePage editInplace()
     {
-        return getRichTextArea(true);
+        super.editInplace();
+        return this;
     }
 
     @Override
-    public RealtimeRichTextAreaElement getRichTextArea(boolean wait)
+    public RealtimeInplaceEditablePage waitForInplaceEditor()
     {
-        return new RealtimeRichTextAreaElement(this, wait);
+        super.waitForInplaceEditor();
+        this.toolbar = new RealtimeEditToolbar().waitUntilConnected();
+        return this;
+    }
+
+    /**
+     * Click on the "Done" button and wait for the page to return to view mode.
+     * 
+     * @return this instance
+     */
+    public RealtimeInplaceEditablePage done()
+    {
+        this.toolbar.clickDone();
+        waitForView();
+        return this;
     }
 }

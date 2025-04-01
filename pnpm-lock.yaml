@@ -3375,6 +3375,9 @@ importers:
       '@xwiki/cristal-browser-api':
         specifier: workspace:*
         version: link:../../core/browser/browser-api
+      '@xwiki/cristal-electron-state':
+        specifier: workspace:*
+        version: link:../state
       electron:
         specifier: 35.0.1
         version: 35.0.1
@@ -3615,6 +3618,18 @@ importers:
         specifier: 6.2.2
         version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
 
+  electron/state:
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
+      vite:
+        specifier: 6.2.2
+        version: 6.2.2(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0)
+
   electron/storage:
     dependencies:
       '@xwiki/cristal-api':
@@ -3623,6 +3638,9 @@ importers:
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../../core/backends/backend-api
+      '@xwiki/cristal-electron-state':
+        specifier: workspace:*
+        version: link:../state
       '@xwiki/cristal-link-suggest-api':
         specifier: workspace:*
         version: link:../../core/link-suggest/link-suggest-api

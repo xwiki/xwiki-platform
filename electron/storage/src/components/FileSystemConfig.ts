@@ -18,9 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { APITypes } from "../electron/preload/apiTypes";
 import { DefaultWikiConfig } from "@xwiki/cristal-api";
 import { inject, injectable, named } from "inversify";
 import type { CristalApp, Logger, Storage } from "@xwiki/cristal-api";
+
+declare const fileSystemStorage: APITypes;
 
 @injectable()
 export class FileSystemConfig extends DefaultWikiConfig {
@@ -42,5 +45,12 @@ export class FileSystemConfig extends DefaultWikiConfig {
 
   override getType(): string {
     return "FileSystem";
+  }
+
+  override initialize(): void {
+    super.initialize();
+    // The initialization for the root directory needs to be done after a
+    // configuration change, but before any storage operation.
+    fileSystemStorage.initRootDirectory();
   }
 }

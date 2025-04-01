@@ -19,6 +19,7 @@
  */
 
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
+import { getStorageRoot } from "@xwiki/cristal-electron-state";
 import { LinkType } from "@xwiki/cristal-link-suggest-api";
 import { EntityType } from "@xwiki/cristal-model-api";
 import { protocol as cristalFSProtocol } from "@xwiki/cristal-model-remote-url-filesystem-api";
@@ -32,9 +33,14 @@ import { basename, dirname, join, relative } from "node:path";
 const HOME_PATH = ".cristal";
 const HOME_PATH_FULL = join(app.getPath("home"), HOME_PATH);
 
+function getHomePathFull(): string {
+  // If no custom storage root was provided in the current configuration, we
+  // fallback to the folder `${HOME}/.cristal`.
+  return getStorageRoot() ?? HOME_PATH_FULL;
+}
+
 function resolvePath(page: string, ...lastSegments: string[]) {
-  const homedir = app.getPath("home");
-  return join(homedir, HOME_PATH, page, ...lastSegments);
+  return join(getHomePathFull(), page, ...lastSegments);
 }
 
 function resolvePagePath(page: string): string {
@@ -117,8 +123,9 @@ async function pathExists(path: string) {
 async function readPage(
   path: string,
 ): Promise<{ type: EntityType.DOCUMENT; value: PageData } | undefined> {
-  if (!(await isWithin(HOME_PATH_FULL, path))) {
-    throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
+  const homePathFull = getHomePathFull();
+  if (!(await isWithin(homePathFull, path))) {
+    throw new Error(`[${path}] is not in in [${homePathFull}]`);
   }
   if (await isFile(path)) {
     const pageContent = await fs.promises.readFile(path);
@@ -130,7 +137,7 @@ async function readPage(
         ...parse,
         lastAuthor: { name: os.userInfo().username },
         lastModificationDate: new Date(pageStats.mtimeMs),
-        id: relative(HOME_PATH_FULL, dirname(path)),
+        id: relative(homePathFull, dirname(path)),
         canEdit: true,
       },
     };
@@ -142,8 +149,9 @@ async function readPage(
 async function readAttachments(
   path: string,
 ): Promise<PageAttachment[] | undefined> {
-  if (!(await isWithin(HOME_PATH_FULL, path))) {
-    throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
+  const homePathFull = getHomePathFull();
+  if (!(await isWithin(homePathFull, path))) {
+    throw new Error(`[${path}] is not in in [${homePathFull}]`);
   }
   if (await isDirectory(path)) {
     const attachments = await fs.promises.readdir(path);
@@ -162,8 +170,9 @@ async function readAttachments(
 async function readAttachment(
   path: string,
 ): Promise<{ type: EntityType.ATTACHMENT; value: PageAttachment } | undefined> {
-  if (!(await isWithin(HOME_PATH_FULL, path))) {
-    throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
+  const homePathFull = getHomePathFull();
+  if (!(await isWithin(homePathFull, path))) {
+    throw new Error(`[${path}] is not in in [${homePathFull}]`);
   }
 
   if (await isFile(path)) {
@@ -174,8 +183,8 @@ async function readAttachment(
       value: {
         id: basename(path),
         mimetype,
-        reference: relative(HOME_PATH_FULL, path),
-        href: `${cristalFSProtocol}://${relative(HOME_PATH_FULL, path)}`,
+        reference: relative(homePathFull, path),
+        href: `${cristalFSProtocol}://${relative(homePathFull, path)}`,
         date: stats.mtime,
         size: stats.size,
         author: undefined,
@@ -207,8 +216,9 @@ async function savePage(
   content: string,
   title: string,
 ): Promise<PageData | undefined> {
-  if (!(await isWithin(HOME_PATH_FULL, path))) {
-    throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
+  const homePathFull = getHomePathFull();
+  if (!(await isWithin(homePathFull, path))) {
+    throw new Error(`[${path}] is not in in [${homePathFull}]`);
   }
   let jsonContent: {
     source: string;
@@ -240,8 +250,9 @@ async function savePage(
 }
 
 async function saveAttachment(path: string, filePath: string) {
-  if (!(await isWithin(HOME_PATH_FULL, path))) {
-    throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
+  const homePathFull = getHomePathFull();
+  if (!(await isWithin(homePathFull, path))) {
+    throw new Error(`[${path}] is not in in [${homePathFull}]`);
   }
   const parentDirectory = dirname(path);
 
@@ -303,8 +314,9 @@ async function search(
     | { type: EntityType.DOCUMENT; value: PageData }
   )[]
 > {
-  const attachments = (await readdir(HOME_PATH_FULL, { recursive: true })).map(
-    (it) => join(HOME_PATH_FULL, it),
+  const homePathFull = getHomePathFull();
+  const attachments = (await readdir(homePathFull, { recursive: true })).map(
+    (it) => join(homePathFull, it),
   );
   const allEntities = await asyncFilter(attachments, async (path: string) => {
     if (type == LinkType.ATTACHMENT) {
@@ -345,7 +357,7 @@ async function search(
  */
 async function createMinimalContent() {
   await savePage(
-    join(HOME_PATH_FULL, "index", "page.json"),
+    join(getHomePathFull(), "index", "page.json"),
     "# Welcome\n" +
       "\n" +
       "This is a new **Cristal** wiki.\n" +
@@ -450,7 +462,7 @@ async function movePageSingle(path: string, newPath: string) {
  * @since 0.14
  */
 async function cleanEmptyArborescence(directory: string): Promise<void> {
-  if (await isWithin(HOME_PATH_FULL, directory)) {
+  if (await isWithin(getHomePathFull(), directory)) {
     if (!(await pathExists(directory))) {
       await cleanEmptyArborescence(dirname(directory));
     } else if ((await isDirectory(directory)) && (await isEmpty(directory))) {
@@ -463,22 +475,26 @@ async function cleanEmptyArborescence(directory: string): Promise<void> {
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
 export default async function load(): Promise<void> {
-  // Check if the root directory does not exist, or exists and is empty.
-  // If that's the case, create it and populate it with a default minimal content.
-  if (
-    !(await pathExists(HOME_PATH_FULL)) ||
-    ((await isDirectory(HOME_PATH_FULL)) && (await isEmpty(HOME_PATH_FULL)))
-  ) {
-    await createMinimalContent();
-  }
+  ipcMain.on("initRootDirectory", async () => {
+    // Check if the root directory does not exist, or exists and is empty.
+    // If that's the case, create it and populate it with a default minimal content.
+    const homePathFull = getHomePathFull();
+    if (
+      !(await pathExists(homePathFull)) ||
+      ((await isDirectory(homePathFull)) && (await isEmpty(homePathFull)))
+    ) {
+      await createMinimalContent();
+    }
+  });
 
   protocol.handle(cristalFSProtocol, async (request) => {
+    const homePathFull = getHomePathFull();
     const path = join(
-      HOME_PATH_FULL,
+      homePathFull,
       request.url.substring(`${cristalFSProtocol}://`.length),
     );
-    if (!(await isWithin(HOME_PATH_FULL, path))) {
-      throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
+    if (!(await isWithin(homePathFull, path))) {
+      throw new Error(`[${path}] is not in in [${homePathFull}]`);
     }
     return net.fetch(`file://${path}`);
   });

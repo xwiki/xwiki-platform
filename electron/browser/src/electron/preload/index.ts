@@ -25,5 +25,8 @@ const api: APITypes = {
   reloadBrowser() {
     return ipcRenderer.invoke("reloadBrowser", {});
   },
+  setStorageRoot(storageRoot?: string) {
+    return ipcRenderer.invoke("setStorageRoot", { storageRoot });
+  },
 };
 contextBridge.exposeInMainWorld("browserElectron", api);

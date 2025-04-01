@@ -32,7 +32,7 @@ declare const browserElectron: APITypes;
 @injectable()
 export class BrowserApiElectron implements BrowserApi {
   switchLocation(wikiConfig: WikiConfig): void {
-    window.localStorage.setItem("currentApp", wikiConfig.name);
+    this.setLocation(wikiConfig);
     browserElectron.reloadBrowser();
   }
 
@@ -43,5 +43,10 @@ export class BrowserApiElectron implements BrowserApi {
   onClose(): void {
     // TODO: CRISTAL-429 we did not find a viable implementation to intercept the close action and display a confirm
     // dialog to ask for the user if the confirm closing the page.
+  }
+
+  setLocation(wikiConfig: WikiConfig): void {
+    window.localStorage.setItem("currentApp", wikiConfig.name);
+    browserElectron.setStorageRoot(wikiConfig.storageRoot);
   }
 }

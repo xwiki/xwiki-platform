@@ -47,6 +47,13 @@ export interface BrowserApi {
    */
 
   onClose(callback: () => boolean): void;
+
+  /**
+   * Set the wiki configuration of the Cristal instance
+   * @param wikiConfig - the wiki config to use
+   * @since 0.16
+   */
+  setLocation(wikiConfig: WikiConfig): void;
 }
 
 export const name = "BrowserApi";

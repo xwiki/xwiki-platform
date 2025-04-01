@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-export interface APITypes {
-  reloadBrowser(): void;
-  setStorageRoot(storageRoot?: string): void;
-}
+import { generateConfig } from "../../vite.config";
+
+export default generateConfig(import.meta.url);

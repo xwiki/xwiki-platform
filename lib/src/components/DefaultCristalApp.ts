@@ -137,6 +137,7 @@ export class DefaultCristalApp implements CristalApp {
 
   setWikiConfig(wikiConfig: WikiConfig): void {
     this.wikiConfig = wikiConfig;
+    this.browserApi.setLocation(wikiConfig);
   }
 
   getWikiConfig(): WikiConfig {

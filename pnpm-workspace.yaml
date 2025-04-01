@@ -61,6 +61,7 @@ packages:
   - "electron/preload"
   - "electron/renderer"
   - "electron/storage"
+  - "electron/state"
   - "electron/browser"
   - "electron/configuration/configuration-electron/*"
   - "electron/link-suggest/*"

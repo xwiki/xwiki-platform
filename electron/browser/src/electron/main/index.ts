@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { setStorageRoot as stateSetStorageRoot } from "@xwiki/cristal-electron-state";
 import { app, ipcMain } from "electron";
 import { resolve } from "node:path";
 import BrowserWindow = Electron.BrowserWindow;
@@ -30,8 +31,15 @@ function reloadBrowser(window: BrowserWindow) {
   window.loadFile(resolve(app.getAppPath(), "./renderer/dist/index.html"));
 }
 
+function setStorageRoot(storageRoot?: string): void {
+  stateSetStorageRoot(storageRoot);
+}
+
 export default function load(window: BrowserWindow): void {
   ipcMain.handle("reloadBrowser", () => {
     return reloadBrowser(window);
+  });
+  ipcMain.handle("setStorageRoot", (_event, { storageRoot }) => {
+    return setStorageRoot(storageRoot);
   });
 }

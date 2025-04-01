@@ -23,6 +23,8 @@ import { LinkType } from "@xwiki/cristal-link-suggest-api";
 import { EntityType } from "@xwiki/cristal-model-api";
 
 export interface APITypes {
+  initRootDirectory(): void;
+
   resolvePath(page: string): Promise<string>;
 
   resolveAttachmentsPath(page: string): Promise<string>;

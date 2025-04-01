@@ -25,6 +25,9 @@ import { EntityType } from "@xwiki/cristal-model-api";
 import { contextBridge, ipcRenderer, webUtils } from "electron";
 
 const api: APITypes = {
+  initRootDirectory(): void {
+    return ipcRenderer.send("initRootDirectory", {});
+  },
   readPage: (path: string) => {
     return ipcRenderer.invoke("readPage", { path });
   },

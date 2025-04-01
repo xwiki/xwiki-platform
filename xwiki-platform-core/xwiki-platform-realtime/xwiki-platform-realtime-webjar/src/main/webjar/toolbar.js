@@ -176,10 +176,9 @@ define('xwiki-realtime-toolbar', [
     }
 
     _getFormData() {
-      const form = this.getForm();
       // Notify the others that the form is about to be submitted.
-      $(form).trigger('xwiki:actions:beforePreview');
-      const formData = new FormData(form);
+      $(this._toolbar).trigger('xwiki:actions:beforePreview');
+      const formData = new FormData(this.getForm());
       return new URLSearchParams(formData);
     }
 

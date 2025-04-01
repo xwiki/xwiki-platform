@@ -479,7 +479,7 @@ define('xwiki-realtime-saver', [
             number: revision.version,
             date: new Date(revision.modified).getTime(),
             author: {
-              reference: revision.modifier,
+              reference: this._getAbsoluteUserReference(revision.modifier),
               name: revision.modifierName
             }
           });
@@ -488,6 +488,11 @@ define('xwiki-realtime-saver', [
         });
       }
       return result;
+    }
+
+    _getAbsoluteUserReference(userReference) {
+      const usersSpaceReference = XWiki.Model.resolve('XWiki', XWiki.EntityType.SPACE, xwikiDocument.documentReference);
+      return XWiki.Model.serialize(XWiki.Model.resolve(userReference, XWiki.EntityType.DOCUMENT, usersSpaceReference));
     }
 
     _compareVersions(a, b) {

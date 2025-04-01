@@ -272,7 +272,8 @@ define('xwiki-realtime-wysiwyg', [
         onStatusChange: this._connection.toolbar.onSaveStatusChange.bind(this._connection.toolbar),
         onCreateVersion: version => {
           version.author = Object.values(this._connection.userData).find(
-            user => user.sessionId === version.author || user.reference === version.author?.reference
+            user => (user?.sessionId && user.sessionId === version.author) ||
+              (user?.reference && user.reference === version.author?.reference)
           ) || version.author;
           this._connection.toolbar.onCreateVersion(version);
         }

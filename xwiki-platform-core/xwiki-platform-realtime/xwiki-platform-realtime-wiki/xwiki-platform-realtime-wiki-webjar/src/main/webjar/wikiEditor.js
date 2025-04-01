@@ -249,7 +249,8 @@ define('xwiki-realtime-wikiEditor', [
         onStatusChange: this.toolbar.onSaveStatusChange.bind(this.toolbar),
         onCreateVersion: version => {
           version.author = Object.values(this.userData).find(
-            user => user.sessionId === version.author || user.reference === version.author?.reference
+            user => (user?.sessionId && user.sessionId === version.author) ||
+              (user?.reference && user.reference === version.author?.reference)
           ) || version.author;
           this.toolbar.onCreateVersion(version);
         }

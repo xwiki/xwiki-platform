@@ -297,7 +297,9 @@ ul.realtime-users {
 }
 
 .realtime-version &gt; :first-child {
+  flex-basis: 32px;
   flex-shrink: 0;
+  text-align: center;
 }
 
 .realtime-version-info {

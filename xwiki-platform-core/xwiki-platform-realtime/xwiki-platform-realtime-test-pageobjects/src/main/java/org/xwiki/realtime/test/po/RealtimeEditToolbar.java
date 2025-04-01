@@ -199,7 +199,7 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
-     * Use the Save & Continue shortcut key and wait for the document to be saved.
+     * Use the Save &amp; Continue shortcut key and wait for the document to be saved.
      */
     public void sendSaveShortcutKey()
     {
@@ -207,7 +207,7 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
-     * Use the Save & Continue shortcut key, optionally waiting for the document to be saved.
+     * Use the Save &amp; Continue shortcut key, optionally waiting for the document to be saved.
      * 
      * @param wait whether to wait for the document to be saved or not
      */

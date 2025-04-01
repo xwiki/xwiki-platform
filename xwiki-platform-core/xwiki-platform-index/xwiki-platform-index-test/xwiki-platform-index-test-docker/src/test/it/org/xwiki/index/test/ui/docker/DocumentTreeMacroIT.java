@@ -288,6 +288,55 @@ class DocumentTreeMacroIT
         assertNodeLabels(topLevelNodes.get(4).getChildren(), "FionaTerminal");
     }
 
+    @Test
+    @Order(3)
+    void childrenRoot(TestUtils setup, TestReference testReference)
+    {
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+
+        // Create the following hierarchy:
+        // TestReference:
+        //    - Alice:
+        //        - SubAlice
+        //    - Eve:
+        //        - SubEve
+        //        - SubEve2
+
+        DocumentReference alice =
+            new DocumentReference("WebHome", new SpaceReference("Alice", testSpaceReference));
+        DocumentReference subAlice =
+            new DocumentReference("WebHome", new SpaceReference("SubAlice", alice.getLastSpaceReference()));
+
+        DocumentReference eve =
+            new DocumentReference("WebHome", new SpaceReference("Eve", testSpaceReference));
+        DocumentReference subEve =
+            new DocumentReference("WebHome", new SpaceReference("SubEve", eve.getLastSpaceReference()));
+        DocumentReference subEve2 =
+            new DocumentReference("WebHome", new SpaceReference("SubEve2", eve.getLastSpaceReference()));
+
+        setup.loginAsSuperAdmin();
+        // Clean up.
+        setup.deletePage(testReference, true);
+        createPage(setup, alice, "","");
+        createPage(setup, subAlice, "","");
+        createPage(setup, eve, "","");
+        createPage(setup, subEve, "","");
+        createPage(setup, subEve2, "","");
+
+        // By default only top nodes of current page are displayed
+        TreeElement tree = getChildrenTree(setup, testReference, Map.of());
+        assertNodeLabels(tree.getTopLevelNodes(), "Alice", "Eve");
+        tree.getTopLevelNodes().forEach(node -> assertFalse(node.isOpen()));
+
+        // Set root to Alice displays only Alice nodes
+        tree = getChildrenTree(setup, testReference, Map.of("root", getNodeId(alice)));
+        assertNodeLabels(tree.getTopLevelNodes(), "SubAlice");
+
+        // Set root to Eve displays only Eve nodes
+        tree = getChildrenTree(setup, testReference, Map.of("root", getNodeId(eve)));
+        assertNodeLabels(tree.getTopLevelNodes(), "SubEve", "SubEve2");
+    }
+
     private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title, String content)
     {
         // We don't care what parent page is used, we just want to avoid creating orphan pages in order to not interfere
@@ -314,9 +363,10 @@ class DocumentTreeMacroIT
         Map<String, Object> parameters)
     {
         StringBuilder content = new StringBuilder("{{children");
-        parameters.forEach((key, value) -> content.append(" ").append(key).append("='").append(value).append("'"));
+        parameters.forEach((key, value) ->
+            content.append(" ").append(key).append("='").append(value).append("'"));
         content.append("/}}");
-        setup.createPage(parentReference, content.toString(), "", "xwiki/2.1", "Main.WebHome");
+        createPage(setup, parentReference, "", content.toString());
         return new TreeElement(setup.getDriver().findElement(By.cssSelector("#xwikicontent .xtree"))).waitForIt();
     }
 

@@ -2474,8 +2474,9 @@
       <defaultValue>0</defaultValue>
     </property>
     <property>
-      <description>Define the level of children to expand automatically. Default is 0 and means that only top level
-        nodes are displayed. A level of 1 opens them, 2 opens also their children, etc.</description>
+      <description>Define the depth of the tree to expand automatically. Default is 0 and means that only top level
+        nodes are displayed. A level of 1 opens those, a level of 2 also opens the children below the newly displayed
+        nodes, etc. Note that a high value can make the macro expansive to display for the browser.</description>
     </property>
     <property>
       <mandatory>0</mandatory>

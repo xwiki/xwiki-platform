@@ -84,6 +84,8 @@ rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
 rendering.macro.documentTree.parameter.sortDocumentsBy.name=Sort pages by
 rendering.macro.documentTree.parameter.sortDocumentsBy.description=The page field used to sort the child pages, followed by the sort order.
+rendering.macro.documentTree.parameter.expandToLevel.name=Expand to level
+rendering.macro.documentTree.parameter.expandToLevel.description=Define the depth of the tree to expand automatically. Default is 0 and means that only top level nodes are displayed. A level of 1 opens those, a level of 2 also opens the children below the newly displayed nodes, etc. Note that a high value can make the macro expansive to display for the browser.
 
 rendering.macro.children.name=Children
 rendering.macro.children.description=Displays a tree of children pages of the current page

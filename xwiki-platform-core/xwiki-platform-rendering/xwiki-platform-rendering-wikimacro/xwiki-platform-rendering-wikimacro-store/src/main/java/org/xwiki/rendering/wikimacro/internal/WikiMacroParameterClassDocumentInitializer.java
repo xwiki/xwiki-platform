@@ -45,6 +45,7 @@ public class WikiMacroParameterClassDocumentInitializer extends AbstractMandator
     implements WikiMacroConstants
 {
     private static final String PROPERTY_PIPE = "|";
+    private static final String PROPERTY_YESNO = "yesno";
 
     /**
      * Default constructor.
@@ -59,10 +60,16 @@ public class WikiMacroParameterClassDocumentInitializer extends AbstractMandator
     {
         xclass.addTextField(PARAMETER_NAME_PROPERTY, "Parameter name", 30);
         xclass.addTextAreaField(PARAMETER_DESCRIPTION_PROPERTY, "Parameter description", 40, 5);
-        xclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "yesno");
+        xclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", PROPERTY_YESNO);
         xclass.addTextField(PARAMETER_DEFAULT_VALUE_PROPERTY, "Parameter default value", 30);
         xclass.addStaticListField(PARAMETER_TYPE_PROPERTY, "Parameter type", 1, false, false,
             StringUtils.join(Arrays.asList(PARAMETER_TYPE_UNKNOWN, PARAMETER_TYPE_WIKI), PROPERTY_PIPE),
             ListClass.DISPLAYTYPE_INPUT, PROPERTY_PIPE, PARAMETER_TYPE_UNKNOWN, ListClass.FREE_TEXT_ALLOWED, true);
+        xclass.addTextField(PARAMETER_FEATURE_PROPERTY, "Parameter feature", 30);
+        xclass.addTextField(PARAMETER_GROUP_PROPERTY, "Parameter group", 30);
+        xclass.addBooleanField(PARAMETER_HIDDEN_PROPERTY, "Parameter hidden", PROPERTY_YESNO);
+        xclass.addBooleanField(PARAMETER_ADVANCED_PROPERTY, "Parameter advanced", PROPERTY_YESNO);
+        xclass.addBooleanField(PARAMETER_DEPRECATED_PROPERTY, "Parameter deprecated", PROPERTY_YESNO);
+        xclass.addBooleanField(PARAMETER_FEATURE_MANDATORY_PROPERTY, "Parameter feature mandatory", PROPERTY_YESNO);
     }
 }

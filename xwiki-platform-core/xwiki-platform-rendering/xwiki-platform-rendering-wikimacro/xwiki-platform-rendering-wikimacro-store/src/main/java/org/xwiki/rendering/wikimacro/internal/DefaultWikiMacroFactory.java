@@ -22,7 +22,9 @@ package org.xwiki.rendering.wikimacro.internal;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -39,6 +41,7 @@ import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.PropertyGroupDescriptor;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -278,6 +281,8 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = new ArrayList<>();
         Collection<BaseObject> macroParameters = doc.getObjects(WIKI_MACRO_PARAMETER_CLASS);
+        Map<String, PropertyGroupDescriptor> groupDescriptorMap = new HashMap<>();
+
         if (macroParameters != null) {
             for (BaseObject macroParameter : macroParameters) {
                 // Vectors can contain null values
@@ -288,8 +293,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                 // Extract parameter definition.
                 String parameterName = macroParameter.getStringValue(PARAMETER_NAME_PROPERTY);
                 String parameterDescription = macroParameter.getStringValue(PARAMETER_DESCRIPTION_PROPERTY);
-                boolean parameterMandatory =
-                    (macroParameter.getIntValue(PARAMETER_MANDATORY_PROPERTY) == 0) ? false : true;
+                boolean parameterMandatory = (macroParameter.getIntValue(PARAMETER_MANDATORY_PROPERTY) != 0);
                 String parameterDefaultValue = macroParameter.getStringValue(PARAMETER_DEFAULT_VALUE_PROPERTY);
                 String type = macroParameter.getStringValue(PARAMETER_TYPE_PROPERTY);
                 Type parameterType;
@@ -327,9 +331,42 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                     parameterDefaultValue = null;
                 }
 
+                // handle group property by checking first if the descriptor hasn't been already created for the same
+                // group.
+
+                String groupProperty = macroParameter.getStringValue(PARAMETER_GROUP_PROPERTY);
+                PropertyGroupDescriptor groupDescriptor;
+                if (!StringUtils.isEmpty(groupProperty) && groupDescriptorMap.containsKey(groupProperty)) {
+                    groupDescriptor = groupDescriptorMap.get(groupProperty);
+                } else if (!StringUtils.isEmpty(groupProperty)) {
+                    groupDescriptor =
+                        new PropertyGroupDescriptor(List.of(groupProperty));
+                    groupDescriptorMap.put(groupProperty, groupDescriptor);
+                } else {
+                    groupDescriptor = new PropertyGroupDescriptor(null);
+                }
+
+                // Handle feature property in the group descriptor: note that it's expected that it might impact an
+                // already created group descriptor.
+                // See also implementation of
+                // org.xwiki.properties.internal.DefaultBeanDescriptor#handlePropertyFeatureAndGroupAnnotations
+                String featureProperty = macroParameter.getStringValue(PARAMETER_FEATURE_PROPERTY);
+                if (!StringUtils.isEmpty(featureProperty)) {
+                    groupDescriptor.setFeature(featureProperty);
+                    groupDescriptor
+                        .setFeatureMandatory(macroParameter.getIntValue(PARAMETER_FEATURE_MANDATORY_PROPERTY) != 0);
+                }
+
+                WikiMacroParameterDescriptor wikiMacroParameterDescriptor =
+                    new WikiMacroParameterDescriptor(parameterName, parameterDescription,
+                        parameterMandatory, parameterDefaultValue, parameterType)
+                        .setAdvanced(macroParameter.getIntValue(PARAMETER_ADVANCED_PROPERTY) != 0)
+                        .setDisplayHidden(macroParameter.getIntValue(PARAMETER_HIDDEN_PROPERTY) != 0)
+                        .setDeprecated(macroParameter.getIntValue(PARAMETER_DEPRECATED_PROPERTY) != 0)
+                        .setGroupDescriptor(groupDescriptor);
+
                 // Create the parameter descriptor.
-                parameterDescriptors.add(new WikiMacroParameterDescriptor(parameterName, parameterDescription,
-                    parameterMandatory, parameterDefaultValue, parameterType));
+                parameterDescriptors.add(wikiMacroParameterDescriptor);
             }
         }
 

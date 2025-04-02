@@ -200,4 +200,51 @@ public interface WikiMacroConstants
      */
     String PARAMETER_TYPE_UNKNOWN = MACRO_CONTENT_TYPE_UNKNOWN;
 
+    /**
+     * Constant for representing the feature property of the parameter.
+     *
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    String PARAMETER_FEATURE_PROPERTY = "feature";
+
+    /**
+     * Constant for representing the group property of the parameter.
+     *
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    String PARAMETER_GROUP_PROPERTY = "group";
+
+    /**
+     * Constant for representing the hidden property of the parameter.
+     *
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    String PARAMETER_HIDDEN_PROPERTY = "hidden";
+
+    /**
+     * Constant for representing the advanced property of the parameter.
+     *
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    String PARAMETER_ADVANCED_PROPERTY = "advanced";
+
+    /**
+     * Constant for representing the feature mandatory property of the parameter.
+     *
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    String PARAMETER_FEATURE_MANDATORY_PROPERTY = "featureMandatory";
+
+    /**
+     * Constant for representing the deprecated property of the parameter.
+     *
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    String PARAMETER_DEPRECATED_PROPERTY = "deprecated";
 }

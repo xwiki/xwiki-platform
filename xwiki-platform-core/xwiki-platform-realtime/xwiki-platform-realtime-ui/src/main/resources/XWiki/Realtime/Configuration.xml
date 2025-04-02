@@ -167,19 +167,9 @@
   margin-bottom: 0;
 }
 
-#realtime-changeSummaryModal .modal-footer .btn-primary::after {
-  content: attr(data-done);
-}
-
-#realtime-changeSummaryModal[data-continue="true"] {
-  /* Save &amp; Continue always creates a minor change. */
-  #realtime-changeSummaryModal-minorChange {
-    display: none;
-  }
-
-  .modal-footer .btn-primary::after {
-    content: attr(data-save);
-  }
+#realtime-changeSummaryModal[data-continue="false"] [data-continue="true"],
+#realtime-changeSummaryModal[data-continue="true"] [data-continue="false"] {
+  display: none;
 }
 
 #realtime-changeSummaryModal-changesTab {
@@ -543,7 +533,9 @@ ul.realtime-users {
       &lt;ul
         class="realtime-users"
         data-limit="4"
-      &gt;&lt;/ul&gt;
+      &gt;
+        &lt;li&gt;&lt;!-- User --&gt;&lt;/li&gt;
+      &lt;/ul&gt;
       &lt;div class="btn-group dropup realtime-users-dropdown"&gt;
         &lt;button
           type="button"
@@ -557,6 +549,7 @@ ul.realtime-users {
           &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('realtime.users'))&lt;/span&gt;
         &lt;/button&gt;
         &lt;ul class="dropdown-menu"&gt;
+          &lt;li&gt;&lt;!-- User --&gt;&lt;/li&gt;
         &lt;/ul&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -614,7 +607,7 @@ ul.realtime-users {
       &lt;img
         class="realtime-user-avatar"
         src="$xwiki.getSkinFile('icons/xwiki/noavatar.png', true)"
-        alt=""
+        alt="$escapetool.xml($services.localization.render('username'))"
         title=""
       /&gt;
     &lt;/span&gt;
@@ -700,9 +693,9 @@ ul.realtime-users {
               aria-label="$escapetool.xml($services.localization.render('realtime.close'))"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title"&gt;
+          &lt;div class="modal-title"&gt;
             $escapetool.xml($services.localization.render('realtime.summarize'))
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body xform"&gt;
           &lt;ul class="nav nav-tabs" role="tablist"&gt;
@@ -752,7 +745,9 @@ ul.realtime-users {
                     title="$escapetool.xml($services.localization.render('realtime.summary'))"
                   &gt;&lt;/textarea&gt;
                 &lt;/dd&gt;
-                &lt;dt id="realtime-changeSummaryModal-minorChange"&gt;
+                ## Save &amp; Continue always creates a minor change so we show the minor change checkbox only when the
+                ## action is Save &amp; View
+                &lt;dt id="realtime-changeSummaryModal-minorChange" data-continue="false"&gt;
                   &lt;label&gt;
                     &lt;input type="checkbox" name="minorChange" /&gt;
                     $escapetool.xml($services.localization.render('realtime.minorChange'))
@@ -781,12 +776,10 @@ ul.realtime-users {
           &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-footer"&gt;
-          &lt;button
-            type="button"
-            class="btn btn-primary"
-            data-save="$escapetool.xml($services.localization.render('save'))"
-            data-done="$escapetool.xml($services.localization.render('realtime.done'))"
-          &gt;&lt;/button&gt;
+          &lt;button type="button" class="btn btn-primary"&gt;
+            &lt;span data-continue="true"&gt;$escapetool.xml($services.localization.render('save'))&lt;/span&gt;
+            &lt;span data-continue="false"&gt;$escapetool.xml($services.localization.render('realtime.done'))&lt;/span&gt;
+          &lt;/button&gt;
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
             $escapetool.xml($services.localization.render('cancel'))
           &lt;/button&gt;
@@ -805,7 +798,7 @@ ul.realtime-users {
               aria-label="$escapetool.xml($services.localization.render('realtime.close'))"&gt;
             &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
           &lt;/button&gt;
-          &lt;h4 class="modal-title"&gt;
+          &lt;div class="modal-title"&gt;
             #set ($title = $escapetool.xml($services.localization.render('core.document.modificationWithVersion', [
               '__version__', '__author__', '__date__'
             ])))
@@ -816,7 +809,7 @@ ul.realtime-users {
             ).replace(
               '__date__', '&lt;span class="realtime-version-date"&gt;&lt;/span&gt;'
             )
-          &lt;/h4&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="modal-body"&gt;
           &lt;realtime-document-viewer

@@ -46,7 +46,7 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.2",
-    "vite": "6.2.2",
+    "vite": "6.2.3",
     "vite-plugin-node": "4.0.0"
   },
   "publishConfig": {

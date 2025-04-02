@@ -48,7 +48,7 @@
     "@xwiki/cristal-dsapi": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.2",
-    "vite": "6.2.2",
+    "vite": "6.2.3",
     "vue-tsc": "2.2.8"
   },
   "publishConfig": {

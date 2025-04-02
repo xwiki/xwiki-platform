@@ -22,6 +22,9 @@ package org.xwiki.rendering.wikimacro.internal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import javax.inject.Inject;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -30,11 +33,16 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.AbstractAsyncContentBaseObjectWikiComponent;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
+import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
 import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
@@ -55,6 +63,18 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponent
     implements WikiMacro, NestedScriptMacroEnabled, WikiMacroConstants
 {
+    /**
+     * The name of the macro block attribute holding the id of the block.
+     * 
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    public static final String ATTRIBUTE_PREPARE_BLOCK_ID =
+        "org.xwiki.rendering.wikimacro.internal.DefaultWikiMacro#BLOCK_ID";
+
+    @Inject
+    private MacroContentParser contentParser;
+
     /**
      * The {@link MacroDescriptor} for this macro.
      */
@@ -112,6 +132,59 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         }
 
         return result instanceof CompositeBlock ? result.getChildren() : Arrays.asList(result);
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        // Prepare the content
+        prepareContent(macroBlock);
+
+        // Prepare the block id
+        prepareBlockId(macroBlock);
+    }
+
+    private void prepareContent(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        // Prepare the content
+        if (macroBlock.getContent() != null) {
+            ContentDescriptor contentDescriptor = getDescriptor().getContentDescriptor();
+            if (contentDescriptor != null && contentDescriptor.getType().equals(Block.LIST_BLOCK_TYPE)) {
+                this.contentParser.prepareContentWiki(macroBlock);
+            }
+        }
+    }
+
+    private void prepareBlockId(MacroBlock macroBlock)
+    {
+        getBlockId(macroBlock);
+    }
+
+    public Object getBlockId(MacroBlock macroBlock)
+    {
+        Object cachedIndex = macroBlock.getAttribute(ATTRIBUTE_PREPARE_BLOCK_ID);
+        if (cachedIndex != null) {
+            return cachedIndex;
+        }
+
+        Object index = null;
+        if (isAsyncAllowed() || isCacheAllowed()) {
+            // We need a stable id when the macro is async or cacheable
+            // Find index of the macro in the XDOM
+            Block rootBlock = macroBlock.getRoot();
+            if (rootBlock instanceof AbstractBlock abstractblock) {
+                index = abstractblock.indexOf(macroBlock);
+            }
+        }
+
+        if (index == null) {
+            // Use a less expensive way to generate the id when the macro is not async or cacheable
+            index = UUID.randomUUID().toString();
+        }
+
+        macroBlock.setAttribute(ATTRIBUTE_PREPARE_BLOCK_ID, index);
+
+        return index;
     }
 
     /**

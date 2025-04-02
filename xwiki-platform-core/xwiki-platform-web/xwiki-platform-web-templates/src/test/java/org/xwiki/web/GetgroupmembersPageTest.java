@@ -37,7 +37,7 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.user.DefaultUserComponentList;
 import org.xwiki.user.internal.group.AbstractGroupCache.GroupCacheEntry;
-import org.xwiki.user.internal.group.MembersCache;
+import org.xwiki.user.internal.group.GroupMembersCache;
 import org.xwiki.user.script.GroupScriptService;
 import org.xwiki.user.script.UserScriptService;
 import org.xwiki.velocity.tools.JSONTool;
@@ -76,7 +76,7 @@ class GetgroupmembersPageTest extends PageTest
 
     private XWikiGroupService groupService;
     
-    private MembersCache membersCache;
+    private GroupMembersCache membersCache;
 
     @BeforeEach
     void setUp() throws Exception
@@ -92,7 +92,7 @@ class GetgroupmembersPageTest extends PageTest
         this.groupService = this.context.getWiki().getGroupService(this.context);
 
         // Override the members cache component with a mock.
-        this.membersCache = this.componentManager.registerMockComponent(MembersCache.class);
+        this.membersCache = this.componentManager.registerMockComponent(GroupMembersCache.class);
 
         // Make sure User and Group script services load properly.
         this.componentManager.getInstance(ScriptService.class, "user");

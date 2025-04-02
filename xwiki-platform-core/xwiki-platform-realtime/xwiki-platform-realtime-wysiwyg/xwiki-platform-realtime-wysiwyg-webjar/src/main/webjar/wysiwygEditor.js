@@ -19,8 +19,6 @@
  */
 define('xwiki-realtime-wysiwyg', [
   'jquery',
-  'xwiki-realtime-config',
-  'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
   'xwiki-realtime-userData',
@@ -29,11 +27,11 @@ define('xwiki-realtime-wysiwyg', [
   'xwiki-realtime-saver',
   'chainpad',
   'xwiki-realtime-crypto',
+  'xwiki-realtime-document',
   'xwiki-realtime-wysiwyg-patches'
 ], function (
   /* jshint maxparams:false */
-  $, realtimeConfig, Messages, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver, ChainPad, Crypto,
-  Patches
+  $, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver, ChainPad, Crypto, xwikiDocument, Patches
 ) {
   'use strict';
 
@@ -65,11 +63,11 @@ define('xwiki-realtime-wysiwyg', [
 
       // The channel used to synchronize the content (auto)save (notify others when you save and be notified when others
       // save, in order to avoid merge conflicts and creating unnecessary document revisions).
-      this._eventsChannel = realtimeContext.channels.events;
+      this._saverChannel = realtimeContext.channels.saver;
 
       // The channel used to synchronize the user caret position (notify others when your caret position changes and be
       // notified when others' caret position changes).
-      this._userDataChannel = realtimeContext.channels.userdata;
+      this._userDataChannel = realtimeContext.channels.userData;
   
       Interface.realtimeAllowed(realtimeContext.realtimeEnabled);
       this._createAllowRealtimeCheckbox();
@@ -85,7 +83,7 @@ define('xwiki-realtime-wysiwyg', [
 
     setEditable(editable) {
       this._editor.setReadOnly(!editable);
-      $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', !editable);
+      $('.buttons [name^="action_save"]').prop('disabled', !editable);
     }
 
     async lockDocument() {
@@ -109,6 +107,8 @@ define('xwiki-realtime-wysiwyg', [
 
       // Don't let the user edit until the real-time framework is ready.
       this.setEditable(false);
+
+      this._createToolbar();
 
       this._connection.realtimeInput = ChainPadNetflux.start(this._getRealtimeOptions());
 
@@ -142,6 +142,9 @@ define('xwiki-realtime-wysiwyg', [
       const form = document.getElementById(RealtimeEditor._getFormId());
       $(form).on('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', flushUncommittedWork);
 
+      const resetContent = this._resetContent.bind(this);
+      $(form).on('xwiki:actions:reload', resetContent);
+
       // Leave the realtime session and stop the autosave when the editor is destroyed. We have to do this because the
       // editor can be destroyed without the page being reloaded (e.g. when editing in-place).
       this._editor.onBeforeDestroy(() => {
@@ -149,6 +152,8 @@ define('xwiki-realtime-wysiwyg', [
         // at least we try.
         flushUncommittedWork();
         $(form).off('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', flushUncommittedWork);
+
+        $(form).off('xwiki:actions:reload', resetContent);
 
         // Notify the others that we're not editing anymore.
         this._realtimeContext.destroy();
@@ -163,6 +168,18 @@ define('xwiki-realtime-wysiwyg', [
       window.easyTest = this._easyTest.bind(this);
     }
 
+    _createToolbar() {
+      this._connection.toolbar = new Toolbar({
+        save: (...args) => this._saver?.save(...args),
+        leave: () => Interface.getAllowRealtimeCheckbox().click(),
+        selectUser: userId => {
+          const editableContentLocation = this._editor.getContentWrapper().ownerDocument.defaultView.location;
+          const baseHref = editableContentLocation.href.split('#')[0] || '';
+          editableContentLocation.href = baseHref + '#rt-user-' + userId;
+        }
+      });
+    }
+
     _addNetfluxChannelToSubmittedData() {
       // Indicate the Netflux channel used to synchronize the edited content when performing the HTML conversion (e.g.
       // when refreshing the content after a macro is inserted) in order to render the content using the effective
@@ -174,8 +191,7 @@ define('xwiki-realtime-wysiwyg', [
       $(document).on('xwiki:wysiwyg:convertHTML', convertHTMLListener);
 
       // Indicate the Netflux channel used to synchronize the edited content when saving the content.
-      const fieldSet = this._editor.getToolBar().closest('form, .form, body')
-        .querySelector('input[name=form_token]').parentNode;
+      const fieldSet = this._connection.toolbar.getForm().querySelector('input[name=form_token]').parentNode;
       let netfluxChannelInput = fieldSet.querySelector(
         `input[name=netfluxChannel][data-for="${CSS.escape(this._editor.getFormFieldName())}"]`);
       if (!netfluxChannelInput) {
@@ -200,17 +216,15 @@ define('xwiki-realtime-wysiwyg', [
     async _updateChannels() {
       const channels = await this._realtimeContext.updateChannels();
       this._channel = channels[EDITOR_TYPE] || this._channel;
-      this._eventsChannel = channels.events || this._eventsChannel;
-      this._userDataChannel = channels.userdata || this._userDataChannel;
+      this._saverChannel = channels.saver || this._saverChannel;
+      this._userDataChannel = channels.userData || this._userDataChannel;
       return channels;
     }
 
     _createAllowRealtimeCheckbox() {
       const realtimeEnabled = this._realtimeContext.realtimeEnabled;
-      // Don't display the checkbox in the following cases:
-      // * realtimeEnabled 0 (instead of true/false) => we can't connect to the websocket service
-      // * realtime is disabled and we're not an advanced user
-      if (realtimeEnabled !== 0 && (realtimeEnabled || this._realtimeContext.user.advanced)) {
+      // Don't display the checkbox if we can't connect to the WebSocket service.
+      if (realtimeEnabled !== 0) {
         const allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
         const realtimeToggleHandler = () => {
           if (allowRealtimeCheckbox.prop('checked')) {
@@ -231,7 +245,7 @@ define('xwiki-realtime-wysiwyg', [
               allowRealtimeCheckbox.prop('disabled', false);
             });
           } else {
-            this._realtimeContext.displayDisableModal((state) => {
+            this._realtimeContext.displayDisableModal(state => {
               if (!state) {
                 allowRealtimeCheckbox.prop('checked', true);
               } else {
@@ -248,39 +262,43 @@ define('xwiki-realtime-wysiwyg', [
       }
     }
 
-    async _createSaver(info, userName) {
-      const saverConfig = {
-        editorType: EDITOR_TYPE,
-        editorName: 'WYSIWYG',
-        // Id of the wiki page form.
+    async _createSaver(info) {
+      this._saver = await new Saver({
+        // Edit form ID.
         formId: RealtimeEditor._getFormId(),
-        userList: info.userList,
-        userName,
+        userName: this._realtimeContext.user.sessionId,
         network: info.network,
-        channel: this._eventsChannel,
-        showNotification: Interface.createMergeMessageElement(
-          this._connection.toolbar.toolbar.find('.rt-toolbar-rightside')),
-        setTextValue: (newText) => {
-          this._patchedEditor.setHTML(newText, true);
-        },
-        getTextValue: () => {
-          try {
-            return this._editor.getOutputHTML();
-          } catch (e) {
-            this._editor.showNotification(Messages['editor.getContentFailed'], 'warning');
-            return null;
-          }
-        },
-        getTextAtCurrentRevision: () => {
-          return $.get(XWiki.currentDocument.getURL('get', $.param({
-            xpage:'get',
-            outputSyntax:'annotatedhtml',
-            outputSyntaxVersion:'5.0',
-            transformations:'macro'
-          })));
+        channel: this._saverChannel,
+        onStatusChange: this._connection.toolbar.onSaveStatusChange.bind(this._connection.toolbar),
+        onCreateVersion: version => {
+          version.author = Object.values(this._connection.userData).find(
+            user => (user?.sessionId && user.sessionId === version.author) ||
+              (user?.reference && user.reference === version.author?.reference)
+          ) || version.author;
+          this._connection.toolbar.onCreateVersion(version);
         }
-      };
-      this._saver = await new Saver(saverConfig).toBeReady();
+      }).toBeReady();
+    }
+
+    async _resetContent() {
+      const html = await $.get(xwikiDocument.getURL('get', $.param({
+        xpage:'get',
+        outputSyntax:'annotatedhtml',
+        outputSyntaxVersion:'5.0',
+        transformations:'macro',
+        language: xwikiDocument.language
+      })));
+      this._hideChangesFromSaver(this._patchedEditor.setHTML(html, true));
+    }
+
+    async _hideChangesFromSaver(promise) {
+      const contentModifiedLocally = this._saver.contentModifiedLocally;
+      this._saver.contentModifiedLocally = () => {};
+      try {
+        await promise;
+      } finally {
+        this._saver.contentModifiedLocally = contentModifiedLocally;
+      }
     }
 
     static _getFormId() {
@@ -295,43 +313,39 @@ define('xwiki-realtime-wysiwyg', [
       }
     }
 
-    _changeUserIcons(newdata) {
-      if (!realtimeConfig.marginAvatar) {
-        return;
-      }
-
+    _changeUserIcons(userData) {
       // If no new data (someone has just joined or left the channel), get the latest known values.
-      const updatedData = newdata || this._connection.userData;
+      this._connection.userData = userData = userData || this._connection.userData;
+      const users = this._connection.userList.users.filter(id => userData[id]).map(id => ({id, ...userData[id]}));
+      this._connection.toolbar.onUserListChange(users);
 
       const contentWrapper = this._editor.getContentWrapper();
       const contentWrapperTop = $(contentWrapper).offset().top;
       const ownerDocument = contentWrapper.ownerDocument;
       $(ownerDocument).find('.rt-user-position').remove();
       const positions = {};
-      this._connection.userList.users.filter(id => updatedData[id]?.['cursor_' + EDITOR_TYPE]).forEach(id => {
-        const data = updatedData[id];
-        const name = RealtimeEditor._getPrettyName(data.name);
+      users.filter(user => user['cursor_' + EDITOR_TYPE]).forEach(user => {
         // Set the user position.
-        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], contentWrapper, null,
+        const element = ownerDocument.evaluate(user['cursor_' + EDITOR_TYPE], contentWrapper, null,
           XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         if (!element) {
           return;
         }
         const top = $(element).offset().top - contentWrapperTop;
         if (!positions[top]) {
-          positions[top] = [id];
+          positions[top] = [user.id];
         } else {
-          positions[top].push(id);
+          positions[top].push(user.id);
         }
         let $indicator;
-        if (data.avatar) {
-          $indicator = $('<img alt=""/>').attr('src', data.avatar);
+        if (user.avatar) {
+          $indicator = $('<img alt=""/>').attr('src', user.avatar);
         } else {
-          $indicator = $('<div></div>').text(name.substring(0, 1));
+          $indicator = $('<div></div>').text(user.name.substring(0, 1));
         }
         $indicator.addClass('rt-non-realtime rt-user-position').attr({
-          id: 'rt-user-' + id,
-          title: name,
+          id: 'rt-user-' + user.id,
+          title: user.name,
           contenteditable: 'false'
         }).css({
           // Use the default top value (which is normally the top padding of the rich text area) if the element holding
@@ -347,7 +361,7 @@ define('xwiki-realtime-wysiwyg', [
       return {
         initialState: this._patchedEditor.getHyperJSON() || '{}',
         websocketURL: this._realtimeContext.webSocketURL,
-        userName: this._realtimeContext.user.name,
+        userName: this._realtimeContext.user.sessionId,
         channel: this._channel,
         crypto: Crypto,
         network: this._realtimeContext.network,
@@ -388,24 +402,8 @@ define('xwiki-realtime-wysiwyg', [
     _onInit(info) {
       // List of users still connected to the channel (server IDs).
       this._connection.userList = info.userList;
-      const config = {
-        userData: this._connection.userData,
-        onUsernameClick: (id) => {
-          const editableContentLocation = this._editor.getContentWrapper().ownerDocument.defaultView.location;
-          const baseHref = editableContentLocation.href.split('#')[0] || '';
-          editableContentLocation.href = baseHref + '#rt-user-' + id;
-        }
-      };
-      // The real-time toolbar, showing the list of connected users, the merge message, the spinner and the lag.
-      this._connection.toolbar = Toolbar.create({
-        '$container': $(this._editor.getToolBar()),
-        myUserName: info.myID,
-        realtime: info.realtime,
-        getLag: info.getLag,
-        userList: info.userList,
-        config
-      });
-      // When someone leaves, if they used Save&View, it removes the locks from the document. We're going to add it
+      this._connection.toolbar.onConnectionStatusChange(1 /* connecting */, info.myID);
+      // When someone leaves, if they used Save&View, it removes the lock from the document. We're going to add it
       // again to be sure new users will see the lock page and be able to join.
       let oldUsers = JSON.parse(JSON.stringify(info.userList.users || []));
       info.userList.change.push(() => {
@@ -431,8 +429,7 @@ define('xwiki-realtime-wysiwyg', [
         // Update the user list to link the wiki name to the user id.
         const userDataConfig = {
           myId: info.myId,
-          userName: this._realtimeContext.user.name,
-          userAvatar: this._realtimeContext.user.avatarURL,
+          user: this._realtimeContext.user,
           onChange: this._connection.userList.onChange,
           crypto: Crypto,
           editor: EDITOR_TYPE,
@@ -446,15 +443,13 @@ define('xwiki-realtime-wysiwyg', [
             return this._getXPath(node);
           }
         };
-        if (!realtimeConfig.marginAvatar) {
-          delete userDataConfig.getCursor;
-        }
 
         this._connection.userData = await UserData.start(info.network, this._userDataChannel, userDataConfig);
+        this._changeUserIcons(this._connection.userData);
         this._connection.userList.change.push(this._changeUserIcons.bind(this));
       }
 
-      await this._createSaver(info, this._realtimeContext.user.name);
+      await this._createSaver(info);
 
       this._connection.status = ConnectionStatus.CONNECTED;
 
@@ -463,6 +458,7 @@ define('xwiki-realtime-wysiwyg', [
 
       console.debug('Unlocking editor');
       this.setEditable(true);
+      this._connection.toolbar.onConnectionStatusChange(2 /* connected */, info.myId);
     }
 
     _onLocal(localContent) {
@@ -522,13 +518,13 @@ define('xwiki-realtime-wysiwyg', [
         return;
       }
       console.debug('Connection status: ' + info.state);
-      this._connection.toolbar.failed();
       if (info.state) {
         this._connection.status = ConnectionStatus.CONNECTING;
-        this._connection.toolbar.reconnecting(info.myId);
+        this._connection.toolbar.onConnectionStatusChange(1 /* connecting */, info.myId);
       } else {
         this._connection.chainpad.abort();
         this.setEditable(false);
+        this._connection.toolbar.onConnectionStatusChange(0 /* disconnected */);
       }
     }
 
@@ -579,12 +575,11 @@ define('xwiki-realtime-wysiwyg', [
       // Notify the others that we're editing offline (outside of the realtime session).
       this._realtimeContext.setRealtimeEnabled(false);
 
-      // Stop the autosave (and leave the events Netflux channel associated with the edited document).
+      // Stop the autosave (and leave the saver Netflux channel associated with the edited document).
       this._saver?.stop();
 
-      // Remove the realtime toolbar.
-      this._connection.toolbar?.failed();
-      this._connection.toolbar?.toolbar.remove();
+      // Remove the realtime edit toolbar.
+      this._connection.toolbar.destroy();
 
       // Stop receiving user caret updates (leave the user data Netflux channel associated with the edited document).
       this._connection.userData.stop?.();
@@ -668,13 +663,7 @@ define('xwiki-realtime-wysiwyg', [
       // The path needs to start from the top-most element.
       xpath = xpath.reverse();
       return xpath.join('/');
-    }
-  
-    static _getPrettyName(userName) {
-      return userName ? userName.replace(/^.*-([^-]*)%2d\d*$/, function(all, one) { 
-        return decodeURIComponent(one);
-      }) : userName;
-    }
+    }  
   }
 
   window.REALTIME_DEBUG = window.REALTIME_DEBUG || {};

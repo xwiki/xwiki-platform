@@ -17,50 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal.group;
+package org.xwiki.index.tree;
 
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
- * Manipulate the cache of groups's members.
- * 
+ * Script service for index tree operations.
+ *
  * @version $Id$
- * @since 10.8RC1
+ * @since 17.2.0RC1
+ * @since 16.10.5
+ * @since 16.4.7
  */
-@Component(roles = MembersCache.class)
+@Unstable
+@Component
 @Singleton
-public class MembersCache extends AbstractGroupCache
+@Named("index.tree")
+public class IndexTreeScriptService implements ScriptService
 {
-    /**
-     * Set the id.
-     */
-    public MembersCache()
-    {
-        super("user.membership.members");
-    }
-
-    private String toKey(DocumentReference reference)
-    {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append(this.serializer.serialize(reference));
-
-        return builder.toString();
-    }
+    @Inject
+    private PinnedChildPagesManager pinnedChildPagesManager;
 
     /**
-     * @param reference the reference of the entity for which to get the cache entry
-     * @param create true if an entry should be created if none exist
-     * @return the cache entry
+     * Retrieve the list of pinned child pages of the given parent.
+     * @param parent the document for which to find pinned child pages.
+     * @return the ordered list of pinned child pages.
      */
-    public GroupCacheEntry getCacheEntry(DocumentReference reference, boolean create)
+    public List<DocumentReference> getPinnedChildPages(DocumentReference parent)
     {
-        String key = toKey(reference);
-
-        return getCacheEntry(key, reference, create);
+        return this.pinnedChildPagesManager.getPinnedChildPages(parent);
     }
-
 }

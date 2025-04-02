@@ -28,8 +28,8 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -321,7 +321,7 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilContentEditable()
     {
         getDriver().waitUntilCondition(driver -> getFromEditedContent(
-            () -> getRootEditableElement(false).getAttribute("contenteditable").equals("true")));
+            () -> getRootEditableElement(false).getDomAttribute("contenteditable").equals("true")));
         this.cachedRefreshCounter = getRefreshCounter();
     }
 
@@ -334,7 +334,7 @@ public class RichTextAreaElement extends BaseElement
         try {
             WebElement rootEditableElement = getRootEditableElement();
             getDriver().waitUntilCondition(
-                driver -> Objects.equals(placeholder, rootEditableElement.getAttribute("data-cke-editorplaceholder")));
+                driver -> Objects.equals(placeholder, rootEditableElement.getDomAttribute("data-cke-editorplaceholder")));
         } finally {
             maybeSwitchToDefaultContent();
         }
@@ -423,44 +423,7 @@ public class RichTextAreaElement extends BaseElement
      */
     public String getRefreshCounter()
     {
-        return getFromEditedContent(() -> getRootEditableElement(false).getAttribute("data-xwiki-refresh-counter"));
-    }
-
-    /**
-     * Sends the Save &amp; Continue shortcut key to the text area and waits for the success notification message.
-     *
-     * @since 16.9.0RC1
-     * @since 16.4.5
-     * @since 15.10.13
-     */
-    public void sendSaveShortcutKey()
-    {
-        sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
-
-        // The code that waits for the save confirmation clicks on the success notification message to hide it and this
-        // steals the focus from the rich text area. Unfortunately this makes Chrome lose the caret position: the next
-        // sendKeys will insert the text at the end of the edited content. To avoid this, we backup the active element
-        // and restore it after the save confirmation.
-        WebElement activeElement;
-        try {
-            activeElement = getActiveElement();
-        } finally {
-            maybeSwitchToDefaultContent();
-        }
-
-        // This steals the focus from the rich text area because it clicks on the success notification message in order
-        // to hide it.
-        waitForNotificationSuccessMessage("Saved");
-
-        // Restore the focus to the previously active element. We cannot simply focus the rich text area because the
-        // previously active element might have been a nested editable area (e.g. from an inline editable macro or from
-        // the image caption).
-        maybeSwitchToEditedContent();
-        try {
-            focus(activeElement);
-        } finally {
-            maybeSwitchToDefaultContent();
-        }
+        return getFromEditedContent(() -> getRootEditableElement(false).getDomAttribute("data-xwiki-refresh-counter"));
     }
 
     private void focus(WebElement element)
@@ -570,22 +533,35 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitForOwnNotificationSuccessMessage(String message)
     {
-        waitForOwnNotificationMessage("success", message);
+        waitForOwnNotificationMessage("success", message, true);
     }
 
-    private void waitForOwnNotificationMessage(String level, String message)
+    /**
+     * Waits for a progress notification message to be displayed for this rich text area element.
+     *
+     * @param message the notification message to wait for
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     */
+    public void waitForOwnNotificationProgressMessage(String message)
+    {
+        waitForOwnNotificationMessage("info", message, false);
+    }
+
+    private void waitForOwnNotificationMessage(String level, String message, boolean close)
     {
         String notificationMessageLocator =
             String.format("//div[contains(@class,'cke_notification_%s') and contains(., '%s')]", level, message);
         getDriver().waitUntilElementIsVisible(By.xpath(notificationMessageLocator));
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.
-        try {
-            String notificationCloseLocator = notificationMessageLocator + "/a[@class = 'cke_notification_close']";
-            getDriver().findElementWithoutWaiting(By.xpath(notificationCloseLocator)).click();
-        } catch (WebDriverException e) {
-            // The notification message may disappear before we get to click on it and thus we ignore in case there's
-            // an error.
+        if (close) {
+            try {
+                String notificationCloseLocator = notificationMessageLocator + "/a[@class = 'cke_notification_close']";
+                getDriver().findElementWithoutWaiting(By.xpath(notificationCloseLocator)).click();
+            } catch (WebDriverException e) {
+                // The notification message may disappear before we get to click on it.
+            }
         }
     }
 
@@ -620,5 +596,39 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilWidgetSelected()
     {
         waitUntilContentContains("cke_widget_selected");
+    }
+
+    /**
+     * @return the text selected in the rich text area, or an empty string if no text is selected
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public String getSelectedText()
+    {
+        return (String) getDriver().executeScript(
+            "return CKEDITOR.instances[arguments[0]].getSelection().getSelectedText()", this.editor.getName());
+    }
+
+    /**
+     * @return the size of the rich text area
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public Dimension getSize()
+    {
+        return this.container.getSize();
+    }
+
+    /**
+     * @param xOffset the horizontal offset from the text area's left border
+     * @param yOffset the vertical offset from the text area's top border
+     * @return {@code true} if the specified point inside the text area is visible (i.e. inside the viewport),
+     *         {@code false} otherwise
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public boolean isVisible(int xOffset, int yOffset)
+    {
+        return getDriver().isVisible(this.container, xOffset, yOffset);
     }
 }

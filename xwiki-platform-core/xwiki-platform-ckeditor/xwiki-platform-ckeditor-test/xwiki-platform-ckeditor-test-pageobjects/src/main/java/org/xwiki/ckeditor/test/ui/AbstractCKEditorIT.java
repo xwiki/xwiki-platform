@@ -19,18 +19,20 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Base class for CKEditor integration tests.
@@ -45,17 +47,17 @@ public abstract class AbstractCKEditorIT
 
     protected RichTextAreaElement textArea;
 
-    WYSIWYGEditPage edit(TestUtils setup, TestReference testReference)
+    WYSIWYGEditPage edit(TestUtils setup, EntityReference entityReference)
     {
-        return edit(setup, testReference, true);
+        return edit(setup, entityReference, true);
     }
 
-    WYSIWYGEditPage edit(TestUtils setup, TestReference testReference, boolean startFresh)
+    WYSIWYGEditPage edit(TestUtils setup, EntityReference pageReference, boolean startFresh)
     {
         if (startFresh) {
-            setup.deletePage(testReference, true);
+            setup.deletePage(pageReference, true);
         }
-        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
+        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(pageReference);
         this.editor = new CKEditor("content").waitToLoad();
         this.textArea = this.editor.getRichTextArea();
         return editPage;
@@ -68,8 +70,17 @@ public abstract class AbstractCKEditorIT
 
     protected void assertSourceEquals(String expected)
     {
+        assertSourceEquals(expected, false);
+    }
+
+    protected void assertSourceEquals(String expected, boolean normalizeSpaces)
+    {
         editor.getToolBar().toggleSourceMode();
-        assertEquals(expected, editor.getSourceTextArea().getAttribute("value"));
+        String actualSource = editor.getSourceTextArea().getDomProperty("value");
+        if (actualSource != null && normalizeSpaces) {
+            actualSource = actualSource.replace('\u00A0', ' ');
+        }
+        assertEquals(expected, actualSource);
         editor.getToolBar().toggleSourceMode();
         this.textArea = this.editor.getRichTextArea();
     }
@@ -77,8 +88,8 @@ public abstract class AbstractCKEditorIT
     protected void assertSourceContains(String expectedSource)
     {
         editor.getToolBar().toggleSourceMode();
-        String actualSource = editor.getSourceTextArea().getAttribute("value");
-        assertTrue(actualSource.contains(expectedSource), "Unexpected source: " + actualSource);
+        String actualSource = editor.getSourceTextArea().getDomProperty("value");
+        assertTrue(StringUtils.contains(actualSource, expectedSource), "Unexpected source: " + actualSource);
         editor.getToolBar().toggleSourceMode();
         this.textArea = this.editor.getRichTextArea();
     }
@@ -95,8 +106,9 @@ public abstract class AbstractCKEditorIT
 
     protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)
     {
-        if (setup.isInWYSIWYGEditMode() || setup.isInWikiEditMode()) {
-            new WikiEditPage().clickCancel();
+        if (StringUtils.isNotEmpty(setup.getEditMode())) {
+            // Use the cancel shortcut key to leave the edit mode.
+            setup.getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
         }
     }
 

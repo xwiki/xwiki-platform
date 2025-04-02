@@ -797,6 +797,16 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # solr.synchronizeAtStartupMode=FARM
 
+#-# [Since 17.2.0RC1]
+#-# [Since 16.10.5]
+#-# [Since 16.4.7]
+#-# Indicates the batch size for the synchronization between SOLR index and XWiki database. This defines how many
+#-# documents will be loaded from the database and Solr in each step. Higher values lead to fewer queries and thus
+#-# better performance but increase the memory usage. The expected memory usage is around 1KB per document, but
+#-# depends highly on the length of the document names.
+#-# The default is 1000.
+# solr.synchronizeBatchSize=1000
+
 #-------------------------------------------------------------------------------------
 # Security
 #-------------------------------------------------------------------------------------

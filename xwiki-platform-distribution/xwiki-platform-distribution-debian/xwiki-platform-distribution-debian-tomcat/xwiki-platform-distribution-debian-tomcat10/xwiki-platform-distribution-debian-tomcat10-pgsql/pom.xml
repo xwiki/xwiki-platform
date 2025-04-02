@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-tomcat10</artifactId>
-    <version>17.1.0-SNAPSHOT</version>
+    <version>17.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-tomcat10-pgsql</artifactId>
   <name>XWiki Platform - Distribution - Debian - Tomcat ${debian.tomcat.version} - Postgres SQL</name>
   <packaging>deb</packaging>
-  <description>XWiki Tomcat9/PostgreSQL</description>
+  <description>XWiki Tomcat${debian.tomcat.version}/PostgreSQL</description>
   <properties>
-    <debian.package>xwiki-tomcat9-pgsql</debian.package>
+    <debian.package>xwiki-tomcat${debian.tomcat.version}-pgsql</debian.package>
   </properties>
 </project>

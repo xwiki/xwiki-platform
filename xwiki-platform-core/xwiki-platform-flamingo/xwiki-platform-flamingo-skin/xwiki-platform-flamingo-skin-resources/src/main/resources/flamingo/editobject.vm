@@ -247,7 +247,11 @@
   #if ($mustSync)
     <div class="box warningmessage deprecatedProperties">
       $services.localization.render('core.editors.object.removeDeprecatedProperties.all.info')
-      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')</a></div>
+      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" 
+        title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">
+        $services.icon.renderHTML('cross')
+        $services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')
+      </a></div>
     </div>
   #end
 #end ## checkPropertyDeprecation
@@ -293,13 +297,13 @@
       #if ("$!{request.xredirect}" != '')
         $response.sendRedirect($request.xredirect)
       #else
+        ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
+        ## The object editor will move these 'includes' (link/script tags) in the head of the HTML page.
+        ## Note that we need to pull the JavaScript/CSS only once, for the first object of a given type.
+        <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
+        #skinExtensionHooks
         ## Display
         #if ($isNewClass)
-          ## Output the SkinExtension hooks to allow field displayers to pull JavaScript/CSS resources.
-          ## The object editor will move these 'includes' (link/script tags) in the head of the HTML page.
-          ## Note that we need to pull the JavaScript/CSS only once, for the first object of a given type.
-          <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
-          #skinExtensionHooks
           #displayClass($class $newobj)
         #else
           #getTitleField($props)

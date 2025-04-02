@@ -1,5 +1,19 @@
 # @xwiki/cristal-document-default
 
+## 0.16.0
+
+### Minor Changes
+
+- Cristal 0.16 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.16.0
+  - @xwiki/cristal-document-api@0.16.0
+  - @xwiki/cristal-model-api@0.16.0
+  - @xwiki/cristal-model-reference-api@0.16.0
+
 ## 0.15.0
 
 ### Minor Changes

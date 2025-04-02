@@ -1,5 +1,36 @@
 # @xwiki/cristal-skin
 
+## 0.16.0
+
+### Minor Changes
+
+- Cristal 0.16 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.16.0
+  - @xwiki/cristal-alerts-api@0.16.0
+  - @xwiki/cristal-alerts-ui@0.16.0
+  - @xwiki/cristal-backend-api@0.16.0
+  - @xwiki/cristal-date-ui@0.16.0
+  - @xwiki/cristal-document-api@0.16.0
+  - @xwiki/cristal-extra-tabs-api@0.16.0
+  - @xwiki/cristal-extra-tabs-ui@0.16.0
+  - @xwiki/cristal-hierarchy-api@0.16.0
+  - @xwiki/cristal-icons@0.16.0
+  - @xwiki/cristal-info-actions-api@0.16.0
+  - @xwiki/cristal-info-actions-ui@0.16.0
+  - @xwiki/cristal-markdown-api@0.16.0
+  - @xwiki/cristal-model-api@0.16.0
+  - @xwiki/cristal-model-click-listener@0.16.0
+  - @xwiki/cristal-model-reference-api@0.16.0
+  - @xwiki/cristal-navigation-tree-api@0.16.0
+  - @xwiki/cristal-page-actions-ui@0.16.0
+  - @xwiki/cristal-uiextension-api@0.16.0
+  - @xwiki/cristal-uiextension-ui@0.16.0
+  - @xwiki/cristal-user-ui@0.16.0
+
 ## 0.15.0
 
 ### Minor Changes

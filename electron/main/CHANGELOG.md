@@ -1,5 +1,21 @@
 # @xwiki/cristal-electron-main
 
+## 0.16.0
+
+### Minor Changes
+
+- Cristal 0.16 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-electron-authentication-github-main@0.16.0
+  - @xwiki/cristal-electron-authentication-nextcloud-main@0.16.0
+  - @xwiki/cristal-electron-authentication-xwiki-main@0.16.0
+  - @xwiki/cristal-browser-electron@0.16.0
+  - @xwiki/cristal-configuration-electron-main@0.16.0
+  - @xwiki/cristal-electron-storage@0.16.0
+
 ## 0.15.0
 
 ### Minor Changes

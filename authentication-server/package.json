@@ -20,10 +20,10 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
-    "express": "4.21.2"
+    "express": "5.0.1"
   },
   "devDependencies": {
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "esbuild": "0.25.1",
     "tsx": "4.19.3",
     "typescript": "5.8.2",

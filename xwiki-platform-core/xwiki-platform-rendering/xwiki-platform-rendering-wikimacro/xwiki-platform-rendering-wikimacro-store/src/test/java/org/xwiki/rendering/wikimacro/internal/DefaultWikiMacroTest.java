@@ -72,6 +72,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -293,7 +294,7 @@ class DefaultWikiMacroTest
 
         wikiMacro.prepare(wikiMacroCall);
 
-        assertEquals(Long.valueOf(1), wikiMacroCall.getAttribute(DefaultWikiMacro.ATTRIBUTE_PREPARE_BLOCK_ID));
+        assertNull(wikiMacroCall.getAttribute(DefaultWikiMacro.ATTRIBUTE_PREPARE_BLOCK_ID));
     }
 
     /**

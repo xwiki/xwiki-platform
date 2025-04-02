@@ -160,7 +160,11 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
 
     private void prepareBlockId(MacroBlock macroBlock)
     {
-        getBlockId(macroBlock);
+        if (!isAsyncAllowed() && !isCacheAllowed()) {
+            // Use a less expensive way to generate the id when the macro is not async or cacheable
+            // We can also prepare it since it does not depend on the context
+            macroBlock.setAttribute(ATTRIBUTE_PREPARE_BLOCK_ID, getFastBlockId(macroBlock));
+        }
     }
 
     public Object getBlockId(MacroBlock macroBlock)
@@ -174,6 +178,9 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         if (isAsyncAllowed() || isCacheAllowed()) {
             // We need a stable id when the macro is async or cacheable
             // Find index of the macro in the XDOM
+            // TODO: find a faster and safer way to identify a given macro block (indexOf can be very slow of the XDOM
+            // is huge, and yet it's theoretically possible for it to not be 100% stable depending on what previous
+            // dynamic macro may be doing or if other macros modify the XDOM)
             Block rootBlock = macroBlock.getRoot();
             if (rootBlock instanceof AbstractBlock abstractblock) {
                 index = abstractblock.indexOf(macroBlock);
@@ -182,12 +189,17 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
 
         if (index == null) {
             // Use a less expensive way to generate the id when the macro is not async or cacheable
-            index = UUID.randomUUID().toString();
+            index = getFastBlockId(macroBlock);
         }
 
         macroBlock.setAttribute(ATTRIBUTE_PREPARE_BLOCK_ID, index);
 
         return index;
+    }
+
+    public Object getFastBlockId(MacroBlock macroBlock)
+    {
+        return UUID.randomUUID().toString();
     }
 
     /**

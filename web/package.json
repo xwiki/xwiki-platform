@@ -59,7 +59,7 @@
     "@vitejs/plugin-react": "4.3.4",
     "@vitejs/plugin-vue": "5.2.3",
     "globals": "16.0.0",
-    "inversify": "7.1.0",
+    "inversify": "7.3.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.2",
     "vite": "6.2.2",

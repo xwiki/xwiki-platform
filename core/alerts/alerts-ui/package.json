@@ -25,7 +25,7 @@
   "dependencies": {
     "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
-    "inversify": "7.1.0",
+    "inversify": "7.3.0",
     "vue": "3.5.13",
     "vue-i18n": "11.1.2"
   },

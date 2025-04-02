@@ -29,7 +29,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-browser-api": "workspace:*",
     "@xwiki/cristal-electron-state": "workspace:*",
-    "inversify": "7.1.0"
+    "inversify": "7.3.0"
   },
   "peerDependencies": {
     "electron": "35.1.2",

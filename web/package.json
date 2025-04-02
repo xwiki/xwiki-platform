@@ -50,7 +50,7 @@
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.0",
+    "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.22.0",
     "@playwright/test": "1.51.1",
     "@types/node": "22.13.14",

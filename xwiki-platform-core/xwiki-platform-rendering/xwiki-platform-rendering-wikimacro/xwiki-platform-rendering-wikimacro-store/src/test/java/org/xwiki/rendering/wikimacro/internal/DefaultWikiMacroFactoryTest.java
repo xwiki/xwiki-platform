@@ -28,6 +28,8 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.model.EntityType;
@@ -40,6 +42,7 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.security.authorization.Right;
@@ -275,5 +278,18 @@ class DefaultWikiMacroFactoryTest
         saveDocument();
 
         assertFalse(this.wikiMacroFactory.containsWikiMacro(DOCUMENT_REFERENCE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void createWikiMacroWithIsolatedExecution(boolean isolated) throws Exception
+    {
+        this.macroObject.setIntValue(WikiMacroConstants.MACRO_EXECUTION_ISOLATED_PROPERTY, isolated ? 1 : 0);
+        saveDocument();
+
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(DOCUMENT_REFERENCE);
+        assertNotNull(macro);
+
+        assertEquals(isolated, macro.isExecutionIsolated(new WikiMacroParameters(), "test"));
     }
 }

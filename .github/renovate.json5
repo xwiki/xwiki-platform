@@ -50,6 +50,10 @@
     {
       "groupName": "@typescript-eslint",
       "matchDepPatterns": "@typescript-eslint/.+"
+    },
+    {
+      "groupName": "blocknote",
+      "matchDepPatterns": "@blocknote/.+"
     }
   ]
 }

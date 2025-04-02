@@ -440,8 +440,8 @@ importers:
         specifier: workspace:*
         version: link:../authentication-github-state
       axios:
-        specifier: 1.8.3
-        version: 1.8.3
+        specifier: 1.8.4
+        version: 1.8.4
       inversify:
         specifier: 7.1.0
         version: 7.1.0(reflect-metadata@0.2.2)
@@ -569,8 +569,8 @@ importers:
         specifier: 1.4.1
         version: 1.4.1
       axios:
-        specifier: 1.8.3
-        version: 1.8.3
+        specifier: 1.8.4
+        version: 1.8.4
       inversify:
         specifier: 7.1.0
         version: 7.1.0(reflect-metadata@0.2.2)
@@ -738,8 +738,8 @@ importers:
         specifier: workspace:*
         version: link:../authentication-api
       axios:
-        specifier: 1.8.3
-        version: 1.8.3
+        specifier: 1.8.4
+        version: 1.8.4
       inversify:
         specifier: 7.1.0
         version: 7.1.0(reflect-metadata@0.2.2)
@@ -3376,8 +3376,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       axios:
-        specifier: 1.8.3
-        version: 1.8.3
+        specifier: 1.8.4
+        version: 1.8.4
       electron:
         specifier: 35.1.2
         version: 35.1.2
@@ -3451,8 +3451,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       axios:
-        specifier: 1.8.3
-        version: 1.8.3
+        specifier: 1.8.4
+        version: 1.8.4
       electron:
         specifier: 35.1.2
         version: 35.1.2
@@ -3532,8 +3532,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       axios:
-        specifier: 1.8.3
-        version: 1.8.3
+        specifier: 1.8.4
+        version: 1.8.4
       electron:
         specifier: 35.1.2
         version: 35.1.2
@@ -6545,8 +6545,8 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  axios@1.8.3:
-    resolution: {integrity: sha512-iP4DebzoNlP/YN2dpwCgb8zoCmhtkajzS48JvwmkSkXvPI3DHc7m+XYL5tGnSlJtR6nImXZmdCuN5aP8dh1d8A==}
+  axios@1.8.4:
+    resolution: {integrity: sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==}
 
   bail@2.0.2:
     resolution: {integrity: sha512-0xO6mYd7JB2YesxDKplafRpsiOzPt9V02ddPCLbY1xYGPOX24NTyN50qnUxgCPcSoYMhKpAuBTjQoRZCAkUDRw==}
@@ -12727,7 +12727,7 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.0.0
 
-  axios@1.8.3:
+  axios@1.8.4:
     dependencies:
       follow-redirects: 1.15.9
       form-data: 4.0.1
@@ -15446,7 +15446,7 @@ snapshots:
       '@yarnpkg/lockfile': 1.1.0
       '@yarnpkg/parsers': 3.0.2
       '@zkochan/js-yaml': 0.0.7
-      axios: 1.8.3
+      axios: 1.8.4
       chalk: 4.1.2
       cli-cursor: 3.1.0
       cli-spinners: 2.6.1

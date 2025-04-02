@@ -353,10 +353,7 @@ watch(
       />
     </template>
     <template #default>
-      <c-tiptap-bubble-menu
-        v-if="editor"
-        :editor="editor"
-      ></c-tiptap-bubble-menu>
+      <c-tiptap-bubble-menu v-if="editor" :editor="editor" />
       <editor-content :editor="editor" class="doc-content editor" />
       <form class="pagemenu" @submit="submit">
         <div class="pagemenu-status">

@@ -4,14 +4,16 @@
     "configType": "FileSystem",
     "serverRendering": false,
     "offline": false,
-    "designSystem": "vuetify"
+    "designSystem": "vuetify",
+    "editor": "Tiptap"
   },
   "FileSystemSL": {
     "name": "FileSystemSL",
     "configType": "FileSystem",
     "serverRendering": false,
     "offline": false,
-    "designSystem": "shoelace"
+    "designSystem": "shoelace",
+    "editor": "Tiptap"
   },
   "XWiki": {
     "name": "XWiki",
@@ -22,6 +24,7 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
+    "editor": "Tiptap",
     "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
   "XWikiSL": {
@@ -33,6 +36,7 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "shoelace",
+    "editor": "Tiptap",
     "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   }
 }

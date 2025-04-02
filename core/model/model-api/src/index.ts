@@ -31,15 +31,15 @@ enum EntityType {
 /**
  * @since 0.12
  */
-interface EntityReference {
+interface BaseEntityReference {
   type: EntityType;
 }
 
 /**
  * @since 0.12
  */
-class WikiReference implements EntityReference {
-  type: EntityType = EntityType.WIKI;
+class WikiReference implements BaseEntityReference {
+  type: EntityType.WIKI = EntityType.WIKI;
 
   name: string;
 
@@ -51,8 +51,8 @@ class WikiReference implements EntityReference {
 /**
  * @since 0.12
  */
-class SpaceReference implements EntityReference {
-  type: EntityType = EntityType.SPACE;
+class SpaceReference implements BaseEntityReference {
+  type: EntityType.SPACE = EntityType.SPACE;
   wiki?: WikiReference;
   names: string[];
 
@@ -65,8 +65,8 @@ class SpaceReference implements EntityReference {
 /**
  * @since 0.12
  */
-class DocumentReference implements EntityReference {
-  type: EntityType = EntityType.DOCUMENT;
+class DocumentReference implements BaseEntityReference {
+  type: EntityType.DOCUMENT = EntityType.DOCUMENT;
   space?: SpaceReference;
   name: string;
   /**
@@ -85,8 +85,8 @@ class DocumentReference implements EntityReference {
 /**
  * @since 0.12
  */
-class AttachmentReference implements EntityReference {
-  type: EntityType = EntityType.ATTACHMENT;
+class AttachmentReference implements BaseEntityReference {
+  type: EntityType.ATTACHMENT = EntityType.ATTACHMENT;
   name: string;
   document: DocumentReference;
 
@@ -95,6 +95,15 @@ class AttachmentReference implements EntityReference {
     this.document = document;
   }
 }
+
+/**
+ * @since 0.16
+ */
+type EntityReference =
+  | AttachmentReference
+  | DocumentReference
+  | SpaceReference
+  | WikiReference;
 
 export {
   AttachmentReference,

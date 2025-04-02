@@ -1,0 +1,47 @@
+{
+  "name": "@xwiki/cristal-reactivue",
+  "version": "0.15.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "/core/reactivue",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "main": "./src/index.tsx",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+  },
+  "peerDependencies": {
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "vue": "3.5.13"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.8",
+    "@types/react-dom": "19.0.3",
+    "@vue/shared": "3.5.13",
+    "typescript": "5.7.3"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  }
+}

@@ -30,7 +30,6 @@ import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backe
 import { Configuration } from "@xwiki/cristal-configuration-api";
 import { ComponentInit as DateAPIComponentInit } from "@xwiki/cristal-date-api";
 import { ComponentInit as DocumentComponentInit } from "@xwiki/cristal-document-default";
-import { ComponentInit as EditorTiptapComponentInit } from "@xwiki/cristal-editors-tiptap";
 import { ComponentInit as MenuButtonsComponentInit } from "@xwiki/cristal-extension-menubuttons";
 import { ComponentInit as ExtraTabsComponentInit } from "@xwiki/cristal-extra-tabs-default";
 import { ComponentInit as DefaultPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-default";
@@ -76,9 +75,11 @@ export async function defaultComponentsList(
   } else if (configuration.designSystem == "shoelace") {
     (await import("./shoelace")).load(container);
   }
+
   if (configuration.offline) {
     (await import("./offline")).load(container);
   }
+
   if (configuration.configType == "Nextcloud") {
     (await import("./nextcloud")).load(container);
   } else if (configuration.configType == "XWiki") {
@@ -87,9 +88,16 @@ export async function defaultComponentsList(
     (await import("./github")).load(container);
   }
 
+  if (configuration.editor === "tiptap" || configuration.editor === undefined) {
+    const { ComponentInit } = await import("@xwiki/cristal-editors-tiptap");
+    new ComponentInit(container);
+  } else if (configuration.editor === "blocknote") {
+    const { ComponentInit } = await import("@xwiki/cristal-editors-blocknote");
+    new ComponentInit(container);
+  }
+
   new RenderingComponentInit(container);
   new MenuButtonsComponentInit(container);
-  new EditorTiptapComponentInit(container);
   new ExtraTabsComponentInit(container);
   new InfoActionsComponentInit(container);
   new AttachmentsUIComponentInit(container);

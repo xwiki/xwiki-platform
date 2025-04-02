@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+
+  "compilerOptions": {
+    "lib": ["DOM", "ESNext"],
+
+    /* Bundler mode */
+    "noEmit": false,
+    "isolatedDeclarations": false,
+
+    /* Building */
+    "sourceMap": true,
+    "declarationMap": true,
+    "outDir": "dist/"
+  },
+  "include": ["src/**/*.ts"]
+}

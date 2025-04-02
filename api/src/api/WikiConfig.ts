@@ -53,6 +53,12 @@ export interface WikiConfig {
    * @since 0.16
    */
   storageRoot?: string;
+  /**
+   * The (optional) type of the editor. The default is "tiptap".
+   *
+   * @since 0.16
+   */
+  editor?: string;
 
   setConfig(
     name: string,
@@ -62,6 +68,7 @@ export interface WikiConfig {
     serverRendering: boolean,
     designSystem: string,
     offline: boolean,
+    editor: string,
   ): void;
 
   // TODO get rid of any

@@ -37,6 +37,7 @@ type ConfigObjectType = {
   authenticationBaseURL?: string;
   authenticationManager?: string;
   storageRoot?: string;
+  editor?: string;
 };
 
 @injectable()
@@ -82,6 +83,9 @@ export class DefaultWikiConfig implements WikiConfig {
   // @ts-expect-error designSystem is temporarily undefined during class
   // initialization
   public designSystem: string;
+  // @ts-expect-error editor is temporarily undefined during class
+  // initialization
+  public editor: string;
   // @ts-expect-error offline is temporarily undefined during class
   // initialization
   public offline: boolean;
@@ -112,6 +116,7 @@ export class DefaultWikiConfig implements WikiConfig {
     serverRendering: boolean,
     designSystem: string,
     offline: boolean,
+    editor: string,
     optional?: {
       realtimeURL?: string;
       authenticationBaseURL?: string;
@@ -127,6 +132,7 @@ export class DefaultWikiConfig implements WikiConfig {
       serverRendering,
       designSystem,
       offline,
+      editor,
       ...optional,
     });
   }

@@ -21,6 +21,7 @@
 import { defineConfig } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import dts from "vite-plugin-dts";
+import react from "@vitejs/plugin-react"
 
 import { resolve } from "path";
 
@@ -43,6 +44,7 @@ export default defineConfig({
     }
   },
   plugins: [
+    react(),
     Vue({
       include: [/\.vue$/, /\.md$/],
       template: {

@@ -56,7 +56,7 @@ const contentRoot = ref(undefined);
 const content: ComputedRef<string | undefined> = computed(() => {
   if (currentPage.value) {
     const cpn: PageData = currentPage.value;
-    if (cpn.html && cpn.html.trim() !== "") {
+    if (cpn.html && cpn.html.trim() !== "" && cpn.syntax != "markdown/1.2") {
       return cpn.html as string;
     } else if (cpn.source) {
       return markdownRenderer.render(cpn.source);

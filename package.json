@@ -68,6 +68,13 @@
     ],
     "onlyBuiltDependencies": [
       "electron"
-    ]
+    ],
+    "packageExtensions": {
+      "@xwiki/cristal-editors-tiptap": {
+        "dependencies": {
+          "y-prosemirror": "1.2.13"
+        }
+      }
+    }
   }
 }

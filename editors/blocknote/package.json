@@ -1,0 +1,71 @@
+{
+  "name": "@xwiki/cristal-editors-blocknote",
+  "version": "0.14.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "editors/blocknote",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "pnpm compile",
+    "clean": "rimraf dist",
+    "compile": "vue-tsc --project tsconfig.json && vite build",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "prepack": "pnpm build",
+    "test": "vitest --run"
+  },
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@hocuspocus/provider": "2.15.2",
+    "@xwiki/cristal-alerts-api": "workspace:*",
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-backend-api": "workspace:*",
+    "@xwiki/cristal-document-api": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
+    "@xwiki/cristal-editors-blocknote-headless": "workspace:*",
+    "@xwiki/cristal-icons": "workspace:*",
+    "@xwiki/cristal-model-api": "workspace:*",
+    "@xwiki/cristal-model-reference-api": "workspace:*",
+    "@xwiki/cristal-reactivue": "workspace:*",
+    "@xwiki/cristal-skin": "workspace:*",
+    "@xwiki/cristal-uniast": "workspace:*",
+    "inversify": "7.1.0",
+    "lodash-es": "4.17.21",
+    "vue": "3.5.13",
+    "vue-i18n": "11.1.2"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "4.17.12",
+    "@vitejs/plugin-vue": "5.2.1",
+    "@xwiki/cristal-dev-config": "workspace:*",
+    "reflect-metadata": "0.2.2",
+    "typescript": "5.8.2",
+    "vite": "6.2.2",
+    "vue-tsc": "2.2.8"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  }
+}

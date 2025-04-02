@@ -17,57 +17,31 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script lang="ts">
-import { CristalApp, Logger } from "@xwiki/cristal-api";
+<script setup lang="ts">
+import { CristalApp } from "@xwiki/cristal-api";
 import { inject, markRaw } from "vue";
-import type { Component } from "vue";
 
-let comps: Array<Component>;
-let logger: Logger;
+const cristal = inject<CristalApp>("cristal")!;
 
-export default {
-  async setup() {
-    let cristal = inject<CristalApp>("cristal");
-    if (cristal) {
-      comps = await cristal.getUIXTemplates("editor");
-      logger = cristal.getLogger("skin.vue.editor");
-    }
-  },
-  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
-  // eslint-disable-next-line max-statements
-  data() {
-    logger?.debug("Editor UIX components are ", comps);
-    if (!comps || comps.length == 0) {
-      return {};
-    } else {
-      let editComponent = null;
-      logger?.debug("Using first editor UIX component ", comps);
-      if (comps != null) {
-        for (const item of comps) {
-          // TODO: fix unsafe access to editorname
-          // TODO: the editor should be drawn from the configuration
-          // TODO: also, we shouldn't load all the editors when initializing the
-          // components manager, but instead load them lazily, or only load the
-          // ones allowed by the configuration (e.g., one for wysiwyg, and one
-          // for plain syntax edit).
-          if ((item as { editorname: string }).editorname === "editortiptap") {
-            editComponent = item;
-            break;
-          }
-        }
-      }
-      if (editComponent == null) {
-        editComponent = comps[0];
-      }
-      logger?.debug("Final component ", editComponent);
-      return {
-        component: markRaw(editComponent),
-      };
-    }
-  },
-};
+const comps = await cristal.getUIXTemplates("editor");
+const logger = cristal.getLogger("skin.vue.editor");
+
+logger?.debug("Editor UIX components are ", comps);
+
+const editor = cristal.getWikiConfig().editor;
+
+const editComponent =
+  comps.find(
+    (item) =>
+      // TODO: fix unsafe access to editorname
+      (item as { editorname: string }).editorname === (editor ?? "tiptap"),
+  ) ?? comps[0];
+
+logger?.debug("Final component ", editComponent);
+
+const component = markRaw(editComponent);
 </script>
+
 <template>
   <component :is="component" />
 </template>
-<style></style>

@@ -19,28 +19,40 @@
  */
 package com.xpn.xwiki.api;
 
-import org.jmock.Mock;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.AllComponents;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiUser;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.api.User}.
  * 
  * @version $Id$
  */
-public class UserTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+@AllComponents
+class UserTest
 {
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
     /**
      * Checks that XWIKI-2040 remains fixed.
      */
-    public void testIsUserInGroupDoesNotThrowNPE()
+    @Test
+    void isUserInGroupDoesNotThrowNPE()
     {
         User u = new User(null, null);
         assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
@@ -54,23 +66,23 @@ public class UserTest extends AbstractBridgedXWikiComponentTestCase
         assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
     }
 
-    public void testGetEmail() throws Exception
+    @Test
+    void getEmail() throws Exception
     {
-        Mock mockXWiki = mock(XWiki.class);
-        getContext().setWiki((XWiki) mockXWiki.proxy());
         XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "Admin"));
         BaseClass userClass = new BaseClass();
         userClass.addTextField("email", "email address", 20);
-        mockXWiki.stubs().method("getXClass").will(returnValue(userClass));
-        BaseObject userObj = doc.newXObject(new DocumentReference("xwiki", "XWiki", "XWikiUsers"), getContext());
+        doc.setXClass(userClass);
+        BaseObject userObj = doc.newXObject(new DocumentReference("xwiki", "XWiki", "XWikiUsers"),
+            this.oldcore.getXWikiContext());
         userObj.setStringValue("email", "admin@mail.com");
-        mockXWiki.stubs().method("getDocument").will(returnValue(doc));
+        this.oldcore.getSpyXWiki().saveDocument(doc, this.oldcore.getXWikiContext());
 
         User u = new User(null, null);
         assertNull(u.getEmail());
 
         XWikiUser xu = new XWikiUser("XWiki.Admin");
-        u = new User(xu, getContext());
+        u = new User(xu, this.oldcore.getXWikiContext());
         assertEquals("admin@mail.com", u.getEmail());
     }
 }

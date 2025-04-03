@@ -23,7 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -92,8 +91,8 @@ class EffectiveAuthorSetterListenerTest
         EntityChange entityChangeFive = new EntityChange(new DocumentReference("test", "Other", "Page"),
             otherUserReference, ScriptLevel.PROGRAMMING);
 
-        when(this.request.getProperties("netfluxChannel"))
-            .thenReturn(Arrays.asList("", "one", null, "two", "three", "four", "five"));
+        when(this.request.getParameterValues("netfluxChannel"))
+            .thenReturn(new String[] {"", "one", null, "two", "three", "four", "five"});
         when(this.scriptAuthorTracker.getScriptAuthor("two")).thenReturn(Optional.of(entityChangeTwo));
         when(this.scriptAuthorTracker.getScriptAuthor("three")).thenReturn(Optional.of(entityChangeThree));
         when(this.scriptAuthorTracker.getScriptAuthor("four")).thenReturn(Optional.of(entityChangeFour));
@@ -101,6 +100,6 @@ class EffectiveAuthorSetterListenerTest
 
         this.listener.onEvent(new ActionExecutingEvent(), null, null);
 
-        verify(this.request).setProperty(Request.ATTRIBUTE_EFFECTIVE_AUTHOR, this.effectiveAuthor);
+        verify(this.request).setAttribute(Request.ATTRIBUTE_EFFECTIVE_AUTHOR, this.effectiveAuthor);
     }
 }

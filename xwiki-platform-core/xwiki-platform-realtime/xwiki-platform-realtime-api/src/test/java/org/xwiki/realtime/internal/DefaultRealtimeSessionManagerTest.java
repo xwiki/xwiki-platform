@@ -158,7 +158,7 @@ class DefaultRealtimeSessionManagerTest
     @Test
     void getEditModeFromQueryString()
     {
-        when(request.getProperty(EDITOR)).thenReturn("testQuery");
+        when(request.getParameter(EDITOR)).thenReturn("testQuery");
         assertEquals("testQuery", realtimeSessionManager.getEditMode());
     }
 
@@ -201,7 +201,7 @@ class DefaultRealtimeSessionManagerTest
     @Test
     void sessionIsActiveSameEditor()
     {
-        when(request.getProperty(EDITOR)).thenReturn(WIKI);
+        when(request.getParameter(EDITOR)).thenReturn(WIKI);
         assertTrue(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
     }
 
@@ -216,7 +216,7 @@ class DefaultRealtimeSessionManagerTest
     @Test
     void sessionIsActiveDifferentEditor()
     {
-        when(request.getProperty(EDITOR)).thenReturn(WYSIWYG);
+        when(request.getParameter(EDITOR)).thenReturn(WYSIWYG);
         assertFalse(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
     }
 
@@ -241,7 +241,7 @@ class DefaultRealtimeSessionManagerTest
     @Test
     void sessionMissing()
     {
-        when(request.getProperty(EDITOR)).thenReturn(WIKI);
+        when(request.getParameter(EDITOR)).thenReturn(WIKI);
         when(entityChannelStore.getChannel(null, path)).thenReturn(Optional.empty());
         assertFalse(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
     }
@@ -249,7 +249,7 @@ class DefaultRealtimeSessionManagerTest
     @Test
     void unsupportedEditMode()
     {
-        when(request.getProperty(EDITOR)).thenReturn("inline");
+        when(request.getParameter(EDITOR)).thenReturn("inline");
         assertFalse(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
     }
 }

@@ -144,7 +144,7 @@ public class CKEditor extends BaseElement
     {
         WebElement contentContainer = (WebElement) getDriver()
             .executeScript("return CKEDITOR.instances[arguments[0]].ui.contentsElement.$;", this.name);
-        if (!"textbox".equals(contentContainer.getAttribute("role"))) {
+        if (!"textbox".equals(contentContainer.getDomAttribute("role"))) {
             contentContainer = getDriver().findElementWithoutWaiting(contentContainer, By.tagName("iframe"));
         }
         return contentContainer;

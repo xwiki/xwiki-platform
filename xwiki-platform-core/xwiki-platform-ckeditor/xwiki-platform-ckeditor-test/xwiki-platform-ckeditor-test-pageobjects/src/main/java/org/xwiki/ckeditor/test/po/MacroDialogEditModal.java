@@ -71,7 +71,7 @@ public class MacroDialogEditModal extends BaseElement
      */
     public String getMacroParameter(String name)
     {
-        return getMacroParameterInput(name).getAttribute("value");
+        return getMacroParameterInput(name).getDomProperty("value");
     }
 
     public WebElement getMacroParameterInput(String name)
@@ -108,7 +108,7 @@ public class MacroDialogEditModal extends BaseElement
      */
     public String getMacroContent()
     {
-        return getMacroContentInput().getAttribute("value");
+        return getMacroContentInput().getDomProperty("value");
     }
 
     /**

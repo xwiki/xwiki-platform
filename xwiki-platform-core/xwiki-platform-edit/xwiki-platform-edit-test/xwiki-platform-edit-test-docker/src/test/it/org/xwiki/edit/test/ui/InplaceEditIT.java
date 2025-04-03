@@ -185,7 +185,8 @@ class InplaceEditIT
         ckeditor.getRichTextArea().click();
         ckeditor.getToolBar().toggleSourceMode();
         WebElement sourceTextArea = ckeditor.getSourceTextArea();
-        assertEquals("{{info}}\nType your information message here.\n{{/info}}", sourceTextArea.getAttribute("value"));
+        assertEquals("{{info}}\nType your information message here.\n{{/info}}",
+            sourceTextArea.getDomProperty("value"));
 
         // Modify the soure and save twice, without any change in between.
         sourceTextArea.clear();
@@ -197,7 +198,7 @@ class InplaceEditIT
         ckeditor = new CKEditor("content");
         ckeditor.getRichTextArea().click();
         ckeditor.getToolBar().toggleSourceMode();
-        assertEquals("{{success}}\ntest\n{{/success}}", ckeditor.getSourceTextArea().getAttribute("value"));
+        assertEquals("{{success}}\ntest\n{{/success}}", ckeditor.getSourceTextArea().getDomProperty("value"));
         viewPage.cancel();
     }
 

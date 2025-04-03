@@ -24,13 +24,13 @@ import java.net.URLDecoder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -76,10 +76,9 @@ public class DefaultPageChannelsResource extends XWikiResource implements PageCh
 
         // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue
         // query-params gives list with null element).
-        List<String> actualPaths = paths.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<String> actualPaths = paths.stream().filter(Objects::nonNull).toList();
 
-        return getChannels(documentReference, actualPaths, create).stream().map(this::toRestChannel)
-            .collect(Collectors.toList());
+        return getChannels(documentReference, actualPaths, create).stream().map(this::toRestChannel).toList();
     }
 
     private List<org.xwiki.netflux.EntityChannel> getChannels(org.xwiki.model.reference.EntityReference entityReference,
@@ -90,8 +89,7 @@ public class DefaultPageChannelsResource extends XWikiResource implements PageCh
             return this.channelStore.getChannels(entityReference);
         } else {
             // Return only matching channels, creating missing ones if asked.
-            return paths.stream().flatMap(path -> this.getChannels(entityReference, path, create))
-                .collect(Collectors.toList());
+            return paths.stream().flatMap(path -> this.getChannels(entityReference, path, create)).toList();
         }
     }
 
@@ -125,7 +123,7 @@ public class DefaultPageChannelsResource extends XWikiResource implements PageCh
                 // Shouldn't happen.
                 return pathElement;
             }
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     private EntityChannel toRestChannel(org.xwiki.netflux.EntityChannel channel)

@@ -74,7 +74,7 @@ class RealtimeWikiEditorIT
 
     @Test
     @Order(1)
-    void toggleRealtimeWithSelf(TestReference testReference, TestUtils setup) throws Exception
+    void toggleRealtimeWithSelf(TestReference testReference, TestUtils setup)
     {
         // First tab
         RealtimeWikiEditPage firstRtWikiEditor = RealtimeWikiEditPage.gotoPage(testReference);

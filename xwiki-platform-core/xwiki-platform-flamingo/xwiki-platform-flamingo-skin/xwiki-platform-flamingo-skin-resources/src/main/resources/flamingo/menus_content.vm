@@ -123,17 +123,18 @@
   ##
   ## Display the menu
   ##
-  <div id="contentmenu" class="pull-right actionmenu">
+  <ul id="contentmenu" class="pull-right actionmenu">
     $menuContent
 
     #if($keyboardShortcutsEnabled)
       #keyboardShortcuts()
     #end
-  </div>
+  </ul>
 #end
 
 #**
  * Display a menu if it has some content.
+ * This menu is a list item, made to fit inside the ul `#contentmenu`.
  *
  * @param $id the id of the menu
  * @param $icon the icon of the menu
@@ -150,7 +151,7 @@
  * @since 7.3M2
  *#
 #macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute)
-  <div class="btn-group" id="$id">
+  <li class="btn-group" id="$id">
     <#if ("$!actionUrl" == '')button type="button"#{else}a#end class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
     #if ("$!actionUrl" != '')
       href="$actionUrl"
@@ -174,7 +175,7 @@
         $menuContent
       </dl>
     #end
-  </div>
+  </li>
 #end
 
 #**

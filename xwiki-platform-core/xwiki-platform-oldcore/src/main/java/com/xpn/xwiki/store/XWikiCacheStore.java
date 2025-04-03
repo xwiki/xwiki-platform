@@ -295,8 +295,15 @@ public class XWikiCacheStore extends AbstractXWikiStore
     private void invalidateCache(String key)
     {
         this.cacheLoader.invalidate(key, k -> {
-            getCache().remove(k);
-            getPageExistCache().remove(k);
+            Cache<XWikiDocument> documentCache = getCache();
+            if (documentCache != null) {
+                documentCache.remove(k);
+            }
+
+            Cache<Boolean> existCache = getPageExistCache();
+            if (existCache != null) {
+                existCache.remove(k);
+            }
         });
     }
 
@@ -329,15 +336,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     public void invalidate(XWikiDocument document)
     {
         String key = document.getKey();
-        this.cacheLoader.invalidate(key, k -> {
-            if (getCache() != null) {
-                getCache().remove(k);
-            }
-
-            if (getPageExistCache() != null) {
-                getPageExistCache().remove(k);
-            }
-        });
+        invalidateCache(key);
     }
 
     /**
@@ -485,11 +484,9 @@ public class XWikiCacheStore extends AbstractXWikiStore
 
             this.store.deleteXWikiDoc(doc, context);
 
-            this.cacheLoader.invalidate(key, k -> {
-                getCache().remove(k);
-                getPageExistCache().remove(k);
-                getPageExistCache().set(k, Boolean.FALSE);
-            });
+            // Just invalidate the cache without storing "false" in the page exists cache to avoid issues in case a
+            // document is concurrently recreated.
+            invalidateCache(key);
         } finally {
             restoreExecutionXContext();
         }

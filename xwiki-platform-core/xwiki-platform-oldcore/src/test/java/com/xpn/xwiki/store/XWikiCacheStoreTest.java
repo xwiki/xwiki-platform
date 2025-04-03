@@ -19,6 +19,13 @@
  */
 package com.xpn.xwiki.store;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
@@ -37,12 +44,16 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.isCacheConfiguration;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -111,6 +122,122 @@ class XWikiCacheStoreTest
 
         assertNull(this.cache.get("4:wiki5:space4:page0:"));
         assertFalse(existingDocument.isCached());
+    }
+
+    @Test
+    void documentSavedDuringLoadIsVisibleInNextLoad() throws Exception
+    {
+        // Save a document
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        XWikiDocument initialDocument = document.clone();
+
+        XWikiStoreInterface hibernateStore = this.oldcore.getMockStore();
+        XWikiCacheStore store = new XWikiCacheStore(hibernateStore, this.oldcore.getXWikiContext());
+        CompletableFuture<XWikiDocument> arrivedLoadFuture = new CompletableFuture<>();
+        CompletableFuture<XWikiDocument> storeLoadFuture = new CompletableFuture<>();
+
+        when(hibernateStore.loadXWikiDoc(any(), any())).then(invocation -> {
+            arrivedLoadFuture.complete(document);
+            return storeLoadFuture.get(10, TimeUnit.SECONDS);
+        });
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        try {
+            Future<XWikiDocument> firstLoadFuture =
+                executorService.submit(() -> store.loadXWikiDoc(document, this.oldcore.getXWikiContext()));
+
+            assertSame(document, arrivedLoadFuture.get(10, TimeUnit.SECONDS));
+
+            XWikiDocument savedDocument = document.clone();
+            savedDocument.setTitle("Saved");
+            store.saveXWikiDoc(savedDocument, this.oldcore.getXWikiContext());
+
+            storeLoadFuture.complete(initialDocument);
+
+            assertSame(initialDocument, firstLoadFuture.get(10, TimeUnit.SECONDS));
+
+            assertEquals("{}", this.cache.toString());
+            verify(hibernateStore).saveXWikiDoc(savedDocument, this.oldcore.getXWikiContext(), true);
+            assertEquals(savedDocument, this.oldcore.getDocuments().get(document.getDocumentReferenceWithLocale()));
+
+            when(hibernateStore.loadXWikiDoc(any(), any())).thenReturn(savedDocument);
+
+            XWikiDocument secondLoadDocument = store.loadXWikiDoc(document, this.oldcore.getXWikiContext());
+            assertSame(savedDocument, secondLoadDocument);
+            // This should call the hibernate store again as the document shouldn't have been put in the cache.
+            verify(hibernateStore, times(2)).loadXWikiDoc(document, this.oldcore.getXWikiContext());
+
+            XWikiDocument thirdDocument = store.loadXWikiDoc(document, this.oldcore.getXWikiContext());
+            assertSame(savedDocument, thirdDocument);
+            // Now the document should be cached, so no more call.
+            verify(hibernateStore, times(2)).loadXWikiDoc(document, this.oldcore.getXWikiContext());
+        } finally {
+            executorService.shutdown();
+        }
+        assertTrue(executorService.awaitTermination(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void parallelLoadTriggerOnlyOneLoad() throws Exception
+    {
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        XWikiDocument initialDocument = document.clone();
+
+        XWikiStoreInterface hibernateStore = this.oldcore.getMockStore();
+        XWikiCacheStore store = new XWikiCacheStore(hibernateStore, this.oldcore.getXWikiContext());
+        CompletableFuture<XWikiDocument> arrivedLoadFuture = new CompletableFuture<>();
+        CompletableFuture<XWikiDocument> storeLoadFuture = new CompletableFuture<>();
+
+        when(hibernateStore.loadXWikiDoc(any(), any()))
+            .then(invocation -> {
+                arrivedLoadFuture.complete(document);
+                return storeLoadFuture.get(10, TimeUnit.SECONDS);
+            })
+            .thenThrow(new RuntimeException("Load should never be called twice in this test."));
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        try {
+            Future<XWikiDocument> firstLoadFuture =
+                executorService.submit(() -> store.loadXWikiDoc(document, this.oldcore.getXWikiContext()));
+            Future<XWikiDocument> secondLoadFuture =
+                executorService.submit(() -> store.loadXWikiDoc(document, this.oldcore.getXWikiContext()));
+
+            assertSame(document, arrivedLoadFuture.get(10, TimeUnit.SECONDS));
+
+            // Ensure that both futures wait.
+            assertThrows(TimeoutException.class, () -> firstLoadFuture.get(500, TimeUnit.MILLISECONDS));
+            assertThrows(TimeoutException.class, () -> secondLoadFuture.get(500, TimeUnit.MILLISECONDS));
+
+            storeLoadFuture.complete(initialDocument);
+
+            assertSame(initialDocument, firstLoadFuture.get(10, TimeUnit.SECONDS));
+            assertSame(initialDocument, secondLoadFuture.get(10, TimeUnit.SECONDS));
+            verify(hibernateStore).loadXWikiDoc(document, this.oldcore.getXWikiContext());
+        } finally {
+            executorService.shutdown();
+        }
+        assertTrue(executorService.awaitTermination(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void loadExceptionIsPropagated() throws Exception
+    {
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+
+        XWikiStoreInterface hibernateStore = this.oldcore.getMockStore();
+        XWikiCacheStore store = new XWikiCacheStore(hibernateStore, this.oldcore.getXWikiContext());
+
+        XWikiException exception = new XWikiException();
+        when(hibernateStore.loadXWikiDoc(any(), any())).thenThrow(exception);
+
+        XWikiException actualException =
+            assertThrows(XWikiException.class, () -> store.loadXWikiDoc(document, this.oldcore.getXWikiContext()));
+        assertSame(exception, actualException);
     }
 
     @Test

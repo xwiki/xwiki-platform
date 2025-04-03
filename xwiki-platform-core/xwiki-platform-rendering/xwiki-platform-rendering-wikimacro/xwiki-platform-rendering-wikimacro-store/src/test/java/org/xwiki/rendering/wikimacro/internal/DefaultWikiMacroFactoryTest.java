@@ -147,7 +147,7 @@ class DefaultWikiMacroFactoryTest
         param2.setIntValue(WikiMacroConstants.PARAMETER_MANDATORY_PROPERTY, 0);
         param2.setIntValue(WikiMacroConstants.PARAMETER_ADVANCED_PROPERTY, 1);
         param2.setStringValue(WikiMacroConstants.PARAMETER_TYPE_PROPERTY, WikiMacroConstants.PARAMETER_TYPE_WIKI);
-        param2.setStringValue(WikiMacroConstants.PARAMETER_GROUP_PROPERTY, "foo");
+        param2.setStringListValue(WikiMacroConstants.PARAMETER_GROUP_PROPERTY, List.of("foo"));
         param2.setStringValue(WikiMacroConstants.PARAMETER_FEATURE_PROPERTY, "bar");
         param2.setIntValue(WikiMacroConstants.PARAMETER_FEATURE_MANDATORY_PROPERTY, 1);
         this.macroDefinitionDoc.addXObject(param2);
@@ -158,7 +158,7 @@ class DefaultWikiMacroFactoryTest
         param3.setStringValue(WikiMacroConstants.PARAMETER_NAME_PROPERTY, "param3");
         param3.setStringValue(WikiMacroConstants.PARAMETER_DESCRIPTION_PROPERTY, "Third parameter description");
         param3.setIntValue(WikiMacroConstants.PARAMETER_HIDDEN_PROPERTY, 1);
-        param3.setStringValue(WikiMacroConstants.PARAMETER_GROUP_PROPERTY, "foo");
+        param3.setStringListValue(WikiMacroConstants.PARAMETER_GROUP_PROPERTY, List.of("foo"));
         this.macroDefinitionDoc.addXObject(param3);
 
         // fourth param is mandatory, deprecated, and advanced, belongs to groups foo and buz
@@ -169,7 +169,7 @@ class DefaultWikiMacroFactoryTest
         param4.setIntValue(WikiMacroConstants.PARAMETER_MANDATORY_PROPERTY, 1);
         param4.setIntValue(WikiMacroConstants.PARAMETER_ADVANCED_PROPERTY, 1);
         param4.setIntValue(WikiMacroConstants.PARAMETER_DEPRECATED_PROPERTY, 1);
-        param4.setStringValue(WikiMacroConstants.PARAMETER_GROUP_PROPERTY, "foo|buz");
+        param4.setStringListValue(WikiMacroConstants.PARAMETER_GROUP_PROPERTY, List.of("foo", "buz"));
         this.macroDefinitionDoc.addXObject(param4);
 
         // Fifth parameter is optional, of type java.util.List, as default value [1,2], bound to feature foo
@@ -212,35 +212,35 @@ class DefaultWikiMacroFactoryTest
         assertNull(macro.getDescriptor().getContentDescriptor());
 
         WikiMacroParameterDescriptor descriptor1 =
-            new WikiMacroParameterDescriptor("param1", "First parameter description", true, "42", String.class)
-                .setDeprecated(true);
+            new WikiMacroParameterDescriptor("param1", "First parameter description", true, "42", String.class,
+                Map.of(WikiMacroParameterDescriptor.DEPRECATED_PARAMETER_NAME, true));
 
         PropertyGroupDescriptor fooGroupDescriptor = new PropertyGroupDescriptor(List.of("foo"));
         fooGroupDescriptor.setFeature("bar");
         fooGroupDescriptor.setFeatureMandatory(true);
         WikiMacroParameterDescriptor descriptor2 =
             new WikiMacroParameterDescriptor("param2", "Second parameter description", false, null,
-                Block.LIST_BLOCK_TYPE)
-                .setAdvanced(true)
-                .setGroupDescriptor(fooGroupDescriptor);
+                Block.LIST_BLOCK_TYPE, Map.of(
+                    WikiMacroParameterDescriptor.ADVANCED_PARAMETER_NAME, true,
+                    WikiMacroParameterDescriptor.GROUP_PARAMETER_NAME, fooGroupDescriptor));
 
         WikiMacroParameterDescriptor descriptor3 =
-            new WikiMacroParameterDescriptor("param3", "Third parameter description", false, null, String.class)
-                .setDisplayHidden(true)
-                .setGroupDescriptor(fooGroupDescriptor);
+            new WikiMacroParameterDescriptor("param3", "Third parameter description", false, null, String.class, Map.of(
+                WikiMacroParameterDescriptor.HIDDEN_PARAMETER_NAME, true,
+                WikiMacroParameterDescriptor.GROUP_PARAMETER_NAME, fooGroupDescriptor));
 
         PropertyGroupDescriptor fooBuzGroupDescriptor = new PropertyGroupDescriptor(List.of("foo", "buz"));
         WikiMacroParameterDescriptor descriptor4 =
-            new WikiMacroParameterDescriptor("param4", "Fourth parameter description", true, null, String.class)
-                .setDeprecated(true)
-                .setAdvanced(true)
-                .setGroupDescriptor(fooBuzGroupDescriptor);
+            new WikiMacroParameterDescriptor("param4", "Fourth parameter description", true, null, String.class, Map.of(
+                WikiMacroParameterDescriptor.ADVANCED_PARAMETER_NAME, true,
+                WikiMacroParameterDescriptor.DEPRECATED_PARAMETER_NAME, true,
+                WikiMacroParameterDescriptor.GROUP_PARAMETER_NAME, fooBuzGroupDescriptor));
 
         PropertyGroupDescriptor featureFooGroupDescriptor = new PropertyGroupDescriptor(null);
         featureFooGroupDescriptor.setFeature("foo");
         WikiMacroParameterDescriptor descriptor5 =
-            new WikiMacroParameterDescriptor("param5", "", false, "1,2", List.class)
-                .setGroupDescriptor(featureFooGroupDescriptor);
+            new WikiMacroParameterDescriptor("param5", "", false, "1,2", List.class, Map.of(
+                WikiMacroParameterDescriptor.GROUP_PARAMETER_NAME, featureFooGroupDescriptor));
 
         Map<String, WikiMacroParameterDescriptor> descriptorMap = new LinkedHashMap<>();
         descriptorMap.put("param1", descriptor1);

@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro.wikibridge;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -37,6 +38,46 @@ import org.xwiki.text.XWikiToStringBuilder;
  */
 public class WikiMacroParameterDescriptor implements ParameterDescriptor
 {
+    /**
+     * Constant to be used in the parameters map of the constructor to define whether the parameter is advanced or
+     * not: the accepted value should be a boolean or its serialized value.
+     * @see #isAdvanced()
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    @Unstable
+    public static final String ADVANCED_PARAMETER_NAME = "advanced";
+
+    /**
+     * Constant to be used in the parameters map of the constructor to define whether the parameter is hidden or
+     * not: the accepted value should be a boolean or its serialized value.
+     * @see #isDisplayHidden()
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    @Unstable
+    public static final String HIDDEN_PARAMETER_NAME = "hidden";
+
+    /**
+     * Constant to be used in the parameters map of the constructor to define whether the parameter is deprecated or
+     * not: the accepted value should be a boolean or its serialized value.
+     * @see #isDeprecated()
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    @Unstable
+    public static final String DEPRECATED_PARAMETER_NAME = "deprecated";
+
+    /**
+     * Constant to be used in the parameters map of the constructor to define the group: the accepted value should be
+     * of type {@link PropertyGroupDescriptor}.
+     * @see #getGroupDescriptor()
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    @Unstable
+    public static final String GROUP_PARAMETER_NAME = "group";
+
     /**
      * Identifier of the parameter.
      * 
@@ -64,11 +105,11 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      */
     private final Type parameterType;
 
-    private boolean advanced;
-    private boolean displayHidden;
-    private boolean deprecated;
+    private final boolean advanced;
+    private final boolean displayHidden;
+    private final boolean deprecated;
 
-    private PropertyGroupDescriptor groupDescriptor;
+    private final PropertyGroupDescriptor groupDescriptor;
 
     /**
      * Creates a new {@link WikiMacroParameterDescriptor} instance.
@@ -109,11 +150,39 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     public WikiMacroParameterDescriptor(String id, String description, boolean mandatory, Object defaultValue,
             Type parameterType)
     {
+        this(id, description, mandatory, defaultValue, parameterType, Map.of());
+    }
+
+    /**
+     * Creates a new {@link WikiMacroParameterDescriptor} instance.
+     *
+     * @param id parameter identifier.
+     * @param description parameter description.
+     * @param mandatory if the parameter is mandatory.
+     * @param defaultValue parameter default value.
+     * @param parameterType parameter type.
+     * @param parameters a map of other parameters of the descriptor. See also the documented constants of this class
+     * to know the value allowed in that map.
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    @Unstable
+    public WikiMacroParameterDescriptor(String id, String description, boolean mandatory, Object defaultValue,
+        Type parameterType, Map<String, Object> parameters)
+    {
         this.id = id;
         this.description = description;
         this.mandatory = mandatory;
         this.defaultValue = defaultValue;
         this.parameterType = parameterType;
+        this.advanced = Boolean.parseBoolean(String.valueOf(parameters.get(ADVANCED_PARAMETER_NAME)));
+        this.displayHidden = Boolean.parseBoolean(String.valueOf(parameters.get(HIDDEN_PARAMETER_NAME)));
+        this.deprecated = Boolean.parseBoolean(String.valueOf(parameters.get(DEPRECATED_PARAMETER_NAME)));
+        if (parameters.get(GROUP_PARAMETER_NAME) instanceof PropertyGroupDescriptor localGroupDescriptor) {
+            this.groupDescriptor = localGroupDescriptor;
+        } else {
+            this.groupDescriptor = null;
+        }
     }
 
     @Override
@@ -174,39 +243,10 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
         return advanced;
     }
 
-    /**
-     * Allows to set whether the parameter is advanced or not. See {@link #isAdvanced()}.
-     * @param advanced {@code true} if the parameter is advanced.
-     * @return the current instance (builder pattern)
-     * @since 17.3.0RC1
-     * @since 16.10.6
-     */
-    @Unstable
-    public WikiMacroParameterDescriptor setAdvanced(boolean advanced)
-    {
-        this.advanced = advanced;
-        return this;
-    }
-
     @Override
     public boolean isDisplayHidden()
     {
         return displayHidden;
-    }
-
-    /**
-     * Allows to set whether the parameter is hidden or not. See {@link #isDisplayHidden()}.
-     *
-     * @param displayHidden {@code true} if the parameter is hidden.
-     * @return the current instance (builder pattern)
-     * @since 17.3.0RC1
-     * @since 16.10.6
-     */
-    @Unstable
-    public WikiMacroParameterDescriptor setDisplayHidden(boolean displayHidden)
-    {
-        this.displayHidden = displayHidden;
-        return this;
     }
 
     @Override
@@ -215,40 +255,10 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
         return deprecated;
     }
 
-    /**
-     * Allows to set whether the parameter is deprecated or not. See {@link #isDeprecated()}.
-     *
-     * @param deprecated {@code true} if the parameter is deprecated.
-     * @return the current instance (builder pattern)
-     * @since 17.3.0RC1
-     * @since 16.10.6
-     */
-    @Unstable
-    public WikiMacroParameterDescriptor setDeprecated(boolean deprecated)
-    {
-        this.deprecated = deprecated;
-        return this;
-    }
-
     @Override
     public PropertyGroupDescriptor getGroupDescriptor()
     {
         return groupDescriptor;
-    }
-
-    /**
-     * Allows to set the group descriptor of the parameter. See {@link #getGroupDescriptor()}.
-     *
-     * @param groupDescriptor the group descriptor of the parameter.
-     * @return the current instance (builder pattern)
-     * @since 17.3.0RC1
-     * @since 16.10.6
-     */
-    @Unstable
-    public WikiMacroParameterDescriptor setGroupDescriptor(PropertyGroupDescriptor groupDescriptor)
-    {
-        this.groupDescriptor = groupDescriptor;
-        return this;
     }
 
     @Override
@@ -302,9 +312,9 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
             .append("mandatory", mandatory)
             .append("defaultValue", defaultValue)
             .append("parameterType", parameterType)
-            .append("advanced", advanced)
+            .append(ADVANCED_PARAMETER_NAME, advanced)
             .append("displayHidden", displayHidden)
-            .append("deprecated", deprecated)
+            .append(DEPRECATED_PARAMETER_NAME, deprecated)
             .append("groupDescriptor", groupDescriptor)
             .toString();
     }

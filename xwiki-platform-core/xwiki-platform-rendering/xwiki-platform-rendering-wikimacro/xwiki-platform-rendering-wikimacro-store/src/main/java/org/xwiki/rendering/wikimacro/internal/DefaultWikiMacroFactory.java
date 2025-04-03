@@ -281,7 +281,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = new ArrayList<>();
         Collection<BaseObject> macroParameters = doc.getXObjects(WIKI_MACRO_PARAMETER_CLASS_REFERENCE);
-        Map<String, PropertyGroupDescriptor> groupDescriptorMap = new HashMap<>();
+        Map<List<String>, PropertyGroupDescriptor> groupDescriptorMap = new HashMap<>();
 
         if (macroParameters != null) {
             for (BaseObject macroParameter : macroParameters) {
@@ -334,14 +334,14 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                 // handle group property by checking first if the descriptor hasn't been already created for the same
                 // group.
 
-                String groupProperty = macroParameter.getStringValue(PARAMETER_GROUP_PROPERTY);
+                List<String> groupProperties = macroParameter.getListValue(PARAMETER_GROUP_PROPERTY);
                 PropertyGroupDescriptor groupDescriptor = null;
-                if (!StringUtils.isEmpty(groupProperty) && groupDescriptorMap.containsKey(groupProperty)) {
-                    groupDescriptor = groupDescriptorMap.get(groupProperty);
-                } else if (!StringUtils.isEmpty(groupProperty)) {
+                if (!groupProperties.isEmpty() && groupDescriptorMap.containsKey(groupProperties)) {
+                    groupDescriptor = groupDescriptorMap.get(groupProperties);
+                } else if (!groupProperties.isEmpty()) {
                     groupDescriptor =
-                        new PropertyGroupDescriptor(List.of(groupProperty.split("\\|")));
-                    groupDescriptorMap.put(groupProperty, groupDescriptor);
+                        new PropertyGroupDescriptor(groupProperties);
+                    groupDescriptorMap.put(groupProperties, groupDescriptor);
                 }
 
                 // Handle feature property in the group descriptor: note that it's expected that it might impact an
@@ -358,13 +358,22 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                         .setFeatureMandatory(macroParameter.getIntValue(PARAMETER_FEATURE_MANDATORY_PROPERTY) != 0);
                 }
 
+                // just to avoid possible NPE with Map.of and groupDescriptor...
+                Map<String, Object> parametersMap = new HashMap<>(Map.of(
+                    WikiMacroParameterDescriptor.ADVANCED_PARAMETER_NAME,
+                    macroParameter.getIntValue(PARAMETER_ADVANCED_PROPERTY) != 0,
+                    WikiMacroParameterDescriptor.HIDDEN_PARAMETER_NAME,
+                    macroParameter.getIntValue(PARAMETER_HIDDEN_PROPERTY) != 0,
+                    WikiMacroParameterDescriptor.DEPRECATED_PARAMETER_NAME,
+                    macroParameter.getIntValue(PARAMETER_DEPRECATED_PROPERTY) != 0
+                ));
+                if (groupDescriptor != null) {
+                    parametersMap.put(WikiMacroParameterDescriptor.GROUP_PARAMETER_NAME, groupDescriptor);
+                }
+
                 WikiMacroParameterDescriptor wikiMacroParameterDescriptor =
                     new WikiMacroParameterDescriptor(parameterName, parameterDescription,
-                        parameterMandatory, parameterDefaultValue, parameterType)
-                        .setAdvanced(macroParameter.getIntValue(PARAMETER_ADVANCED_PROPERTY) != 0)
-                        .setDisplayHidden(macroParameter.getIntValue(PARAMETER_HIDDEN_PROPERTY) != 0)
-                        .setDeprecated(macroParameter.getIntValue(PARAMETER_DEPRECATED_PROPERTY) != 0)
-                        .setGroupDescriptor(groupDescriptor);
+                        parameterMandatory, parameterDefaultValue, parameterType, parametersMap);
 
                 // Create the parameter descriptor.
                 parameterDescriptors.add(wikiMacroParameterDescriptor);

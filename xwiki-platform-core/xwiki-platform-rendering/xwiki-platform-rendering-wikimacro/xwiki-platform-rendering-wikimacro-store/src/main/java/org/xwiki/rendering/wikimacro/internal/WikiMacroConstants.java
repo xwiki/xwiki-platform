@@ -162,7 +162,7 @@ public interface WikiMacroConstants
      * @since 16.10.6
      */
     LocalDocumentReference WIKI_MACRO_PARAMETER_CLASS_REFERENCE =
-        new LocalDocumentReference(WIKI_MACRO_PARAMETER_CLASS_SPACE, WIKI_MACRO_PARAMETER_CLASS);
+        new LocalDocumentReference(WIKI_MACRO_PARAMETER_CLASS_SPACE, WIKI_MACRO_PARAMETER_CLASS_PAGE);
 
     /**
      * Constant for representing parameter name property. Same as MACRO_NAME_PROPERTY (Check style Fix)

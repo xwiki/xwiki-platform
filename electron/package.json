@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "electron": "35.1.2",
-    "electron-builder": "25.1.8",
+    "electron-builder": "26.0.12",
     "typescript": "5.8.2",
     "vite": "6.2.3"
   }

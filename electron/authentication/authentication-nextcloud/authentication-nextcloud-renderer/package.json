@@ -28,7 +28,7 @@
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-authentication-nextcloud-state": "workspace:*",
     "async-lock": "1.4.1",
-    "inversify": "7.3.0"
+    "inversify": "7.5.0"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

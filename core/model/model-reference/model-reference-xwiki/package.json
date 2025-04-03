@@ -27,7 +27,7 @@
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
-    "inversify": "7.3.0",
+    "inversify": "7.5.0",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {

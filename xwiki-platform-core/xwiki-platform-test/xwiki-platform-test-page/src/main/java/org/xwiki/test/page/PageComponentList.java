@@ -78,6 +78,7 @@ import org.xwiki.rendering.internal.transformation.DefaultTransformationManager;
 import org.xwiki.rendering.internal.transformation.XWikiRenderingContext;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
+import org.xwiki.rendering.internal.transformation.macro.IsolatedExecutionConfiguration;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.internal.transformation.macro.RawBlockFilterUtils;
 import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
@@ -187,6 +188,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultMacroManager.class,
     DefaultMacroIdFactory.class,
     DefaultErrorBlockGenerator.class,
+    IsolatedExecutionConfiguration.class,
 
     // Properties
     DefaultBeanManager.class,

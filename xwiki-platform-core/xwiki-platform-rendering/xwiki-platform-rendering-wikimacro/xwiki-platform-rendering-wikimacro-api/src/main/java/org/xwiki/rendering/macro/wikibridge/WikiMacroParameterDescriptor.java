@@ -27,6 +27,7 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.properties.PropertyGroupDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * {@link ParameterDescriptor} for describing wiki macro parameters.
@@ -58,16 +59,16 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      */
     private final Object defaultValue;
 
+    /**
+     * Type of the parameter.
+     */
+    private final Type parameterType;
+
     private boolean advanced;
     private boolean displayHidden;
     private boolean deprecated;
 
     private PropertyGroupDescriptor groupDescriptor;
-
-    /**
-     * Type of the parameter.
-     */
-    private Type parameterType;
 
     /**
      * Creates a new {@link WikiMacroParameterDescriptor} instance.
@@ -290,5 +291,21 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
             .append(groupDescriptor)
             .append(parameterType)
             .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("id", id)
+            .append("description", description)
+            .append("mandatory", mandatory)
+            .append("defaultValue", defaultValue)
+            .append("parameterType", parameterType)
+            .append("advanced", advanced)
+            .append("displayHidden", displayHidden)
+            .append("deprecated", deprecated)
+            .append("groupDescriptor", groupDescriptor)
+            .toString();
     }
 }

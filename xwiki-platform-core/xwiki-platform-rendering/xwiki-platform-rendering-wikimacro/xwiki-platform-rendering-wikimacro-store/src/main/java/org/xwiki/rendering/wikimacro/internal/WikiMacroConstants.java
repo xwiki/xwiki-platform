@@ -156,6 +156,13 @@ public interface WikiMacroConstants
      * Constant for representing XWiki.WikiMacroParameterClass xwiki class.
      */
     String WIKI_MACRO_PARAMETER_CLASS = WIKI_MACRO_PARAMETER_CLASS_SPACE + '.' + WIKI_MACRO_PARAMETER_CLASS_PAGE;
+    /**
+     * Constant for representing XWiki.WikiMacroParameterClass local reference.
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    LocalDocumentReference WIKI_MACRO_PARAMETER_CLASS_REFERENCE =
+        new LocalDocumentReference(WIKI_MACRO_PARAMETER_CLASS_SPACE, WIKI_MACRO_PARAMETER_CLASS);
 
     /**
      * Constant for representing parameter name property. Same as MACRO_NAME_PROPERTY (Check style Fix)

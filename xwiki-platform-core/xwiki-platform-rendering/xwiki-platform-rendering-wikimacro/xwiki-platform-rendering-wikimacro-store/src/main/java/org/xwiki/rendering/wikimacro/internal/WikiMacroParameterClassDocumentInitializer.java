@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -52,7 +51,7 @@ public class WikiMacroParameterClassDocumentInitializer extends AbstractMandator
      */
     public WikiMacroParameterClassDocumentInitializer()
     {
-        super(new LocalDocumentReference(WIKI_MACRO_PARAMETER_CLASS_SPACE, WIKI_MACRO_PARAMETER_CLASS_PAGE));
+        super(WIKI_MACRO_PARAMETER_CLASS_REFERENCE);
     }
 
     @Override
@@ -66,7 +65,8 @@ public class WikiMacroParameterClassDocumentInitializer extends AbstractMandator
             StringUtils.join(Arrays.asList(PARAMETER_TYPE_UNKNOWN, PARAMETER_TYPE_WIKI), PROPERTY_PIPE),
             ListClass.DISPLAYTYPE_INPUT, PROPERTY_PIPE, PARAMETER_TYPE_UNKNOWN, ListClass.FREE_TEXT_ALLOWED, true);
         xclass.addTextField(PARAMETER_FEATURE_PROPERTY, "Parameter feature", 30);
-        xclass.addTextField(PARAMETER_GROUP_PROPERTY, "Parameter group", 30);
+        xclass.addStaticListField(PARAMETER_GROUP_PROPERTY, "Parameter group property", 1, true, false, null,
+            ListClass.DISPLAYTYPE_INPUT, PROPERTY_PIPE, null, ListClass.FREE_TEXT_ALLOWED, false);
         xclass.addBooleanField(PARAMETER_HIDDEN_PROPERTY, "Parameter hidden", PROPERTY_YESNO);
         xclass.addBooleanField(PARAMETER_ADVANCED_PROPERTY, "Parameter advanced", PROPERTY_YESNO);
         xclass.addBooleanField(PARAMETER_DEPRECATED_PROPERTY, "Parameter deprecated", PROPERTY_YESNO);

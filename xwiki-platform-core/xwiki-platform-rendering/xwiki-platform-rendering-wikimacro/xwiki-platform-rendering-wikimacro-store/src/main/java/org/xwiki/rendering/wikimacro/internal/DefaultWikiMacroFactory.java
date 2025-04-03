@@ -280,7 +280,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     private List<WikiMacroParameterDescriptor> buildParameterDescriptors(XWikiDocument doc) throws WikiMacroException
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = new ArrayList<>();
-        Collection<BaseObject> macroParameters = doc.getObjects(WIKI_MACRO_PARAMETER_CLASS);
+        Collection<BaseObject> macroParameters = doc.getXObjects(WIKI_MACRO_PARAMETER_CLASS_REFERENCE);
         Map<String, PropertyGroupDescriptor> groupDescriptorMap = new HashMap<>();
 
         if (macroParameters != null) {
@@ -335,15 +335,13 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                 // group.
 
                 String groupProperty = macroParameter.getStringValue(PARAMETER_GROUP_PROPERTY);
-                PropertyGroupDescriptor groupDescriptor;
+                PropertyGroupDescriptor groupDescriptor = null;
                 if (!StringUtils.isEmpty(groupProperty) && groupDescriptorMap.containsKey(groupProperty)) {
                     groupDescriptor = groupDescriptorMap.get(groupProperty);
                 } else if (!StringUtils.isEmpty(groupProperty)) {
                     groupDescriptor =
-                        new PropertyGroupDescriptor(List.of(groupProperty));
+                        new PropertyGroupDescriptor(List.of(groupProperty.split("\\|")));
                     groupDescriptorMap.put(groupProperty, groupDescriptor);
-                } else {
-                    groupDescriptor = new PropertyGroupDescriptor(null);
                 }
 
                 // Handle feature property in the group descriptor: note that it's expected that it might impact an
@@ -352,6 +350,9 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                 // org.xwiki.properties.internal.DefaultBeanDescriptor#handlePropertyFeatureAndGroupAnnotations
                 String featureProperty = macroParameter.getStringValue(PARAMETER_FEATURE_PROPERTY);
                 if (!StringUtils.isEmpty(featureProperty)) {
+                    if (groupDescriptor == null) {
+                        groupDescriptor = new PropertyGroupDescriptor(null);
+                    }
                     groupDescriptor.setFeature(featureProperty);
                     groupDescriptor
                         .setFeatureMandatory(macroParameter.getIntValue(PARAMETER_FEATURE_MANDATORY_PROPERTY) != 0);

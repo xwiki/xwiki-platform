@@ -60,7 +60,7 @@
     "@types/react-dom": "19.0.4",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
-    "vite": "6.2.3",
+    "vite": "6.2.4",
     "vue-tsc": "2.2.8"
   },
   "publishConfig": {

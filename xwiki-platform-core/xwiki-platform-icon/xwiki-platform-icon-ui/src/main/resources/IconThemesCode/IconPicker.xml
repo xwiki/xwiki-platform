@@ -625,11 +625,14 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
 }
 
 .xwikiIconPickerList {
-  overflow-y: scroll;
+  display: grid;
+  max-width: 100%;
   height: 240px;
-  display: flex;
-  flex-wrap: wrap;
+  overflow-y: scroll;
   gap: .3em;
+  padding: .3em;
+  /* 4 columns, each a fraction of the whole width */
+  grid-template-columns: repeat(4, 1fr);
 }
 
 /* Avoid stretching on the Loader element. */
@@ -638,15 +641,19 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
 }
 
 .xwikiIconPickerIcon {
-  height: 80px;
-  width: 100px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
   text-align: center;
   border-radius: 7px;
   vertical-align: middle;
-  overflow: hidden;
-  padding: 10px;
   cursor: pointer;
   background-color: transparent;
+}
+
+.xwikiIconPickerIcon * {
+  padding: 0;
 }
 
 .xwikiIconPickerIcon:hover {
@@ -664,12 +671,6 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
 }
 
 .xwikiIconPickerIcon .xwikiIconPickerIconName {
-  /* We want to limit the number of lines in the name so that it always fit inside the standard button size. 
-    The value below is just about twice the line-height. */
-  max-height: 2.9em;
-  /* For the few names that need three lines, we make sure the user can scroll to read the whole name. */
-  overflow-y: scroll;
-  overflow-x: hidden;
   /* Make sure the name wraps onto multiple lines instead of overflowing. */
   white-space: pre-wrap;
   word-break: break-word;

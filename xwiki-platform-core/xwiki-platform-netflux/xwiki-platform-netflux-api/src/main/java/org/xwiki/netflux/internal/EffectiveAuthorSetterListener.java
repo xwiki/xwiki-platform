@@ -22,6 +22,7 @@ package org.xwiki.netflux.internal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -112,8 +113,9 @@ public class EffectiveAuthorSetterListener extends AbstractLocalEventListener
      */
     private List<String> getChannelsFromRequest(Request request)
     {
-        List<String> channels =
-            Arrays.stream(request.getParameterValues("netfluxChannel")).filter(StringUtils::isNotBlank).toList();
+        String[] values = request.getParameterValues("netfluxChannel");
+        Stream<String> valuesStream = (values == null) ? Stream.empty() : Arrays.stream(values);
+        List<String> channels = valuesStream.filter(StringUtils::isNotBlank).toList();
         this.logger.debug("Channels from request: [{}].", channels);
         return channels;
     }

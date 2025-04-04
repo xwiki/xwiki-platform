@@ -19,10 +19,6 @@
  */
 package org.xwiki.netflux.internal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Locale;
 import java.util.Optional;
 
@@ -39,6 +35,13 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserReference;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link EffectiveAuthorSetterListener}.
@@ -101,5 +104,13 @@ class EffectiveAuthorSetterListenerTest
         this.listener.onEvent(new ActionExecutingEvent(), null, null);
 
         verify(this.request).setAttribute(Request.ATTRIBUTE_EFFECTIVE_AUTHOR, this.effectiveAuthor);
+    }
+
+    @Test
+    void onActionExecutingEventWithoutNetfluxChannel()
+    {
+        this.listener.onEvent(new ActionExecutingEvent(), null, null);
+
+        verify(this.request, never()).setAttribute(eq(Request.ATTRIBUTE_EFFECTIVE_AUTHOR), any(UserReference.class));
     }
 }

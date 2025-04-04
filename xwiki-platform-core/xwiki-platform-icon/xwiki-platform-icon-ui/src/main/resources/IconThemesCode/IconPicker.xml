@@ -631,7 +631,8 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   overflow-y: scroll;
   gap: .3em;
   padding: .3em;
-  grid-template-columns: repeat(4, 1fr);  /* 4 columns, each a fraction of the whole width */
+  /* 4 columns, each a fraction of the whole width */
+  grid-template-columns: repeat(4, 1fr);
 }
 
 /* Avoid stretching on the Loader element. */

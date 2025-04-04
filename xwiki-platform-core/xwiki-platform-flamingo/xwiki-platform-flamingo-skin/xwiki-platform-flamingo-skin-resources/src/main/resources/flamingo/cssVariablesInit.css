@@ -104,8 +104,6 @@
 "max-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))",
 "min-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))",
 "max-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 5))",
-"100vw": "100vw",
-"int-viewport-width": "calc(10000 * tan(atan2(var(--100vw), 10000px)))",
 "font-size-document-title": "calc(max(var(--min-document-title-font-size) * 1px, min(var(--max-document-title-font-size) * 1px, var(--min-document-title-font-size) * 1px + (var(--max-document-title-font-size) - var(--min-document-title-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
 "font-size-h1": "calc(max(var(--min-h1-font-size), min(var(--max-h1-font-size), var(--min-h1-font-size) + (var(--max-h1-font-size) - var(--min-h1-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
 "font-size-h2": "calc(max(var(--min-h2-font-size), min(var(--max-h2-font-size), var(--min-h2-font-size) + (var(--max-h2-font-size) - var(--min-h2-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
@@ -131,6 +129,19 @@
 "brand-danger": "#cc3333"
 })
 
+## List of all the new variables added to the CSS property set.
+## Those variables do not have a LESS variable equivalent in previous systems. They were introduced mostly to replace
+## whole mixins. There should be no overlap between this category of variables and the others.
+## List of versions where variables were introduced:
+## * 17.3.0RC1: 100vw, int-viewport-width, font-weight-regular, font-weight-semibold, font-weight-bold
+#set($newVariables = {
+"100vw": "100vw",
+"int-viewport-width": "calc(10000 * tan(atan2(var(--100vw), 10000px)))",
+"font-weight-regular": 400,
+"font-weight-semibold": 700,
+"font-weight-bold": "900"
+})
+
 ## Retrieve the lists of variables for the old ColorTheme and Flamingo ColorTheme
 #template('variablelist.vm')
 ## If you want to update the values set for the old colortheme, see colorThemeInit.vm, a source of truth shared
@@ -145,7 +156,7 @@
 ## We allow different values from different maps for the same variable. This is an extra fallback in case the first
 ## doesn't work. This could be the case for defaults that rely on other variables.
 ## Values follow CSS cascading order (last one wins).
-#set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariables])
+#set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariables, $newVariables])
 
 ## $flamingoColorThemeVariables is the list of all the variables available to customize directly in the Flamingo
 ## theme editor. These mappings will not always end up in the initialization of a CSS variable.

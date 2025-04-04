@@ -318,6 +318,61 @@ ul.realtime-users {
   /* We want to see the modal buttons from the start (without scrolling) even when the displayed content is large. */
   max-height: ~"calc(100vh - 200px)";
   overflow: auto;
+}
+
+/**
+ * Spinner
+ */
+:host(realtime-spinner), :host(realtime-spinner)::before {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid;
+  width: 8px;
+  height: 8px;
+}
+
+:host(realtime-spinner) {
+  position: relative;
+  border-color: transparent;
+  animation: realtime-spinner-rotate 3s linear infinite;
+}
+
+:host(realtime-spinner)::before {
+  content: "";
+  box-sizing: content-box !important;
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  clip-path: rect(6px 12px 12px 0);
+  animation: realtime-spinner-rotate 1.5s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+}
+
+@keyframes realtime-spinner-rotate {
+  0% {transform: rotate(0deg);}
+  100% {transform: rotate(360deg);}
+}
+
+/**
+ * Status
+ */
+:host(realtime-status) realtime-spinner {
+  display: none;
+}
+
+:host(realtime-status[value="cleaning"]) realtime-spinner {
+  display: inline-block;
+}
+
+:host(realtime-status[value="dirty"])::after {
+  content: attr(data-status-dirty);
+}
+
+:host(realtime-status[value="cleaning"])::after {
+  content: attr(data-status-cleaning);
+}
+
+:host(realtime-status[value="clean"])::after {
+  content: attr(data-status-clean);
 }</code>
     </property>
     <property>
@@ -459,7 +514,9 @@ ul.realtime-users {
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity}}
+      <content>{{template name="display_macros.vm" output="false" /}}
+
+{{velocity}}
 {{html clean="false"}}
 #getUserAvatarURL($xcontext.userReference $avatarURL 120)
 ## Note that we have to pass some document information that is missing from the meta:
@@ -482,7 +539,9 @@ ul.realtime-users {
 &lt;script id="realtime-config" type="application/json"&gt;$jsontool.serialize($config).replace(
   '&lt;', '\u003C')&lt;/script&gt;
 
+#initRequiredSkinExtensions()
 #set ($discard = $xwiki.ssx.use('XWiki.Realtime.Configuration'))
+#getRequiredSkinExtensions($realtimeToolbarStylesheet)
 &lt;template id="realtime-edit-toolbar"&gt;
   &lt;div class="realtime-edit-toolbar" data-user-id=""&gt;
     &lt;div class="realtime-edit-toolbar-left"&gt;
@@ -616,53 +675,11 @@ ul.realtime-users {
 &lt;/template&gt;
 
 &lt;template id="realtime-spinner"&gt;
-  &lt;style&gt;
-    :host, :host::before {
-      display: inline-block;
-      border-radius: 50%;
-      border: 2px solid;
-      width: 8px;
-      height: 8px;
-    }
-    :host {
-      position: relative;
-      border-color: transparent;
-      animation: rotate 3s linear infinite;
-    }
-    :host::before {
-      content: "";
-      box-sizing: content-box !important;
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      clip-path: rect(6px 12px 12px 0);
-      animation: rotate 1.5s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-    }
-    @keyframes rotate {
-      0% {transform: rotate(0deg);}
-      100% {transform: rotate(360deg);}
-    }
-  &lt;/style&gt;
+  $realtimeToolbarStylesheet
 &lt;/template&gt;
 
 &lt;template id="realtime-status"&gt;
-  &lt;style&gt;
-    realtime-spinner {
-      display: none;
-    }
-    :host([value="cleaning"]) realtime-spinner {
-      display: inline-block;
-    }
-    :host([value="dirty"])::after {
-      content: attr(data-status-dirty);
-    }
-    :host([value="cleaning"])::after {
-      content: attr(data-status-cleaning);
-    }
-    :host([value="clean"])::after {
-      content: attr(data-status-clean);
-    }
-  &lt;/style&gt;
+  $realtimeToolbarStylesheet
   &lt;realtime-spinner&gt;&lt;/realtime-spinner&gt;
 &lt;/template&gt;
 

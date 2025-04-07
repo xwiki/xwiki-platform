@@ -200,6 +200,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         // is expensive)
         object.setGuid(this.guid);
 
+        // Restore the dirty state
         object.setDirty(isDirty());
 
         return object;

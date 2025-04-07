@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
@@ -71,29 +72,43 @@ public class GadgetObjectRequiredRightAnalyzer implements RequiredRightAnalyzer<
 
         // Analyze the title
         String titleString = object.getStringValue("title");
-        if (titleString != null && this.velocityDetector.containsVelocityScript(titleString)) {
-            result.add(new RequiredRightAnalysisResult(
-                object.getReference(),
-                this.translationMessageSupplierProvider.get("dashboard.requiredrights.gadget.title"),
-                this.translationMessageSupplierProvider.get(
-                    "dashboard.requiredrights.gadget.title.description", titleString),
-                List.of(RequiredRight.MAYBE_SCRIPT, RequiredRight.MAYBE_PROGRAM)
-            ));
+        // The gadget source handles localization script service calls separately to support them for users without
+        // script right.
+        if (StringUtils.isNotBlank(titleString)
+            && !DefaultGadgetSource.TRANSLATION_SCRIPT_PATTERN.matcher(titleString).matches())
+        {
+            if (this.velocityDetector.containsVelocityScript(titleString)) {
+                result.add(new RequiredRightAnalysisResult(
+                    object.getReference(),
+                    this.translationMessageSupplierProvider.get("dashboard.requiredrights.gadget.title"),
+                    this.translationMessageSupplierProvider.get(
+                        "dashboard.requiredrights.gadget.title.description", titleString),
+                    List.of(RequiredRight.MAYBE_SCRIPT, RequiredRight.MAYBE_PROGRAM)
+                ));
+            } else {
+                result.addAll(analyzeWikiContent(object, titleString));
+            }
         }
 
         // Analyze the content
         String contentString = object.getStringValue("content");
-        if (contentString != null) {
-            try {
-                XDOM parsedContent = this.contentParser.parse(contentString,
-                    object.getOwnerDocument().getSyntax(), object.getDocumentReference());
-                parsedContent.getMetaData().addMetaData("entityReference", object.getReference());
-                result.addAll(this.xdomRequiredRightAnalyzer.analyze(parsedContent));
-            } catch (MissingParserException | ParseException e) {
-                throw new RequiredRightsException("Failed to parse value of 'content' property.", e);
-            }
+        if (StringUtils.isNotBlank(contentString)) {
+            result.addAll(analyzeWikiContent(object, contentString));
         }
 
         return result;
+    }
+
+    private List<RequiredRightAnalysisResult> analyzeWikiContent(BaseObject object, String contentString)
+        throws RequiredRightsException
+    {
+        try {
+            XDOM parsedContent = this.contentParser.parse(contentString,
+                object.getOwnerDocument().getSyntax(), object.getDocumentReference());
+            parsedContent.getMetaData().addMetaData("entityReference", object.getReference());
+            return this.xdomRequiredRightAnalyzer.analyze(parsedContent);
+        } catch (MissingParserException | ParseException e) {
+            throw new RequiredRightsException("Failed to parse value of 'content' property.", e);
+        }
     }
 }

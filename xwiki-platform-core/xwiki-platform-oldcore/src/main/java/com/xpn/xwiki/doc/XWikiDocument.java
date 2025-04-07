@@ -2472,6 +2472,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param deep true if the dirty flag should be set to all children
      * @since 17.2.1
      * @since 17.3.0RC1
+     * @since 16.10.6
      */
     @Unstable
     public void setDirty(boolean dirty, boolean deep)

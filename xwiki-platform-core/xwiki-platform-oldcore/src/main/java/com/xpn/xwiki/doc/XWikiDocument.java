@@ -2453,6 +2453,31 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
+     * @param dirty true the value of the dirty flag(s)
+     * @param deep true if the dirty flag should be set to all children
+     * @since 17.2.1
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public void setDirty(boolean dirty, boolean deep)
+    {
+        setMetaDataDirty(dirty);
+        setContentDirty(dirty);
+
+        if (deep) {
+            if (this.xClass != null) {
+                this.xClass.setDirty(dirty, deep);
+            }
+
+            if (this.xObjects != null) {
+                this.xObjects.values().forEach(objects -> objects.setDirty(dirty, deep));
+            }
+
+            this.attachmentList.setDirty(dirty, deep);
+        }
+    }
+
+    /**
      * Indicate if flags indicating which part of the document has been modified can be trusted.
      * 
      * @return the true if change made to this {@link XWikiDocument} instance are tracked

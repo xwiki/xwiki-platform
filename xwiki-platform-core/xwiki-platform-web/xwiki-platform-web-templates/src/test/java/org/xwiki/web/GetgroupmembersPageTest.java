@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,7 +77,7 @@ class GetgroupmembersPageTest extends PageTest
     private TemplateManager templateManager;
 
     private XWikiGroupService groupService;
-    
+
     private GroupMembersCache membersCache;
 
     private WikiGroupCache wikiGroupCache;
@@ -155,6 +156,7 @@ class GetgroupmembersPageTest extends PageTest
             .thenAnswer(invocationOnMock -> false);
 
         GroupCacheEntry groupCacheEntry = mock(GroupCacheEntry.class);
+        when(this.wikiGroupCache.get("xwiki")).thenReturn(Set.of(groupDocumentReference));
         when(this.membersCache.getCacheEntry(groupDocumentReference, true)).thenReturn(groupCacheEntry);
         when(groupCacheEntry.getAll()).thenReturn(Arrays.asList(
             new DocumentReference("xwiki", "XWiki", "U1"),

@@ -192,3 +192,62 @@
 @xwiki-icon-spinner:                  "$xwiki.getSkinFile('icons/xwiki/spinner.gif')";
 @xwiki-icon-spinner-height:           16px;
 @xwiki-icon-link-external:            "$xwiki.getSkinFile('icons/xwiki/external-link.png')";
+
+##############################################
+##
+## 3/ Uniformize the CSS variable values with the latest compiled LESS values.
+##
+##############################################
+:root {
+## All of those variables exist both in CSS and LESS.
+## Trying to make this mapping with a variable that doesn't exist in LESS will end up in an error.
+## Trying to make this mapping with a property that doesn't exist in CSS will (unexpectedly) create it.
+## CSS property initialization should be done directly in cssVariablesInit.css
+## The goal of this mapping is to make sure the transition from the LESS variables to CSS properties is seamless 
+## whatever the customizations implemented.
+#set($mappedVariables = $collectiontool.getSet())
+#if("$!flamingoColorThemeVariables" != '')
+#set($discard = $mappedVariables.addAll($!flamingoColorThemeVariables.keySet()))
+#end
+#if("$!xsVariables" != '')#set($discard = $mappedVariables.addAll($!xsVariables.keySet()))#end
+#if("$!bootstrapVariables" != '')#set($discard = $mappedVariables.addAll($!bootstrapVariables.keySet()))#end
+#if("$!oldColorThemeVariables" != '')#set($discard = $mappedVariables.addAll($!oldColorThemeVariables.keySet()))#end
+## List all of the CSS property names where we don't want to inherit the value from LESS.
+## Adding a variable name here will make sure its CSS property will stay unrelated to the corresponding LESS variable.
+## By default, most CSS variables should inherit their values, to make sure that LESS customizations are still taken
+## into account.
+## However, we might want to change how we handle things with the 'new' system. This is where this list gets helpful.
+## Examples 1. the font-size variables in LESS are defined in px. We want to move to em/rem font-sizes for the CSS 
+## properties. We make sure values from LESS don't get used for CSS properties.
+## 2. The 'dropdown-bg' variable is just a color. As long as we don't feel like it should represent anything 
+## different in our CSS property system (which is likely what will happen), there's no issue with retrieving its 
+## value from LESS.
+#set($preventMapping = [
+  'font-size-base',
+  'min-h1-font-size',
+  'max-h1-font-size',
+  'min-h2-font-size',
+  'max-h2-font-size',
+  'min-h3-font-size',
+  'max-h3-font-size',
+  'min-h4-font-size',
+  'max-h4-font-size',
+  'min-h5-font-size',
+  'max-h5-font-size',
+  'min-h6-font-size',
+  'max-h6-font-size',
+  'min-document-title-font-size',
+  'max-document-title-font-size',
+  'font-size-document-title',
+  'font-size-h1',
+  'font-size-h2',
+  'font-size-h3',
+  'font-size-h4',
+  'font-size-h5',
+  'font-size-h6'
+])
+#set($discard = $mappedVariables.removeAll($preventMapping))
+#foreach($variableName in $mappedVariables)
+  -/**/-$variableName: @$variableName;
+#end
+}

@@ -400,6 +400,11 @@ public class DefaultModelBridge implements ModelBridge
 
             String title = parameters.get("title");
             if (title != null && !title.equals(document.getTitle())) {
+                // Avoid modifying the cached document
+                if (!save) {
+                    document = document.clone();
+                }
+
                 document.setTitle(title);
                 save = true;
             }
@@ -436,6 +441,11 @@ public class DefaultModelBridge implements ModelBridge
                 //      reference, as it's relative of the document reference. So the parent reference will be well
                 //      computed with the already existing relative reference.
                 if (!relativeHierarchicalReference.equals(newDocumentParentRef)) {
+                    // Avoid modifying the cached document
+                    if (!save) {
+                        document = document.clone();
+                    }
+
                     document.setParentReference(relativeHierarchicalReference);
                     save = true;
                 }

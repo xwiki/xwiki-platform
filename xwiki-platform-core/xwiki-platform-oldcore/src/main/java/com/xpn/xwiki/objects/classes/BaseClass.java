@@ -459,8 +459,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         bclass.setValidationScript(getValidationScript());
         bclass.setNameField(getNameField());
 
-        bclass.setOwnerDocument(this.ownerDocument);
-
+        // Restore the dirty state
         bclass.setDirty(isDirty());
 
         return bclass;

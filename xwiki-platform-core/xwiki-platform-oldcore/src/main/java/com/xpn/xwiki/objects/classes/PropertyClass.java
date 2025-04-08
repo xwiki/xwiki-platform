@@ -563,14 +563,17 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     @Override
+    public void detach()
+    {
+        super.detach();
+
+        setObject(null);
+    }
+
+    @Override
     public PropertyClass clone()
     {
-        PropertyClass pclass = (PropertyClass) super.clone();
-        pclass.setObject(getObject());
-
-        pclass.setDirty(isDirty());
-
-        return pclass;
+        return (PropertyClass) super.clone();
     }
 
     @Override

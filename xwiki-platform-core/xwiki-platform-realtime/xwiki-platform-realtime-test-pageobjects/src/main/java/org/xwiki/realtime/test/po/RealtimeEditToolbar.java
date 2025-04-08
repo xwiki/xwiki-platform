@@ -26,6 +26,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.ConfirmationModal;
 
 /**
  * Represents the realtime edit toolbar.
@@ -92,9 +93,10 @@ public class RealtimeEditToolbar extends BaseElement
     public RealtimeEditToolbar leaveCollaboration()
     {
         openDoneDropdown();
+        ConfirmationModal confirmationModal = new ConfirmationModal(By.id("realtime-leave-modal"));
         getDriver().findElement(By.cssSelector(".realtime-edit-toolbar .realtime-action-leave")).click();
         // Confirm leaving the realtime editing session.
-        getDriver().findElement(By.cssSelector(".modal-popup .realtime-buttons .btn-primary")).click();
+        confirmationModal.clickOk();
         getDriver()
             .waitUntilCondition(ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(ALLOW_REALTIME),
                 ExpectedConditions.elementSelectionStateToBe(ALLOW_REALTIME, false)));

@@ -580,6 +580,8 @@ ul.realtime-users {
               href="#"
               class="realtime-action-leave"
               title="$escapetool.xml($services.localization.render('realtime.leave.hint'))"
+              data-toggle="modal"
+              data-target="#realtime-leave-modal"
             &gt;$escapetool.xml($services.localization.render('realtime.leave'))&lt;/a&gt;
           &lt;/li&gt;
         &lt;/ul&gt;
@@ -839,6 +841,35 @@ ul.realtime-users {
         &lt;div class="modal-footer"&gt;
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
             $escapetool.xml($services.localization.render('realtime.close'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-leave-modal-template"&gt;
+  &lt;div id="realtime-leave-modal" class="modal fade" tabindex="-1" role="dialog"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('realtime.close'))"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title"&gt;
+            $escapetool.xml($services.localization.render('realtime.leave'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          $escapetool.xml($services.localization.render('realtime.leave.confirmation'))
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-primary" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('realtime.leave.accept'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
           &lt;/button&gt;
         &lt;/div&gt;
       &lt;/div&gt;

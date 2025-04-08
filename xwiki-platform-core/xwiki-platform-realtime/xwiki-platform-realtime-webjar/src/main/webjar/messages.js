@@ -43,9 +43,7 @@ define('xwiki-realtime-messages', {
     'reloadDialog.prompt',
     'reloadDialog.reload',
     'reloadDialog.exit',
-    'disableDialog.prompt',
-    'disableDialog.ok',
-    'disableDialog.exit',
-    'autoAcceptSave'
+    'autoAcceptSave',
+    'join.error'
   ]
 });

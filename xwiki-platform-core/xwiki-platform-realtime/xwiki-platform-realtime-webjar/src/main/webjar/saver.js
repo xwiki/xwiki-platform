@@ -144,11 +144,11 @@ define('xwiki-realtime-saver', [
     }
 
     _isSomeoneSaving() {
-      return this._someState(state => state.saving);
+      return this._someState(state => state.saving && this._isConnected(state));
     }
 
     _isSomeoneDirty() {
-      return this._someState(state => state.dirty);
+      return this._someState(state => state.dirty && this._isConnected(state));
     }
 
     _someState(predicate) {
@@ -158,6 +158,17 @@ define('xwiki-realtime-saver', [
     _getStates() {
       // Must be implemented by subclasses.
       return {};
+    }
+
+    _getConnectedStates() {
+      return Object.fromEntries(Object.entries(this._getStates())
+        .filter(([clientId, state]) => this._isConnected(state)));
+    }
+
+    _isConnected(state) {
+      // Must be overridden by subclasses to indicate if the user associated with the given state is connected to the
+      // realtime editing session.
+      return true;
     }
 
     async _save(options) {
@@ -205,7 +216,7 @@ define('xwiki-realtime-saver', [
         setTimeout(() => {
           // Initialize with minimum save priority.
           let savePriority = 1, savingClientId;
-          for (const [clientId, state] of Object.entries(this._getStates())) {
+          for (const [clientId, state] of Object.entries(this._getConnectedStates())) {
             if (state.saving > savePriority || (state.saving === savePriority &&
                 (!savingClientId || savingClientId > clientId))) {
               savePriority = state.saving;
@@ -270,11 +281,16 @@ define('xwiki-realtime-saver', [
     }
 
     _pushState(immediate) {
+      this._state.id = this._myId;
       this._getStates()[this._getClientId()] = this._state;
       this._onLocal();
       if (immediate) {
         this._chainpad.sync();
       }
+    }
+
+    _isConnected(state) {
+      return this._userList.users.includes(state.id);
     }
 
     async toBeReady() {
@@ -302,7 +318,9 @@ define('xwiki-realtime-saver', [
     }
 
     _onReady(info) {
+      this._myId = info.myId;
       this._chainpad = info.realtime;
+      this._userList = info.userList;
       this._notifyReady();
       this._onLocal();
     }

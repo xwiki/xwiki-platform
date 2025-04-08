@@ -140,10 +140,16 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public void setObject(BaseCollection object)
     {
-        this.xclass = (BaseClass) object;
+        if (this.xclass != object) {
+            this.xclass = (BaseClass) object;
 
-        if (object != null) {
-            setOwnerDocument(object.getOwnerDocument());
+            if (object != null) {
+                setOwnerDocument(object.getOwnerDocument());
+
+                if (isDirty()) {
+                    this.xclass.setDirty(true);
+                }
+            }
         }
     }
 
@@ -567,9 +573,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     @Override
-    public void detach()
+    protected void cloneDetach()
     {
-        super.detach();
+        super.cloneDetach();
 
         setObject(null);
     }

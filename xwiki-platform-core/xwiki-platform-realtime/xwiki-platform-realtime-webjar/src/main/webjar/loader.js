@@ -178,14 +178,6 @@ define('xwiki-realtime-loader', [
       displayCustomModal(content[0]);
     }
 
-    displayDisableModal(callback) {
-      const content = createModalContent(Messages['disableDialog.prompt'], Messages['disableDialog.ok']);
-      const buttonOK = content.find('button').on('click', callback.bind(null, true));
-      $('<button class="btn btn-default"></button>').text(Messages['disableDialog.exit']).insertBefore(buttonOK)
-        .on('click', callback.bind(null, false));
-      displayCustomModal(content[0]);
-    }
-
     static getEditedFields() {
       return Object.keys(RealtimeContext.instances);
     }
@@ -779,7 +771,7 @@ define('xwiki-realtime-loader', [
       // We currently support editing in realtime only the content field (using either the Wiki editor, the standalone
       // WYSIWYG editor or the Inplace editor).
       } else if (info.field === 'content' && window.XWiki.editor === info.type) {
-        // The is no edit lock and the current editor is supported. Check if we can join a realtime session.
+        // There is no edit lock and the current editor is supported. Check if we can join a realtime session.
         const realtimeContext = new RealtimeContext(info);
         const keys = await realtimeContext.updateChannels();
         if (!keys[info.type] || !keys.saver || !keys.userData) {

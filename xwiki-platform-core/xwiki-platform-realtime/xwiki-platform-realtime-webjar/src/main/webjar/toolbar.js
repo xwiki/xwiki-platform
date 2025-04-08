@@ -51,8 +51,8 @@ define('xwiki-realtime-toolbar', [
 
       this._createChangeSummaryModal();
       this._createVersionModal();
+      this._createLeaveModal();
       this._activateDoneButton();
-      this._activateLeaveButton();
 
       this.onConnectionStatusChange(1 /* connecting */);
     }
@@ -82,10 +82,15 @@ define('xwiki-realtime-toolbar', [
       });
     }
 
-    _activateLeaveButton() {
-      this._leaveButton = this._toolbar.querySelector('.realtime-action-leave');
-      this._leaveButton.addEventListener('click', event => {
-        event.preventDefault();
+    _createLeaveModal() {
+      let leaveModal = document.querySelector('#realtime-leave-modal');
+      if (!leaveModal) {
+        const template = document.querySelector('template#realtime-leave-modal-template');
+        leaveModal = template.content.querySelector('#realtime-leave-modal').cloneNode(true);
+        document.body.appendChild(leaveModal);
+      }
+
+      $(leaveModal).find('.modal-footer .btn-primary').off('click.realtime').on('click.realtime', () => {
         this._config.leave();
       });
     }

@@ -617,7 +617,7 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    void cloneClean() throws IOException, XWikiException
+    void cloneCleanAndCached() throws IOException, XWikiException
     {
         XWikiDocument cleanDocument = new XWikiDocument(DOCUMENT_REFERENCE);
         cleanDocument.setAttachment("filename.ext", new ByteArrayInputStream("attachment".getBytes()),
@@ -629,7 +629,12 @@ public class XWikiDocumentMockitoTest
 
         // Make sure the document is not considered dirty
         cleanDocument.setDirty(false, true);
+        // Indicate the document is cached and trusted
+        cleanDocument.setCached(true);
+        cleanDocument.setChangeTracked(true);
 
+        assertTrue(cleanDocument.isCached());
+        assertTrue(cleanDocument.isChangeTracked());
         assertFalse(cleanDocument.isContentDirty());
         assertFalse(cleanDocument.isMetaDataDirty());
         assertFalse(cleanDocument.getAttachment("filename.ext").isMetaDataDirty());
@@ -640,6 +645,8 @@ public class XWikiDocumentMockitoTest
 
         XWikiDocument clonedDocument = cleanDocument.clone();
 
+        assertTrue(cleanDocument.isCached());
+        assertTrue(cleanDocument.isChangeTracked());
         assertFalse(cleanDocument.isContentDirty());
         assertFalse(cleanDocument.isMetaDataDirty());
         assertFalse(cleanDocument.getAttachment("filename.ext").isMetaDataDirty());
@@ -648,6 +655,8 @@ public class XWikiDocumentMockitoTest
         assertFalse(cleanDocument.getXObject(CLASS_REFERENCE).isDirty());
         assertFalse(((BaseProperty) cleanDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
 
+        assertFalse(clonedDocument.isCached());
+        assertTrue(clonedDocument.isChangeTracked());
         assertFalse(clonedDocument.isContentDirty());
         assertFalse(clonedDocument.isMetaDataDirty());
         assertFalse(clonedDocument.getAttachment("filename.ext").isMetaDataDirty());

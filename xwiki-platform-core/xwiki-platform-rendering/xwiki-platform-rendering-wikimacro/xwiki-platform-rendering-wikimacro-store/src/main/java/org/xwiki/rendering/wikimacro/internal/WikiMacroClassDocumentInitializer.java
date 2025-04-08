@@ -46,6 +46,8 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
 {
     private static final String PROPERTY_PIPE = "|";
 
+    private static final String YESNO = "yesno";
+
     /**
      * Default constructor.
      */
@@ -63,7 +65,7 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
         xclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5,
             TextAreaClass.ContentType.PURE_TEXT);
         xclass.addStaticListField(MACRO_DEFAULT_CATEGORIES_PROPERTY, "Default categories", 1, true, "", "input");
-        xclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
+        xclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", YESNO);
         xclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
             "Current User|Current Wiki|Global", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
         xclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content availability", 1, false,
@@ -79,6 +81,7 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
         xclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20, TextAreaClass.EditorType.TEXT);
 
         xclass.addNumberField(MACRO_PRIORITY_PROPERTY, "Priority", 10, "integer");
+        xclass.addBooleanField(MACRO_EXECUTION_ISOLATED_PROPERTY, "Isolated Execution", YESNO, Boolean.FALSE);
 
         super.createClass(xclass);
     }

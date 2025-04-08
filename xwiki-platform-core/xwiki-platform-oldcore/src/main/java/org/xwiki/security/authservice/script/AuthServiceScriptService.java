@@ -30,9 +30,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authservice.XWikiAuthServiceComponent;
 import org.xwiki.security.authservice.internal.AuthServiceConfiguration;
@@ -42,6 +44,7 @@ import org.xwiki.security.script.SecurityScriptService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 
 /**
@@ -75,7 +78,7 @@ public class AuthServiceScriptService implements ScriptService
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private AuthorizationManager authorization;
+    private DocumentAuthorizationManager authorization;
 
     @Inject
     private AuthServiceManager authServices;
@@ -84,8 +87,12 @@ public class AuthServiceScriptService implements ScriptService
     {
         XWikiContext xcontext = this.contextProvider.get();
 
+        XWikiDocument sdoc = xcontext.getSecureDocument();
+        DocumentReference contextDocumentReference = sdoc != null ? sdoc.getDocumentReference() : null;
+
         // Make sure current author has wiki admin right to use this API
-        this.authorization.checkAccess(Right.ADMIN, xcontext.getAuthorReference(), xcontext.getWikiReference());
+        this.authorization.checkAccess(Right.ADMIN, EntityType.WIKI, xcontext.getAuthorReference(),
+            contextDocumentReference);
     }
 
     /**

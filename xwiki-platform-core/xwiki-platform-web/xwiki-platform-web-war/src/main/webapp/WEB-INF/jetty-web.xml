@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://www.eclipse.org/jetty/configure_9_0.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -21,7 +21,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+<Configure class="org.eclipse.jetty.ee10.webapp.WebAppContext">
   <!-- In order to avoid getting a "java.lang.IllegalStateException: Form too large" error when editing large page in
        XWiki we need to tell Jetty to allow for large content since by default it only allows for 20K. We do this by
        passing the "org.eclipse.jetty.server.Request.maxFormContentSize" attribute.

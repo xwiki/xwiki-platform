@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * Components implementing this interface defines how the events should be grouped to form composite events.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.5RC1
  */
 @Role
-@Unstable
 public interface GroupingEventStrategy
 {
     /**

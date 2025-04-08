@@ -71,7 +71,6 @@ public interface URLSecurityManager
      * @since 14.10.4
      * @since 15.0
      */
-    @Unstable
     default boolean isURITrusted(URI uri)
     {
         return false;
@@ -92,7 +91,6 @@ public interface URLSecurityManager
      * @since 14.10.4
      * @since 15.0
      */
-    @Unstable
     default URI parseToSafeURI(String serializedURI) throws URISyntaxException, SecurityException
     {
         throw new SecurityException("Cannot guarantee safeness of " + serializedURI);

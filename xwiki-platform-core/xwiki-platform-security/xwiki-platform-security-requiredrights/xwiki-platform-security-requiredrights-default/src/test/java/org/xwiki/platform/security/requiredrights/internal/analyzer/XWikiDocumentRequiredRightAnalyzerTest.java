@@ -37,6 +37,7 @@ import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,6 +65,9 @@ class XWikiDocumentRequiredRightAnalyzerTest
     private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
 
     @MockComponent
+    private RequiredRightAnalyzer<BaseClass> baseClassRequiredRightAnalyzer;
+
+    @MockComponent
     private VelocityDetector velocityDetector;
 
     @Test
@@ -81,6 +85,9 @@ class XWikiDocumentRequiredRightAnalyzerTest
         BaseObject object = mock();
         when(document.getXObjects()).thenReturn(Map.of(mock(), List.of(object)));
 
+        BaseClass baseClass = mock();
+        when(document.getXClass()).thenReturn(baseClass);
+
         XDOM xdom = mock();
         when(document.getXDOM()).thenReturn(xdom);
         RequiredRightAnalysisResult xdomResult = mock();
@@ -89,7 +96,10 @@ class XWikiDocumentRequiredRightAnalyzerTest
         RequiredRightAnalysisResult objectResult = mock();
         when(this.objectRequiredRightAnalyzer.analyze(object)).thenReturn(List.of(objectResult));
 
-        assertEquals(List.of(xdomResult, objectResult), this.analyzer.analyze(document));
+        RequiredRightAnalysisResult baseClassResult = mock();
+        when(this.baseClassRequiredRightAnalyzer.analyze(baseClass)).thenReturn(List.of(baseClassResult));
+
+        assertEquals(List.of(xdomResult, baseClassResult, objectResult), this.analyzer.analyze(document));
     }
 
     @Test

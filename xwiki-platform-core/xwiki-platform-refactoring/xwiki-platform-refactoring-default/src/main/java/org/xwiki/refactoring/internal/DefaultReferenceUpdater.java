@@ -21,6 +21,7 @@ package org.xwiki.refactoring.internal;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +36,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -45,6 +47,8 @@ import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -93,6 +97,12 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
     @Named("context")
     private Provider<ComponentManager> contextComponentManagerProvider;
 
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> userReferenceResolver;
+
+    @Inject
+    private LocalizationManager localizationManager;
+
     @FunctionalInterface
     private interface RenameLambda
     {
@@ -125,11 +135,10 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
      * clear whether the content author deserves to be updated or not (even without the side effects).
      * 
      * @param document the document to be saved
-     * @param comment the revision comment
-     * @param minorEdit whether it's a minor edit or not
+     * @param commentTranslationKey the revision comment translation key
      * @throws XWikiException if saving the document fails
      */
-    private void saveDocumentPreservingContentAuthor(XWikiDocument document, String comment, boolean minorEdit)
+    private void saveDocumentPreservingAuthors(XWikiDocument document, String commentTranslationKey)
         throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -137,8 +146,11 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         document.setContentDirty(false);
         // Make sure the version is incremented.
         document.setMetaDataDirty(true);
-        document.setAuthorReference(xcontext.getUserReference());
-        xcontext.getWiki().saveDocument(document, comment, minorEdit, xcontext);
+        document.getAuthors().setOriginalMetadataAuthor(
+            this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE));
+        Locale defaultLocale = this.localizationManager.getDefaultLocale();
+        String comment = this.localizationManager.getTranslationPlain(commentTranslationKey, defaultLocale);
+        xcontext.getWiki().saveDocument(document, comment, true, xcontext);
     }
 
     private boolean renameLinks(XWikiDocument document, boolean relative, RenameLambda renameLambda)
@@ -246,11 +258,11 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
 
         if (modified) {
             if (relative) {
-                saveDocumentPreservingContentAuthor(document, "Updated the relative links.", true);
+                saveDocumentPreservingAuthors(document, "refactoring.referenceUpdater.saveMessage.relativeLink");
 
                 info("Updated the relative links from [{}].", currentDocumentReference);
             } else {
-                saveDocumentPreservingContentAuthor(document, "Renamed back-links.", false);
+                saveDocumentPreservingAuthors(document, "refactoring.referenceUpdater.saveMessage.backlinks");
 
                 info("The links from [{}] that were targeting [{}] have been updated to target [{}].",
                     document.getDocumentReferenceWithLocale(), oldTarget, newTarget);
@@ -265,17 +277,20 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
     }
 
     private void renameLinks(DocumentReference documentReference, DocumentReference oldLinkTarget,
-        DocumentReference newLinkTarget, boolean relative)
+        DocumentReference newLinkTarget, boolean relative, Map<EntityReference, EntityReference> updatedEntities)
     {
         internalRenameLinks(documentReference, oldLinkTarget, newLinkTarget, relative, (xdom, currentDocumentReference,
-            r) -> this.renamer.renameReferences(xdom, currentDocumentReference, oldLinkTarget, newLinkTarget, r));
+            r) -> this.renamer.renameReferences(xdom, currentDocumentReference, oldLinkTarget, newLinkTarget, r,
+            updatedEntities));
     }
 
     private void renameLinks(DocumentReference documentReference, AttachmentReference oldLinkTarget,
-        AttachmentReference newLinkTarget, boolean relative)
+        AttachmentReference newLinkTarget, boolean relative, Map<EntityReference, EntityReference> updatedEntities)
     {
         internalRenameLinks(documentReference, oldLinkTarget, newLinkTarget, relative, (xdom, currentDocumentReference,
-            r) -> this.renamer.renameReferences(xdom, currentDocumentReference, oldLinkTarget, newLinkTarget, r));
+            r) ->
+            this.renamer.renameReferences(xdom, currentDocumentReference, oldLinkTarget, newLinkTarget, r,
+                updatedEntities));
     }
 
     private void internalRenameLinks(DocumentReference documentReference, EntityReference oldLinkTarget,
@@ -331,7 +346,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
 
     @Override
     public void update(DocumentReference documentReference, EntityReference oldTargetReference,
-        EntityReference newTargetReference)
+        EntityReference newTargetReference, Map<EntityReference, EntityReference> updatedEntities)
     {
         // If the current document is the moved entity the links should be serialized relative to it
         boolean relative = newTargetReference.equals(documentReference);
@@ -344,10 +359,18 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         // Only support documents and attachments targets
         if (oldTargetReference.getType() == EntityType.ATTACHMENT) {
             renameLinks(documentReference, toAttachmentReference(oldTargetReference),
-                toAttachmentReference(newTargetReference), relative);
+                toAttachmentReference(newTargetReference), relative, updatedEntities);
         } else if (oldTargetReference.getType() == EntityType.DOCUMENT) {
             renameLinks(documentReference, toDocumentReference(oldTargetReference),
-                toDocumentReference(newTargetReference), relative);
+                toDocumentReference(newTargetReference), relative, updatedEntities);
         }
+    }
+
+    @Override
+    public void update(DocumentReference documentReference, EntityReference oldTargetReference,
+        EntityReference newTargetReference)
+    {
+        update(documentReference, oldTargetReference, newTargetReference,
+            Map.of(oldTargetReference, newTargetReference));
     }
 }

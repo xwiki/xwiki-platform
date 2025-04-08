@@ -63,6 +63,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Component
 @Named("liveTable")
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigurationResolver<LiveTableConfiguration>
 {
     private static final String HTML = "html";

@@ -144,7 +144,8 @@
       'transprefix': $transprefix,
       'classname': $classname,
       'collist': $stringtool.join($dataColumns, ','),
-      'queryFilters': $queryFilters
+      'queryFilters': $queryFilters,
+      'tagcloud': $tagcloud
     })
     #set ($discard = $parameters.putAll($classParams))
     #set ($resultPage = $options.resultPage)

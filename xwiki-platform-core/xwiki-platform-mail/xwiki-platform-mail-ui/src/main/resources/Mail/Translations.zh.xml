@@ -63,7 +63,7 @@ Mail.SendMailConfigClass_properties=技术配置
 Mail.SendMailConfigClass_properties.hint=上文没有定义的其他JavaMail属性，例如此语句将启用tls选项：mail.smtp.starttls.enable=true
 Mail.SendMailConfigClass_sendWaitTime=发送等待时间
 Mail.SendMailConfigClass_sendWaitTime.hint=发送每封邮件之间的延迟，以毫秒为单位（默认为 8 秒）
-Mail.SendMailConfigClass_discardSuccessStatuses=忽略成功发送的邮件
+Mail.SendMailConfigClass_discardSuccessStatuses=丢弃成功状态？
 Mail.SendMailConfigClass_discardSuccessStatuses.hint=无论是否保留已成功发送的邮件的邮件状态（默认为 true）
 Mail.SendMailStatus_livetable.date=日期
 Mail.SendMailStatus_livetable.batchId=批处理 ID

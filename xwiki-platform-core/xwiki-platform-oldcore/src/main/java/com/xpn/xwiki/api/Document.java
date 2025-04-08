@@ -21,6 +21,7 @@ package com.xpn.xwiki.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
@@ -43,6 +45,11 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.filter.output.DefaultWriterOutputTarget;
+import org.xwiki.filter.output.OutputTarget;
+import org.xwiki.filter.xar.output.XAROutputProperties;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -55,7 +62,11 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
@@ -139,6 +150,10 @@ public class Document extends Api
 
     private ConfigurationSource configuration;
 
+    private DocumentRequiredRightsManager documentRequiredRightsManager;
+
+    private DocumentAuthorizationManager documentAuthorizationManager;
+
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
         if (this.currentMixedDocumentReferenceResolver == null) {
@@ -183,6 +198,24 @@ public class Document extends Api
         }
 
         return this.configuration;
+    }
+
+    private DocumentRequiredRightsManager getDocumentRequiredRightsManager()
+    {
+        if (this.documentRequiredRightsManager == null) {
+            this.documentRequiredRightsManager = Utils.getComponent(DocumentRequiredRightsManager.class);
+        }
+
+        return this.documentRequiredRightsManager;
+    }
+
+    private DocumentAuthorizationManager getDocumentAuthorizationManager()
+    {
+        if (this.documentAuthorizationManager == null) {
+            this.documentAuthorizationManager = Utils.getComponent(DocumentAuthorizationManager.class);
+        }
+
+        return this.documentAuthorizationManager;
     }
 
     /**
@@ -1392,10 +1425,24 @@ public class Document extends Api
 
     public String getXMLContent() throws XWikiException
     {
-        String xml = this.doc.getXMLContent(getXWikiContext());
-        return getXWikiContext().getUtil().substitute("s/<email>.*?<\\/email>/<email>********<\\/email>/goi",
-            getXWikiContext().getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
-                xml));
+        StringWriter writer = new StringWriter();
+        OutputTarget outputTarget = new DefaultWriterOutputTarget(writer);
+
+        DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
+        documentProperties.setWithWikiDocumentContentHTML(true);
+        documentProperties.setWithWikiAttachmentsContent(false);
+        documentProperties.setWithJRCSRevisions(false);
+        documentProperties.setWithRevisions(false);
+        documentProperties.setExcludedPropertyTypes(Set.of("Email", "Password"));
+
+        // Output
+        XAROutputProperties xarProperties = new XAROutputProperties();
+        xarProperties.setPreserveVersion(false);
+        xarProperties.setTarget(outputTarget);
+
+        this.doc.toXML(documentProperties, xarProperties);
+
+        return writer.toString();
     }
 
     public String toXML() throws XWikiException
@@ -1831,6 +1878,25 @@ public class Document extends Api
         } else {
             return new Attachment(this, attach, getXWikiContext());
         }
+    }
+
+    /**
+     * @param filename the name of the attachment
+     * @return the attachment with the given filename or null if the attachment does not exist
+     * @since 17.2.0RC1
+     */
+    public Attachment removeAttachment(String filename)
+    {
+        XWikiAttachment attachment = getDoc().getAttachment(filename);
+        if (attachment != null) {
+            attachment = this.doc.removeAttachment(attachment);
+
+            if (attachment != null) {
+                return new Attachment(this, attachment, getXWikiContext());
+            }
+        }
+
+        return null;
     }
 
     public List<Delta> getContentDiff(Document origdoc, Document newdoc)
@@ -2500,9 +2566,57 @@ public class Document extends Api
 
     private void updateAuthor()
     {
+        updateAuthor(getDoc(), getXWikiContext());
+    }
+
+    protected static void updateAuthor(XWikiDocument document, XWikiContext xcontext)
+    {
         // Temporary set as author of the document the current script author (until the document is saved)
-        XWikiContext xcontext = getXWikiContext();
-        getDoc().setAuthorReference(xcontext.getAuthorReference());
+        DocumentReference author = xcontext.getAuthorReference();
+        document.setAuthorReference(author);
+
+        XWikiDocument secureDocument = xcontext.getSecureDocument();
+        // If there is a secure document that has required rights enforced, we need to be careful.
+        if (secureDocument != null) {
+            DocumentRequiredRightsManager requiredRightsManager =
+                Utils.getComponent(DocumentRequiredRightsManager.class);
+            DocumentReference secureDocumentReference = secureDocument.getDocumentReference();
+            try {
+                DocumentRequiredRights secureRequiredRights =
+                    requiredRightsManager.getRequiredRights(secureDocumentReference)
+                        .orElse(DocumentRequiredRights.EMPTY);
+                DocumentRequiredRights requiredRights =
+                    requiredRightsManager.getRequiredRights(document.getDocumentReference())
+                        .orElse(DocumentRequiredRights.EMPTY);
+
+                DocumentAuthorizationManager authorizationManager =
+                    Utils.getComponent(DocumentAuthorizationManager.class);
+                if (secureRequiredRights.enforce()
+                    // If the secure document has programming right, everything is fine.
+                    && !authorizationManager.hasAccess(Right.PROGRAM, null, author, secureDocumentReference)
+                    // If this document doesn't have required rights enforced or has more rights than the secure
+                    // document, we need to restrict this document to be safe.
+                    && (!requiredRights.enforce()
+                    || !hasAllRequiredRights(requiredRights, secureDocumentReference, author)))
+                {
+                    document.setRestricted(true);
+                }
+            } catch (AuthorizationException e) {
+                document.setRestricted(true);
+
+                LOGGER.error("Failed to load or check required rights in update of document [{}]",
+                    document.getDocumentReference(), e);
+            }
+        }
+    }
+
+    private static boolean hasAllRequiredRights(DocumentRequiredRights requiredRights,
+        DocumentReference secureDocumentReference, DocumentReference author)
+    {
+        DocumentAuthorizationManager authorizationManager = Utils.getComponent(DocumentAuthorizationManager.class);
+        return requiredRights.rights().stream().allMatch(requiredRight ->
+            authorizationManager.hasAccess(requiredRight.right(),
+                requiredRight.scope(), author, secureDocumentReference));
     }
 
     public void setContent(String content)
@@ -2720,14 +2834,85 @@ public class Document extends Api
             doc.getAuthors().setCreator(currentUserReference);
         }
 
+        XWikiContext xWikiContext = getXWikiContext();
         if (checkSaving) {
+            DocumentReference author = doc.getAuthorReference();
+
+            XWikiDocument secureDocument = xWikiContext.getSecureDocument();
+            if (secureDocument != null) {
+                // Use the context author here as these required right checks are only on the secure document and
+                // this shouldn't rely on the current user but the script author.
+                // The existing required rights on doc have already been verified by the edit right check.
+                // If required rights shall be changed, they are checked by a listener in checkSavingDocument() below.
+                checkRequiredRightsForSaving(secureDocument, doc, xWikiContext.getAuthorReference());
+            }
+
             // Make sure the user is allowed to make this modification
-            getXWikiContext().getWiki().checkSavingDocument(doc.getAuthorReference(), doc, comment, minorEdit,
-                getXWikiContext());
+            xWikiContext.getWiki().checkSavingDocument(author, doc, comment, minorEdit,
+                xWikiContext);
         }
 
-        getXWikiContext().getWiki().saveDocument(doc, comment, minorEdit, getXWikiContext());
+        xWikiContext.getWiki().saveDocument(doc, comment, minorEdit, xWikiContext);
         this.initialDoc = this.doc;
+    }
+
+    private void checkRequiredRightsForSaving(XWikiDocument secureDocument, XWikiDocument doc, DocumentReference author)
+        throws XWikiException
+    {
+        DocumentRequiredRights secureDocumentRequiredRights;
+        try {
+            secureDocumentRequiredRights =
+                getDocumentRequiredRightsManager().getRequiredRights(secureDocument.getDocumentReference())
+                    .orElse(DocumentRequiredRights.EMPTY);
+        } catch (AuthorizationException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "The required rights for document [%s] couldn't be loaded"
+                    .formatted(secureDocument.getDocumentReference()), e);
+        }
+
+        try {
+            // No programming right? Enforce required rights!
+            if (secureDocumentRequiredRights.enforce()
+                && !getDocumentAuthorizationManager()
+                .hasAccess(Right.PROGRAM, null, author, secureDocument.getDocumentReference()))
+            {
+
+                DocumentRequiredRights rightsToCheck;
+                if (isTranslation()) {
+                    // For translations, check the required rights of the main document.
+                    rightsToCheck = getDocumentRequiredRightsManager().getRequiredRights(doc.getDocumentReference())
+                        .orElse(DocumentRequiredRights.EMPTY);
+                    // If the main document doesn't enforce required rights, there is nothing we can do.
+                    if (!rightsToCheck.enforce()) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                            XWikiException.ERROR_XWIKI_ACCESS_DENIED, ("The document cannot be saved because rights on"
+                            + " the secure document [%s] are restricted using required rights and the document to "
+                            + "save [%s] doesn't enforce required rights.")
+                            .formatted(secureDocument.getDocumentReference(), doc.getDocumentReference()));
+                    }
+                } else {
+                    // Enable enforcing to avoid breaking scripts that save other documents.
+                    if (!doc.isEnforceRequiredRights()) {
+                        doc.setEnforceRequiredRights(true);
+                    }
+
+                    // Check if the new required rights aren't more than what the secure document has.
+                    DocumentRequiredRightsReader rightsReader = Utils.getComponent(DocumentRequiredRightsReader.class);
+                    rightsToCheck = rightsReader.readRequiredRights(doc);
+                }
+
+                for (DocumentRequiredRight requiredRight : rightsToCheck.rights()) {
+                    getDocumentAuthorizationManager()
+                        .checkAccess(requiredRight.right(), requiredRight.scope(), author,
+                            secureDocument.getDocumentReference());
+                }
+            }
+        } catch (AuthorizationException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                ("The document cannot be saved because rights on the secure document [%s] are restricted using "
+                    + "required rights and the document to save [%s] has more rights than the secure document.")
+                    .formatted(secureDocument.getDocumentReference(), doc.getDocumentReference()), e);
+        }
     }
 
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException
@@ -3048,6 +3233,9 @@ public class Document extends Api
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newReference the reference to the new document
      * @throws XWikiException in case of an error
@@ -3078,7 +3266,9 @@ public class Document extends Api
      * <p>
      * Note: links without a space are renamed with the space added and all documents which have the document being
      * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
-     * </p>
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
@@ -3093,6 +3283,9 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
@@ -3120,6 +3313,9 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newReference the reference to the new document
      * @param backlinkDocumentNames the list of reference to documents to parse and for which links will be modified to
@@ -3206,7 +3402,6 @@ public class Document extends Api
      * @since 14.10.7
      * @since 15.2RC1
      */
-    @Unstable
     public boolean isRestricted()
     {
         return this.doc.isRestricted();
@@ -3261,6 +3456,34 @@ public class Document extends Api
     public void setHidden(boolean hidden)
     {
         this.doc.setHidden(hidden);
+    }
+
+    /**
+     * @return {@code true} if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't
+     * use more rights than defined in the object, {@code false} otherwise. This property is ignored on translations.
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public boolean isEnforceRequiredRights()
+    {
+        return this.doc.isEnforceRequiredRights();
+    }
+
+    /**
+     * @param enforceRequiredRights if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't use
+     * more rights than defined in the object. This property is ignored on translations.
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public void setEnforceRequiredRights(boolean enforceRequiredRights)
+    {
+        getDoc().setEnforceRequiredRights(enforceRequiredRights);
+
+        updateAuthor();
+
+        updateContentAuthor();
     }
 
     /**

@@ -28,16 +28,21 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.security.authorization.Right;
@@ -87,6 +92,9 @@ class DefaultWikiMacroFactoryTest
 
     @MockComponent
     private ContentParser contentParser;
+
+    @MockComponent
+    private MacroContentParser macroContentParser;
 
     @MockComponent
     @Named("macro")
@@ -157,14 +165,15 @@ class DefaultWikiMacroFactoryTest
         assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
         assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.GLOBAL));
 
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.ADMIN, null,
-            DOCUMENT_REFERENCE.getWikiReference())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(Right.ADMIN, EntityType.WIKI, null, DOCUMENT_REFERENCE)).thenReturn(true);
 
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
         assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.GLOBAL));
 
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.PROGRAM, null, null)).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(Right.PROGRAM, null, null, DOCUMENT_REFERENCE)).thenReturn(true);
 
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
@@ -269,5 +278,18 @@ class DefaultWikiMacroFactoryTest
         saveDocument();
 
         assertFalse(this.wikiMacroFactory.containsWikiMacro(DOCUMENT_REFERENCE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void createWikiMacroWithIsolatedExecution(boolean isolated) throws Exception
+    {
+        this.macroObject.setIntValue(WikiMacroConstants.MACRO_EXECUTION_ISOLATED_PROPERTY, isolated ? 1 : 0);
+        saveDocument();
+
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(DOCUMENT_REFERENCE);
+        assertNotNull(macro);
+
+        assertEquals(isolated, macro.isExecutionIsolated(new WikiMacroParameters(), "test"));
     }
 }

@@ -42,7 +42,6 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceTree;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageAttachmentReference;
@@ -68,7 +67,7 @@ public class ModelScriptService implements ScriptService
     /**
      * The default hint used when resolving references.
      */
-    private static final String DEFAULT_RESOLVER_HINT = "current";
+    protected static final String DEFAULT_RESOLVER_HINT = "current";
 
     /**
      * The default hint used when serializing references.
@@ -85,7 +84,8 @@ public class ModelScriptService implements ScriptService
      * Used to dynamically look up component implementations based on a given hint.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    protected ComponentManager componentManager;
 
     @Inject
     private EntityReferenceSerializer<String> defaultSerializer;
@@ -828,51 +828,6 @@ public class ModelScriptService implements ScriptService
             result = null;
         }
         return result;
-    }
-
-    /**
-     * Get the current value for a specific entity type, like the current space or wiki name. This doesn't return a
-     * proper entity reference, but just the string value that should be used for that type of entity.
-     * 
-     * @param type the target entity type; from Velocity it's enough to use a string with the uppercase name of the
-     *            entity, like {@code 'SPACE'}
-     * @return the current value for the requested entity type
-     * @since 4.3M1
-     * @deprecated since 7.4.1/8.0M1, use {@link #getEntityReference(EntityType)}
-     */
-    @Deprecated
-    public String getEntityReferenceValue(EntityType type)
-    {
-        return getEntityReferenceValue(type, DEFAULT_RESOLVER_HINT);
-    }
-
-    /**
-     * Get the value configured for a specific entity type, like the space name or wiki name. This doesn't return a
-     * proper entity reference, but just the string value that should be used for that type of entity.
-     * 
-     * @param type the target entity type; from Velocity it's enough to use a string with the uppercase name of the
-     *            entity, like {@code 'SPACE'}
-     * @param hint the hint of the value provider to use (valid hints are for example "default", "current" and
-     *            "currentmixed")
-     * @return the configured value for the requested entity type, for example "Main" for the default space or "WebHome"
-     *         for the default space homepage
-     * @since 4.3M1
-     * @deprecated since 7.2M1, use {@link #getEntityReference(EntityType, String)}
-     */
-    @Deprecated
-    public String getEntityReferenceValue(EntityType type, String hint)
-    {
-        if (type == null) {
-            return null;
-        }
-
-        try {
-            EntityReferenceValueProvider provider =
-                this.componentManager.getInstance(EntityReferenceValueProvider.class, hint);
-            return provider.getDefaultValue(type);
-        } catch (ComponentLookupException ex) {
-            return null;
-        }
     }
 
     /**

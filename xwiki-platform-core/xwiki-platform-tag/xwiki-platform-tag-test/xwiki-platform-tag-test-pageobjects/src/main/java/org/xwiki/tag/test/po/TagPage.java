@@ -19,6 +19,8 @@
  */
 package org.xwiki.tag.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -30,6 +32,8 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class TagPage extends ViewPage
 {
+    private final String tag;
+
     @FindBy(xpath = "//a[@class='button rename']")
     private WebElement buttonRenameTag;
 
@@ -48,23 +52,17 @@ public class TagPage extends ViewPage
     @FindBy(xpath = "//input[@value='Rename']")
     private WebElement buttonConfirmRename;
 
-    public void clickRenameButton()
+    public TagPage(String tag)
     {
-      this.buttonRenameTag.click();
-    }
-    
-    public void setNewTagName(String newTagName)
-    {
-        this.renameTagInput.sendKeys(newTagName);
+        this.tag = tag;
     }
 
-    public void clickCancelRenameButton()
+    public TagPage renameTag(String newTagName)
     {
-        this.buttonDeleteTag.click();
-    }
-    public void clickConfirmRenameTagButton()
-    {
+        this.buttonRenameTag.click();
+        this.renameTagInput.sendKeys(newTagName);
         this.buttonConfirmRename.click();
+        return new TagPage(newTagName);
     }
     
     public void clickDeleteButton()
@@ -76,16 +74,19 @@ public class TagPage extends ViewPage
         this.buttonConfirmDeleteTag.click();
     }
 
-    public boolean hasTagHighlight(String tagName)
-    {   
-        return getDriver().findElementsWithoutWaiting(
-            By.xpath("//span[@class='highlight tag' and contains(text()[1], '" + tagName + "')]")).size() == 1;
-    }
-    public boolean hasConfirmationMessage(String tagName)
+    public boolean hasConfirmationMessage()
     {
         return getDriver().findElementsWithoutWaiting(
             By.xpath("//div[@class='box infomessage' and contains(. ,'has been successfully deleted')]"))
             .size() == 1;
+    }
+
+    public List<String> getTaggedPages()
+    {
+        String titleId = "HAllpagestaggedwith" + tag;
+        return getDriver().findElementsWithoutWaiting(By.cssSelector(String.format("h3[id='%s'] ~ ul > li", titleId)))
+            .stream().map(WebElement::getText)
+            .toList();
     }
 
 }

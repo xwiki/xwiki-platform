@@ -23,13 +23,14 @@ import java.util.List;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.By;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
-import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -88,9 +89,10 @@ class PagePickerIT
         }
 
         String pageName = reference.getLastSpaceReference().getName();
+        String pageTitle = "Test Title";
         setup.createPage(reference,
             String.format(PICKER_TEMPLATE, PICKER_ID),
-            pageName);
+            pageTitle);
 
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
@@ -99,39 +101,36 @@ class PagePickerIT
         List<SuggestInputElement.SuggestionElement> suggestions =
             pagePicker.sendKeys(pageName).waitForSuggestions().getSuggestions();
         assertEquals(1, suggestions.size());
-        assertEquals(pageName, suggestions.get(0).getLabel());
+        assertEquals(pageTitle, suggestions.get(0).getLabel());
         // Just to be sure that searching for the children also works, search and select the first child.
-        pagePicker.clear().sendKeys(childName).waitForSuggestions()
+        pagePicker.clear().sendKeys(childName + "0").waitForSuggestions()
             .selectByVisibleText("Child page 0");
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = { "ähm", "töst", "école", "hôtelière" })
     @Order(3)
-    void searchCaseInsensitiveUnicode(TestUtils setup, TestReference reference) throws Exception
+    void searchCaseInsensitiveUnicode(String searchText, TestUtils setup, TestReference reference)
+        throws Exception
     {
-        setup.loginAsSuperAdmin();
         String pageName = reference.getLastSpaceReference().getName();
 
         String title = "École hôtelière";
         setup.rest().savePage(new DocumentReference("ÄhmTöst", reference.getLastSpaceReference()), "Content",
             title);
 
-        ViewPage page = setup.createPage(reference, String.format(PICKER_TEMPLATE, PICKER_ID), pageName);
+        setup.rest().delete(reference);
+        setup.createPage(reference, String.format(PICKER_TEMPLATE, PICKER_ID), pageName);
 
-        for (String searchText : List.of("ähm", "école")) {
-            SuggestInputElement pagePicker =
-                new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
+        SuggestInputElement pagePicker =
+            new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
 
-            // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
-            pagePicker.click().waitForSuggestions();
+        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
+        pagePicker.click().waitForSuggestions();
 
-            List<SuggestInputElement.SuggestionElement> suggestions =
-                pagePicker.sendKeys(searchText).waitForSuggestions().getSuggestions();
-            assertEquals(1, suggestions.size());
-            assertEquals(title, suggestions.get(0).getLabel());
-
-            // Reload the page to clear the loaded suggestions.
-            page.reloadPage();
-        }
+        List<SuggestInputElement.SuggestionElement> suggestions =
+            pagePicker.sendKeys(searchText).waitForSuggestions().getSuggestions();
+        assertEquals(1, suggestions.size(), "Didn't find anything searching for %s".formatted(searchText));
+        assertEquals(title, suggestions.get(0).getLabel());
     }
 }

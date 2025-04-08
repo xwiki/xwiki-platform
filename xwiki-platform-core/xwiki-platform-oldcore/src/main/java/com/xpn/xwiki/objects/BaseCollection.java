@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.XWikiContext;
@@ -224,8 +226,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             }
         }
 
-        this.xClassReference = ref;
-        this.xClassReferenceCache = null;
+        if (!Objects.equals(this.xClassReference, ref)) {
+            this.xClassReference = ref;
+            this.xClassReferenceCache = null;
+
+            setDirty(true);
+        }
     }
 
     /**
@@ -265,7 +271,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         addField(name, property);
         if (property instanceof BaseProperty) {
-            ((BaseProperty) property).setObject(this);
             ((BaseProperty) property).setName(name);
         }
     }
@@ -537,9 +542,15 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         this.fields.put(name, element);
 
-        if (element instanceof BaseElement) {
-            ((BaseElement) element).setOwnerDocument(getOwnerDocument());
+        if (element instanceof BaseElement baseElement) {
+            baseElement.setOwnerDocument(getOwnerDocument());
+
+            if (element instanceof BaseProperty baseProperty) {
+                baseProperty.setObject(this);
+            }
         }
+
+        setDirty(true);
     }
 
     public void removeField(String name)
@@ -548,6 +559,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         if (field != null) {
             this.fields.remove(name);
             this.fieldsToRemove.add(field);
+
+            setDirty(true);
         }
     }
 
@@ -635,6 +648,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     public BaseCollection clone()
     {
         BaseCollection collection = (BaseCollection) super.clone();
+
         collection.setXClassReference(getRelativeXClassReference());
         collection.setNumber(getNumber());
         Map fields = getFields();
@@ -646,6 +660,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             cfields.put(entry.getKey(), prop);
         }
         collection.setFields(cfields);
+
+        collection.setDirty(isDirty());
 
         return collection;
     }
@@ -980,5 +996,26 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 }
             }
         }
+    }
+
+    /**
+     * @param dirty true the value of the dirty flag(s)
+     * @param deep true if the dirty flag should be set to all children
+     * @since 17.2.1
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    @Unstable
+    public void setDirty(boolean dirty, boolean deep)
+    {
+        setDirty(dirty);
+
+        this.fields.values().forEach(field -> {
+            if (field instanceof BaseCollection<?> baseCollection) {
+                baseCollection.setDirty(dirty, deep);
+            } else if (field instanceof BaseElement<?> baseElement) {
+                baseElement.setDirty(dirty);
+            }
+        });
     }
 }

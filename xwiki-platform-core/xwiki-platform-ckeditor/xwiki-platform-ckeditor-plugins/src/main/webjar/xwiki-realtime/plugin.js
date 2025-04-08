@@ -155,10 +155,8 @@
           editor.once('dataReady', dataReady);
 
           // Show a notification explaining that we temporarily left the realtime session.
-          editor.showNotification(
-            editor.localization.get('xwiki-realtime.notification.sourcearea.temporarilyLeftSession'),
-            'info',
-            5000);
+          editor.showNotification(editor.localization.get(
+            'xwiki-realtime.notification.sourcearea.temporarilyLeftSession'));
         }
 
       } else if (editor.mode === 'source' && newMode === 'wysiwyg') {
@@ -193,9 +191,6 @@
                 if (editor._realtime._realtimeContext.channels.wysiwyg_users > 0) {
                   /*jshint +W106 */
 
-                  // Bring the autosave checkbox back.
-                  editor._realtimeInterface.realtimeAllowed(false);
-
                   // Show a notification explaining that we are not rejoining the realtime session.
                   editor.showNotification(
                     editor.localization.get('xwiki-realtime.notification.sourcearea.notRejoiningSession'),
@@ -207,8 +202,7 @@
                   // Show a notification explaining that we are rejoining the session because we are alone.
                   editor.showNotification(
                     editor.localization.get('xwiki-realtime.notification.sourcearea.rejoiningSession.alone'),
-                    'success',
-                    5000);
+                    'success');
                   realtimeCheckbox.prop('checked', true);
                   editor._realtime._startRealtimeSync();
                 }
@@ -216,8 +210,7 @@
                 // Join the realtime session.
                 editor.showNotification(
                   editor.localization.get('xwiki-realtime.notification.sourcearea.rejoiningSession.noChanges'),
-                  'success',
-                  5000);
+                  'success');
                 realtimeCheckbox.prop('checked', true);
 
                 const readOnly = function () {

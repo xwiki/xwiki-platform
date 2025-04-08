@@ -212,6 +212,11 @@ public class ModelFactory
 
         doc.setHidden(restPage.isHidden());
 
+        if (restPage.isEnforceRequiredRights() != null) {
+            doc.setEnforceRequiredRights(restPage.isEnforceRequiredRights());
+            modified = true;
+        }
+
         // Set objects
         if (restPage.getObjects() != null) {
             Set<ObjectReference> newReferences = new HashSet<>();
@@ -381,7 +386,8 @@ public class ModelFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            if (hasAccess(property)) {
+            // ComputedField properties don't have any value by definition so we ignore those.
+            if (hasAccess(property) && !(propertyClass instanceof ComputedFieldClass)) {
                 try {
                     property.setValue(
                         serializePropertyValue(xwikiObject.get(propertyClass.getName()), propertyClass, xwikiContext));
@@ -761,6 +767,7 @@ public class ModelFactory
         page.setMajorVersion(doc.getRCSVersion().at(0));
         page.setMinorVersion(doc.getRCSVersion().at(1));
         page.setHidden(doc.isHidden());
+        page.setEnforceRequiredRights(doc.isEnforceRequiredRights());
         page.setLanguage(doc.getLocale().toString());
         page.setCreator(doc.getCreator());
         if (withPrettyNames) {

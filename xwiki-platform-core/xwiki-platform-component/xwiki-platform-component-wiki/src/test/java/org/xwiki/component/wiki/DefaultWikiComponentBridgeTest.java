@@ -40,6 +40,8 @@ import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -60,7 +62,9 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -107,6 +111,9 @@ class DefaultWikiComponentBridgeTest implements WikiComponentConstants
     @MockComponent
     private Execution execution;
 
+    @MockComponent
+    private DocumentAuthorizationManager documentAuthorizationManager;
+
     @InjectMockComponents
     private DefaultWikiComponentBridge bridge;
 
@@ -128,6 +135,7 @@ class DefaultWikiComponentBridgeTest implements WikiComponentConstants
 
         when(this.execution.getContext()).thenReturn(context);
         when(this.xwiki.getDocument(DOC_REFERENCE, xwikiContext)).thenReturn(this.componentDoc);
+        when(this.componentDoc.getDocumentReference()).thenReturn(DOC_REFERENCE);
     }
 
     @Test
@@ -263,5 +271,18 @@ class DefaultWikiComponentBridgeTest implements WikiComponentConstants
         when(this.componentDoc.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
         assertEquals(Syntax.XWIKI_2_1, this.bridge.getSyntax(DOC_REFERENCE));
+    }
+
+    @Test
+    void hasProgrammingRights() throws Exception
+    {
+        when(this.componentDoc.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
+
+        assertFalse(this.bridge.hasProgrammingRights(DOC_REFERENCE));
+
+        when(this.documentAuthorizationManager.hasAccess(Right.PROGRAM, null, AUTHOR_REFERENCE, DOC_REFERENCE))
+            .thenReturn(true);
+
+        assertTrue(this.bridge.hasProgrammingRights(DOC_REFERENCE));
     }
 }

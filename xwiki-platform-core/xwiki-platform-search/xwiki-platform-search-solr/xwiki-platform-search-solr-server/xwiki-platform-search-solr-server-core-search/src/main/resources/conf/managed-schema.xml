@@ -65,6 +65,14 @@
        1.6: useDocValuesAsStored defaults to true.
     -->
 
+    <!-- XWIKI: the version of the schema from XWiki point of view.
+         The version should be updated when the configuration need to be updated for the core to work as expected.
+         It cause the whole schema to be re-created with embedded Solr setup.
+
+         160600000: added support for Ukrainian locale, this also requires a special JAR in the lib/ folder
+    -->
+    <fieldType name="__cversion" class="solr.ExternalFileField" defVal="160600000"/>
+
     <!-- Valid attributes for fields:
      name: mandatory - the name for the field
      type: mandatory - the name of a field type from the
@@ -359,7 +367,7 @@
     -->
 
     <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
-    <fieldType name="string" class="solr.StrField" sortMissingLast="true" />
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true" />
     <fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true" docValues="true" />
 
     <!-- boolean type: "true" or "false" -->

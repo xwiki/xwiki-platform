@@ -48,7 +48,7 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -76,7 +76,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
     private AuthorExecutor authorExecutor;
 
     @Inject
-    protected AuthorizationManager authorization;
+    protected DocumentAuthorizationManager authorization;
 
     /**
      * Default constructor.
@@ -103,7 +103,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
             resolve(context.getCurrentMacroBlock(), parameters.getReference(), parameters.getType(), "include");
         checkRecursion(context.getCurrentMacroBlock(), includedReference);
 
-        // Step 2: Retrieve the included document.
+        // Step 2a: Retrieve the included document.
         DocumentModelBridge documentBridge;
         try {
             documentBridge = this.documentAccessBridge.getDocumentInstance(includedReference);
@@ -111,6 +111,11 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
             throw new MacroExecutionException(
                 "Failed to load Document [" + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]",
                 e);
+        }
+
+        // Step 2b: Make sure the page exists
+        if (documentBridge.isNew()) {
+            return List.of();
         }
 
         // Step 3: Check right
@@ -192,7 +197,8 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
                 throw new MacroExecutionException("Failed to retrieve the translated version of the document", e);
             }
             if (parameters.getAuthor() == Author.TARGET || parameters.getAuthor() == Author.AUTO && !this.authorization
-                .hasAccess(Right.PROGRAM, translatedDocumentBridge.getContentAuthorReference(), null)) {
+                .hasAccess(Right.PROGRAM, null, translatedDocumentBridge.getContentAuthorReference(),
+                    translatedDocumentBridge.getDocumentReference())) {
                 // Merge the two XDOM before executing the included content so that it's as close as possible to the
                 // expect execution conditions
                 MacroBlock includeMacro = context.getCurrentMacroBlock();

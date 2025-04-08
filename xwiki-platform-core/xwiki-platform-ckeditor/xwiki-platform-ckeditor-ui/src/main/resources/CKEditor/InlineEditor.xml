@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.InlineEditor" locale="">
+<xwikidoc version="1.6" reference="CKEditor.InlineEditor" locale="">
   <web>CKEditor</web>
   <name>InlineEditor</name>
   <language/>
@@ -291,17 +291,21 @@
       stopAvoidingCKAndSaveBarOverlap = startAvoidingCKAndSaveBarOverlap(editor);
     });
     editor.once('reload', function(event) {
-      $(document).off(['xwiki:actions:view.contentEditor', 'xwiki:actions:beforeSave.contentEditor'].join(' '));
+      $(document).off([
+        'xwiki:actions:view.contentEditor',
+        'xwiki:actions:beforeSave.contentEditor',
+        'xwiki:actions:beforePreview.contentEditor'
+      ].join(' '));
       event.data.promise = event.data.promise.then(createEditor.bind(null, ckeditor, element, config));
     });
-    $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
+    $(document).on('xwiki:actions:beforeSave.contentEditor xwiki:actions:beforePreview.contentEditor', event =&gt; {
       config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
       // Delete the document content field that is not used so that the in-place editor knows what to submit on save.
       delete config.document[editor.mode === 'source' ? 'renderedContent' : 'content'];
       config.document.syntax = editor.config.sourceSyntax;
     });
     $(document).one('xwiki:actions:view.contentEditor', function(event, data) {
-      $(document).off('xwiki:actions:beforeSave.contentEditor');
+      $(document).off('xwiki:actions:beforeSave.contentEditor xwiki:actions:beforePreview.contentEditor');
       // Blur the edited content to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit shortcut).
       // We also do this because destroying the editor while the edited content has the focus can lead to an error.
       // See below.
@@ -374,7 +378,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

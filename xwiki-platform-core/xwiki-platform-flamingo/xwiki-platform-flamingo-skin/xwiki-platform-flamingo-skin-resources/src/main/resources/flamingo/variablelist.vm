@@ -1,0 +1,156 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## The variables defined in this file were added in XWiki 17.3.0
+## They should not be considered as API yet.
+## After some first "private" uses and some unavoidable cleanup/completion, 
+## this set of CSS variables should become an Unstable API.
+## Once those variables become API, make sure to update the documentation accordingly.
+
+## This template contains the initialization of various variable lists used both in CSS and LESS variables generation.
+## The CSS and LESS generators are in charge of filtering those variables (their exact variable sets can be different).
+
+############################################
+## Flamingo color theme variables
+############################################
+## List of all the variables available to edit directly in the Flamingo theme editor.
+#set($flamingoColorThemeVariables = {
+    "text-color": "color",
+    "body-bg": "color",
+    "xwiki-page-content-bg" : "color",
+    "font-family-base": "text",
+    "link-color": "color",
+    "brand-primary": "color",
+    "brand-success": "color",
+    "brand-info": "color",
+    "brand-warning": "color",
+    "brand-danger": "color",
+    "headings-color": "color",
+    "component-active-color" : "color",
+    "component-active-bg" : "color",
+    "font-family-base": "text",
+    "font-family-sans-serif": "text",
+    "font-family-serif": "text",
+    "font-family-monospace": "font",
+    "font-size-base" : "size",
+    "btn-font-weight" : "size",
+    "btn-default-color" : "color",
+    "btn-default-bg" : "color",
+    "btn-primary-color" : "color",
+    "btn-primary-bg" : "color",
+    "btn-success-color" : "color",
+    "btn-success-bg" : "color",
+    "btn-info-color" : "color",
+    "btn-info-bg" : "color",
+    "btn-warning-color" : "color",
+    "btn-warning-bg" : "color",
+    "btn-danger-color" : "color",
+    "btn-danger-bg" : "color",
+    "btn-default-border" : "color",
+    "navbar-default-color" : "color",
+    "navbar-default-bg" : "color",
+    "navbar-default-link-color" : "color",
+    "navbar-default-link-hover-color" : "color",
+    "navbar-default-link-hover-bg" : "color",
+    "navbar-default-link-active-color" : "color",
+    "navbar-default-link-active-bg": "color",
+    "navbar-height" : "size",
+    "dropdown-bg" : "color",
+    "dropdown-border" : "color",
+    "dropdown-link-color" : "color",
+    "dropdown-link-hover-color" : "color",
+    "dropdown-link-hover-bg" : "color",
+    "dropdown-divider-bg" : "color",
+    "input-bg" : "color",
+    "input-border" : "color",
+    "input-color" : "color",
+    "input-border-focus" : "color",
+    "input-color-placeholder" : "color",
+    "legend-color" : "color",
+    "legend-border-color": "color",
+    "panel-bg" : "color",
+    "panel-default-text" : "color",
+    "panel-header-text" : "color",
+    "breadcrumb-bg": "color",
+    "breadcrumb-color": "color",
+    "breadcrumb-link-color": "color",
+    "breadcrumb-separator": "escapedText",
+    "table-bg": "color",
+    "table-bg-hover": "color",
+    "table-border-color": "color"
+})
+############################################
+## Old color theme variables
+############################################
+## Generate the old colortheme variables
+#template('colorThemeInit.vm')
+## List of all the variables that get their values from old colortheme variables.
+#set($oldColorThemeVariables = {
+    "text-color": $theme.textColor,
+    "link-color": $theme.linkColor,
+    "headings-color": $theme.titleColor,
+    "body-bg": $theme.pageBackgroundColor,
+    "nav-tabs-border-color": $theme.borderColor,
+    "nav-tabs-active-link-hover-border-color": $theme.borderColor,
+    "pagination-border": $theme.borderColor,
+    "pagination-hover-border": $theme.borderColor,
+    "pagination-disabled-border": $theme.borderColor,
+    "list-group-border": $theme.borderColor,
+    "thumbnail-border": $theme.borderColor,
+    "input-border": $theme.borderColor,
+
+    "navbar-default-toggle-border-color": $theme.borderColor,
+    "navbar-default-bg": $theme.menuBackgroundColor,
+    "navbar-default-link-color": $theme.menuLinkColor,
+    "navbar-default-link-disabled-color": $theme.menuContentLinkColor,
+    "navbar-default-link-active-bg": $theme.menuBackgroundColor,
+    "navbar-default-link-active-color": $theme.menuLinkColor,
+    "navbar-default-link-hover-bg": $theme.menuBackgroundColor,
+    "navbar-default-link-hover-color": $theme.menuLinkColor,
+    "dropdown-bg": $theme.pageContentBackgroundColor,
+    "dropdown-link-color": $theme.textColor,
+    "dropdown-link-hover-bg": $theme.submenuContentBackgroundColor,
+    "dropdown-link-hover-color": $theme.textColor,
+
+    "btn-primary-color": $theme.buttonPrimaryTextColor,
+    "btn-primary-bg": $theme.buttonPrimaryBackgroundColor,
+    "btn-default-color": $theme.buttonSecondaryTextColor,
+    "btn-default-bg": $theme.buttonSecondaryBackgroundColor,
+    "btn-success-color": $theme.menuAddEntryLinkColor,
+    "btn-success-bg": $theme.menuAddEntryBackgroundColor,
+    "nav-tabs-active-link-hover-bg": $theme.pageContentBackgroundColor,
+    "nav-link-hover-bg": $theme.highlightColor,
+    "brand-primary": $theme.buttonPrimaryBackgroundColor,
+    "brand-success": $theme.notificationSuccessColor,
+    "brand-info": $theme.notificationInfoColor,
+    "brand-warning": $theme.notificationWarningColor,
+    "brand-danger": $theme.notificationErrorColor,
+    "panel-bg": $theme.panelBackgroundColor,
+    "panel-default-text": $theme.panelTextColor,
+    "panel-header-bg": $theme.panelHeaderBackgroundColor,
+    "panel-header-text": $theme.panelHeaderTextColor,
+    "xwiki-panel-header-bg": $theme.panelHeaderBackgroundColor,
+    "xwiki-panel-header-text": $theme.panelHeaderTextColor,
+    "xwiki-border-color": $theme.borderColor,
+    "xwiki-page-content-bg": $theme.pageContentBackgroundColor,
+    "xwiki-background-secondary-color": $theme.backgroundSecondaryColor,
+    "xwiki-page-header-bg-color": $theme.pageHeaderBackgroundColor,
+    "xwiki-page-header-bg-image": $stringtool.defaultString($theme.headerBackgroundImage, '""'),
+    "xwiki-page-header-bg-position": $stringtool.defaultString($theme.headerBackgroundPosition, '""')
+})

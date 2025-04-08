@@ -36,7 +36,7 @@ import org.xwiki.test.ui.po.editor.EditPage;
  * @version $Id$
  * @since 3.2M3
  */
-public class CreatePagePage extends ViewPage
+public class CreatePagePage extends BaseElement
 {
     private static final By errorMessageLocator = By.className("errormessage");
 
@@ -53,7 +53,7 @@ public class CreatePagePage extends ViewPage
     @FindBy(id = "terminal")
     private WebElement isTerminalCheckbox;
 
-    @FindBy(css = "form#create input[type='submit']")
+    @FindBy(css = "form#create input[type='submit'],form#create button[type='submit']")
     private WebElement createButton;
 
     public static CreatePagePage gotoPage()

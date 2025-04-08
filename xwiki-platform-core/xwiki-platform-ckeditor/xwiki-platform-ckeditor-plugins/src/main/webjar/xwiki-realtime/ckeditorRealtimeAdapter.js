@@ -93,11 +93,6 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    getToolBar() {
-      return this._ckeditor.ui.space('top').$.querySelector('.cke_toolbox');
-    }
-
-    /** @inheritdoc */
     async updateContent(updater, isLocalChange) {
       // Don't push local changes when saving the snapshot. Wait until the content has been updated (see below),
       // otherwise we risk reverting the received remote changes.
@@ -148,8 +143,8 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    restoreSelection(ranges) {
-      this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, ranges);
+    async restoreSelection(ranges) {
+      await this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, {ranges});
 
       // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
       // selection is restored.

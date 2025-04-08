@@ -48,6 +48,15 @@ public class RegistrationModal extends AbstractRegistrationPage
         this.createButton.click();
     }
 
+    /**
+     * Wait for the registration form to show no error message.
+     */
+    public void waitForLiveValidationSuccess()
+    {
+        getDriver()
+            .waitUntilCondition(input -> input.findElements(By.cssSelector("#createUserModal .LV_invalid")).isEmpty());
+    }
+
     @Override
     public void waitUntilPageIsReady()
     {

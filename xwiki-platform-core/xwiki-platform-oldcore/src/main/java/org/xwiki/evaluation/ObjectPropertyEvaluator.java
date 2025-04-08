@@ -22,7 +22,6 @@ package org.xwiki.evaluation;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -36,7 +35,6 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 15.5.5
  * @since 15.10.2
  */
-@Unstable
 @Role
 public interface ObjectPropertyEvaluator
 {

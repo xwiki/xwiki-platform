@@ -50,8 +50,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // Add the RightsManagerPlugin needed by the test
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin",
     // Programming rights are required to disable/enable user profiles (cf. XWIKI-21238)
-    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet"
-})
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet",
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+    // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+    // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+    "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class UsersGroupsRightsManagementIT
 {
     @BeforeEach
@@ -268,6 +275,7 @@ class UsersGroupsRightsManagementIT
         UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
         RegistrationModal registrationModal = usersPage.clickAddNewUser();
         registrationModal.fillRegisterForm("", "", userName, userName, userName, "");
+        registrationModal.waitForLiveValidationSuccess();
         registrationModal.clickRegister();
         usersPage.waitForNotificationSuccessMessage("User created");
         usersPage.getUsersLiveData().getTableLayout().assertRow("User", userName);

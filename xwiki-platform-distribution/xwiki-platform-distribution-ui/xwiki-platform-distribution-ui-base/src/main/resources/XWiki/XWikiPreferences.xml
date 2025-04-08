@@ -2939,7 +2939,8 @@ Your account on ${wikiname} has been successfully activated. You can now login a
 ## We verify that we don't display RSS feeds on the login page since it causes problems if these feeds are
 ## protected. In addition it makes the login redirect to the feeds page in some cases.
 #if($doc.fullName != "XWiki.XWikiLogin")
-#set ($rssURL = $services.rest.url($doc.documentReference))
+## TODO: replace this hack with a call to a proper API to get the URL of the notification RSS (or at the very least an API to get the based URL of the REST endpoint)
+#set ($rssURL = $services.rest.url($services.model.createDocumentReference($xcontext.database, 'Main', 'WebHome')))
 #set ($rssURL = "${rssURL.substring(0, $rssURL.indexOf('/rest'))}/rest/notifications/rss")
 #set ($rssURL = "${rssURL}?userId=$!escapetool.url($services.model.serialize($xcontext.userReference, 'default'))")
 #set ($rssURL = "${rssURL}&amp;count=50&amp;useUserPreferences=false&amp;displayOwnEvents=true")

@@ -29,11 +29,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -71,7 +72,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
     private ExplicitlyAllowedValuesDBListQueryBuilder builder;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @MockComponent
     @Named("secure")
@@ -96,9 +97,8 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
         when(ownerDocument.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
 
         BaseClass xclass = new BaseClass();
-        xclass.setDocumentReference(ownerDocument.getDocumentReference());
+        xclass.setOwnerDocument(ownerDocument);
 
-        this.dbListClass.setOwnerDocument(ownerDocument);
         this.dbListClass.setObject(xclass);
         this.dbListClass.setName("category");
         this.dbListClass.setSql(SQL);
@@ -109,8 +109,8 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
     @Test
     public void buildWithScriptRight() throws Exception
     {
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE))
-            .thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE,
+            DOCUMENT_REFERENCE)).thenReturn(true);
 
         String evaluatedStatement = "test";
         when(this.velocityEngine.evaluate(any(), any(), any(), eq(SQL))).thenAnswer(new Answer<Boolean>()

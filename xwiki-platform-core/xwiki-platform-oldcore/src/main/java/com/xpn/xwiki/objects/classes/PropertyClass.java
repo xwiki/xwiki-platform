@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.stability.Unstable;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 
@@ -140,6 +141,10 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public void setObject(BaseCollection object)
     {
         this.xclass = (BaseClass) object;
+
+        if (object != null) {
+            setOwnerDocument(object.getOwnerDocument());
+        }
     }
 
     /**
@@ -293,6 +298,11 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
                 ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("object", new com.xpn.xwiki.api.Object(object, context), ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("type", type, ScriptContext.ENGINE_SCOPE);
+            // This is a text alternative fallback to explain what the input is about. 
+            // If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
+            scontext.setAttribute("aria-label",
+                localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+                    this.getTranslatedPrettyName(context)), ScriptContext.ENGINE_SCOPE);
 
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);
             if (prop != null) {
@@ -307,8 +317,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
             if (StringUtils.isNotEmpty(customDisplayer)) {
                 if (customDisplayer.equals(CLASS_DISPLAYER_IDENTIFIER)) {
                     final String rawContent = getCustomDisplay();
-                    XWikiDocument classDocument =
-                        context.getWiki().getDocument(getObject().getDocumentReference(), context);
+                    XWikiDocument classDocument = getObject().getOwnerDocument();
                     final String classSyntax = classDocument.getSyntax().toIdString();
                     // Using author reference since the document content is not relevant in this case.
                     DocumentReference authorReference = classDocument.getAuthorReference();
@@ -322,7 +331,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
                     // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. class
                     // document author).
                     content = renderContentInContext(rawContent, classSyntax, authorReference,
-                        classDocument.getDocumentReference(), context);
+                        classDocument.getDocumentReference(), classDocument.isRestricted(), context);
                 } else if (customDisplayer.startsWith(DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX)) {
                     XWikiDocument displayerDoc = context.getWiki().getDocument(
                         StringUtils.substringAfter(customDisplayer, DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX), context);
@@ -375,6 +384,25 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         return Utils.getComponent(AuthorExecutor.class)
             .call(() -> context.getDoc().getRenderedContent(content, syntax, context), authorReference, secureDocument);
     }
+
+    /**
+     * Render content in the current document's context with the rights of the given user.
+     *
+     * @since 17.0.0
+     * @since 16.10.3
+     * @since 16.4.7
+     */
+    @Unstable
+    protected String renderContentInContext(final String content, final String syntax,
+        DocumentReference authorReference, DocumentReference secureDocument,
+        boolean restricted, final XWikiContext context)
+        throws Exception
+    {
+        return Utils.getComponent(AuthorExecutor.class)
+            .call(() -> context.getDoc().getRenderedContent(content, syntax, restricted, context), authorReference,
+                secureDocument);
+    }
+
 
     @Override
     public String getClassName()
@@ -539,11 +567,17 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     @Override
+    public void detach()
+    {
+        super.detach();
+
+        setObject(null);
+    }
+
+    @Override
     public PropertyClass clone()
     {
-        PropertyClass pclass = (PropertyClass) super.clone();
-        pclass.setObject(getObject());
-        return pclass;
+        return (PropertyClass) super.clone();
     }
 
     @Override

@@ -60,6 +60,8 @@ import org.xwiki.store.ReadyIndicator;
 @Singleton
 public class DefaultLinkStore implements LinkStore
 {
+    private static final int ROWS = 1000;
+
     @Inject
     private Solr solr;
 
@@ -163,7 +165,7 @@ public class DefaultLinkStore implements LinkStore
 
         SolrQuery solrQuery = new SolrQuery(filter.toString());
 
-        solrQuery.setRows(1000);
+        solrQuery.setRows(ROWS);
         // Set sorting based on the ID for cursor-based pagination to work.
         solrQuery.addSort(FieldUtils.ID, SolrQuery.ORDER.asc);
         solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
@@ -191,7 +193,7 @@ public class DefaultLinkStore implements LinkStore
             }
 
             solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, response.getNextCursorMark());
-        } while (response.getResults().size() == 1000);
+        } while (response.getResults().size() == ROWS);
 
         return references;
     }

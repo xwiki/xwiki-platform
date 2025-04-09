@@ -125,7 +125,17 @@
       <cache>forbid</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
+      <code>define('xwiki-profile-preferences', {
+  prefix: 'platform.core.profile.',
+  keys: [
+    'shortcut.notifications.update.successful',
+    'shortcut.notifications.update.failed',
+    'shortcut.notifications.reset.successful',
+    'shortcut.notifications.reset.failed'
+  ]
+});
+
+require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-profile-preferences'], function ($, xm, l10n) {
   const SHORTCUT_XOBJ_ACTION = Object.freeze({
     CREATE: 'create',
     DELETE: 'delete',
@@ -196,10 +206,18 @@
         let data = {
           'property#value': newValue
         };
-        $.ajax({url: updateUrl,
+        Promise.resolve($.ajax({url: updateUrl,
           type: "PUT",
           data: data
-        });
+        })).then(() => {
+          editor.trigger('xwiki:document:saved');
+          notification.replace(new XWiki.widgets.Notification(
+            l10n['platform.core.profile.shortcut.notifications.update.successful'], 'done'));
+        }).catch(response => {
+          editor.trigger('xwiki:document:saveFailed');
+          notification.replace(new XWiki.widgets.Notification(
+            l10n['platform.core.profile.shortcut.notifications.update.successful'], 'error'));
+          $('#saveFailureReason').text(response.statusText);});
       }
     }
   };

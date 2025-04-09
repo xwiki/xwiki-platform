@@ -105,6 +105,11 @@ platform.core.profile.shortcut.edit.saveandview=Save and view
 platform.core.profile.shortcut.dev.usertype=Switch the current user type
 platform.core.profile.shortcut.dev.hiddendocs=Toggle hidden documents
 
+platform.core.profile.shortcut.notifications.update.successful=Updated shortcut preference
+platform.core.profile.shortcut.notifications.update.failed=Failed to save shortcut preference
+platform.core.profile.shortcut.notifications.reset.successful=Reset shortcut preference
+platform.core.profile.shortcut.notifications.reset.failed=Failed to reset shortcut preference
+
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 

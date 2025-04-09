@@ -144,6 +144,9 @@ require(['jquery', 'jquery-ui'], function($) {
   }
   let applyLocalStorageValues = function(side) {
     // We only update the value from local storage if this new value is significantly different from the default
+    // The user shouldn't be able to save those values, but it's an extra safety in case the threshold used above
+    // changes or the local storage value was manipulated outside of this script.
+    // This means that the column size will not flicker between two very similar values when loading up a page.
     if (!storageValueIsSimilarToDefault(side)) {
       document.body.style.setProperty('--panel-column-' + side + '-width',
         localStorage.getItem(localStoragePrefix + side));
@@ -175,6 +178,8 @@ require(['jquery', 'jquery-ui'], function($) {
     }
     let updateLocalStorageValueForSide = function (side) {
       // We only update the local storage when the last value is different enough from the default value.
+      // This is important to keep this as long as we don't have a proper UI to reset the panel column size.
+      // IMO it makes sense to keep it even when we eventually have this reset UI.
       if (!currentValueIsSimilarToDefault(side)) {
         localStorage.setItem(localStoragePrefix + side,
           document.body.style.getPropertyValue('--panel-column-' + side + '-width'));

@@ -186,6 +186,6 @@ require(['jquery', 'jquery-ui'], function($) {
     updateLocalStorageValueForSide(left);
     updateLocalStorageValueForSide(right);
   }
-  Event.observe(window, 'visibilitychange', savePanelWidthInLocalStorage);
+  document.addEventListener('visibilitychange', savePanelWidthInLocalStorage);
 });
 

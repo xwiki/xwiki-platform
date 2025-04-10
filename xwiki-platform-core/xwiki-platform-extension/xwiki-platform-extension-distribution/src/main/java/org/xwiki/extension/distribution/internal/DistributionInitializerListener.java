@@ -29,8 +29,6 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
-import org.xwiki.extension.distribution.internal.job.DistributionJob;
-import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 

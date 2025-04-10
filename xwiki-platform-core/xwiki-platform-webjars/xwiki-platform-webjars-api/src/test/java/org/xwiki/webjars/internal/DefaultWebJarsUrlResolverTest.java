@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.webjars;
+package org.xwiki.webjars.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
@@ -35,8 +34,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.webjars.internal.WebJarsResourceReference;
-import org.xwiki.webjars.script.WebJarsScriptService;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,16 +41,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.webjars.script.WebJarsScriptService}.
+ * Unit tests for {@link DefaultWebJarsUrlResolver}.
  *
  * @version $Id$
- * @since 6.0M1
+ * @since 17.3.0RC1
  */
 @ComponentTest
-class WebJarsScriptServiceTest
+class DefaultWebJarsUrlResolverTest
 {
     @InjectMockComponents
-    private WebJarsScriptService scriptService;
+    private DefaultWebJarsUrlResolver scriptService;
 
     @MockComponent
     private ResourceReferenceSerializer<ResourceReference, ExtendedURL> serializer;
@@ -63,11 +60,6 @@ class WebJarsScriptServiceTest
 
     @MockComponent
     private InstalledExtensionRepository installedExtensionRepository;
-
-    @BeforeEach
-    public void setUp() throws Exception
-    {
-    }
 
     @Test
     void computeURLWithVersion() throws Exception

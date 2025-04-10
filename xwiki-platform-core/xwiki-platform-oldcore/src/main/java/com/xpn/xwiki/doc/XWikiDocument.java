@@ -4730,7 +4730,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             doc.setEnforceRequiredRights(isEnforceRequiredRights());
 
             if (this.xClass != null) {
-                doc.setXClass(this.xClass.clone());
+                doc.setXClass(this.xClass.clone(true));
             }
 
             if (keepsIdentity) {

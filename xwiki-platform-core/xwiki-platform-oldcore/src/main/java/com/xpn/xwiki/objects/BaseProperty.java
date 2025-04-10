@@ -154,24 +154,34 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     }
 
     @Override
-    protected void cloneDetach()
+    protected void detachOwner()
     {
-        super.cloneDetach();
+        super.detachOwner();
 
         setObject(null);
     }
 
     @Override
+    protected void cloneOwner()
+    {
+        super.cloneOwner();
+
+        // Get the object from the cloned owner
+        if (getOwnerDocument() != null && getObject() != null) {
+            setObject(this.ownerDocument.getXObject(this.object.getReference()));
+        }
+    }
+
+    @Override
     public BaseProperty<R> clone()
     {
-        BaseProperty<R> property = (BaseProperty<R>) super.clone();
+        return (BaseProperty<R>) super.clone();
+    }
 
-        cloneInternal(property);
-
-        // Restore the dirty state
-        property.setDirty(isDirty());
-
-        return property;
+    @Override
+    public BaseProperty<R> clone(boolean detach)
+    {
+        return (BaseProperty<R>) super.clone(detach);
     }
 
     /**
@@ -181,6 +191,14 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     protected void cloneInternal(BaseProperty clone)
     {
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<R> element)
+    {
+        super.cloneContent(element);
+
+        cloneInternal((BaseProperty) element);
     }
 
     public Object getValue()

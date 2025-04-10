@@ -81,7 +81,7 @@ public class BaseObjects extends AbstractList<BaseObject>
         for (Map.Entry<Integer, BaseObject> entry : otherObjects.map.entrySet()) {
             BaseObject otherObject = entry.getValue();
             BaseObject clonedObject =
-                keepsIdentity ? otherObject.clone() : otherObject.duplicate(document.getDocumentReference());
+                keepsIdentity ? otherObject.clone(true) : otherObject.duplicate(document.getDocumentReference());
 
             // Make sure the cloned object has the right document (in case was is cloned in the document)
             clonedObject.setOwnerDocument(document);

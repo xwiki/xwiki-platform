@@ -217,7 +217,6 @@ public class BaseObjects extends AbstractList<BaseObject>
      * @param deep true if the dirty flag should be set to all children
      * @since 17.2.1
      * @since 17.3.0RC1
-     * @since 16.10.6
      */
     @Unstable
     public void setDirty(boolean dirty, boolean deep)

@@ -573,17 +573,35 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     @Override
-    protected void cloneDetach()
+    protected void detachOwner()
     {
-        super.cloneDetach();
+        super.detachOwner();
 
         setObject(null);
+    }
+
+
+    @Override
+    protected void cloneOwner()
+    {
+        super.cloneOwner();
+
+        // Get the object from the cloned owner
+        if (getOwnerDocument() != null && getObject() != null) {
+            setObject(this.ownerDocument.getXClass());
+        }
     }
 
     @Override
     public PropertyClass clone()
     {
         return (PropertyClass) super.clone();
+    }
+
+    @Override
+    public PropertyClass clone(boolean detach)
+    {
+        return (PropertyClass) super.clone(detach);
     }
 
     @Override

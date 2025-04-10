@@ -375,40 +375,84 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * Reset any information related to the parent of this element.
+     * Reset any reference to the owner of this element.
      * 
      * @since 17.3.0RC1
      * @since 17.2.1
-     * @since 16.10.6
      */
     @Unstable
-    protected void cloneDetach()
+    protected void detachOwner()
     {
         this.ownerDocument = null;
         this.documentReference = null;
         this.referenceCache = null;
     }
 
-    @Override
-    public BaseElement clone()
+    /**
+     * Clone the owner referenced by this element.
+     * 
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    protected void cloneOwner()
     {
-        BaseElement element;
+        if (this.ownerDocument != null) {
+            this.ownerDocument = this.ownerDocument.clone();
+        }
+    }
+
+    @Override
+    public BaseElement<R> clone()
+    {
+        return clone(false);
+    }
+
+    /**
+     * @param detach true if the element should be detached from its parent container, if false then the parent
+     *            container is cloned too
+     * @return a clone of this element
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    public BaseElement<R> clone(boolean detach)
+    {
+        BaseElement<R> element;
         try {
-            element = (BaseElement) super.clone();
+            element = (BaseElement<R>) super.clone();
 
-            // This element is not attached to any container yet
-            element.cloneDetach();
+            if (detach) {
+                // This element is not attached to any container yet
+                element.detachOwner();
+            } else {
+                // For retro compatibility reasons we clone the owner document
+                element.cloneOwner();
+            }
 
-            element.setPrettyName(getPrettyName());
+            cloneContent(element);
 
             // Restore the dirty state
             element.setDirty(isDirty());
-        } catch (Exception e) {
+        } catch (CloneNotSupportedException e) {
             // This should not happen
             element = null;
         }
 
         return element;
+    }
+
+    /**
+     * Extra clone related operation between the handling of the owner and the reset of the dirty flag.
+     * 
+     * @param element the cloned element
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    protected void cloneContent(BaseElement<R> element)
+    {
+        element.setPrettyName(getPrettyName());
     }
 
     @Override

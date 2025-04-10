@@ -124,9 +124,15 @@ public abstract class NumberProperty<N extends Number> extends BaseProperty
     }
 
     @Override
-    public NumberProperty clone()
+    public NumberProperty<N> clone()
     {
-        return (NumberProperty) super.clone();
+        return (NumberProperty<N>) super.clone();
+    }
+
+    @Override
+    public NumberProperty<N> clone(boolean detach)
+    {
+        return (NumberProperty<N>) super.clone(detach);
     }
 
     @Override

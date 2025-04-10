@@ -77,12 +77,8 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     {
         this.object = object;
 
-        if (this.object != null) {
-            setOwnerDocument(object.getOwnerDocument());
-
-            if (isDirty()) {
-                this.object.setDirty(true);
-            }
+        if (this.object != null && isDirty()) {
+            this.object.setDirty(true);
         }
     }
 

@@ -97,8 +97,9 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
         when(ownerDocument.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
 
         BaseClass xclass = new BaseClass();
-        xclass.setOwnerDocument(ownerDocument);
+        xclass.setDocumentReference(ownerDocument.getDocumentReference());
 
+        this.dbListClass.setOwnerDocument(ownerDocument);
         this.dbListClass.setObject(xclass);
         this.dbListClass.setName("category");
         this.dbListClass.setSql(SQL);

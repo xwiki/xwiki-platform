@@ -141,10 +141,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public void setObject(BaseCollection object)
     {
         this.xclass = (BaseClass) object;
-
-        if (object != null) {
-            setOwnerDocument(object.getOwnerDocument());
-        }
     }
 
     /**

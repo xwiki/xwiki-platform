@@ -17,42 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.hql.internal;
+package org.xwiki.query.hql;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.xwiki.component.annotation.Role;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.hql.internal.HQLStatementValidator;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
 /**
- * A component in charge of validating a passed HQL statement.
+ * Provider various HQL related scripting APIs.
  * 
  * @version $Id$
- * @since 17.0.0RC1
- * @since 16.10.2
- * @since 15.10.16
- * @since 16.4.6
+ * @since 17.3.0RC1
+ * @since 16.10.6
  */
-@Role
-public interface HQLStatementValidator
+@Component
+@Named("query.hql")
+@Singleton
+@Unstable
+public class HqlQueryScriptService implements ScriptService
 {
-    /**
-     * @param statement the HQL statement to validate
-     * @return {@link Boolean#TRUE} if the passed query is safe, {@link Boolean#FALSE} if it's not and
-     *         {@link Optional#empty()} if unknown.
-     * @throws QueryException when failing the validate the query
-     */
-    boolean isSafe(String statement) throws QueryException;
+    @Inject
+    private HQLStatementValidator hqlStatementValidator;
 
     /**
+     * Validate the given order by value according to the given list of allowed prefixes.
+     * 
      * @param allowedPrefixes the prefix allowed for each order by parameter
      * @param orderByValue the order by value to check
-     * @throws QueryException if the order by is not safe
-     * @since 17.3.0RC1
-     * @since 16.10.6
+     * @throws QueryException if the action should be denied, which may also happen when an error occurs
      */
-    @Unstable
-    void checkOrderBySafe(List<String> allowedPrefixes, String orderByValue) throws QueryException;
+    public void checkOrderBySafe(List<String> allowedPrefixes, String orderByValue) throws QueryException
+    {
+        this.hqlStatementValidator.checkOrderBySafe(allowedPrefixes, orderByValue);
+    }
 }

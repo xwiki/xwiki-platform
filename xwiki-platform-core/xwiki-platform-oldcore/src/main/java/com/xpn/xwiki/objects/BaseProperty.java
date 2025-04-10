@@ -149,21 +149,18 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     }
 
     @Override
-    public void detach()
-    {
-        super.detach();
-
-        setObject(null);
-    }
-
-    @Override
     public BaseProperty<R> clone()
     {
         BaseProperty<R> property = (BaseProperty<R>) super.clone();
 
+        property.ownerDocument = null;
+
         cloneInternal(property);
 
-        // Restore the dirty state
+        property.ownerDocument = this.ownerDocument;
+
+        property.setObject(getObject());
+
         property.setDirty(isDirty());
 
         return property;

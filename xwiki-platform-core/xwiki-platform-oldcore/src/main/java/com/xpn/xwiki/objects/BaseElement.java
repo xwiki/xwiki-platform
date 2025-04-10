@@ -119,7 +119,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * @param dirty true if the element was modified (or created)
+     * @param dirty true of the element was modified (or created)
      * @since 17.1.0RC1
      * @since 16.10.4
      * @since 16.4.7
@@ -374,20 +374,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         return true;
     }
 
-    /**
-     * Reset any information related to the parent of this element.
-     * 
-     * @since 17.3.0RC1
-     * @since 17.2.1
-     * @since 16.10.6
-     */
-    @Unstable
-    public void detach()
-    {
-        setOwnerDocument(null);
-        setDocumentReference(null);
-    }
-
     @Override
     public BaseElement clone()
     {
@@ -395,13 +381,18 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         try {
             element = (BaseElement) super.clone();
 
-            // This element is not attached to any document yet
-            element.detach();
+            element.setOwnerDocument(getOwnerDocument());
+
+            // Make sure we clone either the reference or the name depending on which one is used.
+            if (this.documentReference != null) {
+                element.setDocumentReference(getDocumentReference());
+            } else if (this.name != null) {
+                element.setName(getName());
+            }
 
             element.setPrettyName(getPrettyName());
 
-            // Restore the dirty state
-            element.setDirty(isDirty());
+            element.dirty = this.dirty;
         } catch (Exception e) {
             // This should not happen
             element = null;

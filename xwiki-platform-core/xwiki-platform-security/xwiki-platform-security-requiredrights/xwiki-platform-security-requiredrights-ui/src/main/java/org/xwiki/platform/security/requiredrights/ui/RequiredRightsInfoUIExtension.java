@@ -127,7 +127,7 @@ public class RequiredRightsInfoUIExtension implements UIExtension
                 List<Block> results = new ArrayList<>();
                 results.add(new RawBlock("<dt><label>", Syntax.HTML_5_0));
                 results.add(
-                    this.localizationManager.getTranslation("core.viewers.information.requiredRights").render());
+                    this.localizationManager.getTranslation("security.requiredrights.ui.informationLabel").render());
                 results.add(new RawBlock("</label></dt><dd>", Syntax.HTML_5_0));
 
                 DocumentRequiredRights requiredRights = requiredRightsOptional.get();
@@ -212,18 +212,18 @@ public class RequiredRightsInfoUIExtension implements UIExtension
         List<Block> currentRequiredRights;
         if (!requiredRights.enforce()) {
             currentRequiredRights =
-                List.of(getTranslatedParagraph("core.viewers.information.requiredRights.notEnforced"));
+                List.of(getTranslatedParagraph("security.requiredrights.ui.notEnforced"));
         } else if (requiredRights.rights().isEmpty()) {
             currentRequiredRights =
-                List.of(getTranslatedParagraph("core.viewers.information.requiredRights.enforcedNoRight"));
+                List.of(getTranslatedParagraph("security.requiredrights.ui.enforcedNoRight"));
         } else {
             currentRequiredRights = List.of(
-                getTranslatedParagraph("core.viewers.information.requiredRights.enforced"),
+                getTranslatedParagraph("security.requiredrights.ui.enforced"),
                 new BulletedListBlock(
                     requiredRights.rights().stream()
                         .<Block>map(right -> new ListItemBlock(List.of(
                             Optional.ofNullable(this.localizationManager.getTranslation(
-                                    "core.viewers.information.requiredRights.right." + right.right()))
+                                    "security.requiredrights.ui.right." + right.right()))
                                 .map(Translation::render).orElse(new WordBlock(right.right().toString()))
                         )))
                         .toList())

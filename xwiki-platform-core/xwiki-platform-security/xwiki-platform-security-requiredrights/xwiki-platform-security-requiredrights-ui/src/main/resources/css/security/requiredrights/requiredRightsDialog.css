@@ -17,15 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-#template('colorThemeInit.vm')
-
-#required-rights-dialog {
-  container-type: inline-size;
-  container-name: required-rights-dialog;
-}
-
 #required-rights-dialog .enforce-selection ul {
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
 }
 
 #required-rights-dialog .enforce-selection:has(input[value="1"]:checked) + .rights-selection {
@@ -33,8 +26,8 @@
 }
 
 #required-rights-dialog .rights-selection {
-  background-color: $theme.panelBackgroundColor;
-  color: $theme.panelTextColor;
+  background-color: var(--panel-bg);
+  color: var(--panel-default-text);
   display: none;
   margin: 0 -0.5em 10px;
   padding: 0.5em;
@@ -62,15 +55,16 @@
 
 #required-rights-dialog .rights-selection li p {
   margin: 0;
-  color: $theme.textSecondaryColor;
+  color: var(--text-muted);
+  text-align: center;
 }
 
 #required-rights-dialog .rights-selection li p button.tip {
   border-radius: 2em;
   padding: 0.2em 0.5em;
   border: none;
-  background-color: $theme.textSecondaryColor;
-  color: $theme.pageContentBackgroundColor;
+  background: none;
+  color: var(--text-muted);
 }
 
 #required-rights-dialog .rights-selection li .label-wrapper {
@@ -80,9 +74,9 @@
 }
 
 #required-rights-dialog .rights-selection li .label-wrapper label {
-  background-color: $theme.pageContentBackgroundColor;
-  color: $theme.textColor;
-  border: 2px solid $theme.pageContentBackgroundColor;
+  background-color: var(--xwiki-page-content-bg);
+  color: var(--text-color);
+  border: 2px solid var(--xwiki-page-content-bg);
   border-radius: 2em;
   padding: 0.5em 1em;
   display: block;
@@ -90,27 +84,26 @@
 }
 
 #required-rights-dialog .rights-selection li .label-wrapper label:has(input:checked) {
-  /* TODO: use color theme variables when available */
-  background-color: #e1f1f9;
-  color: #31708f;
-  border-color: #2f70a7;
+  background-color: var(--alert-info-bg);
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
 }
 
 #required-rights-dialog .rights-selection li.required .label-wrapper {
-  border-color: $theme.borderColor;
+  border-color: var(--input-border);
 }
 
 #required-rights-dialog .rights-selection li.required .label-wrapper:has(input:checked) {
-  border-color: #2f70a7;
+  border-color: var(--brand-primary);
 }
 
 #required-rights-dialog .rights-selection li.maybe-required .label-wrapper {
-  border-color: $theme.borderColor;
+  border-color: var(--input-border);
   border-style: dashed;
 }
 
 #required-rights-dialog .rights-selection li.maybe-required .label-wrapper:has(input:checked) {
-  border-color: #2f70a7;
+  border-color: var(--brand-primary);
 }
 
 #required-rights-dialog #required-rights-results .panel-heading {
@@ -133,7 +126,7 @@
   display: none;
 }
 
-@container required-rights-dialog (max-width: 42em) {
+@media (max-width: 42em) {
   #required-rights-dialog .rights-selection ul {
     grid-template-columns: repeat(2, minmax(max-content, 1fr));
     grid-template-rows: repeat(auto-fill, 1fr);
@@ -142,6 +135,10 @@
   #required-rights-dialog .rights-selection li {
     grid-column: span 2;
     grid-row: span 1;
+  }
+
+  #required-rights-dialog .rights-selection li p {
+    text-align: start;
   }
 }
 

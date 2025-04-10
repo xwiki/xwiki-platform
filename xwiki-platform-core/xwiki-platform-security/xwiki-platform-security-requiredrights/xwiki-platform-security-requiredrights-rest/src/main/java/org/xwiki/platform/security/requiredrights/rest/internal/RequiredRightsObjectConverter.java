@@ -19,18 +19,13 @@
  */
 package org.xwiki.platform.security.requiredrights.rest.internal;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -38,8 +33,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.security.requiredrights.rest.model.jaxb.AvailableRight;
 import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRequiredRight;
 import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRequiredRights;
@@ -47,30 +40,17 @@ import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRightsAnalysisR
 import org.xwiki.security.requiredrights.rest.model.jaxb.ObjectFactory;
 import org.xwiki.security.requiredrights.rest.model.jaxb.RequiredRight;
 import org.xwiki.security.requiredrights.rest.model.jaxb.RequiredRightAnalysisResult;
-import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Convert required rights objects to the REST API data types.
  *
  * @version $Id$
- * @since 17.1.0RC1
+ * @since 17.3.0RC1
  */
 @Component(roles = RequiredRightsObjectConverter.class)
 @Singleton
 public class RequiredRightsObjectConverter
 {
-    private static final List<org.xwiki.security.authorization.requiredrights.DocumentRequiredRight>
-        CONSIDERED_RIGHTS = List.of(
-        new org.xwiki.security.authorization.requiredrights.DocumentRequiredRight(null, EntityType.DOCUMENT),
-        new org.xwiki.security.authorization.requiredrights.DocumentRequiredRight(Right.SCRIPT, EntityType.DOCUMENT),
-        new org.xwiki.security.authorization.requiredrights.DocumentRequiredRight(Right.ADMIN, EntityType.WIKI),
-        new org.xwiki.security.authorization.requiredrights.DocumentRequiredRight(Right.PROGRAM, null)
-    );
-
-    // TODO: localize (and make non-static again).
-    private static final List<String> DISPLAY_NAMES = List.of("None", "Script", "Wiki Admin", "Programming");
-
     @Inject
     @Named("html/5.0")
     private BlockRenderer htmlRenderer;
@@ -80,11 +60,7 @@ public class RequiredRightsObjectConverter
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
-    private AuthorizationManager authorizationManager;
-
-    @Inject
-    @Named("document")
-    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
+    private AvailableRightsManager availableRightsManager;
 
     private final ObjectFactory factory = new ObjectFactory();
 
@@ -104,7 +80,8 @@ public class RequiredRightsObjectConverter
         org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRequiredRights jaxbDocumentRights =
             convertDocumentRequiredRights(currentRights);
 
-        List<AvailableRight> availableRights = computeAvailableRights(analysisResults, documentReference);
+        List<AvailableRight> availableRights =
+            this.availableRightsManager.computeAvailableRights(analysisResults, documentReference);
 
         List<org.xwiki.security.requiredrights.rest.model.jaxb.RequiredRightAnalysisResult> jaxbAnalysisResults =
             convertRequiredRightAnalysisResults(analysisResults);
@@ -142,74 +119,6 @@ public class RequiredRightsObjectConverter
                         analysisResult.getRequiredRights().stream().map(this::mapRequiredRight).toList());
             })
             .toList();
-    }
-
-    private List<AvailableRight> computeAvailableRights(
-        List<org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult> analysisResults,
-        DocumentReference documentReference)
-    {
-        int maximumRequiredRight = 0;
-        Set<Integer> maybeRequiredRights = new HashSet<>();
-        for (org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult analysisResult : analysisResults) {
-            for (org.xwiki.platform.security.requiredrights.RequiredRight requiredRight
-                : analysisResult.getRequiredRights()) {
-                int index = getIndexInConsideredRights(requiredRight);
-
-                if (index == -1) {
-                    continue;
-                }
-
-                if (requiredRight.isManualReviewNeeded()) {
-                    maybeRequiredRights.add(index);
-                } else {
-                    maximumRequiredRight = Math.max(maximumRequiredRight, index);
-                }
-            }
-        }
-
-        int finalMaximumRequiredRight = maximumRequiredRight;
-        maybeRequiredRights.removeIf(maybeIndex -> maybeIndex <= finalMaximumRequiredRight);
-
-        DocumentReference userReference = this.userReferenceSerializer.serialize(CurrentUserReference.INSTANCE);
-
-        boolean hasEdit = this.authorizationManager.hasAccess(Right.EDIT, userReference, documentReference);
-
-        List<AvailableRight> availableRights = new ArrayList<>(CONSIDERED_RIGHTS.size());
-        for (int i = 0; i < CONSIDERED_RIGHTS.size(); i++) {
-            org.xwiki.security.authorization.requiredrights.DocumentRequiredRight consideredRight =
-                CONSIDERED_RIGHTS.get(i);
-            boolean maybeRequired = maybeRequiredRights.contains(i);
-            boolean hasRight = hasEdit && (consideredRight.right() == null
-                || this.authorizationManager.hasAccess(consideredRight.right(), userReference,
-                documentReference.extractReference(consideredRight.scope())));
-            availableRights.add(this.factory.createAvailableRight()
-                .withRight(Objects.toString(consideredRight.right(), ""))
-                .withScope(Objects.toString(consideredRight.scope(), null))
-                .withDefinitelyRequiredRight(i == maximumRequiredRight)
-                .withMaybeRequiredRight(maybeRequired)
-                .withHasRight(hasRight)
-                .withDisplayName(DISPLAY_NAMES.get(i))
-            );
-        }
-
-        return availableRights;
-    }
-
-    private static int getIndexInConsideredRights(
-        org.xwiki.platform.security.requiredrights.RequiredRight requiredRight)
-    {
-        int index = -1;
-        // Find the first considered right where scope and right match.
-        for (int i = 0; i < CONSIDERED_RIGHTS.size(); i++) {
-            org.xwiki.security.authorization.requiredrights.DocumentRequiredRight consideredRight =
-                CONSIDERED_RIGHTS.get(i);
-            if (consideredRight.right() == requiredRight.getRight()
-                && (consideredRight.scope() == requiredRight.getEntityType())) {
-                index = i;
-                break;
-            }
-        }
-        return index;
     }
 
     private DocumentRequiredRights convertDocumentRequiredRights(
@@ -252,5 +161,4 @@ public class RequiredRightsObjectConverter
         this.htmlRenderer.render(block, printer);
         return printer.toString();
     }
-
 }

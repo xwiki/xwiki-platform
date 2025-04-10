@@ -18,12 +18,33 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-requiredrights-messages', {
-    prefix: 'core.viewers.information.requiredRights.',
+    prefix: 'security.requiredrights.ui.',
     keys: [
         'modal.label',
-        'enforcedNoRight',
-        'enforced',
-        'notEnforced',
+        'modal.noEnforceOption',
+        'modal.noEnforceOption.hint1',
+        'modal.noEnforceOption.hint2',
+        'modal.enforceOption',
+        'modal.enforceOption.hint1',
+        'modal.enforceOption.hint2',
+        'modal.rightsSelection',
+        'modal.rightsSelection.hint',
+        'modal.required',
+        'modal.required.hint',
+        'modal.maybeRequired',
+        'modal.maybeRequired.hint',
+        'modal.analysisDetails',
+        'modal.analysisDetails',
+        'modal.contentAndTitle',
+        'modal.localizedContentAndTitle',
+        'modal.classProperties',
+        'modal.property',
+        'modal.object',
+        'modal.cancel',
+        'modal.save',
+        'saving.inProgress',
+        'saving.success',
+        'saving.error',
         'right.script',
         'right.programming',
         'right.admin'
@@ -59,23 +80,21 @@ define('xwiki-requiredrights-dialog', [
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                    <!-- TODO: translate! -->
-                                    <h2 class="modal-title" id="required-rights-dialog-label">Required Rights</h2>
+                                    <h2 class="modal-title" id="required-rights-dialog-label"></h2>
                                 </div>
                                 <div class="modal-body">
                                     <div class="enforce-selection"></div>
                                     <div class="rights-selection">
-                                        <h3>Select the right to enforce</h3>
-                                        <p>Every right includes all rights before it.</p>
+                                        <h3></h3>
+                                        <p></p>
                                         <ul></ul>
                                     </div>
                                     <div class="required-rights-advanced-toggle-container">
                                         <a href="#" class="required-rights-advanced-toggle"
                                             aria-controls="required-rights-results" aria-expanded="false">
-                                        <!-- TODO: localize and use icon theme. -->
+                                        <!-- TODO: use icon theme. -->
                                             <span class="icon-collapsed"><i class="fa fa-caret-right"></i></span>
                                             <span class="icon-expanded"><i class="fa fa-caret-down"></i></span>
-                                            Analysis Details
                                         </a>
                                     </div>
                                     <div id="required-rights-results" class="hidden" 
@@ -83,12 +102,18 @@ define('xwiki-requiredrights-dialog', [
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                    <button type="button" class="btn btn-primary">Save</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"></button>
+                                    <button type="button" class="btn btn-primary"></button>
                                 </div>
                             </div>
                         </div>
                     `;
+            this.dialogElement.querySelector('.modal-title').textContent = l10n['modal.label'];
+            this.dialogElement.querySelector('.rights-selection h3').textContent = l10n['modal.rightsSelection'];
+            this.dialogElement.querySelector('.rights-selection p').textContent = l10n['modal.rightsSelection.hint'];
+            this.dialogElement.querySelector('.required-rights-advanced-toggle').append(l10n['modal.analysisDetails']);
+            this.dialogElement.querySelector('.btn-secondary').textContent = l10n['modal.cancel'];
+            this.dialogElement.querySelector('.btn-primary').textContent = l10n['modal.save'];
             this.saveButton = this.dialogElement.querySelector('.modal-footer .btn-primary');
             this.enforceSelectionElement = this.dialogElement.querySelector('.enforce-selection');
             this.advancedToggle = this.dialogElement.querySelector('.required-rights-advanced-toggle');
@@ -112,6 +137,7 @@ define('xwiki-requiredrights-dialog', [
 
         save()
         {
+            $(this.saveButton).trigger('xwiki:actions:beforeSave');
             // Get the selected right
             const selectedRightInput = this.dialogElement.querySelector('input[name="rights"]:checked');
             const enforceInput = this.dialogElement.querySelector('input[name="enforceRequiredRights"]:checked');
@@ -132,23 +158,20 @@ define('xwiki-requiredrights-dialog', [
                     selectedRight === 'admin' ? 'wiki_admin' : selectedRight;
             }
             const url = new XWiki.Document(xm.documentReference).getURL('save');
-            const notification = new XWiki.widgets.Notification(
-                l10n['core.editors.saveandcontinue.notification.inprogress'], 'inprogress');
+            const notification = new XWiki.widgets.Notification(l10n['saving.inProgress'], 'inprogress');
             $.post(url, formData)
                 .then(() => {
-                    // TODO: trigger an event editor.trigger('xwiki:document:saved');
-                    notification.replace(new XWiki.widgets.Notification(
-                        l10n['core.editors.saveandcontinue.notification.done'],
-                        'done'));
+                    $(this.saveButton).trigger('xwiki:document:saved');
+                    notification.replace(new XWiki.widgets.Notification(l10n['saving.success'], 'done'));
                     // Close the dialog
                     $(this.dialogElement).modal('hide');
-                }).catch(response => {
-                // TODO: trigger an event editor.trigger('xwiki:document:saveFailed');
-                notification.replace(new XWiki.widgets.Notification(
-                    l10n.get('core.editors.saveandcontinue.notification.error', response.statusText),
-                    'error'));
-                return Promise.reject();
-            });
+                })
+                .catch(response => {
+                    $(this.saveButton).trigger('xwiki:document:saveFailed');
+                    notification.replace(
+                        new XWiki.widgets.Notification(l10n.get('saving.error', response.statusText), 'error'));
+                    return Promise.reject();
+                });
         }
 
         /**
@@ -214,25 +237,22 @@ define('xwiki-requiredrights-dialog', [
             if (status !== "") {
                 const statusContainer = document.createElement('p');
                 const questionMark = document.createElement('button');
-                questionMark.textContent = '?'
                 questionMark.className = 'btn btn-default tip';
                 questionMark.dataset.toggle = 'tooltip';
                 questionMark.type = 'button';
+                questionMark.innerHTML = '<span class="fa fa-info-circle" aria-hidden="true"></span>';
 
                 if (status === "required") {
                     listItem.classList.add('required');
-                    statusContainer.textContent = "Required ";
-                    questionMark.title = 'The automated analysis determined that this right is required by the' +
-                        ' content of this document.'
+                    statusContainer.append(l10n['modal.required']);
+                    questionMark.title = l10n['modal.required.hint'];
                 } else {
                     listItem.classList.add('maybe-required');
-                    statusContainer.textContent = "Might be required ";
-                    questionMark.title = 'The automated analysis determined that this right might be required by the' +
-                        ' content of this document, review the analysis details below to verify if the right is ' +
-                        'actually required.';
+                    statusContainer.append(l10n['modal.maybeRequired']);
+                    questionMark.title = l10n['modal.maybeRequired.hint'];
                 }
 
-                statusContainer.appendChild(questionMark);
+                statusContainer.append(' ', questionMark);
                 listItem.appendChild(statusContainer);
             }
             this.rightsList.appendChild(listItem);
@@ -343,25 +363,25 @@ define('xwiki-requiredrights-dialog', [
 
             // Create the "Don't enforce" option.
             dialog.createEnforcementOption(
-                "Don't enforce required rights",
+                l10n['modal.noEnforceOption'],
                 '0',
                 !data.currentRights.enforce,
                 !availableRights[0].hasRight,
                 [
-                    'Scripts and objects execute with the last author\'s rights.',
-                    'Anyone with edit rights can edit the page.'
+                    l10n['modal.noEnforceOption.hint1'],
+                    l10n['modal.noEnforceOption.hint2']
                 ]
             );
 
             // Create the "Enforce" option.
             dialog.createEnforcementOption(
-                "Enforce required rights",
+                l10n['modal.enforceOption'],
                 '1',
                 data.currentRights.enforce,
                 !availableRights[0].hasRight,
                 [
-                    'Scripts and objects execute only with the selected rights.',
-                    'Only users with edit right and the selected rights can edit the page.'
+                    l10n['modal.enforceOption.hint1'],
+                    l10n['modal.enforceOption.hint2']
                 ]
             );
 
@@ -388,23 +408,37 @@ define('xwiki-requiredrights-dialog', [
 
             function groupBy(result, propertyExtractor)
             {
-                return result.reduce((acc, result) => {
-                    const value = propertyExtractor(result);
+                const grouped = {};
+
+                for (let i = 0; i < result.length; i++) {
+                    const item = result[i];
+                    const value = propertyExtractor(item);
+
                     if (Array.isArray(value)) {
-                        value.reduce((acc, key, index) => {
-                            if (!acc[key]) {
-                                acc[key] = index === value.length - 1 ? [] : {};
+                        let current = grouped;
+
+                        for (let j = 0; j < value.length; j++) {
+                            const key = value[j];
+                            const isLastKey = j === value.length - 1;
+
+                            if (!current[key]) {
+                                current[key] = isLastKey ? [] : {};
                             }
-                            return acc[key];
-                        }, acc).push(result);
-                    } else {
-                        if (!acc[value]) {
-                            acc[value] = [];
+
+                            current = current[key];
                         }
-                        acc[value].push(result);
+
+                        current.push(item);
+                    } else {
+                        if (!grouped[value]) {
+                            grouped[value] = [];
+                        }
+
+                        grouped[value].push(item);
                     }
-                    return acc;
-                }, {});
+                }
+
+                return grouped;
             }
 
             // Display the results where the entity type is DOCUMENT
@@ -415,27 +449,27 @@ define('xwiki-requiredrights-dialog', [
             const documentResultsByLocale = groupBy(documentResults, result => result.locale ?? '');
             // Display the results in the dialog. Start with the empty string locale, if any.
             if (documentResultsByLocale['']) {
-                dialog.addResultsHeading(3, 'Content and Title');
+                dialog.addResultsHeading(3, l10n['modal.contentAndTitle']);
                 dialog.addResults(documentResultsByLocale['']);
                 delete documentResultsByLocale[''];
             }
             // Display the results for each locale.
             for (const locale in documentResultsByLocale) {
-                dialog.addResultsHeading(3, `Content and Title (${locale})`);
+                dialog.addResultsHeading(3, l10n.get('modal.localizedContentAndTitle', locale));
                 dialog.addResults(documentResultsByLocale[locale]);
             }
             // Display results of type CLASS_PROPERTY, if any.
             const classPropertyResults = analysisResults.filter(
                 result => result.entityReference.type === XWiki.EntityType.CLASS_PROPERTY);
             if (classPropertyResults.length > 0) {
-                dialog.addResultsHeading(3, 'Class Properties');
+                dialog.addResultsHeading(3, l10n['classProperties']);
 
                 // Group the results by property name
                 const classPropertyResultsByProperty = groupBy(classPropertyResults,
                     result => result.entityReference.name);
 
                 for (const propertyName in classPropertyResultsByProperty) {
-                    dialog.addResultsHeading(4, `Property ${propertyName}`);
+                    dialog.addResultsHeading(4, l10n.get('modal.property', propertyName));
                     dialog.addResults(classPropertyResultsByProperty[propertyName]);
                 }
             }
@@ -460,7 +494,7 @@ define('xwiki-requiredrights-dialog', [
 
                 for (const xClassName in objectResultsByXClassAndObject) {
                     for (const objectIndex in objectResultsByXClassAndObject[xClassName]) {
-                        dialog.addResultsHeading(3, `Object ${xClassName}[${objectIndex}]`);
+                        dialog.addResultsHeading(3, l10n.get('modal.object', xClassName, objectIndex));
 
                         // First display results of type OBJECT
                         const objectResults = objectResultsByXClassAndObject[xClassName][objectIndex].filter(
@@ -475,7 +509,7 @@ define('xwiki-requiredrights-dialog', [
                             result => result.entityReference.name);
 
                         for (const propertyName in objectPropertyResultsByProperty) {
-                            dialog.addResultsHeading(4, `Property ${propertyName}`);
+                            dialog.addResultsHeading(4, l10n.get('modal.property', propertyName));
                             dialog.addResults(objectPropertyResultsByProperty[propertyName]);
                         }
                     }

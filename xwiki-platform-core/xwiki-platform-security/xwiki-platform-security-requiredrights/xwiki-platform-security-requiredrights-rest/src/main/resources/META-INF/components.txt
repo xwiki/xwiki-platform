@@ -1,2 +1,3 @@
+org.xwiki.platform.security.requiredrights.rest.internal.AvailableRightsManager
 org.xwiki.platform.security.requiredrights.rest.internal.DefaultRequiredRightsRestResource
 org.xwiki.platform.security.requiredrights.rest.internal.RequiredRightsObjectConverter

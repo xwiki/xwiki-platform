@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
  * Get the result of the required rights analysis of a page.
  *
  * @version $Id$
- * @since 17.1.0RC1
+ * @since 17.3.0RC1
  */
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/requiredRights")
 @Unstable

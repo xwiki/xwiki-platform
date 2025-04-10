@@ -134,14 +134,14 @@ require(['jquery', 'jquery-ui'], function($) {
   };
   // In order to avoid code duplication, a lot of code has been segmented in functions hereafter.
   let valueIsSimilarToDefault = function (valueString, side) {
-    let diff = Math.abs(parseInt(valueString) - initialPanelColumnWidth[side])
+    let diff = Math.abs(parseInt(valueString) - initialPanelColumnWidth[side]);
     // If the value provided is not a number or the difference is lower than 24px, we assume they are about the same.
     // This 24px threshold was picked arbitrarily.
     return !diff || diff < 24;
   };
   let storageValueIsSimilarToDefault = function (side) {
     return valueIsSimilarToDefault(localStorage.getItem(localStoragePrefix + side), side);
-  }
+  };
   let applyLocalStorageValues = function(side) {
     // We only update the value from local storage if this new value is significantly different from the default
     // The user shouldn't be able to save those values, but it's an extra safety in case the threshold used above
@@ -151,7 +151,7 @@ require(['jquery', 'jquery-ui'], function($) {
       document.body.style.setProperty('--panel-column-' + side + '-width',
         localStorage.getItem(localStoragePrefix + side));
     }
-  }
+  };
   applyLocalStorageValues(left);
   applyLocalStorageValues(right);
 
@@ -175,7 +175,7 @@ require(['jquery', 'jquery-ui'], function($) {
     if (!document.hidden) return;
     let currentValueIsSimilarToDefault = function (side) {
       return valueIsSimilarToDefault(document.body.style.getPropertyValue('--panel-column-' + side + '-width'), side);
-    }
+    };
     let updateLocalStorageValueForSide = function (side) {
       // We only update the local storage when the last value is different enough from the default value.
       // This is important to keep this as long as we don't have a proper UI to reset the panel column size.
@@ -187,10 +187,10 @@ require(['jquery', 'jquery-ui'], function($) {
         // If the values are similar, we remove whatever was stored in the localStorage.
         localStorage.removeItem(localStoragePrefix + side);
       }
-    }
+    };
     updateLocalStorageValueForSide(left);
     updateLocalStorageValueForSide(right);
-  }
+  };
   document.addEventListener('visibilitychange', savePanelWidthInLocalStorage);
 });
 

@@ -75,15 +75,13 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     @Override
     public void setObject(BaseCollection object)
     {
-        if (this.object != object) {
-            this.object = object;
+        this.object = object;
 
-            if (this.object != null) {
-                setOwnerDocument(object.getOwnerDocument());
+        if (this.object != null) {
+            setOwnerDocument(object.getOwnerDocument());
 
-                if (isDirty()) {
-                    this.object.setDirty(true);
-                }
+            if (isDirty()) {
+                this.object.setDirty(true);
             }
         }
     }
@@ -155,9 +153,9 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     }
 
     @Override
-    protected void cloneDetach()
+    public void detach()
     {
-        super.cloneDetach();
+        super.detach();
 
         setObject(null);
     }

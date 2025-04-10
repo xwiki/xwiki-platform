@@ -382,11 +382,10 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * @since 16.10.6
      */
     @Unstable
-    protected void cloneDetach()
+    public void detach()
     {
-        this.ownerDocument = null;
-        this.documentReference = null;
-        this.referenceCache = null;
+        setOwnerDocument(null);
+        setDocumentReference(null);
     }
 
     @Override
@@ -396,8 +395,8 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         try {
             element = (BaseElement) super.clone();
 
-            // This element is not attached to any container yet
-            element.cloneDetach();
+            // This element is not attached to any document yet
+            element.detach();
 
             element.setPrettyName(getPrettyName());
 

@@ -62,8 +62,8 @@ class DistributionPageTest extends PageTest
     void nonExistingExtensionRequest() throws Exception
     {
         String testValue = "<test>";
-        this.stubRequest.put("extensionId", testValue);
-        this.stubRequest.put("extensionVersionConstraint", testValue);
+        this.request.put("extensionId", testValue);
+        this.request.put("extensionVersionConstraint", testValue);
 
         ExtensionDependency dependency =
             new DefaultExtensionDependency(testValue, new DefaultVersionConstraint(testValue));

@@ -41,8 +41,8 @@ class JobStatusJSONPageTest extends PageTest
     @Test
     void nonExistingJob() throws Exception
     {
-        this.stubRequest.put("jobId", "<test>");
-        this.stubRequest.put("translationPrefix", "<test>");
+        this.request.put("jobId", "<test>");
+        this.request.put("translationPrefix", "<test>");
 
         String output = this.templateManager.render("job_status_json.vm");
 

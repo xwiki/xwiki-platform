@@ -117,7 +117,7 @@ public class DefaultHQLStatementValidator implements HQLStatementValidator
             }
 
             if (!valid) {
-                throw new QueryException("Usafe ORDER BY value [" + orderByValue + "].", null);
+                throw new QueryException("Unsafe ORDER BY value [" + orderByValue + "].", null);
             }
         }
     }

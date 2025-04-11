@@ -29,6 +29,6 @@
 #else
   $response.setStatus(404)
   <div class="box errormessage">
-    $services.localization.render("${translationPrefix}.notFound")
+    $escapetool.xml($services.localization.render("${translationPrefix}.notFound"))
   </div>
 #end

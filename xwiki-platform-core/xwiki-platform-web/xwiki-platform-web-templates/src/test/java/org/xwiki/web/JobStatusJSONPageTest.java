@@ -23,6 +23,8 @@ import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.script.TemplateScriptService;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,6 +35,7 @@ import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
  *
  * @version $Id$
  */
+@ComponentList(TemplateScriptService.class)
 class JobStatusJSONPageTest extends PageTest
 {
     @Inject

@@ -30,6 +30,8 @@ import org.xwiki.extension.script.ExtensionManagerScriptService;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.template.script.TemplateScriptService;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 
@@ -43,6 +45,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@ComponentList(TemplateScriptService.class)
 class DistributionPageTest extends PageTest
 {
     @MockComponent(classToMock = ExtensionManagerScriptService.class)

@@ -49,7 +49,6 @@ $response.setContentType("application/json")
 #set ($order = "$!request.sort")
 #set ($orderQueryPart = '')
 #if ($order != '')
-  #set($discard = $services.query.hql.checkOrderBySafe(['ddoc.'], $order))
   #set ($orderDirection = "$!{request.get('dir').toLowerCase()}")
   #if ("$!orderDirection" != '' && "$!orderDirection" != 'asc')
     #set($orderDirection = 'desc')
@@ -59,6 +58,7 @@ $response.setContentType("application/json")
     ## So we filter on the document full name instead, which is the expected behavior.
     #set ($order = 'ddoc.fullName')
   #end
+  #set($discard = $services.query.hql.checkOrderBySafe(['ddoc.'], $order))
   ## Weird things happen if we use "ORDER BY" (upper case), at least on HSQLDB. Other DBs may behave differently
   #set ($orderQueryPart = "order by ${order} ${orderDirection}")
 #end

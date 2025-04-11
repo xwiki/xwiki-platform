@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.webjars.script;
+package org.xwiki.webjars;
 
 import java.util.Map;
 
@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
  */
 @Role
 @Unstable
-public interface WebJarsUrlResolver
+public interface WebJarsUrlFactory
 {
     /**
      * The default {@code groupId} for Maven projects that produce WebJars.
@@ -53,7 +53,7 @@ public interface WebJarsUrlResolver
      *
      * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
      *     {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
-     *     {@code groupId} can be omitted if it is {@link WebJarsUrlResolver#DEFAULT_WEBJAR_GROUP_ID} (i.e.
+     *     {@code groupId} can be omitted if it is {@link WebJarsUrlFactory#DEFAULT_WEBJAR_GROUP_ID} (i.e.
      *     {@code angular} translates to {@code org.webjars:angular})
      * @param path the path within the WebJar, starting from the version folder (e.g. you should pass just
      *     {@code angular.js} if the actual path is {@code META-INF/resources/webjars/angular/2.1.11/angular.js})
@@ -67,7 +67,7 @@ public interface WebJarsUrlResolver
      *
      * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
      *     {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
-     *     {@code groupId} can be omitted if it is {@link WebJarsUrlResolver#DEFAULT_WEBJAR_GROUP_ID} (i.e.
+     *     {@code groupId} can be omitted if it is {@link WebJarsUrlFactory#DEFAULT_WEBJAR_GROUP_ID} (i.e.
      *     {@code angular} translates to {@code org.webjars:angular})
      * @param namespace the namespace in which the webjars resources will be loaded from (e.g. for a wiki namespace
      *     you should use the format {@code wiki:<wikiId>}). If null then defaults to the current wiki namespace. And if
@@ -83,7 +83,7 @@ public interface WebJarsUrlResolver
      *
      * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
      *     {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
-     *     {@code groupId} can be omitted if it is {@link WebJarsUrlResolver#DEFAULT_WEBJAR_GROUP_ID} (i.e.
+     *     {@code groupId} can be omitted if it is {@link WebJarsUrlFactory#DEFAULT_WEBJAR_GROUP_ID} (i.e.
      *     {@code angular} translates to {@code org.webjars:angular})
      * @param path the path within the WebJar, starting from the version folder (e.g. you should pass just
      *     {@code angular.js} if the actual path is {@code META-INF/resources/webjars/angular/2.1.11/angular.js})
@@ -101,7 +101,7 @@ public interface WebJarsUrlResolver
      *
      * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
      *     {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
-     *     {@code groupId} can be omitted if it is {@link WebJarsUrlResolver#DEFAULT_WEBJAR_GROUP_ID} (i.e.
+     *     {@code groupId} can be omitted if it is {@link WebJarsUrlFactory#DEFAULT_WEBJAR_GROUP_ID} (i.e.
      *     {@code angular} translates to {@code org.webjars:angular})
      * @param namespace the namespace in which the webjars resources will be loaded from (e.g. for a wiki namespace
      *     you should use the format {@code wiki:<wikiId>}). If null then defaults to the current wiki namespace. And if

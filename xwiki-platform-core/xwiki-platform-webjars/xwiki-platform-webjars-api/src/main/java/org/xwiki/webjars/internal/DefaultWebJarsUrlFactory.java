@@ -41,18 +41,18 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.webjars.script.WebJarsUrlResolver;
+import org.xwiki.webjars.WebJarsUrlFactory;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
- * Default implementation of {@link WebJarsUrlResolver}.
+ * Default implementation of {@link WebJarsUrlFactory}.
  *
  * @version $Id$
  * @since 17.3.0RC1
  */
 @Component
 @Singleton
-public class DefaultWebJarsUrlResolver implements WebJarsUrlResolver
+public class DefaultWebJarsUrlFactory implements WebJarsUrlFactory
 {
     private static final String RESOURCE_SEPARATOR = "/";
 

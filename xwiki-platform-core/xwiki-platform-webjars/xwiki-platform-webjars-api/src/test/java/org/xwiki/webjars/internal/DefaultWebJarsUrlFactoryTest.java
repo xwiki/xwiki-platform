@@ -41,16 +41,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DefaultWebJarsUrlResolver}.
+ * Unit tests for {@link DefaultWebJarsUrlFactory}.
  *
  * @version $Id$
  * @since 17.3.0RC1
  */
 @ComponentTest
-class DefaultWebJarsUrlResolverTest
+class DefaultWebJarsUrlFactoryTest
 {
     @InjectMockComponents
-    private DefaultWebJarsUrlResolver scriptService;
+    private DefaultWebJarsUrlFactory webJarsUrlFactory;
 
     @MockComponent
     private ResourceReferenceSerializer<ResourceReference, ExtendedURL> serializer;
@@ -72,7 +72,7 @@ class DefaultWebJarsUrlResolverTest
         when(this.serializer.serialize(resourceReference))
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "ang:ular", "2.1.11", "angular.css")));
 
-        assertEquals("/xwiki/ang%3Aular/2.1.11/angular.css", this.scriptService.url("ang:ular/2.1.11/angular.css"));
+        assertEquals("/xwiki/ang%3Aular/2.1.11/angular.css", this.webJarsUrlFactory.url("ang:ular/2.1.11/angular.css"));
     }
 
     @Test
@@ -90,7 +90,7 @@ class DefaultWebJarsUrlResolverTest
         when(this.serializer.serialize(resourceReference))
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
-        assertEquals("/xwiki/angular/2.1.11/angular.css", this.scriptService.url("angular", "angular.css"));
+        assertEquals("/xwiki/angular/2.1.11/angular.css", this.webJarsUrlFactory.url("angular", "angular.css"));
     }
 
     @Test
@@ -108,7 +108,7 @@ class DefaultWebJarsUrlResolverTest
         when(this.serializer.serialize(resourceReference))
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
-        assertEquals("/xwiki/angular/2.1.11/angular.css", this.scriptService.url("foo", "angular.css"));
+        assertEquals("/xwiki/angular/2.1.11/angular.css", this.webJarsUrlFactory.url("foo", "angular.css"));
     }
 
     @Test
@@ -121,7 +121,7 @@ class DefaultWebJarsUrlResolverTest
         when(this.serializer.serialize(resourceReference))
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.css")));
 
-        assertEquals("/xwiki/angular/angular.css", this.scriptService.url("angular", "angular.css"));
+        assertEquals("/xwiki/angular/angular.css", this.webJarsUrlFactory.url("angular", "angular.css"));
     }
 
     @Test
@@ -140,7 +140,7 @@ class DefaultWebJarsUrlResolverTest
         params.put("evaluate", true);
         params.put("list", new String[] {"one", "two"});
         assertEquals("/xwiki/angular/2.1.11/angular.js?evaluate=true&list=one&list=two",
-            this.scriptService.url("angular", "wiki:wiki", "angular.js", params));
+            this.webJarsUrlFactory.url("angular", "wiki:wiki", "angular.js", params));
     }
 
     @Test
@@ -154,7 +154,7 @@ class DefaultWebJarsUrlResolverTest
         when(this.serializer.serialize(resourceReference)).thenReturn(
             new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.js"), resourceReference.getParameters()));
 
-        assertEquals("/xwiki/angular/angular.js?r=1", this.scriptService.url("angular", "angular.js"));
+        assertEquals("/xwiki/angular/angular.js?r=1", this.webJarsUrlFactory.url("angular", "angular.js"));
     }
 
     @Test
@@ -171,7 +171,7 @@ class DefaultWebJarsUrlResolverTest
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css",
-            this.scriptService.url("angular", "angular.css", Collections.singletonMap("wiki", "math")));
+            this.webJarsUrlFactory.url("angular", "angular.css", Collections.singletonMap("wiki", "math")));
     }
 
     @Test
@@ -190,6 +190,6 @@ class DefaultWebJarsUrlResolverTest
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css",
-            this.scriptService.url("angular", "angular.css", Collections.<String, Object>emptyMap()));
+            this.webJarsUrlFactory.url("angular", "angular.css", Collections.<String, Object>emptyMap()));
     }
 }

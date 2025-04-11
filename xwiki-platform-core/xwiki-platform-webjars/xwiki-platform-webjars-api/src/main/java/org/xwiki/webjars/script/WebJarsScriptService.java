@@ -27,7 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.webjars.internal.DefaultWebJarsUrlResolver;
+import org.xwiki.webjars.WebJarsUrlFactory;
 
 /**
  * Make it easy to use WebJars in scripts. For example it can compute an XWiki WebJars URL.
@@ -41,7 +41,7 @@ import org.xwiki.webjars.internal.DefaultWebJarsUrlResolver;
 public class WebJarsScriptService implements ScriptService
 {
     @Inject
-    private WebJarsUrlResolver webJarsUrlResolver;
+    private WebJarsUrlFactory webJarsUrlFactory;
 
     /**
      * Creates an URL that can be used to load a resource (JavaScript, CSS, etc.) from a WebJar in the current wiki.
@@ -56,7 +56,7 @@ public class WebJarsScriptService implements ScriptService
         // separator in the webjarId. This is required in order to ensure that the behavior of this method doesn't
         // change. Note that the groupdId is ignored if the WebJar version is specified so the fake groupId won't have
         // any effect.
-        return this.webJarsUrlResolver.url(resourceName);
+        return this.webJarsUrlFactory.url(resourceName);
     }
 
     /**
@@ -64,15 +64,15 @@ public class WebJarsScriptService implements ScriptService
      *
      * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
      *            {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
-     *            {@code groupId} can be omitted if it is {@link DefaultWebJarsUrlResolver#DEFAULT_WEBJAR_GROUP_ID} (i.e. {@code angular}
-     *            translates to {@code org.webjars:angular})
-     * @param path the path within the WebJar, starting from the version folder (e.g. you should pass just
+     *            {@code groupId} can be omitted if it is {@link WebJarsUrlFactory#DEFAULT_WEBJAR_GROUP_ID} (i.e.,
+     *            {@code angular} translates to {@code org.webjars:angular})
+     * @param path the path within the WebJar, starting from the version folder (e.g., you should pass just
      *            {@code angular.js} if the actual path is {@code META-INF/resources/webjars/angular/2.1.11/angular.js})
      * @return the URL to load the WebJar resource (relative to the context path of the web application)
      */
     public String url(String webjarId, String path)
     {
-        return this.webJarsUrlResolver.url(webjarId, path);
+        return this.webJarsUrlFactory.url(webjarId, path);
     }
 
     /**
@@ -80,8 +80,8 @@ public class WebJarsScriptService implements ScriptService
      *
      * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
      *            {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
-     *            {@code groupId} can be omitted if it is {@link DefaultWebJarsUrlResolver#DEFAULT_WEBJAR_GROUP_ID} (i.e. {@code angular}
-     *            translates to {@code org.webjars:angular})
+     *            {@code groupId} can be omitted if it is {@link WebJarsUrlFactory#DEFAULT_WEBJAR_GROUP_ID} (i.e.,
+     *            {@code angular} translates to {@code org.webjars:angular})
      * @param namespace the namespace in which the webjars resources will be loaded from (e.g. for a wiki namespace you
      *                  should use the format {@code wiki:<wikiId>}). If null then defaults to the current wiki
      *                  namespace. And if the passed namespace doesn't exist, falls back to the main wiki namespace
@@ -92,7 +92,7 @@ public class WebJarsScriptService implements ScriptService
      */
     public String url(String webjarId, String namespace, String path)
     {
-        return this.webJarsUrlResolver.url(webjarId, namespace, path);
+        return this.webJarsUrlFactory.url(webjarId, namespace, path);
     }
 
     /**
@@ -100,9 +100,9 @@ public class WebJarsScriptService implements ScriptService
      *
      * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
      *            {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
-     *            {@code groupId} can be omitted if it is {@link DefaultWebJarsUrlResolver#DEFAULT_WEBJAR_GROUP_ID} (i.e. {@code angular}
-     *            translates to {@code org.webjars:angular})
-     * @param path the path within the WebJar, starting from the version folder (e.g. you should pass just
+     *            {@code groupId} can be omitted if it is {@link WebJarsUrlFactory#DEFAULT_WEBJAR_GROUP_ID} (i.e.,
+     *            {@code angular} translates to {@code org.webjars:angular})
+     * @param path the path within the WebJar, starting from the version folder (e.g., you should pass just
      *            {@code angular.js} if the actual path is {@code META-INF/resources/webjars/angular/2.1.11/angular.js})
      * @param params additional query string parameters to add to the returned URL; there are two known (reserved)
      *            parameters: {@code version} (the WebJar version) and {@code evaluate} (a boolean parameter that
@@ -115,7 +115,7 @@ public class WebJarsScriptService implements ScriptService
     {
         // For backward-compatibility reasons, we still support passing the target wiki in parameters
 
-        return this.webJarsUrlResolver.url(webjarId, path, params);
+        return this.webJarsUrlFactory.url(webjarId, path, params);
     }
 
     /**
@@ -123,12 +123,12 @@ public class WebJarsScriptService implements ScriptService
      *
      * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
      *            {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
-     *            {@code groupId} can be omitted if it is {@link DefaultWebJarsUrlResolver#DEFAULT_WEBJAR_GROUP_ID} (i.e. {@code angular}
-     *            translates to {@code org.webjars:angular})
+     *            {@code groupId} can be omitted if it is {@link WebJarsUrlFactory#DEFAULT_WEBJAR_GROUP_ID} (i.e.,
+     *            {@code angular} translates to {@code org.webjars:angular})
      * @param namespace the namespace in which the webjars resources will be loaded from (e.g., for a wiki namespace you
-     *                  should use the format {@code wiki:<wikiId>}). If null then defaults to the current wiki
+     *                  should use the format {@code wiki:<wikiId>}). If null, then defaults to the current wiki
      *                  namespace. And if the passed namespace doesn't exist, falls back to the main wiki namespace
-     * @param path the path within the WebJar, starting from the version folder (e.g. you should pass just
+     * @param path the path within the WebJar, starting from the version folder (e.g., you should pass just
      *            {@code angular.js} if the actual path is {@code META-INF/resources/webjars/angular/2.1.11/angular.js})
      * @param params additional query string parameters to add to the returned URL; there are two known (reserved)
      *            parameters: {@code version} (the WebJar version) and {@code evaluate} (a boolean parameter that
@@ -140,12 +140,12 @@ public class WebJarsScriptService implements ScriptService
      */
     public String url(String webjarId, String namespace, String path, Map<String, ?> params)
     {
-        // For backward-compatibility reasons we still support passing the target wiki in parameters. However we need
+        // For backward-compatibility reasons, we still support passing the target wiki in parameters. However, we need
         // to remove it from the params if that's the case since we don't want to output a URL with the wiki id in the
         // query string (since the namespace is now part of the URL).
 
         // Construct a WebJarsResourceReference so that we can serialize it!
 
-        return this.webJarsUrlResolver.url(webjarId, namespace, path, params);
+        return this.webJarsUrlFactory.url(webjarId, namespace, path, params);
     }
 }

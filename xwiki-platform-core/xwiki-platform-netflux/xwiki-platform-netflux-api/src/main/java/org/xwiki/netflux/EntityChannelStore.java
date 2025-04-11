@@ -22,7 +22,6 @@ package org.xwiki.netflux;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
@@ -55,7 +54,7 @@ public interface EntityChannelStore
         return getChannels(entityReference).stream().filter(Objects::nonNull)
             .filter(channel -> channel.getPath().size() >= pathPrefix.size()
                 && Objects.equals(channel.getPath().subList(0, pathPrefix.size()), pathPrefix))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**

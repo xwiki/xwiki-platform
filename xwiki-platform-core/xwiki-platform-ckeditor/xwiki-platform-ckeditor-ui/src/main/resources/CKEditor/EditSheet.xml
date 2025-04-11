@@ -943,6 +943,77 @@ ul.cke_autocomplete_panel {
 }
 
 /**
+ * Custom styles to match XWiki's Look &amp; Feel
+ */
+.cke_chrome,
+.cke_chrome &gt; .cke_inner {
+  border-radius: @border-radius-base;
+}
+
+.cke_chrome &gt; .cke_inner &gt; .cke_top {
+  border-top-right-radius: @border-radius-base;
+  border-top-left-radius: @border-radius-base;
+}
+
+.cke_chrome &gt; .cke_inner &gt; .cke_bottom {
+  border-bottom-right-radius: @border-radius-base;
+  border-bottom-left-radius: @border-radius-base;
+}
+
+/* The standalone WYSIWYG edit mode shows the form action toolbar right below the CKEditor instance used to edit the
+  document content. We make the bottom border rounded on the form action toolbar instead. */
+#xwikieditcontent &gt; .cke_chrome,
+#xwikieditcontent &gt; .cke_chrome &gt; .cke_inner,
+#xwikieditcontent &gt; .cke_chrome &gt; .cke_inner &gt; .cke_bottom {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+a.cke_button,
+a.cke_combo_button {
+  border-radius: @border-radius-small;
+}
+
+.cke_panel,
+.cke_dialog_body,
+.cke_dialog a.cke_dialog_ui_button,
+.cke_dialog input.cke_dialog_ui_input_text,
+.cke_dialog select.cke_dialog_ui_input_select,
+.cke_dialog fieldset.cke_dialog_ui_fieldset,
+.cke_notification {
+  border-radius: @border-radius-base;
+}
+
+.cke_panel.cke_menu_panel,
+.cke_panel.cke_combopanel {
+  margin: 2px 0;
+}
+
+.cke_dialog_title,
+.cke_dialog a.cke_dialog_tab {
+  border-top-right-radius: @border-radius-base;
+  border-top-left-radius: @border-radius-base;
+}
+
+.cke_dialog_contents,
+.cke_dialog_footer {
+  border-bottom-right-radius: @border-radius-base;
+  border-bottom-left-radius: @border-radius-base;
+}
+
+/**
+ * Custom styles for the in-line editor
+ */
+.viewbody &gt; .cke_float {
+  /* Shift the floating toolbar in order to match the content padding. */
+  margin-right: floor((@grid-gutter-width / 2));
+  margin-left: ceil((@grid-gutter-width / 2));
+}
+.cke_float .cke_top {
+  border-radius: @border-radius-base;
+}
+
+/**
  * Full-screen styles for the in-line editor
  */
 body[data-maximized="true"] {

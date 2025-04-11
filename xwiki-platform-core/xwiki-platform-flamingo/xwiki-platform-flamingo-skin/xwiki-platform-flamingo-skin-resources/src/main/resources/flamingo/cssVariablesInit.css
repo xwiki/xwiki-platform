@@ -1,0 +1,215 @@
+/*!
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## The variables defined in this file were added in XWiki 17.3.0-RC1
+## Those variables will become stable at the end of the cycle 17.
+
+######################
+## Preparation
+######################
+#set ($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
+#if ($themeDocFullName == '')
+#set ($themeDocFullName = 'ColorThemes.DefaultColorTheme')
+#end
+#set ($themeDoc = $xwiki.getDocument($themeDocFullName))
+#set ($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
+
+## List of Bootstrap variables we need to give default values for XWiki standard variables
+## We make sure font-size-base is set in em since it's a more powerful and reliable unit for font sizes
+## The key is their name and the value is the string representing the value in CSS syntax.
+## The equivalent LESS variables are available in: xwiki-platform-bootstrap-->variables.less
+## The font-size-base unit should be discussed, whether we settle on a rem or em unit.
+#set($bootstrapVariables = {
+"btn-danger-color" : "#fff",
+"btn-default-border" : "#ccc",
+"btn-font-weight" : "normal",
+"btn-info-color" : "#fff",
+"btn-info-bg" : "var(--brand-info)",
+"btn-warning-bg" : "var(--brand-warning)",
+"breadcrumb-bg": "#f5f5f5",
+"breadcrumb-link-color": "var(--link-color)",
+"breadcrumb-separator": "/",
+"component-active-color": "#fff",
+"component-active-bg":"var(--brand-primary)",
+"dropdown-border" : "rgba(0, 0, 0, .15)",
+"dropdown-divider-bg" : "#e5e5e5",
+"font-family-base": "var(--font-family-sans-serif)",
+"font-family-sans-serif": '"Helvetica Neue", Helvetica, Arial, sans-serif',
+"font-family-serif": 'Georgia, "Times New Roman", Times, serif',
+"font-family-monospace": 'Georgia, "Times New Roman", Times, serif',
+"font-size-base": "1rem",
+"grid-gutter-width": "30px",
+"input-bg" : "#fff",
+"legend-color" : "#333",
+"legend-border-color": "#e5e5e5",
+"list-group-hover-bg": "#f5f5f5",
+"list-group-link-color": "#555",
+"list-group-link-hover-color": "var(--list-group-link-color)",
+"navbar-height" : "50px",
+"table-bg-hover": "#f5f5f5",
+"table-border-color": "#ddd"
+})
+
+## List of all the variables set in XWiki standard for various purposes.
+## Those should all be defined in variables.less and variablesInit.vm
+## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
+## The key is their name and the value is the string representing the value in CSS syntax.
+## The equivalent LESS variables should be available in: xwiki-platform-flamingo-skin-resources-->variables.less
+#set($xsVariables = {
+"figure-caption-font-size": "90%",
+"figure-caption-color": "var(--text-muted)",
+"login-form-max-width": "450px",
+"target-size-minimum": "24px",
+"target-size-recommended": "44px",
+"border-width": "1px",
+"headings-font-weight": "400",
+"nav-tabs-active-link-hover-bg": "var(--xwiki-page-content-bg)",
+"border-radius-base": "7px",
+"border-radius-large": "10px",
+"border-radius-small": "5px",
+"button-spacing": "2px",
+"button-border-width": "1px",
+"edit-section-relative-height": ".7",
+"main-padding": "calc(var(--grid-gutter-width) * 2)",
+"font-size-headings-scale": "1.190",
+"font-size-headings-scale-min": "1.125",
+"min-screen-size": "768",
+"max-screen-size": "1200",
+"min-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 4))",
+"max-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 4))",
+"min-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 3))",
+"max-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 3))",
+"min-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 2))",
+"max-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 2))",
+"min-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 1))",
+"max-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))",
+"min-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), -1))",
+"max-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))",
+"min-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))",
+"max-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 5))",
+"font-size-document-title": "calc(max(var(--min-document-title-font-size) * 1px, min(var(--max-document-title-font-size) * 1px, var(--min-document-title-font-size) * 1px + (var(--max-document-title-font-size) - var(--min-document-title-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h1": "calc(max(var(--min-h1-font-size), min(var(--max-h1-font-size), var(--min-h1-font-size) + (var(--max-h1-font-size) - var(--min-h1-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h2": "calc(max(var(--min-h2-font-size), min(var(--max-h2-font-size), var(--min-h2-font-size) + (var(--max-h2-font-size) - var(--min-h2-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h3": "calc(max(var(--min-h3-font-size), min(var(--max-h3-font-size), var(--min-h3-font-size) + (var(--max-h3-font-size) - var(--min-h3-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h4": "calc(max(var(--min-h4-font-size), min(var(--max-h4-font-size), var(--min-h4-font-size) + (var(--max-h4-font-size) - var(--min-h4-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h5": "var(--font-size-base)",
+"font-size-h6": "calc(max(var(--min-h6-font-size), min(var(--max-h6-font-size), var(--min-h6-font-size) + (var(--max-h6-font-size) - var(--min-h6-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"navbar-default-link-color": "#727272",
+"navbar-default-color": "#727272",
+"input-color-placeholder": "#727272",
+"breadcrumb-active-color": "#707070",
+"breadcrumb-color": "#707070",
+"text-muted": "#555",
+"brand-primary": "#2f70a7",
+"text-color": "#222222",
+"btn-primary-bg": "#386da7",
+"btn-danger-bg": "#ca302c",
+"brand-success": "#077537",
+"btn-warning-color": "#000",
+"alert-danger-bg": "#f8ecec",
+"alert-success-bg": "#e5f3df",
+"alert-info-bg": "#e1f1f9",
+"brand-danger": "#cc3333"
+})
+
+## List of all the new variables added to the CSS property set.
+## Those variables do not have a LESS variable equivalent in previous systems. They were introduced mostly to replace
+## whole mixins. There should be no overlap between this category of variables and the others.
+## List of versions where variables were introduced:
+## * 17.3.0RC1: 100vw, int-viewport-width, font-weight-regular, font-weight-semibold, font-weight-bold
+#set($newVariables = {
+"100vw": "100vw",
+"int-viewport-width": "calc(10000 * tan(atan2(var(--100vw), 10000px)))",
+"font-weight-regular": 400,
+"font-weight-semibold": 700,
+"font-weight-bold": "900"
+})
+
+## Retrieve the lists of variables for the old ColorTheme and Flamingo ColorTheme
+#template('variablelist.vm')
+## If you want to update the values set for the old colortheme, see colorThemeInit.vm, a source of truth shared
+## with LESS variables defined in xwiki-platform-flamingo-skin-resources -> variablesInit.vm -> initFromOldColorTheme
+## A couple variables are excluded from the set, we do not port them to CSS
+#set($excludeFromOldColorThemeMapping = ['xwiki-panel-header-bg', 'xwiki-panel-header-text'])
+#foreach($excludedVariable in $excludeFromOldColorThemeMapping)
+  #set($discard = $oldColorThemeVariables.remove($excludedVariable))
+#end
+
+## We merge the three maps into one list.
+## We allow different values from different maps for the same variable. This is an extra fallback in case the first
+## doesn't work. This could be the case for defaults that rely on other variables.
+## Values follow CSS cascading order (last one wins).
+#set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariables, $newVariables])
+
+## $flamingoColorThemeVariables is the list of all the variables available to customize directly in the Flamingo
+## theme editor. These mappings will not always end up in the initialization of a CSS variable.
+## If you want to update the values set for the flamingo colortheme, see the colortheme xml,
+## a source of truth shared with LESS variables, defined in xwiki-platform-flamingo-theme-ui
+## To make sure all of those variables are still available even when not set in the colortheme,
+## we make sure that they all appear in another mapping above.
+## The key is the name and the value is a type for the variable.
+######################
+## Generation
+######################
+
+#define($css)
+## We use a tan/arctan2 hack to get a proper unitless viewport width. This hack can be avoided when the CSS Values and
+## Units module Level 4 is accepted and supported in browsers.
+## https://drafts.csswg.org/css-values/#calc-type-checking
+@property --100vw {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: false;
+}
+
+:root {
+## First, we make sure that the necessary variables from bootstrap and XS are given at least one value.
+#foreach($variableWithValue in $variableValueSets)
+  #foreach($variableName in $variableWithValue.keySet())
+    #set($value = $variableWithValue.get($variableName))
+    #if("$!value" != '')
+      --$variableName: $!value;
+    #end
+  #end
+#end
+
+## Create CSS variables for each flamingo colorTheme variable that is set.
+## Right now we have the variable type info for all of those, but we don't use those yet.
+## Those values will override anything already declared in the XS/bootstrap defaults.
+#foreach($property in $flamingoColorThemeVariables.keySet())
+#set($value = $themeDoc.getValue($property, $themeObj))
+#if("$!value" != '')
+## If the value we want to set is a LESS variables, we make sure to convert it into a CSS variable.
+#if($stringtool.startsWith($!value, '@'))
+#set($value = 'var(--' + $stringtool.substring($value, 1) + ')')
+#end
+#set($propertyType = $flamingoColorThemeVariables.get($property))
+## For now we only use `string` variables, because it's the easiest to setup and because it's 100% compatible with
+## LESS variables. We could use the extra info we have on the variable types to use the @property syntax later.
+#if($propertyType == 'escapedText')
+--$property: "$escapetool.javascript($!value)";
+#else
+--$property: $!value;
+#end
+#end
+#end
+}
+#end
+*/$!css

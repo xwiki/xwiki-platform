@@ -59,6 +59,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.tika.internal.TikaUtils;
 
@@ -541,6 +542,24 @@ public class XWikiAttachment implements Cloneable
         this.isMetaDataDirty = metaDataDirty;
         if (metaDataDirty && this.doc != null) {
             this.doc.setMetaDataDirty(true);
+        }
+    }
+
+    /**
+     * @param dirty true the value of the dirty flag(s)
+     * @param deep true if the dirty flag should be set to all children
+     * @since 17.2.1
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public void setDirty(boolean dirty, boolean deep)
+    {
+        setMetaDataDirty(dirty);
+
+        if (deep) {
+            if (this.content != null) {
+                this.content.setContentDirty(dirty);
+            }
         }
     }
 

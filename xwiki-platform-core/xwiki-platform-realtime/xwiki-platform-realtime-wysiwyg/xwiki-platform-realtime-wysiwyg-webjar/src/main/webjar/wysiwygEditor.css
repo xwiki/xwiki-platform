@@ -69,14 +69,14 @@ div.rt-user-position {
 }
 
 /* The rich text area needs a larger padding in order for the user caret indicators to fit on the left side. */
-.xcontent.form > .document-header ~ .row {
-  /* This is for the in-place editor. */
-  position: relative;
-  margin-right: -24px;
-  margin-left: -24px;
-}
-#body[role="textbox"],
-.xcontent.form > .row > #xwikicontent {
+#body[role="textbox"] {
   padding-right: 24px;
   padding-left: 24px;
+}
+/* This is for the in-place editor. */
+.xcontent.form > .document-header ~ .row {
+  position: relative;
+}
+#xwikicontent ~ .rt-user-position {
+  left: -5px;
 }

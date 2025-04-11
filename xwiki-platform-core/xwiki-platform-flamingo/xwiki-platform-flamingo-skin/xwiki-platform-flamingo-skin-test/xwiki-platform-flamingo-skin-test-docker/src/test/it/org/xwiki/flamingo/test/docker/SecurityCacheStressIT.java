@@ -34,8 +34,8 @@ import org.xwiki.text.StringUtils;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Stress test for the security cache. This test takes about 15 minutes on a relatively powerful system of 2021 and
- * doesn't really test anything, it rather gives some performance numbers. Therefore, it isn't executed by default.
+ * Stress test for the security cache. Modify rights while simultaneously querying the cache in several background
+ * threads.
  *
  * @version $Id$
  */

@@ -62,7 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SaveIT extends AbstractCKEditorIT
 {
     @BeforeAll
-    public static void configure(TestUtils setup)
+    static void configure(TestUtils setup)
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
@@ -81,7 +81,7 @@ class SaveIT extends AbstractCKEditorIT
         WYSIWYGEditPage editPage = edit(setup, testReference);
         textArea.clear();
         textArea.sendKeys("xyz");
-        editPage = editPage.clickSaveAndView().editWYSIWYG();
+        editPage.clickSaveAndView().editWYSIWYG();
         assertEquals("<p>xyz</p>", editor.waitToLoad().getRichTextArea().getContent());
     }
 

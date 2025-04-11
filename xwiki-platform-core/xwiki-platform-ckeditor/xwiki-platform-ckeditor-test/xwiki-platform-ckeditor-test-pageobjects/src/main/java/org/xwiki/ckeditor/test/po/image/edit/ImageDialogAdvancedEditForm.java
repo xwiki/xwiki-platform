@@ -50,7 +50,7 @@ public class ImageDialogAdvancedEditForm extends BaseElement
      */
     public String getAlignment()
     {
-        return getDriver().findElement(By.cssSelector("#advanced [name='alignment']:checked")).getAttribute("value");
+        return getDriver().findElement(By.cssSelector("#advanced [name='alignment']:checked")).getDomProperty("value");
     }
 
     /**
@@ -73,7 +73,7 @@ public class ImageDialogAdvancedEditForm extends BaseElement
             // Input the chars one by one to wait for the size ratio computation to be applied before typing in the next
             // characters. If the chars are entered too fast, some are ignored.  
             getDriver().waitUntilCondition(input -> {
-                String value = imageWidth.getAttribute("value");
+                String value = imageWidth.getDomProperty("value");
                 return value.length() == expectedSize;
             });
             // Without this wait, the next iteration might fail when sending the key since the element is not 

@@ -35,6 +35,9 @@ import com.xpn.xwiki.XWikiContext;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -80,5 +83,20 @@ class DocumentsConfigurationSourceTest
         inOrder.verify(spaceSource).containsKey("key");
         // Second call
         inOrder.verify(wikiSource).containsKey("key");
+    }
+
+    @Test
+    void repeatedLoadIsCached()
+    {
+        String key = "test";
+        this.source.containsKey(key);
+
+        verify(this.wikiSource).containsKey(key);
+        verify(this.xcontextProvider).get();
+
+        this.source.containsKey(key);
+
+        verify(this.wikiSource, times(2)).containsKey(key);
+        verifyNoMoreInteractions(this.xcontextProvider);
     }
 }

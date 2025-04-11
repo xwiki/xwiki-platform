@@ -847,7 +847,7 @@ require([
 #macro (displayNavigationPanel)
   #set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
   &lt;div class="panel expanded"&gt;
-  &lt;div class="xwikipanelcontents"&gt;
+  &lt;div class="xwikipanelcontents jstree-xwiki-large"&gt;
   #documentTree({
     'dragAndDrop': true,
     'root': "document:$openToDoc",

@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -322,7 +321,7 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilContentEditable()
     {
         getDriver().waitUntilCondition(driver -> getFromEditedContent(
-            () -> getRootEditableElement(false).getAttribute("contenteditable").equals("true")));
+            () -> getRootEditableElement(false).getDomAttribute("contenteditable").equals("true")));
         this.cachedRefreshCounter = getRefreshCounter();
     }
 
@@ -335,7 +334,7 @@ public class RichTextAreaElement extends BaseElement
         try {
             WebElement rootEditableElement = getRootEditableElement();
             getDriver().waitUntilCondition(
-                driver -> Objects.equals(placeholder, rootEditableElement.getAttribute("data-cke-editorplaceholder")));
+                driver -> Objects.equals(placeholder, rootEditableElement.getDomAttribute("data-cke-editorplaceholder")));
         } finally {
             maybeSwitchToDefaultContent();
         }
@@ -424,44 +423,7 @@ public class RichTextAreaElement extends BaseElement
      */
     public String getRefreshCounter()
     {
-        return getFromEditedContent(() -> getRootEditableElement(false).getAttribute("data-xwiki-refresh-counter"));
-    }
-
-    /**
-     * Sends the Save &amp; Continue shortcut key to the text area and waits for the success notification message.
-     *
-     * @since 16.9.0RC1
-     * @since 16.4.5
-     * @since 15.10.13
-     */
-    public void sendSaveShortcutKey()
-    {
-        sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
-
-        // The code that waits for the save confirmation clicks on the success notification message to hide it and this
-        // steals the focus from the rich text area. Unfortunately this makes Chrome lose the caret position: the next
-        // sendKeys will insert the text at the end of the edited content. To avoid this, we backup the active element
-        // and restore it after the save confirmation.
-        WebElement activeElement;
-        try {
-            activeElement = getActiveElement();
-        } finally {
-            maybeSwitchToDefaultContent();
-        }
-
-        // This steals the focus from the rich text area because it clicks on the success notification message in order
-        // to hide it.
-        waitForNotificationSuccessMessage("Saved");
-
-        // Restore the focus to the previously active element. We cannot simply focus the rich text area because the
-        // previously active element might have been a nested editable area (e.g. from an inline editable macro or from
-        // the image caption).
-        maybeSwitchToEditedContent();
-        try {
-            focus(activeElement);
-        } finally {
-            maybeSwitchToDefaultContent();
-        }
+        return getFromEditedContent(() -> getRootEditableElement(false).getDomAttribute("data-xwiki-refresh-counter"));
     }
 
     private void focus(WebElement element)

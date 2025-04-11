@@ -46,6 +46,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
@@ -449,7 +450,21 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public BaseClass clone()
     {
-        BaseClass bclass = (BaseClass) super.clone();
+        return (BaseClass) super.clone();
+    }
+
+    @Override
+    public BaseClass clone(boolean detach)
+    {
+        return (BaseClass) super.clone(detach);
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<DocumentReference> element)
+    {
+        super.cloneContent(element);
+
+        BaseClass bclass = (BaseClass) element;
 
         bclass.setCustomClass(getCustomClass());
         bclass.setCustomMapping(getCustomMapping());
@@ -458,12 +473,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         bclass.setDefaultEditSheet(getDefaultEditSheet());
         bclass.setValidationScript(getValidationScript());
         bclass.setNameField(getNameField());
-
-        bclass.setOwnerDocument(this.ownerDocument);
-
-        bclass.setDirty(isDirty());
-
-        return bclass;
     }
 
     @Override

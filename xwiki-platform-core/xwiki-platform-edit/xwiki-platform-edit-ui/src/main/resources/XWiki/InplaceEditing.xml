@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.InplaceEditing" locale="">
+<xwikidoc version="1.6" reference="XWiki.InplaceEditing" locale="">
   <web>XWiki</web>
   <name>InplaceEditing</name>
   <language/>
@@ -475,10 +475,14 @@ define('editInPlace', [
 
   var editPage = function() {
     return editInPlace({
-      afterEdit: function() {
-        $('#document-title-input').focus().select();
-      }
+      afterEdit: focusTitleInput
     });
+  };
+
+  var focusTitleInput = function() {
+    const titleInput = document.getElementById('document-title-input');
+    titleInput.focus();
+    titleInput.setSelectionRange(0 ,0);
   };
 
   var translatePage = function() {
@@ -871,7 +875,7 @@ define('editInPlace', [
   };
 
   var createTranslation = function(xwikiDocument) {
-    $('#document-title-input').focus().select();
+    focusTitleInput();
     // Let the user know that they are now editing the translation of this page in the current locale.
     $('#document-title-input').popover({
       content: l10n['edit.inplace.page.translate.messageAfter'],
@@ -905,8 +909,8 @@ define('editInPlace', [
     // the title and content editors to update their values and the 'xwikiDocument' instance. We do this by catching the
     // event early (lower in the DOM, at the start of the event bubbling phase) and adding a one time event listener for
     // the end of the event bubbling phase at the top level of the DOM document.
-    actionButtons.on('xwiki:actions:beforeSave', function() {
-      $(document).one('xwiki:actions:beforeSave', updateFormDataBeforeSave);
+    actionButtons.on('xwiki:actions:beforeSave xwiki:actions:beforePreview', event =&gt; {
+      $(document).one(event.type, updateFormDataBeforeSave);
     });
     actionButtons.on('xwiki:actions:cancel', function(event) {
       // We are already in view mode so there's no need to leave the page.
@@ -1027,12 +1031,14 @@ define('editInPlace', [
       input.attr('placeholder', placeholder);
     }
     $('#document-title h1').addClass('editable').empty().append([label, input]);
-    $(document).on('xwiki:actions:beforeSave.titleEditor', '.xcontent.form', function(event) {
-      xwikiDocument.rawTitle = input.val();
-    });
+    $(document).on(
+      'xwiki:actions:beforeSave.titleEditor xwiki:actions:beforePreview.titleEditor',
+      '.xcontent.form',
+      () =&gt; xwikiDocument.rawTitle = input.val()
+    );
     $(document).one('xwiki:actions:view', '.xcontent.form', function(event, data) {
       // Destroy the title editor.
-      $(document).off('xwiki:actions:beforeSave.titleEditor');
+      $(document).off('xwiki:actions:beforeSave.titleEditor xwiki:actions:beforePreview.titleEditor');
       $('#document-title h1').removeClass('editable').text(xwikiDocument.rawTitle);
     });
     return xwikiDocument;
@@ -1500,13 +1506,13 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
 }
 
 @document-title-input-padding-vertical: @line-height-computed / 4 - 1;
-input#document-title-input {
+.document-header input#document-title-input {
   /* Preserve the heading styles. */
   color: inherit;
   font-size: inherit;
-  background-color: @body-bg;
+  background-color: transparent;
   /* It seems it's not enough to set the line height for the text input. We also need to set its height. */
-  height: @font-size-document-title * @headings-line-height + 2 * (1 + @document-title-input-padding-vertical);
+  height: ~"calc(@{font-size-document-title} * @{headings-line-height} - -2 * (1px - -@{document-title-input-padding-vertical}))";
   line-height: @headings-line-height;
   padding: @document-title-input-padding-vertical (ceil(@grid-gutter-width / 2) - 1);
   width: 100%;
@@ -1516,14 +1522,10 @@ input#document-title-input:valid {
   box-shadow: none;
 }
 
-input#document-title-input:valid:hover {
-  border-color: @input-border;
-}
-
 input#document-title-input:valid:focus,
 #xwikicontent[contenteditable]:focus,
 #xwikicontent[tabindex]:focus {
-  .form-control-focus();
+  outline: 0;
 }
 
 #xwikicontent[contenteditable],
@@ -1604,7 +1606,7 @@ form#inplace-editing {
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

@@ -30,14 +30,14 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 10.8RC1
  */
-@Component(roles = MembersCache.class)
+@Component(roles = GroupMembersCache.class)
 @Singleton
-public class MembersCache extends AbstractGroupCache
+public class GroupMembersCache extends AbstractGroupCache
 {
     /**
      * Set the id.
      */
-    public MembersCache()
+    public GroupMembersCache()
     {
         super("user.membership.members");
     }

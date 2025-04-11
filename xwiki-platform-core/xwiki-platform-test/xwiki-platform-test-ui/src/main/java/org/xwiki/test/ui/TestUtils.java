@@ -1561,6 +1561,14 @@ public class TestUtils
         }
     }
 
+    /**
+     * @return the current edit mode, or null / empty string if we're not currently in edit mode
+     */
+    public String getEditMode()
+    {
+        return (String) getDriver().executeScript("return window.XWiki?.editor");
+    }
+
     public boolean isInWYSIWYGEditMode()
     {
         return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]"))

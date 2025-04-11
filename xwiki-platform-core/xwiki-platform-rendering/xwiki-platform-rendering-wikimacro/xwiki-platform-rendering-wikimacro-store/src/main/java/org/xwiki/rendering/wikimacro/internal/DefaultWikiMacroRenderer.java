@@ -276,10 +276,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         this.syncContext = syncContext;
 
-        // Find index of the macro in the XDOM
-        long index = syncContext.getXDOM().indexOf(syncContext.getCurrentMacroBlock());
-
-        this.id = createId("rendering", "wikimacro", wikimacro.getId(), index);
+        this.id = createId("rendering", "wikimacro", wikimacro.getId(),
+            wikimacro.getBlockId(syncContext.getCurrentMacroBlock()));
         try {
             this.parameters = convertParameters(parameters);
         } catch (ComponentLookupException e) {

@@ -171,9 +171,15 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
             lockWrite();
 
             try {
-                entry = new GroupCacheEntry(key);
-                this.cache.set(key, entry);
-                addToIndex(key, reference);
+                // Load the entry again from the cache to verify that it hasn't been created by another thread while
+                // waiting for the write lock.
+                entry = this.cache.get(key);
+
+                if (entry == null) {
+                    entry = new GroupCacheEntry(key);
+                    this.cache.set(key, entry);
+                    addToIndex(key, reference);
+                }
             } finally {
                 unlockWrite();
             }

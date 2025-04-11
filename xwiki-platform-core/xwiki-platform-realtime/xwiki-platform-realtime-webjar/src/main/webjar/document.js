@@ -121,6 +121,16 @@ define('xwiki-realtime-document', [
         }
       });
     }
+
+    getURL(...args) {
+      return new XWiki.Document(this.documentReference).getURL(...args);
+    }
+
+    getRevision(version) {
+      return $.getJSON(meta.restURL + '/history/' + encodeURIComponent(version), $.param({
+        prettyNames: true
+      }, true));
+    }
   }
 
   // Initialize the document fields based on the meta information available on page load.

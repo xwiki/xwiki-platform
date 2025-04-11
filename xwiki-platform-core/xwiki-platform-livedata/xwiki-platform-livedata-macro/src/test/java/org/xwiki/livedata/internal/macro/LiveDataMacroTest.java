@@ -80,6 +80,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocks;
 
@@ -393,6 +394,12 @@ class LiveDataMacroTest
         List<Block> blocks = this.liveDataMacro.execute(parameters, json(advancedConfig.toString()),
             this.macroTransformationContext);
         assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void isIsolated()
+    {
+        assertTrue(this.liveDataMacro.isExecutionIsolated(new LiveDataMacroParameters(), "test"));
     }
 
     private String json(String text)

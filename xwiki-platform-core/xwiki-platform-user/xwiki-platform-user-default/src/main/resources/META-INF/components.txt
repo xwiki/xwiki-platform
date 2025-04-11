@@ -35,7 +35,8 @@ org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceSerialize
 org.xwiki.user.internal.document.NormalUserConfigurationSourceAuthorization
 org.xwiki.user.internal.group.DefaultGroupManager
 org.xwiki.user.internal.group.GroupCacheInvalidationListener
-org.xwiki.user.internal.group.GroupsCache
-org.xwiki.user.internal.group.MembersCache
+org.xwiki.user.internal.group.GroupMembersCache
+org.xwiki.user.internal.group.MemberGroupsCache
 org.xwiki.user.internal.group.UsersCache
 org.xwiki.user.internal.group.UsersCacheInvalidationListener
+org.xwiki.user.internal.group.WikiGroupCache

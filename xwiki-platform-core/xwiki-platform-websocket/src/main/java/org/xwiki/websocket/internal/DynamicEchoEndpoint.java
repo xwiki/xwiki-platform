@@ -19,10 +19,9 @@
  */
 package org.xwiki.websocket.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.MessageHandler;
@@ -59,14 +58,7 @@ public class DynamicEchoEndpoint extends AbstractXWikiEndpoint
                 close(session, CloseReason.CloseCodes.CANNOT_ACCEPT,
                     "We don't accept connections from guest users. Please login first.");
             } else {
-                session.addMessageHandler(new MessageHandler.Whole<String>()
-                {
-                    @Override
-                    public void onMessage(String message)
-                    {
-                        handleMessage(session, message);
-                    }
-                });
+                session.addMessageHandler((MessageHandler.Whole<String>) message -> handleMessage(session, message));
             }
         });
     }

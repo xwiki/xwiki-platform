@@ -29,10 +29,13 @@ import javax.inject.Named;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.internal.model.reference.CurrentPageReferenceDocumentReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageAttachmentReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -51,6 +54,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -145,4 +149,39 @@ class DefaultLinkStoreTest
         assertEquals(Set.of(documentReference),
             this.store.resolveBackLinkedEntities(new PageReference("wiki", "page1")));
     }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 1000, 1001 })
+    void pagination(int limit) throws Exception
+    {
+        SolrClient client = this.solr.getCore("search").getClient();
+
+        DocumentReference linkTarget = new DocumentReference("wiki", "space", "document1");
+
+        for (int i = 0; i < limit; ++i) {
+            String solrId = "wiki:Space.Name%d_".formatted(i);
+            String solrReference = "document:wiki:Space.Name%d".formatted(i);
+
+            SolrInputDocument inputDocument = new SolrInputDocument("id", solrId);
+
+            inputDocument.setField(FieldUtils.VERSION, "1.1");
+
+            inputDocument.setField(FieldUtils.REFERENCE, solrReference);
+            inputDocument.addField(FieldUtils.LINKS, "entity:document:wiki:space.document1");
+            inputDocument.addField(FieldUtils.LINKS_EXTENDED, "entity:document:wiki:space.document1");
+
+            client.add(inputDocument);
+        }
+        client.commit();
+
+        Set<EntityReference> references = this.store.resolveBackLinkedEntities(linkTarget);
+        assertEquals(limit, references.size());
+        for (int i = 0; i < limit; ++i) {
+            DocumentReference expectedDocumentReference =
+                new DocumentReference("wiki", "Space", "Name%d".formatted(i));
+            assertTrue(references.contains(expectedDocumentReference),
+                "Reference " + expectedDocumentReference + " not found");
+        }
+    }
+
 }

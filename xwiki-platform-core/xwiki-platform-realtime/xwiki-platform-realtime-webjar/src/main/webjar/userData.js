@@ -56,7 +56,7 @@ define('xwiki-realtime-userData', [
     return {
       initialState: '{}',
       network,
-      userName: configData.userName,
+      userName: configData.user.sessionId,
       channel: key,
       crypto: configData.crypto || null,
       // Operational Transformation
@@ -100,16 +100,10 @@ define('xwiki-realtime-userData', [
   }
 
   function getMyUserData(configData, cursor) {
-    const myUserData = {
-      name: configData.userName
+    return {
+      ['cursor_' + configData.editor]: cursor,
+      ...configData.user,
     };
-    if (cursor) {
-      myUserData['cursor_' + configData.editor] = cursor;
-    }
-    if (typeof configData.userAvatar === 'string') {
-      myUserData.avatar = configData.userAvatar;
-    }
-    return myUserData;
   }
 
   function createUserData(configData, config) {
@@ -148,13 +142,12 @@ define('xwiki-realtime-userData', [
     return userData;
   }
 
-  module.start = async function(network, key, configData) {
+  module.start = async function(network, key, configData = {}) {
     startInitializing();
 
-    configData = configData || {};
     myId = configData.myId;
-    if (!myId || !configData.userName) {
-      console.error("myId and userName are required!");
+    if (!myId || !configData.user.sessionId) {
+      console.error("myId and sessionId are required!");
       return;
     }
 

@@ -76,7 +76,7 @@ class UndoRedoIT extends AbstractCKEditorIT
 
     @Test
     @Order(1)
-    void undoRedoWithPlaceholder(TestUtils setup, TestReference testReference) throws Exception
+    void undoRedoWithPlaceholder(TestUtils setup, TestReference testReference)
     {
         textArea.sendKeys("one", Keys.ENTER, "two", Keys.ENTER, "three", Keys.ENTER);
 

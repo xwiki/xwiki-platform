@@ -65,10 +65,13 @@ public class GroupCacheInvalidationListener extends AbstractEventListener
     private DocumentReferenceResolver<String> resolver;
 
     @Inject
-    private GroupsCache groupsCache;
+    private MemberGroupsCache groupsCache;
 
     @Inject
-    private MembersCache membersCache;
+    private GroupMembersCache membersCache;
+
+    @Inject
+    private WikiGroupCache wikiGroupCache;
 
     /**
      * Default constructor.
@@ -86,15 +89,23 @@ public class GroupCacheInvalidationListener extends AbstractEventListener
             WikiReference wikiReference = new WikiReference(((WikiDeletedEvent) event).getWikiId());
             this.groupsCache.cleanCache(wikiReference.getName());
             this.membersCache.cleanCache(wikiReference.getName());
+            this.wikiGroupCache.invalidate(wikiReference.getName());
         } else {
             XWikiDocument newDocument = (XWikiDocument) source;
             XWikiDocument previousDocument = newDocument.getOriginalDocument();
 
             DocumentReference documentReference = newDocument.getDocumentReference();
 
-            // Remove the entity from the cache
+            // Remove the entity from the caches
             this.groupsCache.cleanCache(documentReference);
             this.membersCache.cleanCache(documentReference);
+
+            // Invalidate the wiki groups if a group was added or removed
+            if ((newDocument.getXObject(
+                XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE) != null) != (previousDocument
+                    .getXObject(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE) != null)) {
+                this.wikiGroupCache.invalidate(documentReference.getWikiReference().getName());
+            }
 
             // Remove the previous and new group members from the cache
             Set<DocumentReference> previousMembers = getMembers(previousDocument);

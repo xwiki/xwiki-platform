@@ -65,7 +65,7 @@ class TextAreaIT extends AbstractCKEditorIT
         new DocumentReference("xwiki", Arrays.asList("TextAreaIT", "NestedSpace"), "TextAreaClass");
 
     @BeforeAll
-    public void beforeEach(TestUtils testUtils)
+    void beforeEach(TestUtils testUtils)
     {
         // Use superadmin
         testUtils.loginAsSuperAdmin();

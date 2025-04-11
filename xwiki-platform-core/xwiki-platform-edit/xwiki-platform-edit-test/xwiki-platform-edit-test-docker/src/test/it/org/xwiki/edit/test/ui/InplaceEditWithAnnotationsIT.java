@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @version $Id$
  */
 @UITest
-public class InplaceEditWithAnnotationsIT
+class InplaceEditWithAnnotationsIT
 {
     @BeforeEach
     void setup(TestUtils setup, TestReference testReference)
@@ -96,6 +96,7 @@ public class InplaceEditWithAnnotationsIT
             annotatedPage.beginAddAnnotation("one");
             fail("The annotation creation dialog was opened.");
         } catch (TimeoutException e) {
+            // Expected exception.
         }
 
         // Verify that the edited content is not affected if we delete an annotation (comment) while editing in place.

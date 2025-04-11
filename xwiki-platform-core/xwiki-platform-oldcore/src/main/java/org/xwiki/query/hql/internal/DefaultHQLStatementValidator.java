@@ -53,7 +53,7 @@ import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 @Singleton
 public class DefaultHQLStatementValidator implements HQLStatementValidator
 {
-    private static final Pattern SAFE_ORDERBY_ELEMENT = Pattern.compile("(\\w+.)?\\w+(\\s+\\w+)?");
+    private static final Pattern SAFE_ORDERBY_ELEMENT = Pattern.compile("\\A(\\w+\\.)?\\w+(\\s+\\w+)?\\z");
 
     @Inject
     @Named("context")

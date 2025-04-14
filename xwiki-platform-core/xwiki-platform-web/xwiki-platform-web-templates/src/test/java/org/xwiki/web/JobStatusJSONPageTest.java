@@ -46,9 +46,13 @@ class JobStatusJSONPageTest extends PageTest
 
         String output = this.templateManager.render("job_status_json.vm");
 
-        assertThat(output, equalToCompressingWhiteSpace("""
-            <div class="box errormessage">
-            &#60;test&#62;.notFound
+        assertThat(output.strip(), equalToCompressingWhiteSpace("""
+            <div class="box errormessage ">
+            <span class="icon-block">$services.icon.renderHTML($iconName)</span>
+            <span class="sr-only">error</span>
+            <div>
+                &#60;test&#62;.notFound
+            </div>
             </div>"""));
     }
 }

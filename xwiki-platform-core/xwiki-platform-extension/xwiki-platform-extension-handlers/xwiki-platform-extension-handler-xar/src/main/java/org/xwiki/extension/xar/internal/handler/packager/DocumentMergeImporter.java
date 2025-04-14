@@ -138,14 +138,19 @@ public class DocumentMergeImporter
         if (!currentDocument.isNew()) {
             if (document != currentDocument) {
                 if (document.isNew()) {
+                    // Avoid modifying the cached document
+                    currentDocument = currentDocument.clone();
+
                     currentDocument.loadAttachmentsContentSafe(xcontext);
                     currentDocument.apply(document);
                 } else {
-                    currentDocument = document;
+                    // Avoid modifying the cached document
+                    currentDocument = document.clone();
                 }
             }
         } else {
-            currentDocument = document;
+            // Avoid modifying the cached document
+            currentDocument = document.clone();
         }
 
         // Set document authors

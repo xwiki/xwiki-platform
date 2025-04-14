@@ -305,12 +305,16 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         parameterValues.add(FIELD_XWIKIGROUPS_MEMBER);
         parameterValues.add(memberSource);
 
+        // TODO: load XWikiDocument instance one by one instead of all at once
         List<XWikiDocument> documentList =
             context.getWiki().getStore().searchDocuments(ALL_GROUPS_WITH_MEMBER_QUERY, parameterValues, context);
 
         for (XWikiDocument groupDocument : documentList) {
-            if (replaceMemberFromGroup(groupDocument, memberSourceReference, memberTargetReference, context)) {
-                context.getWiki().saveDocument(groupDocument, context);
+            // Avoid modifying the cached document
+            XWikiDocument clonedDocument = groupDocument.clone();
+
+            if (replaceMemberFromGroup(clonedDocument, memberSourceReference, memberTargetReference, context)) {
+                context.getWiki().saveDocument(clonedDocument, context);
             }
         }
     }
@@ -335,12 +339,16 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 + memberName + HQLLIKE_ALL_SYMBOL);
         }
 
+        // TODO: load XWikiDocument instance one by one instead of all at once
         List<XWikiDocument> documentList =
             context.getWiki().getStore().searchDocuments(ALL_GROUPS_WITH_MEMBER_QUERY, parameterValues, context);
 
         for (XWikiDocument groupDocument : documentList) {
-            if (removeUserOrGroupFromGroup(groupDocument, memberWiki, memberSpace, memberName, context)) {
-                context.getWiki().saveDocument(groupDocument, context);
+            // Avoid modifying the cached document
+            XWikiDocument clonedDocument = groupDocument.clone();
+
+            if (removeUserOrGroupFromGroup(clonedDocument, memberWiki, memberSpace, memberName, context)) {
+                context.getWiki().saveDocument(clonedDocument, context);
             }
         }
     }

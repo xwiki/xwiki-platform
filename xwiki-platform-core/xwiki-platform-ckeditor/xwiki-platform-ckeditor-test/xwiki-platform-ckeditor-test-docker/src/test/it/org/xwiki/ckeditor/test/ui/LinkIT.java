@@ -165,10 +165,11 @@ class LinkIT extends AbstractCKEditorIT
         linkPickerModal.select();
         linkDialog.submit();
         // Verify that the content matches what we did using CKEditor.
-        assertSourceEquals("[[type the link label>>doc:Foo.Bar.Buz.Test]]\n"
-            + "\n"
-            + "[[type the link label>>doc:.Fa\\.Fi\\.Foo.WebHome]]\n"
-            + "\n"
-            + "[[type the link label>>doc:.SubPage.Another.WebHome]]");
+        assertSourceEquals("""
+            [[type the link label>>doc:Foo.Bar.Buz.Test]]
+
+            [[type the link label>>doc:.Fa\\.Fi\\.Foo.WebHome]]
+
+            [[type the link label>>doc:.SubPage.Another.WebHome]]""");
     }
 }

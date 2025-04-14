@@ -42,27 +42,25 @@ $response.setStatus(404)
 #template("htmlheader.vm")
 #template("header.vm")
 <div class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end" id="contentcontainer">
-  <div id="contentcontainerinner">
-    <div class="leftsidecolumns">
-    #if($hidecolumns && ($!hidecolumns == 1))
-      <div id="contentcolumn" class="contenthidelefthideright">
-    #else
-      <div id="contentcolumn"> ## class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">
-    #end
-      ##
-      ## Display the standard error message or the custom XWiki.WikiDoesNotExist page from the main wiki
-      ##
-      <div class='main layoutsubsection'>
-        <main id='mainContentArea'>
-          ## Allow the wiki admin to specify a custom wiki error page in the main wiki
-          #if ($xwiki.exists('XWiki.WikiDoesNotExist'))
-            $xwiki.includeForm('XWiki.WikiDoesNotExist', false)
-          #else
-            ## If no such page exists, display the standard message instead
-            #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thiswikidoesnotexist'))
-            #xwikimessageboxend()
-          #end
-          <div class="clearfloats"></div>
-        </main>## mainContentArea
-      </div>## main
+  #if($hidecolumns && ($!hidecolumns == 1))
+    <div id="contentcolumn" class="contenthidelefthideright">
+  #else
+    <div id="contentcolumn"> ## class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">
+  #end
+    ##
+    ## Display the standard error message or the custom XWiki.WikiDoesNotExist page from the main wiki
+    ##
+    <div class='main layoutsubsection'>
+      <main id='mainContentArea'>
+        ## Allow the wiki admin to specify a custom wiki error page in the main wiki
+        #if ($xwiki.exists('XWiki.WikiDoesNotExist'))
+          $xwiki.includeForm('XWiki.WikiDoesNotExist', false)
+        #else
+          ## If no such page exists, display the standard message instead
+          #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thiswikidoesnotexist'))
+          #xwikimessageboxend()
+        #end
+        <div class="clearfloats"></div>
+      </main>## mainContentArea
+    </div>## main
 #template('endpage.vm')

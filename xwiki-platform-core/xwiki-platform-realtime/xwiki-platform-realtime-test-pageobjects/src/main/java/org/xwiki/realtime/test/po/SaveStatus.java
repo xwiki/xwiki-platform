@@ -17,47 +17,63 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal.metadata;
-
-import org.apache.solr.common.SolrInputDocument;
+package org.xwiki.realtime.test.po;
 
 /**
- * Extended SolrInputDocument with calculated size.
+ * The save status values.
  * 
  * @version $Id$
- * @since 5.1M2
+ * @since 16.10.6
+ * @since 17.3.0RC1
  */
-public class LengthSolrInputDocument extends SolrInputDocument
+public enum SaveStatus
 {
     /**
-     * Serialization identifier.
+     * The document has unsaved changes.
      */
-    private static final long serialVersionUID = 1L;
+    UNSAVED("dirty"),
 
     /**
-     * @see #getLength()
+     * The document is being saved.
      */
-    private int length;
+    SAVING("cleaning"),
 
     /**
-     * @return the length (generally the number of characters). It's not the exact byte length, it's more a scale value.
+     * The document doesn't have unsaved changes.
      */
-    public int getLength()
+    SAVED("clean");
+
+    private final String value;
+
+    /**
+     * Create a new save status.
+     * 
+     * @param value the save status value
+     */
+    SaveStatus(String value)
     {
-        return this.length;
+        this.value = value;
     }
 
-    @Override
-    public void setField(String name, Object value)
+    /**
+     * @return the save status value
+     */
+    public String getValue()
     {
-        super.setField(name, value);
+        return this.value;
+    }
 
-        if (value instanceof String) {
-            this.length += ((String) value).length();
-        } else if (value instanceof byte[]) {
-            this.length += ((byte[]) value).length;
+    /**
+     * @param value the save status value
+     * @return the save status corresponding to the given value
+     */
+    public static SaveStatus fromValue(String value)
+    {
+        for (SaveStatus status : SaveStatus.values()) {
+            if (status.getValue().equals(value)) {
+                return status;
+            }
         }
-
-        // TODO: support more type ?
+        return null;
     }
 }

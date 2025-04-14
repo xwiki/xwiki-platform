@@ -17,50 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal.group;
+package org.xwiki.security.authorization;
 
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.security.authorization.AuthorizationManager.SUPERADMIN_USER;
 
 /**
- * Manipulate the cache of groups's members.
- * 
+ * Test of {@link DefaultAuthorizationManager}.
+ *
  * @version $Id$
- * @since 10.8RC1
  */
-@Component(roles = MembersCache.class)
-@Singleton
-public class MembersCache extends AbstractGroupCache
+@ComponentTest
+class DefaultAuthorizationManagerTest
 {
-    /**
-     * Set the id.
-     */
-    public MembersCache()
+    @InjectMockComponents
+    private DefaultAuthorizationManager defaultAuthorizationManager;
+
+    @Test
+    void isSuperAdminExpectTrue()
     {
-        super("user.membership.members");
+        assertTrue(
+            this.defaultAuthorizationManager.isSuperAdmin(
+                new DocumentReference("s1", "Space", SUPERADMIN_USER)));
     }
 
-    private String toKey(DocumentReference reference)
+    @Test
+    void isSuperAdminExpectFalse()
     {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append(this.serializer.serialize(reference));
-
-        return builder.toString();
+        assertFalse(
+            this.defaultAuthorizationManager.isSuperAdmin(new DocumentReference("xwiki", "XWiki", "Admin")));
     }
-
-    /**
-     * @param reference the reference of the entity for which to get the cache entry
-     * @param create true if an entry should be created if none exist
-     * @return the cache entry
-     */
-    public GroupCacheEntry getCacheEntry(DocumentReference reference, boolean create)
-    {
-        String key = toKey(reference);
-
-        return getCacheEntry(key, reference, create);
-    }
-
 }

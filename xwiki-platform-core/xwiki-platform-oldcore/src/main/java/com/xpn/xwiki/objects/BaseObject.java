@@ -195,14 +195,25 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     @Override
     public BaseObject clone()
     {
-        BaseObject object = (BaseObject) super.clone();
+        return (BaseObject) super.clone();
+    }
+
+    @Override
+    public BaseObject clone(boolean detach)
+    {
+        return (BaseObject) super.clone(detach);
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<BaseObjectReference> element)
+    {
+        super.cloneContent(element);
+
+        BaseObject object = (BaseObject) element;
+
         // We don't use #getGuid() because we actually want the same value and not generate a new guid when null (which
         // is expensive)
         object.setGuid(this.guid);
-
-        object.setDirty(isDirty());
-
-        return object;
     }
 
     /**

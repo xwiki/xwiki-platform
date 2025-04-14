@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class IconContextStoreTest
+class IconContextStoreTest
 {
     private static final String ICONSET_NAME = "iconset_name";
 
@@ -65,13 +65,13 @@ public class IconContextStoreTest
     private IconSet iconSet = mock(IconSet.class);
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         when(this.iconSet.getName()).thenReturn(ICONSET_NAME);
     }
 
     @Test
-    public void saveNoEntry()
+    void saveNoEntry()
     {
         Map<String, Serializable> contextStore = new HashMap<>();
 
@@ -81,7 +81,7 @@ public class IconContextStoreTest
     }
 
     @Test
-    public void save() throws IconException
+    void save() throws IconException
     {
         Map<String, Serializable> contextStore = new HashMap<>();
 
@@ -97,7 +97,7 @@ public class IconContextStoreTest
     }
 
     @Test
-    public void restore() throws IconException
+    void restore() throws IconException
     {
         Map<String, Serializable> contextStore = new HashMap<>();
 

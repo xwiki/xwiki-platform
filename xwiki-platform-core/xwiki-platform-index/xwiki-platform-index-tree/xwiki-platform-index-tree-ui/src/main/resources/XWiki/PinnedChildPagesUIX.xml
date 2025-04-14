@@ -187,7 +187,7 @@ require([
   const nodeTemplate = navigationTree?._data?.core?.node;
   if (!nodeTemplate) {
     // The tree node template hasn't been initialized yet.
-    $navigationTree.on('loading', function(event, data) {
+    $navigationTree.on('loading.jstree', function(event, data) {
       navigationTree = data.instance;
       modifyNodeTemplate(navigationTree._data.core.node);
     });
@@ -847,7 +847,7 @@ require([
 #macro (displayNavigationPanel)
   #set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
   &lt;div class="panel expanded"&gt;
-  &lt;div class="xwikipanelcontents"&gt;
+  &lt;div class="xwikipanelcontents jstree-xwiki-large"&gt;
   #documentTree({
     'dragAndDrop': true,
     'root': "document:$openToDoc",
@@ -877,7 +877,7 @@ require([
     <property>
       <parameters>order=10
 tabName=pinnedChildPages
-title=Pinned Child Pages
+title=index.pinnedChildPages.title
 right=edit</parameters>
     </property>
     <property>

@@ -257,7 +257,12 @@
       <code>{{velocity}}
 ## Escape special characters in the macro parameter value.
 #set ($sort = $xcontext.macro.params.sort.replaceAll('([~"])', '~$1'))
-{{documentTree root="document:" sortDocumentsBy="$!sort" /}}
+#if ("$!xcontext.macro.params.root" != '')
+  #set ($root = $xcontext.macro.params.root)
+#else
+  #set ($root = 'document:')
+#end
+{{documentTree root="$root" sortDocumentsBy="$!sort" /}}
 {{/velocity}}</code>
     </property>
     <property>
@@ -381,6 +386,96 @@
     </property>
     <property>
       <type>org.xwiki.index.tree.internal.macro.DocumentSort</type>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.ChildrenMacro</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>094dc5f2-9774-4f98-8e7b-dc2207a45bde</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>type</name>
+        <number>5</number>
+        <picker>1</picker>
+        <prettyName>Parameter type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified. The format of a node identifier is entityType:entityReference, where the entity type can be for instance wiki, space, document. E.g.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>root</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
 </xwikidoc>

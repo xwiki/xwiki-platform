@@ -191,9 +191,6 @@
                 if (editor._realtime._realtimeContext.channels.wysiwyg_users > 0) {
                   /*jshint +W106 */
 
-                  // Bring the autosave checkbox back.
-                  editor._realtimeInterface.realtimeAllowed(false);
-
                   // Show a notification explaining that we are not rejoining the realtime session.
                   editor.showNotification(
                     editor.localization.get('xwiki-realtime.notification.sourcearea.notRejoiningSession'),

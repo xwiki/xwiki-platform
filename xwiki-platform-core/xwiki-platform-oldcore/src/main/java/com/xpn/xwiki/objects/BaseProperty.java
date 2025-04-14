@@ -74,10 +74,16 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     @Override
     public void setObject(BaseCollection object)
     {
-        this.object = object;
+        if (this.object != object) {
+            this.object = object;
 
-        if (this.object != null && isDirty()) {
-            this.object.setDirty(true);
+            if (this.object != null) {
+                setOwnerDocument(object.getOwnerDocument());
+
+                if (isDirty()) {
+                    this.object.setDirty(true);
+                }
+            }
         }
     }
 
@@ -148,21 +154,34 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     }
 
     @Override
+    protected void detachOwner()
+    {
+        super.detachOwner();
+
+        setObject(null);
+    }
+
+    @Override
+    protected void cloneOwner()
+    {
+        super.cloneOwner();
+
+        // Get the object from the cloned owner
+        if (getOwnerDocument() != null && getObject() != null) {
+            setObject(this.ownerDocument.getXObject(this.object.getReference()));
+        }
+    }
+
+    @Override
     public BaseProperty<R> clone()
     {
-        BaseProperty<R> property = (BaseProperty<R>) super.clone();
+        return (BaseProperty<R>) super.clone();
+    }
 
-        property.ownerDocument = null;
-
-        cloneInternal(property);
-
-        property.ownerDocument = this.ownerDocument;
-
-        property.setObject(getObject());
-
-        property.setDirty(isDirty());
-
-        return property;
+    @Override
+    public BaseProperty<R> clone(boolean detach)
+    {
+        return (BaseProperty<R>) super.clone(detach);
     }
 
     /**
@@ -172,6 +191,14 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     protected void cloneInternal(BaseProperty clone)
     {
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<R> element)
+    {
+        super.cloneContent(element);
+
+        cloneInternal((BaseProperty) element);
     }
 
     public Object getValue()

@@ -21,6 +21,7 @@ package com.xpn.xwiki.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
@@ -43,6 +45,10 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.filter.output.DefaultWriterOutputTarget;
+import org.xwiki.filter.output.OutputTarget;
+import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
@@ -1419,10 +1425,24 @@ public class Document extends Api
 
     public String getXMLContent() throws XWikiException
     {
-        String xml = this.doc.getXMLContent(getXWikiContext());
-        return getXWikiContext().getUtil().substitute("s/<email>.*?<\\/email>/<email>********<\\/email>/goi",
-            getXWikiContext().getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
-                xml));
+        StringWriter writer = new StringWriter();
+        OutputTarget outputTarget = new DefaultWriterOutputTarget(writer);
+
+        DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
+        documentProperties.setWithWikiDocumentContentHTML(true);
+        documentProperties.setWithWikiAttachmentsContent(false);
+        documentProperties.setWithJRCSRevisions(false);
+        documentProperties.setWithRevisions(false);
+        documentProperties.setExcludedPropertyTypes(Set.of("Email", "Password"));
+
+        // Output
+        XAROutputProperties xarProperties = new XAROutputProperties();
+        xarProperties.setPreserveVersion(false);
+        xarProperties.setTarget(outputTarget);
+
+        this.doc.toXML(documentProperties, xarProperties);
+
+        return writer.toString();
     }
 
     public String toXML() throws XWikiException
@@ -1858,6 +1878,25 @@ public class Document extends Api
         } else {
             return new Attachment(this, attach, getXWikiContext());
         }
+    }
+
+    /**
+     * @param filename the name of the attachment
+     * @return the attachment with the given filename or null if the attachment does not exist
+     * @since 17.2.0RC1
+     */
+    public Attachment removeAttachment(String filename)
+    {
+        XWikiAttachment attachment = getDoc().getAttachment(filename);
+        if (attachment != null) {
+            attachment = this.doc.removeAttachment(attachment);
+
+            if (attachment != null) {
+                return new Attachment(this, attachment, getXWikiContext());
+            }
+        }
+
+        return null;
     }
 
     public List<Delta> getContentDiff(Document origdoc, Document newdoc)

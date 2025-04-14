@@ -19,10 +19,6 @@
  */
 package org.xwiki.edit.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +37,11 @@ import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests in-place page editing.
@@ -185,7 +186,8 @@ class InplaceEditIT
         ckeditor.getRichTextArea().click();
         ckeditor.getToolBar().toggleSourceMode();
         WebElement sourceTextArea = ckeditor.getSourceTextArea();
-        assertEquals("{{info}}\nType your information message here.\n{{/info}}", sourceTextArea.getAttribute("value"));
+        assertEquals("{{info}}\nType your information message here.\n{{/info}}",
+            sourceTextArea.getDomProperty("value"));
 
         // Modify the soure and save twice, without any change in between.
         sourceTextArea.clear();
@@ -197,7 +199,7 @@ class InplaceEditIT
         ckeditor = new CKEditor("content");
         ckeditor.getRichTextArea().click();
         ckeditor.getToolBar().toggleSourceMode();
-        assertEquals("{{success}}\ntest\n{{/success}}", ckeditor.getSourceTextArea().getAttribute("value"));
+        assertEquals("{{success}}\ntest\n{{/success}}", ckeditor.getSourceTextArea().getDomProperty("value"));
         viewPage.cancel();
     }
 
@@ -223,7 +225,7 @@ class InplaceEditIT
         // The title should be empty thus invalid.
         assertTrue(viewPage.isDocumentTitleInvalid());
         // We don't use a placeholder when document title is mandatory because it creates confusion.
-        assertEquals("", viewPage.getDocumentTitlePlaceholder());
+        assertNull(viewPage.getDocumentTitlePlaceholder());
 
         // Typing something should make the title input valid.
         viewPage.setDocumentTitle("Title");
@@ -409,7 +411,7 @@ class InplaceEditIT
         // Verify that the restored selection is visible (inside the viewport).
         assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height / 2));
 
-        sourceTextArea.sendKeys(Keys.PAGE_DOWN, Keys.UP, Keys.UP);
+        sourceTextArea.sendKeys(Keys.PAGE_DOWN, Keys.PAGE_DOWN, Keys.UP, Keys.UP);
         sourceTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME));
 
         // Switch back to WYSIWYG mode.

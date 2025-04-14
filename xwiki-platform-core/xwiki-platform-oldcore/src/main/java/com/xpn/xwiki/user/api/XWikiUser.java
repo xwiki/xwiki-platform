@@ -300,6 +300,10 @@ public class XWikiUser
             int checkedFlag = (checked) ? 1 : 0;
             try {
                 XWikiDocument userdoc = getUserDocument(context);
+
+                // Avoid modifying the cached document
+                userdoc = userdoc.clone();
+
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     EMAIL_CHECKED_PROPERTY, checkedFlag);
                 context.getWiki().saveDocument(userdoc, localizePlainOrKey(
@@ -349,6 +353,10 @@ public class XWikiUser
             int activeFlag = (disable) ? 0 : 1;
             try {
                 XWikiDocument userdoc = getUserDocument(context);
+
+                // Avoid modifying the cached document
+                userdoc = userdoc.clone();
+
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
                 UserReference userReference =

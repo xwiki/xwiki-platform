@@ -734,6 +734,12 @@ public class MockitoOldcore
                 return null;
             }
         }).when(getMockStore()).saveXWikiDoc(anyXWikiDocument(), anyXWikiContext());
+        doAnswer(invocation -> {
+            XWikiDocument document = invocation.getArgument(0);
+            XWikiContext xcontext = invocation.getArgument(1);
+            getMockStore().saveXWikiDoc(document, xcontext);
+            return null;
+        }).when(getMockStore()).saveXWikiDoc(anyXWikiDocument(), anyXWikiContext(), anyBoolean());
         when(getMockStore().getLimitSize(any(), any(), any())).thenReturn(255);
 
         // XWikiVersioningStoreInterface

@@ -136,6 +136,13 @@ public interface WikiMacroConstants
     String MACRO_PRIORITY_PROPERTY = "priority";
 
     /**
+     * Constant for representing if the macro execution is isolated.
+     *
+     * @since 17.3.0RC1
+     */
+    String MACRO_EXECUTION_ISOLATED_PROPERTY = "executionIsolated";
+
+    /**
      * Constant for representing XWiki.WikiMacroParameterClass xwiki class space name.
      */
     String WIKI_MACRO_PARAMETER_CLASS_SPACE = "XWiki";

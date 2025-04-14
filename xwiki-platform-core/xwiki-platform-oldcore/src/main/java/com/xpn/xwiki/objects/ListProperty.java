@@ -168,6 +168,12 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     @Override
+    public ListProperty clone(boolean detach)
+    {
+        return (ListProperty) super.clone(detach);
+    }
+
+    @Override
     protected void cloneInternal(BaseProperty clone)
     {
         ListProperty property = (ListProperty) clone;

@@ -22,9 +22,10 @@ package org.xwiki.edit.script;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.edit.EditConfiguration;

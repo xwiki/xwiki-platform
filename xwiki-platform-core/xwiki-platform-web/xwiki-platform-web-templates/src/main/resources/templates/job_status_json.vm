@@ -28,5 +28,5 @@
   #outputJobStatusJSON($jobStatus, $translationPrefix)
 #else
   $response.setStatus(404)
-  #error($services.localization.render("${translationPrefix}.notFound"))
+  #error($escapetool.xml($services.localization.render("${translationPrefix}.notFound")))
 #end

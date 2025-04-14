@@ -235,6 +235,20 @@ public class XarExtensionHandlerTest
         }
     }
 
+    private void assertPageRemoved(String wiki, String space, String page) throws Throwable
+    {
+        XWikiDocument document =
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference(wiki, space, page), getXWikiContext());
+        assertTrue("Document " + wiki + ":" + space + "." + page + " has not been removed", document.isNew());
+    }
+
+    private void assertPageNotRemoved(String wiki, String space, String page) throws Throwable
+    {
+        XWikiDocument document =
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference(wiki, space, page), getXWikiContext());
+        assertFalse("Document " + wiki + ":" + space + "." + page + " has been removed", document.isNew());
+    }
+
     // Tests
 
     @Test
@@ -618,7 +632,7 @@ public class XarExtensionHandlerTest
         XWikiDocument modifiedpage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
 
-        assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
+        assertFalse("Document wiki:space.page has not been saved in the database", modifiedpage.isNew());
 
         assertEquals("Wrong content", "content 2", modifiedpage.getContent());
         assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
@@ -751,7 +765,7 @@ public class XarExtensionHandlerTest
         XWikiDocument modifiedpage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
 
-        assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
+        assertFalse("Document wiki:space.page has not been saved in the database", modifiedpage.isNew());
 
         assertEquals("Wrong content", "content 2", modifiedpage.getContent());
         assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
@@ -846,7 +860,7 @@ public class XarExtensionHandlerTest
         XWikiDocument modifiedpage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
 
-        assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
+        assertFalse("Document wiki:space.page has not been saved in the database", modifiedpage.isNew());
 
         assertEquals("Wrong content", "content", modifiedpage.getContent());
         assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
@@ -866,14 +880,14 @@ public class XarExtensionHandlerTest
         XWikiDocument newPage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space2", "page2"), getXWikiContext());
 
-        assertTrue("Document wiki.space2.page2 has not been removed from the database", newPage.isNew());
+        assertTrue("Document wiki:space2.page2 has not been removed from the database", newPage.isNew());
 
         // space1.page1
 
         XWikiDocument removedPage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
 
-        assertFalse("Document wiki.space1.page1 has not been saved in the database", removedPage.isNew());
+        assertFalse("Document wiki:space1.page1 has not been saved in the database", removedPage.isNew());
     }
 
     @Test
@@ -892,16 +906,11 @@ public class XarExtensionHandlerTest
         // validate
 
         // space.page belong to several extensions
-        XWikiDocument page =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
+        assertPageNotRemoved("wiki", "space", "page");
 
-        assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
-
-        // space1.page1 only belong to the uninstalled extension
-        XWikiDocument page1 =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
-
-        assertTrue("Document wiki.space1.page1 has not been removed from the database", page1.isNew());
+        // pages which only belong to the uninstalled extension
+        assertPageRemoved("wiki", "space1", "page1");
+        assertPageRemoved("wiki", "space", "class");
     }
 
     @Test
@@ -928,7 +937,7 @@ public class XarExtensionHandlerTest
         XWikiDocument page =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
 
-        assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
+        assertFalse("Document wiki:space.page has been removed from the database", page.isNew());
     }
 
     @Test

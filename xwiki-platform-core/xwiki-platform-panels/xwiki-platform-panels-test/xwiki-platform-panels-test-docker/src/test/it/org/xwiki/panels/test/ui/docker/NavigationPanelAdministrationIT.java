@@ -59,6 +59,9 @@ class NavigationPanelAdministrationIT
         // Reset the configuration.
         setup.deletePage("PanelsCode", "NavigationConfiguration");
 
+        // Cleanup
+        setup.deletePage("A AA", "WebHome");
+
         // Create a top level page that doesn't belong to an extension.
         setup.createPage("Denis", "WebHome", "", "");
 
@@ -196,6 +199,10 @@ class NavigationPanelAdministrationIT
         assertEquals(Arrays.asList("A AA", "Alice", "Bob", "Denis", "XWiki"),
             navPanelAdminPage.getNavigationTree().getTopLevelPages());
         assertTrue(navPanelAdminPage.isPinned("A AA"));
+        // Reset the state of pinned page so that automated accessibility tests don't hit an unexpected fail
+        // in the test following this one.
+        navPanelAdminPage.unpinPage("A AA");
+        navPanelAdminPage.save();
     }
 
     private NavigationPanelAdministrationPage saveAndReload(NavigationPanelAdministrationPage navPanelAdminPage,

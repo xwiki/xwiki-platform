@@ -19,12 +19,6 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,6 +58,12 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * Test of the CKEditor Image Plugin.
  *
@@ -100,7 +100,7 @@ class ImageIT extends AbstractCKEditorIT
     void setUp(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
-        setup.deletePage(testReference);
+        setup.deletePage(testReference, true);
         DocumentReference configurationReference = getConfigurationReference(setup);
         setup.deletePage(configurationReference);
         DocumentReference imageStylesReference =
@@ -213,7 +213,6 @@ class ImageIT extends AbstractCKEditorIT
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
-        setup.deletePage(testReference);
         ViewPage newPage = setup.gotoPage(testReference);
 
         // Move to the WYSIWYG edition page.
@@ -650,8 +649,7 @@ class ImageIT extends AbstractCKEditorIT
 
     @Test
     @Order(14)
-    void quickInsertImageOtherPage(TestUtils setup,
-            TestReference testReference) throws Exception
+    void quickInsertImageOtherPage(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
@@ -695,9 +693,12 @@ class ImageIT extends AbstractCKEditorIT
     void quickInsertImageSubWiki(WikiReference wiki, TestUtils setup,
             TestLocalReference testLocalReference, TestReference testReference) throws Exception
     {
+        // Cleanup.
+        DocumentReference subwikiDocumentReference = new DocumentReference(testLocalReference, wiki);
+        setup.deletePage(subwikiDocumentReference, true);
+
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
-        DocumentReference subwikiDocumentReference = new DocumentReference(testLocalReference, wiki);
 
         // Upload image to subwiki.
         String attachmentName = "image.gif";
@@ -1041,8 +1042,7 @@ class ImageIT extends AbstractCKEditorIT
         throws Exception
     {
         ViewPage newPage = setup.createPage(entityReference, "", "");
-        setup.attachFile(entityReference, attachmentName,
-            getClass().getResourceAsStream("/ImagePlugin/" + attachmentName), false);
+        setup.attachFile(entityReference, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
         return newPage;
     }
 

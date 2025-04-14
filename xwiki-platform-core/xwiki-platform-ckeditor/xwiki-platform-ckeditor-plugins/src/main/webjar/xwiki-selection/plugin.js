@@ -300,6 +300,33 @@
           }
         }, true);
       });
+
+      // When content is pasted or inserted into the editor, the Widget plugin scans the new content for widgets to be
+      // upcasted. When widgets are upcasted the content is transformed and the caret may end up inside the read-only
+      // part of the widget or inside one of its nested editable areas. If this is the case then we need to focus either
+      // the widget or the nested editable, otherwise the caret gets hidden and the user can't get it back without using
+      // the mouse.
+      editor.widgets?.on('checkWidgets', event => {
+        const selection = editor.getSelection();
+        if (selection?.isCollapsed()) {
+          const container = selection.getStartElement();
+          const widget = editor.widgets.getByElement(container);
+          if (widget) {
+            // The caret is inside a widget.
+            if (container.isReadOnly()) {
+              // The caret is hidden inside the read-only part of the widget. We focus the widget in order to select it.
+              widget.focus();
+            } else {
+              // The caret is inside a nested editable area. Some browsers (e.g. Chrome) don't show the caret if the
+              // nested editable area is not focused.
+              CKEDITOR.plugins.widget.getNestedEditable(widget.wrapper, container)?.focus();
+              // In Firefox, if we focus the nested editable area then the user can't move the caret outside of it using
+              // the keyboard. We need to focus again the root editable area to fix this...
+              editor.editable().focus();
+            }
+          }
+        }
+      });
     }
   });
 })();

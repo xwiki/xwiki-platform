@@ -1013,6 +1013,82 @@ class ImageIT extends AbstractCKEditorIT
         assertEquals(2, attachmentsPane.getNumberOfAttachments());
     }
 
+    @Test
+    @Order(23)
+    void pasteCaptionedImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String firstImageName = "image.gif";
+        uploadAttachment(setup, testReference, firstImageName);
+
+        String secondImageName = "otherImage.gif";
+        ViewPage sourcePage = uploadAttachment(setup, testReference, secondImageName);
+
+        AttachmentReference firstImageReference = new AttachmentReference(firstImageName, testReference);
+        String firstImageURL = setup.getURL(firstImageReference, "download", "");
+
+        AttachmentReference secondImageReference = new AttachmentReference(secondImageName, testReference);
+        String secondImageURL = setup.getURL(secondImageReference, "download", "x=y");
+
+        String linkHref = setup.getURL(testReference, "view", "x=y");
+
+        // After this method, the clipboard contains an html content with some text and an image.
+        copyHTML(setup, sourcePage, """
+            <figure>
+                <img src="%s" />
+                <figcaption>First image</figcaption>
+            </figure>
+            <p>between</p>
+            <figure>
+                <a href="%s">
+                  <img src="%s" />
+                </a>
+                <figcaption>Second image</figcaption>
+            </figure>
+            """.formatted(firstImageURL, linkHref, secondImageURL));
+
+        DocumentReference subPageReference = new DocumentReference("Paste", testReference.getLastSpaceReference());
+        WYSIWYGEditPage editPage = edit(setup, subPageReference, true);
+        this.textArea.clear();
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        this.textArea.sendKeys(Keys.END, " has");
+        this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images: 2 / 2");
+        this.textArea.sendKeys(" caption");
+        assertSourceEquals("""
+            [[First image>>image:image.gif]]
+
+            between
+
+            [[~[~[Second image has caption~>~>image:otherImage.gif~]~]>>url:%s]]""".formatted(linkHref), true);
+        editPage.clickSaveAndView();
+
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(2, attachmentsPane.getNumberOfAttachments());
+        assertTrue(attachmentsPane.attachmentIsDisplayedByFileName("image.gif"));
+        assertTrue(attachmentsPane.attachmentIsDisplayedByFileName("otherImage.gif"));
+
+        //
+        // Paste again, but this time cancel the upload.
+        //
+
+        edit(setup, subPageReference, true);
+        this.textArea.clear();
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        this.textArea.waitForOwnNotificationProgressMessage("Starting upload in 4s");
+        this.textArea.sendKeys(Keys.END, " is");
+        // Close the notification to cancel the upload.
+        this.textArea.sendKeys(Keys.ESCAPE);
+        this.textArea.sendKeys(" captioned");
+        assertSourceEquals("""
+            [[First image>>image:%s]]
+
+            between
+
+            [[~[~[Second image is captioned~>~>image:%s~]~]>>url:%s]]""".formatted(firstImageURL, secondImageURL,
+            linkHref), true);
+    }
+
     /**
      * Initialize a page with some HTML content and then, copy its displayed content to the clipboard.
      *

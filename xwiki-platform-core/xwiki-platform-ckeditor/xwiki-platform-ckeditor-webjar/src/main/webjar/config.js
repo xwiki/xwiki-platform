@@ -115,6 +115,16 @@ CKEDITOR.editorConfig = function(config) {
           height: true,
           src: true,
           width: true
+        },
+        match: function(image) {
+          if (image.parent?.name?.toLowerCase() === 'figure' ||
+              (image.parent?.name?.toLowerCase() === 'a' && image.parent?.parent?.name?.toLowerCase() === 'figure')) {
+            const figure = image.getAscendant('figure');
+            // This is needed in order for this figure to be upcasted as a captioned image widget.
+            // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_config.html#cfg-image2_captionedClass
+            figure.addClass('image');
+          }
+          return true;
         }
       },
       // Allowed table header and table cell attributes.

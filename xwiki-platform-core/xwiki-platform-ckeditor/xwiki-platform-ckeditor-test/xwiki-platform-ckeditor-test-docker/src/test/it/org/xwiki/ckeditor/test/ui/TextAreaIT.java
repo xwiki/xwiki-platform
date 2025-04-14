@@ -65,7 +65,7 @@ class TextAreaIT extends AbstractCKEditorIT
         new DocumentReference("xwiki", Arrays.asList("TextAreaIT", "NestedSpace"), "TextAreaClass");
 
     @BeforeAll
-    public void beforeEach(TestUtils testUtils)
+    void beforeEach(TestUtils testUtils) throws Exception
     {
         // Use superadmin
         testUtils.loginAsSuperAdmin();
@@ -74,6 +74,7 @@ class TextAreaIT extends AbstractCKEditorIT
         testUtils.setPropertyInXWikiPreferences("editor", "String", "Wysiwyg");
 
         // Create a class with a textarea
+        testUtils.rest().delete(TEXTAREA_CLASS_REFERENCE);
         testUtils.createPage(TEXTAREA_CLASS_REFERENCE, "", "TextAreaClass");
         testUtils.addClassProperty(TEXTAREA_CLASS_REFERENCE, "textarea", "TextArea");
     }

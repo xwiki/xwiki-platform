@@ -449,7 +449,7 @@
 
         // The image has been wrapped in the image resize wrapper. If the image was the widget element then we need to
         // create another widget element to hold the image resize wrapper (which includes the image).
-        if (!widget.wrapper.getChild(0).hasClass('cke_widget_element')) {
+        if (!widget.wrapper.getFirst(node => node.type === CKEDITOR.NODE_ELEMENT)?.hasClass('cke_widget_element')) {
           const oldWidgetElement = widget.element;
           const widgetElementAttrs = [
             'data-cke-widget-data',

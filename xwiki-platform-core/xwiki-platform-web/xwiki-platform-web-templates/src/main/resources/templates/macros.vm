@@ -953,16 +953,57 @@ $html
 ###    message
 ###
 
+### This velocity macro aims at providing an element similar to a XWiki Macro-Message in places where this XWikiMacro 
+### cannot be used.
+#macro(_genericMessage $text $classAffix $iconName $prettyNameKey $isInline $extraClass $title)
+  <#if($isInline)span#{else}div#end class="box ${classAffix}message $!{extraClass}">
+    <span class="icon-block">$services.icon.renderHTML($iconName)</span>
+    <span class="sr-only">$services.localization.render($prettyNameKey)</span>
+    <div>
+      #if("$!title" != "")<div class="box-title">$!title</div>#end
+      $text
+    </div>
+  </#if($isInline)span#{else}div#end>
+#end
+
+## Display a block warning message with the content $text.
 #macro(warning $text)
-<div class="box warningmessage"><span class="messagetype">$services.localization.render('warning'): </span>$text</div>
+#_genericMessage($text 'warning' 'warning' 'warning')
 #end
 
+## Display an inline warning message with the content $text.
+#macro(inlineWarning $text)
+#_genericMessage($text 'warning' 'warning' 'warning' true)
+#end
+
+## Display a block error message with the content $text.  
 #macro(error $text)
-<div class="box errormessage"><span class="messagetype">$services.localization.render('error'): </span>$text</div>
+#_genericMessage($text 'error' 'exclamation' 'error')
 #end
 
+## Display an inline error message with the content $text.
+#macro(inlineError $text)
+  #_genericMessage($text 'error' 'exclamation' 'error' true)
+#end
+
+## Display a block info message with the content $text.  
 #macro(info $text)
-<div class="box infomessage">$text</div>
+#_genericMessage($text 'info' 'info' 'info')
+#end
+
+## Display an inline info message with the content $text.
+#macro(inlineInfo $text)
+  #_genericMessage($text 'info' 'info' 'info' true)
+#end
+
+## Display a block success message with the content $text.  
+#macro(success $text)
+#_genericMessage($text 'success' 'check' 'success')
+#end
+
+## Display an inline success message with the content $text.
+#macro(inlineSuccess $text)
+  #_genericMessage($text 'success' 'check' 'success' true)
 #end
 
 #macro(message $text)
@@ -1516,7 +1557,7 @@ $Msz MB##
             #livetable_filters($collist $colprops $classname)
             <tr class="xwiki-livetable-initial-message">
               <td colspan="${columnCount}">
-                <div class="warningmessage">$services.localization.render('platform.livetable.environmentCannotLoadTableMessage')</div>
+                #warning($services.localization.render('platform.livetable.environmentCannotLoadTableMessage'))
               </td>
             </tr>
           </thead>

@@ -292,9 +292,7 @@
     #end
   #else
     $response.setStatus(404)
-    <div class="box errormessage">
-      $services.localization.render('core.copy.status.notFound')
-    </div>
+    #error($services.localization.render('core.copy.status.notFound'))
   #end
 #end
 

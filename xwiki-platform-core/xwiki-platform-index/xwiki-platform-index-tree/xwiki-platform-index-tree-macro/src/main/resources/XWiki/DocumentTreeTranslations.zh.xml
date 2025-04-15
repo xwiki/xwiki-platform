@@ -82,11 +82,28 @@ rendering.macro.documentTree.parameter.showOnlyViewable.name=仅显示可见
 ### Missing: rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
 ### Missing: rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 ### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
+rendering.macro.documentTree.parameter.sortDocumentsBy.name=排序页面，通过
+rendering.macro.documentTree.parameter.sortDocumentsBy.description=页面区域用来排列子页面，依据是排列的顺序。
+rendering.macro.documentTree.parameter.expandToLevel.name=扩展到级别
+rendering.macro.documentTree.parameter.expandToLevel.description=定义树形结构自动展开的深度。默认值为 0，表示仅显示顶级节点。设置为 1 会自动展开这些顶级节点，设置为 2 会进一步展开新显示节点的子节点，依此类推。请注意，较高的值可能会使浏览器在渲染宏时变得较为缓慢。
 ### Missing: rendering.macro.children.name=Children
 ### Missing: rendering.macro.children.description=Displays a tree of children pages of the current page
+rendering.macro.children.parameter.sort.name=排序，通过
+rendering.macro.children.parameter.sort.description=页面区域用来排列子页面，依据是排列顺序。
+rendering.macro.children.parameter.root.name=根(节点)
+rendering.macro.children.parameter.root.description=根节点 ID。如果您只想显示某个指定节点（即根节点）的后代页面，这将非常有用。树形结构会在第一层显示根节点的子节点，因此根节点本身不会被显示。如果未指定根节点，则会显示整个树形结构。节点标识符的格式为 entityType:entityReference，其中实体类型可以是 wiki, space, document 等。例如：wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
 index.documentTree.empty=无
 ### Missing: index.documentTree.more={0} more ...
 ### Missing: index.documentTree.addDocument=New page...
+index.documentTree.documentSortDisplayer.field=排序区域
+index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.title=标题
+index.documentTree.documentSortDisplayer.field.date=上次修改日期
+index.documentTree.documentSortDisplayer.field.creationDate=创建日期
+index.documentTree.documentSortDisplayer.order=排列顺序
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=升序
+index.documentTree.documentSortDisplayer.order.desc=降序
 
 ## Deprecated translation keys
 

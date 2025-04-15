@@ -264,8 +264,9 @@
 
       editor.on('paste', function(event) {
         const data = event.data;
-        // Check if the pasted content is HTML and contains images.
-        if (data.type === 'html' && data.dataValue.includes('<img')) {
+        // Check if the pasted content was copied from outside the editor, is HTML and contains images.
+        if (data.dataTransfer.getTransferType() === CKEDITOR.DATA_TRANSFER_EXTERNAL && data.type === 'html' &&
+            data.dataValue.includes('<img')) {
           // The clipboard can contain multiple data types. For instance, when using the "Copy Image" option from the
           // browser's context menu, the clipboard is filled with both the image HTML markup and the image File object.
           // CKEditor prefers the HTML markup but we can still access the File object.

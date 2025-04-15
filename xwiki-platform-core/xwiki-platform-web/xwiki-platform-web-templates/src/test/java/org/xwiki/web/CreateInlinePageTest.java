@@ -32,7 +32,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.invocation.InvocationOnMock;
 import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;

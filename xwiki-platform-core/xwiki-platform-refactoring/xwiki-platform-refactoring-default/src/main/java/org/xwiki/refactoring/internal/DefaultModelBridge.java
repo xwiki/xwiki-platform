@@ -156,6 +156,10 @@ public class DefaultModelBridge implements ModelBridge
 
         try {
             XWikiDocument newDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+            // Avoid modifying the cached document (if it already exist)
+            newDocument = newDocument.clone();
+
             xcontext.getWiki().saveDocument(newDocument, xcontext);
             this.logger.info("Document [{}] has been created.", documentReference);
             return true;
@@ -247,6 +251,10 @@ public class DefaultModelBridge implements ModelBridge
         try {
             if (xcontext.getWiki().exists(redirectClassReference, xcontext)) {
                 XWikiDocument oldDocument = xcontext.getWiki().getDocument(oldReference, xcontext);
+
+                // Avoid modifying the cached document
+                oldDocument = oldDocument.clone();
+
                 int number = oldDocument.createXObject(redirectClassReference, xcontext);
                 String location = this.defaultEntityReferenceSerializer.serialize(newReference);
                 oldDocument.getXObject(redirectClassReference, number).setStringValue("location", location);
@@ -356,6 +364,10 @@ public class DefaultModelBridge implements ModelBridge
                 this.progressManager.startStep(this);
 
                 XWikiDocument childDocument = wiki.getDocument(childReference, context);
+
+                // Avoid modifying the cached document
+                childDocument = childDocument.clone();
+
                 childDocument.setParentReference(newParentReference);
 
                 wiki.saveDocument(childDocument, "Updated parent field.", true, context);

@@ -143,10 +143,10 @@ CKEDITOR.editorConfig = function(config) {
         // * lone paragraphs, when inside a list item, table cell, definition list or block quote (in order to simplify
         //   the generated wiki syntax; they will be replaced by their child nodes)
         match: function(element) {
-          var loneParagraphParents = ['li', 'td', 'th', 'dd', 'blockquote'];
-          var name = element.name.toLowerCase();
-          var allowed = name !== 'div' && name !== 'span' && (
-            name !== 'p' || !element.parent || !element.parent.name ||
+          const loneParagraphParents = ['li', 'td', 'th', 'dd', 'blockquote'];
+          const name = element.name.toLowerCase();
+          const allowed = name !== 'div' && name !== 'span' && (
+            name !== 'p' || !element.parent?.name ||
             element.parent.children.length > 1 || loneParagraphParents.indexOf(element.parent.name.toLowerCase()) < 0
           );
           if (!allowed && name === 'p') {

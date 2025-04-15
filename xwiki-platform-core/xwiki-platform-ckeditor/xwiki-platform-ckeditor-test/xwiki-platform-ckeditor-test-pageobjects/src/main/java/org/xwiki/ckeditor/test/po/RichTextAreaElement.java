@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -631,5 +630,38 @@ public class RichTextAreaElement extends BaseElement
     public boolean isVisible(int xOffset, int yOffset)
     {
         return getDriver().isVisible(this.container, xOffset, yOffset);
+    }
+
+    /**
+     * Drag the specified image relative to its current position.
+     * 
+     * @param imageIndex the index of the image to be dragged (0-based)
+     * @param xOffset the horizontal move offset (from the current position of the image)
+     * @param yOffset the vertical move offset (from the current position of the image)
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void dragAndDropImageBy(int imageIndex, int xOffset, int yOffset)
+    {
+        verifyContent(editedContent -> {
+            WebElement targetImage = editedContent.getImages().get(imageIndex);
+            WebElement dragHandle = targetImage
+                .findElement(By.xpath("./ancestor::*[@data-cke-widget-wrapper]//*[@data-cke-widget-drag-handler]"));
+            // This doesn't seem to work in Firefox, at least not for the standalone WYSIWYG edit mode, where the rich
+            // text area is implemented using an iframe. Here's what we tried:
+            // * pausing after each action (e.g. hover the image, pause 2s, click and hold the drag handle, pause 2s,
+            //   and so on)
+            // * clicking the image before dragging it
+            // * clicking the rich text area before dragging the image
+            // * use the root editable element as the drop target, and consider the offsets relative to the top left
+            //   corner of the rich text area
+            // * calling perform() after each action
+            // * switching to the top frame and dropping on the iframe element used by the rich text area
+            getDriver().createActions()
+                // Hover the image first to make sure the drag handle is visible.
+                .moveToElement(targetImage)
+                // We have to drag the image using the dedicated drag handle.
+                .dragAndDropBy(dragHandle, xOffset, yOffset).perform();
+        });
     }
 }

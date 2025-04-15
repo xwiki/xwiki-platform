@@ -412,6 +412,8 @@ public class TestUtils
      */
     public void loginAndGotoPage(String username, String password, String pageURL, boolean checkLoginSuccess)
     {
+        // ensure to be on a wiki page before performing check on the username.
+        getDriver().get(getURL("XWiki", "Register", "register", "_=" + new Date().getTime()));
         if (!username.equals(getLoggedInUserName())) {
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.

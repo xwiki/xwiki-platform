@@ -54,6 +54,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -1087,6 +1088,89 @@ class ImageIT extends AbstractCKEditorIT
 
             [[~[~[Second image is captioned~>~>image:%s~]~]>>url:%s]]""".formatted(firstImageURL, secondImageURL,
             linkHref), true);
+    }
+
+    @Test
+    @Order(24)
+    void moveImageWithinEditedContentWithCopyPaste(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String imageName = "otherImage.gif";
+        DocumentReference childReference = new DocumentReference("childPage", testReference.getLastSpaceReference());
+        uploadAttachment(setup, childReference, imageName);
+
+        WYSIWYGEditPage editPage = edit(setup, testReference);
+        this.textArea.sendKeys("12 3");
+
+        // Insert the image.
+        this.textArea.sendKeys(Keys.LEFT, "/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        this.textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        this.textArea.sendKeys("other");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
+        this.textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+        assertSourceEquals("12 [[image:childPage@otherImage.gif]]3");
+
+        // Move the image using cut & paste.
+        this.textArea.sendKeys(Keys.LEFT, Keys.LEFT);
+        this.textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "x"));
+        this.textArea.sendKeys(Keys.LEFT);
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+
+        try {
+            this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images");
+            fail("The editor should not have proposed to upload the image.");
+        } catch (Exception e) {
+            // Expected.
+        }
+        assertSourceEquals("2 [[image:childPage@otherImage.gif]]31");
+
+        // Verify that no attachments were uploaded.
+        editPage.clickSaveAndView();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(0, attachmentsPane.getNumberOfAttachments());
+    }
+
+    @Test
+    @IgnoreBrowser(value = "firefox", reason = "We couldn't make the drag & drop work in Firefox inside an iframe "
+        + "(the rich text area is implemented using an iframe for the standalone edit mode).")
+    @Order(25)
+    void moveImageWithinEditedContentWithDragAndDrop(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String imageName = "otherImage.gif";
+        DocumentReference childReference = new DocumentReference("childPage", testReference.getLastSpaceReference());
+        uploadAttachment(setup, childReference, imageName);
+        WYSIWYGEditPage editPage = edit(setup, testReference);
+
+        // Insert the image.
+        this.textArea.sendKeys("/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        this.textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        this.textArea.sendKeys("other");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
+        this.textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+        textArea.sendKeys(Keys.RIGHT, "after");
+        assertSourceEquals("[[image:childPage@otherImage.gif]]after");
+
+        // Drag the image to the right, after the text.
+        this.textArea.dragAndDropImageBy(0, 70, 15);
+
+        try {
+            this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images");
+            fail("The editor should not have proposed to upload the image.");
+        } catch (Exception e) {
+            // Expected.
+        }
+        assertSourceEquals("after[[image:childPage@otherImage.gif]]");
+
+        // Verify that no attachments were uploaded.
+        editPage.clickSaveAndView();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(0, attachmentsPane.getNumberOfAttachments());
     }
 
     /**

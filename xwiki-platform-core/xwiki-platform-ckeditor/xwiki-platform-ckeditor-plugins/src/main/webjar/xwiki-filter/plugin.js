@@ -71,6 +71,17 @@
             if (!editor.config.fullData) {
               return false;
             }
+          },
+          '$': function(element) {
+            // When copying a fragment of the edited content that includes both text and widgets, CKEditor saves the
+            // selection by injecting two hidden elements in the DOM to bookmark the selection start and end. These
+            // bookmarks are sometimes included in the copied content. When the content is pasted in another editor
+            // instance the bookmarks are removed by the paste filter. However, if the content is pasted in the same
+            // editor instance, the bookmarks are not removed and they are saved in the wiki syntax. Let's make sure
+            // this doesn't happen.
+            if (element.attributes['data-cke-bookmark']) {
+              return false;
+            }
           }
         }
       };

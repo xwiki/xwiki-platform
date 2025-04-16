@@ -27,7 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -2492,6 +2495,7 @@ public class TestUtils
             RESOURCES_MAP.put(EntityType.OBJECT, new ResourceAPI(ObjectResource.class, null));
             RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, new ResourceAPI(ObjectPropertyResource.class, null));
             RESOURCES_MAP.put(EntityType.CLASS_PROPERTY, new ResourceAPI(ClassPropertyResource.class, null));
+            RESOURCES_MAP.put(EntityType.ATTACHMENT, new ResourceAPI(AttachmentResource.class, null));
         }
 
         /**
@@ -3088,6 +3092,19 @@ public class TestUtils
             return get(resourceURI, null, failIfNotFound);
         }
 
+        /**
+         * @param attachmentReference the reference of the attachment
+         * @return the attachment content as byte array
+         * @throws Exception when failing to get the attachment content
+         * @since 17.3.0RC1
+         */
+        public byte[] getAttachmentAsByteArray(EntityReference attachmentReference) throws Exception
+        {
+            try (InputStream stream = get(attachmentReference)) {
+                return IOUtils.toByteArray(stream);
+            }
+        }
+
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
             throws Exception
         {
@@ -3375,5 +3392,17 @@ public class TestUtils
         switchTab(secondTabHandle);
         getDriver().close();
         switchTab(currentTab);
+    }
+
+    /**
+     * @param path the resource path
+     * @return the corresponding {@link File}
+     * @throws URISyntaxException
+     * @since 17.3.0RC1
+     */
+    public File getResourceFile(String path) throws URISyntaxException
+    {
+        URL resource = getClass().getResource(path);
+        return Paths.get(resource.toURI()).toFile();
     }
 }

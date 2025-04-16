@@ -19,6 +19,8 @@
  */
 package org.xwiki.realtime.wysiwyg.test.ui;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,8 +42,10 @@ import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.realtime.test.po.Coeditor;
 import org.xwiki.realtime.test.po.RealtimeInplaceEditablePage;
 import org.xwiki.realtime.test.po.SaveStatus;
@@ -55,6 +59,8 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import com.mchange.io.FileUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -629,6 +635,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
         imageDialogEditModal.clickInsert();
+
+        // Verify the image is uploaded properly
+        File file = setup.getResourceFile("/image.gif");
+        byte[] uploadedAttachmentContent = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
+        assertTrue(Arrays.equals(FileUtils.getBytes(file), uploadedAttachmentContent));
 
         // Focus the caption and edit it.
         secondTextArea.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP);

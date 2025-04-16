@@ -42,13 +42,11 @@
 #set ($rangePattern = $regextool.compile('^[\[{](.+) TO (.+)[\]}]$'))
 #set ($wildcardPattern = $regextool.compile('^\(.*\*.*\)$'))
 
-#macro (displaySearchForm)
+#macro (_displaySearchFormBegin)
   #set($void = $services.progress.startStep('#displaySearchForm'))
   {{html clean="false"}}
-  &lt;form class="search-form row" action="$doc.getURL()" role="search"&gt;
+  &lt;form class="search-form" action="$doc.getURL()" role="search"&gt;
     &lt;div class="hidden"&gt;
-      &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
-      &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
       &lt;input type="hidden" name="highlight" value="$highlightEnabled"/&gt;
       &lt;input type="hidden" name="facet" value="$facetEnabled"/&gt;
       ## The parameter used to determine if the request has been redirected with default search filters.
@@ -65,25 +63,31 @@
         #end
       #end
     &lt;/div&gt;
-    &lt;div class="col-xs-12 col-sm-6"&gt;
+    &lt;div class="search-bar"&gt;
       &lt;div class="input-group"&gt;
+        &lt;input id='search-page-bar-input' type='search' name='text' class='form-control withTip useTitleAsTip'
+          title="$escapetool.xml($services.localization.render('search.page.bar.query.title'))"
+          placeholder="$escapetool.xml($services.localization.render('search.page.bar.query.title'))"
+          value="$escapetool.xml($text)"/&gt;
         &lt;label class='sr-only' for='search-page-bar-input'&gt;
-        $services.localization.render('search.page.bar.query.title')
+          $escapetool.xml($services.localization.render('search.page.bar.query.title'))
         &lt;/label&gt;
-        &lt;input id='search-page-bar-input' type='search' name='text' class='form-control'
-          placeholder="$services.localization.render('search.page.bar.query.title')"
-          title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;
         &lt;span class="input-group-btn"&gt;
           &lt;button type="submit" class="btn btn-primary"&gt;
             $services.icon.renderHTML('search')
-            &lt;span class="sr-only"&gt;$services.localization.render('search.page.bar.submit')&lt;/span&gt;
+            &lt;span&gt;$escapetool.xml($services.localization.render('search.page.bar.submit'))&lt;/span&gt;
           &lt;/button&gt;
         &lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;
-  &lt;/form&gt;
   {{/html}}
   #set($void = $services.progress.endStep())
+#end
+
+#macro (_displaySearchFormEnd)
+  {{html clean="false"}}
+  &lt;/form&gt;
+  {{/html}}
 #end
 
 #macro (displaySearchDebugInfo)
@@ -150,12 +154,12 @@
       #end
       #extendQueryString($url $resetParameters)
       [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url
-        ||class="search-facets-action-reset"]]## Continue in the same paragraph.
+        ||class="search-facets-action-reset force-no-underline"]]## Continue in the same paragraph.
       {{html clean="false"}}
-      &lt;a href="#" class="search-facets-action-collapseAll hidden"&gt;
+      &lt;a href="#" class="search-facets-action-collapseAll hidden force-no-underline"&gt;
         $escapetool.xml($services.localization.render('solr.facets.collapseAll'))
       &lt;/a&gt;
-      &lt;a href="#" class="search-facets-action-expandAll hidden"&gt;
+      &lt;a href="#" class="search-facets-action-expandAll hidden force-no-underline"&gt;
         $escapetool.xml($services.localization.render('solr.facets.expandAll'))
       &lt;/a&gt;
       &lt;span class="clearfloats"&gt;&lt;/span&gt;
@@ -221,12 +225,12 @@
     #set ($facetPrettyName = $facetField.name)
   #end
   &lt;div class="search-facet-header"&gt;
-    &lt;span id="$escapetool.xml($facetField.name)-toggler-hint"&gt;$escapetool.xml($facetPrettyName)&lt;/span&gt;
-    &lt;button class="btn btn-xs facet-toggler"
-      aria-controls="$escapetool.xml($facetField.name)-dropdown"
-      aria-labelledby="$escapetool.xml($facetField.name)-toggler-hint"&gt;
+    &lt;label&gt;$escapetool.xml($facetPrettyName)
+    &lt;button class="btn btn-xs facet-toggle"
+      aria-controls="$escapetool.xml($facetField.name)-dropdown"&gt;
       $services.icon.renderHTML('caret-down')
     &lt;/button&gt;
+    &lt;/label&gt;
   &lt;/div&gt;
 #end
 
@@ -284,7 +288,7 @@
   #displaySearchFacetValue($facetValue $customQueryStringParameters $customValueDisplayer false)
 #end
 
-#macro (displaySearchFacetValue $facetValue $customQueryStringParameters $customValueDisplayer $displayToggler)
+#macro (displaySearchFacetValue $facetValue $customQueryStringParameters $customValueDisplayer $displayToggle)
   #set ($selectedValues = [])
   #if ($facetRequestValues)
     #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
@@ -299,7 +303,8 @@
     #set ($discard = $queryStringParameters.putAll($customQueryStringParameters))
   #end
   #extendQueryString($url $queryStringParameters)
-  &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"&gt;
+  &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"
+    #if ($facetValue.name != '')data-facet-value="$escapetool.xml($facetValue.name)"#end&gt;
     #if ($facetValue.name == '')
       #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")
       #if (!$services.localization.get($facetPrettyValueKey))
@@ -316,8 +321,8 @@
     #end
   &lt;/a&gt;
   &lt;div class="itemCount"&gt;$facetValue.count&lt;/div&gt;
-  #if ($displayToggler)
-    &lt;button class="btn btn-xs facet-value-toggler"&gt;
+  #if ($displayToggle)
+    &lt;button class="btn btn-xs facet-value-toggle"&gt;
       &lt;span class='sr-only'&gt;$escapetool.xml($facetPrettyValue)&lt;/span&gt;
       $services.icon.renderHTML('caret-down')
     &lt;/button&gt;
@@ -344,7 +349,7 @@
   #end
 #end
 
-#macro (displaySearchResultsSort)
+#macro (_displaySearchResultsControls)
   #set ($defaultSortOrder = $solrConfig.sortFields.get($type))
   #if (!$defaultSortOrder)
     #set ($defaultSortOrder = {'score': 'desc'})
@@ -353,28 +358,63 @@
     'asc': $services.icon.render('caret-up'),
     'desc': $services.icon.render('caret-down')
   })
-  (% class="search-options" %)
-  * {{translation key="solr.options"/}}
-  #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
-  * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:${url}||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
-  #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
-  * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:${url}||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
+  (% class='search-results-controls' %)
+  (((
 
-  (% class="search-results-sort" %)
-  * {{translation key="solr.sortBy"/}}
-  #foreach ($entry in $defaultSortOrder.entrySet())
-    #set ($class = 'sort-item')
-    #set ($sortOrderIndicator = $NULL)
-    #set ($targetSortOrder = $entry.value)
-    #if ($sort == $entry.key)
-      #set ($class = "$class active")
-      #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
-      #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
-      #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
-    #end
-    #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
-    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:${url}||class="$class"]]
-  #end
+    {{html clean="false"}}
+    &lt;div class="search-results-sort"&gt;
+      &lt;label for="sort-by-input" class="sr-only"&gt;$escapetool.xml($services.localization.render('search.solr.sortBy.hint'))&lt;/label&gt;##
+      &lt;select id="sort-by-input" name="sort"&gt;
+        #foreach ($entry in $defaultSortOrder.entrySet())
+          &lt;option class="sort-item" value="$entry.key" #if($sort == $entry.key)selected='selected'#end&gt;
+            #set ($sortOptionNameList = $entry.key.split('_'))
+            #set ($camelCasedSortOptionName = $sortOptionNameList.get(0))
+            #foreach ($namePart in $sortOptionNameList.subList(1, $sortOptionNameList.size()))
+              #set ($camelCasedSortOptionName = "${camelCasedSortOptionName}$stringtool.capitalize($namePart)")
+            #end
+            $escapetool.xml($services.localization.render("search.solr.sortBy.field.$camelCasedSortOptionName"))
+          &lt;/option&gt;
+        #end
+      &lt;/select&gt;##
+      &lt;label class="form-control" title="$escapetool.xml($services.localization.render("search.solr.sortOrder.$sortOrder"))"&gt;##
+        &lt;input id="sort-order-input" type="checkbox" name="sortOrder" value="asc" #if ("$!sortOrder" == 'asc')checked="checked"#end/&gt;##
+        $services.icon.renderHTML('sort-descending')##
+        $services.icon.renderHTML('sort-ascending')##
+        &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render("search.solr.sortOrder.$sortOrder"))&lt;/span&gt;##
+      &lt;/label&gt;##
+    &lt;/div&gt;
+    &lt;div class="search-options"&gt;
+    &lt;ul&gt;##
+      &lt;li&gt;##
+      &lt;label&gt;##
+        &lt;input id="option-highlight-input" type="checkbox" class="options-item" value="true" 
+        data-query-name="highlight"
+        aria-describedby="option-highlight-description"
+        title="$escapetool.xml($services.localization.render('solr.options.highlight.title'))"
+        #if($highlightEnabled)checked#end/&gt;##
+        $escapetool.xml($services.localization.render('search.solr.options.showHighlight'))##
+      &lt;/label&gt;##
+      &lt;span id="option-highlight-description" class="sr-only"&gt;
+      $escapetool.xml($services.localization.render('solr.options.highlight.title'))
+      &lt;/span&gt;##
+      &lt;/li&gt;##
+      &lt;li&gt;##
+        &lt;label&gt;##
+          &lt;input id="option-facet-input" type="checkbox" class="options-item" value="true" data-query-name="facet"
+          aria-describedby="option-facet-description"
+          title="$escapetool.xml($services.localization.render('solr.options.facet.title'))"
+          #if($facetEnabled)checked#end/&gt;##
+          $escapetool.xml($services.localization.render('search.solr.options.showFacet'))
+        &lt;/label&gt;##
+        &lt;span id="option-facet-description" class="sr-only"&gt;
+          $escapetool.xml($services.localization.render('solr.options.facet.title'))
+        &lt;/span&gt;##
+      &lt;/li&gt;##
+    &lt;/ul&gt;##
+    &lt;/div&gt;
+    {{/html}}
+
+  )))
 #end
 
 #macro (extendQueryString $url $extraParameters)
@@ -419,7 +459,8 @@
   ## Add the parameters required to output the RSS feed instead of the search UI.
   #set ($discard = $parameters.put('outputSyntax', 'plain'))
   #set ($discard = $parameters.put('media', 'rss'))
-  &lt;a href="$doc.getURL('get', $escapetool.url($parameters))" class="hasIcon iconRSS"&gt;
+  &lt;a href="$doc.getURL('get', $escapetool.url($parameters))"&gt;
+    $services.icon.renderHTML('rss')
     $services.localization.render('search.rss', ["[$escapetool.xml($text)]"])
   &lt;/a&gt;
   {{/html}}
@@ -451,7 +492,7 @@
   #displaySearchResultLocation()
   &lt;div class="search-result-author"&gt;
     $services.localization.render('core.footer.modification', [
-      "#displayUserProfileLink($searchResult.author $searchResult.author_display)",
+      "#displayUser($searchResult.author {'useInlineHTML': true})",
       $xwiki.formatDate($searchResult.date)
     ])
   &lt;/div&gt;
@@ -473,7 +514,7 @@
   &lt;/h2&gt;
   #displaySearchResultLocation($searchResult)
   &lt;div class="search-result-uploader"&gt;
-    #set ($uploader = "#displayUserProfileLink($searchResult.attauthor.get(0) $searchResult.attauthor_display.get(0))")
+    #set ($uploader = "#displayUser($searchResult.attauthor.get(0) {'useInlineHTML': true})")
     #set ($uploadDate = $xwiki.formatDate($searchResult.attdate.get(0)))
     #set ($fileSize = "#dynamicsize($searchResult.attsize.get(0))")
     $services.localization.render('solr.result.uploadedBy', [$uploader, $uploadDate, $fileSize])
@@ -524,15 +565,6 @@
   &lt;/div&gt;
 #end
 
-#macro (displayUserProfileLink $userReference $userName)
-#if ($userReference)
-## We could test if the specified user exists but we want to speed up the search.
-&lt;a href="$xwiki.getURL($userReference)"&gt;$escapetool.xml($userName)&lt;/a&gt;##
-#else
-$services.localization.render('core.users.unknownUser')##
-#end
-#end
-
 #macro (displaySearchResultHighlighting $searchResult)
   #getSearchResultHighlighting($searchResult $highlighting)
   #if ($highlighting.size() &gt; 0)
@@ -556,12 +588,10 @@ $services.localization.render('core.users.unknownUser')##
       #end
     &lt;/dl&gt;
     #if ($highlighting.size() &gt; 1)
-      ## We wrap the link in a DIV because otherwise the HTML cleaning generates a paragraph.
-      &lt;div&gt;
-        &lt;a href="#" class="search-result-highlightAll hidden"&gt;
-          $escapetool.xml($services.localization.render('solr.result.highlightAll'))
-        &lt;/a&gt;
-      &lt;/div&gt;
+      &lt;button class="search-result-highlightAll btn btn-xs btn-default hidden"&gt;
+        $escapetool.xml($services.localization.render('solr.result.highlightAll'))
+        $services.icon.renderHTML('right')
+      &lt;/button&gt;
     #end
   #end
 #end
@@ -849,6 +879,8 @@ $value##
   #if ("$!sort" == '')
     #set ($sort = 'score')
   #end
+  ## If at any point this default behavior is changed, be extra careful with "#sort-order-input" initialization.
+  ## We assume here that empty values are mapped to "desc" (meaning that we use "asc" as the checkbox value).
   #set ($sortOrder = $request.sortOrder)
   #if ("$!sortOrder" == '')
     #set ($sortOrder = 'desc')
@@ -890,12 +922,15 @@ $value##
       {{/html}}
 
     #end
-    #displaySearchForm()
+    #_displaySearchFormBegin()
     #if ($text != '')
       #getSearchResults()
+      #_displaySearchResultsControls()
+      #_displaySearchFormEnd()
       #if ($debug)
         #displaySearchDebugInfo()
       #end
+      
       (% class="search-results-container row" %)(((
         #if ($facetEnabled)
           (% class="col-xs-12 col-sm-4 col-sm-push-8 col-md-3 col-md-push-9" %)(((
@@ -904,11 +939,11 @@ $value##
         #end
         (% class="search-results-left col-xs-12#if ($facetEnabled) col-sm-8 col-sm-pull-4 col-md-9 col-md-pull-3#end" %)
         (((
-          #displaySearchResultsSort()
-
           #displaySearchResults()
         )))
       )))
+    #else
+      #_displaySearchFormEnd()
     #end
   )))
   #set($void = $services.progress.popLevel())

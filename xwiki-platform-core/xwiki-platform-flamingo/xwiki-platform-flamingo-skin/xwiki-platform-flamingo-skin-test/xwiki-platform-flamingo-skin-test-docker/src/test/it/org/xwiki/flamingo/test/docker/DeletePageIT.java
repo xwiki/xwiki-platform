@@ -87,7 +87,7 @@ class DeletePageIT
 
     private static final String PAGE_TITLE = "Page title that will be deleted";
 
-    private static final String DELETE_SUCCESSFUL = "Done.";
+    private static final String DELETE_SUCCESSFUL = "Success\nDone.";
 
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
@@ -352,7 +352,7 @@ class DeletePageIT
         // Trigger the actual restore.
         RestoreStatusPage restoreStatusPage = undeletePage.clickRestore();
         restoreStatusPage.waitUntilFinished();
-        assertEquals("Done.", restoreStatusPage.getInfoMessage());
+        assertEquals("Success\nDone.", restoreStatusPage.getInfoMessage());
         page = restoreStatusPage.gotoRestoredPage();
 
         // Check the page have been effectively restored.

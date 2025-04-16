@@ -39,6 +39,7 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
@@ -512,6 +513,10 @@ public class SaveAction extends EditAction
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
+        XWikiRequest request = context.getRequest();
+        LOGGER.warn("Before performing save action HTTP Session [{}]. Current user in session [{}]",
+            request.getSession().getId(),
+            request.getSession().getAttribute(SecurityRequestWrapper.PRINCIPAL_SESSION_KEY));
         // CSRF prevention
         if (!csrfTokenCheck(context, true)) {
             return false;

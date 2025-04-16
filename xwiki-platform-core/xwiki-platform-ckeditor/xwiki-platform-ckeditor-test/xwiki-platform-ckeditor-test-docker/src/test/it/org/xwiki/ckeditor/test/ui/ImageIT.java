@@ -19,12 +19,6 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,9 +54,16 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test of the CKEditor Image Plugin.
@@ -100,7 +101,7 @@ class ImageIT extends AbstractCKEditorIT
     void setUp(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
-        setup.deletePage(testReference);
+        setup.deletePage(testReference, true);
         DocumentReference configurationReference = getConfigurationReference(setup);
         setup.deletePage(configurationReference);
         DocumentReference imageStylesReference =
@@ -213,7 +214,6 @@ class ImageIT extends AbstractCKEditorIT
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
-        setup.deletePage(testReference);
         ViewPage newPage = setup.gotoPage(testReference);
 
         // Move to the WYSIWYG edition page.
@@ -650,8 +650,7 @@ class ImageIT extends AbstractCKEditorIT
 
     @Test
     @Order(14)
-    void quickInsertImageOtherPage(TestUtils setup,
-            TestReference testReference) throws Exception
+    void quickInsertImageOtherPage(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
@@ -695,9 +694,12 @@ class ImageIT extends AbstractCKEditorIT
     void quickInsertImageSubWiki(WikiReference wiki, TestUtils setup,
             TestLocalReference testLocalReference, TestReference testReference) throws Exception
     {
+        // Cleanup.
+        DocumentReference subwikiDocumentReference = new DocumentReference(testLocalReference, wiki);
+        setup.deletePage(subwikiDocumentReference, true);
+
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
-        DocumentReference subwikiDocumentReference = new DocumentReference(testLocalReference, wiki);
 
         // Upload image to subwiki.
         String attachmentName = "image.gif";
@@ -1012,6 +1014,165 @@ class ImageIT extends AbstractCKEditorIT
         assertEquals(2, attachmentsPane.getNumberOfAttachments());
     }
 
+    @Test
+    @Order(23)
+    void pasteCaptionedImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String firstImageName = "image.gif";
+        uploadAttachment(setup, testReference, firstImageName);
+
+        String secondImageName = "otherImage.gif";
+        ViewPage sourcePage = uploadAttachment(setup, testReference, secondImageName);
+
+        AttachmentReference firstImageReference = new AttachmentReference(firstImageName, testReference);
+        String firstImageURL = setup.getURL(firstImageReference, "download", "");
+
+        AttachmentReference secondImageReference = new AttachmentReference(secondImageName, testReference);
+        String secondImageURL = setup.getURL(secondImageReference, "download", "x=y");
+
+        String linkHref = setup.getURL(testReference, "view", "x=y");
+
+        // After this method, the clipboard contains an html content with some text and an image.
+        copyHTML(setup, sourcePage, """
+            <figure>
+                <img src="%s" />
+                <figcaption>First image</figcaption>
+            </figure>
+            <p>between</p>
+            <figure>
+                <a href="%s">
+                  <img src="%s" />
+                </a>
+                <figcaption>Second image</figcaption>
+            </figure>
+            """.formatted(firstImageURL, linkHref, secondImageURL));
+
+        DocumentReference subPageReference = new DocumentReference("Paste", testReference.getLastSpaceReference());
+        WYSIWYGEditPage editPage = edit(setup, subPageReference, true);
+        this.textArea.clear();
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        this.textArea.sendKeys(Keys.END, " has");
+        this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images: 2 / 2");
+        this.textArea.sendKeys(" caption");
+        assertSourceEquals("""
+            [[First image>>image:image.gif]]
+
+            between
+
+            [[~[~[Second image has caption~>~>image:otherImage.gif~]~]>>url:%s]]""".formatted(linkHref), true);
+        editPage.clickSaveAndView();
+
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(2, attachmentsPane.getNumberOfAttachments());
+        assertTrue(attachmentsPane.attachmentIsDisplayedByFileName("image.gif"));
+        assertTrue(attachmentsPane.attachmentIsDisplayedByFileName("otherImage.gif"));
+
+        //
+        // Paste again, but this time cancel the upload.
+        //
+
+        edit(setup, subPageReference, true);
+        this.textArea.clear();
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        this.textArea.waitForOwnNotificationProgressMessage("Starting upload in 4s");
+        this.textArea.sendKeys(Keys.END, " is");
+        // Close the notification to cancel the upload.
+        this.textArea.sendKeys(Keys.ESCAPE);
+        this.textArea.sendKeys(" captioned");
+        assertSourceEquals("""
+            [[First image>>image:%s]]
+
+            between
+
+            [[~[~[Second image is captioned~>~>image:%s~]~]>>url:%s]]""".formatted(firstImageURL, secondImageURL,
+            linkHref), true);
+    }
+
+    @Test
+    @Order(24)
+    void moveImageWithinEditedContentWithCopyPaste(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String imageName = "otherImage.gif";
+        DocumentReference childReference = new DocumentReference("childPage", testReference.getLastSpaceReference());
+        uploadAttachment(setup, childReference, imageName);
+
+        WYSIWYGEditPage editPage = edit(setup, testReference);
+        this.textArea.sendKeys("12 3");
+
+        // Insert the image.
+        this.textArea.sendKeys(Keys.LEFT, "/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        this.textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        this.textArea.sendKeys("other");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
+        this.textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+        assertSourceEquals("12 [[image:childPage@otherImage.gif]]3");
+
+        // Move the image using cut & paste.
+        this.textArea.sendKeys(Keys.LEFT, Keys.LEFT);
+        this.textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "x"));
+        this.textArea.sendKeys(Keys.LEFT);
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+
+        try {
+            this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images");
+            fail("The editor should not have proposed to upload the image.");
+        } catch (Exception e) {
+            // Expected.
+        }
+        assertSourceEquals("2 [[image:childPage@otherImage.gif]]31");
+
+        // Verify that no attachments were uploaded.
+        editPage.clickSaveAndView();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(0, attachmentsPane.getNumberOfAttachments());
+    }
+
+    @Test
+    @IgnoreBrowser(value = "firefox", reason = "We couldn't make the drag & drop work in Firefox inside an iframe "
+        + "(the rich text area is implemented using an iframe for the standalone edit mode).")
+    @Order(25)
+    void moveImageWithinEditedContentWithDragAndDrop(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String imageName = "otherImage.gif";
+        DocumentReference childReference = new DocumentReference("childPage", testReference.getLastSpaceReference());
+        uploadAttachment(setup, childReference, imageName);
+        WYSIWYGEditPage editPage = edit(setup, testReference);
+
+        // Insert the image.
+        this.textArea.sendKeys("/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        this.textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        this.textArea.sendKeys("other");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::other", imageName);
+        this.textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+        textArea.sendKeys(Keys.RIGHT, "after");
+        assertSourceEquals("[[image:childPage@otherImage.gif]]after");
+
+        // Drag the image to the right, after the text.
+        this.textArea.dragAndDropImageBy(0, 70, 15);
+
+        try {
+            this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images");
+            fail("The editor should not have proposed to upload the image.");
+        } catch (Exception e) {
+            // Expected.
+        }
+        assertSourceEquals("after[[image:childPage@otherImage.gif]]");
+
+        // Verify that no attachments were uploaded.
+        editPage.clickSaveAndView();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(0, attachmentsPane.getNumberOfAttachments());
+    }
+
     /**
      * Initialize a page with some HTML content and then, copy its displayed content to the clipboard.
      *
@@ -1041,8 +1202,7 @@ class ImageIT extends AbstractCKEditorIT
         throws Exception
     {
         ViewPage newPage = setup.createPage(entityReference, "", "");
-        setup.attachFile(entityReference, attachmentName,
-            getClass().getResourceAsStream("/ImagePlugin/" + attachmentName), false);
+        setup.attachFile(entityReference, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
         return newPage;
     }
 

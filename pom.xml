@@ -58,12 +58,12 @@
     <tika.version>2.9.3</tika.version>
     <pdfbox.version>2.0.33</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.18</jetty.server.version>
+    <jetty.server.version>12.0.19</jetty.server.version>
     <jetty.client.version>10.0.25</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.119.Final</netty.version>
+    <netty.version>4.2.0.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.4.2</dockerJava.version>
+    <dockerJava.version>3.5.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
@@ -113,7 +113,7 @@
     <mysql.version>9.2.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.2</mariadb.version>
+    <mariadb.version>3.5.3</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
@@ -397,7 +397,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.13.1</version>
+        <version>2.14.0</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -713,7 +713,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>5.2</version>
+        <version>5.3.1</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>

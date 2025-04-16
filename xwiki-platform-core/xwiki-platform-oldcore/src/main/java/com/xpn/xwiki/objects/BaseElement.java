@@ -119,7 +119,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * @param dirty true of the element was modified (or created)
+     * @param dirty true if the element was modified (or created)
      * @since 17.1.0RC1
      * @since 16.10.4
      * @since 16.4.7
@@ -374,31 +374,85 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         return true;
     }
 
-    @Override
-    public BaseElement clone()
+    /**
+     * Reset any reference to the owner of this element.
+     * 
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    protected void detachOwner()
     {
-        BaseElement element;
+        this.ownerDocument = null;
+        this.documentReference = null;
+        this.referenceCache = null;
+    }
+
+    /**
+     * Clone the owner referenced by this element.
+     * 
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    protected void cloneOwner()
+    {
+        if (this.ownerDocument != null) {
+            this.ownerDocument = this.ownerDocument.clone();
+        }
+    }
+
+    @Override
+    public BaseElement<R> clone()
+    {
+        return clone(false);
+    }
+
+    /**
+     * @param detach true if the element should be detached from its parent container, if false then the parent
+     *            container is cloned too
+     * @return a clone of this element
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    public BaseElement<R> clone(boolean detach)
+    {
+        BaseElement<R> element;
         try {
-            element = (BaseElement) super.clone();
+            element = (BaseElement<R>) super.clone();
 
-            element.setOwnerDocument(getOwnerDocument());
-
-            // Make sure we clone either the reference or the name depending on which one is used.
-            if (this.documentReference != null) {
-                element.setDocumentReference(getDocumentReference());
-            } else if (this.name != null) {
-                element.setName(getName());
+            if (detach) {
+                // This element is not attached to any container yet
+                element.detachOwner();
+            } else {
+                // For retro compatibility reasons we clone the owner document
+                element.cloneOwner();
             }
 
-            element.setPrettyName(getPrettyName());
+            cloneContent(element);
 
-            element.dirty = this.dirty;
-        } catch (Exception e) {
+            // Restore the dirty state
+            element.setDirty(isDirty());
+        } catch (CloneNotSupportedException e) {
             // This should not happen
             element = null;
         }
 
         return element;
+    }
+
+    /**
+     * Extra clone related operation between the handling of the owner and the reset of the dirty flag.
+     * 
+     * @param element the cloned element
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    protected void cloneContent(BaseElement<R> element)
+    {
+        element.setPrettyName(getPrettyName());
     }
 
     @Override

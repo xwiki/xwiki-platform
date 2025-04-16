@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.script.ScriptContext;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -68,7 +69,10 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -267,6 +271,30 @@ class DefaultWikiMacroTest
 
         assertEquals(falsePreparedXDOM.getChildren(), result.get(0).getChildren());
         assertNotSame(falsePreparedXDOM.getChildren().get(0), result.get(0).getChildren().get(0));
+    }
+
+    @Test
+    void preparedMacroIndex() throws Exception
+    {
+        DefaultWikiMacro wikiMacro = registerWikiMacro("wikimacro", "word", Syntax.XWIKI_2_0,
+            new DefaultContentDescriptor("", false, Block.LIST_BLOCK_TYPE), Collections.emptyList());
+
+        MacroBlock wikiMacroCall = new MacroBlock("wikimacro", Map.of(), "content", false);
+        new XDOM(List.of(wikiMacroCall), new MetaData(Map.of(MetaData.SYNTAX, Syntax.XWIKI_2_0)));
+
+        wikiMacro.prepare(wikiMacroCall);
+
+        Object preparedIndex = wikiMacroCall.getAttribute(DefaultWikiMacro.ATTRIBUTE_PREPARE_BLOCK_ID);
+        assertNotNull(preparedIndex);
+        assertInstanceOf(String.class, preparedIndex);
+
+        // Enable async
+        FieldUtils.writeField(wikiMacro, "asyncAllowed", true, true);
+        wikiMacroCall.setAttribute(DefaultWikiMacro.ATTRIBUTE_PREPARE_BLOCK_ID, null);
+
+        wikiMacro.prepare(wikiMacroCall);
+
+        assertNull(wikiMacroCall.getAttribute(DefaultWikiMacro.ATTRIBUTE_PREPARE_BLOCK_ID));
     }
 
     /**

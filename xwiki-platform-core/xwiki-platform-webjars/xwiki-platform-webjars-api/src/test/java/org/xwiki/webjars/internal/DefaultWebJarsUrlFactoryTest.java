@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.webjars;
+package org.xwiki.webjars.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
@@ -35,8 +34,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.webjars.internal.WebJarsResourceReference;
-import org.xwiki.webjars.script.WebJarsScriptService;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,16 +41,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.webjars.script.WebJarsScriptService}.
+ * Unit tests for {@link DefaultWebJarsUrlFactory}.
  *
  * @version $Id$
- * @since 6.0M1
+ * @since 17.3.0RC1
  */
 @ComponentTest
-class WebJarsScriptServiceTest
+class DefaultWebJarsUrlFactoryTest
 {
     @InjectMockComponents
-    private WebJarsScriptService scriptService;
+    private DefaultWebJarsUrlFactory webJarsUrlFactory;
 
     @MockComponent
     private ResourceReferenceSerializer<ResourceReference, ExtendedURL> serializer;
@@ -63,11 +60,6 @@ class WebJarsScriptServiceTest
 
     @MockComponent
     private InstalledExtensionRepository installedExtensionRepository;
-
-    @BeforeEach
-    public void setUp() throws Exception
-    {
-    }
 
     @Test
     void computeURLWithVersion() throws Exception
@@ -80,7 +72,7 @@ class WebJarsScriptServiceTest
         when(this.serializer.serialize(resourceReference))
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "ang:ular", "2.1.11", "angular.css")));
 
-        assertEquals("/xwiki/ang%3Aular/2.1.11/angular.css", this.scriptService.url("ang:ular/2.1.11/angular.css"));
+        assertEquals("/xwiki/ang%3Aular/2.1.11/angular.css", this.webJarsUrlFactory.url("ang:ular/2.1.11/angular.css"));
     }
 
     @Test
@@ -98,7 +90,7 @@ class WebJarsScriptServiceTest
         when(this.serializer.serialize(resourceReference))
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
-        assertEquals("/xwiki/angular/2.1.11/angular.css", this.scriptService.url("angular", "angular.css"));
+        assertEquals("/xwiki/angular/2.1.11/angular.css", this.webJarsUrlFactory.url("angular", "angular.css"));
     }
 
     @Test
@@ -116,7 +108,7 @@ class WebJarsScriptServiceTest
         when(this.serializer.serialize(resourceReference))
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
-        assertEquals("/xwiki/angular/2.1.11/angular.css", this.scriptService.url("foo", "angular.css"));
+        assertEquals("/xwiki/angular/2.1.11/angular.css", this.webJarsUrlFactory.url("foo", "angular.css"));
     }
 
     @Test
@@ -129,7 +121,7 @@ class WebJarsScriptServiceTest
         when(this.serializer.serialize(resourceReference))
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.css")));
 
-        assertEquals("/xwiki/angular/angular.css", this.scriptService.url("angular", "angular.css"));
+        assertEquals("/xwiki/angular/angular.css", this.webJarsUrlFactory.url("angular", "angular.css"));
     }
 
     @Test
@@ -148,7 +140,7 @@ class WebJarsScriptServiceTest
         params.put("evaluate", true);
         params.put("list", new String[] {"one", "two"});
         assertEquals("/xwiki/angular/2.1.11/angular.js?evaluate=true&list=one&list=two",
-            this.scriptService.url("angular", "wiki:wiki", "angular.js", params));
+            this.webJarsUrlFactory.url("angular", "wiki:wiki", "angular.js", params));
     }
 
     @Test
@@ -162,7 +154,7 @@ class WebJarsScriptServiceTest
         when(this.serializer.serialize(resourceReference)).thenReturn(
             new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.js"), resourceReference.getParameters()));
 
-        assertEquals("/xwiki/angular/angular.js?r=1", this.scriptService.url("angular", "angular.js"));
+        assertEquals("/xwiki/angular/angular.js?r=1", this.webJarsUrlFactory.url("angular", "angular.js"));
     }
 
     @Test
@@ -179,7 +171,7 @@ class WebJarsScriptServiceTest
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css",
-            this.scriptService.url("angular", "angular.css", Collections.singletonMap("wiki", "math")));
+            this.webJarsUrlFactory.url("angular", "angular.css", Collections.singletonMap("wiki", "math")));
     }
 
     @Test
@@ -198,6 +190,6 @@ class WebJarsScriptServiceTest
             .thenReturn(new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css",
-            this.scriptService.url("angular", "angular.css", Collections.<String, Object>emptyMap()));
+            this.webJarsUrlFactory.url("angular", "angular.css", Collections.<String, Object>emptyMap()));
     }
 }

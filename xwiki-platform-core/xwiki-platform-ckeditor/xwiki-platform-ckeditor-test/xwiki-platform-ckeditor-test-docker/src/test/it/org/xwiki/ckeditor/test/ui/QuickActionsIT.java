@@ -19,6 +19,8 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,6 +77,24 @@ class QuickActionsIT extends AbstractCKEditorIT
         setup.loginAsSuperAdmin();
         setup.setWikiPreference("iconTheme",  "IconThemes.Silk");
         waitForSolrIndexing(setup, testConfiguration);
+
+        // The mentions quick action is implemented with a global JSX provided by the mentions macro page, which has to
+        // be saved with programming rights, otherwise the global JSX is not registered. Programming rights are
+        // forbidden by default, when running tests. Using:
+        //
+        //   xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.Mentions\\.MentionsMacro
+        //
+        // doesn't help because the programming rights checker also checks if the security document on the XWiki context
+        // has programming rights. The global skin extensions are registered on the first request after the XWiki is
+        // (re)started. When tests are run with an existing XWiki instance (that was started before running the tests)
+        // we don't know which page was first requested (and used as security document for registering global skin
+        // extensions). So we can't configure the exclude pattern for it. The workaround is to save the document that
+        // provides the global skin extension using an user that has programming rights.
+        //
+        // Note that this problem is not visible if the test is run right after the mentions macro XAR is installed
+        // (i.e. when the XWiki instance is created by the test). It is visible only if you reuse the XWiki instance to
+        // run the test a second time.
+        setup.gotoPage(List.of("XWiki", "Mentions"), "MentionsMacro", "save", "");
 
         createAndLoginStandardUser(setup);
     }

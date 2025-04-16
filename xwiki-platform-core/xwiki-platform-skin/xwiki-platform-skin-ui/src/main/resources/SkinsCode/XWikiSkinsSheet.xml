@@ -99,9 +99,7 @@
     
     {{html}}
     &lt;noscript&gt;
-      &lt;div class="box errormessage"&gt;
-        $escapetool.xml($services.localization.render('skin.sheet.nojs', ['LINK_START', 'LINK_END', 'XWiki.XWikiSkinFileOverrideClass'])).replace('LINK_START', "&lt;a href='$escapetool.xml($doc.getURL('edit', 'editor=object'))'&gt;").replace('LINK_END', '&lt;/a&gt;')
-      &lt;/div&gt;
+      #error($escapetool.xml($services.localization.render('skin.sheet.nojs', ['LINK_START', 'LINK_END', 'XWiki.XWikiSkinFileOverrideClass'])).replace('LINK_START', "&lt;a href='$escapetool.xml($doc.getURL('edit', 'editor=object'))'&gt;").replace('LINK_END', '&lt;/a&gt;'))
     &lt;/noscript&gt;
     {{/html}}
     

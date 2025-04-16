@@ -66,7 +66,7 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 class MacroIT extends AbstractCKEditorIT
 {
     @BeforeAll
-    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void beforeAll(TestUtils setup, TestConfiguration testConfiguration)
     {
         setup.loginAsSuperAdmin();
         CKEditorConfigurationPane.open().setLoadJavaScriptSkinExtensions(true).clickSave();
@@ -118,9 +118,10 @@ class MacroIT extends AbstractCKEditorIT
     {
         WYSIWYGEditPage editPage = edit(setup, testReference, true);
 
-        setSource("{{box}}\n"
-            + "Inline {{box}}<param></param>{{/box}}.\n"
-            + "{{/box}}");
+        setSource("""
+            {{box}}
+            Inline {{box}}<param></param>{{/box}}.
+            {{/box}}""");
 
         this.textArea.waitUntilContentContains("Inline");
 

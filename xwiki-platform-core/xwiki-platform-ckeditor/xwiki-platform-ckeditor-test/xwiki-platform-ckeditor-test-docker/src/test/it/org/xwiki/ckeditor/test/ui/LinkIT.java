@@ -86,12 +86,11 @@ class LinkIT extends AbstractCKEditorIT
     void insertLinks(TestUtils setup, TestReference testReference) throws Exception
     {
         // Create a sub-page with an attachment, to have something to link to.
-        String attachmentName = "image.gif";
+        String attachmentName = "text.txt";
         setup.createPage(testReference, "", "");
         DocumentReference subPage = new DocumentReference("subPage", testReference.getLastSpaceReference());
         setup.createPage(subPage, "", "");
-        setup.attachFile(subPage, attachmentName,
-            getClass().getResourceAsStream("/ResourcePicker/" + attachmentName), false);
+        setup.attachFile(subPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
 
         edit(setup, testReference, false);
 
@@ -105,12 +104,12 @@ class LinkIT extends AbstractCKEditorIT
 
         editor.getToolBar().insertOrEditLink()
             .setResourceType("attach")
-            .setResourceValue("image")
-            .selectPageItem(String.format("%s / insertLinks / subPage", spaceName), "image.gif")
+            .setResourceValue("text")
+            .selectPageItem(String.format("%s / insertLinks / subPage", spaceName), attachmentName)
             .submit();
 
         // Verify that the content matches what we did using CKEditor.
-        assertSourceEquals("[[type the link label>>doc:subPage]]\n\n[[type the link label>>attach:subPage@image.gif]]");
+        assertSourceEquals("[[type the link label>>doc:subPage]]\n\n[[type the link label>>attach:subPage@text.txt]]");
     }
 
     @Test
@@ -165,10 +164,11 @@ class LinkIT extends AbstractCKEditorIT
         linkPickerModal.select();
         linkDialog.submit();
         // Verify that the content matches what we did using CKEditor.
-        assertSourceEquals("[[type the link label>>doc:Foo.Bar.Buz.Test]]\n"
-            + "\n"
-            + "[[type the link label>>doc:.Fa\\.Fi\\.Foo.WebHome]]\n"
-            + "\n"
-            + "[[type the link label>>doc:.SubPage.Another.WebHome]]");
+        assertSourceEquals("""
+            [[type the link label>>doc:Foo.Bar.Buz.Test]]
+
+            [[type the link label>>doc:.Fa\\.Fi\\.Foo.WebHome]]
+
+            [[type the link label>>doc:.SubPage.Another.WebHome]]""");
     }
 }

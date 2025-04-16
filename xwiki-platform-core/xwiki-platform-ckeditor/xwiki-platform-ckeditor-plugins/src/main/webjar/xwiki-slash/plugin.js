@@ -49,6 +49,7 @@
           // group.
           {name: 'id', weight: 5},
           {name: 'nameTokens', weight: 4},
+          {name: 'name', weight: 3},
           {name: 'descriptionTokens', weight: 2},
           {name: 'group.id', weight: 1},
           {name: 'group.nameTokens', weight: 1}

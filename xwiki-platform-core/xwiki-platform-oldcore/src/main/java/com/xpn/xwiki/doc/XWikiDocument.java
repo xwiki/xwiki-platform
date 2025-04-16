@@ -3793,6 +3793,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @return the rendered field
      * @since 17.3.0RC1
      */
+    @Unstable
     public String display(String fieldname, String type, BaseObject obj, boolean isolated, boolean number,
         XWikiContext context)
     {
@@ -3878,6 +3879,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @return the rendered field
      * @since 17.3.0RC1
      */
+    @Unstable
     public String display(String fieldname, String type, String pref, BaseObject obj, boolean isolated, boolean number,
         XWikiContext context)
     {
@@ -3931,6 +3933,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @return the rendered field
      * @since 17.3.0RC1
      */
+    @Unstable
     public String display(String fieldname, String type, String pref, BaseObject obj, String wrappingSyntaxId,
         boolean isolated, boolean number, XWikiContext context)
     {

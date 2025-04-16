@@ -24,6 +24,7 @@ import java.util.Map;
 import org.xwiki.evaluation.ObjectEvaluator;
 import org.xwiki.evaluation.ObjectEvaluatorException;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -118,6 +119,7 @@ public class Object extends Collection
      * @param number true if the number you be part of the input name, false otherwise
      * @since 17.3.0RC1
      */
+    @Unstable
     public java.lang.Object display(String name, String mode, boolean isolated, boolean number)
     {
         try {

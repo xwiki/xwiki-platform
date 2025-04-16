@@ -75,7 +75,7 @@
         &lt;span class="input-group-btn"&gt;
           &lt;button type="submit" class="btn btn-primary"&gt;
             $services.icon.renderHTML('search')
-            &lt;span class="sr-only"&gt;$services.localization.render('search.page.bar.submit')&lt;/span&gt;
+            &lt;span&gt;$services.localization.render('search.page.bar.submit')&lt;/span&gt;
           &lt;/button&gt;
         &lt;/span&gt;
       &lt;/div&gt;
@@ -343,7 +343,7 @@
   #end
 #end
 
-#macro (displaySearchResultsSort)
+#macro (_displaySearchResultsControls)
   #set ($defaultSortOrder = $solrConfig.sortFields.get($type))
   #if (!$defaultSortOrder)
     #set ($defaultSortOrder = {'score': 'desc'})
@@ -352,28 +352,31 @@
     'asc': $services.icon.render('caret-up'),
     'desc': $services.icon.render('caret-down')
   })
-  (% class="search-options" %)
-  * {{translation key="solr.options"/}}
-  #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
-  * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:${url}||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
-  #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
-  * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:${url}||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
-
-  (% class="search-results-sort" %)
-  * {{translation key="solr.sortBy"/}}
-  #foreach ($entry in $defaultSortOrder.entrySet())
-    #set ($class = 'sort-item')
-    #set ($sortOrderIndicator = $NULL)
-    #set ($targetSortOrder = $entry.value)
-    #if ($sort == $entry.key)
-      #set ($class = "$class active")
-      #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
-      #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
-      #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
+  (% class="search-results-controls" %)
+  (((
+    (% class="search-results-sort" %)
+    * {{translation key="solr.sortBy"/}}
+    #foreach ($entry in $defaultSortOrder.entrySet())
+      #set ($class = 'sort-item')
+      #set ($sortOrderIndicator = $NULL)
+      #set ($targetSortOrder = $entry.value)
+      #if ($sort == $entry.key)
+        #set ($class = "$class active")
+        #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
+        #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
+        #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
+      #end
+      #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
+      * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:${url}||class="$class"]]
     #end
-    #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
-    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:${url}||class="$class"]]
-  #end
+
+    (% class="search-options" %)
+    * {{translation key="solr.options"/}}
+    #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
+    * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:${url}||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
+    #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
+    * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:${url}||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
+  )))
 #end
 
 #macro (extendQueryString $url $extraParameters)
@@ -895,6 +898,10 @@ $value##
       #if ($debug)
         #displaySearchDebugInfo()
       #end
+      (% class="search-results-controls")
+      (((
+        #_displaySearchResultsControls()
+      )))
       (% class="search-results-container row" %)(((
         #if ($facetEnabled)
           (% class="col-xs-12 col-sm-4 col-sm-push-8 col-md-3 col-md-push-9" %)(((
@@ -903,8 +910,6 @@ $value##
         #end
         (% class="search-results-left col-xs-12#if ($facetEnabled) col-sm-8 col-sm-pull-4 col-md-9 col-md-pull-3#end" %)
         (((
-          #displaySearchResultsSort()
-
           #displaySearchResults()
         )))
       )))

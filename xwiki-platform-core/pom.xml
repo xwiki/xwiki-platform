@@ -149,24 +149,12 @@
               </differences>
             </revapi.differences>
             -->
-            <revapi.differences>
-              <justification>False positive</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.varargOverloadsOnlyDifferInVarargParameter</code>
-                  <old>method void org.xwiki.observation.event.AbstractLocalEventListener::&lt;init&gt;(java.lang.String, java.lang.Object[])</old>
-                  <new>method void org.xwiki.observation.event.AbstractLocalEventListener::&lt;init&gt;(java.lang.String, java.lang.Object[])</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.varargOverloadsOnlyDifferInVarargParameter</code>
-                  <old>method void org.xwiki.observation.event.AbstractLocalEventListener::&lt;init&gt;(java.lang.String, org.xwiki.observation.event.Event[])</old>
-                  <new>method void org.xwiki.observation.event.AbstractLocalEventListener::&lt;init&gt;(java.lang.String, org.xwiki.observation.event.Event[])</new>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
+
+            <!-- Jakarta -->
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

@@ -87,7 +87,7 @@ class DeletePageIT
 
     private static final String PAGE_TITLE = "Page title that will be deleted";
 
-    private static final String ACTION_SUCCESSFUL = "Success\nDone.";
+    private static final String ACTION_SUCCESSFUL = "Done.";
 
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)

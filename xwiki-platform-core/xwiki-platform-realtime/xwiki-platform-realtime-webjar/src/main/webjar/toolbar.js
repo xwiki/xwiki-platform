@@ -45,6 +45,8 @@ define('xwiki-realtime-toolbar', [
 
       // Replace the old toolbar.
       this._oldToolbar = document.querySelector('.bottombuttons.sticky-buttons > .buttons,' +
+        // The old toolbar is moved when editing fullscreen with the standalone editor.
+        ' .cke_maximized > .buttons,' +
         ' .inplace-editing-buttons.sticky-buttons > .buttons');
       this._oldToolbar.before(this._toolbar);
       this._oldToolbar.hidden = true;
@@ -381,7 +383,9 @@ define('xwiki-realtime-toolbar', [
   }
 
   class Spinner extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+      super();
+
       const shadowRoot = this.attachShadow({mode: 'open'});
       const template = document.querySelector('template#realtime-spinner');
       shadowRoot.appendChild(template.content.cloneNode(true));
@@ -390,7 +394,9 @@ define('xwiki-realtime-toolbar', [
   customElements.define("realtime-spinner", Spinner);
 
   class Status extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+      super();
+
       const shadowRoot = this.attachShadow({mode: 'open'});
       const template = document.querySelector('template#realtime-status');
       shadowRoot.appendChild(template.content.cloneNode(true));
@@ -403,15 +409,18 @@ define('xwiki-realtime-toolbar', [
       return ['reference', 'locale', 'version'];
     }
 
-    connectedCallback() {
+    constructor() {
+      super();
+
       this.attachShadow({mode: 'open'});
-      this._initialized = true;
+    }
+
+    connectedCallback() {
       this._fetchDocument();
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-      // This method can be called before the connected callback.
-      if (this._initialized) {
+      if (this.isConnected) {
         this._fetchDocument();
       }
     }

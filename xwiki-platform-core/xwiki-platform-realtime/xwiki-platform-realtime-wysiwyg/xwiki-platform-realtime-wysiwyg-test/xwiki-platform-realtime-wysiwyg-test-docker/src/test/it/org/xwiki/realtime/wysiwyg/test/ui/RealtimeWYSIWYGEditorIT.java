@@ -135,13 +135,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("John", selfPosition.getAvatarHint());
         assertTrue(selfPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + selfPosition.getAvatarURL());
-        selfPosition.waitForLocation(new Point(4, 18));
+        selfPosition.waitForLocation(new Point(4, 17));
 
         assertEquals(1, textArea.getCoeditorPositions().size());
 
         // Verify that the cursor indicator is updated when typing.
         textArea.sendKeys(Keys.ENTER, "two");
-        selfPosition.waitForLocation(new Point(4, 48));
+        selfPosition.waitForLocation(new Point(4, 47));
 
         // Verify save and cancel.
         editPage.getToolbar().sendSaveShortcutKey();
@@ -254,14 +254,14 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The first user is on the third line (paragraph).
         CoeditorPosition firstPosition =
-            secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 78));
+            secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 77));
         assertEquals("John", firstPosition.getAvatarHint());
         assertTrue(firstPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + firstPosition.getAvatarURL());
 
         // The second user is on the first line (paragraph).
         CoeditorPosition secondPosition =
-            secondTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 18));
+            secondTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 17));
         assertEquals("John", secondPosition.getAvatarHint());
         assertTrue(secondPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + secondPosition.getAvatarURL());
@@ -276,7 +276,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 48));
+        firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 47));
 
         // Verify that clicking on the coeditor indicator scrolls the editing area to the coeditor position.
         // But first we need to add enough paragraphs to make the editing area scrollable.
@@ -292,7 +292,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Switch to the second tab and click on the coeditor indicator.
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.waitUntilTextContains("end");
-        firstPosition = secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 18 + 22 * 30));
+        firstPosition = secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 17 + 22 * 30));
         assertFalse(firstPosition.isVisible(), "The coeditor position is visible before scrolling.");
         secondEditPage.getToolbar().waitForCoeditor(firstCoeditorId).click();
         assertTrue(firstPosition.isVisible(), "The coeditor position is not visible after scrolling.");

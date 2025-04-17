@@ -137,7 +137,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
      */
     public List<CoeditorPosition> getCoeditorPositions()
     {
-        return getFromEditedContent(() -> getDriver().findElementsWithoutWaiting(By.className("rt-user-position"))
+        return getFromEditedContent(() -> getDriver().findElementsWithoutWaiting(By.className("realtime-user-position"))
             .stream().map(element -> element.getDomAttribute("id")).map(CoeditorPosition::new).toList());
     }
 
@@ -202,6 +202,11 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
         getDriver().getWindowHandles().forEach(handle -> {
             if (!handle.equals(initialHandle)) {
                 getDriver().switchTo().window(handle);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         });
         getDriver().switchTo().window(initialHandle);

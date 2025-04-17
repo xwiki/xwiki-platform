@@ -575,7 +575,7 @@
     &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $watchText
   &lt;/a&gt;
 &lt;/li&gt;
-&lt;div class="modal fade" tabindex="-1" role="dialog" id="watchModal"&gt;
+&lt;li class="modal fade" tabindex="-1" role="dialog" id="watchModal"&gt;
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
@@ -682,7 +682,7 @@
       &lt;/div&gt;
     &lt;/div&gt;&lt;!-- /.modal-content --&gt;
   &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
-&lt;/div&gt;&lt;!-- /.modal --&gt;
+&lt;/li&gt;&lt;!-- /.modal --&gt;
 {{/html}}
 #end
 {{/velocity}}</content>

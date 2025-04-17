@@ -955,55 +955,108 @@ $html
 
 ### This velocity macro aims at providing an element similar to a XWiki Macro-Message in places where this XWikiMacro 
 ### cannot be used.
-#macro(_genericMessage $text $classAffix $iconName $prettyNameKey $isInline $extraClass $title)
-  <#if($isInline)span#{else}div#end class="box ${classAffix}message $!{extraClass}">
-    <span class="icon-block">$services.icon.renderHTML($iconName)</span>
-    <span class="sr-only">$services.localization.render($prettyNameKey)</span>
+## The parameter object can contain $text $classAffix $iconName $prettyNameKey $isInline $extraClass $title
+#macro(_genericMessage $parameters)
+  <#if($parameters.isInline)span#{else}div#end class="box ${parameters.classAffix}message $!{parameters.extraClass}">
+    <span class="icon-block">$services.icon.renderHTML($parameters.iconName)</span>
+    <span class="sr-only">$services.localization.render($parameters.prettyNameKey)</span>
     <div>
-      #if("$!title" != "")<div class="box-title">$!title</div>#end
-      $text
+      #if("$!parameters.title" != "")<div class="box-title">$!parameters.title</div>#end
+      $parameters.text
     </div>
-  </#if($isInline)span#{else}div#end>
+  </#if($parameters.isInline)span#{else}div#end>
 #end
 
 ## Display a block warning message with the content $text.
 #macro(warning $text)
-#_genericMessage($text 'warning' 'warning' 'warning')
+#set( $parameters = {
+'text': $text,
+'classAffix': 'warning',
+'iconName': 'warning',
+'prettyNameKey': 'warning'
+})
+#_genericMessage($parameters)
 #end
 
 ## Display an inline warning message with the content $text.
 #macro(inlineWarning $text)
-#_genericMessage($text 'warning' 'warning' 'warning' true)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'warning',
+  'iconName': 'warning',
+  'prettyNameKey': 'warning',
+  'isInline': true
+})
+#_genericMessage($parameters)
 #end
 
 ## Display a block error message with the content $text.  
 #macro(error $text)
-#_genericMessage($text 'error' 'exclamation' 'error')
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'error',
+  'iconName': 'exclamation',
+  'prettyNameKey': 'error'
+})
+#_genericMessage($parameters)
 #end
 
 ## Display an inline error message with the content $text.
 #macro(inlineError $text)
-  #_genericMessage($text 'error' 'exclamation' 'error' true)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'error',
+  'iconName': 'exclamation',
+  'prettyNameKey': 'error',
+  'isInline': true
+})
+#_genericMessage($parameters)
 #end
 
 ## Display a block info message with the content $text.  
 #macro(info $text)
-#_genericMessage($text 'info' 'info' 'info')
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'info',
+  'iconName': 'info',
+  'prettyNameKey': 'info'
+})
+#_genericMessage($parameters)
 #end
 
 ## Display an inline info message with the content $text.
 #macro(inlineInfo $text)
-  #_genericMessage($text 'info' 'info' 'info' true)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'info',
+  'iconName': 'info',
+  'prettyNameKey': 'info',
+  'isInline': true
+})
+#_genericMessage($parameters)
 #end
 
 ## Display a block success message with the content $text.  
 #macro(success $text)
-#_genericMessage($text 'success' 'check' 'success')
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'success',
+  'iconName': 'check',
+  'prettyNameKey': 'success'
+})
+#_genericMessage($parameters)
 #end
 
 ## Display an inline success message with the content $text.
 #macro(inlineSuccess $text)
-  #_genericMessage($text 'success' 'check' 'success' true)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'success',
+  'iconName': 'check',
+  'prettyNameKey': 'success',
+  'isInline': true
+})
+#_genericMessage($parameters)
 #end
 
 #macro(message $text)

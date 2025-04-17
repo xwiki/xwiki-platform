@@ -43,7 +43,15 @@
     <button class="btn btn-default btAnswerCancel">$escapetool.xml($services.localization.render(["job.question.${status.jobType}.cancel", 'job.question.button.cancel']))</button>
   </div>
 #end
-#_genericMessage("$errorMessageContent", 'error', 'exclamation', 'error', false, 'deleteWarningXClass', $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenTitle")))
+#set( $parameters = {
+  'text': "$errorMessageContent",
+  'classAffix': 'error',
+  'iconName': 'exclamation',
+  'prettyNameKey': 'error',
+  'extraClass':'deleteWarningXClass',
+  'title': $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenTitle"))
+})
+#_genericMessage($parameters)
 #else
 #define ($warningMessageContent)
   <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.explanation"))</p>
@@ -62,6 +70,14 @@
   </div>
   #questionButtons($jobStatus)
 #end
-#_genericMessage("$warningMessageContent", 'warning', 'warning', 'warning', false, 'deleteWarningXClass', $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.title")))
+#set( $parameters = {
+  'text': "$warningMessageContent",
+  'classAffix': 'warning',
+  'iconName': 'warning',
+  'prettyNameKey': 'warning',
+  'extraClass':'deleteWarningXClass',
+  'title': $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.title"))
+})
+#_genericMessage($parameters)
 #end
 #questionFooter()

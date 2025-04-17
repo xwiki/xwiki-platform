@@ -120,6 +120,99 @@ require(['jquery'], function($) {
     });
   });
 });
+/*
+  Panel column interactivity.
+  This script makes sure they are resizable using the mouse.
+*/
+require(['jquery', 'jquery-ui'], function($) {
+  let resizeCustomFunction = function(columnPosition, event, ui) {
+    // We remove the default inline CSS properties.
+    ui.element.attr('style', '');
+    // We set the one we want when displayed in the flex layout.
+    document.body.style.setProperty('--panel-column-' + columnPosition + '-width', ui.size.width + 'px');
+  };
+  $("#rightPanels").resizable({
+    handles: 'w',
+    resize: resizeCustomFunction.bind(null, 'right')
+  });
+  $( "#leftPanels" ).resizable({
+    handles: 'e',
+    resize: resizeCustomFunction.bind(null, 'left')
+  });
+});
+
+require(['jquery'], function($) {
+  let rightToggler = $("#rightPanelsToggle");
+  let leftToggler = $("#leftPanelsToggle");
+
+  /* The body update hides completely the panel column. We want to make sure the panel column is visible for the whole
+  animation before hiding it. */
+  let updateBody = function (isRight, newExpandedState) {
+    let body = $('body.content');
+    // The JQuery UI handles defined above add an inline style on the body to work.
+    // This inline style is reset when the panel is collapsed.
+    body.removeAttr('style');
+    if (isRight) {
+      if (newExpandedState) {
+        // We remove the hideright class
+        if (body.hasClass('hidelefthideright')) {
+          body.removeClass('hidelefthideright');
+          body.addClass('hideleft');
+        } else {
+          body.removeClass('hideright');
+        }
+      } else {
+        // We add the hideright class
+        if (body.hasClass('hideleft')) {
+          body.addClass('hidelefthideright');
+          body.removeClass('hideleft');
+        } else {
+          body.addClass('hideright');
+        }
+      }
+    } else {
+      if (newExpandedState) {
+        // We remove the hideleft class
+        if (body.hasClass('hidelefthideright')) {
+          body.removeClass('hidelefthideright');
+          body.addClass('hideright');
+        } else {
+          body.removeClass('hideleft');
+        }
+      } else {
+        // We add the hideleft class
+        if (body.hasClass('hideright')) {
+          body.addClass('hidelefthideright');
+          body.removeClass('hideright');
+        } else {
+          body.addClass('hideleft');
+        }
+      }
+    }
+  }
+  var togglePanels = function (toggler, isRight) {
+    let newExpandedState = toggler.attr('aria-expanded') === 'false';
+
+    if (newExpandedState) {
+      // If we want to expand the panel, we first show it, then we slide it in view.
+      updateBody(isRight, newExpandedState);
+      toggler.attr('aria-expanded', 'true');
+    } else {
+      // If we want to collapse the panel, we first slide it out of view and then we hide it.
+      toggler.attr('aria-expanded', 'false');
+      let panels;
+      if (isRight) {
+        panels = $('#rightPanels');
+      } else {
+        panels = $('#leftPanels');
+      }
+      updateBody(isRight, newExpandedState);
+    }
+  }
+
+  rightToggler.on('click', function(){togglePanels(rightToggler, true)});
+  leftToggler.on('click', function(){togglePanels(leftToggler, false)});
+});
 
 /*
   Panel column interactivity.

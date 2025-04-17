@@ -74,7 +74,7 @@ public class PasswordClass extends StringClass
         if (value.equals(FORM_PASSWORD_PLACEHODLER)) {
             return null;
         }
-        BaseProperty property = newProperty();
+        BaseProperty property = getCurrentOrNewProperty();
         if (value.isEmpty() || value.startsWith(HASH_IDENTIFIER + SEPARATOR)
             || value.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
             property.setValue(value);

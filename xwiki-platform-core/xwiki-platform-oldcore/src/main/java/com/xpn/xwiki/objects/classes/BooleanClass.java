@@ -100,7 +100,7 @@ public class BooleanClass extends PropertyClass
     @Override
     public BaseProperty fromString(String value)
     {
-        BaseProperty property = newProperty();
+        BaseProperty property = getCurrentOrNewProperty();
         Number nvalue = null;
         if (StringUtils.isNotEmpty(value)) {
             if (StringUtils.isNumeric(value)) {

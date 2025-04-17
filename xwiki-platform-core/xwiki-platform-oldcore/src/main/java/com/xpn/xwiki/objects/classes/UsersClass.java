@@ -156,7 +156,7 @@ public class UsersClass extends ListClass
     @Override
     public BaseProperty fromString(String value)
     {
-        BaseProperty prop = newProperty();
+        BaseProperty prop = getCurrentOrNewProperty();
         prop.setValue(value);
         return prop;
     }
@@ -170,7 +170,7 @@ public class UsersClass extends ListClass
         } else {
             list = Arrays.asList(strings);
         }
-        BaseProperty prop = newProperty();
+        BaseProperty prop = getCurrentOrNewProperty();
         fromList(prop, list);
         return prop;
     }

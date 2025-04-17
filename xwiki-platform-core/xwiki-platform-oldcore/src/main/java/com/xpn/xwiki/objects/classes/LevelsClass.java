@@ -108,7 +108,7 @@ public class LevelsClass extends ListClass
     @Override
     public BaseProperty fromString(String value)
     {
-        BaseProperty prop = newProperty();
+        BaseProperty prop = getCurrentOrNewProperty();
         prop.setValue(value);
         return prop;
     }
@@ -123,7 +123,7 @@ public class LevelsClass extends ListClass
             list = Arrays.asList(strings);
         }
 
-        BaseProperty prop = newProperty();
+        BaseProperty prop = getCurrentOrNewProperty();
         fromList(prop, list, true);
         return prop;
     }

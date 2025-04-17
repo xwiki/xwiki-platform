@@ -231,6 +231,11 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentContains(String html)
     {
+        waitUntilContentContains(html, getDriver().getTimeout());
+    }
+
+    protected void waitUntilContentContains(String html, int timeout)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
                 return StringUtils.contains(getContent(), html);
@@ -239,7 +244,7 @@ public class RichTextAreaElement extends BaseElement
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
                 return false;
             }
-        });
+        }, timeout);
     }
 
     /**
@@ -251,6 +256,11 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilTextContains(String textFragment)
     {
+        waitUntilTextContains(textFragment, getDriver().getTimeout());
+    }
+
+    protected void waitUntilTextContains(String textFragment, int timeout)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
                 return StringUtils.contains(getText(), textFragment);
@@ -259,7 +269,7 @@ public class RichTextAreaElement extends BaseElement
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
                 return false;
             }
-        });
+        }, timeout);
     }
 
     /**

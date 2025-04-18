@@ -26,12 +26,14 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.internal.document.DocumentUserManager;
 
 /**
  * Document-based implementation of {@link UserManager} which proxies to the specific UserManager implementation
@@ -47,6 +49,10 @@ public class DefaultUserManager implements UserManager
     @Inject
     @Named("context")
     private ComponentManager componentManager;
+
+    @Inject
+    @Named(DocumentUserManager.HINT)
+    private UserManager documentUserManager;
 
     @Override
     public boolean exists(UserReference userReference) throws UserException
@@ -79,5 +85,11 @@ public class DefaultUserManager implements UserManager
                 "Failed to find user manager for role [%s] and hint [%s]", UserManager.class.getName(),
                 userReference.getClass().getName()), e);
         }
+    }
+
+    @Override
+    public boolean hasUsers(WikiReference wiki) throws UserException
+    {
+        return this.documentUserManager.hasUsers(wiki);
     }
 }

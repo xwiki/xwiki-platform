@@ -33,6 +33,8 @@ org.xwiki.user.internal.document.SecureUserDocumentUserPropertiesResolver
 org.xwiki.user.internal.document.XWikiUserUserReferenceResolver
 org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceSerializer
 org.xwiki.user.internal.document.NormalUserConfigurationSourceAuthorization
+org.xwiki.user.internal.document.UserCache
+org.xwiki.user.internal.document.UserListener
 org.xwiki.user.internal.group.DefaultGroupManager
 org.xwiki.user.internal.group.GroupCacheInvalidationListener
 org.xwiki.user.internal.group.GroupMembersCache

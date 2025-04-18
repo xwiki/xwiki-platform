@@ -20,6 +20,8 @@
 package org.xwiki.user;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * CRUD operations on users. Note that for retrieving a user's properties you should use a
@@ -38,4 +40,19 @@ public interface UserManager
      *     the user
      */
     boolean exists(UserReference userReference) throws UserException;
+
+    /**
+     * Verify if a wiki contains any user. This method only look at the given wiki, it's not taking into account global
+     * users when the target wiki is a sub-wiki.
+     * 
+     * @param wiki the reference of the wiki where to search for users
+     * @return true if at least one user is available on that target wiki
+     * @throws UserException when failing to check if a user exist on the target wiki
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    default boolean hasUsers(WikiReference wiki) throws UserException
+    {
+        return false;
+    }
 }

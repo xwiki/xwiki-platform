@@ -44,6 +44,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-default</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
@@ -107,7 +112,6 @@
                 org/xwiki/configuration/internal/AbstractDocumentConfigurationSource.java,
                 org/xwiki/configuration/internal/AllConfigurationSource.java,
                 org/xwiki/configuration/internal/CommonsConfigurationSource.java,
-                org/xwiki/configuration/internal/CompositeConfigurationSource.java,
                 org/xwiki/configuration/internal/DefaultConfigurationSource.java
               </excludes>
             </configuration>

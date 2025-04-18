@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link DefaultConfigurationSource}.
+ * Unit tests for {@link SystemConfigurationSource}.
  *
  * @version $Id$
  * @since 6.1M2
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.*;
 class DefaultConfigurationSourceTest
 {
     @InjectMockComponents
-    private DefaultConfigurationSource source;
+    private SystemConfigurationSource source;
 
     @MockComponent
     @Named("documents")

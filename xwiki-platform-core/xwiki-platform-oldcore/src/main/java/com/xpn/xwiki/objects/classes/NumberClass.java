@@ -123,7 +123,7 @@ public class NumberClass extends PropertyClass
     @Override
     public BaseProperty fromString(String value)
     {
-        BaseProperty property = newProperty();
+        BaseProperty property = getCurrentOrNewProperty();
         String ntype = getNumberType();
         Number nvalue = null;
 

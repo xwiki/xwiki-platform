@@ -48,6 +48,7 @@ import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
@@ -193,6 +194,33 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public BaseProperty fromString(String value)
     {
         return null;
+    }
+
+    /**
+     * Retrieve the already existing base property based on current name, or create a new one.
+     *
+     * @return the existing {@link BaseProperty} or a new one.
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    protected BaseProperty getCurrentOrNewProperty()
+    {
+        PropertyInterface propertyInterface = null;
+        if (getObject() != null && getName() != null) {
+            try {
+                propertyInterface = getObject().get(getName());
+            } catch (XWikiException e) {
+                // in theory it should never really happen, I'm not sure why the exception is thrown...
+                LOGGER.error(String.format("Error while retrieving property [%s]", getName()), e);
+            }
+        }
+        BaseProperty property;
+        if (propertyInterface instanceof BaseProperty propertyField) {
+            property = propertyField;
+        } else {
+            property = newProperty();
+        }
+        return property;
     }
 
     public BaseProperty newPropertyfromXML(Element ppcel)

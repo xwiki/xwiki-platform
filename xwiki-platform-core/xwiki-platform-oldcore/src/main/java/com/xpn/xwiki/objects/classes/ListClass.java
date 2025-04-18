@@ -591,7 +591,7 @@ public abstract class ListClass extends PropertyClass
     @Override
     public BaseProperty fromString(String value)
     {
-        BaseProperty prop = newProperty();
+        BaseProperty prop = getCurrentOrNewProperty();
         if (isMultiSelect()) {
             ((ListProperty) prop).setList(getListFromString(value, getSeparators(), false));
         } else {
@@ -606,7 +606,7 @@ public abstract class ListClass extends PropertyClass
         if (!isMultiSelect()) {
             return fromString(strings[0]);
         }
-        BaseProperty prop = newProperty();
+        BaseProperty prop = getCurrentOrNewProperty();
         // FIXME: this should be probably removed since we can never reach it.
         if (prop instanceof StringProperty) {
             return fromString(strings[0]);

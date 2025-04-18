@@ -82,7 +82,7 @@ public class StringClass extends PropertyClass
     @Override
     public BaseProperty fromString(String value)
     {
-        BaseProperty property = newProperty();
+        BaseProperty property = getCurrentOrNewProperty();
         property.setValue(value);
         return property;
     }

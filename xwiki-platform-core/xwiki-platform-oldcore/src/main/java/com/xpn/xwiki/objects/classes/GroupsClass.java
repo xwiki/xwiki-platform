@@ -141,7 +141,7 @@ public class GroupsClass extends ListClass
     @Override
     public BaseProperty fromString(String value)
     {
-        BaseProperty prop = newProperty();
+        BaseProperty prop = getCurrentOrNewProperty();
         prop.setValue(value);
         return prop;
     }
@@ -156,7 +156,7 @@ public class GroupsClass extends ListClass
             list = Arrays.asList(strings);
         }
 
-        BaseProperty prop = newProperty();
+        BaseProperty prop = getCurrentOrNewProperty();
         fromList(prop, list);
         return prop;
     }

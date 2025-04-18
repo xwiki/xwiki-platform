@@ -194,9 +194,9 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=只有�
 
 ## Common notification settings errors
 notifications.settings.error.userReferenceNotSupported=提供的用户引用不受支持，目前仅支持文档用户引用（DocumentUserReference）。
-### Missing: notifications.settings.error.userReferenceAdminForbidden=You don't have administration right for the given user: {0}.
-### Missing: notifications.settings.error.badCSRF=Bad CSRF token.
-### Missing: notifications.settings.badParameters=Bad request parameters.
+notifications.settings.error.userReferenceAdminForbidden=您没有对指定用户 {0} 的管理权限。
+notifications.settings.error.badCSRF=CSRF 令牌无效（网络安全防御令牌）。
+notifications.settings.badParameters=错误的参数请求。
 
 ## User profile
 notifications.userprofile.following=已关注
@@ -231,13 +231,13 @@ notifications.switches.changeStatusError=无法更改通知的状态。
 
 ## Watch button and modal
 
-### Missing: notifications.watch.button.title=Current notification setting for this page: {0} - Click to change it
-### Missing: notifications.watch.button.status.notset=Not set
-### Missing: notifications.watch.button.status.followed=Followed
-### Missing: notifications.watch.button.status.blocked=Blocked
-### Missing: notifications.watch.button.status.custom=Custom
-### Missing: notifications.watch.modal.title=Notification settings for this page
-### Missing: notifications.watch.modal.description.options=You can change the current notification settings with the following options: 
+notifications.watch.button.title=当前此页面的通知设置为：{0} - 点击此处进行更改
+notifications.watch.button.status.notset=未设置
+notifications.watch.button.status.followed=已关注
+notifications.watch.button.status.blocked=已屏蔽
+notifications.watch.button.status.custom=自定义
+notifications.watch.modal.title=此页面的通知设置
+notifications.watch.modal.description.options=您可以使用以下选项更改当前的通知设置： 
 ### Missing: notifications.watch.modal.description.ancestoroption=You can either go to {0} and modify the notification settings there or directly apply settings on the current page with the following options: 
 ### Missing: notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Followed page watch settings
 ### Missing: notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=You are following this page: you will receive notifications for it.

@@ -53,7 +53,7 @@ public class UserCache implements Initializable, Disposable
     public void initialize() throws InitializationException
     {
         try {
-            this.hasUserCache = this.cacheManager.createNewCache(new LRUCacheConfiguration("use.hasUsers"));
+            this.hasUserCache = this.cacheManager.createNewCache(new LRUCacheConfiguration("user.hasUsers"));
         } catch (CacheException e) {
             throw new InitializationException("Failed to create the cache to store if a user exist in a given wiki", e);
         }

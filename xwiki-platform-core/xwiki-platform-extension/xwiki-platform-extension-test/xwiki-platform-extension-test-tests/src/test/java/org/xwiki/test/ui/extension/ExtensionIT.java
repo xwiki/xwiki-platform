@@ -208,7 +208,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         searchResults = new SimpleSearchPane().search("blahblah");
         assertEquals(0, searchResults.getDisplayedResultsCount());
         assertNull(searchResults.getPagination());
-        assertEquals("There were no extensions found matching 'blahblah'. Try different keywords. "
+        assertEquals("Information\nThere were no extensions found matching 'blahblah'. Try different keywords. "
             + "Alternatively, if you know the identifier and the version of the extension you're "
             + "looking for, you can use the Advanced Search form above.", searchResults.getNoResultsMessage());
 
@@ -247,7 +247,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals(0, searchResults.getDisplayedResultsCount());
         assertNull(searchResults.getPagination());
         assertEquals(
-            "We couldn't find any extension with id 'foo' and version 'bar'. "
+            "Information\nWe couldn't find any extension with id 'foo' and version 'bar'. "
                 + "Make sure you have the right extension repositories configured.",
             searchResults.getNoResultsMessage());
 
@@ -671,7 +671,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals("Resolving extension [alice-xar-extension 1.3] from namespace [Home]", log.get(2).getMessage());
         assertEquals("info", log.get(log.size() - 1).getLevel());
         assertEquals(
-            "Finished job of type [uninstall] with identifier " + "[extension/action/alice-xar-extension/wiki:xwiki]",
+            "Finished job of type [uninstall] with identifier [extension/action/alice-xar-extension/wiki:xwiki]",
             log.get(log.size() - 1).getMessage());
 
         // Check if the uninstalled pages have been deleted.

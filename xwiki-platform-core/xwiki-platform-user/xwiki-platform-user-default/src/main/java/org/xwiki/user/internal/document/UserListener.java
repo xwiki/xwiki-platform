@@ -41,7 +41,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * Invalidate the cache based on user events.
  * 
  * @version $Id$
- * @since 17.3.0RC1
+ * @since 17.4.0RC1
  */
 @Component
 @Named(UserListener.NAME)

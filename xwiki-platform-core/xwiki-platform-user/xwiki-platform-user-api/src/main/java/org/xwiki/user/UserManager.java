@@ -42,10 +42,13 @@ public interface UserManager
     boolean exists(UserReference userReference) throws UserException;
 
     /**
-     * @param wiki the reference of the wiki where to check of users exist
+     * Verify if a wiki contains any user. This method only look at the given wiki, it's not taking into account global
+     * users when the target wiki is a sub-wiki.
+     * 
+     * @param wiki the reference of the wiki where to search for users
      * @return true if at least one user is available on that target wiki
      * @throws UserException when failing to check if a user exist on the target wiki
-     * @since 17.3.0RC1
+     * @since 17.4.0RC1
      */
     @Unstable
     default boolean hasUsers(WikiReference wiki) throws UserException

@@ -335,6 +335,8 @@ public class DefaultIOService implements IOService
             // get the document pointed to by the target
             XWikiContext deprecatedContext = getXWikiContext();
             XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
+            // Avoid modifying the cached document
+            document = document.clone();
             List<String> updateNotifs = new ArrayList<>();
             boolean updated = false;
             for (Annotation annotation : annotations) {

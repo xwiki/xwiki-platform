@@ -38,7 +38,7 @@ import org.xwiki.model.reference.WikiReference;
  * Cache various user related information.
  * 
  * @version $Id$
- * @since 17.3.0RC1
+ * @since 17.4.0RC1
  */
 @Component(roles = UserCache.class)
 @Singleton

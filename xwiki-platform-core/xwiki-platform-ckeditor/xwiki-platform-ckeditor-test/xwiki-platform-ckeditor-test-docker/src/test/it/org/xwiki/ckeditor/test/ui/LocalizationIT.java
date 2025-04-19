@@ -69,11 +69,11 @@ class LocalizationIT extends AbstractCKEditorIT
         // Make WYSIWYG the default editor
         setup.setPropertyInXWikiPreferences("editor", "String", "Wysiwyg");
     }
-    
+
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup)
     {
-        maybeLeaveEditMode(setup, testReference);
+        setup.maybeLeaveEditMode();
         setup.setPropertyInXWikiPreferences("default_language", "String", "en");
     }
 

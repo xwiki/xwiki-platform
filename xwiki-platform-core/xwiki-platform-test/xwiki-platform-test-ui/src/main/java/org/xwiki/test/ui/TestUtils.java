@@ -712,6 +712,19 @@ public class TestUtils
         }
     }
 
+    /**
+     * Attempt to navigate to the specified page without waiting for the page to load. This is useful for instance when
+     * leaving the current page triggers a confirmation alert that you want to accept or dismiss.
+     * 
+     * @param reference the reference of the page to go to
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void gotoPageWithoutWaiting(EntityReference reference)
+    {
+        getDriver().executeScript("window.location.href = arguments[0]", getURL(reference));
+    }
+
     public ViewPage gotoPage(String space, String page)
     {
         gotoPage(space, page, "view");
@@ -1572,6 +1585,28 @@ public class TestUtils
     public String getEditMode()
     {
         return (String) getDriver().executeScript("return window.XWiki?.editor");
+    }
+
+    /**
+     * If we are in edit mode, leave using the cancel shortcut key (ALT + C).
+     *
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void maybeLeaveEditMode()
+    {
+        if (StringUtils.isNotEmpty(getEditMode())) {
+            // Use the cancel shortcut key to leave the edit mode, but since the shortcut keys are handled with
+            // JavaScript we need to wait for view mode ourselves. We can't use the page reload marker because the
+            // in-place editor doesn't reload the page on cancel. We can only rely on the fact that the URL will change
+            // (even for the in-place editor where the '#edit' URL fragment is removed).
+            String editURL = getDriver().getCurrentUrl();
+            getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
+            getDriver().waitUntilCondition(driver -> {
+                String viewURL = driver.getCurrentUrl();
+                return !viewURL.equals(editURL);
+            });
+        }
     }
 
     public boolean isInWYSIWYGEditMode()

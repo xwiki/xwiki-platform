@@ -104,14 +104,6 @@ public abstract class AbstractCKEditorIT
         this.textArea = this.editor.getRichTextArea();
     }
 
-    protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)
-    {
-        if (StringUtils.isNotEmpty(setup.getEditMode())) {
-            // Use the cancel shortcut key to leave the edit mode.
-            setup.getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
-        }
-    }
-
     protected void waitForSolrIndexing(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();

@@ -62,16 +62,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SaveIT extends AbstractCKEditorIT
 {
     @BeforeAll
-    public static void configure(TestUtils setup)
+    static void beforeAll(TestUtils setup)
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup)
     {
-        maybeLeaveEditMode(setup, testReference);
+        setup.maybeLeaveEditMode();
     }
 
     @Test

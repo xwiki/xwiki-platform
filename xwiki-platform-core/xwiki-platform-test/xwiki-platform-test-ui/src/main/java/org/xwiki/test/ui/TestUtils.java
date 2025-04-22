@@ -1596,17 +1596,28 @@ public class TestUtils
     public void maybeLeaveEditMode()
     {
         if (StringUtils.isNotEmpty(getEditMode())) {
-            // Use the cancel shortcut key to leave the edit mode, but since the shortcut keys are handled with
-            // JavaScript we need to wait for view mode ourselves. We can't use the page reload marker because the
-            // in-place editor doesn't reload the page on cancel. We can only rely on the fact that the URL will change
-            // (even for the in-place editor where the '#edit' URL fragment is removed).
-            String editURL = getDriver().getCurrentUrl();
-            getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
-            getDriver().waitUntilCondition(driver -> {
-                String viewURL = driver.getCurrentUrl();
-                return !viewURL.equals(editURL);
-            });
+            leaveEditMode();
         }
+    }
+
+    /**
+     * Leave the edit mode using the cancel shortcut key (ALT + C).
+     *
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void leaveEditMode()
+    {
+        // Use the cancel shortcut key to leave the edit mode, but since the shortcut keys are handled with JavaScript
+        // we need to wait for view mode ourselves. We can't use the page reload marker because the in-place editor
+        // doesn't reload the page on cancel. We can only rely on the fact that the URL will change (even for the
+        // in-place editor where the '#edit' URL fragment is removed).
+        String editURL = getDriver().getCurrentUrl();
+        getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
+        getDriver().waitUntilCondition(driver -> {
+            String viewURL = driver.getCurrentUrl();
+            return !viewURL.equals(editURL);
+        });
     }
 
     public boolean isInWYSIWYGEditMode()

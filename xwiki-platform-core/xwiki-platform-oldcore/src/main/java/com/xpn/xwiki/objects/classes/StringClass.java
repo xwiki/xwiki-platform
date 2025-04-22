@@ -80,9 +80,9 @@ public class StringClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value, BaseProperty baseProperty)
     {
-        BaseProperty property = getCurrentOrNewProperty();
+        BaseProperty property = getCurrentOrNewProperty(baseProperty);
         property.setValue(value);
         return property;
     }

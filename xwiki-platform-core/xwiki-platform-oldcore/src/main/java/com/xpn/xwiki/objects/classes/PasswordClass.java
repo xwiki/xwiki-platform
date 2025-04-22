@@ -69,12 +69,12 @@ public class PasswordClass extends StringClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value, BaseProperty baseProperty)
     {
         if (value.equals(FORM_PASSWORD_PLACEHODLER)) {
             return null;
         }
-        BaseProperty property = getCurrentOrNewProperty();
+        BaseProperty property = getCurrentOrNewProperty(baseProperty);
         if (value.isEmpty() || value.startsWith(HASH_IDENTIFIER + SEPARATOR)
             || value.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
             property.setValue(value);

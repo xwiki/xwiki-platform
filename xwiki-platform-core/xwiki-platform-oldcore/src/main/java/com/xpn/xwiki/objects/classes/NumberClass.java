@@ -121,9 +121,9 @@ public class NumberClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value, BaseProperty baseProperty)
     {
-        BaseProperty property = getCurrentOrNewProperty();
+        BaseProperty property = getCurrentOrNewProperty(baseProperty);
         String ntype = getNumberType();
         Number nvalue = null;
 

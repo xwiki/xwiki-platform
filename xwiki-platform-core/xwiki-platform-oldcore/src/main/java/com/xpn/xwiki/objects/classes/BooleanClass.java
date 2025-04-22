@@ -36,6 +36,11 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
+/**
+ * Representation of a boolean property.
+ *
+ * @version $Id$
+ */
 public class BooleanClass extends PropertyClass
 {
     private static final long serialVersionUID = 1L;
@@ -47,12 +52,19 @@ public class BooleanClass extends PropertyClass
 
     /** Other string values that might be used to represent "false" values. */
     private static final Pattern FALSE_PATTERN = Pattern.compile("no|false", Pattern.CASE_INSENSITIVE);
-    
+
+    /**
+     * Constructor taking the given metaclass.
+     * @param wclass the metaclass to use.
+     */
     public BooleanClass(PropertyMetaClass wclass)
     {
         super(XCLASSNAME, "Boolean", wclass);
     }
 
+    /**
+     * Default constructor.
+     */
     public BooleanClass()
     {
         this(null);
@@ -98,9 +110,9 @@ public class BooleanClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value, BaseProperty baseProperty)
     {
-        BaseProperty property = getCurrentOrNewProperty();
+        BaseProperty property = getCurrentOrNewProperty(baseProperty);
         Number nvalue = null;
         if (StringUtils.isNotEmpty(value)) {
             if (StringUtils.isNumeric(value)) {

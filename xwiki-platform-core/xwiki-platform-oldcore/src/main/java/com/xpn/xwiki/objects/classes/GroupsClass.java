@@ -139,15 +139,15 @@ public class GroupsClass extends ListClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value, BaseProperty baseProperty)
     {
-        BaseProperty prop = getCurrentOrNewProperty();
+        BaseProperty prop = getCurrentOrNewProperty(baseProperty);
         prop.setValue(value);
         return prop;
     }
 
     @Override
-    public BaseProperty fromStringArray(String[] strings)
+    public BaseProperty fromStringArray(String[] strings, BaseProperty baseProperty)
     {
         List<String> list;
         if ((strings.length == 1) && (getDisplayType().equals(DISPLAYTYPE_INPUT) || isMultiSelect())) {
@@ -156,7 +156,7 @@ public class GroupsClass extends ListClass
             list = Arrays.asList(strings);
         }
 
-        BaseProperty prop = getCurrentOrNewProperty();
+        BaseProperty prop = getCurrentOrNewProperty(baseProperty);
         fromList(prop, list);
         return prop;
     }

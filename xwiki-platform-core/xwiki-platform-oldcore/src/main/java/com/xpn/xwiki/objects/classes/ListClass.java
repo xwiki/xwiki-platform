@@ -589,9 +589,9 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value, BaseProperty baseProperty)
     {
-        BaseProperty prop = getCurrentOrNewProperty();
+        BaseProperty prop = getCurrentOrNewProperty(baseProperty);
         if (isMultiSelect()) {
             ((ListProperty) prop).setList(getListFromString(value, getSeparators(), false));
         } else {
@@ -601,12 +601,12 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromStringArray(String[] strings)
+    public BaseProperty fromStringArray(String[] strings, BaseProperty baseProperty)
     {
         if (!isMultiSelect()) {
             return fromString(strings[0]);
         }
-        BaseProperty prop = getCurrentOrNewProperty();
+        BaseProperty prop = getCurrentOrNewProperty(baseProperty);
         // FIXME: this should be probably removed since we can never reach it.
         if (prop instanceof StringProperty) {
             return fromString(strings[0]);

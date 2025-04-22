@@ -170,9 +170,9 @@ public class DateClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value, BaseProperty baseProperty)
     {
-        BaseProperty property = getCurrentOrNewProperty();
+        BaseProperty property = getCurrentOrNewProperty(baseProperty);
 
         if (StringUtils.isEmpty(value)) {
             if (getEmptyIsToday() == 1) {

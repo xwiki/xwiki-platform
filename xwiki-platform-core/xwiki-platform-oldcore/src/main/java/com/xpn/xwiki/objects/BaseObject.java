@@ -366,7 +366,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         BaseProperty prop = (BaseProperty) safeget(fieldname);
         if ((value instanceof String) && (pclass != null)) {
-            prop = pclass.fromString((String) value);
+            prop = pclass.fromString((String) value, prop);
         } else {
             if ((prop == null) && (pclass != null)) {
                 prop = pclass.newProperty();

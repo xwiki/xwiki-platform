@@ -48,7 +48,6 @@ import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
@@ -193,6 +192,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public BaseProperty fromString(String value)
     {
+        return fromString(value, null);
+    }
+
+    @Override
+    public BaseProperty fromString(String value, BaseProperty baseProperty)
+    {
         return null;
     }
 
@@ -203,24 +208,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * @since 17.3.0RC1
      */
     @Unstable
-    protected BaseProperty getCurrentOrNewProperty()
+    protected BaseProperty getCurrentOrNewProperty(BaseProperty property)
     {
-        PropertyInterface propertyInterface = null;
-        if (getObject() != null && getName() != null) {
-            try {
-                propertyInterface = getObject().get(getName());
-            } catch (XWikiException e) {
-                // in theory it should never really happen, I'm not sure why the exception is thrown...
-                LOGGER.error(String.format("Error while retrieving property [%s]", getName()), e);
-            }
-        }
-        BaseProperty property;
-        if (propertyInterface instanceof BaseProperty propertyField) {
-            property = propertyField;
-        } else {
-            property = newProperty();
-        }
-        return property;
+        return (property != null) ? property : newProperty();
     }
 
     public BaseProperty newPropertyfromXML(Element ppcel)
@@ -724,7 +714,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
     public BaseProperty fromStringArray(String[] strings)
     {
-        return fromString(strings[0]);
+        return fromStringArray(strings, null);
+    }
+
+    public BaseProperty fromStringArray(String[] strings, BaseProperty baseProperty)
+    {
+        return fromString(strings[0], baseProperty);
     }
 
     public boolean isValidColumnTypes(Property hibprop)
@@ -735,7 +730,13 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public BaseProperty fromValue(Object value)
     {
-        BaseProperty property = newProperty();
+        return fromValue(value, null);
+    }
+
+    @Override
+    public BaseProperty fromValue(Object value, BaseProperty baseProperty)
+    {
+        BaseProperty property = getCurrentOrNewProperty(baseProperty);
         if (property != null) {
             property.setValue(value);
             return property;

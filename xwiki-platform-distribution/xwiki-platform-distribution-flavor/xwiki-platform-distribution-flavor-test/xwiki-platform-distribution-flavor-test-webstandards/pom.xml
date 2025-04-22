@@ -107,6 +107,8 @@
               Panels.PanelClass
               XWiki.XWikiGroups
             </whitelistedWCAGClasses>
+            <!-- Used to exclude some documents from webstandards tests -->
+            <documentsToTest>^(?!.+IconPickerMacro).+$</documentsToTest>
           </systemPropertyVariables>
         </configuration>
       </plugin>

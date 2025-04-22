@@ -56,8 +56,8 @@
 {{/code}}
 == Play with it ==
 {{html}}
-  &lt;p&gt;Field 1: &lt;input type="text" id="myPicker" /&gt;&lt;/p&gt;
-  &lt;p&gt;Field 2: &lt;input type="text" class="fieldWithPicker" /&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;label&gt;Field 1: &lt;input type="text" id="myPicker" /&gt;&lt;/label&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;label&gt;Field 2: &lt;input type="text" class="fieldWithPicker" /&gt;&lt;/label&gt;&lt;/p&gt;
 {{/html}}
 
 {{iconPicker id="myPicker" class="fieldWithPicker" prefix="icon:" /}}</content>

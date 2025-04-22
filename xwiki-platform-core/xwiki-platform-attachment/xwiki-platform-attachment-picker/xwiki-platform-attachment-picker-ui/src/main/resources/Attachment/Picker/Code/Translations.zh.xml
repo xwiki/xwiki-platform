@@ -20,10 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="Attachment.Picker.Code.Translations" locale="">
+<xwikidoc version="1.5" reference="Attachment.Picker.Code.Translations" locale="zh">
   <web>Attachment.Picker.Code</web>
   <name>Translations</name>
-  <language/>
+  <language>zh</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
@@ -41,41 +41,4 @@ attachment.picker.searchField.placeholder=搜索...
 attachment.picker.searchField.scope.currentPage=当前页面
 attachment.picker.searchField.scope.allPages=所有页面
 </content>
-  <object>
-    <name>Attachment.Picker.Code.Translations</name>
-    <number>0</number>
-    <className>XWiki.TranslationDocumentClass</className>
-    <guid>f2f1397f-8498-467e-87c3-cf29cf539e5c</guid>
-    <class>
-      <name>XWiki.TranslationDocumentClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>1</number>
-        <prettyName>Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <property>
-      <scope>WIKI</scope>
-    </property>
-  </object>
 </xwikidoc>

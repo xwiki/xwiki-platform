@@ -193,14 +193,6 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
-     * Use the Cancel shortcut key to leave the editing session immediately.
-     */
-    public void sendCancelShortcutKey()
-    {
-        getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
-    }
-
-    /**
      * Use the Save &amp; Continue shortcut key and wait for the document to be saved.
      */
     public void sendSaveShortcutKey()

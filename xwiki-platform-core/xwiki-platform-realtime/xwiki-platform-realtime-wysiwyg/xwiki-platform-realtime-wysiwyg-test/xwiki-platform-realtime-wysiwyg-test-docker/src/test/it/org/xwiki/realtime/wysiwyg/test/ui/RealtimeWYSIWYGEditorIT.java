@@ -140,7 +140,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify save and cancel.
         editPage.getToolbar().sendSaveShortcutKey();
         textArea.sendKeys(Keys.ENTER, "three");
-        editPage.getToolbar().sendCancelShortcutKey();
+        setup.leaveEditMode();
         RealtimeInplaceEditablePage inplaceEditablePage = new RealtimeInplaceEditablePage();
         assertEquals("one\ntwo", inplaceEditablePage.getContent());
 
@@ -1215,7 +1215,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         String firstRefreshCounter = firstTextArea.getRefreshCounter();
 
         // Leave the edit mode to see that the script level associated with the realtime session remains the same.
-        firstEditPage.getToolbar().sendCancelShortcutKey();
+        setup.leaveEditMode();
 
         //
         // Second Tab
@@ -1384,11 +1384,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         assertEquals("John, superadmin", firstEditPage.getToolbar().getVisibleCoeditors().stream()
             .map(Coeditor::getAvatarHint).reduce((a, b) -> a + ", " + b).get());
-
-        // Leave edit mode.
-        firstEditPage.getToolbar().sendCancelShortcutKey();
-        multiUserSetup.switchToBrowserTab(secondTabHandle);
-        secondEditPage.getToolbar().sendCancelShortcutKey();
     }
 
     @Test

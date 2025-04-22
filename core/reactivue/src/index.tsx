@@ -345,18 +345,19 @@ type ReactIndirectionLayerProps<Props extends Record<string, unknown>> = {
   componentProps: Observable<Props>;
 };
 
+/**
+ * Wrap a Vue component to render it inside React
+ *
+ * Note that this spawns an entire Vue application for every component
+ *
+ * @param options - The Vue component to render along with options like properties
+ *
+ * @returns A wrapping React component
+ *
+ * @since 0.16
+ */
 function VueComponentWrapper<Props extends Record<string, unknown>>({
   vueComponent,
-  /**
-   * Wrap a Vue component to render it inside React
-   *
-   * Note that this spawns an entire Vue application for every component
-   *
-   * @param param0 - The Vue component to render
-   * @returns A wrapping React component
-   *
-   * @since 0.16
-   */
   props,
   modifyVueApp,
 }: {
@@ -412,7 +413,6 @@ function VueComponentWrapper<Props extends Record<string, unknown>>({
  *
  * This only renders the underlying component with the provided properties, nothing else
  */
-
 const VueIndirectionLayer = defineComponent({
   __typeProps: {} as VueIndirectionLayerProps<Record<string, unknown>>,
 

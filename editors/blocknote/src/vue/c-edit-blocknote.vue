@@ -76,7 +76,7 @@ const editorProps = shallowRef<
   InstanceType<typeof CBlockNoteView>["$props"]["editorProps"] | null
 >(null);
 
-const editorContent = shallowRef<UniAst | null>(null);
+const editorContent = shallowRef<UniAst | Error | null>(null);
 
 const editorInstance =
   useTemplateRef<InstanceType<typeof CBlockNoteView>>("editorInstance");
@@ -120,9 +120,21 @@ function view() {
   cristal?.getRouter().push(viewRouterParams);
 }
 
+async function saveContent() {
+  const editor = editorInstance.value!;
+  const content = await editor.getContent();
+
+  // TODO: error reporting
+  if (!(content instanceof Error)) {
+    // Perform a last save before quitting.
+    await save(content);
+  }
+}
+
 async function submit() {
-  // Perform a last save before quitting.
-  await save(await editorInstance.value!.getContent());
+  saveContent();
+
+  // TODO: hold back user in case of error
   view();
 }
 
@@ -162,7 +174,9 @@ async function save(content: string) {
 watch(
   title,
   debounce(async () => {
-    save(await editorInstance.value!.getContent());
+    if (editorInstance.value) {
+      await saveContent();
+    }
   }, 500),
 );
 </script>

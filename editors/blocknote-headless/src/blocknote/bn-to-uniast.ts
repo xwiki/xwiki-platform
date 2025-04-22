@@ -26,13 +26,15 @@ import {
   EditorStyledText,
 } from ".";
 import { Link, TableCell as BlockNoteTableCell } from "@blocknote/core";
+import { tryFallibleOrError } from "@xwiki/cristal-fn-utils";
 import {
   Block,
   BlockStyles,
   ConverterContext,
   InlineContent,
+  LinkTarget,
+  ListItem,
   TableCell,
-  Text,
   UniAst,
 } from "@xwiki/cristal-uniast";
 
@@ -45,24 +47,56 @@ import {
 export class BlockNoteToUniAstConverter {
   constructor(public context: ConverterContext) {}
 
-  blocksToUniAst(blocks: BlockType[]): UniAst {
-    return {
-      blocks: this.convertBlocks(blocks),
-    };
+  blocksToUniAst(blocks: BlockType[]): UniAst | Error {
+    const uniAstBlocks = tryFallibleOrError(() => this.convertBlocks(blocks));
+
+    return uniAstBlocks instanceof Error
+      ? uniAstBlocks
+      : {
+          blocks: uniAstBlocks,
+        };
   }
 
+  // eslint-disable-next-line max-statements
   private convertBlocks(blocks: BlockType[]): Block[] {
-    return blocks.map((block, i) =>
-      this.convertBlock(block, blocks.slice(0, i)),
-    );
+    const out: Block[] = [];
+
+    for (const block of blocks) {
+      if (
+        block.type !== "bulletListItem" &&
+        block.type !== "numberedListItem" &&
+        block.type !== "checkListItem"
+      ) {
+        out.push(this.convertBlock(block));
+        continue;
+      }
+
+      const lastBlock = out.at(-1);
+      const currentList = lastBlock?.type === "list" ? lastBlock : null;
+
+      console.log(!!currentList);
+
+      const listItem = this.convertListItem(block, currentList);
+
+      if (currentList) {
+        currentList.items.push(listItem);
+      } else {
+        out.push({
+          type: "list",
+          items: [listItem],
+          styles: {},
+        });
+      }
+    }
+
+    return out;
   }
 
-  // TODO: explain that previous blocks are required to compute number for contiguous numbered list items
-  private convertBlock(block: BlockType, previousBlocks: BlockType[]): Block {
+  private convertBlock(block: BlockType): Block {
     const dontExpectChildren = () => {
       if (block.children.length > 0) {
         console.error({ unexpextedChildrenInBlock: block });
-        throw new Error("Unexpected children in block");
+        throw new Error("Unexpected children in block type: " + block.type);
       }
     };
 
@@ -116,65 +150,6 @@ export class BlockNoteToUniAstConverter {
           styles: {}, // TODO
         };
 
-      case "bulletListItem":
-        return {
-          type: "bulletListItem",
-          content: block.content.map((item) => this.convertInlineContent(item)),
-          subItems: this.convertBlocks(block.children).map((block) => {
-            if (
-              block.type !== "bulletListItem" &&
-              block.type !== "numberedListItem"
-            ) {
-              throw new Error(
-                "Unexpected child type in list item: " + block.type,
-              );
-            }
-
-            return block;
-          }),
-          styles: this.convertBlockStyles(block.props),
-        };
-
-      case "numberedListItem":
-        return {
-          type: "numberedListItem",
-          number: this.computeNumberedListItemNum(block, previousBlocks),
-          content: block.content.map((item) => this.convertInlineContent(item)),
-          subItems: this.convertBlocks(block.children).map((block) => {
-            if (
-              block.type !== "bulletListItem" &&
-              block.type !== "numberedListItem"
-            ) {
-              throw new Error(
-                "Unexpected child type in list item: " + block.type,
-              );
-            }
-
-            return block;
-          }),
-          styles: this.convertBlockStyles(block.props),
-        };
-
-      case "checkListItem":
-        return {
-          type: "checkedListItem",
-          checked: block.props.checked,
-          content: block.content.map((item) => this.convertInlineContent(item)),
-          subItems: this.convertBlocks(block.children).map((block) => {
-            if (
-              block.type !== "bulletListItem" &&
-              block.type !== "numberedListItem"
-            ) {
-              throw new Error(
-                "Unexpected child type in list item: " + block.type,
-              );
-            }
-
-            return block;
-          }),
-          styles: this.convertBlockStyles(block.props),
-        };
-
       case "codeBlock":
         dontExpectChildren();
 
@@ -217,11 +192,7 @@ export class BlockNoteToUniAstConverter {
 
         return {
           type: "image",
-          target: {
-            // TODO: support internal
-            type: "external",
-            url: block.props.url,
-          },
+          target: this.parseTarget(block.props.url),
           caption: block.props.caption,
           widthPx: block.props.previewWidth,
           styles: { alignment: block.props.textAlignment },
@@ -246,47 +217,87 @@ export class BlockNoteToUniAstConverter {
       }
 
       case "column":
-        // TODO
+      case "columnList":
+        // TODO: support columns
         return {
           type: "paragraph",
           content: [],
           styles: {},
         };
 
-      case "columnList":
-        return {
-          type: "paragraph",
-          content: [],
-          styles: {},
-        };
+      case "bulletListItem":
+      case "numberedListItem":
+      case "checkListItem":
+        throw new Error(
+          "Block should have been handled elsewhere in BlockNote to UniAst converter: " +
+            block.type,
+        );
     }
   }
 
-  // eslint-disable-next-line max-statements
-  private computeNumberedListItemNum(
-    numberedListItem: Extract<BlockType, { type: "numberedListItem" }>,
-    previousBlocks: BlockType[],
-  ): number {
-    if (numberedListItem.props.start !== undefined) {
-      return numberedListItem.props.start;
-    }
+  private convertListItem(
+    block: Extract<
+      BlockType,
+      { type: "bulletListItem" | "numberedListItem" | "checkListItem" }
+    >,
+    currentList: Extract<Block, { type: "list" }> | null,
+  ): ListItem {
+    switch (block.type) {
+      case "bulletListItem":
+        return {
+          content: [
+            // TODO: change when nested blocks are supported in blocknote
+            {
+              type: "paragraph",
+              content: block.content.map((item) =>
+                this.convertInlineContent(item),
+              ),
+              styles: {},
+            },
+            ...this.convertBlocks(block.children),
+          ],
+          styles: this.convertBlockStyles(block.props),
+        };
 
-    let number = 1;
+      case "numberedListItem": {
+        const prevNumber = currentList?.items.at(-1)?.number;
 
-    for (const block of previousBlocks.toReversed()) {
-      if (block.type !== "numberedListItem") {
-        break;
+        const number = (prevNumber ?? 0) + 1;
+
+        return {
+          number,
+          content: [
+            // TODO: change when nested blocks are supported in blocknote
+            {
+              type: "paragraph",
+              content: block.content.map((item) =>
+                this.convertInlineContent(item),
+              ),
+              styles: {},
+            },
+            ...this.convertBlocks(block.children),
+          ],
+          styles: this.convertBlockStyles(block.props),
+        };
       }
 
-      if (block.props.start !== undefined) {
-        number += block.props.start;
-        break;
-      }
-
-      number += 1;
+      case "checkListItem":
+        return {
+          checked: block.props.checked,
+          content: [
+            // TODO: change when nested blocks are supported in blocknote
+            {
+              type: "paragraph",
+              content: block.content.map((item) =>
+                this.convertInlineContent(item),
+              ),
+              styles: {},
+            },
+            ...this.convertBlocks(block.children),
+          ],
+          styles: this.convertBlockStyles(block.props),
+        };
     }
-
-    return number;
   }
 
   private convertBlockStyles(styles: BlockStyles): BlockStyles {
@@ -317,47 +328,56 @@ export class BlockNoteToUniAstConverter {
     inlineContent: EditorStyledText | Link<EditorStyleSchema>,
   ): InlineContent {
     switch (inlineContent.type) {
-      case "text":
+      case "text": {
+        const {
+          bold,
+          italic,
+          underline,
+          strike,
+          code,
+          backgroundColor,
+          textColor,
+        } = inlineContent.styles;
+
         return {
           type: "text",
-          props: this.convertText(inlineContent),
+          content: inlineContent.text,
+          styles: {
+            bold: bold ?? false,
+            italic: italic ?? false,
+            underline: underline ?? false,
+            strikethrough: strike ?? false,
+            code: code ?? false,
+            backgroundColor,
+            textColor,
+          },
         };
+      }
 
       case "link":
         return {
           type: "link",
-          content: inlineContent.content.map((item) => this.convertText(item)),
-          target: {
-            // TODO: internal links
-            type: "external",
-            url: inlineContent.href,
-          },
+          content: inlineContent.content.map((item) => {
+            const converted = this.convertInlineContent(item);
+
+            if (converted.type === "link") {
+              throw new Error(
+                "Nested links are not supported inside BlockNote",
+              );
+            }
+
+            return converted;
+          }),
+          target: this.parseTarget(inlineContent.href),
         };
     }
   }
 
-  private convertText(text: EditorStyledText): Text {
-    const {
-      bold,
-      italic,
-      underline,
-      strike,
-      code,
-      backgroundColor,
-      textColor,
-    } = text.styles;
+  private parseTarget(url: string): LinkTarget {
+    const reference = this.context.parseReferenceFromUrl(url);
 
-    return {
-      content: text.text,
-      styles: {
-        bold: bold ?? false,
-        italic: italic ?? false,
-        underline: underline ?? false,
-        strikethrough: strike ?? false,
-        code: code ?? false,
-        backgroundColor,
-        textColor,
-      },
-    };
+    return reference
+      ? { type: "internal", reference }
+      : { type: "external", url };
   }
 }

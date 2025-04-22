@@ -37,6 +37,7 @@
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
+    "@xwiki/cristal-fn-utils": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",

@@ -28,6 +28,7 @@ packages:
   - "core/document/*"
   - "core/extra-tabs/*"
   - "core/file-preview/*"
+  - "core/fn-utils"
   - "core/hierarchy/*"
   - "core/history/*"
   - "core/icons"

@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-uniast",
-  "version": "0.18.0",
+  "name": "@xwiki/cristal-fn-utils",
+  "version": "0.16.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "core/uniast",
+    "directory": "core/fn-utils",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "bugs": {
@@ -20,31 +20,15 @@
   "scripts": {
     "build": "tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "lint": "eslint \"./src/**/*.ts\" --max-warnings=0",
     "test": "vitest --run"
   },
   "types": "dist/index.d.ts",
-  "dependencies": {
-    "@xwiki/cristal-fn-utils": "workspace:*",
-    "@xwiki/cristal-model-api": "workspace:*",
-    "@xwiki/cristal-model-reference-api": "workspace:*",
-    "@xwiki/cristal-model-remote-url-api": "workspace:*",
-    "inversify": "7.5.0",
-    "mdast-util-gfm-strikethrough": "2.0.0",
-    "mdast-util-gfm-table": "2.0.0",
-    "mdast-util-gfm-task-list-item": "2.0.0",
-    "micromark-extension-gfm-strikethrough": "2.1.0",
-    "micromark-extension-gfm-table": "2.1.1",
-    "micromark-extension-gfm-task-list-item": "2.1.0",
-    "remark-parse": "11.0.0",
-    "unified": "11.0.5"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/mdast": "4.0.4",
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.8.2",
-    "vite": "6.2.4",
-    "vitest-mock-extended": "3.0.1"
+    "vite": "6.2.4"
   },
   "publishConfig": {
     "exports": {

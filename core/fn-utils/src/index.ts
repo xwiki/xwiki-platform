@@ -23,7 +23,7 @@
  *
  * @param value - the error value printed when this method is reached
  *
- * @since 0.16
+ * @since 0.17
  */
 function assertUnreachable(value: never): never {
   console.error({ unreachable: value });
@@ -33,13 +33,13 @@ function assertUnreachable(value: never): never {
 /**
  * Assert that a value is in an array, and fix its type
  *
- * @since 0.16
+ * @since 0.17
  *
  * @param array - the array to check
  * @param value - the value expected in the array
  * @param message - a message displayed in case the value is not found in the array
  *
- * @returns -
+ * @returns Whether the value is in the provided array, with the correct type
  */
 function assertInArray<T, U extends T>(
   value: T,
@@ -56,11 +56,11 @@ function assertInArray<T, U extends T>(
 /**
  * Get a function's output or `null` if thrown an error
  *
- * @since 0.16
+ * @since 0.17
  *
  * @param func - The function to try
  *
- * @returns -
+ * @returns The function's output, or `null` if it thrown an error
  */
 function tryFallible<T>(func: () => T): T | null {
   try {
@@ -71,4 +71,44 @@ function tryFallible<T>(func: () => T): T | null {
   }
 }
 
-export { assertInArray, assertUnreachable, tryFallible };
+/**
+ * Get a function's output of the thrown error
+ * Will construct a new Error object if the thrown value is not an instance of the Error class
+ *
+ * @since 0.17
+ *
+ * @param func - The function to try
+ *
+ * @returns The function's output, the thrown error if it's an instance of the `Error` class, or a constructed `Error` instance
+ */
+// eslint-disable-next-line max-statements
+function tryFallibleOrError<T>(func: () => T): T | Error {
+  try {
+    return func();
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      return e;
+    }
+
+    if (typeof e === "string") {
+      return new Error(e);
+    }
+
+    if (typeof e === "number" || typeof e === "boolean") {
+      return new Error(e.toString());
+    }
+
+    if (e === null) {
+      return new Error("null");
+    }
+
+    if (e === undefined) {
+      return new Error("undefined");
+    }
+
+    console.error({ throw: e });
+    return new Error("<thrown unknown value type>");
+  }
+}
+
+export { assertInArray, assertUnreachable, tryFallible, tryFallibleOrError };

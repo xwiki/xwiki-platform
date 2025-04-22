@@ -22,7 +22,6 @@ import { User } from "../components/currentUser";
 import { providerRef } from "../components/realtimeState";
 import NoAvatar from "../images/noavatar.png";
 import {
-  HocuspocusProvider,
   WebSocketStatus,
   // eslint-disable-next-line import/named
   onAwarenessChangeParameters,
@@ -36,16 +35,19 @@ const status = ref(WebSocketStatus.Disconnected);
 
 watch(
   providerRef,
-  (provider: HocuspocusProvider | undefined) => {
-    if (provider) {
-      provider.on("status", (event: onStatusParameters) => {
-        status.value = event.status;
-      });
-      provider.on("awarenessChange", (event: onAwarenessChangeParameters) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        users.value = Array.from(event.states.values() as any);
-      });
+  (provider) => {
+    if (!provider) {
+      return;
     }
+
+    provider.on("status", (event: onStatusParameters) => {
+      status.value = event.status;
+    });
+
+    provider.on("awarenessChange", (event: onAwarenessChangeParameters) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      users.value = Array.from(event.states.values() as any);
+    });
   },
   {
     immediate: true,

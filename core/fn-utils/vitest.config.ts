@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-// TODO: don't do barrel files!
-export * from "./ast";
-export * from "./interface";
-export * from "./markdown/md-to-uniast";
-export * from "./markdown/uniast-to-md";
+import localConfig from "./vite.config";
+import defaultConfig from "@xwiki/cristal-dev-config/vitest-vue.config";
+import { mergeConfig } from "vitest/config";
+
+export default mergeConfig(defaultConfig, localConfig);

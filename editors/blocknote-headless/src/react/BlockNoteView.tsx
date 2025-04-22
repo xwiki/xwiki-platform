@@ -46,7 +46,7 @@ import {
 import { multiColumnDropCursor } from "@blocknote/xl-multi-column";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { ReactivueChild } from "@xwiki/cristal-reactivue";
-import React from "react";
+import React, { useState } from "react";
 import { ShallowRef } from "vue";
 
 type DefaultEditorOptionsType = BlockNoteEditorOptions<
@@ -61,7 +61,6 @@ type DefaultEditorOptionsType = BlockNoteEditorOptions<
 type BlockNoteViewWrapperProps = {
   blockNoteOptions?: Partial<Omit<DefaultEditorOptionsType, "schema">>;
   theme?: "light" | "dark";
-  readonly?: boolean;
   content: BlockType[];
   editorRef?: ShallowRef<EditorType | null>;
 
@@ -106,7 +105,6 @@ async function parseAndLoadContent(
 function BlockNoteViewWrapper({
   blockNoteOptions,
   theme,
-  readonly,
   formattingToolbar: CustomFormattingToolbar,
   formattingToolbarOnlyFor,
   linkToolbar: CustomLinkToolbar,
@@ -120,26 +118,8 @@ function BlockNoteViewWrapper({
     | HocuspocusProvider
     | undefined;
 
-  // When realtime is activated, the first user to join the session sets the content for everybody.
-  // The rest of the participants will just retrieve the editor content from the realtime server.
-  // We know who is the first user joining the session by checking for the absence of an initialContentLoaded key in the
-  // document's configuration map (shared across all session participants).
-  if (provider) {
-    provider.on("synced", () => {
-      if (
-        !provider.document.getMap("configuration").get("initialContentLoaded")
-      ) {
-        provider.document
-          .getMap("configuration")
-          .set("initialContentLoaded", true);
-
-        parseAndLoadContent(editor, content);
-      }
-    });
-    provider.on("destroy", () => {
-      provider.destroy();
-    });
-  }
+  // Prevent changes in the editor until the provider has synced with other clients
+  const [ready, setReady] = useState(!provider);
 
   // Creates a new editor instance.
   const editor = useCreateBlockNote({
@@ -160,15 +140,42 @@ function BlockNoteViewWrapper({
     editorRef.value = editor;
   }
 
-  if (!provider) {
+  // When realtime is activated, the first user to join the session sets the content for everybody.
+  // The rest of the participants will just retrieve the editor content from the realtime server.
+  // We know who is the first user joining the session by checking for the absence of an initialContentLoaded key in the
+  // document's configuration map (shared across all session participants).
+  if (provider) {
+    provider.on("synced", () => {
+      console.debug("HocusPocus synced");
+
+      if (
+        !provider.document.getMap("configuration").get("initialContentLoaded")
+      ) {
+        provider.document
+          .getMap("configuration")
+          .set("initialContentLoaded", true);
+
+        parseAndLoadContent(editor, content);
+      }
+
+      setReady(true);
+    });
+
+    provider.on("destroy", () => {
+      provider.destroy();
+    });
+  } else {
     parseAndLoadContent(editor, content);
+  }
+
+  if (!ready) {
+    return <h1>Syncing changes with other realtime users...</h1>;
   }
 
   // Renders the editor instance using a React component.
   return (
     <BlockNoteView
       editor={editor}
-      editable={readonly !== true}
       theme={theme}
       // Override some builtin components
       formattingToolbar={false}

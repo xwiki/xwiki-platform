@@ -20,12 +20,15 @@
 
 import {
   Block,
+  Image,
   InlineContent,
-  ListItem,
   TableCell,
   Text,
   UniAst,
+  ListItem,
 } from "../ast";
+import { ConverterContext } from "../interface";
+import { tryFallibleOrError } from "@xwiki/cristal-fn-utils";
 
 /**
  * Converts Universal AST trees to markdown.
@@ -33,13 +36,21 @@ import {
  * @since 0.16
  */
 export class UniAstToMarkdownConverter {
-  toMarkdown(uniAst: UniAst): string {
+  constructor(public context: ConverterContext) {}
+
+  toMarkdown(uniAst: UniAst): string | Error {
     const { blocks } = uniAst;
 
     const out: string[] = [];
 
     for (let i = 0; i < blocks.length; i++) {
-      out.push(this.blockToMarkdown(blocks[i]));
+      const md = tryFallibleOrError(() => this.blockToMarkdown(blocks[i]));
+
+      if (md instanceof Error) {
+        return md;
+      }
+
+      out.push(md);
     }
 
     return out.join("\n\n");
@@ -48,20 +59,14 @@ export class UniAstToMarkdownConverter {
   private blockToMarkdown(block: Block): string {
     switch (block.type) {
       case "paragraph":
-        return this.inlineContentsToMarkdown(block.content);
+        return this.convertInlineContents(block.content);
 
       case "heading":
-        return `${"#".repeat(block.level)} ${this.inlineContentsToMarkdown(block.content)}`;
+        return `${"#".repeat(block.level)} ${this.convertInlineContents(block.content)}`;
 
-      case "bulletListItem":
-        return `* ${this.listItemContentToMarkdown(block)}`;
-
-      case "numberedListItem": {
-        return `${block.number}. ${this.listItemContentToMarkdown(block)}`;
+      case "list": {
+        return block.items.map((item) => this.convertListItem(item)).join("\n");
       }
-
-      case "checkedListItem":
-        return `* [${block.checked ? "x" : " "}] ${this.listItemContentToMarkdown(block)}`;
 
       case "blockQuote":
         return block.content
@@ -74,76 +79,91 @@ export class UniAstToMarkdownConverter {
         return `\`\`\`${block.language ?? ""}\n${block.content}\n\`\`\``;
 
       case "table":
-        return this.tableToMarkdown(block);
+        return this.convertTable(block);
 
       case "image":
-        return block.target.type === "external"
-          ? `![${block.caption}](${block.target.url})`
-          : `![[${block.caption}|${block.target.reference}]]`;
+        return this.convertImage(block);
+
+      case "break":
+        return "---";
 
       case "macro":
-        throw new Error("TODO: macro");
+        throw new Error("TODO: handle macros");
     }
   }
 
-  private listItemContentToMarkdown(item: ListItem): string {
-    return (
-      this.inlineContentsToMarkdown(item.content) +
-      item.subItems
-        .map((item) => this.blockToMarkdown(item))
-        .flatMap((item) => item.split("\n"))
-        .map((line) => "\n\t" + line)
-        .join("")
-    );
+  private convertListItem(listItem: ListItem): string {
+    let prefix = listItem.number !== undefined ? `${listItem.number}. ` : "* ";
+
+    if (listItem.checked !== undefined) {
+      prefix += `[${listItem.checked ? "x" : " "}] `;
+    }
+
+    const content = listItem.content
+      .flatMap((item) => this.blockToMarkdown(item).split("\n"))
+      .map((line, i) => (i > 0 ? " ".repeat(prefix.length) : "") + line)
+      .join("\n");
+
+    return `${prefix}${content}`;
   }
 
-  private tableToMarkdown(table: Extract<Block, { type: "table" }>): string {
+  private convertImage(image: Image): string {
+    // TODO: alt text
+    return image.target.type === "external"
+      ? `![${image.alt}](${image.target.url})`
+      : `![[${image.alt}|${this.context.serializeReference(image.target.reference)}]]`;
+  }
+
+  private convertTable(table: Extract<Block, { type: "table" }>): string {
     const { columns, rows } = table;
 
     const out = [
       columns
         .map((column) =>
-          column.headerCell ? this.tableCellToMarkdown(column.headerCell) : "",
+          column.headerCell ? this.convertTableCell(column.headerCell) : "",
         )
         .join(" | "),
       columns.map(() => " - ").join(" | "),
     ];
 
     for (const cell of rows) {
-      out.push(cell.map((item) => this.tableCellToMarkdown(item)).join(" | "));
+      out.push(cell.map((item) => this.convertTableCell(item)).join(" | "));
     }
 
     return out.map((line) => `| ${line} |`).join("\n");
   }
 
-  private tableCellToMarkdown(cell: TableCell): string {
-    return this.inlineContentsToMarkdown(cell.content);
+  private convertTableCell(cell: TableCell): string {
+    return this.convertInlineContents(cell.content);
   }
 
-  private inlineContentsToMarkdown(inlineContents: InlineContent[]): string {
+  private convertInlineContents(inlineContents: InlineContent[]): string {
     return inlineContents
-      .map((item) => this.inlineContentToMarkdown(item))
+      .map((item) => this.convertInlineContent(item))
       .join("");
   }
 
-  private inlineContentToMarkdown(inlineContent: InlineContent): string {
+  private convertInlineContent(inlineContent: InlineContent): string {
     switch (inlineContent.type) {
       case "text":
-        return this.textToMarkdown(inlineContent.props);
+        return this.convertText(inlineContent);
+
+      case "image":
+        return this.convertImage(inlineContent);
 
       case "link":
         switch (inlineContent.target.type) {
           case "external":
-            return `[${inlineContent.content.map((item) => this.textToMarkdown(item)).join("")}](${inlineContent.target.url})`;
+            return `[${this.convertInlineContents(inlineContent.content)}](${inlineContent.target.url})`;
 
           case "internal":
-            return `[[${inlineContent.content.map((item) => this.textToMarkdown(item)).join("")}|${inlineContent.target.reference}]]`;
+            return `[[${this.convertInlineContents(inlineContent.content)}|${this.context.serializeReference(inlineContent.target.reference)}]]`;
         }
     }
   }
 
   // eslint-disable-next-line max-statements
-  private textToMarkdown(text: Text): string {
+  private convertText(text: Text): string {
     const { content, styles } = text;
 
     const { bold, italic, strikethrough, code } = styles;

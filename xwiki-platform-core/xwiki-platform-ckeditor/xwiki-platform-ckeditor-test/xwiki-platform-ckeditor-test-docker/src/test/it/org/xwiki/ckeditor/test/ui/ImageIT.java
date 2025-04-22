@@ -100,6 +100,7 @@ class ImageIT extends AbstractCKEditorIT
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
     {
+        createAndLoginStandardUser(setup);
         setup.loginAsSuperAdmin();
         setup.deletePage(testReference, true);
         DocumentReference configurationReference = getConfigurationReference(setup);
@@ -107,7 +108,7 @@ class ImageIT extends AbstractCKEditorIT
         DocumentReference imageStylesReference =
             new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code"), "ImageStyles");
         setup.deletePage(imageStylesReference, true);
-        // Calling "loginAsSuperAdmin" right after "createAndLoginStandardUser" can lead to the loginAsSuperAdmin call
+        // Calling "loginAsSuperAdmin" right after "loginStandardUser" can lead to the loginAsSuperAdmin call
         // being ignored. It is also bad for test performance as the first login is done for nothing. Please remember to
         // log in with the standard user as soon as superadmin is not needed in your tests. 
     }
@@ -123,7 +124,7 @@ class ImageIT extends AbstractCKEditorIT
     void insertImage(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
@@ -164,7 +165,7 @@ class ImageIT extends AbstractCKEditorIT
         createBorderedStyle(setup);
 
         // Then test the image styles on the image dialog as a standard user.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
@@ -213,7 +214,7 @@ class ImageIT extends AbstractCKEditorIT
     void insertIcon(TestUtils setup, TestReference testReference)
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         ViewPage newPage = setup.gotoPage(testReference);
 
         // Move to the WYSIWYG edition page.
@@ -237,7 +238,7 @@ class ImageIT extends AbstractCKEditorIT
     void insertUrl(TestUtils setup, TestReference testReference)
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         ViewPage newPage = setup.gotoPage(testReference);
 
         // Move to the WYSIWYG edition page.
@@ -267,7 +268,7 @@ class ImageIT extends AbstractCKEditorIT
     void activateCaptionIdPersistence(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Insert a first image.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -316,7 +317,7 @@ class ImageIT extends AbstractCKEditorIT
     void imageWithCaption(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -377,7 +378,7 @@ class ImageIT extends AbstractCKEditorIT
     void imageWrappedInLink(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
@@ -421,7 +422,7 @@ class ImageIT extends AbstractCKEditorIT
     void imageWrappedInLinkUI(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -450,7 +451,7 @@ class ImageIT extends AbstractCKEditorIT
     void imageWithLinkAndCaptionUI(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -517,7 +518,7 @@ class ImageIT extends AbstractCKEditorIT
     void editLegacyCenteredImage(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
@@ -542,7 +543,7 @@ class ImageIT extends AbstractCKEditorIT
     void updateImageSize(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -581,7 +582,7 @@ class ImageIT extends AbstractCKEditorIT
     void updateExternalImageSize(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -624,7 +625,7 @@ class ImageIT extends AbstractCKEditorIT
             TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Upload an attachment to the page.
         String attachmentName = "image.gif";
         uploadAttachment(setup, testReference, attachmentName);
@@ -653,7 +654,7 @@ class ImageIT extends AbstractCKEditorIT
     void quickInsertImageOtherPage(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         // Create a child page.
         DocumentReference otherPage = new DocumentReference("attachmentOtherPage",
             testReference.getLastSpaceReference());
@@ -699,7 +700,7 @@ class ImageIT extends AbstractCKEditorIT
         setup.deletePage(subwikiDocumentReference, true);
 
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
 
         // Upload image to subwiki.
         String attachmentName = "image.gif";
@@ -742,7 +743,7 @@ class ImageIT extends AbstractCKEditorIT
         createBorderedStyle(setup);
 
         // Then test the image styles on the image dialog as a standard user.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
@@ -776,7 +777,7 @@ class ImageIT extends AbstractCKEditorIT
         createBorderedStyle(setup);
 
         // Then test the image styles on the image dialog as a standard user.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
@@ -867,7 +868,7 @@ class ImageIT extends AbstractCKEditorIT
     void editListWithImage(TestUtils setup, TestReference testReference) throws Exception
     {
         // Then test the image styles on the image dialog as a standard user.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
         String attachmentName = "image.gif";
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
 
@@ -912,7 +913,7 @@ class ImageIT extends AbstractCKEditorIT
     void editLegacyCenteredImageWithLink(TestUtils setup, TestReference testReference) throws Exception
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        loginStandardUser(setup);
 
         // Upload an attachment to test with.
         String attachmentName = "image.gif";

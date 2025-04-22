@@ -41,6 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public abstract class AbstractCKEditorIT
 {
+    private static final String STANDARD_USER_LOGIN = "alice";
+    private static final String STANDARD_USER_PASSWORD = "pa$$word";
+
     protected CKEditor editor;
 
     protected RichTextAreaElement textArea;
@@ -63,7 +66,14 @@ public abstract class AbstractCKEditorIT
 
     protected void createAndLoginStandardUser(TestUtils setup)
     {
-        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
+        setup.createUserAndLogin(STANDARD_USER_LOGIN, STANDARD_USER_PASSWORD,
+            "editor", "Wysiwyg",
+            "usertype", "Advanced");
+    }
+
+    protected void loginStandardUser(TestUtils setup)
+    {
+        setup.login(STANDARD_USER_LOGIN, STANDARD_USER_PASSWORD);
     }
 
     protected void assertSourceEquals(String expected)

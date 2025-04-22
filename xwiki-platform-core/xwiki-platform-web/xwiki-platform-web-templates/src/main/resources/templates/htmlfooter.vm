@@ -23,6 +23,13 @@
 #if ($services.debug.isEnabled())
 #template('debug.vm')
 #end
+<div class="modal-container">
+## We don't care about order for this extension point, none of the extensions should have 'visible' content.
+## The primary use of this extension point is to gather modal elements that did not get loaded asynchronously.
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.body.end'))
+  $services.rendering.render($uix.execute(), 'xhtml/1.0')
+#end
+</div>
 </body>
 </html>
 #else ## Portlet Mode

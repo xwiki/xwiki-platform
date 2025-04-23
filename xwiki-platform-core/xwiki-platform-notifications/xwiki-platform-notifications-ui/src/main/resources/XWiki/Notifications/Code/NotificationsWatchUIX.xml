@@ -725,7 +725,7 @@
 #set ($unblockSpaceOption = "#_displayOption('unblock-space','unblockSpace','unblockspace','chart-organisation','')")
 #set ($unblockWikiOption = "#_displayOption('unblock-wiki','unblockWiki','unblockwiki','world','wiki-option')")
 {{html clean='false'}}
-&lt;div class="modal fade" tabindex="-1" role="dialog" id="watchModal"&gt;
+&lt;dialog class="modal fade" id="watchModal"&gt;
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
@@ -832,7 +832,7 @@
       &lt;/div&gt;
     &lt;/div&gt;&lt;!-- /.modal-content --&gt;
   &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
-&lt;/div&gt;&lt;!-- /.modal --&gt;
+&lt;/dialog&gt;&lt;!-- /.modal --&gt;
 {{/html}}
 #end
 {{/velocity}}</content>

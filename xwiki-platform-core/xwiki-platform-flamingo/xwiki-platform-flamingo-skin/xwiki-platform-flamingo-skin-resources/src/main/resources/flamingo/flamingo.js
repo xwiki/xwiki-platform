@@ -142,18 +142,32 @@ require(['jquery', 'jquery-ui'], function($) {
   let storageValueIsSimilarToDefault = function (side) {
     return valueIsSimilarToDefault(localStorage.getItem(localStoragePrefix + side), side);
   };
+  
+  let panelIsHidden = function (side) {
+    return document.body.classList.contains("hidelefthideright") || document.body.classList.contains("hide" + side);
+  };
   let applyLocalStorageValues = function(side) {
     // We only update the value from local storage if this new value is significantly different from the default
     // The user shouldn't be able to save those values, but it's an extra safety in case the threshold used above
     // changes or the local storage value was manipulated outside of this script.
     // This means that the column size will not flicker between two very similar values when loading up a page.
-    if (!storageValueIsSimilarToDefault(side)) {
+    // Since this inline style takes precedence over everything else, we want to be extra careful when applying it.
+    if (!storageValueIsSimilarToDefault(side) && !panelIsHidden(side)) {
       document.body.style.setProperty('--panel-column-' + side + '-width',
         localStorage.getItem(localStoragePrefix + side));
     }
   };
   applyLocalStorageValues(left);
   applyLocalStorageValues(right);
+  
+  // Make sure the local storage stays synchronised across tabs.
+  // This does not call itself recursively :)
+  window.addEventListener('storage', function (event) {
+    switch (event.key) {
+      case localStoragePrefix + left: applyLocalStorageValues(left);
+      case localStoragePrefix + right: applyLocalStorageValues(right);
+    }
+  });
 
   let resizeCustomFunction = function(side, event, ui) {
     // We remove the default inline CSS properties.

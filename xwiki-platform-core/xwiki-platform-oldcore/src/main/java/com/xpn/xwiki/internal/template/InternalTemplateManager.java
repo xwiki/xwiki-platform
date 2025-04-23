@@ -59,6 +59,7 @@ import org.xwiki.cache.CacheControl;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
+import org.xwiki.classloader.internal.ClassLoaderUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -1107,18 +1108,14 @@ public class InternalTemplateManager implements Initializable, Disposable
 
     private Template getClassloaderTemplate(ClassLoader classloader, String prefixPath, String templateName)
     {
-        String templatePath = prefixPath + templateName;
-
-        // Prevent access to resources from other directories
-        Path normalizedResource = Paths.get(templatePath).normalize();
-        // Protect against directory attacks.
-        if (!normalizedResource.startsWith(prefixPath)) {
-            this.logger.warn("Direct access to skin file [{}] refused. Possible break-in attempt!", normalizedResource);
+        URL url;
+        try {
+            url = ClassLoaderUtils.getResource(classloader, prefixPath, templateName);
+        } catch (IllegalArgumentException e) {
+            this.logger.warn("The template name [{}] is trying to execute a path traversal attack!", templateName);
 
             return null;
         }
-
-        URL url = classloader.getResource(templatePath);
 
         return url != null ? new ClassloaderTemplate(new ClassloaderResource(url, templateName)) : null;
     }

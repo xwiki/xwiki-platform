@@ -55,7 +55,7 @@ public class DocumentUserManager implements UserManager
     /**
      * The role hint of the component.
      * 
-     * @since 17.3.0RC1
+     * @since 17.4.0RC1
      */
     public static final String HINT = "org.xwiki.user.internal.document.DocumentUserReference";
 

@@ -110,9 +110,6 @@
     ## Note: Both the admin actions and the more actions menus are now merged into one.
     #if ($displayAdminMenu || $displayMoreActionsMenu)
       #displayOptionsMenu()
-      #if ($canView)
-        #template("export_modal.vm")
-      #end
     #end
   #end
   #set ($discard = $topStaticExtensions.add( { 'content': "$!actionsMenu", 'order': 40000}))
@@ -132,10 +129,6 @@
       #keyboardShortcuts()
     #end
   </ul>
-## Display the submenu modals next to the list. Note that those could be pretty much anywhere but in the ul for HTML
-## correctness sake.
-#if ("$!notificationsWatchModal" != "")$notificationsWatchModal#end
-#if ($!_exportModalAvailable)#exportModal()#end
 #end
 
 #**

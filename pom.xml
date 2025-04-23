@@ -35,7 +35,7 @@
          By using an empty value we force Maven to resolve the parent from the Maven repositories,
          see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
     -->
-    <relativePath/>
+    <relativePath />
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>
@@ -129,7 +129,7 @@
     <npm.version>11.1.0</npm.version>
   </properties>
   <scm>
-    <tag>HEAD</tag>
+    <tag>stable-17.3.x</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

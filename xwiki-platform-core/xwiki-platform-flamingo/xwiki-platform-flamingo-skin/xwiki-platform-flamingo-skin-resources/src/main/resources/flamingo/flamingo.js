@@ -142,7 +142,6 @@ require(['jquery', 'jquery-ui'], function($) {
   let storageValueIsSimilarToDefault = function (side) {
     return valueIsSimilarToDefault(localStorage.getItem(localStoragePrefix + side), side);
   };
-  
   let panelIsHidden = function (side) {
     return document.body.classList.contains("hidelefthideright") || document.body.classList.contains("hide" + side);
   };

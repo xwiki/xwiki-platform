@@ -164,8 +164,8 @@ require(['jquery', 'jquery-ui'], function($) {
   // This does not call itself recursively :)
   window.addEventListener('storage', function (event) {
     switch (event.key) {
-      case localStoragePrefix + left: applyLocalStorageValues(left);
-      case localStoragePrefix + right: applyLocalStorageValues(right);
+      case localStoragePrefix + left: return applyLocalStorageValues(left);
+      case localStoragePrefix + right: return applyLocalStorageValues(right);
     }
   });
 

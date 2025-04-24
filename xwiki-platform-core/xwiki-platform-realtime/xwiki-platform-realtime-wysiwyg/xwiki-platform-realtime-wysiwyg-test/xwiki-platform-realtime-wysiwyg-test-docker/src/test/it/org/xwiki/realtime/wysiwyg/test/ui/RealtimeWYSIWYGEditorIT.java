@@ -49,6 +49,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.realtime.test.po.Coeditor;
 import org.xwiki.realtime.test.po.RealtimeInplaceEditablePage;
 import org.xwiki.realtime.test.po.SaveStatus;
+import org.xwiki.realtime.test.po.SummaryModal;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement.CoeditorPosition;
@@ -57,6 +58,7 @@ import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
@@ -169,6 +171,43 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         inplaceEditablePage.done();
         assertEquals("zero\ntwo\nthree", inplaceEditablePage.getContent());
+
+        // edit again and test the summarize & done
+        inplaceEditablePage.editInplace();
+        new RealtimeCKEditor().getRichTextArea().sendKeys(
+            Keys.ARROW_DOWN,
+            Keys.ARROW_DOWN,
+            Keys.END,
+            Keys.ENTER,
+            "four");
+        SummaryModal summaryModal = inplaceEditablePage.getToolbar().clickSummarizeAndDone();
+        summaryModal.setSummary("Summarize changes");
+        summaryModal.clickSave(true);
+        inplaceEditablePage.waitForView();
+        assertEquals("zero\ntwo\nthree\nfour", inplaceEditablePage.getContent());
+        HistoryPane historyPane = inplaceEditablePage.openHistoryDocExtraPane();
+        assertEquals(4, historyPane.getNumberOfVersions());
+        assertEquals("Summarize changes", historyPane.getCurrentVersionComment());
+
+        // delete the page to test creation with summarize & done (regression test for XWIKI-23136)
+        setup.deletePage(testReference);
+        editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        editor = editPage.getContenEditor();
+        textArea = editor.getRichTextArea();
+        textArea.sendKeys("New content");
+        new WikiEditPage().setTitle("Dummy title");
+        summaryModal = editPage.getToolbar().clickSummarizeAndDone();
+        summaryModal.setSummary("Summarize changes 2");
+
+        // Since it's a page creation, we're not in inplace editable page and so we'll have a reload.
+        setup.getDriver().addPageNotYetReloadedMarker();
+        summaryModal.clickSave(true);
+        setup.getDriver().waitUntilPageIsReloaded();
+        ViewPage viewPage = new ViewPage();
+        assertEquals("New content", viewPage.getContent());
+        assertEquals("Dummy title", viewPage.getDocumentTitle());
+        historyPane = inplaceEditablePage.openHistoryDocExtraPane();
+        assertEquals("Summarize changes 2", historyPane.getCurrentVersionComment());
     }
 
     @Test

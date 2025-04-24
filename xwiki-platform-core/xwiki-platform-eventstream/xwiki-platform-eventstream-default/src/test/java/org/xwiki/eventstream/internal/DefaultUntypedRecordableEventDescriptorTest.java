@@ -19,7 +19,6 @@
  */
 package org.xwiki.eventstream.internal;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -79,7 +78,7 @@ class DefaultUntypedRecordableEventDescriptorTest
 
         when(baseObject.getStringValue(anyString())).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(baseObject.getListValue(anyString())).thenAnswer(
-            invocationOnMock -> Collections.singletonList((String) invocationOnMock.getArgument(0)));
+            invocationOnMock -> List.of((String) invocationOnMock.getArgument(0)));
 
         this.descriptor =
             new DefaultUntypedRecordableEventDescriptor(ENTITY_REFERENCE, AUTHOR_REFERENCE, baseObject,

@@ -140,22 +140,26 @@ define('xwiki-realtime-toolbar', [
 
     async _loadChanges(changesTab) {
       changesTab.dataset.state = 'loading';
-      const previousVersion = this._changeSummaryModal.dataset.previousVersion;
+      if (xwikiDocument.isNew) {
+        changesTab.dataset.state = 'isNew';
+      } else {
+        const previousVersion = this._changeSummaryModal.dataset.previousVersion;
 
-      try {
-        const html = await this._fetchChanges(previousVersion);
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = html;
-        const diff = wrapper.querySelector('.diff-group');
-        if (diff) {
-          changesTab.dataset.state = 'loaded';
-          changesTab.querySelector('.diff-group').replaceWith(diff);
-        } else {
-          changesTab.dataset.state = 'empty';
+        try {
+          const html = await this._fetchChanges(previousVersion);
+          const wrapper = document.createElement('div');
+          wrapper.innerHTML = html;
+          const diff = wrapper.querySelector('.diff-group');
+          if (diff) {
+            changesTab.dataset.state = 'loaded';
+            changesTab.querySelector('.diff-group').replaceWith(diff);
+          } else {
+            changesTab.dataset.state = 'empty';
+          }
+        } catch (error) {
+          changesTab.dataset.state = 'error';
+          console.error(error);
         }
-      } catch (error) {
-        changesTab.dataset.state = 'error';
-        console.error(error);
       }
     }
 
@@ -191,13 +195,15 @@ define('xwiki-realtime-toolbar', [
 
     async _saveChangeSummary() {
       const commentInput = this._oldToolbar.querySelector('input[name="comment"]');
-      const minorEditCheckbox = this._oldToolbar.querySelector('input[name="minorEdit"]');
       const changeSummaryTextArea = this._changeSummaryModal.querySelector('textarea[name=summary]');
       const minorChangeCheckbox = this._changeSummaryModal.querySelector('input[name="minorChange"]');
       const continueEditing = this._changeSummaryModal.dataset.continue === 'true';
       // Put the change summary and the minor edit checkbox in the form.
       commentInput.value = changeSummaryTextArea.value;
-      minorEditCheckbox.checked = minorChangeCheckbox.checked;
+      if (!xwikiDocument.isNew) {
+        const minorEditCheckbox = this._oldToolbar.querySelector('input[name="minorEdit"]');
+        minorEditCheckbox.checked = minorChangeCheckbox.checked;
+      }
       $(this._changeSummaryModal).modal('hide');
 
       const lastReviewedVersion = this._lastReviewedVersion;

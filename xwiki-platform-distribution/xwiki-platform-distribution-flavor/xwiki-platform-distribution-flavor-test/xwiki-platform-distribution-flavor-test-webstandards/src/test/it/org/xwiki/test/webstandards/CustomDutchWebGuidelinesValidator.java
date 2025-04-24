@@ -83,7 +83,8 @@ public class CustomDutchWebGuidelinesValidator extends HTML5DutchWebGuidelinesVa
     public void validateRpd3s4()
     {
         if (!isPage("XWiki", "XWikiSyntax") && !isPage("XWiki", "XWikiSyntaxParagraphs")
-            && !isPage("XWiki", "XWikiSyntaxGeneralRemarks")) {
+            && !isPage("XWiki", "XWikiSyntaxGeneralRemarks")
+            && !isPage("IconThemesCode", "IconPickerMacro")) {
             super.validateRpd3s4();
         }
     }
@@ -129,7 +130,8 @@ public class CustomDutchWebGuidelinesValidator extends HTML5DutchWebGuidelinesVa
             && !isPage("XWiki", "XWikiSyntaxDefinitionLists") && !isPage("XWiki", "XWikiSyntaxHeadings")
             && !isPage("XWiki", "XWikiSyntaxLists") && !isPage("XWiki", "XWikiSyntaxParameters")
             && !isPage("XWiki", "XWikiSyntaxGroups") && !isPage("XWiki", "Treeview")
-            && !isPage("Panels", "PanelWizard") && !isPage("Invitation", "WebHome")) {
+            && !isPage("Panels", "PanelWizard") && !isPage("Invitation", "WebHome")
+            && !isPage("IconThemesCode", "IconPickerMacro")) {
             // Usage of the style attribute is strictly forbidden in the other spaces.
 
             assertTrue(Type.ERROR, "rpd9s1.attr", getElement(ELEM_BODY).getElementsByAttribute(STYLE).isEmpty());

@@ -619,6 +619,12 @@ function panelEditorInit() {
 
   prevcolumn = allPanels;
 
+  // Those properties do not interact well with live changes of the layout (hiding columns).
+  // If we want to make them work even here, we'd need to reset the values and set them back with
+  // a function similar to `applyLocalStorageValues` from flamingo.js every time the hiding classes are updated...
+  document.body.style.removeProperty('--panel-column-left-width');
+  document.body.style.removeProperty('--panel-column-right-width');
+
   start1();
 
   // Update the enabled/disable state of the left/right panel inputs.

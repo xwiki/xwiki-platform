@@ -256,6 +256,12 @@
   padding: @line-height-computed @grid-gutter-width;
 }
 
+/* We don't want to apply a extra padding when the #hierarchy_breadcrumb is nested inside the #mainContentArea,
+ which happens on some pages (like the AdminSheet). On most pages, these elements are next to each other. */
+#mainContentArea #hierarchy_breadcrumb {
+  padding: @line-height-computed 0;
+}
+
 #hierarchy_breadcrumb {
   padding-bottom: 0;
 

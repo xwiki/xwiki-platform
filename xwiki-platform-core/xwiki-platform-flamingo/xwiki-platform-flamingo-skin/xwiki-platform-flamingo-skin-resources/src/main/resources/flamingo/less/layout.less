@@ -36,11 +36,13 @@
   & #leftPanels {
     order: 1;
     width: ~"var(--panel-column-left-width)";
+    margin-left: ~"calc(-1 * var(--grid-gutter-width) / 2)";
   }
 
   & #rightPanels, & #editPanels {
     order: 3;
     width: ~"var(--panel-column-right-width)";
+    margin-right: ~"calc(-1 * var(--grid-gutter-width) / 2)";
   }
   
   /* Depending on the admin parameters, we want to change the default size. */

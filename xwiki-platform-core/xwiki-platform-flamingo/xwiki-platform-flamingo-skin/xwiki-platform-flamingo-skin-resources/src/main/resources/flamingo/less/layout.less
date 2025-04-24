@@ -36,11 +36,13 @@
   & #leftPanels {
     order: 1;
     width: ~"var(--panel-column-left-width)";
+    padding-right: ~"calc(var(--grid-gutter-width) / 2)";
   }
 
   & #rightPanels, & #editPanels {
     order: 3;
     width: ~"var(--panel-column-right-width)";
+    padding-left: ~"calc(var(--grid-gutter-width) / 2)";
   }
   
   /* Depending on the admin parameters, we want to change the default size. */
@@ -175,25 +177,27 @@
   min-width: 0;
   /* With this width, there should be just enough space to fit the handle on the side of the panel 
     without it going over panel content. */
-  width: 14px;
+  width: ~"var(--grid-gutter-width)";
   border: 0;
   border-radius: 0;
   /* We want those handles to display above any regular content. The style should be discreete. */
   z-index: 1;
+  /* We already provide a visible indicator when those handles are focused. There's no need for an outline. */
+  outline: 0;
 }
 
 #leftPanels > .ui-resizable-e {
   right: 0;
   /* We want the click zone to be large, but the display to be discreete. 
-    80% of the button is transparent and the 20% on the right are highlighted on hover. */
-  background-image: linear-gradient( 90deg, transparent 0%, transparent 80%, @navbar-default-bg 80%, @navbar-default-bg 80%);
+    90% of the button is transparent and the 10% on the right are highlighted on hover. */
+  background-image: linear-gradient( 90deg, transparent 0%, transparent 90%, @navbar-default-bg 90%, @navbar-default-bg 90%);
 }
 
 #rightPanels > .ui-resizable-w {
   left: 0;
   /* We want the click zone to be large, but the display to be discreete. 
-    80% of the button is transparent and the 20% on the left are highlighted on hover. */
-  background-image: linear-gradient( -90deg, transparent 0%, transparent 80%, @navbar-default-bg 80%, @navbar-default-bg 80%);
+    90% of the button is transparent and the 10% on the left are highlighted on hover. */
+  background-image: linear-gradient( -90deg, transparent 0%, transparent 90%, @navbar-default-bg 90%, @navbar-default-bg 90%);
 }
 
 #rightPanels > .ui-resizable-w:focus,
@@ -254,6 +258,12 @@
 #docextrapanes {
   background-color: @xwiki-page-content-bg;
   padding: @line-height-computed @grid-gutter-width;
+}
+
+/* We don't want to apply a extra padding when the #hierarchy_breadcrumb is nested inside the #mainContentArea,
+ which happens on some pages (like the AdminSheet). On most pages, these elements are next to each other. */
+#mainContentArea #hierarchy_breadcrumb {
+  padding: @line-height-computed 0;
 }
 
 #hierarchy_breadcrumb {

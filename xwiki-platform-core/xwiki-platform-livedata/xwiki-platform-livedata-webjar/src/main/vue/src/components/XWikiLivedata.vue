@@ -92,11 +92,3 @@ export default {
 
 };
 </script>
-
-<style scoped>
-.xwiki-livedata {
-  --table-cell-padding: 8px; /* TODO: make a variable, copied from less for now*/
-  --screen-xs-max: 766px; /* TODO: make a variable, copied from less for now*/
-  --panel-default-heading-bg: #f5f5f5; /* TODO: make a variable, copied from less for now*/
-}
-</style>

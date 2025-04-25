@@ -22,6 +22,11 @@
 #if (!$services.debug.minify)
   #set ($jsExtension = '.js')
 #end
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.importmap', {'sortByParameter' : 'order'}))
+<script type="importmap">
+$services.rendering.render($uix.execute(), 'plain/1.0')
+</script>
+#end
 ##
 ## JavaScript libraries
 ##
@@ -29,7 +34,7 @@
 <script src="$escapetool.xml($services.webjars.url('requirejs', "require$jsExtension"))" data-wysiwyg="true"></script>
 ## Load the JavaScript module used to determine when the page is ready (no pending HTTP requests or promises).
 <script src="$escapetool.xml($xwiki.getSkinFile('uicomponents/tools/pageReady.js'))" data-wysiwyg="true"></script>
-## Fix some Prototype.js breaking changes. 
+## Fix some Prototype.js breaking changes.
 <script src="$escapetool.xml($xwiki.getSkinFile('js/xwiki/prototypeJSPatches.js'))"></script>
 ## FIXME: We still have code depending on Prototype.js without declaring it (i.e. without using RequireJS). Short term
 ## goal is to stop loading Prototype.js by default and change the existing code to load it when needed. Long term goal is
@@ -184,8 +189,8 @@ if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
             delete event.target[method];
         }, 0);
       };
-      pluginsToDisable.each(function (plugin) { 
-          $(window).on(method + '.bs.' + plugin, handler); 
+      pluginsToDisable.each(function (plugin) {
+          $(window).on(method + '.bs.' + plugin, handler);
       });
     },
     pluginsToDisable = ['collapse', 'dropdown', 'modal', 'tooltip', 'tab', 'popover'];

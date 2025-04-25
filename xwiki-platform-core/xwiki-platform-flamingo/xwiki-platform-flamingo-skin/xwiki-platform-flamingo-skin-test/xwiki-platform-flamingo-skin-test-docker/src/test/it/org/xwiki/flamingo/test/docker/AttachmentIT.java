@@ -80,6 +80,9 @@ class AttachmentIT
     @BeforeAll
     public void setup(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
+        // Make sure the timezone configuration the default value until XWIKI-21924 is fixed.
+        setup.setPropertyInXWikiPreferences("timezone", "String", "");
         setup.createUser("User2", "pass", "");
         setup.createUserAndLogin("User1", "pass");
     }
@@ -104,7 +107,7 @@ class AttachmentIT
         setup.rest().savePage(testReference, "", "");
         Page page = setup.rest().get(testReference);
         // We make the page hidden as we identified some issues specific to hidden pages (see XWIKI-20093).
-        // If it happens that some issues are specific to non-hidden pages, the test will need to be improved to 
+        // If it happens that some issues are specific to non-hidden pages, the test will need to be improved to
         // cover both cases (which will make the execution time of the test suite larger).
         page.setHidden(true);
         setup.rest().save(page);

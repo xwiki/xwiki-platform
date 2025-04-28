@@ -235,7 +235,7 @@
           #set ($showRoot = !$showWikis)
           #set ($showTerminalDocuments = false || $options.showTerminalDocuments)
           #set ($macro.showSpaces = false || $options.showSpaces)
-          #set ($macro.filterHiddenDocuments = ($options.filterHiddenDocuments != false))
+          #set ($macro.filterHiddenDocuments = $options.filterHiddenDocuments != false)
           #documentTree({
             'class': 'location-tree',
             'finder': true,

@@ -21,8 +21,9 @@
 ##.prod
 $jsontool.serialize({
     'imports': {
-        'xwiki-livedata': $xwiki.getSkinFile("ld/main.es.js"),
-        'vue': $services.webjars.url('org.webjars.npm:vue', 'dist/vue.runtime.esm-browser.js')
+        'xwiki-livedata': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'main.es.js'),
+        'vue': $services.webjars.url('org.webjars.npm:vue', 'dist/vue.runtime.esm-browser.prod.js'),
+        'vue-i18n': $services.webjars.url('org.webjars.npm:vue-i18n', 'dist/vue-i18n.esm-browser.prod.js')
     }
 })
 </script>

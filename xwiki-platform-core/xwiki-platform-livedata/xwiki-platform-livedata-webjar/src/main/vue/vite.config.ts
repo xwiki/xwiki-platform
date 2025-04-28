@@ -36,7 +36,7 @@ export default defineConfig({
     },
     sourcemap: true,
     rollupOptions: {
-      external: ['jquery', 'vue'],
+      external: ['jquery', 'vue', 'vue-i18n'],
       output: {
         globals: {
           vue: 'Vue'

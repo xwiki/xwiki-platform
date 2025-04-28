@@ -2727,7 +2727,7 @@ Recursive title display detected!##
     'name': $id,
     'value': $value,
     'class': 'suggest-propertyValues',
-    'data-className': $field.className,
+    'data-className': $services.model.serialize($field.reference.parent, 'default'),
     'data-propertyName': $name
   })
   #if ("$!freeText" != '')

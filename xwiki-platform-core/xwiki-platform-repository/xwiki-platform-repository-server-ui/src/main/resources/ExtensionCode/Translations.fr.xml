@@ -75,7 +75,7 @@ ExtensionCode.ExtensionSupportPlanClass_doc.title=Nom
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
 ExtensionCode.ExtensionSupportPlanClass_url=URL
-### Missing: ExtensionCode.ExtensionSupportPlanClass_content=Details
+ExtensionCode.ExtensionSupportPlanClass_content=Détails
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_active=Active
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
 </content>

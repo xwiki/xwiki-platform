@@ -51,9 +51,9 @@ describe("BaseDisplayer.vue", () => {
       },
     });
 
-    expect(wrapper.find("input").element.value).toMatch("red");
-    // TODO: test focus manually
-    // expect(wrapper.find('input').element).toBe(document.activeElement)
+    const inputElement = wrapper.find("input").element;
+    expect(inputElement.value).toMatch("red");
+    expect(inputElement).toBe(document.activeElement)
   });
 
   it("Send an event on save", async () => {

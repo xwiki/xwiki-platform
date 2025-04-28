@@ -46,7 +46,7 @@ export default {
     // This can be useful in order to autofocus the input in the Editor widget
     // right after the user switched from the Viewer widget
     autofocus: {
-      inserted(el) {
+      mounted(el) {
         el.focus();
       },
     },

@@ -136,9 +136,9 @@ describe("DisplayerLink.vue", () => {
 
     await wrapper.setProps({ isView: false });
 
-    expect(wrapper.find("input").element.value).toBe("red");
-    // TODO: test focus manually first
-    // expect(wrapper.find('input').element).toHaveFocus()
+    const inputElement = wrapper.find("input").element;
+    expect(inputElement.value).toBe("red");
+    expect(inputElement).toBe(document.activeElement)
   });
 
   it("Send events after the end of the edit", async () => {

@@ -57,7 +57,6 @@ describe("DisplayerDate.vue", () => {
 
     const input = wrapper.find(".editor-date");
     expect(input.attributes("value")).toBe("formatted date");
-    // TODO; test manually first
-    // expect(input.element).toHaveFocus()
+    expect(input.element).toBe(document.activeElement)
   });
 });

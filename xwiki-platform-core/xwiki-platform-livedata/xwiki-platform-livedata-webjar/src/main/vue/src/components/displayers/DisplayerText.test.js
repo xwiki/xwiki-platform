@@ -39,8 +39,8 @@ describe("DisplayerText.vue", () => {
 
     await wrapper.setProps({ isView: false });
 
-    expect(wrapper.find("input").element.value).toBe("red");
-    // TODO: test focus on a real instance
-    // expect(document.activeElement).toBe(wrapper.find('input').element)
+    const inputElement = wrapper.find("input").element;
+    expect(inputElement.value).toBe("red");
+    expect(inputElement).toBe(document.activeElement)
   });
 });

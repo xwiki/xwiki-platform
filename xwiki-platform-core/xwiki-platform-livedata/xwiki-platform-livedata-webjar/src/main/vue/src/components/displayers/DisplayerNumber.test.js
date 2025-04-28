@@ -53,8 +53,8 @@ describe("DisplayerNumber.vue", () => {
 
     await wrapper.setProps({ isView: false });
 
-    expect(wrapper.find("input").element.value).toBe("42");
-    // TODO: test manually first
-    //expect(wrapper.find('input').element).toHaveFocus()
+    const inputElement = wrapper.find("input").element;
+    expect(inputElement.value).toBe("42");
+    expect(inputElement).toBe(document.activeElement)
   });
 });

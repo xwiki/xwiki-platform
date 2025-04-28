@@ -74,20 +74,14 @@ describe("DisplayerXObjectProperty.vue", () => {
       },
     });
 
-    // // The :visible filter does not work in the context of jest. To mitigate that issue we spy
-    // on jquery filter // method and return the expected result (the #editField input).
-    // $.fn.filter= = sinon.stub($.fn, "filter"); $.fn.filter.resolves({  })
-    // jQuerySpy.mockImplementation(() => { return $(wrapper.element).find('#editField') })
-
     // Switch to edit mode and manually call updateEdit, instead of using the actions because
     // accessing the actions of the popover is not currently possible.
     await wrapper.setProps({ isView: false });
-    wrapper.vm.updateEdit();
+    await wrapper.setData({ isView: false });
     await flushPromises();
 
     // Checks that the edition form is properly retrieved and displayed.
-    expect(wrapper.find("#editForm").exists()).toBe(true);
-    // TODO: test manually first
-    // expect(wrapper.find('#editField').element).toHaveFocus();
+    const editForm = wrapper.find("#editForm");
+    expect(editForm.exists()).toBe(true);
   });
 });

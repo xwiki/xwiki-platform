@@ -87,8 +87,8 @@ rendering.macro.menu.parameter.type.description=Le type de menu (optionnel) dét
 rendering.macro.menu.content.description=Définit la structure du menu en utilisant la syntaxe wiki. Chaque élément du menu devrait être un élément de liste, et devrait contenir l'étiquette du menu ou un lien. Vous pouvez utiliser des listes imbriquées pour les sous-menus.
 
 # Menu UI
-### Missing: menu.ui.openSubMenu=Open the submenu.
-### Missing: menu.ui.closeSubMenu=Close the submenu.
+menu.ui.openSubMenu=Ouvrir le sous-menu.
+menu.ui.closeSubMenu=Fermer le sous-menu.
 ### Missing: menu.ui.horizontal.toggler.description=Toggle the horizontal menu.
 
 # Menu WebHome

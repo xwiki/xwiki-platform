@@ -196,8 +196,8 @@ help.videos.videoCard6.topic2=Découvrez l'interface d'Administration XWiki
 help.videos.watch=Voir
 
 ## Example Macro
-### Missing: rendering.macro.example.name=Example
+rendering.macro.example.name=Exemple
 ### Missing: rendering.macro.example.description=Shows an example and its source code.
-### Missing: rendering.macro.example.content.description=The example code.
+rendering.macro.example.content.description=Le code d'exemple.
 </content>
 </xwikidoc>

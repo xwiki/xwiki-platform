@@ -20,12 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.3" reference="XWiki.XWikiSyntaxOtherSyntaxes" locale="zh">
   <web>XWiki</web>
   <name>XWikiSyntaxOtherSyntaxes</name>
-  <language/>
+  <language>zh</language>
   <defaultLanguage>en</defaultLanguage>
-  <translation>0</translation>
+  <translation>1</translation>
   <parent>XWiki.XWikiSyntax</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
@@ -33,90 +33,10 @@
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>其他Wiki语法</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.XWikiSyntaxClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <category>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>category</name>
-        <number>1</number>
-        <numberType>integer</numberType>
-        <prettyName>Category ID</prettyName>
-        <size>10</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-      </category>
-      <maxSyntaxId>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>maxSyntaxId</name>
-        <number>4</number>
-        <prettyName>Maximum Syntax Version</prettyName>
-        <size>10</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </maxSyntaxId>
-      <minSyntaxId>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>minSyntaxId</name>
-        <number>3</number>
-        <prettyName>Minimum Syntax Version</prettyName>
-        <size>10</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </minSyntaxId>
-      <section>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>section</name>
-        <number>2</number>
-        <numberType>integer</numberType>
-        <prettyName>Section ID</prettyName>
-        <size>10</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-      </section>
-    </class>
-    <name>XWiki.XWikiSyntaxIntroduction</name>
-    <number>0</number>
-    <className>XWiki.XWikiSyntaxClass</className>
-    <guid>c49c899e-d77d-4f06-91a5-c6a29b3e8550</guid>
-    <property>
-      <category>0</category>
-    </property>
-    <property>
-      <maxSyntaxId>1.0</maxSyntaxId>
-    </property>
-    <property>
-      <minSyntaxId>1.0</minSyntaxId>
-    </property>
-    <property>
-      <section>2</section>
-    </property>
-  </object>
   <content>= 通用 =
 == 其他语法 ==
 === 1.0 其他语法 ===

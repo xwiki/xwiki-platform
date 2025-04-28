@@ -197,7 +197,7 @@ help.videos.watch=Voir
 
 ## Example Macro
 rendering.macro.example.name=Exemple
-### Missing: rendering.macro.example.description=Shows an example and its source code.
-rendering.macro.example.content.description=Le code d'exemple.
+rendering.macro.example.description=Afficher un exemple et le code source correspondant.
+rendering.macro.example.content.description=L'exemple de code.
 </content>
 </xwikidoc>

@@ -95,9 +95,6 @@ export default {
     applyFilterWithDelay(newValue) {
       // Clear existing timeout
       clearTimeout(this._applyFilterTimeoutId);
-      // Once a filter is applied, the filtering state is switched to true.
-      // The filtering state is switched to false only once the filtering is finished.
-      this.$emit("update:isFiltering", true);
       // Set a 250 milliseconds timeout before calling applyFilter method
       const timeoutDelay = 250;
       this._applyFilterTimeoutId = setTimeout(() => {

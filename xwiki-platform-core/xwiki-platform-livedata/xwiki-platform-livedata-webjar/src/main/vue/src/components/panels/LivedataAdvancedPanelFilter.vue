@@ -102,6 +102,7 @@
             @change="reorderFilter($event, filterGroup)"
             :group="`filter-panel${logic.getFilterDescriptor(filterGroup.property).id}`"
             tag="div"
+            handle=".handle"
           >
             <template #item="{index: filterIdx}">
               <!--

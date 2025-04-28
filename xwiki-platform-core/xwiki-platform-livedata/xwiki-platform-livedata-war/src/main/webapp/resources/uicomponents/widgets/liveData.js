@@ -25,7 +25,7 @@
     'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')
   },
   'module': {
-    'xwiki-livedata': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'main.es.js')
+    'xwiki-livedata': '/xwiki/resources/ld/main.es.js?cache-version=1745835708181'
   },
   'css': {
     'liveData': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',

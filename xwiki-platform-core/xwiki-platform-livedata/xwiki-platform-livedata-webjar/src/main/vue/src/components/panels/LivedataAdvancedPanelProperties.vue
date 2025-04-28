@@ -52,6 +52,7 @@
         item-key="id"
         @change="reorderProperty"
         tag="div"
+        handle=".handle"
       >
         <!--
             Properties

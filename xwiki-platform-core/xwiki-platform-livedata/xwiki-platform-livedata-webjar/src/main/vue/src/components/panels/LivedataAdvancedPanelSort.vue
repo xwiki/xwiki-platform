@@ -59,6 +59,7 @@
         item-key="property"
         @change="reorderSorts"
         tag="div"
+        handle=".handle"
       >
         <template #item="{element: sortEntry, index: level}">
           <!--

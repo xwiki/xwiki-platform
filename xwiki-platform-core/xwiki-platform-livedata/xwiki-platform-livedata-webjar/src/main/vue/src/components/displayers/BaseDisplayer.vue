@@ -36,13 +36,13 @@
   <tippy
     class="displayer-actions-popover"
     :interactive="true"
-    :trigger="isEditable && !duringEditing ? 'mouseenter focus click' : 'manual'"
+    :trigger="isEditable && !duringEditing ? 'mouseenter focus manual': 'manual'"
     theme="light-border"
-    placement="bottom"
     follow-cursor="horizontal"
     :arrow="true"
     ref="tippy"
     :ignore-attributes="true"
+    :z-index="99999"
   >
     <div
       :class="{ view: isView, edit: !isView, editable: isEditable }"
@@ -236,6 +236,9 @@ export default {
 
         if (this.isEditable && targetsLink) {
           e.preventDefault();
+        }
+        if(this.isEditable) {
+          this.$refs.tippy.tippy.hide();
           this.$refs.tippy.tippy.show();
         }
       }

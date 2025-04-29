@@ -126,8 +126,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   authentication-server:
     dependencies:
@@ -235,8 +235,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/attachments/attachments-api:
     dependencies:
@@ -385,8 +385,8 @@ importers:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.2)(vitest@3.1.1(@types/debug@4.1.12)(@types/node@22.14.0)(happy-dom@17.4.4)(tsx@4.19.3)(yaml@2.7.0))
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/authentication/authentication-api:
     devDependencies:
@@ -551,8 +551,8 @@ importers:
         specifier: 3.1.1
         version: 3.1.1(@types/debug@4.1.12)(@types/node@22.14.0)(happy-dom@17.4.4)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/authentication/authentication-nextcloud:
     dependencies:
@@ -671,8 +671,8 @@ importers:
         specifier: 3.1.1
         version: 3.1.1(@types/debug@4.1.12)(@types/node@22.14.0)(happy-dom@17.4.4)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/authentication/authentication-ui:
     dependencies:
@@ -726,8 +726,8 @@ importers:
         specifier: 3.1.1
         version: 3.1.1(@types/debug@4.1.12)(@types/node@22.14.0)(happy-dom@17.4.4)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/authentication/authentication-xwiki:
     dependencies:
@@ -1041,8 +1041,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/document/document-api:
     dependencies:
@@ -1187,8 +1187,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/file-preview/file-preview-ui:
     dependencies:
@@ -1215,8 +1215,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/fn-utils:
     devDependencies:
@@ -1534,8 +1534,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/history/history-xwiki:
     dependencies:
@@ -1593,8 +1593,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/info-actions/info-actions-api:
     dependencies:
@@ -1674,8 +1674,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/link-suggest/link-suggest-api:
     dependencies:
@@ -2483,8 +2483,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/reactivue:
     dependencies:
@@ -2650,8 +2650,8 @@ importers:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.2)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/tiptap-extensions/tiptap-link-suggest-ui:
     dependencies:
@@ -2678,8 +2678,8 @@ importers:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.2)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/uiextension/uiextension-api:
     dependencies:
@@ -2747,8 +2747,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/uniast:
     dependencies:
@@ -2827,8 +2827,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   core/xwiki/xwiki-utils:
     devDependencies:
@@ -2938,8 +2938,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   ds/shoelace:
     dependencies:
@@ -2999,8 +2999,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   ds/vuetify:
     dependencies:
@@ -3054,8 +3054,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   editors/blocknote:
     dependencies:
@@ -3130,8 +3130,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   editors/blocknote-headless:
     dependencies:
@@ -3227,8 +3227,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   editors/tiptap:
     dependencies:
@@ -3387,8 +3387,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   electron:
     dependencies:
@@ -4011,8 +4011,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   lib:
     dependencies:
@@ -4234,8 +4234,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   macros:
     dependencies:
@@ -4268,8 +4268,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   realtime:
     dependencies:
@@ -4339,8 +4339,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   rendering/wikimodel:
     devDependencies:
@@ -4354,8 +4354,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   sharedworker/api:
     dependencies:
@@ -4379,8 +4379,8 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(comlink@4.4.2)(vite@6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0))
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   sharedworker/impl:
     dependencies:
@@ -4452,8 +4452,8 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(comlink@4.4.2)(vite@6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0))
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   skin:
     dependencies:
@@ -4564,8 +4564,8 @@ importers:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.2)(vitest@3.1.1(@types/debug@4.1.12)(@types/node@22.14.0)(happy-dom@17.4.4)(tsx@4.19.3)(yaml@2.7.0))
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   sources/xwiki/mock-server:
     dependencies:
@@ -4686,8 +4686,8 @@ importers:
         specifier: 2.1.0
         version: 2.1.0(vite@6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.8.2))(vuetify@3.8.2)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
   xwiki/remoteinlineeditor:
     dependencies:
@@ -4717,8 +4717,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
-        specifier: 2.2.8
-        version: 2.2.8(typescript@5.8.2)
+        specifier: 2.2.10
+        version: 2.2.10(typescript@5.8.2)
 
 packages:
 
@@ -6324,8 +6324,8 @@ packages:
       typescript:
         optional: true
 
-  '@vue/language-core@2.2.8':
-    resolution: {integrity: sha512-rrzB0wPGBvcwaSNRriVWdNAbHQWSf0NlGqgKHK5mEkXpefjUlVRP62u03KvwZpvKVjRnBIQ/Lwre+Mx9N6juUQ==}
+  '@vue/language-core@2.2.10':
+    resolution: {integrity: sha512-+yNoYx6XIKuAO8Mqh1vGytu8jkFEOH5C8iOv3i8Z/65A7x9iAOXA97Q+PqZ3nlm2lxf5rOJuIGI/wDtx/riNYw==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
@@ -10311,8 +10311,8 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  vue-tsc@2.2.8:
-    resolution: {integrity: sha512-jBYKBNFADTN+L+MdesNX/TB3XuDSyaWynKMDgR+yCSln0GQ9Tfb7JS2lr46s2LiFUT1WsmfWsSvIElyxzOPqcQ==}
+  vue-tsc@2.2.10:
+    resolution: {integrity: sha512-jWZ1xSaNbabEV3whpIDMbjVSVawjAyW+x1n3JeGQo7S0uv2n9F/JMgWW90tGWNFRKya4YwKMZgCtr0vRAM7DeQ==}
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
@@ -12439,7 +12439,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.8.2
 
-  '@vue/language-core@2.2.8(typescript@5.8.2)':
+  '@vue/language-core@2.2.10(typescript@5.8.2)':
     dependencies:
       '@volar/language-core': 2.4.11
       '@vue/compiler-dom': 3.5.13
@@ -17369,10 +17369,10 @@ snapshots:
       tippy.js: 6.3.7
       vue: 3.5.13(typescript@5.8.2)
 
-  vue-tsc@2.2.8(typescript@5.8.2):
+  vue-tsc@2.2.10(typescript@5.8.2):
     dependencies:
       '@volar/typescript': 2.4.11
-      '@vue/language-core': 2.2.8(typescript@5.8.2)
+      '@vue/language-core': 2.2.10(typescript@5.8.2)
       typescript: 5.8.2
 
   vue3-draggable-resizable@1.6.5: {}

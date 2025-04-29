@@ -59,8 +59,8 @@ importers:
         specifier: 0.4.0
         version: 0.4.0
       eslint-plugin-vue:
-        specifier: 10.0.0
-        version: 10.0.0(eslint@9.23.0)(vue-eslint-parser@10.1.1(eslint@9.23.0))
+        specifier: 10.0.1
+        version: 10.0.1(eslint@9.23.0)(vue-eslint-parser@10.1.1(eslint@9.23.0))
       globals:
         specifier: 16.0.0
         version: 16.0.0
@@ -7310,8 +7310,8 @@ packages:
   eslint-plugin-tsdoc@0.4.0:
     resolution: {integrity: sha512-MT/8b4aKLdDClnS8mP3R/JNjg29i0Oyqd/0ym6NnQf+gfKbJJ4ZcSh2Bs1H0YiUMTBwww5JwXGTWot/RwyJ7aQ==}
 
-  eslint-plugin-vue@10.0.0:
-    resolution: {integrity: sha512-XKckedtajqwmaX6u1VnECmZ6xJt+YvlmMzBPZd+/sI3ub2lpYZyFnsyWo7c3nMOQKJQudeyk1lw/JxdgeKT64w==}
+  eslint-plugin-vue@10.0.1:
+    resolution: {integrity: sha512-A5dRYc3eQ5i2rJFBW8J6F69ur/H7YfYg+5SCg6v829FU0BhM4fUTrRVR2d4MdZgzw0ioJEk6otYHEAnoGFqO4A==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
@@ -13707,14 +13707,14 @@ snapshots:
       '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.1
 
-  eslint-plugin-vue@10.0.0(eslint@9.23.0)(vue-eslint-parser@10.1.1(eslint@9.23.0)):
+  eslint-plugin-vue@10.0.1(eslint@9.23.0)(vue-eslint-parser@10.1.1(eslint@9.23.0)):
     dependencies:
       '@eslint-community/eslint-utils': 4.4.1(eslint@9.23.0)
       eslint: 9.23.0
       natural-compare: 1.4.0
       nth-check: 2.1.1
       postcss-selector-parser: 6.1.2
-      semver: 7.6.3
+      semver: 7.7.1
       vue-eslint-parser: 10.1.1(eslint@9.23.0)
       xml-name-validator: 4.0.0
 

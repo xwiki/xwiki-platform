@@ -160,7 +160,21 @@ const initializedEditorProps: Omit<
   "content"
 > = {
   ...editorProps,
-  prefixDefaultFormattingToolbarFor: ["paragraph"],
+  prefixDefaultFormattingToolbarFor: [
+    "paragraph",
+    "BlockQuote",
+    "heading",
+    "Heading4",
+    "Heading5",
+    "Heading6",
+    "bulletListItem",
+    "checkListItem",
+    "numberedListItem",
+    "column",
+    "columnList",
+    "codeBlock",
+    "table",
+  ],
   blockNoteOptions: {
     ...editorProps.blockNoteOptions,
     collaboration,
@@ -217,7 +231,12 @@ const { t } = useI18n({
         :link-edition-ctx
       />
 
-      <strong v-else>Unknown block type: {{ currentBlock.type }}</strong>
+      <!--
+        NOTE: This is the expected behaviour once we've implemented a custom toolbar for **ALL** block types
+        In the meantime, we'll keep using BlockNote's default toolbar when we don't have our own one
+      -->
+
+      <!--<strong v-else>Unknown block type: {{ currentBlock.type }}</strong>-->
     </template>
 
     <!-- Custom (popover) toolbar for link edition -->

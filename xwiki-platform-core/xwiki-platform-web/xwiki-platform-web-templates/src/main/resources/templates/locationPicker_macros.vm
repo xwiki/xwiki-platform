@@ -234,7 +234,6 @@
           ## target top level documents (e.g. create a top level document, move a document to the top level, etc.).
           #set ($showRoot = !$showWikis)
           #set ($showTerminalDocuments = false || $options.showTerminalDocuments)
-          #set ($macro.showSpaces = false || $options.showSpaces)
           #set ($macro.filterHiddenDocuments = $options.filterHiddenDocuments != false)
           #documentTree({
             'class': 'location-tree',
@@ -246,7 +245,6 @@
             'showWikis': $showWikis,
             'exclusions': "$!options.exclusions",
             'root': "$!options.root",
-            'showSpaces': $macro.showSpaces,
             'filterHiddenDocuments': $macro.filterHiddenDocuments,
             'sortDocumentsBy': "$!options.sortDocumentsBy"
           })

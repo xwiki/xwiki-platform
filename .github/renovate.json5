@@ -54,6 +54,10 @@
     {
       "groupName": "blocknote",
       "matchDepPatterns": "@blocknote/.+"
+    },
+    {
+      "groupName": "react",
+      "matchDepPatterns": "react(-.+)?"
     }
   ]
 }

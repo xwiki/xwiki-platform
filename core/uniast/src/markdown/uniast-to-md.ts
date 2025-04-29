@@ -22,10 +22,10 @@ import {
   Block,
   Image,
   InlineContent,
+  ListItem,
   TableCell,
   Text,
   UniAst,
-  ListItem,
 } from "../ast";
 import { ConverterContext } from "../interface";
 import { tryFallibleOrError } from "@xwiki/cristal-fn-utils";

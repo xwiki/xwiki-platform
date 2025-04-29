@@ -208,15 +208,15 @@ require(['jquery', 'jquery-ui'], function($) {
 });
 
 require(['jquery'], function($) {
-  let rightToggler = $("#rightPanelsToggle");
-  let leftToggler = $("#leftPanelsToggle");
-
   /* The body update hides completely the panel column. We want to make sure the panel column is visible for the whole
   animation before hiding it. */
   let updateBody = function (side, newExpandedState) {
-    let showLeftColumn = (side === left && newExpandedState) || (side === right && panelsEnabled(left));
-    let showRightColumn = (side === right && newExpandedState) || (side === left && panelsEnabled(right));
-
+    let showSide = function (updatedSide, newExpandedState, compareSide) {
+      return (updatedSide === compareSide && newExpandedState) || 
+        (updatedSide !== compareSide && panelsEnabled(compareSide));
+    };
+    let showLeftColumn = showSide(side, newExpandedState, left);
+    let showRightColumn = showSide(side, newExpandedState, left);
     let bodyClasses= document.body.classList;
     bodyClasses.remove('hidelefthideright');
     if (!showLeftColumn && !showRightColumn) bodyClasses.add('hidelefthideright');
@@ -227,32 +227,31 @@ require(['jquery'], function($) {
     // The JQuery UI handles defined for handle resizing above add an inline style on the body to work.
     // This inline style is reset when the panel is collapsed.
     document.body.style.removeProperty('--panel-column-' + side + '-width');
-  }
+  };
   var togglePanels = function (side) {
-    let toggler = $("#" + side + "PanelsToggle")
-    let newExpandedState = toggler.attr('aria-expanded') === 'false';
+    let toggle = $("#" + side + "PanelsToggle");
+    let newExpandedState = toggle.attr('aria-expanded') === 'false';
 
     if (newExpandedState) {
       // If we want to expand the panel, we first show it, then we slide it in view.
       updateBody(side, newExpandedState);
-      toggler.attr('aria-expanded', newExpandedState);
+      toggle.attr('aria-expanded', newExpandedState);
     } else {
       // If we want to collapse the panel, we first slide it out of view and then we hide it.
-      toggler.attr('aria-expanded', newExpandedState);
+      toggle.attr('aria-expanded', newExpandedState);
       updateBody(side, newExpandedState);
     }
-  }
+  };
 
-  rightToggler.on('click', function(){togglePanels(right)});
-  leftToggler.on('click', function(){togglePanels(left)});
+  $("#rightPanelsToggle").on('click', function() {togglePanels(right);});
+  $("#leftPanelsToggle").on('click', function() {togglePanels(left);});
   
   // Store the user preference in the local storage
-  
   let localStoragePrefix = 'xwiki-panel-enabled-';
   let [right,left] = ['right','left'];
   let panelsEnabled = function(side) {
     return !document.body.classList.contains("hidelefthideright") && !document.body.classList.contains("hide" + side);
-  }
+  };
   let defaultPanelState = {
     'right': panelsEnabled(right),
     'left': panelsEnabled(left)

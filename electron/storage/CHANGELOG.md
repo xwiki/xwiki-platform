@@ -1,5 +1,21 @@
 # @xwiki/cristal-electron-storage
 
+## 0.17.0
+
+### Minor Changes
+
+- Cristal 0.17 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.17.0
+  - @xwiki/cristal-backend-api@0.17.0
+  - @xwiki/cristal-link-suggest-api@0.17.0
+  - @xwiki/cristal-model-api@0.17.0
+  - @xwiki/cristal-model-remote-url-filesystem-api@0.17.0
+  - @xwiki/cristal-electron-state@0.17.0
+
 ## 0.16.0
 
 ### Minor Changes

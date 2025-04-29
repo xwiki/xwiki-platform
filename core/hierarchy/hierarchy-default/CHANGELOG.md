@@ -1,5 +1,18 @@
 # @xwiki/cristal-hierarchy-default
 
+## 0.17.0
+
+### Minor Changes
+
+- Cristal 0.17 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.17.0
+  - @xwiki/cristal-hierarchy-api@0.17.0
+  - @xwiki/cristal-model-api@0.17.0
+
 ## 0.16.0
 
 ### Minor Changes

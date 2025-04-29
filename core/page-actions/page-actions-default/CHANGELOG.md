@@ -1,5 +1,16 @@
 # @xwiki/cristal-page-actions-default
 
+## 0.17.0
+
+### Minor Changes
+
+- Cristal 0.17 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-page-actions-api@0.17.0
+
 ## 0.16.0
 
 ### Minor Changes

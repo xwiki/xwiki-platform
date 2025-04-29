@@ -47,7 +47,7 @@
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.2",
     "vite": "6.3.3",
-    "vite-plugin-node": "5.0.0"
+    "vite-plugin-node": "5.0.1"
   },
   "publishConfig": {
     "exports": {

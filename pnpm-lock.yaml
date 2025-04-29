@@ -3958,8 +3958,8 @@ importers:
         specifier: 6.3.3
         version: 6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)
       vite-plugin-node:
-        specifier: 5.0.0
-        version: 5.0.0(vite@6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0))
+        specifier: 5.0.1
+        version: 5.0.1(vite@6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0))
 
   extension-manager:
     dependencies:
@@ -10181,11 +10181,11 @@ packages:
       vite:
         optional: true
 
-  vite-plugin-node@5.0.0:
-    resolution: {integrity: sha512-xvfx5SH4hhzGj3fR9OAohW5KAH0iAvZkcB35xBGG6FGZ7qlV8C7BXC4HZsOalkYzgASzveQPoq7D3ffU1Nx54Q==}
+  vite-plugin-node@5.0.1:
+    resolution: {integrity: sha512-xdR4UW1h2ZM1wBf4pjwzuty/mX6F/GViB8h1iqOpxr81pa5OuWb3IJghl66v4e7Srsi2p5o22n9G7G46FeZK9Q==}
     peerDependencies:
       '@swc/core': ^1.7.26
-      vite: 'catalog:'
+      vite: ^6.2.2
     peerDependenciesMeta:
       '@swc/core':
         optional: true
@@ -17251,7 +17251,7 @@ snapshots:
       - rollup
       - supports-color
 
-  vite-plugin-node@5.0.0(vite@6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)):
+  vite-plugin-node@5.0.1(vite@6.3.3(@types/node@22.14.0)(tsx@4.19.3)(yaml@2.7.0)):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       chalk: 4.1.2

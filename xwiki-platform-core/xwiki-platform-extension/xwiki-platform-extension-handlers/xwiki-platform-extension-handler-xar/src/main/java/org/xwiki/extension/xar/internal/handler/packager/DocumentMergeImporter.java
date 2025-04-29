@@ -144,13 +144,16 @@ public class DocumentMergeImporter
                     currentDocument.loadAttachmentsContentSafe(xcontext);
                     currentDocument.apply(document);
                 } else {
-                    // Avoid modifying the cached document
-                    currentDocument = document.clone();
+                    currentDocument = document;
                 }
             }
         } else {
+            currentDocument = document;
+        }
+
+        if (currentDocument.isCached()) {
             // Avoid modifying the cached document
-            currentDocument = document.clone();
+            currentDocument = currentDocument.clone();
         }
 
         // Set document authors

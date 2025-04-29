@@ -99,7 +99,7 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
     "typescript": "5.8.2",
-    "vite": "6.2.5",
+    "vite": "6.2.6",
     "vue-tsc": "2.2.8"
   },
   "publishConfig": {

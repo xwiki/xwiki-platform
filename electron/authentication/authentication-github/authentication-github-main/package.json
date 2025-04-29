@@ -34,7 +34,7 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.8.2",
-    "vite": "6.2.5"
+    "vite": "6.2.6"
   },
   "publishConfig": {
     "exports": {

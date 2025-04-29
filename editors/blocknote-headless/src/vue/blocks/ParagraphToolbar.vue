@@ -18,72 +18,63 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import ImageFilePanel from "./ImageFilePanel.vue";
+import LinkEditor from "./LinkEditor.vue";
 import ToolbarButtonSet from "./ToolbarButtonSet.vue";
 import { BlockOfType, EditorType } from "../../blocknote";
 import { LinkEditionContext } from "../../components/linkEditionContext";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
-const {
-  editor,
-  currentBlock: image,
-  linkEditionCtx,
-} = defineProps<{
+const { editor, linkEditionCtx } = defineProps<{
   editor: EditorType;
-  currentBlock: BlockOfType<"image">;
+  currentBlock: BlockOfType<"paragraph">;
   linkEditionCtx: LinkEditionContext;
 }>();
 
-const url = ref(image.props.url);
+const showLinkEditor = ref(false);
 
-watch(url, (url) => {
-  editor.updateBlock({ id: image.id }, { props: { url } });
-});
+const selected = editor.getSelectedText();
 
-const showImagePanel = ref(false);
+function insertLink(url: string) {
+  editor.createLink(url);
+}
 </script>
 
 <template>
   <ToolbarButtonSet
     :buttons="[
       {
-        icon: 'pencil',
-        title: 'Edit',
+        icon: 'link',
+        title: 'Create link',
         onClick() {
-          showImagePanel = !showImagePanel;
-        },
-      },
-      {
-        icon: 'trash',
-        title: 'Delete',
-        onClick() {
-          editor.removeBlocks([image.id]);
+          showLinkEditor = !showLinkEditor;
         },
       },
     ]"
   />
 
-  <div v-if="showImagePanel" class="imageSelector">
-    <ImageFilePanel
-      :current-block="image"
+  <div v-if="showLinkEditor" class="linkEditor">
+    <LinkEditor
       :link-edition-ctx
-      :editor
-      @update="editor.focus()"
+      :current="{ title: selected, reference: null, url: '' }"
+      hide-title
+      @update="({ url }) => insertLink(url)"
     />
   </div>
 </template>
 
 <style scoped>
 /*
-  NOTE: Popover is implemented manually here due to positioning problems with Tippy + considerations to switch to Floating UI now that Tippy is deprecated
-  This is temporary and will be replaced with a "proper" solution using a dedicated library in the near future
+  NOTE: Popover is implemented manually here due to an unresolved bug in the library we'd like to use
+  Once that issue is resolved, this code block will be removed and the library will be used instead
+  Consider this a temporary "dirty" hack
 */
-.imageSelector {
+.linkEditor {
   position: absolute;
   left: 0;
   /* Yes, this is dirty */
   top: 2.5rem;
   background: white;
+  width: 100%;
   box-shadow: 0px 4px 12px #cfcfcf;
   border-radius: 6px;
 }

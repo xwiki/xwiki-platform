@@ -21,6 +21,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import ImageFilePanel from "./blocks/ImageFilePanel.vue";
 import ImageToolbar from "./blocks/ImageToolbar.vue";
 import LinkToolbar from "./blocks/LinkToolbar.vue";
+import ParagraphToolbar from "./blocks/ParagraphToolbar.vue";
 import { BlockNoteToUniAstConverter } from "../blocknote/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../blocknote/uniast-to-bn";
 import { AutoSaver } from "../components/autoSaver";
@@ -61,7 +62,10 @@ const {
   container,
   skinManager,
 } = defineProps<{
-  editorProps: Omit<ReactNonSlotProps<BlockNoteViewWrapperProps>, "content">;
+  editorProps: Omit<
+    ReactNonSlotProps<BlockNoteViewWrapperProps>,
+    "content" | "prefixDefaultFormattingToolbarFor"
+  >;
   editorContent: UniAst | Error;
   realtimeServerURL?: string;
   container: Container;
@@ -151,8 +155,12 @@ if (!realtimeServerURL && editorProps.editorRef) {
   });
 }
 
-const initializedEditorProps = {
+const initializedEditorProps: Omit<
+  ReactNonSlotProps<BlockNoteViewWrapperProps>,
+  "content"
+> = {
   ...editorProps,
+  prefixDefaultFormattingToolbarFor: ["paragraph"],
   blockNoteOptions: {
     ...editorProps.blockNoteOptions,
     collaboration,
@@ -199,6 +207,14 @@ const { t } = useI18n({
         v-if="currentBlock.type === 'image'"
         :editor
         :current-block
+        :link-edition-ctx
+      />
+
+      <ParagraphToolbar
+        v-else-if="currentBlock.type === 'paragraph'"
+        :editor
+        :current-block
+        :link-edition-ctx
       />
 
       <strong v-else>Unknown block type: {{ currentBlock.type }}</strong>
@@ -206,7 +222,9 @@ const { t } = useI18n({
 
     <!-- Custom (popover) toolbar for link edition -->
     <template #linkToolbar="{ editor, linkToolbarProps }">
-      <LinkToolbar :editor :link-toolbar-props :link-edition-ctx />
+      <div class="shadow">
+        <LinkToolbar :editor :link-toolbar-props :link-edition-ctx />
+      </div>
     </template>
 
     <!-- Custom (popover) file panel for editing file-like blocks -->
@@ -214,7 +232,9 @@ const { t } = useI18n({
       <ImageFilePanel
         v-if="filePanelProps.block.type === 'image'"
         :editor
-        :file-panel-props
+        :current-block="
+          filePanelProps.block as any /* required as filePanelProps.block is not narrowed enough here */
+        "
         :link-edition-ctx
       />
 
@@ -224,3 +244,11 @@ const { t } = useI18n({
     </template>
   </BlockNoteViewAdapter>
 </template>
+
+<style scoped>
+.shadow {
+  box-shadow: 0px 4px 12px #cfcfcf;
+  border-radius: 6px;
+  padding: 2px;
+}
+</style>

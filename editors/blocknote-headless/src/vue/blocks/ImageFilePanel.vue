@@ -18,30 +18,35 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import ImageSuggestion from "./ImageSuggestion.vue";
-import {
-  EditorInlineContentSchema,
-  EditorStyleSchema,
-  EditorType,
-} from "../../blocknote";
+import ImageSearchSelector from "./ImageEditor.vue";
+import { BlockOfType, EditorType } from "../../blocknote";
 import { LinkEditionContext } from "../../components/linkEditionContext";
-import { FilePanelProps } from "@blocknote/react";
 
-const { editor, filePanelProps } = defineProps<{
+const { editor, currentBlock: image } = defineProps<{
   editor: EditorType;
-  filePanelProps: FilePanelProps<EditorInlineContentSchema, EditorStyleSchema>;
+  currentBlock: BlockOfType<"image">;
   linkEditionCtx: LinkEditionContext;
 }>();
 
-const { block } = filePanelProps;
+const emit = defineEmits<{
+  update: [];
+}>();
 
 function update(url: string) {
-  editor.updateBlock({ id: block.id }, { props: { url } });
+  editor.updateBlock({ id: image.id }, { props: { url } });
+  emit("update");
 }
 </script>
 
 <template>
-  <div style="border: 1px solid black; padding: 5px; background-color: white">
-    <ImageSuggestion @selected="({ url }) => update(url)" />
+  <div>
+    <ImageSearchSelector :link-edition-ctx @select="({ url }) => update(url)" />
   </div>
 </template>
+
+<style scoped>
+div {
+  padding: 5px;
+  background-color: white;
+}
+</style>

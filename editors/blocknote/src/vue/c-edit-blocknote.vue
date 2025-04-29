@@ -96,7 +96,6 @@ async function loadEditor(currentPage: PageData | undefined): Promise<void> {
   editorProps.value = {
     editorRef: editor,
     theme: "light",
-    formattingToolbarOnlyFor: [],
   };
 
   const markdownConverter = new MarkdownToUniAstConverter(

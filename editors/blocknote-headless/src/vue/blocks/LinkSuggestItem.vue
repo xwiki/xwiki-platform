@@ -18,40 +18,36 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { LinkSuggestion } from "../../components/linkSuggest";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { LinkType } from "@xwiki/cristal-link-suggest-api";
 
 defineProps<{
-  link: {
-    type: LinkType;
-    title: string;
-    segments: string[];
-    imageURL?: string;
-  };
+  link: LinkSuggestion;
+  isImage: boolean;
 }>();
 </script>
 
 <template>
-  <div :class="{ parent: true, 'no-image': !link.imageURL }">
-    <div v-if="link.imageURL" class="image">
-      <img :src="link.imageURL" alt="" />
+  <div :class="{ parent: true, 'no-image': !isImage }">
+    <div v-if="isImage" class="image">
+      <img :src="link.url" alt="" />
     </div>
+
     <div class="text">
       <c-icon
         class="icon-type"
         :size="Size.Small"
         :name="link.type == LinkType.PAGE ? 'file-earmark' : 'paperclip'"
       />
+
       {{ link.title }}
     </div>
+
     <div class="breadcrumb">
       <XBreadcrumb
-        :items="
-          link.segments.map((segment) => {
-            return { label: segment };
-          })
-        "
-      ></XBreadcrumb>
+        :items="link.segments.map((segment) => ({ label: segment }))"
+      />
     </div>
   </div>
 </template>
@@ -63,6 +59,11 @@ defineProps<{
   grid-template-rows: repeat(2, auto);
   grid-column-gap: 0;
   grid-row-gap: 0;
+  cursor: pointer;
+}
+
+.parent:hover {
+  background-color: var(--cr-color-neutral-200);
 }
 
 .image {

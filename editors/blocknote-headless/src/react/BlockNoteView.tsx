@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { DefaultFormattingToolbar } from "./DefaultFormattingToolbar";
 import {
   BlockType,
   EditorBlockSchema,
@@ -64,12 +65,16 @@ type BlockNoteViewWrapperProps = {
   content: BlockType[];
   editorRef?: ShallowRef<EditorType | null>;
 
+  /**
+   * Prepend the default formatting toolbar for the provided block types
+   * For all these blocks, the custom-provided `formattingToolbar` will be *appended* to the default toolbar instead of replacing it
+   */
+  prefixDefaultFormattingToolbarFor: Array<BlockType["type"]>;
+
   formattingToolbar: ReactivueChild<{
     editor: EditorType;
     currentBlock: BlockType;
   }>;
-
-  formattingToolbarOnlyFor: Array<BlockType["type"]>;
 
   linkToolbar: ReactivueChild<{
     editor: EditorType;
@@ -106,7 +111,7 @@ function BlockNoteViewWrapper({
   blockNoteOptions,
   theme,
   formattingToolbar: CustomFormattingToolbar,
-  formattingToolbarOnlyFor,
+  prefixDefaultFormattingToolbarFor,
   linkToolbar: CustomLinkToolbar,
   filePanel: CustomFilePanel,
   content,
@@ -119,7 +124,8 @@ function BlockNoteViewWrapper({
     | undefined;
 
   // Prevent changes in the editor until the provider has synced with other clients
-  const [ready, setReady] = useState(!provider);
+  // TODO: "ready" is not defined here (see below)
+  const [, setReady] = useState(!provider);
 
   // Creates a new editor instance.
   const editor = useCreateBlockNote({
@@ -168,9 +174,12 @@ function BlockNoteViewWrapper({
     parseAndLoadContent(editor, content);
   }
 
-  if (!ready) {
-    return <h1>Syncing changes with other realtime users...</h1>;
-  }
+  // TODO: this condition ensures the editor does not show until all changes have been synced with clients
+  // Currently, there is a problem with realtime not syncing changes in a reliable fashion, so we disable it for now
+  //
+  // if (!ready) {
+  //   return <h1>Syncing changes with other realtime users...</h1>;
+  // }
 
   // Renders the editor instance using a React component.
   return (
@@ -194,12 +203,21 @@ function BlockNoteViewWrapper({
 
           return (
             <FormattingToolbar>
-              {formattingToolbarOnlyFor.includes(currentBlock.type) && (
-                <CustomFormattingToolbar
-                  editor={editor}
-                  currentBlock={currentBlock}
-                />
-              )}
+              {
+                // Prepend the default formatting toolbar for blocks that require it
+                prefixDefaultFormattingToolbarFor.includes(
+                  currentBlock.type,
+                ) && (
+                  <DefaultFormattingToolbar
+                    disableButtons={{ createLink: true }}
+                  />
+                )
+              }
+
+              <CustomFormattingToolbar
+                editor={editor}
+                currentBlock={currentBlock}
+              />
             </FormattingToolbar>
           );
         }}

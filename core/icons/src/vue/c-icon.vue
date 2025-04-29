@@ -56,7 +56,7 @@ const classes = computed(() => {
 </script>
 
 <template>
-  <span :class="classes"></span>
+  <span :class="classes" />
 </template>
 
 <style scoped>

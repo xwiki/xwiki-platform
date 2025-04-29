@@ -67,14 +67,17 @@ export class BlockNoteToUniAstConverter {
         block.type !== "numberedListItem" &&
         block.type !== "checkListItem"
       ) {
-        out.push(this.convertBlock(block));
+        const converted = this.convertBlock(block);
+
+        if (converted !== null) {
+          out.push(converted);
+        }
+
         continue;
       }
 
       const lastBlock = out.at(-1);
       const currentList = lastBlock?.type === "list" ? lastBlock : null;
-
-      console.log(!!currentList);
 
       const listItem = this.convertListItem(block, currentList);
 
@@ -92,7 +95,7 @@ export class BlockNoteToUniAstConverter {
     return out;
   }
 
-  private convertBlock(block: BlockType): Block {
+  private convertBlock(block: BlockType): Block | null {
     const dontExpectChildren = () => {
       if (block.children.length > 0) {
         console.error({ unexpextedChildrenInBlock: block });
@@ -189,6 +192,10 @@ export class BlockNoteToUniAstConverter {
 
       case "image":
         dontExpectChildren();
+
+        if (!block.props.url) {
+          return null;
+        }
 
         return {
           type: "image",

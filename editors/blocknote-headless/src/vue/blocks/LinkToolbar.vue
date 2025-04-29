@@ -18,27 +18,88 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import LinkSuggestion from "./LinkSuggestion.vue";
+import LinkEditor from "./LinkEditor.vue";
+import ToolbarButtonSet from "./ToolbarButtonSet.vue";
 import { EditorType } from "../../blocknote";
 import { LinkEditionContext } from "../../components/linkEditionContext";
 import { LinkToolbarProps } from "@blocknote/react";
+import { tryFallible } from "@xwiki/cristal-fn-utils";
+import { ref } from "vue";
 
-defineProps<{
+const { linkToolbarProps } = defineProps<{
   editor: EditorType;
   linkToolbarProps: LinkToolbarProps;
   linkEditionCtx: LinkEditionContext;
 }>();
+
+const editingLink = ref(false);
+
+function openTarget() {
+  if (linkToolbarProps.url) {
+    window.open(linkToolbarProps.url);
+  }
+}
 </script>
 
 <template>
-  <div style="border: 1px solid black; padding: 5px; background-color: white">
-    <p>
-      Current link is: <strong>{{ linkToolbarProps.url }}</strong>
-    </p>
+  <ToolbarButtonSet
+    :buttons="[
+      {
+        icon: 'pencil',
+        title: 'Edit',
+        onClick() {
+          editingLink = !editingLink;
+        },
+      },
+      {
+        icon: 'box-arrow-up-right',
+        title: 'Open',
+        onClick() {
+          openTarget();
+        },
+      },
+      {
+        icon: 'trash',
+        title: 'Delete',
+        onClick() {
+          linkToolbarProps.deleteLink();
+        },
+      },
+    ]"
+  />
 
-    <LinkSuggestion
+  <div v-if="editingLink" class="link-editor">
+    <LinkEditor
       :link-edition-ctx
-      @selected="({ url, title }) => linkToolbarProps.editLink(url, title)"
+      :current="{
+        url: linkToolbarProps.url,
+        reference: tryFallible(
+          () =>
+            linkEditionCtx.remoteURLParser.parse(linkToolbarProps.url) ?? null,
+        ),
+        title: linkToolbarProps.text,
+      }"
+      @update="({ url, title }) => linkToolbarProps.editLink(url, title)"
     />
   </div>
 </template>
+
+<style scoped>
+/*
+  NOTE: Popover is implemented manually here due to positioning problems with Tippy + considerations to switch to Floating UI now that Tippy is deprecated
+  This is temporary and will be replaced with a "proper" solution using a dedicated library in the near future
+*/
+.link-editor {
+  position: absolute;
+  left: 0;
+  /*
+    Here we are positioning the popoverin an absolute fashion below the above element (the toolbar)
+    We're assuming it here it has a fixed height of 2.5 rem (+ padding), which should stay true no matter what your screen resolution is
+    (Yes, this is dirty)
+  */
+  top: 2.5rem;
+  background: white;
+  box-shadow: 0px 4px 12px #cfcfcf;
+  border-radius: 6px;
+}
+</style>

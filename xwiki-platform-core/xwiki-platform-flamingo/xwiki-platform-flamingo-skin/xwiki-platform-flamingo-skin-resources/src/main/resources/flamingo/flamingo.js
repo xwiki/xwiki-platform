@@ -213,70 +213,87 @@ require(['jquery'], function($) {
 
   /* The body update hides completely the panel column. We want to make sure the panel column is visible for the whole
   animation before hiding it. */
-  let updateBody = function (isRight, newExpandedState) {
-    let body = $('body.content');
-    // The JQuery UI handles defined above add an inline style on the body to work.
+  let updateBody = function (side, newExpandedState) {
+    let showLeftColumn = (side === left && newExpandedState) || (side === right && panelsEnabled(left));
+    let showRightColumn = (side === right && newExpandedState) || (side === left && panelsEnabled(right));
+
+    let bodyClasses= document.body.classList;
+    bodyClasses.remove('hidelefthideright');
+    if (!showLeftColumn && !showRightColumn) bodyClasses.add('hidelefthideright');
+    bodyClasses.remove('hideleft');
+    if (!showLeftColumn && showRightColumn) bodyClasses.add('hideleft');
+    bodyClasses.remove('hideright');
+    if (showLeftColumn && !showRightColumn) bodyClasses.add('hideright');
+    // The JQuery UI handles defined for handle resizing above add an inline style on the body to work.
     // This inline style is reset when the panel is collapsed.
-    body.removeAttr('style');
-    if (isRight) {
-      if (newExpandedState) {
-        // We remove the hideright class
-        if (body.hasClass('hidelefthideright')) {
-          body.removeClass('hidelefthideright');
-          body.addClass('hideleft');
-        } else {
-          body.removeClass('hideright');
-        }
-      } else {
-        // We add the hideright class
-        if (body.hasClass('hideleft')) {
-          body.addClass('hidelefthideright');
-          body.removeClass('hideleft');
-        } else {
-          body.addClass('hideright');
-        }
-      }
-    } else {
-      if (newExpandedState) {
-        // We remove the hideleft class
-        if (body.hasClass('hidelefthideright')) {
-          body.removeClass('hidelefthideright');
-          body.addClass('hideright');
-        } else {
-          body.removeClass('hideleft');
-        }
-      } else {
-        // We add the hideleft class
-        if (body.hasClass('hideright')) {
-          body.addClass('hidelefthideright');
-          body.removeClass('hideright');
-        } else {
-          body.addClass('hideleft');
-        }
-      }
-    }
+    document.body.style.removeProperty('--panel-column-' + side + '-width');
   }
-  var togglePanels = function (toggler, isRight) {
+  var togglePanels = function (side) {
+    let toggler = $("#" + side + "PanelsToggle")
     let newExpandedState = toggler.attr('aria-expanded') === 'false';
 
     if (newExpandedState) {
       // If we want to expand the panel, we first show it, then we slide it in view.
-      updateBody(isRight, newExpandedState);
-      toggler.attr('aria-expanded', 'true');
+      updateBody(side, newExpandedState);
+      toggler.attr('aria-expanded', newExpandedState);
     } else {
       // If we want to collapse the panel, we first slide it out of view and then we hide it.
-      toggler.attr('aria-expanded', 'false');
-      let panels;
-      if (isRight) {
-        panels = $('#rightPanels');
-      } else {
-        panels = $('#leftPanels');
-      }
-      updateBody(isRight, newExpandedState);
+      toggler.attr('aria-expanded', newExpandedState);
+      updateBody(side, newExpandedState);
     }
   }
 
-  rightToggler.on('click', function(){togglePanels(rightToggler, true)});
-  leftToggler.on('click', function(){togglePanels(leftToggler, false)});
+  rightToggler.on('click', function(){togglePanels(right)});
+  leftToggler.on('click', function(){togglePanels(left)});
+  
+  // Store the user preference in the local storage
+  
+  let localStoragePrefix = 'xwiki-panel-enabled-';
+  let [right,left] = ['right','left'];
+  let panelsEnabled = function(side) {
+    return !document.body.classList.contains("hidelefthideright") && !document.body.classList.contains("hide" + side);
+  }
+  let defaultPanelState = {
+    'right': panelsEnabled(right),
+    'left': panelsEnabled(left)
+  };
+  let applyLocalStorageValues = function() {
+    let localStorageLeft = JSON.parse(localStorage.getItem(localStoragePrefix + left));
+    let localStorageRight = JSON.parse(localStorage.getItem(localStoragePrefix + right));
+    if ((localStorageLeft !== null ?  localStorageLeft : defaultPanelState[left]) !== panelsEnabled(left)) {
+      togglePanels(left);
+    } 
+    if ((localStorageRight !== null ?  localStorageRight : defaultPanelState[right]) !== panelsEnabled(right)) {
+      togglePanels(right);
+    }
+  };
+  // Initialization
+  applyLocalStorageValues();
+  // Synchronization across tabs
+  window.addEventListener('storage', function (event) {
+    switch (event.key) {
+      case localStoragePrefix + left:
+      case localStoragePrefix + right: return applyLocalStorageValues();
+    }
+  });
+
+  // Saving preference at the end of the session
+  let savePanelStateInLocalStorage = function(event) {
+    // We only update the local storage when the user ends its session on the page
+    if (!document.hidden) return;
+    let updateLocalStorageValueForSide = function (side) {
+      
+      if (panelsEnabled(side) !== defaultPanelState[side]) {
+        localStorage.setItem(localStoragePrefix + side, panelsEnabled(side));
+      }
+      else {
+        // If the values are the same, we remove whatever was stored in the localStorage.
+        localStorage.removeItem(localStoragePrefix + side);
+      }
+    };
+    updateLocalStorageValueForSide(left);
+    updateLocalStorageValueForSide(right);
+  };
+  document.addEventListener('visibilitychange', savePanelStateInLocalStorage);
 });
 

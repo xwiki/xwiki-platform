@@ -371,6 +371,10 @@
     #end
 
     (% class="search-options" %)
+    {{html}}
+    $escapetool.xml($services.localization.render('solr.options'))
+    <input type="checkbox"><label></label></input>
+    {{/html}}
     * {{translation key="solr.options"/}}
     #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
     * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:${url}||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]

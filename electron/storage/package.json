@@ -42,7 +42,7 @@
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
-    "@types/node": "22.15.2",
+    "@types/node": "22.15.3",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.3",

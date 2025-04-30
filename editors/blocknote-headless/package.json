@@ -57,8 +57,8 @@
   },
   "devDependencies": {
     "@types/lodash-es": "4.17.12",
-    "@types/react": "19.0.10",
-    "@types/react-dom": "19.0.4",
+    "@types/react": "19.1.2",
+    "@types/react-dom": "19.1.2",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "vite": "6.3.3",

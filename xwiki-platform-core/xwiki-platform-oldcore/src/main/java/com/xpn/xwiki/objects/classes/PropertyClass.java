@@ -142,6 +142,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         if (this.xclass != object) {
             this.xclass = (BaseClass) object;
+            this.referenceCache = null;
 
             if (object != null) {
                 setOwnerDocument(object.getOwnerDocument());
@@ -429,6 +430,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public void setName(String name)
     {
         setStringValue("name", name);
+        this.referenceCache = null;
     }
 
     public String getCustomDisplay()

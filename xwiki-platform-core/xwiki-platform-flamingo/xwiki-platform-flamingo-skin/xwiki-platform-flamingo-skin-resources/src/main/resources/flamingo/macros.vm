@@ -375,7 +375,8 @@
     #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
-      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
+      data-className="$!escapetool.xml($services.model.serialize($xproperty.reference.parent, 'default'))"
+      data-propertyName="$!escapetool.xml($xproperty.name)"
       title="$!filterTitle">
     </select>
   #end

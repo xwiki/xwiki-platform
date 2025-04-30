@@ -25,7 +25,7 @@
   "dependencies": {
     "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
-    "inversify": "7.5.0",
+    "inversify": "7.5.1",
     "pinia": "3.0.2",
     "vue": "3.5.13"
   },

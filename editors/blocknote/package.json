@@ -40,7 +40,7 @@
     "@xwiki/cristal-reactivue": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",
     "@xwiki/cristal-uniast": "workspace:*",
-    "inversify": "7.5.0",
+    "inversify": "7.5.1",
     "lodash-es": "4.17.21",
     "vue": "3.5.13",
     "vue-i18n": "11.1.3"

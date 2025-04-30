@@ -27,7 +27,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
-    "inversify": "7.5.0",
+    "inversify": "7.5.1",
     "xml-escape": "1.1.0"
   },
   "peerDependencies": {

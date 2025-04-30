@@ -107,9 +107,8 @@ widgets.Notification = Class.create({
   /** Creates the HTML structure for the notification. */
   createElement : function() {
     if (!this.element) {
-      // The ARIA role `alert` should give implicit values for `aria-live` and `aria-atomic`.
-      this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type,
-        "role": "alert"}).update(this.text);
+      // The notification container is already an ARIA "alert", those notifications do not need extra semantics.
+      this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type}).update(this.text);
       if (this.options.icon) {
         this.element.setStyle({backgroundImage : this.options.icon, paddingLeft : "22px"});
       }
@@ -167,6 +166,7 @@ widgets.Notification.getContainer = function() {
   if (!widgets.Notification.container) {
     widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
     // Make notifications alert / accessible for screen readers
+    // The ARIA role `alert` should give implicit values for `aria-live` and `aria-atomic`.
     widgets.Notification.container.writeAttribute("role", "alert");
     // Insert the container in the document body.
     $('body').insert(widgets.Notification.container);

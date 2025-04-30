@@ -141,6 +141,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public void setObject(BaseCollection object)
     {
         this.xclass = (BaseClass) object;
+        this.referenceCache = null;
     }
 
     /**
@@ -419,6 +420,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public void setName(String name)
     {
         setStringValue("name", name);
+        this.referenceCache = null;
     }
 
     public String getCustomDisplay()

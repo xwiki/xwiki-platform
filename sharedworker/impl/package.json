@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "typescript": "5.8.2",
+    "typescript": "5.8.3",
     "vite": "6.3.3",
     "vite-plugin-comlink": "5.1.0",
     "vue-tsc": "2.2.10"

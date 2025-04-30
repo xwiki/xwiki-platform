@@ -26,7 +26,7 @@
     "@types/express": "5.0.1",
     "esbuild": "0.25.3",
     "tsx": "4.19.4",
-    "typescript": "5.8.2",
+    "typescript": "5.8.3",
     "vite": "6.3.3"
   }
 }

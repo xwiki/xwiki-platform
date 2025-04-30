@@ -31,7 +31,7 @@
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
     "@vue/shared": "3.5.13",
-    "typescript": "5.8.2"
+    "typescript": "5.8.3"
   },
   "publishConfig": {
     "exports": {

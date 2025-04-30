@@ -4570,8 +4570,8 @@ importers:
   sources/xwiki/mock-server:
     dependencies:
       dotenv:
-        specifier: 16.4.7
-        version: 16.4.7
+        specifier: 16.5.0
+        version: 16.5.0
       express:
         specifier: 5.1.0
         version: 5.1.0
@@ -7175,6 +7175,10 @@ packages:
 
   dotenv@16.4.7:
     resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
+    engines: {node: '>=12'}
+
+  dotenv@16.5.0:
+    resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
     engines: {node: '>=12'}
 
   dotenv@9.0.2:
@@ -12614,7 +12618,7 @@ snapshots:
       config-file-ts: 0.2.8-rc1
       debug: 4.4.0(supports-color@5.5.0)
       dmg-builder: 26.0.12(electron-builder-squirrel-windows@24.13.3)
-      dotenv: 16.4.7
+      dotenv: 16.5.0
       dotenv-expand: 11.0.7
       ejs: 3.1.10
       electron-builder-squirrel-windows: 24.13.3(dmg-builder@26.0.12)
@@ -13302,11 +13306,13 @@ snapshots:
 
   dotenv-expand@11.0.7:
     dependencies:
-      dotenv: 16.4.7
+      dotenv: 16.5.0
 
   dotenv-expand@5.1.0: {}
 
   dotenv@16.4.7: {}
+
+  dotenv@16.5.0: {}
 
   dotenv@9.0.2: {}
 

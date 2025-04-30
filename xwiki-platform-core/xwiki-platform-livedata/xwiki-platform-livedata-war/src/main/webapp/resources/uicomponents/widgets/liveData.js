@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 /*!
 #set ($paths = {
   'js': {
@@ -44,32 +43,32 @@
 #[[*/
 // Start JavaScript-only code.
 (function(paths) {
-  'use strict'
+  "use strict";
 
   require.config({
     paths: paths.js,
     map: {
-      '*': {
-        'xwiki-livedata': 'xwiki-livedata-with-css',
-        daterangepicker: 'daterangepicker-with-css',
-        'xwiki-selectize': 'xwiki-selectize-with-css'
+      "*": {
+        "xwiki-livedata": "xwiki-livedata-with-css",
+        daterangepicker: "daterangepicker-with-css",
+        "xwiki-selectize": "xwiki-selectize-with-css",
       },
-      'xwiki-livedata-with-css': {
-        'xwiki-livedata': 'xwiki-livedata'
+      "xwiki-livedata-with-css": {
+        "xwiki-livedata": "xwiki-livedata",
       },
-      'daterangepicker-with-css': {
-        daterangepicker: 'daterangepicker'
+      "daterangepicker-with-css": {
+        daterangepicker: "daterangepicker",
       },
-      'xwiki-selectize-with-css': {
-        'xwiki-selectize': 'xwiki-selectize'
-      }
+      "xwiki-selectize-with-css": {
+        "xwiki-selectize": "xwiki-selectize",
+      },
     },
     config: {
-      'xwiki-livedata-source': {
-        contextPath: paths.contextPath
-      }
-    }
-  })
+      "xwiki-livedata-source": {
+        contextPath: paths.contextPath,
+      },
+    },
+  });
 
   function loadCSS(url) {
     const link = document.createElement("link");
@@ -86,30 +85,30 @@
     document.getElementsByTagName("head")[0].appendChild(script);
   }
 
-  define('loadCSS', function() {
+  define("loadCSS", function() {
     return (url) => {
-      const urls = Array.isArray(url) ? url : [url]
-      urls.forEach(loadCSS)
-    }
-  })
+      const urls = Array.isArray(url) ? url : [url];
+      urls.forEach(loadCSS);
+    };
+  });
 
-  define('daterangepicker-with-css', ['loadCSS', 'daterangepicker'], function(loadCSS) {
+  define("daterangepicker-with-css", ["loadCSS", "daterangepicker"], function(loadCSS) {
     // Load the CSS for the date range picker.
-    loadCSS(paths.css.dateRangePicker)
-    return arguments[1]
-  })
+    loadCSS(paths.css.dateRangePicker);
+    return arguments[1];
+  });
 
-  define('xwiki-selectize-with-css', ['loadCSS', 'xwiki-selectize'], function(loadCSS) {
+  define("xwiki-selectize-with-css", ["loadCSS", "xwiki-selectize"], function(loadCSS) {
     // Load the CSS for the suggest picker.
-    loadCSS(paths.css.selectize)
-    return arguments[1]
-  })
+    loadCSS(paths.css.selectize);
+    return arguments[1];
+  });
 
-  loadModule(paths.module['xwiki-livedata'])
-  loadCSS(paths.css.liveData)
+  loadModule(paths.module["xwiki-livedata"]);
+  loadCSS(paths.css.liveData);
   // Load a small less file with the declarations of a few LESS values that are not exported
   // elsewhere
-  loadCSS(paths.css.liveDataLess)
+  loadCSS(paths.css.liveDataLess);
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths]))
+}).apply("]]#", $jsontool.serialize([$paths]));

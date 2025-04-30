@@ -106,7 +106,7 @@ export class MarkdownToUniAstConverter {
 
       case "blockquote":
         return {
-          type: "blockQuote",
+          type: "quote",
           content: block.children.map((item) => this.convertBlock(item)),
           styles: {},
         };
@@ -130,7 +130,7 @@ export class MarkdownToUniAstConverter {
         // TODO: "token.escaped" property
         // TODO: "token.codeBlockStyle" property
         return {
-          type: "codeBlock",
+          type: "code",
           content: block.value,
           language: block.lang ?? undefined,
         };

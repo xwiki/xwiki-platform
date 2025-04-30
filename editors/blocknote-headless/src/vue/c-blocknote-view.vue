@@ -162,7 +162,7 @@ const initializedEditorProps: Omit<
   ...editorProps,
   prefixDefaultFormattingToolbarFor: [
     "paragraph",
-    "BlockQuote",
+    "quote",
     "heading",
     "Heading4",
     "Heading5",

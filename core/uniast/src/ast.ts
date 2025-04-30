@@ -41,8 +41,8 @@ type Block =
       items: ListItem[];
       styles: BlockStyles;
     }
-  | { type: "blockQuote"; content: Block[]; styles: BlockStyles }
-  | { type: "codeBlock"; language?: string; content: string }
+  | { type: "quote"; content: Block[]; styles: BlockStyles }
+  | { type: "code"; language?: string; content: string }
   | {
       type: "table";
       columns: TableColumn[];

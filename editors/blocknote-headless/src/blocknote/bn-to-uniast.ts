@@ -157,7 +157,7 @@ export class BlockNoteToUniAstConverter {
         dontExpectChildren();
 
         return {
-          type: "codeBlock",
+          type: "code",
           content: block.content
             .map((inline) => {
               if (inline.type !== "text") {
@@ -173,11 +173,11 @@ export class BlockNoteToUniAstConverter {
           language: block.props.language,
         };
 
-      case "BlockQuote":
+      case "quote":
         dontExpectChildren();
 
         return {
-          type: "blockQuote",
+          type: "quote",
           content: [
             {
               type: "paragraph",

@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { BlockQuote } from "./blocks/BlockQuote";
 import { Heading4, Heading5, Heading6 } from "./blocks/Headings";
 import {
   Block,
@@ -30,6 +29,12 @@ import {
   combineByGroup,
   defaultBlockSpecs,
   filterSuggestionItems,
+  // NOTE: this is a *TEMPORARY* fix as "locales" is now moved inside a module
+  // that requires to change multiple of Cristal's packages "moduleResolution" setting
+  // This will take a bit of time to do, so for now we're using this ugly hack
+  //
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   locales,
 } from "@blocknote/core";
 import {
@@ -61,7 +66,6 @@ function createBlockNoteSchema() {
       Heading4: Heading4.block,
       Heading5: Heading5.block,
       Heading6: Heading6.block,
-      BlockQuote: BlockQuote.block,
     },
   });
 
@@ -89,7 +93,7 @@ function querySuggestionsMenuItems(
       getMultiColumnSlashMenuItems(editor),
 
       // Custom blocks
-      [Heading4, Heading5, Heading6, BlockQuote].map((custom) =>
+      [Heading4, Heading5, Heading6].map((custom) =>
         custom.slashMenuEntry(editor),
       ),
     ),

@@ -99,16 +99,16 @@ export class UniAstToBlockNoteConverter {
 
         break;
 
-      case "blockQuote":
+      case "quote":
         return {
-          type: "BlockQuote",
+          type: "quote",
           id: genId(),
           children: [],
           content: this.convertCustomBlockContent(block.content),
           props: this.convertBlockStyles(block.styles),
         };
 
-      case "codeBlock":
+      case "code":
         return {
           type: "codeBlock",
           id: genId(),

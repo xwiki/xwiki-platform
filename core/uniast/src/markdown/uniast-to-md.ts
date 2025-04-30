@@ -68,14 +68,14 @@ export class UniAstToMarkdownConverter {
         return block.items.map((item) => this.convertListItem(item)).join("\n");
       }
 
-      case "blockQuote":
+      case "quote":
         return block.content
           .map((item) => this.blockToMarkdown(item))
           .flatMap((item) => item.split("\n"))
           .map((line) => `> ${line}`)
           .join("\n");
 
-      case "codeBlock":
+      case "code":
         return `\`\`\`${block.language ?? ""}\n${block.content}\n\`\`\``;
 
       case "table":

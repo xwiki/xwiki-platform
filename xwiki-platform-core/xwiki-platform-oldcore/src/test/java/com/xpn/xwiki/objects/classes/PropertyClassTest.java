@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -247,5 +248,25 @@ public class PropertyClassTest
         PropertyMetaClass metaClass = new TextAreaMetaClass();
         propertyClass.setxWikiClass(metaClass);
         assertEquals("TextArea_editor", propertyClass.getFieldFullName());
+    }
+
+    @Test
+    void getReference()
+    {
+        PropertyClass propertyClass = new PropertyClass();
+        propertyClass.setName("tags");
+        propertyClass.setObject(this.xclass);
+        assertEquals(new ClassPropertyReference("tags", this.xclass.getReference()), propertyClass.getReference());
+
+        // Modify the property name.
+        propertyClass.setName("users");
+        assertEquals(new ClassPropertyReference("users", this.xclass.getReference()), propertyClass.getReference());
+
+        // Modify the class reference.
+        DocumentReference newClassReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "NewClass");
+        BaseClass newClass = new BaseClass();
+        newClass.setOwnerDocument(new XWikiDocument(newClassReference));
+        propertyClass.setObject(newClass);
+        assertEquals(new ClassPropertyReference("users", newClass.getReference()), propertyClass.getReference());
     }
 }

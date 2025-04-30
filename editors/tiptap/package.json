@@ -62,7 +62,7 @@
     "inversify": "7.5.0",
     "lodash-es": "4.17.21",
     "markdown-it": "14.1.0",
-    "pinia": "3.0.1",
+    "pinia": "3.0.2",
     "tippy.js": "6.3.7",
     "tiptap-extension-global-drag-handle": "0.1.18",
     "tiptap-markdown": "0.8.10",

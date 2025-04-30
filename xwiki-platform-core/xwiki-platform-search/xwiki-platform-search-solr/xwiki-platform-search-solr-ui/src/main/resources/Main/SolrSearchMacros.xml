@@ -42,7 +42,7 @@
 #set ($rangePattern = $regextool.compile('^[\[{](.+) TO (.+)[\]}]$'))
 #set ($wildcardPattern = $regextool.compile('^\(.*\*.*\)$'))
 
-#macro (displaySearchForm)
+#macro (_displaySearchFormBegin)
   #set($void = $services.progress.startStep('#displaySearchForm'))
   {{html clean="false"}}
   &lt;form class="search-form row" action="$doc.getURL()" role="search"&gt;
@@ -80,9 +80,14 @@
         &lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;
-  &lt;/form&gt;
   {{/html}}
   #set($void = $services.progress.endStep())
+#end
+
+#macro (_displaySearchFormEnd)
+  {{html clean="false"}}
+  &lt;/form&gt;
+  {{/html}}
 #end
 
 #macro (displaySearchDebugInfo)
@@ -373,13 +378,23 @@
     (% class="search-options" %)
     {{html}}
     $escapetool.xml($services.localization.render('solr.options'))
-    <input type="checkbox"><label></label></input>
+    <input id="option-highlight-input" type="checkbox" class="options-item" value="true" data-query-name="highlight"
+      aria-describedby="option-highlight-description" 
+      title="$services.localization.render('solr.options.highlight.title')"
+      #if($highlightEnabled)checked#end/>
+    <label for="option-highlight-input">$escapetool.xml($services.localization.render('solr.options.highlight'))</label>
+    <span id="option-highlight-description" class="sr-only">
+      $escapetool.xml($services.localization.render('solr.options.highlight.title'))
+    </span>
+    <input id="option-facet-input" type="checkbox" class="options-item" value="true" data-query-name="facet"
+      aria-describedby="option-facet-description"
+      title="$services.localization.render('solr.options.facet.title')" 
+      #if($facetEnabled)checked#end/>
+    <label for="option-facet-input">$escapetool.xml($services.localization.render('solr.options.facet'))</label>
+    <span id="option-facet-description" class="sr-only">
+      $escapetool.xml($services.localization.render('solr.options.facet.title'))
+    </span>
     {{/html}}
-    * {{translation key="solr.options"/}}
-    #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
-    * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:${url}||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
-    #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
-    * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:${url}||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
   )))
 #end
 
@@ -896,16 +911,18 @@ $value##
       {{/html}}
 
     #end
-    #displaySearchForm()
+    #_displaySearchFormBegin()
     #if ($text != '')
       #getSearchResults()
-      #if ($debug)
-        #displaySearchDebugInfo()
-      #end
       (% class="search-results-controls")
       (((
         #_displaySearchResultsControls()
       )))
+      #_displaySearchFormEnd()
+      #if ($debug)
+        #displaySearchDebugInfo()
+      #end
+      
       (% class="search-results-container row" %)(((
         #if ($facetEnabled)
           (% class="col-xs-12 col-sm-4 col-sm-push-8 col-md-3 col-md-push-9" %)(((
@@ -917,6 +934,8 @@ $value##
           #displaySearchResults()
         )))
       )))
+    #else
+      #_displaySearchFormEnd()
     #end
   )))
   #set($void = $services.progress.popLevel())

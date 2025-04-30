@@ -31,7 +31,7 @@
     "@blocknote/mantine": "0.29.1",
     "@blocknote/react": "0.29.1",
     "@blocknote/xl-multi-column": "0.29.1",
-    "@hocuspocus/provider": "2.15.2",
+    "@hocuspocus/provider": "3.1.0",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-attachments-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",

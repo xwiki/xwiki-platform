@@ -538,6 +538,13 @@ public class TableLayoutElement extends BaseElement
             } else {
                 element.sendKeys(content);
             }
+            try {
+                // Wait for the duration of the debounce, to make sure the text filtering process is started before
+                // continuing.
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         } else if (classes.contains("filter-date")) {
             element.click();
             DateRangePicker picker = new DateRangePicker(element);
@@ -987,14 +994,14 @@ public class TableLayoutElement extends BaseElement
         // its edit action popover to be displayed.
         List<WebElement> popoverActions = getDriver().findElements(editActionSelector);
         popoverActions.get(popoverActions.size() - 1).click();
-        
+
         // Selector of the edited field.
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
 
         // Waits for the text input to be displayed.
         getDriver().waitUntilElementIsVisible(element, selector);
 
-        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
+        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements
         // displayed in the live data (they are the same as the one of the inline edit mode).
         new FormContainerElement(By.cssSelector(".livedata-displayer .edit"))
             .setFieldValue(element.findElement(selector), newValue);

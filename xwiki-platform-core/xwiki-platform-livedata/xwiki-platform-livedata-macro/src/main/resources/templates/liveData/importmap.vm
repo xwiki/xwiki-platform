@@ -18,7 +18,6 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 <script type="importmap">
-##.prod
 $jsontool.serialize({
     'imports': {
         'xwiki-livedata': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'main.es.js'),

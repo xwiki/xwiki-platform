@@ -58,6 +58,10 @@
     {
       "groupName": "react",
       "matchDepPatterns": "^react(-.+)?"
+    },
+    {
+      "groupName": "@types/react",
+      "matchDepPatterns": "^@types/react(-.+)?"
     }
   ]
 }

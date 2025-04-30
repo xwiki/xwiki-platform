@@ -3403,8 +3403,8 @@ importers:
         version: 6.6.2
     devDependencies:
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
       electron-builder:
         specifier: 26.0.12
         version: 26.0.12(electron-builder-squirrel-windows@24.13.3)
@@ -3424,8 +3424,8 @@ importers:
         specifier: 1.8.4
         version: 1.8.4
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
       electron-store:
         specifier: 10.0.1
         version: 10.0.1
@@ -3446,8 +3446,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3499,8 +3499,8 @@ importers:
         specifier: 1.8.4
         version: 1.8.4
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
       electron-store:
         specifier: 10.0.1
         version: 10.0.1
@@ -3521,8 +3521,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3580,8 +3580,8 @@ importers:
         specifier: 1.8.4
         version: 1.8.4
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
       electron-store:
         specifier: 10.0.1
         version: 10.0.1
@@ -3602,8 +3602,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3652,8 +3652,8 @@ importers:
         specifier: workspace:*
         version: link:../state
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
       inversify:
         specifier: 7.5.0
         version: 7.5.0(reflect-metadata@0.2.2)
@@ -3677,8 +3677,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/configuration/configuration-api
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
       electron-store:
         specifier: 10.0.1
         version: 10.0.1
@@ -3699,8 +3699,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/configuration/configuration-api
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3783,8 +3783,8 @@ importers:
         specifier: workspace:*
         version: link:../storage
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3933,8 +3933,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-api
       electron:
-        specifier: 35.1.2
-        version: 35.1.2
+        specifier: 36.0.0
+        version: 36.0.0
       inversify:
         specifier: 7.5.0
         version: 7.5.0(reflect-metadata@0.2.2)
@@ -6129,9 +6129,6 @@ packages:
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
 
-  '@types/node@22.13.10':
-    resolution: {integrity: sha512-I6LPUvlRH+O6VRUqYOcMudhaIdUVWfsjnZavnsraHvpBwaEyMN29ry+0UVJhImYL16xsscu0aske3yA+uPOWfw==}
-
   '@types/node@22.15.2':
     resolution: {integrity: sha512-uKXqKN9beGoMdBfcaTY1ecwz6ctxuJAcUlwE55938g0ZJ8lRxwAZqRz2AJ4pzpt5dHdTPMB863UZ0ESiFUcP7A==}
 
@@ -7206,8 +7203,8 @@ packages:
   electron-updater@6.6.2:
     resolution: {integrity: sha512-Cr4GDOkbAUqRHP5/oeOmH/L2Bn6+FQPxVLZtPbcmKZC63a1F3uu5EefYOssgZXG3u/zBlubbJ5PJdITdMVggbw==}
 
-  electron@35.1.2:
-    resolution: {integrity: sha512-ipYSDZEV3+PpHfJ8/oWlpMCvxwutX6xLvBz2HRPgEzSFzgLmGO7YXTjEow4DhDtCpGE+b95NTGoJaRAVQi5n7A==}
+  electron@36.0.0:
+    resolution: {integrity: sha512-MhBL5tgzqLsiw++YXxzXRvF5s90gelcEZP4Upz/aaRmmoscmCw/EtimxMSH6EPnKt+8KwBY9RVAdlcffFPYkyw==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -9893,9 +9890,6 @@ packages:
   undefsafe@2.0.5:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
 
-  undici-types@6.20.0:
-    resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
-
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
@@ -11994,10 +11988,6 @@ snapshots:
 
   '@types/node@12.20.55': {}
 
-  '@types/node@22.13.10':
-    dependencies:
-      undici-types: 6.20.0
-
   '@types/node@22.15.2':
     dependencies:
       undici-types: 6.21.0
@@ -13356,10 +13346,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@35.1.2:
+  electron@36.0.0:
     dependencies:
       '@electron/get': 2.0.3
-      '@types/node': 22.13.10
+      '@types/node': 22.15.2
       extract-zip: 2.0.1
     transitivePeerDependencies:
       - supports-color
@@ -16574,8 +16564,6 @@ snapshots:
       which-boxed-primitive: 1.1.1
 
   undefsafe@2.0.5: {}
-
-  undici-types@6.20.0: {}
 
   undici-types@6.21.0: {}
 

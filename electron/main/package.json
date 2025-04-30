@@ -24,7 +24,7 @@
     "@xwiki/cristal-electron-authentication-nextcloud-main": "workspace:*",
     "@xwiki/cristal-electron-authentication-xwiki-main": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
-    "electron": "35.1.2",
+    "electron": "36.0.0",
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {

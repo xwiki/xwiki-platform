@@ -123,10 +123,10 @@
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.17.0.0</oracle.version>
-    
+
     <!-- Versions of Node related tools -->
-    <node.version>v22.13.1</node.version>
-    <npm.version>11.1.0</npm.version>
+    <node.version>v22.14.0</node.version>
+    <npm.version>11.2.0</npm.version>
   </properties>
   <scm>
     <tag>HEAD</tag>
@@ -1187,15 +1187,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>2.7.16</version>
-        <exclusions>
-          <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
-          not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
-          <exclusion>
-            <groupId>org.webjars.npm</groupId>
-            <artifactId>vue__compiler-sfc</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>3.5.13</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

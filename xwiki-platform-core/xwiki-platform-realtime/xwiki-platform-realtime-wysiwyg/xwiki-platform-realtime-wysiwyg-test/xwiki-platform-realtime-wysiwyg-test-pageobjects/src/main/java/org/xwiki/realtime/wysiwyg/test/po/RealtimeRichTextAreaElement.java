@@ -203,6 +203,11 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
         getDriver().getWindowHandles().forEach(handle -> {
             if (!handle.equals(initialHandle)) {
                 getDriver().switchTo().window(handle);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         });
         getDriver().switchTo().window(initialHandle);

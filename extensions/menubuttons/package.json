@@ -36,7 +36,7 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.8.3",
-    "vite": "6.3.3",
+    "vite": "6.3.4",
     "vue-tsc": "2.2.10"
   },
   "publishConfig": {

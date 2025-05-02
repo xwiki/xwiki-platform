@@ -444,18 +444,17 @@
   margin-bottom: 0;
 }
 
-/**
- * Search form
+/** 
+ * Layout for the search bar 
  */
-
-.skin-colibri .search-form {
-  /* There is no space after the title in Colibri. */
-  margin-top: 1.5em;
+.search-bar {
+  margin: .5em 0;
 }
 
-.skin-colibri .search-form input[type="search"] {
-  /* Colibri doesn't have the grid system. */
-  width: 50%;
+@media (min-width: 768px) {
+  .search-bar {
+    max-width: 50%;
+  }
 }
 
 /**
@@ -465,6 +464,19 @@
 .search-results-controls {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  
+  &amp; label {
+    /* Reset the styles of the labels. */
+    margin: 0;
+    font-weight: unset;
+  }
+}
+
+.search-results-sort, .search-options {
+  display: flex;
+  gap: .4em;
+  align-items: center;
 }
 
 /**
@@ -502,6 +514,23 @@ a.sort-item.active, a.sort-item.active:hover {
   margin-left: .3em;
 }
 
+/* This checkbox input should be styled as a switch between ascending and descending states. */
+.search-results-sort #sort-order-input {
+  /* Hide the default checkbox. We rely on the style of the label itself to make it work. */
+  appearance: none;
+  margin: 0;
+}
+
+.search-results-sort #sort-order-input + label *:first-child {
+  transform: rotate(180deg);
+  transition: transform .2s ease-out;
+}
+
+/* When the box is checked, we want to rotate the icon. */
+.search-results-sort #sort-order-input:checked + label *:first-child {
+  transform: none;
+}
+
 /**
  * Options
  */
@@ -532,6 +561,17 @@ a.options-item.active, a.options-item.active:hover{
   font-weight: bold;
   color: $theme.textColor;
   text-decoration: none;
+}
+
+.search-options {
+  &amp; input[type="checkbox"] {
+    position: unset;
+    margin: 0;
+  }
+
+  &amp; label {
+    margin-right: 1em;
+  }
 }
 
 /**

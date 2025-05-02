@@ -110,9 +110,11 @@
     ## Add user-defined Meta directives.
     ## ---------------------------------------------------------------------------------------------------------------
     ## Note: Velocity code, so it needs to be evaluated.
+    ## Check for the presence of a meta preference in the current space.
+    ## If not found, falls back to the default meta.vm template.
     #set ($spacePreferenceMeta = $!xwiki.getSpacePreference("meta"))
     #if ($spacePreferenceMeta != '')
-      #evaluate($!xwiki.getSpacePreference("meta"))
+      #evaluate($spacePreferenceMeta )
     #else
       #template("meta.vm")
     #end

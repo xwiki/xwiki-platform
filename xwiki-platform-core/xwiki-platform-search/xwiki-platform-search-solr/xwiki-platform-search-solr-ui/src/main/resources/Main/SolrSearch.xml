@@ -521,14 +521,19 @@ a.sort-item.active, a.sort-item.active:hover {
   margin: 0;
 }
 
+.search-results-sort #sort-order-input + label {
+  /* We want most of the styles from "form-control", but not the shadow that comes from bootstrap. */
+  box-shadow: none;
+}
+
 .search-results-sort #sort-order-input + label *:first-child {
-  transform: rotate(180deg);
+  transform: none;
   transition: transform .2s ease-out;
 }
 
 /* When the box is checked, we want to rotate the icon. */
 .search-results-sort #sort-order-input:checked + label *:first-child {
-  transform: none;
+  transform: rotate(180deg);
 }
 
 /**

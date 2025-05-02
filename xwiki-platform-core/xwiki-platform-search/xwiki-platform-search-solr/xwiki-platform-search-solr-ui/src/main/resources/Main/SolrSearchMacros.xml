@@ -45,10 +45,8 @@
 #macro (_displaySearchFormBegin)
   #set($void = $services.progress.startStep('#displaySearchForm'))
   {{html clean="false"}}
-  &lt;form class="search-form row" action="$doc.getURL()" role="search"&gt;
+  &lt;form class="search-form" action="$doc.getURL()" role="search"&gt;
     &lt;div class="hidden"&gt;
-      &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
-      &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
       &lt;input type="hidden" name="highlight" value="$highlightEnabled"/&gt;
       &lt;input type="hidden" name="facet" value="$facetEnabled"/&gt;
       ## The parameter used to determine if the request has been redirected with default search filters.
@@ -65,13 +63,13 @@
         #end
       #end
     &lt;/div&gt;
-    &lt;div class="col-xs-12 col-sm-6"&gt;
+    &lt;div class="search-bar"&gt;
       &lt;div class="input-group"&gt;
+        &lt;input id='search-page-bar-input' type='search' name='text' class='form-control withTip useTitleAsTip'
+          title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;
         &lt;label class='sr-only' for='search-page-bar-input'&gt;
         $services.localization.render('search.page.bar.query.title')
         &lt;/label&gt;
-        &lt;input id='search-page-bar-input' type='search' name='text' class='form-control withTip useTitleAsTip'
-          title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;
         &lt;span class="input-group-btn"&gt;
           &lt;button type="submit" class="btn btn-primary"&gt;
             $services.icon.renderHTML('search')
@@ -357,44 +355,48 @@
     'asc': $services.icon.render('caret-up'),
     'desc': $services.icon.render('caret-down')
   })
-  (% class="search-results-controls" %)
+  (% class='search-results-controls' %)
   (((
-    (% class="search-results-sort" %)
-    * {{translation key="solr.sortBy"/}}
-    #foreach ($entry in $defaultSortOrder.entrySet())
-      #set ($class = 'sort-item')
-      #set ($sortOrderIndicator = $NULL)
-      #set ($targetSortOrder = $entry.value)
-      #if ($sort == $entry.key)
-        #set ($class = "$class active")
-        #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
-        #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
-        #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
-      #end
-      #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
-      * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:${url}||class="$class"]]
-    #end
 
-    (% class="search-options" %)
     {{html}}
+    &lt;div class="search-results-sort"&gt;
+      &lt;label for="sort-by-input" class="sr-only"&gt;$escapetool.xml($services.localization.render("solr.sortBy"))&lt;/label&gt;##
+      &lt;select id="sort-by-input" name="sort"&gt;
+        #foreach ($entry in $defaultSortOrder.entrySet())
+          #set ($class = 'sort-item')
+          #set ($targetSortOrder = $entry.value)
+          &lt;option class="$class" value="$entry.key" #if($sort == $entry.key)selected='selected'#end&gt;
+            $services.localization.render("solr.sortBy.$entry.key")
+          &lt;/option&gt;
+        #end
+      &lt;/select&gt;##
+      &lt;input id="sort-order-input" type="checkbox" name="sortOrder" value="desc" #if ($sortOrder == 'asc')checked="checked"#end/&gt;##
+      &lt;label for="sort-order-input" class="form-control" title="$escapetool.xml($services.localization.render('solr.options.highlight'))"&gt;##
+        $services.icon.renderHTML('caret-down')##
+        &lt;span class="sr-only"&gt;$services.localization.render('solr.options.highlight')&lt;/span&gt;##
+      &lt;/label&gt;##
+    &lt;/div&gt;
+    &lt;div class="search-options"&gt;
     $escapetool.xml($services.localization.render('solr.options'))
-    <input id="option-highlight-input" type="checkbox" class="options-item" value="true" data-query-name="highlight"
+      &lt;input id="option-highlight-input" type="checkbox" class="options-item" value="true" data-query-name="highlight"
       aria-describedby="option-highlight-description" 
       title="$services.localization.render('solr.options.highlight.title')"
-      #if($highlightEnabled)checked#end/>
-    <label for="option-highlight-input">$escapetool.xml($services.localization.render('solr.options.highlight'))</label>
-    <span id="option-highlight-description" class="sr-only">
+      #if($highlightEnabled)checked#end/&gt;##
+      &lt;label for="option-highlight-input"&gt;$services.localization.render('solr.options.highlight')&lt;/label&gt;##
+      &lt;span id="option-highlight-description" class="sr-only"&gt;
       $escapetool.xml($services.localization.render('solr.options.highlight.title'))
-    </span>
-    <input id="option-facet-input" type="checkbox" class="options-item" value="true" data-query-name="facet"
+      &lt;/span&gt;##
+      &lt;input id="option-facet-input" type="checkbox" class="options-item" value="true" data-query-name="facet"
       aria-describedby="option-facet-description"
       title="$services.localization.render('solr.options.facet.title')" 
-      #if($facetEnabled)checked#end/>
-    <label for="option-facet-input">$escapetool.xml($services.localization.render('solr.options.facet'))</label>
-    <span id="option-facet-description" class="sr-only">
-      $escapetool.xml($services.localization.render('solr.options.facet.title'))
-    </span>
+      #if($facetEnabled)checked#end/&gt;##
+      &lt;label for="option-facet-input"&gt;$services.localization.render('solr.options.facet')&lt;/label&gt;
+      &lt;span id="option-facet-description" class="sr-only"&gt;
+      $services.localization.render('solr.options.facet.title')
+      &lt;/span&gt;##
+    &lt;/div&gt;
     {{/html}}
+
   )))
 #end
 

@@ -834,8 +834,8 @@ importers:
         specifier: 7.5.1
         version: 7.5.1(reflect-metadata@0.2.2)
       mime:
-        specifier: 4.0.6
-        version: 4.0.6
+        specifier: 4.0.7
+        version: 4.0.7
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3939,8 +3939,8 @@ importers:
         specifier: 7.5.1
         version: 7.5.1(reflect-metadata@0.2.2)
       mime:
-        specifier: 4.0.6
-        version: 4.0.6
+        specifier: 4.0.7
+        version: 4.0.7
     devDependencies:
       '@types/node':
         specifier: 22.15.3
@@ -8431,8 +8431,8 @@ packages:
     engines: {node: '>=4.0.0'}
     hasBin: true
 
-  mime@4.0.6:
-    resolution: {integrity: sha512-4rGt7rvQHBbaSOF9POGkk1ocRP16Md1x36Xma8sz8h8/vfCUI2OtEIeCqe4Ofes853x4xDoPiFLIT47J5fI/7A==}
+  mime@4.0.7:
+    resolution: {integrity: sha512-2OfDPL+e03E0LrXaGYOtTFIYhiuzep94NSsuhrNULq+stylcJedcHdzHtz0atMUuGwJfFYs0YL5xeC/Ca2x0eQ==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -14917,7 +14917,7 @@ snapshots:
 
   mime@2.6.0: {}
 
-  mime@4.0.6: {}
+  mime@4.0.7: {}
 
   mimic-fn@2.1.0: {}
 

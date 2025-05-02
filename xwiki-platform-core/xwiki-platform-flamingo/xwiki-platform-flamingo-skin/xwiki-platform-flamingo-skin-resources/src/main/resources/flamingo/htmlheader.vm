@@ -104,13 +104,18 @@
     #end
     ## ---------------------------------------------------------------------------------------------------------------
     ## Make sure search engine spiders give the plain page instead of ?viewer=comments, ?viewer=code etc.
-    ## ---------------------------------------------------------------------------------------------------------------    
+    ## ---------------------------------------------------------------------------------------------------------------
     <link rel="canonical" href="$doc.getURL('view')" />
     ## ---------------------------------------------------------------------------------------------------------------
     ## Add user-defined Meta directives.
     ## ---------------------------------------------------------------------------------------------------------------
     ## Note: Velocity code, so it needs to be evaluated.
-    #evaluate($!xwiki.getSpacePreference("meta"))
+    #set ($spacePreferenceMeta = $!xwiki.getSpacePreference("meta"))
+    #if ($spacePreferenceMeta != '')
+      #evaluate($!xwiki.getSpacePreference("meta"))
+    #else
+      #template("meta.vm")
+    #end
     ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     ## ---------------------------------------------------------------------------------------------------------------

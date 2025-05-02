@@ -61,16 +61,19 @@ const {
   realtimeServerURL,
   container,
   skinManager,
-} = defineProps<{
-  editorProps: Omit<
-    ReactNonSlotProps<BlockNoteViewWrapperProps>,
-    "content" | "prefixDefaultFormattingToolbarFor"
-  >;
-  editorContent: UniAst | Error;
-  realtimeServerURL?: string;
-  container: Container;
-  skinManager: SkinManager;
-}>();
+} = withDefaults(
+  defineProps<{
+    editorProps: Omit<
+      ReactNonSlotProps<BlockNoteViewWrapperProps>,
+      "content" | "prefixDefaultFormattingToolbarFor"
+    >;
+    editorContent: UniAst | Error;
+    realtimeServerURL?: string | undefined;
+    container: Container;
+    skinManager: SkinManager;
+  }>(),
+  { realtimeServerURL: undefined },
+);
 
 const emit = defineEmits<{
   // TODO: the type of the content might change!

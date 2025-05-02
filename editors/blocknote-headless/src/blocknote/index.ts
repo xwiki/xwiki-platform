@@ -30,8 +30,7 @@ import {
   defaultBlockSpecs,
   filterSuggestionItems,
 } from "@blocknote/core";
-// TODO: ts-ignore can be removed once the moduleResolution for this module is moved to bundle
-// @ts-ignore
+// @ts-expect-error can be removed once the moduleResolution for this module is moved to bundle
 import * as locales from "@blocknote/core/locales";
 import {
   DefaultReactSuggestionItem,

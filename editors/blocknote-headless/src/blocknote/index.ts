@@ -29,14 +29,10 @@ import {
   combineByGroup,
   defaultBlockSpecs,
   filterSuggestionItems,
-  // NOTE: this is a *TEMPORARY* fix as "locales" is now moved inside a module
-  // that requires to change multiple of Cristal's packages "moduleResolution" setting
-  // This will take a bit of time to do, so for now we're using this ugly hack
-  //
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  locales,
 } from "@blocknote/core";
+// TODO: ts-ignore can be removed once the moduleResolution for this module is moved to bundle
+// @ts-ignore
+import * as locales from "@blocknote/core/locales";
 import {
   DefaultReactSuggestionItem,
   getDefaultReactSlashMenuItems,

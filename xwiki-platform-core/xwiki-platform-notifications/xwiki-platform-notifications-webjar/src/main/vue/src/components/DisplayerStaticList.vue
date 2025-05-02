@@ -26,17 +26,17 @@
     Uses the BaseDisplayer as root element, as it handles for us all the displayer default behavior.
   -->
   <BaseDisplayer
-    class="displayer-staticList"
-    view-only
-    :property-id="propertyId"
-    :entry="entry"
-    :is-empty="false"
-    :intercept-touch="false"
+      class="displayer-staticList"
+      view-only
+      :property-id="propertyId"
+      :entry="entry"
+      :is-empty="false"
+      :intercept-touch="false"
   >
     <template #viewer>
       <ul :class="'staticList ' + sanitizeHtml(entry[propertyId].extraClass)">
         <li v-for="item in entry[propertyId].items"
-            :key="item"
+          :key="item"
         >
           {{ sanitizeHtml(item) }}
         </li>
@@ -45,7 +45,7 @@
 
     <!--
       The displayer does not have an Editor widget. Therefore, we leave the editor template empty.
-      Moreover, we add the `view-only` property on the BaseDisplayer component so that user can't possibly switch
+      Moreover, we add the `view-only` property on the BaseDisplayer component so that user can't possibly switch 
       to the Editor widget.
     -->
     <template #editor></template>
@@ -53,12 +53,12 @@
 </template>
 
 <script>
-import { BaseDisplayer, displayerMixin } from "xwiki-livedata";
+import {displayerMixin, BaseDisplayer} from "xwiki-livedata-vue";
 
 export default {
   name: "displayer-staticList",
-  components: { BaseDisplayer },
+  components: {BaseDisplayer},
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component.
-  mixins: [displayerMixin],
-};
+  mixins: [displayerMixin]
+}
 </script>

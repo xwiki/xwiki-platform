@@ -26,12 +26,12 @@
     Uses the BaseDisplayer as root element, as it handles for us all the displayer default behavior.
   -->
   <BaseDisplayer
-    class="displayer-scope"
-    view-only
-    :property-id="propertyId"
-    :entry="entry"
-    :is-empty="false"
-    :intercept-touch="false"
+      class="displayer-scope"
+      view-only
+      :property-id="propertyId"
+      :entry="entry"
+      :is-empty="false"
+      :intercept-touch="false"
   >
     <template #viewer>
       <XWikiIcon :iconDescriptor="{name: entry[propertyId].icon}" />
@@ -40,7 +40,7 @@
 
     <!--
       The displayer does not have an Editor widget. Therefore, we leave the editor template empty.
-      Moreover, we add the `view-only` property on the BaseDisplayer component so that user can't possibly switch
+      Moreover, we add the `view-only` property on the BaseDisplayer component so that user can't possibly switch 
       to the Editor widget.
     -->
     <template #editor></template>
@@ -48,14 +48,14 @@
 </template>
 
 <script>
-import { BaseDisplayer, displayerMixin, XWikiIcon } from "xwiki-livedata";
+import {displayerMixin, BaseDisplayer, XWikiIcon} from "xwiki-livedata-vue";
 
 export default {
   name: "displayer-scope",
-  components: { BaseDisplayer, XWikiIcon },
+  components: {BaseDisplayer, XWikiIcon},
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component.
-  mixins: [displayerMixin],
-};
+  mixins: [displayerMixin]
+}
 </script>
 
 <style scoped>

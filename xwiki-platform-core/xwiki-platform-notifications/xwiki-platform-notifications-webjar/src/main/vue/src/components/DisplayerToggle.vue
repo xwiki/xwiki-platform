@@ -27,32 +27,32 @@
     Uses the BaseDisplayer as root element, as it handles for us all the displayer default behavior.
   -->
   <BaseDisplayer
-    class="displayer-toggle"
-    view-only
-    :property-id="propertyId"
-    :entry="entry"
-    :is-empty="false"
-    :intercept-touch="false"
+      class="displayer-toggle"
+      view-only
+      :property-id="propertyId"
+      :entry="entry"
+      :is-empty="false"
+      :intercept-touch="false"
   >
     <template #viewer>
       <input
-        type='checkbox'
-        class='toggleableFilterPreferenceCheckbox'
-        ref="input"
+          type='checkbox'
+          class='toggleableFilterPreferenceCheckbox'
+          ref="input"
       />
       <!-- We keep this section hidden as it is only there to be copied when initializing the toggle. -->
       <span v-show="false">
         <XWikiIcon
-          :icon-descriptor="{name: iconName}"
-          ref="icon"
-          @ready="iconReady = true"
+            :icon-descriptor="{name: iconName}"
+            ref="icon"
+            @ready="iconReady = true"
         />
       </span>
     </template>
 
     <!--
       The Toggle displayer does not have an Editor widget. Therefore, we leave the editor template empty.
-      Moreover, we add the `view-only` property on the BaseDisplayer component so that user can't possibly switch
+      Moreover, we add the `view-only` property on the BaseDisplayer component so that user can't possibly switch 
       to the Editor widget.
     -->
     <template #editor></template>
@@ -60,19 +60,19 @@
 </template>
 
 <script>
-import { BaseDisplayer, displayerMixin, XWikiIcon } from "xwiki-livedata";
+import {displayerMixin, BaseDisplayer, XWikiIcon} from "xwiki-livedata-vue";
+import $ from "jquery";
 
 export default {
   name: "displayer-toggle",
-  components: { BaseDisplayer, XWikiIcon },
+  components: {BaseDisplayer, XWikiIcon},
   // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component.
   mixins: [displayerMixin],
-  inject: ["jQuery"],
   props: {
     iconName: {
       type: String,
-      default: "bell",
-    },
+      default: 'bell'
+    }
   },
   data() {
     return {
@@ -81,18 +81,18 @@ export default {
       innerChecked: this.entry[`${this.propertyId}_checked`],
       innerDisabled: this.entry[`${this.propertyId}_disabled`],
       innerData: {
-        ...this.entry[`${this.propertyId}_data`],
-      },
-    };
+        ... this.entry[`${this.propertyId}_data`]
+      }
+    }
   },
   watch: {
-    iconReady: function(val) {
+    iconReady: function (val) {
       if (val) {
         const component = this;
         // Wait for the icon component to be fully rendered before copying its content.
         this.$nextTick(() => {
-          this.jQuery(this.$refs.input).bootstrapSwitch({
-            size: "mini",
+          $(this.$refs.input).bootstrapSwitch({
+            size: 'mini',
             state: component.innerChecked,
             disabled: component.innerDisabled,
             labelText: this.$refs.icon.$el.outerHTML,
@@ -101,8 +101,8 @@ export default {
              - the data of the toggle
              - the new state of the toggle
              - the disabled status of the toggle
-             - a callback. When the callback is called, the toggle component is updated with the provided data, state,
-                and disabled status.
+             - a callback. When the callback is called, the toggle component is updated with the provided data, state, 
+                and disabled status. 
             */
             onSwitchChange(event, state) {
               const toggleData = component.innerData;
@@ -111,24 +111,24 @@ export default {
                 data: toggleData,
                 checked: state,
                 disabled: disabledVal,
-                callback: function({
+                callback: function ({
                   data = toggleData,
                   checked = state,
-                  disabled = disabledVal,
+                  disabled = disabledVal
                 }) {
                   component.innerData = data;
                   component.innerChecked = checked;
                   component.innerDisabled = disabled;
                   // The last parameter is skip, preventing to call onSwitchChange again.
-                  this.jQuery(component.$refs.input).bootstrapSwitch("state", checked, true);
-                  this.jQuery(component.$refs.input).bootstrapSwitch("disabled", disabled);
-                },
-              });
-            },
-          });
-        });
+                  $(component.$refs.input).bootstrapSwitch('state', checked, true);
+                  $(component.$refs.input).bootstrapSwitch('disabled', disabled);
+                }
+              })
+            }
+          })
+        })
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>

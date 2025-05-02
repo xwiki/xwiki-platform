@@ -370,10 +370,10 @@
           &lt;/option&gt;
         #end
       &lt;/select&gt;##
-      &lt;input id="sort-order-input" type="checkbox" name="sortOrder" value="desc" #if ($sortOrder == 'asc')checked="checked"#end/&gt;##
-      &lt;label for="sort-order-input" class="form-control" title="$escapetool.xml($services.localization.render('solr.options.highlight'))"&gt;##
+      &lt;input id="sort-order-input" type="checkbox" name="sortOrder" value="asc" #if ("$!sortOrder" == 'asc')checked="checked"#end/&gt;##
+      &lt;label for="sort-order-input" class="form-control" title="$escapetool.xml($services.localization.render("solr.sortOrder.$sortOrder"))"&gt;##
         $services.icon.renderHTML('caret-down')##
-        &lt;span class="sr-only"&gt;$services.localization.render('solr.options.highlight')&lt;/span&gt;##
+        &lt;span class="sr-only"&gt;$services.localization.render("solr.sortOrder.$sortOrder")&lt;/span&gt;##
       &lt;/label&gt;##
     &lt;/div&gt;
     &lt;div class="search-options"&gt;
@@ -872,6 +872,8 @@ $value##
   #if ("$!sort" == '')
     #set ($sort = 'score')
   #end
+  ## If at any point this default behavior is changed, be extra careful with "#sort-order-input" initialization.
+  ## We assume here that empty values are mapped to "desc" (meaning that we use "asc" as the checkbox value).
   #set ($sortOrder = $request.sortOrder)
   #if ("$!sortOrder" == '')
     #set ($sortOrder = 'desc')

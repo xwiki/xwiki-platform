@@ -108,16 +108,16 @@
   'sortFields': {
     'DOCUMENT': {
       'score': 'desc',
-      'title_sort': 'asc',
       'date': 'desc',
-      'author_display_sort': 'asc'
+      'author_display_sort': 'asc',
+      'title_sort': 'asc'
     },
     'ATTACHMENT': {
       'score': 'desc',
-      'filename_sort': 'asc',
       'attsize_sort': 'asc',
       'attdate_sort': 'desc',
-      'attauthor_display_sort': 'asc'
+      'attauthor_display_sort': 'asc',
+      'filename_sort': 'asc'
     }
   },
   'filterQuery': [],

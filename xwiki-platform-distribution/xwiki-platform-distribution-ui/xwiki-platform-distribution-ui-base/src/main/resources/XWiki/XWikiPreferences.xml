@@ -2810,7 +2810,15 @@
       <comment_registered>---</comment_registered>
     </property>
     <property>
-      <confirmation_email_content/>
+      <confirmation_email_content>#set ($wikiname = $request.serverName)
+#set ($host = ${request.getRequestURL()})
+#set ($host = ${host.substring(0, ${host.indexOf('/', ${mathtool.add(${host.indexOf('//')}, 2)})})})
+Content-Type: text/plain; charset=utf-8
+Subject: Your account on ${wikiname} has been activated
+
+Hello ${xwiki.getUserName("$xwikiname", false)},
+
+Your account on ${wikiname} has been successfully activated. You can now login at ${host}${xwiki.getURL('XWiki.XWikiLogin', 'login')} using your username (${xwiki.getDocument($xwikiname).documentReference.name}).</confirmation_email_content>
     </property>
     <property>
       <core.defaultDocumentSyntax/>
@@ -3005,7 +3013,18 @@
       <upload_maxsize>107374182400</upload_maxsize>
     </property>
     <property>
-      <validation_email_content/>
+      <validation_email_content>#set ($wikiname = $request.serverName)
+#set ($host = ${request.getRequestURL()})
+#set ($host = ${host.substring(0, ${host.indexOf('/', ${mathtool.add(${host.indexOf('//')}, 2)})})})
+Content-Type: text/plain; charset=utf-8
+Subject: Validate your account on ${wikiname}
+
+Hello ${xwiki.getUserName("XWiki.$xwikiname", false)},
+
+This email address was used to register a new account on ${wikiname}. If you did not make the request, please ignore this message.
+
+In order to activate your account, please follow this link:
+${host}${xwiki.getURL('XWiki.AccountValidation', 'view', "validkey=${validkey}&amp;xwikiname=${xwikiname}")}</validation_email_content>
     </property>
     <property>
       <version/>

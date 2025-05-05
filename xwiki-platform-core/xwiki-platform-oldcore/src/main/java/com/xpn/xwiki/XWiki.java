@@ -280,7 +280,7 @@ public class XWiki implements EventListener
 
     /**
      * Name of the default system space as an EntityReference.
-     *
+     * 
      * @since 13.2RC1
      */
     public static final EntityReference SYSTEM_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
@@ -1035,7 +1035,7 @@ public class XWiki implements EventListener
 
     /**
      * Make sure the wiki is initializing or wait for it.
-     *
+     * 
      * @param wikiId the identifier of the wiki to initialize
      * @param wait true if the method should return only when the wiki is fully initialized
      * @return true if the wiki is fully initialized
@@ -1863,7 +1863,7 @@ public class XWiki implements EventListener
 
     /**
      * Check if the user is allowed to save the document.
-     *
+     * 
      * @param userReference the user responsible for the changes
      * @param document the document to save
      * @param comment the comment to associated to the new version of the saved document
@@ -1879,7 +1879,7 @@ public class XWiki implements EventListener
 
     /**
      * Check if the user is allowed to save the document.
-     *
+     * 
      * @param userReference the user responsible for the changes
      * @param document the document to save
      * @param context see {@link XWikiContext}
@@ -1894,7 +1894,7 @@ public class XWiki implements EventListener
 
     /**
      * Check if the user is allowed to save the document.
-     *
+     * 
      * @param userReference the user responsible for the changes
      * @param document the document to save
      * @param comment the comment to associated to the new version of the saved document
@@ -2052,7 +2052,7 @@ public class XWiki implements EventListener
      * <p>
      * Since 11.1, if document#isNew() return true, any pre existing document will be backuped in the deleted documents
      * store automatically and completely replaced.
-     *
+     * 
      * @param document the document to save
      * @param comment the comment to associated to the new version of the saved document
      * @param isMinorEdit true if the new version is a minor version
@@ -2290,7 +2290,7 @@ public class XWiki implements EventListener
     /**
      * Find the document reference corresponding to the entity reference based on what exist in the database (page
      * reference can means two different documents for example).
-     *
+     * 
      * @param reference the reference to resolve
      * @param context the XWiki context
      * @return the document reference
@@ -2662,7 +2662,7 @@ public class XWiki implements EventListener
 
     /**
      * Build and return a skin file url based on the given parameters.
-     *
+     * 
      * @param filename the file name of the skin file wanted
      * @param forceSkinAction if true force the usage of directory /skins/ in the URL
      * @param context current context for the request
@@ -2969,7 +2969,7 @@ public class XWiki implements EventListener
      * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
      * <p>
      * If the property is not set on any level then empty String is returned.
-     *
+     * 
      * @param preferenceKey the name of the preference key
      * @param spaceReference the reference of the space
      * @param context see {@link XWikiContext}
@@ -2985,7 +2985,7 @@ public class XWiki implements EventListener
      * Get the preference key for the space and fallback on parent space or wiki in case nothing is found.
      * <p>
      * If the property is not set on any level then <code>defaultValue</code> is returned.
-     *
+     * 
      * @param preferenceKey the name of the preference key
      * @param spaceReference the reference of the space. If null and there's a current document then the current space
      *                       is used. If null and there's no current document then fall back to the wiki preferences.
@@ -4067,11 +4067,19 @@ public class XWiki implements EventListener
 
         }
 
-        if(content != null) {
-            content =
-                evaluateMailContent(xwikiname, password, email, addfieldname, addfieldvalue, context, sender, content);
-        } else {
-            // TODO: load from template, if template exists, otherwisejust return the empty string?
+        try {
+            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            vcontext.put(addfieldname, addfieldvalue);
+            vcontext.put("email", email);
+            vcontext.put("password", password);
+            vcontext.put("sender", sender);
+            vcontext.put("xwikiname", xwikiname);
+            content = parseContent(content, context);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
+                XWikiException.ERROR_XWIKI_EMAIL_CANNOT_PREPARE_VALIDATION_EMAIL,
+                "Exception while preparing the validation email", e, null);
+
         }
 
         // Let's now send the message
@@ -4097,26 +4105,6 @@ public class XWiki implements EventListener
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                 XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, "Error while sending the validation email", e);
         }
-    }
-
-    private String evaluateMailContent(String xwikiname, String password, String email, String addfieldname, String addfieldvalue,
-        XWikiContext context, String sender, String content) throws XWikiException
-    {
-        try {
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            vcontext.put(addfieldname, addfieldvalue);
-            vcontext.put("email", email);
-            vcontext.put("password", password);
-            vcontext.put("sender", sender);
-            vcontext.put("xwikiname", xwikiname);
-            content = parseContent(content, context);
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                XWikiException.ERROR_XWIKI_EMAIL_CANNOT_PREPARE_VALIDATION_EMAIL,
-                "Exception while preparing the validation email", e, null);
-
-        }
-        return content;
     }
 
     public String generateRandomString(int size)
@@ -4697,7 +4685,7 @@ public class XWiki implements EventListener
 
     /**
      * Check if the user is allowed to delete the document.
-     *
+     * 
      * @param userReference the user responsible for the delete
      * @param document the document to delete
      * @param context the XWiki context
@@ -4741,7 +4729,7 @@ public class XWiki implements EventListener
 
     /**
      * Delete a range of versions from a document history.
-     *
+     * 
      * @param document the document from which to delete versions
      * @param version1 one end of the versions range to remove
      * @param version2 the other end of the versions range to remove
@@ -4757,7 +4745,7 @@ public class XWiki implements EventListener
 
     /**
      * Delete a range of versions from a document history.
-     *
+     * 
      * @param document the document from which to delete versions
      * @param version1 one end of the versions range to remove
      * @param version2 the other end of the versions range to remove
@@ -6601,7 +6589,7 @@ public class XWiki implements EventListener
      * Check if a document exist.
      * <p>
      * Since 14.9, if the check fail an exception is thrown.
-     *
+     * 
      * @param documentReference the reference of the document
      * @param context the XWiki context
      * @return true if the document exist or false if it does not
@@ -6626,7 +6614,7 @@ public class XWiki implements EventListener
      * Returns whether a page exists or not.
      * <p>
      * Since 14.9, if the check fail an exception is thrown.
-     *
+     * 
      * @param reference the reference of the page to check for its existence
      * @return true if the page exists, false if not
      * @throws XWikiException when failing to check page existence
@@ -7395,7 +7383,7 @@ public class XWiki implements EventListener
      * Generates a unique page name based on initial page name and already existing pages.
      * <p>
      * Since 14.9, if the document exist check fail an exception is thrown.
-     *
+     * 
      * @param space the space where to add a new document
      * @param context the XWiki context
      * @return a unique document name
@@ -7412,7 +7400,7 @@ public class XWiki implements EventListener
      * Generates a unique page name based on initial page name and already existing pages.
      * <p>
      * Since 14.9, if the document exist check fail an exception is thrown.
-     *
+     * 
      * @param space the space where to add a new document
      * @param name the prefix of the document name
      * @param context the XWiki context
@@ -7556,7 +7544,7 @@ public class XWiki implements EventListener
         if (observation != null) {
             observation.notify(new DocumentRestoredEvent(newdoc.getDocumentReferenceWithLocale(), index), newdoc,
                 context);
-        }
+        }        
     }
 
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException

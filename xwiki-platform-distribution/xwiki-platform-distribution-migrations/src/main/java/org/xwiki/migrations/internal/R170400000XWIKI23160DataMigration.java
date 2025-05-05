@@ -20,9 +20,7 @@
 package org.xwiki.migrations.internal;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -47,6 +45,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
@@ -55,6 +54,9 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 import static com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer.LOCAL_REFERENCE;
 
 /**
+ * Empty fields from {@link XWikiPreferencesDocumentInitializer#LOCAL_REFERENCE} used as templates when they are
+ * replaced by actual velocity templates.
+ *
  * @version $Id$
  * @since 17.4.0RC1
  */
@@ -64,10 +66,6 @@ import static com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializ
 public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigration
 {
     private static final String META_FIELD = "meta";
-
-    private static final String CONFIRMATION_EMAIL_CONTENT_FIELD = "confirmation_email_content";
-
-    private static final String VALIDATION_EMAIL_CONTENT_FIELD = "validation_email_content";
 
     @Inject
     private Packager packager;
@@ -85,7 +83,7 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
     @Override
     public String getDescription()
     {
-        return "Cleanup XWikiProperties fields used as templates when they match the default value.";
+        return "Cleanup XWikiProperties fields used as templates when they match the default values.";
     }
 
     @Override
@@ -97,6 +95,7 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
         DocumentReference xwikiPreferencesDocumentReference =
             new DocumentReference(new LocalDocumentReference(LOCAL_REFERENCE, Locale.ROOT),
                 xWikiContext.getWikiReference());
+        // We manipulate a cloned version to avoid conflicts with potential concurrent modifications.
         XWikiDocument xwikiPreferencesDocument =
             wiki.getDocument(xwikiPreferencesDocumentReference, xWikiContext).clone();
         XWikiDocument xwikiPreferencesDocumentFromXar = loadFromXar(xwikiPreferencesDocumentReference);
@@ -115,25 +114,10 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
         BaseObject xwikiPreferencesXObjectFromXar =
             xwikiPreferencesDocumentFromXar.getXObject(xwikiPreferencesDocumentReferenceNoLocal);
         boolean metaChanged = clearField(xwikiPreferencesXObject, xwikiPreferencesXObjectFromXar, META_FIELD);
-        boolean confirmationEmailContentChanged =
-            clearField(xwikiPreferencesXObject, xwikiPreferencesXObjectFromXar, CONFIRMATION_EMAIL_CONTENT_FIELD);
-        boolean validationEmailContentChanged =
-            clearField(xwikiPreferencesXObject, xwikiPreferencesXObjectFromXar, VALIDATION_EMAIL_CONTENT_FIELD);
-        List<String> changedFields = new ArrayList<>();
-        if (metaChanged) {
-            changedFields.add(META_FIELD);
-        }
-        if (confirmationEmailContentChanged) {
-            changedFields.add(CONFIRMATION_EMAIL_CONTENT_FIELD);
-        }
-        if (validationEmailContentChanged) {
-            changedFields.add(VALIDATION_EMAIL_CONTENT_FIELD);
-        }
 
-        if (metaChanged || confirmationEmailContentChanged || validationEmailContentChanged) {
+        if (metaChanged) {
             wiki.saveDocument(xwikiPreferencesDocument,
-                "[UPGRADE] empty fields [%s] because they match the default values".formatted(
-                    String.join(", ", changedFields)), xWikiContext);
+                "[UPGRADE] empty field [%s] because it matches the default values".formatted(META_FIELD), xWikiContext);
         }
     }
 

@@ -33,8 +33,6 @@
   <properties>
     <!-- Put the name of the distribution which will be displayed in the footer -->
     <xwiki.extension.name>XWiki Distribution Migrations</xwiki.extension.name>
-
-    <xwiki.extension.features>xwiki</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

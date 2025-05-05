@@ -21,7 +21,7 @@
 #if(!$request.getParameter("forceLeftPanels"))
   <button id="leftPanelsToggle" class="btn btn-default" title="$escapetool.xml($services.localization.render('panels.column.left.toggle.hint'))">
     $services.icon.renderHTML('caret-right')
-    <div class="sr-only">$services.localization.render('panels.column.toggle.left.label')</div>
+    <div class="sr-only">$services.localization.render('panels.column.left.toggle.hint')</div>
   </button>
 #end
 <div id="leftPanels" class="panels left panel-width-$!{leftPanelsWidth}"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>

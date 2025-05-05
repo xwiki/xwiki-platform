@@ -281,8 +281,7 @@ require(['jquery'], function($) {
       
       if (panelsEnabled(side) !== defaultPanelState[side]) {
         localStorage.setItem(localStoragePrefix + side, panelsEnabled(side));
-      }
-      else {
+      } else {
         // If the values are the same, we remove whatever was stored in the localStorage.
         localStorage.removeItem(localStoragePrefix + side);
       }

@@ -20,6 +20,7 @@
 package org.xwiki.export.pdf.internal.job;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -159,6 +160,7 @@ class PDFExportJobTest
         when(this.pdfPrinter.print(printPreviewURL)).thenReturn(pdfContent);
 
         this.request.setServerSide(true);
+        this.request.getContext().put("request.session", "session");
         this.pdfExportJob.initialize(this.request);
         this.pdfExportJob.runInternal();
 
@@ -170,11 +172,14 @@ class PDFExportJobTest
 
         TemporaryResourceReference pdfFileReference = jobStatus.getPDFFileReference();
         verify(this.temporaryResourceStore).createTemporaryFile(pdfFileReference, pdfContent);
+
+        assertFalse(this.request.getContext().containsKey("request.session"));
     }
 
     @Test
     void runClientSide() throws Exception
     {
+        this.request.getContext().put("request.headers", "headers");
         this.pdfExportJob.initialize(this.request);
         this.pdfExportJob.runInternal();
 
@@ -188,6 +193,8 @@ class PDFExportJobTest
         assertEquals(2, renderingResults.size());
         assertSame(this.firstPageRendering, renderingResults.get(0));
         assertSame(this.secondPageRendering, renderingResults.get(1));
+
+        assertFalse(this.request.getContext().containsKey("request.headers"));
     }
 
     @Test
@@ -216,6 +223,7 @@ class PDFExportJobTest
     @Test
     void runWithoutDocuments() throws Exception
     {
+        this.request.getContext().put("request.cookies", "cookies");
         this.request.setDocuments(Collections.emptyList());
         this.pdfExportJob.initialize(this.request);
         this.pdfExportJob.runInternal();
@@ -224,6 +232,8 @@ class PDFExportJobTest
         assertNull(jobStatus.getPDFFileReference());
         assertNull(jobStatus.getRequiredSkinExtensions());
         assertEquals(0, jobStatus.getDocumentRenderingResults().size());
+
+        assertFalse(this.request.getContext().containsKey("request.cookies"));
     }
 
     @Test
@@ -233,6 +243,8 @@ class PDFExportJobTest
             new XDOM(Collections.singletonList(new WordBlock("second"))), StringUtils.repeat('x', 1000));
         when(this.documentRenderer.render(this.secondPageReference, this.rendererParameters)).thenReturn(largeResult);
 
+        this.request.getContext().put("request.cookies", "cookies");
+        this.request.getContext().put("request.foo", "bar");
         this.pdfExportJob.initialize(this.request);
         try {
             this.pdfExportJob.runInternal();
@@ -243,6 +255,9 @@ class PDFExportJobTest
                     + " or disable this limit from the PDF Export administration section or from XWiki properties.",
                 e.getMessage());
         }
+
+        assertFalse(this.request.getContext().containsKey("request.cookies"));
+        assertEquals("bar", this.request.getContext().get("request.foo"));
     }
 
     @Test

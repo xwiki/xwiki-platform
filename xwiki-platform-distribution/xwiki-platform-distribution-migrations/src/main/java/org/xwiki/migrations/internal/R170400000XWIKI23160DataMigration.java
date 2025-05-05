@@ -89,6 +89,8 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
+        // TODO: confirmation_email_content and validation_email_content fields also need to be migrated, see
+        //  XWIKI-23164
         XWikiContext xWikiContext = getXWikiContext();
         XWiki wiki = xWikiContext.getWiki();
         // Defining the root local is important to have entity equality when retrieving the version from the XAR.

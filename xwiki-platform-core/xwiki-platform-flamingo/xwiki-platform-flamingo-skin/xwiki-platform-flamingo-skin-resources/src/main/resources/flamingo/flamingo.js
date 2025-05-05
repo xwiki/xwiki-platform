@@ -228,7 +228,7 @@ require(['jquery'], function($) {
     // This inline style is reset when the panel is collapsed.
     document.body.style.removeProperty('--panel-column-' + side + '-width');
   };
-  var togglePanels = function (side) {
+  let togglePanels = function (side) {
     let toggle = $("#" + side + "PanelsToggle");
     let newExpandedState = toggle.attr('aria-expanded') === 'false';
 

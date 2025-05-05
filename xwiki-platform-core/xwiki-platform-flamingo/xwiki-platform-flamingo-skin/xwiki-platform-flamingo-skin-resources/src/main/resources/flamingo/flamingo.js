@@ -216,7 +216,7 @@ require(['jquery'], function($) {
         (updatedSide !== compareSide && panelsEnabled(compareSide));
     };
     let showLeftColumn = showSide(side, newExpandedState, left);
-    let showRightColumn = showSide(side, newExpandedState, left);
+    let showRightColumn = showSide(side, newExpandedState, right);
     let bodyClasses= document.body.classList;
     bodyClasses.toggle('hidelefthideright', !showLeftColumn && !showRightColumn);
     bodyClasses.toggle('hideleft', !showLeftColumn && showRightColumn);

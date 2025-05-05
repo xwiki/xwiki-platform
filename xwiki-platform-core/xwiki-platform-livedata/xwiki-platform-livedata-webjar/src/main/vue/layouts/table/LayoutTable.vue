@@ -34,7 +34,7 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataPagination v-if="isMoreThanOnePage" />
+        <LivedataPagination />
       </template>
       <template #right>
         <LivedataDropdownMenu />

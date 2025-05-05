@@ -499,7 +499,7 @@ var XWiki = (function(XWiki){
       // This meaningful change in the DOM must be announced 
       // so that assistive technology users can notice it without trouble.
       var div = new Element("div", { 
-        'class': "suggestItems "+ this.options.className ,
+        'class': "suggestItems "+ this.options.className,
         'role': 'alert'
       });
 

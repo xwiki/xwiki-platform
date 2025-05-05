@@ -218,8 +218,7 @@ require(['jquery'], function($) {
     let showLeftColumn = showSide(side, newExpandedState, left);
     let showRightColumn = showSide(side, newExpandedState, left);
     let bodyClasses= document.body.classList;
-    bodyClasses.remove('hidelefthideright');
-    if (!showLeftColumn && !showRightColumn) bodyClasses.add('hidelefthideright');
+    bodyClasses.toggle('hidelefthideright', !showLeftColumn && !showRightColumn);
     bodyClasses.remove('hideleft');
     if (!showLeftColumn && showRightColumn) bodyClasses.add('hideleft');
     bodyClasses.remove('hideright');

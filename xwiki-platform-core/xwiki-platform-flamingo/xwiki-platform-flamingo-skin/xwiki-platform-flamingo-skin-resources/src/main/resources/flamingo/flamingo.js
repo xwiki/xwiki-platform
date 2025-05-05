@@ -220,8 +220,7 @@ require(['jquery'], function($) {
     let bodyClasses= document.body.classList;
     bodyClasses.toggle('hidelefthideright', !showLeftColumn && !showRightColumn);
     bodyClasses.toggle('hideleft', !showLeftColumn && showRightColumn);
-    bodyClasses.remove('hideright');
-    if (showLeftColumn && !showRightColumn) bodyClasses.add('hideright');
+    bodyClasses.toggle('hideright', showLeftColumn && !showRightColumn);
     // The JQuery UI handles defined for handle resizing above add an inline style on the body to work.
     // This inline style is reset when the panel is collapsed.
     document.body.style.removeProperty('--panel-column-' + side + '-width');

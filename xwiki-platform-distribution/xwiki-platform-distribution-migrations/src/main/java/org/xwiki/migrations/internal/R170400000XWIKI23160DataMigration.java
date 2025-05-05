@@ -36,8 +36,10 @@ import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
+import org.xwiki.index.TaskManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
 
@@ -52,10 +54,13 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 import static com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer.LOCAL_REFERENCE;
+import static org.xwiki.migrations.internal.XWikiPropertiesMetaFieldCleanupTaskConsumer.TASK_NAME;
 
 /**
- * Empty fields from {@link XWikiPreferencesDocumentInitializer#LOCAL_REFERENCE} used as templates when they are
- * replaced by actual velocity templates.
+ * Sends {@link XWikiPreferencesDocumentInitializer#LOCAL_REFERENCE} to the {@link TaskManager} queue with task id
+ * {@link XWikiPropertiesMetaFieldCleanupTaskConsumer#TASK_NAME} if the content of the {@code meta} field matches the
+ * one from the XAR. Then, {@link XWikiPropertiesMetaFieldCleanupTaskConsumer} takes care of emptying the {@code meta}
+ * field.
  *
  * @version $Id$
  * @since 17.4.0RC1
@@ -73,6 +78,9 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
     @Inject
     @Named(XarExtensionHandler.TYPE)
     private InstalledExtensionRepository installedExtensionRepository;
+
+    @Inject
+    private TaskManager taskManager;
 
     @Override
     public XWikiDBVersion getVersion()
@@ -97,29 +105,29 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
         DocumentReference xwikiPreferencesDocumentReference =
             new DocumentReference(new LocalDocumentReference(LOCAL_REFERENCE, Locale.ROOT),
                 xWikiContext.getWikiReference());
-        // We manipulate a cloned version to avoid conflicts with potential concurrent modifications.
-        XWikiDocument xwikiPreferencesDocument =
-            wiki.getDocument(xwikiPreferencesDocumentReference, xWikiContext).clone();
+        XWikiDocument xwikiPreferencesDocument = wiki.getDocument(xwikiPreferencesDocumentReference, xWikiContext);
         XWikiDocument xwikiPreferencesDocumentFromXar = loadFromXar(xwikiPreferencesDocumentReference);
         if (xwikiPreferencesDocumentFromXar != null) {
-            runMigration(xWikiContext, xwikiPreferencesDocument, xwikiPreferencesDocumentFromXar, wiki);
+            runMigration(xWikiContext, xwikiPreferencesDocument, xwikiPreferencesDocumentFromXar);
         }
     }
 
     private void runMigration(XWikiContext xWikiContext, XWikiDocument xwikiPreferencesDocument,
-        XWikiDocument xwikiPreferencesDocumentFromXar, XWiki wiki) throws XWikiException
+        XWikiDocument xwikiPreferencesDocumentFromXar)
     {
+        WikiReference wikiReference = xWikiContext.getWikiReference();
         DocumentReference xwikiPreferencesDocumentReferenceNoLocal =
-            new DocumentReference(LOCAL_REFERENCE, xWikiContext.getWikiReference());
+            new DocumentReference(LOCAL_REFERENCE, wikiReference);
         BaseObject xwikiPreferencesXObject =
             xwikiPreferencesDocument.getXObject(xwikiPreferencesDocumentReferenceNoLocal);
         BaseObject xwikiPreferencesXObjectFromXar =
             xwikiPreferencesDocumentFromXar.getXObject(xwikiPreferencesDocumentReferenceNoLocal);
-        boolean metaChanged = clearField(xwikiPreferencesXObject, xwikiPreferencesXObjectFromXar, META_FIELD);
-
-        if (metaChanged) {
-            wiki.saveDocument(xwikiPreferencesDocument,
-                "[UPGRADE] empty field [%s] because it matches the default values".formatted(META_FIELD), xWikiContext);
+        String template = xwikiPreferencesXObject.getStringValue(META_FIELD);
+        if (StringUtils.isNotEmpty(template)) {
+            String templateFromXar = xwikiPreferencesXObjectFromXar.getStringValue(META_FIELD);
+            if (template.equals(templateFromXar)) {
+                this.taskManager.addTask(wikiReference.getName(), xwikiPreferencesDocument.getId(), TASK_NAME);
+            }
         }
     }
 
@@ -158,18 +166,5 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
                 "The resolved [%s] component cannot be cast to [%s]".formatted(InstalledExtensionRepository.class,
                     XarInstalledExtensionRepository.class));
         }
-    }
-
-    private boolean clearField(BaseObject object, BaseObject objectFromXar, String field)
-    {
-        String template = object.getStringValue(field);
-        if (StringUtils.isNotEmpty(template)) {
-            String templateFromXar = objectFromXar.getStringValue(field);
-            if (template.equals(templateFromXar)) {
-                object.setStringValue(field, "");
-                return true;
-            }
-        }
-        return false;
     }
 }

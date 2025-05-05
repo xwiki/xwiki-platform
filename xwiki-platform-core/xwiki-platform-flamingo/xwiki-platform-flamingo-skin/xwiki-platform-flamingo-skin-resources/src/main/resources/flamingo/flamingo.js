@@ -219,8 +219,7 @@ require(['jquery'], function($) {
     let showRightColumn = showSide(side, newExpandedState, left);
     let bodyClasses= document.body.classList;
     bodyClasses.toggle('hidelefthideright', !showLeftColumn && !showRightColumn);
-    bodyClasses.remove('hideleft');
-    if (!showLeftColumn && showRightColumn) bodyClasses.add('hideleft');
+    bodyClasses.toggle('hideleft', !showLeftColumn && showRightColumn);
     bodyClasses.remove('hideright');
     if (showLeftColumn && !showRightColumn) bodyClasses.add('hideright');
     // The JQuery UI handles defined for handle resizing above add an inline style on the body to work.

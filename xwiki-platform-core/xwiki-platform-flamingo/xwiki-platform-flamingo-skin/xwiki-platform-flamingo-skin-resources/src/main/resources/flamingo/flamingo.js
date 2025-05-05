@@ -208,8 +208,8 @@ require(['jquery', 'jquery-ui'], function($) {
 });
 
 require(['jquery'], function($) {
-  /* The body update hides completely the panel column. We want to make sure the panel column is visible for the whole
-  animation before hiding it. */
+  // The body update hides completely the panel column. We want to make sure the panel column is visible for the whole
+  // animation before hiding it.
   let updateBody = function (side, newExpandedState) {
     let showSide = function (updatedSide, newExpandedState, compareSide) {
       return (updatedSide === compareSide && newExpandedState) || 

@@ -116,12 +116,12 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
         XWikiDocument xwikiPreferencesDocumentFromXar)
     {
         WikiReference wikiReference = xWikiContext.getWikiReference();
-        DocumentReference xwikiPreferencesDocumentReferenceNoLocal =
+        DocumentReference xwikiPreferencesDocumentReferenceNoLocale =
             new DocumentReference(LOCAL_REFERENCE, wikiReference);
         BaseObject xwikiPreferencesXObject =
-            xwikiPreferencesDocument.getXObject(xwikiPreferencesDocumentReferenceNoLocal);
+            xwikiPreferencesDocument.getXObject(xwikiPreferencesDocumentReferenceNoLocale);
         BaseObject xwikiPreferencesXObjectFromXar =
-            xwikiPreferencesDocumentFromXar.getXObject(xwikiPreferencesDocumentReferenceNoLocal);
+            xwikiPreferencesDocumentFromXar.getXObject(xwikiPreferencesDocumentReferenceNoLocale);
         String template = xwikiPreferencesXObject.getStringValue(META_FIELD);
         if (StringUtils.isNotEmpty(template)) {
             String templateFromXar = xwikiPreferencesXObjectFromXar.getStringValue(META_FIELD);

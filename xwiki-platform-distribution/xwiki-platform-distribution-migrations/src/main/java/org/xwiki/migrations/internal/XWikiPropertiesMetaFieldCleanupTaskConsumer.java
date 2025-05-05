@@ -61,22 +61,27 @@ public class XWikiPropertiesMetaFieldCleanupTaskConsumer implements TaskConsumer
     @Override
     public void consume(DocumentReference documentReference, String version) throws IndexException
     {
+        XWikiContext context = this.contextProvider.get();
+        XWiki wiki = context.getWiki();
+        XWikiDocument document;
         try {
-            XWikiContext context = this.contextProvider.get();
-            XWiki wiki = context.getWiki();
-            XWikiDocument document = wiki.getDocument(documentReference, context);
-            DocumentReference xwikiPreferencesDocumentReferenceNoLocal =
-                new DocumentReference(LOCAL_REFERENCE, context.getWikiReference());
-
-            BaseObject xObject = document.getXObject(xwikiPreferencesDocumentReferenceNoLocal);
-            if (xObject != null && StringUtils.isNotEmpty(xObject.getStringValue(META_FIELD))) {
-                XWikiDocument documentClone = document.clone();
-                documentClone.getXObject(xwikiPreferencesDocumentReferenceNoLocal).setStringValue(META_FIELD, "");
-                wiki.saveDocument(documentClone,
-                    "[UPGRADE] empty field [%s] because it matches the default values".formatted(META_FIELD), context);
-            }
+            document = wiki.getDocument(documentReference, context);
         } catch (XWikiException e) {
             throw new IndexException("Unable to retrieve document [%s]".formatted(documentReference), e);
+        }
+        DocumentReference xwikiPreferencesDocumentReferenceNoLocal =
+            new DocumentReference(LOCAL_REFERENCE, context.getWikiReference());
+
+        BaseObject xObject = document.getXObject(xwikiPreferencesDocumentReferenceNoLocal);
+        if (xObject != null && StringUtils.isNotEmpty(xObject.getStringValue(META_FIELD))) {
+            XWikiDocument documentClone = document.clone();
+            documentClone.getXObject(xwikiPreferencesDocumentReferenceNoLocal).setStringValue(META_FIELD, "");
+            try {
+                wiki.saveDocument(documentClone,
+                    "[UPGRADE] empty field [%s] because it matches the default values".formatted(META_FIELD), context);
+            } catch (XWikiException e) {
+                throw new IndexException("Unable to save document [%s]".formatted(documentReference), e);
+            }
         }
     }
 }

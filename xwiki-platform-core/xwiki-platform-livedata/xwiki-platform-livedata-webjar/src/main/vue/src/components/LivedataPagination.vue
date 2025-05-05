@@ -83,14 +83,14 @@
               in the Livedata meta config
             -->
       <button
-          :class="['page-nav',
+        :class="['page-nav',
           'first-page', 
-        'btn btn-default btn-xs',  {
-          'disabled': isFirstPage,
-        }]"
-          v-if="data.meta.pagination.showFirstLast"
-          :title="$t('livedata.pagination.first')"
-          @click.prevent="changePageIndex(!isFirstPage, 0)"
+          'btn btn-default btn-xs',  {
+            'disabled': isFirstPage,
+        }]" 
+        v-if="data.meta.pagination.showFirstLast"
+        :title="$t('livedata.pagination.first')"
+        @click.prevent="changePageIndex(!isFirstPage, 0)"
       >
         <XWikiIcon :icon-descriptor="{name: 'fast-backward'}"/>
       </button>
@@ -101,14 +101,14 @@
         in the Livedata meta config
       -->
       <button
-          :class="['page-nav',
+        :class="['page-nav',
           'previous-page', 
-        'btn btn-default btn-xs',  {
-          'disabled': isFirstPage,
+          'btn btn-default btn-xs',  {
+            'disabled': isFirstPage,
         }]"
-          v-if="data.meta.pagination.showNextPrevious"
-          :title="$t('livedata.pagination.previous')"
-          @click.prevent="changePageIndex(!isFirstPage, logic.getPageIndex() - 1)"
+        v-if="data.meta.pagination.showNextPrevious"
+        :title="$t('livedata.pagination.previous')"
+        @click.prevent="changePageIndex(!isFirstPage, logic.getPageIndex() - 1)"
       >
         <XWikiIcon :icon-descriptor="{name: 'caret-right'}" />
       </button>
@@ -120,9 +120,9 @@
       -->
       <button
         :class="['page-nav',
-        'next-page', 
-        'btn btn-default btn-xs',  {
-          'disabled': isLastPage,
+          'next-page', 
+          'btn btn-default btn-xs',  {
+            'disabled': isLastPage,
         }]"
         v-if="data.meta.pagination.showNextPrevious"
         :title="$t('livedata.pagination.next')"
@@ -138,9 +138,9 @@
       -->
       <button
         :class="['page-nav', 
-        'last-page', 
-        'btn btn-default btn-xs', {
-          'disabled': isLastPage,
+          'last-page', 
+          'btn btn-default btn-xs', {
+            'disabled': isLastPage,
         }]"
         v-if="data.meta.pagination.showFirstLast"
         :title="$t('livedata.pagination.last')"
@@ -157,8 +157,8 @@
       in the Livedata meta config
     -->
     <span
-        class="pagination-current-entries"
-        v-if="showEntryRange && side !== 'left'"
+      class="pagination-current-entries"
+      v-if="showEntryRange && side !== 'left'"
     >
       {{ $t("livedata.pagination.currentEntries", [
       logic.getFirstIndexOfPage() + 1,
@@ -173,24 +173,23 @@
       in the Livedata meta config
     -->
     <span
-        class="pagination-page-size"
-        v-if="data.meta.pagination.showPageSizeDropdown && side !== 'left'"
+      class="pagination-page-size"
+      v-if="data.meta.pagination.showPageSizeDropdown && side !== 'left'"
     >
       {{ $t('livedata.pagination.resultsPerPage') }}
       <select
-          :title="$t('livedata.pagination.selectPageSize')"
-          @change="changePageSize"
+        :title="$t('livedata.pagination.selectPageSize')"
+        @change="changePageSize"
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->
         <option
-            v-for="pageSize in pageSizes"
-            :key="pageSize"
-            :value="pageSize"
-            :selected="pageSize === data.query.limit"
+          v-for="pageSize in pageSizes"
+          :key="pageSize"
+          :value="pageSize"
+          :selected="pageSize === data.query.limit"
         >{{ pageSize }}</option>
       </select>
     </span>
-    
   </nav>
 </template>
 

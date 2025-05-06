@@ -78,10 +78,10 @@
       </template>
       
       <!--
-              Go to First Page button`
-              Can be shown / hidden by the `pagination.showFirstLast` property
-              in the Livedata meta config
-            -->
+        Go to First Page button
+        Can be shown / hidden by the `pagination.showFirstLast` property
+        in the Livedata meta config
+      -->
       <button
         :class="['page-nav',
           'first-page', 
@@ -97,7 +97,7 @@
       
       <!--
         Go to Previous Page button
-        Can be shown / hiden by the `pagination.showNextPrevious` property
+        Can be shown / hidden by the `pagination.showNextPrevious` property
         in the Livedata meta config
       -->
       <button

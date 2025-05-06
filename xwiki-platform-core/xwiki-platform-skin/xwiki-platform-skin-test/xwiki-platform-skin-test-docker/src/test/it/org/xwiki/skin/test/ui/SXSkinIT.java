@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,18 +16,35 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.skin.test.ui;
 
-<extensions xmlns="http://maven.apache.org/EXTENSIONS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/EXTENSIONS/1.1.0 https://maven.apache.org/xsd/core-extensions-1.0.0.xsd">
-  <extension>
-    <groupId>com.gradle</groupId>
-    <artifactId>develocity-maven-extension</artifactId>
-    <version>1.23.2</version>
-  </extension>
-  <extension>
-    <groupId>com.gradle</groupId>
-    <artifactId>common-custom-user-data-maven-extension</artifactId>
-    <version>2.0.2</version>
-  </extension>
-</extensions>
+import java.net.URI;
+
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
+
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+/**
+ * Verify the behavior of resource based skin resources.
+ *
+ * @version $Id$
+ */
+@UITest
+class SXSkinIT
+{
+    @Test
+    void pathTraversal(TestUtils setup) throws Exception
+    {
+        URI uri = new URI(setup.getURL("Main", "WebHome", "sx", "resource=../../WEB-INF/xwiki.cfg"));
+
+        GetMethod response = setup.rest().executeGet(uri);
+
+        assertNotEquals(200, response.getStatusCode());
+
+        response.releaseConnection();
+     }
+}

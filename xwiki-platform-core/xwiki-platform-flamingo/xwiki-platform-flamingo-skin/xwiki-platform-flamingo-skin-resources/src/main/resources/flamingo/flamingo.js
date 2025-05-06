@@ -207,3 +207,88 @@ require(['jquery', 'jquery-ui'], function($) {
   document.addEventListener('visibilitychange', savePanelWidthInLocalStorage);
 });
 
+require(['jquery'], function($) {
+  // The body update hides completely the panel column. We want to make sure the panel column is visible for the whole
+  // animation before hiding it.
+  let updateBody = function (side, newExpandedState) {
+    let showSide = function (updatedSide, newExpandedState, compareSide) {
+      return (updatedSide === compareSide && newExpandedState) || 
+        (updatedSide !== compareSide && panelsEnabled(compareSide));
+    };
+    let showLeftColumn = showSide(side, newExpandedState, left);
+    let showRightColumn = showSide(side, newExpandedState, right);
+    let bodyClasses= document.body.classList;
+    bodyClasses.toggle('hidelefthideright', !showLeftColumn && !showRightColumn);
+    bodyClasses.toggle('hideleft', !showLeftColumn && showRightColumn);
+    bodyClasses.toggle('hideright', showLeftColumn && !showRightColumn);
+    // The JQuery UI handles defined for handle resizing above add an inline style on the body to work.
+    // This inline style is reset when the panel is collapsed.
+    document.body.style.removeProperty('--panel-column-' + side + '-width');
+  };
+  let togglePanels = function (side) {
+    let toggle = $("#" + side + "PanelsToggle");
+    let newExpandedState = toggle.attr('aria-expanded') === 'false';
+
+    if (newExpandedState) {
+      // If we want to expand the panel, we first show it, then we slide it in view.
+      updateBody(side, newExpandedState);
+      toggle.attr('aria-expanded', newExpandedState);
+    } else {
+      // If we want to collapse the panel, we first slide it out of view and then we hide it.
+      toggle.attr('aria-expanded', newExpandedState);
+      updateBody(side, newExpandedState);
+    }
+  };
+
+  $("#rightPanelsToggle").on('click', function() {togglePanels(right);});
+  $("#leftPanelsToggle").on('click', function() {togglePanels(left);});
+  
+  // Store the user preference in the local storage
+  let localStoragePrefix = 'xwiki-panel-enabled-';
+  let [right,left] = ['right','left'];
+  let panelsEnabled = function(side) {
+    return !document.body.classList.contains("hidelefthideright") && !document.body.classList.contains("hide" + side);
+  };
+  let defaultPanelState = {
+    'right': panelsEnabled(right),
+    'left': panelsEnabled(left)
+  };
+  let applyLocalStorageValues = function() {
+    let localStorageLeft = JSON.parse(localStorage.getItem(localStoragePrefix + left));
+    let localStorageRight = JSON.parse(localStorage.getItem(localStoragePrefix + right));
+    if ((localStorageLeft !== null ?  localStorageLeft : defaultPanelState[left]) !== panelsEnabled(left)) {
+      togglePanels(left);
+    } 
+    if ((localStorageRight !== null ?  localStorageRight : defaultPanelState[right]) !== panelsEnabled(right)) {
+      togglePanels(right);
+    }
+  };
+  // Initialization
+  applyLocalStorageValues();
+  // Synchronization across tabs
+  window.addEventListener('storage', function (event) {
+    switch (event.key) {
+      case localStoragePrefix + left:
+      case localStoragePrefix + right: return applyLocalStorageValues();
+    }
+  });
+
+  // Saving preference at the end of the session
+  let savePanelStateInLocalStorage = function(event) {
+    // We only update the local storage when the user ends its session on the page
+    if (!document.hidden) return;
+    let updateLocalStorageValueForSide = function (side) {
+      
+      if (panelsEnabled(side) !== defaultPanelState[side]) {
+        localStorage.setItem(localStoragePrefix + side, panelsEnabled(side));
+      } else {
+        // If the values are the same, we remove whatever was stored in the localStorage.
+        localStorage.removeItem(localStoragePrefix + side);
+      }
+    };
+    updateLocalStorageValueForSide(left);
+    updateLocalStorageValueForSide(right);
+  };
+  document.addEventListener('visibilitychange', savePanelStateInLocalStorage);
+});
+

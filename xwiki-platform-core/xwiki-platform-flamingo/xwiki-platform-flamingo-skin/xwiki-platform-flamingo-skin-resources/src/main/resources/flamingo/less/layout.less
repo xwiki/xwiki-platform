@@ -165,6 +165,84 @@
 }
 
 /* Styles for the panel column handles.. */
+/* Toggle handles */
+#leftPanelsToggle, #rightPanelsToggle {
+  /* We make sure it doesn't get over the content. */
+  max-width: @grid-gutter-width - 4px;
+  background-color: @breadcrumb-bg;
+  border: 0;
+  box-shadow: none;
+  .text-muted;
+  /* By default, those buttons are hidden visually but never hidden in the DOM. */
+  opacity: 0;
+  /* Smoothen out the apparition and disparition of the togglers in the UI. */
+  transition: visibility .2s ease-in-out, opacity .2s ease-in-out;
+  /* They are fixed on the page, always at the very top of their parent #contentcontainer.
+    We use the same top-margin as #leftPanels and #rightPanels so that the carets are aligned with
+    the first panel title at first. */
+  position: fixed;
+  margin-top: 15px;
+  /* Make sure the toggles are displayed above the panel content. */
+  z-index: 1;
+  /* Smoothen out the state transition when expanding and collapsing the panel. */
+  & > * {
+    transition: transform .2s;
+  }
+}
+
+/* We only allow the panel column toggles when the screen is large enough to support the columns next to the content.
+It would not make sense on mobile. 
+A niche weird interaction that would make this style behave unexpectedly is: hide one column, reduce the screen width 
+(e.g. rotate the phone) and the panels are not here and cannot be displayed again until the screen width is increased 
+again or the page is reloaded (because the toggler is hidden until then). */
+@media (min-width: @screen-md-min) {
+  /* The panel toggle is quite small. Since it's hidden by default, we need to give it proper conditions for showing up.
+  We show the toggles when either of the panel columns are hovered.  */
+  #leftPanelsToggle[aria-expanded="false"],
+  #contentcontainer:hover #contentcolumn:not(:hover) ~ #leftPanelsToggle,
+  #leftPanelsToggle:has(+ #leftPanels:focus-within),
+  #leftPanelsToggle:hover, #leftPanelsToggle:focus,
+  #rightPanelsToggle[aria-expanded="false"],
+  #contentcontainer:hover #contentcolumn:not(:hover) ~ #rightPanelsToggle,
+  #rightPanelsToggle:has(+ #rightPanels:focus-within),
+  #rightPanelsToggle:hover, #rightPanelsToggle:focus {
+    opacity: 1;
+  }
+}
+
+body#body #rightPanelsToggle {
+  /* Merge the button with the side of the screen. */
+  right: 0;
+  border-radius: @border-radius-small 0 0 @border-radius-small;
+  
+  /* Default state has the caret pointing right. */
+  & > * {
+    transform: rotate(0);
+  }
+  
+  /* When the panel is closed, we want the caret pointing left. ie 'right-caret' rotated 180deg */
+  &[aria-expanded="false"] > * {
+    transform: rotate(180deg);
+  }
+}
+
+body#body #leftPanelsToggle {
+  /* Merge the button with the side of the screen. */
+  left: 0;
+  border-radius: 0 @border-radius-small @border-radius-small 0;
+  
+  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
+  & > * {
+    transform: rotate(180deg);
+  }
+  
+  /* When the panel is closed, we want the caret pointing right. */
+  &[aria-expanded="false"] > * {
+    transform: rotate(0);
+  }
+}
+
+/* Resize handles */
 #rightPanels > .ui-resizable-w,
 #leftPanels > .ui-resizable-e {
   position: absolute;

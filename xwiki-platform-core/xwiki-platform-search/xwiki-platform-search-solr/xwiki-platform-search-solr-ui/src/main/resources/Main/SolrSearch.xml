@@ -473,7 +473,8 @@
   }
 }
 
-.search-results-sort, .search-options {
+.search-results-sort,
+.search-options, .search-options &gt; ul, .search-options &gt; ul &gt; li {
   display: flex;
   gap: .4em;
   align-items: center;
@@ -482,38 +483,6 @@
 /**
  * Sort
  */
-
-ul.search-results-sort {
-  color: $theme.textSecondaryColor;
-  font-size: .9em;
-  padding: 5px 0 2px 0;
-  margin: 0;
-}
-.search-results-sort li {
-  display: inline;
-  list-style-type: none;
-  padding-left: 1.5em;
-}
-.search-results-sort li:first-of-type {
-  padding: 0;
-}
-a.sort-item {
-  color: inherit;
-  text-decoration: none;
-}
-a.sort-item:hover {
-  color: $theme.linkColor;
-  text-decoration: underline;
-}
-a.sort-item.active, a.sort-item.active:hover {
-  font-weight: bold;
-  color: $theme.textColor;
-  text-decoration: none;
-}
-.sort-item-order {
-  margin-left: .3em;
-}
-
 /* This checkbox input should be styled as a switch between ascending and descending states. */
 .search-results-sort #sort-order-input {
   /* Hide the default checkbox. We rely on the style of the label itself to make it work. */
@@ -540,35 +509,10 @@ a.sort-item.active, a.sort-item.active:hover {
  * Options
  */
 
-ul.search-options {
-  color: $theme.textSecondaryColor;
-  font-size: .9em;
-  padding: 5px 0 2px 0;
+.search-options ul {
   margin: 0;
-}
-.search-options li {
-  display: inline;
-  list-style-type: none;
-  padding-left: 1.5em;
-}
-.search-options li:first-of-type {
   padding: 0;
-}
-a.options-item {
-  color: inherit;
-  text-decoration: none;
-}
-a.options-item:hover {
-  color: $theme.linkColor;
-  text-decoration: underline;
-}
-a.options-item.active, a.options-item.active:hover{
-  font-weight: bold;
-  color: $theme.textColor;
-  text-decoration: none;
-}
-
-.search-options {
+  
   &amp; input[type="checkbox"] {
     position: unset;
     margin: 0;
@@ -713,12 +657,6 @@ a.search-result-highlightAll:after {
   margin-bottom: 1em;
   border-radius: 7px;
 }
-/* Colibri skin doesn't have the grid system. */
-.skin-colibri .search-facets {
-  float: right;
-  max-width: 19.5em;
-  width: 19.5em;
-}
 
 .search-facets-header,
 .search-facets-actions,
@@ -778,11 +716,9 @@ a.search-result-highlightAll:after {
 .search-facet-header {
   color: $theme.titleColor;
   cursor: pointer;
-  line-height: 1.4em;
-  margin: 0 .2em;
   display: flex;
   justify-content: space-between;
-  position: relative;
+  align-items: center;
 }
 
 .search-facet:last-of-type .search-facet-header:after {
@@ -849,10 +785,6 @@ a.search-result-highlightAll:after {
   margin: .5em 0;
 }
 
-.search-facet-body li:hover {
-  background-color: $theme.highlightColor;
-}
-
 .search-facet-body input[type="checkbox"] {
   margin: .2em 0;
 }
@@ -895,8 +827,11 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 }
 
 .search-facet-body .itemCount {
-  padding: .1em 0;
+  padding: .1em .5em;
   margin-left: auto;
+  background-color: var(--nav-link-hover-bg);
+  /* We want those item count blocks to be pill shaped. */
+  border-radius: 1em / 50%;
 }
 
 @media (max-width: 768px) {

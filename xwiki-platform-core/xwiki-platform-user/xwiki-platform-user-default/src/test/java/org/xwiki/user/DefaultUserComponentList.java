@@ -35,11 +35,9 @@ import org.xwiki.user.internal.GuestConfigurationSource;
 import org.xwiki.user.internal.SecureAllUserPropertiesResolver;
 import org.xwiki.user.internal.SecureUserPropertiesResolver;
 import org.xwiki.user.internal.SuperAdminConfigurationSource;
-import org.xwiki.user.internal.document.DocumentUserManager;
 import org.xwiki.user.internal.document.NormalUserConfigurationSourceAuthorization;
 import org.xwiki.user.internal.document.NormalUserPreferencesConfigurationSource;
 import org.xwiki.user.internal.document.SecureUserDocumentUserPropertiesResolver;
-import org.xwiki.user.internal.document.UserCache;
 import org.xwiki.user.internal.document.UserPreferencesConfigurationSource;
 import org.xwiki.user.internal.group.DefaultGroupManager;
 import org.xwiki.user.internal.group.MemberGroupsCache;
@@ -81,9 +79,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     MemberGroupsCache.class,
     WikiGroupCache.class,
     GroupMembersCache.class,
-    SpacesConfigurationSource.class,
-    DocumentUserManager.class,
-    UserCache.class
+    SpacesConfigurationSource.class
 })
 @Inherited
 @UserReferenceComponentList

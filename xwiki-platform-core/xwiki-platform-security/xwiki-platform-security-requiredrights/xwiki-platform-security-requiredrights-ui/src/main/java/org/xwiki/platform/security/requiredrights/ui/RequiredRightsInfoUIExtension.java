@@ -124,11 +124,14 @@ public class RequiredRightsInfoUIExtension implements UIExtension
 
             // Only display required rights for actually existing pages.
             if (requiredRightsOptional.isPresent()) {
+                // Load the JavaScript for updating the information when the document is saved.
+                this.jsrx.use("js/security/requiredrights/requiredRightsInformationUpdater.js");
+
                 List<Block> results = new ArrayList<>();
                 results.add(new RawBlock("<dt><label>", Syntax.HTML_5_0));
                 results.add(
                     this.localizationManager.getTranslation("security.requiredrights.ui.informationLabel").render());
-                results.add(new RawBlock("</label></dt><dd>", Syntax.HTML_5_0));
+                results.add(new RawBlock("</label></dt><dd class=\"required-rights-information\">", Syntax.HTML_5_0));
 
                 DocumentRequiredRights requiredRights = requiredRightsOptional.get();
                 results.addAll(getCurrentRequiredrightsDisplay(requiredRights));

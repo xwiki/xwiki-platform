@@ -39,6 +39,7 @@ import org.xwiki.platform.security.requiredrights.internal.RequiredRightChangeSu
 import org.xwiki.platform.security.requiredrights.internal.RequiredRightsChangeSuggestionManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
+import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
@@ -105,6 +106,9 @@ public class MissingRequiredRightWarningUIExtension implements UIExtension
         if ("view".equals(xWikiContext.getAction()) && this.authorizationManager.hasAccess(Right.EDIT,
             userReference, documentReference))
         {
+            Block container = new GroupBlock(Map.of("id", "missing-required-rights-warning"));
+            // Load the JavaScript for updating the warning when the document is saved.
+            this.jsrx.use("js/security/requiredrights/requiredRightsInformationUpdater.js");
             Optional<RequiredRightChangeSuggestion> changeSuggestion = getDefinitelyMissingRequiredRight(xWikiContext);
             if (changeSuggestion.isPresent() && this.authorizationManager.hasAccess(
                 changeSuggestion.get().rightToAdd().right(),
@@ -113,9 +117,11 @@ public class MissingRequiredRightWarningUIExtension implements UIExtension
             {
                 this.jsrx.use("js/security/requiredrights/requiredRightsDialog.js");
                 this.ssrx.use("css/security/requiredrights/requiredRightsDialog.css");
-                return this.templateManager.executeNoException(
-                    "security/requiredrights/missingRequiredRightWarning.vm");
+                container.addChild(
+                    this.templateManager.executeNoException("security/requiredrights/missingRequiredRightWarning.vm"));
             }
+
+            return container;
         }
 
         return new CompositeBlock();

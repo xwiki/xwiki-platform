@@ -205,7 +205,7 @@ class R170400000XWIKI23160DataMigrationTest
         xwikiPreferencesXObject.setStringValue("meta", "a");
         BaseObject xwikiPreferencesXObjectFromXar = new BaseObject();
         xwikiPreferencesXObjectFromXar.setStringValue("meta", "a");
-        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
+        LocalDocumentReference classReference = new LocalDocumentReference("XWiki", "XWikiPreferences");
 
         XWikiDocument xwikiPreferencesDocument = mock(XWikiDocument.class);
         XWikiDocument xwikiPreferencesDocumentFromXar = mock(XWikiDocument.class);

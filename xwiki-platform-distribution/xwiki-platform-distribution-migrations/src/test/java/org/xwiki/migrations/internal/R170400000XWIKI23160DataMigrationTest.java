@@ -19,9 +19,8 @@
  */
 package org.xwiki.migrations.internal;
 
+import java.util.List;
 import java.util.Locale;
-
-import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,27 +28,38 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.index.TaskManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.xar.XarEntry;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer.LOCAL_REFERENCE;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.xwiki.migrations.internal.XWikiPropertiesMetaFieldCleanupTaskConsumer.TASK_NAME;
 
 /**
  * Test of {@link R170400000XWIKI23160DataMigration}.
@@ -70,10 +80,6 @@ class R170400000XWIKI23160DataMigrationTest
     private Packager packager;
 
     @MockComponent
-    @Named(XarExtensionHandler.TYPE)
-    private InstalledExtensionRepository installedExtensionRepository;
-
-    @MockComponent
     private TaskManager taskManager;
 
     @MockComponent
@@ -91,6 +97,21 @@ class R170400000XWIKI23160DataMigrationTest
     @Mock
     private XWiki wiki;
 
+    private XarInstalledExtensionRepository xarInstalledExtensionRepository;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @BeforeComponent
+    void componentsSetup() throws Exception
+    {
+        // We inject the InstalledExtensionRepository with in xar manually to control the concrete type of the component
+        // as it's going to be cast in the tested code.
+        this.xarInstalledExtensionRepository =
+            this.componentManager.registerMockComponent(InstalledExtensionRepository.class, XarExtensionHandler.TYPE,
+                XarInstalledExtensionRepository.class, true);
+    }
+
     @BeforeEach
     void setUp()
     {
@@ -101,11 +122,110 @@ class R170400000XWIKI23160DataMigrationTest
     }
 
     @Test
-    void hibernateMigrate() throws Exception
+    void hibernateMigrateNoMatchingXAR() throws Exception
     {
         when(this.wiki.getDocument(XWIKI_PREFERENCES_DOCUMENT_REFERENCE, this.context)).thenReturn(
             mock(XWikiDocument.class));
+        XarInstalledExtension xarInstalledExtension = mock(XarInstalledExtension.class);
+        when(xarInstalledExtension.getId()).thenReturn(new ExtensionId("extension-id-0"));
+        when(this.xarInstalledExtensionRepository.getXarInstalledExtensions(XWIKI_PREFERENCES_DOCUMENT_REFERENCE))
+            .thenReturn(List.of(xarInstalledExtension));
 
         this.dataMigration.hibernateMigrate();
+
+        verifyNoInteractions(this.taskManager);
+    }
+
+    @Test
+    void hibernateMigrateNoXObject() throws Exception
+    {
+        WikiReference xwiki = new WikiReference("xwiki");
+        XarEntry xarEntry = new XarEntry(XWIKI_PREFERENCES_DOCUMENT_REFERENCE.getLocalDocumentReference(),
+            "XWiki/XWikiPreferences.xml");
+        ExtensionId extensionId = new ExtensionId("org.xwiki.platform:xwiki-platform-distribution-ui-base");
+
+        XWikiDocument xwikiPreferencesDocument = mock(XWikiDocument.class);
+        XWikiDocument xwikiPreferencesDocumentFromXar = mock(XWikiDocument.class);
+        XarInstalledExtension xarInstalledExtension = mock(XarInstalledExtension.class);
+
+        when(this.wiki.getDocument(XWIKI_PREFERENCES_DOCUMENT_REFERENCE, this.context))
+            .thenReturn(xwikiPreferencesDocument);
+        when(xarInstalledExtension.getId()).thenReturn(extensionId);
+        when(this.xarInstalledExtensionRepository.getXarInstalledExtensions(XWIKI_PREFERENCES_DOCUMENT_REFERENCE))
+            .thenReturn(List.of(xarInstalledExtension));
+        when(this.packager.getXWikiDocument(xwiki, xarEntry, xarInstalledExtension))
+            .thenReturn(xwikiPreferencesDocumentFromXar);
+
+        this.dataMigration.hibernateMigrate();
+
+        verifyNoInteractions(this.taskManager);
+    }
+
+    @Test
+    void hibernateMigrateDifferentValues() throws Exception
+    {
+        WikiReference xwiki = new WikiReference("xwiki");
+        XarEntry xarEntry = new XarEntry(XWIKI_PREFERENCES_DOCUMENT_REFERENCE.getLocalDocumentReference(),
+            "XWiki/XWikiPreferences.xml");
+        ExtensionId extensionId = new ExtensionId("org.xwiki.platform:xwiki-platform-distribution-ui-base");
+        BaseObject xwikiPreferencesXObject = new BaseObject();
+        xwikiPreferencesXObject.setStringValue("meta", "a");
+        BaseObject xwikiPreferencesXObjectFromXar = new BaseObject();
+        xwikiPreferencesXObjectFromXar.setStringValue("meta", "b");
+        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
+
+        XWikiDocument xwikiPreferencesDocument = mock(XWikiDocument.class);
+        XWikiDocument xwikiPreferencesDocumentFromXar = mock(XWikiDocument.class);
+        XarInstalledExtension xarInstalledExtension = mock(XarInstalledExtension.class);
+
+        when(this.wiki.getDocument(XWIKI_PREFERENCES_DOCUMENT_REFERENCE, this.context))
+            .thenReturn(xwikiPreferencesDocument);
+        when(xarInstalledExtension.getId()).thenReturn(extensionId);
+        when(this.xarInstalledExtensionRepository.getXarInstalledExtensions(XWIKI_PREFERENCES_DOCUMENT_REFERENCE))
+            .thenReturn(List.of(xarInstalledExtension));
+        when(this.packager.getXWikiDocument(xwiki, xarEntry, xarInstalledExtension))
+            .thenReturn(xwikiPreferencesDocumentFromXar);
+
+        when(xwikiPreferencesDocument.getXObject(classReference)).thenReturn(xwikiPreferencesXObject);
+        when(xwikiPreferencesDocumentFromXar.getXObject(classReference)).thenReturn(xwikiPreferencesXObjectFromXar);
+
+        this.dataMigration.hibernateMigrate();
+
+        verifyNoInteractions(this.taskManager);
+    }
+
+    @Test
+    void hibernateMigrateSameValues() throws Exception
+    {
+        WikiReference xwiki = new WikiReference("xwiki");
+        XarEntry xarEntry = new XarEntry(XWIKI_PREFERENCES_DOCUMENT_REFERENCE.getLocalDocumentReference(),
+            "XWiki/XWikiPreferences.xml");
+        ExtensionId extensionId = new ExtensionId("org.xwiki.platform:xwiki-platform-distribution-ui-base");
+        BaseObject xwikiPreferencesXObject = new BaseObject();
+        xwikiPreferencesXObject.setStringValue("meta", "a");
+        BaseObject xwikiPreferencesXObjectFromXar = new BaseObject();
+        xwikiPreferencesXObjectFromXar.setStringValue("meta", "a");
+        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
+
+        XWikiDocument xwikiPreferencesDocument = mock(XWikiDocument.class);
+        XWikiDocument xwikiPreferencesDocumentFromXar = mock(XWikiDocument.class);
+        XarInstalledExtension xarInstalledExtension = mock(XarInstalledExtension.class);
+
+        when(this.wiki.getDocument(XWIKI_PREFERENCES_DOCUMENT_REFERENCE, this.context))
+            .thenReturn(xwikiPreferencesDocument);
+        when(xarInstalledExtension.getId()).thenReturn(extensionId);
+        when(this.xarInstalledExtensionRepository.getXarInstalledExtensions(XWIKI_PREFERENCES_DOCUMENT_REFERENCE))
+            .thenReturn(List.of(xarInstalledExtension));
+        when(this.packager.getXWikiDocument(xwiki, xarEntry, xarInstalledExtension))
+            .thenReturn(xwikiPreferencesDocumentFromXar);
+
+        when(xwikiPreferencesDocument.getXObject(classReference)).thenReturn(xwikiPreferencesXObject);
+        when(xwikiPreferencesDocumentFromXar.getXObject(classReference)).thenReturn(xwikiPreferencesXObjectFromXar);
+
+        when(xwikiPreferencesDocument.getId()).thenReturn(42L);
+
+        this.dataMigration.hibernateMigrate();
+
+        verify(this.taskManager).addTask("xwiki", 42L, TASK_NAME);
     }
 }

@@ -72,15 +72,19 @@ public class XWikiPropertiesMetaFieldCleanupTaskConsumer implements TaskConsumer
         DocumentReference xwikiPreferencesDocumentReferenceNoLocal =
             new DocumentReference(LOCAL_REFERENCE, context.getWikiReference());
 
-        BaseObject xObject = document.getXObject(xwikiPreferencesDocumentReferenceNoLocal);
-        if (xObject != null && StringUtils.isNotEmpty(xObject.getStringValue(META_FIELD))) {
-            XWikiDocument documentClone = document.clone();
-            documentClone.getXObject(xwikiPreferencesDocumentReferenceNoLocal).setStringValue(META_FIELD, "");
-            try {
-                wiki.saveDocument(documentClone,
-                    "[UPGRADE] empty field [%s] because it matches the default values".formatted(META_FIELD), context);
-            } catch (XWikiException e) {
-                throw new IndexException("Unable to save document [%s]".formatted(documentReference), e);
+        if (document != null) {
+            BaseObject xObject = document.getXObject(xwikiPreferencesDocumentReferenceNoLocal);
+
+            if (xObject != null && StringUtils.isNotEmpty(xObject.getStringValue(META_FIELD))) {
+                XWikiDocument documentClone = document.clone();
+                documentClone.getXObject(xwikiPreferencesDocumentReferenceNoLocal).setStringValue(META_FIELD, "");
+                try {
+                    wiki.saveDocument(documentClone,
+                        "[UPGRADE] empty field [%s] because it matches the default values".formatted(META_FIELD),
+                        context);
+                } catch (XWikiException e) {
+                    throw new IndexException("Unable to save document [%s]".formatted(documentReference), e);
+                }
             }
         }
     }

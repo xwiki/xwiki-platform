@@ -122,11 +122,13 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
             xwikiPreferencesDocument.getXObject(xwikiPreferencesDocumentReferenceNoLocale);
         BaseObject xwikiPreferencesXObjectFromXar =
             xwikiPreferencesDocumentFromXar.getXObject(xwikiPreferencesDocumentReferenceNoLocale);
-        String template = xwikiPreferencesXObject.getStringValue(META_FIELD);
-        if (StringUtils.isNotEmpty(template)) {
-            String templateFromXar = xwikiPreferencesXObjectFromXar.getStringValue(META_FIELD);
-            if (template.equals(templateFromXar)) {
-                this.taskManager.addTask(wikiReference.getName(), xwikiPreferencesDocument.getId(), TASK_NAME);
+        if(xwikiPreferencesXObject != null && xwikiPreferencesXObjectFromXar != null) {
+            String template = xwikiPreferencesXObject.getStringValue(META_FIELD);
+            if (StringUtils.isNotEmpty(template)) {
+                String templateFromXar = xwikiPreferencesXObjectFromXar.getStringValue(META_FIELD);
+                if (template.equals(templateFromXar)) {
+                    this.taskManager.addTask(wikiReference.getName(), xwikiPreferencesDocument.getId(), TASK_NAME);
+                }
             }
         }
     }

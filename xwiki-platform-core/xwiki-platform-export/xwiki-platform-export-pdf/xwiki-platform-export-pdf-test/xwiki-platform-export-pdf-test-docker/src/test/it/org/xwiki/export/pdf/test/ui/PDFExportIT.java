@@ -109,14 +109,6 @@ class PDFExportIT
         // the user (the authentication cookies are copied and updated to match the Chrome Docker container IP address).
         setup.setWikiPreference("authenticate_view", "1");
 
-        // Enable the 'org.xwiki.platform.html.head' UIXP which normally is provided by
-        // 'org.xwiki.platform:xwiki-platform-distribution-ui-base' but we didn't add it as a test dependency because it
-        // brings too many transitive dependencies that we don't need.
-        setup.setWikiPreference("meta", """
-            #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter': 'order'}))
-              $services.rendering.render($uix.execute(), 'xhtml/1.0')
-            #end""");
-
         // Enable debug logs for the PDF export code.
         setup.gotoPage(new LocalDocumentReference("PDFExportIT", "EnableDebugLogs"), "get");
 

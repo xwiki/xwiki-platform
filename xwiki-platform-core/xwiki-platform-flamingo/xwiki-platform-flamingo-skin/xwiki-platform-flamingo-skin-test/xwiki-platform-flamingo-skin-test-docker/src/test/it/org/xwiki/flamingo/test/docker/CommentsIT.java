@@ -131,7 +131,10 @@ class CommentsIT
         commentsTab.openCommentForm();
         assertTrue(commentsTab.isCommentFormShown());
         commentIndex = commentsTab.postComment(COMMENT_CONTENT, true);
-        commentsTab.editCommentByID(commentIndex, COMMENT_REPLACED_CONTENT);
+        CommentForm editCommentForm = commentsTab.editCommentByID(commentIndex);
+        assertEquals(COMMENT_CONTENT, editCommentForm.getContentField().getText());
+        editCommentForm.clearAndSetContentField(COMMENT_REPLACED_CONTENT);
+        editCommentForm.clickSubmit();
         assertEquals(COMMENT_REPLACED_CONTENT, commentsTab.getCommentContentByID(commentIndex));
         
         // Open then cancel the edit comment forms

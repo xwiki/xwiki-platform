@@ -32,6 +32,12 @@
     init : function(editor) {
       applyStyleSheets(editor);
 
+      if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
+        // When editing in-place we need to maximize the parent of the editable area in order to have the user caret
+        // indicators visible (they are injected after the editable area).
+        editor.element.getParent().addClass('cke_editable_fullscreen');
+      }
+
       // CKEditor's HTML parser doesn't preserve the space character typed at the end of a line of text. For instance,
       // the following:
       //   CKEDITOR.htmlParser.fragment.fromHtml('<p>x </p>')

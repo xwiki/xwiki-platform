@@ -678,8 +678,12 @@ class RenamePageIT
         throws Exception
     {
         SpaceReference rootSpaceReference = testReference.getLastSpaceReference();
+        DocumentReference externalLinkPage = new DocumentReference("xwiki", "RenamePageIT", "ExternalPage");
+        testUtils.rest().savePage(externalLinkPage);
         testUtils.rest().savePage(testReference, 
-            String.format("[[Alice]]%n[[page:../%s/Alice]]%n[[Bob]]%n[[Eve]]", rootSpaceReference.getName()), 
+            String.format("[[Alice]]%n[[page:../%s/Alice]]%n[[Bob]]%n[[Eve]]"
+                    + "%n[[Other link>>RenamePageIT.ExternalPage]]",
+                rootSpaceReference.getName()),
             "Test relative links");
         
         SpaceReference aliceSpace = new SpaceReference("Alice", rootSpaceReference);
@@ -701,7 +705,8 @@ class RenamePageIT
             new SpaceReference(rootSpaceReference.getName() + "Foo", rootSpaceReference.getParent());
         WikiEditPage wikiEditPage = statusPage.gotoNewPage().editWiki();
         String newRootSpaceSerialized = testUtils.serializeLocalReference(newRootSpace).replaceAll("\\.", "/");
-        assertEquals(String.format("[[Alice]]%n[[page:%s/Alice]]%n[[Bob]]%n[[Eve]]", newRootSpaceSerialized),
+        assertEquals(String.format("[[Alice]]%n[[page:%s/Alice]]%n[[Bob]]%n[[Eve]]"
+                + "%n[[Other link>>RenamePageIT.ExternalPage]]", newRootSpaceSerialized),
             wikiEditPage.getContent());
 
         SpaceReference newBobSpace = new SpaceReference("Bob", newRootSpace);
@@ -720,7 +725,8 @@ class RenamePageIT
         DocumentReference alice2Reference = new DocumentReference("WebHome", alice2Space);
         wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newRootSpace));
         String serializedAlice2Reference = testUtils.serializeLocalReference(alice2Reference);
-        assertEquals(String.format("[[%s]]%n[[page:%s/Alice2]]%n[[Bob]]%n[[Eve]]",
+        assertEquals(String.format("[[%s]]%n[[page:%s/Alice2]]%n[[Bob]]%n[[Eve]]"
+                + "%n[[Other link>>RenamePageIT.ExternalPage]]",
             serializedAlice2Reference, newRootSpaceSerialized), wikiEditPage.getContent());
 
         // FIXME: ideally this one should be refactored too, however it's not a regression.

@@ -51,14 +51,13 @@ import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserException;
+import org.xwiki.user.UserManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
 
 /**
  * Default {@link DistributionManager} implementation.
@@ -124,10 +123,13 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     private JobStatusStore jobStatusStorage;
 
     @Inject
-    private Logger logger;
+    private UserManager userManager;
 
     @Inject
     private ConfigurationSource configuration;
+
+    @Inject
+    private Logger logger;
 
     private CoreExtension distributionExtension;
 
@@ -401,16 +403,16 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         // If not guest make sure the user has admin right
         if (currentUser != null) {
             return this.authorizationManager.hasAccess(Right.ADMIN, currentUser,
-                new WikiReference(xcontext.getWikiId()));
+                xcontext.getWikiReference());
         }
 
         // Give guess access if there is no other user already registered
         if (xcontext.isMainWiki()) {
             // If there is no user on main wiki let guest access distribution wizard
             try {
-                return RightsManager.getInstance().countAllGlobalUsersOrGroups(true, null, xcontext) == 0;
-            } catch (XWikiException e) {
-                this.logger.error("Failed to count global users", e);
+                return !this.userManager.hasUsers(xcontext.getWikiReference());
+            } catch (UserException e) {
+                this.logger.error("Failed to check if main wiki has any user", e);
             }
         }
 

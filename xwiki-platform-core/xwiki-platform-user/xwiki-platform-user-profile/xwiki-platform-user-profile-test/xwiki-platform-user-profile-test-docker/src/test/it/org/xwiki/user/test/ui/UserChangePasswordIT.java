@@ -112,7 +112,7 @@ class UserChangePasswordIT
         changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePasswordAsAdmin(DEFAULT_PASSWORD, DEFAULT_PASSWORD);
         changePasswordPage = changePasswordPage.submit();
-        changePasswordPage.assertSuccessMessage("Your password has been successfully changed.");
+        changePasswordPage.assertSuccessMessage("Information\nYour password has been successfully changed.");
     }
 
     @Test
@@ -185,6 +185,6 @@ class UserChangePasswordIT
         changePasswordPage.assertValidationErrorMessage("The password must contain at least one number.");
         changePasswordPage.changePasswordAsAdmin("foofoofoo42", "foofoofoo42");
         changePasswordPage = changePasswordPage.submit();
-        changePasswordPage.assertSuccessMessage("Your password has been successfully changed.");
+        changePasswordPage.assertSuccessMessage("Information\nYour password has been successfully changed.");
     }
 }

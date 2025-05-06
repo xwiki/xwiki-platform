@@ -283,6 +283,22 @@ public class AbstractValidationTest extends TestCase
         }
     }
 
+    private static List<Node> getChildElementsOfName(Node element, String nodeName)
+    {
+        List<Node> result = new ArrayList<>();
+
+        NodeList childNodes = element.getChildNodes();
+
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node node = childNodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE && nodeName.equals(node.getNodeName())) {
+                result.add(node);
+            }
+        }
+
+        return result;
+    }
+
     private static boolean isTechnicalPage(String directoryPath, XarEntry entry, DocumentBuilder documentBuilder,
         List<String> whitelistedClasses)
         throws Exception
@@ -290,29 +306,24 @@ public class AbstractValidationTest extends TestCase
         try (InputStream inputStream = new FileInputStream(new File(directoryPath, entry.getEntryName()))) {
             Document parsedDocument = documentBuilder.parse(inputStream);
 
-            NodeList hiddenElements = parsedDocument.getElementsByTagName("hidden");
-            NodeList objectElements = parsedDocument.getDocumentElement().getElementsByTagName("object");
-
+            List<Node> hiddenElements = getChildElementsOfName(parsedDocument.getDocumentElement(), "hidden");
             boolean isHiddenPage = false;
 
             // if a page is hidden, then it's considered as a technical page
-            if (hiddenElements.getLength() == 1) {
-               isHiddenPage = "true".equals(hiddenElements.item(0).getTextContent());
+            if (hiddenElements.size() == 1) {
+                isHiddenPage = "true".equals(hiddenElements.get(0).getTextContent());
             }
 
             // if there's a whitelist, we check the document does not contain any object
             // of the class of any of the whitelisted classes
             if (!whitelistedClasses.isEmpty()) {
-                for (int i = 0; i < objectElements.getLength(); i++) {
-                    Node objectElement = objectElements.item(i);
-                    NodeList childNodes = objectElement.getChildNodes();
-                    for (int j = 0; j < childNodes.getLength(); j++) {
-                        Node objectAttribute = childNodes.item(j);
-
+                List<Node> objectElements = getChildElementsOfName(parsedDocument.getDocumentElement(), "object");
+                for (Node objectElement : objectElements) {
+                    List<Node> classNameElements = getChildElementsOfName(objectElement, "className");
+                    for (Node objectAttribute : classNameElements) {
                         // if we find an object with a className corresponding to one of those whitelisted
                         // then we immediately consider the page as not technical: it must be checked
-                        if ("className".equals(objectAttribute.getNodeName())
-                            && whitelistedClasses.contains(objectAttribute.getTextContent())) {
+                        if (whitelistedClasses.contains(objectAttribute.getTextContent())) {
                             return false;
                         }
                     }

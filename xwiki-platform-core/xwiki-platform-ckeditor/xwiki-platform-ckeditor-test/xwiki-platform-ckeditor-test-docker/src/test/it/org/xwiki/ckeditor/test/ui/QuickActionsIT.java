@@ -106,9 +106,9 @@ class QuickActionsIT extends AbstractCKEditorIT
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup)
     {
-        maybeLeaveEditMode(setup, testReference);
+        setup.maybeLeaveEditMode();
     }
 
     @Test

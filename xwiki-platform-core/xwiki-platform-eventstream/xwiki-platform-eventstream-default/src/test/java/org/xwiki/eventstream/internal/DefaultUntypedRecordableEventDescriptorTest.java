@@ -19,12 +19,15 @@
  */
 package org.xwiki.eventstream.internal;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.Extensions;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.component.wiki.WikiComponentScope;
@@ -32,11 +35,13 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.test.AllLogRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.MockitoComponentManagerExtension;
 
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -47,148 +52,148 @@ import static org.mockito.Mockito.when;
  * @since 10.6RC1
  * @since 9.11.6
  */
-public class DefaultUntypedRecordableEventDescriptorTest
+@Extensions({ @ExtendWith({ MockitoComponentManagerExtension.class }) })
+class DefaultUntypedRecordableEventDescriptorTest
 {
-    @Rule
-    // TODO: Replace by junit5
-    public AllLogRule allLogRule = new AllLogRule();
-
-    private ContextualLocalizationManager contextualLocalizationManager;
+    @Mock
     private NamespaceContextExecutor namespaceContextExecutor;
 
-    private EntityReference entityReference;
-    private DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "User");
-    private BaseObject baseObject;
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    private static final EntityReference ENTITY_REFERENCE = new ObjectReference("someObject", new DocumentReference(
+        "someWiki", "someSpace",
+        "somePage"));
+
+    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "User");
 
     private DefaultUntypedRecordableEventDescriptor descriptor;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        contextualLocalizationManager = mock(ContextualLocalizationManager.class);
-        namespaceContextExecutor = mock(NamespaceContextExecutor.class);
+        ContextualLocalizationManager contextualLocalizationManager = mock(ContextualLocalizationManager.class);
 
-        entityReference = new ObjectReference("someObject", new DocumentReference("someWiki", "someSpace",
-                "somePage"));
-        baseObject = mock(BaseObject.class);
+        BaseObject baseObject = mock(BaseObject.class);
 
         when(baseObject.getStringValue(anyString())).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
         when(baseObject.getListValue(anyString())).thenAnswer(
-                invocationOnMock -> Arrays.asList((String) invocationOnMock.getArgument(0)));
+            invocationOnMock -> List.of((String) invocationOnMock.getArgument(0)));
 
-        descriptor = new DefaultUntypedRecordableEventDescriptor(entityReference, authorReference, baseObject,
-                contextualLocalizationManager, namespaceContextExecutor);
+        this.descriptor =
+            new DefaultUntypedRecordableEventDescriptor(ENTITY_REFERENCE, AUTHOR_REFERENCE, baseObject,
+                contextualLocalizationManager, this.namespaceContextExecutor);
 
-        when(namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenAnswer(
-                invocationOnMock -> String.format("Namespace [%s] -> [%s]", invocationOnMock.getArgument(0),
-                        ((Callable) invocationOnMock.getArgument(1)).call())
+        when(this.namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenAnswer(
+            invocationOnMock -> String.format("Namespace [%s] -> [%s]", invocationOnMock.getArgument(0),
+                ((Callable) invocationOnMock.getArgument(1)).call())
         );
         when(contextualLocalizationManager.getTranslationPlain(anyString())).thenAnswer(
-                invocationOnMock -> invocationOnMock.getArgument(0)
+            invocationOnMock -> invocationOnMock.getArgument(0)
         );
     }
 
     @Test
-    public void getEventType() throws Exception
+    void getEventType()
     {
-        assertEquals("eventType", descriptor.getEventType());
+        assertEquals("eventType", this.descriptor.getEventType());
     }
 
     @Test
-    public void getEventTypeIcon() throws Exception
+    void getEventTypeIcon()
     {
-        assertEquals("eventTypeIcon", descriptor.getEventTypeIcon());
+        assertEquals("eventTypeIcon", this.descriptor.getEventTypeIcon());
     }
 
     @Test
-    public void getApplicationId() throws Exception
+    void getApplicationId()
     {
-        assertEquals("applicationId", descriptor.getApplicationId());
+        assertEquals("applicationId", this.descriptor.getApplicationId());
     }
 
     @Test
-    public void getAuthorReference() throws Exception
+    void getAuthorReference()
     {
-        assertEquals(authorReference, descriptor.getAuthorReference());
+        assertEquals(AUTHOR_REFERENCE, this.descriptor.getAuthorReference());
     }
 
     @Test
-    public void getRoleHint() throws Exception
+    void getRoleHint()
     {
-        assertEquals("eventType", descriptor.getRoleHint());
+        assertEquals("eventType", this.descriptor.getRoleHint());
     }
 
     @Test
-    public void getValidationExpression() throws Exception
+    void getValidationExpression()
     {
-        assertEquals("validationExpression", descriptor.getValidationExpression());
+        assertEquals("validationExpression", this.descriptor.getValidationExpression());
     }
 
     @Test
-    public void getTargetExpression() throws Exception
+    void getTargetExpression()
     {
-        assertEquals("target", descriptor.getTargetExpression());
+        assertEquals("target", this.descriptor.getTargetExpression());
     }
 
     @Test
-    public void getEntityReference() throws Exception
+    void getEntityReference()
     {
-        assertEquals(entityReference, descriptor.getEntityReference());
+        assertEquals(ENTITY_REFERENCE, this.descriptor.getEntityReference());
     }
 
     @Test
-    public void getEventTriggers() throws Exception
+    void getEventTriggers()
     {
-        assertEquals(Arrays.asList("listenTo"), descriptor.getEventTriggers());
+        assertEquals(List.of("listenTo"), this.descriptor.getEventTriggers());
     }
 
     @Test
-    public void getScope() throws Exception
+    void getScope()
     {
-        assertEquals(WikiComponentScope.WIKI, descriptor.getScope());
+        assertEquals(WikiComponentScope.WIKI, this.descriptor.getScope());
     }
 
     @Test
-    public void getObjectTypes() throws Exception
+    void getObjectTypes()
     {
-        assertEquals(Arrays.asList("objectType"), descriptor.getObjectTypes());
+        assertEquals(List.of("objectType"), this.descriptor.getObjectTypes());
     }
 
     @Test
-    public void getApplicationIcon() throws Exception
+    void getApplicationIcon()
     {
-        assertEquals("applicationIcon", descriptor.getApplicationIcon());
+        assertEquals("applicationIcon", this.descriptor.getApplicationIcon());
     }
 
     @Test
-    public void getDocumentReference() throws Exception
+    void getDocumentReference()
     {
-        assertEquals("someWiki:someSpace.somePage", descriptor.getDocumentReference().toString());
+        assertEquals("someWiki:someSpace.somePage", this.descriptor.getDocumentReference().toString());
     }
 
     @Test
-    public void getApplicationName() throws Exception
+    void getApplicationName() throws Exception
     {
-        assertEquals("Namespace [wiki:someWiki] -> [applicationName]", descriptor.getApplicationName());
+        assertEquals("Namespace [wiki:someWiki] -> [applicationName]", this.descriptor.getApplicationName());
 
         // With an exception
-        Exception e = new Exception("Some error");
-        when(namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenThrow(e);
-        assertEquals("applicationName", descriptor.getApplicationName());
+        when(this.namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class)))
+            .thenThrow(new Exception("Some error"));
+        assertEquals("applicationName", this.descriptor.getApplicationName());
         assertEquals("Failed to render the translation key [applicationName] in the namespace "
-                + "[wiki:someWiki] for the event descriptor of [eventType].", allLogRule.getMessage(0));
+            + "[wiki:someWiki] for the event descriptor of [eventType].", this.logCapture.getMessage(0));
     }
 
     @Test
-    public void getDescription() throws Exception
+    void getDescription() throws Exception
     {
-        assertEquals("Namespace [wiki:someWiki] -> [eventDescription]", descriptor.getDescription());
+        assertEquals("Namespace [wiki:someWiki] -> [eventDescription]", this.descriptor.getDescription());
 
         // With an exception
         Exception e = new Exception("Some error");
-        when(namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenThrow(e);
-        assertEquals("eventDescription", descriptor.getDescription());
+        when(this.namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenThrow(e);
+        assertEquals("eventDescription", this.descriptor.getDescription());
         assertEquals("Failed to render the translation key [eventDescription] in the namespace "
-                + "[wiki:someWiki] for the event descriptor of [eventType].", allLogRule.getMessage(0));
+            + "[wiki:someWiki] for the event descriptor of [eventType].", this.logCapture.getMessage(0));
     }
 }

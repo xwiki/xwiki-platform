@@ -19,13 +19,13 @@
  */
 package org.xwiki.eventstream.internal;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.xpn.xwiki.objects.classes.BaseClass;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link EventClassDocumentInitializer}.
@@ -33,18 +33,18 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 9.6RC1
  */
-public class EventClassDocumentInitializerTest
+@ComponentTest
+class EventClassDocumentInitializerTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<EventClassDocumentInitializer> mocker =
-            new MockitoComponentMockingRule<>(EventClassDocumentInitializer.class);
+    @InjectMockComponents
+    private EventClassDocumentInitializer eventClassDocumentInitializer;
 
     @Test
-    public void testCreateClass() throws Exception
+    void createClass()
     {
         BaseClass testXClass = new BaseClass();
 
-        this.mocker.getComponentUnderTest().createClass(testXClass);
+        this.eventClassDocumentInitializer.createClass(testXClass);
 
         assertEquals(10, testXClass.getFieldList().size());
     }

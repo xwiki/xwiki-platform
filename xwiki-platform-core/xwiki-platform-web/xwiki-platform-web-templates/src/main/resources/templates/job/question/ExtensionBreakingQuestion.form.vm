@@ -39,7 +39,14 @@
   </div>
   #questionButtons($jobStatus)
 #end
-
-#_genericMessage("$warningMessageContent", 'warning', 'warning', 'warning', false, 'deleteWarningExtensions', $escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title")))
+#set( $parameters = {
+  'text': "$warningMessageContent",
+  'classAffix': 'warning',
+  'iconName': 'warning',
+  'prettyNameKey': 'warning',
+  'extraClass':'deleteWarningExtensions',
+  'title': $escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title"))
+})
+#_genericMessage($parameters)
 
 #questionFooter()

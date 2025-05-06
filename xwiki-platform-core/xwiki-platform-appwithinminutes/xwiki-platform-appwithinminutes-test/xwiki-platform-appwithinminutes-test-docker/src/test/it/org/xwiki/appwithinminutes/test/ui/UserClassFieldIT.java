@@ -31,6 +31,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
 import org.xwiki.appwithinminutes.test.po.SuggestClassFieldEditPane;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -99,7 +100,7 @@ class UserClassFieldIT
     void setUp(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
-        setup.deleteSpace(testReference.getLastSpaceReference());
+        setup.deletePage(testReference, true);
     }
 
     @Test
@@ -301,12 +302,13 @@ class UserClassFieldIT
         // Create the application entry.
         ClassSheetPage classSheetPage = new ClassSheetPage();
 
-        String className = setup.serializeReference(testReference.getLocalDocumentReference().getParent().getParent());
-        String pageName = testReference.getLastSpaceReference().getName();
-        InlinePage entryEditPage = classSheetPage.createNewDocument(className, pageName + "Entry");
+        String location = setup.serializeLocalReference(testReference.getLastSpaceReference());
+        InlinePage entryEditPage = classSheetPage.createNewDocument(location, "Entry");
 
         // Assert the initial value.
-        String id = className + "." + pageName + "_0_user1";
+        String className = setup.serializeReference(
+            new DocumentReference("Class", testReference.getLastSpaceReference()).getLocalDocumentReference());
+        String id = className + "_0_user1";
         userPicker = new SuggestInputElement(setup.getDriver().findElement(By.id(id)));
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(1, selectedUsers.size());
@@ -327,7 +329,8 @@ class UserClassFieldIT
 
     private ApplicationClassEditPage goToEditor(TestReference testReference)
     {
-        return ApplicationClassEditPage.goToEditor(testReference.getLastSpaceReference());
+        return ApplicationClassEditPage
+            .goToEditor(new DocumentReference("Class", testReference.getLastSpaceReference()));
     }
 
     /**

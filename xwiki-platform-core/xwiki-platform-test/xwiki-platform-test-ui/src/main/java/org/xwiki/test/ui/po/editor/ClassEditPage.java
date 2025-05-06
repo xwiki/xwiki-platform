@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.FormContainerElement;
 
 /**
@@ -55,6 +56,20 @@ public class ClassEditPage extends EditPage
     public static ClassEditPage gotoPage(String space, String page)
     {
         getUtil().gotoPage(space, page, "edit", "editor=class");
+        return new ClassEditPage();
+    }
+
+    /**
+     * Edit the specified class.
+     *
+     * @param classReference the reference of the class to edit
+     * @return the class edit page
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public static ClassEditPage gotoPage(EntityReference classReference)
+    {
+        getUtil().gotoPage(classReference, "edit", "editor=class");
         return new ClassEditPage();
     }
 

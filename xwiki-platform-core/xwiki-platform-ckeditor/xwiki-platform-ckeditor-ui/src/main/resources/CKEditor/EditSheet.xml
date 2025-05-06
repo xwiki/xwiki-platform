@@ -1049,12 +1049,6 @@ body[data-maximized="true"] {
     margin: 0 !important;
     overflow-y: auto !important;
     z-index: 9995;
-
-    &amp;:focus {
-      /* Remove the focus border. */
-      border-color: transparent !important;
-      box-shadow: none !important;
-    }
   }
   .cke_maximize_backdrop {
     top: 0;

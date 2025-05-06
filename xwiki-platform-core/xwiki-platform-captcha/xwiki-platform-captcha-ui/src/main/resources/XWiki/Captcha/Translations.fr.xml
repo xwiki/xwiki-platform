@@ -38,5 +38,9 @@
   <hidden>true</hidden>
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=CAPTCHA par défaut
-captcha.admin.defaultCaptchaName.hint=Le CAPTCHA à proposer par défaut. Utilisez le Gestionnaire d'extension pour rechercher et installer d'autres types de CAPTCHA.</content>
+captcha.admin.defaultCaptchaName.hint=Le CAPTCHA à proposer par défaut. Utilisez le Gestionnaire d'extensions pour rechercher et installer d'autres types de CAPTCHA.
+### Missing: captcha.admin.configure.title=Configure {0}
+captcha.admin.sample.title=Exemple de CAPTCHA
+### Missing: captcha.admin.sample.description=How the configured CAPTCHA looks like when it will be displayed in a form, for example.
+</content>
 </xwikidoc>

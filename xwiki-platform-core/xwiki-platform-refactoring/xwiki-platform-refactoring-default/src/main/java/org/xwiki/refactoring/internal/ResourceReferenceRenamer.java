@@ -249,7 +249,6 @@ public class ResourceReferenceRenamer
         // current link, use the old document's reference to fill in blanks.
         EntityReference oldLinkReference =
             this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
-        EntityReference absoluteResolvedReference = this.entityReferenceResolver.resolve(resourceReference, null);
 
         boolean docExists = false;
         EntityType entityType = linkEntityReference.getType();
@@ -271,13 +270,10 @@ public class ResourceReferenceRenamer
                 && documentReferenceTarget.equals(updatedEntities.get(documentReference))));
 
         // We should update the reference if:
-        //  - it's relative: the resolution of the reference without any parameter, and the resolution of the reference
-        //                   with the new reference should give different results
         //  - it doesn't match any reference moved in the same job, i.e. in the same hierarchy
         //  - the new and old link references don`t match
         //  - the link refers to a doc that exists
-        boolean shouldBeUpdated = !absoluteResolvedReference.equals(linkEntityReference)
-            && !anyMatchInMovedReferences
+        boolean shouldBeUpdated = !anyMatchInMovedReferences
             && !linkEntityReference.equals(oldLinkReference)
             && docExists;
 

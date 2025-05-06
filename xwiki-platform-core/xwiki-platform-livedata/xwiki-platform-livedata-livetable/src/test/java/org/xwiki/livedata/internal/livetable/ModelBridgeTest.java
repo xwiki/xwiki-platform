@@ -117,6 +117,7 @@ class ModelBridgeTest
     {
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+        when(this.document.clone()).thenReturn(this.document);
     }
 
     @Test

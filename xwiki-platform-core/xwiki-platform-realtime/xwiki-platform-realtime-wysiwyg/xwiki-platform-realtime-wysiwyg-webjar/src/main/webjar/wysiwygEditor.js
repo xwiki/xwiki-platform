@@ -302,38 +302,26 @@ define('xwiki-realtime-wysiwyg', [
       const contentWrapper = this._editor.getContentWrapper();
       const contentWrapperTop = $(contentWrapper).offset().top;
       const ownerDocument = contentWrapper.ownerDocument;
-      $(ownerDocument).find('.rt-user-position').remove();
-      const positions = {};
+      $(ownerDocument).find('.realtime-user-position').remove();
       users.filter(user => user['cursor_' + EDITOR_TYPE]).forEach(user => {
         // Set the user position.
         const element = ownerDocument.evaluate(user['cursor_' + EDITOR_TYPE], contentWrapper, null,
           XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        if (!element) {
-          return;
+        if (element) {
+          const top = $(element).offset().top - contentWrapperTop;
+          $('<img/>').attr({
+            class: 'realtime-user-position',
+            id: 'rt-user-' + user.id,
+            src: user.avatar,
+            alt: user.name,
+            title: user.name
+          }).css({
+            // Use the default top value (which is normally the top padding of the rich text area) if the element
+            // holding the caret has 0 or negative top value (this can happen for instance if the caret is directly
+            // under the root element, e.g. the BODY element for the standalone edit mode).
+            top: top > 0 ? top + 'px' : ''
+          }).insertAfter($(contentWrapper));
         }
-        const top = $(element).offset().top - contentWrapperTop;
-        if (!positions[top]) {
-          positions[top] = [user.id];
-        } else {
-          positions[top].push(user.id);
-        }
-        let $indicator;
-        if (user.avatar) {
-          $indicator = $('<img alt=""/>').attr('src', user.avatar);
-        } else {
-          $indicator = $('<div></div>').text(user.name.substring(0, 1));
-        }
-        $indicator.addClass('rt-non-realtime rt-user-position').attr({
-          id: 'rt-user-' + user.id,
-          title: user.name,
-          contenteditable: 'false'
-        }).css({
-          // Use the default top value (which is normally the top padding of the rich text area) if the element holding
-          // the caret has 0 or negative top value (this can happen for instance if the caret is directly under the root
-          // element, e.g. the BODY element for the standalone edit mode).
-          'top': top > 0 ? top + 'px' : ''
-        });
-        $(contentWrapper).after($indicator);
       });
     }
 

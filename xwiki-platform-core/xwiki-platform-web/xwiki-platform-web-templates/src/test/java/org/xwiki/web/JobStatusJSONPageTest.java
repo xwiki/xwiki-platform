@@ -20,13 +20,20 @@
 package org.xwiki.web;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.icon.IconManagerScriptService;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Page test for {@code job_status_json.vm}.
@@ -38,6 +45,17 @@ class JobStatusJSONPageTest extends PageTest
     @Inject
     private TemplateManager templateManager;
 
+    @MockComponent(classToMock = IconManagerScriptService.class)
+    @Named("icon")
+    private ScriptService iconManagerScriptService;
+
+    @BeforeEach
+    void setup()
+    {
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+            .then(invocationOnMock -> invocationOnMock.getArgument(0) + "Icon");
+    }
+
     @Test
     void nonExistingJob() throws Exception
     {
@@ -48,7 +66,7 @@ class JobStatusJSONPageTest extends PageTest
 
         assertThat(output.strip(), equalToCompressingWhiteSpace("""
             <div class="box errormessage ">
-            <span class="icon-block">$services.icon.renderHTML($iconName)</span>
+            <span class="icon-block">exclamationIcon</span>
             <span class="sr-only">error</span>
             <div>
                 &#60;test&#62;.notFound

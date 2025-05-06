@@ -68,7 +68,7 @@ public class JobQuestionPane extends BaseElement
     public boolean isCanceled()
     {
         return getDriver().findElement(By.cssSelector("#mainContentArea .box.warningmessage")).getText()
-            .equals("Canceled.");
+            .equals("Warning\nCanceled.");
     }
 
     /**

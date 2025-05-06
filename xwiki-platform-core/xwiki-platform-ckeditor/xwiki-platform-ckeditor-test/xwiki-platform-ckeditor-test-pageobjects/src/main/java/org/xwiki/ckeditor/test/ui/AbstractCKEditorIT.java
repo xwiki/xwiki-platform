@@ -20,14 +20,12 @@
 package org.xwiki.ckeditor.test.ui;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
@@ -43,6 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public abstract class AbstractCKEditorIT
 {
+    private static final String STANDARD_USER_LOGIN = "alice";
+    private static final String STANDARD_USER_PASSWORD = "pa$$word";
+
     protected CKEditor editor;
 
     protected RichTextAreaElement textArea;
@@ -65,7 +66,14 @@ public abstract class AbstractCKEditorIT
 
     protected void createAndLoginStandardUser(TestUtils setup)
     {
-        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
+        setup.createUserAndLogin(STANDARD_USER_LOGIN, STANDARD_USER_PASSWORD,
+            "editor", "Wysiwyg",
+            "usertype", "Advanced");
+    }
+
+    protected void loginStandardUser(TestUtils setup)
+    {
+        setup.login(STANDARD_USER_LOGIN, STANDARD_USER_PASSWORD);
     }
 
     protected void assertSourceEquals(String expected)
@@ -102,14 +110,6 @@ public abstract class AbstractCKEditorIT
         sourceTextArea.sendKeys(source);
         editor.getToolBar().toggleSourceMode();
         this.textArea = this.editor.getRichTextArea();
-    }
-
-    protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)
-    {
-        if (StringUtils.isNotEmpty(setup.getEditMode())) {
-            // Use the cancel shortcut key to leave the edit mode.
-            setup.getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
-        }
     }
 
     protected void waitForSolrIndexing(TestUtils setup, TestConfiguration testConfiguration) throws Exception

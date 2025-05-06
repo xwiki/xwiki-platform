@@ -119,6 +119,19 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
+     * Click on the "Summarize and done" button to open the modal for summarizing the changes.
+     * @return the modal to summarize.
+     */
+    public SummaryModal clickSummarizeAndDone()
+    {
+        openDoneDropdown();
+        getDriver().findElement(By.cssSelector(".realtime-edit-toolbar .realtime-action-summarize")).click();
+        SummaryModal summaryModal = new SummaryModal();
+        getDriver().waitUntilCondition(it -> summaryModal.isDisplayed());
+        return summaryModal;
+    }
+
+    /**
      * @return the user identifier in the realtime session
      */
     public String getUserId()
@@ -190,14 +203,6 @@ public class RealtimeEditToolbar extends BaseElement
         getDriver().waitUntilCondition(ExpectedConditions.attributeToBe(SAVE_STATUS, VALUE, status.getValue()),
             timeout);
         return this;
-    }
-
-    /**
-     * Use the Cancel shortcut key to leave the editing session immediately.
-     */
-    public void sendCancelShortcutKey()
-    {
-        getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
     }
 
     /**

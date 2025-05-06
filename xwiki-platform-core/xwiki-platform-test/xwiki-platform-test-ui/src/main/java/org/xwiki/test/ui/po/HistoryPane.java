@@ -149,7 +149,12 @@ public class HistoryPane extends BaseElement
      */
     public HistoryPane showMinorEdits()
     {
+        // We cannot count on Selenium to wait for the page to be reloaded because the action is handled with
+        // JavaScript: there's a click event listener that prevents the default behaviour, changes the form action URL
+        // and then submits the form (see history.js).
+        getDriver().addPageNotYetReloadedMarker();
         getDriver().findElementWithoutWaiting(pane, By.name("viewMinorVersions")).click();
+        getDriver().waitUntilPageIsReloaded();
         return new HistoryPane();
     }
 

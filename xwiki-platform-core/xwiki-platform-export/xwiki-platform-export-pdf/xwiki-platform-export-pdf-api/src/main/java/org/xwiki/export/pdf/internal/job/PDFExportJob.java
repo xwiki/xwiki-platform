@@ -77,6 +77,22 @@ public class PDFExportJob extends AbstractPDFExportJob
     @Override
     protected void runInternal() throws Exception
     {
+        try {
+            exportAsPDF();
+        } finally {
+            cleanup();
+        }
+    }
+
+    private void cleanup()
+    {
+        // Avoid saving sensitive information along with the PDF export job status. This information is not needed
+        // anymore after the PDF export job is done (whether the PDF is generated client-side or server-side).
+        getRequest().getContext().keySet().removeAll(List.of("request.session", "request.headers", "request.cookies"));
+    }
+
+    private void exportAsPDF() throws Exception
+    {
         if (!this.request.getDocuments().isEmpty()) {
             this.requiredSkinExtensionsRecorder.start();
             render(this.request.getDocuments());

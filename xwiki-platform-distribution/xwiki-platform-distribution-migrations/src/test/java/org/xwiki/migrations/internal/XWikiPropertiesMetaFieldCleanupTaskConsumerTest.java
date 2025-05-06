@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.index.IndexException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -44,7 +45,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -98,10 +98,11 @@ class XWikiPropertiesMetaFieldCleanupTaskConsumerTest
 
         XWikiDocument document = mock(XWikiDocument.class);
         when(this.wiki.getDocument(documentReference, this.context)).thenReturn(document);
+        when(document.clone()).thenReturn(document);
 
         this.taskConsumer.consume(documentReference, null);
 
-        verify(document).getXObject(any(DocumentReference.class));
+        verify(document).getXObject(any(LocalDocumentReference.class));
         verify(this.wiki, never()).saveDocument(any(), any());
     }
 
@@ -115,11 +116,12 @@ class XWikiPropertiesMetaFieldCleanupTaskConsumerTest
         XWikiDocument document = mock(XWikiDocument.class);
 
         when(this.wiki.getDocument(documentReference, this.context)).thenReturn(document);
-        when(document.getXObject(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"))).thenReturn(metaField);
+        when(document.clone()).thenReturn(document);
+        when(document.getXObject(documentReference.getLocalDocumentReference())).thenReturn(metaField);
 
         this.taskConsumer.consume(documentReference, null);
 
-        verify(document).getXObject(any(DocumentReference.class));
+        verify(document).getXObject(any(LocalDocumentReference.class));
         verify(this.wiki, never()).saveDocument(any(), any());
     }
 
@@ -133,8 +135,8 @@ class XWikiPropertiesMetaFieldCleanupTaskConsumerTest
         XWikiDocument document = mock(XWikiDocument.class);
 
         when(this.wiki.getDocument(documentReference, this.context)).thenReturn(document);
-        when(document.getXObject(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"))).thenReturn(metaField);
         when(document.clone()).thenReturn(document);
+        when(document.getXObject(documentReference.getLocalDocumentReference())).thenReturn(metaField);
         doThrow(XWikiException.class).when(this.wiki).saveDocument(any(), anyString(), any());
 
         IndexException indexException =
@@ -142,7 +144,7 @@ class XWikiPropertiesMetaFieldCleanupTaskConsumerTest
 
         assertEquals(XWikiException.class, indexException.getCause().getClass());
         assertEquals("Unable to save document [xwiki:XWiki.XWikiPreferences]", indexException.getMessage());
-        verify(document, times(2)).getXObject(any(DocumentReference.class));
+        verify(document).getXObject(any(LocalDocumentReference.class));
         assertEquals("", metaField.getStringValue("meta"));
     }
 
@@ -156,12 +158,12 @@ class XWikiPropertiesMetaFieldCleanupTaskConsumerTest
         XWikiDocument document = mock(XWikiDocument.class);
 
         when(this.wiki.getDocument(documentReference, this.context)).thenReturn(document);
-        when(document.getXObject(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"))).thenReturn(metaField);
+        when(document.getXObject(documentReference.getLocalDocumentReference())).thenReturn(metaField);
         when(document.clone()).thenReturn(document);
 
         this.taskConsumer.consume(documentReference, null);
 
-        verify(document, times(2)).getXObject(any(DocumentReference.class));
+        verify(document).getXObject(any(LocalDocumentReference.class));
         assertEquals("", metaField.getStringValue("meta"));
         verify(this.wiki).saveDocument(document, "[UPGRADE] empty field [meta] because it matches the default values",
             this.context);

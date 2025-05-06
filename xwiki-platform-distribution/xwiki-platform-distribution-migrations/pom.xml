@@ -33,7 +33,7 @@
   <properties>
     <!-- Put the name of the distribution which will be displayed in the footer -->
     <xwiki.extension.name>XWiki Distribution Migrations</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

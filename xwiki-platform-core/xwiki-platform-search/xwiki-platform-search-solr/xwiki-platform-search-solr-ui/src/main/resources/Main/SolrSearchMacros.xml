@@ -378,6 +378,8 @@
     &lt;/div&gt;
     &lt;div class="search-options"&gt;
     $escapetool.xml($services.localization.render('solr.options'))
+    &lt;ul&gt;##
+      &lt;li&gt;##
       &lt;input id="option-highlight-input" type="checkbox" class="options-item" value="true" data-query-name="highlight"
       aria-describedby="option-highlight-description" 
       title="$services.localization.render('solr.options.highlight.title')"
@@ -386,14 +388,18 @@
       &lt;span id="option-highlight-description" class="sr-only"&gt;
       $escapetool.xml($services.localization.render('solr.options.highlight.title'))
       &lt;/span&gt;##
-      &lt;input id="option-facet-input" type="checkbox" class="options-item" value="true" data-query-name="facet"
-      aria-describedby="option-facet-description"
-      title="$services.localization.render('solr.options.facet.title')" 
-      #if($facetEnabled)checked#end/&gt;##
-      &lt;label for="option-facet-input"&gt;$services.localization.render('solr.options.facet')&lt;/label&gt;
-      &lt;span id="option-facet-description" class="sr-only"&gt;
-      $services.localization.render('solr.options.facet.title')
-      &lt;/span&gt;##
+      &lt;/li&gt;##
+      &lt;li&gt;##
+        &lt;input id="option-facet-input" type="checkbox" class="options-item" value="true" data-query-name="facet"
+        aria-describedby="option-facet-description"
+        title="$services.localization.render('solr.options.facet.title')" 
+        #if($facetEnabled)checked#end/&gt;##
+        &lt;label for="option-facet-input"&gt;$services.localization.render('solr.options.facet')&lt;/label&gt;
+        &lt;span id="option-facet-description" class="sr-only"&gt;
+        $services.localization.render('solr.options.facet.title')
+        &lt;/span&gt;##
+      &lt;/li&gt;##
+    &lt;/ul&gt;##
     &lt;/div&gt;
     {{/html}}
 
@@ -920,10 +926,7 @@ $value##
     #_displaySearchFormBegin()
     #if ($text != '')
       #getSearchResults()
-      (% class="search-results-controls")
-      (((
-        #_displaySearchResultsControls()
-      )))
+      #_displaySearchResultsControls()
       #_displaySearchFormEnd()
       #if ($debug)
         #displaySearchDebugInfo()

@@ -22,7 +22,7 @@ package org.xwiki.migrations.internal;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -70,7 +70,18 @@ import static org.xwiki.migrations.internal.XWikiPropertiesMetaFieldCleanupTaskC
 @Singleton
 public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigration
 {
+
     private static final String META_FIELD = "meta";
+
+    /**
+     * The set of expected ids for the default distribution xar files containing XWiki.XWikiPreferences
+     */
+    private static final Set<String> DISTRIBUTION_XAR_IDS = Set.of(
+        // Id in recent distributions
+        "org.xwiki.platform:xwiki-platform-distribution-ui-base",
+        // Id in older distributions
+        "org.xwiki.platform:xwiki-platform-distribution-flavor"
+    );
 
     @Inject
     private Packager packager;
@@ -138,8 +149,7 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
             Collection<XarInstalledExtension> xarInstalledExtensions =
                 xarInstalledExtensionRepository.getXarInstalledExtensions(xwikiPreferencesDocumentReference);
             XarInstalledExtension xarInstalledExtension = xarInstalledExtensions.stream()
-                .filter(
-                    it -> Objects.equals(it.getId().getId(), "org.xwiki.platform:xwiki-platform-distribution-ui-base"))
+                .filter(it -> DISTRIBUTION_XAR_IDS.contains(it.getId().getId()))
                 .findFirst()
                 .orElse(null);
             if (xarInstalledExtension != null) {

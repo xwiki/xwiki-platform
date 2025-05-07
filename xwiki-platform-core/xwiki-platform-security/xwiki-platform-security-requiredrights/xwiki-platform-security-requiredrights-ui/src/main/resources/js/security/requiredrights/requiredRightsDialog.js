@@ -33,6 +33,10 @@ define('xwiki-requiredrights-messages', {
         'modal.required.hint',
         'modal.maybeRequired',
         'modal.maybeRequired.hint',
+        'modal.enough',
+        'modal.enough.hint',
+        'modal.maybeEnough',
+        'modal.maybeEnough.hint',
         'modal.analysisDetails',
         'modal.analysisDetails',
         'modal.contentAndTitle',
@@ -242,15 +246,11 @@ define('xwiki-requiredrights-dialog', [
                 questionMark.type = 'button';
                 questionMark.innerHTML = '<span class="fa fa-info-circle" aria-hidden="true"></span>';
 
-                if (status === "required") {
-                    listItem.classList.add('required');
-                    statusContainer.append(l10n['modal.required']);
-                    questionMark.title = l10n['modal.required.hint'];
-                } else {
-                    listItem.classList.add('maybe-required');
-                    statusContainer.append(l10n['modal.maybeRequired']);
-                    questionMark.title = l10n['modal.maybeRequired.hint'];
-                }
+                // Convert from camelCase to kebab-case for the class name.
+                const className = status.replace(/([A-Z])/g, '-$1').toLowerCase();
+                listItem.classList.add(className);
+                statusContainer.append(l10n['modal.' + status]);
+                questionMark.title = l10n.get('modal.' + status + '.hint', labelText);
 
                 statusContainer.append(' ', questionMark);
                 listItem.appendChild(statusContainer);
@@ -322,7 +322,6 @@ define('xwiki-requiredrights-dialog', [
 
             const response = await fetch(restURL);
             const data = await response.json();
-            // Example response: {"analysisResults":[{"entityReference":"document:xwiki:Macro Analyzer.WebHome","locale":"","summaryMessageHTML":"An HTML macro with wiki content could require script right depending on the content, please review the content carefully.","detailedMessageHTML":"<dl class=\"xform\"><dt>wiki<span class=\"xHint\">Indicate if the wiki syntax in the macro will be interpreted or not.</span></dt><dd><div class=\"code box\">true</div></dd><dt>Content<span class=\"xHint\">The HTML content to insert in the page.</span></dt><dd><div class=\"code box\">Hello!</div></dd></dl>","requiredRights":[{"right":"script","entityType":"DOCUMENT","manualReviewNeeded":true}]}],"currentRights":{"enforce":true,"rights":[{"right":"programming","scope":null}]},"availableRights":[{"right":"","scope":"DOCUMENT","displayName":"None","hasRight":true,"definitelyRequiredRight":true,"maybeRequiredRight":false},{"right":"script","scope":"DOCUMENT","displayName":"Script","hasRight":true,"definitelyRequiredRight":false,"maybeRequiredRight":true},{"right":"admin","scope":"WIKI","displayName":"Wiki Admin","hasRight":true,"definitelyRequiredRight":false,"maybeRequiredRight":false},{"right":"programming","scope":null,"displayName":"Programming","hasRight":true,"definitelyRequiredRight":false,"maybeRequiredRight":false}]}
             // Create a bootstrap dialog to display the results
             const dialog = new RequiredRightsDialog();
             // Add a click event listener to the advanced toggle
@@ -389,7 +388,14 @@ define('xwiki-requiredrights-dialog', [
             availableRights.forEach(right => {
                 const checked = currentRight && currentRight.right === right.right;
                 let status = '';
-                if (right.definitelyRequiredRight) {
+                if (right.right === '' && right.definitelyRequiredRight) {
+                    // Check if there is any right that is maybe required.
+                    if (availableRights.some(r => r.maybeRequiredRight)) {
+                        status = 'maybeEnough';
+                    } else {
+                        status = 'enough';
+                    }
+                } else if (right.definitelyRequiredRight) {
                     status = 'required';
                 } else if (right.maybeRequiredRight) {
                     status = 'maybeRequired';

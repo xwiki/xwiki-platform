@@ -56,6 +56,8 @@
 #required-rights-dialog .rights-selection li p {
   margin: 0;
   color: var(--text-muted);
+  /* TODO: would be nice to have a variable for this font size. */
+  font-size: 0.9em;
   text-align: center;
 }
 
@@ -89,20 +91,24 @@
   border-color: var(--brand-primary);
 }
 
-#required-rights-dialog .rights-selection li.required .label-wrapper {
+#required-rights-dialog .rights-selection li.required .label-wrapper,
+#required-rights-dialog .rights-selection li.enough .label-wrapper {
   border-color: var(--input-border);
 }
 
-#required-rights-dialog .rights-selection li.required .label-wrapper:has(input:checked) {
+#required-rights-dialog .rights-selection li.required .label-wrapper:has(input:checked),
+#required-rights-dialog .rights-selection li.enough .label-wrapper:has(input:checked) {
   border-color: var(--brand-primary);
 }
 
-#required-rights-dialog .rights-selection li.maybe-required .label-wrapper {
+#required-rights-dialog .rights-selection li.maybe-required .label-wrapper,
+#required-rights-dialog .rights-selection li.maybe-enough .label-wrapper {
   border-color: var(--input-border);
   border-style: dashed;
 }
 
-#required-rights-dialog .rights-selection li.maybe-required .label-wrapper:has(input:checked) {
+#required-rights-dialog .rights-selection li.maybe-required .label-wrapper:has(input:checked),
+#required-rights-dialog .rights-selection li.maybe-enough .label-wrapper:has(input:checked) {
   border-color: var(--brand-primary);
 }
 
@@ -139,6 +145,7 @@
 
   #required-rights-dialog .rights-selection li p {
     text-align: start;
+    margin: auto 0;
   }
 }
 

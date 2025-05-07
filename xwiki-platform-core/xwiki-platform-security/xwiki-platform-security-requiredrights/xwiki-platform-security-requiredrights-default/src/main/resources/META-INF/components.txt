@@ -24,4 +24,3 @@ org.xwiki.platform.security.requiredrights.internal.configuration.DefaultRequire
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsEditConfirmationChecker
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsChangedFilter
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsChangeSuggestionManager
-org.xwiki.platform.security.requiredrights.script.SecurityRequiredRightsScriptService

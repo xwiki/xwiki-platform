@@ -86,7 +86,7 @@
     -/**/-panel-column-left-width: 0;
     -/**/-panel-column-right-width: 0;
 
-    & #leftPanels, & #rightPanels {
+    & #leftPanels, & #rightPanels, & #editPanels {
       display: none;
     }
   }
@@ -205,6 +205,7 @@ again or the page is reloaded (because the toggler is hidden until then). */
   #rightPanelsToggle[aria-expanded="false"],
   #contentcontainer:hover #contentcolumn:not(:hover) ~ #rightPanelsToggle,
   #rightPanelsToggle:has(+ #rightPanels:focus-within),
+  #rightPanelsToggle:has(+ #editPanels:focus-within),
   #rightPanelsToggle:hover, #rightPanelsToggle:focus {
     opacity: 1;
   }
@@ -244,6 +245,7 @@ body#body #leftPanelsToggle {
 
 /* Resize handles */
 #rightPanels > .ui-resizable-w,
+#editPanels > .ui-resizable-w,
 #leftPanels > .ui-resizable-e {
   position: absolute;
   top: 0;
@@ -270,7 +272,7 @@ body#body #leftPanelsToggle {
   background-image: linear-gradient( 90deg, transparent 0%, transparent 90%, @navbar-default-bg 90%, @navbar-default-bg 90%);
 }
 
-#rightPanels > .ui-resizable-w {
+#rightPanels > .ui-resizable-w, #editPanels > .ui-resizable-w {
   left: 0;
   /* We want the click zone to be large, but the display to be discreete. 
     90% of the button is transparent and the 10% on the left are highlighted on hover. */
@@ -281,6 +283,10 @@ body#body #leftPanelsToggle {
 #rightPanels > .ui-resizable-w:hover,
 #rightPanels > .ui-resizable-w:active,
 #rightPanels.ui-resizable-resizing > .ui-resizable-w,
+#editPanels > .ui-resizable-w:focus,
+#editPanels > .ui-resizable-w:hover,
+#editPanels > .ui-resizable-w:active,
+#editPanels.ui-resizable-resizing > .ui-resizable-w,
 #leftPanels > .ui-resizable-e:focus,
 #leftPanels > .ui-resizable-e:hover,
 #leftPanels > .ui-resizable-e:active,

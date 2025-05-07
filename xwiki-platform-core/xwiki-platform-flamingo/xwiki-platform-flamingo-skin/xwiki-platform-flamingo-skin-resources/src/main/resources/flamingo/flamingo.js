@@ -174,7 +174,7 @@ require(['jquery', 'jquery-ui'], function($) {
     // We set the one we want when displayed in the flex layout.
     document.body.style.setProperty('--panel-column-' + side + '-width', ui.size.width + 'px');
   };
-  $("#rightPanels").resizable({
+  $("#rightPanels, #editPanels").resizable({
     handles: 'w',
     resize: resizeCustomFunction.bind(null, right)
   });

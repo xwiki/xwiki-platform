@@ -71,6 +71,12 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
         }
 
         @Override
+        public List<String> getKeys(String prefix)
+        {
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getKeys(prefix));
+        }
+        
+        @Override
         public <T> T getProperty(String key)
         {
             return getFromWiki(() -> AbstractWikisConfigurationSource.super.getProperty(key));
@@ -92,6 +98,12 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
         public boolean isEmpty()
         {
             return getFromWiki(() -> AbstractWikisConfigurationSource.super.isEmpty());
+        }
+
+        @Override
+        public boolean isEmpty(String prefix)
+        {
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.isEmpty(prefix));
         }
 
         private <T> T getFromWiki(Supplier<T> supplier)
@@ -131,6 +143,12 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
     }
 
     @Override
+    public List<String> getKeys(String prefix)
+    {
+        return getConfigurationSource().getKeys(prefix);
+    }
+    
+    @Override
     public <T> T getProperty(String key)
     {
         return getConfigurationSource().getProperty(key);
@@ -154,6 +172,12 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
         return getConfigurationSource().isEmpty();
     }
 
+    @Override
+    public boolean isEmpty(String prefix)
+    {
+        return getConfigurationSource().isEmpty(prefix);
+    }
+    
     private ConfigurationSource getConfigurationSource()
     {
         CompositeConfigurationSource compositeConfigSource = new CompositeConfigurationSource();

@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -206,6 +207,23 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     }
 
     @Override
+    public List<String> getKeys(String prefix)
+    {
+        List<String> keyList = new ArrayList<>();
+
+        for (Enumeration<String> keys = (Enumeration<String>) this.properties.propertyNames(); keys
+            .hasMoreElements();) {
+            String key = keys.nextElement();
+
+            if (key.startsWith(prefix)) {
+                keyList.add(key);
+            }
+        }
+
+        return keyList;
+    }
+
+    @Override
     public boolean containsKey(String key)
     {
         return this.properties.containsKey(key);
@@ -215,6 +233,19 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     public boolean isEmpty()
     {
         return this.properties.isEmpty();
+    }
+
+    @Override
+    public boolean isEmpty(String prefix)
+    {
+        for (Enumeration<String> keys = (Enumeration<String>) this.properties.propertyNames(); keys
+            .hasMoreElements();) {
+            if (keys.nextElement().startsWith(prefix)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

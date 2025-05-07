@@ -265,6 +265,12 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public List<String> getKeys()
     {
+        return getKeys("");
+    }
+
+    @Override
+    public List<String> getKeys(String prefix)
+    {
         List<String> keys = Collections.emptyList();
 
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -280,7 +286,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
                     for (String key : properties) {
                         // We need to check if the key really have a value as otherwise it does not really make sense to
                         // return it
-                        if (containsKey(key)) {
+                        if (key.startsWith(prefix) && containsKey(key)) {
                             keys.add(key);
                         }
                     }
@@ -372,6 +378,12 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     public boolean isEmpty()
     {
         return getKeys().isEmpty();
+    }
+
+    @Override
+    public boolean isEmpty(String prefix)
+    {
+        return getKeys(prefix).isEmpty();
     }
 
     @Override

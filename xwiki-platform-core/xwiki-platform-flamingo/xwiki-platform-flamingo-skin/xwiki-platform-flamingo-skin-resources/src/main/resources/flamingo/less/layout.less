@@ -36,13 +36,11 @@
   & #leftPanels {
     order: 1;
     width: ~"var(--panel-column-left-width)";
-    padding-right: ~"calc(var(--grid-gutter-width) / 2)";
   }
 
   & #rightPanels {
     order: 3;
     width: ~"var(--panel-column-right-width)";
-    padding-left: ~"calc(var(--grid-gutter-width) / 2)";
   }
   
   /* Depending on the admin parameters, we want to change the default size. */
@@ -218,6 +216,15 @@ again or the page is reloaded (because the toggler is hidden until then). */
   #rightPanelsToggle:has(+ #rightPanels:focus-within),
   #rightPanelsToggle:hover, #rightPanelsToggle:focus {
     opacity: 1;
+  }
+  
+  /* When the display is large enough, we add padding on the outer sides of the panel columns. */
+  #leftPanels {
+    padding-right: ~"calc(var(--grid-gutter-width) / 2)";
+  }
+  
+  #rightPanels {
+    padding-left: ~"calc(var(--grid-gutter-width) / 2)";
   }
 }
 

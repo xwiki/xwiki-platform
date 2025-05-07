@@ -73,7 +73,7 @@
           }"
           :aria-current="pageIndex === logic.getPageIndex() ? 'page' : null"
           @click.prevent="changePageIndex(true, pageIndex)"
-        >{{ pageIndex + 1 }} <span class="sr-only">{{$t('livedata.pagination.loadPageByNumber')}}</span></button>
+        ><span class="sr-only">{{$t('livedata.pagination.loadPageByNumber')}}</span> {{ pageIndex + 1 }} </button>
         <!-- pageIndex + 1 because pageIndex are 0-based -->
       </template>
       

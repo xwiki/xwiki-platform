@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -32,7 +34,9 @@ import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.platform.security.requiredrights.rest.RequiredRightsRestResource;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRightsAnalysisResult;
 
 import com.xpn.xwiki.XWikiException;
@@ -54,20 +58,25 @@ public class DefaultRequiredRightsRestResource extends XWikiResource implements 
     @Inject
     private RequiredRightsObjectConverter objectConverter;
 
+    @Inject
+    private DocumentRequiredRightsManager documentRequiredRightsManager;
+
     @Override
     public DocumentRightsAnalysisResult analyze(String spaceNames, String page, String wiki) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wiki, spaceNames, page, null, null, true, false);
 
-            DocumentRequiredRights currentRights = documentInfo.getDocument().getRequiredRights();
+            DocumentReference documentReference = documentInfo.getDocument().getDocumentReference();
+            DocumentRequiredRights currentRights =
+                this.documentRequiredRightsManager.getRequiredRights(documentReference)
+                    .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
 
-            List<RequiredRightAnalysisResult> analysisResults =
-                this.requiredRightAnalyzer.analyze(documentInfo.getDocument().getDocumentReference());
+            List<RequiredRightAnalysisResult> analysisResults = this.requiredRightAnalyzer.analyze(documentReference);
 
             return this.objectConverter.toDocumentRightsAnalysisResult(currentRights, analysisResults,
-                documentInfo.getDocument().getDocumentReference());
-        } catch (XWikiException e) {
+                documentReference);
+        } catch (XWikiException | AuthorizationException e) {
             throw new XWikiRestException("Failed loading document", e);
         } catch (RequiredRightsException e) {
             throw new XWikiRestException("Failed analyzing required rights", e);

@@ -3487,17 +3487,6 @@ public class Document extends Api
     }
 
     /**
-     * @return the required rights that have been set on this document
-     * @since 17.1.0RC1
-     */
-    @Unstable
-    public DocumentRequiredRights getRequiredRights()
-    {
-        // TODO: this should do something more meaningful on translation instances maybe?
-        return Utils.getComponent(DocumentRequiredRightsReader.class).readRequiredRights(this.doc);
-    }
-
-    /**
      * Drop permissions for the remainder of the rendering cycle. After this is called:
      * <ul>
      * <li>1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.</li>

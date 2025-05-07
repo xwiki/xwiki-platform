@@ -409,14 +409,23 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
             Object formvalues = map.get(name);
+            BaseProperty baseProperty = null;
+            try {
+                PropertyInterface propertyInterface = object.get(name);
+                if (propertyInterface instanceof BaseProperty obtainedProperty) {
+                    baseProperty = obtainedProperty;
+                }
+            } catch (XWikiException e) {
+                LOGGER.error("Error while loading property [{}] from object [{}]", name, object, e);
+            }
             if (formvalues != null) {
                 BaseProperty objprop;
                 if (formvalues instanceof String[]) {
-                    objprop = property.fromStringArray(((String[]) formvalues));
+                    objprop = property.fromStringArray(((String[]) formvalues), baseProperty);
                 } else if (formvalues instanceof String) {
-                    objprop = property.fromString(formvalues.toString());
+                    objprop = property.fromString(formvalues.toString(), baseProperty);
                 } else {
-                    objprop = property.fromValue(formvalues);
+                    objprop = property.fromValue(formvalues, baseProperty);
                 }
 
                 if (objprop != null) {

@@ -39,7 +39,7 @@
     padding-right: ~"calc(var(--grid-gutter-width) / 2)";
   }
 
-  & #rightPanels, & #editPanels {
+  & #rightPanels {
     order: 3;
     width: ~"var(--panel-column-right-width)";
     padding-left: ~"calc(var(--grid-gutter-width) / 2)";
@@ -51,10 +51,14 @@
      We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
      Once this file is migrated to native CSS, this hack can be removed. */
   &.hideleft {
-    -/**/-panel-column-left-width: 0;
-    
-    & #leftPanels {
-      display: none;
+    /* We hide panels only when the screen is small enough.
+        Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. */
+    @media (min-width: @screen-md-min) {
+      -/**/-panel-column-left-width: 0;
+
+      & #leftPanels {
+        display: none;
+      }
     }
   }
 
@@ -67,10 +71,14 @@
   }
 
   &.hideright {
-    -/**/-panel-column-right-width: 0;
+    /* We hide panels only when the screen is small enough.
+        Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. */
+    @media (min-width: @screen-md-min) {
+      -/**/-panel-column-right-width: 0;
 
-    & #rightPanels {
-      display: none;
+      & #rightPanels {
+        display: none;
+      }
     }
   }
 
@@ -83,11 +91,15 @@
   }
 
   &.hidelefthideright {
-    -/**/-panel-column-left-width: 0;
-    -/**/-panel-column-right-width: 0;
-
-    & #leftPanels, & #rightPanels, & #editPanels {
-      display: none;
+    /* We hide panels only when the screen is small enough.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. */
+    @media (min-width: @screen-md-min) {
+      -/**/-panel-column-left-width: 0;
+      -/**/-panel-column-right-width: 0;
+  
+      & #leftPanels, & #rightPanels {
+        display: none;
+      }
     }
   }
 
@@ -157,8 +169,7 @@
   resize: vertical;
 }
 
-.main, #editcolumn,
-#leftPanels, #rightPanels, #editPanels {
+.main, #editcolumn, #leftPanels, #rightPanels {
   position: relative;
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
@@ -205,7 +216,6 @@ again or the page is reloaded (because the toggler is hidden until then). */
   #rightPanelsToggle[aria-expanded="false"],
   #contentcontainer:hover #contentcolumn:not(:hover) ~ #rightPanelsToggle,
   #rightPanelsToggle:has(+ #rightPanels:focus-within),
-  #rightPanelsToggle:has(+ #editPanels:focus-within),
   #rightPanelsToggle:hover, #rightPanelsToggle:focus {
     opacity: 1;
   }
@@ -245,7 +255,6 @@ body#body #leftPanelsToggle {
 
 /* Resize handles */
 #rightPanels > .ui-resizable-w,
-#editPanels > .ui-resizable-w,
 #leftPanels > .ui-resizable-e {
   position: absolute;
   top: 0;
@@ -272,7 +281,7 @@ body#body #leftPanelsToggle {
   background-image: linear-gradient( 90deg, transparent 0%, transparent 90%, @navbar-default-bg 90%, @navbar-default-bg 90%);
 }
 
-#rightPanels > .ui-resizable-w, #editPanels > .ui-resizable-w {
+#rightPanels > .ui-resizable-w {
   left: 0;
   /* We want the click zone to be large, but the display to be discreete. 
     90% of the button is transparent and the 10% on the left are highlighted on hover. */
@@ -283,10 +292,6 @@ body#body #leftPanelsToggle {
 #rightPanels > .ui-resizable-w:hover,
 #rightPanels > .ui-resizable-w:active,
 #rightPanels.ui-resizable-resizing > .ui-resizable-w,
-#editPanels > .ui-resizable-w:focus,
-#editPanels > .ui-resizable-w:hover,
-#editPanels > .ui-resizable-w:active,
-#editPanels.ui-resizable-resizing > .ui-resizable-w,
 #leftPanels > .ui-resizable-e:focus,
 #leftPanels > .ui-resizable-e:hover,
 #leftPanels > .ui-resizable-e:active,

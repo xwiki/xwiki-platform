@@ -1558,7 +1558,7 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>1.15.1</version>
+          <version>1.15.10-atlassian-2</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.gmavenplus</groupId>

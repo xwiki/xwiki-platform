@@ -74,7 +74,7 @@ public class R170400000XWIKI23160DataMigration extends AbstractHibernateDataMigr
     private static final String META_FIELD = "meta";
 
     /**
-     * The set of expected ids for the default distribution xar files containing XWiki.XWikiPreferences
+     * The set of expected ids for the default distribution xar files containing {@code XWiki.XWikiPreferences}.
      */
     private static final Set<String> DISTRIBUTION_XAR_IDS = Set.of(
         // Id in recent distributions

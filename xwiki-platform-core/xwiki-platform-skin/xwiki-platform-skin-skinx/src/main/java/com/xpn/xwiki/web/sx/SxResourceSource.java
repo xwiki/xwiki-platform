@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
+import org.xwiki.classloader.internal.ClassLoaderUtils;
 
 /**
  * JAR resource source for Skin Extensions.
@@ -58,7 +59,7 @@ public class SxResourceSource implements SxSource
         try {
             // Load from the current context class loader to allow extensions to contribute skin extensions.
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            try (InputStream in = contextClassLoader.getResourceAsStream(this.resourceName)) {
+            try (InputStream in = ClassLoaderUtils.getResourceAsStream(contextClassLoader, this.resourceName)) {
                 return IOUtils.toString(in, StandardCharsets.UTF_8);
             }
         } catch (NullPointerException e) {

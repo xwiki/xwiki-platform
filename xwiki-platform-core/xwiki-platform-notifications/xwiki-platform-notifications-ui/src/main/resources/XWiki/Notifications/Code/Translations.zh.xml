@@ -55,9 +55,9 @@ notifications.filters.advanced.modal.close=关闭
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=系统过滤器
-notifications.filters.description.systemUserNotificationFilter=隐藏系统用户的通知
+notifications.filters.description.systemUserNotificationFilter=隐藏系统用户的通知，除非事件明确针对你
 notifications.filters.name.ownEventsNotificationFilter=自己的事件过滤器
-notifications.filters.description.ownEventsNotificationFilter=隐藏有关您自己活动的通知
+notifications.filters.description.ownEventsNotificationFilter=隐藏有关您自己活动的通知，除非事件明确针对你
 notifications.filters.name.eventReadAlertFilter=读取事件过滤器（警报）
 notifications.filters.description.eventReadAlertFilter=隐藏标记为已读的通知
 notifications.filters.name.eventReadEmailFilter=读取事件过滤器（电子邮件）
@@ -86,7 +86,7 @@ notifications.filters.preferences.delete.error=删除过滤器偏好失败
 notifications.filters.preferences.setEnabled.inProgress=保存中...
 notifications.filters.preferences.setEnabled.done=过滤器偏好已保存！
 notifications.filters.preferences.setEnabled.error=保存过滤器偏好失败
-notifications.filters.preferences.allEvents=-
+notifications.filters.preferences.allEvents=-所有事件（包括已被禁用的）
 
 ## System Filter preferences settings
 notifications.settings.filters.preferences.system.title=系统过滤器

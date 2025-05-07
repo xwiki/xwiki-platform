@@ -140,6 +140,16 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final String SOLR_SYNCHRONIZE_AT_STARTUP_MODE = "solr.synchronizeAtStartupMode";
 
     /**
+     * The default synchronization batch size.
+     */
+    public static final int SOLR_SYNCHRONIZE_BATCH_SIZE_DEFAULT = 1000;
+
+    /**
+     * The name of the configuration property containing the batch size for the synchronization.
+     */
+    public static final String SOLR_SYNCHRONIZE_BATCH_SIZE = "solr.synchronizeBatchSize";
+
+    /**
      * Indicate which mode to use for synchronize at startup by default.
      */
     public static final SynchronizeAtStartupMode SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT =
@@ -237,5 +247,11 @@ public class DefaultSolrConfiguration implements SolrConfiguration
             result = SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT;
         }
         return result;
+    }
+
+    @Override
+    public int getSynchronizationBatchSize()
+    {
+        return this.configuration.getProperty(SOLR_SYNCHRONIZE_BATCH_SIZE, SOLR_SYNCHRONIZE_BATCH_SIZE_DEFAULT);
     }
 }

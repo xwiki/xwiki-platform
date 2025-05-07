@@ -21,8 +21,9 @@ package org.xwiki.edit.internal;
 
 import java.lang.reflect.Type;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -42,6 +43,9 @@ import org.xwiki.edit.EditorDescriptorBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -69,7 +73,7 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
-    private DocumentReference authorReference;
+    private UserReference authorReference;
 
     private DocumentReference editorReference;
 
@@ -80,10 +84,18 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
     @Inject
     private EditorDescriptorBuilder descriptorBuilder;
 
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceDocumentReferenceSerializer;
+
     @Override
     public DocumentReference getAuthorReference()
     {
-        return this.authorReference;
+        if (this.authorReference != null && this.authorReference != GuestUserReference.INSTANCE) {
+            return this.userReferenceDocumentReferenceSerializer.serialize(this.authorReference);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -118,12 +130,12 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
             XWikiDocument editorDocument = xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext);
             XWikiDocument translatedEditorDocument = editorDocument.getTranslatedDocument(xcontext);
             this.descriptorBuilder.setName(translatedEditorDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext));
-            this.descriptorBuilder.setDescription(translatedEditorDocument.getRenderedContent(Syntax.PLAIN_1_0,
-                xcontext));
+            this.descriptorBuilder
+                .setDescription(translatedEditorDocument.getRenderedContent(Syntax.PLAIN_1_0, xcontext));
 
         } catch (XWikiException e) {
-            this.logger.warn("Failed to read the editor name and description. Root cause: "
-                + ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to read the editor name and description. Root cause: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return this.descriptorBuilder.build();
     }
@@ -173,13 +185,13 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
 
     private void initialize(XWikiDocument editorDocument) throws WikiComponentException
     {
-        this.authorReference = editorDocument.getAuthorReference();
+        this.authorReference = editorDocument.getAuthors().getEffectiveMetadataAuthor();
         BaseObject editorObject = editorDocument.getXObject(EDITOR_CLASS_REFERENCE);
         if (editorObject != null) {
             initialize(editorObject);
         } else {
-            throw new WikiComponentException(String.format(
-                "The document [%s] is missing the XWiki.EditorClass object.", editorDocument.getDocumentReference()));
+            throw new WikiComponentException(String.format("The document [%s] is missing the XWiki.EditorClass object.",
+                editorDocument.getDocumentReference()));
         }
     }
 

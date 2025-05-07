@@ -151,11 +151,11 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     }
 
     @Override
-    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference)
+    public XWikiSolrInputDocument getSolrDocument(EntityReference entityReference)
         throws SolrIndexerException, IllegalArgumentException
     {
         try {
-            LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
+            XWikiSolrInputDocument solrDocument = new XWikiSolrInputDocument();
 
             solrDocument.setField(FieldUtils.ID, this.seachUtils.getId(entityReference));
             solrDocument.setField(FieldUtils.REFERENCE,
@@ -180,12 +180,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     }
 
     /**
-     * @param solrDocument the {@link LengthSolrInputDocument} to modify
+     * @param solrDocument the {@link XWikiSolrInputDocument} to modify
      * @param entityReference the reference of the entity
      * @return false if the entity should not be indexed (generally mean it does not exist), true otherwise
      * @throws Exception in case of errors
      */
-    protected abstract boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    protected abstract boolean setFieldsInternal(XWikiSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception;
 
     /**
@@ -365,7 +365,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param locale the locale of the indexed document; in case of translations, this will obviously be different than
      *            the original document's locale
      */
-    protected void setObjectContent(SolrInputDocument solrDocument, BaseObject object, Locale locale)
+    protected void setObjectContent(XWikiSolrInputDocument solrDocument, BaseObject object, Locale locale)
     {
         if (object == null) {
             // Yes, the platform can return null objects.
@@ -392,7 +392,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param propertyClass the class that describes the given property
      * @param locale the locale of the indexed document
      */
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    protected void setPropertyValue(XWikiSolrInputDocument solrDocument, BaseProperty<?> property,
         PropertyClass propertyClass, Locale locale)
     {
         Object propertyValue = property.getValue();
@@ -454,7 +454,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param locale the locale of the indexed document
      * @see "XWIKI-9417: Search does not return any results for Static List values"
      */
-    private void setStaticListPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    private void setStaticListPropertyValue(XWikiSolrInputDocument solrDocument, BaseProperty<?> property,
         StaticListClass propertyClass, Locale locale)
     {
         // The list of known values specified in the XClass.
@@ -489,7 +489,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param typedValue the value to add
      * @param locale the locale of the indexed document
      */
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    protected void setPropertyValue(XWikiSolrInputDocument solrDocument, BaseProperty<?> property,
         TypedValue typedValue, Locale locale)
     {
         // Collect all the property values from all the objects of a document in a single (localized) field.
@@ -508,12 +508,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param fieldName the field name
      * @param fieldValue the field value to add
      */
-    protected void addFieldValueOnce(SolrInputDocument solrDocument, String fieldName, Object fieldValue)
+    protected void addFieldValueOnce(XWikiSolrInputDocument solrDocument, String fieldName, Object fieldValue)
     {
-        Collection<Object> fieldValues = solrDocument.getFieldValues(fieldName);
-        if (fieldValues == null || !fieldValues.contains(fieldValue)) {
-            solrDocument.addField(fieldName, fieldValue);
-        }
+        solrDocument.addFieldOnce(fieldName, fieldValue);
     }
 
     /**

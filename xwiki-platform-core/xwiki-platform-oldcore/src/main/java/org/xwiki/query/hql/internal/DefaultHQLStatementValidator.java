@@ -19,13 +19,17 @@
  */
 package org.xwiki.query.hql.internal;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -49,6 +53,8 @@ import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 @Singleton
 public class DefaultHQLStatementValidator implements HQLStatementValidator
 {
+    private static final Pattern SAFE_ORDERBY_ELEMENT = Pattern.compile("\\A(\\w+\\.)?\\w+(\\s+\\w+)?\\z");
+
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
@@ -91,6 +97,43 @@ public class DefaultHQLStatementValidator implements HQLStatementValidator
         }
 
         // If we really could not find any way to validate the statement, consider it unsafe
+        return false;
+    }
+
+    @Override
+    public void checkOrderBySafe(List<String> allowedPrefixes, String orderByValue) throws QueryException
+    {
+        if (StringUtils.isBlank(orderByValue)) {
+            return;
+        }
+
+        StringTokenizer tokenizer = new StringTokenizer(orderByValue, ",");
+        while (tokenizer.hasMoreTokens()) {
+            String orderByColumn = tokenizer.nextToken().trim();
+
+            boolean valid = false;
+            if (SAFE_ORDERBY_ELEMENT.matcher(orderByColumn).matches()) {
+                valid = isValidOrderBy(allowedPrefixes, orderByColumn);
+            }
+
+            if (!valid) {
+                throw new QueryException("Unsafe ORDER BY value [" + orderByValue + "].", null);
+            }
+        }
+    }
+
+    private boolean isValidOrderBy(List<String> allowedPrefixes, String orderByColumn)
+    {
+        if (CollectionUtils.isEmpty(allowedPrefixes)) {
+            return true;
+        } else {
+            for (String allowedPrefix : allowedPrefixes) {
+                if (orderByColumn.startsWith(allowedPrefix)) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 }

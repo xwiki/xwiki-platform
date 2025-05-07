@@ -300,6 +300,33 @@
           }
         }, true);
       });
+
+      // When content is pasted or inserted into the editor, the Widget plugin scans the new content for widgets to be
+      // upcasted. When widgets are upcasted the content is transformed and the caret may end up inside the read-only
+      // part of the widget or inside one of its nested editable areas. If this is the case then we need to focus either
+      // the widget or the nested editable, otherwise the caret gets hidden and the user can't get it back without using
+      // the mouse.
+      editor.widgets?.on('checkWidgets', event => {
+        const selection = editor.getSelection();
+        if (selection?.isCollapsed()) {
+          const container = selection.getStartElement();
+          const widget = editor.widgets.getByElement(container);
+          if (widget) {
+            // The caret is inside a widget.
+            if (container.isReadOnly()) {
+              // The caret is hidden inside the read-only part of the widget. We focus the widget in order to select it.
+              widget.focus();
+            } else {
+              // The caret is inside a nested editable area. Some browsers (e.g. Chrome) don't show the caret if the
+              // nested editable area is not focused.
+              CKEDITOR.plugins.widget.getNestedEditable(widget.wrapper, container)?.focus();
+              // In Firefox, if we focus the nested editable area then the user can't move the caret outside of it using
+              // the keyboard. We need to focus again the root editable area to fix this...
+              editor.editable().focus();
+            }
+          }
+        }
+      });
     }
   });
 })();
@@ -660,35 +687,6 @@ define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], functio
     return newOffset;
   }
 
-  function scrollSelectionIntoView(element, range) {
-    if (isTextInput(element)) {
-      // See https://bugs.chromium.org/p/chromium/issues/detail?id=331233
-      var fullText = element.value;
-      element.value = fullText.substring(0, range.endOffset);
-      // Scroll to the bottom.
-      element.scrollTop = element.scrollHeight;
-      var canScroll = element.scrollHeight > element.clientHeight;
-      element.value = fullText;
-      if (canScroll) {
-        // Scroll to center the selection.
-        element.scrollTop += element.clientHeight / 2;
-      }
-    } else {
-      scrollUtils.centerVertically(getScrollTarget(range), 65);
-    }
-  }
-
-  function getScrollTarget(range) {
-    // Try the child node at the specified offset, or the last child if the offset is greater than the number of
-    // children, or the node itself if it doesn't have child nodes (e.g. if it's a text node).
-    let target = range.startContainer.childNodes[range.startOffset] || range.startContainer.lastChild ||
-      range.startContainer;
-    if (target.nodeType !== Node.ELEMENT_NODE) {
-      target = target.previousElementSibling || target.parentNode;
-    }
-    return target;
-  }
-
   return {
     from: function(root, ranges) {
       return $.extend({}, this, getTextSelection(root, ranges));
@@ -709,7 +707,7 @@ define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], functio
 
       const range = isTextInput(element) ? this : this.asRange(element);
       if (options.scrollIntoView) {
-        scrollSelectionIntoView(element, range);
+        scrollUtils.scrollSelectionIntoView(element, range);
       }
 
       if (isTextInput(element)) {
@@ -743,44 +741,39 @@ define('scrollUtils', ['jquery'], function($) {
   /**
    * Look for the first ancestor, starting from the given element, that has vertical scroll.
    */
-  var getVerticalScrollParent = function(element) {
-    var parent = element.parentNode;
+  function getVerticalScrollParent(element) {
+    let parent = element.parentNode;
     while (parent && !(parent.nodeType === Node.ELEMENT_NODE && hasVerticalScrollBar(parent))) {
       parent = parent.parentNode;
     }
-    return parent;
-  };
+    return parent || document.scrollingElement || document.documentElement;
+  }
 
-  var hasVerticalScrollBar = function(element) {
-    var overflowY = $(element).css('overflow-y');
-    // Use a delta to detect the vertical scroll bar, in order to overcome a bug in Chrome.
-    // See https://bugs.chromium.org/p/chromium/issues/detail?id=34224 (Incorrect scrollHeight on the <body> element)
-    var delta = 4;
-    return element.scrollHeight > (element.clientHeight + delta) && overflowY !== 'hidden' &&
-      // The HTML and BODY tags can have vertical scroll bars even if overflow is visible.
-      (overflowY !== 'visible' || element === element.ownerDocument.documentElement ||
-        element === element.ownerDocument.body);
-  };
+  function hasVerticalScrollBar(element) {
+    const overflowY = $(element).css('overflow-y');
+    // There is content that exceeds the element's height and this excess content is neither hidden nor visible.
+    return element.scrollHeight > element.clientHeight && (overflowY.includes('scroll') || overflowY.includes('auto'));
+  }
 
   /**
    * Compute the top offset of the given element within the specified ancestor.
    */
-  var getRelativeTopOffset = function(element, ancestor) {
+  function getRelativeTopOffset(element, ancestor) {
     // Save the vertical scroll position so that we can restore it afterwards.
-    var originalScrollTop = ancestor.scrollTop;
+    const originalScrollTop = ancestor.scrollTop;
     // Scroll the contents of the specified ancestor to the top, temporarily, so that the element offset, relative to
     // its ancestor, is positive.
     ancestor.scrollTop = 0;
-    var relativeTopOffset = $(element).offset().top - $(ancestor).offset().top;
+    const relativeTopOffset = $(element).offset().top - $(ancestor).offset().top;
     // Restore the previous vertical scroll position.
     ancestor.scrollTop = originalScrollTop;
     return relativeTopOffset;
-  };
+  }
 
-  var isCenteredVertically = function(verticalScrollParent, padding, position) {
+  function isCenteredVertically(verticalScrollParent, padding, position) {
     return position >= (verticalScrollParent.scrollTop + padding) &&
       position <= (verticalScrollParent.scrollTop + verticalScrollParent.clientHeight - padding);
-  };
+  }
 
   /**
    * Center the given element vertically within its scroll parent, if needed.
@@ -789,25 +782,87 @@ define('scrollUtils', ['jquery'], function($) {
    * @param padding the amount of pixels from the top and from the bottom of the scroll parent that delimits the center
    *          area; when specified, the element is centered vertically only if it's not already in the center area
    *          defined by this padding
+   * @param verticalRange the vertical segment of the given element that should be centered, defaults to the entire
+   *          element
    */
-  var centerVertically = function(element, padding) {
-    var verticalScrollParent = getVerticalScrollParent(element);
+  function centerVertically(
+    element,
+    padding = 0,
+    verticalRange = {startOffset: 0, endOffset: element.clientHeight}
+  ) {
+    const verticalScrollParent = getVerticalScrollParent(element);
     if (verticalScrollParent) {
-      var relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent);
+      const rangeHeight = verticalRange.endOffset - verticalRange.startOffset;
+      const relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent) + verticalRange.startOffset;
       if (!padding || !isCenteredVertically(verticalScrollParent, padding, relativeTopOffset)) {
-        // Center the element by removing half of the scroll parent height (i.e. half of the visible vertical space)
-        // from the element's relative position. If this is a negative value then the browser will use 0 instead.
-        var scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight / 2);
-        verticalScrollParent.scrollTop = scrollTop;
+        if (rangeHeight < verticalScrollParent.clientHeight) {
+          // Center the specified vertical range inside the scroll parent.
+          verticalScrollParent.scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight - rangeHeight) / 2;
+        } else {
+          // Align the top of the specified vertical range to the top of the scroll parent.
+          verticalScrollParent.scrollTop = relativeTopOffset;
+        }
       }
     }
-  };
+  }
+
+  function scrollSelectionIntoView(element, range) {
+    const padding = 65;
+    if (typeof element?.setSelectionRange === 'function') {
+      // We handle text areas differently because we want to center the selected text.
+      // See https://bugs.chromium.org/p/chromium/issues/detail?id=331233
+      const fullText = element.value;
+      const styleBackup = element.style.cssText;
+      // Determine the scroll offset corresponding to the start and end of the text selection.
+      element.style.height = element.style.minHeight = 0;
+      element.style.overflowY = 'hidden';
+      // Cut the text after the selection start.
+      element.value = fullText.substring(0, range.startOffset);
+      const scrollStartOfset = element.scrollHeight;
+      // Cut the text after the selection end.
+      element.value = fullText.substring(0, range.endOffset);
+      const scrollEndOffset = element.scrollHeight;
+      const selectionHeight = scrollEndOffset - scrollStartOfset;
+      // Restore the full text and the text area styles.
+      element.value = fullText;
+      element.style.cssText = styleBackup;
+      const canScrollVertically = element.scrollHeight > element.clientHeight;
+      if (canScrollVertically) {
+        if (selectionHeight < element.clientHeight) {
+          // Center the selection inside the text area.
+          element.scrollTop = scrollStartOfset - (element.clientHeight - selectionHeight) / 2;
+        } else {
+          // Align the selection start to the top of the text area.
+          element.scrollTop = scrollStartOfset;
+        }
+      } else {
+        centerVertically(element, padding, {
+          startOffset: scrollStartOfset,
+          endOffset: scrollEndOffset
+        });
+      }
+    } else {
+      centerVertically(getScrollTarget(range), padding);
+    }
+  }
+
+  function getScrollTarget(range) {
+    // Try the child node at the specified offset, or the last child if the offset is greater than the number of
+    // children, or the node itself if it doesn't have child nodes (e.g. if it's a text node).
+    let target = range.startContainer.childNodes[range.startOffset] || range.startContainer.lastChild ||
+      range.startContainer;
+    if (target.nodeType !== Node.ELEMENT_NODE) {
+      target = target.previousElementSibling || target.parentNode;
+    }
+    return target;
+  }
 
   return {
-    getVerticalScrollParent: getVerticalScrollParent,
-    hasVerticalScrollBar: hasVerticalScrollBar,
-    getRelativeTopOffset: getRelativeTopOffset,
-    isCenteredVertically: isCenteredVertically,
-    centerVertically: centerVertically
+    getVerticalScrollParent,
+    hasVerticalScrollBar,
+    getRelativeTopOffset,
+    isCenteredVertically,
+    centerVertically,
+    scrollSelectionIntoView
   };
 });

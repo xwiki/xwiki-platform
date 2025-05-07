@@ -76,6 +76,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ComputedFieldClass;
 import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StringClass;
@@ -101,6 +102,8 @@ class ModelFactoryTest
     private static final String TEST_PASSWORD_FIELD = "passwordValue";
 
     private static final String TEST_PASSWORD_VALUE = "secret";
+
+    private static final String TEST_COMPUTED_FIELD = "content";
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -190,7 +193,10 @@ class ModelFactoryTest
         pwElement.setValue(TEST_PASSWORD_VALUE);
         when(xwikiObject.get(TEST_PASSWORD_FIELD)).thenReturn(pwElement);
 
-        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] {stringField, pwField});
+        ComputedFieldClass computedField = new ComputedFieldClass();
+        computedField.setName(TEST_COMPUTED_FIELD);
+
+        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] {stringField, pwField, computedField});
 
         return xwikiObject;
     }

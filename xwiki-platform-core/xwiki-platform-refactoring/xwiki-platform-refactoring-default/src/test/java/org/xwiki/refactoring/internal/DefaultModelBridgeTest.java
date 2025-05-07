@@ -195,6 +195,7 @@ class DefaultModelBridgeTest
         XWikiDocument document = mock(XWikiDocument.class);
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.clone()).thenReturn(document);
 
         this.modelBridge.create(documentReference);
 
@@ -294,6 +295,7 @@ class DefaultModelBridgeTest
         when(this.xcontext.getWiki().exists(redirectClassReference, this.xcontext)).thenReturn(true);
 
         XWikiDocument oldDocument = mock(XWikiDocument.class);
+        when(oldDocument.clone()).thenReturn(oldDocument);
         when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
         when(oldDocument.getXObject(eq(redirectClassReference), anyInt())).thenReturn(mock(BaseObject.class));
 
@@ -338,6 +340,7 @@ class DefaultModelBridgeTest
         DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
 
         XWikiDocument oldParentDocument = mock(XWikiDocument.class);
+        when(oldParentDocument.clone()).thenReturn(oldParentDocument);
         when(this.xcontext.getWiki().getDocument(oldParentReference, this.xcontext)).thenReturn(oldParentDocument);
 
         DocumentReference child1Reference = new DocumentReference("wiki", "Space", "Child1");
@@ -348,8 +351,10 @@ class DefaultModelBridgeTest
         JobProgressManager mockProgressManager = componentManager.getInstance(JobProgressManager.class);
 
         XWikiDocument child1Document = mock(XWikiDocument.class);
+        when(child1Document.clone()).thenReturn(child1Document);
         when(this.xcontext.getWiki().getDocument(child1Reference, this.xcontext)).thenReturn(child1Document);
         XWikiDocument child2Document = mock(XWikiDocument.class);
+        when(child2Document.clone()).thenReturn(child2Document);
         when(this.xcontext.getWiki().getDocument(child2Reference, this.xcontext)).thenReturn(child2Document);
 
         this.modelBridge.updateParentField(oldParentReference, newParentReference);
@@ -392,6 +397,8 @@ class DefaultModelBridgeTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        XWikiDocument clonedDocument = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(clonedDocument);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
 
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
@@ -403,8 +410,9 @@ class DefaultModelBridgeTest
 
         this.modelBridge.update(documentReference, Collections.singletonMap("title", "foo"));
 
-        verify(document).setTitle("foo");
-        verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(clonedDocument).setTitle("foo");
+        verify(this.xcontext.getWiki()).saveDocument(clonedDocument, "Update document after refactoring.", true,
+            xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
 
@@ -413,6 +421,8 @@ class DefaultModelBridgeTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        XWikiDocument clonedDocument = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(clonedDocument);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
@@ -424,8 +434,9 @@ class DefaultModelBridgeTest
 
         this.modelBridge.update(documentReference, Collections.emptyMap());
 
-        verify(document).setParentReference(hierarchicalParent.getLocalDocumentReference());
-        verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(clonedDocument).setParentReference(hierarchicalParent.getLocalDocumentReference());
+        verify(this.xcontext.getWiki()).saveDocument(clonedDocument, "Update document after refactoring.", true,
+            xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
 
@@ -486,6 +497,8 @@ class DefaultModelBridgeTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         XWikiDocument document = mock(XWikiDocument.class);
+        XWikiDocument clonedDocument = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(clonedDocument);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
         DocumentReference hierarchicalParent = new DocumentReference("wiki", "Path", "WebHome");
@@ -497,8 +510,9 @@ class DefaultModelBridgeTest
 
         this.modelBridge.update(documentReference, Collections.emptyMap());
 
-        verify(document).setParentReference(hierarchicalParent.getLocalDocumentReference());
-        verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(clonedDocument).setParentReference(hierarchicalParent.getLocalDocumentReference());
+        verify(this.xcontext.getWiki()).saveDocument(clonedDocument, "Update document after refactoring.", true,
+            xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
 
@@ -507,6 +521,8 @@ class DefaultModelBridgeTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Path", "WebHome");
         XWikiDocument document = mock(XWikiDocument.class);
+        XWikiDocument clonedDocument = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(clonedDocument);
         when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
 
@@ -519,8 +535,9 @@ class DefaultModelBridgeTest
 
         this.modelBridge.update(documentReference, Collections.emptyMap());
 
-        verify(document).setParentReference(hierarchicalParent.getLocalDocumentReference());
-        verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(clonedDocument).setParentReference(hierarchicalParent.getLocalDocumentReference());
+        verify(this.xcontext.getWiki()).saveDocument(clonedDocument, "Update document after refactoring.", true,
+            xcontext);
         assertLog(Level.INFO, "Document [{}] has been updated.", documentReference);
     }
 

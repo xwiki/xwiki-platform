@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.code;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -37,12 +38,15 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.properties.PropertyException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.internal.code.layout.CodeLayoutHandler;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
 import org.xwiki.rendering.macro.code.source.CodeMacroSource;
@@ -64,6 +68,8 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 @Singleton
 public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
 {
+    static final String ATTRIBUTE_PREPARE_RESULT = "prepare.code.result";
+
     /**
      * The description of the macro.
      */
@@ -129,6 +135,23 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
 
     @Override
     protected List<Block> parseContent(CodeMacroParameters parameters, String inputContent,
+        MacroTransformationContext context) throws MacroExecutionException
+    {
+        List<Block> result = getPreparedResult(context.getCurrentMacroBlock());
+        if (result != null) {
+            // Clone the prepared content before it's used
+            List<Block> clonedResult = new ArrayList<>(result.size());
+            for (Block block : result) {
+                clonedResult.add(block.clone());
+            }
+
+            return clonedResult;
+        }
+
+        return highlight(parameters, inputContent, context);
+    }
+
+    private List<Block> highlight(CodeMacroParameters parameters, String inputContent,
         MacroTransformationContext context) throws MacroExecutionException
     {
         CodeMacroSource source = getContent(parameters, inputContent, context);
@@ -212,5 +235,46 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         parser = componentManager.getInstance(HighlightParser.class, "default");
 
         return parser.highlight(language, new StringReader(source.getContent()));
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        // We cannot prepare the content if the source is not null since we don't yet have the content to prepare.
+        // TODO: no all types of source are dynamic, we could prepare those which are not (but need a good way to
+        // identify them)
+        if (macroBlock.getParameter("source") == null) {
+            // Resolve the macro parameters
+            CodeMacroParameters macroParameters = new CodeMacroParameters();
+            try {
+                this.beanManager.populate(macroParameters, macroBlock.getParameters());
+            } catch (PropertyException e) {
+                throw new MacroPreparationException("Failed to populate macro parameters", e);
+            }
+
+            // Prepare the content
+            MacroTransformationContext context = new MacroTransformationContext();
+            context.setInline(macroBlock.isInline());
+            List<Block> blocks;
+            try {
+                blocks = highlight(macroParameters, macroBlock.getContent(), context);
+            } catch (MacroExecutionException e) {
+                throw new MacroPreparationException("Failed to prepare content", e);
+            }
+
+            // Remember the result of the preparation
+            macroBlock.setAttribute(ATTRIBUTE_PREPARE_RESULT, blocks);
+        }
+    }
+
+    private List<Block> getPreparedResult(MacroBlock macroBlock)
+    {
+        return (List<Block>) macroBlock.getAttribute(ATTRIBUTE_PREPARE_RESULT);
+    }
+
+    @Override
+    public boolean isExecutionIsolated(CodeMacroParameters parameters, String content)
+    {
+        return true;
     }
 }

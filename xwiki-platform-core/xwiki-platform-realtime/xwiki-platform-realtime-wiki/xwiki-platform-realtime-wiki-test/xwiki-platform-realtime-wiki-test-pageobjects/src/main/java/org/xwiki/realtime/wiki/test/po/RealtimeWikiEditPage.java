@@ -19,11 +19,9 @@
  */
 package org.xwiki.realtime.wiki.test.po;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.realtime.test.po.RealtimeEditToolbar;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
@@ -35,16 +33,7 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  */
 public class RealtimeWikiEditPage extends WikiEditPage
 {
-    @FindBy(className = "realtime-allow")
-    private WebElement allowRealtimeCheckbox;
-
-    /**
-     * Default constructor.
-     */
-    public RealtimeWikiEditPage()
-    {
-        waitToLoad();
-    }
+    private RealtimeEditToolbar toolbar;
 
     /**
      * Opens the specified wiki page in real-time wiki edit mode.
@@ -59,13 +48,11 @@ public class RealtimeWikiEditPage extends WikiEditPage
     }
 
     /**
-     * Waits until the given user is present in the list of coeditors.
-     * 
-     * @param user The user to wait for.
+     * Default constructor.
      */
-    public void waitUntilEditingWith(String user)
+    public RealtimeWikiEditPage()
     {
-        getDriver().waitUntilElementHasTextContent(By.cssSelector("a.rt-user-link"), user);
+        this.toolbar = new RealtimeEditToolbar().waitUntilConnected();
     }
 
     /**
@@ -78,41 +65,6 @@ public class RealtimeWikiEditPage extends WikiEditPage
         getDriver().waitUntilCondition(ExpectedConditions.textToBePresentInElementValue(this.contentText, text));
     }
 
-    /**
-     * @return {@code true} if realtime editing is enabled, {@code false} otherwise
-     */
-    public boolean isRealtimeEditing()
-    {
-        return this.allowRealtimeCheckbox.isSelected();
-    }
-
-    /**
-     * Leave the realtime editing session.
-     */
-    public void leaveRealtimeEditing()
-    {
-        if (isRealtimeEditing()) {
-            this.allowRealtimeCheckbox.click();
-        }
-    }
-
-    /**
-     * Join the realtime editing session.
-     *
-     * @return the realtime wiki edit page
-     */
-    public RealtimeWikiEditPage joinRealtimeEditing()
-    {
-        if (!isRealtimeEditing()) {
-            // Joining back the realtime session reloads the page currently.
-            getDriver().addPageNotYetReloadedMarker();
-            this.allowRealtimeCheckbox.click();
-            getDriver().waitUntilPageIsReloaded();
-            return new RealtimeWikiEditPage();
-        }
-        return this;
-    }
-
     @Override
     public void sendKeys(CharSequence... keys)
     {
@@ -121,10 +73,13 @@ public class RealtimeWikiEditPage extends WikiEditPage
         super.sendKeys(keys);
     }
 
-    private RealtimeWikiEditPage waitToLoad()
+    /**
+     * @return the edit mode toolbar (holding the button to save the changes)
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public RealtimeEditToolbar getToolbar()
     {
-        getDriver().waitUntilElementIsEnabled(this.allowRealtimeCheckbox);
-        getDriver().waitUntilElementIsEnabled(this.contentText);
-        return this;
+        return this.toolbar;
     }
 }

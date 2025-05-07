@@ -109,20 +109,26 @@ class SubWikiIT
 
         setup.loginAsSuperAdmin();
         DocumentReference mainWikiLinkPage = new DocumentReference("xwiki", "Test", "Link");
+        DocumentReference externalLinkPageMainWiki = new DocumentReference("xwiki", "SubWikiIT", "ExternalPage");
+        DocumentReference externalLinkPageSubWiki = new DocumentReference(SUBWIKI_NAME, "SubWikiIT", "ExternalPage");
 
         // Ensure that the page does not exist before the test.
         setup.rest().delete(mainWikiLinkPage);
         // The page that will be moved.
         // We'll check moving a hierarchy with relative links
-        setup.createPage(testReference, "[[Alice]]\n[[Bob]]\n[[Eve]]", "Test relative links");
+        setup.createPage(testReference,
+            "[[Alice]]\n[[Bob]]\n[[Eve]]\n[[Test link>>Test.Link]]\n[[In both>>SubWikiIT.ExternalPage]]",
+            "Test relative links");
         SpaceReference rootSpaceReference = testReference.getLastSpaceReference();
         SpaceReference aliceSpace = new SpaceReference("Alice", rootSpaceReference);
         DocumentReference alicePage = new DocumentReference("WebHome", aliceSpace);
         setup.createPage(alicePage, "Alice page", "Alice");
         SpaceReference bobSpace = new SpaceReference("Bob", rootSpaceReference);
         DocumentReference bobPage = new DocumentReference("WebHome", bobSpace);
-        setup.createPage(bobPage, "[[Alice]]",
-            "Alice");
+        setup.createPage(bobPage, "[[Alice]]", "Alice");
+
+        setup.createPage(externalLinkPageMainWiki, "External main wiki");
+        setup.createPage(externalLinkPageSubWiki, "External sub wiki");
 
         // For checking the link update in an external page.
         setup.createPage(mainWikiLinkPage,
@@ -151,7 +157,8 @@ class SubWikiIT
             String.format("/%s/%s/%s", SUBWIKI_NAME, testReference.getLastSpaceReference().extractFirstReference(
                 EntityType.SPACE).getName(), "Test relative links"), viewPage.getBreadcrumbContent());
         WikiEditPage wikiEditPage = viewPage.editWiki();
-        assertEquals("[[Alice]]\n[[Bob]]\n[[Eve]]", wikiEditPage.getContent());
+        assertEquals("[[Alice]]\n[[Bob]]\n[[Eve]]\n[[Test link>>xwiki:Test.Link]]"
+            + "\n[[In both>>xwiki:SubWikiIT.ExternalPage]]", wikiEditPage.getContent());
 
         SpaceReference newBobSpace = new SpaceReference("Bob", newRootSpace);
         DocumentReference newBobPage = new DocumentReference("WebHome", newBobSpace);
@@ -170,7 +177,6 @@ class SubWikiIT
                 setup.serializeReference(newAliceReference),
                 setup.serializeReference(newBobPage)), wikiEditPage.getContent());
 
-
         viewPage = setup.gotoPage(newAliceReference);
         renamePage = viewPage.rename();
         renamePage.getDocumentPicker().setName("Alice2");
@@ -182,9 +188,13 @@ class SubWikiIT
         DocumentReference Alice2Reference = new DocumentReference("WebHome", Alice2Space);
         wikiEditPage = WikiEditPage.gotoPage(newrootPage);
         String serializedlocalAlice2Reference = setup.serializeLocalReference(Alice2Reference);
-        assertEquals(String.format("[[%s]]%n[[Bob]]%n[[Eve]]", serializedlocalAlice2Reference),
+        assertEquals(String.format("[[%s]]%n[[Bob]]%n[[Eve]]%n[[Test link>>xwiki:Test.Link]]"
+                    + "%n[[In both>>xwiki:SubWikiIT.ExternalPage]]",
+                serializedlocalAlice2Reference),
             wikiEditPage.getContent());
-        wikiEditPage.setContent(String.format("[[Alice2]]%n[[%s]]%n[[Bob]]%n[[Eve]]",serializedlocalAlice2Reference));
+        wikiEditPage.setContent(String.format("[[Alice2]]%n[[%s]]%n[[Bob]]%n[[Eve]]%n[[Test link>>xwiki:Test.Link]]"
+                + "%n[[In both>>xwiki:SubWikiIT.ExternalPage]]",
+            serializedlocalAlice2Reference));
         wikiEditPage.clickSaveAndView();
 
         viewPage = setup.gotoPage(mainWikiLinkPage);
@@ -204,7 +214,9 @@ class SubWikiIT
         Alice2Reference = Alice2Reference.setWikiReference(new WikiReference("xwiki"));
         String serializedAliceReference = setup.serializeReference(Alice2Reference);
         wikiEditPage = WikiEditPage.gotoPage(newrootPage);
-        assertEquals(String.format("[[%1$s]]%n[[%1$s]]%n[[Bob]]%n[[Eve]]", serializedAliceReference),
+        assertEquals(String.format("[[%1$s]]%n[[%1$s]]%n[[Bob]]%n[[Eve]]%n[[Test link>>xwiki:Test.Link]]"
+                    + "%n[[In both>>xwiki:SubWikiIT.ExternalPage]]",
+                serializedAliceReference),
             wikiEditPage.getContent());
         viewPage = setup.gotoPage(mainWikiLinkPage);
         wikiEditPage = viewPage.editWiki();

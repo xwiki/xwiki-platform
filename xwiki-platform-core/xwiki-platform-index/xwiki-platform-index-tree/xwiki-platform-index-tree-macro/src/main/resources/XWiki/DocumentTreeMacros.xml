@@ -243,6 +243,7 @@
 
 #macro (maybeAddFarmNode $nodeReference $siblings)
   #set ($farmHomeReference = $services.model.resolveDocument('', 'default'))
+  #set ($isOpened = $docTreeConfig.expandToLevel &gt; 0)
   #set ($discard = $siblings.add({
     'id': 'farm:*',
     'text': 'Farm',
@@ -251,6 +252,9 @@
     'data': {
       'type': 'farm',
       'validChildren': ['wiki', 'pagination']
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($farmHomeReference)
@@ -280,6 +284,7 @@
   #else
     #set ($label = $wiki.id)
   #end
+  #set ($isOpened = $docTreeConfig.expandToLevel &gt; 0)
   #set ($discard = $siblings.add({
     'id': "wiki:$wiki.id",
     'text': $label,
@@ -290,6 +295,9 @@
       'type': 'wiki',
       'validChildren': ['space', 'document', 'pagination'],
       'canDelete': $canDeleteWiki
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($wiki.mainPageReference)
@@ -316,6 +324,7 @@
 
 #macro (addSpaceNode $spaceReference $siblings)
   #set ($spaceId = $services.model.serialize($spaceReference, 'default'))
+  #set ($nodeId = "space:$spaceId")
   #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spaceReference))
   #set ($canViewSpace = $services.security.authorization.hasAccess('view', $spaceReference))
   #if ($docTreeConfig.showTerminalDocuments)
@@ -323,10 +332,21 @@
     #set ($hasChildren = true)
   #else
     ## We display only the nested spaces. This space might contain only documents.
-    #set ($hasChildren = $tree.getChildCount("space:$spaceId") &gt; 0)
+    #set ($hasChildren = $tree.getChildCount($nodeId) &gt; 0)
+  #end
+  #set ($isOpened = false)
+  #if ("$!docTreeConfig.expandToLevel" != '')
+    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #if ("$!docTreeConfig.root" != '')
+      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #else
+      #set ($rootNode = $docTreeConfig.root)
+    #end
+    #set ($rootDistance = $tree.getPath($nodeId).size())
+    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
   #end
   #set ($discard = $siblings.add({
-    'id': "space:$spaceId",
+    'id': $nodeId,
     'text': $spaceReference.name,
     'icon': 'fa fa-folder-o',
     'iconOpened': 'fa fa-folder-open-o',
@@ -343,6 +363,9 @@
       'canDelete': $hasSpaceAdmin,
       'createDocumentURL': $xwiki.getURL($spaceReference, 'create', $NULL),
       'deleteURL': $xwiki.getURL($spaceReference, 'deletespace', $NULL)
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($spaceReference)
@@ -369,6 +392,7 @@
 
 #macro (addDocumentNode $documentReference $siblings)
   #set ($documentId = $services.model.serialize($documentReference, 'default'))
+  #set ($nodeId = "document:$documentId")
   #set ($label = $documentReference.name)
   #if (!$docTreeConfig.showSpaces &amp;&amp;
       $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
@@ -385,9 +409,20 @@
       #set ($label = $plainTitle)
     #end
   #end
-  #set ($hasChildren = $tree.getChildCount("document:$documentId") &gt; 0)
+  #set ($hasChildren = $tree.getChildCount($nodeId) &gt; 0)
+  #set ($isOpened = false)
+  #if ("$!docTreeConfig.expandToLevel" != '')
+    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #if ("$!docTreeConfig.root" != '')
+      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #else
+      #set ($rootNode = $docTreeConfig.root)
+    #end
+    #set ($rootDistance = $tree.getPath($nodeId).size())
+    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
+  #end
   #set ($discard = $siblings.add({
-    'id': "document:$documentId",
+    'id': $nodeId,
     'text': $label,
     'icon': 'fa fa-file-o',
     'children': $hasChildren,
@@ -401,6 +436,9 @@
       'canMove': $canDeleteDoc,
       'canCopy': $canViewDoc,
       'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL)
+    },
+    'state': {
+       'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($documentReference)

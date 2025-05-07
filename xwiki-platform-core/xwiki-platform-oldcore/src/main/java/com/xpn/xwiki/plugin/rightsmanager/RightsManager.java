@@ -1056,13 +1056,17 @@ public final class RightsManager
                 .add(HQLLIKE_ALL_SYMBOL + userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName + HQLLIKE_ALL_SYMBOL);
         }
 
+        // TODO: load XWikiDocument instance one by one instead of all at once
         List<XWikiDocument> documentList =
             context.getWiki().getStore().searchDocuments(where, parameterValues, context);
 
         for (XWikiDocument groupDocument : documentList) {
-            if (removeUserOrGroupFromAllRights(groupDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
+            // Avoid modifying the cached document
+            XWikiDocument clonedDocument = groupDocument.clone();
+
+            if (removeUserOrGroupFromAllRights(clonedDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
                 context)) {
-                context.getWiki().saveDocument(groupDocument, context);
+                context.getWiki().saveDocument(clonedDocument, context);
             }
         }
     }
@@ -1192,13 +1196,17 @@ public final class RightsManager
             + this.compactWikiEntityReferenceSerializer.serialize(userOrGroupSourceReference)
             + HQLLIKE_ALL_SYMBOL);
 
+        // TODO: load XWikiDocument instance one by one instead of all at once
         List<XWikiDocument> documentList =
             context.getWiki().getStore().searchDocuments(where, parameterValues, context);
 
         for (XWikiDocument groupDocument : documentList) {
-            if (replaceUserOrGroupFromAllRights(groupDocument, userOrGroupSourceReference, userOrGroupTargetReference,
+            // Avoid modifying the cached document
+            XWikiDocument clonedDocument = groupDocument.clone();
+
+            if (replaceUserOrGroupFromAllRights(clonedDocument, userOrGroupSourceReference, userOrGroupTargetReference,
                 user)) {
-                context.getWiki().saveDocument(groupDocument, context);
+                context.getWiki().saveDocument(clonedDocument, context);
             }
         }
     }
@@ -1224,6 +1232,9 @@ public final class RightsManager
 
         List<BaseObject> rightObjects = preferences.getXObjects(rightClassReference);
         if (rightObjects != null && !rightObjects.isEmpty()) {
+            // Avoid modifying the cached document
+            preferences = preferences.clone();
+
             preferences.removeXObjects(rightClassReference);
             context.getWiki().saveDocument(preferences, comment, context);
         }

@@ -37,11 +37,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   padding: 8px 2px;
 }
 
-.more-actions .edit-all {
-  display: block;
-  padding: 2px 18px;
-}
-
 /* Object editor */
 /* XClass */
 .xclass-title {
@@ -305,6 +300,12 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
 
 .PasswordClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/password.png')");
+}
+
+.add-xproperty {
+  display: flex;
+  gap: 1em;
+  flex-wrap: wrap;
 }
 
 #body #xwikiclassproperties #add_xproperty label,

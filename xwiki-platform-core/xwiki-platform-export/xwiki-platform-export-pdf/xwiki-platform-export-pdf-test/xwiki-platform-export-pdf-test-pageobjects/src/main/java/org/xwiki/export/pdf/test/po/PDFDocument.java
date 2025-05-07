@@ -151,31 +151,26 @@ public class PDFDocument implements AutoCloseable
      */
     public Map<String, String> getLinksFromPage(int pageNumber) throws IOException
     {
-        Map<String, String> links = new LinkedHashMap<>();
-        for (Map.Entry<String, PDAnnotationLink> entry : getLinksFromPage(this.document.getPage(pageNumber))
-            .entrySet()) {
-            PDAction action = entry.getValue().getAction();
-            PDDestination destination = entry.getValue().getDestination();
-            if (action instanceof PDActionGoTo) {
-                PDActionGoTo anchor = (PDActionGoTo) entry.getValue().getAction();
-                links.put(entry.getKey(), getDestinationText(anchor.getDestination()));
-            } else if (action instanceof PDActionURI) {
-                PDActionURI uri = (PDActionURI) entry.getValue().getAction();
-                links.put(entry.getKey(), uri.getURI());
-            } else if (destination != null) {
-                links.put(entry.getKey(), getDestinationText(destination));
-            }
-        }
-        return links;
+        return getLinksFromPage(pageNumber, true);
+    }
+
+    /**
+     * @param pageNumber the page number
+     * @param merge whether to merge consecutive link annotations with the same target
+     * @return a mapping between link labels and link targets
+     * @throws IOException if we fail to extract the links from the specified page
+     */
+    public Map<String, String> getLinksFromPage(int pageNumber, boolean merge) throws IOException
+    {
+        return getLinksFromPage(this.document.getPage(pageNumber), merge);
     }
 
     /**
      * Code adapted from
      * https://github.com/apache/pdfbox/blob/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/PrintURLs.java
      */
-    private Map<String, PDAnnotationLink> getLinksFromPage(PDPage page) throws IOException
+    private Map<String, String> getLinksFromPage(PDPage page, boolean merge) throws IOException
     {
-        Map<String, PDAnnotationLink> links = new LinkedHashMap<>();
         PDFTextStripperByArea stripper = new PDFTextStripperByArea();
         List<PDAnnotation> annotations = page.getAnnotations();
         // First setup the text extraction regions.
@@ -202,16 +197,56 @@ public class PDFDocument implements AutoCloseable
 
         stripper.extractRegions(page);
 
+        Map<String, String> links = new LinkedHashMap<>();
+        // Starting with Chrome 124 we sometimes get multiple link annotations for the same source HTML link. Basically,
+        // the link label is split into multiple parts, each part being annotated as a link to the same target. We
+        // overcome this strange behavior by merging consecutive link annotations with the same target.
+        StringBuilder linkLabel = new StringBuilder();
+        String previousLinkTarget = null;
         for (int j = 0; j < annotations.size(); j++) {
             PDAnnotation annotation = annotations.get(j);
             if (annotation instanceof PDAnnotationLink) {
                 PDAnnotationLink link = (PDAnnotationLink) annotation;
-                String label = stripper.getTextForRegion(String.valueOf(j)).trim();
-                links.put(label, link);
+                String linkTarget = getLinkTarget(link);
+                if (!merge || (previousLinkTarget != null && !previousLinkTarget.equals(linkTarget))) {
+                    // Commit the current link group and start a new link group.
+                    links.put(linkLabel.toString(), previousLinkTarget);
+                    linkLabel.setLength(0);
+                }
+
+                linkLabel.append(stripper.getTextForRegion(String.valueOf(j)).trim());
+                previousLinkTarget = linkTarget;
+            } else if (previousLinkTarget != null) {
+                // Commit the current link group and start a new link group.
+                links.put(linkLabel.toString(), previousLinkTarget);
+                linkLabel.setLength(0);
+                previousLinkTarget = null;
             }
         }
 
+        if (previousLinkTarget != null) {
+            // Commit the last link group.
+            links.put(linkLabel.toString(), previousLinkTarget);
+        }
+
         return links;
+    }
+
+    private String getLinkTarget(PDAnnotationLink link) throws IOException
+    {
+        PDAction action = link.getAction();
+        PDDestination destination = link.getDestination();
+        if (action instanceof PDActionGoTo) {
+            PDActionGoTo anchor = (PDActionGoTo) action;
+            return getDestinationText(anchor.getDestination());
+        } else if (action instanceof PDActionURI) {
+            PDActionURI uri = (PDActionURI) action;
+            return uri.getURI();
+        } else if (destination != null) {
+            return getDestinationText(destination);
+        } else {
+            return null;
+        }
     }
 
     private String getDestinationText(PDDestination destination) throws IOException

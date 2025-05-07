@@ -27,37 +27,91 @@
 #######################################################
 ##!source.syntax=xwiki/2.1
 {{velocity}}
+##================
+## Find which tab to display
+##================
+#if("$!{view}" == '')
+  #set($view = $request.getParameter('view'))
+  #if("$!{view}" == '')
+    #set ($view = 'children')
+  #end
+#end
+#set($tabs = [])
+#set ($titleToDisplay = $services.localization.render('core.children.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
+#define ($parentChildrenContent)
+  #if ($request.hierarchy == 'parentchild')
+    #displayParentChildChildren()
+  #else
+    #displayChildren()
+  #end
+#end
+#set ($defaultTab = {
+  'tabName': 'children',
+  'title': 'docextra.children',
+  'content': $parentChildrenContent
+})
+#set ($discard = $tabs.add($defaultTab))
+#set ($extensions = $services.uix.getExtensions('org.xwiki.platform.template.childrenViewer', {'sortByParameter':'order'}))
+#foreach ($extension in $extensions)
+  #set ($minimumRight = $extension.getParameters().get('right'))
+  #if ("$!minimumRight" == '')
+    #set ($minimumRight = 'view')
+  #end
+  #if ($services.security.authorization.hasAccess("$minimumRight"))
+    #set ($discard = $tabs.add({
+      'tabName': $extension.getParameters().get('tabName'),
+      'title': $extension.getParameters().get('title'),
+      'content': $services.rendering.render($extension.execute(), 'html/5.0')
+    }))
+  #end
+#end
 {{html clean='false'}}
 #if($request.xpage == 'children')
   #template('startpage.vm')
-    <div class="main layoutsubsection">
-      ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
-      <main id="mainContentArea">
-        <div class="xcontent">
+<div class="main layoutsubsection">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
+<div class="xcontent">
 #end
-#######################################################
-##                    TITLE
-#######################################################
-#set ($titleToDisplay = $services.localization.render('core.children.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
 #template('contentheader.vm')
-#######################################################
-##                  CONTROLLER
-#######################################################
-#if ($request.hierarchy == 'parentchild')
-  #displayParentChildChildren()
+#if ($tabs.size() == 1)
+  $tabs.get(0).content
 #else
-  #displayChildren()
+  ##===========
+  ## Display the Tabs
+  ##===========
+  <div class="floatcontainer">
+    <ul class="xwikitabbar">
+      #foreach ($tab in $tabs)
+        <li id="xwiki$tab['tabName']"#if($view == $tab['tabName']) class="active"#end>
+          <a href="$doc.getURL('view',"viewer=children&view=$tab['tabName']&$!param")">
+            $services.localization.render($tab['title'])
+          </a>
+        </li>
+      #end
+    </ul>
+  </div>
+  ##==========================
+  ## Include the Tab data for the selected Tab
+  ##==========================
+  <div class='xwikitabpanescontainer'>
+    #foreach ($tab in $tabs)
+    #if ($tab['tabName'] == $view)
+      $tab['content']
+      #break
+    #end
+  #end
+  </div>
 #end
+
 #######################################################
 ##                 DISPLAY CHILDREN
 #######################################################
 #macro(displayChildren)
   #if ($services.parentchild.isParentChildMechanismEnabled())
-    <div class="box warningmessage">
-      $services.localization.render('core.children.warningParentChild')
-    </div>
+    #warning($services.localization.render('core.children.warningParentChild'))
   #end
-  
+
   #if ($doc.documentReference.name != 'WebHome')
     <p>$services.localization.render('core.children.terminalPage')</p>
   #else

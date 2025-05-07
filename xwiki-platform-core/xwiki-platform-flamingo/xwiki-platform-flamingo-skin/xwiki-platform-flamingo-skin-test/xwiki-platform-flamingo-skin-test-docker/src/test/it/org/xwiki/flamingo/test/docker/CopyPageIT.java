@@ -19,7 +19,6 @@
  */
 package org.xwiki.flamingo.test.docker;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.index.tree.test.po.DocumentPickerModal;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -54,7 +54,7 @@ class CopyPageIT
 
     private static final String COPY_SUCCESSFUL = "Done.";
 
-    private static final String OVERWRITE_PROMPT1 = "Warning: The page ";
+    private static final String OVERWRITE_PROMPT1 = "Warning\nThe page ";
 
     private static final String OVERWRITE_PROMPT2 =
         " already exists. Are you sure you want to overwrite it (all its content would be lost)?";
@@ -76,29 +76,27 @@ class CopyPageIT
     void copyPage(WikiReference wiki, TestLocalReference testReference, TestUtils setup,
         TestConfiguration testConfiguration) throws Exception
     {
-        // Make sure to be on the right wiki
-        setup.gotoPage(new DocumentReference(testReference, wiki));
-
         String sourceSpaceName = testReference.getParent().getParent().getName();
         String sourcePageName = testReference.getParent().getName();
         String targetSpaceName = sourceSpaceName + "Copy";
         String targetPageName = sourcePageName + "Copy";
+        DocumentReference sourceReference = new DocumentReference(wiki.getName(), sourceSpaceName, sourcePageName);
+        DocumentReference targetReference = new DocumentReference(wiki.getName(), targetSpaceName, targetPageName);
 
         // Delete page that may already exist
-        setup.rest().deletePage(sourceSpaceName, sourcePageName);
-        setup.rest().deletePage(targetSpaceName, targetPageName);
+        setup.rest().delete(sourceReference);
+        setup.rest().delete(targetReference);
 
-        // Create a new page that will be copied.
-        ViewPage viewPage = setup.createPage(sourceSpaceName, sourcePageName, PAGE_CONTENT, sourcePageName);
-
-        // Add an attachment to verify that it's version is not incremented in the target document (XWIKI-8157).
-        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
-        File image = new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/image.gif");
-        attachmentsPane.setFileToUpload(image.getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish("image.gif");
-        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("image.gif"));
+        setup.rest().savePage(sourceReference, PAGE_CONTENT, sourceReference.getName());
+        // Add an attachment to verify that its version is not incremented in the target document
+        // And add several versions to make sure the history is copied
+        AttachmentReference attachmentReference = new AttachmentReference("file.txt", sourceReference);
+        setup.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
+        setup.rest().attachFile(attachmentReference, "attachment2".getBytes(), false);
+        setup.rest().attachFile(attachmentReference, "attachment3".getBytes(), false);
 
         // Click on Copy from the Page top menu.
+        ViewPage viewPage = setup.gotoPage(sourceReference);
         viewPage.copy();
         CopyPage copyPage = new CopyPage();
 
@@ -137,11 +135,11 @@ class CopyPageIT
         assertEquals(targetPageName, viewPage.getDocumentTitle());
         assertEquals(PAGE_CONTENT, viewPage.getContent());
 
-        // Verify the attachment version is the same (XWIKI-8157).
+        // Verify the attachment version is the same
         // FIXME: Remove the following wait when XWIKI-6688 is fixed.
         viewPage.waitForDocExtraPaneActive("comments");
-        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
-        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("image.gif"));
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
     }
 
     @ParameterizedTest

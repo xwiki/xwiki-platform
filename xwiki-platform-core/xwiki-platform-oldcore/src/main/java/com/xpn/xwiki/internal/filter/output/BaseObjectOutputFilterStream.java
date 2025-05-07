@@ -47,7 +47,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStream<BaseObject> implements Initializable
+public class BaseObjectOutputFilterStream extends AbstractElementOutputFilterStream<BaseObject> implements Initializable
 {
     @Inject
     private EntityOutputFilterStream<BaseClass> classFilter;
@@ -210,7 +210,7 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
     }
 
     private void addMissingProperties(BaseClass xclass)
-    {        
+    {
         for (String key : xclass.getPropertyList()) {
             if (this.entity.safeget(key) == null) {
                 PropertyClass classProperty = (PropertyClass) xclass.getField(key);
@@ -221,7 +221,7 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
             }
         }
     }
-    
+
     @Override
     public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters) throws FilterException
     {

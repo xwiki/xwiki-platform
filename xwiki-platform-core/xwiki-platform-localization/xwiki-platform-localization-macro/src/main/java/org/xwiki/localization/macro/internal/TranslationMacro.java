@@ -165,4 +165,10 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
     {
         return true;
     }
+
+    @Override
+    public boolean isExecutionIsolated(TranslationMacroParameters parameters, String content)
+    {
+        return true;
+    }
 }

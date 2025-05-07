@@ -22,7 +22,6 @@ package org.xwiki.test.ui.po;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -258,7 +257,7 @@ public class DocumentPicker extends BaseElement
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
-            public @Nullable Boolean apply(@Nullable WebDriver driver)
+            public Boolean apply(WebDriver driver)
             {
                 // Wait until the document picker JavaScript initialization code is executed.
                 // The pick action is available only if the document tree is available.

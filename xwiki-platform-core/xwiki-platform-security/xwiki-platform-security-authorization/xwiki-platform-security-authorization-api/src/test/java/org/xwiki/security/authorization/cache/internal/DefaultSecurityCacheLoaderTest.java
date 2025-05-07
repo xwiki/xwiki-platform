@@ -62,10 +62,13 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -134,11 +137,14 @@ public class DefaultSecurityCacheLoaderTest
         when(wikiEntry.getReference()).thenReturn(entity.getParentSecurityReference().getParentSecurityReference());
         when(wikiEntry.isEmpty()).thenReturn(true);
 
+        long invalidationCounter = 42;
+
         SecurityCache securityCache = mocker.getInstance(org.xwiki.security.authorization.cache.SecurityCache.class);
         when(securityCache.get(entity)).thenReturn(documentEntry);
         when(securityCache.get(entity.getParentSecurityReference())).thenReturn(spaceEntry);
         when(securityCache.get(entity.getParentSecurityReference().getParentSecurityReference())).thenReturn(wikiEntry);
         when(securityCache.getGroupsFor(user, null)).thenReturn(null);
+        when(securityCache.getInvalidationCounter()).thenReturn(invalidationCounter);
 
         UserBridge userBridge = mocker.getInstance(UserBridge.class);
         DocumentReference groupReference = new DocumentReference("wiki", "Groups", "AllGroup");
@@ -153,12 +159,13 @@ public class DefaultSecurityCacheLoaderTest
             new LinkedList<SecurityRuleEntry>(Arrays.asList(documentEntry, spaceEntry, wikiEntry));
         when(authorizationSettler.settle(user, groups, securityRuleEntries)).thenReturn(securityAccessEntry);
 
-        doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry);
-        doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry, null);
+        doThrow(ConflictingInsertionException.class).when(securityCache).add(eq(securityAccessEntry), anyLong());
+        doThrow(ConflictingInsertionException.class).when(securityCache).add(eq(securityAccessEntry), isNull(),
+            anyLong());
 
         assertEquals(securityAccessEntry, this.securityCacheLoader.load(user, entity));
 
-        verify(securityCache).add(securityAccessEntry, null);
+        verify(securityCache).add(securityAccessEntry, null, invalidationCounter);
     }
 
     /**
@@ -225,18 +232,21 @@ public class DefaultSecurityCacheLoaderTest
             return result;
         });
 
+        SecurityCache securityCache = mocker.getInstance(org.xwiki.security.authorization.cache.SecurityCache.class);
+        when(securityCache.getInvalidationCounter()).thenReturn(0L).thenReturn(1L);
+
         assertEquals(securityAccessEntry, this.securityCacheLoader.load(user, entity));
 
         // Verify that rules were loaded in the correct order
-        SecurityCache securityCache = mocker.getInstance(org.xwiki.security.authorization.cache.SecurityCache.class);
         InOrder inOrder = inOrder(securityCache);
+        inOrder.verify(securityCache, times(2)).getInvalidationCounter();
         inOrder.verify(securityCache).get(entity.getWikiReference());
-        inOrder.verify(securityCache).add(mainWikiRuleEntry);
+        inOrder.verify(securityCache).add(mainWikiRuleEntry, 1);
         inOrder.verify(securityCache).get(entity.getParentSecurityReference());
-        inOrder.verify(securityCache).add(spaceRuleEntry);
+        inOrder.verify(securityCache).add(spaceRuleEntry, 1);
         inOrder.verify(securityCache).get(entity);
-        inOrder.verify(securityCache).add(documentRuleEntry);
-        inOrder.verify(securityCache).add(securityAccessEntry, null);
+        inOrder.verify(securityCache).add(documentRuleEntry, 1);
+        inOrder.verify(securityCache).add(securityAccessEntry, null, 0);
         inOrder.verifyNoMoreInteractions();
         verify(authorizationSettler).settle(user, Collections.emptySet(), hierarchy);
     }

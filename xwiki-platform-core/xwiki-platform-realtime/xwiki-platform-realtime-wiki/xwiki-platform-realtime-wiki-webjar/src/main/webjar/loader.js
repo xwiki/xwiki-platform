@@ -36,7 +36,7 @@ define('xwiki-realtime-wikiEditor-loader', [
   Loader.bootstrap(info).then(realtimeContext => {
     require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
       realtimeContext.rtURL = Loader.getEditorURL(window.location.href, info);
-      RealtimeWikiEditor.main(realtimeContext);
+      new RealtimeWikiEditor(realtimeContext);
     });
   });
 

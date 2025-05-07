@@ -156,6 +156,10 @@ public class DefaultModelBridge implements ModelBridge
 
         try {
             XWikiDocument newDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+            // Avoid modifying the cached document (if it already exist)
+            newDocument = newDocument.clone();
+
             xcontext.getWiki().saveDocument(newDocument, xcontext);
             this.logger.info("Document [{}] has been created.", documentReference);
             return true;
@@ -247,6 +251,10 @@ public class DefaultModelBridge implements ModelBridge
         try {
             if (xcontext.getWiki().exists(redirectClassReference, xcontext)) {
                 XWikiDocument oldDocument = xcontext.getWiki().getDocument(oldReference, xcontext);
+
+                // Avoid modifying the cached document
+                oldDocument = oldDocument.clone();
+
                 int number = oldDocument.createXObject(redirectClassReference, xcontext);
                 String location = this.defaultEntityReferenceSerializer.serialize(newReference);
                 oldDocument.getXObject(redirectClassReference, number).setStringValue("location", location);
@@ -356,6 +364,10 @@ public class DefaultModelBridge implements ModelBridge
                 this.progressManager.startStep(this);
 
                 XWikiDocument childDocument = wiki.getDocument(childReference, context);
+
+                // Avoid modifying the cached document
+                childDocument = childDocument.clone();
+
                 childDocument.setParentReference(newParentReference);
 
                 wiki.saveDocument(childDocument, "Updated parent field.", true, context);
@@ -400,6 +412,11 @@ public class DefaultModelBridge implements ModelBridge
 
             String title = parameters.get("title");
             if (title != null && !title.equals(document.getTitle())) {
+                // Avoid modifying the cached document
+                if (!save) {
+                    document = document.clone();
+                }
+
                 document.setTitle(title);
                 save = true;
             }
@@ -436,6 +453,11 @@ public class DefaultModelBridge implements ModelBridge
                 //      reference, as it's relative of the document reference. So the parent reference will be well
                 //      computed with the already existing relative reference.
                 if (!relativeHierarchicalReference.equals(newDocumentParentRef)) {
+                    // Avoid modifying the cached document
+                    if (!save) {
+                        document = document.clone();
+                    }
+
                     document.setParentReference(relativeHierarchicalReference);
                     save = true;
                 }

@@ -35,7 +35,7 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class BasePropertyOutputFilterStream extends AbstractEntityOutputFilterStream<BaseProperty>
+public class BasePropertyOutputFilterStream extends AbstractElementOutputFilterStream<BaseProperty>
 {
     private BaseClass currentXClass;
 

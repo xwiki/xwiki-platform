@@ -75,13 +75,18 @@ public class DistributionInitializerListener implements EventListener
     @Override
     public void onEvent(Event event, Object arg1, Object arg2)
     {
+        // Check if current distribution job was triggered already
+        if (this.distributionManager.getCurrentDistributionJob() != null) {
+            return;
+        }
+
         XWikiContext xcontext = (XWikiContext) arg2;
-        
+
         // Do nothing if the automatic start of DW is disabled
         if (!isAutoDistributionWizardEnabled(xcontext)) {
             return;
         }
-        
+
         DistributionState distributionState = this.distributionManager.getFarmDistributionState();
 
         // Start the Distribution Wizard only if the current user has the right to access it

@@ -43,7 +43,6 @@ captcha.jcaptcha.displayer.audio.play=Écouter
 captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha n'est pas correctement configuré.
 captcha.jcaptcha.displayer.refresh=Actualiser
 captcha.jcaptcha.displayer.answer.placeholder=Réponse
-
 XWiki.Captcha.JCaptcha.ConfigurationClass_type=Type
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_hint=Le type de CAPTCHA à afficher.
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_image=Image
@@ -51,7 +50,6 @@ XWiki.Captcha.JCaptcha.ConfigurationClass_type_sound=Son
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_text=Texte
 XWiki.Captcha.JCaptcha.ConfigurationClass_engine=Moteur
 XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=Le type de moteur à utiliser pour afficher un CAPTCHA.
-
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=Default Gimpy (Gmail)
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Simple List
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Non Linear Text Gimpy
@@ -61,5 +59,7 @@ captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngin
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Simple List
-captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simple Math</content>
+captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simple Math
+captcha.jcaptcha.engine.custom=Personnalisé :
+</content>
 </xwikidoc>

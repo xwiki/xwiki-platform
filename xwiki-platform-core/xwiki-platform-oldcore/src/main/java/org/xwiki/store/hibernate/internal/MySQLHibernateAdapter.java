@@ -80,6 +80,8 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
                 NativeQuery<?> query = session.createNativeQuery(statement);
 
                 // Execute the query
+                this.logger.info("Changing the table row type (currently [{}]) with [{}]", rowFormats.get(tableName),
+                    statement);
                 session.getTransaction().begin();
                 query.executeUpdate();
                 session.getTransaction().commit();

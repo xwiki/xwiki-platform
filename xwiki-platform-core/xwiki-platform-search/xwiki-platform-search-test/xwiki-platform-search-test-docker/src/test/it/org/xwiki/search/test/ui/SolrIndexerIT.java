@@ -53,6 +53,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*Test\\.Execute\\..*
         solr.indexer.batch.maxLength=10000000
         solr.indexer.batch.size=200"""
+}, extraJARs = {
+    // Solr initialization isn't reliable when it's not part of the WAR.
+    "org.xwiki.platform:xwiki-platform-search-solr-query"
 })
 class SolrIndexerIT
 {

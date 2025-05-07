@@ -73,7 +73,7 @@ public class LinkDialog extends CKEditorDialog
      */
     public String getSelectedResourceType()
     {
-        return getResourceDisplay().getAttribute("data-resourcetype");
+        return getResourceDisplay().getDomAttribute("data-resourcetype");
     }
 
     /**
@@ -81,7 +81,7 @@ public class LinkDialog extends CKEditorDialog
      */
     public String getSelectedResourceReference()
     {
-        return getResourceDisplay().getAttribute("data-resourcereference");
+        return getResourceDisplay().getDomAttribute("data-resourcereference");
     }
 
     private WebElement getResourceDisplay()

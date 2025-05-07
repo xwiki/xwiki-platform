@@ -58,6 +58,10 @@ public class DefaultModelBridge implements ModelBridge
             XWikiContext xcontext = contextProvider.get();
             DocumentReference documentReference = (DocumentReference) objectReference.getParent();
             XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+            // Avoid modifying the cached document
+            doc = doc.clone();
+
             doc.setHidden(true);
             BaseObject obj = doc.getObject(entityReferenceSerializer.serialize(objectReference.getXClassReference()),
                     true, xcontext);

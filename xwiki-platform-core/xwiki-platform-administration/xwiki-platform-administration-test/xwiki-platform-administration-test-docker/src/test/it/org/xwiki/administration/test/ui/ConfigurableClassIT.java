@@ -60,8 +60,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*ConfigurableClassIT\\."
         + "(testCodeToExecutionAndAutoSandboxing.WebHome"
         + "|testLockingAndUnlocking.TestConfigurable1"
-        + "|testLockingAndUnlocking.TestConfigurable2)"
-})
+        + "|testLockingAndUnlocking.TestConfigurable2)",
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class ConfigurableClassIT
 {
     @BeforeEach

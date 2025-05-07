@@ -166,6 +166,10 @@ public class EventStreamCleanerJobDocumentInitializer extends AbstractEventListe
 
         try {
             XWikiDocument doc = context.getWiki().getDocument(CLEANER_JOB_REF, context);
+
+            // Avoid modifying cache document
+            doc = doc.clone();
+
             boolean needsUpdate = setCleanerCommonDocumentsFields(doc);
 
             BaseObject job = doc.getXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE);

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.internal;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -39,6 +40,7 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     private static final String CONFIGURATION_PREFIX = "notifications.";
 
     @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
 
     @Override

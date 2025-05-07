@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class IconSetContextTest
+class IconSetContextTest
 {
     @InjectMockComponents
     private IconSetContext isContext;
@@ -49,7 +49,7 @@ public class IconSetContextTest
     private Execution execution;
 
     @Test
-    public void getIconSet()
+    void getIconSet()
     {
         assertNull(this.isContext.getIconSet());
 
@@ -65,7 +65,7 @@ public class IconSetContextTest
     }
 
     @Test
-    public void setIconSet()
+    void setIconSet()
     {
         this.isContext.setIconSet(null);
 

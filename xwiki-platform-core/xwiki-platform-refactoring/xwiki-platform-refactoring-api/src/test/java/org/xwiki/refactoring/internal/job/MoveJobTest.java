@@ -58,6 +58,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -489,6 +490,205 @@ public class MoveJobTest extends AbstractMoveJobTest
             )));
         assertEquals(1, getLogCapture().size());
         assertEquals("Skipping [chess:A.B.C.WebHome] because it doesn't exist.", getLogCapture().getMessage(0));
+    }
+
+    /*
+     * This test scenario checks performing a move of the space chess:A.B.C that contains docs WebHome, X et Y and a
+     * WebPreference to wiki tennis.
+     * The resulting references are tennis:C.X and tennis:C.Y. Note that it's a space move because the request is using
+     * deep flag set to true.
+     * Contrarily to previous test, this test checks the needed rights for the move and in particular for
+     * WebPreferences.
+     */
+    @Test
+    void moveSpaceHomeDeepWithPreferences() throws Throwable
+    {
+        DocumentReference spaceHome = new DocumentReference("chess", List.of("A", "B", "C"), "WebHome");
+        DocumentReference docFromSpace = new DocumentReference("X", spaceHome.getLastSpaceReference());
+        DocumentReference otherDocFromSpace = new DocumentReference("Y", spaceHome.getLastSpaceReference());
+        DocumentReference prefFromSpace = new DocumentReference("WebPreferences", spaceHome.getLastSpaceReference());
+        when(this.modelBridge.getDocumentReferences(spaceHome.getLastSpaceReference()))
+            .thenReturn(List.of(spaceHome, docFromSpace, otherDocFromSpace, prefFromSpace));
+        when(this.modelBridge.exists(spaceHome)).thenReturn(true);
+        when(this.modelBridge.exists(docFromSpace)).thenReturn(true);
+        when(this.modelBridge.exists(otherDocFromSpace)).thenReturn(true);
+        when(this.modelBridge.exists(prefFromSpace)).thenReturn(true);
+
+        DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Author");
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "User");
+
+        // We check needed rights, but we don't need specific rights for the WebPreferences as we're checking right
+        // of the space home.
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, spaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, docFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, otherDocFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, prefFromSpace)).thenReturn(false);
+
+        when(this.authorization.hasAccess(Right.VIEW, userReference, spaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, docFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, otherDocFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, prefFromSpace)).thenReturn(false);
+
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, spaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, docFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, otherDocFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, prefFromSpace)).thenReturn(false);
+
+        when(this.authorization.hasAccess(Right.DELETE, userReference, spaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.DELETE, userReference, docFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.DELETE, userReference, otherDocFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.DELETE, userReference, prefFromSpace)).thenReturn(false);
+
+        DocumentReference targetDoc1 = new DocumentReference("tennis", "C", "X");
+        DocumentReference targetDoc2 = new DocumentReference("tennis", "C", "Y");
+        DocumentReference targetDoc3 = new DocumentReference("tennis", "C", "WebPreferences");
+        DocumentReference targetDocSpaceHome = new DocumentReference("tennis", "C", "WebHome");
+
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, spaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, targetDocSpaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, targetDoc1)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, targetDoc2)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, targetDoc3)).thenReturn(false);
+
+        when(this.authorization.hasAccess(Right.EDIT, userReference, spaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, userReference, targetDocSpaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, userReference, targetDoc1)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, userReference, targetDoc2)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, userReference, targetDoc3)).thenReturn(false);
+
+        WikiReference newWiki = new WikiReference("tennis");
+
+        MoveRequest request = createRequest(spaceHome, newWiki);
+        request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
+        request.setDeep(true);
+        request.setAuthorReference(authorReference);
+        request.setUserReference(userReference);
+
+        run(request);
+
+        verify(this.modelBridge).rename(docFromSpace, targetDoc1);
+        verify(this.modelBridge).rename(otherDocFromSpace, targetDoc2);
+        verify(this.modelBridge).rename(prefFromSpace, targetDoc3);
+        verify(this.modelBridge).rename(spaceHome, targetDocSpaceHome);
+
+        verify(this.authorization).hasAccess(Right.VIEW, authorReference, spaceHome);
+        verify(this.authorization).hasAccess(Right.VIEW, authorReference, docFromSpace);
+        verify(this.authorization).hasAccess(Right.VIEW, authorReference, otherDocFromSpace);
+        verify(this.authorization, never()).hasAccess(Right.VIEW, authorReference, prefFromSpace);
+
+        verify(this.authorization).hasAccess(Right.VIEW, userReference, spaceHome);
+        verify(this.authorization).hasAccess(Right.VIEW, userReference, docFromSpace);
+        verify(this.authorization).hasAccess(Right.VIEW, userReference, otherDocFromSpace);
+        verify(this.authorization, never()).hasAccess(Right.VIEW, userReference, prefFromSpace);
+
+        verify(this.authorization, times(2)).hasAccess(Right.DELETE, authorReference, spaceHome);
+        verify(this.authorization).hasAccess(Right.DELETE, authorReference, docFromSpace);
+        verify(this.authorization).hasAccess(Right.DELETE, authorReference, otherDocFromSpace);
+        verify(this.authorization, never()).hasAccess(Right.DELETE, authorReference, prefFromSpace);
+
+        verify(this.authorization, times(2)).hasAccess(Right.DELETE, userReference, spaceHome);
+        verify(this.authorization).hasAccess(Right.DELETE, userReference, docFromSpace);
+        verify(this.authorization).hasAccess(Right.DELETE, userReference, otherDocFromSpace);
+        verify(this.authorization, never()).hasAccess(Right.DELETE, userReference, prefFromSpace);
+
+        verify(this.authorization).hasAccess(Right.EDIT, authorReference, spaceHome);
+        verify(this.authorization).hasAccess(Right.EDIT, authorReference, targetDocSpaceHome);
+        verify(this.authorization).hasAccess(Right.EDIT, authorReference, targetDoc1);
+        verify(this.authorization).hasAccess(Right.EDIT, authorReference, targetDoc2);
+        verify(this.authorization, never()).hasAccess(Right.EDIT, authorReference, targetDoc3);
+
+        verify(this.authorization).hasAccess(Right.EDIT, userReference, spaceHome);
+        verify(this.authorization).hasAccess(Right.EDIT, userReference, targetDocSpaceHome);
+        verify(this.authorization).hasAccess(Right.EDIT, userReference, targetDoc1);
+        verify(this.authorization).hasAccess(Right.EDIT, userReference, targetDoc2);
+        verify(this.authorization, never()).hasAccess(Right.EDIT, userReference, targetDoc3);
+
+        verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class),
+            eq(Map.of(
+                docFromSpace, new EntitySelection(docFromSpace, targetDoc1),
+                otherDocFromSpace, new EntitySelection(otherDocFromSpace, targetDoc2),
+                prefFromSpace, new EntitySelection(prefFromSpace, targetDoc3),
+                spaceHome, new EntitySelection(spaceHome, targetDocSpaceHome)
+            )));
+    }
+
+    @Test
+    void moveWebPreferencesWithoutHome() throws Throwable
+    {
+        DocumentReference spaceHome = new DocumentReference("chess", List.of("A", "B", "C"), "WebHome");
+        DocumentReference docFromSpace = new DocumentReference("X", spaceHome.getLastSpaceReference());
+        DocumentReference prefFromSpace = new DocumentReference("WebPreferences", spaceHome.getLastSpaceReference());
+        when(this.modelBridge.getDocumentReferences(spaceHome.getLastSpaceReference()))
+            .thenReturn(List.of(docFromSpace, prefFromSpace));
+        when(this.modelBridge.exists(spaceHome)).thenReturn(false);
+        when(this.modelBridge.exists(docFromSpace)).thenReturn(true);
+        when(this.modelBridge.exists(prefFromSpace)).thenReturn(true);
+
+        DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Author");
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "User");
+
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, docFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, authorReference, prefFromSpace)).thenReturn(false);
+
+        when(this.authorization.hasAccess(Right.VIEW, userReference, docFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, userReference, prefFromSpace)).thenReturn(false);
+
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, docFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.DELETE, authorReference, prefFromSpace)).thenReturn(false);
+
+        when(this.authorization.hasAccess(Right.DELETE, userReference, docFromSpace)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.DELETE, userReference, prefFromSpace)).thenReturn(false);
+
+        DocumentReference targetDoc1 = new DocumentReference("tennis", "C", "X");
+        DocumentReference targetDoc3 = new DocumentReference("tennis", "C", "WebPreferences");
+
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, spaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, targetDoc1)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, authorReference, targetDoc3)).thenReturn(false);
+
+        when(this.authorization.hasAccess(Right.EDIT, userReference, spaceHome)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, userReference, targetDoc1)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.EDIT, userReference, targetDoc3)).thenReturn(false);
+
+        WikiReference newWiki = new WikiReference("tennis");
+
+        MoveRequest request = createRequest(spaceHome, newWiki);
+        request.setCheckRights(true);
+        request.setCheckAuthorRights(true);
+        request.setDeep(true);
+        request.setAuthorReference(authorReference);
+        request.setUserReference(userReference);
+
+        run(request);
+
+        verify(this.modelBridge).rename(docFromSpace, targetDoc1);
+        verify(this.modelBridge, never()).rename(prefFromSpace, targetDoc3);
+
+        verify(this.authorization).hasAccess(Right.VIEW, authorReference, docFromSpace);
+        verify(this.authorization, never()).hasAccess(Right.VIEW, authorReference, prefFromSpace);
+
+        verify(this.authorization).hasAccess(Right.VIEW, userReference, docFromSpace);
+        verify(this.authorization, never()).hasAccess(Right.VIEW, userReference, prefFromSpace);
+
+        verify(this.authorization).hasAccess(Right.DELETE, authorReference, docFromSpace);
+        verify(this.authorization, never()).hasAccess(Right.DELETE, authorReference, prefFromSpace);
+
+        verify(this.authorization).hasAccess(Right.DELETE, userReference, docFromSpace);
+        verify(this.authorization).hasAccess(Right.DELETE, userReference, prefFromSpace);
+
+        verify(this.authorization).hasAccess(Right.EDIT, authorReference, targetDoc1);
+        verify(this.authorization, never()).hasAccess(Right.EDIT, authorReference, targetDoc3);
+
+        verify(this.authorization).hasAccess(Right.EDIT, userReference, targetDoc1);
+        verify(this.authorization, never()).hasAccess(Right.EDIT, userReference, targetDoc3);
+
+        verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class),
+            eq(Map.of(
+                docFromSpace, new EntitySelection(docFromSpace, targetDoc1)
+            )));
+        assertEquals(1, getLogCapture().size());
+        assertEquals("You are not allowed to delete [chess:A.B.C.WebPreferences].", getLogCapture().getMessage(0));
     }
 
     @Test

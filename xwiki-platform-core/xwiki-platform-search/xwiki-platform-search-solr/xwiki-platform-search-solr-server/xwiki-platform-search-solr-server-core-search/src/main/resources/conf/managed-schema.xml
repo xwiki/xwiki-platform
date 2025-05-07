@@ -633,13 +633,11 @@
       </analyzer>
     </fieldType>
 
-    <!-- lowercases the entire field value, keeping it as a single token.  -->
-    <fieldType name="lowercase" class="solr.TextField" positionIncrementGap="100">
-      <analyzer>
-        <tokenizer name="keyword"/>
-        <filter name="lowercase" />
-      </analyzer>
-    </fieldType>
+    <!--
+    Custom lowercase field that is like a String field but lowercases the value before indexing, querying, and storing.
+    -->
+    <fieldType name="lowercase" class="org.xwiki.search.solr.LowerCaseStrField" docValues="true"
+      sortMissingLast="true"/>
 
     <!--
       Example of using PathHierarchyTokenizerFactory at index time, so

@@ -20,18 +20,11 @@
 define('xwiki-realtime-messages', {
   prefix: 'realtime.',
   keys: [
-    'editingAlone',
-    'editingWith',
-    'disconnected',
-    'synchronizing',
-    'reconnecting',
-    'lag',
     'allowRealtime',
     'sessionInProgress',
-    'saved',
-    'savedRemote',
     'redirectDialog.pluralPrompt',
     'redirectDialog.create',
+    'redirectDialog.join',
     'requestASession',
     'requestDialog.prompt',
     'requestDialog.create',
@@ -45,19 +38,12 @@ define('xwiki-realtime-messages', {
     'conflictsWarningInfoRt',
     'conflictsWarningSuggestion',
     'conflictsWarningInfoLink',
-    'wsError',
     'wsErrorConflicts',
-    'connectingBox',
-    'connectionLost',
-    'connectionLostInfo',
     'forbidden',
     'reloadDialog.prompt',
     'reloadDialog.reload',
     'reloadDialog.exit',
-    'disableDialog.prompt',
-    'disableDialog.ok',
-    'disableDialog.exit',
     'autoAcceptSave',
-    'editor.getContentFailed'
+    'join.error'
   ]
 });

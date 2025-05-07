@@ -93,11 +93,6 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    getToolBar() {
-      return this._ckeditor.ui.space('top').$.querySelector('.cke_toolbox');
-    }
-
-    /** @inheritdoc */
     async updateContent(updater, isLocalChange) {
       // Don't push local changes when saving the snapshot. Wait until the content has been updated (see below),
       // otherwise we risk reverting the received remote changes.

@@ -52,4 +52,19 @@ public class HqlQueryUtilsTest
         assertEquals("select column from table where table.column <?1",
             HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column <?"));
     }
+
+    @Test
+    public void toCompleteStatement()
+    {
+        assertEquals("from table", HqlQueryUtils.toCompleteStatement("from table"));
+        assertEquals("select * from table", HqlQueryUtils.toCompleteStatement("select * from table"));
+
+        assertEquals("select doc.fullName from XWikiDocument doc where doc.name = 'name'",
+            HqlQueryUtils.toCompleteStatement("where doc.name = 'name'"));
+        assertEquals("select doc.fullName from XWikiDocument doc order by doc.name",
+            HqlQueryUtils.toCompleteStatement("order by doc.name"));
+        assertEquals("select doc.fullName from XWikiDocument doc , XWikiSpace space",
+            HqlQueryUtils.toCompleteStatement(", XWikiSpace space"));
+
+    }
 }

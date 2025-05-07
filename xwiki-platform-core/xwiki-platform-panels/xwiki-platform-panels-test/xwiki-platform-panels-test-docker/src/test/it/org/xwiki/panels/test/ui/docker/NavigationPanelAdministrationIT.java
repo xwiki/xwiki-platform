@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.panels.test.po.NavigationPanelAdministrationPage;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -57,6 +58,9 @@ class NavigationPanelAdministrationIT
 
         // Reset the configuration.
         setup.deletePage("PanelsCode", "NavigationConfiguration");
+
+        // Cleanup
+        setup.deletePage("A AA", "WebHome");
 
         // Create a top level page that doesn't belong to an extension.
         setup.createPage("Denis", "WebHome", "", "");
@@ -149,6 +153,56 @@ class NavigationPanelAdministrationIT
         assertTrue(navPanelAdminPage.isExcludingTopLevelExtensionPages());
         assertEquals(Collections.singletonList("Bob"), navPanelAdminPage.getInclusions());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getExclusions());
+
+        // Check pin pages behaviour
+        assertFalse(navPanelAdminPage.isPinned("Alice"));
+        assertFalse(navPanelAdminPage.isPinned("Bob"));
+        navPanelAdminPage.pinPage("Bob");
+
+        assertTrue(navPanelAdminPage.isPinned("Alice"));
+        assertTrue(navPanelAdminPage.isPinned("Bob"));
+
+        saveAndReload(navPanelAdminPage, driver);
+        assertTrue(navPanelAdminPage.isPinned("Alice"));
+        assertTrue(navPanelAdminPage.isPinned("Bob"));
+
+        navPanelAdminPage.unpinPage("Alice");
+        assertFalse(navPanelAdminPage.isPinned("Alice"));
+        assertFalse(navPanelAdminPage.isPinned("Bob"));
+
+        navPanelAdminPage.dragBefore("Denis", "Bob");
+        assertTrue(navPanelAdminPage.isPinned("Alice"));
+        assertTrue(navPanelAdminPage.isPinned("Denis"));
+        assertFalse(navPanelAdminPage.isPinned("Bob"));
+
+        saveAndReload(navPanelAdminPage, driver);
+        assertEquals(Arrays.asList("Alice", "Denis", "Bob", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        assertTrue(navPanelAdminPage.isPinned("Alice"));
+        assertTrue(navPanelAdminPage.isPinned("Denis"));
+        assertFalse(navPanelAdminPage.isPinned("Bob"));
+
+        navPanelAdminPage.unpinPage("Alice");
+        saveAndReload(navPanelAdminPage, driver);
+        assertEquals(Arrays.asList("Alice", "Bob", "Denis", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
+
+        // Ensure XWIKI-22885 is fixed.
+        setup.createPage(new DocumentReference("xwiki", "A AA", "WebHome"), "Test pin page", "A AA");
+
+        navPanelAdminPage = NavigationPanelAdministrationPage.gotoPage();
+        assertEquals(Arrays.asList("A AA", "Alice", "Bob", "Denis", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        navPanelAdminPage.pinPage("A AA");
+        saveAndReload(navPanelAdminPage, driver);
+
+        assertEquals(Arrays.asList("A AA", "Alice", "Bob", "Denis", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        assertTrue(navPanelAdminPage.isPinned("A AA"));
+        // Reset the state of pinned page so that automated accessibility tests don't hit an unexpected fail
+        // in the test following this one.
+        navPanelAdminPage.unpinPage("A AA");
+        navPanelAdminPage.save();
     }
 
     private NavigationPanelAdministrationPage saveAndReload(NavigationPanelAdministrationPage navPanelAdminPage,

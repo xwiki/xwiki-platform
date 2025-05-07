@@ -129,7 +129,7 @@ public abstract class AbstractRegistrationPage extends BasePage
     public boolean errorMessageInclude(String message)
     {
         return !getDriver().findElementsWithoutWaiting(
-                By.xpath("//div[@class = 'box errormessage' and . = '" + message + "']"))
+                By.xpath("//div[contains(@class, 'errormessage') and contains(., '" + message + "')]"))
             .isEmpty();
     }
 

@@ -36,12 +36,14 @@ import static org.openqa.selenium.By.cssSelector;
 @Unstable
 public class CKEditorDialog extends BaseElement
 {
+    private static final By DIALOG_CONTENTS = By.className("cke_dialog_contents");
+
     /**
      * Creates a CKEditor dialog instance.
      */
     public CKEditorDialog()
     {
-        getDriver().waitUntilElementIsVisible(By.className("cke_dialog_contents"));
+        getDriver().waitUntilElementIsVisible(DIALOG_CONTENTS);
     }
 
     /**
@@ -50,7 +52,7 @@ public class CKEditorDialog extends BaseElement
     public void submit()
     {
         getDriver().findElement(By.className("cke_dialog_ui_button_ok")).click();
-        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
+        getDriver().waitUntilElementDisappears(DIALOG_CONTENTS);
     }
 
     /**
@@ -59,7 +61,7 @@ public class CKEditorDialog extends BaseElement
     public void cancel()
     {
         getDriver().findElement(By.className("cke_dialog_ui_button_cancel")).click();
-        getDriver().waitUntilElementDisappears(By.className("cke_dialog_contents"));
+        getDriver().waitUntilElementDisappears(DIALOG_CONTENTS);
     }
 
     protected WebElement getContainer()

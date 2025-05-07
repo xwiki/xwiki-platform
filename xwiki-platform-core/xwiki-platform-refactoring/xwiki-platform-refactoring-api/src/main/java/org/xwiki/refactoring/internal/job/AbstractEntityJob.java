@@ -69,9 +69,9 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
         void visit(T node);
     }
 
-    private static final JobGroupPath ROOT_GROUP = new JobGroupPath(RefactoringJobs.GROUP, null);
+    protected static final String PREFERENCES_DOCUMENT_NAME = "WebPreferences";
 
-    private static final String PREFERENCES_DOCUMENT_NAME = "WebPreferences";
+    private static final JobGroupPath ROOT_GROUP = new JobGroupPath(RefactoringJobs.GROUP, null);
 
     /**
      * The component used to access the XWiki model and to perform low level operations on it.
@@ -261,7 +261,13 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
             .equals(this.defaultEntityReferenceProvider.getDefaultReference(documentReference.getType()).getName());
     }
 
-    private boolean isSpacePreferencesReference(EntityReference entityReference)
+    protected DocumentReference getSpaceHomeReference(DocumentReference reference)
+    {
+        String referenceName = this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+        return new DocumentReference(referenceName, reference.getLastSpaceReference());
+    }
+
+    protected boolean isSpacePreferencesReference(EntityReference entityReference)
     {
         return entityReference.getType() == EntityType.DOCUMENT
             && PREFERENCES_DOCUMENT_NAME.equals(entityReference.getName());

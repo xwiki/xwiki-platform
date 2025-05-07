@@ -6,7 +6,7 @@
   background-color: @xwiki-page-content-bg;
   .buttons {
     margin: 0;
-    padding: 1em;
+    padding: .5em;
     #autosaveControl.autosaveDisabled > label.frequency {
       .text-muted;
     }
@@ -17,6 +17,8 @@
     position: fixed;
     bottom: 0;
     background-color: @breadcrumb-bg;
+    border: @border-width solid @input-border;
+    border-radius: @border-radius-base;
     @media (max-width: @screen-sm-max) {
       #commentinput, #autosaveControl, .metamodifs {
         display: none;
@@ -33,9 +35,11 @@
   .sticky-buttons {
     border: @border-width solid @input-border;
     border-top: 0;
+    border-radius: 0 0 @border-radius-base @border-radius-base;
     background-color: @xwiki-background-secondary-color;
     &.sticky-buttons-fixed {
       border-top: @border-width solid @input-border;
+      border-radius: 0;
     }
   }
 }

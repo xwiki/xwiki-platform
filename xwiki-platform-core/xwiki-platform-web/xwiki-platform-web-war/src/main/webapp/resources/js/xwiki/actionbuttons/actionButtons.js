@@ -842,8 +842,9 @@ require(['jquery'], function ($) {
 
     if (isVisible && !isFullScreen && $(window).height() + $(window).scrollTop() < position) {
       $container.addClass('sticky-buttons-fixed');
-      // The width of the parent element is not inherited when the position is fixed
-      $container.innerWidth($container.parent().width());
+      // The width of the parent element is not inherited when the position is fixed. Note that we have to subtract 2
+      // for the left / right borders.
+      $container.innerWidth($container.parent().width() - 2);
     } else {
       $container.removeClass('sticky-buttons-fixed');
       $container.innerWidth('');

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.server.HandshakeRequest;
 
@@ -82,7 +83,7 @@ class XWikiWebSocketRequestStubTest
         assertArrayEquals(new String[] {"red", "blue"}, stub.getParameterValues("color"));
 
         String validationCookie = Stream.of(stub.getCookies()).filter(c -> c.getName().equals("validation"))
-            .map(c -> c.getValue()).findFirst().get();
+            .map(Cookie::getValue).findFirst().get();
         assertEquals("xyz", validationCookie);
         assertEquals(6, stub.getCookies().length);
 

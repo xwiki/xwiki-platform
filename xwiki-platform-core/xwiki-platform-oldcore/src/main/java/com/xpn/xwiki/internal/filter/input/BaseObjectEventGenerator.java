@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
@@ -41,6 +42,7 @@ import com.xpn.xwiki.internal.filter.BaseObjectFilter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * @version $Id$
@@ -98,7 +100,10 @@ public class BaseObjectEventGenerator
             BaseProperty<?> xproperty = it.next();
 
             String pname = xproperty.getName();
-            if (pname != null && !pname.trim().equals("")) {
+            if (StringUtils.isNotBlank(pname)
+                && (!(xclass.get(pname) instanceof PropertyClass propertyClass)
+                || !properties.getExcludedPropertyTypes().contains(propertyClass.getClassType())))
+            {
                 ((BasePropertyEventGenerator) this.propertyEventGenerator).write(xproperty, filter,
                     (Map<String, Object>) properties);
             }

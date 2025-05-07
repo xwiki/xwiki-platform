@@ -1,1 +1,2 @@
+org.xwiki.index.IndexScriptService
 org.xwiki.index.TaskConsumerScriptService

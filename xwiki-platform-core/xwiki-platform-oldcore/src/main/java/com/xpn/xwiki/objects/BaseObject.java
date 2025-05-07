@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.objects;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
-public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Serializable, Cloneable
+public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Cloneable
 {
     private static final long serialVersionUID = 1L;
 
@@ -196,12 +195,25 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     @Override
     public BaseObject clone()
     {
-        BaseObject object = (BaseObject) super.clone();
+        return (BaseObject) super.clone();
+    }
+
+    @Override
+    public BaseObject clone(boolean detach)
+    {
+        return (BaseObject) super.clone(detach);
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<BaseObjectReference> element)
+    {
+        super.cloneContent(element);
+
+        BaseObject object = (BaseObject) element;
+
         // We don't use #getGuid() because we actually want the same value and not generate a new guid when null (which
         // is expensive)
         object.setGuid(this.guid);
-
-        return object;
     }
 
     /**

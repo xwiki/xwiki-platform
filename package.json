@@ -64,6 +64,7 @@
     "ignoredBuiltDependencies": [
       "esbuild",
       "nx",
+      "unrs-resolver",
       "vue-demi"
     ],
     "onlyBuiltDependencies": [

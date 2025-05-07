@@ -145,6 +145,8 @@ public class WikisResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(reference);
         this.testUtils.rest().savePage(reference, "Name Content", "Name Title " + this.pageName);
 
+        this.solrUtils.waitEmptyQueue();
+
         GetMethod getMethod = executeGet(
             String.format("%s?scope=name&q=" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
         SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
@@ -160,6 +162,8 @@ public class WikisResourceIT extends AbstractHttpIT
         String nonTerminalFullName = String.join(".", nonTerminalSpaces) + "." + "WebHome";
         this.testUtils.rest().savePage(nonTerminalReference, "content2" + this.pageName, "title2" + this.pageName);
 
+        this.solrUtils.waitEmptyQueue();
+
         getMethod = executeGet(
             String.format("%s?scope=name&q=" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
         searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
@@ -173,12 +177,17 @@ public class WikisResourceIT extends AbstractHttpIT
         assertTrue(foundPages.contains(this.fullName));
         assertTrue(foundPages.contains(nonTerminalFullName));
 
-        // Ensure that searching by space finds neither the terminal nor the non-terminal page.
+        // Ensure that searching by space finds both pages.
         getMethod =
             executeGet(String.format("%s?scope=name&q=" + this.spaces.get(0),
                 buildURI(WikiSearchResource.class, getWiki())));
         searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertEquals(0, searchResults.getSearchResults().size());
+        foundPages = searchResults.getSearchResults().stream()
+            .map(SearchResult::getPageFullName)
+            .toList();
+
+        assertTrue(foundPages.contains(this.fullName));
+        assertTrue(foundPages.contains(nonTerminalFullName));
     }
 
     @Test
@@ -186,6 +195,8 @@ public class WikisResourceIT extends AbstractHttpIT
     {
         this.testUtils.rest().delete(reference);
         this.testUtils.rest().savePage(reference, "content" + this.pageName, "title" + this.pageName);
+
+        this.solrUtils.waitEmptyQueue();
 
         GetMethod getMethod =
             executeGet(String.format("%s?q=content" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));

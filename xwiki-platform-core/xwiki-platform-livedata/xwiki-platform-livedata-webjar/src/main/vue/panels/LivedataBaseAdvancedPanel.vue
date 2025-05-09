@@ -58,7 +58,7 @@
           class="action collapse-button"
           @click="collapsed = !collapsed"
         >
-          <XWikiIcon v-if="!collapsed" :icon-descriptor="{name: 'arrow_in'}"/>
+          <XWikiIcon v-if="!collapsed" :icon-descriptor="{name: 'arrow-in'}"/>
           <XWikiIcon v-else :icon-descriptor="{name: 'arrow_out'}"/>
         </span>
         <!-- Close panel button -->

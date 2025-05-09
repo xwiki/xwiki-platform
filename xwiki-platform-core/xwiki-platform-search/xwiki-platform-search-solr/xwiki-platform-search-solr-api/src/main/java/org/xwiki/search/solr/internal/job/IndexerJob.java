@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -76,6 +77,9 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
     @Override
     public String getType()
     {
@@ -107,7 +111,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     /**
      * Update the Solr index to match the current state of the database.
      */
-    private void updateSolrIndex()
+    private void updateSolrIndex() throws Exception
     {
         DiffDocumentIterator<String> iterator = new DiffDocumentIterator<>(this.solrIterator, this.databaseIterator);
         iterator.setRootReference(getRequest().getRootReference());
@@ -131,7 +135,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         }
     }
 
-    private void updateSolrIndex(int progressSize, DiffDocumentIterator<String> iterator)
+    private void updateSolrIndex(int progressSize, DiffDocumentIterator<String> iterator) throws Exception
     {
         this.progressManager.pushLevelProgress(progressSize, this);
 
@@ -147,12 +151,23 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
                     // version
                     // from the database.
                     this.indexer.index(entry.getKey(), true);
-                } else if (entry.getValue() == Action.DELETE && getRequest().isRemoveMissing()) {
+                    counter[entry.getValue().ordinal()]++;
+                } else if (entry.getValue() == Action.DELETE && getRequest().isRemoveMissing()
+                    // Double-check if the document really doesn't exist.
+                    // Removing an actually existing document is much worse than re-indexing an existing one.
+                    // The document might have been created and indexed in Solr between the database and the Solr
+                    // query, or the pagination of the database query might have gotten messed up due to the
+                    // insertion or deletion of documents.
+                    // This check may throw an exception that we just propagate as this would indicate a serious
+                    // problem with the database.
+                    // It doesn't seem like a good idea to just continue removing documents from the Solr index in that
+                    // case.
+                    && !this.documentAccessBridge.exists(entry.getKey()))
+                {
                     // The index entry doesn't exist anymore in the database.
                     this.indexer.delete(entry.getKey(), true);
+                    counter[Action.DELETE.ordinal()]++;
                 }
-
-                counter[entry.getValue().ordinal()]++;
 
                 this.progressManager.endStep(this);
             }

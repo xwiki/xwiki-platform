@@ -22,6 +22,7 @@ package org.xwiki.livedata.internal.rest;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -45,9 +46,14 @@ import org.xwiki.livedata.rest.model.jaxb.Entry;
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntryResource")
 public class DefaultLiveDataEntryResource extends AbstractLiveDataResource implements LiveDataEntryResource
 {
+    @Inject
+    private LiveDataResourceContextInitializer contextInitializer;
+
     @Override
     public Entry getEntry(String sourceId, String namespace, String entryId) throws Exception
     {
+        this.contextInitializer.initialize(namespace);
+
         LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
@@ -64,6 +70,8 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
     @Override
     public Response updateEntry(String sourceId, String namespace, String entryId, Entry entry) throws Exception
     {
+        this.contextInitializer.initialize(namespace);
+
         LiveDataConfiguration config = getLiveDataConfig(sourceId);
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(config.getQuery().getSource(), namespace);
         if (source.isPresent()) {
@@ -94,6 +102,8 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
     @Override
     public void deleteEntry(String sourceId, String namespace, String entryId) throws Exception
     {
+        this.contextInitializer.initialize(namespace);
+
         LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {

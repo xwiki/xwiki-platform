@@ -21,6 +21,7 @@ package org.xwiki.livedata.macro;
 
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
 import org.xwiki.livedata.internal.macro.LiveDataMacro;
+import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.stability.Unstable;
 
@@ -157,5 +158,19 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     public void setDescription(String description)
     {
         super.setDescription(description);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 16.10.3
+     */
+    @Override
+    @Unstable
+    @PropertyDescription("Show or hide the page list that allows the user to switch pages when there is only one page.")
+    @PropertyAdvanced
+    public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)
+    {
+        super.setShowPaginationOnSinglePage(showPaginationOnSinglePage);
     }
 }

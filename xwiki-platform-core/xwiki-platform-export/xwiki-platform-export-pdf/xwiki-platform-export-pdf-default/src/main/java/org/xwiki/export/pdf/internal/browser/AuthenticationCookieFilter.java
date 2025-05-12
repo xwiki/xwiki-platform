@@ -26,11 +26,12 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+
+import jakarta.servlet.http.Cookie;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;

@@ -22,7 +22,7 @@ package org.xwiki.export.pdf.internal.browser;
 import java.net.URL;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.xwiki.component.annotation.Role;
 

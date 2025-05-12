@@ -36,8 +36,9 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -47,6 +48,7 @@ import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter.CookieFilterContext;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -165,7 +167,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      */
     private Cookie[] getCookies(CookieFilterContext cookieFilterContext)
     {
-        Cookie[] cookiesArray = getRequest().getCookies();
+        Cookie[] cookiesArray = getJakartaRequest().getCookies();
         List<Cookie> cookies = new LinkedList<>();
         if (cookiesArray != null) {
             Stream.of(cookiesArray).forEach(cookies::add);
@@ -264,7 +266,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
     private Optional<String> getClientIPAddress(URL targetURL, BrowserTab browserTab)
     {
         try {
-            URL restURL = new URL(targetURL, getRequest().getContextPath() + "/rest/client?media=json");
+            URL restURL = new URL(targetURL, getJakartaRequest().getContextPath() + "/rest/client?media=json");
             if (browserTab.navigate(restURL)) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 String clientIPAddress = objectMapper.readTree(browserTab.getSource()).path("ip").asText();
@@ -287,7 +289,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      */
     private List<String> getForwardedHTTPHeader(String proxyIPAddress)
     {
-        HttpServletRequest request = getRequest();
+        HttpServletRequest request = getJakartaRequest();
 
         List<String> forwarded = new LinkedList<>();
         Enumeration<String> forwardedValues = request.getHeaders(HTTP_HEADER_FORWARDED);
@@ -335,6 +337,13 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     /**
      * @return the current HTTP servlet request, used to take the cookies from
+     * @deprecated since 17.4.0RC1
      */
-    protected abstract HttpServletRequest getRequest();
+    @Deprecated
+    protected abstract javax.servlet.http.HttpServletRequest getRequest();
+
+    protected HttpServletRequest getJakartaRequest()
+    {
+        return JakartaServletBridge.toJakarta(getRequest());
+    }
 }

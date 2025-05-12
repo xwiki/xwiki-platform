@@ -31,8 +31,6 @@ import jakarta.servlet.http.Cookie;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.stability.Unstable;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a web browser tab.
  * 

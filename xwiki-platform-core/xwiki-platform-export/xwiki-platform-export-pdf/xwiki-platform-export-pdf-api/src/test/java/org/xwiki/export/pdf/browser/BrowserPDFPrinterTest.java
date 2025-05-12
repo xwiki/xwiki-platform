@@ -27,8 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,7 +101,7 @@ class BrowserPDFPrinterTest
         when(this.cookieFilter.isFilterRequired()).thenReturn(true);
 
         when(this.printer.getBrowserManager()).thenReturn(this.browserManager);
-        when(this.printer.getRequest()).thenReturn(this.request);
+        when(this.printer.getJakartaRequest()).thenReturn(this.request);
 
         when(this.request.getContextPath()).thenReturn("/xwiki");
         when(this.configuration.getXWikiURI()).thenReturn(new URI("//xwiki-host"));

@@ -31,6 +31,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -72,6 +74,12 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
     @Override
     public InputStream print(URL printPreviewURL) throws IOException
     {
+        return print(printPreviewURL, () -> false);
+    }
+
+    @Override
+    public InputStream print(URL printPreviewURL, BooleanSupplier isCanceled) throws IOException
+    {
         if (printPreviewURL == null) {
             throw new IOException("Print preview URL missing.");
         }
@@ -83,15 +91,21 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         BrowserTab browserTab = getBrowserManager().createIncognitoTab();
 
         try {
+            continueIfNotCanceled(isCanceled);
+
             // Find the actual print preview URL and the IP address of the client (browser) that will be used to load
             // this URL and print its content to PDF.
             CookieFilterContext cookieFilterContext = findCookieFilterContext(printPreviewURL, browserTab);
+
+            continueIfNotCanceled(isCanceled);
 
             // Indicate that the browser used to generate the PDF acts as a proxy that forwards the PDF export request
             // to the XWiki backend and "modifies" the HTML response, replacing it with the PDF document, before sending
             // it back to the original client (users's browser) that triggered the PDF export.
             browserTab.setExtraHTTPHeaders(
                 Map.of(HTTP_HEADER_FORWARDED, getForwardedHTTPHeader(cookieFilterContext.getClientIPAddress())));
+
+            continueIfNotCanceled(isCanceled);
 
             // Authentication cookies are usually bound to the IP address of the client that made the authentication
             // request (the users's browser in our case), so we may have to re-encode the authentication cookies based
@@ -111,12 +125,16 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
             // on the client IP address from the cookie filter context.
             Cookie[] cookies = getCookies(cookieFilterContext);
 
+            continueIfNotCanceled(isCanceled);
+
             // Load the print preview URL and wait for the web page to be ready (wait for all images to be loaded, wait
             // for asynchronous HTTP requests made at page load time, wait for JavaScript code executed on page load).
             if (!browserTab.navigate(cookieFilterContext.getTargetURL(), cookies, true,
-                this.configuration.getPageReadyTimeout())) {
+                this.configuration.getPageReadyTimeout(), isCanceled)) {
                 throw new IOException("Failed to load the print preview URL: " + cookieFilterContext.getTargetURL());
             }
+
+            continueIfNotCanceled(isCanceled);
 
             // Print the loaded web page to PDF, skipping the print preview modal dialog.
             return browserTab.printToPDF(browserTab::close);
@@ -125,8 +143,19 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
             // input stream is read and closed.
             browserTab.close();
 
-            // Propagate the caught exception.
-            throw e;
+            if (e instanceof CancellationException) {
+                return InputStream.nullInputStream();
+            } else {
+                // Propagate the caught exception.
+                throw e;
+            }
+        }
+    }
+
+    private void continueIfNotCanceled(BooleanSupplier isCanceled)
+    {
+        if (isCanceled.getAsBoolean()) {
+            throw new CancellationException();
         }
     }
 

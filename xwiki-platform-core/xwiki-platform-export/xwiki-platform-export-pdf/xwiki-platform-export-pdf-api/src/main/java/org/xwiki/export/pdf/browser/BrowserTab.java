@@ -24,10 +24,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 import jakarta.servlet.http.Cookie;
 
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+import org.xwiki.stability.Unstable;
+
 import org.xwiki.stability.Unstable;
 
 /**
@@ -50,6 +53,27 @@ public interface BrowserTab extends AutoCloseable
     default void setExtraHTTPHeaders(Map<String, List<String>> headers)
     {
         // Do nothing by default.
+    }
+
+    /**
+     * Navigates to the specified web page, optionally waiting for it to be ready (fully loaded). The process can be
+     * canceled using the provided supplier.
+     * 
+     * @param url the URL of the web page we are going to navigate to
+     * @param cookies the cookies to use when loading the specified web page
+     * @param wait {@code true} to wait for the page to be ready, {@code false} otherwise
+     * @param timeout the number of seconds to wait for the web page to be ready before timing out
+     * @param isCanceled a supplier that indicates whether the process should be canceled
+     * @return {@code true} if the navigation was successful, {@code false} otherwise
+     * @throws IOException if navigating to the specified web page fails
+     * @since 16.10.8
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    default boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout, BooleanSupplier isCanceled)
+        throws IOException
+    {
+        return navigate(url, cookies, wait, timeout);
     }
 
     /**

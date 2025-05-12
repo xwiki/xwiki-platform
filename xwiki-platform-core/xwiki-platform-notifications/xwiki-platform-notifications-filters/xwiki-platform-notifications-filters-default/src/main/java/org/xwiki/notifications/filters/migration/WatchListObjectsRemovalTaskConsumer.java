@@ -80,6 +80,9 @@ public class WatchListObjectsRemovalTaskConsumer implements TaskConsumer
         try {
             XWikiDocument document = context.getWiki().getDocument(documentReference, context);
 
+            // Avoid modifying the cached document
+            document = document.clone();
+
             // We use to fallback on the old WatchClass xobject automaticwatch property when it was defined, so we
             // also take back this value and create the new autowatch xobject if needed.
             BaseObject watchXObject = document.getXObject(classReference);

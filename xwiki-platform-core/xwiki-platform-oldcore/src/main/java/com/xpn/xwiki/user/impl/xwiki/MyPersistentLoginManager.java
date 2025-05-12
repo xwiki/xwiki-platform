@@ -37,6 +37,8 @@ import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.container.servlet.HttpServletUtils;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
 /**
  * Class responsible for remembering the login information between requests. It uses (encrypted) cookies for this. The
@@ -249,7 +251,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         setupCookie(rememberCookie, sessionCookie, secureCookie, cookieDomain, response);
 
         if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
-            String validationHash = getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
+            String validationHash =
+                getValidationHash(protectedUsername, protectedPassword,
+                    HttpServletUtils.getClientIP(JakartaServletBridge.toJakarta(request)));
             if (validationHash != null) {
                 // Validation
                 Cookie validationCookie = new Cookie(getCookiePrefix() + COOKIE_VALIDATION, validationHash);
@@ -568,7 +572,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
             String cookieHash =
                 getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_VALIDATION, DEFAULT_VALUE);
-            String calculatedHash = getValidationHash(username, password, getClientIP(request));
+            String calculatedHash = getValidationHash(username, password,
+                HttpServletUtils.getClientIP(JakartaServletBridge.toJakarta(request)));
             if (cookieHash.equals(calculatedHash)) {
                 return true;
             } else {
@@ -662,31 +667,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             LOGGER.error("Error decypting text: " + encryptedText, e);
             return null;
         }
-    }
-
-    /**
-     * Returns the original client IP. Needed because request.getRemoteAddr returns the address of the last requesting
-     * host, which can be either the real client, or a proxy. The original method prevents logging in when using a
-     * cluster of reverse proxies in front of XWiki.
-     *
-     * @param request The servlet request.
-     * @return The IP of the actual client.
-     */
-    protected String getClientIP(HttpServletRequest request)
-    {
-        // TODO: This HTTP header can have multiple values (each proxy is supposed to add a new value) and so the
-        // trustworthy value should be determined based on the known (configurable) number of proxies, as per
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#selecting_an_ip_address . For
-        // instance, if XWiki is not aware of any proxy then it should ignore all values. If XWiki is aware of one proxy
-        // then it should use the last value (not the first!). When two proxies are configured then the value before
-        // last should be used, and so on.
-        String remoteIP = request.getHeader("X-Forwarded-For");
-        if (remoteIP == null || "".equals(remoteIP)) {
-            remoteIP = request.getRemoteAddr();
-        } else if (remoteIP.indexOf(',') != -1) {
-            remoteIP = remoteIP.substring(0, remoteIP.indexOf(','));
-        }
-        return remoteIP;
     }
 
     /**

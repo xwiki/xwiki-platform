@@ -104,7 +104,7 @@ public class AuthenticationCookieFilter implements CookieFilter
                 public String getHeader(String name)
                 {
                     if ("X-Forwarded-For".equals(name)) {
-                        return cookieFilterContext.getBrowserIPAddress();
+                        return cookieFilterContext.getClientIPAddress();
                     } else {
                         return super.getHeader(name);
                     }
@@ -113,7 +113,7 @@ public class AuthenticationCookieFilter implements CookieFilter
                 @Override
                 public String getRemoteAddr()
                 {
-                    return cookieFilterContext.getBrowserIPAddress();
+                    return cookieFilterContext.getClientIPAddress();
                 }
             };
             HttpServletResponse fakeResponse = new HttpServletResponseWrapper(xcontext.getResponse())

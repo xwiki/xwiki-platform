@@ -718,12 +718,12 @@ class PDFExportIT
                 Romance
                 description modified
                 Submit
-                TITLE
-                 ENABLED
-                COLOR
-                CITY
-                GENRE
-                DESCRIPTION
+                Title
+                 Enabled
+                Color
+                City
+                Genre
+                Description
                 """, content);
         }
     }

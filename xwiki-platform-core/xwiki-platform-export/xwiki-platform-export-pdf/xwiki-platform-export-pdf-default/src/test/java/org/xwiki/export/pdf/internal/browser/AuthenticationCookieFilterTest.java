@@ -108,7 +108,7 @@ class AuthenticationCookieFilterTest
     @Test
     void filter() throws Exception
     {
-        when(this.cookieFilterContext.getBrowserIPAddress()).thenReturn("172.17.0.3");
+        when(this.cookieFilterContext.getClientIPAddress()).thenReturn("172.17.0.3");
         Cookie cookie = new Cookie("test", "before");
 
         when(this.loginManager.getRememberedUsername(this.httpRequest, this.httpResponse)).thenReturn("alice");

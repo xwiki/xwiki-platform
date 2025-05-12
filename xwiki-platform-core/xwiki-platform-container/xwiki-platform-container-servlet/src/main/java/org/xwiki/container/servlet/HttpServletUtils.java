@@ -31,6 +31,7 @@ import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.internal.ForwardedHeader;
+import org.xwiki.stability.Unstable;
 
 /**
  * Various helpers around the {@link HttpServletRequest} and {@link HttpServletResponse} API.
@@ -257,5 +258,34 @@ public final class HttpServletUtils
         }
 
         return true;
+    }
+
+    /**
+     * Returns the original client IP address. Needed because {@link HttpServletRequest#getRemoteAddr()} returns the
+     * address of the last requesting host, which can be either the real client, or a proxy. The original method
+     * prevents logging in when using a cluster of reverse proxies in front of XWiki, if the authentication cookies are
+     * IP-bound (encoded using the client IP address).
+     *
+     * @param request the servlet request
+     * @return the IP of the actual client that made the request
+     * @since 16.10.8
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    public static String getClientIP(HttpServletRequest request)
+    {
+        // TODO: This HTTP header can have multiple values (each proxy is supposed to add a new value) and so the
+        // trustworthy value should be determined based on the known (configurable) number of proxies, as per
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#selecting_an_ip_address . For
+        // instance, if XWiki is not aware of any proxy then it should ignore all values. If XWiki is aware of one proxy
+        // then it should use the last value (not the first!). When two proxies are configured then the value before
+        // last should be used, and so on.
+        String remoteIP = request.getHeader("X-Forwarded-For");
+        if (remoteIP == null || "".equals(remoteIP)) {
+            remoteIP = request.getRemoteAddr();
+        } else if (remoteIP.indexOf(',') != -1) {
+            remoteIP = remoteIP.substring(0, remoteIP.indexOf(','));
+        }
+        return remoteIP;
     }
 }

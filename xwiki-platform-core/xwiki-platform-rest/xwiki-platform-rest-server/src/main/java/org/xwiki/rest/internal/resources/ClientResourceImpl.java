@@ -20,9 +20,9 @@
 package org.xwiki.rest.internal.resources;
 
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.Utils;
@@ -30,8 +30,6 @@ import org.xwiki.rest.model.jaxb.Client;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.resources.ClientResource;
 import org.xwiki.rest.resources.RootResource;
-
-import com.xpn.xwiki.user.impl.xwiki.MyPersistentLoginManager;
 
 /**
  * Default implementation of {@link ClientResource}.
@@ -54,22 +52,7 @@ public class ClientResourceImpl extends XWikiResource implements ClientResource
         selfLink.setHref(this.uriInfo.getAbsolutePath().toString());
         selfLink.setRel(Relations.SELF);
 
-        return new Client().withIp(getClientIP()).withLinks(parentLink, selfLink);
-    }
-
-    private String getClientIP()
-    {
-        // TODO: Either make MyPersistentLoginManager#getClientIP() and use the dedicated provider to get an instance,
-        // or extract the code from MyPersistentLoginManager#getClientIP() in a separate component.
-        return new MyPersistentLoginManager()
-        {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String getClientIP(HttpServletRequest request)
-            {
-                return super.getClientIP(request);
-            }
-        }.getClientIP(getXWikiContext().getRequest());
+        return new Client().withIp(HttpServletUtils.getClientIP(getXWikiContext().getRequest())).withLinks(parentLink,
+            selfLink);
     }
 }

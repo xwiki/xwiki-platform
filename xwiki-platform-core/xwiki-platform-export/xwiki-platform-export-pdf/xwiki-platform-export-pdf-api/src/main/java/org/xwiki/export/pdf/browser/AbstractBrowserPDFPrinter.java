@@ -77,21 +77,54 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         }
         this.logger.debug("Printing [{}]", printPreviewURL);
 
+        // Each PDF export is performed in a separate, incognito, browser tab, where the user that triggered the PDF
+        // export is authenticated, so their cookies need to be isolated because multiple exports can happen at the same
+        // time.
         BrowserTab browserTab = getBrowserManager().createIncognitoTab();
-        CookieFilterContext cookieFilterContext = findCookieFilterContext(printPreviewURL, browserTab);
-        Cookie[] cookies = getCookies(cookieFilterContext);
+
         try {
-            browserTab.setExtraHTTPHeaders(getExtraHTTPHeaders(cookieFilterContext));
+            // Find the actual print preview URL and the IP address of the client (browser) that will be used to load
+            // this URL and print its content to PDF.
+            CookieFilterContext cookieFilterContext = findCookieFilterContext(printPreviewURL, browserTab);
+
+            // Indicate that the browser used to generate the PDF acts as a proxy that forwards the PDF export request
+            // to the XWiki backend and "modifies" the HTML response, replacing it with the PDF document, before sending
+            // it back to the original client (users's browser) that triggered the PDF export.
+            browserTab.setExtraHTTPHeaders(
+                Map.of(HTTP_HEADER_FORWARDED, getForwardedHTTPHeader(cookieFilterContext.getClientIPAddress())));
+
+            // Authentication cookies are usually bound to the IP address of the client that made the authentication
+            // request (the users's browser in our case), so we may have to re-encode the authentication cookies based
+            // on the IP address of the browser used to generate the PDF.
+            boolean isFilterRequired = this.cookieFilters.stream().anyMatch(CookieFilter::isFilterRequired);
+            if (isFilterRequired) {
+                // We need to re-fetch the (perceived) client IP address because it may have changed when we set the
+                // Forwarded HTTP header above. In a strict environment, the number of proxies between the client and
+                // the server is known and verified. Adding a new proxy (i.e. the browser used to generate the PDF) may
+                // fail the proxy count validation. The result may be that the proxy is seen as the original client, so
+                // its IP address is used to decode the authentication cookies.
+                cookieFilterContext =
+                    getCookieFilterContext(cookieFilterContext.getTargetURL(), browserTab).orElseThrow();
+            }
+
+            // Filter the cookies if needed. E.g. the authentication cookies may have to be decoded and re-encoded based
+            // on the client IP address from the cookie filter context.
+            Cookie[] cookies = getCookies(cookieFilterContext);
+
+            // Load the print preview URL and wait for the web page to be ready (wait for all images to be loaded, wait
+            // for asynchronous HTTP requests made at page load time, wait for JavaScript code executed on page load).
             if (!browserTab.navigate(cookieFilterContext.getTargetURL(), cookies, true,
                 this.configuration.getPageReadyTimeout())) {
                 throw new IOException("Failed to load the print preview URL: " + cookieFilterContext.getTargetURL());
             }
 
+            // Print the loaded web page to PDF, skipping the print preview modal dialog.
             return browserTab.printToPDF(browserTab::close);
         } catch (Exception e) {
             // Close the browser tab only if an exception is caught. Otherwise the tab will be closed after the PDF
             // input stream is read and closed.
             browserTab.close();
+
             // Propagate the caught exception.
             throw e;
         }
@@ -143,10 +176,8 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      */
     private CookieFilterContext findCookieFilterContext(URL printPreviewURL, BrowserTab browserTab) throws IOException
     {
-        boolean isFilterRequired = this.cookieFilters.stream().anyMatch(CookieFilter::isFilterRequired);
         return getBrowserPrintPreviewURLs(printPreviewURL).stream()
-            .map(url -> this.getCookieFilterContext(url, isFilterRequired, browserTab)).flatMap(Optional::stream)
-            .findFirst()
+            .map(url -> this.getCookieFilterContext(url, browserTab)).flatMap(Optional::stream).findFirst()
             .orElseThrow(() -> new IOException("Couldn't find an alternative print preview URL that the web browser "
                 + "used for PDF printing can access."));
     }
@@ -183,15 +214,12 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         return uriBuilder.build().toURL();
     }
 
-    private Optional<CookieFilterContext> getCookieFilterContext(URL targetURL, boolean isFilterRequired,
-        BrowserTab browserTab)
+    private Optional<CookieFilterContext> getCookieFilterContext(URL targetURL, BrowserTab browserTab)
     {
-        Optional<String> browserIPAddress = isFilterRequired ? getBrowserIPAddress(targetURL, browserTab)
-            : Optional.of(StringUtils.defaultString(getRequest().getHeader(HTTP_HEADER_FORWARDED_FOR)));
-        return browserIPAddress.map(ip -> new CookieFilterContext()
+        return getClientIPAddress(targetURL, browserTab).map(ip -> new CookieFilterContext()
         {
             @Override
-            public String getBrowserIPAddress()
+            public String getClientIPAddress()
             {
                 return ip;
             }
@@ -204,15 +232,15 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         });
     }
 
-    private Optional<String> getBrowserIPAddress(URL targetURL, BrowserTab browserTab)
+    private Optional<String> getClientIPAddress(URL targetURL, BrowserTab browserTab)
     {
         try {
             URL restURL = new URL(targetURL, getRequest().getContextPath() + "/rest/client?media=json");
             if (browserTab.navigate(restURL)) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                String browserIPAddress = objectMapper.readTree(browserTab.getSource()).path("ip").asText();
-                if (!StringUtils.isEmpty(browserIPAddress)) {
-                    return Optional.of(InetAddress.getByName(browserIPAddress).getHostAddress());
+                String clientIPAddress = objectMapper.readTree(browserTab.getSource()).path("ip").asText();
+                if (!StringUtils.isEmpty(clientIPAddress)) {
+                    return Optional.of(InetAddress.getByName(clientIPAddress).getHostAddress());
                 }
             }
         } catch (IOException e) {
@@ -222,7 +250,13 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         return Optional.empty();
     }
 
-    private Map<String, List<String>> getExtraHTTPHeaders(CookieFilterContext cookieFilterContext)
+    /**
+     * Computes the values of the "Forwarded" HTTP header as if the request was forwarded by the specified proxy.
+     *
+     * @param proxyIPAddress the IP address of the proxy that forwards the request to XWiki
+     * @return the values of the "Forwarded" HTTP header
+     */
+    private List<String> getForwardedHTTPHeader(String proxyIPAddress)
     {
         HttpServletRequest request = getRequest();
 
@@ -247,11 +281,11 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
             protocol = request.getScheme();
         }
 
-        String lastForwarded = String.format("by=%s;for=%s;host=%s;proto=%s", cookieFilterContext.getBrowserIPAddress(),
-            forwardedFor, host, protocol);
+        String lastForwarded =
+            String.format("by=%s;for=%s;host=%s;proto=%s", proxyIPAddress, forwardedFor, host, protocol);
         forwarded.add(lastForwarded);
 
-        return Map.of(HTTP_HEADER_FORWARDED, forwarded);
+        return forwarded;
     }
 
     @Override

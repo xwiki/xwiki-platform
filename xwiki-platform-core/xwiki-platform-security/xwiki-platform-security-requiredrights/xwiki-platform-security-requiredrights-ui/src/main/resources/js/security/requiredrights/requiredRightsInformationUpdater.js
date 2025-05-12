@@ -20,7 +20,8 @@
 require(['jquery'], function($) {
     // Refresh information about required rights when the document is saved.
     $(document).on('xwiki:document:saved', function () {
-        const warningContainer = $('#missing-required-rights-warning');
+        const warningID = 'missing-required-rights-warning';
+        const warningContainer = $('#' + warningID);
 
         if (warningContainer.length > 0) {
             const getURL = XWiki.currentDocument.getURL('view',
@@ -28,6 +29,7 @@ require(['jquery'], function($) {
             $.get(getURL, function (data) {
                 if (data.length > 0) {
                     warningContainer.replaceWith(data);
+                    $(document).trigger('xwiki:dom:updated', {'elements': [document.getElementById(warningID)]});
                 }
             });
         }
@@ -39,7 +41,11 @@ require(['jquery'], function($) {
                 'xpage=security/requiredrights/getRequiredRightsInformation');
             $.get(getURL, function (data) {
                 if (data.length > 0) {
-                    informationContainer.replaceWith($(data).filter('dd.required-rights-information'));
+                    const requiredRightsInfo = $(data).filter('dd.required-rights-information');
+                    informationContainer.replaceWith(requiredRightsInfo);
+                    if (requiredRightsInfo.length > 0) {
+                        $(document).trigger('xwiki:dom:updated', {'elements': [requiredRightsInfo[0]]});
+                    }
                 }
             });
         }

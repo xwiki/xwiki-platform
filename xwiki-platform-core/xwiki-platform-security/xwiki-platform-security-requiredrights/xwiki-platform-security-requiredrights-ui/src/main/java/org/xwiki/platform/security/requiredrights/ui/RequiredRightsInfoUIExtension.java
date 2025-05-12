@@ -162,7 +162,7 @@ public class RequiredRightsInfoUIExtension implements UIExtension
                     this.jsrx.use("js/security/requiredrights/requiredRightsDialog.js");
                     this.ssrx.use("css/security/requiredrights/requiredRightsDialog.css");
 
-                    results.add(new RawBlock("<button type=\"button\" class=\"btn btn-default\" "
+                    results.add(new RawBlock("<button type=\"button\" class=\"btn btn-default\" disabled "
                         + "data-xwiki-requiredrights-dialog=\"show\">", Syntax.HTML_5_0));
                     results.add(this.localizationManager.getTranslation(
                         "security.requiredrights.ui.reviewRequiredRightsButton").render());

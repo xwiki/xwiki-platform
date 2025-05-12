@@ -21,7 +21,7 @@
 {{warning cssClass="requiredrights-warning"}}
 {{translation key="security.requiredrights.ui.missingRequiredRightsWarning" /}}
 
-{{html clean="false"}}<button class="btn btn-default" type="button" data-xwiki-requiredrights-dialog="show"
+{{html clean="false"}}<button class="btn btn-default" type="button" disabled data-xwiki-requiredrights-dialog="show"
 >{{/html}}{{translation key="security.requiredrights.ui.reviewRequiredRightsButton" /}}{{html
     clean="false"}}</button>{{/html}}
 {{/warning}}

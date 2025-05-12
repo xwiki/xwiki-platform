@@ -545,8 +545,23 @@ define('xwiki-requiredrights-dialog', [
 });
 
 require(['jquery', 'xwiki-requiredrights-dialog'], function ($, dialog) {
-    $(document).on('click', 'button[data-xwiki-requiredrights-dialog="show"]', function (event) {
-        event.preventDefault();
-        dialog.show();
+    const selector = 'button[data-xwiki-requiredrights-dialog="show"]';
+
+    function init(root)
+    {
+        $(root).find(selector).prop('disabled', false);
+    }
+
+    $(function () {
+        $(document).on('click', 'button[data-xwiki-requiredrights-dialog="show"]', function (event) {
+            event.preventDefault();
+            dialog.show();
+        });
+
+        init(document);
+
+        $(document).on('xwiki:dom:updated', (event, data) => {
+            data.elements.forEach(init);
+        });
     });
 });

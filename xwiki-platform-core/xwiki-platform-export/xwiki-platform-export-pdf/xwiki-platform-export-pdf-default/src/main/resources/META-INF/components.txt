@@ -3,6 +3,7 @@ org.xwiki.export.pdf.internal.chrome.ChromeManager
 org.xwiki.export.pdf.internal.chrome.ChromeManagerManager
 org.xwiki.export.pdf.internal.chrome.ChromeManagerProvider
 org.xwiki.export.pdf.internal.chrome.ChromePDFPrinter
+org.xwiki.export.pdf.internal.chrome.ChromeServiceConfigurationProvider
 org.xwiki.export.pdf.internal.chrome.ChromeServiceFactory
 org.xwiki.export.pdf.internal.docker.ContainerManager
 org.xwiki.export.pdf.internal.docker.DockerClientFactory

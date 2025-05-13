@@ -109,14 +109,6 @@ class PDFExportIT
         // the user (the authentication cookies are copied and updated to match the Chrome Docker container IP address).
         setup.setWikiPreference("authenticate_view", "1");
 
-        // Enable the 'org.xwiki.platform.html.head' UIXP which normally is provided by
-        // 'org.xwiki.platform:xwiki-platform-distribution-ui-base' but we didn't add it as a test dependency because it
-        // brings too many transitive dependencies that we don't need.
-        setup.setWikiPreference("meta", """
-            #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter': 'order'}))
-              $services.rendering.render($uix.execute(), 'xhtml/1.0')
-            #end""");
-
         // Enable debug logs for the PDF export code.
         setup.gotoPage(new LocalDocumentReference("PDFExportIT", "EnableDebugLogs"), "get");
 
@@ -726,12 +718,12 @@ class PDFExportIT
                 Romance
                 description modified
                 Submit
-                TITLE
-                 ENABLED
-                COLOR
-                CITY
-                GENRE
-                DESCRIPTION
+                Title
+                 Enabled
+                Color
+                City
+                Genre
+                Description
                 """, content);
         }
     }
@@ -1473,13 +1465,104 @@ class PDFExportIT
         }
     }
 
+    @Test
+    @Order(29)
+    void simulateLongPDFExport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        // Disable multilingual mode from the previous test.
+        setup.loginAsSuperAdmin();
+        setMultiLingual(false, "en");
+
+        // Get back to the simple user login.
+        setup.login("John", "pass");
+
+        setup.gotoPage(new LocalDocumentReference("PDFExportIT", "DelayedPageReady"), "view", "delay=23");
+        // We delayed the page ready in order to simulate a long PDF export, but we don't want to wait when viewing the
+        // page. We want to trigger the export right away.
+        markPageReady(setup);
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(new ViewPage());
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and one content page.
+            assertEquals(2, pdf.getNumberOfPages());
+            assertEquals("DelayedPageReady\n2 / 2\nTest content.\n", pdf.getTextFromPage(1));
+        }
+    }
+
+    @Test
+    @Order(30)
+    void cancelWhileWaitingForPageToBeReady(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        setup.gotoPage(new LocalDocumentReference("PDFExportIT", "DelayedPageReady"), "view", "delay=17");
+        // We delayed the page ready in order to simulate a long PDF export, but we don't want to wait when viewing the
+        // page. We want to trigger the export right away.
+        markPageReady(setup);
+        ViewPage viewPage = new ViewPage();
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        // Trigger the export without waiting for the PDF file to be generated because we want to cancel the export.
+        exportOptions.triggerExport();
+
+        // Wait a bit to avoid canceling the export too early. We want to cancel it while the PDF export
+        // is waiting for the page to be ready because we want to check that the PDF export is stopped before the page
+        // ready timeout is reached (60 seconds by default). The content of the exported page is very simple, so it
+        // should reach fast enough the point where it waits for the web page to be ready.
+        Thread.sleep(3000);
+
+        // Cancel the export.
+        exportOptions.cancel();
+
+        // Close the modal.
+        exportOptions.close();
+    }
+
+    @Test
+    @Order(31)
+    void stopChromeWhileWaitingForPageToBeReady(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        // Reduce the page ready timeout to 10 seconds in order to check that the PDF export is aborted when it takes
+        // too long, even if the Chrome Docker container is stopped (or not responding).
+        setup.loginAsSuperAdmin();
+        PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
+        adminSection.setPageReadyTimeout("10");
+        adminSection.clickSave();
+
+        setup.loginAndGotoPage("John", "pass",
+            setup.getURL(new LocalDocumentReference("PDFExportIT", "DelayedPageReady"), "view", "delay=8"));
+        // We delayed the page ready in order to simulate a long PDF export, but we don't want to wait when viewing the
+        // page. We want to trigger the export right away.
+        markPageReady(setup);
+        ViewPage viewPage = new ViewPage();
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        // Trigger the export, without waiting for the PDF file to be generated because we want to stop the Chrome
+        // Docker container and check if the page ready timeout is respected.
+        exportOptions.triggerExport();
+
+        // Wait a bit to avoid stopping the Chrome Docker container too early. We want to stop it while the PDF export
+        // is waiting for the page to be ready (otherwise we don't reproduce the hanging). The content of the exported
+        // page is very simple, so it should reach fast enough the point where it waits for the web page to be ready.
+        Thread.sleep(3000);
+
+        // Stop the Chrome Docker container.
+        DockerTestUtils.cleanupContainersWithLabels(ContainerManager.DEFAULT_LABELS);
+
+        viewPage.waitForNotificationErrorMessage("Failed to export as PDF: The connection has been closed.");
+    }
+
+    private void markPageReady(TestUtils setup)
+    {
+        setup.getDriver().executeScript("document.documentElement.dataset.xwikiPageReady = 'true';");
+    }
+
     private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)
     {
         AdministrationPage adminPage = AdministrationPage.gotoPage();
         LocalizationAdministrationSectionPage sectionPage = adminPage.clickLocalizationSection();
         sectionPage.setMultiLingual(isMultiLingual);
         sectionPage.setDefaultLanguage("en");
-        sectionPage.setSupportedLanguages(Arrays.asList(supportedLanguages));
+        if (isMultiLingual) {
+            sectionPage.setSupportedLanguages(Arrays.asList(supportedLanguages));
+        }
         sectionPage.clickSave();
     }
 

@@ -53,15 +53,15 @@
     <xwiki.github.repository>xwiki-platform</xwiki.github.repository>
 
     <!-- Dependencies versions -->
-    <batik.version>1.18</batik.version>
+    <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.9.3</tika.version>
+    <tika.version>2.9.4</tika.version>
     <pdfbox.version>2.0.34</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.19</jetty.server.version>
+    <jetty.server.version>12.0.20</jetty.server.version>
     <jetty.client.version>10.0.25</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.0.Final</netty.version>
+    <netty.version>4.2.1.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.5.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
@@ -79,7 +79,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>24.8.5</libreoffice.version>
+    <libreoffice.version>24.8.6</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -110,7 +110,7 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.2.0</mysql.version>
+    <mysql.version>9.3.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.5.3</mariadb.version>
@@ -123,10 +123,10 @@
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.17.0.0</oracle.version>
-    
+
     <!-- Versions of Node related tools -->
-    <node.version>v22.13.1</node.version>
-    <npm.version>11.1.0</npm.version>
+    <node.version>v22.14.0</node.version>
+    <npm.version>11.2.0</npm.version>
   </properties>
   <scm>
     <tag>HEAD</tag>
@@ -648,7 +648,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.10</version>
+        <version>2.11</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -1187,15 +1187,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>2.7.16</version>
-        <exclusions>
-          <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
-          not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
-          <exclusion>
-            <groupId>org.webjars.npm</groupId>
-            <artifactId>vue__compiler-sfc</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>3.5.13</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

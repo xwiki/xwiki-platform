@@ -227,6 +227,12 @@
               <artifactId>xwiki-platform-extension-index</artifactId>
               <version>${project.version}</version>
             </dependency>
+            <!-- Distribution migrations not specific to a given extension.  -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-distribution-migrations</artifactId>
+              <version>${project.version}</version>
+            </dependency>
           </dependencies>
           <executions>
             <execution>

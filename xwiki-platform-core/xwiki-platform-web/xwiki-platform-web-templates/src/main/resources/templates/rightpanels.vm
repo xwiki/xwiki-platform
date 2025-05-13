@@ -22,7 +22,7 @@
 #if(!$request.getParameter("forceRightPanels"))
   <button id="rightPanelsToggle" class="btn btn-default" title="$escapetool.xml($services.localization.render('panels.column.right.toggle.hint'))">
     $services.icon.renderHTML('caret-right')
-    <div class="sr-only">$services.localization.render('panels.column.right.toggle.hint')</div>
+    <span class="sr-only">$services.localization.render('panels.column.right.toggle.hint')</span>
   </button>
 #end
 <div id="rightPanels" class="panels right panel-width-$!{rightPanelsWidth}"#if($showRightPanels != "1" && $request.getParameter("forceRightPanels")) style="display: none;"#end>

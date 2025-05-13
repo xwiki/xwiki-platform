@@ -539,7 +539,6 @@ define('xwiki-requiredrights-dialog', [
 
             // Display the dialog
             $(dialog.dialogElement).modal('show');
-            return dialog;
         }
     };
 });

@@ -99,7 +99,8 @@ public class DistributionInitializerListener implements EventListener
     {
         // Do nothing if the current distribution job was triggered already
         // Do nothing if the automatic start of DW is disabled
-        if (this.distributionManager.getCurrentDistributionJob() != null || !isAutoDistributionWizardEnabled(xcontext)) {
+        if (this.distributionManager.getCurrentDistributionJob() != null
+            || !isAutoDistributionWizardEnabled(xcontext)) {
             return;
         }
 
@@ -127,13 +128,6 @@ public class DistributionInitializerListener implements EventListener
     {
         return xcontext.isMainWiki() ? this.distributionConfiguration.isAutoDistributionWizardEnabledForMainWiki()
             : this.distributionConfiguration.isAutoDistributionWizardEnabledForWiki();
-    }
-
-    private boolean isInteractiveDistributionWizard(XWikiContext xcontext)
-    {
-        return xcontext.isMainWiki()
-            ? this.distributionConfiguration.isInteractiveDistributionWizardEnabledForMainWiki()
-            : this.distributionConfiguration.isInteractiveDistributionWizardEnabledForWiki();
     }
 
     private synchronized void startFarmJob()

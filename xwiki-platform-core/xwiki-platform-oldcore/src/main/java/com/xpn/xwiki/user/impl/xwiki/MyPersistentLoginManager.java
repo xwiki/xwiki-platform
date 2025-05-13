@@ -251,9 +251,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         setupCookie(rememberCookie, sessionCookie, secureCookie, cookieDomain, response);
 
         if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
-            String validationHash =
-                getValidationHash(protectedUsername, protectedPassword,
-                    HttpServletUtils.getClientIP(JakartaServletBridge.toJakarta(request)));
+            String validationHash = getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
                 Cookie validationCookie = new Cookie(getCookiePrefix() + COOKIE_VALIDATION, validationHash);
@@ -572,8 +570,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
             String cookieHash =
                 getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_VALIDATION, DEFAULT_VALUE);
-            String calculatedHash = getValidationHash(username, password,
-                HttpServletUtils.getClientIP(JakartaServletBridge.toJakarta(request)));
+            String calculatedHash = getValidationHash(username, password, getClientIP(request));
             if (cookieHash.equals(calculatedHash)) {
                 return true;
             } else {
@@ -667,6 +664,19 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             LOGGER.error("Error decypting text: " + encryptedText, e);
             return null;
         }
+    }
+
+    /**
+     * Returns the original client IP. Needed because request.getRemoteAddr returns the address of the last requesting
+     * host, which can be either the real client, or a proxy. The original method prevents logging in when using a
+     * cluster of reverse proxies in front of XWiki.
+     *
+     * @param request The servlet request.
+     * @return The IP of the actual client.
+     */
+    protected String getClientIP(HttpServletRequest request)
+    {
+        return HttpServletUtils.getClientIP(JakartaServletBridge.toJakarta(request));
     }
 
     /**

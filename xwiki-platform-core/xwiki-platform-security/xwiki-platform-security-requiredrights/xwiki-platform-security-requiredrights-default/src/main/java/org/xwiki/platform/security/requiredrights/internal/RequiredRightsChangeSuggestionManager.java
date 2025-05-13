@@ -39,7 +39,7 @@ import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
  * Proposes changes for required rights.
  *
  * @version $Id$
- * @since 17.1.0RC1
+ * @since 17.4.0RC1
  */
 @Singleton
 @Component(roles = RequiredRightsChangeSuggestionManager.class)

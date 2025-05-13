@@ -42,7 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Required right analyzer that specifically only analyzes the content and not XObjects or XClass of the document.
  *
  * @version $Id$
- * @since 17.1.0RC1
+ * @since 17.4.0RC1
  */
 @Component
 @Singleton

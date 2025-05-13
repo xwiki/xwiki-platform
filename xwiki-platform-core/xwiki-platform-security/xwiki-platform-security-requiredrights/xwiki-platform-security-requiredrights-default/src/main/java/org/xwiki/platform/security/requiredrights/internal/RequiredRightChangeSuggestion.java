@@ -32,7 +32,7 @@ import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
  *     analysis result to determine if the right is actually needed/not needed
  *
  * @version $Id$
- * @since 17.1.0RC1
+ * @since 17.4.0RC1
  */
 public record RequiredRightChangeSuggestion(boolean increasesRights, DocumentRequiredRight rightToRemove,
                                             DocumentRequiredRight rightToAdd, boolean requiresManualReview,

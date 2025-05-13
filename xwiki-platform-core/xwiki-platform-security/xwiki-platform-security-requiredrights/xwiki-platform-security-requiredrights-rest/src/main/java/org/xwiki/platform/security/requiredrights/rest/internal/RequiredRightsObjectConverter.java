@@ -45,7 +45,7 @@ import org.xwiki.security.requiredrights.rest.model.jaxb.RequiredRightAnalysisRe
  * Convert required rights objects to the REST API data types.
  *
  * @version $Id$
- * @since 17.3.0RC1
+ * @since 17.4.0RC1
  */
 @Component(roles = RequiredRightsObjectConverter.class)
 @Singleton

@@ -41,17 +41,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * A required rights analyzer that analyzes the passed document including all translations.
  *
- * // TODO: it would be awesome if we could simply add a cache here but the problem is that we include lots of
- * translations in the output and these translations depend on the current context at the moment that could include
- * translations that are only visible to a user or that also simply depend on the current user. Therefore, it isn't
- * that easy to cache the required rights analysis results. We might add a cache depending on the user, locale and
- * document reference but that doesn't seem that effective. A possibility could be to let the object suppliers
- * compute more data at display time and thereby remove the dependency on locale and user. This would really be nice
- * but also quite a change.
- * Another problem is that some macros could only be defined for the current user and therefore the macro analysis
- * also depends on the current user.
  * @version $Id$
- * @since 17.1.0RC1
+ * @since 17.4.0RC1
  */
 @Named("full")
 @Component
@@ -71,6 +62,14 @@ public class FullDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer<
     @Override
     public List<RequiredRightAnalysisResult> analyze(DocumentReference documentReference) throws RequiredRightsException
     {
+        // TODO: it would be awesome if we could simply add a cache here but the problem is that we include lots of
+        // translations in the output and these translations depend on the current context at the moment that could
+        // include translations that are only visible to a user or that also simply depend on the current user.
+        // Therefore, it isn't that easy to cache the required rights analysis results. We might add a cache
+        // depending on the user, locale and document reference but that doesn't seem that effective. A possibility
+        // could be to let the object suppliers compute more data at display time and thereby remove the dependency
+        // on locale and user. This would really be nice but also quite a change. Another problem is that some macros
+        // could only be defined for the current user and therefore the macro analysis also depends on the current user.
         XWikiDocument document;
         XWikiContext context = this.xWikiContextProvider.get();
         try {

@@ -45,7 +45,7 @@ import com.xpn.xwiki.XWikiException;
  * Default implementation of the {@link RequiredRightsRestResource}.
  *
  * @version $Id$
- * @since 17.3.0RC1
+ * @since 17.4.0RC1
  */
 @Component
 @Named("org.xwiki.platform.security.requiredrights.rest.internal.DefaultRequiredRightsRestResource")

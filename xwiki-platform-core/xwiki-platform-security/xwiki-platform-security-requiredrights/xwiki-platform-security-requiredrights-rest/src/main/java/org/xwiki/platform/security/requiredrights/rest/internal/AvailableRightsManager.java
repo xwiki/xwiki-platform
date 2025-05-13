@@ -47,7 +47,7 @@ import org.xwiki.user.UserReferenceSerializer;
  * Compute the available rights for the current user on a given document.
  *
  * @version $Id$
- * @since 17.3.0RC1
+ * @since 17.4.0RC1
  */
 @Component(roles = AvailableRightsManager.class)
 @Singleton

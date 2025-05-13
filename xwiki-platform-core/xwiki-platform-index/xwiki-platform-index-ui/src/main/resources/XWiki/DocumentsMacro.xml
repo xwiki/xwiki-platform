@@ -307,7 +307,7 @@ Generates:
   #set ($limit = $services.rendering.escape($xcontext.macro.params.count, 'xwiki/2.1'))
 #end
 #set ($propertiesStr = $services.rendering.escape($stringtool.join($properties, ','), 'xwiki/2.1'))
-#set ($filters = $xcontext.macro.params.filters)
+#set ($filters = $services.rendering.escape($xcontext.macro.params.filters, 'xwiki/2.1'))
 {{liveData
   id="$livedataId"
   properties="$propertiesStr"

@@ -259,43 +259,45 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
             && wikis.isMainWiki(getWiki())) {
             try {
                 Collection<String> wikiIds = wikis.getAllIds();
-                Thread distributionJobThread = new Thread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        // Create a clean Execution Context
-                        ExecutionContext context = new ExecutionContext();
-
-                        try {
-                            executionContextManager.initialize(context);
-                        } catch (ExecutionContextException e) {
-                            throw new RuntimeException("Failed to initialize wiki distribution job execution context",
-                                e);
-                        }
-
-                        for (String wikiId : wikiIds) {
-                            if (!wikis.isMainWiki(wikiId)) {
-                                try {
-                                    // Trigger the wiki distribution job only if it's not the case already
-                                    if (distributionManager.getWikiJob(wikiId) == null) {
-                                        logger.info("Start distribution job for wiki [{}]", wikiId);
-                                        distributionManager.startWikiJob(wikiId, false).join();
-                                        logger.info("Finished distribution job for wiki [{}]", wikiId);
-                                    }
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                        }
-                    }
-                });
+                Thread distributionJobThread = new Thread(() -> runSubWikiDistributions(wikiIds, wikis));
 
                 distributionJobThread.setDaemon(true);
                 distributionJobThread.setName("Wikis non-interfactive distribution jobs");
                 distributionJobThread.start();
             } catch (WikiManagerException e) {
                 this.logger.error("Failed to get the list of wikis. Sub-wikis ditribution jobs won't be triggered.", e);
+            }
+        }
+    }
+
+    private void runSubWikiDistributions(Collection<String> wikiIds, WikiDescriptorManager wikiManager)
+    {
+        // Create a clean Execution Context
+        ExecutionContext context = new ExecutionContext();
+
+        try {
+            this.executionContextManager.initialize(context);
+        } catch (ExecutionContextException e) {
+            throw new RuntimeException("Failed to initialize wiki distribution job execution context", e);
+        }
+
+        for (String wikiId : wikiIds) {
+            if (!wikiManager.isMainWiki(wikiId)) {
+                try {
+                    // Trigger the wiki distribution job only if it's not the case already
+                    if (this.distributionManager.getWikiJob(wikiId) == null) {
+                        this.logger.info("Start distribution job for wiki [{}]", wikiId);
+                        this.distributionManager.startWikiJob(wikiId, false).join();
+                        this.logger.info("Finished distribution job for wiki [{}]", wikiId);
+                    }
+                } catch (InterruptedException e) {
+                    // Sonar is not a fan of InterruptedException catching, and apparently throwing it
+                    // through a RuntimeException is not enough for it (but unfortunately we cannot
+                    // really throw much else in a Runnable)
+                    Thread.currentThread().interrupt();
+
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

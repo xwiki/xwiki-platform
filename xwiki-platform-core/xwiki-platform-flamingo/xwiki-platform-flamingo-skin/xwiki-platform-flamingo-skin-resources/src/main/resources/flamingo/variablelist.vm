@@ -95,6 +95,102 @@
     "table-bg-hover": "color",
     "table-border-color": "color"
 })
+
+############################################
+## XS specific variables
+############################################
+## List of all the variables set in XWiki standard for various purposes.
+#set($xsVariables = {
+    "figure-caption-font-size": "90%",
+    "figure-caption-color": "var(--text-muted)",
+    "target-size-minimum": "24px",
+    "target-size-recommended": "44px",
+    "border-width": "1px",
+    "headings-font-weight": "400",
+    "nav-tabs-active-link-hover-bg": "var(--xwiki-page-content-bg)",
+    "border-radius-base": "7px",
+    "border-radius-large": "10px",
+    "border-radius-small": "5px",
+    "button-spacing": "2px",
+    "button-border-width": "1px",
+    "edit-section-relative-height": ".7",
+    "main-padding": "calc(var(--grid-gutter-width) * 2)",
+    "font-size-headings-scale": "1.190",
+    "font-size-headings-scale-min": "1.125",
+    "min-screen-size": "768",
+    "max-screen-size": "1200",
+    "min-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 4))",
+    "max-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 4))",
+    "min-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 3))",
+    "max-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 3))",
+    "min-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 2))",
+    "max-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 2))",
+    "min-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 1))",
+    "max-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))",
+    "min-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), -1))",
+    "max-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))",
+    "min-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))",
+    "max-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 5))",
+    "font-size-document-title": "calc(max(var(--min-document-title-font-size) * 1px, min(var(--max-document-title-font-size) * 1px, var(--min-document-title-font-size) * 1px + (var(--max-document-title-font-size) - var(--min-document-title-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+    "font-size-h1": "calc(max(var(--min-h1-font-size), min(var(--max-h1-font-size), var(--min-h1-font-size) + (var(--max-h1-font-size) - var(--min-h1-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+    "font-size-h2": "calc(max(var(--min-h2-font-size), min(var(--max-h2-font-size), var(--min-h2-font-size) + (var(--max-h2-font-size) - var(--min-h2-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+    "font-size-h3": "calc(max(var(--min-h3-font-size), min(var(--max-h3-font-size), var(--min-h3-font-size) + (var(--max-h3-font-size) - var(--min-h3-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+    "font-size-h4": "calc(max(var(--min-h4-font-size), min(var(--max-h4-font-size), var(--min-h4-font-size) + (var(--max-h4-font-size) - var(--min-h4-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+    "font-size-h5": "var(--font-size-base)",
+    "font-size-h6": "calc(max(var(--min-h6-font-size), min(var(--max-h6-font-size), var(--min-h6-font-size) + (var(--max-h6-font-size) - var(--min-h6-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+    "navbar-default-link-color": "#727272",
+    "navbar-default-color": "#727272",
+    "input-color-placeholder": "#727272",
+    "breadcrumb-active-color": "#707070",
+    "breadcrumb-color": "#707070",
+    "text-muted": "#555",
+    "brand-primary": "#2f70a7",
+    "text-color": "#222222",
+    "btn-primary-bg": "#386da7",
+    "btn-danger-bg": "#ca302c",
+    "brand-success": "#077537",
+    "btn-warning-color": "#000",
+    "alert-danger-bg": "#f8ecec",
+    "alert-success-bg": "#e5f3df",
+    "alert-info-bg": "#e1f1f9",
+    "brand-danger": "#cc3333"
+})
+
+############################################
+## Bootstrap variables
+############################################
+## List of Bootstrap variables we need to give default values for XWiki standard variables shown above
+#set($bootstrapVariables = {
+    "btn-danger-color" : "#fff",
+    "btn-default-border" : "#ccc",
+    "btn-font-weight" : "normal",
+    "btn-info-color" : "#fff",
+    "btn-info-bg" : "var(--brand-info)",
+    "btn-warning-bg" : "var(--brand-warning)",
+    "breadcrumb-bg": "#f5f5f5",
+    "breadcrumb-link-color": "var(--link-color)",
+    "breadcrumb-separator": "/",
+    "component-active-color": "#fff",
+    "component-active-bg":"var(--brand-primary)",
+    "dropdown-border" : "rgba(0, 0, 0, .15)",
+    "dropdown-divider-bg" : "#e5e5e5",
+    "font-family-base": "var(--font-family-sans-serif)",
+    "font-family-sans-serif": '"Helvetica Neue", Helvetica, Arial, sans-serif',
+    "font-family-serif": 'Georgia, "Times New Roman", Times, serif',
+    "font-family-monospace": 'Georgia, "Times New Roman", Times, serif',
+    "font-size-base": "1rem",
+    "grid-gutter-width": "30px",
+    "input-bg" : "#fff",
+    "legend-color" : "#333",
+    "legend-border-color": "#e5e5e5",
+    "list-group-hover-bg": "#f5f5f5",
+    "list-group-link-color": "#555",
+    "list-group-link-hover-color": "var(--list-group-link-color)",
+    "navbar-height" : "50px",
+    "table-bg-hover": "#f5f5f5",
+    "table-border-color": "#ddd"
+})
+
 ############################################
 ## Old color theme variables
 ############################################

@@ -21,10 +21,12 @@ package org.xwiki.platform.security.requiredrights.rest;
 
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRequiredRights;
 import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRightsAnalysisResult;
 import org.xwiki.stability.Unstable;
 
@@ -48,4 +50,19 @@ public interface RequiredRightsRestResource
     @GET
     DocumentRightsAnalysisResult analyze(@PathParam("spaceName") @Encoded String spaceNames,
         @PathParam("pageName") String page, @PathParam("wikiName") String wiki) throws XWikiRestException;
+
+    /**
+     * Updates the required rights configuration for a document.
+     *
+     * @param spaceNames the space names of the document for which the required rights will be updated
+     * @param page the name of the document for which the required rights will be updated
+     * @param wiki the wiki of the document for which the required rights will be updated
+     * @param documentRequiredRights the new required rights configuration to be applied to the document
+     * @return the updated configuration of the required rights for the specified document
+     * @throws XWikiRestException if an error occurs while processing the update request
+     */
+    @PUT
+    DocumentRequiredRights updateRequiredRights(@PathParam("spaceName") @Encoded String spaceNames,
+        @PathParam("pageName") String page, @PathParam("wikiName") String wiki,
+        DocumentRequiredRights documentRequiredRights) throws XWikiRestException;
 }

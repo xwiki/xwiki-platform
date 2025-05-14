@@ -121,7 +121,14 @@ public class RequiredRightsObjectConverter
             .toList();
     }
 
-    private DocumentRequiredRights convertDocumentRequiredRights(
+    /**
+     * Converts the provided {@link org.xwiki.security.authorization.requiredrights.DocumentRequiredRights}
+     * instance to a new instance of {@link DocumentRequiredRights}.
+     *
+     * @param currentRights the current required rights of the document to be converted
+     * @return a new {@link DocumentRequiredRights} instance populated with the data from the given input
+     */
+    public DocumentRequiredRights convertDocumentRequiredRights(
         org.xwiki.security.authorization.requiredrights.DocumentRequiredRights currentRights)
     {
         return this.factory.createDocumentRequiredRights()

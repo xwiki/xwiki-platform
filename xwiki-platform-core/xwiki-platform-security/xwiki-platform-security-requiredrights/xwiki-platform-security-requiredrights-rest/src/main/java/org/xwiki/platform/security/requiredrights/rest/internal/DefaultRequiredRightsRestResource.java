@@ -35,11 +35,14 @@ import org.xwiki.platform.security.requiredrights.rest.RequiredRightsRestResourc
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRightsAnalysisResult;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 
 /**
  * Default implementation of the {@link RequiredRightsRestResource}.
@@ -60,6 +63,12 @@ public class DefaultRequiredRightsRestResource extends XWikiResource implements 
 
     @Inject
     private DocumentRequiredRightsManager documentRequiredRightsManager;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
+    @Inject
+    private DocumentRequiredRightsUpdater documentRequiredRightsUpdater;
 
     @Override
     public DocumentRightsAnalysisResult analyze(String spaceNames, String page, String wiki) throws XWikiRestException
@@ -82,4 +91,30 @@ public class DefaultRequiredRightsRestResource extends XWikiResource implements 
             throw new XWikiRestException("Failed analyzing required rights", e);
         }
     }
+
+    @Override
+    public org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRequiredRights updateRequiredRights(
+        String spaceNames, String page, String wiki,
+        org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRequiredRights documentRequiredRights)
+        throws XWikiRestException
+    {
+        try {
+            DocumentInfo documentInfo = getDocumentInfo(wiki, spaceNames, page, null, null, true, false);
+
+            Document doc = documentInfo.getDocument();
+
+            if (!this.authorization.hasAccess(Right.EDIT, doc.getDocumentReference())) {
+                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            }
+
+            this.documentRequiredRightsUpdater.updateRequiredRights(documentRequiredRights, doc);
+
+            return this.objectConverter.convertDocumentRequiredRights(
+                this.documentRequiredRightsManager.getRequiredRights(doc.getDocumentReference())
+                    .orElseThrow(() -> new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR)));
+        } catch (XWikiException | AuthorizationException e) {
+            throw new XWikiRestException(e);
+        }
+    }
+
 }

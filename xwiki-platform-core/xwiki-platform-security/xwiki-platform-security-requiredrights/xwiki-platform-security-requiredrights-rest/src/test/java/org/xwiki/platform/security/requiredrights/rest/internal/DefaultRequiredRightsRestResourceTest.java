@@ -20,6 +20,7 @@
 package org.xwiki.platform.security.requiredrights.rest.internal;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Named;
 
@@ -31,6 +32,9 @@ import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
+import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRequiredRights;
 import org.xwiki.security.requiredrights.rest.model.jaxb.DocumentRightsAnalysisResult;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -45,8 +49,10 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -74,6 +80,9 @@ class DefaultRequiredRightsRestResourceTest
 
     @MockComponent
     private RequiredRightsObjectConverter objectConverter;
+
+    @MockComponent
+    private DocumentRequiredRightsUpdater updater;
 
     @BeforeEach
     void setUp() throws Exception
@@ -109,5 +118,27 @@ class DefaultRequiredRightsRestResourceTest
         when(this.requiredRightAnalyzer.analyze(DOCUMENT_REFERENCE)).thenThrow(expectedException);
 
         assertThrows(XWikiRestException.class, () -> this.restResource.analyze("space", "page", "wiki"));
+    }
+
+    @Test
+    void updateRequiredRightsSucceeds() throws Exception
+    {
+        org.xwiki.security.authorization.requiredrights.DocumentRequiredRights updatedRequiredrights = mock();
+        DocumentRequiredRightsManager requiredRightsManager =
+            this.oldcore.getMocker().getInstance(DocumentRequiredRightsManager.class);
+        when(requiredRightsManager.getRequiredRights(DOCUMENT_REFERENCE))
+            .thenReturn(Optional.of(updatedRequiredrights));
+        DocumentRequiredRights expectedResponse = mock();
+        when(this.objectConverter.convertDocumentRequiredRights(updatedRequiredrights)).thenReturn(expectedResponse);
+
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.EDIT, DOCUMENT_REFERENCE))
+            .thenReturn(true);
+
+        DocumentRequiredRights inputRights = new DocumentRequiredRights().withEnforce(true);
+
+        assertEquals(expectedResponse, this.restResource.updateRequiredRights("space", "page", "wiki", inputRights));
+
+        verify(this.updater).updateRequiredRights(eq(inputRights),
+            argThat(doc -> doc.getDocumentReference().equals(DOCUMENT_REFERENCE)));
     }
 }

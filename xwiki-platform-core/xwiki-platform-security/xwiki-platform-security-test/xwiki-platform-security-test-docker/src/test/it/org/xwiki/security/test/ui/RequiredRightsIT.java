@@ -20,6 +20,7 @@
 package org.xwiki.security.test.ui;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -113,7 +114,7 @@ class RequiredRightsIT
         setup.rest().delete(testReference);
 
         ViewPage viewPage = setup.createPage(testReference, "Content");
-        enabledRequiredRights(viewPage);
+        enabledRequiredRights(viewPage, setup);
 
         // Add an HTML macro with wiki="true": in this case, script right might be needed, but no right might also be
         // enough.
@@ -160,7 +161,7 @@ class RequiredRightsIT
         setup.rest().delete(testReference);
 
         ViewPage viewPage = setup.createPage(testReference, "Content");
-        enabledRequiredRights(viewPage);
+        enabledRequiredRights(viewPage, setup);
 
         // HTML macro with clean=false definitely requires script right.
         WikiEditPage wikiEditPage = viewPage.editWiki();
@@ -208,12 +209,57 @@ class RequiredRightsIT
         requiredRightsModal.clickCancel();
     }
 
-    private static void enabledRequiredRights(ViewPage viewPage)
+    @ParameterizedTest
+    @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-security-requiredrights-ui")
+    @Order(4)
+    void testAllSupportedValues(WikiReference wiki, TestLocalReference testLocalReference, TestUtils setup)
+        throws Exception
+    {
+        DocumentReference testReference = new DocumentReference(testLocalReference, wiki);
+
+        setup.rest().delete(testReference);
+
+        ViewPage viewPage = setup.createPage(testReference, "Content");
+        enabledRequiredRights(viewPage, setup);
+
+        InformationPane informationPane = viewPage.openInformationDocExtraPane();
+
+        String previousRight = "";
+
+        Map<String, String> displayForRight =
+            Map.of("script", "Script right", "admin", "Admin right on the wiki level", "programming",
+                "Programming right");
+
+        for (Map.Entry<String, String> entry : displayForRight.entrySet()) {
+            String right = entry.getKey();
+            String display = entry.getValue();
+
+            RequiredRightsModal requiredRightsModal = informationPane.openRequiredRightsModal();
+            assertEquals(previousRight, requiredRightsModal.getEnforcedRequiredRight());
+
+            assertEquals(right, requiredRightsModal.setEnforcedRequiredRight(right));
+            requiredRightsModal.clickSave(true);
+
+            setup.getDriver().waitUntilCondition(driver -> informationPane.getRequiredRights().contains(display));
+            assertEquals(List.of(display), informationPane.getRequiredRights());
+
+            previousRight = right;
+        }
+
+        RequiredRightsModal requiredRightsModal = informationPane.openRequiredRightsModal();
+        assertEquals(previousRight, requiredRightsModal.getEnforcedRequiredRight());
+        requiredRightsModal.clickCancel();
+    }
+
+    private static void enabledRequiredRights(ViewPage viewPage, TestUtils setup)
     {
         InformationPane informationPane = viewPage.openInformationDocExtraPane();
         RequiredRightsModal requiredRightsModal = informationPane.openRequiredRightsModal();
         requiredRightsModal.setEnforceRequiredRights(true);
         requiredRightsModal.setEnforcedRequiredRight("");
         requiredRightsModal.clickSave(true);
+        setup.getDriver()
+            .waitUntilCondition(driver -> StringUtils.contains(informationPane.getRequiredRightsStatusMessage(),
+                "This page is enforcing required rights but no rights"));
     }
 }

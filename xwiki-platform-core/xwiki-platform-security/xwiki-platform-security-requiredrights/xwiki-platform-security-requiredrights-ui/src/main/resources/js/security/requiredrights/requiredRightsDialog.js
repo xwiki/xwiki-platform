@@ -27,6 +27,8 @@ define('xwiki-requiredrights-messages', {
         'modal.enforceOption',
         'modal.enforceOption.hint1',
         'modal.enforceOption.hint2',
+        'modal.unsupportedRights',
+        'modal.unsupportedRightItem',
         'modal.rightsSelection',
         'modal.rightsSelection.hint',
         'modal.required',
@@ -64,6 +66,9 @@ define('xwiki-requiredrights-dialog', [
     'xwiki-l10n!xwiki-requiredrights-messages'
 ], function (xm, $, l10n) {
     'use strict';
+
+    // Remove /translations/{language} from the REST URL if present
+    const restURL = xm.restURL.replace(/\/translations\/[^/]+$/, '') + '/requiredRights';
 
     class RequiredRightsDialog {
         constructor()
@@ -146,35 +151,41 @@ define('xwiki-requiredrights-dialog', [
             const selectedRightInput = this.dialogElement.querySelector('input[name="rights"]:checked');
             const enforceInput = this.dialogElement.querySelector('input[name="enforceRequiredRights"]:checked');
 
-            const formData = {
-                enforceRequiredRights: enforceInput.value,
-                form_token: xm.form_token
-            };
+            const updatedData = {
+                'enforce': enforceInput.value === '1',
+                'rights': []
+            }
 
             const selectedRight = selectedRightInput?.value ?? '';
-            if (selectedRight === '') {
-                // Delete the first object.
-                formData['deletedObjects'] = 'XWiki.RequiredRightClass_0';
-            } else {
-                formData['addedObjects'] = 'XWiki.RequiredRightClass_0';
-                // TODO: make this "wiki_admin" more generic.
-                formData['XWiki.RequiredRightClass_0_level'] =
-                    selectedRight === 'admin' ? 'wiki_admin' : selectedRight;
+            if (selectedRight !== '') {
+                updatedData.rights.push({'right': selectedRight, 'scope': selectedRightInput?.dataset.scope ?? null});
             }
-            const url = new XWiki.Document(xm.documentReference).getURL('save');
+
             const notification = new XWiki.widgets.Notification(l10n['saving.inProgress'], 'inprogress');
-            $.post(url, formData)
-                .then(() => {
-                    $(this.saveButton).trigger('xwiki:document:saved');
-                    notification.replace(new XWiki.widgets.Notification(l10n['saving.success'], 'done'));
-                    // Close the dialog
-                    $(this.dialogElement).modal('hide');
+            fetch(restURL, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        $(this.saveButton).trigger('xwiki:document:saveFailed');
+                        notification.replace(
+                            new XWiki.widgets.Notification(l10n.get('saving.error', response.statusText), 'error'));
+                    } else {
+                        $(this.saveButton).trigger('xwiki:document:saved');
+                        notification.replace(new XWiki.widgets.Notification(l10n['saving.success'], 'done'));
+                        // Close the dialog
+                        $(this.dialogElement).modal('hide');
+                    }
                 })
-                .catch(response => {
+                .catch(error => {
                     $(this.saveButton).trigger('xwiki:document:saveFailed');
+                    const errorMessage = error.message ? error.message : 'Unknown error';
                     notification.replace(
-                        new XWiki.widgets.Notification(l10n.get('saving.error', response.statusText), 'error'));
-                    return Promise.reject();
+                        new XWiki.widgets.Notification(l10n.get('saving.error', errorMessage), 'error'));
                 });
         }
 
@@ -217,12 +228,13 @@ define('xwiki-requiredrights-dialog', [
          * Adds a right to the list of rights.
          * @param labelText the human-readable name of the right
          * @param value the value of the right
+         * @param scope the scope of the right
          * @param checked whether the right is checked
          * @param disabled whether the right is disabled
          * @param status "required" if the right is required according to the analysis, "maybeRequired" if it might be
          * required according to the analysis.
          */
-        addRight(labelText, value, checked, disabled, status)
+        addRight(labelText, value, scope, checked, disabled, status)
         {
             const listItem = document.createElement('li');
             const labelWrapper = document.createElement('div');
@@ -236,6 +248,7 @@ define('xwiki-requiredrights-dialog', [
             inputElement.checked = checked;
             inputElement.value = value;
             inputElement.disabled = disabled;
+            inputElement.dataset.scope = scope;
             labelElement.append(inputElement, ' ', labelText);
 
             if (status !== "") {
@@ -317,9 +330,6 @@ define('xwiki-requiredrights-dialog', [
          * @return {Promise} A promise that resolves when the dialog is shown
          */
         show: async function () {
-            // Remove /translations/{language} from the REST URL if present
-            const restURL = xm.restURL.replace(/\/translations\/[^/]+$/, '') + '/requiredRights';
-
             const response = await fetch(restURL);
             const data = await response.json();
             // Create a bootstrap dialog to display the results
@@ -328,36 +338,39 @@ define('xwiki-requiredrights-dialog', [
             // Show the current rights.
             const currentRights = data.currentRights;
             const availableRights = data.availableRights;
-            const supportedRightScopes = {'script': 'DOCUMENT', 'admin': 'WIKI', 'programming': null};
 
-            function getScopeName(scope)
-            {
-                // TODO: localization
-                if (scope === null) {
-                    return 'farm';
+            let indexOfCurrentRight = 0;
+            const unsupportedRights = [];
+            for (const right of currentRights.rights) {
+                const rightIndex = availableRights.findIndex(r => r.right === right.right && r.scope === right.scope);
+                if (rightIndex !== -1) {
+                    // Keep the one with the highest index, which should be the most powerful right.
+                    if (rightIndex > indexOfCurrentRight) {
+                        indexOfCurrentRight = rightIndex;
+                    }
                 } else {
-                    return scope.toLowerCase();
+                    unsupportedRights.push(right);
                 }
             }
 
-            let currentRight = data.currentRights.enforce ? {
-                right: '',
-                scope: 'DOCUMENT'
-            } : null;
-            // Check if the configured right is supported.
-            if (currentRights.rights.length > 0
-                && currentRights.rights[0].scope === supportedRightScopes[currentRights.rights[0].right])
-            {
-                currentRight = currentRights.rights[0];
-            } else if (currentRights.rights.length > 0) {
-                // Display a warning that the configured right is not supported.
-                // TODO: use a proper warning box.
-                dialog.enforceSelectionElement.innerHTML = `
-                            <h2>Warning</h2>
-                            <p>The configured right is not supported. 
-                            The configured right is ${currentRights.rights[0].right} for the
-                                ${getScopeName(currentRights.rights[0].scope)} scope.</p>
-                        `;
+            const currentRight = availableRights[indexOfCurrentRight];
+
+            if (unsupportedRights.length > 0) {
+                const warningBox = document.createElement('div');
+                warningBox.className = 'box warningmessage';
+                const warningContent = document.createElement('div');
+                warningBox.appendChild(warningContent);
+                const warningParagraph = document.createElement('p');
+                warningContent.appendChild(warningParagraph);
+                warningParagraph.textContent = l10n['modal.unsupportedRights'];
+                const unsupportedRightsList = document.createElement('ul');
+                warningContent.appendChild(unsupportedRightsList);
+                unsupportedRights.forEach(right => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = l10n.get('modal.unsupportedRightItem', right.right, right.scope);
+                    unsupportedRightsList.appendChild(listItem);
+                });
+                dialog.enforceSelectionElement.appendChild(warningBox);
             }
 
             // Create the "Don't enforce" option.
@@ -386,7 +399,7 @@ define('xwiki-requiredrights-dialog', [
 
             // Display a nice visualization that shows the rights "Edit", "Script", "Wiki Admin" and "Programming" with the current right highlighted if it isn't null.
             availableRights.forEach(right => {
-                const checked = currentRight && currentRight.right === right.right;
+                const checked = currentRight.right === right.right && currentRight.scope === right.scope;
                 let status = '';
                 if (right.right === '' && right.definitelyRequiredRight) {
                     // Check if there is any right that is maybe required.
@@ -400,7 +413,7 @@ define('xwiki-requiredrights-dialog', [
                 } else if (right.maybeRequiredRight) {
                     status = 'maybeRequired';
                 }
-                dialog.addRight(right.displayName, right.right, checked, !right.hasRight, status);
+                dialog.addRight(right.displayName, right.right, right.scope, checked, !right.hasRight, status);
             });
 
             // Display the analysis results.
@@ -408,7 +421,7 @@ define('xwiki-requiredrights-dialog', [
             const analysisResults = data.analysisResults.map(result => {
                 // The client-side resolver isn't fully compatible with the entity references generated in Java.
                 result.entityReference =
-                    XWiki.Model.resolve(result.entityReference.replace(/^(object|class)_property/, '$1Property'));
+                    XWiki.Model.resolve(result.entityReference.replace(/^(object|class)_property/, '$1'));
                 return result;
             });
 

@@ -165,7 +165,12 @@
   var addFacetValueCheckbox = function(index) {
     // Create an id unique to the facet value.
     let facetContainer = $(this).parents('.search-facet').first();
-    $(this).attr('id', facetContainer.attr('data-name') + '-' + index.toString());
+    // We use the JQuery index, so that id indexes are reset across facetContainers.
+    // This allows more stable indexes: when reloading the facets after changing the filter for facet X,
+    // the ids of all the checkbox for facet X will keep the same index.
+    // This allows us to refocus exactly the element interacted with to make this filter change.
+    // This property is lost if multiple facets are changed in the query at once.
+    $(this).attr('id', facetContainer.attr('data-name') + '-' + facetContainer.find('a.itemName').index($(this)));
     // Initialize the checkbox.
     let checkBox = $(document.createElement('input')).attr('type', 'checkbox');
     checkBox.attr('aria-labelledby', $(this).attr('id'));
@@ -237,7 +242,9 @@
 
   var searchRequest = null;
 
-  var pushSearchUIState = function(viewURL) {
+  // ChangeTargetId is the id of the facet anchor that initiated this reload. We expect the focus to go back to this 
+  // place once the UI is reloaded.
+  var pushSearchUIState = function(viewURL, changeTargetId) {
     // If there is a request in progress, abort it to prevent its callback from being called.
     searchRequest &amp;&amp; searchRequest.abort();
     $('.search-ui').attr('aria-busy', true);
@@ -250,18 +257,20 @@
       window.history.replaceState &amp;&amp; window.history.replaceState(state, document.title);
       // Make sure the browser address bar reflects the new state (and thus the new state can be bookmarked).
       window.history.pushState &amp;&amp; window.history.pushState(state, document.title, viewURL);
+      document.getElementBy(changeTargetValue).focus();
+      document.querySelectorAll().querySelectorAll("[data-foo='1']")
     });
   };
 
   var reloadSearchUI = function(event) {
     event.preventDefault();
     var anchor = $(event.target).closest('a');
-    anchor.length &amp;&amp; $(document).trigger('xwiki:search:update', anchor.attr('href'));
+    anchor.length &amp;&amp; anchor.first().trigger('xwiki:search:update', anchor.attr('href'));
   };
 
   // Others (e.g. a custom facet) can trigger a search UI update by firing this event.
   $(document).on('xwiki:search:update', function(event, viewURL) {
-    pushSearchUIState(viewURL);
+    pushSearchUIState(viewURL, event.target.id);
   });
 
   $(window).on('popstate', function(event) {
@@ -713,7 +722,7 @@ a.search-result-highlightAll:after {
   border-bottom: none;
 }
 
-.search-facet-header {
+.search-facet-header label {
   color: $theme.titleColor;
   cursor: pointer;
   display: flex;
@@ -721,11 +730,11 @@ a.search-result-highlightAll:after {
   align-items: center;
 }
 
-.search-facet:last-of-type .search-facet-header:after {
+.search-facet:last-of-type .search-facet-header label:after {
   border: medium none;
 }
 
-.search-facet.expanded:last-of-type .search-facet-header:after {
+.search-facet.expanded:last-of-type .search-facet-header label:after {
   border-bottom: 1px dotted $theme.pageContentBackgroundColor;
   border-top: 1px dotted $theme.borderColor;
 }
@@ -747,7 +756,7 @@ a.search-result-highlightAll:after {
   padding: .1em .2em;
 }
 
-.search-facet .search-facet-header .facet-toggler, button.facet-value-toggler {
+.search-facet .search-facet-header  .facet-toggler, button.facet-value-toggler {
   background: transparent;
   transition: background-color .2s ease-in-out;
 }

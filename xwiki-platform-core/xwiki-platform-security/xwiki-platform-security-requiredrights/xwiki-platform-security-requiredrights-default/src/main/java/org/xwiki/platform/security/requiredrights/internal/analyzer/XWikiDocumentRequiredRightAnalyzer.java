@@ -68,7 +68,7 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
     {
         // Analyze the content
         try {
-            ArrayList<RequiredRightAnalysisResult> result =
+            List<RequiredRightAnalysisResult> result =
                 new ArrayList<>(this.contentRequiredRightAnalyzer.analyze(document));
 
             // Push the document into the context such that we, e.g., get the correct context wiki with the correct

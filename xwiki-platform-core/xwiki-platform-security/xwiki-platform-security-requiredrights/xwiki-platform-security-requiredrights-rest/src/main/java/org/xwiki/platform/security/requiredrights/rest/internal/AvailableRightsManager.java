@@ -133,8 +133,7 @@ public class AvailableRightsManager
         return this.localizationManager.getTranslationPlain(translationKey);
     }
 
-    private static int getIndexInConsideredRights(
-        RequiredRight requiredRight)
+    private static int getIndexInConsideredRights(RequiredRight requiredRight)
     {
         int index = -1;
         // Find the first considered right where scope and right match.

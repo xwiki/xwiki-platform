@@ -95,7 +95,7 @@ public class XWikiDocumentContentRequiredRightAnalyzer implements RequiredRightA
                 return result;
             }, document);
         } catch (Exception e) {
-            throw new RequiredRightsException("Error...", e);
+            throw new RequiredRightsException("Error analyzing document title and content.", e);
         }
     }
 }

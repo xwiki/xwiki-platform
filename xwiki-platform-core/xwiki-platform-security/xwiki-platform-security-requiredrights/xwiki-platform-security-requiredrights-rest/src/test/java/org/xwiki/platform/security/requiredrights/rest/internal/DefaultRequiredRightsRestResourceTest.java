@@ -22,7 +22,7 @@ package org.xwiki.platform.security.requiredrights.rest.internal;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

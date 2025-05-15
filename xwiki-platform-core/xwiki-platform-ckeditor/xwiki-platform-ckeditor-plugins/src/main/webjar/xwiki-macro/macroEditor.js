@@ -29,213 +29,25 @@ define('macroEditorTranslationKeys', [], [
 ]);
 
 /**
- * Macro Parameter Tree Builder
- *
- * The result is a JavaScript plain object with a structure similar to this:
- *
- *   [
- *     {
- *       type: 'parameter',
- *       data: {...}
- *     },
- *     {
- *       // The children of this node provide the same feature so only one of them needs to be set.
- *       type: 'group-single',
- *       data: {
- *         feature: '...'
- *       },
- *       children: [
- *         {
- *           type: 'parameter',
- *           data: {...}
- *         },
- *         {
- *           // This node groups related parameters, any can be set.
- *           type: 'group-multiple',
- *           data: {...},
- *           children: [
- *             {
- *               type: 'parameter',
- *               data: {...}
- *             },
- *             ...
- *           ]
- *         },
- *         {
- *           type: 'parameter',
- *           data: {...}
- *         }
- *       ]
- *     },
- *     {
- *       type: 'parameter',
- *       data: {...}
- *     }
- *   ];
- */
-define('macroParameterTreeBuilder', ['jquery', 'l10n!macroEditor'], function($, translations) {
-  'use strict';
-
-  var buildMacroParameterTree = function(macroDescriptor) {
-    var parameter, macroParameterTree = {children: []};
-    // Add the macro parameter groups specified in the macro descriptor.
-    $.each(macroDescriptor.groupDescriptorTree, function(groupId, groupDescriptor) {
-      addMacroParameterGroupTreeNode(macroParameterTree, groupDescriptor);
-    });
-    // Add the macro parameters specified in the macro descriptor.
-    if (macroDescriptor.parameterDescriptorMap) {
-      for (var parameterId in macroDescriptor.parameterDescriptorMap) {
-        if (macroDescriptor.parameterDescriptorMap.hasOwnProperty(parameterId)) {
-          parameter = $.extend({}, macroDescriptor.parameterDescriptorMap[parameterId]);
-          parameter.name = parameter.name || parameter.id;
-          addMacroParameterTreeNode(parameter, macroParameterTree, macroDescriptor);
-        }
-      }
-    }
-    // Handle the macro content as a special macro parameter.
-    if (macroDescriptor.contentDescriptor) {
-      parameter = $.extend({
-        id: '$content',
-        name: translations.get('content')
-      }, macroDescriptor.contentDescriptor);
-      addMacroParameterTreeNode(parameter, macroParameterTree, macroDescriptor);
-    }
-    // Group parameters by feature.
-    groupMacroParametersByFeature(macroParameterTree);
-    return macroParameterTree;
-  },
-
-  addMacroParameterGroupTreeNode = function(parentNode, groupDescriptor) {
-    var groupNode = {
-      type: 'group-multiple',
-      data: $.extend({}, groupDescriptor),
-      children: []
-    };
-    delete groupNode.data.groups;
-    $.each(groupDescriptor.groups, function(childGroupId, childGroupDescriptor) {
-      addMacroParameterGroupTreeNode(groupNode, childGroupDescriptor);
-    });
-    parentNode.children.push(groupNode);
-  },
-
-  addMacroParameterTreeNode = function(parameter, macroParameterTree, macroDescriptor) {
-    var parentNode = macroParameterTree;
-    if (Array.isArray(parameter.group)) {
-      parameter.group.forEach(function(groupId) {
-        var childNode = getChildNode(parentNode, groupId);
-        if (!childNode) {
-          parentNode.children.push({
-            type: 'group-multiple',
-            data: {
-              id: groupId,
-              name: groupId,
-              children: []
-            }
-          });
-        }
-        parentNode = childNode;
-      });
-    }
-    parentNode.children.push({
-      type: 'parameter',
-      data: parameter
-    });
-  },
-
-  getChildNode = function(parent, id) {
-    for (var i = 0; parent.children && i < parent.children.length; i++) {
-      var child = parent.children[i];
-      if (child.data && child.data.id === id) {
-        return child;
-      }
-    }
-  },
-
-  groupMacroParametersByFeature = function(parentNode) {
-    var featureGroupNodes = {};
-    var children = [];
-    parentNode.children.forEach(function(childNode) {
-      if (childNode.children) {
-        groupMacroParametersByFeature(childNode);
-      }
-      if (childNode.data && childNode.data.feature) {
-        var featureGroupNode = featureGroupNodes[childNode.data.feature];
-        if (!featureGroupNode) {
-          featureGroupNodes[childNode.data.feature] = featureGroupNode = {
-            type: 'group-single',
-            data: {feature: childNode.data.feature},
-            children: []
-          };
-          children.push(featureGroupNode);
-        }
-        featureGroupNode.children.push(childNode);
-      } else {
-        children.push(childNode);
-      }
-    });
-    parentNode.children = children;
-  };
-
-  return {
-    build:  buildMacroParameterTree
-  };
-});
-
-/**
  * Macro Parameter Tree Sorter
  */
-define('macroParameterTreeSorter', ['jquery'], function($) {
+define('macroParameterEnhancer', ['jquery'], function($) {
   'use strict';
 
-  var sortMacroParameterTree = function(parentNode, macroCall, hiddenMacroParameters) {
-    if (parentNode.children) {
-      // We need to be able to compare parameters and groups.
-      parentNode.data = $.extend({
-        hidden: true,
-        mandatory: false,
-        value: false,
-        advanced: true,
-        index: Infinity
-      }, parentNode.data);
-      parentNode.children.forEach(function(childNode) {
-        sortMacroParameterTree(childNode, macroCall, hiddenMacroParameters);
-        // The parent is hidden if all the children are hidden.
-        parentNode.data.hidden = parentNode.data.hidden && childNode.data.hidden === true;
-        // The parent is mandatory if at least one child is mandatory.
-        parentNode.data.mandatory = parentNode.data.mandatory || childNode.data.mandatory;
-        // The parent has value if at least one child has value.
-        parentNode.data.value = parentNode.data.value ||
-          (childNode.data.hasOwnProperty('value') && childNode.data.value !== false);
-        // The parent is advanced if all the children are advanced.
-        parentNode.data.advanced = parentNode.data.advanced && childNode.data.advanced === true;
-        // The parent index is the minimum index from its children.
-        parentNode.data.index = Math.min(parentNode.data.index, childNode.data.index);
-      });
-      // Sort the child nodes.
-      parentNode.children.sort(compareMacroParameterTreeNodes);
-      // Add parameter separator (More).
-      addParameterSeparator(parentNode.children);
-    } else if (parentNode.type === 'parameter') {
-      maybeSetParameterValue(parentNode.data, macroCall);
-      maybeHideParameter(parentNode.data, hiddenMacroParameters);
+  var enhanceMacroParameters = function(macroDescriptor, macroCall) {
+    for (let parameterId in macroDescriptor.parametersMap) {
+      let parameter = macroDescriptor.parametersMap[parameterId];
+      maybeSetParameterValue(parameter, macroCall);
+      maybeHideParameter(parameter);
     }
   },
 
   maybeSetParameterValue = function(parameter, macroCall) {
-    if (parameter.id === '$content') {
-      // We set the parameter value even if it's empty because we want the macro content to have the priority of a
-      // macro parameter that is explicitly set. This means that the macro content text area will be displayed on top
-      // of the macro parameters that don't have a value set.
-      if (typeof macroCall.content === 'string') {
-        parameter.value = macroCall.content;
-      }
-    } else {
-      var parameterCall = macroCall.parameters[parameter.id.toLowerCase()];
-      // Check if the macro parameter is set.
-      if (parameterCall !== null && parameterCall !== undefined) {
-        parameter.value = (typeof parameterCall === 'object' && typeof parameterCall.name === 'string') ?
-          parameterCall.value : parameterCall;
-      }
+    var parameterCall = macroCall.parameters[parameter.id.toLowerCase()];
+    // Check if the macro parameter is set.
+    if (parameterCall !== null && parameterCall !== undefined) {
+      parameter.value = (typeof parameterCall === 'object' && typeof parameterCall.name === 'string') ?
+        parameterCall.value : parameterCall;
     }
   },
 
@@ -243,12 +55,10 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
    * The following macro parameters should be hidden:
    * - parameters marked as "display hidden" in the descriptor and not having any value set
    * - deprecated parameters that don't have a value set
-   * - parameters that can be edited in-place (as long as they are not mandatory and without a value set)
    */
-  maybeHideParameter = function(parameter, hiddenMacroParameters) {
+  maybeHideParameter = function(parameter) {
     // We can't hide mandatory parameters that don't have a value set.
-    parameter.hidden = isHiddenParameterAndNoValue(parameter) || isDeprecatedParameterUnset(parameter) ||
-        hiddenMacroParameters.indexOf(parameter.id) >= 0;
+    parameter.hidden = isHiddenParameterAndNoValue(parameter) || isDeprecatedParameterUnset(parameter);
   },
 
   isHiddenParameterAndNoValue = function(macroParameter) {
@@ -259,83 +69,10 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
 
   isDeprecatedParameterUnset = function(macroParameter) {
     return macroParameter.deprecated && macroParameter.value === undefined;
-  },
-
-  compareMacroParameterTreeNodes = function(alice, bob) {
-    return compareMacroParameters(alice.data, bob.data);
-  },
-
-  macroParameterComparators = [
-    // Put the hidden macro parameters first to prevent the macro parameter separator (More) from showing them.
-    function (alice, bob) {
-      return bob.hidden - alice.hidden;
-    },
-    // Then mandatory parameters..
-    function (alice, bob) {
-      return bob.mandatory - alice.mandatory;
-    },
-    // ..and parameters with value.
-    function (alice, bob) {
-      var aliceHasValue = alice.hasOwnProperty('value') && alice.value !== false;
-      var bobHasValue = bob.hasOwnProperty('value') && bob.value !== false;
-      return bobHasValue - aliceHasValue;
-    },
-    // Put advanced parameters last.
-    function (alice, bob) {
-      return !!alice.advanced - !!bob.advanced;
-    },
-    // Finally, use the macro descriptor order (lower index first).
-    function (alice, bob) {
-      return alice.index - bob.index;
-    }
-  ],
-
-  compareMacroParameters = function(alice, bob) {
-    for (var i = 0; i < macroParameterComparators.length; i++) {
-      var result = macroParameterComparators[i](alice, bob);
-      if (result !== 0) {
-        return result;
-      }
-    }
-    return 0;
-  },
-
-  addParameterSeparator = function(childNodes) {
-    // TODO: The the complexity can onlu be lowered. Once below the default maxcomplexity (10 at the time of writing), 
-    //  the jshint annotation can be removed.
-    /*jshint maxcomplexity:14 */
-    // Skip hidden nodes (they should be at the start).
-    var offset = 0;
-    while (offset < childNodes.length && childNodes[offset].data.hidden) {
-      offset++;
-    }
-    var i = offset;
-    // Show all the mandatory parameters and those that have been set.
-    while (i < childNodes.length && (childNodes[i].data.mandatory ||
-        (childNodes[i].data.hasOwnProperty('value') && childNodes[i].data.value !== false))) {
-      i++;
-    }
-    var limit = 3;
-    // Show simple parameters until we reach the limit.
-    while (i < childNodes.length && i < (offset + limit) && !childNodes[i].data.advanced) {
-      i++;
-    }
-    // If there are no mandatory parameters and no parameter is set and all parameters are advanced then we're forced
-    // to show some advanced parameters.
-    if (i === offset) {
-      i = Math.min(childNodes.length, offset + limit);
-    }
-    // Show a 'more' link to toggle the remaining parameters.
-    if (i > offset && i < childNodes.length) {
-      childNodes.splice(i, 0, {type: 'more'});
-    // Show a message for the empty list of parameters.
-    } else if (childNodes.length === 0) {
-      childNodes.push({type: 'empty'});
-    }
   };
 
   return {
-    sort:  sortMacroParameterTree
+    enhance: enhanceMacroParameters
   };
 });
 
@@ -347,8 +84,19 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
 
   var displayMacroParameterTree = function(macroParameterTree, requiredSkinExtensions) {
     var output = $('<div></div>');
-    output.append(macroParameterTree.children.map(displayMacroParameterTreeNode));
-    output.find('.more').on('click', toggleMacroParameters).click();
+    if (macroParameterTree.mandatoryNodes.length < 1 && macroParameterTree.optionalNodes.length < 1) {
+      output.append($('<li class="empty"></li>').text(translations.get('noParameters')));
+    } else {
+      output.append(macroParameterTree.mandatoryNodes.map(key => {
+        let node = macroParameterTree.parametersMap[key];
+        return displayMacroParameterTreeNode(node, true);
+      }));
+      output.append(macroParameterTree.optionalNodes.map(key => {
+        let node = macroParameterTree.parametersMap[key];
+        return displayMacroParameterTreeNode(node, false);
+      }));
+    }
+
     output.find('a[role="tab"]').on('click', function(event) {
       event.preventDefault();
       $(this).tab('show');
@@ -358,14 +106,11 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     return output.children();
   },
 
-  displayMacroParameterTreeNode = function(node) {
+  displayMacroParameterTreeNode = function(node, isMandatory) {
     switch (node.type) {
-      case 'group-multiple': return displayMultipleChoiceGroup(node);
-      case 'group-single': return displaySingleChoiceGroup(node);
-      case 'parameter': return displayMacroParameter(node.data);
-      case 'more': return $('<li class="more"><span class="arrow arrow-down"></span> <a href="#more"></a></li>')
-        .find('a').text(translations.get('more')).end();
-      case 'empty': return $('<li class="empty"></li>').text(translations.get('noParameters'));
+      case 'GROUP': return displayMultipleChoiceGroup(node, isMandatory);
+      case 'FEATURE': return displaySingleChoiceGroup(node, isMandatory);
+      case 'PARAMETER': return displayMacroParameter(node, isMandatory);
     }
   },
 
@@ -381,31 +126,34 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       '</div>' +
     '</li>',
 
-  displayMultipleChoiceGroup = function(groupNode) {
+  displayMultipleChoiceGroup = function(groupNode, isMandatory) {
     var output = $(macroParameterGroupTemplate).addClass('multiple-choice');
-    fillNodeTab(groupNode, output.find('.macro-parameter-group-name'), output.find('.macro-parameter-group-members'));
+    fillNodeTab(groupNode,
+        output.find('.macro-parameter-group-name'),
+        output.find('.macro-parameter-group-members'),
+        isMandatory);
     toggleMacroParameterGroupVisibility(output);
     return output;
   },
 
   // The given node can be a group or a parameter.
-  fillNodeTab = function(node, tab, tabPanel) {
-    var id = 'macroParameterTreeNode-' + node.data.id;
+  fillNodeTab = function(node, tab, tabPanel, isMandatory) {
+    var id = 'macroParameterTreeNode-' + node.id;
     tab.attr({
       'href': '#' + id,
       'aria-controls': id
-    }).text(node.data.name);
+    }).text(node.name);
     // If the given node is a parameter (no children) then we handle it as a group with a single parameter.
     var childNodes = node.children || [node];
-    tabPanel.attr('id', id).append(childNodes.map(displayMacroParameterTreeNode));
+    tabPanel.attr('id', id).append(childNodes.map(node => displayMacroParameterTreeNode(node, isMandatory)));
     // Hide the parameter name if there is only one child node and its name matches the name used on the tab.
     if (childNodes.length === 1 && childNodes[0].data && childNodes[0].data.name === node.data.name) {
       tabPanel.find('.macro-parameter-name').hide();
     }
   },
 
-  displaySingleChoiceGroup = function(groupNode) {
-    var output = $(macroParameterGroupTemplate).addClass('single-choice').attr('data-feature', groupNode.data.feature);
+  displaySingleChoiceGroup = function(groupNode, isMandatory) {
+    var output = $(macroParameterGroupTemplate).addClass('single-choice').attr('data-feature', groupNode.id);
     var tabs = output.find('ul[role="tablist"]');
     var tabTemplate = tabs.children().remove();
     var tabPanels = output.find('.tab-content');
@@ -415,7 +163,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       var tabPanel = tabPanelTemplate.clone().appendTo(tabPanels);
       // Some of the child nodes might be hidden so we will activate the first visible tab at the end.
       tab.add(tabPanel).removeClass('active').toggleClass('hidden', !!childNode.data.hidden);
-      fillNodeTab(childNode, tab.children().first(), tabPanel);
+      fillNodeTab(childNode, tab.children().first(), tabPanel, isMandatory);
     });
     // Activate the first visible tab.
     var activeTab = tabs.children().not('.hidden').first();
@@ -438,9 +186,9 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       '<div class="macro-parameter-description"></div>' +
     '</li>',
 
-  displayMacroParameter = function(parameter) {
+  displayMacroParameter = function(parameter, isMandatory) {
     var output = $(macroParameterTemplate);
-    output.attr('data-id', parameter.id).attr('data-type', parameter.type);
+    output.attr('data-id', parameter.id).attr('data-type', parameter.displayType);
     output.find('.macro-parameter-name').text(parameter.name);
     output.find('.macro-parameter-description').text(parameter.description);
     output.toggleClass('mandatory', !!parameter.mandatory);
@@ -496,18 +244,6 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     // We pass the value as an array in order to properly handle radio inputs and checkboxes.
     valueInputs.val(Array.isArray(value) ? value : [value]);
     return field;
-  },
-
-  toggleMacroParameters = function(event) {
-    event.preventDefault();
-    var toggle = $(this);
-    toggle.nextAll().toggleClass('hidden');
-    var arrow = toggle.find('.arrow');
-    if (arrow.hasClass('arrow-down')) {
-      arrow.removeClass('arrow-down').addClass('arrow-right');
-    } else {
-      arrow.removeClass('arrow-right').addClass('arrow-down');
-    }
   };
 
   return {
@@ -520,10 +256,10 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
  */
 define(
   'macroEditor',
-  ['jquery', 'modal', 'l10n!macroEditor', 'macroService', 'macroParameterTreeBuilder', 'macroParameterTreeSorter',
+  ['jquery', 'modal', 'l10n!macroEditor', 'macroService', 'macroParameterEnhancer',
     'macroParameterTreeDisplayer', 'bootstrap'],
   // jshint maxparams:false
-  function($, $modal, translations, macroService, macroParameterTreeBuilder, macroParameterTreeSorter,
+  function($, $modal, translations, macroService, macroParameterEnhancer,
     macroParameterTreeDisplayer)
 {
   'use strict';
@@ -535,22 +271,22 @@ define(
       '<ul class="macro-parameters"></ul>' +
     '</div>',
 
-  createMacroEditor = function(macroCall, macroDescriptor) {
-    var macroEditor = $(macroEditorTemplate);
+  createMacroEditor = function(macroCall, macroDescriptorData) {
+    let macroDescriptor = macroDescriptorData.descriptor;
+    let macroEditor = $(macroEditorTemplate);
     macroEditor.find('.macro-name').text(macroDescriptor.name);
     macroEditor.find('.macro-description').text(macroDescriptor.description);
-    var macroParameterTree = macroParameterTreeBuilder.build(macroDescriptor);
-    macroParameterTreeSorter.sort(macroParameterTree, macroCall, this.data('hiddenMacroParameters'));
-    macroEditor.find('.macro-parameters').append(macroParameterTreeDisplayer.display(macroParameterTree,
-      macroDescriptor.requiredSkinExtensions));
+    macroParameterEnhancer.enhance(macroDescriptor, macroCall);
+    macroEditor.find('.macro-parameters').append(macroParameterTreeDisplayer
+        .display(macroDescriptor, macroDescriptorData.requiredSkinExtensions));
     this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
     $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
   },
 
-  maybeCreateMacroEditor = function(requestNumber, macroCall, macroDescriptor) {
+  maybeCreateMacroEditor = function(requestNumber, macroCall, macroDescriptorData) {
     // Check if the macro descriptor corresponds to the last request.
     if (this.prop('requestNumber') === requestNumber) {
-      createMacroEditor.call(this, macroCall, macroDescriptor);
+      createMacroEditor.call(this, macroCall, macroDescriptorData);
       this.trigger('ready');
     }
   },
@@ -594,22 +330,22 @@ define(
       return null;
     }
     var macroCall = {
-      name: macroDescriptor.id.id,
+      name: macroDescriptor.id,
       content: undefined,
       parameters: {}
     };
     // Note that we include the empty content in the macro call (instead of leaving it undefined) because we want to
     // generate {{macro}}{{/macro}} instead of {{macro/}} when the macro supports content.
-    if (typeof formData.$content === 'string' && macroDescriptor.contentDescriptor) {
+    if (typeof formData.$content === 'string' && macroDescriptor.parametersMap["PARAMETER:$content"]) {
       macroCall.content = formData.$content;
     }
     for (var parameterId in formData) {
       // The parameter descriptor map keys are lower case for easy lookup (macro parameter names are case insensitive).
-      var parameterDescriptor = macroDescriptor.parameterDescriptorMap[parameterId.toLowerCase()];
+      var parameterDescriptor = macroDescriptor.parametersMap[parameterId.toLowerCase()];
       if (parameterDescriptor) {
         var value = formData[parameterId];
         if (Array.isArray(value)) {
-          value = isBooleanType(parameterDescriptor.type) ? value[0] : value.join();
+          value = isBooleanType(parameterDescriptor.displayType) ? value[0] : value.join();
         }
         var defaultValue = parameterDescriptor.defaultValue;
         if (value !== '' && (defaultValue === undefined || defaultValue === null || (defaultValue + '') !== value)) {
@@ -666,7 +402,6 @@ define(
 
   load = function(input, macroEditor) {
     var macroEditorAPI = macroEditor.data('macroEditorAPI');
-    macroEditor.data('hiddenMacroParameters', input.hiddenMacroParameters || []);
     var macroCall = input.macroCall || {
       name: input.macroId,
       parameters: {}

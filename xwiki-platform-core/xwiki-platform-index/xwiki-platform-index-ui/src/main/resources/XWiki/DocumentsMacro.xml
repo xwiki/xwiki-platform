@@ -307,13 +307,16 @@ Generates:
   #set ($limit = $services.rendering.escape($xcontext.macro.params.count, 'xwiki/2.1'))
 #end
 #set ($propertiesStr = $services.rendering.escape($stringtool.join($properties, ','), 'xwiki/2.1'))
-#set ($filters = $services.rendering.escape($xcontext.macro.params.filters, 'xwiki/2.1'))
+#set ($filtersDeclared = $xcontext.macro.params.parameterNames.contains('filters'))
+#if ($filtersDeclared)
+  #set ($filters = $services.rendering.escape($xcontext.macro.params.filters, 'xwiki/2.1'))
+#end
 {{liveData
   id="$livedataId"
   properties="$propertiesStr"
   source="liveTable"
   sourceParameters="$escapetool.url($sourceParameters)"
-  #if ($filters) filters="$filters"#end
+  #if ($filtersDeclared) filters="$filters"#end
   #if ($description != '')description="$description"#end
   #if ($properties.contains('doc.location'))sort="doc.location"#end
   #if ($limit != '')limit="$limit"#end

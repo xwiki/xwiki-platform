@@ -1159,24 +1159,6 @@ public class Document extends Api
     }
 
     /**
-     * Creates a new XObject from the given class reference.
-     *
-     * @param classReference the reference to the class of the XObject to be created
-     * @return the index of the newly created XObject
-     * @throws XWikiException if an error occurs while creating the XObject
-     * @since 17.4.0RC1
-     */
-    @Unstable
-    public int createNewObject(EntityReference classReference) throws XWikiException
-    {
-        int index = getDoc().createXObject(classReference, getXWikiContext());
-
-        updateAuthor();
-
-        return index;
-    }
-
-    /**
      * Creates a New XWiki Object of the given classname
      *
      * @param classname the classname used
@@ -1199,8 +1181,11 @@ public class Document extends Api
     @Unstable
     public Object newObject(EntityReference classReference) throws XWikiException
     {
-        int nb = createNewObject(classReference);
-        return getObject(classReference, nb);
+        int index = getDoc().createXObject(classReference, getXWikiContext());
+
+        updateAuthor();
+
+        return getObject(classReference, index);
     }
 
     /**

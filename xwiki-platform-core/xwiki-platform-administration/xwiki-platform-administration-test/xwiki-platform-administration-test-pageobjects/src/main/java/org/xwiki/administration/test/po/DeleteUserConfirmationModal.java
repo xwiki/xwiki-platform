@@ -50,7 +50,7 @@ public class DeleteUserConfirmationModal extends ConfirmationModal
     /**
      * @return the href value of the message displayed when removing a user with script rights
      * @since 17.4.0RC1
-     * @since 16.10.8
+     * @since 16.10.9
      */
     public String getScriptRightUserErrorMessageHrefValue()
     {

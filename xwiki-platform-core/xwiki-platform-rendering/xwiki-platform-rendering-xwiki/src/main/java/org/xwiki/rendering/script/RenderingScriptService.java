@@ -38,6 +38,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.util.ui.MacroDescriptorUI;
+import org.xwiki.rendering.internal.util.ui.MacroParametersHelper;
 import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
 import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
@@ -92,6 +94,9 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private XWikiSyntaxEscaper escaper;
+
+    @Inject
+    private MacroParametersHelper macroParametersHelper;
 
     /**
      * @return the list of syntaxes for which a Parser is available
@@ -308,5 +313,20 @@ public class RenderingScriptService implements ScriptService
     public Set<String> getHiddenMacroCategories()
     {
         return this.macroCategoryManager.getHiddenCategories();
+    }
+
+    public MacroDescriptorUI getMacroDescriptorUI(String macroIdAsString)
+    {
+        try {
+            MacroId macroId = this.macroIdFactory.createMacroId(macroIdAsString);
+            if (this.macroManager.exists(macroId, true)) {
+                MacroDescriptor descriptor = this.macroManager.getMacro(macroId).getDescriptor();
+                return this.macroParametersHelper.buildMacroDescriptorUI(descriptor);
+            }
+        } catch (ParseException | MacroLookupException e) {
+            this.logger.warn("Failed to resolve macro id [{}]. Root cause is: [{}]", macroIdAsString,
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+        return null;
     }
 }

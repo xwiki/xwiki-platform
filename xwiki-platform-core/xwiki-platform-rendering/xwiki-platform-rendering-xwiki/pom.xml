@@ -68,6 +68,16 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-displayer</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-velocity</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <!-- For parsing the CSS from the style attribute. -->
       <groupId>net.sourceforge.cssparser</groupId>
       <artifactId>cssparser</artifactId>

@@ -54,6 +54,7 @@ import org.xwiki.user.UserReferenceSerializer;
 public class AvailableRightsManager
 {
     private static final List<DocumentRequiredRight> CONSIDERED_RIGHTS = List.of(
+        // The "None" option isn't really a right and thus represented as "null" here.
         new DocumentRequiredRight(null, EntityType.DOCUMENT),
         new DocumentRequiredRight(Right.SCRIPT, EntityType.DOCUMENT),
         new DocumentRequiredRight(Right.ADMIN, EntityType.WIKI),

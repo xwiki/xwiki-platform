@@ -26,12 +26,12 @@
   </parent>
   <artifactId>xwiki-platform-security-requiredrights-ui</artifactId>
   <name>XWiki Platform - Security - Required Rights - UI</name>
-  <description>UI for setting and analyzing required rights.</description>
+  <description>Manage the required rights of a document.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Required Rights UI</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->
-    <xwiki.extension.category>api</xwiki.extension.category>
+    <xwiki.extension.category>uix</xwiki.extension.category>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -64,10 +63,10 @@ import com.xpn.xwiki.XWikiContext;
  * Displays information about the required rights in the document information.
  *
  * @version $Id$
+ * @since 17.4.0RC1
  */
 @Component
 @Named(RequiredRightsInfoUIExtension.ROLE_HINT)
-@Priority(100)
 @Singleton
 public class RequiredRightsInfoUIExtension implements UIExtension
 {
@@ -294,6 +293,8 @@ public class RequiredRightsInfoUIExtension implements UIExtension
     @Override
     public Map<String, String> getParameters()
     {
+        // Use an order of 600 that is a natural continuation of the "core" extensions in the left column that have
+        // 100-500 in steps of 100.
         return Map.of("order", "600");
     }
 }

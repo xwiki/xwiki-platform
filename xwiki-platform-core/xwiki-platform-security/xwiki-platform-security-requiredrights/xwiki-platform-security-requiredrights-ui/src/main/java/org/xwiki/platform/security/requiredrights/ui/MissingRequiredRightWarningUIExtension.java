@@ -54,10 +54,14 @@ import com.xpn.xwiki.XWikiContext;
  * Displays a warning above the content if required rights are missing.
  *
  * @version $Id$
+ * @since 17.4.0RC1
  */
 @Component
 @Named(MissingRequiredRightWarningUIExtension.ROLE_HINT)
-@Priority(100)
+// This priority orders the UI extension as the used UIXP doesn't explicitly sort the UIX.
+// Use a lower number than the default (1000) to have the warning before standard UI extensions that might care more
+// about being close to the content.
+@Priority(900)
 @Singleton
 public class MissingRequiredRightWarningUIExtension implements UIExtension
 {

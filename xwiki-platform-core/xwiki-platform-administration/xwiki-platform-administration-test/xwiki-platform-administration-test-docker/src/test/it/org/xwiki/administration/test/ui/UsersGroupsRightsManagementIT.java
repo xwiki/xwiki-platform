@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.CreateGroupModal;
+import org.xwiki.administration.test.po.DeleteUserConfirmationModal;
 import org.xwiki.administration.test.po.EditGroupModal;
 import org.xwiki.administration.test.po.GroupEditPage;
 import org.xwiki.administration.test.po.GroupsPage;
@@ -417,5 +418,27 @@ class UsersGroupsRightsManagementIT
         groupEditPage.getMembersTable().filterColumn("Member", groupName.substring(2));
         assertEquals(1, groupEditPage.getMembersTable().countRows());
         groupEditPage.getMembersTable().assertRow("Member", userName);
+    }
+
+    @Test
+    @Order(8)
+    void deleteUserWithScriptRights(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        String scriptUserName = testReference.getLastSpaceReference().getName();
+        String scriptUserPassword = "password";
+        setup.createUser(scriptUserName, scriptUserPassword, "");
+        setup.setGlobalRights( "", "XWiki.%s".formatted(scriptUserName), "script", true);
+        setup.login(scriptUserName, scriptUserPassword);
+        setup.createPage(testReference, "");
+        setup.loginAsSuperAdmin();
+        UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
+        usersPage.getUsersLiveData().getTableLayout().filterColumn("User", scriptUserName);
+        usersPage.disableUser(1);
+        DeleteUserConfirmationModal deleteUserConfirmationModal = usersPage.clickDeleteUser(1);
+        assertEquals("/xwiki/bin/view/Main/AllDocs?doc.author=XWiki.%s".formatted(scriptUserName),
+            deleteUserConfirmationModal.getScriptRightUserErrorMessageHrefValue());
+        deleteUserConfirmationModal.clickOk();
+        assertEquals(0, usersPage.getUsersLiveData().getTableLayout().countRows());
     }
 }

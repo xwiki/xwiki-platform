@@ -26,7 +26,7 @@
   </parent>
   <artifactId>xwiki-platform-security-requiredrights-rest</artifactId>
   <name>XWiki Platform - Security - Required Rights - REST</name>
-  <description>REST API for getting the required rights analysis results of a document.</description>
+  <description>REST API for getting, analyzing, and updating the required rights of a document.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Required Rights REST API</xwiki.extension.name>

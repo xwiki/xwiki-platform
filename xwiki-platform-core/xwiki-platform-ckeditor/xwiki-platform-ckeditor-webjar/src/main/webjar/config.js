@@ -174,6 +174,7 @@ CKEDITOR.editorConfig = function(config) {
       'xwiki-maximize',
       'xwiki-office',
       'xwiki-realtime',
+      'xwiki-rights',
       'xwiki-save',
       'xwiki-selection',
       'xwiki-slash',

@@ -33,6 +33,8 @@
   Deactivate the popover on non editable entries by setting the trigger configuration to manual.
   Since we don't do anything manually, that make the popover disabled.
   -->
+  <!-- We explicitly disable expanded in the aria prop as otherwise a aria-expanded attribute is
+  produced on a non-iteractive div element. -->
   <tippy
     class="displayer-actions-popover"
     :interactive="true"
@@ -43,6 +45,9 @@
     ref="tippy"
     :ignore-attributes="true"
     :z-index="99999"
+    tabindex="0"
+    :aria="{expanded: false}"
+    tag="div"
   >
     <div
       :class="{ view: isView, edit: !isView, editable: isEditable }"

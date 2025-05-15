@@ -53,7 +53,7 @@ public class XMLErrorHandler implements ErrorHandler
     {
         // I couldn't find a way to ignore this error by configuration of the validaor.  Instead, the error is
         // ignored by it's label.
-        // TODO: see XWIKI-23197 for enabling this validation.
+        // TODO: see XWIKI-23198 for enabling this validation.
         if (!Objects.equals(e.getMessage(),
             "Trailing slash on void elements has no effect and interacts badly with unquoted attribute values."))
         {

@@ -223,12 +223,12 @@
     #set ($facetPrettyName = $facetField.name)
   #end
   &lt;div class="search-facet-header"&gt;
-    &lt;span id="$escapetool.xml($facetField.name)-toggler-hint"&gt;$escapetool.xml($facetPrettyName)&lt;/span&gt;
-    &lt;button class="btn btn-xs facet-toggler"
+    &lt;label&gt;$escapetool.xml($facetPrettyName)
+    &lt;button class="btn btn-xs facet-toggle"
       aria-controls="$escapetool.xml($facetField.name)-dropdown"
-      aria-labelledby="$escapetool.xml($facetField.name)-toggler-hint"&gt;
       $services.icon.renderHTML('caret-down')
     &lt;/button&gt;
+    &lt;/label&gt;
   &lt;/div&gt;
 #end
 
@@ -301,7 +301,8 @@
     #set ($discard = $queryStringParameters.putAll($customQueryStringParameters))
   #end
   #extendQueryString($url $queryStringParameters)
-  &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"&gt;
+  &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '')empty#end"
+    #if ($facetValue.name != '')data-facetvalue="$facetValue.name"#end&gt;
     #if ($facetValue.name == '')
       #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")
       #if (!$services.localization.get($facetPrettyValueKey))

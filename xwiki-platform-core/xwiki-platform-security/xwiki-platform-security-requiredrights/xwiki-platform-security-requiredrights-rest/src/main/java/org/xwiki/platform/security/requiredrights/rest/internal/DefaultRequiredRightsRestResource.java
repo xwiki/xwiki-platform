@@ -56,7 +56,7 @@ import com.xpn.xwiki.api.Document;
 public class DefaultRequiredRightsRestResource extends XWikiResource implements RequiredRightsRestResource
 {
     @Inject
-    @Named("full")
+    @Named("withTranslations")
     private RequiredRightAnalyzer<DocumentReference> requiredRightAnalyzer;
 
     @Inject

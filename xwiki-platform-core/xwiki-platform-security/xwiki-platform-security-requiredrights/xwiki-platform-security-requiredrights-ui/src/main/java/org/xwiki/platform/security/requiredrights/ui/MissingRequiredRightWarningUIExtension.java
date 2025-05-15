@@ -82,7 +82,7 @@ public class MissingRequiredRightWarningUIExtension implements UIExtension
     private RequiredRightsChangeSuggestionManager suggestionManager;
 
     @Inject
-    @Named("full")
+    @Named("withTranslations")
     private RequiredRightAnalyzer<DocumentReference> requiredRightAnalyzer;
 
     @Inject

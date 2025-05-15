@@ -44,10 +44,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 17.4.0RC1
  */
-@Named("full")
+@Named("withTranslations")
 @Component
 @Singleton
-public class FullDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer<DocumentReference>
+public class WithTranslationsDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer<DocumentReference>
 {
     @Inject
     private RequiredRightAnalyzer<XWikiDocument> requiredRightAnalyzer;

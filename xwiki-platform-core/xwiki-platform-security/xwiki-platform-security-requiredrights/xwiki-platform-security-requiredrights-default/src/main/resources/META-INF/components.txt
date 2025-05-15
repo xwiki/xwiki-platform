@@ -14,7 +14,7 @@ org.xwiki.platform.security.requiredrights.internal.analyzer.PropertyClassRequir
 org.xwiki.platform.security.requiredrights.internal.analyzer.ScriptMacroAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.SkinExtensionObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.XClassWikiContentAnalyzer
-org.xwiki.platform.security.requiredrights.internal.analyzer.FullDocumentRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.analyzer.WithTranslationsDocumentRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.display.TranslationMessageSupplierProvider
 org.xwiki.platform.security.requiredrights.internal.display.BaseCollectionBlockSupplierProvider
 org.xwiki.platform.security.requiredrights.internal.display.BaseObjectBlockSupplierProvider

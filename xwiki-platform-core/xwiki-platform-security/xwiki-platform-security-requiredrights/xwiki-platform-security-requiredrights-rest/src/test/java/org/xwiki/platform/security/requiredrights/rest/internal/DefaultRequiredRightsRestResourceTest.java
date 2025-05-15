@@ -75,7 +75,7 @@ class DefaultRequiredRightsRestResourceTest
     private DefaultRequiredRightsRestResource restResource;
 
     @MockComponent
-    @Named("full")
+    @Named("withTranslations")
     private RequiredRightAnalyzer<DocumentReference> requiredRightAnalyzer;
 
     @MockComponent

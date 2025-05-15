@@ -51,6 +51,9 @@ define('xwiki-requiredrights-messages', {
         'saving.inProgress',
         'saving.success',
         'saving.error',
+        'contentUpdate.inProgress',
+        'contentUpdate.done',
+        'contentUpdate.failed',
         'right.script',
         'right.programming',
         'right.admin'
@@ -71,8 +74,9 @@ define('xwiki-requiredrights-dialog', [
     const restURL = xm.restURL.replace(/\/translations\/[^/]+$/, '') + '/requiredRights';
 
     class RequiredRightsDialog {
-        constructor()
+        constructor(currentRights)
         {
+            this.currentRights = currentRights;
             // TODO: verify if this is all correct and required.
             this.dialogElement = document.createElement('div');
             this.dialogElement.className = 'modal fade';
@@ -165,7 +169,8 @@ define('xwiki-requiredrights-dialog', [
             fetch(restURL, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify(updatedData)
             })
@@ -175,10 +180,20 @@ define('xwiki-requiredrights-dialog', [
                         notification.replace(
                             new XWiki.widgets.Notification(l10n.get('saving.error', response.statusText), 'error'));
                     } else {
-                        $(this.saveButton).trigger('xwiki:document:saved');
-                        notification.replace(new XWiki.widgets.Notification(l10n['saving.success'], 'done'));
-                        // Close the dialog
-                        $(this.dialogElement).modal('hide');
+                        response.text().then(updatedRightsJSON => {
+                            if (updatedRightsJSON !== JSON.stringify(this.currentRights)) {
+                                // Only trigger the events if the rights have actually changed.
+                                $(this.saveButton).trigger('xwiki:document:saved');
+                                $(this.saveButton).trigger('xwiki:document:requiredRightsUpdated', {
+                                    previousRequiredRights: this.currentRights,
+                                    savedRequiredRights: JSON.parse(updatedRightsJSON),
+                                    documentReference: XWiki.currentDocument.documentReference
+                                });
+                            }
+                            notification.replace(new XWiki.widgets.Notification(l10n['saving.success'], 'done'));
+                            // Close the dialog
+                            $(this.dialogElement).modal('hide');
+                        });
                     }
                 })
                 .catch(error => {
@@ -333,11 +348,9 @@ define('xwiki-requiredrights-dialog', [
             const response = await fetch(restURL);
             const data = await response.json();
             // Create a bootstrap dialog to display the results
-            const dialog = new RequiredRightsDialog();
-            // Add a click event listener to the advanced toggle
-            // Show the current rights.
             const currentRights = data.currentRights;
             const availableRights = data.availableRights;
+            const dialog = new RequiredRightsDialog(currentRights);
 
             let indexOfCurrentRight = 0;
             const unsupportedRights = [];
@@ -577,3 +590,41 @@ require(['jquery', 'xwiki-requiredrights-dialog'], function ($, dialog) {
         });
     });
 });
+
+require(['jquery', 'xwiki-l10n!xwiki-requiredrights-messages'], function ($, l10n) {
+    $(document).on('xwiki:document:requiredRightsUpdated.viewMode', function (event, data) {
+        const contentWrapper = $('#xwikicontent').not('[contenteditable]');
+        if (contentWrapper.length && XWiki.currentDocument.documentReference.equals(data.documentReference)) {
+            const notification = new XWiki.widgets.Notification(l10n['contentUpdate.inProgress'], 'inprogress');
+            return loadContent().then(output => {
+                // Update the displayed document title and content.
+                $('#document-title h1').html(output.renderedTitle);
+                contentWrapper.html(output.renderedContent);
+                // Let others know that the DOM has been updated, in order to enhance it.
+                $(document).trigger('xwiki:dom:updated', {'elements': contentWrapper.toArray()});
+                notification.replace(new XWiki.widgets.Notification(l10n['contentUpdate.done'], 'done'));
+            }).catch(() => {
+                notification.replace(new XWiki.widgets.Notification(l10n['contentUpdate.failed'], 'error'));
+            });
+        }
+
+        function loadContent()
+        {
+            const data = {
+                // Get only the document content and title (without the header, footer, panels, etc.)
+                xpage: 'get',
+                // The displayed document title can depend on the rights.
+                outputTitle: 'true'
+            };
+            return $.get(XWiki.currentDocument.getURL('view'), new URLSearchParams(data).toString())
+                .then(function (html) {
+                    // Extract the rendered title and content.
+                    const container = $('<div></div>').html(html);
+                    return {
+                        renderedTitle: container.find('#document-title h1').html(),
+                        renderedContent: container.find('#xwikicontent').html()
+                    };
+                });
+        }
+    })
+})

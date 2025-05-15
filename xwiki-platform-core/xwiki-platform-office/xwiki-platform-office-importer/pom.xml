@@ -34,7 +34,7 @@
     <!-- Skipping revapi since xwiki-platform-legacy-office-importer wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
-    <jodconverter.version>4.4.8</jodconverter.version>
+    <jodconverter.version>4.4.9</jodconverter.version>
   </properties>
   <dependencies>
     <dependency>

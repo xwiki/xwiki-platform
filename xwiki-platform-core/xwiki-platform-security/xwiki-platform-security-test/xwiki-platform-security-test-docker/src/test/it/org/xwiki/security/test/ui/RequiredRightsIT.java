@@ -251,6 +251,34 @@ class RequiredRightsIT
         requiredRightsModal.clickCancel();
     }
 
+    @ParameterizedTest
+    @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-security-requiredrights-ui")
+    @Order(5)
+    void testContentReload(WikiReference wiki, TestLocalReference testLocalReference, TestUtils setup) throws Exception
+    {
+        DocumentReference testReference = new DocumentReference(testLocalReference, wiki);
+
+        setup.rest().delete(testReference);
+
+        ViewPage viewPage = setup.createPage(testReference, "{{velocity}}Content{{/velocity}}");
+        // Without required rights, the script macro is regularly executed.
+        assertEquals("Content", viewPage.getContent());
+        assertFalse(viewPage.hasRenderingError());
+
+        // Enable required rights, this should break displaying the script macro and display a warning.
+        enabledRequiredRights(viewPage, setup);
+        assertTrue(viewPage.hasRequiredRightsWarning(true));
+        setup.getDriver().waitUntilCondition(driver -> viewPage.hasRenderingError());
+
+        // Enable the required script right, this should fix the script macro.
+        RequiredRightsModal requiredRightsModal = viewPage.openRequiredRightsModal();
+        requiredRightsModal.setEnforcedRequiredRight("script");
+        requiredRightsModal.clickSave(true);
+        setup.getDriver().waitUntilCondition(driver -> !viewPage.hasRequiredRightsWarning(false));
+        setup.getDriver().waitUntilCondition(driver -> !viewPage.hasRenderingError());
+        assertEquals("Content", viewPage.getContent());
+    }
+
     private static void enabledRequiredRights(ViewPage viewPage, TestUtils setup)
     {
         InformationPane informationPane = viewPage.openInformationDocExtraPane();

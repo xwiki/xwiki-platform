@@ -182,7 +182,7 @@ define('xwiki-requiredrights-dialog', [
             this.dialogElement.setAttribute('aria-labelledby', 'required-rights-dialog-label');
             this.dialogElement.innerHTML = `
                         <div class="modal-dialog" role="document">
-                            <div class="modal-content">
+                            <form class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal"></button>
                                     <h2 class="modal-title" id="required-rights-dialog-label"></h2>
@@ -207,9 +207,9 @@ define('xwiki-requiredrights-dialog', [
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal"></button>
-                                    <button type="button" class="btn btn-primary"></button>
+                                    <button class="btn btn-primary"></button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     `;
             this.dialogElement.querySelector('.modal-title').textContent = l10n['modal.label'];
@@ -219,6 +219,7 @@ define('xwiki-requiredrights-dialog', [
             this.dialogElement.querySelector('.btn-default').textContent = l10n['modal.cancel'];
             this.dialogElement.querySelector('.btn-primary').textContent = l10n['modal.save'];
             this.saveButton = this.dialogElement.querySelector('.modal-footer .btn-primary');
+            this.formElement = this.dialogElement.querySelector('form.modal-content');
             this.enforceSelectionElement = this.dialogElement.querySelector('.enforce-selection');
             this.advancedToggle = this.dialogElement.querySelector('.required-rights-advanced-toggle');
             this.advancedToggle.querySelector('.icon-collapsed').append(iconLoader.getIconElement('caret-right'));
@@ -236,7 +237,10 @@ define('xwiki-requiredrights-dialog', [
                 event.preventDefault();
                 this.toggleAdvanced();
             });
-            this.saveButton.addEventListener('click', this.save.bind(this));
+            this.formElement.addEventListener('submit', event => {
+                event.preventDefault();
+                this.save();
+            });
         }
 
         toggleAdvanced()

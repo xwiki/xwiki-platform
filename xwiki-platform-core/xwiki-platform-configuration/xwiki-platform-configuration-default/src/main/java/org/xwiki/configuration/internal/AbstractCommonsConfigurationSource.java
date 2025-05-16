@@ -25,11 +25,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
-
 import org.apache.commons.configuration2.Configuration;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.properties.ConverterManager;
 
 /**
  * Wrap a Commons Configuration instance into a XWiki {@link ConfigurationSource}. This allows us to reuse the
@@ -39,17 +37,18 @@ import org.xwiki.properties.ConverterManager;
  * @version $Id$
  * @since 1.6M1
  */
-public class CommonsConfigurationSource implements ConfigurationSource
+public abstract class AbstractCommonsConfigurationSource extends AbstractPropertiesConfigurationSource
+    implements Initializable
 {
-    /**
-     * Component used for performing type conversions.
-     */
-    @Inject
-    protected ConverterManager converterManager;
-
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private Configuration configuration;
+
+    protected AbstractCommonsConfigurationSource()
+    {
+        // Enable system overwrite
+        this.systemOverwriteEnabled = true;
+    }
 
     protected Configuration getConfiguration()
     {
@@ -63,25 +62,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T getProperty(String key, T defaultValue)
-    {
-        T result;
-        if (containsKey(key)) {
-            if (defaultValue != null) {
-                return getProperty(key, (Class<T>) defaultValue.getClass());
-            } else {
-                return getProperty(key);
-            }
-        } else {
-            result = defaultValue;
-        }
-
-        return result;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getProperty(String key)
+    protected <T> T getPropertyInternal(String key)
     {
         this.lock.readLock().lock();
 
@@ -94,9 +75,9 @@ public class CommonsConfigurationSource implements ConfigurationSource
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T getProperty(String key, Class<T> valueClass)
+    protected <T> T getPropertyInternal(String key, Class<T> valueClass)
     {
-        T result = null;
+        T result;
 
         try {
             if (String.class == valueClass) {
@@ -106,10 +87,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
             } else if (Properties.class.isAssignableFrom(valueClass)) {
                 result = (T) getProperties(key);
             } else {
-                Object value = getProperty(key);
-                if (value != null) {
-                    result = this.converterManager.convert(valueClass, value);
-                }
+                result = getConvertedProperty(key, valueClass, null);
             }
         } catch (org.apache.commons.configuration2.ex.ConversionException
             | org.xwiki.properties.converter.ConversionException e) {
@@ -154,25 +132,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
     }
 
     @Override
-    public List<String> getKeys()
-    {
-        this.lock.readLock().lock();
-
-        try {
-            List<String> keysList = new ArrayList<>();
-            Iterator<String> keys = getConfiguration().getKeys();
-            while (keys.hasNext()) {
-                keysList.add(keys.next());
-            }
-
-            return keysList;
-        } finally {
-            this.lock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public boolean containsKey(String key)
+    protected boolean containsKeyInternal(String key)
     {
         this.lock.readLock().lock();
 
@@ -184,12 +144,57 @@ public class CommonsConfigurationSource implements ConfigurationSource
     }
 
     @Override
-    public boolean isEmpty()
+    protected List<String> getKeysInternal()
+    {
+        return getKeysInternal("");
+    }
+
+    @Override
+    protected List<String> getKeysInternal(String prefix)
+    {
+        this.lock.readLock().lock();
+
+        try {
+            List<String> keysList = new ArrayList<>();
+            for (Iterator<String> keys = getConfiguration().getKeys(); keys.hasNext();) {
+                String key = keys.next();
+                if (key.startsWith(prefix)) {
+                    keysList.add(key);
+                }
+            }
+
+            return keysList;
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    protected boolean isEmptyInternal()
     {
         this.lock.readLock().lock();
 
         try {
             return getConfiguration().isEmpty();
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    protected boolean isEmptyInternal(String prefix)
+    {
+        this.lock.readLock().lock();
+
+        try {
+            for (Iterator<String> keys = getConfiguration().getKeys(); keys.hasNext();) {
+                String key = keys.next();
+                if (key.startsWith(prefix)) {
+                    return false;
+                }
+            }
+
+            return true;
         } finally {
             this.lock.readLock().unlock();
         }

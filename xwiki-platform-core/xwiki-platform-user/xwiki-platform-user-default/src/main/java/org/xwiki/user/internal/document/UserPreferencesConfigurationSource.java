@@ -30,7 +30,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.configuration.internal.AbstractConfigurationSource;
+import org.xwiki.configuration.internal.AbstractSystemOverwriteConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
@@ -48,7 +48,7 @@ import org.xwiki.user.UserReferenceResolver;
 @Component
 @Named("user")
 @Singleton
-public class UserPreferencesConfigurationSource extends AbstractConfigurationSource
+public class UserPreferencesConfigurationSource extends AbstractSystemOverwriteConfigurationSource
 {
     @Inject
     @Named("normaluser")
@@ -70,43 +70,55 @@ public class UserPreferencesConfigurationSource extends AbstractConfigurationSou
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     @Override
-    public <T> T getProperty(String key, T defaultValue)
+    public <T> T getPropertyInternal(String key, T defaultValue)
     {
         return getConfigurationSource().getProperty(key, defaultValue);
     }
 
     @Override
-    public <T> T getProperty(String key, Class<T> valueClass)
+    public <T> T getPropertyInternal(String key, Class<T> valueClass)
     {
         return getConfigurationSource().getProperty(key, valueClass);
     }
 
     @Override
-    public <T> T getProperty(String key)
+    public <T> T getPropertyInternal(String key)
     {
         return getConfigurationSource().getProperty(key);
     }
 
     @Override
-    public List<String> getKeys()
+    public List<String> getKeysInternal()
     {
         return getConfigurationSource().getKeys();
     }
 
     @Override
-    public boolean containsKey(String key)
+    public List<String> getKeysInternal(String prefix)
+    {
+        return getConfigurationSource().getKeys(prefix);
+    }
+
+    @Override
+    public boolean containsKeyInternal(String key)
     {
         return getConfigurationSource().containsKey(key);
     }
 
     @Override
-    public boolean isEmpty()
+    public boolean isEmptyInternal()
     {
         return getConfigurationSource().isEmpty();
     }
 
     @Override
-    public <T> T getProperty(String key, Class<T> valueClass, T defaultValue)
+    public boolean isEmptyInternal(String prefix)
+    {
+        return getConfigurationSource().isEmpty(prefix);
+    }
+
+    @Override
+    public <T> T getPropertyInternal(String key, Class<T> valueClass, T defaultValue)
     {
         return getConfigurationSource().getProperty(key, valueClass, defaultValue);
     }

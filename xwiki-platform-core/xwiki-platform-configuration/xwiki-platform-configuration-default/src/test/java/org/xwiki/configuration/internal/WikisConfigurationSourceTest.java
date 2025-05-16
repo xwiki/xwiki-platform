@@ -139,11 +139,20 @@ class WikisConfigurationSourceTest extends AbstractTestDocumentConfigurationSour
     void isEmpty() throws Exception
     {
         assertFalse(this.wikisConfigSource.isEmpty());
+        assertTrue(this.wikisConfigSource.isEmpty("prefix"));
+        assertFalse(this.wikisConfigSource.isEmpty("co"));
+        assertFalse(this.wikisConfigSource.isEmpty("en"));
 
         removeConfigObject(SUBWIKI_CONFIG_DOCREF);
         assertFalse(this.wikisConfigSource.isEmpty());
+        assertTrue(this.wikisConfigSource.isEmpty("prefix"));
+        assertFalse(this.wikisConfigSource.isEmpty("co"));
+        assertFalse(this.wikisConfigSource.isEmpty("en"));
 
         removeConfigObject(MAINWIKI_CONFIG_DOCREF);
         assertTrue(this.wikisConfigSource.isEmpty());
+        assertTrue(this.wikisConfigSource.isEmpty("prefix"));
+        assertTrue(this.wikisConfigSource.isEmpty("co"));
+        assertTrue(this.wikisConfigSource.isEmpty("en"));
     }
 }

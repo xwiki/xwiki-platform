@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -36,9 +37,8 @@ import org.apache.commons.collections4.EnumerationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.internal.AbstractSystemOverwriteConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.properties.ConverterManager;
 
@@ -51,7 +51,7 @@ import org.xwiki.properties.ConverterManager;
 @Component
 @Named(XWikiCfgConfigurationSource.ROLEHINT)
 @Singleton
-public class XWikiCfgConfigurationSource implements ConfigurationSource, Initializable
+public class XWikiCfgConfigurationSource extends AbstractSystemOverwriteConfigurationSource
 {
     /**
      * The name of the JDNI variable.
@@ -77,6 +77,14 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     private String configurationLocation;
 
     /**
+     * Enabled system configuration overwrite.
+     */
+    public XWikiCfgConfigurationSource()
+    {
+        this.systemOverwriteEnabled = true;
+    }
+
+    /**
      * @return the location where to find the configuration
      */
     public static String getConfigPath()
@@ -99,6 +107,8 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     @Override
     public void initialize() throws InitializationException
     {
+        super.initialize();
+
         this.configurationLocation = getConfigPath();
 
         try (InputStream xwikicfgis = loadConfiguration()) {
@@ -174,7 +184,7 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     // ConfigurationSource
 
     @Override
-    public <T> T getProperty(String key, T defaultValue)
+    public <T> T getPropertyInternal(String key, T defaultValue)
     {
         String value = getProperty(key);
 
@@ -186,7 +196,7 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     }
 
     @Override
-    public <T> T getProperty(String key, Class<T> valueClass)
+    public <T> T getPropertyInternal(String key, Class<T> valueClass)
     {
         String value = getProperty(key);
 
@@ -194,27 +204,69 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     }
 
     @Override
-    public <T> T getProperty(String key)
+    protected <T> T getPropertyInternal(String key, Class<T> valueClass, T defaultValue)
+    {
+        String value = getProperty(key);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return convert(value, valueClass, defaultValue);
+    }
+    
+    @Override
+    public <T> T getPropertyInternal(String key)
     {
         return (T) StringUtils.trim(this.properties.getProperty(key));
     }
 
     @Override
-    public List<String> getKeys()
+    public List<String> getKeysInternal()
     {
         return EnumerationUtils.toList((Enumeration<String>) this.properties.propertyNames());
     }
 
     @Override
-    public boolean containsKey(String key)
+    public List<String> getKeysInternal(String prefix)
+    {
+        List<String> keyList = new ArrayList<>();
+
+        for (Enumeration<String> keys = (Enumeration<String>) this.properties.propertyNames(); keys
+            .hasMoreElements();) {
+            String key = keys.nextElement();
+
+            if (key.startsWith(prefix)) {
+                keyList.add(key);
+            }
+        }
+
+        return keyList;
+    }
+
+    @Override
+    public boolean containsKeyInternal(String key)
     {
         return this.properties.containsKey(key);
     }
 
     @Override
-    public boolean isEmpty()
+    public boolean isEmptyInternal()
     {
         return this.properties.isEmpty();
+    }
+
+    @Override
+    public boolean isEmptyInternal(String prefix)
+    {
+        for (Enumeration<String> keys = (Enumeration<String>) this.properties.propertyNames(); keys
+            .hasMoreElements();) {
+            if (keys.nextElement().startsWith(prefix)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

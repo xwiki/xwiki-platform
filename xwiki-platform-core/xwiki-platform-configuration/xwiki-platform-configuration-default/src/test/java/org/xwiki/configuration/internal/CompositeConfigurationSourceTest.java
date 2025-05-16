@@ -23,14 +23,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.properties.ConverterManager;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link CompositeConfigurationSource}.
@@ -38,123 +39,112 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
  * @version $Id$
  * @since 2.0M1
  */
-public class CompositeConfigurationSourceTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents
+class CompositeConfigurationSourceTest
 {
+    private MapConfigurationSource config1 = new MapConfigurationSource();
+
+    private MapConfigurationSource config2 = new MapConfigurationSource();
+
     private CompositeConfigurationSource composite;
 
-    private Configuration config1;
-
-    private Configuration config2;
-
-    @Override
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void beforeEach()
     {
-        super.setUp();
         this.composite = new CompositeConfigurationSource();
-        ConverterManager converterManager = getComponentManager().getInstance(ConverterManager.class);
-
-        CommonsConfigurationSource source1 = new CommonsConfigurationSource();
-        ReflectionUtils.setFieldValue(source1, "converterManager", converterManager);
-        this.config1 = new PropertiesConfiguration();
-        source1.setConfiguration(this.config1);
-        this.composite.addConfigurationSource(source1);
-
-        CommonsConfigurationSource source2 = new CommonsConfigurationSource();
-        ReflectionUtils.setFieldValue(source2, "converterManager", converterManager);
-        this.config2 = new PropertiesConfiguration();
-        source2.setConfiguration(this.config2);
-        this.composite.addConfigurationSource(source2);
+        this.composite.addConfigurationSource(this.config1);
+        this.composite.addConfigurationSource(this.config2);
     }
 
     @Test
-    public void testContainsKey()
+    void testContainsKey()
     {
-        config1.setProperty("key1", "value1");
-        config1.setProperty("key3", "value3");
-        config2.setProperty("key2", "value2");
-        config2.setProperty("key3", "value3");
+        this.config1.setProperty("key1", "value1");
+        this.config1.setProperty("key3", "value3");
+        this.config2.setProperty("key2", "value2");
+        this.config2.setProperty("key3", "value3");
 
-        Assert.assertTrue(composite.containsKey("key1"));
-        Assert.assertTrue(composite.containsKey("key2"));
-        Assert.assertTrue(composite.containsKey("key3"));
-        Assert.assertFalse(composite.containsKey("unknown"));
+        assertTrue(this.composite.containsKey("key1"));
+        assertTrue(this.composite.containsKey("key2"));
+        assertTrue(this.composite.containsKey("key3"));
+        assertFalse(this.composite.containsKey("unknown"));
     }
 
     @Test
-    public void testGetProperty()
+    void testGetProperty()
     {
-        config1.setProperty("key1", "value1");
-        config1.setProperty("key3", "value3");
-        config2.setProperty("key2", "value2");
-        config2.setProperty("key3", "value3");
+        this.config1.setProperty("key1", "value1");
+        this.config1.setProperty("key3", "value3");
+        this.config2.setProperty("key2", "value2");
+        this.config2.setProperty("key3", "value3");
 
-        Assert.assertEquals("value1", composite.getProperty("key1"));
-        Assert.assertEquals("value2", composite.getProperty("key2"));
-        Assert.assertEquals("value3", composite.getProperty("key3"));
-        Assert.assertNull(composite.getProperty("unknown"));
+        assertEquals("value1", this.composite.getProperty("key1"));
+        assertEquals("value2", this.composite.getProperty("key2"));
+        assertEquals("value3", this.composite.getProperty("key3"));
+        assertNull(this.composite.getProperty("unknown"));
     }
 
     @Test
-    public void testGetPropertyWithClass()
+    void testGetPropertyWithClass()
     {
-        config1.setProperty("key1", "value1");
-        config1.setProperty("key3", "value3");
-        config2.setProperty("key2", "value2");
-        config2.setProperty("key3", "value3");
+        this.config1.setProperty("key1", "value1");
+        this.config1.setProperty("key3", "value3");
+        this.config2.setProperty("key2", "value2");
+        this.config2.setProperty("key3", "value3");
 
-        Assert.assertEquals("value1", composite.getProperty("key1", String.class));
-        Assert.assertEquals("value2", composite.getProperty("key2", String.class));
-        Assert.assertEquals("value3", composite.getProperty("key3", String.class));
-        Assert.assertNull(composite.getProperty("unknown", String.class));
+        assertEquals("value1", this.composite.getProperty("key1", String.class));
+        assertEquals("value2", this.composite.getProperty("key2", String.class));
+        assertEquals("value3", this.composite.getProperty("key3", String.class));
+        assertNull(this.composite.getProperty("unknown", String.class));
     }
 
     @Test
-    public void testGetPropertyWithDefaultValue()
+    void testGetPropertyWithDefaultValue()
     {
-        config1.setProperty("key1", "value1");
-        config1.setProperty("key3", "value3");
-        config2.setProperty("key2", "value2");
-        config2.setProperty("key3", "value3");
+        this.config1.setProperty("key1", "value1");
+        this.config1.setProperty("key3", "value3");
+        this.config2.setProperty("key2", "value2");
+        this.config2.setProperty("key3", "value3");
 
-        Assert.assertEquals("value1", composite.getProperty("key1", "default"));
-        Assert.assertEquals("value2", composite.getProperty("key2", "default"));
-        Assert.assertEquals("value3", composite.getProperty("key3", "default"));
-        Assert.assertEquals("default", composite.getProperty("unknown", "default"));
+        assertEquals("value1", this.composite.getProperty("key1", "default"));
+        assertEquals("value2", this.composite.getProperty("key2", "default"));
+        assertEquals("value3", this.composite.getProperty("key3", "default"));
+        assertEquals("default", this.composite.getProperty("unknown", "default"));
     }
 
     @Test
-    public void testGetKeys()
+    void testGetKeys()
     {
-        config1.setProperty("key1", "value1");
-        config2.setProperty("key2", "value2");
+        this.config1.setProperty("key1", "value1");
+        this.config2.setProperty("key2", "value2");
 
         List<String> expected = Arrays.asList("key1", "key2");
-        Assert.assertEquals(expected, composite.getKeys());
+        assertEquals(expected, this.composite.getKeys());
     }
 
     @Test
-    public void testIsEmpty()
+    void testIsEmpty()
     {
-        Assert.assertTrue(composite.isEmpty());
+        assertTrue(this.composite.isEmpty());
 
-        config2.setProperty("key", "value");
-        Assert.assertFalse(composite.isEmpty());
+        this.config2.setProperty("key", "value");
+        assertFalse(this.composite.isEmpty());
     }
 
     @Test
-    public void testGetPropertiesAndListsWhenEmpty()
+    void testGetPropertiesAndListsWhenEmpty()
     {
-        Assert.assertTrue(composite.getProperty("unknown", Properties.class).isEmpty());
-        Assert.assertTrue(composite.getProperty("unknown", List.class).isEmpty());
+        assertTrue(this.composite.getProperty("unknown", Properties.class).isEmpty());
+        assertTrue(this.composite.getProperty("unknown", List.class).isEmpty());
     }
 
     @Test
-    public void testTypeConversionsWhenDefaultValuesAreNotUsed()
+    void testTypeConversionsWhenDefaultValuesAreNotUsed()
     {
-        config1.setProperty("key1", "true");
+        this.config1.setProperty("key1", "true");
 
         // Default value is not used since the property exists and is converted to boolean automatically
-        Assert.assertTrue(composite.getProperty("key1", false));
+        assertTrue(this.composite.getProperty("key1", false));
     }
 }

@@ -25,8 +25,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.configuration.internal.CommonsConfigurationSource;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.internal.AbstractCommonsConfigurationSource;
 import org.xwiki.user.UserConfiguration;
 
 import static org.xwiki.user.internal.UserPropertyConstants.ACTIVE;
@@ -44,14 +44,16 @@ import static org.xwiki.user.internal.UserPropertyConstants.USER_TYPE;
 @Component
 @Named("superadminuser")
 @Singleton
-public class SuperAdminConfigurationSource extends CommonsConfigurationSource implements Initializable
+public class SuperAdminConfigurationSource extends AbstractCommonsConfigurationSource
 {
     @Inject
     private UserConfiguration userConfiguration;
 
     @Override
-    public void initialize()
+    public void initialize() throws InitializationException
     {
+        super.initialize();
+
         // Default preferences
         BaseConfiguration configuration = new BaseConfiguration();
         configuration.addProperty(DISPLAY_HIDDEN_DOCUMENTS, "1");

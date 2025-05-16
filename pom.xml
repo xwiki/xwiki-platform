@@ -713,7 +713,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>5.3.1</version>
+        <version>6.0</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>

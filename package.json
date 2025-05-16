@@ -27,7 +27,7 @@
     "test": "nx run-many -t test"
   },
   "devDependencies": {
-    "@changesets/cli": "2.29.2",
+    "@changesets/cli": "2.29.4",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.25.1",
     "@microsoft/tsdoc": "0.15.1",

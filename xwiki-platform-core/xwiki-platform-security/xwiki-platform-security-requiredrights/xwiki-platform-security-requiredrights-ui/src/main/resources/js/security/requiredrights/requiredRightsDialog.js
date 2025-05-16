@@ -48,6 +48,7 @@ define('xwiki-requiredrights-messages', {
         'modal.object',
         'modal.cancel',
         'modal.save',
+        'modal.close',
         'saving.inProgress',
         'saving.success',
         'saving.error',
@@ -70,6 +71,101 @@ define('xwiki-requiredrights-dialog', [
 ], function (xm, $, l10n) {
     'use strict';
 
+    /**
+     * Class to load icons from the XWiki REST API.
+     * Creates DOM elements for requested icons.
+     */
+    class IconLoader {
+        /**
+         * Creates a new IconLoader instance.
+         */
+        constructor()
+        {
+            // Cache for icon data (from API response).
+            this.iconCache = {};
+        }
+
+        /**
+         * Loads a set of icons from the server.
+         * @param {string[]} iconNames - Array of icon names to load.
+         * @returns {Promise} Promise that resolves when icons are loaded.
+         */
+        loadIcons(iconNames)
+        {
+            // Deduplicate icon names
+            const uniqueIcons = [...new Set(iconNames)];
+
+            // Filter out already cached icons (either as data or as pending promises)
+            const iconsToLoad = uniqueIcons.filter(name => !this.iconCache[name]);
+
+            // If no new icons to load, return a resolved promise
+            if (iconsToLoad.length === 0) {
+                return Promise.resolve();
+            }
+
+            // Build the query string
+            const iconQuery = iconsToLoad.map(icon => `name=${icon}`).join('&');
+            const encodedWikiName = encodeURIComponent(XWiki.currentWiki);
+            const iconURL = `${XWiki.contextPath}/rest/wikis/${encodedWikiName}/iconThemes/icons?${iconQuery}`;
+
+            return fetch(iconURL, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to load icons: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Cache the loaded icons
+                    data.icons.forEach(icon => {
+                        this.iconCache[icon.name] = icon;
+                    });
+                    return data.icons;
+                })
+                .catch(error => {
+                    console.error('Error loading icons:', error);
+                    throw error;
+                });
+        }
+
+        /**
+         * Gets a DOM element for the specified icon.
+         * @param {string} iconName - The name of the icon.
+         * @returns {HTMLElement} The DOM element for the icon.
+         */
+        getIconElement(iconName)
+        {
+            // Throw an error if the icon hasn't been requested.
+            if (!this.iconCache[iconName]) {
+                throw new Error(`Icon "${iconName}" not loaded. Call loadIcons() first.`);
+            }
+
+            if (this.iconCache[iconName].iconSetType === 'IMAGE') {
+                const img = document.createElement('img');
+                img.src = this.iconCache[iconName].url;
+                img.alt = '';
+                return img;
+            } else if (this.iconCache[iconName].iconSetType === 'FONT') {
+                const span = document.createElement('span');
+                span.className = this.iconCache[iconName].cssClass;
+                span.setAttribute('aria-hidden', 'true');
+                return span;
+            } else {
+                // Fallback for unknown icon type
+                const fallback = document.createElement('span');
+                fallback.textContent = this.iconCache[iconName].name;
+                return fallback;
+            }
+        }
+    }
+
+    // Create a single instance shared by all required rights dialogs.
+    const iconLoader = new IconLoader();
+
     // Remove /translations/{language} from the REST URL if present
     const restURL = xm.restURL.replace(/\/translations\/[^/]+$/, '') + '/requiredRights';
 
@@ -89,10 +185,7 @@ define('xwiki-requiredrights-dialog', [
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <!-- TODO: check if we don't have a standard for the close button now. -->
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                                    <button type="button" class="close" data-dismiss="modal"></button>
                                     <h2 class="modal-title" id="required-rights-dialog-label"></h2>
                                 </div>
                                 <div class="modal-body">
@@ -105,9 +198,8 @@ define('xwiki-requiredrights-dialog', [
                                     <div class="required-rights-advanced-toggle-container">
                                         <a href="#" class="required-rights-advanced-toggle"
                                             aria-controls="required-rights-results" aria-expanded="false">
-                                        <!-- TODO: use icon theme. -->
-                                            <span class="icon-collapsed"><i class="fa fa-caret-right"></i></span>
-                                            <span class="icon-expanded"><i class="fa fa-caret-down"></i></span>
+                                            <span class="icon-collapsed"></span>
+                                            <span class="icon-expanded"></span>
                                         </a>
                                     </div>
                                     <div id="required-rights-results" class="hidden" 
@@ -130,6 +222,11 @@ define('xwiki-requiredrights-dialog', [
             this.saveButton = this.dialogElement.querySelector('.modal-footer .btn-primary');
             this.enforceSelectionElement = this.dialogElement.querySelector('.enforce-selection');
             this.advancedToggle = this.dialogElement.querySelector('.required-rights-advanced-toggle');
+            this.advancedToggle.querySelector('.icon-collapsed').append(iconLoader.getIconElement('caret-right'));
+            this.advancedToggle.querySelector('.icon-expanded').append(iconLoader.getIconElement('caret-down'));
+            const closeButton = this.dialogElement.querySelector('button.close');
+            closeButton.append(iconLoader.getIconElement('cross'));
+            closeButton.ariaLabel = l10n['modal.close'];
             this.advancedToggleContainer =
                 this.dialogElement.querySelector('.required-rights-advanced-toggle-container');
             this.analysisResultsContainer = this.dialogElement.querySelector('#required-rights-results');
@@ -272,7 +369,7 @@ define('xwiki-requiredrights-dialog', [
                 questionMark.className = 'btn btn-default tip';
                 questionMark.dataset.toggle = 'tooltip';
                 questionMark.type = 'button';
-                questionMark.innerHTML = '<span class="fa fa-info-circle" aria-hidden="true"></span>';
+                questionMark.append(iconLoader.getIconElement('info'));
 
                 // Convert from camelCase to kebab-case for the class name.
                 const className = status.replace(/([A-Z])/g, '-$1').toLowerCase();
@@ -317,9 +414,8 @@ define('xwiki-requiredrights-dialog', [
                                         href="#collapse-${panelId}"
                                         aria-expanded="false"
                                         aria-controls="collapse-${panelId}">
-                                        <!-- TODO: icons from the API? -->
-                                            <span class="icon-collapsed"><i class="fa fa-caret-right"></i></span>
-                                            <span class="icon-expanded"><i class="fa fa-caret-down"></i></span>
+                                            <span class="icon-collapsed"></span>
+                                            <span class="icon-expanded"></span>
                                             ${result.summaryMessageHTML}
                                         </a>
                                     </span>
@@ -331,6 +427,9 @@ define('xwiki-requiredrights-dialog', [
                                     </div>
                                 </div>
                             `;
+                const panelToggle = panel.querySelector('.panel-title a');
+                panelToggle.querySelector('.icon-collapsed').append(iconLoader.getIconElement('caret-right'));
+                panelToggle.querySelector('.icon-expanded').append(iconLoader.getIconElement('caret-down'));
 
                 panelGroup.appendChild(panel);
             });
@@ -345,11 +444,16 @@ define('xwiki-requiredrights-dialog', [
          * @return {Promise} A promise that resolves when the dialog is shown
          */
         show: async function () {
+            const iconsPromise = iconLoader.loadIcons(['info', 'cross', 'caret-right', 'caret-down']);
+
             const response = await fetch(restURL);
             const data = await response.json();
             // Create a bootstrap dialog to display the results
             const currentRights = data.currentRights;
             const availableRights = data.availableRights;
+
+            // Wait for the icons to be loaded before displaying the dialog.
+            await iconsPromise;
             const dialog = new RequiredRightsDialog(currentRights);
 
             let indexOfCurrentRight = 0;

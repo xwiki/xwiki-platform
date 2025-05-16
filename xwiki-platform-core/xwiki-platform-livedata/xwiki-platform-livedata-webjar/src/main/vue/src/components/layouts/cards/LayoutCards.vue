@@ -35,9 +35,10 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataPagination />
+        <LivedataPagination side="left" />
       </template>
       <template #right>
+        <LivedataPagination side="right" />
         <LivedataEntrySelectorAll v-if="isSelectionEnabled" />
         <LivedataDropdownMenu />
       </template>

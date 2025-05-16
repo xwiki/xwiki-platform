@@ -22,6 +22,10 @@
 target
 target-eclipse
 
+# Npm
+node_modules/
+dist/
+
 # Gradle
 build
 .gradle

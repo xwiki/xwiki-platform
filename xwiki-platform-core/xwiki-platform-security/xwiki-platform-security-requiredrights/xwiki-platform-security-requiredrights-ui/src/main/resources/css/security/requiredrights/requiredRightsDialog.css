@@ -78,7 +78,7 @@
 #required-rights-dialog .rights-selection li .label-wrapper label {
   background-color: var(--xwiki-page-content-bg);
   color: var(--text-color);
-  border: 2px solid var(--xwiki-page-content-bg);
+  border: 1px solid var(--panel-bg);
   border-radius: 2em;
   padding: 0.5em 1em;
   display: block;
@@ -88,12 +88,12 @@
 #required-rights-dialog .rights-selection li .label-wrapper label:has(input:checked) {
   background-color: var(--alert-info-bg);
   color: var(--brand-primary);
-  border-color: var(--brand-primary);
+  border-color: var(--brand-info);
 }
 
 #required-rights-dialog .rights-selection li.required .label-wrapper,
 #required-rights-dialog .rights-selection li.enough .label-wrapper {
-  border-color: var(--input-border);
+  border-color: var(--xwiki-border-color);
 }
 
 #required-rights-dialog .rights-selection li.required .label-wrapper:has(input:checked),
@@ -103,13 +103,19 @@
 
 #required-rights-dialog .rights-selection li.maybe-required .label-wrapper,
 #required-rights-dialog .rights-selection li.maybe-enough .label-wrapper {
-  border-color: var(--input-border);
+  border-color: var(--xwiki-border-color);
   border-style: dashed;
 }
 
 #required-rights-dialog .rights-selection li.maybe-required .label-wrapper:has(input:checked),
 #required-rights-dialog .rights-selection li.maybe-enough .label-wrapper:has(input:checked) {
   border-color: var(--brand-primary);
+}
+
+#required-rights-dialog .rights-selection li .label-wrapper label:has(input[disabled]) {
+  cursor: not-allowed;
+  color:var(--text-muted);
+  background-color: transparent;
 }
 
 #required-rights-dialog #required-rights-results .panel-heading {
@@ -132,6 +138,7 @@
   display: none;
 }
 
+/* Switch rows and columns for small screens. The width uses em as the required width depends on the font size. */
 @media (max-width: 42em) {
   #required-rights-dialog .rights-selection ul {
     grid-template-columns: repeat(2, minmax(max-content, 1fr));
@@ -149,6 +156,14 @@
   }
 }
 
+/* In "wide" layout, make the dialog wide enough to fit the required rights selection. */
+@media (min-width: 42em) {
+  #required-rights-dialog .modal-dialog {
+    min-width: min-content;
+  }
+}
+
+/* Styles for the warning box above the content. */
 .box.requiredrights-warning > div {
   display: flex;
   align-items: baseline;

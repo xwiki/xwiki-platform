@@ -39,6 +39,7 @@ define('xwiki-requiredrights-messages', {
         'modal.enough.hint',
         'modal.maybeEnough',
         'modal.maybeEnough.hint',
+        'modal.statusHelp',
         'modal.analysisDetails',
         'modal.analysisDetails',
         'modal.contentAndTitle',
@@ -173,14 +174,12 @@ define('xwiki-requiredrights-dialog', [
         constructor(currentRights)
         {
             this.currentRights = currentRights;
-            // TODO: verify if this is all correct and required.
             this.dialogElement = document.createElement('div');
             this.dialogElement.className = 'modal fade';
             this.dialogElement.id = 'required-rights-dialog';
             this.dialogElement.tabIndex = -1;
             this.dialogElement.role = 'dialog';
             this.dialogElement.setAttribute('aria-labelledby', 'required-rights-dialog-label');
-            this.dialogElement.setAttribute('aria-hidden', 'true');
             this.dialogElement.innerHTML = `
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
@@ -207,7 +206,7 @@ define('xwiki-requiredrights-dialog', [
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"></button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal"></button>
                                     <button type="button" class="btn btn-primary"></button>
                                 </div>
                             </div>
@@ -217,7 +216,7 @@ define('xwiki-requiredrights-dialog', [
             this.dialogElement.querySelector('.rights-selection h3').textContent = l10n['modal.rightsSelection'];
             this.dialogElement.querySelector('.rights-selection p').textContent = l10n['modal.rightsSelection.hint'];
             this.dialogElement.querySelector('.required-rights-advanced-toggle').append(l10n['modal.analysisDetails']);
-            this.dialogElement.querySelector('.btn-secondary').textContent = l10n['modal.cancel'];
+            this.dialogElement.querySelector('.btn-default').textContent = l10n['modal.cancel'];
             this.dialogElement.querySelector('.btn-primary').textContent = l10n['modal.save'];
             this.saveButton = this.dialogElement.querySelector('.modal-footer .btn-primary');
             this.enforceSelectionElement = this.dialogElement.querySelector('.enforce-selection');
@@ -227,6 +226,7 @@ define('xwiki-requiredrights-dialog', [
             const closeButton = this.dialogElement.querySelector('button.close');
             closeButton.append(iconLoader.getIconElement('cross'));
             closeButton.ariaLabel = l10n['modal.close'];
+            closeButton.title = l10n['modal.close'];
             this.advancedToggleContainer =
                 this.dialogElement.querySelector('.required-rights-advanced-toggle-container');
             this.analysisResultsContainer = this.dialogElement.querySelector('#required-rights-results');
@@ -369,7 +369,11 @@ define('xwiki-requiredrights-dialog', [
                 questionMark.className = 'btn btn-default tip';
                 questionMark.dataset.toggle = 'tooltip';
                 questionMark.type = 'button';
-                questionMark.append(iconLoader.getIconElement('info'));
+                questionMark.append(iconLoader.getIconElement('question'));
+                const srLabel = document.createElement('span');
+                srLabel.className = 'sr-only';
+                srLabel.textContent = l10n['modal.statusHelp'];
+                questionMark.append(srLabel);
 
                 // Convert from camelCase to kebab-case for the class name.
                 const className = status.replace(/([A-Z])/g, '-$1').toLowerCase();
@@ -444,7 +448,7 @@ define('xwiki-requiredrights-dialog', [
          * @return {Promise} A promise that resolves when the dialog is shown
          */
         show: async function () {
-            const iconsPromise = iconLoader.loadIcons(['info', 'cross', 'caret-right', 'caret-down']);
+            const iconsPromise = iconLoader.loadIcons(['question', 'cross', 'caret-right', 'caret-down']);
 
             const response = await fetch(restURL);
             const data = await response.json();

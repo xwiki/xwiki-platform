@@ -118,10 +118,12 @@ public class RequiredRightsModal extends BaseModal
                     suggestionText = null;
                     suggestionTooltip = null;
                 } else {
-                    suggestionText = suggestionElement.get(0).getText().trim();
-                    suggestionTooltip =
-                        suggestionElement.get(0).findElement(By.tagName("button"))
-                            .getDomAttribute("data-original-title");
+                    suggestionText = suggestionElement.get(0).getText();
+                    WebElement tooltipButton = suggestionElement.get(0).findElement(By.tagName("button"));
+                    // Remove the text inside the button from the suggestion text as it's just the label for screen
+                    // readers that explains the button's purpose.
+                    suggestionText = suggestionText.replace(tooltipButton.getText(), "").trim();
+                    suggestionTooltip = tooltipButton.getDomAttribute("data-original-title");
                 }
                 return new RequiredRight(name, label, enabled, suggestionClass, suggestionText, suggestionTooltip);
             })
@@ -147,7 +149,7 @@ public class RequiredRightsModal extends BaseModal
      */
     public void clickCancel()
     {
-        this.container.findElement(By.cssSelector(".modal-footer button.btn-secondary")).click();
+        this.container.findElement(By.cssSelector(".modal-footer button.btn-default")).click();
     }
 
     /**

@@ -55,6 +55,7 @@ public class RequiredRightsModal extends BaseModal
     public RequiredRightsModal()
     {
         super(By.id("required-rights-dialog"));
+        getDriver().waitUntilCondition(driver -> isDisplayed());
     }
 
     /**

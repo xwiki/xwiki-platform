@@ -44,6 +44,7 @@ administration.sectionTitle=Administración: {0}
 administration.sectionTitle.page=Administración de la página: {0}
 administration.sectionTitle.wiki=Administración del Wiki: {0}
 administration.sectionTitle.global=Administración Global: {0}
+### Missing: administration.menu.label=Administration sections.
 administration.menu.search.hint=Buscar...
 administration.menu.search.noResults=No hay resultados.
 
@@ -54,8 +55,6 @@ XWiki.XWikiPreferences_confirmation_email_content.hint=La plantilla de correo el
 XWiki.XWikiPreferences_invitation_email_content.hint=La plantilla de correo electrónico que se enviará a los usuarios invitados a registrarse.
 XWiki.Registration_heading.hint=Esta es la línea en la parte superior de la página que se muestra a las personas que se están registrando y cuando se acaban de registrar. Se puede usar sintaxis Velocity y wiki.
 XWiki.Registration_welcomeMessage.hint=Solo se muestra cuando alguna persona está rellenando el formulario. Se puede usar sintaxis Velocity y wiki.
-XWiki.Registration_liveValidation_enabled.hint=Defina esta opción como false para desactivar el código JavaScript de validación en tiempo real (los campos seguirán siendo validados en el lado del servidor).
-XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=La validación en tiempo real muestra un mensaje para indicar a los usuarios que han rellenado el campo satisfactoriamente. Este es el mensaje que recibirán si no se anula para un campo en particular. Se puede utilizar la sintaxis velocity.
 XWiki.Registration_loginButton_enabled.hint=Cuando el usuario se ha registrado, le proporcionamos un botón para que haga clic en el que publicará su nombre de usuario y contraseña en la acción de inicio de sesión y los hará iniciar sesión de inmediato. Sin embargo, esto hace que el nombre de usuario y la contraseña se devuelvan en el HTML, lo que puede ser inaceptable en función de sus necesidades de seguridad.
 XWiki.Registration_loginButton_autoLogin_enabled.hint=Si el botón de inicio de sesión está activado, puede hacer que un fragmento de JavaScript "pulse" el botón de inicio de sesión para el usuario.
 XWiki.Registration_defaultRedirect.hint=Esta es la URL a la que el usuario será redirigido después de pulsar el botón de inicio de sesión si no se especifica el parámetro xredirect. Se puede utilizar la sintaxis velocity.
@@ -139,6 +138,12 @@ administration.section.users.deleteUser.newAuthor.hint=Seleccione un usuario que
 administration.section.users.deleteUser.newAuthor.error=¡El usuario seleccionado no tiene permisos de {0}!
 administration.section.users.deleteUser.newAuthor.programming=programando
 administration.section.users.deleteUser.newAuthor.script=script
+### Missing: admin.usersgroups.extensionrights=Extension Rights
+
+# Groups section
+### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
 
 # Other Category
 admin.other=Otro
@@ -150,7 +155,26 @@ administration.section.analytics.status.hint=Determinar si el seguimiento en Goo
 admin.social=Social
 admin.social.description=Configuración de funciones sociales.
 
-## Used to indicate where deprecated keys start
+# Configurable Class
+### Missing: XWiki.ConfigurableClass_displayInSection=Display in section
+### Missing: XWiki.ConfigurableClass_heading=Heading
+### Missing: XWiki.ConfigurableClass_configurationClass=Configuration class
+### Missing: XWiki.ConfigurableClass_linkPrefix=Link prefix
+### Missing: XWiki.ConfigurableClass_propertiesToShow=Properties to show
+### Missing: XWiki.ConfigurableClass_codeToExecute=Code to execute
+### Missing: XWiki.ConfigurableClass_iconAttachment=Icon attachment
+### Missing: XWiki.ConfigurableClass_displayInCategory=Display in category
+### Missing: XWiki.ConfigurableClass_displayBeforeCategory=Display before category
+### Missing: XWiki.ConfigurableClass_categoryIcon=Category icon
+### Missing: XWiki.ConfigurableClass_scope=Scope
+### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
+### Missing: XWiki.ConfigurableClass_scope_SPACE=Current space
+### Missing: XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
+### Missing: XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
+### Missing: XWiki.ConfigurableClass_sectionOrder=Section order
+
+
+## Used to indicate where deprecated keys end
 #@deprecatedstart
 
 ## Deprecated since 11.6RC1
@@ -159,6 +183,8 @@ administration.section.users.deleteUser.markInactiveMessage=En lugar de eliminar
 
 ## Deprecated since 11.8RC1
 administration.section.users.deleteUser.markDisabledMessage=En lugar de eliminar el usuario, puede marcar su perfil como inactivo. Esto evitará que inicien sesión y preservará los derechos de acceso asociados con los scripts que escribieron.
+XWiki.Registration_liveValidation_enabled.hint=Defina esta opción como false para desactivar el código JavaScript de validación en tiempo real (los campos seguirán siendo validados en el lado del servidor).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=La validación en tiempo real muestra un mensaje para indicar a los usuarios que han rellenado el campo satisfactoriamente. Este es el mensaje que recibirán si no se anula para un campo en particular. Se puede utilizar la sintaxis velocity.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

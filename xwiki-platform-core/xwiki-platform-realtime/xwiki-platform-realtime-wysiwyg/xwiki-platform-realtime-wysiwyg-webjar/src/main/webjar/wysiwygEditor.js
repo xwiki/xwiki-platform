@@ -255,7 +255,7 @@ define('xwiki-realtime-wysiwyg', [
             user => (user?.sessionId && user.sessionId === version.author) ||
               (user?.reference && user.reference === version.author?.reference)
           ) || version.author;
-          this._connection.toolbar.onCreateVersion(version);
+          this._connection.toolbar?.onCreateVersion(version);
         }
       }).toBeReady();
     }

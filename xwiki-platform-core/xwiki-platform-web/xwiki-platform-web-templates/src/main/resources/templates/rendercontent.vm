@@ -61,15 +61,13 @@ $services.progress.endStep()
     <div class="document-info">
       <div id="document-title"><h1>$titleToDisplay</h1></div>
     </div>
-    <div id="xwikicontent">
+    <div id="xwikicontent">##
 #end
 #if ("$!exception" != '')
   $exceptiontool.getStackTrace($exception)
-#else
-  $renderedContent
-#end
+#{else}$renderedContent#end
 #if ($request.outputTitle == 'true')
-    </div>
+#**#</div>
   </div>## xcontent
   </main>## mainContentArea
 #end

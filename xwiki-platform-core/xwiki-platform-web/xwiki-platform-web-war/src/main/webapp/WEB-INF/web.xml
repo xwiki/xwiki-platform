@@ -57,6 +57,12 @@
     <filter-class>org.xwiki.container.servlet.filters.internal.ResolveRelativeRedirectFilter</filter-class>
   </filter>
 
+  <!-- Filter in charge of fixing the request base URL base on proxy headers. -->
+  <filter>
+    <filter-name>SourceURLResolverFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SourceURLResolverFilter</filter-class>
+  </filter>
+
   <!-- Filter which inject a response wrapper in charge of converting the redirect location into a safe URL. -->
   <filter>
     <filter-name>SafeRedirectFilter</filter-name>
@@ -166,6 +172,11 @@
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
     <dispatcher>ERROR</dispatcher>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>SourceURLResolverFilter</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <filter-mapping>

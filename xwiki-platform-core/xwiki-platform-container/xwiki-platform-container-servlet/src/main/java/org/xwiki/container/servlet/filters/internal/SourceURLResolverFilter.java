@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -107,8 +108,8 @@ public class SourceURLResolverFilter implements Filter
 
         if (filteredRequest instanceof HttpServletRequest httpRequest) {
             try {
-                filteredRequest =
-                    new SourceURLResolverRequest(httpRequest, HttpServletUtils.getSourceURL(httpRequest).toURI());
+                filteredRequest = new SourceURLResolverRequest(httpRequest,
+                    new URL(HttpServletUtils.getSourceBaseURL(httpRequest), httpRequest.getRequestURI()).toURI());
             } catch (URISyntaxException | MalformedURLException e) {
                 // It's very unlikely that the source URL would be invalid, but just ignore it in this case
                 LOGGER.warn("Failed to resolve the source URL ([{}]), falling back to standard ServletRequest.",

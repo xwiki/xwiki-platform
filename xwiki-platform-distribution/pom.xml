@@ -89,7 +89,6 @@
   com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin,\
   com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
   com.xpn.xwiki.plugin.feed.FeedPlugin,\
-  com.xpn.xwiki.plugin.mail.MailPlugin,\
   com.xpn.xwiki.plugin.packaging.PackagePlugin,\
   com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
   com.xpn.xwiki.plugin.image.ImagePlugin,\

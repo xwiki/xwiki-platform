@@ -3297,7 +3297,10 @@ public class Document extends Api
      * @param newReference the reference to the new document
      * @throws XWikiException in case of an error
      * @since 2.3M2
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public void rename(DocumentReference newReference) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
@@ -3331,7 +3334,10 @@ public class Document extends Api
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
      *            new renamed document.
      * @throws XWikiException in case of an error
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public void rename(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
     {
         rename(newDocumentName, backlinkDocumentNames, Collections.emptyList());
@@ -3349,7 +3355,10 @@ public class Document extends Api
      *            new renamed document.
      * @param childDocumentNames the list of documents whose parent field will be set to the new document name.
      * @throws XWikiException in case of an error
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames)
         throws XWikiException
     {
@@ -3381,7 +3390,10 @@ public class Document extends Api
      *            reference
      * @throws XWikiException in case of an error
      * @since 2.3M2
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public void rename(DocumentReference newReference, List<DocumentReference> backlinkDocumentNames,
         List<DocumentReference> childDocumentNames) throws XWikiException
     {

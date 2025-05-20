@@ -722,7 +722,7 @@ distribution.automaticStartOnMainWiki=$xwikiPropertiesAutomaticStartOnMainWiki
 distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #end
 
-#-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
+#-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
 #-# 
 #-# On the main wiki
 # distribution.job.interactive=true

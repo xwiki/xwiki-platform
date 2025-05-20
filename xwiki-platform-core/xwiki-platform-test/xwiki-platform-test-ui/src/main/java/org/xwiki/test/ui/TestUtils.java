@@ -27,7 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -412,6 +415,8 @@ public class TestUtils
      */
     public void loginAndGotoPage(String username, String password, String pageURL, boolean checkLoginSuccess)
     {
+        // ensure to be on a wiki page before performing check on the username.
+        getDriver().get(getURL("XWiki", "Register", "register", "_=" + new Date().getTime()));
         if (!username.equals(getLoggedInUserName())) {
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.
@@ -705,6 +710,19 @@ public class TestUtils
             fail("Failed to add rights object of class [" + rightClassName + "] with groups [" + normalizedGroups
                 + "], users [" + normalizedUsers + "], rights [" + rights + "] and enabled [" + enabled + "]", e);
         }
+    }
+
+    /**
+     * Attempt to navigate to the specified page without waiting for the page to load. This is useful for instance when
+     * leaving the current page triggers a confirmation alert that you want to accept or dismiss.
+     * 
+     * @param reference the reference of the page to go to
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void gotoPageWithoutWaiting(EntityReference reference)
+    {
+        getDriver().executeScript("window.location.href = arguments[0]", getURL(reference));
     }
 
     public ViewPage gotoPage(String space, String page)
@@ -1567,6 +1585,39 @@ public class TestUtils
     public String getEditMode()
     {
         return (String) getDriver().executeScript("return window.XWiki?.editor");
+    }
+
+    /**
+     * If we are in edit mode, leave using the cancel shortcut key (ALT + C).
+     *
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void maybeLeaveEditMode()
+    {
+        if (StringUtils.isNotEmpty(getEditMode())) {
+            leaveEditMode();
+        }
+    }
+
+    /**
+     * Leave the edit mode using the cancel shortcut key (ALT + C).
+     *
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void leaveEditMode()
+    {
+        // Use the cancel shortcut key to leave the edit mode, but since the shortcut keys are handled with JavaScript
+        // we need to wait for view mode ourselves. We can't use the page reload marker because the in-place editor
+        // doesn't reload the page on cancel. We can only rely on the fact that the URL will change (even for the
+        // in-place editor where the '#edit' URL fragment is removed).
+        String editURL = getDriver().getCurrentUrl();
+        getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
+        getDriver().waitUntilCondition(driver -> {
+            String viewURL = driver.getCurrentUrl();
+            return !viewURL.equals(editURL);
+        });
     }
 
     public boolean isInWYSIWYGEditMode()
@@ -2490,6 +2541,7 @@ public class TestUtils
             RESOURCES_MAP.put(EntityType.OBJECT, new ResourceAPI(ObjectResource.class, null));
             RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, new ResourceAPI(ObjectPropertyResource.class, null));
             RESOURCES_MAP.put(EntityType.CLASS_PROPERTY, new ResourceAPI(ClassPropertyResource.class, null));
+            RESOURCES_MAP.put(EntityType.ATTACHMENT, new ResourceAPI(AttachmentResource.class, null));
         }
 
         /**
@@ -3086,6 +3138,19 @@ public class TestUtils
             return get(resourceURI, null, failIfNotFound);
         }
 
+        /**
+         * @param attachmentReference the reference of the attachment
+         * @return the attachment content as byte array
+         * @throws Exception when failing to get the attachment content
+         * @since 17.3.0RC1
+         */
+        public byte[] getAttachmentAsByteArray(EntityReference attachmentReference) throws Exception
+        {
+            try (InputStream stream = get(attachmentReference)) {
+                return IOUtils.toByteArray(stream);
+            }
+        }
+
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
             throws Exception
         {
@@ -3373,5 +3438,17 @@ public class TestUtils
         switchTab(secondTabHandle);
         getDriver().close();
         switchTab(currentTab);
+    }
+
+    /**
+     * @param path the resource path
+     * @return the corresponding {@link File}
+     * @throws URISyntaxException
+     * @since 17.3.0RC1
+     */
+    public File getResourceFile(String path) throws URISyntaxException
+    {
+        URL resource = getClass().getResource(path);
+        return Paths.get(resource.toURI()).toFile();
     }
 }

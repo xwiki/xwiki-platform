@@ -645,9 +645,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     @Override
-    public BaseCollection clone()
+    public BaseCollection<R> clone()
     {
-        BaseCollection collection = (BaseCollection) super.clone();
+        return (BaseCollection<R>) super.clone();
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<R> element)
+    {
+        super.cloneContent(element);
+
+        BaseCollection<R> collection = (BaseCollection<R>) element;
 
         collection.setXClassReference(getRelativeXClassReference());
         collection.setNumber(getNumber());
@@ -655,15 +663,11 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         Map cfields = new HashMap();
         for (Object objEntry : fields.entrySet()) {
             Map.Entry entry = (Map.Entry) objEntry;
-            PropertyInterface prop = (PropertyInterface) ((BaseElement) entry.getValue()).clone();
+            PropertyInterface prop = (PropertyInterface) ((BaseElement) entry.getValue()).clone(true);
             prop.setObject(collection);
             cfields.put(entry.getKey(), prop);
         }
         collection.setFields(cfields);
-
-        collection.setDirty(isDirty());
-
-        return collection;
     }
 
     public void merge(BaseObject object)
@@ -672,7 +676,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         while (itfields.hasNext()) {
             String name = (String) itfields.next();
             if (safeget(name) == null) {
-                safeput(name, (PropertyInterface) ((BaseElement) object.safeget(name)).clone());
+                safeput(name, (PropertyInterface) ((BaseElement) object.safeget(name)).clone(true));
             }
         }
     }
@@ -1003,7 +1007,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * @param deep true if the dirty flag should be set to all children
      * @since 17.2.1
      * @since 17.3.0RC1
-     * @since 16.10.6
      */
     @Unstable
     public void setDirty(boolean dirty, boolean deep)

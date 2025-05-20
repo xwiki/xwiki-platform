@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.Condition;
@@ -27,6 +28,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.extension.distribution.internal.DistributionConfiguration;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
@@ -35,6 +40,7 @@ import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionSte
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * @version $Id$
@@ -51,6 +57,15 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
 
     @Inject
     protected Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
+
+    @Inject
+    protected DistributionConfiguration distributionConfiguration;
+
+    /**
+     * Used to create a new Execution Context from scratch.
+     */
+    @Inject
+    private ExecutionContextManager executionContextManager;
 
     /**
      * Condition to wait for ready state.
@@ -236,6 +251,55 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
         super.jobFinished(exception);
 
         signalReady();
+
+        // After finishing the main wiki distribution job, trigger non-interactive wiki distribution jobs (subwikis
+        // extensions very often depends on extensions installed in the context of the main wiki)
+        WikiDescriptorManager wikis = this.wikiDescriptorManagerProvider.get();
+        if (!this.distributionConfiguration.isInteractiveDistributionWizardEnabledForWiki()
+            && wikis.isMainWiki(getWiki())) {
+            try {
+                Collection<String> wikiIds = wikis.getAllIds();
+                Thread distributionJobThread = new Thread(() -> runSubWikiDistributions(wikiIds, wikis));
+
+                distributionJobThread.setDaemon(true);
+                distributionJobThread.setName("Wikis non-interfactive distribution jobs");
+                distributionJobThread.start();
+            } catch (WikiManagerException e) {
+                this.logger.error("Failed to get the list of wikis. Sub-wikis ditribution jobs won't be triggered.", e);
+            }
+        }
+    }
+
+    private void runSubWikiDistributions(Collection<String> wikiIds, WikiDescriptorManager wikiManager)
+    {
+        // Create a clean Execution Context
+        ExecutionContext context = new ExecutionContext();
+
+        try {
+            this.executionContextManager.initialize(context);
+        } catch (ExecutionContextException e) {
+            throw new RuntimeException("Failed to initialize wiki distribution job execution context", e);
+        }
+
+        for (String wikiId : wikiIds) {
+            if (!wikiManager.isMainWiki(wikiId)) {
+                try {
+                    // Trigger the wiki distribution job only if it's not the case already
+                    if (this.distributionManager.getWikiJob(wikiId) == null) {
+                        this.logger.info("Start distribution job for wiki [{}]", wikiId);
+                        this.distributionManager.startWikiJob(wikiId, false).join();
+                        this.logger.info("Finished distribution job for wiki [{}]", wikiId);
+                    }
+                } catch (InterruptedException e) {
+                    // Sonar is not a fan of InterruptedException catching, and apparently throwing it
+                    // through a RuntimeException is not enough for it (but unfortunately we cannot
+                    // really throw much else in a Runnable)
+                    Thread.currentThread().interrupt();
+
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 
     private void signalReady()

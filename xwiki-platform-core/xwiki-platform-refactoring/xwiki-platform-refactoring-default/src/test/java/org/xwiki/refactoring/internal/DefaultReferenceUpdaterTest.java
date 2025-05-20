@@ -264,8 +264,6 @@ class DefaultReferenceUpdaterTest
         AttachmentReference oldImageTargetAttachment = new AttachmentReference("attachment.txt", oldReference);
         DocumentReference newReference = new DocumentReference("wiki", "X", "Y");
         AttachmentReference newImageTargetAttachment = new AttachmentReference("attachment.txt", newReference);
-        AttachmentReference absoluteTargetAttachment = new AttachmentReference("attachment.txt",
-            new DocumentReference("wiki", "Main", "WebHome"));
 
         XWikiDocument newDocument = mock(XWikiDocument.class);
         DocumentAuthors authors = mock(DocumentAuthors.class);
@@ -304,12 +302,9 @@ class DefaultReferenceUpdaterTest
         DocumentReference absoluteDocLinkReference = new DocumentReference("WebHome", new SpaceReference("wiki", "C"));
         EntityReference relativeDocLinkReference = new EntityReference("WebHome", EntityType.DOCUMENT,
             new EntityReference("C", EntityType.SPACE));
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null))
-            .thenReturn(absoluteDocLinkReference);
+
         when(this.relativeEntityReferenceResolver.resolve(docLinkReference, null, null))
             .thenReturn(relativeDocLinkReference);
-        when(this.resourceReferenceResolver.resolve(absoluteDocLinkResourceReference, null))
-            .thenReturn(absoluteDocLinkReference);
         when(this.relativeEntityReferenceResolver.resolve(absoluteDocLinkResourceReference, null, null))
             .thenReturn(absoluteDocLinkReference);
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
@@ -322,8 +317,7 @@ class DefaultReferenceUpdaterTest
             .thenReturn(relativeDocLinkReference);
         when(this.resourceReferenceResolver.resolve(xobjectDocLinkReference, null, oldReference))
             .thenReturn(originalDocLinkReference);
-        when(this.resourceReferenceResolver.resolve(imageReference, null))
-            .thenReturn(absoluteTargetAttachment);
+
         when(this.resourceReferenceResolver.resolve(imageReference, null, oldReference))
             .thenReturn(oldImageTargetAttachment);
         when(this.relativeEntityReferenceResolver.resolve(imageReference, null, null))
@@ -341,14 +335,12 @@ class DefaultReferenceUpdaterTest
 
         SpaceReference originalSpaceReference = new SpaceReference("wiki", "Z");
         EntityReference relativeSpaceReference = new EntityReference("Z", EntityType.SPACE);
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null))
-            .thenReturn(originalSpaceReference);
+
         when(this.relativeEntityReferenceResolver.resolve(spaceLinkReference, null, null))
             .thenReturn(relativeSpaceReference);
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference))
             .thenReturn(originalSpaceReference);
-        when(this.resourceReferenceResolver.resolve(xobjectSpaceLinkReference, null))
-            .thenReturn(originalSpaceReference);
+
         when(this.resourceReferenceResolver.resolve(xobjectSpaceLinkReference, null, oldReference))
             .thenReturn(originalSpaceReference);
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, newReference))
@@ -411,11 +403,9 @@ class DefaultReferenceUpdaterTest
             .thenReturn(List.of(docLinkBlock, spaceLinkBlock));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
-        DocumentReference absoluteDocLinkReference = new DocumentReference("C", new SpaceReference("xwiki", "Main"));
         EntityReference relativeDocLinkReference = new EntityReference("C", EntityType.DOCUMENT,
             new EntityReference("B", EntityType.SPACE));
         EntityReference relativeSpaceLinkReference = new EntityReference("Z", EntityType.SPACE);
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null)).thenReturn(absoluteDocLinkReference);
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
             .thenReturn(originalDocLinkReference);
         DocumentReference newDocLinkReference = new DocumentReference("C", newReference.getLastSpaceReference());
@@ -425,8 +415,6 @@ class DefaultReferenceUpdaterTest
             .thenReturn(relativeDocLinkReference);
 
         SpaceReference originalSpaceReference = new SpaceReference("wiki1", "Z");
-        SpaceReference absoluteSpaceReference = new SpaceReference("xwiki", "Z");
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null)).thenReturn(absoluteSpaceReference);
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference))
             .thenReturn(originalSpaceReference);
         SpaceReference newSpaceReference = new SpaceReference("wiki2", "Z");

@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.ui;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -57,18 +58,23 @@ import static org.hamcrest.Matchers.containsString;
 )
 class FilterIT extends AbstractCKEditorIT
 {
-    @BeforeEach
-    void beforeEach(TestUtils setup, TestReference testReference)
+    @BeforeAll
+    void beforeAll(TestUtils setup)
     {
         // Ensure that raw HTML is allowed.
         setup.loginAsSuperAdmin();
+    }
+
+    @BeforeEach
+    void beforeEach(TestUtils setup, TestReference testReference)
+    {
         edit(setup, testReference);
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup)
     {
-        maybeLeaveEditMode(setup, testReference);
+        setup.maybeLeaveEditMode();
     }
 
     @Test

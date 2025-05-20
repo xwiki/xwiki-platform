@@ -69,8 +69,10 @@ define('xwiki-realtime-wysiwyg', [
       // notified when others' caret position changes).
       this._userDataChannel = realtimeContext.channels.userData;
   
-      Interface.realtimeAllowed(realtimeContext.realtimeEnabled);
-      this._createAllowRealtimeCheckbox();
+      // Don't create the checkbox if we can't connect to the WebSocket service.
+      if (realtimeContext.realtimeEnabled !== 0) {
+        this._createAllowRealtimeCheckbox();
+      }
 
       this._connection = {
         status: ConnectionStatus.DISCONNECTED
@@ -222,44 +224,22 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     _createAllowRealtimeCheckbox() {
-      const realtimeEnabled = this._realtimeContext.realtimeEnabled;
-      // Don't display the checkbox if we can't connect to the WebSocket service.
-      if (realtimeEnabled !== 0) {
-        const allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
-        const realtimeToggleHandler = () => {
-          if (allowRealtimeCheckbox.prop('checked')) {
-            // Disable the checkbox while we're fetching the channels.
-            allowRealtimeCheckbox.prop('disabled', true);
-            // We need to fetch the channels before we can connect to the realtime session because:
-            // * the channels might have been closed since we left the realtime session
-            // * the channels might have changed since we last connected to the realtime session
-            // * the channels might not have been created yet because we started editing with realtime disabled.
-            this._updateChannels().then(() => {
-              Interface.realtimeAllowed(true);
-              this._startRealtimeSync();
-            }).catch(() => {
-              // We failed to fetch the channels so we can't connect to the realtime session.
-              allowRealtimeCheckbox.prop('checked', false);
-            }).finally(() => {
-              // Re-enable the checkbox so that the user can try again.
-              allowRealtimeCheckbox.prop('disabled', false);
-            });
-          } else {
-            this._realtimeContext.displayDisableModal(state => {
-              if (!state) {
-                allowRealtimeCheckbox.prop('checked', true);
-              } else {
-                Interface.realtimeAllowed(false);
-                this._onAbort();
-              }
-            });
-          }
-        };
-        allowRealtimeCheckbox.on('change', realtimeToggleHandler);
-        this._editor.onBeforeDestroy(() => {
-          allowRealtimeCheckbox.off('change', realtimeToggleHandler);
-        });
-      }
+      Interface.createAllowRealtimeCheckbox({
+        checked: this._realtimeContext.realtimeEnabled,
+        join: async () => {
+          // We need to fetch the channels before we can connect to the realtime session because:
+          // * the channels might have been closed since we left the realtime session
+          // * the channels might have changed since we last connected to the realtime session
+          // * the channels might not have been created yet because we started editing with realtime disabled.
+          await this._updateChannels();
+          this._startRealtimeSync();
+        },
+        leave: this._onAbort.bind(this)
+      });
+      this._editor.onBeforeDestroy(() => {
+        // While editing in-place the editor can be destroyed without the page being reloaded.
+        Interface.getAllowRealtimeCheckbox().off();
+      });
     }
 
     async _createSaver(info) {
@@ -275,7 +255,7 @@ define('xwiki-realtime-wysiwyg', [
             user => (user?.sessionId && user.sessionId === version.author) ||
               (user?.reference && user.reference === version.author?.reference)
           ) || version.author;
-          this._connection.toolbar.onCreateVersion(version);
+          this._connection.toolbar?.onCreateVersion(version);
         }
       }).toBeReady();
     }
@@ -322,38 +302,26 @@ define('xwiki-realtime-wysiwyg', [
       const contentWrapper = this._editor.getContentWrapper();
       const contentWrapperTop = $(contentWrapper).offset().top;
       const ownerDocument = contentWrapper.ownerDocument;
-      $(ownerDocument).find('.rt-user-position').remove();
-      const positions = {};
+      $(ownerDocument).find('.realtime-user-position').remove();
       users.filter(user => user['cursor_' + EDITOR_TYPE]).forEach(user => {
         // Set the user position.
         const element = ownerDocument.evaluate(user['cursor_' + EDITOR_TYPE], contentWrapper, null,
           XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        if (!element) {
-          return;
+        if (element) {
+          const top = $(element).offset().top - contentWrapperTop;
+          $('<img/>').attr({
+            class: 'realtime-user-position',
+            id: 'rt-user-' + user.id,
+            src: user.avatar,
+            alt: user.name,
+            title: user.name
+          }).css({
+            // Use the default top value (which is normally the top padding of the rich text area) if the element
+            // holding the caret has 0 or negative top value (this can happen for instance if the caret is directly
+            // under the root element, e.g. the BODY element for the standalone edit mode).
+            top: top > 0 ? top + 'px' : ''
+          }).insertAfter($(contentWrapper));
         }
-        const top = $(element).offset().top - contentWrapperTop;
-        if (!positions[top]) {
-          positions[top] = [user.id];
-        } else {
-          positions[top].push(user.id);
-        }
-        let $indicator;
-        if (user.avatar) {
-          $indicator = $('<img alt=""/>').attr('src', user.avatar);
-        } else {
-          $indicator = $('<div></div>').text(user.name.substring(0, 1));
-        }
-        $indicator.addClass('rt-non-realtime rt-user-position').attr({
-          id: 'rt-user-' + user.id,
-          title: user.name,
-          contenteditable: 'false'
-        }).css({
-          // Use the default top value (which is normally the top padding of the rich text area) if the element holding
-          // the caret has 0 or negative top value (this can happen for instance if the caret is directly under the root
-          // element, e.g. the BODY element for the standalone edit mode).
-          'top': top > 0 ? top + 'px' : ''
-        });
-        $(contentWrapper).after($indicator);
       });
     }
 
@@ -458,6 +426,10 @@ define('xwiki-realtime-wysiwyg', [
 
       console.debug('Unlocking editor');
       this.setEditable(true);
+
+      // Allow the user to leave the realtime editing session now that we're connected.
+      Interface.getAllowRealtimeCheckbox().prop('disabled', false);
+
       this._connection.toolbar.onConnectionStatusChange(2 /* connected */, info.myId);
     }
 
@@ -514,17 +486,19 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     _onConnectionChange(info) {
-      if (this._connection.status === ConnectionStatus.DISCONNECTED) {
-        return;
-      }
       console.debug('Connection status: ' + info.state);
       if (info.state) {
-        this._connection.status = ConnectionStatus.CONNECTING;
+        // Reconnecting.
         this._connection.toolbar.onConnectionStatusChange(1 /* connecting */, info.myId);
       } else {
-        this._connection.chainpad.abort();
-        this.setEditable(false);
+        // Temporarily disconnected.
+        // The internal state is set to 'connecting' because 'disconnected' is used when the user leaves the realtime
+        // session. We show 'Disconnected' on the toolbar to indicate that the user is offline.
+        this._connection.status = ConnectionStatus.CONNECTING;
         this._connection.toolbar.onConnectionStatusChange(0 /* disconnected */);
+        // Disable the editor while we're disconnected because ChainPad doesn't support very well merging changes made
+        // offline, especially if we stay offline for a long time.
+        this.setEditable(false);
       }
     }
 
@@ -538,9 +512,12 @@ define('xwiki-realtime-wysiwyg', [
           // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
           // abort the current realtime session.
           this._onAbort();
-          if (!this._saver.isDirty()) {
-            // Fortunately we don't have any unsaved local changes so we can rejoin the realtime session using the new
-            // Netflux channel.
+          if (
+            !this._saver.isDirty() ||
+            !this._realtimeContext.channels.wysiwyg_users // jshint ignore:line
+          ) {
+            // Either we don't have any unsaved local changes or there's no one else connected to the realtime session.
+            // We can rejoin the realtime session using the new Netflux channel.
             //
             // The editor was previously put in read-only mode when we got disconnected from the WebSocket (i.e. when
             // the WebSocket connection status changed, see above). The editor takes into account nested calls to
@@ -563,6 +540,11 @@ define('xwiki-realtime-wysiwyg', [
       if (this._connection.status === ConnectionStatus.DISCONNECTED) {
         // We already left the realtime session.
         return;
+      } else if (this._connection.status === ConnectionStatus.CONNECTING) {
+        // The editor has been put in read-only mode before we attempted to (re)connect to the realtime session. We need
+        // to restore the editable state before aborting the realtime session, in order to leave the editor in the state
+        // it was before we initiated the connection.
+        this.setEditable(true);
       }
 
       console.debug("Aborting the realtime session!");

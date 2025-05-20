@@ -94,6 +94,8 @@ class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigu
         assertEquals("default", this.source.getProperty("key", "default"));
         assertNull(this.source.getProperty("key"));
         assertNull(this.source.getProperty("key", Integer.class));
+        assertNull(this.source.getProperty("key", Void.TYPE));
+        assertEquals("default", this.source.getProperty("key", String.class, "default"));
 
         // Validate result for simple String key
 
@@ -102,6 +104,7 @@ class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigu
 
         assertEquals("value", this.source.getProperty("key", String.class));
         assertEquals("value", this.source.getProperty("key", "default"));
+        assertEquals("value", this.source.getProperty("key", String.class, "default"));
         assertEquals("value", this.source.getProperty("key"));
 
         // Validate result for non existing key
@@ -180,15 +183,23 @@ class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigu
     void isEmpty() throws XWikiException
     {
         assertTrue(this.source.isEmpty());
+        assertTrue(this.source.isEmpty("prefix"));
 
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
         assertFalse(this.source.isEmpty());
+        assertTrue(this.source.isEmpty("prefix"));
+
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "prefixkey", "value");
+
+        assertFalse(this.source.isEmpty());
+        assertFalse(this.source.isEmpty("prefix"));        
     }
 
     @Test
-    void setProperty() throws Exception
+    void setProperties() throws Exception
     {
         DocumentReference reference = new DocumentReference(CURRENT_WIKI,
             WikiPreferencesConfigurationSource.CLASS_SPACE_NAME, WikiPreferencesConfigurationSource.CLASS_PAGE_NAME);
@@ -203,14 +214,17 @@ class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigu
         BaseClass baseClass = document.getXClass();
         baseClass.addTextField("textKey", "Text Key", 30);
         baseClass.addBooleanField("booleanKey", "Boolean Key");
+        baseClass.addTextField("othertextKey", "Text Key", 30);
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("textKey", "value");
         properties.put("booleanKey", true);
         this.source.setProperties(properties);
+        this.source.setProperty("othertextKey", "othervalue");
 
         assertEquals("value", this.source.getProperty("textKey"));
+        assertEquals("othervalue", this.source.getProperty("othertextKey"));
 
         // Simulate the conversion from Integer to Boolean
         when(this.converterManager.convert(Boolean.class, 1)).thenReturn(true);

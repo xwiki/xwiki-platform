@@ -81,28 +81,16 @@ define('xwiki-realtime-wikiEditor', [
     }
 
     createAllowRealtimeCheckbox() {
-      Interface.realtimeAllowed(true);
-      let allowRealtimeCheckbox = $('.buttons input[type=checkbox].realtime-allow');
-      if (!allowRealtimeCheckbox.length) {
-        allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(true);
-        allowRealtimeCheckbox.on('change', () => {
-          if (allowRealtimeCheckbox.prop('checked')) {
-            // TODO: Allow for enabling realtime without reloading the entire page.
+      Interface.createAllowRealtimeCheckbox({
+        checked: this.editorConfig.realtimeEnabled,
+        join: () => {
+          return new Promise(() => {
+            // TODO: Join the realtime editing session without reloading the entire page.
             window.location.href = this.editorConfig.rtURL;
-          } else {
-            this.editorConfig.displayDisableModal(state => {
-              if (!state) {
-                allowRealtimeCheckbox.prop('checked', true);
-              } else {
-                Interface.realtimeAllowed(false);
-                this.onAbort();
-              }
-            });
-          }
-        });
-      }
-      // Disable while real-time framework is loading.
-      allowRealtimeCheckbox.prop('disabled', true);
+          });
+        },
+        leave: this.onAbort.bind(this)
+      });
     }
 
     cursorToPos(cursor, oldText) {

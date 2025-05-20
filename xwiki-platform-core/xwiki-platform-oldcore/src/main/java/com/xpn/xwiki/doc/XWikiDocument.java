@@ -2472,7 +2472,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param deep true if the dirty flag should be set to all children
      * @since 17.2.1
      * @since 17.3.0RC1
-     * @since 16.10.6
      */
     @Unstable
     public void setDirty(boolean dirty, boolean deep)
@@ -3786,6 +3785,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     /**
      * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param obj the object containing the field to display
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param number true if the number you be part of the input name, false otherwise
+     * @param context the XWiki context
+     * @return the rendered field
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public String display(String fieldname, String type, BaseObject obj, boolean isolated, boolean number,
+        XWikiContext context)
+    {
+        return display(fieldname, type, "", obj, isolated, number, context);
+    }
+
+    /**
+     * @param fieldname the name of the field to display
      * @param mode the mode to use ("view", "edit", ...)
      * @param prefix the prefix to add in the field identifier in edit display for example
      * @param context the XWiki context
@@ -3857,6 +3873,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param type the type of the field to display
      * @param pref the prefix to add in the field identifier in edit display for example
      * @param obj the object containing the field to display
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param number true if the number you be part of the input name, false otherwise
+     * @param context the XWiki context
+     * @return the rendered field
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public String display(String fieldname, String type, String pref, BaseObject obj, boolean isolated, boolean number,
+        XWikiContext context)
+    {
+        return display(fieldname, type, pref, obj, context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context),
+            isolated, number, context);
+    }
+
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param pref the prefix to add in the field identifier in edit display for example
+     * @param obj the object containing the field to display
      * @param wrappingSyntaxId the syntax of the content in which the result will be included. This to take care of some
      *            escaping depending of the syntax.
      * @param context the XWiki context
@@ -3881,6 +3916,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public String display(String fieldname, String type, String pref, BaseObject obj, String wrappingSyntaxId,
         boolean isolated, XWikiContext context)
+    {
+        return display(fieldname, type, pref, obj, wrappingSyntaxId, isolated, true, context);
+    }
+
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param pref the prefix to add in the field identifier in edit display for example
+     * @param obj the object containing the field to display
+     * @param wrappingSyntaxId the syntax of the content in which the result will be included. This to take care of some
+     *            escaping depending of the syntax.
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param number true if the number you be part of the input name, false otherwise
+     * @param context the XWiki context
+     * @return the rendered field
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public String display(String fieldname, String type, String pref, BaseObject obj, String wrappingSyntaxId,
+        boolean isolated, boolean number, XWikiContext context)
     {
         if (obj == null) {
             return "";
@@ -3908,8 +3963,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
-            String prefix = pref + LOCAL_REFERENCE_SERIALIZER.serialize(obj.getXClass(context).getDocumentReference())
-                + "_" + obj.getNumber() + "_";
+
+            StringBuilder builder = new StringBuilder(pref);
+            builder.append(LOCAL_REFERENCE_SERIALIZER.serialize(obj.getXClass(context).getDocumentReference()));
+            if (number) {
+                builder.append('_');
+                builder.append(obj.getNumber());
+            }
+            builder.append('_');
+            String prefix = builder.toString();
 
             if (pclass == null) {
                 return "";
@@ -4731,7 +4793,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             doc.setEnforceRequiredRights(isEnforceRequiredRights());
 
             if (this.xClass != null) {
-                doc.setXClass(this.xClass.clone());
+                doc.setXClass(this.xClass.clone(true));
             }
 
             if (keepsIdentity) {

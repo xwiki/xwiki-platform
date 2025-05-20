@@ -45,21 +45,50 @@
           'data-linktype': 'attachment',
           'data-freestanding': true,
           'data-wikigeneratedlinkcontent': upload.fileName,
-          'data-reference': upload.responseData.resourceReference
+          'data-reference': upload.responseData.serializedResourceReference
         }));
       });
 
       this.overrideUploadWidget(editor, 'uploadimage', false, function(html, upload) {
-        // The image widget looks for these markers.
-        var startMarker = '<!--startimage:' + CKEDITOR.tools.escapeComment(
-          upload.responseData.resourceReference) + '-->';
-        var stopMarker = '<!--stopimage-->';
-        // We need to overwrite the HTML because the upload image widget sets the image width and height and we don't
-        // want to save them unless the user resizes the image explicitly.
-        // See CKEDITOR-223: Image larger than the screen inserted with drag & drop gets distorted (explicit image size
-        // is added by default)
-        var image = '<img src="' + upload.url + '"/>';
-        return startMarker + image + stopMarker;
+        // Check if the uploaded image is already wrapped by a image widget.
+        const widget = editor.widgets.getByElement(this.wrapper.getParent());
+        if (widget?.name === 'image' && widget.parts.image.equals(this.parts.img)) {
+          // Update the image widget data.
+          widget.setData({
+            resourceReference: upload.responseData.resourceReference,
+            src: upload.url
+          });
+
+          // We need to add the image back after the upload image widget is removed. We use a placeholder to know where
+          // to insert the image back.
+          const placeholder = editor.document.createElement('span');
+          placeholder.insertBefore(this.wrapper);
+          setTimeout(() => {
+            // The upload image widget has been detached from the DOM but the image element still has some leftover
+            // attributes specific to the upload image widget. We perform the cleanup by destroying the upload image
+            // widget. We set the wrapper to the placeholder knowing that the destroy method is replacing the wrapper
+            // with the widget element (the image) at the end. Note that the image source was updated when we set the
+            // image widget data above.
+            this.wrapper = placeholder;
+            // Don't keep any widget specific attributes when destroying the widget.
+            widget.parts.image.data('cke-widget-keep-attr', 0);
+            editor.widgets.destroy(this);
+          }, 0);
+
+          // Simply remove the upload image widget.
+          return "";
+        } else {
+          // Insert the image widget markers so that the uploaded image is upcasted to an image widget.
+          const startMarker = '<!--startimage:' + CKEDITOR.tools.escapeComment(
+            upload.responseData.serializedResourceReference) + '-->';
+          const stopMarker = '<!--stopimage-->';
+          // We need to overwrite the HTML because the upload image widget sets the image width and height and we don't
+          // want to save them unless the user resizes the image explicitly.
+          // See CKEDITOR-223: Image larger than the screen inserted with drag & drop gets distorted (explicit image
+          // size is added by default)
+          const image = '<img src="' + upload.url + '"/>';
+          return startMarker + image + stopMarker;
+        }
       });
 
       // Browses uses 'image.png', or a localized form (e.g., 'graphik.png' in German Firefox) as file name when pasting
@@ -123,9 +152,9 @@
         delete this._upload;
         if (upload) {
           upload.responseData.resourceReference.typed = typedResourceReference;
-          upload.responseData.resourceReference = CKEDITOR.plugins.xwikiResource
+          upload.responseData.serializedResourceReference = CKEDITOR.plugins.xwikiResource
             .serializeResourceReference(upload.responseData.resourceReference);
-          data = filter(data, upload);
+          data = filter.call(this, data, upload);
         }
         originalReplaceWith.call(this, data, mode);
       };
@@ -204,6 +233,9 @@
           'name': 'uploadedFiles',
           'value': JSON.parse(event.data.fileLoader.xhr.responseText).fileName
         });
+        if (editor.config.formId) {
+          input.attr('form', editor.config.formId);
+        }
         input.insertAfter($(editor.element.$));
       }
     });
@@ -235,8 +267,9 @@
 
       editor.on('paste', function(event) {
         const data = event.data;
-        // Check if the pasted content is HTML and contains images.
-        if (data.type === 'html' && data.dataValue.includes('<img')) {
+        // Check if the pasted content was copied from outside the editor, is HTML and contains images.
+        if (data.dataTransfer.getTransferType() === CKEDITOR.DATA_TRANSFER_EXTERNAL && data.type === 'html' &&
+            data.dataValue.includes('<img')) {
           // The clipboard can contain multiple data types. For instance, when using the "Copy Image" option from the
           // browser's context menu, the clipboard is filled with both the image HTML markup and the image File object.
           // CKEditor prefers the HTML markup but we can still access the File object.
@@ -428,17 +461,6 @@
         const fileName = getFileName(image.$.src);
         const loader = editor.uploadRepository.create(imageFile, fileName, uploadImageWidgetDef.loaderType);
         loader.upload(uploadImageWidgetDef.uploadUrl, uploadImageWidgetDef.additionalRequestParameters);
-
-        // Destroy the image widget (we replace it with the upload image widget below).
-        const imageWidget = editor.widgets.getByElement(image);
-        if (imageWidget) {
-          // Destroying the image widget doesn't cleanup the DOM, so we have to replace ourselves the widget wrapper
-          // with the image element.
-          imageWidget.wrapper.$.replaceWith(image.$);
-          editor.widgets.destroy(imageWidget, true);
-          // At this point the widget repository still thinks that the image widget we just destroyed is focused.
-          editor.widgets.checkSelection();
-        }
 
         // Create the upload image widget.
         CKEDITOR.fileTools.markElement(image, 'uploadimage', loader.id);

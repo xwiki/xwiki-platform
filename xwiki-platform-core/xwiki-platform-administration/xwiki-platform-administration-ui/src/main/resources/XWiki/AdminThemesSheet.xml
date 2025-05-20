@@ -44,22 +44,6 @@ $xwiki.jsx.use('XWiki.AdminThemesSheet')
   'icontheme' : ['iconTheme'],
   'skin': ['skin']
 })
-###
-### Use the color theme displayer.
-###
-### It's needed because the XWikiPreferences class might not have been configured to use it, which is the case
-### when oldcore creates the class (it is not supposed to know that the Administration Application will be installed).
-###
-#if ($hasGlobalAdmin)
-  #set ($class = $xwiki.getClass('XWiki.XWikiPreferences'))
-  #foreach ($p in $class.XWikiClass.enabledProperties)
-    #if ($p.name == 'colorTheme' &amp;&amp; "$!p.customDisplay" == '')
-      ## Add the custom displayer (it won't be saved but it will be used for the display of the current document)
-      $p.setCustomDisplay('{{include reference="XWiki.ColorThemePropertyDisplayer" /}}')
-      #break
-    #end
-  #end
-#end
 {{/velocity}}
 
 {{include reference="XWiki.AdminFieldsDisplaySheet" /}}</content>

@@ -54,6 +54,7 @@ import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageReference;
@@ -1170,6 +1171,24 @@ public class Document extends Api
     }
 
     /**
+     * Creates a new XObject from the given class reference.
+     *
+     * @param classReference the reference to the class of the XObject to be created
+     * @return the object created
+     * @throws XWikiException if an error occurs while creating the XObject
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    public Object newObject(EntityReference classReference) throws XWikiException
+    {
+        int index = getDoc().createXObject(classReference, getXWikiContext());
+
+        updateAuthor();
+
+        return getObject(classReference, index);
+    }
+
+    /**
      * @return true of the document has been loaded from cache
      */
     public boolean isFromCache()
@@ -1226,6 +1245,21 @@ public class Document extends Api
     public Vector<Object> getObjects(String className)
     {
         List<BaseObject> objects = this.getDoc().getXObjects(this.doc.resolveClassReference(className));
+        return getXObjects(objects);
+    }
+
+    /**
+     * Retrieves and returns all objects corresponding to the class reference corresponding to the resolution of the
+     * given entity reference, or an empty list if there are none.
+     *
+     * @param classReference the reference that is resolved to an XClass for retrieving the corresponding xobjects
+     * @return a list of xobjects corresponding to the given XClass or an empty list.
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    public List<Object> getObjects(EntityReference classReference)
+    {
+        List<BaseObject> objects = this.getDoc().getXObjects(classReference);
         return getXObjects(objects);
     }
 
@@ -1377,6 +1411,29 @@ public class Document extends Api
     {
         try {
             BaseObject obj = this.getDoc().getObject(classname, nb);
+            if (obj == null) {
+                return null;
+            } else {
+                return newObjectApi(obj, getXWikiContext());
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Gets the object matching the given class reference and given object number.
+     *
+     * @param classReference the reference of the class of the object
+     * @param nb the number of the object
+     * @return the XWiki Object
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    public Object getObject(EntityReference classReference, int nb)
+    {
+        try {
+            BaseObject obj = this.getDoc().getXObject(classReference, nb);
             if (obj == null) {
                 return null;
             } else {
@@ -1882,7 +1939,7 @@ public class Document extends Api
 
     /**
      * @param filename the name of the attachment
-     * @return the attachment with the given filename or null if the attachment does not exist
+     * @return the attachment with the given filename or null if the attachment doesn’t exist
      * @since 17.2.0RC1
      */
     public Attachment removeAttachment(String filename)

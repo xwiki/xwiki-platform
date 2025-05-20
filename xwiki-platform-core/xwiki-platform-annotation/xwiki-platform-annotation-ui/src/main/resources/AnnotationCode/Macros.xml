@@ -119,7 +119,7 @@
         #displayAnnotationBoxButtons('edit')
       &lt;/form&gt;
     #else
-      &lt;div class="box infomessage"&gt;$services.localization.render('annotations.action.edit.error.notfound')&lt;/div&gt;
+      #info($services.localization.render('annotations.action.edit.error.notfound'))
     #end
   &lt;/div&gt;
 #end
@@ -152,7 +152,7 @@
       ##&lt;div class="clearfloats"&gt;&lt;/div&gt;
       #displayAnnotationFromReference($ann $mode $docRef)
     #else
-      &lt;div class="box infomessage"&gt;$services.localization.render('annotations.action.view.error.notfound')&lt;/div&gt;
+      #info($services.localization.render('annotations.action.view.error.notfound'))
     #end
   &lt;/div&gt;
 #end

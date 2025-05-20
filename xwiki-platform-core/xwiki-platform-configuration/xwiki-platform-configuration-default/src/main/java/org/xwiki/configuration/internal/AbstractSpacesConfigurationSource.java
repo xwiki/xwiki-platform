@@ -164,6 +164,17 @@ public abstract class AbstractSpacesConfigurationSource extends AbstractComposit
         }
 
         @Override
+        public List<String> getKeys(String prefix)
+        {
+            XWikiDocument currentDocument = setCurrentDocument(getDocument());
+            try {
+                return getSpaceConfigurationSource().getKeys(prefix);
+            } finally {
+                setCurrentDocument(currentDocument);
+            }
+        }
+        
+        @Override
         public boolean containsKey(String key)
         {
             XWikiDocument currentDocument = setCurrentDocument(getDocument());
@@ -180,6 +191,17 @@ public abstract class AbstractSpacesConfigurationSource extends AbstractComposit
             XWikiDocument currentDocument = setCurrentDocument(getDocument());
             try {
                 return getSpaceConfigurationSource().isEmpty();
+            } finally {
+                setCurrentDocument(currentDocument);
+            }
+        }
+
+        @Override
+        public boolean isEmpty(String prefix)
+        {
+            XWikiDocument currentDocument = setCurrentDocument(getDocument());
+            try {
+                return getSpaceConfigurationSource().isEmpty(prefix);
             } finally {
                 setCurrentDocument(currentDocument);
             }

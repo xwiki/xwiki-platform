@@ -140,10 +140,17 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public void setObject(BaseCollection object)
     {
-        this.xclass = (BaseClass) object;
+        if (this.xclass != object) {
+            this.xclass = (BaseClass) object;
+            this.referenceCache = null;
 
-        if (object != null) {
-            setOwnerDocument(object.getOwnerDocument());
+            if (object != null) {
+                setOwnerDocument(object.getOwnerDocument());
+
+                if (isDirty()) {
+                    this.xclass.setDirty(true);
+                }
+            }
         }
     }
 
@@ -423,6 +430,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     public void setName(String name)
     {
         setStringValue("name", name);
+        this.referenceCache = null;
     }
 
     public String getCustomDisplay()
@@ -567,17 +575,35 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     @Override
-    public void detach()
+    protected void detachOwner()
     {
-        super.detach();
+        super.detachOwner();
 
         setObject(null);
+    }
+
+
+    @Override
+    protected void cloneOwner()
+    {
+        super.cloneOwner();
+
+        // Get the object from the cloned owner
+        if (getOwnerDocument() != null && getObject() != null) {
+            setObject(this.ownerDocument.getXClass());
+        }
     }
 
     @Override
     public PropertyClass clone()
     {
         return (PropertyClass) super.clone();
+    }
+
+    @Override
+    public PropertyClass clone(boolean detach)
+    {
+        return (PropertyClass) super.clone(detach);
     }
 
     @Override

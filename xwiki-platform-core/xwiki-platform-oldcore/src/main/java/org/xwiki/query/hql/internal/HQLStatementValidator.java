@@ -19,10 +19,12 @@
  */
 package org.xwiki.query.hql.internal;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.query.QueryException;
+import org.xwiki.stability.Unstable;
 
 /**
  * A component in charge of validating a passed HQL statement.
@@ -43,4 +45,14 @@ public interface HQLStatementValidator
      * @throws QueryException when failing the validate the query
      */
     boolean isSafe(String statement) throws QueryException;
+
+    /**
+     * @param allowedPrefixes the prefix allowed for each order by parameter
+     * @param orderByValue the order by value to check
+     * @throws QueryException if the order by is not safe
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     */
+    @Unstable
+    void checkOrderBySafe(List<String> allowedPrefixes, String orderByValue) throws QueryException;
 }

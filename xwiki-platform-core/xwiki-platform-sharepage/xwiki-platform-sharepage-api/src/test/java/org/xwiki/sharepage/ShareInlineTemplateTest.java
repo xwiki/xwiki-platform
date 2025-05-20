@@ -19,17 +19,25 @@
  */
 package org.xwiki.sharepage;
 
+import javax.inject.Named;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Page test for the {@code shareinline} template.
@@ -41,6 +49,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 })
 class ShareInlineTemplateTest extends PageTest
 {
+    @MockComponent(classToMock = IconManagerScriptService.class)
+    @Named("icon")
+    private ScriptService iconManagerScriptService;
+
+    @BeforeEach
+    void setup()
+    {
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+            .then(invocationOnMock -> invocationOnMock.getArgument(0) + "Icon");
+    }
+
     /**
      * Verify that when no "from" address is specified, one is constructed automatically, based on the server name.
      */
@@ -71,7 +90,15 @@ class ShareInlineTemplateTest extends PageTest
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         String result = templateManager.render("shareinline.vm");
 
-        assertTrue(result.contains("<div class=\"box infomessage\">core.viewers.share.send.success [john]</div>"));
+        assertTrue(result.trim().contains("""
+                <div class="box infomessage ">
+                    <span class="icon-block">infoIcon</span>
+                    <span class="sr-only">info</span>
+                    <div>
+                            core.viewers.share.send.success [john]
+                    </div>
+                  </div>"""),
+            String.format("Actual result is: %s", result));
     }
 
     @Test
@@ -92,7 +119,7 @@ class ShareInlineTemplateTest extends PageTest
 
         Document document = Jsoup.parse(templateManager.render("shareinline.vm"));
 
-        assertEquals("error: core.viewers.share.send.error "
+        assertEquals("exclamationIcon error core.viewers.share.send.error "
                 + "[<strong>hello</strong>, core.viewers.share.error.serverError]",
             document.selectFirst(".errormessage").text());
     }

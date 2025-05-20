@@ -19,10 +19,8 @@
  */
 package org.xwiki.realtime.wysiwyg.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,11 +42,14 @@ import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.realtime.test.po.Coeditor;
 import org.xwiki.realtime.test.po.RealtimeInplaceEditablePage;
 import org.xwiki.realtime.test.po.SaveStatus;
+import org.xwiki.realtime.test.po.SummaryModal;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement.CoeditorPosition;
@@ -57,8 +58,15 @@ import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import com.mchange.io.FileUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the real-time WYSIWYG editor.
@@ -129,18 +137,18 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("John", selfPosition.getAvatarHint());
         assertTrue(selfPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + selfPosition.getAvatarURL());
-        selfPosition.waitForLocation(new Point(4, 18));
+        selfPosition.waitForLocation(new Point(4, 17));
 
         assertEquals(1, textArea.getCoeditorPositions().size());
 
         // Verify that the cursor indicator is updated when typing.
         textArea.sendKeys(Keys.ENTER, "two");
-        selfPosition.waitForLocation(new Point(4, 48));
+        selfPosition.waitForLocation(new Point(4, 47));
 
         // Verify save and cancel.
         editPage.getToolbar().sendSaveShortcutKey();
         textArea.sendKeys(Keys.ENTER, "three");
-        editPage.getToolbar().sendCancelShortcutKey();
+        setup.leaveEditMode();
         RealtimeInplaceEditablePage inplaceEditablePage = new RealtimeInplaceEditablePage();
         assertEquals("one\ntwo", inplaceEditablePage.getContent());
 
@@ -163,6 +171,43 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         inplaceEditablePage.done();
         assertEquals("zero\ntwo\nthree", inplaceEditablePage.getContent());
+
+        // edit again and test the summarize & done
+        inplaceEditablePage.editInplace();
+        new RealtimeCKEditor().getRichTextArea().sendKeys(
+            Keys.ARROW_DOWN,
+            Keys.ARROW_DOWN,
+            Keys.END,
+            Keys.ENTER,
+            "four");
+        SummaryModal summaryModal = inplaceEditablePage.getToolbar().clickSummarizeAndDone();
+        summaryModal.setSummary("Summarize changes");
+        summaryModal.clickSave(true);
+        inplaceEditablePage.waitForView();
+        assertEquals("zero\ntwo\nthree\nfour", inplaceEditablePage.getContent());
+        HistoryPane historyPane = inplaceEditablePage.openHistoryDocExtraPane();
+        assertEquals(4, historyPane.getNumberOfVersions());
+        assertEquals("Summarize changes", historyPane.getCurrentVersionComment());
+
+        // delete the page to test creation with summarize & done (regression test for XWIKI-23136)
+        setup.deletePage(testReference);
+        editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        editor = editPage.getContenEditor();
+        textArea = editor.getRichTextArea();
+        textArea.sendKeys("New content");
+        new WikiEditPage().setTitle("Dummy title");
+        summaryModal = editPage.getToolbar().clickSummarizeAndDone();
+        summaryModal.setSummary("Summarize changes 2");
+
+        // Since it's a page creation, we're not in inplace editable page and so we'll have a reload.
+        setup.getDriver().addPageNotYetReloadedMarker();
+        summaryModal.clickSave(true);
+        setup.getDriver().waitUntilPageIsReloaded();
+        ViewPage viewPage = new ViewPage();
+        assertEquals("New content", viewPage.getContent());
+        assertEquals("Dummy title", viewPage.getDocumentTitle());
+        historyPane = inplaceEditablePage.openHistoryDocExtraPane();
+        assertEquals("Summarize changes 2", historyPane.getCurrentVersionComment());
     }
 
     @Test
@@ -248,14 +293,14 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The first user is on the third line (paragraph).
         CoeditorPosition firstPosition =
-            secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 78));
+            secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 77));
         assertEquals("John", firstPosition.getAvatarHint());
         assertTrue(firstPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + firstPosition.getAvatarURL());
 
         // The second user is on the first line (paragraph).
         CoeditorPosition secondPosition =
-            secondTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 18));
+            secondTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 17));
         assertEquals("John", secondPosition.getAvatarHint());
         assertTrue(secondPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + secondPosition.getAvatarURL());
@@ -270,7 +315,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 48));
+        firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 47));
 
         // Verify that clicking on the coeditor indicator scrolls the editing area to the coeditor position.
         // But first we need to add enough paragraphs to make the editing area scrollable.
@@ -286,7 +331,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Switch to the second tab and click on the coeditor indicator.
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.waitUntilTextContains("end");
-        firstPosition = secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 18 + 22 * 30));
+        firstPosition = secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 17 + 22 * 30));
         assertFalse(firstPosition.isVisible(), "The coeditor position is visible before scrolling.");
         secondEditPage.getToolbar().waitForCoeditor(firstCoeditorId).click();
         assertTrue(firstPosition.isVisible(), "The coeditor position is not visible after scrolling.");
@@ -629,6 +674,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
         imageDialogEditModal.clickInsert();
+
+        // Verify the image is uploaded properly
+        File file = setup.getResourceFile("/image.gif");
+        byte[] uploadedAttachmentContent = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
+        assertTrue(Arrays.equals(FileUtils.getBytes(file), uploadedAttachmentContent));
 
         // Focus the caption and edit it.
         secondTextArea.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP);
@@ -1215,7 +1266,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         String firstRefreshCounter = firstTextArea.getRefreshCounter();
 
         // Leave the edit mode to see that the script level associated with the realtime session remains the same.
-        firstEditPage.getToolbar().sendCancelShortcutKey();
+        setup.leaveEditMode();
 
         //
         // Second Tab
@@ -1384,11 +1435,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         assertEquals("John, superadmin", firstEditPage.getToolbar().getVisibleCoeditors().stream()
             .map(Coeditor::getAvatarHint).reduce((a, b) -> a + ", " + b).get());
-
-        // Leave edit mode.
-        firstEditPage.getToolbar().sendCancelShortcutKey();
-        multiUserSetup.switchToBrowserTab(secondTabHandle);
-        secondEditPage.getToolbar().sendCancelShortcutKey();
     }
 
     @Test

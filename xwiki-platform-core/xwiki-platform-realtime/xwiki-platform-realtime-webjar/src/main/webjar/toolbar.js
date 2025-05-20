@@ -45,14 +45,16 @@ define('xwiki-realtime-toolbar', [
 
       // Replace the old toolbar.
       this._oldToolbar = document.querySelector('.bottombuttons.sticky-buttons > .buttons,' +
+        // The old toolbar is moved when editing fullscreen with the standalone editor.
+        ' .cke_maximized > .buttons,' +
         ' .inplace-editing-buttons.sticky-buttons > .buttons');
       this._oldToolbar.before(this._toolbar);
       this._oldToolbar.hidden = true;
 
       this._createChangeSummaryModal();
       this._createVersionModal();
+      this._createLeaveModal();
       this._activateDoneButton();
-      this._activateLeaveButton();
 
       this.onConnectionStatusChange(1 /* connecting */);
     }
@@ -82,10 +84,15 @@ define('xwiki-realtime-toolbar', [
       });
     }
 
-    _activateLeaveButton() {
-      this._leaveButton = this._toolbar.querySelector('.realtime-action-leave');
-      this._leaveButton.addEventListener('click', event => {
-        event.preventDefault();
+    _createLeaveModal() {
+      let leaveModal = document.querySelector('#realtime-leave-modal');
+      if (!leaveModal) {
+        const template = document.querySelector('template#realtime-leave-modal-template');
+        leaveModal = template.content.querySelector('#realtime-leave-modal').cloneNode(true);
+        document.body.appendChild(leaveModal);
+      }
+
+      $(leaveModal).find('.modal-footer .btn-primary').off('click.realtime').on('click.realtime', () => {
         this._config.leave();
       });
     }
@@ -133,22 +140,26 @@ define('xwiki-realtime-toolbar', [
 
     async _loadChanges(changesTab) {
       changesTab.dataset.state = 'loading';
-      const previousVersion = this._changeSummaryModal.dataset.previousVersion;
+      if (xwikiDocument.isNew) {
+        changesTab.dataset.state = 'isNew';
+      } else {
+        const previousVersion = this._changeSummaryModal.dataset.previousVersion;
 
-      try {
-        const html = await this._fetchChanges(previousVersion);
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = html;
-        const diff = wrapper.querySelector('.diff-group');
-        if (diff) {
-          changesTab.dataset.state = 'loaded';
-          changesTab.querySelector('.diff-group').replaceWith(diff);
-        } else {
-          changesTab.dataset.state = 'empty';
+        try {
+          const html = await this._fetchChanges(previousVersion);
+          const wrapper = document.createElement('div');
+          wrapper.innerHTML = html;
+          const diff = wrapper.querySelector('.diff-group');
+          if (diff) {
+            changesTab.dataset.state = 'loaded';
+            changesTab.querySelector('.diff-group').replaceWith(diff);
+          } else {
+            changesTab.dataset.state = 'empty';
+          }
+        } catch (error) {
+          changesTab.dataset.state = 'error';
+          console.error(error);
         }
-      } catch (error) {
-        changesTab.dataset.state = 'error';
-        console.error(error);
       }
     }
 
@@ -184,13 +195,15 @@ define('xwiki-realtime-toolbar', [
 
     async _saveChangeSummary() {
       const commentInput = this._oldToolbar.querySelector('input[name="comment"]');
-      const minorEditCheckbox = this._oldToolbar.querySelector('input[name="minorEdit"]');
       const changeSummaryTextArea = this._changeSummaryModal.querySelector('textarea[name=summary]');
       const minorChangeCheckbox = this._changeSummaryModal.querySelector('input[name="minorChange"]');
       const continueEditing = this._changeSummaryModal.dataset.continue === 'true';
       // Put the change summary and the minor edit checkbox in the form.
       commentInput.value = changeSummaryTextArea.value;
-      minorEditCheckbox.checked = minorChangeCheckbox.checked;
+      if (!xwikiDocument.isNew) {
+        const minorEditCheckbox = this._oldToolbar.querySelector('input[name="minorEdit"]');
+        minorEditCheckbox.checked = minorChangeCheckbox.checked;
+      }
       $(this._changeSummaryModal).modal('hide');
 
       const lastReviewedVersion = this._lastReviewedVersion;
@@ -376,7 +389,9 @@ define('xwiki-realtime-toolbar', [
   }
 
   class Spinner extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+      super();
+
       const shadowRoot = this.attachShadow({mode: 'open'});
       const template = document.querySelector('template#realtime-spinner');
       shadowRoot.appendChild(template.content.cloneNode(true));
@@ -385,7 +400,9 @@ define('xwiki-realtime-toolbar', [
   customElements.define("realtime-spinner", Spinner);
 
   class Status extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+      super();
+
       const shadowRoot = this.attachShadow({mode: 'open'});
       const template = document.querySelector('template#realtime-status');
       shadowRoot.appendChild(template.content.cloneNode(true));
@@ -398,15 +415,18 @@ define('xwiki-realtime-toolbar', [
       return ['reference', 'locale', 'version'];
     }
 
-    connectedCallback() {
+    constructor() {
+      super();
+
       this.attachShadow({mode: 'open'});
-      this._initialized = true;
+    }
+
+    connectedCallback() {
       this._fetchDocument();
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-      // This method can be called before the connected callback.
-      if (this._initialized) {
+      if (this.isConnected) {
         this._fetchDocument();
       }
     }

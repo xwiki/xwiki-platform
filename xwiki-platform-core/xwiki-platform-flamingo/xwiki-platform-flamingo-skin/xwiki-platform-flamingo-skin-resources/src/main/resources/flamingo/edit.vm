@@ -127,7 +127,6 @@
   ##################
   <div id="xwikieditor">
   <div id="xwikieditorinner">
-  <div class="leftsidecolumns main">
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
   <div id="mainEditArea">
@@ -214,8 +213,6 @@
   </div> ## mainEditArea
   </div> ## alleditcontent
   </div> ## editcolumn
-  <div class="clearfix"></div>
-  </div> ## leftsidecolumns
   #template("editpanels.vm")
   <div class="clearfix"></div>
   </div> ## xwikieditorinner

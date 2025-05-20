@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ActionExecutingEvent;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.observation.EventListener;
@@ -35,7 +36,7 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Initialize farm distribution job.
+ * Trigger distribution jobs.
  * 
  * @version $Id$
  * @since 4.2M3
@@ -49,7 +50,7 @@ public class DistributionInitializerListener implements EventListener
      * The list of events to listen to.
      */
     private static final List<Event> EVENTS = Arrays.<Event>asList(new ActionExecutingEvent("view"),
-        new ActionExecutingEvent("distribution"));
+        new ActionExecutingEvent("distribution"), new ApplicationReadyEvent());
 
     /**
      * The component used to get information about the current distribution.
@@ -75,13 +76,34 @@ public class DistributionInitializerListener implements EventListener
     @Override
     public void onEvent(Event event, Object arg1, Object arg2)
     {
-        XWikiContext xcontext = (XWikiContext) arg2;
-        
+        if (event instanceof ApplicationReadyEvent) {
+            onApplicationReady();
+        } else {
+            onView((XWikiContext) arg2);
+        }
+    }
+
+    private void onApplicationReady()
+    {
+        // If the DW is not interactive, trigger it right away
+        if (!this.distributionConfiguration.isInteractiveDistributionWizardEnabledForMainWiki()) {
+            DistributionState distributionState = this.distributionManager.getFarmDistributionState();
+
+            if (distributionState != DistributionState.NONE) {
+                startFarmJob();
+            }
+        }
+    }
+
+    private void onView(XWikiContext xcontext)
+    {
+        // Do nothing if the current distribution job was triggered already
         // Do nothing if the automatic start of DW is disabled
-        if (!isAutoDistributionWizardEnabled(xcontext)) {
+        if (this.distributionManager.getCurrentDistributionJob() != null
+            || !isAutoDistributionWizardEnabled(xcontext)) {
             return;
         }
-        
+
         DistributionState distributionState = this.distributionManager.getFarmDistributionState();
 
         // Start the Distribution Wizard only if the current user has the right to access it
@@ -104,8 +126,8 @@ public class DistributionInitializerListener implements EventListener
      */
     private boolean isAutoDistributionWizardEnabled(XWikiContext xcontext)
     {
-        return xcontext.isMainWiki() ? distributionConfiguration.isAutoDistributionWizardEnabledForMainWiki()
-                : distributionConfiguration.isAutoDistributionWizardEnabledForWiki();
+        return xcontext.isMainWiki() ? this.distributionConfiguration.isAutoDistributionWizardEnabledForMainWiki()
+            : this.distributionConfiguration.isAutoDistributionWizardEnabledForWiki();
     }
 
     private synchronized void startFarmJob()
@@ -121,7 +143,7 @@ public class DistributionInitializerListener implements EventListener
     private synchronized void startWikiJob(String wiki)
     {
         if (this.distributionManager.getWikiJob(wiki) == null) {
-            this.distributionManager.startWikiJob(wiki);
+            this.distributionManager.startWikiJob(wiki, true);
         }
     }
 }

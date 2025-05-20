@@ -181,7 +181,8 @@
   }
   &amp;[data-state="loading"] &gt; realtime-spinner,
   &amp;[data-state="loaded"] &gt; .diff-group,
-  &amp;[data-state="empty"] &gt; .infomessage,
+  &amp;[data-state="empty"] &gt; .infomessage.noChange,
+  &amp;[data-state="isNew"] &gt; .infomessage.isNew,
   &amp;[data-state="error"] &gt; .errormessage {
     display: block;
   }
@@ -580,6 +581,8 @@ ul.realtime-users {
               href="#"
               class="realtime-action-leave"
               title="$escapetool.xml($services.localization.render('realtime.leave.hint'))"
+              data-toggle="modal"
+              data-target="#realtime-leave-modal"
             &gt;$escapetool.xml($services.localization.render('realtime.leave'))&lt;/a&gt;
           &lt;/li&gt;
         &lt;/ul&gt;
@@ -783,8 +786,11 @@ ul.realtime-users {
             &gt;
               &lt;realtime-spinner&gt;&lt;/realtime-spinner&gt;
               &lt;div class="diff-group"&gt;&lt;/div&gt;
-              &lt;div class="box infomessage"&gt;
+              &lt;div class="box infomessage noChange"&gt;
                 $escapetool.xml($services.localization.render('realtime.changes.empty'))
+              &lt;/div&gt;
+              &lt;div class="box infomessage isNew"&gt;
+                $escapetool.xml($services.localization.render('realtime.changes.isnew'))
               &lt;/div&gt;
               &lt;div class="box errormessage"&gt;
                 $escapetool.xml($services.localization.render('realtime.changes.error'))
@@ -839,6 +845,35 @@ ul.realtime-users {
         &lt;div class="modal-footer"&gt;
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
             $escapetool.xml($services.localization.render('realtime.close'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-leave-modal-template"&gt;
+  &lt;div id="realtime-leave-modal" class="modal fade" tabindex="-1" role="dialog"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('realtime.close'))"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title"&gt;
+            $escapetool.xml($services.localization.render('realtime.leave'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          $escapetool.xml($services.localization.render('realtime.leave.confirmation'))
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-primary" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('realtime.leave.accept'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
           &lt;/button&gt;
         &lt;/div&gt;
       &lt;/div&gt;

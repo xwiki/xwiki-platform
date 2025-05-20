@@ -26,11 +26,12 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+
+import jakarta.servlet.http.Cookie;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;
@@ -104,7 +105,7 @@ public class AuthenticationCookieFilter implements CookieFilter
                 public String getHeader(String name)
                 {
                     if ("X-Forwarded-For".equals(name)) {
-                        return cookieFilterContext.getBrowserIPAddress();
+                        return cookieFilterContext.getClientIPAddress();
                     } else {
                         return super.getHeader(name);
                     }
@@ -113,7 +114,7 @@ public class AuthenticationCookieFilter implements CookieFilter
                 @Override
                 public String getRemoteAddr()
                 {
-                    return cookieFilterContext.getBrowserIPAddress();
+                    return cookieFilterContext.getClientIPAddress();
                 }
             };
             HttpServletResponse fakeResponse = new HttpServletResponseWrapper(xcontext.getResponse())

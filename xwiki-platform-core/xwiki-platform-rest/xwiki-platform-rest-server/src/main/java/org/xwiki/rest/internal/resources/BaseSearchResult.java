@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.EnumSet;
@@ -26,6 +27,7 @@ import java.util.Formatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,9 +37,12 @@ import javax.inject.Provider;
 import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
-import org.xwiki.localization.LocaleUtils;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -63,6 +68,8 @@ import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserPropertiesResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -84,6 +91,27 @@ public class BaseSearchResult extends XWikiResource
 
     protected static final String QUERY_TEMPLATE_INFO =
         "q={query}(&type={type})(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
+
+    private static final String WIKI_SEPARATOR = ":";
+
+    private static final String ASC = "asc";
+
+    /**
+     * Mapping of database fields that are supported as order parameters with corresponding Solr fields.
+     */
+    private static final Map<String, String> ORDER_FIELD_DATABASE_TO_SOLR = Map.ofEntries(
+        Map.entry("fullName", "fullname"),
+        Map.entry("name", "name_exact"),
+        Map.entry("title", "title_sort"),
+        Map.entry("language", "language"),
+        Map.entry("date", "date"),
+        Map.entry("creationDate", "creationdate"),
+        Map.entry("author", "author_display_sort"),
+        Map.entry("creator", "creator"),
+        Map.entry("space", "space_exact"),
+        Map.entry("version", "version"),
+        Map.entry("hidden", "hidden")
+    );
 
     protected enum SearchScope
     {
@@ -119,6 +147,12 @@ public class BaseSearchResult extends XWikiResource
 
     @Inject
     private DocumentReferenceResolver<SolrDocument> solrDocumentDocumentReferenceResolver;
+
+    /**
+     * Used to retrieve user preference regarding hidden documents.
+     */
+    @Inject
+    private UserPropertiesResolver userPropertiesResolver;
 
     /**
      * Search for keyword in the given scopes. See {@link SearchScope} for more information.
@@ -171,7 +205,9 @@ public class BaseSearchResult extends XWikiResource
 
         List<String> filterQueries = new ArrayList<>();
         filterQueries.add("type:DOCUMENT");
-        filterQueries.add("hidden:false");
+        if (!this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments()) {
+            filterQueries.add("hidden:false");
+        }
         if (StringUtils.isNotBlank(wikiName)) {
             filterQueries.add("wiki:" + this.solrUtils.toCompleteFilterQueryString(wikiName));
         }
@@ -179,15 +215,31 @@ public class BaseSearchResult extends XWikiResource
             filterQueries.add("space_exact:" + this.solrUtils.toCompleteFilterQueryString(space));
         }
 
+        // Wildcard queries completely bypass the tokenizer. For this reason, we can't just take the full query and
+        // append a wildcard as it wouldn't match anything when the query is more than a single word. Instead, we
+        // perform a hybrid approach: we pass the query without wildcards to use the regular tokenizer, and we add a
+        // wildcard to the last token of the query as this is the word that is most likely incomplete.
+        String wildcardQuery = this.solrUtils.toCompleteFilterQueryString(getLastTerm(keywords).toLowerCase()) + "*";
+
+        // The passed query could also be a local or absolute document reference.
+        // Convert a local reference to an absolute reference.
+        String escapedReference = getEscapedAbsoluteReferenceForWiki(keywords, wikiName);
+
+        String webHome = this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+
         String escapedKeyWords = this.solrUtils.toFilterQueryString(keywords);
         Set<SearchScope> supportedScopes = EnumSet.of(TITLE, NAME, CONTENT);
         String queryString = searchScopes.stream()
             .filter(supportedScopes::contains)
             .map(scope -> switch (scope) {
                 // Consider matches in the title as way more important.
-                case TITLE -> "(title:" + escapedKeyWords + "*)^4";
+                case TITLE -> "(title:" + escapedKeyWords + " OR title:" + wildcardQuery + ")^4";
                 // Prefer matching in the name over the spaces, but only if the name is not "WebHome".
-                case NAME -> "spaces:" + escapedKeyWords + "* OR (name:" + escapedKeyWords + "* -name_exact:WebHome)^2";
+                case NAME -> "spaces:" + escapedKeyWords + " OR spaces:" + wildcardQuery
+                    + " OR (name:" + escapedKeyWords + " OR name:" + wildcardQuery + " -name_exact:" + webHome + ")^2"
+                    // Try matching the exact reference - if this matches, it should be the first result.
+                    + " OR (reference:document\\:" + escapedReference + ")^1000";
+                // No wildcard for the content as it might be too expensive.
                 case CONTENT -> "doccontent:" + escapedKeyWords;
                 default -> throw new IllegalStateException("Unexpected value: " + scope);
             })
@@ -199,17 +251,17 @@ public class BaseSearchResult extends XWikiResource
         }
 
         if (Boolean.TRUE.equals(isLocaleAware)) {
-            // TODO: this might not be the right way to filter by language.
             Locale currentLocale = this.localizationContext.getCurrentLocale();
-            filterQueries.add("locale:(\"\" OR %s OR %s)".formatted(currentLocale, currentLocale.getLanguage()));
+            filterQueries.add("locale:(\"\" OR %s)".formatted(currentLocale));
         }
 
         Query query = this.queryManager.createQuery(queryString, "solr");
-        query.setLimit(number * 2);
+        query.setLimit(number);
         query.setOffset(start);
         query.bindValue("fq", filterQueries);
         query.bindValue("fl", String.join(",", FieldUtils.WIKI, FieldUtils.SPACES, FieldUtils.NAME,
             FieldUtils.DOCUMENT_LOCALE, FieldUtils.TYPE));
+        addSortValue(orderField, order, query);
         List<Object> results = query.execute();
         List<DocumentReference> documentReferences = ((QueryResponse) results.get(0)).getResults().stream()
             .map(this.solrDocumentDocumentReferenceResolver::resolve)
@@ -218,165 +270,56 @@ public class BaseSearchResult extends XWikiResource
         return getPagesSearchResults(documentReferences, wikiName, withPrettyNames, number, isLocaleAware);
     }
 
-    /**
-     * Search for keyword in the given scopes. Limit the search only to Pages. Search for keyword
-     * 
-     * @param keywords the string that will be used in a "like" XWQL clause.
-     * @param number number of results to be returned.
-     * @param start 0-based start offset.
-     * @param orderField the field to be used to order the results.
-     * @param order "asc" or "desc"
-     * @param isLocaleAware If true, fetches the documents with the best language (the one from the user
-     * or the default one from the document).
-     * @return the results.
-     */
-    protected List<SearchResult> searchPages(List<SearchScope> searchScopes, String keywords, String wikiName,
-        String space, boolean hasProgrammingRights, int number, int start, String orderField, String order,
-        Boolean withPrettyNames, Boolean isLocaleAware) throws QueryException, IllegalArgumentException,
-            UriBuilderException, XWikiException
+    private void addSortValue(String orderField, String order, Query query)
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
-
-        /* This try is just needed for executing the finally clause. */
-        try {
-            if (keywords == null) {
-                return new ArrayList<>();
-            }
-
-            Formatter f = new Formatter();
-
-            /*
-             * If the order field is already one of the field hard coded in the base query, then do not add it to the
-             * select clause.
-             */
-            String addColumn = "";
-            if (!StringUtils.isBlank(orderField)) {
-                addColumn =
-                    (orderField.equals("") || orderField.equals("fullName") || orderField.equals("name") || orderField
-                        .equals("space")) ? "" : ", doc." + orderField;
-            }
-
-            String addSpace = "";
-            if (searchScopes.contains(NAME)) {
-                // Join the space to get the last space name.
-                addSpace = "left join XWikiSpace as space on doc.space = space.reference";
-            }
-
-            if (space != null) {
-                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
-                f.format(addColumn);
-                f.format(" from XWikiDocument as doc %s where doc.space = :space and ( ", addSpace);
-            } else {
-                f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
-                f.format(addColumn);
-                f.format(" from XWikiDocument as doc %s where ( ", addSpace);
-            }
-
-            /* Look for scopes related to pages */
-            int acceptedScopes = 0;
-            for (int i = 0; i < searchScopes.size(); i++) {
-                SearchScope scope = searchScopes.get(i);
-
-                switch (scope) {
-                    case CONTENT:
-                        f.format("upper(doc.content) like :keywords ");
-                        acceptedScopes++;
-                        break;
-                    case NAME:
-                        String matchTerminalPage = "doc.name <> :defaultDocName and upper(doc.name) like :keywords";
-                        String matchNestedPage = "doc.name = :defaultDocName and upper(space.name) like :keywords";
-                        f.format("((%s) or (%s)) ", matchTerminalPage, matchNestedPage);
-                        acceptedScopes++;
-                        break;
-                    case TITLE:
-                        f.format("(upper(doc.title) like :keywords");
-                        if (isLocaleAware) {
-                            f.format(" and (");
-                            // In Oracle database, an empty language is stored as null.
-                            String emptyLanguageCondition = "(doc.language = '' or doc.language is null)";
-                            f.format("(doc.language = :locale or (%s and doc.defaultLanguage = :locale)) ",
-                                emptyLanguageCondition);
-                            f.format("or (doc.language = :language or (%s and doc.defaultLanguage = :language)) ",
-                                emptyLanguageCondition);
-                            f.format(("or (%s and not exists("
-                                    + " from XWikiDocument as doc2"
-                                    + " where doc2.fullName = doc.fullName"
-                                    + " and (doc2.language = :locale or doc2.language = :language)))"
-                                    + ")"), emptyLanguageCondition);
-                        }
-                        f.format(") ");
-                        acceptedScopes++;
-                        break;
-                }
-
-                if (i != searchScopes.size() - 1) {
-                    f.format(" or ");
-                }
-            }
-
-            /* If we don't find any scope related to pages then return empty results */
-            if (acceptedScopes == 0) {
-                return new ArrayList<>();
-            }
-
-            /* Build the order clause. */
-            String orderClause;
-            if (StringUtils.isBlank(orderField)) {
-                orderClause = "doc.fullName asc";
-            } else {
-                orderClause = String.format("doc.%s %s", orderField, HqlQueryUtils.getValidQueryOrder(order, "asc"));
-            }
-
-            // Add ordering
-            f.format(") order by %s", orderClause);
-            String queryString = f.toString();
-
-            Query query = this.secureQueryManager.createQuery(queryString, Query.HQL)
-                    .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
-                    .addFilter(Utils.getHiddenQueryFilter(this.componentManager)).setOffset(start)
-                    // Worst case scenario when making the locale aware query:
-                    // e.g.: Search matches a document translated in fr_CA and fr
-                    .setLimit(number * 2);
-
-            if (space != null) {
-                query.bindValue("space", space);
-            }
-
-            if (searchScopes.contains(NAME)) {
-                query.bindValue("defaultDocName",
-                    this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName());
-            }
-
-            // Search only pages translated in the user locale (e.g. fr_CA)
-            if (isLocaleAware && searchScopes.contains(TITLE)) {
-                Locale userLocale = localizationContext.getCurrentLocale();
-                query.bindValue("locale", userLocale.toString());
-                query.bindValue("language", userLocale.getLanguage());
-            }
-
-            List<DocumentReference> documentReferences = query.execute().stream()
-                .map(object -> {
-                    Object[] fields = (Object[]) object;
-
-                    String spaceId = (String) fields[1];
-                    List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
-                    String pageName = (String) fields[2];
-                    String language = (String) fields[3];
-
-                    return new DocumentReference(wikiName, spaces, pageName, LocaleUtils.toLocale(language));
-                })
-                .toList();
-
-            return getPagesSearchResults(documentReferences, wikiName, withPrettyNames, number, isLocaleAware);
-        } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+        // Ordering was designed for database search. It might behave very differently here.
+        // Still, if explicitly requested and supported by Solr, simulate ordering by a similar field.
+        if (StringUtils.isNotBlank(orderField) && ORDER_FIELD_DATABASE_TO_SOLR.containsKey(orderField)) {
+            query.bindValue("sort", ORDER_FIELD_DATABASE_TO_SOLR.get(orderField) + " " + getValidOrder(order));
         }
     }
 
+    private String getEscapedAbsoluteReferenceForWiki(String keywords, String wikiName)
+    {
+        String absoluteReference;
+        if (!StringUtils.startsWith(keywords, wikiName + WIKI_SEPARATOR)) {
+            absoluteReference = wikiName + WIKI_SEPARATOR + keywords;
+        } else {
+            absoluteReference = keywords;
+        }
+        return this.solrUtils.toCompleteFilterQueryString(absoluteReference);
+    }
+
+    private static String getLastTerm(String keywords) throws XWikiException
+    {
+        List<String> tokens = new ArrayList<>();
+
+        try (Analyzer analyzer = new StandardAnalyzer();
+             TokenStream tokenStream = analyzer.tokenStream("content", keywords))
+        {
+            tokenStream.reset();
+            while (tokenStream.incrementToken()) {
+                tokens.add(tokenStream.getAttribute(CharTermAttribute.class).toString());
+            }
+            tokenStream.end();
+        } catch (IOException e) {
+            throw new XWikiException("Failed to tokenize the query", e);
+        }
+
+        // Take the last token, if there is no token, just take the full query.
+        String lastTerm;
+        if (!tokens.isEmpty()) {
+            lastTerm = tokens.get(tokens.size() - 1);
+        } else {
+            lastTerm = keywords;
+        }
+        return lastTerm;
+    }
+
     /**
-     * Process the results of the query made by {@link #searchPages}
+     * Process the results of the query made by {@link #searchPagesSolr}
      *
-     * @param queryResult results of the {@link #searchPages} query
+     * @param queryResult results of the {@link #searchPagesSolr} query
      * @param wikiName the wiki name
      * @param withPrettyNames render the author name
      * @param limit the maximum number of results
@@ -573,12 +516,7 @@ public class BaseSearchResult extends XWikiResource
             if (StringUtils.isBlank(orderField)) {
                 orderClause = "doc.fullName asc";
             } else {
-                /* Check if the order parameter is a valid "asc" or "desc" string, otherwise use "asc" */
-                if ("asc".equals(order) || "desc".equals(order)) {
-                    orderClause = String.format("doc.%s %s", orderField, order);
-                } else {
-                    orderClause = String.format("doc.%s asc", orderField);
-                }
+                orderClause = String.format("doc.%s %s", orderField, getValidOrder(order));
             }
 
             /* Add some filters if the user doesn't have programming rights. */
@@ -717,6 +655,17 @@ public class BaseSearchResult extends XWikiResource
         } finally {
             Utils.getXWikiContext(componentManager).setWikiId(currentWiki);
         }
+    }
+
+    /**
+     * Validates the order parameter and returns either "asc" or "desc".
+     *
+     * @param order The order string to validate
+     * @return "asc" or "desc", defaulting to "asc" if the input is invalid
+     */
+    private String getValidOrder(String order)
+    {
+        return ASC.equals(order) || "desc".equals(order) ? order : ASC;
     }
 
     /**

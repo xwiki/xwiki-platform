@@ -20,8 +20,8 @@
 package org.xwiki.configuration.internal;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -159,12 +159,30 @@ class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testListPropertyWhenArrayList()
+    void testListPropertyWhenArrayAsList()
     {
         this.configuration.setProperty("list", "value");
         List<String> expected = Arrays.asList("value");
 
-        assertEquals(expected, this.source.getProperty("list", new ArrayList<>(Arrays.asList("default"))));
+        assertEquals(expected, this.source.getProperty("list", Arrays.asList("default")));
+    }
+
+    @Test
+    void testListPropertyWhenCollectionEmptyList()
+    {
+        this.configuration.setProperty("list", "value");
+        List<String> expected = Arrays.asList("value");
+
+        assertEquals(expected, this.source.getProperty("list", Collections.emptyList()));
+    }
+
+    @Test
+    void testListPropertyWhenListOf()
+    {
+        this.configuration.setProperty("list", "value");
+        List<String> expected = Arrays.asList("value");
+
+        assertEquals(expected, this.source.getProperty("list", List.of()));
     }
 
     @Test

@@ -161,10 +161,10 @@
       v-if="showEntryRange && side !== 'left'"
     >
       {{ $t("livedata.pagination.currentEntries", [
-      logic.getFirstIndexOfPage() + 1,
-      logic.getLastIndexOfPage() + 1,
-      data.data.count,
-    ])}}
+        logic.getFirstIndexOfPage() + 1,
+        logic.getLastIndexOfPage() + 1,
+        data.data.count,
+      ])}}
     </span>
 
     <!--

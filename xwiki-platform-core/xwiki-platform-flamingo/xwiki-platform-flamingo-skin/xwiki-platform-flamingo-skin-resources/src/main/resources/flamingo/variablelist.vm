@@ -197,7 +197,21 @@
 ## Generate the old colortheme variables
 #template('colorThemeInit.vm')
 ## List of all the variables that get their values from old colortheme variables.
-#set($oldColorThemeVariables = {
+## The last group contains XWiki specific variables.
+#set($xsFromOldColorThemeVariables = {
+    "panel-header-bg": $theme.panelHeaderBackgroundColor,
+    "panel-header-text": $theme.panelHeaderTextColor,
+    "xwiki-panel-header-bg": $theme.panelHeaderBackgroundColor,
+    "xwiki-panel-header-text": $theme.panelHeaderTextColor,
+    "xwiki-border-color": $theme.borderColor,
+    "xwiki-page-content-bg": $theme.pageContentBackgroundColor,
+    "xwiki-background-secondary-color": $theme.backgroundSecondaryColor,
+    "xwiki-page-header-bg-color": $theme.pageHeaderBackgroundColor,
+    "xwiki-page-header-bg-image": $stringtool.defaultString($theme.headerBackgroundImage, '""'),
+    "xwiki-page-header-bg-position": $stringtool.defaultString($theme.headerBackgroundPosition, '""')
+})
+
+#set($bootstrapFromOldColorThemeVariables = {
     "text-color": $theme.textColor,
     "link-color": $theme.linkColor,
     "headings-color": $theme.titleColor,
@@ -238,15 +252,8 @@
     "brand-warning": $theme.notificationWarningColor,
     "brand-danger": $theme.notificationErrorColor,
     "panel-bg": $theme.panelBackgroundColor,
-    "panel-default-text": $theme.panelTextColor,
-    "panel-header-bg": $theme.panelHeaderBackgroundColor,
-    "panel-header-text": $theme.panelHeaderTextColor,
-    "xwiki-panel-header-bg": $theme.panelHeaderBackgroundColor,
-    "xwiki-panel-header-text": $theme.panelHeaderTextColor,
-    "xwiki-border-color": $theme.borderColor,
-    "xwiki-page-content-bg": $theme.pageContentBackgroundColor,
-    "xwiki-background-secondary-color": $theme.backgroundSecondaryColor,
-    "xwiki-page-header-bg-color": $theme.pageHeaderBackgroundColor,
-    "xwiki-page-header-bg-image": $stringtool.defaultString($theme.headerBackgroundImage, '""'),
-    "xwiki-page-header-bg-position": $stringtool.defaultString($theme.headerBackgroundPosition, '""')
+    "panel-default-text": $theme.panelTextColor
 })
+#set($oldColorThemeVariables = {})
+#set($discard = $oldColorThemeVariables.putAll($xsFromOldColorThemeVariables))
+#set($discard = $oldColorThemeVariables.putAll($bootstrapFromOldColorThemeVariables))

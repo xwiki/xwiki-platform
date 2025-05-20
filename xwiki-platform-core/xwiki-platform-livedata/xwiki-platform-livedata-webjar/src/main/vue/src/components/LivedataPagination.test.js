@@ -164,7 +164,7 @@ describe("LivedataPagination.vue", () => {
       },
     });
     let pageNavs = wrapper.findAll('.pagination-indexes .page-nav');
-    expect(pageNavs.length).toBe(3)
+    expect(pageNavs.length).toBe(3);
     expect(pageNavs.at(0).text()).toContain("1");
     expect(pageNavs.at(0).text()).toContain("livedata.pagination.loadPageByNumber");
     expect(pageNavs.at(1).text()).toContain("2");

@@ -26,9 +26,6 @@ import java.lang.annotation.Target;
 
 import org.xwiki.configuration.internal.DocumentsConfigurationSource;
 import org.xwiki.configuration.internal.SpacesConfigurationSource;
-import org.xwiki.configuration.internal.SystemConfigurationSource;
-import org.xwiki.configuration.internal.SystemEnvConfigurationSource;
-import org.xwiki.configuration.internal.SystemPropertiesConfigurationSource;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.user.internal.AllGuestConfigurationSource;
 import org.xwiki.user.internal.AllSuperAdminConfigurationSource;
@@ -79,9 +76,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     UserPreferencesConfigurationSource.class,
     NormalUserPreferencesConfigurationSource.class,
     NormalUserConfigurationSourceAuthorization.class,
-    SystemConfigurationSource.class,
-    SystemEnvConfigurationSource.class,
-    SystemPropertiesConfigurationSource.class,
     // Group Script Service
     DefaultGroupManager.class,
     MemberGroupsCache.class,

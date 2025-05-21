@@ -1,0 +1,64 @@
+##!source.syntax=xwiki/2.1
+{{velocity output="false"}}
+#macro (blocknote $parameters)
+  ## FIXME: Move this to the HTML head somehow.
+  <script type="module" src="$escapetool.xml($services.webjars.url(
+    'org.xwiki.platform:xwiki-platform-blocknote-webjar',
+    "main.es.js"
+  ))"></script>
+  #set ($discard = $parameters.attributes.putAll({
+    'class': "xwiki-blocknote-wrapper loading $!parameters.attributes.get('class')"
+  }))
+  ##
+  #set ($sourceDocumentReference = $parameters.attributes.get('data-source-document-reference'))
+  #if (!$sourceDocumentReference)
+    #set ($sourceDocumentReference = $tdoc.documentReference)
+  #end
+  #set ($parameters.attributes.data-output-syntax = $parameters.attributes.remove('data-syntax'))
+  #set ($source = {
+    'documentReference': $sourceDocumentReference,
+    'syntax': $parameters.attributes.get('data-syntax'),
+    'content': $parameters.content,
+    'restricted': $parameters.attributes.data-restricted
+  })
+  ##
+  ## Disable the file upload and drag & drop when the current user doesn't have edit right on the source document, if
+  ## the source is restricted. This is the case for instance when an user with comment right adds a comment to a page
+  ## they don't have edit right on. They are allowed to add the comment but they can't upload files because that
+  ## requires edit right. We check if the source is in restricted mode because in some cases (such as for Change Request
+  ## Application) we want to allow file upload even if the current user doesn't have edit right on the source document.
+  #if ($source.restricted == 'true' && !$services.security.authorization.hasAccess('edit', $source.documentReference))
+    #set ($parameters.attributes.data-upload-disabled = 'true')
+  #end
+  ## We use the velocity template context to convey the startupFocus parameter to BlockNote.
+  #if ($wysiwygEditorConfig.startupFocus)
+    #set ($parameters.attributes.data-startup-focus = 'true')
+    ## We make sure to clear this context so that it doesn't interfere with other BlockNote instances.
+    #set ($wysiwygEditorConfig.startupFocus = false)
+  #end
+  ##
+  #set ($parameters.attributes.data-value = "#blocknote_render($source)")
+  <div
+    #set ($nonDataAttributes = ['id', 'class'])
+    #foreach ($entry in $parameters.attributes.entrySet())
+      #set ($attributeName = $entry.key)
+      #if (!$attributeName.startsWith('data-') && !$nonDataAttributes.contains($attributeName))
+        #set ($attributeName = "data-$attributeName")
+      #end
+      $attributeName="$!escapetool.xml($entry.value)"
+    #end
+  ></div>
+#end
+
+#macro (blocknote_render $source)
+  ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
+  #set ($macro.previousDisplayMode = $xcontext.displayMode)
+  #set ($discard = $xcontext.setDisplayMode('view'))
+  #set ($restricted = "$!source.restricted" == 'true')
+  ## TODO: Render the source to BlockNote's specific JSON syntax (add the required script service).
+  #set ($renderedContent = $source.content)
+  ## Restore the previous display mode.
+  #set ($discard = $xcontext.setDisplayMode($macro.previousDisplayMode))
+  $!renderedContent##
+#end
+{{/velocity}}

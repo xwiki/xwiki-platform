@@ -36,6 +36,8 @@ const config = {
     "pagination.currentEntries",
     "pagination.pageSize",
     "pagination.selectPageSize",
+    "pagination.resultsPerPage",
+    "pagination.loadPageByNumber",
     "pagination.page",
     "pagination.first",
     "pagination.previous",

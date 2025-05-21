@@ -26,6 +26,9 @@ import java.lang.annotation.Target;
 
 import org.xwiki.configuration.internal.DocumentsConfigurationSource;
 import org.xwiki.configuration.internal.SpacesConfigurationSource;
+import org.xwiki.configuration.internal.SystemConfigurationSource;
+import org.xwiki.configuration.internal.SystemEnvConfigurationSource;
+import org.xwiki.configuration.internal.SystemPropertiesConfigurationSource;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.user.internal.AllGuestConfigurationSource;
 import org.xwiki.user.internal.AllSuperAdminConfigurationSource;
@@ -42,9 +45,9 @@ import org.xwiki.user.internal.document.SecureUserDocumentUserPropertiesResolver
 import org.xwiki.user.internal.document.UserCache;
 import org.xwiki.user.internal.document.UserPreferencesConfigurationSource;
 import org.xwiki.user.internal.group.DefaultGroupManager;
+import org.xwiki.user.internal.group.GroupMembersCache;
 import org.xwiki.user.internal.group.MemberGroupsCache;
 import org.xwiki.user.internal.group.WikiGroupCache;
-import org.xwiki.user.internal.group.GroupMembersCache;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -76,6 +79,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     UserPreferencesConfigurationSource.class,
     NormalUserPreferencesConfigurationSource.class,
     NormalUserConfigurationSourceAuthorization.class,
+    SystemConfigurationSource.class,
+    SystemEnvConfigurationSource.class,
+    SystemPropertiesConfigurationSource.class,
     // Group Script Service
     DefaultGroupManager.class,
     MemberGroupsCache.class,

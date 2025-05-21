@@ -1,0 +1,2 @@
+org.xwiki.blocknote.internal.BlockNoteEditor
+org.xwiki.blocknote.internal.BlockNoteRequireJSModuleUIExtension

@@ -1,0 +1,62 @@
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<template>
+  <div class="xwiki-blocknote">
+    <textarea :name :value :form :disabled @input="$emit('update:modelValue', $event.target.value)"></textarea>
+    <input v-if="name" type="hidden" name="RequiresConversion" :value="name" :form :disabled />
+    <input v-if="name" type="hidden" :name="name + '_inputSyntax'" :value="inputSyntax" :form :disabled />
+    <input v-if="name" type="hidden" :name="name + '_outputSyntax'" :value="outputSyntax" :form :disabled />
+  </div>
+</template>
+
+<script>
+export default {
+  name: "XWikiBlockNote",
+
+  props: {
+    // The key used to submit the edited content.
+    name: String,
+
+    // The edited content.
+    value: String,
+
+    // The ID of the form this editor is associated with.
+    form: String,
+
+    // Prevent the edited content and the conversion metadata from being submitted.
+    disabled: Boolean,
+
+    // The syntax of the edited content, as expected by the editor.
+    inputSyntax: {
+      type: String,
+      // TODO: Replace with BlockNote's default input syntax.
+      default: "xwiki/2.1",
+    },
+
+    // The syntax of the edited content, as expected by the back-end storage.
+    outputSyntax: {
+      type: String,
+      default: "xwiki/2.1",
+    },
+  },
+
+  emits: ["update:modelValue"],
+};
+</script>

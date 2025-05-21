@@ -148,9 +148,9 @@ describe("LivedataPagination.vue", () => {
         },
       },
     });
-    expect(wrapper.find(".pagination-indexes").text()).toContain("livedata.pagination.page");
+    expect(wrapper.find(".pagination-indexes").text()).toContain("livedata.pagination.loadPageByNumber");
     expect(wrapper.findAll(".pagination-indexes .page-nav").length).toBe(1);
-    expect(wrapper.find(".pagination-indexes .page-nav").text()).toBe("1");
+    expect(wrapper.find(".pagination-indexes .page-nav").text()).toContain("1");
   });
 
   it("Displays the pagination indexes when there is some entries", () => {

@@ -498,7 +498,7 @@ var XWiki = (function(XWiki){
       // We populate the suggestion container with information that was not on the page.
       // This meaningful change in the DOM must be announced 
       // so that assistive technology users can notice it without trouble.
-      var div = new Element("div", { 
+      let div = new Element("div", { 
         'class': "suggestItems "+ this.options.className,
         'role': 'alert'
       });

@@ -29,6 +29,7 @@ import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.BaseSearchResult;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
+import org.xwiki.security.authorization.Right;
 
 /**
  * @version $Id$
@@ -55,8 +56,8 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
             List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
             searchResults.getSearchResults().addAll(
-                search(searchScopes, keywords, getXWikiContext().getWikiId(), null, Utils.getXWiki(componentManager)
-                    .getRightService().hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start,
+                search(searchScopes, keywords, getXWikiContext().getWikiId(), null,
+                    this.authorizationManager.hasAccess(Right.PROGRAM), number, start,
                     true, orderField, order, withPrettyNames, isLocaleAware));
 
             return searchResults;

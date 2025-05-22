@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.Formatter;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -123,7 +121,7 @@ public class BaseSearchResult extends XWikiResource
     }
 
     @Inject
-    private ContextualAuthorizationManager authorizationManager;
+    protected ContextualAuthorizationManager authorizationManager;
 
     @Inject
     @Named("hidden/space")
@@ -177,7 +175,7 @@ public class BaseSearchResult extends XWikiResource
             }
 
             List<SearchResult> result =
-                new ArrayList<>(searchPagesSolr(searchScopes, keywords, wikiName, space, number, start,
+                new ArrayList<>(searchPages(searchScopes, keywords, wikiName, space, number, start,
                     orderField, order, withPrettyNames, isLocaleAware));
 
             if (searchScopes.contains(SearchScope.SPACES)) {
@@ -195,11 +193,12 @@ public class BaseSearchResult extends XWikiResource
         }
     }
 
-    private List<SearchResult> searchPagesSolr(List<SearchScope> searchScopes, String keywords, String wikiName,
+    private List<SearchResult> searchPages(List<SearchScope> searchScopes, String keywords, String wikiName,
         String space, int number, int start, String orderField, String order, Boolean withPrettyNames,
         Boolean isLocaleAware) throws QueryException, XWikiException
     {
-        if (StringUtils.isBlank(keywords)) {
+        Set<SearchScope> supportedScopes = EnumSet.of(TITLE, NAME, CONTENT);
+        if (StringUtils.isBlank(keywords) || searchScopes.stream().noneMatch(supportedScopes::contains)) {
             return List.of();
         }
 
@@ -215,6 +214,14 @@ public class BaseSearchResult extends XWikiResource
             filterQueries.add("space_exact:" + this.solrUtils.toCompleteFilterQueryString(space));
         }
 
+        if (Boolean.TRUE.equals(isLocaleAware)) {
+            // Match translations but also the main document when no translation is available by using the locales
+            // field.
+            String currentLocale =
+                this.solrUtils.toCompleteFilterQueryString(this.localizationContext.getCurrentLocale());
+            filterQueries.add("locales:%s".formatted(currentLocale));
+        }
+
         // Wildcard queries completely bypass the tokenizer. For this reason, we can't just take the full query and
         // append a wildcard as it wouldn't match anything when the query is more than a single word. Instead, we
         // perform a hybrid approach: we pass the query without wildcards to use the regular tokenizer, and we add a
@@ -228,12 +235,12 @@ public class BaseSearchResult extends XWikiResource
         String webHome = this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
 
         String escapedKeyWords = this.solrUtils.toFilterQueryString(keywords);
-        Set<SearchScope> supportedScopes = EnumSet.of(TITLE, NAME, CONTENT);
         String queryString = searchScopes.stream()
             .filter(supportedScopes::contains)
             .map(scope -> switch (scope) {
                 // Consider matches in the title as way more important.
-                case TITLE -> "(title:" + escapedKeyWords + " OR title:" + wildcardQuery + ")^4";
+                // Use title_ for wildcard matches to ensure we're using the same tokenizer as the field.
+                case TITLE -> "(title:" + escapedKeyWords + " OR title_:" + wildcardQuery + ")^4";
                 // Prefer matching in the name over the spaces, but only if the name is not "WebHome".
                 case NAME -> "spaces:" + escapedKeyWords + " OR spaces:" + wildcardQuery
                     + " OR (name:" + escapedKeyWords + " OR name:" + wildcardQuery + " -name_exact:" + webHome + ")^2"
@@ -245,29 +252,20 @@ public class BaseSearchResult extends XWikiResource
             })
             .collect(Collectors.joining(" OR "));
 
-        if (queryString.isEmpty()) {
-            // No supported scope.
-            return List.of();
-        }
-
-        if (Boolean.TRUE.equals(isLocaleAware)) {
-            Locale currentLocale = this.localizationContext.getCurrentLocale();
-            filterQueries.add("locale:(\"\" OR %s)".formatted(currentLocale));
-        }
-
         Query query = this.queryManager.createQuery(queryString, "solr");
         query.setLimit(number);
         query.setOffset(start);
         query.bindValue("fq", filterQueries);
+        query.bindValue("mm", "0%");
         query.bindValue("fl", String.join(",", FieldUtils.WIKI, FieldUtils.SPACES, FieldUtils.NAME,
-            FieldUtils.DOCUMENT_LOCALE, FieldUtils.TYPE));
+            FieldUtils.DOCUMENT_LOCALE, FieldUtils.TYPE, FieldUtils.LOCALES));
         addSortValue(orderField, order, query);
         List<Object> results = query.execute();
         List<DocumentReference> documentReferences = ((QueryResponse) results.get(0)).getResults().stream()
             .map(this.solrDocumentDocumentReferenceResolver::resolve)
             .toList();
 
-        return getPagesSearchResults(documentReferences, wikiName, withPrettyNames, number, isLocaleAware);
+        return getPagesSearchResults(documentReferences, wikiName, withPrettyNames);
     }
 
     private void addSortValue(String orderField, String order, Query query)
@@ -317,35 +315,21 @@ public class BaseSearchResult extends XWikiResource
     }
 
     /**
-     * Process the results of the query made by {@link #searchPagesSolr}
+     * Process the results of the query made by {@link #searchPages}.
      *
-     * @param queryResult results of the {@link #searchPagesSolr} query
+     * @param queryResult results of the {@link #searchPages} query
      * @param wikiName the wiki name
      * @param withPrettyNames render the author name
-     * @param limit the maximum number of results
-     * @param withUniquePages add pages only once
      * @return the list of {@link SearchResult}
      * @throws XWikiException
      */
     protected List<SearchResult> getPagesSearchResults(List<DocumentReference> queryResult, String wikiName,
-        Boolean withPrettyNames, int limit, Boolean withUniquePages) throws XWikiException
+        Boolean withPrettyNames) throws XWikiException
     {
         List<SearchResult> result = new ArrayList<>();
-        Set<DocumentReference> seenPages = new HashSet<>();
         XWiki xwikiApi = Utils.getXWikiApi(this.componentManager);
 
         for (DocumentReference ref : queryResult) {
-            // Stop if there's a limit specified and we reach it.
-            if (limit > 0 && result.size() >= limit) {
-                break;
-            }
-
-            if (Boolean.TRUE.equals(withUniquePages) && seenPages.contains(ref)) {
-                continue;
-            }
-
-            seenPages.add(ref);
-
             if (this.authorizationManager.hasAccess(Right.VIEW, ref)) {
                 Document doc = xwikiApi.getDocument(ref).getTranslatedDocument();
                 String title = doc.getDisplayTitle();

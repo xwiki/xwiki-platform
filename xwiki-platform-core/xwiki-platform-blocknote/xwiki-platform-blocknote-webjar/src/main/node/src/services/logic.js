@@ -19,6 +19,7 @@
  */
 import { createApp, reactive } from "vue";
 import XWikiBlockNote from "@/components/XWikiBlockNote.vue";
+import { container } from "@/services/container.js";
 
 /**
  * Encapsulates the logic of a BlockNote instance, exposing the API that can be used to interact with it.
@@ -27,6 +28,7 @@ export class Logic {
   constructor(host) {
     this._host = host;
     this._name = host.name || host.id || host.dataset.name;
+    this._realtimeServerURL = null;
 
     this._data = reactive(this._parseDataFromHost());
 
@@ -34,6 +36,8 @@ export class Logic {
       this._resolveReady = resolve;
       this._rejectReady = reject;
     });
+
+    const skinManager = container.get("SkinManager");
 
     const logic = this;
     this._vueApp = createApp(XWikiBlockNote, this._data)
@@ -43,7 +47,11 @@ export class Logic {
           logic._resolveReady(logic);
         },
       })
-      .provide("logic", this);
+      .provide("logic", this)
+      .provide("container", container);
+
+    skinManager.loadDesignSystem(this._vueApp, container);
+
     this._vueApp.mount(host);
   }
 
@@ -74,6 +82,10 @@ export class Logic {
    */
   get ready() {
     return this._ready;
+  }
+
+  get realtimeServerURL() {
+    return this._realtimeServerURL;
   }
 
   /**

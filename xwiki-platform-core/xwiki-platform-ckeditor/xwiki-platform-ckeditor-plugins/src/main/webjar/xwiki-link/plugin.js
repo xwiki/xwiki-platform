@@ -471,7 +471,8 @@
           type: this.resourceTypes[0],
           reference: defaultReference,
           // Make sure the picker doesn't try to resolve the link label as a resource reference.
-          isNew: true
+          isNew: true,
+          isInitialValue: true
         };
       }
     });

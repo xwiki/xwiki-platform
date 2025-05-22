@@ -162,13 +162,15 @@
         },
         validate: function() {
           var resourceReference = this.getValue();
+          var resourceTypeConfig = $resource.types[resourceReference.type] || {};
           if (resourceReference.reference === '') {
             // Check if the selected resource type supports empty references.
-            var resourceTypeConfig = $resource.types[resourceReference.type] || {};
             if (resourceTypeConfig.allowEmptyReference !== true) {
               return this.getDialog().getParentEditor().localization.get('xwiki-resource.notSpecified',
                 this.getLabelElement().getText());
             }
+          } else if (resourceReference.notSelected && resourceTypeConfig.mustBeSelected) {
+            return this.getDialog().getParentEditor().localization.get('xwiki-resource.selectValue');
           }
           return true;
         },
@@ -187,6 +189,10 @@
               this.selectedResource.reference.reference === resourceReference.reference) {
             // Preserve the typed field if the resource type and reference have not changed.
             resourceReference.typed = this.selectedResource.reference.typed;
+          }
+          if (this.selectedResource.reference.isInitialValue ||
+              this.selectedResource.reference.reference !== resourceReference.reference) {
+            resourceReference.notSelected = true;
           }
           return resourceReference;
         },

@@ -64,7 +64,8 @@ define('entityResourceSuggester', [
     $.post(new XWiki.Document('LinkNameStrategyHelper', 'CKEditor').getURL('get'), {
       outputSyntax: 'plain',
       input: input,
-      base: XWiki.Model.serialize(base)
+      base: XWiki.Model.serialize(base),
+      action: 'suggest'
     }).done(function(data) {
       data.forEach(function (item) {
         suggestions.push(createDocumentFromLinkNameStrategyHelperResult(item, base));

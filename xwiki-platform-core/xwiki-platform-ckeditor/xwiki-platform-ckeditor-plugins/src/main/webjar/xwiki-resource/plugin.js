@@ -170,9 +170,42 @@
                 this.getLabelElement().getText());
             }
           } else if (resourceReference.notSelected && resourceTypeConfig.mustBeSelected) {
-            return this.getDialog().getParentEditor().localization.get('xwiki-resource.selectValue');
+            return this.validateInput(resourceReference);
           }
           return true;
+        },
+        validateInput: function(resourceReference) {
+          if (!this.validationRequest) {
+            // Trigger a new validation.
+            this.validationRequest = this.validateAsync(resourceReference).always((function() {
+              // Re-submit the dialog after the current event is handled.
+              setTimeout((function() {
+                this.getDialog().click('ok');
+              }).bind(this), 0);
+            }).bind(this));
+            return false;
+          } else if (this.validationRequest.state() === 'pending') {
+            // Block the submit while the validation takes place.
+            return false;
+          } else {
+            // Trigger a new validation next time validate() is called.
+            delete this.validationRequest;
+            if (!this.validationRequestResult) {
+              return this.getDialog().getParentEditor().localization.get('xwiki-resource.selectValue');
+            }
+          }
+        },
+        validateAsync(resourceReference) {
+          return $.post(new XWiki.Document('LinkNameStrategyHelper', 'CKEditor').getURL('get'), {
+            outputSyntax: 'plain',
+            input: resourceReference.reference,
+            action: 'validate'
+          }).done((function(data) {
+            this.validationRequestResult = data.validated;
+          }).bind(this)).fail((function(data) {
+            console.error("Error while loading validation link response", data);
+            this.validationRequestResult = false;
+          }).bind(this));
         },
         getValue: function() {
           var resourcePickerInput = this.getResourcePickerInput();

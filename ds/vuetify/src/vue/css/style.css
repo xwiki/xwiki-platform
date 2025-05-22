@@ -25,6 +25,10 @@
   height: 64px;
 }
 
+html {
+  overflow-y: auto;
+}
+
 main ul, main ol {
   padding-inline-start: var(--cr-spacing-x-large);
 }

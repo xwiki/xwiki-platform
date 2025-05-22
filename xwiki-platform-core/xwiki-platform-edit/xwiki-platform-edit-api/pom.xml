@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Provides APIs to associate editors to data types.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -70,6 +70,13 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-localization-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

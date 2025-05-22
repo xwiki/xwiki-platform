@@ -20,6 +20,15 @@
 <template>
   <div class="xwiki-blocknote">
     <textarea :name :value :form :disabled @input="$emit('update:modelValue', $event.target.value)"></textarea>
+    <BlocknoteEditor
+      ref="editor"
+      :editor-props
+      :editor-content
+      :container
+      :skin-manager
+      :realtime-server-u-r-l
+      @blocknote-save="updateModelValue"
+    ></BlocknoteEditor>
     <input v-if="name" type="hidden" name="RequiresConversion" :value="name" :form :disabled />
     <input v-if="name" type="hidden" :name="name + '_inputSyntax'" :value="inputSyntax" :form :disabled />
     <input v-if="name" type="hidden" :name="name + '_outputSyntax'" :value="outputSyntax" :form :disabled />
@@ -27,8 +36,17 @@
 </template>
 
 <script>
+import { MarkdownToUniAstConverter, createConverterContext } from "@xwiki/cristal-uniast";
+import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
+
 export default {
   name: "XWikiBlockNote",
+
+  inject: ["logic", "container"],
+
+  components: {
+    BlocknoteEditor,
+  },
 
   props: {
     // The key used to submit the edited content.
@@ -46,14 +64,43 @@ export default {
     // The syntax of the edited content, as expected by the editor.
     inputSyntax: {
       type: String,
-      // TODO: Replace with BlockNote's default input syntax.
-      default: "xwiki/2.1",
+      default: "markdown/1.2",
     },
 
     // The syntax of the edited content, as expected by the back-end storage.
     outputSyntax: {
       type: String,
       default: "xwiki/2.1",
+    },
+  },
+
+  data() {
+    const markdownConverter = new MarkdownToUniAstConverter(createConverterContext(this.container));
+    const editorContent = markdownConverter.parseMarkdown(this.value);
+
+    return {
+      editorProps: {
+        theme: "light",
+      },
+      editorContent,
+    };
+  },
+
+  computed: {
+    editor() {
+      return this.$refs.editor;
+    },
+    skinManager() {
+      return this.container.get("SkinManager");
+    },
+    realtimeServerURL() {
+      return this.logic.realtimeServerURL;
+    },
+  },
+
+  methods: {
+    updateModelValue(value) {
+      this.$emit("update:modelValue", value);
     },
   },
 

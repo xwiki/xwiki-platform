@@ -17,24 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Factory } from "@/services/factory.js";
-import "@/services/inplace.js";
-import "@/services/skin.js";
+import { Container } from "inversify";
 
-const factory = new Factory();
+const container = new Container();
 
-define("xwiki-blocknote", [], () => factory);
-
-function init(event, data) {
-  const containers = data?.elements || [document];
-  containers
-    .flatMap((container) => [...container.querySelectorAll(".xwiki-blocknote-wrapper")])
-    .forEach((host) => factory.create(host));
-}
-
-require(["jquery"], ($) => {
-  $(document).on("xwiki:dom:updated", init);
-  $(init);
-});
-
-export { factory };
+export { container };

@@ -55,8 +55,8 @@
   #set ($macro.previousDisplayMode = $xcontext.displayMode)
   #set ($discard = $xcontext.setDisplayMode('view'))
   #set ($restricted = "$!source.restricted" == 'true')
-  ## TODO: Render the source to BlockNote's specific JSON syntax (add the required script service).
-  #set ($renderedContent = $source.content)
+  #set ($xdom = $services.rendering.parse($source.content, $source.syntax))
+  #set ($renderedContent = $services.rendering.render($xdom, 'markdown/1.2'))
   ## Restore the previous display mode.
   #set ($discard = $xcontext.setDisplayMode($macro.previousDisplayMode))
   $!renderedContent##

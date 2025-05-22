@@ -35,6 +35,25 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>BlockNote API</xwiki.extension.name>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.xwiki.rendering</groupId>
+        <artifactId>xwiki-rendering-syntax-wikimodel</artifactId>
+        <version>${rendering.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.rendering</groupId>
+        <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
+        <version>${rendering.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.rendering</groupId>
+        <artifactId>xwiki-rendering-syntax-plain</artifactId>
+        <version>${rendering.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -65,6 +84,13 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-blocknote-webjar</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- We temporarily use Markdown syntax for editing, until we implement a parser / renderer for the UniAst syntax. -->
+      <groupId>org.xwiki.contrib.markdown</groupId>
+      <artifactId>syntax-markdown-commonmark12</artifactId>
+      <version>8.9</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

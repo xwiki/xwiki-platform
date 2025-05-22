@@ -85,8 +85,8 @@ export class Factory {
    */
   get syntax() {
     return {
-      type: "xwiki",
-      version: "2.1",
+      type: "markdown",
+      version: "1.2",
     };
   }
 }

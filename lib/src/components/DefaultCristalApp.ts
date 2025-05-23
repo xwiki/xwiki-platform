@@ -119,8 +119,8 @@ export class DefaultCristalApp implements CristalApp {
     return this.page.name || this.wikiConfig.defaultPageName();
   }
 
-  setCurrentPage(newPage: string, mode: string = "view"): void {
-    this.router.push({
+  async setCurrentPage(newPage: string, mode: string = "view"): Promise<void> {
+    await this.router.push({
       name: mode,
       params: { page: newPage },
     });
@@ -234,9 +234,15 @@ export class DefaultCristalApp implements CristalApp {
   async loadPage(options?: { requeue: boolean }): Promise<void> {
     try {
       this.logger?.debug("Loading page", this.page.name);
+
       const documentService =
         this.getContainer().get<DocumentService>(documentServiceName);
-      documentService.setCurrentDocument(this.page.name, this.page.version);
+
+      await documentService.setCurrentDocument(
+        this.page.name,
+        this.page.version,
+      );
+
       if (this.getWikiConfig().isSupported("jsonld")) {
         const pageData = await this.getWikiConfig().storage.getPageContent(
           this.page.name,
@@ -328,7 +334,7 @@ export class DefaultCristalApp implements CristalApp {
     const page = this.getWikiConfig().storage.getPageFromViewURL(url);
     if (page != null) {
       this.logger?.debug("The link is evaluated as being page ", page);
-      this.setCurrentPage(page);
+      await this.setCurrentPage(page);
     } else {
       this.logger?.debug("The link is evaluated as an external link");
       window.open(url, "_blank");

@@ -43,7 +43,7 @@ export default class DefaultQueueWorker implements QueueWorker {
     this.cristalApp = cristalApp;
   }
 
-  public pageLoaded(page: string): void {
+  async pageLoaded(page: string): Promise<void> {
     try {
       this.logger.debug(
         "Received callback that new document has been loaded",
@@ -54,7 +54,8 @@ export default class DefaultQueueWorker implements QueueWorker {
       const documentService = this.cristalApp
         .getContainer()
         .get<DocumentService>(documentServiceName);
-      documentService.refreshCurrentDocument();
+
+      await documentService.refreshCurrentDocument();
 
       this.logger.debug(
         "Done callback that new document has been loaded",
@@ -77,9 +78,10 @@ export default class DefaultQueueWorker implements QueueWorker {
         // TODO get rid of aliasing
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
+
         this.workerInstance.setPageLoadedCallback(
-          Comlink.proxy(function (page: string) {
-            that.pageLoaded(page);
+          Comlink.proxy(async (page: string) => {
+            await that.pageLoaded(page);
           }),
         );
 

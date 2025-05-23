@@ -210,7 +210,7 @@ export class GitHubStorage extends AbstractStorage {
     return "";
   }
 
-  async save(page: string, content: string, title: string): Promise<unknown> {
+  async save(page: string, title: string, content: string): Promise<unknown> {
     const pageRestUrl = this.getPageRestURL(`${page}/page.json`, "");
 
     const headResponse = await fetch(pageRestUrl, {

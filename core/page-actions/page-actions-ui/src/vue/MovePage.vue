@@ -105,7 +105,7 @@ async function handleSuccess(result: { success: boolean; error?: string }) {
         props.currentPageReference,
       );
     }
-    cristal.setCurrentPage(newDocumentReferenceSerialized, "view");
+    await cristal.setCurrentPage(newDocumentReferenceSerialized, "view");
     alertsService.success(
       t("page.action.action.move.page.success", {
         page: props.currentPageName,

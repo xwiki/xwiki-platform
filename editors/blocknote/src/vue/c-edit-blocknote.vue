@@ -135,8 +135,8 @@ async function save(content: string) {
     // TODO: html does not make any sense here.
     await storage.save(
       currentPageName.value ?? "",
-      content,
       title.value,
+      content,
       "html",
     );
   } catch (e) {
@@ -144,13 +144,6 @@ async function save(content: string) {
     console.error(e);
     alertsService.error(t("blocknote.editor.save.error"));
   }
-
-  // If this save operation just created the document, the current document
-  // will be undefined. So we update it.
-  if (!currentPage.value) {
-    documentService.setCurrentDocument(currentPageName.value ?? "");
-  }
-  documentService.notifyDocumentChange("update", currentPageReference.value!);
 }
 
 /**

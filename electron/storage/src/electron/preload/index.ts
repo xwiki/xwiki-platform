@@ -46,7 +46,7 @@ const api: APITypes = {
     });
   },
   savePage(path: string, content: string, title: string): Promise<PageData> {
-    return ipcRenderer.invoke("savePage", { path, content, title });
+    return ipcRenderer.invoke("savePage", { path, title, content });
   },
   resolveAttachmentPath(page: string, filename: string): Promise<string> {
     return ipcRenderer.invoke("resolveAttachmentPath", {

@@ -88,13 +88,20 @@ interface DocumentService {
    * Update the reference of the latest document.
    * @param documentReference - the current document reference
    * @param revision - the revision of the document, undefined for latest
+   *
+   * @since 0.18
    */
-  setCurrentDocument(documentReference: string, revision?: string): void;
+  setCurrentDocument(
+    documentReference: string,
+    revision?: string,
+  ): Promise<void>;
 
   /**
    * Force reloading the content of the document without changing the current document reference
+   *
+   * @since 0.18
    */
-  refreshCurrentDocument(): void;
+  refreshCurrentDocument(): Promise<void>;
 
   /**
    * Register a change listener that will be executed on any document change

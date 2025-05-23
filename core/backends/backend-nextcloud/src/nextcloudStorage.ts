@@ -245,7 +245,7 @@ export class NextcloudStorage extends AbstractStorage {
     return `${this.getAttachmentsBasePath(page, username)}/${name}`;
   }
 
-  async save(page: string, content: string, title: string): Promise<unknown> {
+  async save(page: string, title: string, content: string): Promise<unknown> {
     const username = (
       await this.authenticationManagerProvider.get()?.getUserDetails()
     )?.username;

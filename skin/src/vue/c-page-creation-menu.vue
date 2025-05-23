@@ -19,6 +19,11 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import messages from "../translations";
+import { StorageProvider } from "@xwiki/cristal-backend-api";
+import {
+  DocumentService,
+  name as documentServiceName,
+} from "@xwiki/cristal-document-api";
 import { CIcon } from "@xwiki/cristal-icons";
 import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -35,23 +40,24 @@ import type {
 } from "@xwiki/cristal-model-reference-api";
 import type { Ref } from "vue";
 
-const cristal: CristalApp = inject<CristalApp>("cristal")!;
+const cristal = inject<CristalApp>("cristal")!;
+const container = cristal.getContainer();
 
-const referenceHandler: ModelReferenceHandler = cristal
-  .getContainer()
+const referenceHandler: ModelReferenceHandler = container
   .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
   .get()!;
-const referenceSerializer: ModelReferenceSerializer = cristal
-  .getContainer()
+const referenceSerializer: ModelReferenceSerializer = container
   .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
   .get()!;
+const documentService = container.get<DocumentService>(documentServiceName);
+const storage = container.get<StorageProvider>("StorageProvider").get();
 
 const dialogOpen: Ref<boolean> = ref(false);
 const name: Ref<string> = ref("");
 const namePlaceholder: Ref<string> = ref("");
 const location: Ref<SpaceReference | undefined> = ref(undefined);
 const existingPage: Ref<PageData | undefined> = ref(undefined);
-let newDocumentReference: string = "";
+let newDocumentReferenceString: string = "";
 
 defineProps<{
   currentPageReference?: DocumentReference;
@@ -66,24 +72,40 @@ function updateCurrentPage() {
   name.value = "";
 }
 
+// eslint-disable-next-line max-statements
 async function createPage() {
   const newDocumentName = name.value ? name.value : namePlaceholder.value;
-  newDocumentReference = referenceSerializer.serialize(
-    referenceHandler.createDocumentReference(newDocumentName, location.value!),
-  )!;
+  const newDocumentReference = referenceHandler.createDocumentReference(
+    newDocumentName,
+    location.value!,
+  );
+  newDocumentReferenceString =
+    referenceSerializer.serialize(newDocumentReference)!;
 
-  existingPage.value = await cristal.getPage(newDocumentReference);
+  existingPage.value = await cristal.getPage(newDocumentReferenceString);
+
+  const titlePlaceholder = referenceHandler.getTitle(newDocumentReference);
 
   if (!existingPage.value) {
-    cristal.setCurrentPage(newDocumentReference, "edit");
+    await storage.save(
+      newDocumentReferenceString,
+      titlePlaceholder,
+      "",
+      "html",
+    );
+
+    await documentService.setCurrentDocument(newDocumentReferenceString);
+    await documentService.notifyDocumentChange("update", newDocumentReference);
+
+    await cristal.setCurrentPage(newDocumentReferenceString, "edit");
 
     dialogOpen.value = false;
   }
 }
 
-function editExistingPage() {
+async function editExistingPage() {
   dialogOpen.value = false;
-  cristal.setCurrentPage(newDocumentReference, "edit");
+  await cristal.setCurrentPage(newDocumentReferenceString, "edit");
 }
 </script>
 
@@ -123,10 +145,10 @@ function editExistingPage() {
                     :href="
                       cristal.getRouter().resolve({
                         name: 'view',
-                        params: { page: newDocumentReference },
+                        params: { page: newDocumentReferenceString },
                       }).href
                     "
-                    >{{ newDocumentReference }}</a
+                    >{{ newDocumentReferenceString }}</a
                   >
                 </template>
               </i18n-t>
@@ -140,10 +162,10 @@ function editExistingPage() {
                     :href="
                       cristal.getRouter().resolve({
                         name: 'view',
-                        params: { page: newDocumentReference },
+                        params: { page: newDocumentReferenceString },
                       }).href
                     "
-                    >{{ newDocumentReference }}</a
+                    >{{ newDocumentReferenceString }}</a
                   >
                 </template>
                 <template #link>
@@ -151,7 +173,7 @@ function editExistingPage() {
                     :href="
                       cristal.getRouter().resolve({
                         name: 'edit',
-                        params: { page: newDocumentReference },
+                        params: { page: newDocumentReferenceString },
                       }).href
                     "
                     @click.prevent="editExistingPage"

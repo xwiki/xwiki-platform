@@ -304,7 +304,7 @@ export class XWikiStorage extends AbstractStorage {
     }
   }
 
-  async save(page: string, content: string, title: string): Promise<unknown> {
+  async save(page: string, title: string, content: string): Promise<unknown> {
     const url = this.buildSavePageURL(page, ["rest", "wikis", "xwiki"]);
 
     const response = await fetch(url, {

@@ -123,7 +123,7 @@ export class WorkerCristalApp implements CristalApp {
     throw new Error("Method not implemented.");
   }
 
-  setCurrentPage(): void {
+  setCurrentPage(): Promise<void> {
     throw new Error("Method not implemented.");
   }
 

@@ -227,16 +227,24 @@ export class DefaultDocumentService implements DocumentService {
     return this.refs.error;
   }
 
-  setCurrentDocument(documentReference: string, revision?: string): void {
+  async setCurrentDocument(
+    documentReference: string,
+    revision?: string,
+  ): Promise<void> {
     if (this.store) {
-      this.store.update(documentReference, true, revision);
+      await this.store.update(documentReference, true, revision);
     }
   }
 
-  refreshCurrentDocument(): void {
+  async refreshCurrentDocument(): Promise<void> {
     const documentReference = this.store.lastDocumentReference;
+
     if (documentReference) {
-      this.store.update(documentReference, false, this.store.lastRevision);
+      await this.store.update(
+        documentReference,
+        false,
+        this.store.lastRevision,
+      );
     }
   }
 

@@ -283,4 +283,70 @@ const content =
   border-radius: 6px;
   padding: 2px;
 }
+
+:deep(.bn-editor) {
+  font-family: var(--cr-font-sans);
+  font-size: var(--cr-base-font-size);
+  font-weight: var(--cr-font-weight-normal);
+  color: var(--cr-base-text-color);
+  letter-spacing: var(--cr-letter-spacing-normal);
+  line-height: var(--cr-line-height-normal);
+  padding-inline-start: var(--cr-spacing-large);
+
+  /* Note: font sizes are inconsistent here, but that's how they are rendered at the end. So we keep it the same here. */
+  & h1 {
+    font-size: var(--cr-font-size-x-large);
+  }
+
+  & h2 {
+    font-size: var(--cr-font-size-x-large);
+  }
+
+  & h3 {
+    font-size: var(--cr-font-size-large);
+  }
+
+  & h4 {
+    font-size: var(--cr-font-size-medium);
+  }
+
+  & h5 {
+    font-size: var(--cr-font-size-medium);
+  }
+
+  & h6 {
+    font-size: var(--cr-font-size-medium);
+  }
+
+  /* Remove left border on lists */
+  & .bn-block-group,
+  .bn-block-group .bn-block-outer:not([data-prev-depth-changed])::before {
+    border-left: none;
+  }
+
+  & [data-content-type="bulletListItem"] {
+    padding-inline-start: var(--cr-spacing-large);
+  }
+
+  & blockquote {
+    background-color: var(--cr-color-neutral-50);
+    color: var(--cr-color-neutral-600);
+    font-size: var(--cr-font-size-large);
+    border-inline-start: 2px solid var(--cr-color-neutral-200);
+    padding-inline-start: var(--cr-spacing-large);
+    margin: 0;
+  }
+
+  & [data-content-type="codeBlock"] {
+    background: white;
+    border-radius: var(--cr-border-radius-medium);
+    font-family: var(--cr-font-mono);
+    color: var(--cr-base-text-color);
+
+    & pre {
+      margin: 0;
+      padding: 0;
+    }
+  }
+}
 </style>

@@ -177,12 +177,12 @@
         validateInput: function(resourceReference) {
           if (!this.validationRequest) {
             // Trigger a new validation.
-            this.validationRequest = this.validateAsync(resourceReference).always((function() {
+            this.validationRequest = this.validateAsync(resourceReference).always(() => {
               // Re-submit the dialog after the current event is handled.
-              setTimeout((function() {
+              setTimeout(() => {
                 this.getDialog().click('ok');
-              }).bind(this), 0);
-            }).bind(this));
+              }, 0);
+            });
             return false;
           } else if (this.validationRequest.state() === 'pending') {
             // Block the submit while the validation takes place.

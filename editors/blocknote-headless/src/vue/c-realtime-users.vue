@@ -31,7 +31,9 @@ import {
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { ref, watch } from "vue";
 
-const status = ref(WebSocketStatus.Disconnected);
+// We don't assign a status yet, as we don't know if realtime is enabled or not
+// (the providerRef may be empty now but filled later)
+const status = ref<WebSocketStatus>();
 
 watch(
   providerRef,
@@ -40,6 +42,10 @@ watch(
       return;
     }
 
+    // Now that we now we have a provider, we can indicate it's connecting
+    status.value = WebSocketStatus.Connecting;
+
+    // As soon as the provider's status changes, update it
     provider.on("status", (event: onStatusParameters) => {
       status.value = event.status;
     });
@@ -71,6 +77,7 @@ const users = ref<{ user: User; clientId: string }[]>([]);
       />
       <span class="connection-status-label">Offline</span>
     </span>
+
     <span
       v-if="status === WebSocketStatus.Connecting"
       class="connection-status-connecting"
@@ -82,6 +89,7 @@ const users = ref<{ user: User; clientId: string }[]>([]);
       />
       <span class="connection-status-label">Connecting</span>
     </span>
+
     <span
       v-if="status === WebSocketStatus.Connected"
       class="connection-status-users"

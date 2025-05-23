@@ -22,6 +22,7 @@ import ImageFilePanel from "./blocks/ImageFilePanel.vue";
 import ImageToolbar from "./blocks/ImageToolbar.vue";
 import LinkToolbar from "./blocks/LinkToolbar.vue";
 import ParagraphToolbar from "./blocks/ParagraphToolbar.vue";
+import { EditorType } from "../blocknote";
 import { BlockNoteToUniAstConverter } from "../blocknote/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../blocknote/uniast-to-bn";
 import { AutoSaver } from "../components/autoSaver";
@@ -50,7 +51,7 @@ import {
 import { Container } from "inversify";
 
 import { debounce } from "lodash-es";
-import { watch } from "vue";
+import { shallowRef, watch } from "vue";
 import { createI18n, useI18n } from "vue-i18n";
 import type { SkinManager } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api/dist";
@@ -58,22 +59,21 @@ import type { AuthenticationManagerProvider } from "@xwiki/cristal-authenticatio
 const {
   editorProps,
   editorContent: uniAst,
-  realtimeServerURL,
+  realtimeServerURL = undefined,
   container,
   skinManager,
-} = withDefaults(
-  defineProps<{
-    editorProps: Omit<
-      ReactNonSlotProps<BlockNoteViewWrapperProps>,
-      "content" | "prefixDefaultFormattingToolbarFor"
-    >;
-    editorContent: UniAst | Error;
-    realtimeServerURL?: string | undefined;
-    container: Container;
-    skinManager: SkinManager;
-  }>(),
-  { realtimeServerURL: undefined },
-);
+} = defineProps<{
+  editorProps: Omit<
+    ReactNonSlotProps<BlockNoteViewWrapperProps>,
+    "content" | "prefixDefaultFormattingToolbarFor" | "pendingSyncMessage"
+  >;
+  editorContent: UniAst | Error;
+  realtimeServerURL?: string | undefined;
+  container: Container;
+  skinManager: SkinManager;
+}>();
+
+const editorRef = shallowRef<EditorType | null>(null);
 
 const emit = defineEmits<{
   // TODO: the type of the content might change!
@@ -81,13 +81,14 @@ const emit = defineEmits<{
 }>();
 
 defineExpose({
-  async getContent() {
-    return extractEditorContent();
-  },
+  getContent: (): string | Error => extractEditorContent(),
 });
 
-async function extractEditorContent() {
-  const editor = editorProps.editorRef!.value!;
+/**
+ * Extract the editor's content and convert it to Markdown
+ */
+function extractEditorContent(): string | Error {
+  const editor = editorRef.value!;
   const uniAst = blockNoteToUniAst.blocksToUniAst(editor.document);
 
   if (uniAst instanceof Error) {
@@ -98,8 +99,11 @@ async function extractEditorContent() {
   return uniAstToMarkdown.toMarkdown(uniAst);
 }
 
-async function notifyChanges(): Promise<void> {
-  const content = await extractEditorContent();
+/**
+ * Notify the parent component the editor's content changed
+ */
+function notifyChanges(): void {
+  const content = extractEditorContent();
 
   // TODO: error reporting
   if (!(content instanceof Error)) {
@@ -107,6 +111,9 @@ async function notifyChanges(): Promise<void> {
   }
 }
 
+/**
+ * This function's purpose is to build the realtime provider that will be used throughout the app
+ */
 // eslint-disable-next-line max-statements
 async function getRealtimeProvider(): Promise<
   NonNullable<BlockNoteViewWrapperProps["blockNoteOptions"]>["collaboration"]
@@ -133,7 +140,7 @@ async function getRealtimeProvider(): Promise<
     name: `${documentReference}:blocknote`,
   });
 
-  autoSaverRef.value = new AutoSaver(provider, notifyChanges);
+  autoSaverRef.value = new AutoSaver(provider, async () => notifyChanges());
 
   const user = await computeCurrentUser(authenticationManager);
 
@@ -146,10 +153,10 @@ async function getRealtimeProvider(): Promise<
   };
 }
 
-const collaboration = await getRealtimeProvider();
+const provider = await getRealtimeProvider();
 
-if (!realtimeServerURL && editorProps.editorRef) {
-  watch(editorProps.editorRef, (editor) => {
+if (!realtimeServerURL && editorRef.value) {
+  watch(editorRef.value, (editor) => {
     if (editor) {
       const debouncedSave = debounce(notifyChanges, 500);
 
@@ -158,11 +165,18 @@ if (!realtimeServerURL && editorProps.editorRef) {
   });
 }
 
+const { t } = useI18n({
+  messages,
+});
+
+// Build the properties object for the React BlockNoteView component
 const initializedEditorProps: Omit<
   ReactNonSlotProps<BlockNoteViewWrapperProps>,
   "content"
 > = {
   ...editorProps,
+  editorRef,
+  pendingSyncMessage: t("blocknote.realtime.syncing"),
   prefixDefaultFormattingToolbarFor: [
     "paragraph",
     "quote",
@@ -180,7 +194,7 @@ const initializedEditorProps: Omit<
   ],
   blockNoteOptions: {
     ...editorProps.blockNoteOptions,
-    collaboration,
+    collaboration: provider,
   },
 };
 
@@ -206,10 +220,6 @@ const content =
   uniAst instanceof Error
     ? uniAst
     : uniAstToBlockNote.uniAstToBlockNote(uniAst);
-
-const { t } = useI18n({
-  messages,
-});
 </script>
 
 <template>

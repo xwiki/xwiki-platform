@@ -41,7 +41,6 @@ import { debounce } from "lodash-es";
 import { inject, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
-import type { EditorType } from "@xwiki/cristal-editors-blocknote-headless";
 
 const { t } = useI18n({
   messages,
@@ -70,8 +69,6 @@ const titlePlaceholder = modelReferenceHandler?.getTitle(
   currentPageReference.value!,
 );
 
-const editor = shallowRef<EditorType | null>(null);
-
 const editorProps = shallowRef<
   InstanceType<typeof CBlockNoteView>["$props"]["editorProps"] | null
 >(null);
@@ -81,6 +78,11 @@ const editorContent = shallowRef<UniAst | Error | null>(null);
 const editorInstance =
   useTemplateRef<InstanceType<typeof CBlockNoteView>>("editorInstance");
 
+/**
+ * Setup the editor and title input using the fetched page's content
+ *
+ * @param currentPage - The fetched current page
+ */
 async function loadEditor(currentPage: PageData | undefined): Promise<void> {
   if (!currentPage) {
     // TODO
@@ -94,7 +96,6 @@ async function loadEditor(currentPage: PageData | undefined): Promise<void> {
   }
 
   editorProps.value = {
-    editorRef: editor,
     theme: "light",
   };
 
@@ -107,8 +108,13 @@ async function loadEditor(currentPage: PageData | undefined): Promise<void> {
   title.value = documentService.getTitle().value ?? "";
 }
 
-function view() {
+/**
+ * Go to the view route
+ */
+function navigateToView() {
   // Destroy the editor instance.
+  editorInstance.value?.getContent();
+
   // editor.value?.destroy();
   // Navigate to view mode.
   const viewRouterParams = {
@@ -119,34 +125,11 @@ function view() {
   cristal?.getRouter().push(viewRouterParams);
 }
 
-async function saveContent() {
-  const editor = editorInstance.value!;
-  const content = await editor.getContent();
-
-  // TODO: error reporting
-  if (!(content instanceof Error)) {
-    // Perform a last save before quitting.
-    await save(content);
-  }
-}
-
-async function submit() {
-  saveContent();
-
-  // TODO: hold back user in case of error
-  view();
-}
-
-watch(
-  loading,
-  (loading) => {
-    if (!loading) {
-      loadEditor(currentPage.value);
-    }
-  },
-  { immediate: true },
-);
-
+/**
+ * Save a content into the current page document
+ *
+ * @param content - The content to save
+ */
 async function save(content: string) {
   try {
     // TODO: html does not make any sense here.
@@ -170,6 +153,44 @@ async function save(content: string) {
   documentService.notifyDocumentChange("update", currentPageReference.value!);
 }
 
+/**
+ * Save the editor's content into the page
+ */
+async function saveContent() {
+  const editor = editorInstance.value!;
+  const content = editor.getContent();
+
+  // TODO: error reporting
+  if (!(content instanceof Error)) {
+    // Perform a last save before quitting.
+    await save(content);
+  }
+}
+
+/**
+ * Save the editor's content and navigate to the view page
+ */
+async function submit() {
+  await saveContent();
+
+  // TODO: hold back user in case of error
+  navigateToView();
+}
+
+// Wait for the page to be fetched before loading the editor
+watch(
+  loading,
+  (loading) => {
+    if (!loading) {
+      loadEditor(currentPage.value);
+    }
+  },
+  { immediate: true },
+);
+
+/**
+ * Save the edited title in realtime
+ */
 watch(
   title,
   debounce(async () => {
@@ -198,10 +219,13 @@ watch(
         class="doc-title"
       />
     </template>
+
     <template #default>
       <div class="doc-content">
         <span v-if="unknownSyntax">{{ unknownSyntax }}</span>
+
         <span v-else-if="!editorProps || !editorContent">Loading...</span>
+
         <template v-else>
           <div class="editor-centerer">
             <div class="editor">

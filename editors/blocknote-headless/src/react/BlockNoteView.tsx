@@ -47,7 +47,7 @@ import {
 import { multiColumnDropCursor } from "@blocknote/xl-multi-column";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { ReactivueChild } from "@xwiki/cristal-reactivue";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ShallowRef } from "vue";
 
 type DefaultEditorOptionsType = BlockNoteEditorOptions<
@@ -66,21 +66,36 @@ type BlockNoteViewWrapperProps = {
   editorRef?: ShallowRef<EditorType | null>;
 
   /**
+   * Message to display while syncing changes with other users
+   */
+  pendingSyncMessage: string;
+
+  /**
    * Prepend the default formatting toolbar for the provided block types
    * For all these blocks, the custom-provided `formattingToolbar` will be *appended* to the default toolbar instead of replacing it
    */
   prefixDefaultFormattingToolbarFor: Array<BlockType["type"]>;
 
+  /**
+   * Replace BlockNote's default formatting toolbar with a custom one
+   * Can be used together with `prefixDefaultFormattingToolbarFor` to make this one be _appended_ to the default one
+   */
   formattingToolbar: ReactivueChild<{
     editor: EditorType;
     currentBlock: BlockType;
   }>;
 
+  /**
+   * Replace BlockNote's link toolbar with a custom one
+   */
   linkToolbar: ReactivueChild<{
     editor: EditorType;
     linkToolbarProps: LinkToolbarProps;
   }>;
 
+  /**
+   * Replace BlockNote's file/image panel with a custom one
+   */
   filePanel: ReactivueChild<{
     editor: EditorType;
     filePanelProps: FilePanelProps<
@@ -91,15 +106,20 @@ type BlockNoteViewWrapperProps = {
 };
 
 /**
- * Load the provided content, parse it to Markdown and load it to the provided editor.
+ * Load the provided content into the provided editor.
  * @param editor - the editor in which the parsed content will be loaded
- * @param blocks - the content to to load into the editor
+ * @param blocks - the content to load into the editor
  */
-async function parseAndLoadContent(
-  // TODO: MaybeUninit<EditorType>
-  editor: EditorType,
-  blocks: BlockType[],
-) {
+async function replaceContent(editor: EditorType, blocks: BlockType[]) {
+  // TODO: with time, see if this fix actually works fine
+  //
+  // Some BlockNote crash seems to happen when replacing the whole document, but only sometimes.
+  // So here we ensure the document is never empty by introducing some empty inline content, which will be put
+  // inside a paragraph.
+  if (editor.document.length === 0) {
+    editor.insertInlineContent("");
+  }
+
   editor.replaceBlocks(editor.document, blocks);
 }
 
@@ -110,6 +130,7 @@ async function parseAndLoadContent(
 function BlockNoteViewWrapper({
   blockNoteOptions,
   theme,
+  pendingSyncMessage,
   formattingToolbar: CustomFormattingToolbar,
   prefixDefaultFormattingToolbarFor,
   linkToolbar: CustomLinkToolbar,
@@ -124,8 +145,7 @@ function BlockNoteViewWrapper({
     | undefined;
 
   // Prevent changes in the editor until the provider has synced with other clients
-  // TODO: "ready" is not defined here (see below)
-  const [, setReady] = useState(!provider);
+  const [ready, setReady] = useState(!provider);
 
   // Creates a new editor instance.
   const editor = useCreateBlockNote({
@@ -150,36 +170,64 @@ function BlockNoteViewWrapper({
   // The rest of the participants will just retrieve the editor content from the realtime server.
   // We know who is the first user joining the session by checking for the absence of an initialContentLoaded key in the
   // document's configuration map (shared across all session participants).
-  if (provider) {
-    provider.on("synced", () => {
-      console.debug("HocusPocus synced");
+  useEffect(() => {
+    if (provider) {
+      console.debug("Trying to connect to realtime server...");
 
-      if (
-        !provider.document.getMap("configuration").get("initialContentLoaded")
-      ) {
-        provider.document
+      provider.on("synced", () => {
+        console.debug("Connected to realtime server and synced!");
+
+        const initialContentLoaded = provider.document
           .getMap("configuration")
-          .set("initialContentLoaded", true);
+          .get("initialContentLoaded");
 
-        parseAndLoadContent(editor, content);
-      }
+        if (!initialContentLoaded) {
+          provider.document
+            .getMap("configuration")
+            .set("initialContentLoaded", true);
 
-      setReady(true);
-    });
+          console.debug("Setting initial content for realtime first player", {
+            content,
+          });
 
-    provider.on("destroy", () => {
-      provider.destroy();
-    });
-  } else {
-    parseAndLoadContent(editor, content);
+          replaceContent(editor, content);
+        }
+
+        setReady(true);
+      });
+
+      provider.on("destroy", () => {
+        provider.destroy();
+      });
+    } else {
+      // If we don't have a provider, we can simply load the content directly
+      console.debug(
+        "No realtime provider, setting document's content directly",
+      );
+
+      replaceContent(editor, content);
+    }
+  }, [provider]);
+
+  // Disconnect from the realtime provider when the component is unmounted
+  // Otherwise, our user profile may be left over and still be displayed to other users
+  useEffect(() => {
+    return () => {
+      console.debug(
+        "BlockNoteView is being unmounted, disconnecting from the realtime provider...",
+      );
+
+      provider?.disconnect();
+    };
+  }, []);
+
+  if (!ready) {
+    return (
+      <h3>
+        <em>{pendingSyncMessage}</em>
+      </h3>
+    );
   }
-
-  // TODO: this condition ensures the editor does not show until all changes have been synced with clients
-  // Currently, there is a problem with realtime not syncing changes in a reliable fashion, so we disable it for now
-  //
-  // if (!ready) {
-  //   return <h1>Syncing changes with other realtime users...</h1>;
-  // }
 
   // Renders the editor instance using a React component.
   return (

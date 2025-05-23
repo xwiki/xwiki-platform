@@ -18,7 +18,7 @@
   },
   "main": "./src/index.tsx",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },

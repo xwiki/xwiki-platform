@@ -200,12 +200,12 @@
             outputSyntax: 'plain',
             input: resourceReference.reference,
             action: 'validate'
-          }).done((function(data) {
+          }).done(data => {
             this.validationRequestResult = data.validated;
-          }).bind(this)).fail((function(data) {
-            console.error("Error while loading validation link response", data);
+          }).fail(error => {
+            console.error("Error while loading validation link response", error);
             this.validationRequestResult = false;
-          }).bind(this));
+          });
         },
         getValue: function() {
           var resourcePickerInput = this.getResourcePickerInput();

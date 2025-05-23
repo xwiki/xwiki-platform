@@ -90,6 +90,8 @@ public class BaseSearchResult extends XWikiResource
     protected static final String QUERY_TEMPLATE_INFO =
         "q={query}(&type={type})(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
+    protected static final Set<SearchScope> PAGE_SCOPES = EnumSet.of(TITLE, NAME, CONTENT);
+
     private static final String WIKI_SEPARATOR = ":";
 
     private static final String ASC = "asc";
@@ -110,6 +112,8 @@ public class BaseSearchResult extends XWikiResource
         Map.entry("version", "version"),
         Map.entry("hidden", "hidden")
     );
+
+    private static final String SEARCH_WILDCARD = "*";
 
     protected enum SearchScope
     {
@@ -197,8 +201,7 @@ public class BaseSearchResult extends XWikiResource
         String space, int number, int start, String orderField, String order, Boolean withPrettyNames,
         Boolean isLocaleAware) throws QueryException, XWikiException
     {
-        Set<SearchScope> supportedScopes = EnumSet.of(TITLE, NAME, CONTENT);
-        if (StringUtils.isBlank(keywords) || searchScopes.stream().noneMatch(supportedScopes::contains)) {
+        if (searchScopes.stream().noneMatch(PAGE_SCOPES::contains)) {
             return List.of();
         }
 
@@ -222,11 +225,36 @@ public class BaseSearchResult extends XWikiResource
             filterQueries.add("locales:%s".formatted(currentLocale));
         }
 
+        String queryString = getQueryString(searchScopes, keywords, wikiName);
+
+        Query query = this.queryManager.createQuery(queryString, "solr");
+        query.setLimit(number);
+        query.setOffset(start);
+        query.bindValue("fq", filterQueries);
+        query.bindValue("fl", String.join(",", FieldUtils.WIKI, FieldUtils.SPACES, FieldUtils.NAME,
+            FieldUtils.DOCUMENT_LOCALE, FieldUtils.TYPE, FieldUtils.LOCALES));
+        addSortValue(orderField, order, query);
+        List<Object> results = query.execute();
+        List<DocumentReference> documentReferences = ((QueryResponse) results.get(0)).getResults().stream()
+            .map(this.solrDocumentDocumentReferenceResolver::resolve)
+            .toList();
+
+        return getPagesSearchResults(documentReferences, wikiName, withPrettyNames);
+    }
+
+    private String getQueryString(List<SearchScope> searchScopes, String keywords, String wikiName)
+        throws XWikiException
+    {
+        if (StringUtils.isBlank(keywords)) {
+            return SEARCH_WILDCARD;
+        }
+
         // Wildcard queries completely bypass the tokenizer. For this reason, we can't just take the full query and
         // append a wildcard as it wouldn't match anything when the query is more than a single word. Instead, we
         // perform a hybrid approach: we pass the query without wildcards to use the regular tokenizer, and we add a
         // wildcard to the last token of the query as this is the word that is most likely incomplete.
-        String wildcardQuery = this.solrUtils.toCompleteFilterQueryString(getLastTerm(keywords).toLowerCase()) + "*";
+        String wildcardQuery =
+            this.solrUtils.toCompleteFilterQueryString(getLastTerm(keywords).toLowerCase()) + SEARCH_WILDCARD;
 
         // The passed query could also be a local or absolute document reference.
         // Convert a local reference to an absolute reference.
@@ -235,8 +263,8 @@ public class BaseSearchResult extends XWikiResource
         String webHome = this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
 
         String escapedKeyWords = this.solrUtils.toFilterQueryString(keywords);
-        String queryString = searchScopes.stream()
-            .filter(supportedScopes::contains)
+        return searchScopes.stream()
+            .filter(BaseSearchResult.PAGE_SCOPES::contains)
             .map(scope -> switch (scope) {
                 // Consider matches in the title as way more important.
                 // Use title_ for wildcard matches to ensure we're using the same tokenizer as the field.
@@ -251,21 +279,6 @@ public class BaseSearchResult extends XWikiResource
                 default -> throw new IllegalStateException("Unexpected value: " + scope);
             })
             .collect(Collectors.joining(" OR "));
-
-        Query query = this.queryManager.createQuery(queryString, "solr");
-        query.setLimit(number);
-        query.setOffset(start);
-        query.bindValue("fq", filterQueries);
-        query.bindValue("mm", "0%");
-        query.bindValue("fl", String.join(",", FieldUtils.WIKI, FieldUtils.SPACES, FieldUtils.NAME,
-            FieldUtils.DOCUMENT_LOCALE, FieldUtils.TYPE, FieldUtils.LOCALES));
-        addSortValue(orderField, order, query);
-        List<Object> results = query.execute();
-        List<DocumentReference> documentReferences = ((QueryResponse) results.get(0)).getResults().stream()
-            .map(this.solrDocumentDocumentReferenceResolver::resolve)
-            .toList();
-
-        return getPagesSearchResults(documentReferences, wikiName, withPrettyNames);
     }
 
     private void addSortValue(String orderField, String order, Query query)
@@ -274,6 +287,9 @@ public class BaseSearchResult extends XWikiResource
         // Still, if explicitly requested and supported by Solr, simulate ordering by a similar field.
         if (StringUtils.isNotBlank(orderField) && ORDER_FIELD_DATABASE_TO_SOLR.containsKey(orderField)) {
             query.bindValue("sort", ORDER_FIELD_DATABASE_TO_SOLR.get(orderField) + " " + getValidOrder(order));
+        } else if (SEARCH_WILDCARD.equals(query.getStatement())) {
+            // Return the most recently modified documents when the query is empty.
+            query.bindValue("sort", "date desc");
         }
     }
 

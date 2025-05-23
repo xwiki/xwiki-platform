@@ -10,5 +10,38 @@
     {
       "path": "./tsconfig.vitest.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "ESNext",
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "allowSyntheticDefaultImports": true,
+    "noResolve": false,
+    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "isolatedModules": true,
+    "isolatedDeclarations": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "noImplicitOverride": true
+  },
+  "vueCompilerOptions": {
+    "strictTemplates": true
+  }
 }

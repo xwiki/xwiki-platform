@@ -1656,4 +1656,15 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Default is "true".
 # container.request.resolveRelativeRedirect=true
 
+#-------------------------------------------------------------------------------------
+# Scheduler
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.5.0]
+#-# "true" (the default) if the scheduler should be enabled on this instance.
+#-# Disabling the scheduler is often used as a workaround to avoid duplicates in a cluster.
+#-# 
+#-# Default is "true".
+# shceduler.enabled=false
+
 $!xwikiPropertiesAdditionalProperties

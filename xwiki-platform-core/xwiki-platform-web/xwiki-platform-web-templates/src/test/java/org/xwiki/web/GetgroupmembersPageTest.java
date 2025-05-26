@@ -158,7 +158,7 @@ class GetgroupmembersPageTest extends PageTest
         GroupCacheEntry groupCacheEntry = mock(GroupCacheEntry.class);
         when(this.wikiGroupCache.get("xwiki")).thenReturn(Set.of(groupDocumentReference));
         when(this.membersCache.getCacheEntry(groupDocumentReference, true)).thenReturn(groupCacheEntry);
-        when(groupCacheEntry.getAll()).thenReturn(Arrays.asList(
+        when(groupCacheEntry.getDirect()).thenReturn(Arrays.asList(
             new DocumentReference("xwiki", "XWiki", "U1"),
             new DocumentReference("xwiki", "XWiki", "U2"),
             new DocumentReference("xwiki", "XWiki", "U3")

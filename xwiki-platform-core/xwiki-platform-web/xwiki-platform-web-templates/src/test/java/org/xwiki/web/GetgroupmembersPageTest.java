@@ -169,6 +169,7 @@ class GetgroupmembersPageTest extends PageTest
                 "U1",
                 "U2"));
         Map<String, Object> results = getJsonResultMap();
+        assertEquals(3, results.get("totalrows"));
         List<Map<String, Object>> rows = (List<Map<String, Object>>) results.get("rows");
         assertEquals(2, rows.size());
         assertEquals("U1", rows.get(0).get("doc_fullName"));

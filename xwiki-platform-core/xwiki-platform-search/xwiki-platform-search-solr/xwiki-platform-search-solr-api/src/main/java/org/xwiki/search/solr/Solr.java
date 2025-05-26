@@ -20,7 +20,6 @@
 package org.xwiki.search.solr;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.core.SolrCore;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
 import org.xwiki.stability.Unstable;

@@ -35,6 +35,7 @@ import { CArticle } from "@xwiki/cristal-skin";
 import {
   MarkdownToUniAstConverter,
   UniAst,
+  UniAstToMarkdownConverter,
   createConverterContext,
 } from "@xwiki/cristal-uniast";
 import { debounce } from "lodash-es";
@@ -78,6 +79,11 @@ const editorContent = shallowRef<UniAst | Error | null>(null);
 const editorInstance =
   useTemplateRef<InstanceType<typeof CBlockNoteView>>("editorInstance");
 
+// Tools for UniAst handling
+const converterContext = createConverterContext(container);
+const markdownToUniAst = new MarkdownToUniAstConverter(converterContext);
+const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
+
 /**
  * Setup the editor and title input using the fetched page's content
  *
@@ -99,11 +105,7 @@ async function loadEditor(currentPage: PageData | undefined): Promise<void> {
     theme: "light",
   };
 
-  const markdownConverter = new MarkdownToUniAstConverter(
-    createConverterContext(container),
-  );
-
-  editorContent.value = markdownConverter.parseMarkdown(currentPage.source);
+  editorContent.value = markdownToUniAst.parseMarkdown(currentPage.source);
 
   title.value = documentService.getTitle().value ?? "";
 }
@@ -130,13 +132,19 @@ function navigateToView() {
  *
  * @param content - The content to save
  */
-async function save(content: string) {
+async function save(content: UniAst) {
   try {
+    const markdown = uniAstToMarkdown.toMarkdown(content);
+
+    if (markdown instanceof Error) {
+      throw error;
+    }
+
     // TODO: html does not make any sense here.
     await storage.save(
       currentPageName.value ?? "",
       title.value,
-      content,
+      markdown,
       "html",
     );
   } catch (e) {
@@ -153,11 +161,12 @@ async function saveContent() {
   const editor = editorInstance.value!;
   const content = editor.getContent();
 
-  // TODO: error reporting
-  if (!(content instanceof Error)) {
-    // Perform a last save before quitting.
-    await save(content);
+  if (content instanceof Error) {
+    // TODO: error reporting
+    return;
   }
+
+  await save(content);
 }
 
 /**

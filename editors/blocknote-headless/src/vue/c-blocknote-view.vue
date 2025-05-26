@@ -43,11 +43,7 @@ import {
   ReactNonSlotProps,
   reactComponentAdapter,
 } from "@xwiki/cristal-reactivue";
-import {
-  UniAst,
-  UniAstToMarkdownConverter,
-  createConverterContext,
-} from "@xwiki/cristal-uniast";
+import { UniAst, createConverterContext } from "@xwiki/cristal-uniast";
 import { Container } from "inversify";
 
 import { debounce } from "lodash-es";
@@ -76,27 +72,18 @@ const {
 const editorRef = shallowRef<EditorType | null>(null);
 
 const emit = defineEmits<{
-  // TODO: the type of the content might change!
-  "blocknote-save": [content: string];
+  "blocknote-save": [content: UniAst];
 }>();
 
 defineExpose({
-  getContent: (): string | Error => extractEditorContent(),
+  getContent: (): UniAst | Error => extractEditorContent(),
 });
 
 /**
- * Extract the editor's content and convert it to Markdown
+ * Extract the editor's content and convert it to UniAst
  */
-function extractEditorContent(): string | Error {
-  const editor = editorRef.value!;
-  const uniAst = blockNoteToUniAst.blocksToUniAst(editor.document);
-
-  if (uniAst instanceof Error) {
-    // TODO: show proper error to user
-    throw uniAst;
-  }
-
-  return uniAstToMarkdown.toMarkdown(uniAst);
+function extractEditorContent(): UniAst | Error {
+  return blockNoteToUniAst.blocksToUniAst(editorRef.value!.document);
 }
 
 /**
@@ -212,7 +199,6 @@ const linkEditionCtx = createLinkEditionContext(container);
 const converterContext = createConverterContext(container);
 
 const blockNoteToUniAst = new BlockNoteToUniAstConverter(converterContext);
-const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
 
 const uniAstToBlockNote = new UniAstToBlockNoteConverter(converterContext);
 

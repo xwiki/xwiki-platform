@@ -166,7 +166,7 @@
     // Create an id unique to the facet value.
     let facetContainer = $(this).parents('.search-facet').first();
     // We use the JQuery index, so that id indexes are reset across facetContainers.
-    // This allows more stable indexes: when reloading the facets after changing the filter for facet X,
+    // This allows for stable indexes: when reloading the facets after changing the filter for facet X,
     // the ids of all the checkbox for facet X will keep the same index.
     // This allows us to refocus exactly the element interacted with to make this filter change.
     // This property is lost if multiple facets are changed in the query at once.
@@ -244,7 +244,7 @@
 
   // ChangeTargetId is the id of the facet anchor that initiated this reload. We expect the focus to go back to this 
   // place once the UI is reloaded.
-  var pushSearchUIState = function(viewURL, changeTargetId) {
+  var pushSearchUIState = function(viewURL, changeTargetValue) {
     // If there is a request in progress, abort it to prevent its callback from being called.
     searchRequest &amp;&amp; searchRequest.abort();
     $('.search-ui').attr('aria-busy', true);
@@ -257,8 +257,7 @@
       window.history.replaceState &amp;&amp; window.history.replaceState(state, document.title);
       // Make sure the browser address bar reflects the new state (and thus the new state can be bookmarked).
       window.history.pushState &amp;&amp; window.history.pushState(state, document.title, viewURL);
-      document.getElementBy(changeTargetValue).focus();
-      document.querySelectorAll().querySelectorAll("[data-foo='1']")
+      document.querySelector("[data-facetvalue='" + changeTargetValue + "']").focus();
     });
   };
 
@@ -270,7 +269,7 @@
 
   // Others (e.g. a custom facet) can trigger a search UI update by firing this event.
   $(document).on('xwiki:search:update', function(event, viewURL) {
-    pushSearchUIState(viewURL, event.target.id);
+    pushSearchUIState(viewURL, event.target.getAttribute('data-facetvalue'));
   });
 
   $(window).on('popstate', function(event) {

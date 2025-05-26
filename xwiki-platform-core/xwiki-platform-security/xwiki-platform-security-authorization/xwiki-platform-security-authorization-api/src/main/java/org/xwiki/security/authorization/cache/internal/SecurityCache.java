@@ -122,6 +122,7 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      * security cache and then passed when adding the entry to the cache.
      *
      * @since 17.2.0RC1
+     * @since 16.10.9
      */
     long getInvalidationCounter();
 

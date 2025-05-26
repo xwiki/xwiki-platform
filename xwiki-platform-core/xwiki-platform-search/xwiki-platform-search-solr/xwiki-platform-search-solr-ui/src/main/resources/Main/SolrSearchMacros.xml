@@ -481,7 +481,7 @@
   #displaySearchResultLocation()
   &lt;div class="search-result-author"&gt;
     $services.localization.render('core.footer.modification', [
-      "#displayUserProfileLink($searchResult.author $searchResult.author_display)",
+      "#displayUser($searchResult.author {'useInlineHTML': true})",
       $xwiki.formatDate($searchResult.date)
     ])
   &lt;/div&gt;
@@ -503,7 +503,7 @@
   &lt;/h2&gt;
   #displaySearchResultLocation($searchResult)
   &lt;div class="search-result-uploader"&gt;
-    #set ($uploader = "#displayUserProfileLink($searchResult.attauthor.get(0) $searchResult.attauthor_display.get(0))")
+    #set ($uploader = "#displayUser($searchResult.attauthor.get(0) {'useInlineHTML': true})")
     #set ($uploadDate = $xwiki.formatDate($searchResult.attdate.get(0)))
     #set ($fileSize = "#dynamicsize($searchResult.attsize.get(0))")
     $services.localization.render('solr.result.uploadedBy', [$uploader, $uploadDate, $fileSize])
@@ -552,15 +552,6 @@
     })
     #hierarchy($searchResultReference $locationOptions)
   &lt;/div&gt;
-#end
-
-#macro (displayUserProfileLink $userReference $userName)
-#if ($userReference)
-## We could test if the specified user exists but we want to speed up the search.
-&lt;a href="$xwiki.getURL($userReference)"&gt;$escapetool.xml($userName)&lt;/a&gt;##
-#else
-$services.localization.render('core.users.unknownUser')##
-#end
 #end
 
 #macro (displaySearchResultHighlighting $searchResult)

@@ -1,0 +1,2 @@
+org.xwiki.migrations.internal.R170400000XWIKI23160DataMigration
+org.xwiki.migrations.internal.XWikiPropertiesMetaFieldCleanupTaskConsumer

@@ -22,12 +22,13 @@ package org.xwiki.export.pdf.internal.chrome;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mock;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -37,6 +38,7 @@ import com.github.kklisura.cdt.protocol.commands.Target;
 import com.github.kklisura.cdt.protocol.types.browser.Version;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
+import com.github.kklisura.cdt.services.config.ChromeDevToolsServiceConfiguration;
 import com.github.kklisura.cdt.services.exceptions.ChromeServiceException;
 import com.github.kklisura.cdt.services.types.ChromeTab;
 import com.github.kklisura.cdt.services.types.ChromeVersion;
@@ -67,7 +69,7 @@ class ChromeManagerTest
     private ChromeServiceFactory chromeServiceFactory;
 
     @MockComponent
-    private PDFExportConfiguration configuration;
+    private Provider<ChromeDevToolsServiceConfiguration> configProvider;
 
     @Mock
     private ChromeService chromeService;
@@ -78,10 +80,14 @@ class ChromeManagerTest
     @Mock
     private ChromeVersion chromeVersion;
 
+    @Mock
+    private ChromeDevToolsServiceConfiguration config;
+
     @BeforeEach
     void configure() throws Exception
     {
-        when(this.configuration.getChromeRemoteDebuggingTimeout()).thenReturn(1);
+        when(this.configProvider.get()).thenReturn(this.config);
+        when(this.config.getReadTimeout()).thenReturn(1L);
 
         when(this.chromeService.getVersion()).thenReturn(this.chromeVersion);
         when(this.chromeServiceFactory.createBrowserDevToolsService(this.chromeVersion))
@@ -175,7 +181,7 @@ class ChromeManagerTest
     void connectWithTimeout() throws Exception
     {
         // Increase the timeout so that it tries multiple times (it waits 2s before retrying).
-        when(this.configuration.getChromeRemoteDebuggingTimeout()).thenReturn(3);
+        when(this.config.getReadTimeout()).thenReturn(3L);
 
         when(this.chromeServiceFactory.createChromeService("localhost", 9222)).thenReturn(this.chromeService);
         when(this.chromeService.getVersion()).thenThrow(new ChromeServiceException("Remote Chrome is not available."));

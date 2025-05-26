@@ -126,4 +126,22 @@ public class HttpServletUtilsTest
         assertSourceBaseURL("https://sourcehost", "http://host:8080", forwarded("host=sourcehost"),
             xhost("sourcehost2"), xproto("https"));
     }
+
+    @Test
+    void getClientIP()
+    {
+        jakarta.servlet.http.HttpServletRequest request = mock(jakarta.servlet.http.HttpServletRequest.class);
+
+        when(request.getRemoteAddr()).thenReturn("192.168.0.3");
+        assertEquals("192.168.0.3", HttpServletUtils.getClientIP(request));
+
+        when(request.getHeader("X-Forwarded-For")).thenReturn("192.168.0.1");
+        assertEquals("192.168.0.1", HttpServletUtils.getClientIP(request));
+
+        when(request.getHeader("X-Forwarded-For")).thenReturn("192.168.0.1,192.168.0.2");
+        assertEquals("192.168.0.1", HttpServletUtils.getClientIP(request));
+
+        when(request.getHeader("X-Forwarded-For")).thenReturn("");
+        assertEquals("192.168.0.3", HttpServletUtils.getClientIP(request));
+    }
 }

@@ -40,12 +40,15 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DocumentPicker;
@@ -157,9 +160,12 @@ class RenamePageIT
      * question to be renamed.
      */
     @Order(3)
-    @Test
-    void renamePageWithUsedClass(TestUtils setup, TestReference testReference)
+    @ParameterizedTest
+    @WikisSource
+    void renamePageWithUsedClass(WikiReference wikiReference, TestUtils setup, TestLocalReference localReference)
     {
+        DocumentReference testReference = new DocumentReference(localReference, wikiReference);
+
         // Create 4 pages under the same parent
         // 2 of them are free pages (WebHome and FreePage)
         // 1 of them is a class (ClassPage)

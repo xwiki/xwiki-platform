@@ -161,7 +161,7 @@ public class PDFExportOptionsModal extends BaseModal
         // The user is redirected to the generated PDF when ready, so we need to detect when the current URL changes.
         String currentURL = getDriver().getCurrentUrl();
 
-        getDriver().findElement(this.exportButtonLocator).click();
+        triggerExport();
 
         // Use a bigger timeout (60s) because the PDF export might have to fetch the headless Chrome Docker image,
         // create the container and start it (if it's the first PDF export).
@@ -179,5 +179,31 @@ public class PDFExportOptionsModal extends BaseModal
         // code itself so we can't always use the same URL as the browser to download the PDF file.
         URL pdfURL = new URL(hostURL, new URL(getDriver().getCurrentUrl()).getFile());
         return new PDFDocument(pdfURL, userName, password);
+    }
+
+    /**
+     * Submit the PDF export options modal without waiting for the PDF document to be generated.
+     */
+    public void triggerExport()
+    {
+        getDriver().findElement(this.exportButtonLocator).click();
+    }
+
+    /**
+     * If the PDF export has been triggered and is currently running, this will mark PDF export job as canceled and wait
+     * for it to finish (e.g. wait for the Export button to be re-enabled). Otherwise, this will simply close the modal.
+     */
+    public void cancel()
+    {
+        WebElement exportButton = getDriver().findElement(this.exportButtonLocator);
+        if (exportButton.isEnabled()) {
+            // Close the modal.
+            close();
+        } else {
+            // PDF export in progress, cancel it.
+            getDriver().findElement(By.cssSelector("#pdfExportOptions .modal-footer .button.secondary")).click();
+            waitForNotificationSuccessMessage("PDF export canceled");
+            getDriver().waitUntilElementIsEnabled(exportButton);
+        }
     }
 }

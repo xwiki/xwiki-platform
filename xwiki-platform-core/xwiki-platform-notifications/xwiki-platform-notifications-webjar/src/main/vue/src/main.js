@@ -17,9 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import DisplayerToggle from "./components/DisplayerToggle.vue";
-import DisplayerScope from "./components/DisplayerScope.vue";
-import DisplayerStaticList from "./components/DisplayerStaticList.vue";
 
-// Export the elements that are expected to be imported from other modules.
-export {DisplayerToggle,DisplayerScope,DisplayerStaticList}
+import("./initNotificationDisplayers.js");
+

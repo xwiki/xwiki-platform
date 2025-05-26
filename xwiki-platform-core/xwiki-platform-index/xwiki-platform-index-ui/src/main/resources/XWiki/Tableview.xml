@@ -36,5 +36,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{documents id="alldocs"/}}</content>
+  <content>{{velocity}}
+#set ($author = "$!request.getParameter('doc.author')")
+{{documents id="alldocs" 
+#if($author != '')filters="doc.author=${services.rendering.escape($author, 'xwiki/2.1')}"#end
+/}}
+{{/velocity}}</content>
 </xwikidoc>

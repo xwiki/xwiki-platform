@@ -600,7 +600,7 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         // Initialize the filesystem template cache
         try {
-            this.templateCache = cacheManager.createNewCache(new LRUCacheConfiguration("templates", 500));
+            this.templateCache = this.cacheManager.createNewCache(new LRUCacheConfiguration("templates", 500));
         } catch (CacheException e) {
             this.logger.error("Failed to create the filesystem template cache", e);
         }
@@ -663,7 +663,7 @@ public class InternalTemplateManager implements Initializable, Disposable
         return this.templateRootURL;
     }
 
-    private boolean checkFilesystemTemplate(String templatePath)
+    private boolean checkFilesystemTemplate(String templatePath, boolean checkPathTraversal)
     {
         URL templateURL = this.environment.getResource(templatePath);
 
@@ -672,15 +672,17 @@ public class InternalTemplateManager implements Initializable, Disposable
             return false;
         }
 
-        // Prevent inclusion of templates from other directories
-        String rootTemplate = getTemplateRootPath();
-        if (rootTemplate != null) {
-            String templateURLString = templateURL.toString();
-            if (!templateURLString.startsWith(getTemplateRootPath())) {
-                this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!",
-                    templateURLString);
+        if (checkPathTraversal) {
+            // Prevent inclusion of templates from other directories
+            String rootTemplate = getTemplateRootPath();
+            if (rootTemplate != null) {
+                String templateURLString = templateURL.toString();
+                if (!templateURLString.startsWith(getTemplateRootPath())) {
+                    this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!",
+                        templateURLString);
 
-                return false;
+                    return false;
+                }
             }
         }
 
@@ -1018,23 +1020,29 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         String templateId = TemplateSkinResource.createId(templatePath);
 
-        if (!checkFilesystemTemplate(templatePath)) {
-            // Force invalidating the potentially cached template since it's not valid anymore
-            this.templateCache.remove(templateId);
+        // Check if a template already been cached for this identifier
+        Template template = getCachedTemplate(templateId);
 
+        if (template != null) {
+            // The template was cached already, so just check if the template file still exist
+            if (!checkFilesystemTemplate(templatePath, false)) {
+                // Force invalidating the cached template since it's not valid anymore
+                this.templateCache.remove(templateId);
+
+                return null;
+            }
+        } else if (!checkFilesystemTemplate(templatePath, true)) {
             return null;
         }
 
-        // Try the cache
-        Template template = getCachedTemplate(templateId, () -> getResourceInstant(this.environment, templatePath));
+        // Check the cached value, and reload the template if needed
+        template = getCachedTemplate(templateId, template, () -> getResourceInstant(this.environment, templatePath));
 
         // Create a new instance if it could not be found in the cache
         if (template == null) {
             template = new EnvironmentTemplate(new TemplateSkinResource(templatePath, templateName, this.environment));
 
-            if (this.templateCache != null) {
-                this.templateCache.set(templateId, template);
-            }
+            setCachedTemplate(templateId, template);
         }
 
         return template;
@@ -1043,7 +1051,7 @@ public class InternalTemplateManager implements Initializable, Disposable
     private Template getTemplate(Resource<?> resource)
     {
         // Try the cache
-        Template template = getCachedTemplate(resource.getId(), resource::getInstant);
+        Template template = getCachedTemplate(resource.getId(), null, resource::getInstant);
 
         if (template == null) {
             if (resource instanceof AbstractSkinResource) {
@@ -1052,20 +1060,36 @@ public class InternalTemplateManager implements Initializable, Disposable
                 template = new DefaultTemplate(resource);
             }
 
-            if (this.templateCache != null) {
-                this.templateCache.set(resource.getId(), template);
-            }
+            setCachedTemplate(resource.getId(), template);
         }
 
         return template;
     }
 
-    private Template getCachedTemplate(String id, Callable<Instant> resourceInstantProvider)
+    private Template getCachedTemplate(String id)
     {
-        Template template = null;
+        if (this.templateCache != null) {
+            return this.templateCache.get(id);
+        }
+
+        return null;
+    }
+
+    private void setCachedTemplate(String id, Template template)
+    {
+        if (this.templateCache != null) {
+            this.templateCache.set(id, template);
+        }
+    }
+
+    private Template getCachedTemplate(String id, Template cachedTemplate, Callable<Instant> resourceInstantProvider)
+    {
+        Template template = cachedTemplate;
 
         if (this.templateCache != null) {
-            template = this.templateCache.get(id);
+            if (template == null) {
+                template = this.templateCache.get(id);
+            }
 
             // Check if the cached template is older than the actual resource last modification
             if (template != null) {

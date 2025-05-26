@@ -158,6 +158,8 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
         XWiki xwiki = context.getWiki();
         DocumentReference userDocReference = documentReferenceResolver.resolve(docUser);
         XWikiDocument userDocument = xwiki.getDocument(userDocReference, context);
+        // Avoid modifying the cached document
+        userDocument = userDocument.clone();
         BaseObject userObject = userDocument.getXObject(xwikiUserXClass.getReference());
 
         // this condition should never happen normally, but we might imagine so DB with stale objects for some reasons

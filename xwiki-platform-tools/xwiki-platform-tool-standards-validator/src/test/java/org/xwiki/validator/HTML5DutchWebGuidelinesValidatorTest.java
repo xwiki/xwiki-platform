@@ -643,7 +643,7 @@ public class HTML5DutchWebGuidelinesValidatorTest
         this.validator.validateRpd13s1();
         assertFalse(isValid(this.validator), getErrors(this.validator));
 
-        setValidatorDocument("<body><form><label /><input name='test' id='test' /></form></body>");
+        setValidatorDocument("<body><form><label></label><input name='test' id='test' /></form></body>");
         this.validator.validateRpd13s1();
         assertFalse(isValid(this.validator), getErrors(this.validator));
 

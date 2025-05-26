@@ -30,13 +30,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.platform.security.requiredrights.display.BlockSupplierProvider;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -55,49 +51,30 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
     private DocumentContextExecutor documentContextExecutor;
 
     @Inject
-    @Named("translation")
-    private BlockSupplierProvider<String> translationMessageSupplierProvider;
-
-    @Inject
-    private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
-
-    @Inject
     private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
 
     @Inject
     private RequiredRightAnalyzer<BaseClass> classRequiredRightAnalyzer;
 
     @Inject
-    private VelocityDetector velocityDetector;
+    private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
+    @Named("content")
+    private RequiredRightAnalyzer<XWikiDocument> contentRequiredRightAnalyzer;
 
     @Override
     public List<RequiredRightAnalysisResult> analyze(XWikiDocument document) throws RequiredRightsException
     {
         // Analyze the content
         try {
+            List<RequiredRightAnalysisResult> result =
+                new ArrayList<>(this.contentRequiredRightAnalyzer.analyze(document));
+
             // Push the document into the context such that we, e.g., get the correct context wiki with the correct
             // wiki macros etc.
             return this.documentContextExecutor.call(() ->
             {
-                List<RequiredRightAnalysisResult> result = new ArrayList<>();
-
-                // Analyze the title
-                if (this.velocityDetector.containsVelocityScript(document.getTitle())) {
-                    result.add(new RequiredRightAnalysisResult(
-                        document.getDocumentReferenceWithLocale(),
-                        this.translationMessageSupplierProvider.get("security.requiredrights.title"),
-                        this.translationMessageSupplierProvider.get("security.requiredrights.title.description",
-                            document.getTitle()),
-                        List.of(RequiredRight.MAYBE_SCRIPT, RequiredRight.MAYBE_PROGRAM)
-                    ));
-                }
-
-                // Analyze the content
-                result.addAll(this.xdomRequiredRightAnalyzer.analyze(document.getXDOM()));
-
                 // Analyze XObjects and XClass on the Root locale version of the document
                 XWikiDocument rootLocaleDocument = document;
                 if (document.getLocale() != null && !document.getLocale().equals(Locale.ROOT)) {

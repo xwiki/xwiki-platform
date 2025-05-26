@@ -323,7 +323,8 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         DisplayerDescriptor displayerConfig = new DisplayerDescriptor();
         if (columnProperties.path(ACTIONS).isArray()) {
             displayerConfig.setId(ACTIONS);
-            displayerConfig.setParameter(ACTIONS, columnProperties.get(ACTIONS));
+            displayerConfig.setParameter(ACTIONS,
+                columnProperties.get(ACTIONS).valueStream().map(JsonNode::asText).toList());
         } else if (columnProperties.path(LINK).isTextual()) {
             displayerConfig.setId(LINK);
             displayerConfig.setParameter("propertyHref", getLinkTarget(column, columnProperties.get(LINK).asText()));
@@ -345,12 +346,12 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         String docURL = "doc.url";
         String columnURL = column + "_url";
         if ("auto".equals(linkType)) {
-            return new String[] {columnURL, docURL};
+            return List.of(columnURL, docURL);
         } else if ("field".equals(linkType)) {
             return columnURL;
         } else {
             String linkTypeURL = String.format("doc.%s_url", linkType);
-            return new String[] {linkTypeURL, docURL};
+            return List.of(linkTypeURL, docURL);
         }
     }
 

@@ -44,6 +44,7 @@ administration.sectionTitle=Upravljanje\: {0}
 administration.sectionTitle.page=Upravljanje stranicom\: {0}
 administration.sectionTitle.wiki=Upravljanje wikijem\: {0}
 administration.sectionTitle.global=Globalno upravljanje\: {0}
+### Missing: administration.menu.label=Administration sections.
 administration.menu.search.hint=Pretraga...
 administration.menu.search.noResults=Nema rezultata.
 
@@ -52,11 +53,8 @@ XWiki.XWikiPreferences_use_email_verification.hint=Ako je postavljeno na "Da", n
 XWiki.XWikiPreferences_validation_email_content.hint=Predložak e-pošte koji će korisnicima biti poslan radi validacije njihove adrese e-pošte.
 XWiki.XWikiPreferences_confirmation_email_content.hint=Preložak e-pošte koji odgovara e-pošti koja se šalje nakon što korisnik validira svoj račun klikanjem na poveznicu za validaciju iz prve zaprimljene e-pošte.
 XWiki.XWikiPreferences_invitation_email_content.hint=Predložak e-pošte koji će biti poslan korisnicima pozvanima da se registriraju.
-
 XWiki.Registration_heading.hint=Linija na vrhu stranice koja se prikazuje korisnicima čija registracija je u tijeku i onima koji su se netom registrirali. Može se uporijebiti Velocity kôd i kôd wiki sintakse.
 XWiki.Registration_welcomeMessage.hint=Ovo se prikazuje jedino onda kada korisnici ispunjavaju obrazac. Može se uporijebiti Velocity kôd i kôd wiki sintakse.
-XWiki.Registration_liveValidation_enabled.hint=Onemogućite ovo da biste onemogućili živi kôd Javascript validacije (polja će i dalje biti validirana na strani poslužitelja).
-XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Živa validacija prikazuje poruku kao znak korisnicima da su zadovoljavajuće ispunili polje. Ovo je poruka koju će primiti ukoliko ona za neko konkretno polje nije nadjačana. Može se uporijebiti Velocity kôd.
 XWiki.Registration_loginButton_enabled.hint=Kada se korisnik registrira bit će mu pružen gumb koji će njegovo korisničko ime i lozinku poslati akciji za prijavu te ih odmah prijaviti u sustav. Ovo međutim uzrokuje to da korisničko ime i lozinka budu vraćeni natrag u HTML-u, što može biti neprihvatljivo ovisno o vašim sigurnosnim potrebama.
 XWiki.Registration_loginButton_autoLogin_enabled.hint=Ukoliko je omogućen gumb za prijavu, onda možete imati djelić Javascript kôda koji će umjesto korisnika pritisnuti gumb za prijavu.
 XWiki.Registration_defaultRedirect.hint=Ovo je URL na koji će korisnik biti preusmjeren nakon pritiska gumba za prijavu ukoliko nije naznačen xredirect parametar. Može se uporijebiti Velocity kôd.
@@ -140,6 +138,12 @@ administration.section.export.backupPack.hint=Naznačite hoće li paket biti kor
 ### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
 ### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
 ### Missing: administration.section.users.deleteUser.newAuthor.script=script
+### Missing: admin.usersgroups.extensionrights=Extension Rights
+
+# Groups section
+### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
 
 # Other Category
 admin.other=Ostalo
@@ -151,6 +155,25 @@ administration.section.analytics.status.hint=Odredite je li Google Analytics™ 
 ### Missing: admin.social=Social
 ### Missing: admin.social.description=Configuration for social features.
 
+# Configurable Class
+### Missing: XWiki.ConfigurableClass_displayInSection=Display in section
+### Missing: XWiki.ConfigurableClass_heading=Heading
+### Missing: XWiki.ConfigurableClass_configurationClass=Configuration class
+### Missing: XWiki.ConfigurableClass_linkPrefix=Link prefix
+### Missing: XWiki.ConfigurableClass_propertiesToShow=Properties to show
+### Missing: XWiki.ConfigurableClass_codeToExecute=Code to execute
+### Missing: XWiki.ConfigurableClass_iconAttachment=Icon attachment
+### Missing: XWiki.ConfigurableClass_displayInCategory=Display in category
+### Missing: XWiki.ConfigurableClass_displayBeforeCategory=Display before category
+### Missing: XWiki.ConfigurableClass_categoryIcon=Category icon
+### Missing: XWiki.ConfigurableClass_scope=Scope
+### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
+### Missing: XWiki.ConfigurableClass_scope_SPACE=Current space
+### Missing: XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
+### Missing: XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
+### Missing: XWiki.ConfigurableClass_sectionOrder=Section order
+
+
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 
@@ -160,7 +183,10 @@ XWiki.XWikiPreferences_auth_active_check.hint=Ako je postavljeno na "Da", korisn
 
 ## Deprecated since 11.8RC1
 ### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+XWiki.Registration_liveValidation_enabled.hint=Onemogućite ovo da biste onemogućili živi kôd Javascript validacije (polja će i dalje biti validirana na strani poslužitelja).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Živa validacija prikazuje poruku kao znak korisnicima da su zadovoljavajuće ispunili polje. Ovo je poruka koju će primiti ukoliko ona za neko konkretno polje nije nadjačana. Može se uporijebiti Velocity kôd.
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

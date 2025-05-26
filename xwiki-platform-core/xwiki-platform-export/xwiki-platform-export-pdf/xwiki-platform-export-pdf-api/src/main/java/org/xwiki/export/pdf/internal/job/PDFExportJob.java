@@ -176,7 +176,8 @@ public class PDFExportJob extends AbstractPDFExportJob
     private void saveAsPDF() throws IOException
     {
         URL printPreviewURL = this.printPreviewURLBuilder.getPrintPreviewURL(this.request);
-        try (InputStream pdfContent = this.pdfPrinterProvider.get().print(printPreviewURL)) {
+        try (InputStream pdfContent =
+            this.pdfPrinterProvider.get().print(printPreviewURL, () -> this.status.isCanceled())) {
             if (!this.status.isCanceled()) {
                 this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
             }

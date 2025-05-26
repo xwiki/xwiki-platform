@@ -42,9 +42,9 @@ import org.xwiki.user.internal.document.SecureUserDocumentUserPropertiesResolver
 import org.xwiki.user.internal.document.UserCache;
 import org.xwiki.user.internal.document.UserPreferencesConfigurationSource;
 import org.xwiki.user.internal.group.DefaultGroupManager;
+import org.xwiki.user.internal.group.GroupMembersCache;
 import org.xwiki.user.internal.group.MemberGroupsCache;
 import org.xwiki.user.internal.group.WikiGroupCache;
-import org.xwiki.user.internal.group.GroupMembersCache;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;

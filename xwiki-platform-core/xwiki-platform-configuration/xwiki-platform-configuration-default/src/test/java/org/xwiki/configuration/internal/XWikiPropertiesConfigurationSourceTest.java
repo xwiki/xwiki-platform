@@ -22,16 +22,27 @@ package org.xwiki.configuration.internal;
 import java.util.Arrays;
 import java.util.Properties;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import jakarta.inject.Named;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.properties.ConverterManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,40 +51,57 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 3.0M1
  */
-public class XWikiPropertiesConfigurationSourceTest
+@ComponentTest
+@ComponentList(XWikiPropertiesConfigurationSource.class)
+class XWikiPropertiesConfigurationSourceTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ConfigurationSource> mocker =
-        new MockitoComponentMockingRule<>(XWikiPropertiesConfigurationSource.class);
-
+    @MockComponent
     private Environment environment;
 
-    @Before
-    public void before() throws ComponentLookupException
+    @MockComponent
+    @Named("system")
+    private ConfigurationSource configurationSource;
+
+    @MockComponent
+    private ConverterManager converterManager;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.DEBUG);
+
+    private ConfigurationSource getConfiguration() throws ComponentLookupException
     {
-        this.environment = this.mocker.getInstance(Environment.class);
+        // We cannot use @InjectMockComponents because some test need to customize the input of the initialization
+        return this.componentManager.getInstance(ConfigurationSource.class, "xwikiproperties");
     }
 
     @Test
-    public void testInitializeWhenNoPropertiesFile() throws Exception
+    void testInitializeWhenNoPropertiesFile() throws ComponentLookupException
     {
         // Verifies that we can get a property from the source (i.e. that it's correctly initialized)
-        this.mocker.getComponentUnderTest().getProperty("key");
+        getConfiguration().getProperty("key");
 
-        verify(this.mocker.getMockedLogger()).debug(
-            "No configuration file [{}] found. Using default configuration values.", "/WEB-INF/xwiki.properties");
+        ILoggingEvent logEvent = this.logCapture.getLogEvent(0);
+        assertSame(Level.DEBUG, logEvent.getLevel());
+        assertEquals("No configuration file [{}] found. Using default configuration values.", logEvent.getMessage());
+        assertEquals("/WEB-INF/xwiki.properties", logEvent.getArgumentArray()[0]);
     }
 
     @Test
-    public void testListParsing() throws ComponentLookupException
+    void testListParsing() throws ComponentLookupException
     {
-        when(environment.getResource("/WEB-INF/xwiki.properties"))
+        when(this.environment.getResource("/WEB-INF/xwiki.properties"))
             .thenReturn(getClass().getResource("/xwiki.properties"));
 
-        assertEquals(Arrays.asList("value1", "value2"),
-            this.mocker.getComponentUnderTest().getProperty("listProperty"));
+        ConfigurationSource configuration = getConfiguration();
 
-        Properties properties = this.mocker.getComponentUnderTest().getProperty("propertiesProperty", Properties.class);
+        assertEquals(Arrays.asList("value1", "value2"), configuration.getProperty("listProperty"));
+
+        Properties properties = configuration.getProperty("propertiesProperty", Properties.class);
         assertEquals("value1", properties.get("prop1"));
+
+        this.logCapture.ignoreAllMessages();
     }
 }

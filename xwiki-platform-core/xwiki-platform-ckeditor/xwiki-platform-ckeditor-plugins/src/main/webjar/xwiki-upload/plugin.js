@@ -233,6 +233,9 @@
           'name': 'uploadedFiles',
           'value': JSON.parse(event.data.fileLoader.xhr.responseText).fileName
         });
+        if (editor.config.formId) {
+          input.attr('form', editor.config.formId);
+        }
         input.insertAfter($(editor.element.$));
       }
     });

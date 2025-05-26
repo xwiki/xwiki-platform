@@ -44,13 +44,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.configuration.GeneralMailConfigClassDocumentConfigurationSource}.
+ * Unit tests for {@link GeneralMailConfigClassDocumentConfigurationSource}.
  *
  * @version $Id$
  * @since 12.4RC1
  */
 @ComponentTest
-public class GeneralMailConfigClassDocumentConfigurationSourceTest
+class GeneralMailConfigClassDocumentConfigurationSourceTest
 {
     @InjectMockComponents
     private GeneralMailConfigClassDocumentConfigurationSource source;

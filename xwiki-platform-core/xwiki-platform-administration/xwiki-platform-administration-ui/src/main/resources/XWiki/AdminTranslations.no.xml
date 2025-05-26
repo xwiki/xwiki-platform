@@ -44,6 +44,7 @@ administration.sectionTitle=Administrasjon: {0}
 administration.sectionTitle.page=Sideadministrasjon: {0}
 administration.sectionTitle.wiki=Wikiadministrasjon: {0}
 administration.sectionTitle.global=Global administrasjon: {0}
+### Missing: administration.menu.label=Administration sections.
 administration.menu.search.hint=Søk etter...
 administration.menu.search.noResults=Ingen resultat.
 
@@ -54,8 +55,6 @@ XWiki.XWikiPreferences_confirmation_email_content.hint=E-postmalen som tilsvarer
 XWiki.XWikiPreferences_invitation_email_content.hint=E-postmalen som sendes til brukere som er invitert til å registrere seg.
 XWiki.Registration_heading.hint=Dette er linjen øverst på siden som vises til de som registrerer seg og når de nettopp har registrert seg. Velocity og wiki syntaks kan brukes.
 XWiki.Registration_welcomeMessage.hint=Dette vises bare når noen fyller ut skjemaet. Velocity og wiki-syntakskode kan brukes.
-XWiki.Registration_liveValidation_enabled.hint=Sett dette til false for å deaktivere JavaScript-koden for live validering (feltene vil fortsatt bli validert på serveren).
-XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validering viser en melding som indikerer til brukere at de har fylt ut feltet tilfredsstillende. Dette er meldingen de vil få hvis det ikke er overstyrt for et bestemt felt. Velocitykode kan brukes.
 XWiki.Registration_loginButton_enabled.hint=Når brukeren har registrert seg, tilbyr vi en knapp brukeren kan klikke for å legge inn brukernavn og passord til påloggingshandlingen og få dem logget inn med en gang. Dette fører imidlertid til at brukernavnet og passordet sendes tilbake i HTML-en, noe som kan være uakseptabelt avhengig av sikkerhetsbehovene dine.
 XWiki.Registration_loginButton_autoLogin_enabled.hint=Hvis innloggingsknappen er aktivert, kan du få et stykke JavaScript til å trykke på innloggingsknappen for brukeren.
 XWiki.Registration_defaultRedirect.hint=Dette er nettadressen som brukeren blir omdirigert til etter å ha trykket på innloggingsknappen hvis xredirect-parameteren ikke er spesifisert. Velocitykode kan brukes.
@@ -141,6 +140,11 @@ administration.section.users.deleteUser.newAuthor.programming=programmering
 administration.section.users.deleteUser.newAuthor.script=skript
 admin.usersgroups.extensionrights=Utvidelsesrettigheter
 
+# Groups section
+### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
+
 # Other Category
 admin.other=Annet
 admin.other.description=Ulike konfigurasjoner for utvidelser.
@@ -151,6 +155,25 @@ administration.section.analytics.status.hint=Bestem om sporing i Google Analytic
 admin.social=Sosial
 admin.social.description=Konfigurasjon for sosiale funksjoner.
 
+# Configurable Class
+### Missing: XWiki.ConfigurableClass_displayInSection=Display in section
+### Missing: XWiki.ConfigurableClass_heading=Heading
+### Missing: XWiki.ConfigurableClass_configurationClass=Configuration class
+### Missing: XWiki.ConfigurableClass_linkPrefix=Link prefix
+### Missing: XWiki.ConfigurableClass_propertiesToShow=Properties to show
+### Missing: XWiki.ConfigurableClass_codeToExecute=Code to execute
+### Missing: XWiki.ConfigurableClass_iconAttachment=Icon attachment
+### Missing: XWiki.ConfigurableClass_displayInCategory=Display in category
+### Missing: XWiki.ConfigurableClass_displayBeforeCategory=Display before category
+### Missing: XWiki.ConfigurableClass_categoryIcon=Category icon
+### Missing: XWiki.ConfigurableClass_scope=Scope
+### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
+### Missing: XWiki.ConfigurableClass_scope_SPACE=Current space
+### Missing: XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
+### Missing: XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
+### Missing: XWiki.ConfigurableClass_sectionOrder=Section order
+
+
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 
@@ -160,6 +183,8 @@ administration.section.users.deleteUser.markInactiveMessage=I stedet for å slet
 
 ## Deprecated since 11.8RC1
 administration.section.users.deleteUser.markDisabledMessage=I stedet for å slette brukeren kan du merke profilen som deaktivert. Dette vil forhindre dem i å logge seg på og vil bevare tilgangsrettighetene knyttet til skriptene de skrev.
+XWiki.Registration_liveValidation_enabled.hint=Sett dette til false for å deaktivere JavaScript-koden for live validering (feltene vil fortsatt bli validert på serveren).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validering viser en melding som indikerer til brukere at de har fylt ut feltet tilfredsstillende. Dette er meldingen de vil få hvis det ikke er overstyrt for et bestemt felt. Velocitykode kan brukes.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

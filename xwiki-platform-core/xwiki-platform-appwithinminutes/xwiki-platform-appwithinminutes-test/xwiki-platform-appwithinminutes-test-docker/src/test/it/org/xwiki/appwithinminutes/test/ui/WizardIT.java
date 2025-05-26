@@ -207,7 +207,7 @@ class WizardIT
 
         // Assert the pretty name and the default value of the Short Text field.
         // Apparently WebElement#getText() takes into account the text-transform CSS property.
-        assertEquals("CITY NAME", entryEditPage.getLabel("cityName"));
+        assertEquals("City Name", entryEditPage.getLabel("cityName"));
         assertEquals("Paris", entryEditPage.getValue("cityName"));
 
         // Change the field value.
@@ -274,7 +274,7 @@ class WizardIT
 
         // Assert the new field is displayed in the edit sheet (field name was auto-generated).
         // Apparently WebElement#getText() takes into account the text-transform CSS property.
-        assertEquals("POPULATION SIZE", entryEditPage.getLabel("number1"));
+        assertEquals("Population Size", entryEditPage.getLabel("number1"));
 
         // Save and go back to the application home page.
         entryEditPage.clickSaveAndView().clickBreadcrumbLink(appName);

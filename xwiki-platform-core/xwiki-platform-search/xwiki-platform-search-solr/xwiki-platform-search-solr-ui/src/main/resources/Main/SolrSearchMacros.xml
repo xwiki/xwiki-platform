@@ -449,7 +449,8 @@
   ## Add the parameters required to output the RSS feed instead of the search UI.
   #set ($discard = $parameters.put('outputSyntax', 'plain'))
   #set ($discard = $parameters.put('media', 'rss'))
-  &lt;a href="$doc.getURL('get', $escapetool.url($parameters))" class="hasIcon iconRSS"&gt;
+  &lt;a href="$doc.getURL('get', $escapetool.url($parameters))"&gt;
+    $services.icon.renderHTML('rss')
     $services.localization.render('search.rss', ["[$escapetool.xml($text)]"])
   &lt;/a&gt;
   {{/html}}

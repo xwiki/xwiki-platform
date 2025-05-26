@@ -139,6 +139,7 @@ public interface WikiMacroConstants
      * Constant for representing if the macro execution is isolated.
      *
      * @since 17.3.0RC1
+     * @since 16.10.9
      */
     String MACRO_EXECUTION_ISOLATED_PROPERTY = "executionIsolated";
 

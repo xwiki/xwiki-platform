@@ -577,12 +577,9 @@
       #end
     &lt;/dl&gt;
     #if ($highlighting.size() &gt; 1)
-      ## We wrap the link in a DIV because otherwise the HTML cleaning generates a paragraph.
-      &lt;div&gt;
-        &lt;a href="#" class="search-result-highlightAll hidden"&gt;
-          $escapetool.xml($services.localization.render('solr.result.highlightAll'))
-        &lt;/a&gt;
-      &lt;/div&gt;
+      &lt;button class="search-result-highlightAll btn btn-xs btn-primary hidden"&gt;
+        $escapetool.xml($services.localization.render('solr.result.highlightAll'))
+      &lt;/button&gt;
     #end
   #end
 #end

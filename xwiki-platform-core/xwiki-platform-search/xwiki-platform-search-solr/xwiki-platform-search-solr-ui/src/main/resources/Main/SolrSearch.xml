@@ -125,7 +125,7 @@
     <property>
       <code>require(['jquery', 'xwiki-events-bridge'], function($) {
   var enhanceSearchResultHighlights = function() {
-    var highlights = $(this).removeClass('hidden').parent().prev('.search-result-highlights').addClass('preview');
+    var highlights = $(this).removeClass('hidden').prev('.search-result-highlights').addClass('preview');
 
     // Workaround for IE8 which doesn't support :first-of-type CSS selector.
     highlights.find('.search-result-highlight').first().addClass('first').parent('dd').addClass('first')
@@ -608,6 +608,8 @@ dl.search-result-highlights {
 
 dl.search-result-highlights &gt; dt {
   margin-top: .3em;
+  color: var(--text-muted);
+  font-weight: var(--font-weight-semibold);
 }
 
 blockquote.search-result-highlight {
@@ -628,11 +630,6 @@ blockquote.search-result-highlight {
   font-weight: bold;
 }
 
-dl.search-result-highlights &gt; dt {
-  color: $theme.textSecondaryColor;
-  font-weight: normal;
-}
-
 dl.search-result-highlights.preview dt,
 dl.search-result-highlights.preview dd &gt; * {
   display: none;
@@ -646,7 +643,7 @@ dl.search-result-highlights.preview dd.first blockquote.first {
   display: block;
 }
 
-a.search-result-highlightAll:after {
+button.search-result-highlightAll:after {
   content: ' \bb';
 }
 

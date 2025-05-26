@@ -127,10 +127,6 @@
   var enhanceSearchResultHighlights = function() {
     var highlights = $(this).removeClass('hidden').prev('.search-result-highlights').addClass('preview');
 
-    // Workaround for IE8 which doesn't support :first-of-type CSS selector.
-    highlights.find('.search-result-highlight').first().addClass('first').parent('dd').addClass('first')
-      .prev('dt').addClass('first');
-
     $(this).one('click', function(event) {
       event.preventDefault();
       $(event.target).remove();
@@ -444,7 +440,7 @@
       <code>#template('colorThemeInit.vm')
 
 /* Hide the 'Created by', 'Modified by' and 'Tags' document sections. */
-.xdocLastModification, .skin-colibri #document-info, #xdocFooter {
+.xdocLastModification {
   display: none;
 }
 #document-title &gt; h1 {
@@ -539,12 +535,6 @@
   margin-top: 1em;
 }
 
-/* Colibri skin doesn't have the grid system. */
-.skin-colibri .search-results-left {
-  margin: 0.5em 20em 0.5em 0;
-  padding: 0.5em 0.5em 0.5em 0;
-}
-
 .search-results {
   padding: .3em 0 .8em 0;
 }
@@ -636,10 +626,7 @@ dl.search-result-highlights.preview dd &gt; * {
 }
 
 dl.search-result-highlights.preview dt:first-of-type,
-dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type,
-/* Workaround for IE8 which doesn't support :first-of-type CSS selector. */
-dl.search-result-highlights.preview dt.first,
-dl.search-result-highlights.preview dd.first blockquote.first {
+dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   display: block;
 }
 
@@ -856,17 +843,6 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 }
 
 /**
- * Fix the breadcrumb in Colibri skin.
- */
-.skin-colibri .breadcrumb &gt; li {
-  display: inline;
-}
-.skin-colibri .breadcrumb &gt; li + li:before {
-  color: $theme.textSecondaryColor;
-  content: ' \00BB  ';
-}
-
-/**
  * Miscellaneous
  */
 
@@ -874,11 +850,7 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
   border-top: 1px solid $theme.borderColor;
   padding-left: 0;
 }
-
-.iconRSS {
-  background: url("$xwiki.getSkinFile('icons/silk/feed.png')") no-repeat scroll 0 0 transparent;
-  padding-left: 20px;
-}</code>
+</code>
     </property>
     <property>
       <contentType>CSS</contentType>

@@ -434,6 +434,7 @@ export class NextcloudStorage extends AbstractStorage {
         if (res.status === 404) {
           await this.save(
             "home",
+            "",
             "# Welcome\n" +
               "\n" +
               "This is a new **Cristal** wiki.\n" +
@@ -443,7 +444,6 @@ export class NextcloudStorage extends AbstractStorage {
               "You can also create new [[pages|home/newpage]].\n" +
               "\n" +
               "Enjoy!",
-            "",
           );
         }
       } catch (e) {

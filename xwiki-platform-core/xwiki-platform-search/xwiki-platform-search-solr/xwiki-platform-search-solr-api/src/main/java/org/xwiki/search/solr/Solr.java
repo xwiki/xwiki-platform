@@ -46,7 +46,7 @@ public interface Solr
     /**
      * @param name the name of the core form XWiki point of view (so without potential prefix/suffix part of the real
      *            solr core specific to the setup)
-     * @return the cached {@link SolrCore} instance to use to manipulate the core
+     * @return the cached {@link XWikiSolrCore} instance to use to manipulate the core
      * @throws SolrException when failing to create the solr client
      * @since 16.2.0RC1
      */

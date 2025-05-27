@@ -96,7 +96,7 @@
               </outputDirectory>
               <resources>
                 <resource>
-                  <directory>${project.build.directory}/vue/src/</directory>
+                  <directory>${project.build.directory}/node-src/src/</directory>
                   <includes>
                     <include>variables.less</include>
                   </includes>

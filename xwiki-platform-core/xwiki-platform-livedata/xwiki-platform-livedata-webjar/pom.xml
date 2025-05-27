@@ -28,7 +28,7 @@
     <version>17.5.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
-  <artifactId>xwiki-platform-livedata-webjar</artifactId>
+  <artifactId>xwiki-platform-livedata-webjar-new</artifactId>
   <name>XWiki Platform - Live Data - WebJar</name>
   <properties>
     <!-- Name to display by the Extension Manager -->

@@ -106,24 +106,6 @@ type BlockNoteViewWrapperProps = {
 };
 
 /**
- * Load the provided content into the provided editor.
- * @param editor - the editor in which the parsed content will be loaded
- * @param blocks - the content to load into the editor
- */
-async function replaceContent(editor: EditorType, blocks: BlockType[]) {
-  // TODO: with time, see if this fix actually works fine
-  //
-  // Some BlockNote crash seems to happen when replacing the whole document, but only sometimes.
-  // So here we ensure the document is never empty by introducing some empty inline content, which will be put
-  // inside a paragraph.
-  if (editor.document.length === 0) {
-    editor.insertInlineContent("");
-  }
-
-  editor.replaceBlocks(editor.document, blocks);
-}
-
-/**
  * BlockNote editor wrapper
  */
 // eslint-disable-next-line max-statements
@@ -171,6 +153,26 @@ function BlockNoteViewWrapper({
   // We know who is the first user joining the session by checking for the absence of an initialContentLoaded key in the
   // document's configuration map (shared across all session participants).
   useEffect(() => {
+    // Replace the editor's current content with the provided blocks
+    const replaceContent = (blocks: BlockType[]) => {
+      // NOTE: replacing the content immediately seems to lead to a data race with the provider and/or BlockNote,
+      //       and we end up with an empty editor
+      //       So, to avoid this, we run the content replacement function separately with the smallest possible non-zero delay
+      // This is something we'll need to investigate, but this does the trick for now.
+      setTimeout(() => {
+        // TODO: with time, see if this fix actually works fine
+        //
+        // Some BlockNote crash seems to happen when replacing the whole document, but only sometimes.
+        // So here we ensure the document is never empty by introducing some empty inline content, which will be put
+        // inside a paragraph.
+        if (editor.document.length === 0) {
+          editor.insertInlineContent("");
+        }
+
+        editor.replaceBlocks(editor.document, blocks);
+      }, 1);
+    };
+
     if (provider) {
       console.debug("Trying to connect to realtime server...");
 
@@ -190,7 +192,7 @@ function BlockNoteViewWrapper({
             content,
           });
 
-          replaceContent(editor, content);
+          replaceContent(content);
         }
 
         setReady(true);
@@ -205,7 +207,7 @@ function BlockNoteViewWrapper({
         "No realtime provider, setting document's content directly",
       );
 
-      replaceContent(editor, content);
+      replaceContent(content);
     }
   }, [provider]);
 

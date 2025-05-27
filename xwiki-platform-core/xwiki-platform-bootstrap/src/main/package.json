@@ -8,8 +8,8 @@
   "license": "MIT",
   "scripts": {
     "build": "grunt dist",
-    "test:unit": "echo test",
-    "lint": "echo lint"
+    "test": "grunt test",
+    "lint": "grunt lint"
   },
   "dependencies": {},
   "devDependencies": {

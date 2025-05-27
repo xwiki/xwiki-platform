@@ -85,6 +85,7 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
+            <!-- Copy the remaining less file. Can be removed once XWIKI-23080 is done. -->
             <id>copy-less-resources</id>
             <phase>validate</phase>
             <goals>

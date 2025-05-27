@@ -31,6 +31,25 @@
   <name>XWiki Platform - BlockNote</name>
   <packaging>pom</packaging>
   <description>Integrates BlockNote editor in XWiki.</description>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.xwiki.rendering</groupId>
+        <artifactId>xwiki-rendering-syntax-wikimodel</artifactId>
+        <version>${rendering.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.rendering</groupId>
+        <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
+        <version>${rendering.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.rendering</groupId>
+        <artifactId>xwiki-rendering-syntax-plain</artifactId>
+        <version>${rendering.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <modules>
     <module>xwiki-platform-blocknote-api</module>
     <module>xwiki-platform-blocknote-webjar</module>

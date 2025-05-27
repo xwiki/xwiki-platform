@@ -20,6 +20,7 @@
 
 import { NextcloudWikiConfig } from "./NextcloudWikiConfig";
 import { NextcloudStorage } from "./nextcloudStorage";
+import { whenNamedOrDefault } from "@xwiki/cristal-utils-inversify";
 import { Container } from "inversify";
 import type { Storage, WikiConfig } from "@xwiki/cristal-api";
 
@@ -28,7 +29,7 @@ export class ComponentInit {
     container
       .bind<WikiConfig>("WikiConfig")
       .to(NextcloudWikiConfig)
-      .whenNamed("Nextcloud");
+      .when(whenNamedOrDefault("Nextcloud"));
     container
       .bind<Storage>("Storage")
       .to(NextcloudStorage)

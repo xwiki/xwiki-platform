@@ -25,7 +25,7 @@ defineProps<{
 </script>
 
 <template>
-  <v-dialog :width="width" scrollable>
+  <v-dialog :width="width" attach="#view" scrollable>
     <template #activator="{ props }">
       <span v-bind="props">
         <slot name="activator" />

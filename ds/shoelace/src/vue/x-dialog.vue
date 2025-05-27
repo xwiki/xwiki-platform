@@ -40,7 +40,7 @@ const open = defineModel<boolean>();
     <slot name="activator" />
   </span>
   <!-- We need to place the modal in the root node to avoid overlay issues. -->
-  <Teleport to="#xwCristalApp">
+  <Teleport to="#view">
     <sl-dialog
       ref="dialog"
       :open="open"

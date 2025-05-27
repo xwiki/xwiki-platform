@@ -20,13 +20,17 @@
 
 import "reflect-metadata";
 import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-electron";
-import { loadConfig } from "@xwiki/cristal-configuration-electron-renderer";
 import { ComponentInit as GitHubAuthenticationComponentInit } from "@xwiki/cristal-electron-authentication-github-renderer";
 import { ComponentInit as NextcloudAuthenticationComponentInit } from "@xwiki/cristal-electron-authentication-nextcloud-renderer";
 import { ComponentInit as XWikiAuthenticationComponentInit } from "@xwiki/cristal-electron-authentication-xwiki-renderer";
+import { ComponentInit as SettingsComponentInit } from "@xwiki/cristal-electron-settings-renderer";
 import { ComponentInit as ElectronStorageComponentInit } from "@xwiki/cristal-electron-storage";
 import { ComponentInit as FileSystemPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-filesystem";
-import { CristalAppLoader, defaultComponentsList } from "@xwiki/cristal-lib";
+import {
+  CristalAppLoader,
+  conditionalComponentsList,
+  defaultComponentsList,
+} from "@xwiki/cristal-lib";
 import { ComponentInit as FileSystemLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-filesystem";
 import { ComponentInit as ModelReferenceFilesystemComponentInit } from "@xwiki/cristal-model-reference-filesystem";
 import { ComponentInit as ModelRemoteURLFilesystemComponentInit } from "@xwiki/cristal-model-remote-url-filesystem-default";
@@ -44,13 +48,14 @@ CristalAppLoader.init(
     "extension-menubuttons",
     "sharedworker",
   ],
-  loadConfig,
+  // With Electron, configs are only loaded through user settings.
+  async () => ({}),
   true,
   true,
   "FileSystemSL",
   // eslint-disable-next-line max-statements
-  async (container, configuration) => {
-    await defaultComponentsList(container, configuration);
+  async (container) => {
+    await defaultComponentsList(container);
     new ElectronStorageComponentInit(container);
     new BrowserComponentInit(container);
     new FileSystemPageHierarchyComponentInit(container);
@@ -62,5 +67,9 @@ CristalAppLoader.init(
     new FileSystemRenameComponentInit(container);
     new GitHubAuthenticationComponentInit(container);
     new NextcloudAuthenticationComponentInit(container);
+    new SettingsComponentInit(container);
+  },
+  async (container, configuration) => {
+    await conditionalComponentsList(container, configuration);
   },
 );

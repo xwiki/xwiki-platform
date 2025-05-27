@@ -1,12 +1,27 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import type { Ref } from "vue";
+
+const form: Ref<HTMLFormElement | undefined> = ref(undefined);
 const emits = defineEmits(["formSubmit"]);
+
+defineExpose({
+  reset,
+});
+
+async function reset() {
+  form.value?.reset();
+}
+
 function submit() {
-  emits("formSubmit");
+  if (form.value?.checkValidity()) {
+    emits("formSubmit");
+  }
 }
 </script>
 
 <template>
-  <form @submit.prevent="submit">
+  <form ref="form" @submit.prevent="submit">
     <slot></slot>
   </form>
 </template>

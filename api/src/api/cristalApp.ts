@@ -49,6 +49,14 @@ export interface CristalApp {
 
   getAvailableConfigurations(): Map<string, WikiConfig>;
 
+  /**
+   * Delete a configuration from the set of available configurations.
+   *
+   * @param configName - the name of the configuration to delete
+   * @since 0.18
+   */
+  deleteAvailableConfiguration(configName: string): void;
+
   run(): Promise<void>;
 
   /**

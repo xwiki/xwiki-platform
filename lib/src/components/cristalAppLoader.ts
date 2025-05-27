@@ -20,6 +20,7 @@
 
 import { DefaultCristalApp } from "./DefaultCristalApp";
 import { CristalLoader } from "@xwiki/cristal-extension-manager";
+import { ConfigurationsSettings } from "@xwiki/cristal-settings-configurations";
 import { Container } from "inversify";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
@@ -28,6 +29,10 @@ import type {
   ConfigurationLoader,
   Configurations,
 } from "@xwiki/cristal-configuration-api";
+import type {
+  SettingsManager,
+  SettingsStorage,
+} from "@xwiki/cristal-settings-api";
 
 async function handleCallback(container: Container): Promise<void> {
   if (window.location.pathname.startsWith("/callback")) {
@@ -102,21 +107,23 @@ class CristalAppLoader extends CristalLoader {
     loadConfig: ConfigurationLoader,
     isElectron: boolean,
     configName: string,
-    additionalComponents: (
+    /** Method that initalizes additional components that are always loaded. */
+    additionalComponents: (container: Container) => Promise<void>,
+    /** Method that initalizes components that depend on the loaded configuration. */
+    conditionalComponents: (
       container: Container,
       config: Configuration,
     ) => Promise<void>,
   ): Promise<void> {
     let staticMode = forceStaticMode;
     const config = await loadConfig();
-    if (import.meta.env.MODE == "development" || staticMode) {
+    if (import.meta.env?.MODE == "development" || staticMode) {
       staticMode = true;
       const StaticBuild = await import("../staticBuild");
       await StaticBuild.StaticBuild.init(
         this.container,
         staticMode,
         additionalComponents,
-        config[this.resolveCurrentConfiguration(isElectron, config)],
       );
     }
 
@@ -131,6 +138,24 @@ class CristalAppLoader extends CristalLoader {
     this.cristal.isElectron = isElectron;
     this.cristal.setContainer(this.container);
 
+    const settingsManager =
+      this.container.get<SettingsManager>("SettingsManager")!;
+    const settingsStorage =
+      this.container.get<SettingsStorage>("SettingsStorage")!;
+    await settingsStorage.load(settingsManager);
+    const additionalConfigs = Object.fromEntries(
+      settingsManager.get(ConfigurationsSettings)?.content ?? new Map(),
+    );
+
+    Object.assign(config, additionalConfigs);
+
+    const currentConfig = this.resolveCurrentConfiguration(isElectron, config);
+    // We load conditional components only after we have loaded user configs
+    // and resolved the current config to initialize.
+    if (import.meta.env?.MODE == "development" || staticMode) {
+      await conditionalComponents(this.container, config[currentConfig]);
+    }
+
     await this.loadApp(config, isElectron, configName);
   }
 
@@ -140,9 +165,12 @@ class CristalAppLoader extends CristalLoader {
     staticBuild: boolean,
     isElectron: boolean,
     configName: string,
-    additionalComponents: (
+    /** Method that initalizes additional components that are always loaded. */
+    additionalComponents: (container: Container) => Promise<void>,
+    /** Method that initalizes components that depend on the loaded configuration. */
+    conditionalComponents: (
       container: Container,
-      configuration: Configuration,
+      config: Configuration,
     ) => Promise<void>,
   ): void {
     const cristalLoader = new CristalAppLoader(extensionList);
@@ -153,6 +181,7 @@ class CristalAppLoader extends CristalLoader {
       isElectron,
       configName,
       additionalComponents,
+      conditionalComponents,
     );
   }
 

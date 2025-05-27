@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { readConfiguration } from "@xwiki/cristal-configuration-electron-main";
+import { getConfigurations } from "@xwiki/cristal-electron-settings-main";
 import { app, shell } from "electron";
 import { URL } from "node:url";
 import type { Session } from "electron";
@@ -71,10 +71,10 @@ app.on("web-contents-created", (_, contents) => {
    *
    * @see https://www.electronjs.org/docs/latest/tutorial/security#13-disable-or-limit-navigation
    */
-  const configuration = readConfiguration();
   contents.on("will-navigate", (event, url) => {
+    const configurations = getConfigurations();
     const { origin } = new URL(url);
-    const isAllowedOrigin = Object.values(configuration).some(
+    const isAllowedOrigin = Object.values(configurations).some(
       (configuration) => {
         const baseURL = configuration.baseURL;
         if (!baseURL) {

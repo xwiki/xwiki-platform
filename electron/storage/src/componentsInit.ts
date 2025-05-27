@@ -20,6 +20,7 @@
 
 import { FileSystemConfig } from "./components/FileSystemConfig";
 import FileSystemStorage from "./components/fileSystemStorage";
+import { whenNamedOrDefault } from "@xwiki/cristal-utils-inversify";
 import type { Logger, Storage, WikiConfig } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
 
@@ -34,7 +35,7 @@ export default class ComponentInit {
     container
       .bind<WikiConfig>("WikiConfig")
       .to(FileSystemConfig)
-      .whenNamed("FileSystem");
+      .when(whenNamedOrDefault("FileSystem"));
     container
       .bind<Storage>("Storage")
       .to(FileSystemStorage)

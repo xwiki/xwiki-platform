@@ -1,0 +1,48 @@
+{
+  "name": "@xwiki/cristal-wiki-config-default",
+  "version": "0.17.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "/core/wiki-config/wiki-config-default",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.json && vite build",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run"
+  },
+  "dependencies": {
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-configuration-api": "workspace:*",
+    "@xwiki/cristal-wiki-config-api": "workspace:*",
+    "inversify": "7.5.1",
+    "vue": "3.5.13"
+  },
+  "devDependencies": {
+    "@xwiki/cristal-dev-config": "workspace:*",
+    "typescript": "5.8.3",
+    "vite": "6.3.5"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  }
+}

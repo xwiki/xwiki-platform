@@ -178,6 +178,10 @@ export class DefaultCristalApp implements CristalApp {
     return this.availableConfigurations;
   }
 
+  deleteAvailableConfiguration(configName: string): void {
+    this.availableConfigurations.delete(configName);
+  }
+
   getLogger(module: string): Logger {
     let logger = this.container.get<Logger>("Logger");
     if (!logger) {

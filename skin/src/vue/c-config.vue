@@ -18,22 +18,40 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
+import { CIcon, Size } from "@xwiki/cristal-icons";
+import { ConfigurationsSettings } from "@xwiki/cristal-settings-configurations";
 import { inject } from "vue";
 import type { CristalApp, WikiConfig } from "@xwiki/cristal-api";
+import type { SettingsManager } from "@xwiki/cristal-settings-api";
+import type { WikiConfigProxy } from "@xwiki/cristal-wiki-config-api";
+import type { Ref } from "vue";
 
-const configList: Array<WikiConfig> = [];
 const cristal = inject<CristalApp>("cristal")!;
-let configs = cristal.getAvailableConfigurations();
+const wikiConfigProxy = cristal
+  .getContainer()
+  .get<WikiConfigProxy>("WikiConfigProxy")!;
+const configs: Ref<Map<string, WikiConfig>> =
+  wikiConfigProxy.getAvailableConfigurations();
+const settingsManager = cristal
+  .getContainer()
+  .get<SettingsManager>("SettingsManager")!;
 
-configs.forEach((wikiConfig: WikiConfig) => {
-  configList.push(wikiConfig);
-});
 const currentConfig = cristal.getWikiConfig().name;
+
+function isEditable(configName: string): boolean {
+  return (
+    (configName != currentConfig &&
+      settingsManager.get(ConfigurationsSettings)?.content?.has(configName)) ??
+    false
+  );
+}
+
+defineEmits(["edit", "delete"]);
 </script>
 <template>
   <div>
     <div class="grid-container">
-      <div v-for="wikiConfig in configList" :key="wikiConfig.name">
+      <div v-for="[key, wikiConfig] in configs" :key="key">
         <div>
           <div class="wiki-name">
             {{ wikiConfig.name }}
@@ -44,6 +62,22 @@ const currentConfig = cristal.getWikiConfig().name;
           </div>
           <div class="url">{{ wikiConfig.baseURL }}</div>
         </div>
+        <x-btn
+          v-if="isEditable(wikiConfig.name)"
+          variant="primary"
+          @click="$parent!.$emit('edit', wikiConfig.name)"
+        >
+          <c-icon name="pencil" :size="Size.Small"></c-icon>
+        </x-btn>
+        <div v-else></div>
+        <x-btn
+          v-if="isEditable(wikiConfig.name)"
+          variant="danger"
+          @click="$parent!.$emit('delete', wikiConfig.name)"
+        >
+          <c-icon name="trash" :size="Size.Small"></c-icon>
+        </x-btn>
+        <div v-else></div>
         <div v-if="wikiConfig.name == currentConfig" class="current-ds">
           Currently in Use
         </div>
@@ -90,10 +124,10 @@ p {
 
 .grid-container > * {
   display: grid;
-  gap: var(--cr-spacing-medium);
+  gap: var(--cr-spacing-x-small);
   align-items: center;
   justify-content: center;
-  grid-template-columns: 1fr 150px;
+  grid-template-columns: 1fr max-content max-content 150px;
   border-bottom: 1px solid #ddd;
   padding: var(--cr-spacing-x-small) var(--cr-spacing-2x-small);
 }

@@ -38,13 +38,6 @@ import type { WikiConfig } from "@xwiki/cristal-api";
 import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
 import type { Container } from "inversify";
 
-async function loadConfigElectron() {
-  const loadConfig: ConfigurationLoader = (
-    await import("@xwiki/cristal-configuration-electron-renderer")
-  ).loadConfig;
-  return await loadConfig();
-}
-
 async function loadConfigWeb() {
   const loadConfig: ConfigurationLoader = (
     await import("@xwiki/cristal-configuration-web")
@@ -59,8 +52,9 @@ async function loadConfigWeb() {
 async function loadConfig(): Promise<Configurations> {
   try {
     // @ts-expect-error process is not a known variable and might not be defined
-    if (process && process.versions && process.versions["electron"]) {
-      return await loadConfigElectron();
+    if (!process || !process.versions || !process.versions["electron"]) {
+      // Default configurations are loaded with Electron settings.
+      return {};
     } else {
       return await loadConfigWeb();
     }

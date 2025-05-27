@@ -151,5 +151,10 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
       "XNavigationTreeSelect",
       () => import("../vue/form/x-navigation-tree-select.vue"),
     );
+    registerAsyncComponent(
+      app,
+      "XSelect",
+      () => import("../vue/form/x-select.vue"),
+    );
   }
 }

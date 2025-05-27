@@ -24,18 +24,14 @@ import { loadFile } from "./reload";
 import "./security-restrictions";
 // @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
 import loadBrowser from "@xwiki/cristal-browser-electron/main";
-import { load as loadConfiguration } from "@xwiki/cristal-configuration-electron-main";
 import { load as loadGitHubAuthentication } from "@xwiki/cristal-electron-authentication-github-main";
 import { load as loadNextcloudAuthentication } from "@xwiki/cristal-electron-authentication-nextcloud-main";
 import { load as loadXWikiAuthentication } from "@xwiki/cristal-electron-authentication-xwiki-main";
+import { load as loadSettings } from "@xwiki/cristal-electron-settings-main";
 // @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
 import load from "@xwiki/cristal-electron-storage/main";
 import { BrowserWindow, app } from "electron";
 import { platform } from "node:process";
-
-// Set up IPC listener for configuration loading before the app actually starts
-// It needs to be setup before the preload script runs, which means the first window mustn't have been created
-loadConfiguration();
 
 /**
  * Prevent electron from running multiple instances.
@@ -78,6 +74,7 @@ app
       loadGitHubAuthentication(w, loadFile);
       loadNextcloudAuthentication(w, loadFile);
       loadXWikiAuthentication(w, loadFile);
+      loadSettings();
     });
     /**
      * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.

@@ -47,55 +47,26 @@ import { ComponentInit as ActionsPagesComponentInit } from "@xwiki/cristal-page-
 import { ComponentInit as ActionsPagesUIComponentInit } from "@xwiki/cristal-page-actions-ui";
 import { ComponentInit as RenameComponentInit } from "@xwiki/cristal-rename-default";
 import { ComponentInit as RenderingComponentInit } from "@xwiki/cristal-rendering";
+import { ComponentInit as SettingsConfigurationsComponentInit } from "@xwiki/cristal-settings-configurations";
+import { ComponentInit as SettingsConfigurationsUIComponentInit } from "@xwiki/cristal-settings-configurations-ui";
+import { ComponentInit as SettingsComponentInit } from "@xwiki/cristal-settings-default";
 import { ComponentInit as SkinComponentInit } from "@xwiki/cristal-skin";
 import { ComponentInit as UIExtensionDefaultComponentInit } from "@xwiki/cristal-uiextension-default";
+import { ComponentInit as WikiConfigComponentInit } from "@xwiki/cristal-wiki-config-default";
 import type { Container } from "inversify";
 
 /**
  * Loads all the components of the default distribution.
  *
  * @param container - the container the load the components in
- * @param configuration - the current configuration, some component are only loaded if they match a given configuration
- *   value
- * @since 0.14
+ * @since 0.18
  */
 // eslint-disable-next-line max-statements
-export async function defaultComponentsList(
-  container: Container,
-  configuration: Configuration,
-): Promise<void> {
+async function defaultComponentsList(container: Container): Promise<void> {
   new SkinComponentInit(container);
   new MacrosComponentInit(container);
   new XWikiBackendComponentInit(container);
   new NextcloudBackendComponentInit(container);
-
-  // Load only components that are required by the current configuration.
-  if (configuration.designSystem == "vuetify") {
-    (await import("./vuetify")).load(container);
-  } else if (configuration.designSystem == "shoelace") {
-    (await import("./shoelace")).load(container);
-  }
-
-  if (configuration.offline) {
-    (await import("./offline")).load(container);
-  }
-
-  if (configuration.configType == "Nextcloud") {
-    (await import("./nextcloud")).load(container);
-  } else if (configuration.configType == "XWiki") {
-    (await import("./xwiki")).load(container);
-  } else if (configuration.configType == "GitHub") {
-    (await import("./github")).load(container);
-  }
-
-  if (configuration.editor === "tiptap" || configuration.editor === undefined) {
-    const { ComponentInit } = await import("@xwiki/cristal-editors-tiptap");
-    new ComponentInit(container);
-  } else if (configuration.editor === "blocknote") {
-    const { ComponentInit } = await import("@xwiki/cristal-editors-blocknote");
-    new ComponentInit(container);
-  }
-
   new RenderingComponentInit(container);
   new MenuButtonsComponentInit(container);
   new ExtraTabsComponentInit(container);
@@ -122,4 +93,50 @@ export async function defaultComponentsList(
   new MarkdownDefaultComponentInit(container);
   new RenameComponentInit(container);
   new GithubBackendComponentInit(container);
+  new SettingsComponentInit(container);
+  new SettingsConfigurationsComponentInit(container);
+  new SettingsConfigurationsUIComponentInit(container);
+  new WikiConfigComponentInit(container);
 }
+
+/**
+ * Loads the components required specifically for the current configuration.
+ *
+ * @param container - the container to load the components in
+ * @param configuration - the current configuration
+ * @since 0.18
+ */
+// eslint-disable-next-line max-statements
+async function conditionalComponentsList(
+  container: Container,
+  configuration: Configuration,
+): Promise<void> {
+  // Load only components that are required by the current configuration.
+  if (configuration.designSystem == "vuetify") {
+    (await import("./vuetify")).load(container);
+  } else if (configuration.designSystem == "shoelace") {
+    (await import("./shoelace")).load(container);
+  }
+
+  if (configuration.offline) {
+    (await import("./offline")).load(container);
+  }
+
+  if (configuration.configType == "Nextcloud") {
+    (await import("./nextcloud")).load(container);
+  } else if (configuration.configType == "XWiki") {
+    (await import("./xwiki")).load(container);
+  } else if (configuration.configType == "GitHub") {
+    (await import("./github")).load(container);
+  }
+
+  if (configuration.editor === "tiptap" || configuration.editor === undefined) {
+    const { ComponentInit } = await import("@xwiki/cristal-editors-tiptap");
+    new ComponentInit(container);
+  } else if (configuration.editor === "blocknote") {
+    const { ComponentInit } = await import("@xwiki/cristal-editors-blocknote");
+    new ComponentInit(container);
+  }
+}
+
+export { conditionalComponentsList, defaultComponentsList };

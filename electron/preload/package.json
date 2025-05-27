@@ -18,10 +18,10 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
-    "@xwiki/cristal-configuration-electron-preload": "workspace:*",
     "@xwiki/cristal-electron-authentication-github-preload": "workspace:*",
     "@xwiki/cristal-electron-authentication-nextcloud-preload": "workspace:*",
-    "@xwiki/cristal-electron-authentication-xwiki-preload": "workspace:*"
+    "@xwiki/cristal-electron-authentication-xwiki-preload": "workspace:*",
+    "@xwiki/cristal-electron-settings-preload": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "22.15.3",

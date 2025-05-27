@@ -95,6 +95,10 @@ export class WorkerCristalApp implements CristalApp {
     return this.availableConfigurations;
   }
 
+  deleteAvailableConfiguration(configName: string): void {
+    this.availableConfigurations.delete(configName);
+  }
+
   run(): Promise<void> {
     throw new Error("Method not implemented.");
   }

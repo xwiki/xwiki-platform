@@ -21,6 +21,7 @@
 import { GitHubWikiConfig } from "./GitHubWikiConfig";
 import { GitHubStorage } from "./githubStorage";
 import { Storage } from "@xwiki/cristal-api";
+import { whenNamedOrDefault } from "@xwiki/cristal-utils-inversify";
 import { Container } from "inversify";
 import type { WikiConfig } from "@xwiki/cristal-api";
 
@@ -29,7 +30,7 @@ export class ComponentInit {
     container
       .bind<WikiConfig>("WikiConfig")
       .to(GitHubWikiConfig)
-      .whenNamed("GitHub");
+      .when(whenNamedOrDefault("GitHub"));
     container.bind<Storage>("Storage").to(GitHubStorage).whenNamed("GitHub");
   }
 }

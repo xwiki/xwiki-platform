@@ -49,6 +49,7 @@ import type { MenuItemProps } from "./XMenuItem";
 import type { MenuLabelProps } from "./XMenuLabel";
 import type { NavigationTreeProps } from "./XNavigationTree";
 import type { NavigationTreeSelectProps } from "./XNavigationTreeSelect";
+import type { SelectProps } from "./XSelect";
 import type { TabProps } from "./XTab";
 import type { TabGroupProps } from "./XTabGroup";
 import type { TabPanelProps } from "./XTabPanel";
@@ -80,6 +81,7 @@ type AbstractElements = {
   XNavigationTreeSelect: DefineComponent<
     NavigationTreeSelectProps & HTMLAttributes
   >;
+  XSelect: DefineComponent<SelectProps & HTMLAttributes>;
   XTab: DefineComponent<TabProps & HTMLAttributes>;
   XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
   XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
@@ -111,6 +113,7 @@ export type {
   MenuProps,
   NavigationTreeProps,
   NavigationTreeSelectProps,
+  SelectProps,
   TabGroupProps,
   TabPanelProps,
   TabProps,

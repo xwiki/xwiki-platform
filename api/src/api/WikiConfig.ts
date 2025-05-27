@@ -20,7 +20,7 @@
 
 import type { Storage } from "./storage";
 
-export interface WikiConfig {
+interface WikiConfig {
   name: string;
   // The base url of the backend endpoint
   baseURL: string;
@@ -101,3 +101,5 @@ export interface WikiConfig {
    */
   getNewPageDefaultName(): string;
 }
+
+export type { WikiConfig };

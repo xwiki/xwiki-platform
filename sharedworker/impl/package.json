@@ -35,7 +35,6 @@
     "@xwiki/cristal-backend-nextcloud": "workspace:*",
     "@xwiki/cristal-backend-xwiki": "workspace:*",
     "@xwiki/cristal-configuration-api": "workspace:*",
-    "@xwiki/cristal-configuration-electron-renderer": "workspace:*",
     "@xwiki/cristal-configuration-web": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-extension-manager": "workspace:*",

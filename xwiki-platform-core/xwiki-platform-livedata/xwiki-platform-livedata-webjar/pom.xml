@@ -44,17 +44,17 @@
       <artifactId>requirejs</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>vue-i18n</artifactId>
-      <version>11.1.5</version>
-    </dependency>
-    <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>vue-i18n</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- Used by the date filter. -->

@@ -18,40 +18,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath, URL } from "node:url";
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { dirname, resolve } from 'node:path'
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import react from "@vitejs/plugin-react";
+import { dirname, resolve } from "node:path";
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/main.js'),
+      entry: resolve(__dirname, "src/main.js"),
       fileName: (format, entryName) => `${entryName}.${format}.js`,
-      formats: ['es']
+      formats: ["es"],
     },
     sourcemap: true,
+    minify: false,
     rollupOptions: {
-      external: ['jquery', 'vue', 'vue-i18n'],
+      external: ["jquery", "vue", "vue-i18n"],
       output: {
         globals: {
-          vue: 'Vue'
-        }
-      }
-    }
+          vue: "Vue",
+        },
+      },
+    },
   },
   define: {
     // define process to avoid runtime error with jquery
-    'process.env': {}
+    "process.env": {},
   },
-  plugins: [vue()],
+  plugins: [react(), vue()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-})
+});

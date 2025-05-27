@@ -90,12 +90,9 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       let parametersMap = macroParameterTree.parametersMap;
       output.append(macroParameterTree.mandatoryNodes.map(key => {
         let node = parametersMap[key];
-        return displayMacroParameterTreeNode(parametersMap, node, true);
+        return displayMacroParameterTreeNode(parametersMap, node);
       }));
-      output.append(macroParameterTree.optionalNodes.map(key => {
-        let node = parametersMap[key];
-        return displayMacroParameterTreeNode(parametersMap, node, false);
-      }));
+      output.append(displayOptionalNodes(parametersMap, macroParameterTree.optionalNodes));
     }
 
     output.find('a[role="tab"]').on('click', function(event) {
@@ -107,10 +104,10 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     return output.children();
   },
 
-  displayMacroParameterTreeNode = function(parametersMap, node, isMandatory) {
+  displayMacroParameterTreeNode = function(parametersMap, node) {
     switch (node.type) {
-      case 'GROUP': return displayGroup(parametersMap, node, isMandatory);
-      case 'PARAMETER': return displayMacroParameter(node, isMandatory);
+      case 'GROUP': return displayGroup(parametersMap, node);
+      case 'PARAMETER': return displayMacroParameter(node);
     }
   },
 
@@ -126,8 +123,30 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
         '</div>' +
       '</li>',
 
+  displayOptionalNodes = function(parametersMap, optionalNodeList) {
+    let output = $(macroParameterGroupOptionalsTemplate);
+    let tabs = output.find('ul[role="tablist"]');
+    let tabTemplate = tabs.children().remove();
+    let tabPanels = output.find('.tab-content');
+    let tabPanelTemplate = tabPanels.children().remove();
+    optionalNodeList.forEach(function(nodeKey, index) {
+      let childNode = parametersMap[nodeKey];
+      let tab = tabTemplate.clone().appendTo(tabs);
+      let tabPanel = tabPanelTemplate.clone().appendTo(tabPanels);
+      // Some of the child nodes might be hidden so we will activate the first visible tab at the end.
+      tab.add(tabPanel).removeClass('active').toggleClass('hidden', !!childNode.hidden);
+      fillNodeTab(parametersMap, childNode, tab.children().first(), tabPanel);
+    });
+    // Activate the first visible tab.
+    let activeTab = tabs.children().not('.hidden').first();
+    let activeTabPanel = tabPanels.children().not('.hidden').first();
+    activeTab.add(activeTabPanel).addClass('active');
+    toggleMacroParameterGroupVisibility(output);
+    return output;
+  },
+
   macroParameterGroupTemplate = 
-    '<li class="macro-parameter-group">' +
+    '<li class="macro-parameter-group multiple-choice">' +
       '<ul class="nav nav-tabs" role="tablist">' +
         '<li class="active" role="presentation">' +
           '<a class="macro-parameter-group-name" href="#groupId" aria-controls="groupId" role="tab"></a>' +
@@ -138,20 +157,21 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       '</div>' +
     '</li>',
 
-  displayGroup = function(parametersMap, groupNode, isMandatory) {
-    if (!isMandatory) {
-      return displaySingleChoiceGroup(parametersMap, groupNode, isMandatory);
-    } else if (groupNode.feature) {
-      return displayFeature(parametersMap, groupNode, isMandatory);
+  displayGroup = function(parametersMap, groupNode) {
+    if (groupNode.featureOnly) {
+      return displayFeature(parametersMap, groupNode);
     } else {
-      var output = $(macroParameterGroupTemplate).addClass('multiple-choice');
-      fillNodeTab(parametersMap, groupNode,
-          output.find('.macro-parameter-group-name'),
-          output.find('.macro-parameter-group-members'),
-          isMandatory);
-      toggleMacroParameterGroupVisibility(output);
-      return output;
+      return displayMultipleChoiceGroup(parametersMap, groupNode);
     }
+  },
+
+  displayMultipleChoiceGroup = function(parametersMap, groupNode) {
+    let output = $(macroParameterGroupTemplate).addClass('multiple-choice');
+    fillNodeTab(parametersMap, groupNode,
+        output.find('.macro-parameter-group-name'),
+        output.find('.macro-parameter-group-members'));
+    toggleMacroParameterGroupVisibility(output);
+    return output;
   },
 
   macroFeatureContainerTemplate =
@@ -188,7 +208,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   // The given node can be a group or a parameter.
-  fillNodeTab = function(parametersMap, node, tab, tabPanel, isMandatory) {
+  fillNodeTab = function(parametersMap, node, tab, tabPanel) {
     var id = 'macroParameterTreeNode-' + node.id;
     tab.attr({
       'href': '#' + id,
@@ -199,34 +219,11 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     tabPanel
         .attr('id', id)
         .append(childNodes.map(nodeKey =>
-            displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey], isMandatory)));
+            displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey])));
     // Hide the parameter name if there is only one child node and its name matches the name used on the tab.
     if (childNodes.length === 1 && childNodes[0] && parametersMap[childNodes[0]].name === node.name) {
       tabPanel.find('.macro-parameter-name').hide();
     }
-  },
-
-  // FIXME
-  displaySingleChoiceGroup = function(parametersMap, groupNode, isMandatory) {
-    let output = $(macroParameterGroupTemplate).addClass('single-choice').attr('data-feature', groupNode.id);
-    let tabs = output.find('ul[role="tablist"]');
-    let tabTemplate = tabs.children().remove();
-    let tabPanels = output.find('.tab-content');
-    let tabPanelTemplate = tabPanels.children().remove();
-    groupNode.children.forEach(function(childNodeKey, index) {
-      let childNode = parametersMap[childNodeKey];
-      let tab = tabTemplate.clone().appendTo(tabs);
-      let tabPanel = tabPanelTemplate.clone().appendTo(tabPanels);
-      // Some of the child nodes might be hidden so we will activate the first visible tab at the end.
-      tab.add(tabPanel).removeClass('active').toggleClass('hidden', !!childNode.hidden);
-      fillNodeTab(parametersMap, childNode, tab.children().first(), tabPanel, isMandatory);
-    });
-    // Activate the first visible tab.
-    let activeTab = tabs.children().not('.hidden').first();
-    let activeTabPanel = tabPanels.children().not('.hidden').first();
-    activeTab.add(activeTabPanel).addClass('active');
-    toggleMacroParameterGroupVisibility(output);
-    return output;
   },
 
   // Make the macro parameter grouping (tabs) invisible if there is only one visible tab and it contains a single item.
@@ -242,7 +239,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       '<div class="macro-parameter-description"></div>' +
     '</li>',
 
-  displayMacroParameter = function(parameter, isMandatory) {
+  displayMacroParameter = function(parameter) {
     var output = $(macroParameterTemplate);
     output.attr('data-id', parameter.id).attr('data-type', parameter.displayType);
     output.find('.macro-parameter-name').text(parameter.name);

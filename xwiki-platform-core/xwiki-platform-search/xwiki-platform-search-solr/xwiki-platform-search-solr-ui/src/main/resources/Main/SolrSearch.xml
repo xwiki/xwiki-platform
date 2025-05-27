@@ -240,7 +240,7 @@
 
   // ChangeTargetId is the id of the facet anchor that initiated this reload. We expect the focus to go back to this 
   // place once the UI is reloaded.
-  var pushSearchUIState = function(viewURL, changeTargetValue) {
+  var pushSearchUIState = function(viewURL, changeTargetSelector) {
     // If there is a request in progress, abort it to prevent its callback from being called.
     searchRequest &amp;&amp; searchRequest.abort();
     $('.search-ui').attr('aria-busy', true);
@@ -253,7 +253,7 @@
       window.history.replaceState &amp;&amp; window.history.replaceState(state, document.title);
       // Make sure the browser address bar reflects the new state (and thus the new state can be bookmarked).
       window.history.pushState &amp;&amp; window.history.pushState(state, document.title, viewURL);
-      document.querySelector("[data-facetvalue='" + changeTargetValue + "']").focus();
+      document.querySelector(changeTargetSelector).focus();
     });
   };
 
@@ -265,7 +265,7 @@
 
   // Others (e.g. a custom facet) can trigger a search UI update by firing this event.
   $(document).on('xwiki:search:update', function(event, viewURL) {
-    pushSearchUIState(viewURL, event.target.getAttribute('data-facetvalue'));
+    pushSearchUIState(viewURL, "[data-facetvalue='" + event.target.getAttribute('data-facetvalue') + "']");
   });
 
   $(window).on('popstate', function(event) {
@@ -303,21 +303,23 @@
     // Make sure this code is not executed twice.
     $(data.elements).find('noscript.skin-extension-imports').remove();
   });
-  
-  document.querySelectorAll('input.options-item').forEach(function (option){
-    option.addEventListener('change', function() {
-      let queryFieldName = this.getAttribute('data-query-name');
-      let queryField = document.querySelector('input[name="' + queryFieldName + '"]');
-      queryField.value = this.checked ? 'true' : 'false';
-      this.form.submit();
-    });
-  });
 
   var enhanceSearchUI = function() {
+    // Enhance search options 
+    document.querySelectorAll('input.options-item').forEach(function (option){
+      option.addEventListener('change', function() {
+        let queryFieldName = this.getAttribute('data-query-name');
+        let queryField = document.querySelector('input[name="' + queryFieldName + '"]');
+        queryField.value = this.checked ? 'true' : 'false';
+        pushSearchUIState(this.form.getAttribute('action') + "?" +
+          new URLSearchParams(new FormData(this.form)).toString(),
+          'input[data-query-name="' + queryFieldName + '"]');
+      });
+    });
+    
     $('.search-result-highlightAll').each(enhanceSearchResultHighlights);
     $('.search-facets').each(enhanceSearchFacets);
     $([
-      '.search-results-sort a.sort-item',
       '.search-options a.options-item',
       '.pagination a',
       '.controlPagination a',

@@ -23,10 +23,13 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -67,13 +70,15 @@ public class MacroParametersHelper
         <textarea name="$content" rows="7"></textarea>
         """;
 
+    private static final String DEFAULT_GROUP_OPTIONALS_ID = "defaultOptionalGroup";
+
     @Inject
     private ContextualLocalizationManager localizationManager;
 
     @Inject
     private HTMLDisplayerManager htmlDisplayerManager;
 
-    private EscapeTool escapeTool = new EscapeTool();
+    private final EscapeTool escapeTool = new EscapeTool();
 
     // FIXME: introduce a cache?
     public MacroDescriptorUI buildMacroDescriptorUI(MacroDescriptor macroDescriptor)
@@ -86,21 +91,24 @@ public class MacroParametersHelper
             .setSupportsInlineMode(macroDescriptor.supportsInlineMode());
 
         Collection<ParameterDescriptor> parameterDescriptors = macroDescriptor.getParameterDescriptorMap().values();
-        Map<String, MacroParameterUINode> parametersMap = new HashMap<>();
-        List<MacroParameterUINode> mandatoryParameters = new ArrayList<>();
-        List<MacroParameterUINode> optionalParameters = new ArrayList<>();
+        Map<String, AbstractMacroParameterUINode> parametersMap = new HashMap<>();
+        Map<String, SortedSet<AbstractMacroParameterUINode>> childrenMap = new HashMap<>();
+        List<AbstractMacroParameterUINode> mandatoryParameters = new ArrayList<>();
+        List<AbstractMacroParameterUINode> optionalParameters = new ArrayList<>();
+        Map<String, MacroParameterUINodeGroup> groupMap = new HashMap<>();
+        Map<String, List<MacroParameterUINodeGroup>> featureMap = new HashMap<>();
 
         ContentDescriptor contentDescriptor = macroDescriptor.getContentDescriptor();
         if (contentDescriptor != null) {
-            MacroParameterUINode contentNode =
-                new MacroParameterUINode(MacroParameterUINodeType.PARAMETER, "$content")
+            MacroParameterUINodeParameter contentNode =
+                new MacroParameterUINodeParameter("$content")
+                    .setDisplayType(contentDescriptor.getType().getTypeName())
+                    .setEditTemplate(CONTENT_TEMPLATE.trim())
                     .setName(getParameterTranslation("rendering.macroContent", "Content"))
                     .setDescription(getParameterTranslation(macroTranslationKey + "content.description",
                         contentDescriptor.getDescription()))
                     .setMandatory(contentDescriptor.isMandatory())
-                    .setOrder(contentDescriptor.getOrder())
-                    .setDisplayType(contentDescriptor.getType().getTypeName())
-                    .setEditTemplate(CONTENT_TEMPLATE);
+                    .setOrder(contentDescriptor.getOrder());
             if (contentNode.isMandatory()) {
                 mandatoryParameters.add(contentNode);
             } else {
@@ -109,102 +117,139 @@ public class MacroParametersHelper
             parametersMap.put(contentNode.getKey(), contentNode);
         }
 
-        MacroParameterUINode defaultOptionalGroup = new MacroParameterUINode(MacroParameterUINodeType.GROUP, "default")
-            .setName(this.localizationManager.getTranslationPlain("rendering.macro.config.defaultOptionalGroup"));
-        optionalParameters.add(defaultOptionalGroup);
-
-        Map<String, MacroParameterUINode> groupMap = new HashMap<>();
-        Map<String, MacroParameterUINode> featureMap = new HashMap<>();
+        MacroParameterUINodeGroup defaultOptionalGroup =
+            createOrGetGroup(DEFAULT_GROUP_OPTIONALS_ID, null, false, groupMap, featureMap,
+                childrenMap, macroTranslationKey)
+            .setName(getParameterTranslation("rendering.macro.config.defaultOptionalGroup.name",
+                "Optional parameters"));
 
         for (ParameterDescriptor parameterDescriptor : parameterDescriptors) {
             String parameterTranslationKey =
                 String.format("%s.parameter.%s", macroTranslationKey, parameterDescriptor.getId());
             boolean mandatory = parameterDescriptor.isMandatory();
-            MacroParameterUINode node = new MacroParameterUINode(MacroParameterUINodeType.PARAMETER,
-                parameterDescriptor.getId());
+            MacroParameterUINodeParameter node = new MacroParameterUINodeParameter(parameterDescriptor.getId());
 
             parametersMap.put(node.getKey(), node);
-            node.setName(getParameterTranslation(parameterTranslationKey + ".name", parameterDescriptor.getName()))
+            node.setAdvanced(parameterDescriptor.isAdvanced())
+                .setDeprecated(parameterDescriptor.isDeprecated())
+                .setDisplayType(parameterDescriptor.getDisplayType().getTypeName())
+                .setDefaultValue(parameterDescriptor.getDefaultValue())
+                .setEditTemplate(getEditTemplate(parameterDescriptor, parameterTranslationKey))
+                .setCaseInsensitive(parameterDescriptor.getDisplayType() instanceof Enum)
+                .setName(getParameterTranslation(parameterTranslationKey + ".name", parameterDescriptor.getName()))
                 .setDescription(getParameterTranslation(parameterTranslationKey + ".description",
                     parameterDescriptor.getDescription()))
                 .setMandatory(mandatory)
                 .setHidden(parameterDescriptor.isDisplayHidden())
-                .setAdvanced(parameterDescriptor.isAdvanced())
-                .setDeprecated(parameterDescriptor.isDeprecated())
-                .setOrder(parameterDescriptor.getOrder())
-                .setDisplayType(parameterDescriptor.getDisplayType().getTypeName())
-                .setDefaultValue(parameterDescriptor.getDefaultValue())
-                .setEditTemplate(getEditTemplate(parameterDescriptor, parameterTranslationKey))
-                .setCaseInsensitive(parameterDescriptor.getDisplayType() instanceof Enum);
+                .setOrder(parameterDescriptor.getOrder());
 
             PropertyGroupDescriptor groupDescriptor = parameterDescriptor.getGroupDescriptor();
             if (groupDescriptor != null
                 && !(StringUtils.isEmpty(groupDescriptor.getFeature())
                 && (groupDescriptor.getGroup() == null || groupDescriptor.getGroup().isEmpty()))) {
-                boolean mandatoryGroup = mandatory || groupDescriptor.isFeatureMandatory();
-                MacroParameterUINode groupNode;
-                String feature = groupDescriptor.getFeature();
-                if (!StringUtils.isEmpty(feature)) {
-                    groupNode = featureMap.computeIfAbsent(feature, key ->
-                        createGroupNode(true, key, mandatoryGroup, mandatoryParameters, optionalParameters));
-                } else {
-                    String groupName = StringUtils.join(groupDescriptor.getGroup(), ",");
-                    groupNode = groupMap.computeIfAbsent(groupName, key ->
-                        createGroupNode(false, key, mandatoryGroup, mandatoryParameters, optionalParameters));
+                String featureName = groupDescriptor.getFeature();
+                String groupName = StringUtils.join(groupDescriptor.getGroup(), ",");
+                boolean featureOnly = false;
+
+                if (groupDescriptor.getGroup() == null || groupDescriptor.getGroup().isEmpty()) {
+                    groupName = featureName;
+                    featureOnly = true;
                 }
-                parametersMap.put(groupNode.getKey(), groupNode);
-                groupNode.addChild(node);
+
+                MacroParameterUINodeGroup groupNode = createOrGetGroup(groupName, featureName, featureOnly,
+                    groupMap, featureMap, childrenMap, macroTranslationKey);
+
+                if ((mandatory || groupDescriptor.isFeatureMandatory()) && !groupNode.isMandatory()) {
+                    groupNode.setMandatory(true);
+                }
+
+                childrenMap.get(groupNode.getKey()).add(node);
                 if (node.getOrder() > -1 && (groupNode.getOrder() == -1 || node.getOrder() < groupNode.getOrder())) {
                     groupNode.setOrder(node.getOrder());
                 }
             } else if (node.isMandatory()) {
                 mandatoryParameters.add(node);
             } else {
-                defaultOptionalGroup.addChild(node);
+                childrenMap.get(defaultOptionalGroup.getKey()).add(node);
             }
         }
 
-        if (defaultOptionalGroup.getChildren().isEmpty()) {
-            optionalParameters.remove(defaultOptionalGroup);
-        } else {
-            // default group should always have priority.
-            defaultOptionalGroup.setOrder(0);
-            parametersMap.put(defaultOptionalGroup.getKey(), defaultOptionalGroup);
+        Set<String> belongToFeature = new HashSet<>();
+
+        for (Map.Entry<String, List<MacroParameterUINodeGroup>> featureEntry : featureMap.entrySet()) {
+            String featureName = featureEntry.getKey();
+            List<MacroParameterUINodeGroup> featureGroups = featureEntry.getValue();
+            MacroParameterUINodeGroup featureNode = createOrGetGroup(featureName, featureName, true, groupMap,
+                featureMap, childrenMap, macroTranslationKey);
+            childrenMap.get(featureNode.getKey()).addAll(featureGroups);
+            featureNode.setMandatory(featureGroups.stream().anyMatch(MacroParameterUINodeGroup::isMandatory));
+            featureNode.setOrder(featureGroups.stream()
+                .map(MacroParameterUINodeGroup::getOrder)
+                .filter(i -> i != -1)
+                .min(Integer::compareTo)
+                .orElse(-1));
+
+            belongToFeature.addAll(featureGroups.stream().map(MacroParameterUINodeGroup::getKey).toList());
         }
+
+        for (MacroParameterUINodeGroup groupNode : groupMap.values()) {
+            SortedSet<AbstractMacroParameterUINode> children = childrenMap.get(groupNode.getKey());
+            if (!children.isEmpty() && !belongToFeature.contains(groupNode.getKey())) {
+                if (groupNode.isMandatory()) {
+                    mandatoryParameters.add(groupNode);
+                } else {
+                    optionalParameters.add(groupNode);
+                }
+            }
+            if (!children.isEmpty()) {
+                groupNode.setChildren(children.stream().map(AbstractMacroParameterUINode::getKey).toList());
+                parametersMap.put(groupNode.getKey(), groupNode);
+            }
+        }
+        // force the priority to appear first.
+        defaultOptionalGroup.setOrder(0);
+
         MacroParameterUINodeComparator comparator = new MacroParameterUINodeComparator();
         mandatoryParameters.sort(comparator);
         optionalParameters.sort(comparator);
 
-        result.setMandatoryNodes(mandatoryParameters.stream().map(MacroParameterUINode::getKey).toList())
-            .setOptionalNodes(optionalParameters.stream().map(MacroParameterUINode::getKey).toList())
+        result.setMandatoryNodes(mandatoryParameters.stream().map(AbstractMacroParameterUINode::getKey).toList())
+            .setOptionalNodes(optionalParameters.stream().map(AbstractMacroParameterUINode::getKey).toList())
             .setParametersMap(parametersMap);
 
         return result;
     }
 
-    private String getParameterTranslation(String translationKey, String fallback)
+    private MacroParameterUINodeGroup createOrGetGroup(String id,
+        String featureName,
+        boolean featureOnly,
+        Map<String, MacroParameterUINodeGroup> groupMap,
+        Map<String, List<MacroParameterUINodeGroup>> featureMap,
+        Map<String, SortedSet<AbstractMacroParameterUINode>> childrenMap,
+        String macroTranslationKey)
     {
-        String translationPlain = this.localizationManager.getTranslationPlain(translationKey);
-        if (translationKey.equals(translationPlain)) {
-            translationPlain = fallback;
-        }
-        return translationPlain;
+        String mapId = (featureOnly) ? "FEATURE:" + id : id;
+        return groupMap.computeIfAbsent(mapId, key -> {
+            String groupNameKey =
+                String.format("%s.%s.%s.name", macroTranslationKey, "group", id);
+            boolean isFeature = !StringUtils.isEmpty(featureName);
+            MacroParameterUINodeGroup group = new MacroParameterUINodeGroup(id)
+                .setFeatureName(featureName)
+                .setFeature(isFeature)
+                .setFeatureOnly(featureOnly)
+                .setName(getParameterTranslation(groupNameKey, id));
+            childrenMap.put(group.getKey(), new TreeSet<>(new MacroParameterUINodeComparator()));
+            if (isFeature && !featureOnly) {
+                featureMap.computeIfAbsent(featureName,featureKey -> new ArrayList<>()).add(group);
+            }
+            return group;
+        });
     }
 
-    private MacroParameterUINode createGroupNode(boolean isFeature, String key, boolean mandatoryGroup,
-        List<MacroParameterUINode> mandatoryParameters, List<MacroParameterUINode> optionalParameters)
+    private String getParameterTranslation(String translationKey, String fallback)
     {
-        MacroParameterUINodeType type = (isFeature) ? MacroParameterUINodeType.FEATURE :
-            MacroParameterUINodeType.GROUP;
-        MacroParameterUINode groupNode = new MacroParameterUINode(type, key);
-        groupNode.setName(this.localizationManager.getTranslationPlain(key));
-        if (mandatoryGroup) {
-            groupNode.setMandatory(true);
-            mandatoryParameters.add(groupNode);
-        } else {
-            optionalParameters.add(groupNode);
-        }
-        return groupNode;
+        String result = this.localizationManager.getTranslationPlain(translationKey);
+        return (result != null) ? result : fallback;
     }
 
     private String getEditTemplate(ParameterDescriptor parameterDescriptor, String parameterTranslationKey)
@@ -229,7 +274,7 @@ public class MacroParametersHelper
         if (StringUtils.isEmpty(result)) {
             result = getEditTemplateFallback(parameterDescriptor, parameterTranslationKey);
         }
-        return result;
+        return result.trim();
     }
 
     private String getEditTemplateFallback(ParameterDescriptor parameterDescriptor, String parameterTranslationKey)

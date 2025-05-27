@@ -21,25 +21,47 @@ package org.xwiki.rendering.internal.util.ui;
 
 import java.util.Comparator;
 
-public class MacroParameterUINodeComparator implements Comparator<MacroParameterUINode>
+public class MacroParameterUINodeComparator implements Comparator<AbstractMacroParameterUINode>
 {
     @Override
-    public int compare(MacroParameterUINode node1, MacroParameterUINode node2)
+    public int compare(AbstractMacroParameterUINode node1, AbstractMacroParameterUINode node2)
     {
-        if (node1.getOrder() != -1 && node2.getOrder() != -1) {
+        // we don't want to use Integer.compare if the order are exactly the same as it will return 0 and the TreeSet
+        // will consider them equal.
+        if (node1.getOrder() != -1 && node2.getOrder() != -1 && node1.getOrder() != node2.getOrder()) {
             return Integer.compare(node1.getOrder(), node2.getOrder());
         } else if (node1.getOrder() == -1 && node2.getOrder() == -1) {
-            if (node1.isAdvanced() == node2.isAdvanced() && node1.isHidden() == node2.isHidden()) {
-                return node1.getId().compareTo(node2.getId());
-            } else if (node1.isAdvanced() || node1.isHidden()) {
-                return 1;
-            } else {
-                return -1;
-            }
+            return compareWhenNoOrder(node1, node2);
         } else if (node1.getOrder() == -1) {
             return 1;
         } else {
             return -1;
+        }
+    }
+
+    public int compareWhenNoOrder(AbstractMacroParameterUINode node1, AbstractMacroParameterUINode node2)
+    {
+        if (node1 instanceof MacroParameterUINodeParameter paramNode1
+            && node2 instanceof MacroParameterUINodeParameter paramNode2) {
+            if (paramNode1.isHidden() && !paramNode2.isHidden()
+            || paramNode1.isDeprecated() && !paramNode2.isDeprecated()
+            || paramNode1.isAdvanced() && !paramNode2.isAdvanced()) {
+                return 1;
+            } else if (!paramNode1.isHidden() && paramNode2.isHidden()
+                || !paramNode1.isDeprecated() && paramNode2.isDeprecated()
+                || !paramNode1.isAdvanced() && paramNode2.isAdvanced()) {
+                return -1;
+            } else {
+                return paramNode1.getId().compareTo(paramNode2.getId());
+            }
+        } else {
+            if (node1.isHidden() == node2.isHidden()) {
+                return node1.getId().compareTo(node2.getId());
+            } else if (node1.isHidden()) {
+                return 1;
+            } else {
+                return -1;
+            }
         }
     }
 }

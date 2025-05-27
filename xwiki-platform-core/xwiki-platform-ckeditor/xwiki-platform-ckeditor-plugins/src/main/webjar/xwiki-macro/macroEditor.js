@@ -87,13 +87,14 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     if (macroParameterTree.mandatoryNodes.length < 1 && macroParameterTree.optionalNodes.length < 1) {
       output.append($('<li class="empty"></li>').text(translations.get('noParameters')));
     } else {
+      let parametersMap = macroParameterTree.parametersMap;
       output.append(macroParameterTree.mandatoryNodes.map(key => {
-        let node = macroParameterTree.parametersMap[key];
-        return displayMacroParameterTreeNode(node, true);
+        let node = parametersMap[key];
+        return displayMacroParameterTreeNode(parametersMap, node, true);
       }));
       output.append(macroParameterTree.optionalNodes.map(key => {
-        let node = macroParameterTree.parametersMap[key];
-        return displayMacroParameterTreeNode(node, false);
+        let node = parametersMap[key];
+        return displayMacroParameterTreeNode(parametersMap, node, false);
       }));
     }
 
@@ -106,13 +107,24 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     return output.children();
   },
 
-  displayMacroParameterTreeNode = function(node, isMandatory) {
+  displayMacroParameterTreeNode = function(parametersMap, node, isMandatory) {
     switch (node.type) {
-      case 'GROUP': return displayMultipleChoiceGroup(node, isMandatory);
-      case 'FEATURE': return displaySingleChoiceGroup(node, isMandatory);
+      case 'GROUP': return displayGroup(parametersMap, node, isMandatory);
       case 'PARAMETER': return displayMacroParameter(node, isMandatory);
     }
   },
+
+  macroParameterGroupOptionalsTemplate =
+      '<li class="macro-parameter-group-optionals single-choice">' +
+        '<ul class="nav nav-tabs" role="tablist">' +
+          '<li class="active" role="presentation">' +
+            '<a class="macro-parameter-group-name" href="#groupId" aria-controls="groupId" role="tab"></a>' +
+          '</li>' +
+        '</ul>' +
+        '<div class="tab-content">' +
+          '<ul id="groupId" class="macro-parameter-group-members tab-pane active" role="tabpanel"></ul>' +
+        '</div>' +
+      '</li>',
 
   macroParameterGroupTemplate = 
     '<li class="macro-parameter-group">' +
@@ -126,48 +138,92 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       '</div>' +
     '</li>',
 
-  displayMultipleChoiceGroup = function(groupNode, isMandatory) {
-    var output = $(macroParameterGroupTemplate).addClass('multiple-choice');
-    fillNodeTab(groupNode,
-        output.find('.macro-parameter-group-name'),
-        output.find('.macro-parameter-group-members'),
-        isMandatory);
-    toggleMacroParameterGroupVisibility(output);
-    return output;
+  displayGroup = function(parametersMap, groupNode, isMandatory) {
+    if (!isMandatory) {
+      return displaySingleChoiceGroup(parametersMap, groupNode, isMandatory);
+    } else if (groupNode.feature) {
+      return displayFeature(parametersMap, groupNode, isMandatory);
+    } else {
+      var output = $(macroParameterGroupTemplate).addClass('multiple-choice');
+      fillNodeTab(parametersMap, groupNode,
+          output.find('.macro-parameter-group-name'),
+          output.find('.macro-parameter-group-members'),
+          isMandatory);
+      toggleMacroParameterGroupVisibility(output);
+      return output;
+    }
+  },
+
+  macroFeatureContainerTemplate =
+    '<div class="panel-group" id="accordion-feature-{{featureName}}" role="tablist" aria-multiselectable="true"></div>',
+
+  macroFeatureContentTemplate =
+    '<div class="panel panel-default">' +
+      '<div class="panel-heading" role="tab" id="feature-heading-{{parameterId}}">' +
+        '<h4 class="panel-title">' +
+          '<a role="button" data-toggle="collapse" data-parent="#accordion-feature-{{featureName}}" ' +
+      'href="#feature-collapse-{{parameterId}}" ' +
+          'aria-expanded="true" aria-controls="feature-collapse-{{parameterId}}"></a>' +
+        '</h4>' +
+      '</div>' +
+      '<div id="feature-collapse-{{parameterId}}" class="panel-collapse collapse" role="tabpanel"' +
+      ' aria-labelledby="feature-heading-{{parameterId}}">' +
+        '<div class="panel-body"></div>' +
+      '</div>' +
+    '</div>',
+
+  displayFeature = function (parametersMap, featureNode, isMandatory) {
+    let featureName = featureNode.featureName;
+    let output = $(macroFeatureContainerTemplate.replaceAll("{{featureName}}", featureName));
+    output.append(featureNode.children.map(nodeKey => {
+      let paramNode = parametersMap[nodeKey];
+      let parameterId = paramNode.id;
+      let nodeOutput = $(macroFeatureContentTemplate
+          .replaceAll("{{featureName}}", featureName)
+          .replaceAll("{{parameterId}}", parameterId));
+      return nodeOutput
+          .find('.panel-body')
+          .append(displayMacroParameterTreeNode(parametersMap, paramNode, isMandatory));
+    }));
   },
 
   // The given node can be a group or a parameter.
-  fillNodeTab = function(node, tab, tabPanel, isMandatory) {
+  fillNodeTab = function(parametersMap, node, tab, tabPanel, isMandatory) {
     var id = 'macroParameterTreeNode-' + node.id;
     tab.attr({
       'href': '#' + id,
       'aria-controls': id
     }).text(node.name);
     // If the given node is a parameter (no children) then we handle it as a group with a single parameter.
-    var childNodes = node.children || [node];
-    tabPanel.attr('id', id).append(childNodes.map(node => displayMacroParameterTreeNode(node, isMandatory)));
+    var childNodes = node.children || [node.key];
+    tabPanel
+        .attr('id', id)
+        .append(childNodes.map(nodeKey =>
+            displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey], isMandatory)));
     // Hide the parameter name if there is only one child node and its name matches the name used on the tab.
-    if (childNodes.length === 1 && childNodes[0].data && childNodes[0].data.name === node.data.name) {
+    if (childNodes.length === 1 && childNodes[0] && parametersMap[childNodes[0]].name === node.name) {
       tabPanel.find('.macro-parameter-name').hide();
     }
   },
 
-  displaySingleChoiceGroup = function(groupNode, isMandatory) {
-    var output = $(macroParameterGroupTemplate).addClass('single-choice').attr('data-feature', groupNode.id);
-    var tabs = output.find('ul[role="tablist"]');
-    var tabTemplate = tabs.children().remove();
-    var tabPanels = output.find('.tab-content');
-    var tabPanelTemplate = tabPanels.children().remove();
-    groupNode.children.forEach(function(childNode, index) {
-      var tab = tabTemplate.clone().appendTo(tabs);
-      var tabPanel = tabPanelTemplate.clone().appendTo(tabPanels);
+  // FIXME
+  displaySingleChoiceGroup = function(parametersMap, groupNode, isMandatory) {
+    let output = $(macroParameterGroupTemplate).addClass('single-choice').attr('data-feature', groupNode.id);
+    let tabs = output.find('ul[role="tablist"]');
+    let tabTemplate = tabs.children().remove();
+    let tabPanels = output.find('.tab-content');
+    let tabPanelTemplate = tabPanels.children().remove();
+    groupNode.children.forEach(function(childNodeKey, index) {
+      let childNode = parametersMap[childNodeKey];
+      let tab = tabTemplate.clone().appendTo(tabs);
+      let tabPanel = tabPanelTemplate.clone().appendTo(tabPanels);
       // Some of the child nodes might be hidden so we will activate the first visible tab at the end.
-      tab.add(tabPanel).removeClass('active').toggleClass('hidden', !!childNode.data.hidden);
-      fillNodeTab(childNode, tab.children().first(), tabPanel, isMandatory);
+      tab.add(tabPanel).removeClass('active').toggleClass('hidden', !!childNode.hidden);
+      fillNodeTab(parametersMap, childNode, tab.children().first(), tabPanel, isMandatory);
     });
     // Activate the first visible tab.
-    var activeTab = tabs.children().not('.hidden').first();
-    var activeTabPanel = tabPanels.children().not('.hidden').first();
+    let activeTab = tabs.children().not('.hidden').first();
+    let activeTabPanel = tabPanels.children().not('.hidden').first();
     activeTab.add(activeTabPanel).addClass('active');
     toggleMacroParameterGroupVisibility(output);
     return output;

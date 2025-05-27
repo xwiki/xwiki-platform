@@ -22,6 +22,5 @@ package org.xwiki.rendering.internal.util.ui;
 public enum MacroParameterUINodeType
 {
     PARAMETER,
-    GROUP,
-    FEATURE
+    GROUP
 }

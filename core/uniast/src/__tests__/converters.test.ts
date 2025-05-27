@@ -416,7 +416,7 @@ describe("MarkdownToUniAstConverter", () => {
               },
             ],
             styles: {},
-            type: "blockQuote",
+            type: "quote",
           },
           {
             content: [
@@ -433,7 +433,7 @@ describe("MarkdownToUniAstConverter", () => {
               },
             ],
             styles: {},
-            type: "blockQuote",
+            type: "quote",
           },
           {
             items: [
@@ -692,12 +692,12 @@ describe("MarkdownToUniAstConverter", () => {
           {
             content: "Code block 1",
             language: undefined,
-            type: "codeBlock",
+            type: "code",
           },
           {
             content: "Code block 2 (js)",
             language: "javascript",
-            type: "codeBlock",
+            type: "code",
           },
           {
             columns: [

@@ -35,7 +35,7 @@
     <xwiki.jacoco.instructionRatio>0.15</xwiki.jacoco.instructionRatio>
     </properties>
   <dependencies>
-	<dependency>
+    <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
@@ -46,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-container-api</artifactId>
+      <artifactId>xwiki-platform-container-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

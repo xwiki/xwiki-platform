@@ -18,10 +18,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { User } from "../components/currentUser";
-import { providerRef } from "../components/realtimeState";
-import NoAvatar from "../images/noavatar.png";
+import NoAvatar from "../../images/noavatar.png";
 import {
+  HocuspocusProvider,
   WebSocketStatus,
   // eslint-disable-next-line import/named
   onAwarenessChangeParameters,
@@ -31,12 +30,16 @@ import {
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { ref, watch } from "vue";
 
+const { provider } = defineProps<{
+  provider: HocuspocusProvider | null;
+}>();
+
 // We don't assign a status yet, as we don't know if realtime is enabled or not
 // (the providerRef may be empty now but filled later)
 const status = ref<WebSocketStatus>();
 
 watch(
-  providerRef,
+  () => provider,
   (provider) => {
     if (!provider) {
       return;
@@ -60,12 +63,14 @@ watch(
   },
 );
 
-const users = ref<{ user: User; clientId: string }[]>([]);
+const users = ref<
+  { user: { name: string; color: string }; clientId: string }[]
+>([]);
 </script>
 
 <template>
   <!-- this element produce content only if a provider has been initialized -->
-  <span v-if="providerRef" class="connection-status">
+  <span v-if="provider" class="connection-status">
     <span
       v-if="status === WebSocketStatus.Disconnected"
       class="connection-status-offline"
@@ -95,7 +100,7 @@ const users = ref<{ user: User; clientId: string }[]>([]);
       class="connection-status-users"
     >
       <x-avatar
-        v-for="{ clientId, user } in users"
+        v-for="{ clientId, user } in users.filter((user) => user.user)"
         :key="clientId"
         :image="NoAvatar"
         :name="user.name"

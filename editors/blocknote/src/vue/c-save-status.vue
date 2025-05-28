@@ -17,12 +17,19 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+<script lang="ts">
+export enum SaveStatus {
+  UNSAVED = "UNSAVED",
+  SAVING = "SAVING",
+  SAVED = "SAVED",
+}
+</script>
+
 <script setup lang="ts">
-import { AutoSaverStatus } from "../components/autoSaver";
-import { autoSaverRef } from "../components/realtimeState";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import { ref, watch } from "vue";
-import type { Ref } from "vue";
+import { computed } from "vue";
+
+const { saveStatus } = defineProps<{ saveStatus: SaveStatus }>();
 
 interface StatusInfo {
   id: string;
@@ -30,45 +37,32 @@ interface StatusInfo {
   icon: string;
 }
 
-const statuses: { [key: number]: StatusInfo } = {
-  [AutoSaverStatus.UNSAVED.valueOf()]: {
+const statuses: Record<SaveStatus, StatusInfo> = {
+  [SaveStatus.UNSAVED]: {
     id: "unsaved",
     label: "Unsaved",
     icon: "cloud",
   },
-  [AutoSaverStatus.SAVING.valueOf()]: {
+
+  [SaveStatus.SAVING]: {
     id: "saving",
     label: "Saving",
     icon: "arrow-clockwise",
   },
-  [AutoSaverStatus.SAVED.valueOf()]: {
+
+  [SaveStatus.SAVED]: {
     id: "saved",
     label: "Saved",
     icon: "cloud-check",
   },
 };
 
-const status: Ref<StatusInfo> = ref(statuses[AutoSaverStatus.SAVED.valueOf()]);
-watch(
-  autoSaverRef,
-  (autoSaver) => {
-    if (autoSaver) {
-      autoSaver.on("statusChange", (value: AutoSaverStatus) => {
-        status.value = statuses[value.valueOf()];
-      });
-    }
-  },
-  { immediate: true },
-);
+const status = computed(() => statuses[saveStatus]);
 </script>
 
 <template>
-  <span v-if="autoSaverRef" :class="`save-status save-status-${status.id}`">
-    <c-icon
-      :name="status.icon"
-      :size="Size.Small"
-      class="save-status-icon"
-    ></c-icon>
+  <span v-if="saveStatus" :class="`save-status save-status-${status.id}`">
+    <c-icon :name="status.icon" :size="Size.Small" class="save-status-icon" />
     <span class="save-status-label">{{ status.label }}</span>
   </span>
 </template>

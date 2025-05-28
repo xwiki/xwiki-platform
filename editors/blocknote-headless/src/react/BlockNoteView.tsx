@@ -45,7 +45,12 @@ import {
   useCreateBlockNote,
 } from "@blocknote/react";
 import { multiColumnDropCursor } from "@blocknote/xl-multi-column";
-import { HocuspocusProvider } from "@hocuspocus/provider";
+import {
+  HocuspocusProvider,
+  // BUG: ESLint incorrectly reports this as an error even though it's not (TODO: investigate)
+  // eslint-disable-next-line import/named
+  HocuspocusProviderConfiguration,
+} from "@hocuspocus/provider";
 import { ReactivueChild } from "@xwiki/cristal-reactivue";
 import React, { useEffect, useState } from "react";
 import { ShallowRef } from "vue";
@@ -60,10 +65,37 @@ type DefaultEditorOptionsType = BlockNoteEditorOptions<
  * Properties for the {@link BlockNoteEditor} component
  */
 type BlockNoteViewWrapperProps = {
-  blockNoteOptions?: Partial<Omit<DefaultEditorOptionsType, "schema">>;
+  /**
+   * Options to forward to the BlockNote editor
+   */
+  blockNoteOptions?: Partial<
+    Omit<DefaultEditorOptionsType, "schema" | "collaboration">
+  >;
+
+  /**
+   * The display theme to use
+   */
   theme?: "light" | "dark";
+
+  /**
+   * The editor's initial content
+   * If realtime is enabled, this content may be replaced by the other users' own editor content
+   */
   content: BlockType[];
-  editorRef?: ShallowRef<EditorType | null>;
+
+  /**
+   * Realtime options
+   */
+  realtime?: {
+    hocusPocus: HocuspocusProviderConfiguration;
+    user: { name: string; color: string };
+  };
+
+  /**
+   * Run a function when the document's content change
+   * WARN: this function may be fired at a rapid rate if the user types rapidly. Debouncing may be required on your end.
+   */
+  onChange?: (editor: EditorType) => void;
 
   /**
    * Message to display while syncing changes with other users
@@ -103,6 +135,14 @@ type BlockNoteViewWrapperProps = {
       EditorStyleSchema
     >;
   }>;
+
+  /**
+   * Make the wrapper forward some data through references
+   */
+  refs?: {
+    editorRef?: ShallowRef<EditorType | null>;
+    providerRef?: ShallowRef<HocuspocusProvider | null>;
+  };
 };
 
 /**
@@ -112,19 +152,25 @@ type BlockNoteViewWrapperProps = {
 function BlockNoteViewWrapper({
   blockNoteOptions,
   theme,
+  content,
+  realtime,
+  onChange,
   pendingSyncMessage,
   formattingToolbar: CustomFormattingToolbar,
   prefixDefaultFormattingToolbarFor,
   linkToolbar: CustomLinkToolbar,
   filePanel: CustomFilePanel,
-  content,
-  editorRef,
+  refs: { editorRef, providerRef } = {},
 }: BlockNoteViewWrapperProps) {
   const schema = createBlockNoteSchema();
 
-  const provider = blockNoteOptions?.collaboration?.provider as
-    | HocuspocusProvider
-    | undefined;
+  const provider = realtime?.hocusPocus
+    ? new HocuspocusProvider(realtime.hocusPocus)
+    : undefined;
+
+  if (providerRef && provider) {
+    providerRef.value = provider;
+  }
 
   // Prevent changes in the editor until the provider has synced with other clients
   const [ready, setReady] = useState(!provider);
@@ -132,6 +178,13 @@ function BlockNoteViewWrapper({
   // Creates a new editor instance.
   const editor = useCreateBlockNote({
     ...blockNoteOptions,
+    collaboration: provider
+      ? {
+          provider,
+          fragment: provider.document.getXmlFragment("document-store"),
+          user: realtime!.user,
+        }
+      : undefined,
     // Editor's schema, with custom blocks definition
     schema,
     dropCursor: multiColumnDropCursor,
@@ -241,6 +294,7 @@ function BlockNoteViewWrapper({
       linkToolbar={false}
       filePanel={false}
       slashMenu={false}
+      onChange={(editor) => onChange?.(editor)}
     >
       <SuggestionMenuController
         triggerCharacter={"/"}

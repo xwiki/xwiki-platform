@@ -24,23 +24,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>17.6.0-SNAPSHOT</version>
+    <artifactId>xwiki-platform-container</artifactId>
+    <version>17.5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-container</artifactId>
-  <name>XWiki Platform - Containers - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Containers - Parent POM</description>
+  <artifactId>xwiki-platform-container-default</artifactId>
+  <name>XWiki Platform - Containers - Default</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Containers - Default</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-api</artifactId>
+      <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-default</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
   </dependencies>
-  <modules>
-    <module>xwiki-platform-container-api</module>
-    <module>xwiki-platform-container-default</module>
-    <module>xwiki-platform-container-servlet</module>
-  </modules>
 </project>
+

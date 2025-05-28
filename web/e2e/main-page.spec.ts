@@ -238,6 +238,8 @@ configs.forEach(
 
       const configurationForm = page.locator("form").filter({ visible: true }).nth(0);
 
+      // All the waits below are temporary, until we have proper page objects for forms.
+
       await expect(configurationForm).toBeVisible();
       await configurationForm.getByText("Name").nth(0).focus();
       await page.keyboard.type("Test Configuration");
@@ -246,6 +248,8 @@ configs.forEach(
       // Wait for Shoelace animation to end.
       await page.waitForTimeout(100);
       await page.keyboard.press("Home");
+      // Ensure Vuetify has time to select the element.
+      await page.waitForTimeout(100);
       await page.keyboard.press("Enter");
       // Wait for Shoelace animation to end.
       await page.waitForTimeout(100);
@@ -262,6 +266,8 @@ configs.forEach(
       // Wait for Shoelace animation to end.
       await page.waitForTimeout(100);
       await page.keyboard.press("Home");
+      // Ensure Vuetify has time to select the element.
+      await page.waitForTimeout(100);
       await page.keyboard.press("Enter");
       // Wait for Shoelace animation to end.
       await page.waitForTimeout(100);

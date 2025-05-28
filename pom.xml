@@ -1702,7 +1702,7 @@
                 <!-- Forbid JAR extensions to have XAR runtime dependencies -->
                 <bannedDependencyType>
                   <dependencyType>xar</dependencyType>
-                  <projectPackaging>jar|webjar</projectPackaging>
+                  <projectPackaging>jar|webjar|webjar-node</projectPackaging>
                   <!-- Integration test modules are never going to be installed as extension, and they need to depend
                        on XAR modules -->
                   <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>

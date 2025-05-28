@@ -17,38 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.tool.packager.internal;
+package org.xwiki.extension.jar.internal.validator;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.InstallException;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
-import org.xwiki.job.Request;
+import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
+import org.xwiki.extension.jar.internal.handler.JarExtensionHandler;
+import org.xwiki.security.authorization.Right;
 
 /**
- * JAR handler doing nothing. Just here so that JAR extension are not failing.
+ * Check rights for webjar extensions.
  * 
  * @version $Id$
- * @since 9.5RC1
+ * @since 17.5.0RC1
  */
-@Component(hints = { "jar", "webjar", "webjar-node" })
+@Component
+@Named(JarExtensionHandler.WEBJAR_NODE)
 @Singleton
-public class MavenBuildJarExtensionHandler extends AbstractExtensionHandler
+public class WebjarNodeExtensionValidator extends AbstractExtensionValidator
 {
-    @Override
-    public void install(LocalExtension localExtension, String namespace, Request request) throws InstallException
-    {
-        // Do nothing
-    }
 
-    @Override
-    public void uninstall(InstalledExtension localExtension, String namespace, Request request)
-        throws UninstallException
+    /**
+     * Default constructor.
+     */
+    public WebjarNodeExtensionValidator()
     {
-        // Do nothing
+        this.entityRight = Right.ADMIN;
     }
 }

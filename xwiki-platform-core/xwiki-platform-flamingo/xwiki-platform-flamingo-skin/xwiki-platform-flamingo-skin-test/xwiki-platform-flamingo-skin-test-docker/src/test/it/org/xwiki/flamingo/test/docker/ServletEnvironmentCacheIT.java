@@ -46,13 +46,16 @@ class ServletEnvironmentCacheIT
             import org.xwiki.environment.internal.ServletEnvironment
             
             def environment = services.component.getInstance(Environment.class)
-            if (!(environment instanceof ServletEnvironment)) {
-                println("Expected ServletEnvironment, got: " + environment.getClass().getName())
-            }
-            if (environment.resourceURLCache == null) {
-                println("Error: Resource URL Cache is null.")
-            } else {
+            // Load the same resource twice to check if we get the same URL instance, which is only the case when it is
+            // stored in a cache.
+            def url1 = environment.getResource('/WEB-INF/xwiki.properties')
+            def url2 = environment.getResource('/WEB-INF/xwiki.properties')
+            if (url1 == null) {
+                println("Error: URL is null")
+            } else if (url1 === url2) {
                 println("Resource URL Cache is initialized.")
+            } else {
+                println("Error: URLs aren't identical, resource URL Cache is NOT initialized.")
             }
             {{/groovy}}
             """, Syntax.XWIKI_2_1));

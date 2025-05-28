@@ -43,7 +43,6 @@ class ServletEnvironmentCacheIT
         assertEquals("<p>Resource URL Cache is initialized.<br/></p>", setup.executeWiki("""
             {{groovy wiki="false"}}
             import org.xwiki.environment.Environment
-            import org.xwiki.environment.internal.ServletEnvironment
             
             def environment = services.component.getInstance(Environment.class)
             // Load the same resource twice to check if we get the same URL instance, which is only the case when it is

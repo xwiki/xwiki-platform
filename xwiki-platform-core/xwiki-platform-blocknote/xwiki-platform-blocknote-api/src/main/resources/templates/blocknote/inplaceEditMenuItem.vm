@@ -18,7 +18,7 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template("menus_macros.vm")
-#if (!$tdoc.isNew() && $services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()) &&
+#if ($isAdvancedUser && !$tdoc.isNew() && $services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()) &&
     $services.edit.document.inPlaceEditingEnabled())
   ## In-place edit mode is enabled only when the preferred editor type is WYSIWYG.
   #getDefaultDocumentEditor($defaultEditMode)

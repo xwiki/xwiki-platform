@@ -18,7 +18,7 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template("menus_macros.vm")
-#if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()) &&
+#if ($isAdvancedUser && $services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()) &&
     $services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id != 'blocknote')
   #submenuitem(
     $doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}$escapetool.url({

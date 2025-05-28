@@ -19,5 +19,12 @@
  */
 
 import { generateConfigVue } from "../../vite.config";
+import react from "@vitejs/plugin-react";
+import { defineConfig, mergeConfig } from "vite";
 
-export default generateConfigVue(import.meta.url);
+export default mergeConfig(
+  generateConfigVue(import.meta.url),
+  defineConfig({
+    plugins: [react()],
+  }),
+);

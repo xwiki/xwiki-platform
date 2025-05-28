@@ -7,7 +7,7 @@
 
 		/* Bundler mode */
 		"moduleResolution": "nodenext",
-		"jsx": "react-jsx",
+		"jsx": "preserve",
 		"isolatedDeclarations": false,
 
 		/* Building */

@@ -52,7 +52,7 @@ import {
   HocuspocusProviderConfiguration,
 } from "@hocuspocus/provider";
 import { ReactivueChild } from "@xwiki/cristal-reactivue";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ShallowRef } from "vue";
 
 type DefaultEditorOptionsType = BlockNoteEditorOptions<

@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 
 /**
  * Update XWiki.WikiMacroParameterClass document with all required informations.
@@ -71,5 +72,6 @@ public class WikiMacroParameterClassDocumentInitializer extends AbstractMandator
         xclass.addBooleanField(PARAMETER_ADVANCED_PROPERTY, "Parameter advanced", PROPERTY_YESNO);
         xclass.addBooleanField(PARAMETER_DEPRECATED_PROPERTY, "Parameter deprecated", PROPERTY_YESNO);
         xclass.addBooleanField(PARAMETER_FEATURE_MANDATORY_PROPERTY, "Parameter feature mandatory", PROPERTY_YESNO);
+        xclass.addNumberField(PARAMETER_ORDER_PROPERTY, "Parameter order property", 30, NumberClass.TYPE_INTEGER);
     }
 }

@@ -232,7 +232,8 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                 }
             }
             contentDescriptor = new DefaultContentDescriptor(macroContentDescription,
-                macroContentVisibility.equals(MACRO_CONTENT_MANDATORY), contentType);
+                macroContentVisibility.equals(MACRO_CONTENT_MANDATORY), contentType)
+                .setOrder(macroDefinition.getIntValue(MACRO_CONTENT_ORDER_PROPERTY, -1));
         }
         return contentDescriptor;
     }
@@ -365,7 +366,9 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                     WikiMacroParameterDescriptor.HIDDEN_PARAMETER_NAME,
                     macroParameter.getIntValue(PARAMETER_HIDDEN_PROPERTY) != 0,
                     WikiMacroParameterDescriptor.DEPRECATED_PARAMETER_NAME,
-                    macroParameter.getIntValue(PARAMETER_DEPRECATED_PROPERTY) != 0
+                    macroParameter.getIntValue(PARAMETER_DEPRECATED_PROPERTY) != 0,
+                    WikiMacroParameterDescriptor.ORDER_PARAMETER_NAME,
+                    macroParameter.getIntValue(PARAMETER_ORDER_PROPERTY, -1)
                 ));
                 if (groupDescriptor != null) {
                     parametersMap.put(WikiMacroParameterDescriptor.GROUP_PARAMETER_NAME, groupDescriptor);

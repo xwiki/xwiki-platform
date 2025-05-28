@@ -39,7 +39,7 @@ import org.xwiki.webjars.WebJarsUrlFactory;
  * Publishes the BlockNote editor as a RequireJS module.
  *
  * @version $Id$
- * @since 17.4.0
+ * @since 17.5.0RC1
  */
 @Component
 @Named(BlockNoteRequireJSModuleUIExtension.ID)

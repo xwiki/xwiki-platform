@@ -35,7 +35,7 @@ import org.xwiki.rendering.syntax.SyntaxContent;
  * Adds support for editing wiki syntax using the BlockNote editor.
  *
  * @version $Id$
- * @since 17.4.0
+ * @since 17.5.0RC1
  */
 @Component
 @Singleton

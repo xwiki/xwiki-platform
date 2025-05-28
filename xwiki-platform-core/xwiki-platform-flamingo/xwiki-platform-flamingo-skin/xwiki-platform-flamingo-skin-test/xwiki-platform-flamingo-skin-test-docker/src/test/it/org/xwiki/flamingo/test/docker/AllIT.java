@@ -224,4 +224,10 @@ public class AllIT
     class NestedSecurityCacheStressIT extends SecurityCacheStressIT
     {
     }
+
+    @Nested
+    @DisplayName("Servlet Environment Cache Tests")
+    class NestedServletEnvironmentCacheIT extends ServletEnvironmentCacheIT
+    {
+    }
 }

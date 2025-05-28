@@ -98,6 +98,12 @@ public class MacroParametersHelper
         Map<String, MacroParameterUINodeGroup> groupMap = new HashMap<>();
         Map<String, List<MacroParameterUINodeGroup>> featureMap = new HashMap<>();
 
+        MacroParameterUINodeGroup defaultOptionalGroup =
+            createOrGetGroup(DEFAULT_GROUP_OPTIONALS_ID, null, false, groupMap, featureMap,
+                childrenMap, macroTranslationKey)
+                .setName(getParameterTranslation("rendering.macro.config.defaultOptionalGroup.name",
+                    "Optional parameters"));
+
         ContentDescriptor contentDescriptor = macroDescriptor.getContentDescriptor();
         if (contentDescriptor != null) {
             MacroParameterUINodeParameter contentNode =
@@ -112,16 +118,12 @@ public class MacroParametersHelper
             if (contentNode.isMandatory()) {
                 mandatoryParameters.add(contentNode);
             } else {
-                optionalParameters.add(contentNode);
+                childrenMap.get(defaultOptionalGroup.getKey()).add(contentNode);
             }
             parametersMap.put(contentNode.getKey(), contentNode);
         }
 
-        MacroParameterUINodeGroup defaultOptionalGroup =
-            createOrGetGroup(DEFAULT_GROUP_OPTIONALS_ID, null, false, groupMap, featureMap,
-                childrenMap, macroTranslationKey)
-            .setName(getParameterTranslation("rendering.macro.config.defaultOptionalGroup.name",
-                "Optional parameters"));
+
 
         for (ParameterDescriptor parameterDescriptor : parameterDescriptors) {
             String parameterTranslationKey =

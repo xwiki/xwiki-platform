@@ -334,6 +334,7 @@ macroSelector.filter.category.placeholder=Select a category...
 
 macroEditor.title=Edit Macro
 macroEditor.more=More
+macroEditor.required=Required
 macroEditor.changeMacro=Change Macro
 macroEditor.submit=Submit
 macroEditor.content=Content

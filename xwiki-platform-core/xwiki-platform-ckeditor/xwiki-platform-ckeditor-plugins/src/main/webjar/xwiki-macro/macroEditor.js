@@ -25,7 +25,7 @@ define('macroEditorTranslationKeys', [], [
   'installRequestFailed',
   'noParameters',
   'content',
-  'more'
+  'required'
 ]);
 
 /**
@@ -112,16 +112,16 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   macroParameterGroupOptionalsTemplate =
-      '<li class="macro-parameter-group-optionals single-choice">' +
+      '<div class="macro-parameter-group-optionals single-choice">' +
         '<ul class="nav nav-tabs" role="tablist">' +
           '<li class="active" role="presentation">' +
             '<a class="macro-parameter-group-name" href="#groupId" aria-controls="groupId" role="tab"></a>' +
           '</li>' +
         '</ul>' +
         '<div class="tab-content">' +
-          '<ul id="groupId" class="macro-parameter-group-members tab-pane active" role="tabpanel"></ul>' +
+          '<div id="groupId" class="macro-parameter-group-members tab-pane active" role="tabpanel"></div>' +
         '</div>' +
-      '</li>',
+      '</div>',
 
   displayOptionalNodes = function(parametersMap, optionalNodeList) {
     let output = $(macroParameterGroupOptionalsTemplate);
@@ -146,16 +146,16 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   macroParameterGroupTemplate = 
-    '<li class="macro-parameter-group multiple-choice">' +
+    '<div class="macro-parameter-group multiple-choice">' +
       '<ul class="nav nav-tabs" role="tablist">' +
         '<li class="active" role="presentation">' +
           '<a class="macro-parameter-group-name" href="#groupId" aria-controls="groupId" role="tab"></a>' +
         '</li>' +
       '</ul>' +
       '<div class="tab-content">' +
-        '<ul id="groupId" class="macro-parameter-group-members tab-pane active" role="tabpanel"></ul>' +
+        '<div id="groupId" class="macro-parameter-group-members tab-pane active" role="tabpanel"></div>' +
       '</div>' +
-    '</li>',
+    '</div>',
 
   displayGroup = function(parametersMap, groupNode) {
     if (groupNode.featureOnly) {
@@ -175,36 +175,36 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   macroFeatureContainerTemplate =
-    '<div class="panel-group" id="accordion-feature-{{featureName}}" role="tablist" aria-multiselectable="true"></div>',
-
-  macroFeatureContentTemplate =
-    '<div class="panel panel-default">' +
-      '<div class="panel-heading" role="tab" id="feature-heading-{{parameterId}}">' +
-        '<h4 class="panel-title">' +
-          '<a role="button" data-toggle="collapse" data-parent="#accordion-feature-{{featureName}}" ' +
-      'href="#feature-collapse-{{parameterId}}" ' +
-          'aria-expanded="true" aria-controls="feature-collapse-{{parameterId}}"></a>' +
-        '</h4>' +
-      '</div>' +
-      '<div id="feature-collapse-{{parameterId}}" class="panel-collapse collapse" role="tabpanel"' +
-      ' aria-labelledby="feature-heading-{{parameterId}}">' +
-        '<div class="panel-body"></div>' +
-      '</div>' +
+    '<div class="feature-container" id="feature-{{featureName}}">' +
+      '<div class="feature-title">{{featureTitle}}</div>' +
     '</div>',
 
-  displayFeature = function (parametersMap, featureNode, isMandatory) {
-    let featureName = featureNode.featureName;
-    let output = $(macroFeatureContainerTemplate.replaceAll("{{featureName}}", featureName));
+  macroFeatureContentTemplate =
+    '<div class="feature-parameter">' +
+      '<div class="feature-choice">' +
+        '<input type="radio" name="feature-radio-{{featureName}}" value="{{parameterId}}" />' +
+        '<span class="feature-choice-name">{{parameterName}}</span>' +
+      '</div>' +
+      '<div class="feature-choice-body"></div>' +
+    '</div>',
+
+  displayFeature = function (parametersMap, featureNode) {
+    let output = $(macroFeatureContainerTemplate
+        .replaceAll("{{featureName}}", featureNode.id)
+        .replaceAll("{{featureTitle}}", featureNode.featureName));
     output.append(featureNode.children.map(nodeKey => {
       let paramNode = parametersMap[nodeKey];
       let parameterId = paramNode.id;
       let nodeOutput = $(macroFeatureContentTemplate
-          .replaceAll("{{featureName}}", featureName)
-          .replaceAll("{{parameterId}}", parameterId));
-      return nodeOutput
-          .find('.panel-body')
-          .append(displayMacroParameterTreeNode(parametersMap, paramNode, isMandatory));
+          .replaceAll("{{featureName}}", featureNode.id)
+          .replaceAll("{{parameterId}}", parameterId)
+          .replaceAll("{{parameterName}}", paramNode.name));
+      nodeOutput
+          .find('.feature-choice-body')
+          .append(displayMacroParameterTreeNode(parametersMap, paramNode));
+      return nodeOutput;
     }));
+    return output;
   },
 
   // The given node can be a group or a parameter.
@@ -215,11 +215,18 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       'aria-controls': id
     }).text(node.name);
     // If the given node is a parameter (no children) then we handle it as a group with a single parameter.
-    var childNodes = node.children || [node.key];
+    let childNodes = node.children || [node.key];
+    let tabOutput;
+    if (node.featureOnly) {
+      tabOutput = displayFeature(parametersMap, node);
+    } else {
+      tabOutput = childNodes.map(nodeKey =>
+          displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey]));
+    }
+
     tabPanel
         .attr('id', id)
-        .append(childNodes.map(nodeKey =>
-            displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey])));
+        .append(tabOutput);
     // Hide the parameter name if there is only one child node and its name matches the name used on the tab.
     if (childNodes.length === 1 && childNodes[0] && parametersMap[childNodes[0]].name === node.name) {
       tabPanel.find('.macro-parameter-name').hide();
@@ -234,15 +241,21 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   macroParameterTemplate =
-    '<li class="macro-parameter">' +
-      '<div class="macro-parameter-name"></div>' +
+    '<div class="macro-parameter">' +
+      '<div class="macro-parameter-name-container">' +
+        '<span class="macro-parameter-name"></span>' +
+        '<span class="mandatory"></span>' +
+      '</div>' +
       '<div class="macro-parameter-description"></div>' +
-    '</li>',
+    '</div>',
 
   displayMacroParameter = function(parameter) {
     var output = $(macroParameterTemplate);
     output.attr('data-id', parameter.id).attr('data-type', parameter.displayType);
     output.find('.macro-parameter-name').text(parameter.name);
+    if (parameter.mandatory) {
+      output.find('.mandatory').text('(' + translations.get('required') + ')');
+    }
     output.find('.macro-parameter-description').text(parameter.description);
     output.toggleClass('mandatory', !!parameter.mandatory);
     output.toggleClass('hidden', !!parameter.hidden);
@@ -317,11 +330,13 @@ define(
 {
   'use strict';
 
-  var macroEditorTemplate =
+  const macroEditorTemplate =
     '<div>' +
-      '<div class="macro-name"></div>' +
-      '<div class="macro-description"></div>' +
-      '<ul class="macro-parameters"></ul>' +
+      '<div class="macro-title jumbotron">' +
+        '<div class="macro-name"></div>' +
+        '<div class="macro-description"></div>' +
+      '</div>' +
+      '<div class="macro-parameters"></div>' +
     '</div>',
 
   createMacroEditor = function(macroCall, macroDescriptorData) {

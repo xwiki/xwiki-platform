@@ -293,8 +293,8 @@ configs.forEach(
         // Assert that at some point to page content is reloaded with a more recent
         // version from the server (the counter is incremented by one at each
         // request).
-        const textContent = await page.locator(".offlinecount").textContent();
-        expect(textContent).toBe(`${parseInt(textBefore) + 1}`);
+        const textContent = page.locator(".offlinecount");
+        await expect(textContent).toContainText(`${parseInt(textBefore) + 1}`);
       });
     }
   },

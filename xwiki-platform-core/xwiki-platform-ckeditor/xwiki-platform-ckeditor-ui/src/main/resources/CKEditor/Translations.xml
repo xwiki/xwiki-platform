@@ -94,6 +94,7 @@ ckeditor.plugin.office.importer.noUploadURL=File upload URL is not configured.
 ckeditor.plugin.office.importer.failedToLoadForm=Failed to load the form.
 
 ckeditor.plugin.resource.notSpecified=The {0} is not specified.
+ckeditor.plugin.resource.selectValue=Please select a value for the link location.
 ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
 ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
 ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.

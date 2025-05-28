@@ -52,6 +52,29 @@
   #setVariable("$result" $location)
 #end
 
+#macro (handleValidationRequest)
+  #set ($requestedReference = $services.model.resolveDocument($request.input, 'default'))
+  #if ($xwiki.exists($requestedReference))
+    #set ($answer = {
+      'validated': true,
+      'validation': 'exists',
+      'input': $request.input
+    })
+  #elseif ($services.modelvalidation.isValid($requestedReference))
+    #set ($answer = {
+      'validated': true,
+      'validation': 'name',
+      'input': $request.input
+    })
+  #else
+    #set ($answer = {
+      'validated': false,
+      'input': $request.input
+    })
+  #end
+  #jsonResponse($answer)
+#end
+
 #macro (handleSuggestionRequest)
   #set ($isAdvanced = $services.user.properties.type == 'ADVANCED')
   #set ($result = [])
@@ -82,8 +105,12 @@
 #end
 {{/velocity}}
 {{velocity}}
-#if ($xcontext.action == 'get' &amp;&amp; $request.input != '')
-#handleSuggestionRequest()
+#if ($xcontext.action == 'get' &amp;&amp; $request.input != '' &amp;&amp; $request.action != '')
+  #if ($request.action == 'suggest')
+    #handleSuggestionRequest()
+  #elseif ($request.action == 'validate')
+    #handleValidationRequest()
+  #end
 #else
 Technical page to help using the name strategy when suggesting links.
 #end

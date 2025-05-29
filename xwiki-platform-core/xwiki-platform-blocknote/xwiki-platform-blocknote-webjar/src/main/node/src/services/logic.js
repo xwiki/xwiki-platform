@@ -19,7 +19,7 @@
  */
 import { createApp, reactive } from "vue";
 import XWikiBlockNote from "@/components/XWikiBlockNote.vue";
-import { container } from "@/services/container.js";
+import { container } from "@/services/container";
 
 /**
  * Encapsulates the logic of a BlockNote instance, exposing the API that can be used to interact with it.

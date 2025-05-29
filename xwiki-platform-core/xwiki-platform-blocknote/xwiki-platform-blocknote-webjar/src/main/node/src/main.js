@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Factory } from "@/services/factory.js";
-import "@/services/inplace.js";
-import "@/services/skin.js";
+import { Factory } from "@/services/factory";
+import "@/services/inplace";
+import "@/services/skin";
 
 const factory = new Factory();
 

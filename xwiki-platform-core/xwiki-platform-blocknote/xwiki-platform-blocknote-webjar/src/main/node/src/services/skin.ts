@@ -18,6 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { container } from "@/services/container.js";
-import { DefaultSkinManager } from "@xwiki/cristal-skin";
+import { SkinManager } from "@xwiki/cristal-api";
+
+class DefaultSkinManager implements SkinManager {
+}
 
 container.bind("SkinManager").to(DefaultSkinManager);

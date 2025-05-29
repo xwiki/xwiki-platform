@@ -19,8 +19,8 @@
       "DOM",
       "DOM.Iterable"
     ],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -37,7 +37,6 @@
     "declaration": true,
     "isolatedModules": true,
     "isolatedDeclarations": true,
-    "jsx": "react-jsx",
     "resolveJsonModule": true,
     "strict": true,
     "noImplicitOverride": true

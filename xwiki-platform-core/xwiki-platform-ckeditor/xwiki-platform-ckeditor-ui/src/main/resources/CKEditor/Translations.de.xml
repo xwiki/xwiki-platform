@@ -87,6 +87,7 @@ ckeditor.plugin.office.importer.fail=Office Import fehlgeschlagen.
 ckeditor.plugin.office.importer.noUploadURL=Datei-Upload-URL ist nicht konfiguriert.
 ckeditor.plugin.office.importer.failedToLoadForm=Fehler beim Laden des Formulars.
 ckeditor.plugin.resource.notSpecified={0} ist nicht angegeben.
+ckeditor.plugin.resource.selectValue=Einen Wert für den Ort des Links wählen.
 ckeditor.plugin.save.leaveConfirmationMessage=Es existieren ungespeicherte Änderungen. Wollen Sie diese verwerfen?
 ckeditor.plugin.save.failed=Der Inhalt kann nicht gespeichert werden aufgrund eines internen Fehlers im CKEditor. Sie sollten versuchen wichtige Änderungen zu kopieren und den Editor neu zu laden.
 ckeditor.plugin.source.conversionFailed=Fehler beim Ausführen der Konvertierung.

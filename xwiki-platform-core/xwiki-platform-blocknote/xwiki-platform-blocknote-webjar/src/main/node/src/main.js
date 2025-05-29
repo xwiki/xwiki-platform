@@ -32,6 +32,7 @@ function init(event, data) {
     .forEach((host) => factory.create(host));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 require(["jquery"], ($) => {
   $(document).on("xwiki:dom:updated", init);
   $(init);

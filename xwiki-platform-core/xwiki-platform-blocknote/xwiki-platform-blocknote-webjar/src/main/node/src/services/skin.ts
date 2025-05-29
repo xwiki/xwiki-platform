@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { container } from "@/services/container";
-import { SkinManager } from "@xwiki/cristal-api";
+import type { SkinManager } from "@xwiki/cristal-api";
 
 class DefaultSkinManager implements SkinManager {
 }

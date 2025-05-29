@@ -50,13 +50,22 @@ export default {
 
   props: {
     // The key used to submit the edited content.
-    name: String,
+    name: {
+      type: String,
+      default: null,
+    },
 
     // The edited content.
-    value: String,
+    value: {
+      type: String,
+      default: "",
+    },
 
     // The ID of the form this editor is associated with.
-    form: String,
+    form: {
+      type: String,
+      default: null,
+    },
 
     // Prevent the edited content and the conversion metadata from being submitted.
     disabled: Boolean,

@@ -22,7 +22,6 @@ import { fileURLToPath, URL } from "node:url";
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import react from "@vitejs/plugin-react";
 import { dirname, resolve } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -36,7 +35,6 @@ export default defineConfig({
       formats: ["es"],
     },
     sourcemap: true,
-    minify: false,
     rollupOptions: {
       external: ["jquery", "vue", "vue-i18n"],
       output: {
@@ -50,10 +48,18 @@ export default defineConfig({
     // define process to avoid runtime error with jquery
     "process.env": {},
   },
-  plugins: [react(), vue()],
+  plugins: [vue()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
+  esbuild: {
+    tsconfigRaw: {
+      compilerOptions: {
+        // Workaround for a vite bug (see https://github.com/vitejs/vite/issues/13736)
+        experimentalDecorators: true,
+      },
     },
   },
 });

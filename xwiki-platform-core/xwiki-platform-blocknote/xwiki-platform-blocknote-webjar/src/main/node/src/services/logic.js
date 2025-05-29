@@ -39,6 +39,7 @@ export class Logic {
 
     const skinManager = container.get("SkinManager");
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const logic = this;
     this._vueApp = createApp(XWikiBlockNote, this._data)
       .mixin({

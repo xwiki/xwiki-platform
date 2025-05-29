@@ -24,6 +24,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "jsx": "preserve",
     "noImplicitAny": true,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": false,

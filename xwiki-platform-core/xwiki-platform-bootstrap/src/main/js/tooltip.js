@@ -99,6 +99,7 @@
   }
 
   function sanitizeHtml(unsafeHtml, whiteList, sanitizeFn) {
+    let doc = null
     if (unsafeHtml.length === 0) {
       return unsafeHtml
     }
@@ -107,16 +108,21 @@
       return sanitizeFn(unsafeHtml)
     }
 
-    // IE 8 and below don't support createHTMLDocument
-    if (!document.implementation || !document.implementation.createHTMLDocument) {
-      return unsafeHtml
+    try {
+        doc = new DOMParser().parseFromString(unsafeHtml, 'text/html');
+    } catch (_) {}
+    if (!doc || !doc.documentElement) {
+      // IE 8 and below don't support createHTMLDocument
+      if (!document.implementation || !(document.implementation instanceof DOMImplementation) || document.implementation.createHTMLDocument === undefined) {
+        throw new Error('Could not sanitize CVE-2025-1647');
+      }
+      doc = document.implementation.createHTMLDocument('sanitization')
+      doc.body.innerHTML = unsafeHtml
     }
-
-    var createdDocument = document.implementation.createHTMLDocument('sanitization')
-    createdDocument.body.innerHTML = unsafeHtml
+    const body = doc.body || doc.documentElement;
 
     var whitelistKeys = $.map(whiteList, function (el, i) { return i })
-    var elements = $(createdDocument.body).find('*')
+    var elements = $(body).find('*')
 
     for (var i = 0, len = elements.length; i < len; i++) {
       var el = elements[i]
@@ -138,7 +144,7 @@
       }
     }
 
-    return createdDocument.body.innerHTML
+    return body.innerHTML
   }
 
   // TOOLTIP PUBLIC CLASS DEFINITION

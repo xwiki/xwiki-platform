@@ -1,5 +1,5 @@
 /*
- * See the NOTICE file distributed with this work for additional
+ * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,10 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { container } from "@/services/container";
-import type { SkinManager } from "@xwiki/cristal-api";
+import { ModelReferenceSerializer, ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";
+import { Container, inject, injectable } from "inversify";
 
-class DefaultSkinManager implements SkinManager {
+@injectable("Singleton")
+export class DefaultModelReferenceSerializerProvider implements ModelReferenceSerializerProvider {
+  public static bind(container: Container): void {
+    container.bind("ModelReferenceSerializerProvider").to(DefaultModelReferenceSerializerProvider).inSingletonScope();
+  }
+
+  constructor(@inject("Container") private readonly container: Container) {}
+
+  public get(type?: string): ModelReferenceSerializer | undefined {
+    return this.container.get("ModelReferenceSerializer", { name: type || "XWiki" });
+  }
 }
-
-container.bind("SkinManager").to(DefaultSkinManager);

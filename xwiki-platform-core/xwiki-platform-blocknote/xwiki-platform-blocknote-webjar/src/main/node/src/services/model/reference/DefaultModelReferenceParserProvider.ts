@@ -1,5 +1,5 @@
 /*
- * See the NOTICE file distributed with this work for additional
+ * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,24 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Factory } from "@/services/Factory";
-import "@/services/inplace";
+import { ModelReferenceParser, ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
+import { Container, inject, injectable } from "inversify";
 
-const factory = new Factory();
+@injectable("Singleton")
+export class DefaultModelReferenceParserProvider implements ModelReferenceParserProvider {
+  public static bind(container: Container): void {
+    container.bind("ModelReferenceParserProvider").to(DefaultModelReferenceParserProvider).inSingletonScope();
+  }
 
-define("xwiki-blocknote", [], () => factory);
+  constructor(@inject("Container") private readonly container: Container) {}
 
-function init(event, data) {
-  const containers = data?.elements || [document];
-  containers
-    .flatMap((container) => [...container.querySelectorAll(".xwiki-blocknote-wrapper")])
-    .forEach((host) => factory.create(host));
+  get(type?: string): ModelReferenceParser | undefined {
+    return this.container.get("ModelReferenceParser", { name: type || "XWiki" });
+  }
 }
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-require(["jquery"], ($) => {
-  $(document).on("xwiki:dom:updated", init);
-  $(init);
-});
-
-export { factory };

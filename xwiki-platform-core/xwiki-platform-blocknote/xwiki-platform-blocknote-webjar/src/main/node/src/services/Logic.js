@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { createApp, reactive } from "vue";
 import XWikiBlockNote from "@/components/XWikiBlockNote.vue";
-import { container } from "@/services/container";
+import {container} from "@/services/container";
+import {createApp, reactive} from "vue";
 
 /**
  * Encapsulates the logic of a BlockNote instance, exposing the API that can be used to interact with it.

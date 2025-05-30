@@ -17,8 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { ComponentInit as ModelReferenceXWiki } from "@xwiki/cristal-model-reference-xwiki";
 import { Container } from "inversify";
+import { DefaultDocumentService } from "./document/DefaultDocumentService";
+import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
+import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
+import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
+import { DefaultRemoteURLParserProvider } from "./model/url/DefaultRemoteURLParserProvider";
+import { DefaultRemoteURLSerializerProvider } from "./model/url/DefaultRemoteURLSerializerProvider";
+import { XWikiRemoteURLParser } from "./model/url/XWikiRemoteURLParser";
+import { XWikiRemoteURLSerializer } from "./model/url/XWikiRemoteURLSerializer";
+import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 
 const container = new Container();
+container.bind("Container").toConstantValue(container);
+
+DefaultDocumentService.bind(container);
+
+DefaultModelReferenceParserProvider.bind(container);
+DefaultModelReferenceSerializerProvider.bind(container);
+DefaultModelReferenceHandlerProvider.bind(container);
+new ModelReferenceXWiki(container);
+
+DefaultRemoteURLParserProvider.bind(container);
+XWikiRemoteURLParser.bind(container);
+DefaultRemoteURLSerializerProvider.bind(container);
+XWikiRemoteURLSerializer.bind(container);
+
+DefaultSkinManager.bind(container);
 
 export { container };

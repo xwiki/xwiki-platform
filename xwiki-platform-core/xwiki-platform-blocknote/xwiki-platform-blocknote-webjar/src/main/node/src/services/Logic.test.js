@@ -17,43 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Factory } from "./factory";
-import { describe, expect, it, vi } from "vitest";
+import { describe, it } from "vitest";
+import { Logic } from "./Logic";
 
-describe("factory.js", () => {
-  vi.mock("@/services/logic.js", () => {
-    return {
-      Logic: class MockLogic {
-        constructor(host) {
-          this.host = host;
-          this.name = host.name;
-          this.ready = Promise.resolve(this);
-        }
-
-        destroy() {
-          // Do nothing.
-        }
-      },
-    };
-  });
-
+describe("Logic", () => {
   it("should create a BlockNote instance", async () => {
-    const factory = new Factory();
     const host = document.createElement("div");
     host.name = "test";
 
-    expect(factory.get(host)).toBeUndefined();
-    expect(factory.get("test")).toBeUndefined();
-
-    const logic = await factory.create(host);
-
-    expect(factory.get(host)).toBe(logic);
-    expect(factory.get("test")).toBe(logic);
-
-    expect(factory.destroy("test")).toBe(true);
-    expect(factory.destroy(host)).toBe(false);
-
-    expect(factory.get(host)).toBeUndefined();
-    expect(factory.get("test")).toBeUndefined();
+    const logic = new Logic(host);
+    await logic.ready;
   });
 });

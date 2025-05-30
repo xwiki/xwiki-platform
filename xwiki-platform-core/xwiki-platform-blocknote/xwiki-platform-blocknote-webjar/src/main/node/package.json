@@ -10,7 +10,12 @@
   },
   "dependencies": {
     "@xwiki/cristal-api": "0.17.0",
+    "@xwiki/cristal-document-api": "0.17.0",
     "@xwiki/cristal-editors-blocknote-headless": "0.17.0",
+    "@xwiki/cristal-model-api": "0.17.0",
+    "@xwiki/cristal-model-reference-api": "0.17.0",
+    "@xwiki/cristal-model-reference-xwiki": "0.17.0",
+    "@xwiki/cristal-model-remote-url-api": "0.17.0",
     "@xwiki/cristal-uniast": "0.19.0",
     "inversify": "7.5.1",
     "vue": "3.5.13",

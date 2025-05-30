@@ -20,15 +20,17 @@
 <template>
   <div class="xwiki-blocknote">
     <textarea :name :value :form :disabled @input="$emit('update:modelValue', $event.target.value)"></textarea>
-    <BlocknoteEditor
-      ref="editor"
-      :editor-props
-      :editor-content
-      :container
-      :skin-manager
-      :realtime-server-u-r-l
-      @blocknote-save="updateModelValue"
-    ></BlocknoteEditor>
+    <suspense>
+      <BlocknoteEditor
+        ref="editor"
+        :editor-props
+        :editor-content
+        :container
+        :skin-manager
+        :realtime-server-u-r-l
+        @blocknote-save="updateModelValue"
+      ></BlocknoteEditor>
+    </suspense>
     <input v-if="name" type="hidden" name="RequiresConversion" :value="name" :form :disabled />
     <input v-if="name" type="hidden" :name="name + '_inputSyntax'" :value="inputSyntax" :form :disabled />
     <input v-if="name" type="hidden" :name="name + '_outputSyntax'" :value="outputSyntax" :form :disabled />
@@ -36,8 +38,8 @@
 </template>
 
 <script>
-import { MarkdownToUniAstConverter, createConverterContext } from "@xwiki/cristal-uniast";
 import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
+import { MarkdownToUniAstConverter, createConverterContext } from "@xwiki/cristal-uniast";
 
 export default {
   name: "XWikiBlockNote",

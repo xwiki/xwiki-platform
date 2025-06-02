@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@xwiki/cristal-api": "0.17.0",
+    "@xwiki/cristal-authentication-api": "0.17.0",
     "@xwiki/cristal-document-api": "0.17.0",
     "@xwiki/cristal-editors-blocknote-headless": "0.17.0",
+    "@xwiki/cristal-link-suggest-api": "0.17.0",
     "@xwiki/cristal-model-api": "0.17.0",
     "@xwiki/cristal-model-reference-api": "0.17.0",
     "@xwiki/cristal-model-reference-xwiki": "0.17.0",

@@ -77,7 +77,7 @@ solr.sortOrder.desc=Descending
 solr.options=Show:
 solr.options.highlight=Highlighting
 solr.options.highlight.title=Display an extract of what was matched in each result
-solr.options.facet=Facets
+solr.options.facet=Filters
 solr.options.facet.title=Allow extra filtering of the result
 
 solr.result.language=Language
@@ -87,8 +87,8 @@ solr.result.mediaType=File of type {0}
 solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
 solr.result.highlightAll=Highlight all matches
 
-solr.facets.title=Refine your search
-solr.facets.hint=Select a category and activate filters on the current results
+solr.facets.title=Filter your search
+solr.facets.hint=Select a category and filter the current results on different facets.
 solr.facets.resetAll=Reset all
 solr.facets.expandAll=Expand all
 solr.facets.collapseAll=Collapse all

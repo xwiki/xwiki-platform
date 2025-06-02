@@ -316,6 +316,15 @@
           'input[data-query-name="' + queryFieldName + '"]');
       });
     });
+    // Enhance search result sorting
+    document.querySelectorAll('.search-results-sort select#sort-by-input, ' +
+     '.search-results-sort input#sort-order-input').forEach(function (sortInput){
+      sortInput.addEventListener('change', function() {
+        pushSearchUIState(this.form.getAttribute('action') + "?" +
+          new URLSearchParams(new FormData(this.form)).toString(),
+          'input[data-query-name="' + this.getAttribute('name') + '"]');
+      });
+     });
     
     $('.search-result-highlightAll').each(enhanceSearchResultHighlights);
     $('.search-facets').each(enhanceSearchFacets);
@@ -803,6 +812,7 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 }
 
 .search-facet-body .itemName,
+.search-facet-body .itemNameempty,
 .search-facet-body .facet-value-toggler,
 .search-facet-body .more {
   /* Remove link styling */

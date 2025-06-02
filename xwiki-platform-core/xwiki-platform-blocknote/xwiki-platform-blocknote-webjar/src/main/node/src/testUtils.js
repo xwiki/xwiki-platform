@@ -17,20 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Logic } from "@/services/Logic";
-import { mockI18n } from "@/testUtils";
-import { describe, it } from "vitest";
+import { vi } from "vitest";
+import { useI18n } from "vue-i18n";
 
-define("xwiki-l10n!xwiki-blocknote-translation-keys", () => {});
+const modules = {};
+global.define = (id, deps, factory) => {
+  if (typeof factory === "function") {
+    modules[id] = factory(...getModules(deps));
+  } else {
+    modules[id] = factory;
+  }
+};
+global.require = (deps, callback) => {
+  callback(...getModules(deps));
+};
+function getModules(deps) {
+  return deps.map((dep) => modules[dep]);
+}
 
-describe("Logic", () => {
-  it("should create a BlockNote instance", async () => {
-    mockI18n();
-
-    const host = document.createElement("div");
-    host.name = "test";
-
-    const logic = new Logic(host);
-    await logic.ready;
+function mockI18n() {
+  vi.mock("vue-i18n");
+  useI18n.mockReturnValue({
+    t: (tKey) => tKey,
   });
-});
+}
+
+export { mockI18n };

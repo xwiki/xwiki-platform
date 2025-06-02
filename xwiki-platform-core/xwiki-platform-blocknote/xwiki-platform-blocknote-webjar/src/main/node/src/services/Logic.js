@@ -18,8 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import XWikiBlockNote from "@/components/XWikiBlockNote.vue";
-import {container} from "@/services/container";
-import {createApp, reactive} from "vue";
+import { container } from "@/services/container";
+import { i18nResolver } from "@/services/i18nResolver";
+import { createApp, reactive } from "vue";
+import { createI18n } from "vue-i18n";
 
 /**
  * Encapsulates the logic of a BlockNote instance, exposing the API that can be used to interact with it.
@@ -39,6 +41,11 @@ export class Logic {
 
     const skinManager = container.get("SkinManager");
 
+    const i18n = createI18n({ legacy: false });
+    this._i18nPromise = i18nResolver(i18n)
+      .then(() => i18n)
+      .catch(() => i18n);
+
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const logic = this;
     this._vueApp = createApp(XWikiBlockNote, this._data)
@@ -49,7 +56,8 @@ export class Logic {
         },
       })
       .provide("logic", this)
-      .provide("container", container);
+      .provide("container", container)
+      .use(i18n);
 
     skinManager.loadDesignSystem(this._vueApp, container);
 
@@ -87,6 +95,18 @@ export class Logic {
 
   get realtimeServerURL() {
     return this._realtimeServerURL;
+  }
+
+  /**
+   * Returns a translation only once the translations have been loaded from the server.
+   *
+   * @param {String} key the translation key to translate
+   * @param {...*} args the arguments to pass to the translation function
+   */
+  async translate(key, ...args) {
+    // Make sure that the translations are loaded from the server before translating.
+    const i18n = await this._i18nPromise;
+    return i18n.global.t(key, args);
   }
 
   /**

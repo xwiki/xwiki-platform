@@ -80,6 +80,7 @@ public abstract class AbstractExtensionDistributionStep extends AbstractDistribu
             ScriptExtensionRewriter rewriter = new ScriptExtensionRewriter();
             rewriter.installExtensionTypeOnRootNamespace("jar");
             rewriter.installExtensionTypeOnRootNamespace("webjar");
+            rewriter.installExtensionTypeOnRootNamespace("webjar-node");
             installRequest.setRewriter(rewriter);
         }
 

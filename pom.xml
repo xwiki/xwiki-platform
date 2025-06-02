@@ -123,10 +123,6 @@
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.17.0.0</oracle.version>
-
-    <!-- Versions of Node related tools -->
-    <node.version>v22.16.0</node.version>
-    <npm.version>11.4.1</npm.version>
   </properties>
   <scm>
     <tag>HEAD</tag>
@@ -1199,6 +1195,11 @@
         <artifactId>xwiki-commons-tool-webjar-handlers</artifactId>
         <version>${commons.version}</version>
       </extension>
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-webjar-node-handlers</artifactId>
+        <version>${commons.version}</version>
+      </extension>
       <!-- Needed to add support for the "xar" packaging -->
       <extension>
         <groupId>org.xwiki.commons</groupId>
@@ -1701,7 +1702,7 @@
                 <!-- Forbid JAR extensions to have XAR runtime dependencies -->
                 <bannedDependencyType>
                   <dependencyType>xar</dependencyType>
-                  <projectPackaging>jar|webjar</projectPackaging>
+                  <projectPackaging>jar|webjar|webjar-node</projectPackaging>
                   <!-- Integration test modules are never going to be installed as extension, and they need to depend
                        on XAR modules -->
                   <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>

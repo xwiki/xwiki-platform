@@ -34,7 +34,7 @@
     "@vue/eslint-config-typescript": "14.5.0",
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "0.7.0",
-    "eslint": "9.23.0",
+    "eslint": "9.28.0",
     "eslint-plugin-vue": "10.0.0",
     "flush-promises": "1.0.2",
     "jiti": "2.4.2",

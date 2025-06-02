@@ -1,5 +1,26 @@
 # @xwiki/cristal-web
 
+## 0.18.0
+
+### Minor Changes
+
+- Cristal 0.18 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-authentication-github@0.18.0
+  - @xwiki/cristal-authentication-nextcloud@0.18.0
+  - @xwiki/cristal-authentication-xwiki@0.18.0
+  - @xwiki/cristal-browser-default@0.18.0
+  - @xwiki/cristal-configuration-api@0.18.0
+  - @xwiki/cristal-configuration-web@0.18.0
+  - @xwiki/cristal-navigation-tree-default@0.18.0
+  - @xwiki/cristal-navigation-tree-nextcloud@0.18.0
+  - @xwiki/cristal-navigation-tree-xwiki@0.18.0
+  - @xwiki/cristal-settings-browser@0.18.0
+  - @xwiki/cristal-lib@0.18.0
+
 ## 0.17.0
 
 ### Minor Changes

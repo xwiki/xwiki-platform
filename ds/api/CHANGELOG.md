@@ -1,5 +1,18 @@
 # @xwiki/cristal-dsapi
 
+## 0.18.0
+
+### Minor Changes
+
+- Cristal 0.18 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.18.0
+  - @xwiki/cristal-model-api@0.18.0
+  - @xwiki/cristal-navigation-tree-api@0.18.0
+
 ## 0.17.0
 
 ### Minor Changes

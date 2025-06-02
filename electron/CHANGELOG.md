@@ -1,5 +1,17 @@
 # @xwiki/cristal-electron
 
+## 0.18.0
+
+### Minor Changes
+
+- Cristal 0.18 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-electron-storage@0.18.0
+  - @xwiki/cristal-lib@0.18.0
+
 ## 0.17.0
 
 ### Minor Changes

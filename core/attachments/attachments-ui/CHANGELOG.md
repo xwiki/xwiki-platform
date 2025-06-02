@@ -1,5 +1,28 @@
 # @xwiki/cristal-attachments-ui
 
+## 0.18.0
+
+### Minor Changes
+
+- Cristal 0.18 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.18.0
+  - @xwiki/cristal-alerts-api@0.18.0
+  - @xwiki/cristal-attachments-api@0.18.0
+  - @xwiki/cristal-date-ui@0.18.0
+  - @xwiki/cristal-document-api@0.18.0
+  - @xwiki/cristal-extra-tabs-api@0.18.0
+  - @xwiki/cristal-file-preview-ui@0.18.0
+  - @xwiki/cristal-info-actions-api@0.18.0
+  - @xwiki/cristal-model-api@0.18.0
+  - @xwiki/cristal-model-click-listener@0.18.0
+  - @xwiki/cristal-model-reference-api@0.18.0
+  - @xwiki/cristal-uiextension-api@0.18.0
+  - @xwiki/cristal-user-ui@0.18.0
+
 ## 0.17.0
 
 ### Minor Changes

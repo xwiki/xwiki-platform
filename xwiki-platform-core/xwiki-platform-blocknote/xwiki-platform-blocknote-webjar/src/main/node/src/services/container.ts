@@ -19,7 +19,11 @@
  */
 import { ComponentInit as ModelReferenceXWiki } from "@xwiki/cristal-model-reference-xwiki";
 import { Container } from "inversify";
+import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
+import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
+import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
+import { XWikiLinkSuggestService } from "./link/XWikiLinkSuggestService";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
@@ -43,6 +47,12 @@ DefaultRemoteURLParserProvider.bind(container);
 XWikiRemoteURLParser.bind(container);
 DefaultRemoteURLSerializerProvider.bind(container);
 XWikiRemoteURLSerializer.bind(container);
+
+DefaultAuthenticationManagerProvider.bind(container);
+XWikiAuthenticationManager.bind(container);
+
+DefaultLinkSuggestServiceProvider.bind(container);
+XWikiLinkSuggestService.bind(container);
 
 DefaultSkinManager.bind(container);
 

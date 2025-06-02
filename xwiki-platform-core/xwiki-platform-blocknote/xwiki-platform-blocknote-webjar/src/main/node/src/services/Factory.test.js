@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {describe, expect, it, vi} from "vitest";
-import {Factory} from "./Factory";
+import { Factory } from "@/services/Factory";
+import { describe, expect, it, vi } from "vitest";
 
 describe("Factory", () => {
   vi.mock("@/services/Logic", () => {

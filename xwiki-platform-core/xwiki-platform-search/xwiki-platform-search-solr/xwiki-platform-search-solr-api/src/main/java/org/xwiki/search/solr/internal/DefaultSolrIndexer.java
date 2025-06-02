@@ -20,7 +20,9 @@
 package org.xwiki.search.solr.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -482,6 +484,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     {
         int length = 0;
 
+        List<SolrInputDocument> solrDocuments = new ArrayList<>();
+
         for (IndexQueueEntry batchEntry = queueEntry; batchEntry != null; batchEntry = this.indexQueue.poll()) {
             this.indexQueueRemovalCounter.incrementAndGet();
 
@@ -503,18 +507,20 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                     case INDEX:
                         XWikiSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
                         if (solrDocument != null) {
-                            solrInstance.add(solrDocument);
+                            solrDocuments.add(solrDocument);
                             length += solrDocument.getLength();
                             ++this.batchSize;
                         }
                         break;
                     case DELETE:
+                        // Ensure that all queued additions are processed before any deletions are processed.
+                        flushDocuments(solrDocuments);
                         applyDeletion(batchEntry);
 
                         ++this.batchSize;
                         break;
                     case READY_MARKER:
-                        commit();
+                        commit(solrDocuments);
                         batchEntry.readyIndicator.complete(null);
                         length = 0;
                         break;
@@ -530,14 +536,14 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             // Commit the index changes so that they become available to queries. This is a costly operation and that is
             // the reason why we perform it at the end of the batch.
             if (shouldCommit(length, this.batchSize)) {
-                commit();
+                commit(solrDocuments);
                 length = 0;
             }
         }
 
         // Commit what's left
         if (this.batchSize > 0) {
-            commit();
+            commit(solrDocuments);
         }
 
         return true;
@@ -552,12 +558,24 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         }
     }
 
+    private void flushDocuments(List<SolrInputDocument> documents) throws SolrServerException, IOException
+    {
+        try {
+            this.solrInstance.add(documents);
+        } finally {
+            // Clear the list of documents even when adding them failed to avoid leaking memory and to avoid
+            // re-submitting the same documents to the Solr server multiple times.
+            documents.clear();
+        }
+    }
+
     /**
      * Commit.
      */
-    private void commit()
+    private void commit(List<SolrInputDocument> documents)
     {
         try {
+            flushDocuments(documents);
             solrInstance.commit();
         } catch (Exception e) {
             this.logger.error("Failed to commit index changes to the Solr server. Rolling back.", e);

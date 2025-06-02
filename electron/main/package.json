@@ -28,7 +28,7 @@
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
-    "@types/node": "22.15.27",
+    "@types/node": "22.15.28",
     "typescript": "5.8.3",
     "vite": "6.3.5"
   }

@@ -301,7 +301,7 @@
     #set ($discard = $queryStringParameters.putAll($customQueryStringParameters))
   #end
   #extendQueryString($url $queryStringParameters)
-  &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '')empty#end"
+  &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"
     #if ($facetValue.name != '')data-facetvalue="$facetValue.name"#end&gt;
     #if ($facetValue.name == '')
       #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")

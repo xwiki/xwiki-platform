@@ -1,5 +1,5 @@
 /*
- * See the NOTICE file distributed with this work for additional
+ * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,29 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Logic } from "@/services/Logic";
-import { mockI18n } from "@/testUtils";
-import { describe, it, vi } from "vitest";
+import { AuthenticationManager, UserDetails } from "@xwiki/cristal-authentication-api";
+import { Container, injectable } from "inversify";
 
-define("xwiki-l10n!xwiki-blocknote-translation-keys", () => {});
+@injectable("Singleton")
+export class XWikiAuthenticationManager implements AuthenticationManager {
+  public static bind(container: Container): void {
+    container.bind("AuthenticationManager").to(XWikiAuthenticationManager).inSingletonScope().whenNamed("XWiki");
+  }
 
-global.matchMedia = vi.fn().mockImplementation((query) => ({
-  matches: false,
-  media: query,
-  onchange: null,
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  dispatchEvent: vi.fn(),
-}));
+  public async start(): Promise<void> {}
 
-describe("Logic", () => {
-  it("should create a BlockNote instance", async () => {
-    mockI18n();
+  public async callback(): Promise<void> {}
 
-    const host = document.createElement("div");
-    host.name = "test";
+  public async getAuthorizationHeader(): Promise<string | undefined> {}
 
-    const logic = new Logic(host);
-    await logic.ready;
-  });
-});
+  public async isAuthenticated(): Promise<boolean> {}
+
+  public async getUserDetails(): Promise<UserDetails> {}
+
+  public async logout(): Promise<void> {}
+}

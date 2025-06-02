@@ -286,6 +286,25 @@ app.get("/xwiki/bin/get", (req: Request, res: Response) => {
   }
 });
 
+// Handles preflight request.
+app.options(
+  "/xwiki/rest/wikis/xwiki/spaces/Main/spaces/NewPage/pages/WebHome",
+  (_req: Request, res: Response) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "PUT");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.status(200).send("Preflight request allowed");
+  },
+);
+
+app.put(
+  "/xwiki/rest/wikis/xwiki/spaces/Main/spaces/NewPage/pages/WebHome",
+  (_req: Request, res: Response) => {
+    res.appendHeader("Access-Control-Allow-Origin", "*");
+    res.json({});
+  },
+);
+
 app.listen(port, () => {
   console.log(`XWiki mock server listening on http://localhost:${port}`);
 });

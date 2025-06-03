@@ -141,7 +141,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       // We add some random UUID to make sure we don't inadvertently collide with another ID.
       if (!editInput.attr('id')) {
         let id = editInput.attr('name');
-        if(typeof crypto?.randomUUID === "function") {
+        if (typeof crypto?.randomUUID === 'function') {
           id = id + '-' + crypto.randomUUID().toString();
         }
         editInput.attr('id', id);

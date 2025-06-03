@@ -20,7 +20,6 @@
 package org.xwiki.extension.security;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide the configuration values for the extension security.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.5RC1
  */
 @Role
-@Unstable
 public interface ExtensionSecurityConfiguration
 {
     /**
@@ -58,6 +56,5 @@ public interface ExtensionSecurityConfiguration
      * @return the URL where the reviews are fetched
      * @since 15.6RC1
      */
-    @Unstable
     String getReviewsURL();
 }

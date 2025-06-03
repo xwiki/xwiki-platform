@@ -29,6 +29,14 @@
   // Skip Eclipse M2E special setup "dependency"
   "ignoreDeps": ["org.eclipse.m2e:lifecycle-mapping"],
 
+   ignorePaths: [
+     // Ignore boostrap until we are ready to move its build to more recent libraries (see XWIKI-22858).
+     "xwiki-platform-core/xwiki-platform-bootstrap/**"
+   ],
+
+   // Set a "dependencies" label on all pull requests created by Renovate
+  "labels": ["dependencies"],
+
   "packageRules": [
     // Add the URL to the XWiki Nexus public proxy for non-Central Maven dependencies
     {

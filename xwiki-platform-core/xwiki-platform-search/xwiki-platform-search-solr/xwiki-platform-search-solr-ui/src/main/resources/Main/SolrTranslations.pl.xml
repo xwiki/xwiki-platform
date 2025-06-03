@@ -42,11 +42,9 @@ solr.admin.error.action={0} nie powiodło się:
 solr.admin.error.notallowed=Nie możesz wykonać tej czynności.
 solr.admin.error.norights=Aby uzyskać dostęp do tej sekcji, wymagane są prawa administracyjne.
 solr.admin.success.action={0} uruchomiono pomyślnie.
-
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Rozmiar kolejki
 solr.admin.status.queueSize.hint=Liczba obiektów, które pozostały do indeksowania, ponownego indeksowania lub usunięcia z indeksu (w zależności od wykonanej akcji).
-
 solr.admin.indexing.title=Indeksowanie
 solr.admin.indexing.action.label=Czynność
 solr.admin.indexing.action.hint=Operacja do wykonania w indeksie.
@@ -58,9 +56,7 @@ solr.admin.indexing.wiki.hint=Wiki, na którą będą miały wpływ wszystkie do
 solr.admin.indexing.wiki.select_farm=Cały obszar
 solr.admin.indexing.query.label=Niestandardowe zapytanie
 solr.admin.indexing.query.hint=Opcjonalne zapytanie ograniczające dokumenty, na które ma wpływ wybrana akcja w indeksie.
-
 solr.admin.info.affectedDocuments=Dotyczy dokumentów w indeksie:
-
 solr.sortBy=Sortuj według:
 solr.sortBy.score=Związek z tematem
 solr.sortBy.title_sort=Tytuł
@@ -72,20 +68,17 @@ solr.sortBy.attdate_sort=Data przesłania
 solr.sortBy.attauthor_display_sort=Przesłane przez
 solr.sortOrder.asc=Rosnąco
 solr.sortOrder.desc=Malejąco
-
 solr.options=Pokaż:
 solr.options.highlight=Zaznaczenie
-solr.options.highlight.title=Wyświetl wyciąg z tego, co zostało dopasowane w każdym wyniku
+solr.options.highlight.title=Wyświetlenie fragmentu dopasowania w każdym wyniku
 solr.options.facet=Aspekty
 solr.options.facet.title=Pozwól na dodatkowe filtrowanie wyniku
-
 solr.result.language=Język
 solr.result.locatedIn=Położony w
 solr.result.author=Zmodyfikowany przez {0} w dniu {1}
 solr.result.mediaType=Typ pliku {0}
 solr.result.uploadedBy=Przesłane przez {0} w dniu {1} ({2})
 solr.result.highlightAll=Zaznacz wszystko
-
 solr.facets.title=Zawęź wyszukiwanie
 solr.facets.hint=Wybierz kategorię i włącz filtry na bieżących wynikach
 solr.facets.resetAll=Wyczyść wszystko
@@ -93,12 +86,10 @@ solr.facets.expandAll=Rozwiń wszystko
 solr.facets.collapseAll=Zwiń wszystko
 solr.facets.emptyValue=Pusta wartość
 solr.facets.moreValues={0} więcej
-
 solr.filterBy.type.document=Dokument
 solr.filterBy.type.attachment=Załącznik
 solr.filterBy.type.object=Obiekt
 solr.filterBy.type.object_property=Właściwość obiektu
-
 solr.filterBy.fileType.image=Obraz
 solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.video=Video
@@ -118,7 +109,6 @@ solr.facet.fileType.image.icon=Ikona
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Dane binarne
-
 solr.facet.date.today=Dzisiaj
 solr.facet.date.last7Days=Ostatnie 7 dni
 solr.facet.date.last30Days=Ostatnie 30 dni
@@ -131,7 +121,6 @@ solr.facet.date.between=Od {0} do {1}
 solr.facet.date.after=Po {0}
 solr.facet.date.before=Przed {0}
 solr.facet.date.any=Dowolna data
-
 solr.facet.size.tiny=Malutki
 solr.facet.size.small=Mały
 solr.facet.size.medium=Średni
@@ -140,7 +129,6 @@ solr.facet.size.between=Pomiędzy {0} a {1}
 solr.facet.size.lessThan=Mniej niż {0}
 solr.facet.size.moreThan=Więcej niż {0}
 solr.facet.size.any=Wszystkie rozmiary
-
 solr.field.type=Typ wyniku
 solr.field.locale=Język
 solr.field.locale.emptyValue=Brak języka
@@ -173,7 +161,6 @@ solr.field.attauthor=Przesłane przez
 solr.field.attauthor_display=Przesłane przez
 solr.field.attdate=Data załadowania
 solr.field.attsize=Rozmiar pliku
-
 solr.uix.docdoesnotexist.title=Czy zamiast tego szukałeś jednej z następujących stron?
 solr.uix.attachmentdoesnotexist.title=Czy szukasz zamiast tego jednego z następujących załączników?
 
@@ -187,5 +174,6 @@ solr.uix.attachmentdoesnotexist.title=Czy szukasz zamiast tego jednego z następ
 ### Missing: solr.field.space=Location
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

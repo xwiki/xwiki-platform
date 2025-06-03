@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.Translations" locale="">
+<xwikidoc version="1.6" reference="CKEditor.Translations" locale="">
   <web>CKEditor</web>
   <name>Translations</name>
   <language/>
@@ -94,9 +94,11 @@ ckeditor.plugin.office.importer.noUploadURL=File upload URL is not configured.
 ckeditor.plugin.office.importer.failedToLoadForm=Failed to load the form.
 
 ckeditor.plugin.resource.notSpecified=The {0} is not specified.
+ckeditor.plugin.resource.selectValue=Please select a value for the link location.
 ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
 ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
 ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
+ckeditor.plugin.selection.restoring=Restoring selection...
 
 ckeditor.plugin.toolbar.basicStyles=Basic Styles
 ckeditor.plugin.toolbar.lists=Lists
@@ -271,6 +273,12 @@ ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=No c
 ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=There are unsaved changes, but no one else is in the realtime session. Re-joining.
 ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=Could not rejoin the realtime session because there are unsaved changes.
 
+ckeditor.plugin.upload.downloadingPastedImages=Downloading pasted images: {0} / {1}
+ckeditor.plugin.upload.imageDownloadFailed=Failed to download {0} out of {1} pasted images
+ckeditor.plugin.upload.starting=Starting upload in {0}s
+ckeditor.plugin.upload.uploadingPastedImages=Uploading pasted images: {0} / {1}
+ckeditor.plugin.upload.imageUploadFailed=Failed to upload {0} out of {1} pasted images
+
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 
 ckeditor.upload.error.csrf=The CSRF token is missing.
@@ -300,6 +308,7 @@ resource.user.placeholder=alias
 
 resourcePicker.attach.hint=Select an attachment
 resourcePicker.doc.hint=Select a page
+resourcePicker.dropdown.toggle.title=Toggle the display of resource types.
 
 entityResourceSuggester.doc.placeholder=Find a page...
 entityResourceSuggester.attach.placeholder=Find an attachment...

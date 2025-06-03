@@ -37,6 +37,8 @@ import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.container.servlet.HttpServletUtils;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
 /**
  * Class responsible for remembering the login information between requests. It uses (encrypted) cookies for this. The
@@ -674,19 +676,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     protected String getClientIP(HttpServletRequest request)
     {
-        // TODO: This HTTP header can have multiple values (each proxy is supposed to add a new value) and so the
-        // trustworthy value should be determined based on the known (configurable) number of proxies, as per
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#selecting_an_ip_address . For
-        // instance, if XWiki is not aware of any proxy then it should ignore all values. If XWiki is aware of one proxy
-        // then it should use the last value (not the first!). When two proxies are configured then the value before
-        // last should be used, and so on.
-        String remoteIP = request.getHeader("X-Forwarded-For");
-        if (remoteIP == null || "".equals(remoteIP)) {
-            remoteIP = request.getRemoteAddr();
-        } else if (remoteIP.indexOf(',') != -1) {
-            remoteIP = remoteIP.substring(0, remoteIP.indexOf(','));
-        }
-        return remoteIP;
+        return HttpServletUtils.getClientIP(JakartaServletBridge.toJakarta(request));
     }
 
     /**

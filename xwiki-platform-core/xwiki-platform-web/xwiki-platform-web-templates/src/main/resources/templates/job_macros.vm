@@ -113,20 +113,17 @@ $services.template.execute('logging_macros.vm')
 #macro (jobFinishedMessage $status $translationPrefix $successKey $errorKey $canceledKey $warningKey)
   #if ($status.error)
     #set($messageKeys = [$errorKey, "${translationPrefix}.finish.error", "job.status.${status.jobType}.error", 'job.status.error'])
-    #set($messageClass = 'errormessage')
+    #error($services.localization.render($messageKeys))
   #elseif ($status.canceled)
     #set($messageKeys = [$canceledKey, "${translationPrefix}.finish.canceled", "job.status.${status.jobType}.canceled", 'job.status.canceled'])
-    #set($messageClass = 'warningmessage')
+    #warning($services.localization.render($messageKeys))
   #elseif ($status.logTail.hasLogLevel('error'))
     #set($messageKeys = [$warningKey, "${translationPrefix}.finish.warning", "job.status.${status.jobType}.warning", 'job.status.warning'])
-    #set($messageClass = 'warningmessage')
+    #warning($services.localization.render($messageKeys))
   #else
     #set($messageKeys = [$successKey, "${translationPrefix}.finish.success", "job.status.${status.jobType}.success", 'job.status.success'])
-    #set($messageClass = 'successmessage')
+    #success($services.localization.render($messageKeys))
   #end
-  <div class="box $messageClass">
-    $services.localization.render($messageKeys)
-  </div>
 #end
 
 #macro (displayJobFinishedMessage $status $successKey $errorKey $canceledKey $translationPrefix)

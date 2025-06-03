@@ -130,6 +130,7 @@
   "breadcrumb": {
     "breadcrumb-bg": "color",
     "breadcrumb-color": "color",
+    "breadcrumb-link-color": "color",
     "breadcrumb-separator": "escapedText"
   },
   "advanced": {

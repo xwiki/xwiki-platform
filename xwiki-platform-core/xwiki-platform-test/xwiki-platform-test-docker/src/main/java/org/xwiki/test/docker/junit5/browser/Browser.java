@@ -100,6 +100,8 @@ public enum Browser
         }
         options.enableBiDi();
         options.addPreference("dom.disable_beforeunload", false);
+        // Workaround for https://github.com/mozilla/geckodriver/issues/2212
+        options.addPreference("remote.events.async.enabled", false);
         return options;
     }
 
@@ -110,6 +112,7 @@ public enum Browser
         logPrefs.enable(LogType.BROWSER, Level.ALL);
         options.enableBiDi();
         options.setCapability(ChromeOptions.LOGGING_PREFS, logPrefs);
+        options.setCapability("unhandledPromptBehavior", "ignore");
         options.addArguments(
             "--whitelisted-ips",
             "--no-sandbox",

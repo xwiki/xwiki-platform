@@ -203,12 +203,29 @@ define('xwiki-selectize', [
         });
       }
     }
+    let oldOnOptionSelect = this.selectize.onOptionSelect;
+    this.selectize.onOptionSelect = function(...args) {
+      const result = oldOnOptionSelect.apply(this, args);
+      return result;
+    }
+    let oldSetActiveOption = this.selectize.setActiveOption;
+    this.selectize.setActiveOption = function(option, ...args) {
+      this.liveRegion?.text($(option).text());
+      return oldSetActiveOption.call(this, option, ...args);
+    }
+    // Create a live region to store the value of the currently active option.
+    this.selectize.liveRegion = $('<span>');
+    this.selectize.liveRegion.attr('aria-live', 'assertive');
+    this.selectize.liveRegion.addClass('sr-only');
+    this.selectize.get$('input').after(this.selectize.liveRegion);
     setDropDownAlignment(this.selectize);
     if (this.selectize.settings.takeInputWidth) {
       this.selectize.get$('control').width($(this).data('initialWidth'));
     }
     // Set the title of the input field.
     this.selectize.get$('control_input').attr('title', $(this).attr('title'));
+    // Set the text alternative of the input field.
+    this.selectize.get$('control_input').attr('aria-label', $(this).attr('aria-label'));
   };
 
   var setDropDownAlignment = function(selectize) {

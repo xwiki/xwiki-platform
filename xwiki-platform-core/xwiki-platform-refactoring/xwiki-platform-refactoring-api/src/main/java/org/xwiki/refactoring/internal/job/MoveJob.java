@@ -26,6 +26,8 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.observation.event.BeginFoldEvent;
+import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.refactoring.event.EntitiesRenamedEvent;
@@ -51,30 +53,15 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     }
 
     @Override
-    protected void runInternal() throws Exception
+    protected BeginFoldEvent createBeginEvent()
     {
-        this.progressManager.pushLevelProgress(3, this);
+        return new EntitiesRenamingEvent();
+    }
 
-        try {
-            this.progressManager.startStep(this);
-            EntitiesRenamingEvent entitiesRenamingEvent = new EntitiesRenamingEvent();
-            this.observationManager.notify(entitiesRenamingEvent, this, this.getRequest());
-            if (entitiesRenamingEvent.isCanceled()) {
-                return;
-            }
-            this.progressManager.endStep(this);
-
-            this.progressManager.startStep(this);
-            super.runInternal();
-            this.progressManager.endStep(this);
-
-            this.progressManager.startStep(this);
-            EntitiesRenamedEvent entitiesRenamedEvent = new EntitiesRenamedEvent();
-            this.observationManager.notify(entitiesRenamedEvent, this, this.getRequest());
-            this.progressManager.endStep(this);
-        } finally {
-            this.progressManager.popLevelProgress(this);
-        }
+    @Override
+    protected EndFoldEvent createEndEvent()
+    {
+        return new EntitiesRenamedEvent();
     }
 
     @Override
@@ -90,7 +77,20 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     @Override
     protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference) throws Exception
     {
-        if (!hasAccess(Right.DELETE, oldReference)) {
+        boolean isWebPreferences =
+            isSpacePreferencesReference(oldReference) && isSpacePreferencesReference(newReference);
+        DocumentReference oldHomeReference = getSpaceHomeReference(oldReference);
+        // if it's a WebPreferences document and the operation concerns also its WebHome then we check the rights of the
+        // WebHome only.
+        if (isWebPreferences && this.concernedEntities.containsKey(oldHomeReference)) {
+            if (!hasAccess(Right.DELETE, oldHomeReference)) {
+                this.logger.error("You don't have sufficient permissions over the home document of WebPreferences "
+                        + "[{}].",
+                    newReference);
+                return false;
+            }
+            return super.checkAllRights(oldReference, newReference);
+        } else if (!hasAccess(Right.DELETE, oldReference)) {
             // The move operation is implemented as Copy + Delete.
             this.logger.error("You are not allowed to delete [{}].", oldReference);
             return false;

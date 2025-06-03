@@ -28,7 +28,6 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.stability.Unstable;
 
 /**
  * A {@link NamingCriterion} based on the name of the main document being split.
@@ -67,7 +66,6 @@ public class PageIndexNamingCriterion extends AbstractNamingCriterion
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     public PageIndexNamingCriterion()
     {
     }

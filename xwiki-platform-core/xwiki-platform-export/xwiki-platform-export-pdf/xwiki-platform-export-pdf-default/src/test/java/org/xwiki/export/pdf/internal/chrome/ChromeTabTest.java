@@ -25,7 +25,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 
 import com.github.kklisura.cdt.protocol.commands.IO;
@@ -54,12 +53,14 @@ import com.github.kklisura.cdt.protocol.types.runtime.ExceptionDetails;
 import com.github.kklisura.cdt.protocol.types.runtime.RemoteObject;
 import com.github.kklisura.cdt.protocol.types.target.TargetInfo;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
+import com.github.kklisura.cdt.services.config.ChromeDevToolsServiceConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -78,7 +79,7 @@ class ChromeTabTest
     private ChromeDevToolsService browserDevToolsService;
 
     @Mock
-    private PDFExportConfiguration configuration;
+    private ChromeDevToolsServiceConfiguration configuration;
 
     private ChromeTab chromeTab;
 
@@ -96,7 +97,7 @@ class ChromeTabTest
     {
         when(this.tabDevToolsService.getRuntime()).thenReturn(this.runtime);
         when(this.tabDevToolsService.getPage()).thenReturn(this.page);
-        when(this.configuration.getChromeRemoteDebuggingTimeout()).thenReturn(10);
+        when(this.configuration.getReadTimeout()).thenReturn(10L);
 
         this.chromeTab = new ChromeTab(this.tabDevToolsService, this.browserDevToolsService, this.configuration);
     }
@@ -168,7 +169,7 @@ class ChromeTabTest
         when(this.page.navigate(url.toString())).thenReturn(navigate);
         when(navigate.getErrorText()).thenReturn("Failed to navigate!");
 
-        assertFalse(this.chromeTab.navigate(url, null, false));
+        assertFalse(this.chromeTab.navigate(url, (Cookie[]) null, false));
     }
 
     @Test
@@ -179,20 +180,57 @@ class ChromeTabTest
         Navigate navigate = mock(Navigate.class);
         when(this.page.navigate(url.toString())).thenReturn(navigate);
 
-        Evaluate evaluate = mock(Evaluate.class);
-        String pageReadyPromise = ChromeTab.PAGE_READY_PROMISE.replace("__pageReadyTimeout__", "25000");
-        when(this.runtime.evaluate(/* expression */ pageReadyPromise, /* objectGroup */ null,
-            /* includeCommandLineAPI */ false, /* silent */ false, /* contextId */ null, /* returnByValue */ true,
-            /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
-            /* throwOnSideEffect */ false, /* timeout */ 10000.0,
-            /* disableBreaks */ true, /* replMode */ false, /* allowUnsafeEvalBlockedByCSP */ false,
-            /* uniqueContextId */ null)).thenReturn(evaluate);
+        Evaluate rejectedEvaluate = mock(Evaluate.class, "rejected");
+        RemoteObject exception = mock(RemoteObject.class, "exception");
+        ExceptionDetails exceptionDetails = mock(ExceptionDetails.class);
+        when(rejectedEvaluate.getExceptionDetails()).thenReturn(exceptionDetails);
+        when(exceptionDetails.getException()).thenReturn(exception);
+        when(exception.getValue()).thenReturn("Timeout waiting for page to be ready.");
 
-        RemoteObject result = mock(RemoteObject.class);
-        when(evaluate.getResult()).thenReturn(result);
-        when(result.getValue()).thenReturn("Page ready.");
+        String pageReadyPromise = PageReadyPromise.PAGE_READY_PROMISE.replace("__pageReadyTimeout__", "10000");
+        when(this.runtime.evaluate(
+            /* expression */ pageReadyPromise,
+            /* objectGroup */ null,
+            /* includeCommandLineAPI */ false,
+            /* silent */ false,
+            /* contextId */ null,
+            /* returnByValue */ true,
+            /* generatePreview */ false,
+            /* userGesture */ false,
+            /* awaitPromise */ true,
+            /* throwOnSideEffect */ false,
+            /* timeout */ 10000.0,
+            /* disableBreaks */ true,
+            /* replMode */ false,
+            /* allowUnsafeEvalBlockedByCSP */ false,
+            /* uniqueContextId */ null
+        )).thenReturn(rejectedEvaluate);
 
-        assertTrue(this.chromeTab.navigate(url, null, true, 25));
+        Evaluate resolvedEvaluate = mock(Evaluate.class, "resolved");
+        RemoteObject resolvedResult = mock(RemoteObject.class, "pageReady");
+        when(resolvedEvaluate.getResult()).thenReturn(resolvedResult);
+        when(resolvedResult.getValue()).thenReturn("Page ready.");
+
+        pageReadyPromise = PageReadyPromise.PAGE_READY_PROMISE.replace("__pageReadyTimeout__", "5000");
+        when(this.runtime.evaluate(
+            /* expression */ pageReadyPromise,
+            /* objectGroup */ null,
+            /* includeCommandLineAPI */ false,
+            /* silent */ false,
+            /* contextId */ null,
+            /* returnByValue */ true,
+            /* generatePreview */ false,
+            /* userGesture */ false,
+            /* awaitPromise */ true,
+            /* throwOnSideEffect */ false,
+            /* timeout */ 5000.0,
+            /* disableBreaks */ true,
+            /* replMode */ false,
+            /* allowUnsafeEvalBlockedByCSP */ false,
+            /* uniqueContextId */ null
+        )).thenReturn(resolvedEvaluate);
+
+        assertTrue(this.chromeTab.navigate(url, (Cookie[]) null, true, 25));
 
         verify(this.runtime).enable();
     }
@@ -206,13 +244,24 @@ class ChromeTabTest
         when(this.page.navigate(url.toString())).thenReturn(navigate);
 
         Evaluate evaluate = mock(Evaluate.class);
-        String pageReadyPromise = ChromeTab.PAGE_READY_PROMISE.replace("__pageReadyTimeout__", "60000");
-        when(this.runtime.evaluate(/* expression */ pageReadyPromise, /* objectGroup */ null,
-            /* includeCommandLineAPI */ false, /* silent */ false, /* contextId */ null, /* returnByValue */ true,
-            /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
-            /* throwOnSideEffect */ false, /* timeout */ 10000.0,
-            /* disableBreaks */ true, /* replMode */ false, /* allowUnsafeEvalBlockedByCSP */ false,
-            /* uniqueContextId */ null)).thenReturn(evaluate);
+        String pageReadyPromise = PageReadyPromise.PAGE_READY_PROMISE.replace("__pageReadyTimeout__", "10000");
+        when(this.runtime.evaluate(
+            /* expression */ pageReadyPromise,
+            /* objectGroup */ null,
+            /* includeCommandLineAPI */ false,
+            /* silent */ false,
+            /* contextId */ null,
+            /* returnByValue */ true,
+            /* generatePreview */ false,
+            /* userGesture */ false,
+            /* awaitPromise */ true,
+            /* throwOnSideEffect */ false,
+            /* timeout */ 10000.0,
+            /* disableBreaks */ true,
+            /* replMode */ false,
+            /* allowUnsafeEvalBlockedByCSP */ false,
+            /* uniqueContextId */ null
+        )).thenReturn(evaluate);
 
         ExceptionDetails exceptionDetails = mock(ExceptionDetails.class);
         when(evaluate.getExceptionDetails()).thenReturn(exceptionDetails);
@@ -222,12 +271,30 @@ class ChromeTabTest
         when(exception.getValue()).thenReturn("'xwiki-page-ready' module not found");
 
         try {
-            this.chromeTab.navigate(url, null, true);
+            this.chromeTab.navigate(url, (Cookie[]) null, true);
             fail("Navigation should have thrown an exception.");
         } catch (IOException e) {
-            assertEquals("Failed to wait for page to be ready. Root cause: 'xwiki-page-ready' module not found",
-                e.getMessage());
+            assertEquals("Timeout waiting for page to be ready.", e.getMessage());
+            assertEquals("'xwiki-page-ready' module not found", e.getCause().getMessage());
         }
+
+        verify(this.runtime, times(6)).evaluate(
+            /* expression */ pageReadyPromise,
+            /* objectGroup */ null,
+            /* includeCommandLineAPI */ false,
+            /* silent */ false,
+            /* contextId */ null,
+            /* returnByValue */ true,
+            /* generatePreview */ false,
+            /* userGesture */ false,
+            /* awaitPromise */ true,
+            /* throwOnSideEffect */ false,
+            /* timeout */ 10000.0,
+            /* disableBreaks */ true,
+            /* replMode */ false,
+            /* allowUnsafeEvalBlockedByCSP */ false,
+            /* uniqueContextId */ null
+        );
     }
 
     @Test

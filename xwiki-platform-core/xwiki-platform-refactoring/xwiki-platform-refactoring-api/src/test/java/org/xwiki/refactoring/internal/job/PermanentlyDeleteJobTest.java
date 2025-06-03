@@ -19,26 +19,21 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
+import org.junit.jupiter.api.Test;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atMost;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,42 +43,29 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class PermanentlyDeleteJobTest extends AbstractJobTest
+@ComponentTest
+class PermanentlyDeleteJobTest extends AbstractJobTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<>(PermanentlyDeleteJob.class);
-
-    private ModelContext modelContext;
+    @InjectMockComponents
+    private PermanentlyDeleteJob deleteJob;
 
     private WikiReference wikiReference = new WikiReference("mywiki");
 
     private DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
 
     @Override
-    protected MockitoComponentMockingRule<Job> getMocker()
+    protected Job getJob()
     {
-        return this.mocker;
-    }
-
-    @Override
-    public void configure() throws Exception
-    {
-        super.configure();
-
-        Execution execution = mocker.getInstance(Execution.class);
-        ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(execution.getContext()).thenReturn(executionContext);
-
-        modelContext = mocker.getInstance(ModelContext.class);
+        return this.deleteJob;
     }
 
     @Test
-    public void permanentlyDeleteSingleDocument() throws Throwable
+    void permanentlyDeleteSingleDocument() throws Throwable
     {
         long deletedDocumentId = 13;
 
         PermanentlyDeleteRequest request = createRequest();
-        request.setDeletedDocumentIds(Arrays.asList(deletedDocumentId));
+        request.setDeletedDocumentIds(List.of(deletedDocumentId));
         request.setCheckRights(true);
         assertEquals(request.getAuthorReference(), userReference);
         run(request);
@@ -95,10 +77,10 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
     }
 
     @Test
-    public void permanentlyDeleteAll() throws Throwable
+    void permanentlyDeleteAll() throws Throwable
     {
         PermanentlyDeleteRequest request = createRequest();
-        request.setDeletedDocumentIds(Collections.emptyList());
+        request.setDeletedDocumentIds(List.of());
         request.setCheckRights(true);
         run(request);
 
@@ -109,14 +91,14 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
     }
 
     @Test
-    public void permanentlyDeleteBatch() throws Throwable
+    void permanentlyDeleteBatch() throws Throwable
     {
         long deletedDocumentId1 = 13;
         long deletedDocumentId2 = 42;
         String batchId = "abc123";
 
         when(modelBridge.getDeletedDocumentIds(batchId))
-            .thenReturn(Arrays.asList(deletedDocumentId1, deletedDocumentId2));
+            .thenReturn(List.of(deletedDocumentId1, deletedDocumentId2));
 
         PermanentlyDeleteRequest request = createRequest();
         request.setBatchId(batchId);
@@ -130,7 +112,7 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
     }
 
     @Test
-    public void permanentlyDeleteBatchAndDocuments() throws Throwable
+    void permanentlyDeleteBatchAndDocuments() throws Throwable
     {
         // Batch documents.
         long deletedDocumentId1 = 13;
@@ -144,11 +126,11 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
         long deletedDocumentIdC = 3;
 
         when(modelBridge.getDeletedDocumentIds(batchId))
-            .thenReturn(Arrays.asList(deletedDocumentId1, deletedDocumentId2));
+            .thenReturn(List.of(deletedDocumentId1, deletedDocumentId2));
 
         PermanentlyDeleteRequest request = createRequest();
         request.setBatchId(batchId);
-        request.setDeletedDocumentIds(Arrays.asList(deletedDocumentIdA, deletedDocumentIdB, deletedDocumentIdC));
+        request.setDeletedDocumentIds(List.of(deletedDocumentIdA, deletedDocumentIdB, deletedDocumentIdC));
         run(request);
 
         verifyContext();
@@ -161,14 +143,13 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
     }
 
     @Test
-    public void jobGroupAtWikiLevel() throws Exception
+     void jobGroupAtWikiLevel() throws Exception
     {
         PermanentlyDeleteRequest request = createRequest();
-        PermanentlyDeleteJob job = (PermanentlyDeleteJob) getMocker().getComponentUnderTest();
-        job.initialize(request);
+        this.deleteJob.initialize(request);
 
         JobGroupPath expectedJobGroupPath = new JobGroupPath(wikiReference.getName(), PermanentlyDeleteJob.ROOT_GROUP);
-        assertEquals(expectedJobGroupPath, job.getGroupPath());
+        assertEquals(expectedJobGroupPath, this.deleteJob.getGroupPath());
     }
 
     @Test
@@ -177,7 +158,7 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
         long deletedDocumentId = 13;
 
         PermanentlyDeleteRequest request = createRequest();
-        request.setDeletedDocumentIds(Arrays.asList(deletedDocumentId));
+        request.setDeletedDocumentIds(List.of(deletedDocumentId));
         request.setWikiReference(null);
 
         try {
@@ -192,6 +173,7 @@ public class PermanentlyDeleteJobTest extends AbstractJobTest
 
         // Verify that the document is not restored.
         verify(this.modelBridge, never()).permanentlyDeleteDocument(deletedDocumentId, request);
+        assertEquals("Exception thrown during job execution", getLogCapture().getMessage(0));
     }
 
     private PermanentlyDeleteRequest createRequest()

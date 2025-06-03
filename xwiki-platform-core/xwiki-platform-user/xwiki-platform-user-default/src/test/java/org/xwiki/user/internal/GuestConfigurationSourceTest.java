@@ -21,7 +21,10 @@ package org.xwiki.user.internal;
 
 import java.util.Properties;
 
+import jakarta.inject.Named;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -37,8 +40,12 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class GuestConfigurationSourceTest
+class GuestConfigurationSourceTest
 {
+    @MockComponent
+    @Named("system")
+    private ConfigurationSource configurationSource;
+
     @InjectMockComponents
     private GuestConfigurationSource source;
 
@@ -46,7 +53,7 @@ public class GuestConfigurationSourceTest
     private UserConfiguration userConfiguration;
 
     @BeforeComponent
-    public void setup()
+    public void beforeComponent()
     {
         when(this.userConfiguration.getGuestPreference()).thenReturn(new Properties());
     }

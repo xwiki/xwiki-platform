@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.internal.ExtensionUtils;
@@ -53,7 +52,11 @@ import org.xwiki.extension.test.po.flavor.FlavorPicker;
 import org.xwiki.extension.test.po.flavor.FlavorPickerInstallStep;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.namespace.WikiNamespace;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.po.ViewPage;
@@ -65,7 +68,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Validate the Distribution Wizard part of the upgrade process.
- * 
+ *
  * @version $Id$
  * @since 10.7RC1
  */
@@ -119,14 +122,8 @@ public class UpgradeTest extends AbstractTest
     private static final int STEP_EXTENSIONS_ID = 3;
 
     /**
-     * Automatically register as Admin user.
-     */
-    @Rule
-    public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(getUtil());
-
-    /**
      * Prepare and start XWiki.
-     * 
+     *
      * @throws Exception when failing to configure XWiki
      */
     @BeforeClass
@@ -187,7 +184,7 @@ public class UpgradeTest extends AbstractTest
 
     /**
      * Execute the Distribution Wizard for an upgrade from previous version to current SNAPSHOT.
-     * 
+     *
      * @throws Exception when failing the test
      */
     @Test
@@ -196,8 +193,11 @@ public class UpgradeTest extends AbstractTest
         // Setup logs ignores
         setupLogs();
 
-        // Access home page (and be automatically redirected)
-        getUtil().gotoPage("Main", "WebHome", "view");
+        // Access the home page.
+        ViewPage viewPage = getUtil().gotoPage("Main", "WebHome");
+        assertFalse("Unexpected URL", getUtil().getDriver().getCurrentUrl().contains("/distribution/"));
+        // Login as Admin and be automatically redirected to the Distribution Wizard.
+        viewPage.login().loginAsAdmin();
 
         // Make sure we are redirected to the Distribution Wizard
         assertEquals(
@@ -248,6 +248,12 @@ public class UpgradeTest extends AbstractTest
         // Make sure it's possible to create a page with 768 characters in the reference
         getUtil().rest()
             .savePage(new LocalDocumentReference("Upgrade", StringUtils.repeat("a", 768 - "Upgrade".length() - 1)));
+
+        // Make sure the 'meta' field is set to the empty field by R170400000XWIKI23160DataMigrationTest
+        assertEquals("",
+            getUtil().rest().<Property>get(new ObjectPropertyReference("meta",
+                new ObjectReference("XWiki.XWikiPreferences[0]",
+                    new DocumentReference("xwiki", "XWiki", "XWikiPreferences")))).getValue());
 
         ////////////////////
         // Custom validation

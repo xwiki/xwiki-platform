@@ -101,7 +101,7 @@ class LoginIT
         LoginPage.gotoPage();
         LoginPage loginPage = new LoginPage();
         loginPage.loginAs("Admin", "wrong password");
-        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        assertTrue(loginPage.hasInvalidCredentialsErrorMessage(), "Obtained message: "+ loginPage.getErrorMessages());
         logCaptureConfiguration.registerExpected("Authentication failure with login [Admin]");
 
         loginPage.loginAs("non existent user", "admin");
@@ -198,6 +198,6 @@ class LoginIT
         assertEquals("some content", viewPage.getContent());
 
         // Since we got a CSRF warning, we expect it to be in the logs too.
-        logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed, token:");
+        logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
     }
 }

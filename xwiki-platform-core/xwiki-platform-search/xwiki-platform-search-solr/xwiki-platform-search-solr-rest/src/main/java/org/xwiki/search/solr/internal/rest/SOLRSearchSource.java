@@ -191,13 +191,13 @@ public class SOLRSearchSource extends AbstractSearchSource
 
                 String pageUri = null;
                 if (Locale.ROOT == docLocale) {
-                    pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, searchResult.getWiki(),
-                                spaces, searchResult.getPageName()).toString();
+                    pageUri = Utils.createURI(uriInfo.getBaseUri(), PageResource.class, searchResult.getWiki(),
+                        Utils.getSpacesURLElements(spaces), searchResult.getPageName()).toString();
                 } else {
                     searchResult.setLanguage(docLocale.toString());
-                    pageUri = Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class,
-                        searchResult.getWiki(), spaces, searchResult.getPageName(), docLocale).toString();
+                    pageUri =
+                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, searchResult.getWiki(),
+                            Utils.getSpacesURLElements(spaces), searchResult.getPageName(), docLocale).toString();
                 }
 
                 Link pageLink = new Link();

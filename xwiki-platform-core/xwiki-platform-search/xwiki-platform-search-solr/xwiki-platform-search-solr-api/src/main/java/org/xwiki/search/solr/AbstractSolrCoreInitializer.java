@@ -199,10 +199,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     private static final String SOLR_TYPENAME_XVERSION = "__xversion";
 
-    private static final String SOLR_TYPENAME_CVERSION = "__cversion";
-
-    private static final String SOLR_VERSIONFIELDTYPE_VALUE = "defVal";
-
     private static final int DEFAULT_MIGRATION_BATCH_ROWS = 100;
 
     @Inject
@@ -626,12 +622,12 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected Long getCurrentCoreVersion() throws SolrException
     {
-        return getVersion(SOLR_TYPENAME_CVERSION);
+        return getVersion(SolrSchemaUtils.SOLR_TYPENAME_CVERSION);
     }
 
     protected void setCurrentCoreVersion(boolean add) throws SolrException
     {
-        setVersion(SOLR_TYPENAME_CVERSION, getVersion(), add);
+        setVersion(SolrSchemaUtils.SOLR_TYPENAME_CVERSION, getVersion(), add);
     }
 
     private Long getVersion(String name) throws SolrException
@@ -642,7 +638,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             return null;
         }
 
-        String value = (String) fieldType.getAttributes().get(SOLR_VERSIONFIELDTYPE_VALUE);
+        String value = (String) fieldType.getAttributes().get(SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE);
 
         return NumberUtils.createLong(value);
     }
@@ -654,7 +650,8 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     private void setVersion(String name, long version, boolean add) throws SolrException
     {
-        setFieldType(name, "solr.ExternalFileField", add, SOLR_VERSIONFIELDTYPE_VALUE, String.valueOf(version));
+        setFieldType(name, "solr.ExternalFileField", add, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE,
+            String.valueOf(version));
     }
 
     /**

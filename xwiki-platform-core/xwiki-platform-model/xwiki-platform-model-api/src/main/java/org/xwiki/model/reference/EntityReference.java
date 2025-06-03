@@ -22,8 +22,10 @@ package org.xwiki.model.reference;
 import java.beans.Transient;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -42,6 +44,13 @@ import org.xwiki.stability.Unstable;
  */
 public class EntityReference implements Serializable, Cloneable, Comparable<EntityReference>
 {
+    /**
+     * See {@link #getParentType()}.
+     * @since 17.0.0RC1
+     */
+    @Unstable
+    public static final String PARENT_TYPE_PARAMETER = "parentType";
+
     /**
      * Used to provide a nice and readable pretty name for the {@link #toString()} method.
      */
@@ -117,7 +126,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
 
         setName(reference.name);
         setType(reference.type);
-        setParameters(reference.parameters);
         if (reference.parent == null) {
             if (oldReference == null) {
                 setParent(newReference);
@@ -130,6 +138,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         } else {
             setParent(new EntityReference(reference.parent, oldReference, newReference));
         }
+        setParameters(reference.parameters);
     }
 
     /**
@@ -190,7 +199,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Clone an EntityReference, but use the specified paramaters.
+     * Clone an EntityReference, but use the specified parameters.
      *
      * @param reference the reference to clone
      * @param parameters parameters for this reference, may be null
@@ -297,11 +306,33 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             if (this.parameters == null) {
                 this.parameters = new TreeMap<>();
             }
-            this.parameters.put(name, value);
+            if (PARENT_TYPE_PARAMETER.equals(name)) {
+                setParentTypeParameter(value);
+            } else {
+                this.parameters.put(name, value);
+            }
         } else if (parameters != null) {
             this.parameters.remove(name);
-            if (this.parameters.size() == 0) {
+            if (this.parameters.isEmpty()) {
                 this.parameters = null;
+            }
+        }
+    }
+
+    private void setParentTypeParameter(Serializable value)
+    {
+        if (value != null && getParent() == null) {
+            EntityType parentType;
+            if (value instanceof EntityType entityType) {
+                parentType = entityType;
+            } else {
+                parentType = EntityType.valueOf(value.toString().toUpperCase(Locale.ROOT));
+            }
+            if (getType().getAllowedParents().contains(parentType)) {
+                this.parameters.put(PARENT_TYPE_PARAMETER, parentType);
+            } else {
+                throw new IllegalArgumentException(
+                    "The parent type [" + parentType + "] does not belong to the allowed parents");
             }
         }
     }
@@ -533,7 +564,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @since 15.5.5
      * @since 14.10.20
      */
-    @Unstable
     public EntityReference removeParameters(boolean recursive)
     {
         EntityReference current;
@@ -680,6 +710,31 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             && (parameters == null ? otherReference.parameters == null : parameters.equals(otherReference.parameters));
     }
 
+    /**
+     * The parent type information is used by resolvers to identify which part of the base reference should be kept.
+     * If the entity reference has a parent (see {@link #getParent()}) then this type should always be the type of
+     * the parent. Now if the entity reference doesn't have the parent this value can be given by the
+     * {@link #PARENT_TYPE_PARAMETER} parameter (see {@link #getParameter(String)}), and if none is given it will
+     * fall back on first allowed parents (see {@link EntityType#getAllowedParents()} of current type returned by
+     * {@link #getType()}.
+     * @return the type of the parent to be used for computing the proper base reference in resolvers.
+     * @since 17.0.0RC1
+     */
+    @Unstable
+    public EntityType getParentType()
+    {
+        EntityType result;
+        if (getParent() == null) {
+            result = getParameter(PARENT_TYPE_PARAMETER);
+            if (result == null && !getType().getAllowedParents().isEmpty()) {
+                result = getType().getAllowedParents().get(0);
+            }
+        } else {
+            result = getParent().getType();
+        }
+        return result;
+    }
+
     @Override
     public int hashCode()
     {
@@ -687,16 +742,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             .append(this.parameters).toHashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note: The default implementation relies on comparing the string serialization of the 2 entities. It is the
-     * caller's responsibility to make sure that the entities are either first resolved or at least of the same type, in
-     * order for the comparison to actually make sense.
-     * </p>
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     public int compareTo(EntityReference reference)
     {
@@ -708,47 +753,71 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             return 0;
         }
 
-        // Generically compare the string serializations of the 2 references.
-        int stringCompareResult = toString().compareTo(reference.toString());
-        if (stringCompareResult != 0) {
-            return stringCompareResult;
-        }
+        List<EntityReference> references = getReversedReferenceChain();
+        Iterator<EntityReference> it = references.iterator();
+        List<EntityReference> otherReferences = reference.getReversedReferenceChain();
+        Iterator<EntityReference> otherIt = otherReferences.iterator();
+        while (it.hasNext() && otherIt.hasNext()) {
+            EntityReference element = it.next();
+            EntityReference otherElement = otherIt.next();
 
-        // If the string serializations are the same, compare the parameters.
-        return compareParameters(reference);
-    }
+            // Compare the names
+            int result = element.getName().compareTo(otherElement.getName());
+            if (result != 0) {
+                return result;
+            }
 
-    /**
-     * Compare parameters of this reference and another reference.
-     *
-     * @param reference the other reference to be compare with
-     * @return 0 if parameters are equals, -1 if this reference has lower parameters, +1 otherwise
-     */
-    @SuppressWarnings("unchecked")
-    private int compareParameters(EntityReference reference)
-    {
-        if (parameters != null && reference.parameters == null) {
-            return 1;
-        }
-
-        if (parameters != null) {
-            for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
-                Object obj = reference.parameters.get(entry.getKey());
-                Object myobj = entry.getValue();
-                if (myobj instanceof Comparable) {
-                    if (obj == null) {
-                        return 1;
-                    }
-
-                    int number = ((Comparable) myobj).compareTo(obj);
-
-                    if (number != 0) {
-                        return number;
-                    }
-                }
+            // Compare the parameters
+            result = compareParameters(element.getParameters(), otherElement.getParameters());
+            if (result != 0) {
+                return result;
             }
         }
 
-        return (reference.parameters == null) ? 0 : -1;
+        return references.size() - otherReferences.size();
+    }
+
+    /**
+     * Compare parameters of two references.
+     *
+     * @param parameters the first parameters to compare
+     * @param otherParameters the other parameters to compare
+     * @return 0 if parameters are equals, -1 if the first parameters are lower, +1 otherwise
+     */
+    private int compareParameters(Map<String, Serializable> parameters, Map<String, Serializable> otherParameters)
+    {
+        for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
+            Object value = entry.getValue();
+            Object otherValue = otherParameters.get(entry.getKey());
+            int result = compareTo(value, otherValue);
+            if (result != 0) {
+                return result;
+            }
+        }
+
+        return parameters.size() - otherParameters.size();
+    }
+
+    private int compareTo(Object value, Object otherValue)
+    {
+        if (value != otherValue) {
+            if (value == null) {
+                return -1;
+            }
+
+            if (otherValue == null) {
+                return 1;
+            }
+
+            if (value.getClass() == otherValue.getClass() && value instanceof Comparable) {
+                return ((Comparable) value).compareTo(otherValue);
+            }
+
+            if (!value.equals(otherValue)) {
+                return 1;
+            }
+        }
+
+        return 0;
     }
 }

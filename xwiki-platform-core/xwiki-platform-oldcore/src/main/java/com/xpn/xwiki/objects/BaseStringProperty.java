@@ -107,6 +107,12 @@ public class BaseStringProperty extends BaseProperty
     }
 
     @Override
+    public BaseStringProperty clone(boolean detach)
+    {
+        return (BaseStringProperty) super.clone(detach);
+    }
+
+    @Override
     protected void cloneInternal(BaseProperty clone)
     {
         BaseStringProperty property = (BaseStringProperty) clone;

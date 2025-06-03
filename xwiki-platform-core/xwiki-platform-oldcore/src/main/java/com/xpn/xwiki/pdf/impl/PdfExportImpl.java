@@ -52,11 +52,12 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.velocity.VelocityManager;
@@ -114,7 +115,8 @@ public class PdfExportImpl implements PdfExport
 
     private final XMLReaderFactory xmlReaderFactory = Utils.getComponent(XMLReaderFactory.class);
 
-    private final AuthorizationManager authorizationManager = Utils.getComponent(AuthorizationManager.class);
+    private final DocumentAuthorizationManager authorizationManager =
+        Utils.getComponent(DocumentAuthorizationManager.class);
 
     private final AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
 
@@ -501,7 +503,9 @@ public class PdfExportImpl implements PdfExport
             return result;
         }
 
-        if (this.authorizationManager.hasAccess(Right.SCRIPT, templateAuthorReference, templateReference)) {
+        if (this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, templateAuthorReference,
+            templateReference))
+        {
             try {
                 result = this.authorExecutor.call(() -> {
                     StringWriter writer = new StringWriter();

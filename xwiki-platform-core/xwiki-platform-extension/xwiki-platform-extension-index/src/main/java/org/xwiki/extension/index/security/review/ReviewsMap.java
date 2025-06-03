@@ -26,7 +26,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -35,7 +34,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 15.6RC1
  */
-@Unstable
 public class ReviewsMap
 {
     private final Map<String, List<Review>> reviewsMap = new HashMap<>();

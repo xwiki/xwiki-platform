@@ -31,15 +31,17 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.evaluation.ObjectEvaluatorException;
 import org.xwiki.evaluation.ObjectPropertyEvaluator;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.velocity.VelocityManager;
 
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -56,7 +58,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class VelocityObjectPropertyEvaluator implements ObjectPropertyEvaluator
 {
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Inject
     private AuthorExecutor authorExecutor;
@@ -84,11 +86,14 @@ public class VelocityObjectPropertyEvaluator implements ObjectPropertyEvaluator
         }
 
         DocumentReference documentReference = object.getDocumentReference();
-        DocumentAuthors documentAuthors = object.getOwnerDocument().getAuthors();
+        XWikiDocument ownerDocument = object.getOwnerDocument();
+        DocumentAuthors documentAuthors = ownerDocument.getAuthors();
         DocumentReference authorReference =
             this.documentUserSerializer.serialize(documentAuthors.getEffectiveMetadataAuthor());
 
-        if (this.authorizationManager.hasAccess(Right.SCRIPT, authorReference, documentReference)) {
+        if (!ownerDocument.isRestricted() && this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            authorReference, documentReference))
+        {
             try {
                 this.authorExecutor.call(() -> {
                     VelocityContext context = this.velocityManager.getVelocityContext();

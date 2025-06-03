@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -67,11 +68,10 @@ public class HTMLMacroRequiredRightsAnalyzer implements MacroRequiredRightsAnaly
     @Override
     public void analyze(MacroBlock macroBlock, MacroRequiredRightReporter reporter)
     {
-        boolean wiki = Boolean.TRUE.equals(this.converter.convert(Boolean.class, macroBlock.getParameter("wiki")));
-        String cleanParameter = macroBlock.getParameter("clean");
+        boolean wiki = getBooleanParameterValues(macroBlock, "wiki").anyMatch(Boolean.TRUE::equals);
+
         // Cleaning is enabled by default.
-        boolean clean =
-            cleanParameter == null || Boolean.TRUE.equals(this.converter.convert(Boolean.class, cleanParameter));
+        boolean clean = getBooleanParameterValues(macroBlock, "clean").noneMatch(Boolean.FALSE::equals);
 
         if (wiki) {
             reporter.analyzeContent(macroBlock, macroBlock.getContent());
@@ -104,5 +104,12 @@ public class HTMLMacroRequiredRightsAnalyzer implements MacroRequiredRightsAnaly
                     TRANSLATION_PREFIX + "dangerousContent");
             }
         }
+    }
+
+    private Stream<Boolean> getBooleanParameterValues(MacroBlock macroBlock, String parameterName)
+    {
+        return macroBlock.getParameters().entrySet().stream()
+            .filter(entry -> parameterName.equalsIgnoreCase(entry.getKey()))
+            .map(entry -> this.converter.convert(Boolean.class, entry.getValue()));
     }
 }

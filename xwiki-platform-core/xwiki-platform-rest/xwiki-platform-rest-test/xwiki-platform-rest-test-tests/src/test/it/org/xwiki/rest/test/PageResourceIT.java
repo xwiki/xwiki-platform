@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.test;
 
+import java.io.InputStream;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.HistorySummary;
@@ -61,6 +64,7 @@ import org.xwiki.rest.test.framework.TestConstants;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.hamcrest.Matchers.isIn;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class PageResourceIT extends AbstractHttpIT
@@ -170,6 +174,29 @@ public class PageResourceIT extends AbstractHttpIT
         Assert.assertNotNull(link);
 
         checkLinks(page);
+    }
+
+    @Test
+    public void whiteSpaceEncoding() throws Exception
+    {
+        LocalDocumentReference localDocumentReference = new LocalDocumentReference("Space", "Page with space");
+
+        this.testUtils.rest().savePage(localDocumentReference);
+        Page page = this.testUtils.rest().get(localDocumentReference);
+
+        assertEquals("Page with space", page.getName());
+
+        // Make sure that the page can be accessed with the white space characters encoded as +
+        URI uri = new URI(getBaseURL() + "/wikis/xwiki/spaces/Space/pages/Page+with+space");
+        GetMethod getMethod = this.testUtils.rest().executeGet(uri);
+
+        assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+
+        try (InputStream stream = getMethod.getResponseBodyAsStream()) {
+            page = this.testUtils.rest().toResource(stream);
+
+            assertEquals("Page with space", page.getName());
+        }
     }
 
     @Test

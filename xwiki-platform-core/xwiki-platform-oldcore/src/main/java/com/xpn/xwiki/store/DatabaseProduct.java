@@ -119,6 +119,15 @@ public final class DatabaseProduct
         return this.productName;
     }
 
+    /**
+     * @return the JDBC scheme
+     * @since 17.1.0RC1
+     */
+    public String getJDBCScheme()
+    {
+        return this.jdbcScheme;
+    }
+
     @Override
     public boolean equals(Object object)
     {

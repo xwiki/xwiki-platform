@@ -205,18 +205,16 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
                 #end
               #end
             </tr>
-            <tr id="unregistered">
-              ## Rights for guests, statically displayed outside the livetable
-              <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
-              #foreach ($i in [0..$maxlevel])
-                #if ($currentAllowed[$i])
-                  <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
-                #end
-              #end
-            </tr>
             <tr id="usersandgroupstable-filters">
               ## Users/groups filter
-              <td><label for="name">$services.localization.render('rightsmanager.searchfilter')</label><input id="name" name="name" type="text"/>
+              ## We split the column amount in between the two objects as evenly as possible.
+              ## This way we can make sure both element have enough space to display correctly.
+              #set ($colsp = ($maxlevel+2)/2)
+              <td colspan="$colsp">
+                <label for="name">$services.localization.render('rightsmanager.searchfilter')</label>
+                <input id="name" name="name" type="text"/>
+              </td>
+              <td colspan="$colsp">
                 #if(!$xcontext.isMainWiki()) #set($mainwk = false) #else #set($mainwk = true) #end
                 #if(!$mainwk) ## display the combobox only in a local wiki
                   <div id="usersandgroupstable-filters-scope">
@@ -230,9 +228,17 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
                 #else
                   <input type="hidden" name="wiki" value="local"/>
                 #end
-                #set ($colsp = $maxlevel + 1)
+                <input type="hidden" name="clsname" value="$escapetool.xml($clsname)" />
               </td>
-              <td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
+            </tr>
+            <tr id="unregistered">
+              ## Rights for guests, statically displayed outside the livetable
+              <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
+              #foreach ($i in [0..$maxlevel])
+                #if ($currentAllowed[$i])
+                  <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
+                #end
+              #end
             </tr>
           </thead>
           ## Livetable placeholder, will be filled in from Javascript

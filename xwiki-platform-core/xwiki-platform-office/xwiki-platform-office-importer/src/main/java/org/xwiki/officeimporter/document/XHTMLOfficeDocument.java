@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
-import org.xwiki.stability.Unstable;
 import org.xwiki.xml.html.HTMLUtils;
 
 /**
@@ -56,7 +55,6 @@ public class XHTMLOfficeDocument implements OfficeDocument
      * @since 14.10.8
      * @since 15.3RC1
      */
-    @Unstable
     public XHTMLOfficeDocument(Document document, Map<String, OfficeDocumentArtifact> artifacts,
         OfficeConverterResult converterResult)
     {

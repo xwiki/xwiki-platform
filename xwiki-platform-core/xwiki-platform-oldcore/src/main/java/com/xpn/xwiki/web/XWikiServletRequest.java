@@ -19,13 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.Optional;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.xwiki.user.UserReference;
+import org.xwiki.container.Request;
+import org.xwiki.jakartabridge.JavaxToJakartaWrapper;
 
 import com.xpn.xwiki.util.Util;
 
@@ -34,14 +33,28 @@ import com.xpn.xwiki.util.Util;
  * 
  * @version $Id$
  */
-public class XWikiServletRequest extends HttpServletRequestWrapper implements XWikiRequest
+@Deprecated(since = "17.0.0RC1")
+public class XWikiServletRequest extends HttpServletRequestWrapper
+    implements XWikiRequest, JavaxToJakartaWrapper<jakarta.servlet.http.HttpServletRequest>
 {
-    public static final String ATTRIBUTE_EFFECTIVE_AUTHOR = XWikiRequest.class.getName() + "#effectiveAuthor";
+    public static final String ATTRIBUTE_EFFECTIVE_AUTHOR = Request.ATTRIBUTE_EFFECTIVE_AUTHOR;
 
     public XWikiServletRequest(HttpServletRequest request)
     {
         // Passing null to #XWikiServletRequest(HttpServletRequest) used partially work so keeping it working to be safe
         super(request != null ? request : new XWikiServletRequestStub());
+    }
+
+    // JavaxToJakartaWrapper
+
+    @Override
+    public jakarta.servlet.http.HttpServletRequest getJakarta()
+    {
+        if (getRequest() instanceof JavaxToJakartaWrapper wrapper) {
+            return (jakarta.servlet.http.HttpServletRequest) wrapper.getJakarta();
+        }
+
+        return null;
     }
 
     // XWikiRequest
@@ -65,12 +78,6 @@ public class XWikiServletRequest extends HttpServletRequestWrapper implements XW
     }
 
     // HttpServletRequest
-
-    @Override
-    public StringBuffer getRequestURL()
-    {
-        return getHttpServletRequest().getRequestURL();
-    }
 
     @Override
     public String getParameter(String s)
@@ -106,11 +113,5 @@ public class XWikiServletRequest extends HttpServletRequestWrapper implements XW
         }
 
         return request.getRemoteHost();
-    }
-
-    @Override
-    public Optional<UserReference> getEffectiveAuthor()
-    {
-        return Optional.ofNullable((UserReference) getAttribute(ATTRIBUTE_EFFECTIVE_AUTHOR));
     }
 }

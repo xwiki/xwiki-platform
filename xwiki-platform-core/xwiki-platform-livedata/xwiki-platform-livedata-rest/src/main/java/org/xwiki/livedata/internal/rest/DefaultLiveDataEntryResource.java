@@ -22,8 +22,8 @@ package org.xwiki.livedata.internal.rest;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -38,18 +38,22 @@ import org.xwiki.livedata.rest.model.jaxb.Entry;
 
 /**
  * Default implementation of {@link LiveDataEntryResource}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntryResource")
-@Singleton
 public class DefaultLiveDataEntryResource extends AbstractLiveDataResource implements LiveDataEntryResource
 {
+    @Inject
+    private LiveDataResourceContextInitializer contextInitializer;
+
     @Override
     public Entry getEntry(String sourceId, String namespace, String entryId) throws Exception
     {
+        this.contextInitializer.initialize(namespace);
+
         LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {
@@ -66,6 +70,8 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
     @Override
     public Response updateEntry(String sourceId, String namespace, String entryId, Entry entry) throws Exception
     {
+        this.contextInitializer.initialize(namespace);
+
         LiveDataConfiguration config = getLiveDataConfig(sourceId);
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(config.getQuery().getSource(), namespace);
         if (source.isPresent()) {
@@ -78,7 +84,7 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
                 try {
                     values = entryStore.get(updatedEntryId.get());
                 } catch (UnsupportedOperationException e) {
-                    // Returns a success response without an entity when the entry store does not implement the get 
+                    // Returns a success response without an entity when the entry store does not implement the get
                     // operation (for instance the liveTable source).
                     return Response.status(Status.ACCEPTED).build();
                 }
@@ -96,6 +102,8 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
     @Override
     public void deleteEntry(String sourceId, String namespace, String entryId) throws Exception
     {
+        this.contextInitializer.initialize(namespace);
+
         LiveDataQuery.Source querySource = getLiveDataQuerySource(sourceId);
         Optional<LiveDataSource> source = this.liveDataSourceManager.get(querySource, namespace);
         if (source.isPresent()) {

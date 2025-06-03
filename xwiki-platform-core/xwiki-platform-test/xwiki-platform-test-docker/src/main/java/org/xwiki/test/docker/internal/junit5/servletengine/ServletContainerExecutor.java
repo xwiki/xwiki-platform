@@ -25,11 +25,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -48,6 +48,7 @@ import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
 
+import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Image;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -74,6 +75,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
 
     private static final String ROOT_USER = "root";
+
+    private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -179,15 +182,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         List<String> javaOpts = new ArrayList<>();
 
         // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
-        // Note that we should check the version of Java inside the Jetty container but that's hard and FTM we consider
-        // that if the Maven build for the tests runs with Java 17+ then, it's very likely that Jetty/XWiki will also
-        // run on Java 17+.
-        // PS: We could check the tag and verify if it contains "jdkNN" or "jreNN" where NN >= 17 but the problem is
-        // that there are plenty of tags that don't mention the jdk or jre (like "10" for example which runs on Java 21
-        // ATM).
-        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
-            addJava17AddOpens(javaOpts);
-        }
+        addJava17AddOpens(javaOpts);
 
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:
@@ -201,15 +196,35 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         maybeEnableRemoteDebugging(javaOpts);
         this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
-        // Jetty 10.0.3+ has now added a protection in URLs so that encoded characters such as % are
-        // prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
-        // https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
-        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986");
+        // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
+        // (ee10 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
+        int jettyVersion = extractJettyMajorVersionFromDockerTag(this.testConfiguration.getServletEngineTag());
+        if (jettyVersion >= 12) {
+            this.servletContainer.setCommand("--module=ee10-apache-jsp,ee10-deploy,ee10-websocket-jakarta,http");
+        } else {
+            throw new Exception(String.format("Unsupported version of Jetty: [%n]", jettyVersion));
+        }
 
         // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker
         // socket (otherwise we can't manage the Docker containers from within XWiki, which is a use case for the PDF
         // export application).
         this.servletContainer.withCreateContainerCmdModifier(cmd -> cmd.withUser(ROOT_USER));
+    }
+
+    private int extractJettyMajorVersionFromDockerTag(String tag)
+    {
+        int result = 12;
+        if (tag != null) {
+            Matcher matcher = MAJOR_VERSION.matcher(tag);
+            if (matcher.find()) {
+                try {
+                    result = Integer.valueOf(matcher.group());
+                } catch (NumberFormatException e) {
+                    // On error consider we're on Jetty 12
+                }
+            }
+        }
+        return result;
     }
 
     private void configureTomcat(File sourceWARDirectory) throws Exception
@@ -233,11 +248,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         List<String> catalinaOpts = new ArrayList<>();
         catalinaOpts.add("-Xmx1024m");
-        catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
-        catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
-        catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
 
-        // Note: Tomcat 9.x automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
+        // Note: Tomcat automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
         // need to add them as we do for Jetty.
         // see https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
 
@@ -333,26 +345,49 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         start(this.servletContainer, this.testConfiguration);
     }
 
-    private String getDockerImageTag(TestConfiguration testConfiguration)
+    private String getDockerImageTag()
     {
-        // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
-        // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
-        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag()
-            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9-jdk17" : LATEST);
+        return this.testConfiguration.getServletEngineTag() != null ? this.testConfiguration.getServletEngineTag()
+            : LATEST;
+    }
+
+    private String getDockerImageHash() throws InterruptedException
+    {
+        // Not using try-with-resources since the global docker client should never be closed (triggers an
+        // IllegalStateException)
+        DockerClientFactory.instance().client()
+            .pullImageCmd(this.testConfiguration.getServletEngine().getDockerImageName())
+            .withTag(getDockerImageTag())
+            .start().awaitCompletion();
+        InspectImageResponse inspectImageResponse =
+            DockerClientFactory.instance().client().inspectImageCmd(getBaseImageName()).exec();
+        String imageId = inspectImageResponse.getId();
+        String prefix = "sha256:";
+        if (imageId.startsWith(prefix)) {
+            imageId = imageId.substring(prefix.length());
+        }
+        return imageId;
+    }
+
+    private String getBaseImageName()
+    {
+        return String.format("%s:%s",
+            this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag());
     }
 
     private GenericContainer<?> createServletContainer() throws Exception
     {
-        String baseImageName = String.format("%s:%s",
-            this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
+        String baseImageName = getBaseImageName();
+        LOGGER.info("Get base image name: {}", baseImageName);
         GenericContainer<?> container;
 
         if (this.testConfiguration.isOffice()) {
             // We only build the image once for performance reason.
             // So we compute a name for the image we will build, and we check that the image does not exist yet.
-            String imageName = String.format("xwiki-%s-office:%s",
+            String imageName = String.format("xwiki-%s-%s-office:%s",
                 this.testConfiguration.getServletEngine().name().toLowerCase(),
-                getDockerImageTag(this.testConfiguration));
+                getDockerImageTag(),
+                getDockerImageHash());
 
             // We rebuild every time the LibreOffice version changes
             String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");
@@ -385,14 +420,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
                                 + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
-                                + "libxml2 libxslt1-dev && "
-                                + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
-                                + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
+                                + "libxml2 libxslt1-dev")
+                            .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
-                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
-                                + "cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
-                                + "dpkg -i *.deb && "
-                                + "ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
+                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
+                            .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
+                                + "dpkg -i *.deb && ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can
                             // reconstructed on all machines needing it.
                             .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);

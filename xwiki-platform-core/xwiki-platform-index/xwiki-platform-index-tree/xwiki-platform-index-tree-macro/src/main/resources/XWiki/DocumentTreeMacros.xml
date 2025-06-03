@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.DocumentTreeMacros" locale="">
+<xwikidoc version="1.6" reference="XWiki.DocumentTreeMacros" locale="">
   <web>XWiki</web>
   <name>DocumentTreeMacros</name>
   <language/>
@@ -69,9 +69,15 @@
   #end
   ## Handle relative references
   #makeNodeReferencesAbsolute($docTreeConfig ['root', 'openTo'])
-  ## Sort the child documents by (raw) title when the node label is the document title.
-  #if ($docTreeConfig.showDocumentTitle)
-    #set ($docTreeConfig.orderBy = 'title')
+  ## FIXME: The 'orderBy' property of the tree API is shared by all tree node types, which means we can't indicate a
+  ## different sort field per tree node type (e.g. sort wiki nodes by name and document nodes by last modification
+  ## date). At the same time, this property is currently taken into account only for sorting document tree nodes, so for
+  ## now we set its value to the specified document sort. In the future we may want to convert this into a map, where
+  ## the key is the node type.
+  #set ($docTreeConfig.orderBy = $docTreeConfig.sortDocumentsBy)
+  ## Sort the child documents by (raw) title when the node label is the document title and there's no sort specified.
+  #if ($docTreeConfig.showDocumentTitle &amp;&amp; "$!docTreeConfig.orderBy" == '')
+    #set ($docTreeConfig.orderBy = 'title:asc')
   #end
   ## Determine which hierarchy needs to be used.
   #if ($docTreeConfig.showSpaces)
@@ -114,7 +120,11 @@
 #macro (handleDocumentTreeRequest)
   #if ($request.action)
     #if ($services.csrf.isTokenValid($request.form_token))
-      $response.sendError(400, 'The specified action is not supported.')
+      #if ($request.action == 'create' &amp;&amp; $request.type == 'addDocument')
+        #handleNewNodeCreationRequest()
+      #else
+        $response.sendError(400, 'The specified action is not supported.')
+      #end
     #elseif ($isAjaxRequest)
       $response.sendError(403, 'The CSRF token is missing.')
     #else
@@ -138,6 +148,22 @@
       $response.sendError(404)
     #end
   #end
+#end
+
+#macro (handleNewNodeCreationRequest)
+  #set ($cleanId = $stringtool.substring($request.id, $stringtool.length('document:')))
+  #set ($parentReference = $services.model.resolveDocument($cleanId))
+  #set ($requestedName = $request.name)
+  #set ($transformedName = $services.modelvalidation.transformName($requestedName))
+  #set ($spaceReference = $services.model.createSpaceReference($transformedName, $parentReference.lastSpaceReference))
+  #set ($documentReference = $services.model.createDocumentReference('WebHome', $spaceReference))
+  #set ($data = [])
+  #addDocumentNode($documentReference, $data)
+  ## We want to allow opening the node to add another hierarchy.
+  #set ($data[0].children = true)
+  ## We want to display the actual requested name as node name.
+  #set ($data[0].text = $requestedName)
+  #jsonResponse($data)
 #end
 
 #macro (postProcessDocumentTreeData $data)
@@ -217,6 +243,7 @@
 
 #macro (maybeAddFarmNode $nodeReference $siblings)
   #set ($farmHomeReference = $services.model.resolveDocument('', 'default'))
+  #set ($isOpened = $docTreeConfig.expandToLevel &gt; 0)
   #set ($discard = $siblings.add({
     'id': 'farm:*',
     'text': 'Farm',
@@ -225,6 +252,9 @@
     'data': {
       'type': 'farm',
       'validChildren': ['wiki', 'pagination']
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($farmHomeReference)
@@ -254,6 +284,7 @@
   #else
     #set ($label = $wiki.id)
   #end
+  #set ($isOpened = $docTreeConfig.expandToLevel &gt; 0)
   #set ($discard = $siblings.add({
     'id': "wiki:$wiki.id",
     'text': $label,
@@ -264,6 +295,9 @@
       'type': 'wiki',
       'validChildren': ['space', 'document', 'pagination'],
       'canDelete': $canDeleteWiki
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($wiki.mainPageReference)
@@ -290,6 +324,7 @@
 
 #macro (addSpaceNode $spaceReference $siblings)
   #set ($spaceId = $services.model.serialize($spaceReference, 'default'))
+  #set ($nodeId = "space:$spaceId")
   #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spaceReference))
   #set ($canViewSpace = $services.security.authorization.hasAccess('view', $spaceReference))
   #if ($docTreeConfig.showTerminalDocuments)
@@ -297,10 +332,21 @@
     #set ($hasChildren = true)
   #else
     ## We display only the nested spaces. This space might contain only documents.
-    #set ($hasChildren = $tree.getChildCount("space:$spaceId") &gt; 0)
+    #set ($hasChildren = $tree.getChildCount($nodeId) &gt; 0)
+  #end
+  #set ($isOpened = false)
+  #if ("$!docTreeConfig.expandToLevel" != '')
+    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #if ("$!docTreeConfig.root" != '')
+      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #else
+      #set ($rootNode = $docTreeConfig.root)
+    #end
+    #set ($rootDistance = $tree.getPath($nodeId).size())
+    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
   #end
   #set ($discard = $siblings.add({
-    'id': "space:$spaceId",
+    'id': $nodeId,
     'text': $spaceReference.name,
     'icon': 'fa fa-folder-o',
     'iconOpened': 'fa fa-folder-open-o',
@@ -317,6 +363,9 @@
       'canDelete': $hasSpaceAdmin,
       'createDocumentURL': $xwiki.getURL($spaceReference, 'create', $NULL),
       'deleteURL': $xwiki.getURL($spaceReference, 'deletespace', $NULL)
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($spaceReference)
@@ -343,6 +392,7 @@
 
 #macro (addDocumentNode $documentReference $siblings)
   #set ($documentId = $services.model.serialize($documentReference, 'default'))
+  #set ($nodeId = "document:$documentId")
   #set ($label = $documentReference.name)
   #if (!$docTreeConfig.showSpaces &amp;&amp;
       $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
@@ -359,9 +409,20 @@
       #set ($label = $plainTitle)
     #end
   #end
-  #set ($hasChildren = $tree.getChildCount("document:$documentId") &gt; 0)
+  #set ($hasChildren = $tree.getChildCount($nodeId) &gt; 0)
+  #set ($isOpened = false)
+  #if ("$!docTreeConfig.expandToLevel" != '')
+    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #if ("$!docTreeConfig.root" != '')
+      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #else
+      #set ($rootNode = $docTreeConfig.root)
+    #end
+    #set ($rootDistance = $tree.getPath($nodeId).size())
+    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
+  #end
   #set ($discard = $siblings.add({
-    'id': "document:$documentId",
+    'id': $nodeId,
     'text': $label,
     'icon': 'fa fa-file-o',
     'children': $hasChildren,
@@ -375,6 +436,9 @@
       'canMove': $canDeleteDoc,
       'canCopy': $canViewDoc,
       'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL)
+    },
+    'state': {
+       'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($documentReference)
@@ -390,14 +454,18 @@
 #end
 
 #macro (addAddDocumentNode $documentReference $siblings)
+  ## FIXME: This URL is wrong, it should use the $documentReference as the parent for creation of the node:
+  ## the reference is already an existing doc, so it shouldn't be the one used for creation.
   #set ($discard = $siblings.add({
     'id': "addDocument:$services.model.serialize($documentReference, 'default')",
-    'text': 'New page...',
+    'text': $services.localization.render('index.documentTree.addDocument'),
     'icon': 'fa fa-plus-circle',
     'children': false,
     'data': {
       'type': 'addDocument',
-      'validChildren': []
+      'validChildren': [],
+      'hasContextMenu': true,
+      'canRename': true
     },
     'a_attr': {
       'href': $xwiki.getURL($documentReference, 'create')

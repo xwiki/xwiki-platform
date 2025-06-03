@@ -97,7 +97,7 @@
     ## Delete document action template.
     &lt;a href="" class="action actiondelete"
         title="$escapetool.xml($services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip'))"&gt;
-      &lt;span class="action-icon"&gt;$services.icon.renderHTML('cross')&lt;/span&gt;&lt;span
+      &lt;span class="action-icon"&gt;$services.icon.renderHTML('trash')&lt;/span&gt;&lt;span
         class="action-label"&gt;$escapetool.xml(
         $services.localization.render('platform.index.trashDocumentsActionsDeleteText'))
       &lt;/span&gt;
@@ -357,8 +357,12 @@ XWiki.index.trash.documents.displayEntry = function (row, i, table) {
   tr.appendChild(new Element('td').update(row.date));
   var deleter = new Element('a', {'href' : row.deleterurl}).update(row.deletername);
   tr.appendChild(new Element('td').update(deleter));
-  var batchId = new Element('a', {'href' : row.batchId_url}).update(row.batchId);
-  tr.appendChild(new Element('td').update(batchId));
+  if (row.batchId != '') {
+    var batchId = new Element('a', {'href' : row.batchId_url}).update(row.batchId);
+    tr.appendChild(new Element('td').update(batchId));
+  } else {
+    tr.appendChild(new Element('td'));
+  }
   var actions = new Element('td', {'class' : 'actions'});
   if(!row.alreadyExists) {
     if(row.canRestore) {

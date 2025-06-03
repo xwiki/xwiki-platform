@@ -19,18 +19,18 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Base class for CKEditor integration tests.
@@ -41,21 +41,24 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  */
 public abstract class AbstractCKEditorIT
 {
+    private static final String STANDARD_USER_LOGIN = "alice";
+    private static final String STANDARD_USER_PASSWORD = "pa$$word";
+
     protected CKEditor editor;
 
     protected RichTextAreaElement textArea;
 
-    WYSIWYGEditPage edit(TestUtils setup, TestReference testReference)
+    WYSIWYGEditPage edit(TestUtils setup, EntityReference entityReference)
     {
-        return edit(setup, testReference, true);
+        return edit(setup, entityReference, true);
     }
 
-    WYSIWYGEditPage edit(TestUtils setup, TestReference testReference, boolean startFresh)
+    WYSIWYGEditPage edit(TestUtils setup, EntityReference pageReference, boolean startFresh)
     {
         if (startFresh) {
-            setup.deletePage(testReference, true);
+            setup.deletePage(pageReference, true);
         }
-        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
+        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(pageReference);
         this.editor = new CKEditor("content").waitToLoad();
         this.textArea = this.editor.getRichTextArea();
         return editPage;
@@ -63,13 +66,29 @@ public abstract class AbstractCKEditorIT
 
     protected void createAndLoginStandardUser(TestUtils setup)
     {
-        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
+        setup.createUserAndLogin(STANDARD_USER_LOGIN, STANDARD_USER_PASSWORD,
+            "editor", "Wysiwyg",
+            "usertype", "Advanced");
+    }
+
+    protected void loginStandardUser(TestUtils setup)
+    {
+        setup.login(STANDARD_USER_LOGIN, STANDARD_USER_PASSWORD);
     }
 
     protected void assertSourceEquals(String expected)
     {
+        assertSourceEquals(expected, false);
+    }
+
+    protected void assertSourceEquals(String expected, boolean normalizeSpaces)
+    {
         editor.getToolBar().toggleSourceMode();
-        assertEquals(expected, editor.getSourceTextArea().getAttribute("value"));
+        String actualSource = editor.getSourceTextArea().getDomProperty("value");
+        if (actualSource != null && normalizeSpaces) {
+            actualSource = actualSource.replace('\u00A0', ' ');
+        }
+        assertEquals(expected, actualSource);
         editor.getToolBar().toggleSourceMode();
         this.textArea = this.editor.getRichTextArea();
     }
@@ -77,8 +96,8 @@ public abstract class AbstractCKEditorIT
     protected void assertSourceContains(String expectedSource)
     {
         editor.getToolBar().toggleSourceMode();
-        String actualSource = editor.getSourceTextArea().getAttribute("value");
-        assertTrue(actualSource.contains(expectedSource), "Unexpected source: " + actualSource);
+        String actualSource = editor.getSourceTextArea().getDomProperty("value");
+        assertTrue(StringUtils.contains(actualSource, expectedSource), "Unexpected source: " + actualSource);
         editor.getToolBar().toggleSourceMode();
         this.textArea = this.editor.getRichTextArea();
     }
@@ -91,40 +110,6 @@ public abstract class AbstractCKEditorIT
         sourceTextArea.sendKeys(source);
         editor.getToolBar().toggleSourceMode();
         this.textArea = this.editor.getRichTextArea();
-    }
-
-    protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)
-    {
-        try {
-            // Dismiss the page leave confirmation modal if already open. We have to do this because we need to insert
-            // the page reload marker, see below, which is not possible while the modal is open.
-            setup.getDriver().switchTo().alert().dismiss();
-        } catch (Exception e) {
-            // The page leave confirmation modal wasn't open.
-        }
-
-        if (setup.isInWYSIWYGEditMode() || setup.isInWikiEditMode()) {
-            // Leaving the edit mode with unsaved changes triggers the confirmation alert which stops the navigation.
-            // Selenium doesn't wait for the new web page to be loaded after the alert is handled so we have to do this
-            // ourselves. Adding the page reload marker helps us detect when the new web page is loaded after the
-            // confirmation alert is handled.
-            setup.getDriver().addPageNotYetReloadedMarker();
-
-            // We pass the action because we don't want this call to wait for view mode to be loaded. We do our own wait
-            // (after handling the confirmation alert), as mentioned above.
-            setup.gotoPage(testReference, "view");
-
-            try {
-                // Confirm the page leave (discard unsaved changes) if we are asked for.
-                setup.getDriver().switchTo().alert().accept();
-            } catch (Exception e) {
-                // The page leave confirmation hasn't been shown, probably because there were no unsaved changes.
-            }
-
-            // Wait for the new web page to be loaded.
-            setup.getDriver().waitUntilPageIsReloaded();
-            new ViewPage();
-        }
     }
 
     protected void waitForSolrIndexing(TestUtils setup, TestConfiguration testConfiguration) throws Exception

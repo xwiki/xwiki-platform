@@ -38,6 +38,7 @@ import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.reference.SolrEntityReferenceResolver;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -76,13 +77,13 @@ public class SolrIndexScriptServiceTest
 
     private DocumentReference userReference;
 
-    private DocumentReference contentAuthorReference;
-
     private SolrIndexScriptService service;
 
     private Logger logger;
 
     private AuthorizationManager mockAuthorization;
+
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Before
     public void setUp() throws Exception
@@ -106,6 +107,7 @@ public class SolrIndexScriptServiceTest
 
         // RightService
         this.mockAuthorization = this.mocker.getInstance(AuthorizationManager.class);
+        this.contextualAuthorizationManager = this.mocker.getInstance(ContextualAuthorizationManager.class);
 
         this.service = mocker.getComponentUnderTest();
 
@@ -126,7 +128,7 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
@@ -144,7 +146,7 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
@@ -159,7 +161,7 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
@@ -177,7 +179,7 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
@@ -193,7 +195,7 @@ public class SolrIndexScriptServiceTest
         // Actual rights check
         EntityReference wikiReference = documentReference.extractReference(EntityType.WIKI);
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
@@ -202,8 +204,7 @@ public class SolrIndexScriptServiceTest
         EntityReference wikiReference = new WikiReference("someWiki");
 
         // Mock
-        doThrow(AccessDeniedException.class).when(this.mockAuthorization).checkAccess(Right.PROGRAM,
-            this.contentAuthorReference, null);
+        doThrow(AccessDeniedException.class).when(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
 
         // Call
         this.service.index(wikiReference);
@@ -212,7 +213,7 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
 
         // Rights check failure
         verify(this.logger).error(isNull(), any(AccessDeniedException.class));
@@ -237,7 +238,7 @@ public class SolrIndexScriptServiceTest
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
         // hasProgrammingRights does not really get to be called, since hasWikiAdminRights already failed at this point
-        verify(this.mockAuthorization, times(0)).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager, times(0)).checkAccess(Right.PROGRAM);
 
         // Rights check failure.
         verify(this.logger).error(isNull(), any(AccessDeniedException.class));
@@ -262,7 +263,7 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
@@ -286,7 +287,7 @@ public class SolrIndexScriptServiceTest
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference1);
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference2);
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference3);
-        verify(this.mockAuthorization, times(3)).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager, times(3)).checkAccess(Right.PROGRAM);
     }
 
     @Test

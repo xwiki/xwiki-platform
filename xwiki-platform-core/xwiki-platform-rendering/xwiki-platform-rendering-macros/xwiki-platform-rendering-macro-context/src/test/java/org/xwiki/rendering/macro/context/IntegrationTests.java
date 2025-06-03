@@ -33,13 +33,13 @@ import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -57,10 +57,9 @@ import static org.mockito.Mockito.when;
  * @since 8.3RC1
  */
 @AllComponents
-@ComponentList(TestEnvironment.class)
-public class IntegrationTests implements RenderingTests
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         // Replace the environment by a test compatible one

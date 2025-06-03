@@ -8,6 +8,7 @@ org.xwiki.component.wiki.internal.DefaultWikiComponentManagerContext
 org.xwiki.component.wiki.internal.DefaultWikiComponentManagerEventListener
 org.xwiki.component.wiki.internal.DefaultWikiComponentMethodExecutor
 org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper
+org.xwiki.component.wiki.internal.WikiComponentRequiredRightAnalyzer
 org.xwiki.component.wiki.internal.bridge.DefaultContentParser
 org.xwiki.component.wiki.internal.bridge.DefaultWikiComponentBridge
 org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponentManagerEventListener

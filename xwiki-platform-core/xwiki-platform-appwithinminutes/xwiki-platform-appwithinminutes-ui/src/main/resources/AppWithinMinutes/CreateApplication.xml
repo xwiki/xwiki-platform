@@ -140,14 +140,10 @@
     &lt;/dl&gt;
     #set ($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
     #if ($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
-      &lt;div class="box warningmessage"&gt;
-        $services.localization.render('platform.appwithinminutes.appNameIsUsedWarning')
-      &lt;/div&gt;
+      #warning($services.localization.render('platform.appwithinminutes.appNameIsUsedWarning'))
     #end
     #if (!$services.security.authorization.hasAccess('script', $xcontext.userReference, $appHomeRef))
-      &lt;div class="box errormessage"&gt;
-        $escapetool.xml($services.localization.render('platform.appwithinminutes.appHomePageNoScriptRight'))
-      &lt;/div&gt;
+      #error($escapetool.xml($services.localization.render('platform.appwithinminutes.appHomePageNoScriptRight')))
     #end
   #end
 #end

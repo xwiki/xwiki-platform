@@ -34,7 +34,7 @@ public class CreateWikiPage extends ExtendedViewPage
     @FindBy(name = "wikiname")
     private WebElement wikiNameField;
 
-    @FindBy(name = "description")
+    @FindBy(css = "form textarea[name='description']")
     private WebElement descriptionField;
 
     @FindBy(name = "template")

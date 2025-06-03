@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for {@link NamingCriterion} implementations.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10.2
  * @since 15.0RC1
  */
-@Unstable
 public abstract class AbstractNamingCriterion implements NamingCriterion
 {
     private static final String DEFAULT_DOCUMENT_NAME = "WebHome";

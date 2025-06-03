@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents an office document being imported.
@@ -64,7 +63,6 @@ public interface OfficeDocument extends Closeable
      * @since 14.10.8
      * @since 15.3RC1
      */
-    @Unstable
     default Map<String, OfficeDocumentArtifact> getArtifactsMap()
     {
         return Collections.emptyMap();

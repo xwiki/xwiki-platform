@@ -107,7 +107,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #foreach($appName in $outputList)
     ##
     ## Make sure the current user has permission to edit the configurable application.
-    #set($userHasAccessToDocument = $xcontext.hasAccessLevel('edit', $appName))
+    ## Unless we are in the page administration which is never about modifying the application configuration page
+    #set($userHasAccessToDocument = $level == '.page' || $xcontext.hasAccessLevel('edit', $appName))
     ##
     ## If the document was not last saved by a user with edit privilege on this page
     ## then we can't safely display the page but we should warn the viewer.
@@ -428,7 +429,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       $escapetool.xml($sectionDisplayName)
       &lt;/span&gt;
       #if(!$hasAccess)
-        &lt;br/&gt;&lt;span class="errormessage"&gt;$services.localization.render('xe.admin.configurable.sectionIconNoAccess')&lt;/span&gt;
+        &lt;br/&gt;#inlineError($services.localization.render('xe.admin.configurable.sectionIconNoAccess'))
       #end
       &lt;/a&gt;
     &lt;/li&gt;

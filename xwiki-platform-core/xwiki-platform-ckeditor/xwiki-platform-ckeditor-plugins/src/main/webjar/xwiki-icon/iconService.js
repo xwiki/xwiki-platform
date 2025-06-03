@@ -20,47 +20,46 @@
 
 define('xwiki-iconService', [
   'jquery',
-], function ($) {
-
+], function($) {
   /**
    * Generate an URL for getting JSON resources about icons.
    */
-  const getResourceURL = function (action, parameters) {
-    const params = Object.assign({outputSyntax: "plain", action: action}, parameters);
-    return (new XWiki.Document('IconPicker', 'IconThemesCode')).getURL('get', $.param(params), true);
-  };
+  function getResourceURL(action, parameters) {
+    return new XWiki.Document('IconPicker', 'IconThemesCode').getURL('get', $.param({
+      outputSyntax: "plain",
+      action: action,
+      ...parameters
+    }, true));
+  }
 
-  let cachedIconThemes = false;
-  const getIconThemes = function () {
-    return new Promise(function (resolve, reject) {
+  let iconThemesPromise = false;
+  function getIconThemes() {
+    if (!iconThemesPromise) {
+      iconThemesPromise = $.getJSON(getResourceURL('data_iconthemes'));
+      iconThemesPromise.catch(() => {
+        // Reset the promise so that we can try again later.
+        iconThemesPromise = false;
+      });
+    }
+    return iconThemesPromise;
+  }
 
-      if (cachedIconThemes) {
-        resolve(cachedIconThemes);
-        return;
-      }
-
-      $.getJSON(getResourceURL('data_iconthemes'), function (data) {
-        cachedIconThemes = data;
-        resolve(data);
-      }).fail(reject);
-    });
-  };
-
-  const cachedIcons = {};
-  const getIcons = function (iconTheme) {
-    return new Promise(function (resolve, reject) {
-
-      if (cachedIcons[iconTheme]) {
-        resolve(cachedIcons[iconTheme]);
-        return;
-      }
-
-      $.getJSON(getResourceURL('data_icons', {iconTheme}), function (dataIcons) {
-        cachedIcons[iconTheme] = dataIcons;
-        resolve(dataIcons);
-      }).fail(reject);
-    });
-  };
+  const iconsPromises = {};
+  function getIcons(iconTheme, query) {
+    let iconsPromisesPerTheme = iconsPromises[iconTheme] = iconsPromises[iconTheme] || {};
+    let iconsPromise = iconsPromisesPerTheme[query];
+    if (!iconsPromise) {
+      iconsPromise = iconsPromisesPerTheme[query] = $.getJSON(getResourceURL('data_icons', {
+        iconTheme,
+        query,
+      }));
+      iconsPromise.catch(() => {
+        // Reset the promise so that we can try again later.
+        delete iconsPromisesPerTheme[query];
+      });
+    }
+    return iconsPromise;
+  }
 
   return {
     getIconThemes,

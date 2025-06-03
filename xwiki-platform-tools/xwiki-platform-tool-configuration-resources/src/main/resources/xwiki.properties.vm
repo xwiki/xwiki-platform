@@ -381,6 +381,26 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Default value is 60 seconds
 # openoffice.taskExecutionTimeout = 60000
 
+#-# [Since 16.8.0]
+#-# [Since 16.4.4]
+#-# [Since 15.10.13]
+#-# The output image format to use when importing an office presentation in XWiki.
+# officeimporter.presentation.imageFormat = jpg
+
+#-# [Since 16.8.0]
+#-# [Since 16.4.4]
+#-# [Since 15.10.13]
+#-# Quality of the output image when importing an office presentation: the quality value is between 0 and 100.
+#-# Be aware that this option overrides any filter configuration provided in custom-document-formats.json for html
+#-# presentations. Also this configuration is ignored if the image format is png.
+# officeimporter.presentation.quality = 95
+
+#-# [Since 16.8.0]
+#-# [Since 16.4.4]
+#-# [Since 15.10.13]
+#-# Width of the output image when importing an office presentation: the value is given in pixel.
+# officeimporter.presentation.slideWidth = 1920
+
 #-------------------------------------------------------------------------------------
 # Velocity
 #-------------------------------------------------------------------------------------
@@ -446,6 +466,11 @@ rendering.transformations = $xwikiRenderingTransformations
 #-------------------------------------------------------------------------------------
 # Events distribution
 #-------------------------------------------------------------------------------------
+
+#-# [Since 17.5.0RC1]
+#-# Indicate the unique identifier of the instance among the members of a cluster.
+#-# By default it is automatically generated from a UUID and stored in the permanent directory.
+# observation.remote.id = node1
 
 #-# [Since 2.0M3]
 #-# Indicate if the network distribution module is enabled or not.
@@ -702,7 +727,7 @@ distribution.automaticStartOnMainWiki=$xwikiPropertiesAutomaticStartOnMainWiki
 distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #end
 
-#-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
+#-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
 #-# 
 #-# On the main wiki
 # distribution.job.interactive=true
@@ -750,11 +775,11 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# It's possible to configure this behavior with the following properties:
 #-#
 #-# The maximum number of elements sent at the same time to the Solr server
-#-# The default is 50.
-# solr.indexer.batch.size=50
+#-# The default is 1000.
+# solr.indexer.batch.size=1000
 #-# The maximum number of characters in the batch of elements to send to the Solr server.
-#-# The default is 10000.
-# solr.indexer.batch.maxLength=10000
+#-# The default is 10000000.
+# solr.indexer.batch.maxLength=10000000
 
 #-# [Since 5.1M1]
 #-# The maximum number of elements in the background queue of elements to index/delete
@@ -776,6 +801,16 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# some wikis are not used.
 #-# The default is:
 # solr.synchronizeAtStartupMode=FARM
+
+#-# [Since 17.2.0RC1]
+#-# [Since 16.10.5]
+#-# [Since 16.4.7]
+#-# Indicates the batch size for the synchronization between SOLR index and XWiki database. This defines how many
+#-# documents will be loaded from the database and Solr in each step. Higher values lead to fewer queries and thus
+#-# better performance but increase the memory usage. The expected memory usage is around 1KB per document, but
+#-# depends highly on the length of the document names.
+#-# The default is 1000.
+# solr.synchronizeBatchSize=1000
 
 #-------------------------------------------------------------------------------------
 # Security
@@ -857,6 +892,26 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# * warning (the default): a warning is presented to the user when trying to edit a document with required rights
 #-# issues
 # security.requiredRights.protection=warning
+
+#-------------------------------------------------------------------------------------
+# Query
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.0.0RC1]
+#-# [Since 16.10.2]
+#-# [Since 15.10.16]
+#-# [Since 16.4.6]
+#-# While HQL queries executed by users without programming right are already validated, it's sometimes necessary to
+#-# customize the behavior of the standard validator because it might be too strict (or not strict enough).
+#-# The following properties allow giving a list of (Java) regular expressions.
+#-# In case both safe and unsafe patterns match the query, the priority goes to the unsafe pattern.
+#-#
+# query.hql.unsafe=.*some native syntax.*
+#-#
+#-# Note: be very careful to not use too large regular expression when adding a safe pattern as it could introduce a vulnerability.
+#-#
+# query.hql.safe=select prop1, prop2 from CustomTable
+# query.hql.safe=select\\s+((prop1|prop2|prop3)\\s*,?\\s*)+\\s+from MyCustomTable
 
 #-------------------------------------------------------------------------------------
 # URL
@@ -960,6 +1015,15 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-#
 #-# The default is:
 # url.trustedSchemes=http,https,ftp
+
+#-# [Since JAKARTA]
+#-# By default, XWiki will try its best to force the application server to let any URL go through despite their default
+#-# protections and what Servlet 6.0 recommend.
+#-# The point of this option is to allow disabling this bypass of the application server default protections.
+#-# For example, if you are using the same application server for something else than XWiki.
+#-#
+#-# The default is:
+# url.forceAllowAnyCharacter=true
 
 #-------------------------------------------------------------------------------------
 # Attachment
@@ -1581,5 +1645,26 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Configure the timeout in seconds for downloading an image via HTTP to embed it into the XML diff output as data URI.
 #-# Default is 10 seconds.
 # diff.xml.dataURI.httpTimeout = 10
+
+#-------------------------------------------------------------------------------------
+# Container
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.0.0RC1]
+#-# "true" if the relative redirect URLs should be resolved by XWiki instead of the application server.
+#-# 
+#-# Default is "true".
+# container.request.resolveRelativeRedirect=true
+
+#-------------------------------------------------------------------------------------
+# Scheduler
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.5.0]
+#-# "true" (the default) if the scheduler should be enabled on this instance.
+#-# Disabling the scheduler is often used as a workaround to avoid duplicates in a cluster.
+#-# 
+#-# Default is "true".
+# shceduler.enabled=false
 
 $!xwikiPropertiesAdditionalProperties

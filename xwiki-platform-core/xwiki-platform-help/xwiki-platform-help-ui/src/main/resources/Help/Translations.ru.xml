@@ -44,6 +44,7 @@ help.tipsPanel.improveXWikiTip=Знаете ли вы, что вы можете 
 help.tipsPanel.breadcrumbsTip=Вы можете использовать стрелки на панели навигации, чтобы быстро перейти к родственным и дочерним страницам.
 help.tipsPanel.advancedHiddenShortcutTip=Нажмите сочетание клавиш x+x+x+a для переключения в [[Расширенный режим&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] и x+x+x+h для переключения отображения [[скрытых страниц&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 help.tipsPanel.linkAutocompleteWYSIWYGTip=При редактировании в WYSIWYG редакторе введите ## [##, а затем начните вводить буквы, чтобы получить рекомендации по созданию ссылки.
+help.tipsPanel.WYSIWYGEditorTip=При редактировании в режиме WYSIWYG сочетание клавиш {0}Alt + 0{1} ({0}⌥0{1} на macOS) открывает модальное окно помощи с информацией об использовании клавиатуры для навигации по редактору.
 help.macroList.title=Доступные макросы
 help.macroList.id=ID
 help.macroList.name=Название

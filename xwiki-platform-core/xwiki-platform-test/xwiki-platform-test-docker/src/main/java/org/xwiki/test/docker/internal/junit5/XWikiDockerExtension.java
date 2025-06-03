@@ -122,23 +122,7 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
         // of debugging information.
         if (testConfiguration.isVerbose()) {
-            setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
-            setLogbackLoggerLevel("org.rnorth", Level.TRACE);
-            setLogbackLoggerLevel("org.xwiki.test.docker.internal.junit5.browser", Level.TRACE);
-            setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
-            // Don't display the stack trace that TC displays when it cannot find a config file override
-            // ("Testcontainers config override was found on file:/root/.testcontainers.properties but the file was not
-            // found), since this is not a problem and it's optional.
-            // See https://github.com/testcontainers/testcontainers-java/issues/2253
-            setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
-        }
-        if (testConfiguration.isVerbose()) {
-            // Get logs when starting the sshd container
-            setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
-                TestcontainersConfiguration.getInstance().getSSHdImage()).getName(), Level.TRACE);
-            // Get logs when starting the vnc container
-            setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
-                TestcontainersConfiguration.getInstance().getVncRecordedContainerImage()).getName(), Level.TRACE);
+            enableVerboseLogs();
         }
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the
@@ -202,6 +186,29 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         } catch (Exception e) {
             raiseException(e);
         }
+    }
+
+    private void enableVerboseLogs()
+    {
+        // Enable TC logs to get more info
+        setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
+        setLogbackLoggerLevel("org.rnorth", Level.TRACE);
+        setLogbackLoggerLevel("org.xwiki.test.docker.internal.junit5.browser", Level.TRACE);
+        setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
+        // Don't display the stack trace that TC displays when it cannot find a config file override
+        // ("Testcontainers config override was found on file:/root/.testcontainers.properties but the file was not
+        // found), since this is not a problem and it's optional.
+        // See https://github.com/testcontainers/testcontainers-java/issues/2253
+        setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
+        // Also enable some debug logs from our test framework
+        setLogbackLoggerLevel("org.xwiki.test.docker", Level.DEBUG);
+        setLogbackLoggerLevel("org.xwiki.test.extension", Level.DEBUG);
+        // Get logs when starting the sshd container
+        setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
+            TestcontainersConfiguration.getInstance().getSSHdImage()).getName(), Level.TRACE);
+        // Get logs when starting the vnc container
+        setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
+            TestcontainersConfiguration.getInstance().getVncRecordedContainerImage()).getName(), Level.TRACE);
     }
 
     private TestConfiguration computeTestConfiguration(ExtensionContext extensionContext)

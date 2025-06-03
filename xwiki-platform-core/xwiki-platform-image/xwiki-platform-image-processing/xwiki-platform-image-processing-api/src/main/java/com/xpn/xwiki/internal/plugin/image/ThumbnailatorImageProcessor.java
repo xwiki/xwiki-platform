@@ -23,6 +23,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 
@@ -34,6 +35,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.resizers.Resizers;
 
 /**
  * Image processor implementation based on the Thumbnailator library.
@@ -47,6 +49,17 @@ import net.coobird.thumbnailator.Thumbnails;
 @Named("thumbnailator")
 public class ThumbnailatorImageProcessor extends DefaultImageProcessor
 {
+    @Override
+    public Image readImage(InputStream inputStream) throws IOException
+    {
+        // Use Thumbnailator to read the image to correctly interpret the orientation that is set in Exif metadata.
+        return Thumbnails.of(inputStream)
+            .scale(1)
+            // Ensure that nothing is actually resized and there is thus no quality loss.
+            .resizer(Resizers.NULL)
+            .asBufferedImage();
+    }
+
     @Override
     public void writeImage(RenderedImage image, String mimeType, float quality, OutputStream out) throws IOException
     {

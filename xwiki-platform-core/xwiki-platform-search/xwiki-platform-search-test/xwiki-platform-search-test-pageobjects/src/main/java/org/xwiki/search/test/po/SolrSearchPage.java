@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
@@ -36,6 +38,9 @@ public class SolrSearchPage extends ViewPage
 
     @FindBy(xpath = "//div[@id = 'space_facet-dropdown']")
     private WebElement spaceFaucetDropdownContent;
+
+    @FindBy(css = "div.search-results > div.search-result")
+    private List<WebElement> searchResultElements;
 
     public static SolrSearchPage gotoPage()
     {
@@ -55,5 +60,15 @@ public class SolrSearchPage extends ViewPage
 
     public String getSpaceFaucetContent() {
         return this.spaceFaucetDropdownContent.getText();
+    }
+
+    /**
+     * @return the search results that are displayed on the current page
+     */
+    public List<SolrSearchResult> getSearchResults()
+    {
+        return this.searchResultElements.stream()
+            .map(SolrSearchResult::new)
+            .toList();
     }
 }

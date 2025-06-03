@@ -75,6 +75,10 @@
         <property name="syntaxId" type="string" column="XWD_SYNTAX_ID" length="50" />
         <property name="hidden" type="boolean" column="XWD_HIDDEN" index="DOC_HIDDEN" not-null="true" />
         <property name="originalMetadataAuthorReference" type="string" column="XWD_ORIGINAL_METADATA_AUTHOR" length="768" index="DOC_ORIGINAL_METADATA_AUTHOR" />
+        <property name="enforceRequiredRights" type="boolean">
+            <column name="XWD_ENFORCE_REQUIRED_RIGHTS" default="false" index="DOC_ENFORCE_REQUIRED_RIGHTS"
+                not-null="true"/>
+        </property>
     </class>
 
     <!-- com.xpn.xwiki.doc.XWikiSpace root -->
@@ -159,12 +163,11 @@
         <id name="id" column="XWL_ID">
             <generator class="native"/>
         </id>
-        <property name="docId" column="XWL_DOC_ID" type="long" unique-key="XWL_UNIQUE_CONSTRAINT"/>
-        <property name="link" type="string" column="XWL_LINK" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
-        <property name="type" type="string" column="XWL_TYPE" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
-        <property name="fullName" type="string" column="XWL_FULLNAME" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
-        <property name="attachmentName" type="string" column="XWL_ATTACHMENT_NAME" length="768"
-          unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="docId" column="XWL_DOC_ID" type="long" index="XWL_DOC_ID" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="link" type="string" column="XWL_LINK" length="768" index="XWL_LINK" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="type" type="string" column="XWL_TYPE" length="768" index="XWL_TYPE" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="fullName" type="string" column="XWL_FULLNAME" length="768" index="XWL_FULLNAME" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="attachmentName" type="string" column="XWL_ATTACHMENT_NAME" length="768" index="XWL_ATTACHMENT_NAME" unique-key="XWL_UNIQUE_CONSTRAINT"/>
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">

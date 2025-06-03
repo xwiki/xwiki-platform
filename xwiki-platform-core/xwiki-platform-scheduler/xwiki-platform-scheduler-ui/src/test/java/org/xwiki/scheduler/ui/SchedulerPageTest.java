@@ -125,6 +125,7 @@ class SchedulerPageTest extends PageTest
         this.schedulerPluginApi = mock(SchedulerPluginApi.class);
         doReturn(this.schedulerPluginApi).when(this.oldcore.getSpyXWiki()).getPluginApi(eq("scheduler"),
             any(XWikiContext.class));
+        when(this.schedulerPluginApi.isEnabled()).thenReturn(true);
 
         this.xwiki.initializeMandatoryDocuments(this.context);
 

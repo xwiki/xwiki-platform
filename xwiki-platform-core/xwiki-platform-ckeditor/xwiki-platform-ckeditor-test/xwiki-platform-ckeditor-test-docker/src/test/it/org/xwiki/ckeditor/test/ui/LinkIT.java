@@ -21,16 +21,22 @@ package org.xwiki.ckeditor.test.ui;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
+import org.xwiki.ckeditor.test.po.LinkDialog;
+import org.xwiki.ckeditor.test.po.LinkPickerModal;
+import org.xwiki.ckeditor.test.po.LinkTreeElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test of the CKEditor Link Plugin.
@@ -39,9 +45,24 @@ import org.xwiki.test.ui.po.ViewPage;
  * @since 15.0RC1
  * @since 14.10.3
  */
-@UITest(extraJARs = {
-    "org.xwiki.platform:xwiki-platform-search-solr-query"
-})
+@UITest(
+    properties = {
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+
+        // The macro service uses the extension index script service to get the list of uninstalled macros (from
+        // extensions) which expects an implementation of the extension index. The extension index script service is a
+        // core extension so we need to make the extension index also core.
+        "org.xwiki.platform:xwiki-platform-extension-index",
+        // Solr search is used to get suggestions for the link quick action.
+        "org.xwiki.platform:xwiki-platform-search-solr-query"
+    },
+    resolveExtraJARs = true
+)
 class LinkIT extends AbstractCKEditorIT
 {
     @BeforeAll
@@ -55,18 +76,23 @@ class LinkIT extends AbstractCKEditorIT
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup)
     {
-        maybeLeaveEditMode(setup, testReference);
+        setup.maybeLeaveEditMode();
     }
 
     @Test
-    void insertLinks(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration) throws Exception
+    @Order(1)
+    void insertLinks(TestUtils setup, TestReference testReference) throws Exception
     {
         // Create a sub-page with an attachment, to have something to link to.
-        uploadAttachment(setup, new DocumentReference("subPage", testReference.getLastSpaceReference()), "image.gif");
+        String attachmentName = "text.txt";
+        setup.createPage(testReference, "", "");
+        DocumentReference subPage = new DocumentReference("subPage", testReference.getLastSpaceReference());
+        setup.createPage(subPage, "", "");
+        setup.attachFile(subPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
 
-        edit(setup, testReference);
+        edit(setup, testReference, false);
 
         String spaceName = testReference.getLastSpaceReference().getParent().getName();
         editor.getToolBar().insertOrEditLink()
@@ -78,17 +104,17 @@ class LinkIT extends AbstractCKEditorIT
 
         editor.getToolBar().insertOrEditLink()
             .setResourceType("attach")
-            .setResourceValue("image")
-            .selectPageItem(String.format("%s / insertLinks / subPage", spaceName), "image.gif")
+            .setResourceValue("text")
+            .selectPageItem(String.format("%s / insertLinks / subPage", spaceName), attachmentName)
             .submit();
 
         // Verify that the content matches what we did using CKEditor.
-        assertSourceEquals("[[type the link label>>doc:subPage]]\n\n[[type the link label>>attach:subPage@image.gif]]");
+        assertSourceEquals("[[type the link label>>doc:subPage]]\n\n[[type the link label>>attach:subPage@text.txt]]");
     }
 
     @Test
-    void useLinkShortcutWhenTargetPageNameHasSpecialCharacters(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+    @Order(2)
+    void useLinkShortcutWhenTargetPageNameHasSpecialCharacters(TestUtils setup, TestReference testReference)
     {
         // Create the link target page with special characters in its name.
         LocalDocumentReference childPageReference =
@@ -106,12 +132,43 @@ class LinkIT extends AbstractCKEditorIT
         assertSourceEquals(String.format("[[%1$s>>%1$s]] ", childPageReference.getName()));
     }
 
-    private ViewPage uploadAttachment(TestUtils setup, DocumentReference testReference, String attachmentName)
-        throws Exception
+    @Test
+    @Order(3)
+    void createLinkForNotExistingPage(TestUtils setup, TestReference testReference)
     {
-        ViewPage newPage = setup.createPage(testReference, "", "");
-        setup.attachFile(testReference, attachmentName,
-            getClass().getResourceAsStream("/ResourcePicker/" + attachmentName), false);
-        return newPage;
+        setup.createPage(testReference, "", "createLinkForNotExistingPage");
+        edit(setup, testReference, false);
+        editor.getToolBar()
+            .insertOrEditLink()
+            .setResourceValue("Foo.Bar.Buz.Test")
+            .createLinkOfNewPage(true)
+            .submit();
+        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
+        editor.getToolBar()
+            .insertOrEditLink()
+            .setResourceValue("Fa.Fi.Foo")
+            .createLinkOfNewPage(false)
+            .submit();
+        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        LinkPickerModal linkPickerModal = linkDialog.openDocumentPicker();
+        LinkTreeElement tree = linkPickerModal.getTree();
+        tree.waitForIt();
+        assertTrue(tree.hasNewPageCreation(testReference));
+        tree.createNode(testReference, "SubPage");
+        SpaceReference testReferenceLastSpace = new SpaceReference("SubPage", testReference.getLastSpaceReference());
+        DocumentReference subPage = new DocumentReference("WebHome", testReferenceLastSpace);
+        tree.createNode(subPage, "Another");
+        testReferenceLastSpace = new SpaceReference("Another", testReferenceLastSpace);
+        tree.getNode(new DocumentReference("WebHome", testReferenceLastSpace)).select();
+        linkPickerModal.select();
+        linkDialog.submit();
+        // Verify that the content matches what we did using CKEditor.
+        assertSourceEquals("""
+            [[type the link label>>doc:Foo.Bar.Buz.Test]]
+
+            [[type the link label>>doc:.Fa\\.Fi\\.Foo.WebHome]]
+
+            [[type the link label>>doc:.SubPage.Another.WebHome]]""");
     }
 }

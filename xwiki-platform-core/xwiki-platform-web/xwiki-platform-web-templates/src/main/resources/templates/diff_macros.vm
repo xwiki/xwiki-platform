@@ -600,7 +600,7 @@
 #end
 
 #macro (displayDocumentChangesHeader $from $to)
-  <div id="changes-info">
+  <div id="changes-info" class="force-underline">
     <div id="changes-info-boxes">
       #if ("$!from.previousLink" != '' || "$!to.nextLink" != '')
         <div id='changes-arrows-box'>

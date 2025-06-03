@@ -42,11 +42,9 @@ solr.admin.submit=Primijeni
 solr.admin.error.notallowed=Nije vam dozvoljeno obavljanje ove akcije.
 solr.admin.error.norights=Za pristup ovoj rubrici potrebne su administratorske ovlasti.
 ### Missing: solr.admin.success.action={0} successfully triggered.
-
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Veličina reda čekanja
 solr.admin.status.queueSize.hint=Broj preostalih entiteta za indeksiranje, ponovno indeksiranje ili brisanje iz indeksa (ovisno o izvršenoj akciji).
-
 solr.admin.indexing.title=Indeksiranje
 solr.admin.indexing.action.label=Akcija
 solr.admin.indexing.action.hint=Akcija za izvršiti nad indeksom.
@@ -58,9 +56,7 @@ solr.admin.indexing.wiki.hint=Wiki na čije sve dokumente će odabrana akcija im
 solr.admin.indexing.wiki.select_farm=Cijela farma
 solr.admin.indexing.query.label=Korisnički upit
 solr.admin.indexing.query.hint=Neobavezni upit za ograničavanje dokumenata na koje će odabrana akcija nad indeksom imati utjecaj.
-
 ### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-
 solr.sortBy=Poredaj po\:
 solr.sortBy.score=Relevantnosti
 solr.sortBy.title_sort=Naslovu
@@ -72,20 +68,17 @@ solr.sortBy.attdate_sort=Datumu otpreme
 solr.sortBy.attauthor_display_sort=Otpremitelju
 solr.sortOrder.asc=Uzlazno
 solr.sortOrder.desc=Silazno
-
 solr.options=Prikaži\:
 solr.options.highlight=Označavanje
 solr.options.highlight.title=Prikaži ekstrakt podudaranja u svakom rezultatu
 solr.options.facet=Facete
 solr.options.facet.title=Omogući dodatno filtriranje rezultata
-
 solr.result.language=Jezik
 solr.result.locatedIn=Na lokaciji
 solr.result.author=Izmijenio/la {0} {1}
 solr.result.mediaType=Datoteka tipa {0}
 solr.result.uploadedBy=Otpremio/la {0} {1} ({2})
 solr.result.highlightAll=Označi sva podudaranja
-
 solr.facets.title=Razradite vašu pretragu
 solr.facets.hint=Odaberite kategoriju i aktivirajte filtre na trenutnim rezultatima
 solr.facets.resetAll=Ponovo postavi sve
@@ -93,12 +86,10 @@ solr.facets.expandAll=Raširi sve
 solr.facets.collapseAll=Sažmi sve
 solr.facets.emptyValue=Prazna vrijednost
 solr.facets.moreValues=još {0}
-
 solr.filterBy.type.document=Dokument
 solr.filterBy.type.attachment=Privitak
 solr.filterBy.type.object=Objekt
 solr.filterBy.type.object_property=Svojstvo objekta
-
 solr.filterBy.fileType.image=Slika
 solr.filterBy.fileType.audio=Zvuk
 solr.filterBy.fileType.video=Video
@@ -118,7 +109,6 @@ solr.facet.fileType.image.icon=Ikona
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Binarni podatci
-
 solr.facet.date.today=Danas
 solr.facet.date.last7Days=Posljednjih 7 dana
 solr.facet.date.last30Days=Posljednjih 30 dana
@@ -131,7 +121,6 @@ solr.facet.date.between=Od {0} do {1}
 solr.facet.date.after=Nakon {0}
 solr.facet.date.before=Prije {0}
 solr.facet.date.any=Bilo koji datum
-
 solr.facet.size.tiny=Sitno
 solr.facet.size.small=Malo
 solr.facet.size.medium=Srednje
@@ -140,7 +129,6 @@ solr.facet.size.between=Između {0} i {1}
 solr.facet.size.lessThan=Manje od {0}
 solr.facet.size.moreThan=Više od {0}
 solr.facet.size.any=Bilo koja veličina
-
 solr.field.type=Tip rezultata
 solr.field.locale=Jezik
 solr.field.locale.emptyValue=Nema jezika
@@ -173,7 +161,6 @@ solr.field.attauthor=Otpremio/la
 solr.field.attauthor_display=Otpremio/la
 solr.field.attdate=Datum otpreme
 solr.field.attsize=Veličina datoteke
-
 solr.uix.docdoesnotexist.title=Jeste li umjesto te tražili jednu od sljedećih stranica?
 solr.uix.attachmentdoesnotexist.title=Jeste li umjesto tog tražili jedan od sljedećih privitaka?
 
@@ -187,5 +174,6 @@ solr.result.location=Na lokaciji {0} » {1} » {2}
 solr.field.space=Lokacija
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

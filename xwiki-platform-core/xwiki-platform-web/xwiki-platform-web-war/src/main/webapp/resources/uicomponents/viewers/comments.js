@@ -88,6 +88,10 @@ viewers.Comments = Class.create({
             this.addSubmitListener(this.form);
             this.addCancelListener();
             this.addPreview(this.form);
+            if(typeof CKEDITOR === 'undefined') {
+              // Focus on the textarea.
+              this.form["XWiki.XWikiComments_comment"].focus();
+            }
           }.bind(this)
         });
       }.bind(this));

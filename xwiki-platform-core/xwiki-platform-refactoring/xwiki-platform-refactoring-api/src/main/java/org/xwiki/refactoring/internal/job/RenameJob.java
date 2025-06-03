@@ -48,6 +48,8 @@ public class RenameJob extends MoveJob
     {
         if (entityReferences.size() == 1) {
             process(entityReferences.iterator().next());
+        } else {
+            this.logger.warn("Cannot rename multiple entities.");
         }
     }
 

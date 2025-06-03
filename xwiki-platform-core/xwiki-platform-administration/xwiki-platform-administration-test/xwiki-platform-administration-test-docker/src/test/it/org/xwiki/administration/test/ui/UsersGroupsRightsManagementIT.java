@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.CreateGroupModal;
+import org.xwiki.administration.test.po.DeleteUserConfirmationModal;
 import org.xwiki.administration.test.po.EditGroupModal;
 import org.xwiki.administration.test.po.GroupEditPage;
 import org.xwiki.administration.test.po.GroupsPage;
@@ -35,6 +36,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ConfirmationModal;
+import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.EditRightsPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
@@ -49,8 +51,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // Add the RightsManagerPlugin needed by the test
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin",
     // Programming rights are required to disable/enable user profiles (cf. XWIKI-21238)
-    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet"
-})
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet",
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+    // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+    // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+    "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class UsersGroupsRightsManagementIT
 {
     @BeforeEach
@@ -251,6 +260,7 @@ class UsersGroupsRightsManagementIT
      * <li>Validate user disable/enable</li>
      * <li>Validate user deletion.</li>
      * <li>Validate groups automatically cleaned from deleted users.</li>
+     * <li>Validate default groups are updated when a deleted user is restored.</li>
      * </ul>
      */
     @Test
@@ -266,6 +276,7 @@ class UsersGroupsRightsManagementIT
         UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
         RegistrationModal registrationModal = usersPage.clickAddNewUser();
         registrationModal.fillRegisterForm("", "", userName, userName, userName, "");
+        registrationModal.waitForLiveValidationSuccess();
         registrationModal.clickRegister();
         usersPage.waitForNotificationSuccessMessage("User created");
         usersPage.getUsersLiveData().getTableLayout().assertRow("User", userName);
@@ -303,6 +314,13 @@ class UsersGroupsRightsManagementIT
         // Verify that when a user is removed, they are removed from the groups they belong to.
         groupsPage = GroupsPage.gotoPage();
         assertEquals(0, groupsPage.clickEditGroup("XWikiAllGroup").filterMembers(userName).countRows());
+
+        // Verify that when a user is restored, it's put back in the default group
+        setup.gotoPage("XWiki", userName);
+        DeletePageOutcomePage deletePageOutcomePage = new DeletePageOutcomePage();
+        deletePageOutcomePage.getDeletedTerminalPagesEntries().get(0).clickRestore();
+        groupsPage = GroupsPage.gotoPage();
+        assertEquals(1, groupsPage.clickEditGroup("XWikiAllGroup").filterMembers(userName).countRows());
     }
 
     /**
@@ -407,5 +425,27 @@ class UsersGroupsRightsManagementIT
         groupEditPage.getMembersTable().filterColumn("Member", groupName.substring(2));
         assertEquals(1, groupEditPage.getMembersTable().countRows());
         groupEditPage.getMembersTable().assertRow("Member", userName);
+    }
+
+    @Test
+    @Order(8)
+    void deleteUserWithScriptRights(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        String scriptUserName = testReference.getLastSpaceReference().getName();
+        String scriptUserPassword = "password";
+        setup.createUser(scriptUserName, scriptUserPassword, "");
+        setup.setGlobalRights( "", "XWiki.%s".formatted(scriptUserName), "script", true);
+        setup.login(scriptUserName, scriptUserPassword);
+        setup.createPage(testReference, "");
+        setup.loginAsSuperAdmin();
+        UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
+        usersPage.getUsersLiveData().getTableLayout().filterColumn("User", scriptUserName);
+        usersPage.disableUser(1);
+        DeleteUserConfirmationModal deleteUserConfirmationModal = usersPage.clickDeleteUser(1);
+        assertEquals("/xwiki/bin/view/Main/AllDocs?doc.author=XWiki.%s".formatted(scriptUserName),
+            deleteUserConfirmationModal.getScriptRightUserErrorMessageHrefValue());
+        deleteUserConfirmationModal.clickOk();
+        assertEquals(0, usersPage.getUsersLiveData().getTableLayout().countRows());
     }
 }

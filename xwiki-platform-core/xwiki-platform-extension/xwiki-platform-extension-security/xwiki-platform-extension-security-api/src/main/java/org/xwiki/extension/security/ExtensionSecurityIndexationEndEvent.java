@@ -22,7 +22,6 @@ package org.xwiki.extension.security;
 import java.io.Serializable;
 
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * Notify that new security vulnerabilities have been found. The source is {@code null}, and the data is the number of
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.5RC1
  */
-@Unstable
 public class ExtensionSecurityIndexationEndEvent implements Event, Serializable
 {
     @Override

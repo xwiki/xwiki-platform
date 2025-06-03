@@ -129,7 +129,7 @@
   'use strict';
   
   var performChange = function (chosenOption) {
-    var restUrl = xm.restURL;
+    var restUrl = xm.restURL.replace(/\/translations.*/, "");
     var queryParams = new URLSearchParams({
       "form_token": xm.form_token
     });

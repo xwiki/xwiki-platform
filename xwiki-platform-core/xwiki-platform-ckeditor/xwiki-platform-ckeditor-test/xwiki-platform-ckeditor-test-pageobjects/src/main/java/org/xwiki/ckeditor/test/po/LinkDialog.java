@@ -73,7 +73,7 @@ public class LinkDialog extends CKEditorDialog
      */
     public String getSelectedResourceType()
     {
-        return getResourceDisplay().getAttribute("data-resourcetype");
+        return getResourceDisplay().getDomAttribute("data-resourcetype");
     }
 
     /**
@@ -81,7 +81,7 @@ public class LinkDialog extends CKEditorDialog
      */
     public String getSelectedResourceReference()
     {
-        return getResourceDisplay().getAttribute("data-resourcereference");
+        return getResourceDisplay().getDomAttribute("data-resourcereference");
     }
 
     private WebElement getResourceDisplay()
@@ -107,6 +107,23 @@ public class LinkDialog extends CKEditorDialog
             .findFirst().orElseThrow(() -> new NoSuchElementException(String.format("%s / %s not found", hint, label)))
             .click();
         return this;
+    }
+
+    public LinkDialog createLinkOfNewPage(boolean exactReference)
+    {
+        String resourceLabelName = (exactReference) ? "Create with exact reference..." : "Create new page...";
+        getResourcePicker().findElements(DROPDOWN_ITEM_SELECTOR).stream()
+            .filter(element ->
+                Objects.equals(element.findElement(cssSelector(".resource-label")).getText(), resourceLabelName))
+            .findFirst().orElseThrow(() -> new NoSuchElementException(String.format("%s not found", resourceLabelName)))
+            .click();
+        return this;
+    }
+
+    public LinkPickerModal openDocumentPicker()
+    {
+        getContainer().findElement(By.cssSelector("button.resourceType")).click();
+        return new LinkPickerModal(By.cssSelector(".entity-resource-picker-modal.modal"));
     }
 
     /**

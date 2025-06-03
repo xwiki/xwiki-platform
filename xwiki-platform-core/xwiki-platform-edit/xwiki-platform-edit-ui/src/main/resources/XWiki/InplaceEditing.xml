@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.InplaceEditing" locale="">
+<xwikidoc version="1.6" reference="XWiki.InplaceEditing" locale="">
   <web>XWiki</web>
   <name>InplaceEditing</name>
   <language/>
@@ -243,11 +243,11 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
     /**
      * Render the title and the content of this document.
      *
-     * @param forView whether to render the document for view (without the rendering annotations) or for edit (with the
-     *          rendering annotations); when rendering for edit some transformations might not be executed
+     * @param {object} params - optional rendering parameters, that may include the output syntax and the rendering
+     *          transformations to execute
      * @return a promise that resolves to this document instance if the render request succeeds
      */
-    render(forView) {
+    render({outputSyntax, transformations} = {}) {
       var queryString = {
         xpage: 'get',
         outputTitle: true,
@@ -259,16 +259,14 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
       };
-      if (!forView) {
-        // We need the annotated HTML when editing in order to be able to protect the rendering transformations and to
-        // be able to recreate the wiki syntax.
-        queryString.outputSyntax = 'annotatedhtml';
-        queryString.outputSyntaxVersion = '5.0'
-        // Currently, only the macro transformations are protected and thus can be edited.
-        // See XRENDERING-78: Add markers to modified XDOM by Transformations/Macros
-        queryString.transformations = 'macro';
+      if (outputSyntax) {
+        queryString.outputSyntax = outputSyntax.type;
+        queryString.outputSyntaxVersion = outputSyntax.version;
       }
-      return Promise.resolve($.get(this.getURL('view'), queryString)).then(html =&gt; {
+      if (transformations) {
+        queryString.transformations = transformations;
+      }
+      return Promise.resolve($.get(this.getURL('view'), $.param(queryString, true))).then(html =&gt; {
         // Render succeeded.
         var container = $('&lt;div/&gt;').html(html);
         return $.extend(this, {
@@ -346,7 +344,6 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
         lockAction: action,
         force: force,
         language: this.getRealLocale(),
-        outputSyntax: 'plain',
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
       })).then(() =&gt; {
@@ -464,12 +461,26 @@ define('editInPlace', [
     return Promise.resolve(xwikiDocument);
   }
 
+  // The version of the edited document can change even if the in-place editor doesn't save the document (e.g. because a
+  // remote user has saved the document in a realtime editing session or because the document was updated outside the
+  // in-place editor by uploading an attachment). We need to update the version of the edited document in order to avoid
+  // merge conflicts on save (this version is passed to the server on save, see updateFormDataBeforeSave).
+  $(document).on('xwiki:document:changeVersion', (event, data) =&gt; {
+    if (data.documentReference.equals(currentXWikiDocument?.documentReference)) {
+      currentXWikiDocument.version = data.version;
+    }
+  });
+
   var editPage = function() {
     return editInPlace({
-      afterEdit: function() {
-        $('#document-title-input').focus().select();
-      }
+      afterEdit: focusTitleInput
     });
+  };
+
+  var focusTitleInput = function() {
+    const titleInput = document.getElementById('document-title-input');
+    titleInput.focus();
+    titleInput.setSelectionRange(0 ,0);
   };
 
   var translatePage = function() {
@@ -489,11 +500,9 @@ define('editInPlace', [
     return editInPlace({
       lockFailed: function() {
         // Revert the changes done on #xwikicontent.
-        $('#xwikicontent').removeAttr('tabindex').children(':header').children('.edit_section').removeClass('hidden');
+        $('#xwikicontent').children(':header').children('.edit_section').removeClass('hidden');
       },
       afterEdit: function() {
-        // We don't need the tabindex attribute anymore now that the content is editable.
-        $('#xwikicontent').removeAttr('tabindex');
         if (sectionId) {
           // Select the heading of the specified section.
           $('#xwikicontent &gt; #' + $.escapeSelector(sectionId)).each(function() {
@@ -521,8 +530,7 @@ define('editInPlace', [
         options.afterEdit(xwikiDocument);
         return xwikiDocument;
       }).finally(() =&gt; {
-        // Remove the aria-expanded attribute which is incorrect for role=textbox
-        $('#xwikicontent').removeClass('loading').removeAttr('aria-expanded');
+        $('#xwikicontent').removeClass('loading');
       // Then wait for an action (save, cancel, reload) only if the editors were loaded successfully.
       }).then(maybeSave)
       // Then unlock the document both when the edit ended with success and with a failure.
@@ -625,18 +633,18 @@ define('editInPlace', [
     }).catch(xwikiDocument =&gt; {
       new XWiki.widgets.Notification(l10n['edit.inplace.page.loadFailed'], 'error');
       return Promise.reject(xwikiDocument);
-    // Render the document for edit, in order to have the annotated content HTML. The annotations are used to protect
-    // the rendering transformations (e.g. macros) when editing the content.
-    }).then(render.bind(null, false));
+    // Render the document for edit, using the provided rendering configuration, which may depend on the editor used to
+    // edit the content.
+    }).then(render.bind(null, module.contentEditor.getRenderingConfig()));
   };
 
   /**
-   * @param forView whether to render the document for view (without the rendering annotations) or for edit (with the
-   *          rendering annotations); when rendering for edit some transformations might not be executed
+   * @param {object} params - optional rendering parameters, that may include the output syntax and the rendering
+   *          transformations to execute
    * @param xwikiDocument the document to render
    */
-  var render = function(forView, xwikiDocument) {
-    return xwikiDocument.render(forView);
+  var render = function(params, xwikiDocument) {
+    return xwikiDocument.render(params);
   };
 
   var maybeSave = function(xwikiDocument) {
@@ -659,11 +667,18 @@ define('editInPlace', [
       // deferred object (promise) cannot change once it was resolved. So the first event that fires will resolve the
       // promise and the remaining events won't be able to change that. The remaining event listeners could be called
       // later but they won't have any effect on the deferred object.
+      //
+      // Enable the action buttons to receive action events, because they might have been disabled when the previous
+      // action was handled, see below.
+      const actionButtons = $('.inplace-editing-buttons').prop('disabled', false);
       $(document).one([
         'xwiki:actions:save',
         'xwiki:actions:reload',
         'xwiki:actions:cancel',
       ].join(' '), '.xcontent.form', function(event, data) {
+        // Disable the action buttons while we handle the current action. They will be re-enabled once waitForAction is
+        // called again to wait for the next action. This way we avoid handling multiple actions at the same time.
+        actionButtons.prop('disabled', true);
         resolve({
           name: event.type.substring('xwiki:actions:'.length),
           document: xwikiDocument,
@@ -718,7 +733,7 @@ define('editInPlace', [
 
     // Reload the document JSON data (to have the new version) and render the document for view. We need the view HTML
     // both if we stop editing now and if we continue but cancel the edit later.
-    return xwikiDocument.reload().then(render.bind(null, true)).then(
+    return xwikiDocument.reload().then(render.bind(null, {})).then(
       afterReloadAndRender.bind(null, /* success: */ true),
       afterReloadAndRender.bind(null, /* success: */ false)
     );
@@ -825,9 +840,6 @@ define('editInPlace', [
           &lt;div hidden&gt;
             &lt;input type="hidden" name="form_token" /&gt;
             &lt;input type="hidden" name="async" value="true" /&gt;
-            &lt;input type="hidden" name="content" /&gt;
-            &lt;input type="hidden" name="RequiresHTMLConversion" value="content" /&gt;
-            &lt;input type="hidden" name="content_syntax" /&gt;
             &lt;input type="hidden" name="language" /&gt;
           &lt;/div&gt;
           &lt;fieldset id="xwikieditcontent" class="xform inplace-editing-buttons sticky-buttons"&gt;&lt;/fieldset&gt;
@@ -858,7 +870,7 @@ define('editInPlace', [
   };
 
   var createTranslation = function(xwikiDocument) {
-    $('#document-title-input').focus().select();
+    focusTitleInput();
     // Let the user know that they are now editing the translation of this page in the current locale.
     $('#document-title-input').popover({
       content: l10n['edit.inplace.page.translate.messageAfter'],
@@ -892,8 +904,8 @@ define('editInPlace', [
     // the title and content editors to update their values and the 'xwikiDocument' instance. We do this by catching the
     // event early (lower in the DOM, at the start of the event bubbling phase) and adding a one time event listener for
     // the end of the event bubbling phase at the top level of the DOM document.
-    actionButtons.on('xwiki:actions:beforeSave', function() {
-      $(document).one('xwiki:actions:beforeSave', updateFormDataBeforeSave);
+    actionButtons.on('xwiki:actions:beforeSave xwiki:actions:beforePreview', event =&gt; {
+      $(document).one(event.type, updateFormDataBeforeSave);
     });
     actionButtons.on('xwiki:actions:cancel', function(event) {
       // We are already in view mode so there's no need to leave the page.
@@ -947,16 +959,6 @@ define('editInPlace', [
 
     form.find('input[name="language"]').val(xwikiDocument.getRealLocale());
     form.find('input[name="isNew"]').val(xwikiDocument.isNew);
-
-    // Submit either the raw (source) content (no syntax conversion needed in this case) or the rendered content (HTML)
-    // in which case we have to force the conversion to the document syntax on the server.
-    const submitRawContent = typeof xwikiDocument.renderedContent !== 'string';
-    form.find('input[name="content"]').val(submitRawContent ? xwikiDocument.content : xwikiDocument.renderedContent);
-    form.find('input[name="RequiresHTMLConversion"]').prop('disabled', submitRawContent);
-    form.find('input[name="content_syntax"]').val(xwikiDocument.syntax).prop('disabled', submitRawContent);
-
-    // Add the temporary uploaded files to the form.
-    $('#xwikicontent').nextAll('input[name="uploadedFiles"]').attr('form', 'inplace-editing');
 
     // Check for merge conflicts only if the document is not new and we know the current version.
     if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
@@ -1014,12 +1016,14 @@ define('editInPlace', [
       input.attr('placeholder', placeholder);
     }
     $('#document-title h1').addClass('editable').empty().append([label, input]);
-    $(document).on('xwiki:actions:beforeSave.titleEditor', '.xcontent.form', function(event) {
-      xwikiDocument.rawTitle = input.val();
-    });
+    $(document).on(
+      'xwiki:actions:beforeSave.titleEditor xwiki:actions:beforePreview.titleEditor',
+      '.xcontent.form',
+      () =&gt; xwikiDocument.rawTitle = input.val()
+    );
     $(document).one('xwiki:actions:view', '.xcontent.form', function(event, data) {
       // Destroy the title editor.
-      $(document).off('xwiki:actions:beforeSave.titleEditor');
+      $(document).off('xwiki:actions:beforeSave.titleEditor xwiki:actions:beforePreview.titleEditor');
       $('#document-title h1').removeClass('editable').text(xwikiDocument.rawTitle);
     });
     return xwikiDocument;
@@ -1030,9 +1034,7 @@ define('editInPlace', [
     var withFocus = document.activeElement &amp;&amp; document.activeElement === editContent[0];
     // Keep showing the view content until the edit content is ready in order to avoid UI flicker.
     var viewContent = editContent.clone().insertAfter(editContent);
-    // Note that we don't trigger the xwiki:dom:updated event here because we want to let the editor trigger the event
-    // only for the content areas that are safe to be updated from JavaScript (i.e. the macro output).
-    editContent.hide().html(xwikiDocument.renderedContent);
+    editContent.hide().empty();
     if (withFocus) {
       // Keep the focus while the edit content is being prepared.
       viewContent.focus();
@@ -1041,6 +1043,8 @@ define('editInPlace', [
       // Use the same name as for the standalone editor, in order to be consistent.
       editorName: 'content',
       document: xwikiDocument,
+      startupFocus: withFocus,
+      formId: 'inplace-editing',
       // The content editor is loaded on demand, asynchronously.
       deferred: $.Deferred()
     });
@@ -1048,14 +1052,6 @@ define('editInPlace', [
     return data.deferred.promise().then(() =&gt; {
       editContent.show();
       viewContent.remove();
-      if (withFocus) {
-        // Restore the focus when the edit content is ready but make sure we don't scroll the page. We don't restore the
-        // focus right away because we just made the content visible so it may not be editable yet (e.g. the WYSIWYG
-        // editor can make the content editable only if it is visible).
-        setTimeout(function() {
-          editContent[0].focus({preventScroll: true});
-        }, 0);
-      }
       return xwikiDocument;
     });
   };
@@ -1070,12 +1066,15 @@ define('editInPlace', [
     }
   };
 
-  return {
+  let module = {
+    contentEditor: undefined,
     preload,
     editPage,
     editSection,
     translatePage
   };
+
+  return module;
 });
 
 require(['jquery'], function($) {
@@ -1084,16 +1083,15 @@ require(['jquery'], function($) {
     return;
   }
 
-  var wysiwygEditorModule = 'xwiki-' + config.wysiwygEditor + '-inline';
-
   var preloadEditor = function() {
-    require(['editInPlace', wysiwygEditorModule], function(editInPlace) {
+    require(['editInPlace', config.contentEditor], function(editInPlace, contentEditor) {
+      editInPlace.contentEditor = contentEditor;
       editInPlace.preload();
     // Fallback on the standalone edit mode if we fail to load the required modules.
     }, disableInPlaceEditing);
   };
 
-  // Preload the WYSIWYG editor code without slowing down the page view.
+  // Preload the content editor code without slowing down the page view.
   if (document.readyState === 'complete') {
     setTimeout(preloadEditor, 0);
   } else {
@@ -1147,7 +1145,8 @@ require(['jquery'], function($) {
     const data = handler.beforeEdit?.(event);
     // Load the code needed to edit in place only when the edit button is clicked.
     currentlyEditing = new Promise((resolve, reject) =&gt; {
-      require(['editInPlace', wysiwygEditorModule], (editInPlace) =&gt; {
+      require(['editInPlace', config.contentEditor], (editInPlace, contentEditor) =&gt; {
+        editInPlace.contentEditor = contentEditor;
         // Re-enable the translate button because it can be used while editing to create the missing translation.
         translateButton.removeClass('disabled');
         handler.edit(editInPlace, data).finally(() =&gt; {
@@ -1198,8 +1197,15 @@ require(['jquery'], function($) {
       // Return the id of the edited section.
       return $(event.target).closest(':header').attr('id');
     },
-    edit: function(editInPlace, sectionId) {
-      return editInPlace.editSection(sectionId);
+    edit: async function(editInPlace, sectionId) {
+      try {
+        return await editInPlace.editSection(sectionId);
+      } finally {
+        // We have to remove the tabindex attribute ourselves because CKEditor restores at the end the attributes it
+        // finds on the editable element before initialization (and we're setting the tab index above before loading the
+        // editor).
+        $('#xwikicontent').removeAttr('tabindex');
+      }
     }
   }, onInPlaceEditing);
 
@@ -1480,13 +1486,13 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
 }
 
 @document-title-input-padding-vertical: @line-height-computed / 4 - 1;
-input#document-title-input {
+.document-header input#document-title-input {
   /* Preserve the heading styles. */
   color: inherit;
   font-size: inherit;
-  background-color: @body-bg;
+  background-color: transparent;
   /* It seems it's not enough to set the line height for the text input. We also need to set its height. */
-  height: @font-size-document-title * @headings-line-height + 2 * (1 + @document-title-input-padding-vertical);
+  height: ~"calc(@{font-size-document-title} * @{headings-line-height} - -2 * (1px - -@{document-title-input-padding-vertical}))";
   line-height: @headings-line-height;
   padding: @document-title-input-padding-vertical (ceil(@grid-gutter-width / 2) - 1);
   width: 100%;
@@ -1496,14 +1502,10 @@ input#document-title-input:valid {
   box-shadow: none;
 }
 
-input#document-title-input:valid:hover {
-  border-color: @input-border;
-}
-
 input#document-title-input:valid:focus,
 #xwikicontent[contenteditable]:focus,
 #xwikicontent[tabindex]:focus {
-  .form-control-focus();
+  outline: 0;
 }
 
 #xwikicontent[contenteditable],
@@ -1584,7 +1586,7 @@ form#inplace-editing {
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1711,16 +1713,12 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'colorTheme': $services.model.serialize($themeDoc.documentReference, 'default')
     })
     #set ($jsParams = {'language': $xcontext.locale})
-    ## We have to explicitly enable the source mode for in-line edit because the latest version of the content editor
-    ## could be installed on an older version of XWiki where the in-place editor didn't support the source mode (so the
-    ## content editor cannot enable the source mode by default).
     #set ($inplaceEditingConfig = {
       'contentType': 'org.xwiki.rendering.syntax.SyntaxContent',
       'editMode': $defaultEditMode,
-      'wysiwygEditor': $services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id,
+      'contentEditor': "xwiki-${services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id}-inline",
       'editButtonSelector': '#tmEdit &gt; a',
       'translateButtonSelector': '#tmTranslate &gt; a',
-      'enableSourceMode': true,
       'paths': {
         'js': {
           'xwiki-actionButtons': "#getSkinFileWithParams('js/xwiki/actionbuttons/actionButtons.js' $jsParams)",

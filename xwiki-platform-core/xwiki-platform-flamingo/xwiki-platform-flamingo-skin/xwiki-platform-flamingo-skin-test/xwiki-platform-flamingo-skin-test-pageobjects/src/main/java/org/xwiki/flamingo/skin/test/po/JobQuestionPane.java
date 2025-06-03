@@ -68,7 +68,7 @@ public class JobQuestionPane extends BaseElement
     public boolean isCanceled()
     {
         return getDriver().findElement(By.cssSelector("#mainContentArea .box.warningmessage")).getText()
-            .equals("Canceled.");
+            .equals("Warning\nCanceled.");
     }
 
     /**
@@ -111,6 +111,19 @@ public class JobQuestionPane extends BaseElement
     public CopyOrRenameOrDeleteStatusPage confirmQuestion()
     {
         this.questionPane.findElement(By.className("btAnswerConfirm")).click();
+        return new CopyOrRenameOrDeleteStatusPage();
+    }
+
+    /**
+     * Click on the button with the given name and value.
+     *
+     * @param name the name of the button
+     * @param value the value of the button
+     * @return the status page
+     */
+    public CopyOrRenameOrDeleteStatusPage clickButton(String name, String value)
+    {
+        this.questionPane.findElement(By.cssSelector("button[name='" + name + "'][value='" + value + "']")).click();
         return new CopyOrRenameOrDeleteStatusPage();
     }
 

@@ -22,7 +22,6 @@ package org.xwiki.notifications.notifiers.email;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.stability.Unstable;
 
 import java.util.List;
 
@@ -36,7 +35,6 @@ import java.util.List;
  * @version $Id$
  * @since 15.5RC1
  */
-@Unstable
 @Role
 public interface NotificationEmailGroupingStrategy
 {

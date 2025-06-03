@@ -42,7 +42,6 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide logging related script oriented APIs.
@@ -174,7 +173,6 @@ public class LoggingScriptService implements ScriptService
      * @since 15.0RC1
      * @since 14.10.1
      */
-    @Unstable
     public Message translate(Message message)
     {
         if (message != null) {

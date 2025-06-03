@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-netflux</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>17.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-netflux-api</artifactId>
   <name>XWiki Platform - Netflux - API</name>
@@ -35,6 +35,11 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Netflux API</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
+    <!-- Replaces the old realtime backend from XWiki Contrib -->
+    <xwiki.extension.features>
+      org.xwiki.contrib:xwiki-contrib-rtbackend,
+      org.xwiki.contrib:xwiki-contrib-netflux
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
@@ -63,14 +68,25 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.websocket</groupId>
-      <artifactId>javax.websocket-api</artifactId>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-client-api</artifactId>
     </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

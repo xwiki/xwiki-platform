@@ -475,6 +475,8 @@ function changePreviewLayout(element, code) {
       }
       // mainContainer.className = "contenthidelefthideright";
       mainContainer.addClassName("hidelefthideright");
+      document.body.style.removeProperty('--panel-column-left-width');
+      document.body.style.removeProperty('--panel-column-right-width');
       leftPanelsInput && leftPanelsInput.disable();
       leftPanelsWidthInput.disable();
       rightPanelsInput && rightPanelsInput.disable();
@@ -494,6 +496,7 @@ function changePreviewLayout(element, code) {
       }
       // mainContainer.className = "contenthideright";
       mainContainer.addClassName("hideright");
+      document.body.style.removeProperty('--panel-column-right-width');
       leftPanelsInput && leftPanelsInput.enable();
       leftPanelsWidthInput.enable();
       rightPanelsInput && rightPanelsInput.disable();
@@ -513,6 +516,7 @@ function changePreviewLayout(element, code) {
       }
       // mainContainer.className = "contenthideleft";
       mainContainer.addClassName("hideleft");
+      document.body.style.removeProperty('--panel-column-left-width');
       leftPanelsInput && leftPanelsInput.disable();
       leftPanelsWidthInput.disable();
       rightPanelsInput && rightPanelsInput.enable();
@@ -618,6 +622,12 @@ function panelEditorInit() {
   rightPanelsWidthInput.observe('change', setPanelWidth);
 
   prevcolumn = allPanels;
+
+  // Those properties do not interact well with live changes of the layout (hiding columns).
+  // If we want to make them work even here, we'd need to reset the values and set them back with
+  // a function similar to `applyLocalStorageValues` from flamingo.js every time the hiding classes are updated...
+  document.body.style.removeProperty('--panel-column-left-width');
+  document.body.style.removeProperty('--panel-column-right-width');
 
   start1();
 

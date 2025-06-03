@@ -28,7 +28,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.diff.Conflict;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
-import org.xwiki.stability.Unstable;
 
 /**
  * This represents the result of a merge operation: it contains both the result of the merge, the possible conflicts
@@ -107,7 +106,6 @@ public class MergeManagerResult<R, C>
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     public int getConflictsNumber()
     {
         // Each conflicts recorded, is recorded with its own error log.
@@ -137,7 +135,6 @@ public class MergeManagerResult<R, C>
      * @since 14.10.7
      * @since 15.2RC1
      */
-    @Unstable
     public void setLog(LogQueue logQueue)
     {
         this.log = logQueue;

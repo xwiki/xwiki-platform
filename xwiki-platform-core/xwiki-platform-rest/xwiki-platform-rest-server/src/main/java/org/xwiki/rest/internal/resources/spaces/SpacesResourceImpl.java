@@ -63,8 +63,8 @@ public class SpacesResourceImpl extends XWikiResource implements SpacesResource
                     if (xwikiApi.exists(homeId)) {
                         home = Utils.getXWikiApi(componentManager).getDocument(homeId);
                     }
-                    spaces.getSpaces().add(DomainObjectFactory
-                            .createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceList, home));
+                    spaces.getSpaces().add(DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(),
+                        wikiName, spaceList, home));
                 }
             }
         } catch (Exception e) {

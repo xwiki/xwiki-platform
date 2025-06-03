@@ -237,9 +237,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
         try {
             executeRead(inputxcontext, session -> {
                 try {
-                    XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
-                    session.load(content, Long.valueOf(content.getId()));
-
+                    XWikiAttachmentContent content = new XWikiAttachmentContent();
+                    session.load(content, Long.valueOf(attachment.getId()));
                     // Hibernate calls setContent which causes isContentDirty to be true. This is not what we want.
                     content.setContentDirty(false);
 

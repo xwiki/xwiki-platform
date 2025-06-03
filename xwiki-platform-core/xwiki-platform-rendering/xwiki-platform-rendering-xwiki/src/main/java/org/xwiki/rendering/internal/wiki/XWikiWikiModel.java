@@ -33,6 +33,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -312,7 +313,8 @@ public class XWikiWikiModel implements WikiModel
                 value = sd.getPropertyValue(dimension);
             } catch (Exception e) {
                 // Ignore the style parameter but log a warning to let the user know.
-                this.logger.warn("Failed to parse CSS style [{}]", style);
+                this.logger.warn("Failed to parse CSS style [{}]. Root cause is: [{}]", style,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
         if (StringUtils.isBlank(value)) {

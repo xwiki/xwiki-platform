@@ -19,10 +19,6 @@
  */
 package org.xwiki.netflux.internal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -39,7 +35,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.netflux.EntityChannel;
 import org.xwiki.netflux.EntityChannelStore;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -48,6 +44,10 @@ import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link EntityChannelScriptAuthorTracker}.
@@ -64,7 +64,7 @@ class EntityChannelScriptAuthorTrackerTest
     private EntityChannelStore entityChannels;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @MockComponent
     @Named("document")
@@ -99,11 +99,11 @@ class EntityChannelScriptAuthorTrackerTest
         // Alice has only script rights.
         DocumentReference aliceReference = new DocumentReference("xwiki", "Users", "Alice");
         when(this.documentUserReferenceSerializer.serialize(this.alice)).thenReturn(aliceReference);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, aliceReference, this.documentReference))
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, aliceReference,
+            this.documentReference))
             .thenReturn(true);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, aliceReference, this.translationReference))
-            .thenReturn(true);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, aliceReference, this.objectPropertyReference))
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, aliceReference,
+            this.translationReference))
             .thenReturn(true);
 
         // Bob has no script rights.
@@ -113,11 +113,9 @@ class EntityChannelScriptAuthorTrackerTest
         // Carol has programming rights.
         DocumentReference carolReference = new DocumentReference("xwiki", "Users", "Carol");
         when(this.documentUserReferenceSerializer.serialize(this.carol)).thenReturn(carolReference);
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, carolReference, this.documentReference))
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, carolReference, this.documentReference))
             .thenReturn(true);
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, carolReference, this.translationReference))
-            .thenReturn(true);
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, carolReference, this.objectPropertyReference))
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, carolReference, this.translationReference))
             .thenReturn(true);
 
         when(this.currentUserResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(this.carol);

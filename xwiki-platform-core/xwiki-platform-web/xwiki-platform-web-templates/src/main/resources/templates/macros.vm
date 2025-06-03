@@ -318,10 +318,12 @@ $xwiki.getUserName("xwiki:${username}")
     ## We avoid the whitespace because the users are displayed as inline blocks.
     #set ($discard = $output.addAll([
       "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
+        "<$userNameTag $userNameTagAttributes>",
         $avatarWrapperStart,
-          "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedUserName"" />",
+          "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt="""" />",
         $avatarWrapperEnd,
-        "<$userNameTag $userNameTagAttributes>$escapedUserName</$userNameTag>",
+        $escapedUserName,
+        "</$userNameTag>",
         $userAliasDisplay,
       "</$userTag>"
     ]))
@@ -951,16 +953,115 @@ $html
 ###    message
 ###
 
+### This velocity macro aims at providing an element similar to a XWiki Macro-Message in places where this XWikiMacro 
+### cannot be used.
+## The parameter object can contain $text $classAffix $iconName $prettyNameKey $isInline $extraClass $title
+#macro(_genericMessage $parameters)
+  #if($parameters.isInline)
+    #set ($blockTag = "span")
+  #else
+    #set ($blockTag = "div")
+  #end
+  <${blockTag} class="box ${parameters.classAffix}message $!{parameters.extraClass}">
+    <span class="icon-block">$services.icon.renderHTML($parameters.iconName)</span>
+    <span class="sr-only">$services.localization.render($parameters.prettyNameKey)</span>
+    <${blockTag}>
+      #if("$!parameters.title" != "")<${blockTag} class="box-title">$!parameters.title</${blockTag}>#end
+      $parameters.text
+    </${blockTag}>
+  </${blockTag}>
+#end
+
+## Display a block warning message with the content $text.
 #macro(warning $text)
-<div class="warningmessage"><span class="messagetype">$services.localization.render('warning'): </span>$text</div>
+#set( $parameters = {
+'text': $text,
+'classAffix': 'warning',
+'iconName': 'warning',
+'prettyNameKey': 'warning'
+})
+#_genericMessage($parameters)
 #end
 
+## Display an inline warning message with the content $text.
+#macro(inlineWarning $text)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'warning',
+  'iconName': 'warning',
+  'prettyNameKey': 'warning',
+  'isInline': true
+})
+#_genericMessage($parameters)
+#end
+
+## Display a block error message with the content $text.  
 #macro(error $text)
-<div class="errormessage"><span class="messagetype">$services.localization.render('error'): </span>$text</div>
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'error',
+  'iconName': 'exclamation',
+  'prettyNameKey': 'error'
+})
+#_genericMessage($parameters)
 #end
 
+## Display an inline error message with the content $text.
+#macro(inlineError $text)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'error',
+  'iconName': 'exclamation',
+  'prettyNameKey': 'error',
+  'isInline': true
+})
+#_genericMessage($parameters)
+#end
+
+## Display a block info message with the content $text.  
 #macro(info $text)
-<div class="infomessage">$text</div>
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'info',
+  'iconName': 'info',
+  'prettyNameKey': 'info'
+})
+#_genericMessage($parameters)
+#end
+
+## Display an inline info message with the content $text.
+#macro(inlineInfo $text)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'info',
+  'iconName': 'info',
+  'prettyNameKey': 'info',
+  'isInline': true
+})
+#_genericMessage($parameters)
+#end
+
+## Display a block success message with the content $text.  
+#macro(success $text)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'success',
+  'iconName': 'check',
+  'prettyNameKey': 'success'
+})
+#_genericMessage($parameters)
+#end
+
+## Display an inline success message with the content $text.
+#macro(inlineSuccess $text)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'success',
+  'iconName': 'check',
+  'prettyNameKey': 'success',
+  'isInline': true
+})
+#_genericMessage($parameters)
 #end
 
 #macro(message $text)
@@ -1396,7 +1497,8 @@ $Msz MB##
       'transprefix': $transprefix,
       'classname': $classname,
       'collist': $stringtool.join($dataColumns, ','),
-      'queryFilters': $queryFilters
+      'queryFilters': $queryFilters,
+      'tagcloud': $tagcloud
     })
     #set ($discard = $parameters.putAll($classParams))
     #set ($resultPage = $options.resultPage)
@@ -1513,7 +1615,7 @@ $Msz MB##
             #livetable_filters($collist $colprops $classname)
             <tr class="xwiki-livetable-initial-message">
               <td colspan="${columnCount}">
-                <div class="warningmessage">$services.localization.render('platform.livetable.environmentCannotLoadTableMessage')</div>
+                #warning($services.localization.render('platform.livetable.environmentCannotLoadTableMessage'))
               </td>
             </tr>
           </thead>
@@ -1635,7 +1737,8 @@ $Msz MB##
     #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
-      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
+      data-className="$!escapetool.xml($services.model.serialize($xproperty.reference.parent, 'default'))"
+      data-propertyName="$!escapetool.xml($xproperty.name)"
       title="$escapedTitle">
     </select>
   #end
@@ -1716,7 +1819,7 @@ $displayName##
       #if ("$!action.icon" == '')
         #set ($defaultActionIcons = {
           'rename': 'move',
-          'delete': 'cross',
+          'delete': 'trash',
           'restore': 'refresh',
           'undelete': 'refresh',
           'rights': 'lock',
@@ -2726,7 +2829,7 @@ Recursive title display detected!##
     'name': $id,
     'value': $value,
     'class': 'suggest-propertyValues',
-    'data-className': $field.className,
+    'data-className': $services.model.serialize($field.reference.parent, 'default'),
     'data-propertyName': $name
   })
   #if ("$!freeText" != '')

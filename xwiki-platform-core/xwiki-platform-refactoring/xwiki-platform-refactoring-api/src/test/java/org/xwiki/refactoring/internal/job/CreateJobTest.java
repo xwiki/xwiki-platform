@@ -19,19 +19,22 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
+import ch.qos.logback.classic.Level;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -39,19 +42,20 @@ import static org.mockito.Mockito.*;
  * 
  * @version $Id$
  */
-public class CreateJobTest extends AbstractEntityJobTest
+@ComponentTest
+class CreateJobTest extends AbstractEntityJobTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(CreateJob.class);
+    @InjectMockComponents
+    private CreateJob createJob;
 
     @Override
-    protected MockitoComponentMockingRule<Job> getMocker()
+    protected Job getJob()
     {
-        return this.mocker;
+        return this.createJob;
     }
 
     @Test
-    public void createDocumentFromTemplate() throws Throwable
+    void createDocumentFromTemplate() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -74,14 +78,14 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createSpaceFromTemplate() throws Throwable
+    void createSpaceFromTemplate() throws Throwable
     {
         SpaceReference newSpaceReference = new SpaceReference("wiki", "Space");
         SpaceReference templateSpaceReference = new SpaceReference("wiki", "Code", "Template");
 
         DocumentReference templateDocumentReference = new DocumentReference("Index", templateSpaceReference);
         when(this.modelBridge.getDocumentReferences(templateSpaceReference)).thenReturn(
-            Arrays.asList(templateDocumentReference));
+            List.of(templateDocumentReference));
         when(this.modelBridge.exists(templateDocumentReference)).thenReturn(true);
 
         DocumentReference newDocumentReference = new DocumentReference("Index", newSpaceReference);
@@ -102,7 +106,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createDocumentWithoutTemplate() throws Throwable
+    void createDocumentWithoutTemplate() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -118,7 +122,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createSpaceWithoutTemplate() throws Throwable
+    void createSpaceWithoutTemplate() throws Throwable
     {
         SpaceReference spaceReference = new SpaceReference("wiki", "Space");
         DocumentReference spaceHomeReference = new DocumentReference("WebHome", spaceReference);
@@ -135,18 +139,18 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createDocumentDeep() throws Throwable
+    void createDocumentDeep() throws Throwable
     {
         DocumentReference spaceHomeReference = new DocumentReference("wiki", "Space", "WebHome");
         DocumentReference templateHomeReference =
-            new DocumentReference("wiki", Arrays.asList("Code", "Template"), "WebHome");
+            new DocumentReference("wiki", List.of("Code", "Template"), "WebHome");
 
         DocumentReference templateDocumentReference =
             new DocumentReference("Index", templateHomeReference.getLastSpaceReference());
         when(this.modelBridge.getDocumentReferences(templateHomeReference.getLastSpaceReference())).thenReturn(
-            Arrays.asList(templateDocumentReference));
+            List.of(templateDocumentReference));
+        when(this.modelBridge.exists(templateHomeReference)).thenReturn(true);
         when(this.modelBridge.exists(templateDocumentReference)).thenReturn(true);
-
         DocumentReference newDocumentReference =
             new DocumentReference("Index", spaceHomeReference.getLastSpaceReference());
         when(this.modelBridge.exists(newDocumentReference)).thenReturn(false);
@@ -161,7 +165,7 @@ public class CreateJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void createDocumentFromMissingTemplate() throws Throwable
+    void createDocumentFromMissingTemplate() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -175,11 +179,12 @@ public class CreateJobTest extends AbstractEntityJobTest
         run(request);
 
         verifyNoCreate();
-        verify(this.mocker.getMockedLogger()).error("Template document [{}] does not exist.", templateReference);
+        assertEquals("Template document [wiki:Code.Template] does not exist.", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
     }
 
     @Test
-    public void createDocumentFromRestrictedTemplate() throws Throwable
+    void createDocumentFromRestrictedTemplate() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -196,12 +201,12 @@ public class CreateJobTest extends AbstractEntityJobTest
         run(request);
 
         verifyNoCreate();
-        verify(this.mocker.getMockedLogger()).error("You are not allowed to view the template document [{}].",
-            templateReference);
+        assertEquals("You are not allowed to view the template document [wiki:Code.Template].", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
     }
 
     @Test
-    public void createRestrictedDocument() throws Throwable
+    void createRestrictedDocument() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -220,12 +225,12 @@ public class CreateJobTest extends AbstractEntityJobTest
         run(request);
 
         verifyNoCreate();
-        verify(this.mocker.getMockedLogger()).error("You are not allowed to create the document [{}].",
-            documentReference);
+        assertEquals("You are not allowed to create the document [wiki:Space.Page].", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
     }
 
     @Test
-    public void createRestrictedDocumentAuthor() throws Throwable
+    void createRestrictedDocumentAuthor() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(false);
@@ -244,12 +249,12 @@ public class CreateJobTest extends AbstractEntityJobTest
         run(request);
 
         verifyNoCreate();
-        verify(this.mocker.getMockedLogger()).error("You are not allowed to create the document [{}].",
-            documentReference);
+        assertEquals("You are not allowed to create the document [wiki:Space.Page].", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
     }
 
     @Test
-    public void createExistingDocument() throws Throwable
+    void createExistingDocument() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
@@ -257,22 +262,21 @@ public class CreateJobTest extends AbstractEntityJobTest
         run(createRequest(documentReference, null));
 
         verifyNoCreate();
-        verify(this.mocker.getMockedLogger()).warn("Skipping creation of document [{}] because it already exists.",
-            documentReference);
+        assertEquals("Skipping creation of document [wiki:Space.Page] because it already exists.",
+            getLogCapture().getMessage(0));
+        assertEquals(Level.WARN, getLogCapture().getLogEvent(0).getLevel());
     }
 
     @Test
-    public void skipDocumentCreation() throws Throwable
+    void skipDocumentCreation() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
 
         CreateRequest request = createRequest(documentReference, null);
-        request.setSkippedEntities(Arrays.<EntityReference>asList(documentReference));
+        request.setSkippedEntities(List.of(documentReference));
         run(request);
 
         verifyNoCreate();
-        verify(this.mocker.getMockedLogger()).debug("Skipping creation of document [{}], as specified in the request.",
-            documentReference);
     }
 
     private CreateRequest createRequest(EntityReference targetReference, EntityReference templateReference)

@@ -368,9 +368,6 @@ public class ImportTest extends AbstractPackageTest
         assertFalse(foundOverwritingDoc.isNew());
         assertNotSame(foundDocument, foundOverwritingDoc);
         assertEquals(foundOverwritingDoc.getContent(), newContent);
-        // Make sure the previous version is set as original document by the packager
-        // This is cheating a bit, should be tested using a listener instead this hack
-        assertSame(foundDocument, foundOverwritingDoc.getOriginalDocument().getOriginalDocument());
     }
 
     /**

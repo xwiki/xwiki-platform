@@ -166,7 +166,7 @@
       var isWidgetVisible = function(widget) {
         // We don't use CKEDITOR.dom.element#isVisible() because we want to check that the widget has both width and
         // height, otherwise the user cannot select it (to edit it for instance).
-        return widget.element.$.offsetHeight > 0 && widget.element.$.offsetWidth > 0;
+        return isElementVisible(widget.element.$);
       };
 
       var ensureMacroWidgetVisible = function(macroWidget) {
@@ -180,6 +180,30 @@
       // Replace the macro marker comments with a DIV or SPAN in order to be able to initialize the macro widgets.
       editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'macro', {
         toHtml: wrapMacroOutput
+      });
+
+      // Remove the bogus BR tags that are being added by the CKEDITOR.htmlDataProcessor.dataFilter to the empty blocks
+      // from the macro output, since otherwise we can't detect if the macro output is visible or not in order to toggle
+      // the macro placeholder.
+      //
+      // CKEDITOR.htmlDataProcessor.dataFilter is called on the 'toHtml' event with priority 10 and it adds a bogus BR
+      // tag to all the empty block elements, including those from the read-only macro output. These bogus BR tags are
+      // marked with the 'data-cke-bogus' attribute which is removed also by the same dataFilter in a different rule
+      // that has priority 10. We're adding a rule to remove these bogus BR tags from the read-only macro output. This
+      // rule must be applied after the bogus BR tags are added by the dataFilter but before the 'data-cke-bogus'
+      // attribute is removed (with priority 10) so that we can identify the bogus BR tags.
+      // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_editor.html#event-toHtml
+      editor.dataProcessor?.dataFilter?.addRules({
+        elements: {
+          br: function(br) {
+            if (br.attributes['data-cke-bogus'] === 1 && CKEDITOR.plugins.xwikiMacro.isMacroOutput(br)) {
+              return false;
+            }
+          }
+        }
+      }, {
+        applyToAll: true,
+        priority: 9
       });
 
       editor.ui.addButton('xwiki-macro', {
@@ -307,19 +331,37 @@
           }, options.commandData));
         },
         showMacroWizard: function(macroCall) {
-          var widget = this;
-          var input = {
+          // We don't use _showMacroWizard directly as RequireJS callback because it is asynchronous and RequireJS has
+          // issues with async callbacks. See https://github.com/requirejs/requirejs/issues/1694 .
+          require(['macroWizard'], (macroWizard) => {
+            this._showMacroWizard(macroWizard, macroCall);
+          });
+        },
+        _showMacroWizard: async function(macroWizard, macroCall) {
+          // Show the macro wizard to insert or edit a macro and wait for the result.
+          const widget = this;
+          const input = {
             macroCall: macroCall,
             hiddenMacroParameters: Object.keys(widget.editables || {}),
             sourceDocumentReference: editor.config.sourceDocument.documentReference
           };
-          // Show our custom insert/edit dialog.
-          require(['macroWizard'], function(macroWizard) {
-            // Give the focus back to the editor after the modal is closed.
-            macroWizard(input).always(editor.focus.bind(editor)).done(function(data) {
-              macroPlugin.insertOrUpdateMacroWidget(editor, data, widget);
-            });
-          });
+          let output;
+          try {
+            output = await macroWizard(input);
+          } catch (e) {
+            // The macro wizard was canceled.
+          }
+
+          // Give the focus back to the editor after the modal is closed. We need to wait for the editor to be ready
+          // because remote changes might have put the editor in loading mode while the macro wizard was open (e.g. if
+          // another user inserted a macro which triggered a content refresh).
+          await editor.toBeReady();
+          editor.focus();
+
+          // Update or insert the macro widget based on the output of the macro wizard.
+          if (output) {
+            macroPlugin.insertOrUpdateMacroWidget(editor, output, widget);
+          }
         }
       });
 
@@ -346,6 +388,7 @@
         contextSensitive: false,
         editorFocus: false,
         readOnly: true,
+        counter: 0,
         exec: function(editor, options) {
           options = Object.assign({
             preserveSelection: true
@@ -371,14 +414,25 @@
             });
           }).fail(this.done.bind(this, false, options));
         },
-        done: function(success, options) {
-          editor.setLoading(false);
+        done: async function(success, options) {
           if (options.preserveSelection) {
-            CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+            await CKEDITOR.plugins.xwikiSelection.restoreSelection(editor, {
+              beforeApply: () => editor.setLoading(false)
+            });
+          } else {
+            editor.setLoading(false);
           }
           if (!success) {
             editor.showNotification(editor.localization.get('xwiki-macro.refreshFailed'), 'warning');
           }
+          // Increment the refresh counter and publish its value on the editable element to help functional tests detect
+          // when the edited content has been refreshed. This is especially useful for realtime editing tests that use
+          // multiple browser tabs: changing a macro in the first tab triggers a refresh of the content in the second
+          // tab, but after switching to the second tab we can't rely on the editor loading state to determine if the
+          // content was refreshed or not (the content might have been already refreshed or the changes from the first
+          // tab might not have been applied yet).
+          this.counter++;
+          editor.editable()?.data('xwiki-refresh-counter', this.counter);
           editor.fire('afterCommandExec', {name: this.name, command: this});
         }
       });
@@ -527,10 +581,9 @@
             });
           }
         });
-
-
       });
 
+      this.toggleMacroPlaceholderOnDOMUpdate(editor);
     },
 
     // Setup the balloon tool bar for the nested editables, after the balloontoolbar plugin has been fully initialized.
@@ -675,7 +728,11 @@
           });
         });
       });
-
+      // Ensure that widgets are always properly initialized after a paste.
+      // Fix XWIKI-22391
+      editor.on('afterPaste', function () {
+        this.widgets.checkWidgets();
+      });
     },
 
     insertOrUpdateMacroWidget: async function(editor, data, widget, skipRefresh) {
@@ -909,8 +966,70 @@
         output.push(separator, macroCall.content);
       }
       return CKEDITOR.tools.escapeComment(output.join(''));
+    },
+
+    toggleMacroPlaceholderOnDOMUpdate: function(editor) {
+      let cleanUp = () => {};
+      editor.on('contentDom', function() {
+        cleanUp();
+        const doc = editor.document.$;
+        $(doc).on("xwiki:dom:updated", onDOMUpdated);
+        // We need to update the cleanUp function whenever the editing area is (re)created. For in-place edit mode this
+        // happens only once (per editing session) while for standalone edit mode this happens multiple times (e.g.
+        // when we switch to Source and back or when the edited content is refreshed).
+        cleanUp = () => $(doc).off("xwiki:dom:updated", onDOMUpdated);
+      });
+      // We don't pass directly the cleanUp function because the cleanUp function may change during the lifetime of the
+      // editor (e.g. when the editing area is recreated for the standalone edit mode).
+      editor.on('beforeDestroy', () => cleanUp());
+
+      function onDOMUpdated(event, data) {
+        const editable = editor.editable()?.$;
+        const macroElements = data.elements
+          .flatMap(getMacroElements)
+          .filter(element => editable?.contains(element))
+          .sort((alice, bob) => {
+            const delta = alice.compareDocumentPosition(bob);
+            // We need to reverse the pre-order depth-first traversal in order to be able to handle the nested macros
+            // first.
+            if (delta & Node.DOCUMENT_POSITION_PRECEDING) {
+              return -1;
+            } else if (delta & Node.DOCUMENT_POSITION_FOLLOWING) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+        // Hide all the affected macro placeholders first, to trigger a single repaint.
+        macroElements.forEach(hideMacroPlaceholder);
+        // Then show the macro placeholders where needed.
+        macroElements.forEach(maybeToggleMacroPlaceholder);
+      }
+
+      function getMacroElements(root) {
+        const macroElementSelector = '.macro.cke_widget_element[data-macro]';
+        const macroElements = [...root.querySelectorAll(macroElementSelector)];
+        const macroElementAncestor = root.closest(macroElementSelector);
+        if (macroElementAncestor) {
+          macroElements.push(macroElementAncestor);
+        }
+        return macroElements;
+      }
+    
+      function hideMacroPlaceholder(macroElement) {
+        macroElement.querySelector(':scope > .macro-placeholder')?.classList.add('hidden');
+      }
+    
+      function maybeToggleMacroPlaceholder(macroElement) {
+        const macroVisible = isElementVisible(macroElement);
+        macroElement.querySelector(':scope > .macro-placeholder')?.classList.toggle('hidden', macroVisible);
+      }
     }
   });
+
+  function isElementVisible(element) {
+    return element.offsetHeight > 0 && element.offsetWidth > 0;
+  }
 
   CKEDITOR.plugins.xwikiMacro = {
     // The passed element is of type CKEDITOR.htmlParser.element

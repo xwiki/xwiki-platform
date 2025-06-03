@@ -221,8 +221,16 @@
       'showTranslations': $xwiki.isMultiLingual(),
       'showWikis': $showWikis
     })
-    #set ($treeToggle = "<span class='dropdown-toggle' data-toggle='dropdown'>" +
-      "$services.icon.renderHTML('caret-down')</span>")
+    #if ($rootId)
+      #set ($togglerTextAlternative = "<span class='sr-only'>$escapetool.xml($services.localization.render('web.hierarchy.toggler.label.children', [$pathData.get($openToIndex).label])) </span>")
+    #else
+      ## If the rootId is null, this means that the root is the home. Which means that we're on the first tree, which doesn't show exactly the same thing as the others.
+      #set ($togglerTextAlternative = "<span class='sr-only'>$escapetool.xml($services.localization.render('web.hierarchy.toggler.label.parents', [$pathData.get($openToIndex).label])) </span>")
+    #end
+    #set ($treeToggle = "<button class='dropdown-toggle' type='button' data-toggle='dropdown'>" +
+      $togglerTextAlternative +
+      $services.icon.renderHTML('caret-down') +
+      "</button>")
     #set ($treeNavigation = "$treeToggle<div class='dropdown-menu'>#documentTree($treeParams)</div>")
   #end
 #end

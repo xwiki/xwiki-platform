@@ -119,7 +119,7 @@
         #displayAnnotationBoxButtons('edit')
       &lt;/form&gt;
     #else
-      &lt;div class="box infomessage"&gt;$services.localization.render('annotations.action.edit.error.notfound')&lt;/div&gt;
+      #info($services.localization.render('annotations.action.edit.error.notfound'))
     #end
   &lt;/div&gt;
 #end
@@ -152,7 +152,7 @@
       ##&lt;div class="clearfloats"&gt;&lt;/div&gt;
       #displayAnnotationFromReference($ann $mode $docRef)
     #else
-      &lt;div class="box infomessage"&gt;$services.localization.render('annotations.action.view.error.notfound')&lt;/div&gt;
+      #info($services.localization.render('annotations.action.view.error.notfound'))
     #end
   &lt;/div&gt;
 #end
@@ -356,6 +356,10 @@
 
 #macro(displayAnnotationProperty $annotatedDocument $annotationObject $annotationProperty $mode)
   #if ($mode == 'edit' || $mode == 'create')
+    ## This startupFocus parameter is used by the CKEditor WYSIWYG editor.
+    #set ($wysiwygEditorConfig = {
+      'startupFocus': true
+    })
     ## We use displayEdit and not display('edit') because we want the input field name to be just the property name
     ## (without the "DocumentReference_objectNumber_" prefix).
     $annotatedDocument.displayEdit($annotationProperty, '', $annotationObject)

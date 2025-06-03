@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.stability.Unstable;
@@ -38,7 +40,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LiveDataMeta
+public class LiveDataMeta implements InitializableLiveDataElement
 {
     private Collection<LiveDataLayoutDescriptor> layouts;
 
@@ -310,53 +312,100 @@ public class LiveDataMeta
         this.description = description;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    private <A extends InitializableLiveDataElement> Collection<A> initializeAndCleanUpCollection(Collection<A>
+        collection)
+    {
+        Collection<A> result;
+        if (collection == null) {
+            result = new ArrayList<>();
+        } else {
+            result = collection;
+            result.stream().filter(Objects::nonNull).forEach(A::initialize);
+        }
+        return result;
+    }
+
+    private <A extends InitializableLiveDataElement> A initialize(A descriptor, A newInstance)
+    {
+        A result = descriptor;
+        if (result == null) {
+            result = newInstance;
+        }
+        result.initialize();
+        return result;
+    }
+
+    @Override
     public void initialize()
     {
-        if (this.layouts == null) {
-            this.layouts = new ArrayList<>();
-        }
-        this.layouts.stream().filter(Objects::nonNull).forEach(LiveDataLayoutDescriptor::initialize);
-
-        if (this.propertyDescriptors == null) {
-            this.propertyDescriptors = new ArrayList<>();
-        }
-        this.propertyDescriptors.stream().filter(Objects::nonNull).forEach(LiveDataPropertyDescriptor::initialize);
-
-        if (this.propertyTypes == null) {
-            this.propertyTypes = new ArrayList<>();
-        }
-        this.propertyTypes.stream().filter(Objects::nonNull).forEach(LiveDataPropertyDescriptor::initialize);
-
-        if (this.filters == null) {
-            this.filters = new ArrayList<>();
-        }
-        this.filters.stream().filter(Objects::nonNull).forEach(FilterDescriptor::initialize);
+        this.layouts = initializeAndCleanUpCollection(this.layouts);
+        this.propertyDescriptors = initializeAndCleanUpCollection(this.propertyDescriptors);
+        this.propertyTypes = initializeAndCleanUpCollection(this.propertyTypes);
+        this.filters = initializeAndCleanUpCollection(this.filters);
+        this.actions = initializeAndCleanUpCollection(this.actions);
 
         if (this.displayers == null) {
             this.displayers = new ArrayList<>();
         }
 
-        if (this.pagination == null) {
-            this.pagination = new LiveDataPaginationConfiguration();
-        }
-        this.pagination.initialize();
+        this.pagination = initialize(this.pagination, new LiveDataPaginationConfiguration());
+        this.entryDescriptor = initialize(this.entryDescriptor, new LiveDataEntryDescriptor());
+        this.selection = initialize(this.selection, new LiveDataSelectionConfiguration());
+    }
 
-        if (this.entryDescriptor == null) {
-            this.entryDescriptor = new LiveDataEntryDescriptor();
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
         }
-        this.entryDescriptor.initialize();
 
-        if (this.actions == null) {
-            this.actions = new ArrayList<>();
+        if (o == null || getClass() != o.getClass()) {
+            return false;
         }
-        this.actions.stream().filter(Objects::nonNull).forEach(LiveDataActionDescriptor::initialize);
 
-        if (this.selection == null) {
-            this.selection = new LiveDataSelectionConfiguration();
-        }
-        this.selection.initialize();
+        LiveDataMeta that = (LiveDataMeta) o;
+
+        return new EqualsBuilder()
+            .append(this.layouts, that.layouts)
+            .append(this.defaultLayout, that.defaultLayout)
+            .append(this.propertyDescriptors, that.propertyDescriptors)
+            .append(this.propertyTypes, that.propertyTypes)
+            .append(this.filters, that.filters)
+            .append(this.defaultFilter, that.defaultFilter)
+            .append(this.displayers, that.displayers)
+            .append(this.defaultDisplayer, that.defaultDisplayer)
+            .append(this.pagination, that.pagination)
+            .append(this.entryDescriptor, that.entryDescriptor)
+            .append(this.actions, that.actions)
+            .append(this.selection, that.selection)
+            .append(this.description, that.description)
+            .isEquals();
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.layouts)
+            .append(this.defaultLayout)
+            .append(this.propertyDescriptors)
+            .append(this.propertyTypes)
+            .append(this.filters)
+            .append(this.defaultFilter)
+            .append(this.displayers)
+            .append(this.defaultDisplayer)
+            .append(this.pagination)
+            .append(this.entryDescriptor)
+            .append(this.actions)
+            .append(this.selection)
+            .append(this.description)
+            .toHashCode();
     }
 }

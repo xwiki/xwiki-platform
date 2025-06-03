@@ -19,8 +19,8 @@
  */
 package org.xwiki.test.ui;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -101,7 +101,7 @@ public class EditWikiTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146")
     public void testPreviewDisplaysPageTitle()
     {
-        String title = RandomStringUtils.randomAlphanumeric(3);
+        String title = RandomStringUtils.secure().nextAlphanumeric(3);
         this.editPage.setTitle(title);
         this.editPage.clickPreview();
         // The preview page has the action buttons but otherwise it is similar to a view page.

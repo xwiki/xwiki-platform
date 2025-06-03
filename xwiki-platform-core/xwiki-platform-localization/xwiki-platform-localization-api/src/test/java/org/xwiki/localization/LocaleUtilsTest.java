@@ -24,6 +24,8 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link LocaleUtils}.
@@ -49,5 +51,16 @@ class LocaleUtilsTest
         assertEquals(Locale.US, LocaleUtils.toLocale("en_US"));
 
         assertEquals(Locale.FRENCH, LocaleUtils.toLocale("badLocale", Locale.FRENCH));
+    }
+
+    @Test
+    void isValid()
+    {
+        assertTrue(LocaleUtils.isValid(Locale.ROOT));
+        assertTrue(LocaleUtils.isValid(Locale.ENGLISH));
+        assertTrue(LocaleUtils.isValid(Locale.US));
+
+        assertFalse(LocaleUtils.isValid(null));
+        assertFalse(LocaleUtils.isValid(new Locale.Builder().setLanguage("zh").setScript("Hans").build()));
     }
 }

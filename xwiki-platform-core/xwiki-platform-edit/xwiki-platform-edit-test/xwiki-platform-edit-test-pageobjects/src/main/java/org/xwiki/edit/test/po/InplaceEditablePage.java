@@ -24,6 +24,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -35,6 +36,8 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class InplaceEditablePage extends ViewPage
 {
+    private static final By TITLE_INPUT = By.id("document-title-input");
+
     @FindBy(id = "commentinput")
     private WebElement versionSummaryInput;
 
@@ -96,7 +99,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage setDocumentTitle(String title)
     {
-        WebElement titleInput = getDriver().findElement(By.id("document-title-input"));
+        WebElement titleInput = getDriver().findElement(TITLE_INPUT);
         titleInput.clear();
         titleInput.sendKeys(title);
         return this;
@@ -105,13 +108,13 @@ public class InplaceEditablePage extends ViewPage
     @Override
     public String getDocumentTitle()
     {
-        List<WebElement> titleInput = getDriver().findElementsWithoutWaiting(By.id("document-title-input"));
+        List<WebElement> titleInput = getDriver().findElementsWithoutWaiting(TITLE_INPUT);
         if (titleInput.isEmpty()) {
             // View mode.
             return super.getDocumentTitle();
         } else {
             // Edit (in-place) mode.
-            return titleInput.get(0).getAttribute("value");
+            return titleInput.get(0).getDomProperty("value");
         }
     }
 
@@ -129,7 +132,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public String getDocumentTitleValidationMessage()
     {
-        return getDriver().findElement(By.id("document-title-input")).getDomProperty("validationMessage");
+        return getDriver().findElement(TITLE_INPUT).getDomProperty("validationMessage");
     }
 
     /**
@@ -137,7 +140,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public String getDocumentTitlePlaceholder()
     {
-        return getDriver().findElement(By.id("document-title-input")).getAttribute("placeholder");
+        return getDriver().findElement(TITLE_INPUT).getDomAttribute("placeholder");
     }
 
     /**
@@ -160,7 +163,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage cancel()
     {
-        getDriver().findElement(By.cssSelector("input[name='action_cancel']")).click();
+        clickActionButton("cancel");
         return waitForView();
     }
 
@@ -195,7 +198,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage save(String expectedSuccessMessage)
     {
-        getDriver().findElement(By.cssSelector("input[name='action_saveandcontinue']")).click();
+        clickActionButton("saveandcontinue");
         if (expectedSuccessMessage != null) {
             waitForNotificationSuccessMessage(expectedSuccessMessage);
         }
@@ -234,7 +237,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage saveAndView(String expectedSuccessMessage)
     {
-        getDriver().findElement(By.cssSelector("input[name='action_save']")).click();
+        clickActionButton("save");
         if (expectedSuccessMessage != null) {
             waitForNotificationSuccessMessage(expectedSuccessMessage);
             return waitForView();
@@ -251,5 +254,12 @@ public class InplaceEditablePage extends ViewPage
     {
         getDriver().waitUntilElementIsVisible(By.cssSelector(".xcontent:not(.form)"));
         return this;
+    }
+
+    private void clickActionButton(String actionName)
+    {
+        By actionButtonLocator = By.cssSelector("input[name='action_" + actionName + "']");
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(actionButtonLocator));
+        getDriver().findElement(actionButtonLocator).click();
     }
 }

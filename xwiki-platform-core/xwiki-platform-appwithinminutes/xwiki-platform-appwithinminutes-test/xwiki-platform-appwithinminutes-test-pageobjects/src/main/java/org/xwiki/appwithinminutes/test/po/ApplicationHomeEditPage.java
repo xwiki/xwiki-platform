@@ -170,7 +170,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
         // FIXME: This doesn't trigger the :hover CSS pseudo class. The click still works because the delete X (text) is
         // not really hidden: it is displayed with white color (the page background-color).
         new Actions(getDriver().getWrappedDriver()).moveToElement(column).perform();
-        column.findElement(By.className("delete")).click();
+        getDriver().scrollTo(column.findElement(By.className("delete"))).click();
     }
 
     /**
@@ -237,7 +237,10 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     public void removeAllDeprecatedLiveTableColumns(boolean yes)
     {
         WebElement warningMessage = getDriver().findElementWithoutWaiting(getForm(), By.className("warningmessage"));
-        getDriver().findElementWithoutWaiting(warningMessage, By.linkText(yes ? "Yes" : "No")).click();
+        WebElement linkElement =
+            getDriver().findElementWithoutWaiting(warningMessage, By.linkText(yes ? "Yes" : "No"));
+        getDriver().scrollTo(linkElement);
+        linkElement.click();
     }
 
     /**

@@ -35,24 +35,36 @@ public class QueryException extends Exception
     /**
      * @param message exception message
      * @param query Query object
+     */
+    public QueryException(String message, Query query)
+    {
+        super(message);
+
+        this.query = query;
+    }
+
+    /**
+     * @param message exception message
+     * @param query Query object
      * @param cause nested exception
      */
     public QueryException(String message, Query query, Throwable cause)
     {
         super(message, cause);
+
         this.query = query;
     }
 
     @Override
     public String getMessage()
     {
-        if (query == null) {
+        if (this.query == null) {
             return super.getMessage();
         } else {
-            if (query.isNamed()) {
-                return super.getMessage() + ". Named query = [" + query.getStatement() + "]";
+            if (this.query.isNamed()) {
+                return super.getMessage() + ". Named query = [" + this.query.getStatement() + "]";
             } else {
-                return super.getMessage() + ". Query statement = [" + query.getStatement() + "]";
+                return super.getMessage() + ". Query statement = [" + this.query.getStatement() + "]";
             }
         }
     }

@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.objects;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -27,7 +26,6 @@ import org.dom4j.Element;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.xml.XMLUtils;
 
@@ -43,8 +41,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  */
 // TODO: shouldn't this be abstract? toFormString and toText
 // will never work unless getValue is overriden
-public class BaseProperty<R extends EntityReference> extends BaseElement<R>
-    implements PropertyInterface, Serializable, Cloneable
+public class BaseProperty<R extends EntityReference> extends BaseElement<R> implements PropertyInterface, Cloneable
 {
     private static final long serialVersionUID = 1L;
 
@@ -54,11 +51,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     private BaseCollection object;
 
     private long id;
-
-    /**
-     * Set to true if value is not the same as the database value.
-     */
-    private boolean isValueDirty = true;
 
     @Override
     protected R createReference()
@@ -82,7 +74,17 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     @Override
     public void setObject(BaseCollection object)
     {
-        this.object = object;
+        if (this.object != object) {
+            this.object = object;
+
+            if (this.object != null) {
+                setOwnerDocument(object.getOwnerDocument());
+
+                if (isDirty()) {
+                    this.object.setDirty(true);
+                }
+            }
+        }
     }
 
     @Override
@@ -125,9 +127,13 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     @Override
     public void setId(long id)
     {
-        // I hate this.. needed for hibernate to find the object
-        // when loading the collections..
-        this.id = id;
+        if (id != this.id) {
+            // I hate this.. needed for hibernate to find the object
+            // when loading the collections..
+            this.id = id;
+
+            setDirty(true);
+        }
     }
 
     @Override
@@ -148,20 +154,34 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     }
 
     @Override
+    protected void detachOwner()
+    {
+        super.detachOwner();
+
+        setObject(null);
+    }
+
+    @Override
+    protected void cloneOwner()
+    {
+        super.cloneOwner();
+
+        // Get the object from the cloned owner
+        if (getOwnerDocument() != null && getObject() != null) {
+            setObject(this.ownerDocument.getXObject(this.object.getReference()));
+        }
+    }
+
+    @Override
     public BaseProperty<R> clone()
     {
-        BaseProperty<R> property = (BaseProperty<R>) super.clone();
+        return (BaseProperty<R>) super.clone();
+    }
 
-        property.ownerDocument = null;
-
-        cloneInternal(property);
-
-        property.isValueDirty = this.isValueDirty;
-        property.ownerDocument = this.ownerDocument;
-
-        property.setObject(getObject());
-
-        return property;
+    @Override
+    public BaseProperty<R> clone(boolean detach)
+    {
+        return (BaseProperty<R>) super.clone(detach);
     }
 
     /**
@@ -171,6 +191,14 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      */
     protected void cloneInternal(BaseProperty clone)
     {
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<R> element)
+    {
+        super.cloneContent(element);
+
+        cloneInternal((BaseProperty) element);
     }
 
     public Object getValue()
@@ -319,7 +347,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      * @since 15.2RC1
      * @since 14.10.7
      */
-    @Unstable
     protected MergeManagerResult<Object, Object> mergeValue(Object previousValue, Object newValue,
         MergeConfiguration mergeConfiguration)
     {
@@ -349,10 +376,12 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     /**
      * @return {@literal true} if the property value doesn't match the value in the database.
      * @since 4.3M2
+     * @deprecated use {@link #isDirty()} instead
      */
+    @Deprecated(since = "17.1.0RC1")
     public boolean isValueDirty()
     {
-        return this.isValueDirty;
+        return isDirty();
     }
 
     /**
@@ -362,7 +391,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      */
     protected void setValueDirty(Object newValue)
     {
-        if (!this.isValueDirty && !Objects.equals(newValue, getValue())) {
+        if (!isDirty() && !Objects.equals(newValue, getValue())) {
             setValueDirty(true);
         }
     }
@@ -370,30 +399,21 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     /**
      * @param valueDirty Indicate if the dirty flag should be set or cleared.
      * @since 4.3M2
+     * @deprecated use {@link #setDirty(boolean)} instead
      */
+    @Deprecated(since = "17.1.0RC1")
     public void setValueDirty(boolean valueDirty)
     {
-        this.isValueDirty = valueDirty;
-        if (valueDirty && this.ownerDocument != null) {
-            this.ownerDocument.setMetaDataDirty(true);
-        }
+        setDirty(valueDirty);
     }
 
-    /**
-     * Set the owner document of this base property.
-     *
-     * @param ownerDocument The owner document.
-     * @since 4.3M2
-     */
     @Override
-    public void setOwnerDocument(XWikiDocument ownerDocument)
+    public void setDirty(boolean dirty)
     {
-        if (this.ownerDocument != ownerDocument) {
-            super.setOwnerDocument(ownerDocument);
+        super.setDirty(dirty);
 
-            if (ownerDocument != null && this.isValueDirty) {
-                ownerDocument.setMetaDataDirty(true);
-            }
+        if (dirty && this.object != null) {
+            this.object.setDirty(true);
         }
     }
 

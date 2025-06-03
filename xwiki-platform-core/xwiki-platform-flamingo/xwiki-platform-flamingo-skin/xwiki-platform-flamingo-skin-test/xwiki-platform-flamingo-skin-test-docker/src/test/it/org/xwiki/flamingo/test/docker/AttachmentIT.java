@@ -20,6 +20,9 @@
 package org.xwiki.flamingo.test.docker;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -68,8 +71,6 @@ class AttachmentIT
 
     private static final String SECOND_ATTACHMENT = "SmallAttachment2.txt";
 
-    private static final String ESCAPED_ATTACHMENT = "<strong>EscapedAttachment.txt";
-
     private static final String IMAGE_ATTACHMENT = "image.gif";
 
     private static final String SMALL_SIZE_ATTACHMENT = "SmallSizeAttachment.png";
@@ -79,6 +80,9 @@ class AttachmentIT
     @BeforeAll
     public void setup(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
+        // Make sure the timezone configuration the default value until XWIKI-21924 is fixed.
+        setup.setPropertyInXWikiPreferences("timezone", "String", "");
         setup.createUser("User2", "pass", "");
         setup.createUserAndLogin("User1", "pass");
     }
@@ -103,7 +107,7 @@ class AttachmentIT
         setup.rest().savePage(testReference, "", "");
         Page page = setup.rest().get(testReference);
         // We make the page hidden as we identified some issues specific to hidden pages (see XWIKI-20093).
-        // If it happens that some issues are specific to non-hidden pages, the test will need to be improved to 
+        // If it happens that some issues are specific to non-hidden pages, the test will need to be improved to
         // cover both cases (which will make the execution time of the test suite larger).
         page.setHidden(true);
         setup.rest().save(page);
@@ -448,19 +452,24 @@ class AttachmentIT
 
     @Test
     @Order(9)
-    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration)
+    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference) throws IOException
     {
         setup.loginAsSuperAdmin();
+
+        // We shouldn't store files with special characters in the repository, since some filesystems don't support it.
+        // Instead, we create the file during the test.
+        Path unescapedFile = Files.createTempFile("<strong>", null);
+        String unescapedFileName = unescapedFile.getFileName().toString();
+
         setup.createPage(testReference, "Empty content");
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
 
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, ESCAPED_ATTACHMENT).getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish(ESCAPED_ATTACHMENT);
+        attachmentsPane.setFileToUpload(unescapedFile.toString(), true);
+        attachmentsPane.waitForUploadToFinish(unescapedFileName);
         attachmentsPane.clickHideProgress();
 
-        assertTrue(attachmentsPane.attachmentExistsByFileName(ESCAPED_ATTACHMENT));
-        attachmentsPane.deleteAttachmentByFileByName(ESCAPED_ATTACHMENT);
+        assertTrue(attachmentsPane.attachmentExistsByFileName(unescapedFileName));
+        attachmentsPane.deleteAttachmentByFileByName(unescapedFileName);
     }
 
     private String getAttachmentsMacroContent(DocumentReference docRef)

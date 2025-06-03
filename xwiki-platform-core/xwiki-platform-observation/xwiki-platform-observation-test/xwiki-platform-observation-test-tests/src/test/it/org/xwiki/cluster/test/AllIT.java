@@ -21,7 +21,6 @@ package org.xwiki.cluster.test;
 
 import java.util.List;
 
-import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,47 +46,39 @@ public class AllIT
     @PageObjectSuite.PreStart
     public void preStart(List<XWikiExecutor> executors) throws Exception
     {
-        setupChannel(executors.get(0), "tcp");
-        setupChannel(executors.get(1), "tcp");
+        setupRepository();
 
-        repositoryUtil = new RepositoryUtils();
-        repositoryUtil.setup();
-
-        setupRepositories(executors.get(0));
-        setupRepositories(executors.get(1));
+        setupExecutor(executors.get(0));
+        setupExecutor(executors.get(1));
     }
 
-    private void setupChannel(XWikiExecutor executor, String channelName) throws Exception
+    public static void setupRepository() throws Exception
     {
-        if (executor.getExecutionDirectory() != null) {
-            PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
-            properties.setProperty("observation.remote.enabled", "true");
-            properties.setProperty("observation.remote.channels", channelName);
-            executor.saveXWikiProperties();
-
-            setupExecutor(executor);
-        }
+        repositoryUtil = new RepositoryUtils();
+        repositoryUtil.setup();
     }
 
     public static void setupExecutor(XWikiExecutor executor)
     {
+        StringBuilder builder = new StringBuilder("-Xmx512m");
+
         // Force bind_addr since tcp jgroups configuration expect cluster members to listen localhost by default
-        executor.setXWikiOpts("-Djgroups.bind_addr=localhost -Xmx512m");
-    }
+        builder.append(" -Djgroups.bind_addr=localhost");
 
-    private void setupRepositories(XWikiExecutor executor) throws Exception
-    {
-        LOGGER.info("Adding repository to xwiki.properties");
+        // Set a custom cluster id
+        builder.append(" -Dxconf.xwikiproperties.observation.remote.id=" + executor.getPort());
 
-        if (executor.getExecutionDirectory() != null) {
-            PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
+        // Enable and setup event distribution
+        builder.append(" -Dxconf.xwikiproperties.observation.remote.enabled=true");
+        builder.append(" -Dxconf.xwikiproperties.observation.remote.channels=tcp");
 
-            // Put self and Maven as extensions repository
-            properties.setProperty("extension.repositories",
-                "maven-test:maven:" + repositoryUtil.getMavenRepository().toURI());
-
-            executor.saveXWikiProperties();
+        // Inject a test Maven repository
+        if (repositoryUtil != null) {
+            builder.append(" -Dxconf.xwikiproperties.extension.repositories=maven-test:maven:"
+                + repositoryUtil.getMavenRepository().toURI());
         }
+
+        executor.setXWikiOpts(builder.toString());
     }
 
     @PageObjectSuite.PostStart
@@ -96,7 +87,7 @@ public class AllIT
         initExtensionTestUtils(context);
     }
 
-    public static ExtensionTestUtils initExtensionTestUtils(PersistentTestContext context) throws Exception
+    public static ExtensionTestUtils initExtensionTestUtils(PersistentTestContext context)
     {
         // Initialize extensions and repositories
         ExtensionTestUtils extensionTestUtil = new ExtensionTestUtils(context.getUtil());

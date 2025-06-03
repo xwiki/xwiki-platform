@@ -160,8 +160,8 @@ class TasksStoreTest
         this.tasksStore.deleteTask("wikiId", 42, "7.1", "testtask");
         verify(this.contextManager).initialize(any());
         verify(this.context).setWikiId("wikiId");
-        verify(this.session).createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId "
-            + "and t.version = :version and t.type = :type");
+        verify(this.session).createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId"
+            + " and t.type = :type and t.version = :version");
         verify(this.query).setParameter("docId", 42L);
         verify(this.query).setParameter("version", "7.1");
         verify(this.query).setParameter("type", "testtask");
@@ -177,8 +177,8 @@ class TasksStoreTest
         verify(this.contextManager).initialize(any());
         verify(this.context).setWikiId("wikiId");
         verify(this.session).createQuery(
-            "delete from XWikiDocumentIndexingTask t where t.docId = :docId and "
-                + "(t.version = :version or t.version is null)and t.type = :type");
+            "delete from XWikiDocumentIndexingTask t where t.docId = :docId and t.type = :type and "
+                + "(t.version = :version or t.version is null)");
         verify(this.query).setParameter("docId", 42L);
         verify(this.query).setParameter("version", version);
         verify(this.query).setParameter("type", "testtask");
@@ -206,7 +206,7 @@ class TasksStoreTest
         verify(this.contextManager).initialize(any());
         verify(this.context).setWikiId("wikiId");
         verify(this.session).createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId "
-            + "and t.type = :type");
+            + "and t.type = :type ");
         verify(this.query).setParameter("docId", 42L);
         verify(this.query).setParameter("type", "testtask");
         verify(this.query).executeUpdate();

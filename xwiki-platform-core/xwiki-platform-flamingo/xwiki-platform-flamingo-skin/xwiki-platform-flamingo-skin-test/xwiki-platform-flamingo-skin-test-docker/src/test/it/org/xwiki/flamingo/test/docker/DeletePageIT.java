@@ -87,7 +87,7 @@ class DeletePageIT
 
     private static final String PAGE_TITLE = "Page title that will be deleted";
 
-    private static final String DELETE_SUCCESSFUL = "Done.";
+    private static final String ACTION_SUCCESSFUL = "Done.";
 
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
@@ -119,7 +119,7 @@ class DeletePageIT
         deletingPage.waitUntilFinished();
         // Note: it's better to wait instead of using isSuccess() since there could be some timeframe between
         // the hiding of the progress UI and the display of the success message.
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
 
         List<DeletedPageEntry> deletedPagesEntries = deleteOutcome.getDeletedPagesEntries();
@@ -289,7 +289,7 @@ class DeletePageIT
 
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilFinished();
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         // Check the page have been effectively removed
         ViewPage page = setup.gotoPage(parentReference);
         assertFalse(page.exists());
@@ -352,7 +352,7 @@ class DeletePageIT
         // Trigger the actual restore.
         RestoreStatusPage restoreStatusPage = undeletePage.clickRestore();
         restoreStatusPage.waitUntilFinished();
-        assertEquals("Done.", restoreStatusPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, restoreStatusPage.getInfoMessage());
         page = restoreStatusPage.gotoRestoredPage();
 
         // Check the page have been effectively restored.
@@ -505,7 +505,7 @@ class DeletePageIT
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         List<DeletedPageEntry> deletedPagesEntries = deleteOutcome.getDeletedPagesEntries();
         assertEquals(1, deletedPagesEntries.size());
@@ -527,7 +527,7 @@ class DeletePageIT
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
         ViewPage viewPage1 = new ViewPage();
@@ -768,12 +768,12 @@ class DeletePageIT
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
 
         // Verify that a redirect was added and the link was updated.
         viewPage = testUtils.gotoPage(reference);
         assertEquals("New target", this.viewPage.getDocumentTitle());
-        assertEquals("[[Link>>doc:NewTarget.WebHome]]",
+        assertEquals("[[Link>>doc:xwiki:NewTarget.WebHome]]",
             testUtils.rest().<Page>get(backlinkDocumentReference).getContent());
     }
 
@@ -806,7 +806,7 @@ class DeletePageIT
         deletingPage.waitUntilFinished();
 
         // Verify that there is no redirect and the links were not altered.
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
         assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
@@ -826,7 +826,7 @@ class DeletePageIT
         TestConfiguration testConfiguration) throws Exception
     {
         DocumentReference childReference = new DocumentReference("Child", parentReference.getLastSpaceReference());
-        String childFullName = testUtils.serializeReference(childReference).split(":")[1];
+        String childFullName = testUtils.serializeLocalReference(childReference);
         DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
         DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
 
@@ -836,7 +836,7 @@ class DeletePageIT
         // Create backlinks to the parent and the child page.
         String format = "[[Parent>>doc:%s]] [[Child>>doc:%s]]";
         testUtils.createPage(backlinkDocReference,
-            String.format(format, testUtils.serializeReference(parentReference), childFullName), "Backlink document");
+            String.format(format, testUtils.serializeLocalReference(parentReference), childFullName), "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
         new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
@@ -853,9 +853,9 @@ class DeletePageIT
         deletingPage.waitUntilFinished();
 
         // Verify that there is no redirect on the child page and backlink was not altered.
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         String newContent =
-            String.format(format, testUtils.serializeReference(newTargetReference).split(":")[1], childFullName);
+            String.format(format, testUtils.serializeLocalReference(newTargetReference), childFullName);
         assertEquals(newContent, testUtils.rest().<Page>get(backlinkDocReference).getContent());
         parentPage = testUtils.gotoPage(parentReference);
         assertEquals("New target", parentPage.getDocumentTitle());

@@ -20,6 +20,8 @@
 package org.xwiki.index.test.ui.docker;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -73,24 +75,24 @@ class DocumentTreeMacroIT
         setup.deletePage(testReference, true);
 
         // Setup.
-        createPage(setup, carolSecond, "Second");
+        createPage(setup, carolSecond, "Second", "");
         // Make sure the creation date is different for each document (taking into account that milliseconds are lost
         // when the date is saved in the database), otherwise we can't verify the sort on creation date.
         Thread.sleep(1000);
-        createPage(setup, george, "2. George");
+        createPage(setup, george, "2. George", "");
         Thread.sleep(1000);
-        createPage(setup, alice, "3. Alice");
+        createPage(setup, alice, "3. Alice", "");
         Thread.sleep(1000);
-        createPage(setup, bob, "1. Bob");
+        createPage(setup, bob, "1. Bob", "");
 
         Thread.sleep(1000);
-        createPage(setup, eve, "3. Eve");
+        createPage(setup, eve, "3. Eve", "");
         Thread.sleep(1000);
-        createPage(setup, henry, "1. Henry");
+        createPage(setup, henry, "1. Henry", "");
         Thread.sleep(1000);
-        createPage(setup, fionaThird, "Third");
+        createPage(setup, fionaThird, "Third", "");
         Thread.sleep(1000);
-        createPage(setup, denis, "2. Denis");
+        createPage(setup, denis, "2. Denis", "");
 
         // Make sure the last modification date is different for each document (taking into account that milliseconds
         // are lost when the date is saved in the database), otherwise we can't verify the sort on modification date.
@@ -171,11 +173,175 @@ class DocumentTreeMacroIT
         assertNodeLabels(tree.getTopLevelNodes(), "3. Eve", "2. Denis", "1. Henry", "Fiona");
     }
 
-    private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title)
+    @Test
+    @Order(2)
+    void expandToLevel(TestUtils setup, TestReference testReference)
+    {
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+
+        // Create the following hierarchy:
+        // TestReference:
+        //    - Alice:
+        //        - SubAlice
+        //    - Bob
+        //    - Carol (terminal)
+        //    - Eve:
+        //        - SubEve
+        //           - SubEveChild
+        //        - SubEve2
+        //    - Fiona
+        //        - FionaTerminal
+
+        DocumentReference alice =
+            new DocumentReference("WebHome", new SpaceReference("Alice", testSpaceReference));
+        DocumentReference subAlice =
+            new DocumentReference("WebHome", new SpaceReference("SubAlice", alice.getLastSpaceReference()));
+
+        DocumentReference bob =
+            new DocumentReference("WebHome", new SpaceReference("Bob", testSpaceReference));
+        DocumentReference carol = new DocumentReference("Carol", testSpaceReference);
+
+        DocumentReference eve =
+            new DocumentReference("WebHome", new SpaceReference("Eve", testSpaceReference));
+        DocumentReference subEve =
+            new DocumentReference("WebHome", new SpaceReference("SubEve", eve.getLastSpaceReference()));
+        DocumentReference subEveChild =
+            new DocumentReference("WebHome", new SpaceReference("SubEveChild", subEve.getLastSpaceReference()));
+        DocumentReference subEve2 =
+            new DocumentReference("WebHome", new SpaceReference("SubEve2", eve.getLastSpaceReference()));
+
+        DocumentReference fiona =
+            new DocumentReference("WebHome", new SpaceReference("Fiona", testSpaceReference));
+        DocumentReference fionaTerminal =
+            new DocumentReference("FionaTerminal", fiona.getLastSpaceReference());
+
+        setup.loginAsSuperAdmin();
+        // Clean up.
+        setup.deletePage(testReference, true);
+        createPage(setup, alice, "","");
+        createPage(setup, subAlice, "","");
+        createPage(setup, bob, "","");
+        createPage(setup, carol, "","");
+        createPage(setup, eve, "","");
+        createPage(setup, subEve, "","");
+        createPage(setup, subEveChild, "","");
+        createPage(setup, subEve2, "","");
+        createPage(setup, fiona, "","");
+        createPage(setup, fionaTerminal, "","");
+
+        // By default only top nodes are displayed
+        TreeElement tree = getDocumentTree(setup, testReference, Map.of("root", getNodeId(testReference)));
+        assertNodeLabels(tree.getTopLevelNodes(), "Alice", "Bob", "Carol", "Eve", "Fiona");
+        tree.getTopLevelNodes().forEach(node -> assertFalse(node.isOpen()));
+
+        // Specifying expandToLevel 0 should be exactly the same
+        tree = getDocumentTree(setup, testReference, Map.of("root", getNodeId(testReference), "expandToLevel", "0"));
+        assertNodeLabels(tree.getTopLevelNodes(), "Alice", "Bob", "Carol", "Eve", "Fiona");
+        tree.getTopLevelNodes().forEach(node -> assertFalse(node.isOpen()));
+
+        // Now all top nodes are opened
+        tree = getDocumentTree(setup, testReference, Map.of("root", getNodeId(testReference), "expandToLevel", "1"));
+        List<TreeNodeElement> topLevelNodes = tree.getTopLevelNodes();
+        assertNodeLabels(topLevelNodes, "Alice", "Bob", "Carol", "Eve", "Fiona");
+
+        // Alice
+        assertTrue(topLevelNodes.get(0).isOpen());
+        assertNodeLabels(topLevelNodes.get(0).getChildren(), "SubAlice");
+
+        // Bob and Carol cannot be opened
+        assertFalse(topLevelNodes.get(1).isOpen());
+        assertFalse(topLevelNodes.get(2).isOpen());
+
+        // Eve
+        assertTrue(topLevelNodes.get(3).isOpen());
+        assertNodeLabels(topLevelNodes.get(3).getChildren(), "SubEve", "SubEve2");
+        // Ensure only 1 level is open
+        assertFalse(topLevelNodes.get(3).getChildren().get(0).isOpen());
+
+        // Fiona
+        assertTrue(topLevelNodes.get(4).isOpen());
+        assertNodeLabels(topLevelNodes.get(4).getChildren(), "FionaTerminal");
+
+        // Check that expandToLevel=2 also open sublevel
+        tree = getDocumentTree(setup, testReference, Map.of("root", getNodeId(testReference), "expandToLevel", "2"));
+        topLevelNodes = tree.getTopLevelNodes();
+        assertNodeLabels(topLevelNodes, "Alice", "Bob", "Carol", "Eve", "Fiona");
+
+        // Alice
+        assertTrue(topLevelNodes.get(0).isOpen());
+        assertNodeLabels(topLevelNodes.get(0).getChildren(), "SubAlice");
+        // No children so cannot be open
+        assertFalse(topLevelNodes.get(0).getChildren().get(0).isOpen());
+
+        // Bob and Carol cannot be opened
+        assertFalse(topLevelNodes.get(1).isOpen());
+        assertFalse(topLevelNodes.get(2).isOpen());
+
+        // Eve
+        assertTrue(topLevelNodes.get(3).isOpen());
+        assertNodeLabels(topLevelNodes.get(3).getChildren(), "SubEve", "SubEve2");
+        assertTrue(topLevelNodes.get(3).getChildren().get(0).isOpen());
+        assertNodeLabels(topLevelNodes.get(3).getChildren().get(0).getChildren(), "SubEveChild");
+
+        // Fiona
+        assertTrue(topLevelNodes.get(4).isOpen());
+        assertNodeLabels(topLevelNodes.get(4).getChildren(), "FionaTerminal");
+    }
+
+    @Test
+    @Order(3)
+    void childrenRoot(TestUtils setup, TestReference testReference)
+    {
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+
+        // Create the following hierarchy:
+        // TestReference:
+        //    - Alice:
+        //        - SubAlice
+        //    - Eve:
+        //        - SubEve
+        //        - SubEve2
+
+        DocumentReference alice =
+            new DocumentReference("WebHome", new SpaceReference("Alice", testSpaceReference));
+        DocumentReference subAlice =
+            new DocumentReference("WebHome", new SpaceReference("SubAlice", alice.getLastSpaceReference()));
+
+        DocumentReference eve =
+            new DocumentReference("WebHome", new SpaceReference("Eve", testSpaceReference));
+        DocumentReference subEve =
+            new DocumentReference("WebHome", new SpaceReference("SubEve", eve.getLastSpaceReference()));
+        DocumentReference subEve2 =
+            new DocumentReference("WebHome", new SpaceReference("SubEve2", eve.getLastSpaceReference()));
+
+        setup.loginAsSuperAdmin();
+        // Clean up.
+        setup.deletePage(testReference, true);
+        createPage(setup, alice, "","");
+        createPage(setup, subAlice, "","");
+        createPage(setup, eve, "","");
+        createPage(setup, subEve, "","");
+        createPage(setup, subEve2, "","");
+
+        // By default only top nodes of current page are displayed
+        TreeElement tree = getChildrenTree(setup, testReference, Map.of());
+        assertNodeLabels(tree.getTopLevelNodes(), "Alice", "Eve");
+        tree.getTopLevelNodes().forEach(node -> assertFalse(node.isOpen()));
+
+        // Set root to Alice displays only Alice nodes
+        tree = getChildrenTree(setup, testReference, Map.of("root", getNodeId(alice)));
+        assertNodeLabels(tree.getTopLevelNodes(), "SubAlice");
+
+        // Set root to Eve displays only Eve nodes
+        tree = getChildrenTree(setup, testReference, Map.of("root", getNodeId(eve)));
+        assertNodeLabels(tree.getTopLevelNodes(), "SubEve", "SubEve2");
+    }
+
+    private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title, String content)
     {
         // We don't care what parent page is used, we just want to avoid creating orphan pages in order to not interfere
         // with other tests in this module.
-        return setup.createPage(documentReference, "", title, "xwiki/2.1", "Main.WebHome");
+        return setup.createPage(documentReference, content, title, "xwiki/2.1", "Main.WebHome");
     }
 
     private TreeElement getDocumentTree(TestUtils setup, TestReference testReference, Map<String, Object> parameters)
@@ -186,9 +352,10 @@ class DocumentTreeMacroIT
         parameters.put("root", getNodeId(testReference));
         parameters.put("showRoot", false);
         StringBuilder content = new StringBuilder("{{documentTree");
-        parameters.forEach((key, value) -> content.append(" ").append(key).append("='").append(value).append("'"));
+        parameters.forEach((key, value) ->
+            content.append(" ").append(key).append("='").append(value).append("'"));
         content.append("/}}");
-        setup.createPage(testReference, content.toString(), "", "xwiki/2.1", "Main.WebHome");
+        createPage(setup, testReference, "", content.toString());
         return new TreeElement(setup.getDriver().findElement(By.id(id))).waitForIt();
     }
 
@@ -196,9 +363,10 @@ class DocumentTreeMacroIT
         Map<String, Object> parameters)
     {
         StringBuilder content = new StringBuilder("{{children");
-        parameters.forEach((key, value) -> content.append(" ").append(key).append("='").append(value).append("'"));
+        parameters.forEach((key, value) ->
+            content.append(" ").append(key).append("='").append(value).append("'"));
         content.append("/}}");
-        setup.createPage(parentReference, content.toString(), "", "xwiki/2.1", "Main.WebHome");
+        createPage(setup, parentReference, "", content.toString());
         return new TreeElement(setup.getDriver().findElement(By.cssSelector("#xwikicontent .xtree"))).waitForIt();
     }
 

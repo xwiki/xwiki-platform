@@ -318,4 +318,36 @@ public class ViewPage extends BasePage
     {
         return getDriver().findElement(By.className("xdocLastModification")).getText();
     }
+
+    /**
+     * @param wait if {@code true} waits (with the standard timeout) until the required rights warning is present,
+     *     otherwise returns immediately
+     * @return {@code true} if the page has a required rights warning, {@code false} otherwise
+     * @since 17.4.0RC1
+     */
+    public boolean hasRequiredRightsWarning(boolean wait)
+    {
+        By requiredRightsWarningSelector = By.cssSelector("#missing-required-rights-warning .requiredrights-warning");
+        if (wait) {
+            return getDriver().hasElementWithoutWaiting(requiredRightsWarningSelector);
+        } else {
+            return getDriver().hasElement(requiredRightsWarningSelector);
+        }
+    }
+
+    /**
+     * Opens the required rights modal by clicking on the button in the required rights warning.
+     *
+     * @return the opened required rights modal
+     * @since 17.4.0RC1
+     */
+    public RequiredRightsModal openRequiredRightsModal()
+    {
+        WebElement reviewButton = getDriver().findElement(By.cssSelector("#missing-required-rights-warning button"));
+        // Wait until the button isn't disabled anymore to avoid clicking the button before the event handler has been
+        // initialized.
+        getDriver().waitUntilCondition(driver -> reviewButton.isEnabled());
+        reviewButton.click();
+        return new RequiredRightsModal();
+    }
 }

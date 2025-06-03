@@ -1460,6 +1460,9 @@ public class XWiki implements EventListener
             if (documentReference.getWikiReference().getName().equals(context.getWikiId())) {
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);
 
+                // Avoid modifying the cached document
+                document = document.clone();
+
                 if (initializer.updateDocument(document)) {
                     saveDocument(document,
                         localizePlainOrKey("core.model.xclass.mandatoryUpdateProperty.versionSummary"), context);
@@ -4307,14 +4310,15 @@ public class XWiki implements EventListener
         DocumentReference groupClassReference = getGroupClass(context).getDocumentReference();
 
         // Make sure the user is not already part of the group
-        if (groupDoc.getXObject(groupClassReference, "member", userName,
-            false) == null) {
+        if (groupDoc.getXObject(groupClassReference, "member", userName, false) == null) {
+            XWikiDocument modifiedDocument = groupDoc.clone();
             BaseObject memberObject =
-                groupDoc.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
+                modifiedDocument.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()),
+                    context);
 
             memberObject.setStringValue("member", userName);
 
-            saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
+            saveDocument(modifiedDocument, localizePlainOrKey("core.comment.addedUserToGroup"), context);
         }
     }
 

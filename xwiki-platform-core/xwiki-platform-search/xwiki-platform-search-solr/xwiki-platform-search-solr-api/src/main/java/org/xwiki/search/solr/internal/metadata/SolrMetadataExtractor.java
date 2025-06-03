@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
@@ -45,6 +46,6 @@ public interface SolrMetadataExtractor
      * @throws SolrIndexerException if problems occur.
      * @throws IllegalArgumentException if the passed reference is not supported by the current implementation.
      */
-    LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
+    XWikiSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
         IllegalArgumentException;
 }

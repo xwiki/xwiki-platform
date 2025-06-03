@@ -21,6 +21,7 @@ package org.xwiki.configuration.internal;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -34,6 +35,7 @@ import org.xwiki.configuration.ConversionException;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Unit tests for {@link CommonsConfigurationSource}.
+ * Unit tests for {@link AbstractCommonsConfigurationSource}.
  * 
  * @version $Id$
  * @since 2.0M1
@@ -51,14 +53,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AllComponents
 class CommonsConfigurationSourceTest
 {
-    private Configuration configuration;
+    public static class TestCommonsConfigurationSource extends AbstractCommonsConfigurationSource
+    {
 
-    private CommonsConfigurationSource source;
+    }
+
+    @InjectMockComponents
+    private TestCommonsConfigurationSource source;
+
+    private Configuration configuration;
 
     @BeforeEach
     void setUp(ComponentManager componentManager) throws Exception
     {
-        this.source = new CommonsConfigurationSource();
         ConverterManager converterManager = componentManager.getInstance(ConverterManager.class);
         ReflectionUtils.setFieldValue(this.source, "converterManager", converterManager);
         this.configuration = new BaseConfiguration();
@@ -103,8 +110,8 @@ class CommonsConfigurationSourceTest
         this.configuration.setProperty("string", "value");
 
         // Try to retrieve a String property as a Boolean
-        Exception exception = assertThrows(ConversionException.class,
-            () -> this.source.getProperty("string", Boolean.class));
+        Exception exception =
+            assertThrows(ConversionException.class, () -> this.source.getProperty("string", Boolean.class));
         assertEquals("Key [string] is not compatible with type [java.lang.Boolean]", exception.getMessage());
     }
 
@@ -114,8 +121,8 @@ class CommonsConfigurationSourceTest
         this.configuration.setProperty("property", "");
 
         // Try to retrieve a String property as a Color
-        Exception exception = assertThrows(ConversionException.class,
-            () -> this.source.getProperty("property", Color.class));
+        Exception exception =
+            assertThrows(ConversionException.class, () -> this.source.getProperty("property", Color.class));
         assertEquals("Key [property] is not compatible with type [java.awt.Color]", exception.getMessage());
     }
 
@@ -152,12 +159,30 @@ class CommonsConfigurationSourceTest
     }
 
     @Test
-    void testListPropertyWhenArrayList()
+    void testListPropertyWhenArrayAsList()
     {
         this.configuration.setProperty("list", "value");
         List<String> expected = Arrays.asList("value");
 
         assertEquals(expected, this.source.getProperty("list", Arrays.asList("default")));
+    }
+
+    @Test
+    void testListPropertyWhenCollectionEmptyList()
+    {
+        this.configuration.setProperty("list", "value");
+        List<String> expected = Arrays.asList("value");
+
+        assertEquals(expected, this.source.getProperty("list", Collections.emptyList()));
+    }
+
+    @Test
+    void testListPropertyWhenListOf()
+    {
+        this.configuration.setProperty("list", "value");
+        List<String> expected = Arrays.asList("value");
+
+        assertEquals(expected, this.source.getProperty("list", List.of()));
     }
 
     @Test
@@ -179,10 +204,30 @@ class CommonsConfigurationSourceTest
     @Test
     void isEmpty()
     {
-        assertTrue(this.configuration.isEmpty());
+        assertTrue(this.source.isEmpty());
 
         this.configuration.addProperty("properties", "key2=value2");
 
-        assertFalse(this.configuration.isEmpty());
+        assertFalse(this.source.isEmpty());
+        assertTrue(this.source.isEmpty("k"));
+
+        this.configuration.addProperty("key", "value");
+
+        assertFalse(this.source.isEmpty("k"));
+    }
+
+    @Test
+    void getKeys()
+    {
+        assertEquals(List.of(), this.source.getKeys());
+
+        this.configuration.addProperty("properties", "key2=value2");
+
+        assertEquals(List.of("properties"), this.source.getKeys());
+        assertEquals(List.of(), this.source.getKeys("k"));
+
+        this.configuration.addProperty("key", "value");
+
+        assertEquals(List.of("key"), this.source.getKeys("k"));
     }
 }

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>17.1.0-SNAPSHOT</version>
+    <version>17.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -149,12 +149,22 @@
               </differences>
             </revapi.differences>
             -->
-            
-            
-
-            <!-- Jakarta -->
-            
-            
+            <revapi.differences>
+              <justification>Long voted removal for a plugin which hasn't been used in a very long time</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.plugin.mail.MailPlugin</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.plugin.mail.MailPluginApi</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

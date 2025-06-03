@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Название
 extension.repository.summary=Комментарий
 extension.repository.type=Тип
@@ -49,5 +49,34 @@ extension.repository.rating=Рейтинг
 extension.repository.installedCount=Количество установок
 
 ## Administration UI
-admin.repository=Репозиторий расширений</content>
+admin.repository=Репозиторий расширений
+
+## Support
+### Missing: repository.support.createsupporter=Register
+
+## Supporters
+repository.supporter.sheet.description=Эта страница управляет отображением страниц ExtensionSupporter в режимах просмотра и редактирования.
+repository.supporter.sheet.noObject=На текущей странице отсутствует ожидаемый объект ExtensionSupporter.
+### Missing: repository.supporter.sheet.createplan=Add
+repository.supporter.sheet.plans=Планы
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+ExtensionCode.ExtensionSupporterClass_doc.title=Название
+ExtensionCode.ExtensionSupporterClass_summary=Сводка
+ExtensionCode.ExtensionSupporterClass_url=URL
+ExtensionCode.ExtensionSupporterClass_email=Электронная почта
+ExtensionCode.ExtensionSupporterClass_content=Подробности
+ExtensionCode.ExtensionSupporterClass_active=Активный
+
+## Support plans
+repository.supportplan.sheet.description=Эта страница управляет отображением страниц ExtensionSupportPlan в режимах просмотра и редактирования.
+repository.supportplan.sheet.noObject=На текущей странице отсутствует ожидаемый объект ExtensionSupportPlan.
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+ExtensionCode.ExtensionSupportPlanClass_doc.title=Название
+ExtensionCode.ExtensionSupportPlanClass_supporter=Поставщик
+ExtensionCode.ExtensionSupportPlanClass_summary=Сводка
+ExtensionCode.ExtensionSupportPlanClass_url=URL
+ExtensionCode.ExtensionSupportPlanClass_content=Подробности
+ExtensionCode.ExtensionSupportPlanClass_active=Активный
+ExtensionCode.ExtensionSupportPlanClass_paying=Оплата
+</content>
 </xwikidoc>

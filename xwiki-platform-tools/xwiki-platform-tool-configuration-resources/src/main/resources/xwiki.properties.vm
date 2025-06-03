@@ -467,6 +467,11 @@ rendering.transformations = $xwikiRenderingTransformations
 # Events distribution
 #-------------------------------------------------------------------------------------
 
+#-# [Since 17.5.0RC1]
+#-# Indicate the unique identifier of the instance among the members of a cluster.
+#-# By default it is automatically generated from a UUID and stored in the permanent directory.
+# observation.remote.id = node1
+
 #-# [Since 2.0M3]
 #-# Indicate if the network distribution module is enabled or not.
 #-# By default remote events are disabled.
@@ -722,7 +727,7 @@ distribution.automaticStartOnMainWiki=$xwikiPropertiesAutomaticStartOnMainWiki
 distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #end
 
-#-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
+#-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
 #-# 
 #-# On the main wiki
 # distribution.job.interactive=true
@@ -770,11 +775,11 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# It's possible to configure this behavior with the following properties:
 #-#
 #-# The maximum number of elements sent at the same time to the Solr server
-#-# The default is 50.
-# solr.indexer.batch.size=50
+#-# The default is 1000.
+# solr.indexer.batch.size=1000
 #-# The maximum number of characters in the batch of elements to send to the Solr server.
-#-# The default is 10000.
-# solr.indexer.batch.maxLength=10000
+#-# The default is 10000000.
+# solr.indexer.batch.maxLength=10000000
 
 #-# [Since 5.1M1]
 #-# The maximum number of elements in the background queue of elements to index/delete
@@ -796,6 +801,16 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# some wikis are not used.
 #-# The default is:
 # solr.synchronizeAtStartupMode=FARM
+
+#-# [Since 17.2.0RC1]
+#-# [Since 16.10.5]
+#-# [Since 16.4.7]
+#-# Indicates the batch size for the synchronization between SOLR index and XWiki database. This defines how many
+#-# documents will be loaded from the database and Solr in each step. Higher values lead to fewer queries and thus
+#-# better performance but increase the memory usage. The expected memory usage is around 1KB per document, but
+#-# depends highly on the length of the document names.
+#-# The default is 1000.
+# solr.synchronizeBatchSize=1000
 
 #-------------------------------------------------------------------------------------
 # Security
@@ -1640,5 +1655,16 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# 
 #-# Default is "true".
 # container.request.resolveRelativeRedirect=true
+
+#-------------------------------------------------------------------------------------
+# Scheduler
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.5.0]
+#-# "true" (the default) if the scheduler should be enabled on this instance.
+#-# Disabling the scheduler is often used as a workaround to avoid duplicates in a cluster.
+#-# 
+#-# Default is "true".
+# shceduler.enabled=false
 
 $!xwikiPropertiesAdditionalProperties

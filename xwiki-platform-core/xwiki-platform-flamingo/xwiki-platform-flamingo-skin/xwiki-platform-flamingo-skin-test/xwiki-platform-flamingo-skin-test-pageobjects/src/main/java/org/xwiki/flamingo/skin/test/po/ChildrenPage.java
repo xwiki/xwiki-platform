@@ -83,7 +83,9 @@ public class ChildrenPage extends BaseElement
     public static ChildrenPage goToPage(DocumentReference documentReference)
     {
         getUtil().gotoPage(documentReference, "view", Collections.singletonMap("viewer", "children"));
-        return new ChildrenPage();
+        ChildrenPage result = new ChildrenPage();
+        result.waitUntilPageIsReady();
+        return result;
     }
 
     /**
@@ -92,5 +94,45 @@ public class ChildrenPage extends BaseElement
     public LiveDataElement getLiveData()
     {
         return new LiveDataElement("childrenIndex");
+    }
+
+    /**
+     * @return {@code true} if the viewer has tabs.
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    public boolean hasTabs()
+    {
+        return getDriver().hasElementWithoutWaiting(By.className("xwikitabbar"));
+    }
+
+    /**
+     * Open the pinned child pages tab.
+     * @return an instance of {@link PinnedChildPagesTab} after loading it.
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    public PinnedChildPagesTab openPinnedChildPagesTab()
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().findElementWithoutWaiting(By.id("xwikipinnedChildPages")).click();
+        getDriver().waitUntilPageIsReloaded();
+        return new PinnedChildPagesTab(getDriver().findElementWithoutWaiting(
+            By.cssSelector(".xform.navigationPanelConfiguration")));
+    }
+
+    /**
+     * Open the main tab.
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    public void openChildrenTab()
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().findElementWithoutWaiting(By.id("xwikichildren")).click();
+        getDriver().waitUntilPageIsReloaded();
     }
 }

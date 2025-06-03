@@ -10,3 +10,4 @@ org.xwiki.wysiwyg.internal.importer.OfficeAttachmentImporter
 org.xwiki.wysiwyg.internal.importer.OfficeMacroImporter
 org.xwiki.wysiwyg.script.WysiwygEditorScriptService
 org.xwiki.wysiwyg.internal.converter.DefaultRequestParameterConverter
+org.xwiki.wysiwyg.internal.converter.HTMLRequestParameterConverter

@@ -34,8 +34,11 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.container.servlet.events.HttpSessionCreatedEvent;
+import org.xwiki.container.servlet.events.HttpSessionDestroyedEvent;
 import org.xwiki.container.servlet.events.SessionCreatedEvent;
 import org.xwiki.container.servlet.events.SessionDestroyedEvent;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.observation.ObservationManager;
 
 /**
@@ -79,7 +82,9 @@ public class HttpSessionManager implements Initializable, Disposable, HttpSessio
     {
         HttpSession session = se.getSession();
         this.sessionsList.add(session);
-        this.observationManager.notify(new SessionCreatedEvent(), session, null);
+        this.observationManager.notify(new HttpSessionCreatedEvent(), session, null);
+        // This event is expected to be associated with a javax version of the session
+        this.observationManager.notify(new SessionCreatedEvent(), JakartaServletBridge.toJavax(session), null);
     }
 
     @Override
@@ -87,7 +92,9 @@ public class HttpSessionManager implements Initializable, Disposable, HttpSessio
     {
         HttpSession session = se.getSession();
         this.sessionsList.remove(session);
-        this.observationManager.notify(new SessionDestroyedEvent(), session, null);
+        this.observationManager.notify(new HttpSessionDestroyedEvent(), session, null);
+        // This event is expected to be associated with a javax version of the session
+        this.observationManager.notify(new SessionDestroyedEvent(), JakartaServletBridge.toJavax(session), null);
     }
 
     /**

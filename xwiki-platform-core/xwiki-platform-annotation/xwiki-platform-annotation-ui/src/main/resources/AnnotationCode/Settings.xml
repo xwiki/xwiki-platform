@@ -148,10 +148,10 @@
       &lt;/div&gt;
       &lt;div class="clearfloats" /&gt;
     #else
-      &lt;div class="box infomessage"&gt;$services.localization.render('annotations.settings.error.wrongsyntax')&lt;/div&gt;
+      #info($services.localization.render('annotations.settings.error.wrongsyntax'))
     #end
   #else
-    &lt;div class="box infomessage"&gt;$services.localization.render('annotations.settings.error.notarget')&lt;/div&gt;
+    #info($services.localization.render('annotations.settings.error.notarget'))
   #end
 &lt;/div&gt;
 {{/html}}

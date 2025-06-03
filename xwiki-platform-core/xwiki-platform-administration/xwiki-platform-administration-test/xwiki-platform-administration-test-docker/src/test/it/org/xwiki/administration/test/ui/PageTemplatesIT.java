@@ -28,6 +28,9 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.TemplateProviderInlinePage;
 import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -51,7 +54,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 12.9RC1
  */
-@UITest
+@UITest(
+    properties = {
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class PageTemplatesIT
 {
     /**
@@ -111,6 +123,12 @@ class PageTemplatesIT
         // Put a wanted link in the template instance
         templateInstanceEdit.setContent("[[doc:NewPage]]");
         ViewPage vp = templateInstanceEdit.clickSaveAndView();
+
+        // Make sure the attachment has been copied from the template
+        // FIXME: Remove the following wait when XWIKI-6688 is fixed.
+        vp.waitForDocExtraPaneActive("comments");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
 
         // Verify that clicking on the wanted link pops up a box to choose the template.
         EntityReference wantedLinkReference =
@@ -391,6 +409,9 @@ class PageTemplatesIT
         LocalDocumentReference templateReference =
             new LocalDocumentReference(TEMPLATE_NAME, templateProviderReference.getParent());
         setup.rest().savePage(templateReference, templateContent, templateTitle);
+        EntityReference attachmentReference = new EntityReference("file.txt", EntityType.ATTACHMENT, templateReference);
+        setup.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
+        setup.rest().attachFile(attachmentReference, "attachment2".getBytes(), false);
 
         // Create the template provider.
         TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();

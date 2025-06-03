@@ -46,6 +46,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
@@ -84,11 +85,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private String validationScript;
 
     private String nameField;
-
-    /**
-     * Set to true if the class is modified from the database version of it.
-     */
-    private boolean isDirty = true;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -454,7 +450,21 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public BaseClass clone()
     {
-        BaseClass bclass = (BaseClass) super.clone();
+        return (BaseClass) super.clone();
+    }
+
+    @Override
+    public BaseClass clone(boolean detach)
+    {
+        return (BaseClass) super.clone(detach);
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<DocumentReference> element)
+    {
+        super.cloneContent(element);
+
+        BaseClass bclass = (BaseClass) element;
 
         bclass.setCustomClass(getCustomClass());
         bclass.setCustomMapping(getCustomMapping());
@@ -463,11 +473,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         bclass.setDefaultEditSheet(getDefaultEditSheet());
         bclass.setValidationScript(getValidationScript());
         bclass.setNameField(getNameField());
-
-        bclass.setDirty(this.isDirty);
-        bclass.setOwnerDocument(this.ownerDocument);
-
-        return bclass;
     }
 
     @Override
@@ -1639,22 +1644,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (this.ownerDocument != null) {
                 setDocumentReference(this.ownerDocument.getDocumentReference());
             }
-
-            if (ownerDocument != null && this.isDirty) {
-                ownerDocument.setMetaDataDirty(true);
-            }
-        }
-    }
-
-    /**
-     * @param isDirty Indicate if the dirty flag should be set or cleared.
-     * @since 4.3M2
-     */
-    public void setDirty(boolean isDirty)
-    {
-        this.isDirty = isDirty;
-        if (isDirty && this.ownerDocument != null) {
-            this.ownerDocument.setMetaDataDirty(true);
         }
     }
 }

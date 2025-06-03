@@ -121,6 +121,11 @@ XWiki.Gallery = Class.create({
       "${escapetool.javascript($services.localization.render('core.widgets.gallery.minimize'))}";
     this.container.toggleClassName('maximized');
     $(document.documentElement).toggleClassName('maximized');
+    // When a keyboard shortcut is used, the gallery is not focused by default. In order to keep the screen at the
+    // level of the gallery even when minimizing, we need to make sure it's always focused.
+    // Without this forced focus, minimizing the gallery by pressing the `Escape` key will
+    // unexpectedly send the user to the top of the page.
+    this.maximizeToggle.focus();
   },
   show : function(index) {
     if (index < 0 || index >= this.images.length || index == this.index) {

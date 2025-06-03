@@ -341,6 +341,7 @@ macroEditor.content=Content
 macroEditor.noParameters=This macro has no parameters.
 macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
 macroEditor.installRequestFailed=Failed to install the {0} macro.
+macroEditor.selectFeature=Select parameter {0}
 
 
 imageEditor.modal.changeImage.button=Change Image

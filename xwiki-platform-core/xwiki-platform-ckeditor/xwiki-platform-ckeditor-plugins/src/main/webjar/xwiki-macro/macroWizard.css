@@ -51,8 +51,14 @@ ul.macro-list .macro-extension {
 .macro-description::first-letter,
 .macro-parameter-name::first-letter,
 .macro-parameter-description::first-letter,
-.macro-parameter-group-name::first-letter {
+.macro-parameter-group-name::first-letter,
+.feature-title:first-letter,
+.feature-choice-name:first-letter {
   text-transform: capitalize;
+}
+
+.macro-parameter-name {
+  font-size: medium;
 }
 
 .dropdown-menu > li.macro-category > a {
@@ -77,36 +83,58 @@ ul.macro-list .macro-extension {
   padding: 0;
 }
 
-.macro-title.jumbotron {
-  margin-left: -15px;
-  margin-right: -15px;
-  padding-left: 1em;
-  margin-top: -15px;
-  margin-bottom: 0;
+.macro-title {
+  padding: 30px 1em 30px 1em;
+  margin: -15px -15px 0 -15px;
+  background-color: #eeeeee;
 }
 
 .feature-title {
   padding-bottom: 0.5em;
+  font-size: medium;
+  font-weight: 500;
+  border-bottom: 1px solid #eee;
+  margin-left: -10px;
+  margin-right: -10px;
+  padding-left: 10px;
+  margin-bottom: 10px;
+}
+
+.feature-choice {
+  margin-top: 1em;
 }
 
 .feature-container {
-  background-color: #EEE;
+  background-color: #f9f9f9; /* FIXME: Should be a color theme */
   margin-top: 1em;
-  padding: 10px;
+  padding: 10px 10px 1em 10px;
+  border: 1px solid #eee;
+  border-radius: 10px;
 }
 
-.feature-choice-body {
+.feature-container.has-error {
+  border: $theme.notificationErrorColor dashed 1px;
+}
+
+.feature-choice-body.with-choice {
   padding-left: 1.5em;
-  padding-bottom: 1em;
 }
 
 .macro-parameter {
-  margin-top: 1em;
+  margin-top: 0.5em;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
-.macro-parameter-name-container .mandatory {
+.feature-choice-body .macro-parameter {
+  padding-left: 0;
+}
+
+.macro-parameter-name-container .mandatory, .feature-title .mandatory {
   font-size: smaller;
-  padding-left: 1em;
+  padding-left: 0.5em;
+  vertical-align: top;
+  font-weight: 300;
 }
 
 .macro-parameter-group-optionals {

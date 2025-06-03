@@ -25,7 +25,8 @@ define('macroEditorTranslationKeys', [], [
   'installRequestFailed',
   'noParameters',
   'content',
-  'required'
+  'required',
+  'selectFeature'
 ]);
 
 /**
@@ -82,10 +83,10 @@ define('macroParameterEnhancer', ['jquery'], function($) {
 define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($, translations) {
   'use strict';
 
-  var displayMacroParameterTree = function(macroParameterTree, requiredSkinExtensions) {
-    var output = $('<div></div>');
+  let displayMacroParameterTree = function(macroParameterTree, requiredSkinExtensions) {
+    let output = $('<div></div>');
     if (macroParameterTree.mandatoryNodes.length < 1 && macroParameterTree.optionalNodes.length < 1) {
-      output.append($('<li class="empty"></li>').text(translations.get('noParameters')));
+      output.append($('<div class="empty"></div>').text(translations.get('noParameters')));
     } else {
       let parametersMap = macroParameterTree.parametersMap;
       output.append(macroParameterTree.mandatoryNodes.map(key => {
@@ -93,6 +94,9 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
         return displayMacroParameterTreeNode(parametersMap, node);
       }));
       output.append(displayOptionalNodes(parametersMap, macroParameterTree.optionalNodes));
+    }
+    if (macroParameterTree.mandatoryNodes.length < 1) {
+      output.find('.nav-tabs').empty();
     }
 
     output.find('a[role="tab"]').on('click', function(event) {
@@ -142,66 +146,63 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     let activeTabPanel = tabPanels.children().not('.hidden').first();
     activeTab.add(activeTabPanel).addClass('active');
     toggleMacroParameterGroupVisibility(output);
+    // we remove all occurrences of feature title since we already have the tabs name.
+    output.find('.feature-title').remove();
     return output;
   },
-
-  macroParameterGroupTemplate = 
-    '<div class="macro-parameter-group multiple-choice">' +
-      '<ul class="nav nav-tabs" role="tablist">' +
-        '<li class="active" role="presentation">' +
-          '<a class="macro-parameter-group-name" href="#groupId" aria-controls="groupId" role="tab"></a>' +
-        '</li>' +
-      '</ul>' +
-      '<div class="tab-content">' +
-        '<div id="groupId" class="macro-parameter-group-members tab-pane active" role="tabpanel"></div>' +
-      '</div>' +
-    '</div>',
 
   displayGroup = function(parametersMap, groupNode) {
-    if (groupNode.featureOnly) {
-      return displayFeature(parametersMap, groupNode);
-    } else {
-      return displayMultipleChoiceGroup(parametersMap, groupNode);
-    }
-  },
-
-  displayMultipleChoiceGroup = function(parametersMap, groupNode) {
-    let output = $(macroParameterGroupTemplate).addClass('multiple-choice');
-    fillNodeTab(parametersMap, groupNode,
-        output.find('.macro-parameter-group-name'),
-        output.find('.macro-parameter-group-members'));
-    toggleMacroParameterGroupVisibility(output);
-    return output;
+    return displayFeature(parametersMap, groupNode, groupNode.featureOnly);
   },
 
   macroFeatureContainerTemplate =
     '<div class="feature-container" id="feature-{{featureName}}">' +
-      '<div class="feature-title">{{featureTitle}}</div>' +
+      '<div class="feature-title">{{featureTitle}} <span class="mandatory"></span></div>' +
     '</div>',
 
   macroFeatureContentTemplate =
     '<div class="feature-parameter">' +
       '<div class="feature-choice">' +
-        '<input type="radio" name="feature-radio-{{featureName}}" value="{{parameterId}}" />' +
-        '<span class="feature-choice-name">{{parameterName}}</span>' +
+        '<input type="radio" class="feature-radio" id="feature-radio-{{featureName}}-{{parameterId}}"' +
+      ' name="feature-radio-{{featureName}}" value="{{parameterKey}}" />' +
+        '<label class="feature-choice-name" for="feature-radio-{{featureName}}-{{parameterId}}">' +
+          '{{parameterLabel}}' +
+        '</label>' +
       '</div>' +
       '<div class="feature-choice-body"></div>' +
     '</div>',
 
-  displayFeature = function (parametersMap, featureNode) {
+  displayFeature = function (parametersMap, featureNode, isFeature) {
+    let name = (isFeature) ? featureNode.featureName : featureNode.name;
     let output = $(macroFeatureContainerTemplate
         .replaceAll("{{featureName}}", featureNode.id)
-        .replaceAll("{{featureTitle}}", featureNode.featureName));
+        .replaceAll("{{featureTitle}}", name));
+    if (featureNode.mandatory) {
+      output.find('.mandatory').text('(' + translations.get('required') + ')');
+      output.addClass('mandatory');
+    }
     output.append(featureNode.children.map(nodeKey => {
       let paramNode = parametersMap[nodeKey];
-      let parameterId = paramNode.id;
       let nodeOutput = $(macroFeatureContentTemplate
           .replaceAll("{{featureName}}", featureNode.id)
-          .replaceAll("{{parameterId}}", parameterId)
-          .replaceAll("{{parameterName}}", paramNode.name));
+          .replaceAll("{{parameterKey}}", nodeKey)
+          .replaceAll("{{parameterId}}", paramNode.id)
+          .replaceAll("{{parameterLabel}}", translations.get('selectFeature', paramNode.name)));
+      if (isFeature && featureNode.mandatory) {
+        nodeOutput.find('.feature-radio').on('change', function() {
+          $(this).parents('.feature-container').find('.feature-choice-body').removeClass('mandatory');
+          $(this).parents('.feature-parameter').find('.feature-choice-body').addClass('mandatory');
+        });
+      } else if (!isFeature) {
+        nodeOutput.find('.feature-choice').empty();
+      }
       nodeOutput
           .find('.feature-choice-body')
           .append(displayMacroParameterTreeNode(parametersMap, paramNode));
+
+      if (isFeature) {
+        nodeOutput.find('.feature-choice-body').addClass('with-choice');
+      }
       return nodeOutput;
     }));
     return output;
@@ -218,7 +219,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     let childNodes = node.children || [node.key];
     let tabOutput;
     if (node.featureOnly) {
-      tabOutput = displayFeature(parametersMap, node);
+      tabOutput = displayFeature(parametersMap, node, true);
     } else {
       tabOutput = childNodes.map(nodeKey =>
           displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey]));
@@ -243,15 +244,16 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   macroParameterTemplate =
     '<div class="macro-parameter">' +
       '<div class="macro-parameter-name-container">' +
-        '<span class="macro-parameter-name"></span>' +
+        '<label class="macro-parameter-name" for=""></label>' +
         '<span class="mandatory"></span>' +
       '</div>' +
       '<div class="macro-parameter-description"></div>' +
     '</div>',
 
   displayMacroParameter = function(parameter) {
-    var output = $(macroParameterTemplate);
+    let output = $(macroParameterTemplate);
     output.attr('data-id', parameter.id).attr('data-type', parameter.displayType);
+    output.find('.macro-parameter-name').attr('for', 'parameter-' + parameter.id);
     output.find('.macro-parameter-name').text(parameter.name);
     if (parameter.mandatory) {
       output.find('.mandatory').text('(' + translations.get('required') + ')');
@@ -264,14 +266,16 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   displayMacroParameterField = function(parameter) {
-    var field = $('<div></div>').addClass('macro-parameter-field').html(parameter.editTemplate);
+    let field = $('<div></div>').addClass('macro-parameter-field').html(parameter.editTemplate);
     // Look for input elements whose name matches the parameter id.
-    var valueInputs = field.find(':input').filter(function() {
+    let valueInputs = field.find(':input').filter(function() {
       return $(this).attr('name') === parameter.id;
     });
-    var firstInputType = valueInputs.prop('type');
-    var value = parameter.hasOwnProperty('value') ? parameter.value : parameter.defaultValue;
-    var matchesParameterValue = function(value) {
+    // set the id of the input
+    valueInputs.first().attr('id', 'parameter-' + parameter.id);
+    let firstInputType = valueInputs.prop('type');
+    let value = parameter.hasOwnProperty('value') ? parameter.value : parameter.defaultValue;
+    let matchesParameterValue = function(value) {
       return function() {
         if (parameter.caseInsensitive) {
           return $(this).val().toUpperCase() === value.toUpperCase();
@@ -296,7 +300,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       if (value && valueInputs.is('select')) {
         value = valueInputs.prop('type') === 'select-multiple' ? value.split(',') : [value];
         value.forEach(function (val, index) {
-          var matchedOption = valueInputs.find('option').filter(matchesParameterValue(val));
+          let matchedOption = valueInputs.find('option').filter(matchesParameterValue(val));
           if (matchedOption.length > 0) {
             // Use the canonical value.
             value[index] = matchedOption.val();
@@ -307,6 +311,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
         });
       }
     }
+    // FIXME: we need to find a way to select automatically the parent radio button in case of feature
     // We pass the value as an array in order to properly handle radio inputs and checkboxes.
     valueInputs.val(Array.isArray(value) ? value : [value]);
     return field;
@@ -332,7 +337,7 @@ define(
 
   const macroEditorTemplate =
     '<div>' +
-      '<div class="macro-title jumbotron">' +
+      '<div class="macro-title">' +
         '<div class="macro-name"></div>' +
         '<div class="macro-description"></div>' +
       '</div>' +
@@ -371,12 +376,9 @@ define(
   },
 
   extractFormData = function(container) {
-    var data = {};
-    container.find(':input').filter(function() {
-      // Ignore the parameters from non-active groups.
-      return $(this).parents('.macro-parameter-group-members').not('.active').length === 0;
-    }).serializeArray().forEach(function(parameter) {
-      var value = data[parameter.name];
+    let data = {};
+    container.find(':input').serializeArray().forEach(function(parameter) {
+      let value = data[parameter.name];
       if (value === undefined) {
         data[parameter.name] = parameter.value;
       } else if (parameter.value !== '') {
@@ -391,13 +393,10 @@ define(
   },
 
   toMacroCall = function(formData, macroDescriptor) {
-    // TODO: The the complexity can onlu be lowered. Once below the default maxcomplexity (10 at the time of writing), 
-    //  the jshint annotation can be removed.
-    /*jshint maxcomplexity:12 */
     if (!macroDescriptor) {
       return null;
     }
-    var macroCall = {
+    let macroCall = {
       name: macroDescriptor.id,
       content: undefined,
       parameters: {}
@@ -407,21 +406,41 @@ define(
     if (typeof formData.$content === 'string' && macroDescriptor.parametersMap["PARAMETER:$content"]) {
       macroCall.content = formData.$content;
     }
-    for (var parameterId in formData) {
-      // The parameter descriptor map keys are lower case for easy lookup (macro parameter names are case insensitive).
-      var parameterDescriptor = macroDescriptor.parametersMap[parameterId.toLowerCase()];
-      if (parameterDescriptor) {
-        var value = formData[parameterId];
-        if (Array.isArray(value)) {
-          value = isBooleanType(parameterDescriptor.displayType) ? value[0] : value.join();
-        }
-        var defaultValue = parameterDescriptor.defaultValue;
-        if (value !== '' && (defaultValue === undefined || defaultValue === null || (defaultValue + '') !== value)) {
-          macroCall.parameters[parameterId] = value;
-        }
-      }
+
+    for (let key in macroDescriptor.parametersMap) {
+      handleDescriptorKeysToMacroCall(key, macroCall, formData, macroDescriptor);
     }
     return macroCall;
+  },
+
+  handleDescriptorKeysToMacroCall = function (key, macroCall, formData, macroDescriptor) {
+    // we handle content separately.
+    if (key === '$content') {
+      return;
+    }
+    let descriptor = macroDescriptor.parametersMap[key];
+    if (key.startsWith('PARAMETER:')) {
+      addParameterValueToMacroCall(macroCall, formData, descriptor);
+    } else if (key.startsWith('FEATURE:')) {
+      let featureValueKey = formData['feature-radio-' + descriptor.id];
+      if (featureValueKey) {
+        handleDescriptorKeysToMacroCall(featureValueKey, macroCall, formData, macroDescriptor);
+      }
+    } else if (key.startsWith('GROUP:')) {
+      descriptor.children.forEach(childKey =>
+          handleDescriptorKeysToMacroCall(childKey, macroCall, formData, macroDescriptor));
+    }
+  },
+
+  addParameterValueToMacroCall = function(macroCall, formData, parameterDescriptor) {
+    let value = formData[parameterDescriptor.id];
+    if (Array.isArray(value)) {
+      value = isBooleanType(parameterDescriptor.displayType) ? value[0] : value.join();
+    }
+    let defaultValue = parameterDescriptor.defaultValue;
+    if (value !== '' && (defaultValue === undefined || defaultValue === null || (defaultValue + '') !== value)) {
+      macroCall.parameters[parameterDescriptor.id] = value;
+    }
   },
 
   isBooleanType = function(type) {
@@ -437,16 +456,28 @@ define(
         return toMacroCall(extractFormData(macroEditor), macroEditor.data('macroDescriptor'));
       },
       validate: function() {
-        var macroCall = this.getMacroCall();
+        let macroCall = this.getMacroCall();
+
+        let emptyMandatoryParams = [];
+        // Include the mandatory features for which no option is checked.
+        macroEditor.find('.feature-container.mandatory').filter(function () {
+          return $(this).find('.feature-radio').length > 0 &&
+              $(this).find('.feature-radio:checked').length === 0;
+        }).map((index, elt) => emptyMandatoryParams.push(elt));
         // Exclude the mandatory parameters that are editable in-place (they are hidden from the modal).
-        var emptyMandatoryParams = macroEditor.find('.macro-parameter.mandatory:not(.hidden)').filter(function() {
-          var id = $(this).attr('data-id');
-          var value = id === '$content' ? macroCall.content : macroCall.parameters[id];
+        macroEditor.find('.macro-parameter.mandatory:not(.hidden)').filter(function() {
+          let id = $(this).attr('data-id');
+          let value = id === '$content' ? macroCall.content : macroCall.parameters[id];
           return value === undefined || value === '';
-        });
-        emptyMandatoryParams.first().addClass('has-error').find(':input').not(':hidden').focus();
+        }).map((index, elt) => emptyMandatoryParams.push(elt));
+        $(emptyMandatoryParams).first()
+            .addClass('has-error')
+            .find(':input')
+            .not(':hidden')
+            .first()
+            .trigger('focus');
         setTimeout(function() {
-          emptyMandatoryParams.first().removeClass('has-error');
+          $(emptyMandatoryParams).first().removeClass('has-error');
         }, 1000);
         return emptyMandatoryParams.length === 0;
       },

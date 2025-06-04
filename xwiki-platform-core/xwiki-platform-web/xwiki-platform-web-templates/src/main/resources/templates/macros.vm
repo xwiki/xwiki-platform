@@ -2214,9 +2214,6 @@ $displayName##
   #set($parameters.firstItem = $parameters.crtPage * $parameters.itemsPerPage)
   #set($parameters.lastPage = $parameters.pageCount - 1)
   <div class="paginationFilter">
-    #if($parameters.position == 'top')
-      #paginationResultsRange($parameters)
-    #end
     #if($parameters.totalItems > 0)
       #if($parameters.controlsAround == true)
         #_paginationControlLeft($parameters)
@@ -2226,6 +2223,9 @@ $displayName##
         #_paginationPages($parameters)
         #_paginationControl($parameters)
       #end
+    #end
+    #if($parameters.position == 'top')
+      #paginationResultsRange($parameters)
     #end
   </div>
 #end

@@ -150,7 +150,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     activeTab.add(activeTabPanel).addClass('active');
     toggleMacroParameterGroupVisibility(output);
     // we remove all occurrences of feature title since we already have the tabs name.
-    output.find('.feature-title').remove();
+    output.find('.feature-container .panel-heading').remove();
     return output;
   },
 

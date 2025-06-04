@@ -62,22 +62,21 @@ solr.admin.indexing.query.language.label=Language of the custom query
 
 solr.admin.info.affectedDocuments=Affected documents in the index:
 
-solr.sortBy=Sort by:
-solr.sortBy.score=Relevance
-solr.sortBy.title_sort=Title
-solr.sortBy.date=Last edit date
-solr.sortBy.author_display_sort=Last author
-solr.sortBy.filename_sort=File name
-solr.sortBy.attsize_sort=File size
-solr.sortBy.attdate_sort=Upload date
-solr.sortBy.attauthor_display_sort=Uploaded by
-solr.sortOrder.asc=Ascending
-solr.sortOrder.desc=Descending
-
-solr.options=Show:
-solr.options.highlight=Highlighting
+solr.sortBy.hint=Sort order rule
+solr.sortBy.sort_by_score=Sort by relevance
+solr.sortBy.sort_by_title_sort=Sort by title
+solr.sortBy.sort_by_date=Sort by last edit date
+solr.sortBy.sort_by_author_display_sort=Sort by last author name
+solr.sortBy.sort_by_filename_sort=Sort by file name
+solr.sortBy.sort_by_attsize_sort=Sort by file size
+solr.sortBy.sort_by_attdate_sort=Sort by upload date
+solr.sortBy.sort_by_attauthor_display_sort=Sort by uploader name
+solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+    
+solr.options.show_highlight=Display highlights of matches
 solr.options.highlight.title=Display an extract of what was matched in each result
-solr.options.facet=Filters
+solr.options.show_facet=Show filters
 solr.options.facet.title=Allow extra filtering of the result
 
 solr.result.language=Language
@@ -186,6 +185,21 @@ solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
 
 ## until 7.2RC1
 solr.field.space=Location
+
+## until 17.5.0RC1
+## Those translations were composed together, they have been replaced with new keys that follow translation guidelines.
+solr.sortBy=Sort by:
+solr.sortBy.score=Relevance
+solr.sortBy.title_sort=Title
+solr.sortBy.date=Last edit date
+solr.sortBy.author_display_sort=Last author
+solr.sortBy.filename_sort=File name
+solr.sortBy.attsize_sort=File size
+solr.sortBy.attdate_sort=Upload date
+solr.sortBy.attauthor_display_sort=Uploaded by
+solr.options=Show:
+solr.options.highlight=Highlighting
+solr.options.facet=Filters
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>

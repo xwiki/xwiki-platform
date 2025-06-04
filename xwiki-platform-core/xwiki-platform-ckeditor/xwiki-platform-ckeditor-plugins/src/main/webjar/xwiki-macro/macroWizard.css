@@ -73,10 +73,7 @@ ul.macro-list .macro-extension {
 }
 
 .macro-parameters {
-  border-top: 1px dashed #E8E8E8;
-  border-top: 1px dashed $theme.borderColor;
-  list-style: none;
-  padding: 0;
+  margin-top: 10px;
 }
 
 .macro-title {
@@ -86,18 +83,7 @@ ul.macro-list .macro-extension {
 }
 
 .macro-title .macro-name {
-  font-size: max(23px, min(29px, calc(23px + (29 - 23) * (100vw - 768px) / (1200 - 768)))); /* rule based on H1 */
-}
-
-.feature-title {
-  padding-bottom: 0.5em;
-  font-size: medium;
-  font-weight: 500;
-  border-bottom: 1px solid #eee;
-  margin-left: -10px;
-  margin-right: -10px;
-  padding-left: 10px;
-  margin-bottom: 10px;
+  font-size: 23px; /* FIXME: base that rule on H1 */
 }
 
 .feature-choice {
@@ -122,7 +108,14 @@ ul.macro-list .macro-extension {
   padding-left: 0;
 }
 
-.macro-parameter-name-container .mandatory, .feature-choice-name {
+.macro-parameter-name-container .mandatory, .panel-heading .mandatory {
+  font-size: smaller;
+  padding-left: 0.5em;
+  vertical-align: top;
+  font-weight: 300;
+}
+
+.macro-parameter-name, .feature-choice-name {
   color: #222222; /* FIXME: use color theme (should be text color less variable?)*/
   font-size: 1em;
   font-weight: 500;

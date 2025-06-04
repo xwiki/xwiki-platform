@@ -35,7 +35,7 @@ define('macroEditorTranslationKeys', [], [
 define('macroParameterEnhancer', ['jquery'], function($) {
   'use strict';
 
-  var enhanceMacroParameters = function(macroDescriptor, macroCall) {
+  let enhanceMacroParameters = function(macroDescriptor, macroCall) {
     for (let parameterId in macroDescriptor.parametersMap) {
       let parameter = macroDescriptor.parametersMap[parameterId];
       maybeSetParameterValue(parameter, macroCall);
@@ -44,7 +44,10 @@ define('macroParameterEnhancer', ['jquery'], function($) {
   },
 
   maybeSetParameterValue = function(parameter, macroCall) {
-    var parameterCall = macroCall.parameters[parameter.id.toLowerCase()];
+    let parameterCall = macroCall.parameters[parameter.id.toLowerCase()];
+    if (parameter.id.toLowerCase() === '$content') {
+      parameterCall = macroCall.content;
+    }
     // Check if the macro parameter is set.
     if (parameterCall !== null && parameterCall !== undefined) {
       parameter.value = (typeof parameterCall === 'object' && typeof parameterCall.name === 'string') ?
@@ -156,8 +159,12 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   macroFeatureContainerTemplate =
-    '<div class="feature-container" id="feature-{{featureName}}">' +
-      '<div class="feature-title">{{featureTitle}} <span class="mandatory"></span></div>' +
+    '<div class="feature-container panel panel-default" id="feature-{{featureName}}">' +
+      '<div class="panel-heading">' +
+        '<span class="feature-title">{{featureTitle}}</span>' +
+        '<span class="mandatory"></span>' +
+      '</div>' +
+      '<div class="panel-body"></div>' +
     '</div>',
 
   macroFeatureContentTemplate =
@@ -181,7 +188,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       output.find('.mandatory').text('(' + translations.get('required') + ')');
       output.addClass('mandatory');
     }
-    output.append(featureNode.children.map(nodeKey => {
+    output.find('.panel-body').append(featureNode.children.map(nodeKey => {
       let paramNode = parametersMap[nodeKey];
       let nodeOutput = $(macroFeatureContentTemplate
           .replaceAll("{{featureName}}", featureNode.id)
@@ -464,7 +471,7 @@ define(
           return $(this).find('.feature-radio').length > 0 &&
               $(this).find('.feature-radio:checked').length === 0;
         }).map((index, elt) => emptyMandatoryParams.push(elt));
-        // Exclude the mandatory parameters that are editable in-place (they are hidden from the modal).
+        // Exclude the hidden mandatory parameters
         macroEditor.find('.macro-parameter.mandatory:not(.hidden)').filter(function() {
           let id = $(this).attr('data-id');
           let value = id === '$content' ? macroCall.content : macroCall.parameters[id];

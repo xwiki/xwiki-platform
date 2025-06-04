@@ -26,6 +26,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+/**
+ * Representation of a macro descriptor used for the configuration UI.
+ *
+ * @version $Id$
+ * @since 17.5.0RC1
+ */
 public class MacroDescriptorUI
 {
     private final String id;
@@ -34,78 +40,128 @@ public class MacroDescriptorUI
     private boolean supportsInlineMode;
     private List<String> mandatoryNodes;
     private List<String> optionalNodes;
-    private Map<String, AbstractMacroParameterUINode> parametersMap;
+    private Map<String, AbstractMacroUINode> parametersMap;
 
+    /**
+     * Default constructor.
+     * @param id the identifier of the macro.
+     */
     public MacroDescriptorUI(String id)
     {
         this.id = id;
     }
 
+    /**
+     * @return the ordered list of mandatory nodes keys to be found in {@link #getParametersMap()}.
+     */
     public List<String> getMandatoryNodes()
     {
         return mandatoryNodes;
     }
 
+    /**
+     * @param mandatoryNodes see {@link #getMandatoryNodes()}
+     * @return the current instance
+     */
     public MacroDescriptorUI setMandatoryNodes(List<String> mandatoryNodes)
     {
         this.mandatoryNodes = mandatoryNodes;
         return this;
     }
 
+    /**
+     * @return the ordered list of optional nodes keys to be found in {@link #getParametersMap()}.
+     */
     public List<String> getOptionalNodes()
     {
         return optionalNodes;
     }
 
+    /**
+     * @param optionalNodes see {@link #getOptionalNodes()}
+     * @return the current instance
+     */
     public MacroDescriptorUI setOptionalNodes(List<String> optionalNodes)
     {
         this.optionalNodes = optionalNodes;
         return this;
     }
 
-    public Map<String, AbstractMacroParameterUINode> getParametersMap()
+    /**
+     * @return the full map of parameters, groups and features of the descriptor, each index is computed by
+     * parameters themselves with {@link AbstractMacroUINode#getKey()}.
+     */
+    public Map<String, AbstractMacroUINode> getParametersMap()
     {
         return parametersMap;
     }
 
-    public MacroDescriptorUI setParametersMap(Map<String, AbstractMacroParameterUINode> parametersMap)
+    /**
+     * @param parametersMap see {@link #getParametersMap()}
+     * @return the current instance
+     */
+    public MacroDescriptorUI setParametersMap(Map<String, AbstractMacroUINode> parametersMap)
     {
         this.parametersMap = parametersMap;
         return this;
     }
 
+    /**
+     * @return the id of the macro
+     */
     public String getId()
     {
         return id;
     }
 
+    /**
+     * @return the translated description of the macro
+     */
     public String getDescription()
     {
         return description;
     }
 
+    /**
+     * @param description see {@link #getDescription()}
+     * @return the current instance
+     */
     public MacroDescriptorUI setDescription(String description)
     {
         this.description = description;
         return this;
     }
 
+    /**
+     * @return whether the macro supports inline mode as defined by the descriptor.
+     */
     public boolean isSupportsInlineMode()
     {
         return supportsInlineMode;
     }
 
+    /**
+     * @param supportsInlineMode see {@link #isSupportsInlineMode()}
+     * @return the current instance
+     */
     public MacroDescriptorUI setSupportsInlineMode(boolean supportsInlineMode)
     {
         this.supportsInlineMode = supportsInlineMode;
         return this;
     }
 
+    /**
+     * @return the translated name of the macro.
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * @param name see {@link #getName()}.
+     * @return the current instance
+     */
     public MacroDescriptorUI setName(String name)
     {
         this.name = name;
@@ -125,17 +181,29 @@ public class MacroDescriptorUI
 
         MacroDescriptorUI that = (MacroDescriptorUI) o;
 
-        return new EqualsBuilder().append(supportsInlineMode, that.supportsInlineMode)
-            .append(id, that.id).append(name, that.name).append(description, that.description)
-            .append(mandatoryNodes, that.mandatoryNodes).append(optionalNodes, that.optionalNodes)
-            .append(parametersMap, that.parametersMap).isEquals();
+        return new EqualsBuilder()
+            .append(supportsInlineMode, that.supportsInlineMode)
+            .append(id, that.id)
+            .append(name, that.name)
+            .append(description, that.description)
+            .append(mandatoryNodes, that.mandatoryNodes)
+            .append(optionalNodes, that.optionalNodes)
+            .append(parametersMap, that.parametersMap)
+            .isEquals();
     }
 
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(17, 37).append(id).append(name).append(description).append(supportsInlineMode)
-            .append(mandatoryNodes).append(optionalNodes).append(parametersMap).toHashCode();
+        return new HashCodeBuilder(17, 63)
+            .append(id)
+            .append(name)
+            .append(description)
+            .append(supportsInlineMode)
+            .append(mandatoryNodes)
+            .append(optionalNodes)
+            .append(parametersMap)
+            .toHashCode();
     }
 
     @Override

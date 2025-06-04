@@ -19,16 +19,19 @@
  */
 package org.xwiki.rendering.internal.util.ui;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public abstract class AbstractMacroParameterUINode
+/**
+ * Abstract representation of a node in {@link MacroDescriptorUI}.
+ *
+ * @version $Id$
+ * @since 17.5.0RC1.
+ */
+public abstract class AbstractMacroUINode
 {
-    private final MacroParameterUINodeType type;
+    private final AbstractMacroUINodeType type;
     private final String id;
     private String name;
     private String description;
@@ -36,78 +39,132 @@ public abstract class AbstractMacroParameterUINode
     private boolean mandatory;
     private int order;
 
-    protected AbstractMacroParameterUINode(MacroParameterUINodeType type, String id)
+    /**
+     * Default constructor.
+     * @param type the type of the node
+     * @param id its identifier
+     */
+    protected AbstractMacroUINode(AbstractMacroUINodeType type, String id)
     {
         this.type = type;
         this.id = id;
         this.order = -1;
     }
 
+    /**
+     * @return the key of the node to be identified in {@link MacroDescriptorUI#getParametersMap()}.
+     */
     public String getKey()
     {
         return getType().name() + ":" + id;
     }
 
+    /**
+     * @return the identifier of the node as defined in the macro descriptor.
+     */
     public String getId()
     {
         return id;
     }
 
-    public MacroParameterUINodeType getType()
+    /**
+     * @return the type of the node.
+     */
+    public AbstractMacroUINodeType getType()
     {
         return type;
     }
 
+    /**
+     * @return the translated name of the node.
+     */
     public String getName()
     {
         return name;
     }
 
-    public <T extends AbstractMacroParameterUINode> T setName(String name)
+    /**
+     * @param name see {@link #getName()}.
+     * @return the current instance
+     * @param <T> the concrete type
+     */
+    public <T extends AbstractMacroUINode> T setName(String name)
     {
         this.name = name;
         return (T) this;
     }
 
+    /**
+     * @return the translated description of the node.
+     */
     public String getDescription()
     {
         return description;
     }
 
-    public <T extends AbstractMacroParameterUINode> T setDescription(String description)
+    /**
+     * @param description see {@link #getDescription()}.
+     * @return the current instance
+     * @param <T> the concrete type
+     */
+    public <T extends AbstractMacroUINode> T setDescription(String description)
     {
         this.description = description;
         return (T) this;
     }
 
+    /**
+     * @return {@code true} if the node should be hidden in the UI.
+     */
     public boolean isHidden()
     {
         return hidden;
     }
 
-    public <T extends AbstractMacroParameterUINode> T setHidden(boolean hidden)
+    /**
+     * @param hidden see {@link #isHidden()}.
+     * @return the current instance
+     * @param <T> the concrete type
+     */
+    public <T extends AbstractMacroUINode> T setHidden(boolean hidden)
     {
         this.hidden = hidden;
         return (T) this;
     }
 
+    /**
+     * @return {@code true} if the node is mandatory (a value needs to be provided).
+     */
     public boolean isMandatory()
     {
         return mandatory;
     }
 
-    public <T extends AbstractMacroParameterUINode> T setMandatory(boolean mandatory)
+    /**
+     * @param mandatory see {@link #isMandatory()}.
+     * @return the current instance
+     * @param <T> the concrete type
+     */
+    public <T extends AbstractMacroUINode> T setMandatory(boolean mandatory)
     {
         this.mandatory = mandatory;
         return (T) this;
     }
 
+    /**
+     * @return the display order of the node (the lower the value, the higher its priority to display).
+     */
     public int getOrder()
     {
         return order;
     }
 
-    public <T extends AbstractMacroParameterUINode> T setOrder(int order)
+    /**
+     * @param order see {@link #getOrder()}.
+     * @return the current instance
+     * @param <T> the concrete type
+     */
+    public <T extends AbstractMacroUINode> T setOrder(int order)
     {
         this.order = order;
         return (T) this;
@@ -124,11 +181,17 @@ public abstract class AbstractMacroParameterUINode
             return false;
         }
 
-        AbstractMacroParameterUINode that = (AbstractMacroParameterUINode) o;
+        AbstractMacroUINode that = (AbstractMacroUINode) o;
 
-        return new EqualsBuilder().append(hidden, that.hidden)
-            .append(mandatory, that.mandatory).append(order, that.order).append(type, that.type).append(id, that.id)
-            .append(name, that.name).append(description, that.description).isEquals();
+        return new EqualsBuilder()
+            .append(hidden, that.hidden)
+            .append(mandatory, that.mandatory)
+            .append(order, that.order)
+            .append(type, that.type)
+            .append(id, that.id)
+            .append(name, that.name)
+            .append(description, that.description)
+            .isEquals();
     }
 
     @Override

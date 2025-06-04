@@ -26,58 +26,100 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class MacroParameterUINodeGroup extends AbstractMacroParameterUINode
+/**
+ * Representation of a group of parameters in the macro config UI.
+ * Note that this concept is also used to represent a set of parameters bound to the same feature. If a parameter is
+ * only bound to a feature but not to a group, then we consider that this is a "featureOnly" group.
+ *
+ * @version $Id$
+ * @since 17.5.0RC1
+ */
+public class MacroUINodeGroup extends AbstractMacroUINode
 {
     private List<String> children;
     private String featureName;
     private boolean feature;
     private boolean featureOnly;
 
-    public MacroParameterUINodeGroup(String id)
+    /**
+     * Default constructor.
+     * @param id identifier of the group defined in the macro descriptor.
+     */
+    public MacroUINodeGroup(String id)
     {
-        super(MacroParameterUINodeType.GROUP, id);
+        super(AbstractMacroUINodeType.GROUP, id);
         this.children = new ArrayList<>();
     }
 
+    /**
+     * @return the keys of the node children of the group (see {@link AbstractMacroUINode#getKey()}).
+     */
     public List<String> getChildren()
     {
         return children;
     }
 
-    public MacroParameterUINodeGroup setChildren(List<String> children)
+    /**
+     * @param children see {@link #getChildren()}.
+     * @return the current instance
+     */
+    public MacroUINodeGroup setChildren(List<String> children)
     {
         this.children = children;
         return this;
     }
 
+    /**
+     * @return the translated name of the feature if this group also represents a feature (see {@link #isFeature()}),
+     * {@code null} otherwise.
+     */
     public String getFeatureName()
     {
         return featureName;
     }
 
-    public MacroParameterUINodeGroup setFeatureName(String featureName)
+    /**
+     *
+     * @param featureName see {@link #getFeatureName()}
+     * @return the current instance
+     */
+    public MacroUINodeGroup setFeatureName(String featureName)
     {
         this.featureName = featureName;
         return this;
     }
 
+    /**
+     * @return {@code true} if the parameters of the group are bound to a feature.
+     */
     public boolean isFeature()
     {
         return feature;
     }
 
-    public MacroParameterUINodeGroup setFeature(boolean feature)
+    /**
+     * @param feature see {@link #isFeature()}
+     * @return the current instance
+     */
+    public MacroUINodeGroup setFeature(boolean feature)
     {
         this.feature = feature;
         return this;
     }
 
+    /**
+     * @return {@code true} if the parameters of the group are only bound to a feature, and no group name is provided.
+     */
     public boolean isFeatureOnly()
     {
         return featureOnly;
     }
 
-    public MacroParameterUINodeGroup setFeatureOnly(boolean featureOnly)
+    /**
+     * @param featureOnly see {@link #isFeatureOnly()}.
+     * @return the current instance
+     */
+    public MacroUINodeGroup setFeatureOnly(boolean featureOnly)
     {
         this.featureOnly = featureOnly;
         return this;
@@ -104,7 +146,7 @@ public class MacroParameterUINodeGroup extends AbstractMacroParameterUINode
             return false;
         }
 
-        MacroParameterUINodeGroup that = (MacroParameterUINodeGroup) o;
+        MacroUINodeGroup that = (MacroUINodeGroup) o;
 
         return new EqualsBuilder()
             .appendSuper(super.equals(o))

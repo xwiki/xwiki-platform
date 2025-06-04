@@ -21,10 +21,18 @@ package org.xwiki.rendering.internal.util.ui;
 
 import java.util.Comparator;
 
-public class MacroParameterUINodeComparator implements Comparator<AbstractMacroParameterUINode>
+/**
+ * Comparator for ordering {@link AbstractMacroUINode}.
+ * The algorithm for ordering is to consider first order given by {@link AbstractMacroUINode#getOrder()} and if no
+ * order is given, to compute order based on hidden, advanced or deprecated field, before falling back on identifier.
+ *
+ * @version $Id$
+ * @since 17.5.0RC1
+ */
+public class MacroUINodeComparator implements Comparator<AbstractMacroUINode>
 {
     @Override
-    public int compare(AbstractMacroParameterUINode node1, AbstractMacroParameterUINode node2)
+    public int compare(AbstractMacroUINode node1, AbstractMacroUINode node2)
     {
         // we don't want to use Integer.compare if the order are exactly the same as it will return 0 and the TreeSet
         // will consider them equal.
@@ -39,21 +47,11 @@ public class MacroParameterUINodeComparator implements Comparator<AbstractMacroP
         }
     }
 
-    public int compareWhenNoOrder(AbstractMacroParameterUINode node1, AbstractMacroParameterUINode node2)
+    private int compareWhenNoOrder(AbstractMacroUINode node1, AbstractMacroUINode node2)
     {
-        if (node1 instanceof MacroParameterUINodeParameter paramNode1
-            && node2 instanceof MacroParameterUINodeParameter paramNode2) {
-            if (paramNode1.isHidden() && !paramNode2.isHidden()
-            || paramNode1.isDeprecated() && !paramNode2.isDeprecated()
-            || paramNode1.isAdvanced() && !paramNode2.isAdvanced()) {
-                return 1;
-            } else if (!paramNode1.isHidden() && paramNode2.isHidden()
-                || !paramNode1.isDeprecated() && paramNode2.isDeprecated()
-                || !paramNode1.isAdvanced() && paramNode2.isAdvanced()) {
-                return -1;
-            } else {
-                return paramNode1.getId().compareTo(paramNode2.getId());
-            }
+        if (node1 instanceof MacroUINodeParameter paramNode1
+            && node2 instanceof MacroUINodeParameter paramNode2) {
+            return compareMacroUINodeParametersWhenNoOrder(paramNode1, paramNode2);
         } else {
             if (node1.isHidden() == node2.isHidden()) {
                 return node1.getId().compareTo(node2.getId());
@@ -62,6 +60,22 @@ public class MacroParameterUINodeComparator implements Comparator<AbstractMacroP
             } else {
                 return -1;
             }
+        }
+    }
+
+    private int compareMacroUINodeParametersWhenNoOrder(MacroUINodeParameter paramNode1,
+        MacroUINodeParameter paramNode2)
+    {
+        if (paramNode1.isHidden() && !paramNode2.isHidden()
+            || paramNode1.isDeprecated() && !paramNode2.isDeprecated()
+            || paramNode1.isAdvanced() && !paramNode2.isAdvanced()) {
+            return 1;
+        } else if (!paramNode1.isHidden() && paramNode2.isHidden()
+            || !paramNode1.isDeprecated() && paramNode2.isDeprecated()
+            || !paramNode1.isAdvanced() && paramNode2.isAdvanced()) {
+            return -1;
+        } else {
+            return paramNode1.getId().compareTo(paramNode2.getId());
         }
     }
 }

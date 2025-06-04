@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.displayer.HTMLDisplayerManager;
@@ -45,9 +46,15 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.velocity.tools.EscapeTool;
 
-@Component(roles = { MacroParametersHelper.class })
+/**
+ * Factory in charge of building a {@link MacroDescriptorUI} based on a {@link MacroDescriptor}.
+ *
+ * @version $Id$
+ * @since 17.5.0RC1
+ */
+@Component(roles = { MacroDescriptorUIFactory.class })
 @Singleton
-public class MacroParametersHelper
+public class MacroDescriptorUIFactory
 {
     private static final String BOOLEAN_TEMPLATE_FALLBACK = """
             <input type="checkbox" name="%1$s" value="true"/>
@@ -78,9 +85,19 @@ public class MacroParametersHelper
     @Inject
     private HTMLDisplayerManager htmlDisplayerManager;
 
+    @Inject
+    private Logger logger;
+
     private final EscapeTool escapeTool = new EscapeTool();
 
     // FIXME: introduce a cache?
+
+    /**
+     * Build a {@link MacroDescriptorUI} based on all information provided by the {@link MacroDescriptor}.
+     *
+     * @param macroDescriptor the descriptor of the macro to configure in the UI.
+     * @return an instance of {@link MacroDescriptorUI} matching the given descriptor
+     */
     public MacroDescriptorUI buildMacroDescriptorUI(MacroDescriptor macroDescriptor)
     {
         String macroTranslationKey = "rendering.macro." + macroDescriptor.getId();
@@ -91,14 +108,14 @@ public class MacroParametersHelper
             .setSupportsInlineMode(macroDescriptor.supportsInlineMode());
 
         Collection<ParameterDescriptor> parameterDescriptors = macroDescriptor.getParameterDescriptorMap().values();
-        Map<String, AbstractMacroParameterUINode> parametersMap = new HashMap<>();
-        Map<String, SortedSet<AbstractMacroParameterUINode>> childrenMap = new HashMap<>();
-        List<AbstractMacroParameterUINode> mandatoryParameters = new ArrayList<>();
-        List<AbstractMacroParameterUINode> optionalParameters = new ArrayList<>();
-        Map<String, MacroParameterUINodeGroup> groupMap = new HashMap<>();
-        Map<String, List<MacroParameterUINodeGroup>> featureMap = new HashMap<>();
+        Map<String, AbstractMacroUINode> parametersMap = new HashMap<>();
+        Map<String, SortedSet<AbstractMacroUINode>> childrenMap = new HashMap<>();
+        List<AbstractMacroUINode> mandatoryParameters = new ArrayList<>();
+        List<AbstractMacroUINode> optionalParameters = new ArrayList<>();
+        Map<String, MacroUINodeGroup> groupMap = new HashMap<>();
+        Map<String, List<MacroUINodeGroup>> featureMap = new HashMap<>();
 
-        MacroParameterUINodeGroup defaultOptionalGroup =
+        MacroUINodeGroup defaultOptionalGroup =
             createOrGetGroup(DEFAULT_GROUP_OPTIONALS_ID, null, false, groupMap, featureMap,
                 childrenMap, macroTranslationKey)
                 .setName(getParameterTranslation("rendering.macro.config.defaultOptionalGroup.name",
@@ -106,8 +123,8 @@ public class MacroParametersHelper
 
         ContentDescriptor contentDescriptor = macroDescriptor.getContentDescriptor();
         if (contentDescriptor != null) {
-            MacroParameterUINodeParameter contentNode =
-                new MacroParameterUINodeParameter("$content")
+            MacroUINodeParameter contentNode =
+                new MacroUINodeParameter("$content")
                     .setDisplayType(contentDescriptor.getType().getTypeName())
                     .setEditTemplate(CONTENT_TEMPLATE.trim())
                     .setName(getParameterTranslation("rendering.macroContent", "Content"))
@@ -123,13 +140,11 @@ public class MacroParametersHelper
             parametersMap.put(contentNode.getKey(), contentNode);
         }
 
-
-
         for (ParameterDescriptor parameterDescriptor : parameterDescriptors) {
             String parameterTranslationKey =
                 String.format("%s.parameter.%s", macroTranslationKey, parameterDescriptor.getId());
             boolean mandatory = parameterDescriptor.isMandatory();
-            MacroParameterUINodeParameter node = new MacroParameterUINodeParameter(parameterDescriptor.getId());
+            MacroUINodeParameter node = new MacroUINodeParameter(parameterDescriptor.getId());
 
             parametersMap.put(node.getKey(), node);
             node.setAdvanced(parameterDescriptor.isAdvanced())
@@ -158,7 +173,7 @@ public class MacroParametersHelper
                     featureOnly = true;
                 }
 
-                MacroParameterUINodeGroup groupNode = createOrGetGroup(groupName, featureName, featureOnly,
+                MacroUINodeGroup groupNode = createOrGetGroup(groupName, featureName, featureOnly,
                     groupMap, featureMap, childrenMap, macroTranslationKey);
 
                 if ((mandatory || groupDescriptor.isFeatureMandatory()) && !groupNode.isMandatory()) {
@@ -178,24 +193,24 @@ public class MacroParametersHelper
 
         Set<String> belongToFeature = new HashSet<>();
 
-        for (Map.Entry<String, List<MacroParameterUINodeGroup>> featureEntry : featureMap.entrySet()) {
+        for (Map.Entry<String, List<MacroUINodeGroup>> featureEntry : featureMap.entrySet()) {
             String featureName = featureEntry.getKey();
-            List<MacroParameterUINodeGroup> featureGroups = featureEntry.getValue();
-            MacroParameterUINodeGroup featureNode = createOrGetGroup(featureName, featureName, true, groupMap,
+            List<MacroUINodeGroup> featureGroups = featureEntry.getValue();
+            MacroUINodeGroup featureNode = createOrGetGroup(featureName, featureName, true, groupMap,
                 featureMap, childrenMap, macroTranslationKey);
             childrenMap.get(featureNode.getKey()).addAll(featureGroups);
-            featureNode.setMandatory(featureGroups.stream().anyMatch(MacroParameterUINodeGroup::isMandatory));
+            featureNode.setMandatory(featureGroups.stream().anyMatch(MacroUINodeGroup::isMandatory));
             featureNode.setOrder(featureGroups.stream()
-                .map(MacroParameterUINodeGroup::getOrder)
+                .map(MacroUINodeGroup::getOrder)
                 .filter(i -> i != -1)
                 .min(Integer::compareTo)
                 .orElse(-1));
 
-            belongToFeature.addAll(featureGroups.stream().map(MacroParameterUINodeGroup::getKey).toList());
+            belongToFeature.addAll(featureGroups.stream().map(MacroUINodeGroup::getKey).toList());
         }
 
-        for (MacroParameterUINodeGroup groupNode : groupMap.values()) {
-            SortedSet<AbstractMacroParameterUINode> children = childrenMap.get(groupNode.getKey());
+        for (MacroUINodeGroup groupNode : groupMap.values()) {
+            SortedSet<AbstractMacroUINode> children = childrenMap.get(groupNode.getKey());
             if (!children.isEmpty() && !belongToFeature.contains(groupNode.getKey())) {
                 if (groupNode.isMandatory()) {
                     mandatoryParameters.add(groupNode);
@@ -204,30 +219,30 @@ public class MacroParametersHelper
                 }
             }
             if (!children.isEmpty()) {
-                groupNode.setChildren(children.stream().map(AbstractMacroParameterUINode::getKey).toList());
+                groupNode.setChildren(children.stream().map(AbstractMacroUINode::getKey).toList());
                 parametersMap.put(groupNode.getKey(), groupNode);
             }
         }
         // force the priority to appear first.
         defaultOptionalGroup.setOrder(0);
 
-        MacroParameterUINodeComparator comparator = new MacroParameterUINodeComparator();
+        MacroUINodeComparator comparator = new MacroUINodeComparator();
         mandatoryParameters.sort(comparator);
         optionalParameters.sort(comparator);
 
-        result.setMandatoryNodes(mandatoryParameters.stream().map(AbstractMacroParameterUINode::getKey).toList())
-            .setOptionalNodes(optionalParameters.stream().map(AbstractMacroParameterUINode::getKey).toList())
+        result.setMandatoryNodes(mandatoryParameters.stream().map(AbstractMacroUINode::getKey).toList())
+            .setOptionalNodes(optionalParameters.stream().map(AbstractMacroUINode::getKey).toList())
             .setParametersMap(parametersMap);
 
         return result;
     }
 
-    private MacroParameterUINodeGroup createOrGetGroup(String id,
+    private MacroUINodeGroup createOrGetGroup(String id,
         String featureName,
         boolean featureOnly,
-        Map<String, MacroParameterUINodeGroup> groupMap,
-        Map<String, List<MacroParameterUINodeGroup>> featureMap,
-        Map<String, SortedSet<AbstractMacroParameterUINode>> childrenMap,
+        Map<String, MacroUINodeGroup> groupMap,
+        Map<String, List<MacroUINodeGroup>> featureMap,
+        Map<String, SortedSet<AbstractMacroUINode>> childrenMap,
         String macroTranslationKey)
     {
         String mapId = (featureOnly) ? "FEATURE:" + id : id;
@@ -235,12 +250,12 @@ public class MacroParametersHelper
             String groupNameKey =
                 String.format("%s.%s.%s.name", macroTranslationKey, "group", id);
             boolean isFeature = !StringUtils.isEmpty(featureName);
-            MacroParameterUINodeGroup group = new MacroParameterUINodeGroup(id)
+            MacroUINodeGroup group = new MacroUINodeGroup(id)
                 .setFeatureName(featureName)
                 .setFeature(isFeature)
                 .setFeatureOnly(featureOnly)
                 .setName(getParameterTranslation(groupNameKey, id));
-            childrenMap.put(group.getKey(), new TreeSet<>(new MacroParameterUINodeComparator()));
+            childrenMap.put(group.getKey(), new TreeSet<>(new MacroUINodeComparator()));
             if (isFeature && !featureOnly) {
                 featureMap.computeIfAbsent(featureName,featureKey -> new ArrayList<>()).add(group);
             }
@@ -271,7 +286,9 @@ public class MacroParametersHelper
             result = this.htmlDisplayerManager.display(parameterDescriptor.getDisplayType(),
                 parameterDescriptor.getDefaultValue(), displayerMap, "edit");
         } catch (HTMLDisplayerException e) {
-            throw new RuntimeException(e);
+            this.logger.error("Error when computing edit template for parameter [{}] of type [{}]. "
+                + "Falling back on default template.", parameterDescriptor.getId(),
+                parameterDescriptor.getDisplayType(), e);
         }
         if (StringUtils.isEmpty(result)) {
             result = getEditTemplateFallback(parameterDescriptor, parameterTranslationKey);

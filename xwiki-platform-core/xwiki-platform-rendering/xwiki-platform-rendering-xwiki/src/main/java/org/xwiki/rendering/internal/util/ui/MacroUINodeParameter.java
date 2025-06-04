@@ -23,7 +23,13 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class MacroParameterUINodeParameter extends AbstractMacroParameterUINode
+/**
+ * Represents a single parameter of the macro descriptor.
+ *
+ * @version $Id$
+ * @since 17.5.0RC1
+ */
+public class MacroUINodeParameter extends AbstractMacroUINode
 {
     private boolean advanced;
     private boolean deprecated;
@@ -32,72 +38,118 @@ public class MacroParameterUINodeParameter extends AbstractMacroParameterUINode
     private boolean caseInsensitive;
     private String editTemplate;
 
-    public MacroParameterUINodeParameter(String id)
+    /**
+     * Default constructor.
+     * @param id the identifier of the parameter as indicated in the descriptor.
+     */
+    public MacroUINodeParameter(String id)
     {
-        super(MacroParameterUINodeType.PARAMETER, id);
+        super(AbstractMacroUINodeType.PARAMETER, id);
     }
 
+    /**
+     * @return {@code true} if the parameter is advanced.
+     */
     public boolean isAdvanced()
     {
         return advanced;
     }
 
-    public MacroParameterUINodeParameter setAdvanced(boolean advanced)
+    /**
+     * @param advanced see {@link #isAdvanced()}.
+     * @return the current instance
+     */
+    public MacroUINodeParameter setAdvanced(boolean advanced)
     {
         this.advanced = advanced;
         return this;
     }
 
+    /**
+     * @return {@code true} if the parameter is deprecated.
+     */
     public boolean isDeprecated()
     {
         return deprecated;
     }
 
-    public MacroParameterUINodeParameter setDeprecated(boolean deprecated)
+    /**
+     * @param deprecated see {@link #isDeprecated()}.
+     * @return the current instance
+     */
+    public MacroUINodeParameter setDeprecated(boolean deprecated)
     {
         this.deprecated = deprecated;
         return this;
     }
 
+    /**
+     * @return a string serialization of the type used for displaying the parameter.
+     */
     public String getDisplayType()
     {
         return displayType;
     }
 
-    public MacroParameterUINodeParameter setDisplayType(String displayType)
+    /**
+     * @param displayType see {@link #getDisplayType()}.
+     * @return the current instance
+     */
+    public MacroUINodeParameter setDisplayType(String displayType)
     {
         this.displayType = displayType;
         return this;
     }
 
+    /**
+     * @return the default value of the parameter.
+     */
     public Object getDefaultValue()
     {
         return defaultValue;
     }
 
-    public MacroParameterUINodeParameter setDefaultValue(Object defaultValue)
+    /**
+     * @param defaultValue see {@link #getDefaultValue()}.
+     * @return the current instance
+     */
+    public MacroUINodeParameter setDefaultValue(Object defaultValue)
     {
         this.defaultValue = defaultValue;
         return this;
     }
 
+    /**
+     * @return {@code true} if the value is case-insensitive (used for enum values).
+     */
     public boolean isCaseInsensitive()
     {
         return caseInsensitive;
     }
 
-    public MacroParameterUINodeParameter setCaseInsensitive(boolean caseInsensitive)
+    /**
+     * @param caseInsensitive see {@link #isCaseInsensitive()}
+     * @return the current instance
+     */
+    public MacroUINodeParameter setCaseInsensitive(boolean caseInsensitive)
     {
         this.caseInsensitive = caseInsensitive;
         return this;
     }
 
+    /**
+     * @return the HTML code of the edit template for that parameter.
+     */
     public String getEditTemplate()
     {
         return editTemplate;
     }
 
-    public MacroParameterUINodeParameter setEditTemplate(String editTemplate)
+    /**
+     * @param editTemplate see {@link #getEditTemplate()}
+     * @return the current instance
+     */
+    public MacroUINodeParameter setEditTemplate(String editTemplate)
     {
         this.editTemplate = editTemplate;
         return this;
@@ -114,12 +166,17 @@ public class MacroParameterUINodeParameter extends AbstractMacroParameterUINode
             return false;
         }
 
-        MacroParameterUINodeParameter that = (MacroParameterUINodeParameter) o;
+        MacroUINodeParameter that = (MacroUINodeParameter) o;
 
-        return new EqualsBuilder().appendSuper(super.equals(o))
-            .append(advanced, that.advanced).append(deprecated, that.deprecated)
-            .append(caseInsensitive, that.caseInsensitive).append(displayType, that.displayType)
-            .append(defaultValue, that.defaultValue).append(editTemplate, that.editTemplate).isEquals();
+        return new EqualsBuilder()
+            .appendSuper(super.equals(o))
+            .append(advanced, that.advanced)
+            .append(deprecated, that.deprecated)
+            .append(caseInsensitive, that.caseInsensitive)
+            .append(displayType, that.displayType)
+            .append(defaultValue, that.defaultValue)
+            .append(editTemplate, that.editTemplate)
+            .isEquals();
     }
 
     @Override

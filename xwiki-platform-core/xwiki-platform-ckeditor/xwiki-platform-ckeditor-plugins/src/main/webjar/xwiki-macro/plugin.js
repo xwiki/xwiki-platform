@@ -288,14 +288,7 @@
           }
         },
         simplifyMacroCall: function(macroCall) {
-          if (this.editables.$content) {
-            delete macroCall.content;
-          }
-          Object.keys(this.editables).forEach(name => {
-            const parameterName = Object.keys(macroCall.parameters)
-              .find(key => key.toLowerCase() === name.toLowerCase());
-            delete macroCall.parameters[parameterName];
-          });
+          delete macroCall.parameters.$content;
         },
         data: function(event) {
           this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));
@@ -494,11 +487,6 @@
                         // triggered by the user typing text, so in an inline context.
                         inline: descriptor.supportsInlineMode
                       };
-
-                      // Set an empty default content when it is mandatory.
-                      if (descriptor.contentDescriptor && descriptor.contentDescriptor.mandatory) {
-                        insertParam.content = " ";
-                      }
 
                       // Insert the empty macro.
                       macroPlugin.insertOrUpdateMacroWidget(editor, insertParam, widget);

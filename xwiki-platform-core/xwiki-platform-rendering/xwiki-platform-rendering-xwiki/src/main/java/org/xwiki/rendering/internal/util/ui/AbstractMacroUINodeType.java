@@ -19,8 +19,22 @@
  */
 package org.xwiki.rendering.internal.util.ui;
 
-public enum MacroParameterUINodeType
+/**
+ * Possible types of nodes.
+ *
+ * @version $Id$
+ * @since 17.5.0RC1
+ */
+public enum AbstractMacroUINodeType
 {
+    /**
+     * A simple parameter.
+     */
     PARAMETER,
+
+    /**
+     * A group of parameter. Note that we don't make distinction between group and features, all features are
+     * represented as a group of parameter. See also {@link MacroUINodeGroup#isFeatureOnly()}.
+     */
     GROUP
 }

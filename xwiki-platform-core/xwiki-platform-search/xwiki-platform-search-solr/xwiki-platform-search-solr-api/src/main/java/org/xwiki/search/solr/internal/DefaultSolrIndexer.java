@@ -19,11 +19,14 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -31,7 +34,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
@@ -64,6 +66,7 @@ import org.xwiki.search.solr.internal.metadata.XWikiSolrInputDocument;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.store.ReadyIndicator;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
@@ -362,6 +365,16 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     private BlockingQueue<ResolveQueueEntry> resolveQueue;
 
     /**
+     * The executor for Solr client operations.
+     */
+    private ExecutorService solrClientExecutor;
+
+    /**
+     * Future to wait on the last commit operation.
+     */
+    private Future<Void> commitFuture;
+
+    /**
      * Thread in which the indexUpdater will be executed.
      */
     private Thread indexThread;
@@ -393,12 +406,31 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      */
     private volatile int batchSize;
 
+    /**
+     * The length of the not yet sent batch in characters.
+     */
+    private int batchLength;
+
+    /**
+     * The size of the batch that is currently being sent and committed.
+     */
+    private volatile int committingBatchSize;
+
     @Override
     public void initialize() throws InitializationException
     {
         // Initialize the queues before starting the threads.
         this.resolveQueue = new LinkedBlockingQueue<>();
         this.indexQueue = new LinkedBlockingQueue<>(this.configuration.getIndexerQueueCapacity());
+
+        // Launch the Solr client executor.
+        this.solrClientExecutor = Executors.newSingleThreadExecutor(r -> {
+            Thread thread = new Thread(r);
+            thread.setName("XWiki Solr client thread");
+            thread.setDaemon(true);
+            thread.setPriority(Thread.NORM_PRIORITY - 1);
+            return thread;
+        });
 
         // Launch the resolve thread
         this.resolveThread = new Thread(new Resolver());
@@ -482,19 +514,18 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      */
     private boolean processBatch(IndexQueueEntry queueEntry)
     {
-        int length = 0;
-
         List<SolrInputDocument> solrDocuments = new ArrayList<>();
 
         for (IndexQueueEntry batchEntry = queueEntry; batchEntry != null; batchEntry = this.indexQueue.poll()) {
             this.indexQueueRemovalCounter.incrementAndGet();
 
             if (batchEntry == INDEX_QUEUE_ENTRY_STOP) {
+                // Handle the shutdown of the executor here to avoid that the executor is shut down before the batch
+                // processing finished.
+                this.solrClientExecutor.shutdown();
                 // Discard the current batch and stop the indexing thread.
                 return false;
             }
-
-            IndexOperation operation = batchEntry.operation;
 
             // For the current contiguous operations queue, group the changes
             try {
@@ -503,12 +534,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 XWikiContext xcontext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
                 xcontext.setUserReference(indexingUserConfig.getIndexingUserReference());
 
-                switch (operation) {
+                switch (batchEntry.operation) {
                     case INDEX:
                         XWikiSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
                         if (solrDocument != null) {
                             solrDocuments.add(solrDocument);
-                            length += solrDocument.getLength();
+                            this.batchLength += solrDocument.getLength();
                             ++this.batchSize;
                         }
                         break;
@@ -521,8 +552,10 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                         break;
                     case READY_MARKER:
                         commit(solrDocuments);
-                        batchEntry.readyIndicator.complete(null);
-                        length = 0;
+                        // Add the completion of the ready indicator to the same queue to ensure that it is processed
+                        // after the commit.
+                        IndexQueueEntry finalBatchEntry = batchEntry;
+                        this.solrClientExecutor.execute(() -> finalBatchEntry.readyIndicator.complete(null));
                         break;
                     default:
                         // Do nothing.
@@ -535,9 +568,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
             // Commit the index changes so that they become available to queries. This is a costly operation and that is
             // the reason why we perform it at the end of the batch.
-            if (shouldCommit(length, this.batchSize)) {
+            if (shouldCommit(this.batchLength, this.batchSize)) {
                 commit(solrDocuments);
-                length = 0;
             }
         }
 
@@ -549,19 +581,34 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         return true;
     }
 
-    private void applyDeletion(IndexQueueEntry queueEntry) throws SolrServerException, IOException, SolrIndexerException
+    private void applyDeletion(IndexQueueEntry queueEntry)
     {
-        if (queueEntry.reference == null) {
-            solrInstance.deleteByQuery(queueEntry.deleteQuery);
-        } else {
-            solrInstance.delete(this.solrRefereceResolver.getId(queueEntry.reference));
-        }
+        this.solrClientExecutor.execute(() -> {
+            try {
+                if (queueEntry.reference == null) {
+                    this.solrInstance.deleteByQuery(queueEntry.deleteQuery);
+                } else {
+                    this.solrInstance.delete(this.solrRefereceResolver.getId(queueEntry.reference));
+                }
+            } catch (Exception e) {
+                this.logger.error("Failed to delete document [{}] from the Solr server", queueEntry, e);
+            }
+        });
     }
 
-    private void flushDocuments(List<SolrInputDocument> documents) throws SolrServerException, IOException
+    private void flushDocuments(List<SolrInputDocument> documents)
     {
         try {
-            this.solrInstance.add(documents);
+            // Copy the documents to flush to a new list so that we can clear the original list without affecting the
+            // documents that are being added to the Solr server.
+            List<SolrInputDocument> documentsToFlush = new ArrayList<>(documents);
+            this.solrClientExecutor.execute(() -> {
+                try {
+                    this.solrInstance.add(documentsToFlush);
+                } catch (Exception e) {
+                    this.logger.error("Failed to add documents to the Solr server", e);
+                }
+            });
         } finally {
             // Clear the list of documents even when adding them failed to avoid leaking memory and to avoid
             // re-submitting the same documents to the Solr server multiple times.
@@ -574,21 +621,38 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      */
     private void commit(List<SolrInputDocument> documents)
     {
-        try {
-            flushDocuments(documents);
-            solrInstance.commit();
-        } catch (Exception e) {
-            this.logger.error("Failed to commit index changes to the Solr server. Rolling back.", e);
-
+        flushDocuments(documents);
+        if (this.commitFuture != null) {
             try {
-                solrInstance.rollback();
-            } catch (Exception ex) {
-                // Just log the failure.
-                this.logger.error("Failed to rollback index changes.", ex);
+                Uninterruptibles.getUninterruptibly(this.commitFuture);
+            } catch (ExecutionException e) {
+                this.logger.error("Failed to commit index changes to the Solr server", e);
             }
         }
 
+        // At this point, we can be sure that there is no more commit in the queue - so we can safely store the size
+        // of the next commit.
+        this.committingBatchSize = this.batchSize;
+        this.commitFuture = this.solrClientExecutor.submit(() -> {
+            try {
+                this.solrInstance.commit();
+            } catch (Exception e) {
+                this.logger.error("Failed to commit index changes to the Solr server. Rolling back.", e);
+
+                try {
+                    this.solrInstance.rollback();
+                } catch (Exception ex) {
+                    // Just log the failure.
+                    this.logger.error("Failed to rollback index changes.", ex);
+                }
+            }
+
+            this.committingBatchSize = 0;
+
+            return null;
+        });
         this.batchSize = 0;
+        this.batchLength = 0;
     }
 
     /**
@@ -693,7 +757,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Override
     public int getQueueSize()
     {
-        return this.indexQueue.size() + this.resolveQueue.size() + this.batchSize;
+        return this.indexQueue.size() + this.resolveQueue.size() + this.batchSize + this.committingBatchSize;
     }
 
     @Override

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 // The Inplace edit mode is looking for a RequireJS module named "xwiki-<editorId>-inline".
-define("xwiki-blocknote-inline", ["jquery", "xwiki-blocknote"], function ($, BlockNote) {
+define("xwiki-blocknote-inline", ["jquery", "xwiki-blocknote", "css!xwiki-blocknote"], function ($, BlockNote) {
   $(document).on("xwiki:actions:edit", function (event, config) {
     if (config && config.contentType === "org.xwiki.rendering.syntax.SyntaxContent" && config.editMode === "wysiwyg") {
       createEditor(event.target, config);
@@ -62,9 +62,10 @@ define("xwiki-blocknote-inline", ["jquery", "xwiki-blocknote"], function ($, Blo
     getRenderingConfig: function () {
       return {
         outputSyntax: BlockNote.syntax,
-        // Currently, only the macro transformations are protected and thus can be edited.
-        // See XRENDERING-78: Add markers to modified XDOM by Transformations/Macros
-        transformations: ["macro"],
+        // We currently use Markdown as output syntax, for which we don't have a way to protect the rendering
+        // transformations, so we disable all of them. We'll have to add support for protecting the macro
+        // transformation, at least, when switching to the UniAst syntax.
+        transformations: [""],
       };
     },
   };

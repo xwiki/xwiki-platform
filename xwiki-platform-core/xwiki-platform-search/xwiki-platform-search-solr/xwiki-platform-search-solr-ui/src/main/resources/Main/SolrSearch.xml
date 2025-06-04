@@ -706,7 +706,6 @@ button.search-result-highlightAll:after {
 .search-facet-header {
   background-color: var(--xwiki-background-secondary-color);
   padding-left: .5em;
-  border: 1px solid var(--xwiki-border-color);
   border-radius: var(--border-radius-base);
 }
 

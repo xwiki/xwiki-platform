@@ -1,6 +1,15 @@
 ##!source.syntax=xwiki/2.1
 {{velocity output="false"}}
 #macro (blocknote $parameters)
+  #set ($discard = $xwiki.linkx.use(
+    $services.webjars.url(
+      'org.xwiki.platform:xwiki-platform-blocknote-webjar',
+      'xwiki-platform-blocknote.css'
+    ), {
+      'type': 'text/css',
+      'rel': 'stylesheet'
+    }
+  ))
   ## FIXME: Move this to the HTML head somehow.
   <script type="module" src="$escapetool.xml($services.webjars.url(
     'org.xwiki.platform:xwiki-platform-blocknote-webjar',
@@ -17,7 +26,7 @@
   #set ($parameters.attributes.data-output-syntax = $parameters.attributes.remove('data-syntax'))
   #set ($source = {
     'documentReference': $sourceDocumentReference,
-    'syntax': $parameters.attributes.get('data-syntax'),
+    'syntax': $parameters.attributes.get('data-output-syntax'),
     'content': $parameters.content,
     'restricted': $parameters.attributes.data-restricted
   })

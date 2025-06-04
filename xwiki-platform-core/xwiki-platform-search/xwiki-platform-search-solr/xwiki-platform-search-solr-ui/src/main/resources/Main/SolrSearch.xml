@@ -194,7 +194,7 @@
     updateExpandCollapseAllFacetsState(facetsContainer);
 
     // Expand/Collapse toggle for each facet.
-    facetsContainer.find('.facet-toggler').on('click', function(event) {
+    facetsContainer.find('.facet-toggle').on('click', function(event) {
       $(event.target).parents('.search-facet').toggleClass('expanded');
       updateExpandCollapseAllFacetsState(facetsContainer);
     });
@@ -498,6 +498,12 @@
 /**
  * Sort
  */
+/* This select should be especially lightweight on the UI. We're removing the default border and shadow. */
+#sort-by-input {
+  border:none;
+  box-shadow: none;
+}
+
 /* This checkbox input should be styled as a switch between ascending and descending states. */
 .search-results-sort #sort-order-input {
   /* Hide the default checkbox. We rely on the style of the label itself to make it work. */
@@ -653,32 +659,17 @@ button.search-result-highlightAll:after {
  * Facets
  */
 
-.search-facets {
-  background-color: $theme.backgroundSecondaryColor;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-  /* Leave space for the bottom shadow. */
-  margin-bottom: 1em;
-  border-radius: 7px;
-}
-
-.search-facets-header,
-.search-facets-actions,
-.search-facet {
-  border-bottom: 1px solid $theme.borderColor;
-  border-top: 1px solid $theme.pageContentBackgroundColor;
-  position: relative;
+.search-facets-header{
+  border-bottom: 1px solid var(--xwiki-border-color);
 }
 
 .search-facets-header,
 .search-facets-actions {
-  padding: 0.5em 1em;
-}
-.search-facet {
-  padding: 0.5em .8em;
+  padding: .5em 1em;
 }
 
-.search-facets-header {
-  border-top: none;
+.search-facet {
+  padding: .5em 0;
 }
 
 .search-facets-header &gt; p,
@@ -712,8 +703,11 @@ button.search-result-highlightAll:after {
   margin: 0;
 }
 
-.search-facet:last-of-type {
-  border-bottom: none;
+.search-facet-header {
+  background-color: var(--xwiki-background-secondary-color);
+  padding-left: .5em;
+  border: 1px solid var(--xwiki-border-color);
+  border-radius: var(--border-radius-base);
 }
 
 .search-facet-header label {
@@ -724,19 +718,11 @@ button.search-result-highlightAll:after {
   align-items: center;
 }
 
-.search-facet:last-of-type .search-facet-header label:after {
-  border: medium none;
-}
-
-.search-facet.expanded:last-of-type .search-facet-header label:after {
-  border-bottom: 1px dotted $theme.pageContentBackgroundColor;
-  border-top: 1px dotted $theme.borderColor;
-}
-
 .search-facet-body {
   overflow: hidden; /* required for effect */
   display: none;
   margin-top: .5em;
+  padding-left: .8em;
 }
 
 .search-facet-body ul,
@@ -750,34 +736,39 @@ button.search-result-highlightAll:after {
   padding: .1em .2em;
 }
 
-.search-facet .search-facet-header  .facet-toggler, button.facet-value-toggler {
+.search-facet .search-facet-header  .facet-toggle, button.facet-value-toggle {
   background: transparent;
   transition: background-color .2s ease-in-out;
 }
 
-.search-facet .search-facet-header .facet-toggler:active, button.facet-value-toggler:active {
+.search-facet .search-facet-header .facet-toggle:active, button.facet-value-toggle:active {
   box-shadow: unset;
 }
 
-.search-facet .search-facet-header .facet-toggler > span, button.facet-value-toggler > span,
-.search-facet .search-facet-header .facet-toggler > img, button.facet-value-toggler > img {
+.search-facet .search-facet-header .facet-toggle > span, button.facet-value-toggle > span,
+.search-facet .search-facet-header .facet-toggle > img, button.facet-value-toggle > img {
   transform: rotate(90deg);
 }
 
-.search-facet.expanded .search-facet-header .facet-toggler > span, .expanded > button.facet-value-toggler > span,
-.search-facet.expanded .search-facet-header .facet-toggler > img, .expanded > button.facet-value-toggler > img {
+.search-facet.expanded .search-facet-header .facet-toggle > span, .expanded > button.facet-value-toggle > span,
+.search-facet.expanded .search-facet-header .facet-toggle > img, .expanded > button.facet-value-toggle > img {
   transform: rotate(0deg);
 }
 
 @media not (prefers-reduced-motion) {
-  .search-facet .search-facet-header .facet-toggler > span, button.facet-value-toggler > span,
-  .search-facet .search-facet-header .facet-toggler > img, button.facet-value-toggler > img {
+  .search-facet .search-facet-header .facet-toggle > span, button.facet-value-toggle > span,
+  .search-facet .search-facet-header .facet-toggle > img, button.facet-value-toggle > img {
     transition: transform 0.2s ease;
   }
 }
 
-.search-facet.expanded .search-facet-body {
-  display: block;
+.search-facet.expanded {
+  &amp; .search-facet-header label {
+    font-weight: var(--font-weight-semibold);
+  }
+  &amp; .search-facet-body {
+    display: block;
+  }
 }
 
 .search-facet-body ul, .search-facet-body ul.users {
@@ -813,7 +804,7 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 
 .search-facet-body .itemName,
 .search-facet-body .itemNameempty,
-.search-facet-body .facet-value-toggler,
+.search-facet-body .facet-value-toggle,
 .search-facet-body .more {
   /* Remove link styling */
   color: $theme.textColor;

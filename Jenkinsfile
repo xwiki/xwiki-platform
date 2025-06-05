@@ -35,12 +35,16 @@ pipeline {
         stage('Lint') {
             steps {
                 sh 'pnpm lint'
-                sh 'pnpm -r exec publint --pack pnpm --strict'
             }
         }
         stage('Build') {
             steps {
                  sh 'pnpm build'
+            }
+        }
+        stage('PubLint') {
+            steps {
+                sh 'pnpm -r exec publint --pack pnpm --strict'
             }
         }
         stage('Unit Tests') {

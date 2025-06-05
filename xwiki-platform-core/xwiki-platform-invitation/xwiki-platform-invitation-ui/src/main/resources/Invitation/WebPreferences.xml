@@ -1174,6 +1174,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </smtp_server>
       <smtp_server_password>
+        <algorithm/>
         <customDisplay/>
         <disabled>0</disabled>
         <name>smtp_server_password</name>
@@ -1181,10 +1182,11 @@
         <picker>0</picker>
         <prettyName>Server password (optional)</prettyName>
         <size>30</size>
+        <storageType>Clear</storageType>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
       </smtp_server_password>
       <smtp_server_username>
         <customDisplay/>

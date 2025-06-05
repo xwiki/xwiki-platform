@@ -152,12 +152,12 @@
       #end
       #extendQueryString($url $resetParameters)
       [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url
-        ||class="search-facets-action-reset"]]## Continue in the same paragraph.
+        ||class="search-facets-action-reset force-no-underline"]]## Continue in the same paragraph.
       {{html clean="false"}}
-      &lt;a href="#" class="search-facets-action-collapseAll hidden"&gt;
+      &lt;a href="#" class="search-facets-action-collapseAll hidden force-no-underline"&gt;
         $escapetool.xml($services.localization.render('solr.facets.collapseAll'))
       &lt;/a&gt;
-      &lt;a href="#" class="search-facets-action-expandAll hidden"&gt;
+      &lt;a href="#" class="search-facets-action-expandAll hidden force-no-underline"&gt;
         $escapetool.xml($services.localization.render('solr.facets.expandAll'))
       &lt;/a&gt;
       &lt;span class="clearfloats"&gt;&lt;/span&gt;

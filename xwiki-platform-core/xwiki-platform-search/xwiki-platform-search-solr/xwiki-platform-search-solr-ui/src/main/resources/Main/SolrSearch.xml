@@ -682,16 +682,6 @@ button.search-result-highlightAll:after {
   font-size: .8em;
 }
 
-.search-facets-actions a {
-  color: $theme.textSecondaryColor;
-  text-decoration: none;
-}
-
-.search-facets-actions a:hover {
-  color: $theme.linkColor;
-  text-decoration: underline;
-}
-
 .search-facets-action-collapseAll,
 .search-facets-action-expandAll {
   float: right;
@@ -718,8 +708,12 @@ button.search-result-highlightAll:after {
 }
 
 .search-facet-body {
-  overflow: hidden; /* required for effect */
-  display: none;
+  opacity: 0;
+  position: absolute; /* This is a workaround to not keep space in the UI for this element, without using 
+  'display: none' which would interfere with the animation. */
+  visibility: hidden; /* This makes sure the element is removed from the accessibility tree. */
+  
+  transform: translateY(-10px); /* Start slightly above */
   margin-top: .5em;
   padding-left: .8em;
 }
@@ -759,6 +753,10 @@ button.search-result-highlightAll:after {
   .search-facet .search-facet-header .facet-toggle > img, button.facet-value-toggle > img {
     transition: transform 0.2s ease;
   }
+  
+  .search-facet-body {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
 }
 
 .search-facet.expanded {
@@ -766,7 +764,10 @@ button.search-result-highlightAll:after {
     font-weight: var(--font-weight-semibold);
   }
   &amp; .search-facet-body {
-    display: block;
+    opacity: 1;
+    position: unset; /* This element should be positioned normally when shown. */
+    visibility: visible;
+    transform: translateY(0);
   }
 }
 

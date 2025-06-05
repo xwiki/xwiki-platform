@@ -21,6 +21,7 @@
 import { expect, test } from "@playwright/test";
 import { DesignSystem } from "./DesignSystem";
 import { BreadcrumbPageObject } from "./pageObjects/Breadcrumb";
+import { FormPageObject } from "./pageObjects/Form";
 import { HistoryExtraTabPageObject } from "./pageObjects/HistoryExtraTab";
 import { NavigationTreePageObject } from "./pageObjects/NavigationTree";
 import { SidebarPageObject } from "./pageObjects/Sidebar";
@@ -236,43 +237,25 @@ configs.forEach(
       await sidebar.openSidebar();
       await page.locator(".bi-gear").nth(0).click();
 
-      const configurationForm = page.locator("form").filter({ visible: true }).nth(0);
+      const configurationForm = new FormPageObject(
+        page,
+        page.locator("form").filter({ visible: true }).nth(0),
+        designSystem,
+      );
 
-      // All the waits below are temporary, until we have proper page objects for forms.
-
-      await expect(configurationForm).toBeVisible();
-      await configurationForm.getByText("Name").nth(0).focus();
-      await page.keyboard.type("Test Configuration");
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Space");
-      // Wait for Shoelace animation to end.
-      await page.waitForTimeout(100);
-      await page.keyboard.press("Home");
-      // Ensure Vuetify has time to select the element.
-      await page.waitForTimeout(100);
-      await page.keyboard.press("Enter");
-      // Wait for Shoelace animation to end.
-      await page.waitForTimeout(100);
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Enter");
+      await (configurationForm.findInputFromLabel("Name").setValue("Test Configuration"));
+      await (configurationForm.findSelectFromLabel("Type").setValue("XWiki"));
+      await configurationForm.submit()
 
       await expect(page.getByText('Editing Test Configuration (XWiki)')).toBeVisible();
-      const configurationEditForm = page.locator("form").filter({ visible: true }).nth(1);
-      await configurationEditForm.getByText("Base URL").nth(0).focus();
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Space");
-      // Wait for Shoelace animation to end.
-      await page.waitForTimeout(100);
-      await page.keyboard.press("Home");
-      // Ensure Vuetify has time to select the element.
-      await page.waitForTimeout(100);
-      await page.keyboard.press("Enter");
-      // Wait for Shoelace animation to end.
-      await page.waitForTimeout(100);
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Enter");
+      const configurationEditForm = new FormPageObject(
+        page,
+        page.locator("form").filter({ visible: true }).nth(1),
+        designSystem,
+      );
+
+      await (configurationEditForm.findSelectFromLabel("Design System").setValue("shoelace"));
+      await configurationEditForm.submit()
 
       const newConfiguration = page.locator(".grid-container >div").last();
       await expect(newConfiguration.locator(".wiki-name")).toContainText("Test Configuration");

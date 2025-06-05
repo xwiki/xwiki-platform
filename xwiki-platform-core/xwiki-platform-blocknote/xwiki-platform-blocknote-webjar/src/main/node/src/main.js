@@ -32,7 +32,12 @@ function init(event, data) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-require(["jquery"], ($) => {
+require(["jquery", "xwiki-events-bridge"], ($) => {
+  $(document).on("xwiki:actions:beforePreview xwiki:actions:beforeSave", () => {
+    // Make sure that all BlockNote instances update their data before the form is submitted.
+    factory.getAll().forEach((blockNote) => blockNote.data);
+  });
+
   $(document).on("xwiki:dom:updated", init);
   $(init);
 });

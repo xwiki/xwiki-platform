@@ -19,7 +19,6 @@
 -->
 <template>
   <div class="xwiki-blocknote">
-    <textarea :name :value :form :disabled @input="$emit('update:modelValue', $event.target.value)"></textarea>
     <suspense>
       <BlocknoteEditor
         ref="editor"
@@ -28,9 +27,11 @@
         :container
         :skin-manager
         :realtime-server-u-r-l
-        @blocknote-save="updateModelValue"
+        @instant-change="dirty = true"
+        @debounced-change="updateValue"
       ></BlocknoteEditor>
     </suspense>
+    <input v-if="name" ref="valueInput" type="hidden" :name :value :form :disabled />
     <input v-if="name" type="hidden" name="RequiresConversion" :value="name" :form :disabled />
     <input v-if="name" type="hidden" :name="name + '_inputSyntax'" :value="inputSyntax" :form :disabled />
     <input v-if="name" type="hidden" :name="name + '_outputSyntax'" :value="outputSyntax" :form :disabled />
@@ -39,7 +40,7 @@
 
 <script>
 import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
-import { MarkdownToUniAstConverter, createConverterContext } from "@xwiki/cristal-uniast";
+import { MarkdownToUniAstConverter, UniAstToMarkdownConverter, createConverterContext } from "@xwiki/cristal-uniast";
 
 export default {
   name: "XWikiBlockNote",
@@ -57,8 +58,8 @@ export default {
       default: null,
     },
 
-    // The edited content.
-    value: {
+    // The initial content when the editor is created.
+    initialValue: {
       type: String,
       default: "",
     },
@@ -86,14 +87,19 @@ export default {
   },
 
   data() {
-    const markdownConverter = new MarkdownToUniAstConverter(createConverterContext(this.container));
-    const editorContent = markdownConverter.parseMarkdown(this.value);
+    const converterContext = createConverterContext(this.container);
+    const markdownToUniAst = new MarkdownToUniAstConverter(converterContext);
+    const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
+    const editorContent = markdownToUniAst.parseMarkdown(this.initialValue);
 
     return {
+      dirty: false,
+      value: this.initialValue,
       editorProps: {
         theme: "light",
       },
       editorContent,
+      uniAstToMarkdown,
     };
   },
 
@@ -110,11 +116,32 @@ export default {
   },
 
   methods: {
-    updateModelValue(value) {
-      this.$emit("update:modelValue", value);
+    updateValue(editorContent) {
+      if (!this.dirty) {
+        // The value is already up-to-date.
+        return this.value;
+      }
+
+      const instantUpdate = !editorContent;
+      editorContent = editorContent || this.editor.getContent();
+
+      const value = this.uniAstToMarkdown.toMarkdown(editorContent);
+      if (value instanceof Error) {
+        throw error;
+      }
+
+      this.value = value;
+      this.dirty = false;
+
+      if (instantUpdate) {
+        // Update the value input immediately. This is important for instance when the form containing the BlockNote
+        // editor is submitted. Alternatively, we have to delay the form submission until the next tick when Vue will
+        // have updated the value input, but that is more complex.
+        this.$refs.valueInput.value = value;
+      }
+
+      return this.value;
     },
   },
-
-  emits: ["update:modelValue"],
 };
 </script>

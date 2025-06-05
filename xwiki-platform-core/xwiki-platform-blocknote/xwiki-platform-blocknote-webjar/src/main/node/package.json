@@ -32,7 +32,7 @@
     "@vue/eslint-config-prettier": "10.2.0",
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "0.7.0",
-    "eslint": "9.25.1",
+    "eslint": "9.28.0",
     "eslint-plugin-vue": "10.1.0",
     "jiti": "2.4.2",
     "jsdom": "26.0.0",
@@ -41,7 +41,7 @@
     "typescript": "5.8.3",
     "typescript-eslint": "8.33.0",
     "vite": "6.3.5",
-    "vitest": "3.1.2",
+    "vitest": "3.1.4",
     "vue-tsc": "2.2.8"
   },
   "pnpm": {

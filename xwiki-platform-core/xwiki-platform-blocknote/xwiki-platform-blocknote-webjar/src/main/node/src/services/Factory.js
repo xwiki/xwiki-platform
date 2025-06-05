@@ -63,6 +63,13 @@ export class Factory {
   }
 
   /**
+   * @returns {Logic[]} an array of all BlockNote editor instances created by this factory
+   */
+  getAll() {
+    return [...this._instancesByName.values()];
+  }
+
+  /**
    * Destroys the BlockNote instance associated with the given host element or form field name.
    *
    * @param {String | HTMLElement} hostOrName the name of a form field or the host element for which to destroy the

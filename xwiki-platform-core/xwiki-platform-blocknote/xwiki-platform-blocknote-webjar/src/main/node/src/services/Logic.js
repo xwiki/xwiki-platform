@@ -61,7 +61,7 @@ export class Logic {
 
     skinManager.loadDesignSystem(this._vueApp, container);
 
-    this._vueApp.mount(host);
+    this._root = this._vueApp.mount(host);
   }
 
   /**
@@ -83,6 +83,7 @@ export class Logic {
    * @returns {Object} the data managed by this BlockNote instance
    */
   get data() {
+    this._data.value = this._root.updateValue();
     return this._data;
   }
 
@@ -120,7 +121,10 @@ export class Logic {
    * @returns {Object} the data parsed from the host element
    */
   _parseDataFromHost() {
-    const data = { ...this._host.dataset };
+    const data = {
+      initialValue: this._host.dataset.value,
+      ...this._host.dataset,
+    };
     delete data.config;
     return Object.assign(this._host.dataset.config ? JSON.parse(this._host.dataset.config) : {}, data);
   }

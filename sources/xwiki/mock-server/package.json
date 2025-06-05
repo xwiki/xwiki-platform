@@ -8,7 +8,7 @@
   "repository": {
     "type": "git",
     "directory": "sources/xwiki/mock-server",
-    "url": "https://github.com/xwiki-contrib/cristal/"
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
@@ -21,7 +21,6 @@
     "dev": "nodemon src/index.ts",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
-  "types": "dist/index.d.ts",
   "dependencies": {
     "dotenv": "16.5.0",
     "express": "5.1.0"

@@ -7,7 +7,7 @@
   "repository": {
     "type": "git",
     "directory": "core/link-suggest/link-suggest-filesystem",
-    "url": "https://github.com/xwiki-contrib/cristal/"
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
@@ -43,9 +43,14 @@
   "publishConfig": {
     "exports": {
       ".": {
-        "import": "./dist/index.es.js",
-        "require": "./dist/index.umd.js",
-        "types": "./dist/index.d.ts"
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.es.js"
+        },
+        "require": {
+          "types": "./dist/index.d.cts",
+          "default": "./dist/index.umd.js"
+        }
       }
     },
     "main": "./dist/index.es.js",

@@ -35,6 +35,7 @@ pipeline {
         stage('Lint') {
             steps {
                 sh 'pnpm lint'
+                sh 'pnpm -r exec publint --pack pnpm --strict'
             }
         }
         stage('Build') {

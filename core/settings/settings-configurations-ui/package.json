@@ -7,7 +7,7 @@
   "repository": {
     "type": "git",
     "directory": "/core/settings/settings-configurations-ui",
-    "url": "https://github.com/xwiki-contrib/cristal/"
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
@@ -24,8 +24,8 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-alerts-api": "workspace:*",
+    "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-configuration-api": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-settings-api": "workspace:*",
@@ -51,9 +51,14 @@
   "publishConfig": {
     "exports": {
       ".": {
-        "import": "./dist/index.es.js",
-        "require": "./dist/index.umd.js",
-        "types": "./dist/index.d.ts"
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.es.js"
+        },
+        "require": {
+          "types": "./dist/index.d.cts",
+          "default": "./dist/index.umd.js"
+        }
       }
     },
     "main": "./dist/index.es.js",

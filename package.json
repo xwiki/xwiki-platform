@@ -7,11 +7,12 @@
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xwiki-contrib/cristal/"
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
+  "type": "module",
   "scripts": {
     "build": "nx run-many -t build --nxBail=true",
     "clean": "nx run-many -t clean",
@@ -48,6 +49,7 @@
     "happy-dom": "17.4.4",
     "nx": "21.1.2",
     "prettier": "3.5.3",
+    "publint": "0.3.12",
     "rimraf": "6.0.1",
     "typescript": "5.8.3",
     "vite": "6.3.5",

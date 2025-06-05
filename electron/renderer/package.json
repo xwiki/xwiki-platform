@@ -7,11 +7,12 @@
   "repository": {
     "type": "git",
     "directory": "electron/renderer",
-    "url": "https://github.com/xwiki-contrib/cristal/"
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
+  "type": "module",
   "scripts": {
     "build": "pnpm compile",
     "clean": "rimraf dist",

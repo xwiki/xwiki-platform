@@ -22,7 +22,7 @@ import { generateConfig } from "../../vite.config";
 import { defineConfig, mergeConfig } from "vite";
 
 export default mergeConfig(
-  generateConfig(import.meta.url),
+  generateConfig(import.meta.url, "dist/default"),
   defineConfig({
     build: {
       outDir: "dist/default",

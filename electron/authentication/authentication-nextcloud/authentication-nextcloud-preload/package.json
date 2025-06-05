@@ -7,7 +7,7 @@
   "repository": {
     "type": "git",
     "directory": "electron/authentication/authentication-nextcloud/authentication-nextcloud-preload",
-    "url": "https://github.com/xwiki-contrib/cristal/"
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
@@ -37,8 +37,8 @@
   "publishConfig": {
     "exports": {
       ".": {
-        "require": "./dist/index.umd.js",
-        "types": "./dist/index.d.ts"
+        "types": "./dist/index.d.ts",
+        "require": "./dist/index.umd.js"
       }
     },
     "main": "./dist/index.umd.js",

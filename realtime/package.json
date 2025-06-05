@@ -7,14 +7,14 @@
   "repository": {
     "type": "git",
     "directory": "realtime",
-    "url": "https://github.com/xwiki-contrib/cristal/"
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
   "type": "module",
   "scripts": {
-    "build": "tsc --project tsconfig.json &&  esbuild ./src/index.ts --bundle --outfile=dist/index.js --platform=node",
+    "build": "tsc --project tsconfig.json &&  esbuild ./src/index.ts --bundle --outfile=dist/index.cjs --platform=node",
     "clean": "rimraf dist",
     "dev": "tsx src/index.ts",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"

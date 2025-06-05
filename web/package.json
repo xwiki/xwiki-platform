@@ -8,7 +8,7 @@
   "repository": {
     "type": "git",
     "directory": "web",
-    "url": "https://github.com/xwiki-contrib/cristal/"
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
@@ -28,7 +28,6 @@
     "start:e2e:xwiki": "pnpm run -C ../sources/xwiki/mock-server dev",
     "test:e2e": "playwright test"
   },
-  "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-authentication-github": "workspace:*",
     "@xwiki/cristal-authentication-nextcloud": "workspace:*",

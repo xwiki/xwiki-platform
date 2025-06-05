@@ -7,7 +7,7 @@
   "repository": {
     "type": "git",
     "directory": "electron/storage",
-    "url": "https://github.com/xwiki-contrib/cristal/"
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
@@ -53,19 +53,34 @@
   "publishConfig": {
     "exports": {
       ".": {
-        "import": "./dist/main/index.es.js",
-        "require": "./dist/main/index.umd.js",
-        "types": "./dist/main/index.d.ts"
+        "import": {
+          "types": "./dist/default/index.d.ts",
+          "default": "./dist/default/index.es.js"
+        },
+        "require": {
+          "types": "./dist/default/index.d.cts",
+          "default": "./dist/default/index.umd.js"
+        }
       },
       "./preload": {
-        "import": "./dist/preload/index.es.js",
-        "require": "./dist/preload/index.umd.js",
-        "types": "./dist/preload/index.d.ts"
+        "import": {
+          "types": "./dist/preload/index.d.ts",
+          "default": "./dist/preload/index.es.js"
+        },
+        "require": {
+          "types": "./dist/preload/index.d.cts",
+          "default": "./dist/preload/index.umd.js"
+        }
       },
       "./main": {
-        "import": "./dist/main/index.es.js",
-        "require": "./dist/main/index.umd.js",
-        "types": "./dist/main/index.d.ts"
+        "import": {
+          "types": "./dist/main/index.d.ts",
+          "default": "./dist/main/index.es.js"
+        },
+        "require": {
+          "types": "./dist/main/index.d.cts",
+          "default": "./dist/main/index.umd.js"
+        }
       }
     },
     "main": "./dist/main/index.es.js",

@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { defineConfig, mergeConfig, UserConfig } from "vite";
-import dts from "vite-plugin-dts";
 import vue from "@vitejs/plugin-vue";
+import { UserConfig, defineConfig, mergeConfig } from "vite";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
-import { readFileSync } from "node:fs";
+import dts from "vite-plugin-dts";
+import { copyFileSync, existsSync, readFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -35,7 +35,12 @@ function pathsComputation(path: string) {
   return { packageDirName, pkg };
 }
 
-function generateConfig(path: string): UserConfig {
+/**
+ *
+ * @param path - the path of the build module
+ * @param distPath - an optional parameter in case the target directory is not the default dist
+ */
+function generateConfig(path: string, distPath: string = "dist"): UserConfig {
   const { packageDirName, pkg } = pathsComputation(path);
 
   const libFileName = (format: string) => `index.${format}.js`;
@@ -55,6 +60,15 @@ function generateConfig(path: string): UserConfig {
     plugins: [
       dts({
         insertTypesEntry: true,
+        afterBuild: () => {
+          // publint suggests having a specific extensions for the exported types for each kind of module system
+          // (esm/cjs). The goal is to make sure packages are supported by all consumers.
+          const originTypeFile = `${distPath}/index.d.ts`;
+          // First check if the module is producing types.
+          if (existsSync(originTypeFile)) {
+            copyFileSync(originTypeFile, `${distPath}/index.d.cts`);
+          }
+        },
       }),
     ],
   });

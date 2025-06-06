@@ -53,7 +53,7 @@
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.28.0",
     "@playwright/test": "1.52.0",
-    "@types/node": "22.15.28",
+    "@types/node": "22.15.29",
     "@vitejs/plugin-react": "4.5.1",
     "@vitejs/plugin-vue": "5.2.4",
     "globals": "16.2.0",

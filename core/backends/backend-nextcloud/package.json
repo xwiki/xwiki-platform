@@ -28,7 +28,7 @@
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-utils-inversify": "workspace:*",
-    "fast-xml-parser": "5.2.1",
+    "fast-xml-parser": "5.2.3",
     "inversify": "7.5.2"
   },
   "peerDependencies": {

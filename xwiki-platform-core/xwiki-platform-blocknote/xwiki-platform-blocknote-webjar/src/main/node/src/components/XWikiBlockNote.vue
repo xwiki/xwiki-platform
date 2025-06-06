@@ -96,6 +96,7 @@ export default {
       dirty: false,
       value: this.initialValue,
       editorProps: {
+        blockNoteOptions: {},
         theme: "light",
       },
       editorContent,

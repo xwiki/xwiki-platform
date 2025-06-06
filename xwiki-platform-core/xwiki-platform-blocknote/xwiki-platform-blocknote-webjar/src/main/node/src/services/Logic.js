@@ -121,11 +121,11 @@ export class Logic {
    * @returns {Object} the data parsed from the host element
    */
   _parseDataFromHost() {
-    const data = {
-      initialValue: this._host.dataset.value,
+    const data = Object.assign(this._host.dataset.config ? JSON.parse(this._host.dataset.config) : {}, {
       ...this._host.dataset,
-    };
+    });
     delete data.config;
-    return Object.assign(this._host.dataset.config ? JSON.parse(this._host.dataset.config) : {}, data);
+    data.initialValue = data.value;
+    return data;
   }
 }

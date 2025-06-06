@@ -356,6 +356,10 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
             try {
                 XWikiDocument userDocument = context.getWiki().getDocument(reference, context);
+
+                // Avoid modifying the cached document
+                userDocument = userDocument.clone();
+
                 userDocument.removeXObjects(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
                 BaseObject userXObject = userDocument.getXObject(USER_CLASS_REFERENCE);
 

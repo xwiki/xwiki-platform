@@ -4572,11 +4572,11 @@ importers:
         specifier: 7.5.2
         version: 7.5.2(reflect-metadata@0.2.2)
       marked:
-        specifier: 15.0.11
-        version: 15.0.11
+        specifier: 15.0.12
+        version: 15.0.12
       marked-base-url:
         specifier: 1.1.6
-        version: 1.1.6(marked@15.0.11)
+        version: 1.1.6(marked@15.0.12)
     devDependencies:
       '@types/dompurify':
         specifier: 3.2.0
@@ -8458,8 +8458,8 @@ packages:
     peerDependencies:
       marked: '>= 4 < 16'
 
-  marked@15.0.11:
-    resolution: {integrity: sha512-1BEXAU2euRCG3xwgLVT1y0xbJEld1XOrmRJpUwRCcy7rxhSCwMrmEu9LXoPhHSCJG41V7YcQ2mjKRr5BA3ITIA==}
+  marked@15.0.12:
+    resolution: {integrity: sha512-8dD6FusOQSrpv9Z1rdNMdlSgQOIP880DHqnohobOmYLElGEqAL/JvxvuxZO16r4HtjTlfPRDC1hbvxC9dPN2nA==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -14601,11 +14601,11 @@ snapshots:
 
   markdown-table@3.0.4: {}
 
-  marked-base-url@1.1.6(marked@15.0.11):
+  marked-base-url@1.1.6(marked@15.0.12):
     dependencies:
-      marked: 15.0.11
+      marked: 15.0.12
 
-  marked@15.0.11: {}
+  marked@15.0.12: {}
 
   matcher@3.0.0:
     dependencies:

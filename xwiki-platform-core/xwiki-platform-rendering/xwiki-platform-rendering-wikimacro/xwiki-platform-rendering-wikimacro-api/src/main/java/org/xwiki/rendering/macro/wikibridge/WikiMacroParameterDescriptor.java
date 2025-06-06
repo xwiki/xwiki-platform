@@ -79,6 +79,15 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     public static final String GROUP_PARAMETER_NAME = "group";
 
     /**
+     * Constant to be used in the parameters map of the constructor to define the order: the accepted value should be
+     * of type {@link Integer}.
+     * @see #getOrder()
+     * @since 17.5.0RC1
+     */
+    @Unstable
+    public static final String ORDER_PARAMETER_NAME = "order";
+
+    /**
      * Identifier of the parameter.
      * 
      * @since 2.1M1
@@ -108,6 +117,7 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     private final boolean advanced;
     private final boolean displayHidden;
     private final boolean deprecated;
+    private final int order;
 
     private final PropertyGroupDescriptor groupDescriptor;
 
@@ -183,6 +193,7 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
         } else {
             this.groupDescriptor = null;
         }
+        this.order = (int) parameters.getOrDefault(ORDER_PARAMETER_NAME, -1);
     }
 
     @Override
@@ -259,6 +270,12 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     public PropertyGroupDescriptor getGroupDescriptor()
     {
         return groupDescriptor;
+    }
+
+    @Override
+    public int getOrder()
+    {
+        return this.order;
     }
 
     @Override

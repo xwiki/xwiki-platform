@@ -174,6 +174,48 @@ class PanelIT
         testUtils.deletePage(new DocumentReference("xwiki", "Panels", SPECIAL_TITLE));
     }
 
+    @Test
+    @Order(4)
+    void togglePanels(TestUtils testUtils, TestReference testReference) {
+        String testMethodName = testReference.getLastSpaceReference().getName();
+        String testClassName = testReference.getSpaceReferences().get(0).getName();
+        testUtils.gotoPage(testClassName, testMethodName);
+        PageWithPanels panelPage = new PageWithPanels();
+        // Check the initial state
+        assertTrue(panelPage.hasLeftPanels());
+        assertTrue(panelPage.hasRightPanels());
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.RIGHT));
+        // Toggle the left panels ON and OFF
+        panelPage.togglePanel(PageWithPanels.LEFT);
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.RIGHT));
+        panelPage.togglePanel(PageWithPanels.LEFT);
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.RIGHT));
+        // Toggle the right panels OFF and ON
+        panelPage.togglePanel(PageWithPanels.RIGHT);
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.LEFT));
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.RIGHT));
+        panelPage.togglePanel(PageWithPanels.RIGHT);
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.RIGHT));
+        // Toggle both panels OFF at once
+        panelPage.togglePanel(PageWithPanels.LEFT);
+        panelPage.togglePanel(PageWithPanels.RIGHT);
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.LEFT));
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.RIGHT));
+        // Reload the page to make sure the preference is kept in the localstorage
+        testUtils.getDriver().navigate().refresh();
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.LEFT));
+        assertFalse(panelPage.panelIsToggled(PageWithPanels.RIGHT));
+        panelPage.togglePanel(PageWithPanels.LEFT);
+        panelPage.togglePanel(PageWithPanels.RIGHT);
+        testUtils.getDriver().navigate().refresh();
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.LEFT));
+        assertTrue(panelPage.panelIsToggled(PageWithPanels.RIGHT));
+    }
+
     private void setRightPanelInAdministration(String panelName)
     {
         AdministrationPage.gotoPage().clickSection("Look & Feel", "Panels");

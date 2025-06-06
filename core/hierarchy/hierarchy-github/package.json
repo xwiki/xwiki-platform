@@ -27,7 +27,7 @@
     "@xwiki/cristal-hierarchy-api": "workspace:*",
     "@xwiki/cristal-hierarchy-default": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
-    "inversify": "7.5.1"
+    "inversify": "7.5.2"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

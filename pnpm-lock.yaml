@@ -107,8 +107,8 @@ importers:
         specifier: workspace:*
         version: link:../core/configuration/configuration-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -182,8 +182,8 @@ importers:
         specifier: workspace:*
         version: link:../../../api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       pinia:
         specifier: 3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
@@ -213,8 +213,8 @@ importers:
         specifier: workspace:*
         version: link:../../../api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -284,8 +284,8 @@ importers:
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       pinia:
         specifier: 3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
@@ -348,8 +348,8 @@ importers:
         specifier: workspace:*
         version: link:../../user/user-ui
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -415,8 +415,8 @@ importers:
         specifier: workspace:*
         version: link:../authentication-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -446,8 +446,8 @@ importers:
         specifier: 1.9.0
         version: 1.9.0
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       js-cookie:
         specifier: 3.0.5
         version: 3.0.5
@@ -474,8 +474,8 @@ importers:
   core/authentication/authentication-github-state:
     dependencies:
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -520,8 +520,8 @@ importers:
         specifier: workspace:*
         version: link:../../uiextension/uiextension-default
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -575,8 +575,8 @@ importers:
         specifier: 1.9.0
         version: 1.9.0
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       js-cookie:
         specifier: 3.0.5
         version: 3.0.5
@@ -603,8 +603,8 @@ importers:
   core/authentication/authentication-nextcloud-state:
     dependencies:
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -640,8 +640,8 @@ importers:
         specifier: workspace:*
         version: link:../../uiextension/uiextension-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -695,8 +695,8 @@ importers:
         specifier: workspace:*
         version: link:../../uiextension/uiextension-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -744,8 +744,8 @@ importers:
         specifier: 1.9.0
         version: 1.9.0
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       js-cookie:
         specifier: 3.0.5
         version: 3.0.5
@@ -772,8 +772,8 @@ importers:
         specifier: workspace:*
         version: link:../../../api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -803,8 +803,8 @@ importers:
         specifier: 4.0.11
         version: 4.0.11
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -837,8 +837,8 @@ importers:
         specifier: workspace:*
         version: link:../../../utils/inversify
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       mime:
         specifier: 4.0.7
         version: 4.0.7
@@ -877,8 +877,8 @@ importers:
         specifier: 5.2.1
         version: 5.2.1
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -914,8 +914,8 @@ importers:
         specifier: workspace:*
         version: link:../../xwiki/xwiki-utils
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -958,8 +958,8 @@ importers:
         specifier: workspace:*
         version: link:../browser-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -1015,8 +1015,8 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1093,8 +1093,8 @@ importers:
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       pinia:
         specifier: 3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
@@ -1124,8 +1124,8 @@ importers:
   core/extra-tabs/extra-tabs-api:
     dependencies:
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -1152,8 +1152,8 @@ importers:
         specifier: workspace:*
         version: link:../extra-tabs-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -1273,8 +1273,8 @@ importers:
         specifier: workspace:*
         version: link:../../model/model-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1304,8 +1304,8 @@ importers:
         specifier: workspace:*
         version: link:../../model/model-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1335,8 +1335,8 @@ importers:
         specifier: workspace:*
         version: link:../../model/model-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1366,8 +1366,8 @@ importers:
         specifier: workspace:*
         version: link:../../model/model-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1409,8 +1409,8 @@ importers:
         specifier: workspace:*
         version: link:../../xwiki/xwiki-utils
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1453,8 +1453,8 @@ importers:
         specifier: workspace:*
         version: link:../history-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1484,8 +1484,8 @@ importers:
         specifier: workspace:*
         version: link:../history-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1518,8 +1518,8 @@ importers:
         specifier: workspace:*
         version: link:../../user/user-ui
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -1567,8 +1567,8 @@ importers:
         specifier: workspace:*
         version: link:../../xwiki/xwiki-utils
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1630,8 +1630,8 @@ importers:
         specifier: workspace:*
         version: link:../info-actions-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -1695,8 +1695,8 @@ importers:
         specifier: workspace:*
         version: link:../../../api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1723,8 +1723,8 @@ importers:
         specifier: workspace:*
         version: link:../link-suggest-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       xml-escape:
         specifier: 1.1.0
         version: 1.1.0
@@ -1763,8 +1763,8 @@ importers:
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1810,8 +1810,8 @@ importers:
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       markdown-it:
         specifier: 14.1.0
         version: 14.1.0
@@ -1865,8 +1865,8 @@ importers:
         specifier: workspace:*
         version: link:../model-remote-url/model-remote-url-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1887,8 +1887,8 @@ importers:
         specifier: workspace:*
         version: link:../model-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1915,8 +1915,8 @@ importers:
         specifier: workspace:*
         version: link:../../model-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1940,8 +1940,8 @@ importers:
         specifier: workspace:*
         version: link:../model-reference-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1965,8 +1965,8 @@ importers:
         specifier: workspace:*
         version: link:../model-reference-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1990,8 +1990,8 @@ importers:
         specifier: workspace:*
         version: link:../model-reference-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2018,8 +2018,8 @@ importers:
         specifier: workspace:*
         version: link:../model-reference-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -2055,8 +2055,8 @@ importers:
         specifier: workspace:*
         version: link:../../model-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2095,8 +2095,8 @@ importers:
         specifier: workspace:*
         version: link:../model-remote-url-filesystem-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2123,8 +2123,8 @@ importers:
         specifier: workspace:*
         version: link:../model-remote-url-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2151,8 +2151,8 @@ importers:
         specifier: workspace:*
         version: link:../model-remote-url-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2179,8 +2179,8 @@ importers:
         specifier: workspace:*
         version: link:../model-remote-url-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2226,8 +2226,8 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2260,8 +2260,8 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-default
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2294,8 +2294,8 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-default
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2328,8 +2328,8 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-default
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2365,8 +2365,8 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2384,8 +2384,8 @@ importers:
   core/page-actions/page-actions-api:
     dependencies:
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -2412,8 +2412,8 @@ importers:
         specifier: workspace:*
         version: link:../page-actions-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -2470,8 +2470,8 @@ importers:
         specifier: workspace:*
         version: link:../../rename/rename-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -2548,8 +2548,8 @@ importers:
         specifier: workspace:*
         version: link:../rename-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2576,8 +2576,8 @@ importers:
         specifier: workspace:*
         version: link:../rename-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2616,8 +2616,8 @@ importers:
         specifier: workspace:*
         version: link:../settings-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2641,8 +2641,8 @@ importers:
         specifier: workspace:*
         version: link:../settings-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2687,8 +2687,8 @@ importers:
         specifier: workspace:*
         version: link:../../wiki-config/wiki-config-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -2733,8 +2733,8 @@ importers:
         specifier: workspace:*
         version: link:../settings-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2875,8 +2875,8 @@ importers:
         specifier: workspace:*
         version: link:../uiextension-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -2937,8 +2937,8 @@ importers:
         specifier: workspace:*
         version: link:../model/model-remote-url/model-remote-url-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       mdast-util-gfm-strikethrough:
         specifier: 2.0.0
         version: 2.0.0
@@ -3036,8 +3036,8 @@ importers:
         specifier: workspace:*
         version: link:../wiki-config-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -3079,8 +3079,8 @@ importers:
   dev/test-utils:
     dependencies:
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -3138,8 +3138,8 @@ importers:
         specifier: workspace:*
         version: link:../api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -3190,8 +3190,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -3245,8 +3245,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -3321,8 +3321,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/uniast
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -3415,8 +3415,8 @@ importers:
         specifier: 5.0.1
         version: 5.0.1
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -3557,8 +3557,8 @@ importers:
         specifier: 5.0.1
         version: 5.0.1
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -3699,8 +3699,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-github-state
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3777,8 +3777,8 @@ importers:
         specifier: 1.4.1
         version: 1.4.1
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@types/async-lock':
         specifier: 1.4.2
@@ -3852,8 +3852,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3883,8 +3883,8 @@ importers:
         specifier: 36.4.0
         version: 36.4.0
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3917,8 +3917,8 @@ importers:
         specifier: workspace:*
         version: link:../../../core/model/model-remote-url/model-remote-url-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4043,8 +4043,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/rename/rename-filesystem
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -4121,8 +4121,8 @@ importers:
         specifier: workspace:*
         version: link:../../../core/settings/settings-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4176,8 +4176,8 @@ importers:
         specifier: 36.4.0
         version: 36.4.0
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       mime:
         specifier: 4.0.7
         version: 4.0.7
@@ -4207,8 +4207,8 @@ importers:
         specifier: workspace:*
         version: link:../api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4232,8 +4232,8 @@ importers:
         specifier: workspace:*
         version: link:../../skin
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4455,8 +4455,8 @@ importers:
         specifier: workspace:*
         version: link:../core/wiki-config/wiki-config-default
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       pinia:
         specifier: 3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
@@ -4501,8 +4501,8 @@ importers:
         specifier: workspace:*
         version: link:../skin
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -4569,8 +4569,8 @@ importers:
         specifier: 3.2.5
         version: 3.2.5
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       marked:
         specifier: 15.0.11
         version: 15.0.11
@@ -4679,8 +4679,8 @@ importers:
         specifier: 4.4.2
         version: 4.4.2
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4782,8 +4782,8 @@ importers:
         specifier: workspace:*
         version: link:../core/wiki-config/wiki-config-api
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4856,8 +4856,8 @@ importers:
   utils/inversify:
     dependencies:
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4945,8 +4945,8 @@ importers:
         specifier: 16.2.0
         version: 16.2.0
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4975,8 +4975,8 @@ importers:
         specifier: workspace:*
         version: link:../../skin
       inversify:
-        specifier: 7.5.1
-        version: 7.5.1(reflect-metadata@0.2.2)
+        specifier: 7.5.2
+        version: 7.5.2(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -5523,13 +5523,16 @@ packages:
   '@inversifyjs/common@1.5.0':
     resolution: {integrity: sha512-Qj5BELk11AfI2rgZEAaLPmOftmQRLLmoCXgAjmaF0IngQN5vHomVT5ML7DZ3+CA5fgGcEVMcGbUDAun+Rz+oNg==}
 
-  '@inversifyjs/container@1.9.1':
-    resolution: {integrity: sha512-8EhjFoAx1LoD7TpCuP9ptitwc+7kVXEpZB0IeoEsCQb9sWaNYYaBi+7Lommu3/1nYxdMbX2t7AJhQnryT1EEsg==}
+  '@inversifyjs/container@1.10.1':
+    resolution: {integrity: sha512-wrgiCn4R50IJQO0QBqrobdyLpzYngQCHyTAnlvgzQIfxnKrAKGGEUdDQ2bLbZXq3313GVz/Jb5C4RuW7M55cvQ==}
     peerDependencies:
       reflect-metadata: ~0.2.2
 
-  '@inversifyjs/core@5.2.0':
-    resolution: {integrity: sha512-MMaHGGRjQWT9uAof63sbZyEhRl4XptEAE17DJwrgUcN9LsdIEvecKP3r53pE9VF88PFR41knUKKzagUBvWLHmw==}
+  '@inversifyjs/core@5.3.1':
+    resolution: {integrity: sha512-cWVuKb6bsULng+1RlDx/Tuq8/u5wkpHx5sSjeLsHTbNrIhd8V0FLjhET00aSzovxJLMz1dkCIMhF8HUrnboAOQ==}
+
+  '@inversifyjs/plugin@0.2.0':
+    resolution: {integrity: sha512-R/JAdkTSD819pV1zi0HP54mWHyX+H2m8SxldXRgPQarS3ySV4KPyRdosWcfB8Se0JJZWZLHYiUNiS6JvMWSPjw==}
 
   '@inversifyjs/prototype-utils@0.1.0':
     resolution: {integrity: sha512-lNz1yyajMRDXBHLvJsYYX81FcmeD15e5Qz1zAZ/3zeYTl+u7ZF/GxNRKJzNOloeMPMtuR8BnvzHA1SZxjR+J9w==}
@@ -8021,8 +8024,8 @@ packages:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
 
-  inversify@7.5.1:
-    resolution: {integrity: sha512-oWWFDU2BXiuqZynGcLDDD4tqiWAeaEUCALlCj0vk/QwHGgZY/tzDFPuTmWMY3jwRmDIHxVDkcj9SL3MFTlCEDw==}
+  inversify@7.5.2:
+    resolution: {integrity: sha512-RpI97sBhBntaUzN2gLRbAyhXmEbBpTNKZKlJJ6qPW3xB4D6AwBt9SP85ehE+glgqBoan24Eu2SzTGbSpgkxuLw==}
     peerDependencies:
       reflect-metadata: ~0.2.2
 
@@ -11172,20 +11175,23 @@ snapshots:
 
   '@inversifyjs/common@1.5.0': {}
 
-  '@inversifyjs/container@1.9.1(reflect-metadata@0.2.2)':
+  '@inversifyjs/container@1.10.1(reflect-metadata@0.2.2)':
     dependencies:
       '@inversifyjs/common': 1.5.0
-      '@inversifyjs/core': 5.2.0(reflect-metadata@0.2.2)
+      '@inversifyjs/core': 5.3.1(reflect-metadata@0.2.2)
+      '@inversifyjs/plugin': 0.2.0
       '@inversifyjs/reflect-metadata-utils': 1.1.0(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
 
-  '@inversifyjs/core@5.2.0(reflect-metadata@0.2.2)':
+  '@inversifyjs/core@5.3.1(reflect-metadata@0.2.2)':
     dependencies:
       '@inversifyjs/common': 1.5.0
       '@inversifyjs/prototype-utils': 0.1.0
       '@inversifyjs/reflect-metadata-utils': 1.1.0(reflect-metadata@0.2.2)
     transitivePeerDependencies:
       - reflect-metadata
+
+  '@inversifyjs/plugin@0.2.0': {}
 
   '@inversifyjs/prototype-utils@0.1.0':
     dependencies:
@@ -14154,11 +14160,11 @@ snapshots:
       hasown: 2.0.2
       side-channel: 1.1.0
 
-  inversify@7.5.1(reflect-metadata@0.2.2):
+  inversify@7.5.2(reflect-metadata@0.2.2):
     dependencies:
       '@inversifyjs/common': 1.5.0
-      '@inversifyjs/container': 1.9.1(reflect-metadata@0.2.2)
-      '@inversifyjs/core': 5.2.0(reflect-metadata@0.2.2)
+      '@inversifyjs/container': 1.10.1(reflect-metadata@0.2.2)
+      '@inversifyjs/core': 5.3.1(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
 
   ip-address@9.0.5:

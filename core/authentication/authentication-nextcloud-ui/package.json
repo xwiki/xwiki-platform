@@ -28,7 +28,7 @@
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-authentication-nextcloud-state": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
-    "inversify": "7.5.1",
+    "inversify": "7.5.2",
     "vue": "3.5.13",
     "vue-i18n": "11.1.3"
   },

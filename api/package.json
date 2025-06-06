@@ -28,7 +28,7 @@
   "dependencies": {
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-configuration-api": "workspace:*",
-    "inversify": "7.5.1",
+    "inversify": "7.5.2",
     "vue": "3.5.13",
     "vue-router": "4.5.1"
   },

@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@types/node": "22.15.28",
-    "@vitejs/plugin-react": "4.4.1",
+    "@vitejs/plugin-react": "4.5.1",
     "typescript": "5.8.3",
     "vite": "6.3.5"
   }

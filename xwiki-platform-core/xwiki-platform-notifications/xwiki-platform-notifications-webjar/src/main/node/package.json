@@ -14,7 +14,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "vue": "3.5.14"
+    "vue": "3.5.16"
   },
   "devDependencies": {
     "@tsconfig/node22": "22.0.1",

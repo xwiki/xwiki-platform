@@ -39,7 +39,7 @@
     "@vitest/coverage-v8": "3.2.2",
     "concurrently": "9.1.2",
     "eslint": "9.28.0",
-    "eslint-config-prettier": "10.1.2",
+    "eslint-config-prettier": "10.1.5",
     "eslint-import-resolver-typescript": "4.4.2",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-prettier": "5.4.1",

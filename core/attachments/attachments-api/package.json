@@ -25,7 +25,7 @@
   "dependencies": {
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
-    "vue": "3.5.13"
+    "vue": "3.5.16"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

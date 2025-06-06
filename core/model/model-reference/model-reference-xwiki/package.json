@@ -37,7 +37,7 @@
     "vite": "6.3.5",
     "vitest": "3.2.0",
     "vitest-mock-extended": "3.1.0",
-    "vue": "3.5.13"
+    "vue": "3.5.16"
   },
   "publishConfig": {
     "exports": {

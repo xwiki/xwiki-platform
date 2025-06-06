@@ -26,25 +26,26 @@ define("xwiki-blocknote-inline", ["jquery", "xwiki-blocknote", "css!xwiki-blockn
   });
 
   async function createEditor(container, config) {
-    const editorElement = document.createElement("div");
-    editorElement.classList.add("xwiki-blocknote-wrapper", ...container.classList);
-    editorElement.dataset.name = config.editorName;
-    editorElement.dataset.value = config.document.renderedContent;
-    editorElement.dataset.form = config.formId;
-    editorElement.dataset.inputSyntax = `${BlockNote.syntax.type}/${BlockNote.syntax.version}`;
-    editorElement.dataset.outputSyntax = config.document.syntax;
-    editorElement.dataset.startupFocus = config.startupFocus;
-    editorElement.dataset.sourceDocumentReference = XWiki.Model.serialize(config.document.documentReference);
-    container.after(editorElement);
-    const blockNote = await BlockNote.create(editorElement);
+    container.classList.add("xwiki-blocknote-wrapper");
+    container.dataset.config = JSON.stringify({
+      name: config.editorName,
+      value: config.document.renderedContent,
+      form: config.formId,
+      inputSyntax: `${BlockNote.syntax.type}/${BlockNote.syntax.version}`,
+      outputSyntax: config.document.syntax,
+      startupFocus: config.startupFocus,
+      sourceDocumentReference: XWiki.Model.serialize(config.document.documentReference),
+    });
+    const blockNote = await BlockNote.create(container);
 
     const beforeSubmitHandler = beforeSubmit.bind(null, blockNote, config);
     $(document).on("xwiki:actions:beforeSave xwiki:actions:beforePreview", beforeSubmitHandler);
 
     $(document).one("xwiki:actions:view", () => {
       $(document).off("xwiki:actions:beforeSave xwiki:actions:beforePreview", beforeSubmitHandler);
-      BlockNote.destroy(editorElement);
-      editorElement.remove();
+      BlockNote.destroy(container);
+      container.classList.remove("xwiki-blocknote-wrapper");
+      container.removeAttribute("data-config");
     });
 
     config.deferred.resolve(config.document);

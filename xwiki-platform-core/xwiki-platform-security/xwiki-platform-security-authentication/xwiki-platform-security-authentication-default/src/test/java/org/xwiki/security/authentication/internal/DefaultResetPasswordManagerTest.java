@@ -151,6 +151,7 @@ class DefaultResetPasswordManagerTest
         this.xWiki = mock(XWiki.class);
         when(this.context.getWiki()).thenReturn(this.xWiki);
         this.userDocument = mock(XWikiDocument.class);
+        when(this.userDocument.clone()).thenReturn(this.userDocument);
         when(this.xWiki.getDocument(this.userDocumentReference, this.context)).thenReturn(this.userDocument);
         this.authenticationMailSender = mock(AuthenticationMailSender.class);
         when(this.resetPasswordMailSenderProvider.get()).thenReturn(this.authenticationMailSender);

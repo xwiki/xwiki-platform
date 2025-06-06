@@ -55,7 +55,7 @@
     "@playwright/test": "1.52.0",
     "@types/node": "22.15.28",
     "@vitejs/plugin-react": "4.4.1",
-    "@vitejs/plugin-vue": "5.2.3",
+    "@vitejs/plugin-vue": "5.2.4",
     "globals": "16.0.0",
     "inversify": "7.5.1",
     "reflect-metadata": "0.2.2",

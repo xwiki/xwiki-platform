@@ -32,7 +32,7 @@
     "inversify": "7.5.1"
   },
   "peerDependencies": {
-    "electron": "36.3.2",
+    "electron": "36.4.0",
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {

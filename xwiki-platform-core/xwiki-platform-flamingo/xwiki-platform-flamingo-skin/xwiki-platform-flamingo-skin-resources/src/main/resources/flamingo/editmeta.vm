@@ -35,19 +35,26 @@
 #if ($editor != 'inline')
 <dl id="titleinput" class="form-group">
   <dt>
-    <label for="xwikidoctitleinput">
+    #set ($titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
+    #set ($wysiwygWithOptionalTitle = $editor == 'wysiwyg' && !$titleIsMandatory)
+    <label for="xwikidoctitleinput"#if ($wysiwygWithOptionalTitle)class="sr-only"#end>
       $escapetool.xml($services.localization.render('core.editors.content.titleField.label'))
-      #set ($titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
       #if ($titleIsMandatory)
         <span class="xRequired">$escapetool.xml($services.localization.render('core.validation.required'))</span>
       #end
     </label>
   </dt>
-  <dd>
+  <dd#if ($wysiwygWithOptionalTitle) id="document-title"#end>
+    #set ($placeholder = $doc.documentReference.name)
+    #if ($placeholder == $services.model.getEntityReference('DOCUMENT').name)
+      #set ($placeholder = $doc.documentReference.lastSpaceReference.name)
+    #end
+    #if ($wysiwygWithOptionalTitle)<h1 class="editable">#end
     <input type="text" id="xwikidoctitleinput" name="title" value="$!escapetool.xml($docTitle)"
-      #if ($titleIsMandatory)required #end
+      #if ($titleIsMandatory)required #{else}placeholder="$!escapetool.xml($placeholder)" #end
       data-validation-value-missing="$escapetool.xml($services.localization.render('core.validation.required.message'))"
-      />
+    />
+    #if ($wysiwygWithOptionalTitle)</h1>#end
   </dd>
 </dl>
 #end

@@ -145,3 +145,21 @@ export default {
   },
 };
 </script>
+
+<style>
+/**
+ * Standalone edit mode
+ */
+
+/* There's no border around the content editor so we need to show the top border of the action toolbar. */
+form#edit .bottom-editor > .sticky-buttons {
+  border-top: var(--border-width) solid var(--input-border);
+  border-top-left-radius: var(--border-radius-base);
+  border-top-right-radius: var(--border-radius-base);
+}
+
+/* There's no border around the content editor so we need to leave some space before the action toolbar. */
+#xwikieditcontent > .xwiki-blocknote-wrapper {
+  margin-bottom: calc(var(--grid-gutter-width) / 2);
+}
+</style>

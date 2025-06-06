@@ -62,10 +62,6 @@
     {
       "groupName": "@types/react",
       "matchDepPatterns": "^@types/react(-.+)?"
-    },
-    {
-      "groupName": "vue",
-      "matchDepPatterns": "^((@vue/.+)|vue)?"
     }
   ]
 }

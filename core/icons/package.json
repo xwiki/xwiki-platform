@@ -25,7 +25,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "bootstrap-icons": "1.11.3",
+    "bootstrap-icons": "1.13.1",
     "vue": "3.5.16"
   },
   "devDependencies": {

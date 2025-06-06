@@ -70,7 +70,6 @@
         #else
           #set ($passwordLength = $passwordOptions.passwordLength)
         #end
-        $services.localization.render('platform.core.profile.passwd.instructionsPasswordLength', $passwordLength)
         ## We won't ask for the original password if the user is admin and not updating his own profile.
         ## In all other cases, we ask for it.
         #if (!$hasAdmin || $isCurrentUsersProfile)
@@ -106,7 +105,7 @@
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
         #generateHtml($fields, $NULL)
         #if ($request.xwikipassword && !$isValidPassword)
-          <span class='box errormessage'>$stringtool.join($errorMessage, "<br/>")</span>
+          #inlineError($stringtool.join($errorMessage, "<br/>"))
         #end
         <div class="padded buttons">
           <span class="buttonwrapper"><input type="submit" value="$services.localization.render('platform.core.profile.passwd.submit')" class="button"/></span>

@@ -65,7 +65,7 @@
     },
     {
       "groupName": "vue",
-      "matchPackageNames": ["@vue/**", "vue"],
+      "matchDepPatterns": "^((@vue\/.+)|vue)?"
     }
   ]
 }

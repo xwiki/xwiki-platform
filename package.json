@@ -64,6 +64,7 @@
   "packageManager": "pnpm@10.10.0",
   "pnpm": {
     "ignoredBuiltDependencies": [
+      "electron-winstaller",
       "esbuild",
       "nx",
       "unrs-resolver",

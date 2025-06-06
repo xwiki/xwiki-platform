@@ -23,9 +23,9 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@tiptap/extension-image": "2.11.7",
-    "@tiptap/pm": "2.11.7",
-    "@tiptap/vue-3": "2.11.7",
+    "@tiptap/extension-image": "2.13.0",
+    "@tiptap/pm": "2.13.0",
+    "@tiptap/vue-3": "2.13.0",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-attachments-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
@@ -41,12 +41,12 @@
     "vue3-draggable-resizable": "1.6.5"
   },
   "peerDependencies": {
-    "@tiptap/core": "2.11.7",
+    "@tiptap/core": "2.13.0",
     "reflect-metadata": "0.2.2",
     "vue": "3.5.13"
   },
   "devDependencies": {
-    "@tiptap/core": "2.11.7",
+    "@tiptap/core": "2.13.0",
     "@types/lodash-es": "4.17.12",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",

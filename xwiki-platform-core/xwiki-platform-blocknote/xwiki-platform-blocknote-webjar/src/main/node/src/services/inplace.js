@@ -27,7 +27,7 @@ define("xwiki-blocknote-inline", ["jquery", "xwiki-blocknote", "css!xwiki-blockn
 
   async function createEditor(container, config) {
     const editorElement = document.createElement("div");
-    editorElement.classList.add("xwiki-blocknote-wrapper");
+    editorElement.classList.add("xwiki-blocknote-wrapper", ...container.classList);
     editorElement.dataset.name = config.editorName;
     editorElement.dataset.value = config.document.renderedContent;
     editorElement.dataset.form = config.formId;

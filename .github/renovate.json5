@@ -65,7 +65,7 @@
     },
     {
       "groupName": "vue",
-      "matchDepPatterns": "^((@vue\/.+)|vue)?"
+      "matchDepPatterns": "^((@vue/.+)|vue)?"
     }
   ]
 }

@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=隐藏配置面板并保�
 platform.appwithinminutes.classEditorMoveFieldLabel=移动页面
 platform.appwithinminutes.classEditorMoveFieldHint=拖拽并改变排序
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=默认值
+platform.appwithinminutes.classEditorFieldPrettyNameToolTip=好听的名字
+platform.appwithinminutes.classEditorFieldHintToolTip=提示
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=确定

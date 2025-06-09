@@ -1183,7 +1183,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.14</version>
+        <version>3.5.16</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

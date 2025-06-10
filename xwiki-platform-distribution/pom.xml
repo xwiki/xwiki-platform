@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>17.4.0-SNAPSHOT</version>
+    <version>17.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -89,7 +89,6 @@
   com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin,\
   com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
   com.xpn.xwiki.plugin.feed.FeedPlugin,\
-  com.xpn.xwiki.plugin.mail.MailPlugin,\
   com.xpn.xwiki.plugin.packaging.PackagePlugin,\
   com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
   com.xpn.xwiki.plugin.image.ImagePlugin,\
@@ -224,12 +223,12 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-webjars-api</artifactId>
-        <version>17.4.0-SNAPSHOT</version>
+        <version>17.5.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-        <version>17.4.0-SNAPSHOT</version>
+        <version>17.5.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

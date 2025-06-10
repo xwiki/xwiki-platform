@@ -1647,7 +1647,10 @@ public class XWiki extends Api
      * @return {@code true} if the rename succeeded. {@code false} if there was any issue.
      * @throws XWikiException if the document cannot be renamed properly.
      * @since 12.5RC1
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences) throws XWikiException

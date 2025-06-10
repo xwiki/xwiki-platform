@@ -1213,6 +1213,7 @@ $namespace##
   #if ($extensionConfig.installJAROnRoot)
     #set ($discard = $installPlanRequest.rewriter.installExtensionTypeOnRootNamespace('jar'))
     #set ($discard = $installPlanRequest.rewriter.installExtensionTypeOnRootNamespace('webjar'))
+    #set ($discard = $installPlanRequest.rewriter.installExtensionTypeOnRootNamespace('webjar-node'))
   #end
   #set ($discard = $extensionManager.createInstallPlan($installPlanRequest))
   #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')

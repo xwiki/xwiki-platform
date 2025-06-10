@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>17.4.0-SNAPSHOT</version>
+    <version>17.5.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>17.4.0-SNAPSHOT</version>
+  <version>17.5.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -58,22 +58,22 @@
     <tika.version>2.9.4</tika.version>
     <pdfbox.version>2.0.34</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.20</jetty.server.version>
+    <jetty.server.version>12.0.22</jetty.server.version>
     <jetty.client.version>10.0.25</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.1.Final</netty.version>
+    <netty.version>4.2.2.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.5.0</dockerJava.version>
+    <dockerJava.version>3.5.1</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
-    <jersey.version>2.46</jersey.version>
+    <jersey.version>2.47</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.3</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.21.0</testcontainers.version>
+    <testcontainers.version>1.21.1</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
@@ -119,14 +119,10 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.5</pgsql.version>
+    <pgsql.version>42.7.6</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.17.0.0</oracle.version>
-
-    <!-- Versions of Node related tools -->
-    <node.version>v22.14.0</node.version>
-    <npm.version>11.2.0</npm.version>
+    <oracle.version>21.18.0.0</oracle.version>
   </properties>
   <scm>
     <tag>HEAD</tag>
@@ -151,7 +147,7 @@
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
-        <version>0.10.2</version>
+        <version>0.11.1</version>
       </dependency>
       <!-- Hibernate -->
       <dependency>
@@ -178,7 +174,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.31.1</version>
+        <version>4.32.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -713,7 +709,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>5.3.1</version>
+        <version>6.0</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -725,7 +721,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <!-- Note: has a different release cycle than CSS4J "core" -->
-        <version>5.3</version>
+        <version>6.0</version>
       </dependency>
 
       <!-- Carte XML DTD -->
@@ -975,12 +971,12 @@
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-core</artifactId>
-        <version>1.39.0</version>
+        <version>1.40.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-linq4j</artifactId>
-        <version>1.39.0</version>
+        <version>1.40.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
@@ -1187,7 +1183,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.13</version>
+        <version>3.5.14</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1197,6 +1193,11 @@
       <extension>
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-webjar-handlers</artifactId>
+        <version>${commons.version}</version>
+      </extension>
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-webjar-node-handlers</artifactId>
         <version>${commons.version}</version>
       </extension>
       <!-- Needed to add support for the "xar" packaging -->
@@ -1701,7 +1702,7 @@
                 <!-- Forbid JAR extensions to have XAR runtime dependencies -->
                 <bannedDependencyType>
                   <dependencyType>xar</dependencyType>
-                  <projectPackaging>jar|webjar</projectPackaging>
+                  <projectPackaging>jar|webjar|webjar-node</projectPackaging>
                   <!-- Integration test modules are never going to be installed as extension, and they need to depend
                        on XAR modules -->
                   <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>

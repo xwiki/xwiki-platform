@@ -20,6 +20,8 @@
 package org.xwiki.wysiwyg.filter;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import jakarta.servlet.Filter;
@@ -50,24 +52,43 @@ public class ConversionFilter implements Filter
     @Override
     public void destroy()
     {
+        // No cleanup needed.
     }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
         throws IOException, ServletException
     {
-        RequestParameterConverter converter = Utils.getComponent(RequestParameterConverter.class);
         Execution execution = Utils.getComponent(Execution.class);
         execution.pushContext(new ExecutionContext());
-        Optional<ServletRequest> servletRequest = converter.convert(req, res);
-        execution.popContext();
+        Optional<ServletRequest> servletRequest = Optional.of(req);
+        try {
+            servletRequest = convert(servletRequest, res);
+        } finally {
+            execution.popContext();
+        }
+
         if (servletRequest.isPresent()) {
             chain.doFilter(servletRequest.get(), res);
         }
     }
 
+    private Optional<ServletRequest> convert(Optional<ServletRequest> originalRequest, ServletResponse res)
+        throws IOException
+    {
+        List<RequestParameterConverter> converters = Utils.getComponentList(RequestParameterConverter.class);
+        Iterator<RequestParameterConverter> iterator = converters.iterator();
+        Optional<ServletRequest> convertedRequest = originalRequest;
+        while (convertedRequest.isPresent() && iterator.hasNext()) {
+            RequestParameterConverter converter = iterator.next();
+            convertedRequest = converter.convert(convertedRequest.get(), res);
+        }
+        return convertedRequest;
+    }
+
     @Override
     public void init(FilterConfig config) throws ServletException
     {
+        // No initialization needed.
     }
 }

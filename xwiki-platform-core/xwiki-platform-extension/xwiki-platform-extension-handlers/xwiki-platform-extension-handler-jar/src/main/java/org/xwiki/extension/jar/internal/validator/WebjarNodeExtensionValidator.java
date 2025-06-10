@@ -17,41 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.mail;
+package org.xwiki.extension.jar.internal.validator;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-public class MailPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
+import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.internal.validator.AbstractExtensionValidator;
+import org.xwiki.extension.jar.internal.handler.JarExtensionHandler;
+import org.xwiki.security.authorization.Right;
+
+/**
+ * Check rights for webjar extensions.
+ * 
+ * @version $Id$
+ * @since 17.5.0RC1
+ */
+@Component
+@Named(JarExtensionHandler.WEBJAR_NODE)
+@Singleton
+public class WebjarNodeExtensionValidator extends AbstractExtensionValidator
 {
-    public MailPlugin(String name, String className, XWikiContext context)
-    {
-        super(name, className, context);
-        init(context);
-    }
 
-    @Override
-    public String getName()
+    /**
+     * Default constructor.
+     */
+    public WebjarNodeExtensionValidator()
     {
-        return "mail";
-    }
-
-    @Override
-    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
-    {
-        return new MailPluginApi((MailPlugin) plugin, context);
-    }
-
-    @Override
-    public void flushCache()
-    {
-    }
-
-    @Override
-    public void init(XWikiContext context)
-    {
-        super.init(context);
+        this.entityRight = Right.ADMIN;
     }
 }

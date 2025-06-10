@@ -24,6 +24,9 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.xwiki.configuration.internal.SystemConfigurationSource;
+import org.xwiki.configuration.internal.SystemEnvConfigurationSource;
+import org.xwiki.configuration.internal.SystemPropertiesConfigurationSource;
 import org.xwiki.configuration.internal.XWikiPropertiesConfigurationSource;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.user.internal.ConfiguredStringUserReferenceSerializer;
@@ -69,7 +72,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
     // Needed for the ConfiguredXXX component
     DefaultUserConfiguration.class,
-    XWikiPropertiesConfigurationSource.class
+    XWikiPropertiesConfigurationSource.class,
+    SystemConfigurationSource.class,
+    SystemEnvConfigurationSource.class,
+    SystemPropertiesConfigurationSource.class
 })
 @Inherited
 @ReferenceComponentList

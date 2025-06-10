@@ -19,26 +19,25 @@
 -->
 
 <!--
-  LayoutCard.vue is the main file for the Card layout component.
-  It displays data formatted as cards, with a title that can be
-  specified in the `titleProperty` property of its layout descriptor,
-  inside the Livedata configuration.
+  LayoutTable.vue is the main file for the Table layout component.
+  It displays data formatted as a table, with properties as columns
+  and entries as rows.
+  It contains a header row containing LivedataFilter componenents for each column.
 -->
 <template>
-  <div class="layout-cards">
+  <div class="layout-table">
 
     <!--
       The layout Topbar
       Add common layout utilities, like the dropdown menu, the refresh button,
       and the pagination.
-      It is also has the "select all" button
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataPagination />
+        <LivedataPagination side="left" />
       </template>
       <template #right>
-        <LivedataEntrySelectorAll v-if="isSelectionEnabled" />
+        <LivedataPagination side="right" />
         <LivedataDropdownMenu />
       </template>
     </LivedataTopbar>
@@ -49,65 +48,81 @@
     <!-- Loading bar -->
     <LayoutLoader />
 
+    <!-- Table layout root -->
+    <div class="layout-table-wrapper">
+      <table class="layout-table-root responsive-table">
 
-    <!-- Cards layout root -->
-    <div class="layout-table-root">
+        <!--
+          Table Header
+          Implement quick sort, filter, and property reorder
+        -->
+        <thead>
+        <!-- Table property names -->
+        <LayoutTableHeaderNames />
 
-      <!--
-        The cards (= the entries)
-        Implement property reorder
-      -->
-      <!--
+        <!-- Table filters -->
+        <LayoutTableHeaderFilters />
+        </thead>
+
+
+        <!-- Table Body -->
+        <tbody>
+        <!-- The rows (= the entries) -->
+        <!--
         We include the entry index in the key in case of inconsistent data, in this case duplicated entry IDs.
         That way even if two entries have the same id, the keys will not be equals.
-      -->
-      <LayoutCardsCard
-        v-for="(entry, idx) in entries"
-        :key="`card-${logic.getEntryId(entry)}-${idx}`"
-        :entry="entry"
-        :entry-idx="idx"
-      />
+        -->
+        <LayoutTableRow
+          v-for="(entry, idx) in entries"
+          :key="`table-${logic.getEntryId(entry)}-${idx}`"
+          :entry="entry"
+          :entry-idx="idx"
+        />
 
-      <!-- Component to create a new entry -->
-      <LayoutCardsNewCard v-if="canAddEntry" />
+        <!-- Component to create a new entry -->
+        <LayoutTableNewRow v-if="canAddEntry" />
 
+        </tbody>
+
+      </table>
     </div>
+
     <LivedataBottombar>
-      <div v-if="entriesFetched && entries.length === 0" class="noentries-card">
+      <div v-if="entriesFetched && entries.length === 0" class="noentries-table">
         {{ $t("livedata.bottombar.noEntries") }}
       </div>
       <LivedataPagination />
     </LivedataBottombar>
-
   </div>
 </template>
 
 
 <script>
-
 import LivedataTopbar from "../../LivedataTopbar.vue";
 import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
-import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
-import LayoutCardsCard from "./LayoutCardsCard.vue";
-import LayoutCardsNewCard from "./LayoutCardsNewCard.vue";
+import LayoutTableHeaderNames from "./LayoutTableHeaderNames.vue";
+import LayoutTableHeaderFilters from "./LayoutTableHeaderFilters.vue";
+import LayoutTableRow from "./LayoutTableRow.vue";
+import LayoutTableNewRow from "./LayoutTableNewRow.vue";
 import LayoutLoader from "../LayoutLoader.vue";
 import LivedataBottombar from "../../LivedataBottombar.vue";
 
 export default {
 
-  name: "layout-cards",
+  name: "layout-table",
 
   components: {
     LivedataBottombar,
     LivedataTopbar,
     LivedataDropdownMenu,
-    LivedataEntrySelectorAll,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,
-    LayoutCardsCard,
-    LayoutCardsNewCard,
+    LayoutTableHeaderNames,
+    LayoutTableHeaderFilters,
+    LayoutTableRow,
+    LayoutTableNewRow,
     LayoutLoader,
   },
 
@@ -123,9 +138,6 @@ export default {
     },
     entries() {
       return this.logic.data.data.entries;
-    },
-    isSelectionEnabled() {
-      return this.logic.isSelectionEnabled();
     },
     canAddEntry() {
       return this.logic.canAddEntry();
@@ -144,31 +156,46 @@ export default {
 
 <style>
 
-/*
-  The Cards Layout uses css grid to display its cards in a nice grid pattern
-  However, IE11 does not support a lot grid layouts, but does not support either
-  the `@supports` at-rule, so only browser that support at-rule (everyone but IE)
-  and display grid will use the following styles
-*/
-@supports (display: grid) {
+.layout-table-wrapper {
+  overflow: auto;
+}
 
-  /* Make the cards 30rem large, and display as many of them on one row */
-  .layout-cards .layout-table-root {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 30rem);
-    grid-auto-rows: min-content;
-    gap: 1.5rem;
-    grid-gap: 1.5rem; /* safari */
+.layout-table {
+
+  table {
+    height: 100%;
+  }
+
+  th {
+    border-bottom: unset;
+  }
+
+  .livedata-entry-selector-all .btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 2rem;
   }
 
 }
 
-.layout-cards .layout-loader {
-  margin-top: -0.5rem;
-  margin-bottom: 0.5rem;
+/* Responsive mode */
+@media screen and (max-width: var(--screen-xs-max)) {
+  .layout-table .responsive-table > thead {
+    /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use flex display
+      because we have two rows, property names and filters, that we want to display as two equally sized columns. */
+    display: flex;
+
+    > tr {
+      /* We want the property names column to have the same width as the filter column. */
+      flex: 1;
+      /* We need to set the width in order to be able to trim long property names. */
+      width: calc(50vw - var(--grid-gutter-width));
+    }
+  }
 }
 
-.noentries-card {
+.noentries-table {
   text-align: center;
   color: var(--text-muted);
   width: 100%;

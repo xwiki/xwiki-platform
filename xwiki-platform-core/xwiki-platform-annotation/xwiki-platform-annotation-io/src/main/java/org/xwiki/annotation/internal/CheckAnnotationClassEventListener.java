@@ -111,6 +111,9 @@ public class CheckAnnotationClassEventListener implements EventListener
             XWikiDocument annotationClassDocument =
                 deprecatedContext.getWiki().getDocument(annotationClassReference, deprecatedContext);
 
+            // Avoid modifying the cached document
+            annotationClassDocument = annotationClassDocument.clone();
+
             if (this.initializer.updateDocument(annotationClassDocument)) {
                 deprecatedContext.getWiki().saveDocument(annotationClassDocument,
                     "Automatically added missing annotation class fields required by the Annotation Application.",

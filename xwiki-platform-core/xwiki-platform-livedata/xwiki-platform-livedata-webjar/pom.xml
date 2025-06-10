@@ -27,7 +27,7 @@
     <artifactId>xwiki-platform-livedata</artifactId>
     <version>17.5.0-SNAPSHOT</version>
   </parent>
-  <packaging>webjar</packaging>
+  <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
   <name>XWiki Platform - Live Data - WebJar</name>
   <properties>
@@ -84,30 +84,9 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <!-- We keep the Vue files and the build configuration files in separate folders in the source tree but
-              we need them in the same folder when building the Vue components. -->
-            <id>copy-vue-resources</id>
+            <!-- Copy the remaining less file. Can be removed once XWIKI-23080 is done. -->
+            <id>copy-less-resources</id>
             <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/vue</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/main/vue</directory>
-                  <excludes>
-                    <exclude>dist</exclude>
-                    <exclude>node_modules</exclude>
-                  </excludes>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Copy the generated Vue components to the WebJar folder. -->
-            <id>copy-vue-components</id>
-            <phase>process-resources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
@@ -117,10 +96,7 @@
               </outputDirectory>
               <resources>
                 <resource>
-                  <directory>${project.build.directory}/vue/dist</directory>
-                </resource>
-                <resource>
-                  <directory>${project.build.directory}/vue/src/</directory>
+                  <directory>${project.build.directory}/node-src/src/</directory>
                   <includes>
                     <include>variables.less</include>
                   </includes>
@@ -129,74 +105,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <!-- Skip jsHint because we use ESLint through the frontend-maven-plugin -->
-      <plugin>
-        <groupId>org.xwiki.contrib</groupId>
-        <artifactId>jshint-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-lint</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.github.eirslett</groupId>
-        <artifactId>frontend-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>install-node-and-npm</id>
-            <goals>
-              <goal>install-node-and-npm</goal>
-            </goals>
-            <configuration>
-              <nodeVersion>${node.version}</nodeVersion>
-              <npmVersion>${npm.version}</npmVersion>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-install</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>ci</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-run-lint</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run lint</arguments>
-            </configuration>
-            <phase>test</phase>
-          </execution>
-          <execution>
-            <id>npm-run-test</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run test:unit</arguments>
-            </configuration>
-            <phase>test</phase>
-          </execution>
-          <execution>
-            <id>npm-run-build</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run build</arguments>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <workingDirectory>${project.build.directory}/vue</workingDirectory>
-        </configuration>
       </plugin>
     </plugins>
   </build>

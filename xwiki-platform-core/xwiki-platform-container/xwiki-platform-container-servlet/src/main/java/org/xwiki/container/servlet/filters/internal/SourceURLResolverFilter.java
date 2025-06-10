@@ -21,8 +21,6 @@ package org.xwiki.container.servlet.filters.internal;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import jakarta.servlet.Filter;
@@ -33,7 +31,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.HttpServletUtils;
@@ -43,8 +40,7 @@ import org.xwiki.container.servlet.HttpServletUtils;
  * URL.
  * 
  * @version $Id$
- * @since 17.4.0RC1
- * @since 16.10.9
+ * @since 17.5.0RC1
  */
 public class SourceURLResolverFilter implements Filter
 {
@@ -58,45 +54,113 @@ public class SourceURLResolverFilter implements Filter
      */
     public class SourceURLResolverRequest extends HttpServletRequestWrapper
     {
-        private final URI sourceURI;
+        private String superScheme;
 
-        private final StringBuffer requestURL;
+        private String superServerName;
+
+        private int superServerPort;
+
+        // HttpServletRequest#getRequestURL() returns a StringBuffer so we don't really have a choice here
+        @SuppressWarnings("java:S1149")
+        private StringBuffer superRequestURL;
+
+        private URL baseURL;
+
+        // HttpServletRequest#getRequestURL() returns a StringBuffer so we don't really have a choice here
+        @SuppressWarnings("java:S1149")
+        private StringBuffer requestURL;
 
         /**
          * @param request the request
-         * @param sourceURI the source URI resolved by XWiki
-         * @throws MalformedURLException when failing to get the current URL
          */
-        public SourceURLResolverRequest(HttpServletRequest request, URI sourceURI) throws MalformedURLException
+        public SourceURLResolverRequest(HttpServletRequest request)
         {
             super(request);
+        }
 
-            this.sourceURI = sourceURI;
-            this.requestURL = new StringBuffer(sourceURI.toString());
+        // We just want to know if something changed in the wrapped request, we don't need to actually compare the
+        // content of the Strings for that.
+        @SuppressWarnings("java:S4973")
+        private boolean superBaseURLChanged()
+        {
+            return this.superScheme != super.getScheme() || this.superServerName != super.getServerName()
+                || this.superServerPort != super.getServerPort();
+        }
+
+        private boolean checkBaseURL()
+        {
+            // Check if super reference changes (which would suggest the values changed and we should recalculate the
+            // URL)
+            if (superBaseURLChanged()) {
+                try {
+                    this.baseURL = HttpServletUtils.getSourceBaseURL((HttpServletRequest) getRequest());
+                } catch (MalformedURLException e) {
+                    LOGGER.error("Failed to resolve the source base URL, falling back to standard ServletRequest.", e);
+
+                    this.baseURL = null;
+                }
+
+                // Remember current super references
+                this.superScheme = super.getScheme();
+                this.superServerName = super.getServerName();
+                this.superServerPort = super.getServerPort();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private boolean checkURL()
+        {
+            if ((checkBaseURL() || this.superRequestURL != super.getRequestURL()) && this.baseURL != null) {
+                try {
+                    this.requestURL = new StringBuffer(new URL(this.baseURL, super.getRequestURI()).toString());
+                } catch (MalformedURLException e) {
+                    LOGGER.error("Failed to generate the source URL, falling back to standard ServletRequest.", e);
+
+                    this.requestURL = null;
+                }
+
+                // Remember current super references
+                this.superRequestURL = super.getRequestURL();
+
+                return true;
+            }
+
+            return false;
         }
 
         @Override
         public String getScheme()
         {
-            return this.sourceURI.getScheme();
+            checkBaseURL();
+
+            return this.baseURL != null ? this.baseURL.getProtocol() : super.getScheme();
         }
 
         @Override
         public String getServerName()
         {
-            return this.sourceURI.getHost();
+            checkBaseURL();
+
+            return this.baseURL != null ? this.baseURL.getHost() : super.getServerName();
         }
 
         @Override
         public int getServerPort()
         {
-            return this.sourceURI.getPort();
+            checkBaseURL();
+
+            return this.baseURL != null ? this.baseURL.getPort() : super.getServerPort();
         }
 
         @Override
         public StringBuffer getRequestURL()
         {
-            return this.requestURL;
+            checkURL();
+
+            return this.requestURL != null ? this.requestURL : super.getRequestURL();
         }
     }
 
@@ -107,14 +171,7 @@ public class SourceURLResolverFilter implements Filter
         ServletRequest filteredRequest = request;
 
         if (filteredRequest instanceof HttpServletRequest httpRequest) {
-            try {
-                filteredRequest = new SourceURLResolverRequest(httpRequest,
-                    new URL(HttpServletUtils.getSourceBaseURL(httpRequest), httpRequest.getRequestURI()).toURI());
-            } catch (URISyntaxException | MalformedURLException e) {
-                // It's very unlikely that the source URL would be invalid, but just ignore it in this case
-                LOGGER.warn("Failed to resolve the source URL ([{}]), falling back to standard ServletRequest.",
-                    ExceptionUtils.getRootCauseMessage(e));
-            }
+            filteredRequest = new SourceURLResolverRequest(httpRequest);
         }
 
         chain.doFilter(filteredRequest, response);

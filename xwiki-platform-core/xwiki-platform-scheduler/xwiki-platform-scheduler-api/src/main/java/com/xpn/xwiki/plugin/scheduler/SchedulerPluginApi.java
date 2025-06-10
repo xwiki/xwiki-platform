@@ -25,6 +25,7 @@ import java.util.List;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -55,6 +56,16 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     public SchedulerPluginApi(SchedulerPlugin plugin, XWikiContext context)
     {
         super(plugin, context);
+    }
+
+    /**
+     * @return true if the scheduler plugin is enabled on this instance
+     * @since 17.5.0RC1
+     */
+    @Unstable
+    public boolean isEnabled()
+    {
+        return getProtectedPlugin().isEnabled();
     }
 
     /**

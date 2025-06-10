@@ -75,6 +75,24 @@ public abstract class AbstractCommonsConfigurationSource extends AbstractPropert
 
     @Override
     @SuppressWarnings("unchecked")
+    public <T> T getPropertyInternal(String key, T defaultValue)
+    {
+        T result;
+        if (containsKey(key)) {
+            if (defaultValue != null) {
+                return getProperty(key, (Class<T>) defaultValue.getClass());
+            } else {
+                return getProperty(key);
+            }
+        } else {
+            result = defaultValue;
+        }
+
+        return result;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     protected <T> T getPropertyInternal(String key, Class<T> valueClass)
     {
         T result;

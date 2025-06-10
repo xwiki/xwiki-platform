@@ -1667,4 +1667,16 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Default is "true".
 # scheduler.enabled=false
 
+#-------------------------------------------------------------------------------------
+# REST API
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.5.0]
+#-# The default source for keyword search results at the space and wiki level in the REST API.
+#-# Supported values: database, solr
+#-# Before 17.5.0, the database provided the search results. Since 17.5.0, the default "solr" source is the default
+#-# which provides much better performance in particular for large installations and allows more flexible queries.
+#-# You can change this back to "database" to restore the old behavior.
+# rest.keywordSearchSource=solr
+
 $!xwikiPropertiesAdditionalProperties

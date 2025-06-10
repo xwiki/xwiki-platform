@@ -20,10 +20,7 @@
 package org.xwiki.search.solr.internal.rest;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,28 +28,13 @@ import javax.inject.Singleton;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.LocaleUtils;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.SecureQuery;
 import org.xwiki.query.solr.internal.SolrQueryExecutor;
-import org.xwiki.rest.Relations;
-import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.search.AbstractSearchSource;
-import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.SearchResult;
-import org.xwiki.rest.resources.pages.PageResource;
-import org.xwiki.rest.resources.pages.PageTranslationResource;
-import org.xwiki.search.solr.internal.api.FieldUtils;
-
-import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
@@ -67,11 +49,7 @@ public class SOLRSearchSource extends AbstractSearchSource
     protected QueryManager queryManager;
 
     @Inject
-    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
-
-    @Inject
-    @Named("local")
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+    private SearchResultConverter searchResultConverter;
 
     @Override
     public List<SearchResult> search(String queryString, String defaultWikiName, String wikis,
@@ -94,11 +72,8 @@ public class SOLRSearchSource extends AbstractSearchSource
         }
 
         Query query = this.queryManager.createQuery(queryString, SolrQueryExecutor.SOLR);
-
-        if (query instanceof SecureQuery) {
-            // Show only what the current user has the right to see
-            ((SecureQuery) query).checkCurrentUser(true);
-        }
+        // Show only what the current user has the right to see
+        ((SecureQuery) query).checkCurrentUser(true);
 
         List<String> fq = new ArrayList<String>();
 
@@ -118,7 +93,7 @@ public class SOLRSearchSource extends AbstractSearchSource
             } else if (strings.length > 1) {
                 StringBuilder builder = new StringBuilder();
                 for (String str : strings) {
-                    if (builder.length() > 0) {
+                    if (!builder.isEmpty()) {
                         builder.append(" OR ");
                     }
                     builder.append('\'');
@@ -153,65 +128,6 @@ public class SOLRSearchSource extends AbstractSearchSource
         // Limit
         query.setLimit(number).setOffset(start);
 
-        try {
-            QueryResponse response = (QueryResponse) query.execute().get(0);
-
-            SolrDocumentList documents = response.getResults();
-
-            for (SolrDocument document : documents) {
-                SearchResult searchResult = this.objectFactory.createSearchResult();
-
-                DocumentReference documentReference = this.solrDocumentReferenceResolver.resolve(document);
-                searchResult.setPageFullName(this.localEntityReferenceSerializer.serialize(documentReference));
-                searchResult.setWiki(documentReference.getWikiReference().getName());
-                searchResult.setSpace(this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
-                searchResult.setPageName(documentReference.getName());
-                searchResult.setVersion((String) document.get(FieldUtils.VERSION));
-
-                List<String> spaces = Utils.getSpaces(documentReference);
-
-                searchResult.setType("page");
-                searchResult.setId(Utils.getPageId(searchResult.getWiki(), spaces, searchResult.getPageName()));
-
-                searchResult.setScore(((Number) document.get(FieldUtils.SCORE)).floatValue());
-                searchResult.setAuthor((String) document.get(FieldUtils.AUTHOR));
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime((Date) document.get(FieldUtils.DATE));
-                searchResult.setModified(calendar);
-
-                if (withPrettyNames) {
-                    searchResult.setAuthorName((String) document.get(FieldUtils.AUTHOR_DISPLAY));
-                }
-
-                Locale docLocale = LocaleUtils.toLocale((String) document.get(FieldUtils.DOCUMENT_LOCALE));
-                Locale locale = LocaleUtils.toLocale((String) document.get(FieldUtils.LOCALE));
-
-                searchResult.setTitle((String) document.getFirstValue(
-                    FieldUtils.getFieldName(FieldUtils.TITLE, locale)));
-
-                String pageUri = null;
-                if (Locale.ROOT == docLocale) {
-                    pageUri = Utils.createURI(uriInfo.getBaseUri(), PageResource.class, searchResult.getWiki(),
-                        Utils.getSpacesURLElements(spaces), searchResult.getPageName()).toString();
-                } else {
-                    searchResult.setLanguage(docLocale.toString());
-                    pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, searchResult.getWiki(),
-                            Utils.getSpacesURLElements(spaces), searchResult.getPageName(), docLocale).toString();
-                }
-
-                Link pageLink = new Link();
-                pageLink.setHref(pageUri);
-                pageLink.setRel(Relations.PAGE);
-                searchResult.getLinks().add(pageLink);
-
-                result.add(searchResult);
-            }
-        } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Error performing solr search", e);
-        }
-
-        return result;
+        return this.searchResultConverter.getSolrSearchResults(withPrettyNames, query, uriInfo.getBaseUri(), false);
     }
 }

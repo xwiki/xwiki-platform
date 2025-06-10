@@ -154,11 +154,6 @@
       <artifactId>xwiki-platform-mail-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
@@ -216,7 +211,6 @@
                 org/xwiki/rest/internal/Utils.java,
                 org/xwiki/rest/internal/XWikiAuthentication.java,
                 org/xwiki/rest/internal/resources/BaseAttachmentsResource.java,
-                org/xwiki/rest/internal/resources/BaseSearchResult.java,
                 org/xwiki/rest/internal/resources/BrowserAuthenticationResource.java,
                 org/xwiki/rest/internal/resources/pages/PagesResourceImpl.java,
                 org/xwiki/rest/internal/resources/search/AbstractDatabaseSearchSource.java,

@@ -52,6 +52,9 @@
     <!-- GitHub related metadata -->
     <xwiki.github.repository>xwiki-platform</xwiki.github.repository>
 
+    <!-- xwiki-platform is directly released on the configured distributionManagement -->
+    <releaseProfiles>release</releaseProfiles>
+
     <!-- Dependencies versions -->
     <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
@@ -94,9 +97,6 @@
       org.xwiki.platform:.*/[${platform.version}]
     </xwiki.extension.recommendedVersions.platform>
     <xwiki.extension.recommendedVersions>${xwiki.extension.recommendedVersions.platform}</xwiki.extension.recommendedVersions>
-
-    <!-- Disable release staging and directly deploy on the configured distributionManagement -->
-    <xwiki.nexus.skipLocalStaging>true</xwiki.nexus.skipLocalStaging>
 
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
     <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>

@@ -352,7 +352,8 @@ define(
     '</div>',
 
   createMacroEditor = function(macroCall, macroDescriptorData) {
-    let macroDescriptor = macroDescriptorData.descriptor;
+    // We'll perform changes of value in the descriptor, so we want to use a clone not the original instance.
+    let macroDescriptor = structuredClone(macroDescriptorData.descriptor);
     let macroEditor = $(macroEditorTemplate);
     macroEditor.find('.macro-name').text(macroDescriptor.name);
     macroEditor.find('.macro-description').text(macroDescriptor.description);

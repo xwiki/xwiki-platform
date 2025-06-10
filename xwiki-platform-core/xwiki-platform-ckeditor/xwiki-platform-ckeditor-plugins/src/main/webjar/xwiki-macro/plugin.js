@@ -247,6 +247,7 @@
           macro.add(stopMacroComment);
           return macro;
         },
+        // FIXME: this doesn't look good anymore with MacroDescriptorUI
         getParameterType: function(name) {
           var descriptor = this.data.descriptor || {};
           if (name === undefined) {
@@ -459,25 +460,20 @@
 
                     // Retrieve required parameters.
                     macroService.getMacroDescriptor(macro.id.id).done(function (descriptor) {
-
                       // Show the insertion dialog if at least one of the parameters is mandatory.
-                      for (var param in descriptor.parameterDescriptorMap) {
-                        if (descriptor.parameterDescriptorMap[param].mandatory) {
-                          if (widget) {
-                            // Edit existing pre-inserted macro.
-                            widget.edit();
-                          } else {
-                            // Insert and edit macro.
-                            editor.execCommand("xwiki-macro", {
-                              name: macro.id.id
-                            });
-                          }
-                          return;
+                      if (descriptor.mandatoryNodes.length > 0) {
+                        if (widget) {
+                          // Edit existing pre-inserted macro.
+                          widget.edit();
+                        } else {
+                          // Insert and edit macro.
+                          editor.execCommand("xwiki-macro", {
+                            name: macro.id.id
+                          });
                         }
                       }
-
                       // Minimal insertion parameters
-                      var insertParam = {
+                      let insertParam = {
                         name: macro.id.id,
                         parameters: {},
                         // We consider the macro call to be inline if the macro supports inline mode, as indicated by
@@ -741,6 +737,8 @@
       }
       var updatingWidget = !!widget?.element;
       if (updatingWidget && widget.element.getName() === expectedElementName) {
+        // we remove all nested editable so that they're rebuilt.
+        this.cleanupEditables(widget);
         // We have edited a macro and the macro type (inline vs. block) didn't change.
         // We can safely update the existing macro widget.
         widget.setData(data);
@@ -794,6 +792,13 @@
       if (!skipRefresh) {
         // Refresh all the macros because a change in one macro can affect the output of the other macros.
         setTimeout(editor.execCommand.bind(editor, 'xwiki-refresh'), 0);
+      }
+    },
+
+    cleanupEditables: function (widget) {
+      // TODO: we should only remove the editables that have been modified in the dialog
+      for (let item in widget.editables) {
+        widget.editables[item].$.remove();
       }
     },
 

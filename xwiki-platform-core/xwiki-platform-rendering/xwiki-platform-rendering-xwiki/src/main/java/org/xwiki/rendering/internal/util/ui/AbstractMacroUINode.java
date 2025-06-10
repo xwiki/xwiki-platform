@@ -27,7 +27,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * Abstract representation of a node in {@link MacroDescriptorUI}.
  *
  * @version $Id$
- * @since 17.5.0RC1.
+ * @since 17.5.0RC1
  */
 public abstract class AbstractMacroUINode
 {

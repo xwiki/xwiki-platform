@@ -66,16 +66,31 @@ public class MacroUINodeComparator implements Comparator<AbstractMacroUINode>
     private int compareMacroUINodeParametersWhenNoOrder(MacroUINodeParameter paramNode1,
         MacroUINodeParameter paramNode2)
     {
-        if (paramNode1.isHidden() && !paramNode2.isHidden()
-            || paramNode1.isDeprecated() && !paramNode2.isDeprecated()
-            || paramNode1.isAdvanced() && !paramNode2.isAdvanced()) {
+        if (isFirstParamHidden(paramNode1, paramNode2)
+            || isFirstParamDeprecated(paramNode1, paramNode2)
+            || isFirstParamAdvanced(paramNode1, paramNode2)) {
             return 1;
-        } else if (!paramNode1.isHidden() && paramNode2.isHidden()
-            || !paramNode1.isDeprecated() && paramNode2.isDeprecated()
-            || !paramNode1.isAdvanced() && paramNode2.isAdvanced()) {
+        } else if (isFirstParamHidden(paramNode2, paramNode1)
+            || isFirstParamDeprecated(paramNode2, paramNode1)
+            || isFirstParamAdvanced(paramNode2, paramNode1)) {
             return -1;
         } else {
             return paramNode1.getId().compareTo(paramNode2.getId());
         }
+    }
+
+    private boolean isFirstParamHidden(MacroUINodeParameter node1, MacroUINodeParameter node2)
+    {
+        return node1.isHidden() && !node2.isHidden();
+    }
+
+    private boolean isFirstParamDeprecated(MacroUINodeParameter node1, MacroUINodeParameter node2)
+    {
+        return node1.isDeprecated() && !node2.isDeprecated();
+    }
+
+    private boolean isFirstParamAdvanced(MacroUINodeParameter node1, MacroUINodeParameter node2)
+    {
+        return node1.isAdvanced() && !node2.isAdvanced();
     }
 }

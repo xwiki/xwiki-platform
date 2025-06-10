@@ -37,6 +37,8 @@ import org.xwiki.rest.model.jaxb.Tags;
 import org.xwiki.rest.resources.pages.PageTagsResource;
 import org.xwiki.rest.resources.tags.PagesForTagsResource;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -101,8 +103,10 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
                 tagNames.add(tag.getName());
             }
 
-            XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
-                Utils.getXWikiContext(componentManager));
+            XWikiContext xcontext = getXWikiContext();
+            XWiki xwiki = xcontext.getWiki();
+
+            XWikiDocument xwikiDocument = xwiki.getDocument(doc.getDocumentReference(), xcontext);
 
             // Avoid modifying the cached document
             xwikiDocument = xwikiDocument.clone();
@@ -110,24 +114,23 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
             BaseObject xwikiObject = xwikiDocument.getObject(TAG_CLASS, 0);
 
             if (xwikiObject == null) {
-                int objectNumber = xwikiDocument.createNewObject(TAG_CLASS, Utils.getXWikiContext(componentManager));
+                int objectNumber = xwikiDocument.createNewObject(TAG_CLASS, xcontext);
                 xwikiObject = xwikiDocument.getObject(TAG_CLASS, objectNumber);
                 if (xwikiObject == null) {
                     throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
                 }
 
                 // We must initialize all the fields to an empty value in order to correctly create the object
-                BaseClass xwikiClass = Utils.getXWiki(componentManager).getClass(xwikiObject.getClassName(),
-                    Utils.getXWikiContext(componentManager));
+                BaseClass xwikiClass = xwiki.getClass(xwikiObject.getClassName(), xcontext);
                 for (Object propertyNameObject : xwikiClass.getPropertyNames()) {
                     String propertyName = (String) propertyNameObject;
-                    xwikiObject.set(propertyName, "", Utils.getXWikiContext(componentManager));
+                    xwikiObject.set(propertyName, "", xcontext);
                 }
             }
 
-            xwikiObject.set(PROPERTY_TAGS, tagNames, Utils.getXWikiContext(componentManager));
+            xwikiObject.set(PROPERTY_TAGS, tagNames, xcontext);
 
-            doc.save("", Boolean.TRUE.equals(minorRevision));
+            xwiki.saveDocument(xwikiDocument, "", Boolean.TRUE.equals(minorRevision), getXWikiContext());
 
             return Response.status(Status.ACCEPTED).entity(tags).build();
         } catch (XWikiException e) {

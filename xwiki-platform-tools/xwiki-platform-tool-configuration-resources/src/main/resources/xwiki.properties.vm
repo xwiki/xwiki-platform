@@ -1665,6 +1665,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Disabling the scheduler is often used as a workaround to avoid duplicates in a cluster.
 #-# 
 #-# Default is "true".
-# shceduler.enabled=false
+# scheduler.enabled=false
 
 $!xwikiPropertiesAdditionalProperties

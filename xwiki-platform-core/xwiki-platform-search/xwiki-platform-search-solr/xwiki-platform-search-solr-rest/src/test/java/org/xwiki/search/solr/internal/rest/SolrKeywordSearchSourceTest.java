@@ -17,17 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.internal.resources.wikis;
+package org.xwiki.search.solr.internal.rest;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.inject.Provider;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -35,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
@@ -42,8 +40,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.SecureQuery;
+import org.xwiki.rest.internal.resources.KeywordSearchOptions;
+import org.xwiki.rest.internal.resources.KeywordSearchScope;
+import org.xwiki.rest.internal.resources.wikis.WikiSearchResourceImpl;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -57,8 +58,6 @@ import org.xwiki.user.UserPropertiesResolver;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -74,10 +73,18 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ComponentList(DefaultSolrUtils.class)
-class WikiSearchResourceImplTest
+class SolrKeywordSearchSourceTest
 {
+    private static final KeywordSearchOptions DEFAULT_OPTIONS = KeywordSearchOptions.builder()
+        .wikiName("wiki")
+        .searchScopes(List.of(KeywordSearchScope.TITLE))
+        .number(10)
+        .order("asc")
+        .withPrettyNames(Boolean.TRUE)
+        .build();
+
     @InjectMockComponents
-    private WikiSearchResourceImpl wikiSearchResource;
+    private SolrKeywordSearchSource searchSource;
 
     @MockComponent
     private Provider<XWikiContext> xwikiContextProvider;
@@ -101,13 +108,10 @@ class WikiSearchResourceImplTest
     private ConverterManager converterManager;
 
     @Mock
-    private Query query;
+    private SecureQuery query;
 
     @Mock
     private UserProperties userProperties;
-
-    @Mock
-    private UriInfo uriInfo;
 
     private final SolrDocumentList results = new SolrDocumentList();
 
@@ -124,23 +128,18 @@ class WikiSearchResourceImplTest
     @BeforeEach
     void configure() throws Exception
     {
-        FieldUtils.writeField(this.wikiSearchResource, "uriInfo", this.uriInfo, true);
-        when(this.uriInfo.getQueryParameters()).thenReturn(mock());
-        when(this.uriInfo.getAbsolutePath()).thenReturn(URI.create("https://mywiki"));
-        when(this.uriInfo.getBaseUri()).thenReturn(URI.create("https://mywiki"));
-
         // Let the context "remember" the set wiki.
         Mutable<String> wikiId = new MutableObject<>("s1");
         when(this.xwikiContext.getWikiId()).then(invocation -> wikiId.getValue());
         doAnswer(invocation -> {
             wikiId.setValue(invocation.getArgument(0));
             return null;
-        }).when(this.xwikiContext).setWikiId(any());
+        }).when(this.xwikiContext).setWikiId(ArgumentMatchers.any());
 
         when(this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(this.userProperties);
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new DocumentReference("xwiki", "Main", "WebHome"));
-        when(this.queryManager.createQuery(any(), any())).thenReturn(this.query);
+        when(this.queryManager.createQuery(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(this.query);
         QueryResponse queryResponse = mock();
         when(this.query.execute()).thenReturn(List.of(queryResponse));
         when(queryResponse.getResults()).thenReturn(this.results);
@@ -149,7 +148,7 @@ class WikiSearchResourceImplTest
     @Test
     void searchInTitle() throws Exception
     {
-        this.wikiSearchResource.search("wiki", "my search", List.of("title"), 10, 0, null, "asc", true, false);
+        this.searchSource.search("my search", DEFAULT_OPTIONS, mock());
         verify(this.queryManager).createQuery("(title:my\\ search OR title_:search*)^4", "solr");
         verify(this.query).bindValue("fq", List.of("type:DOCUMENT", "hidden:false", "wiki:wiki"));
     }
@@ -157,14 +156,18 @@ class WikiSearchResourceImplTest
     @Test
     void searchInContent() throws Exception
     {
-        this.wikiSearchResource.search("wiki", "my search", List.of("content"), 10, 0, null, "asc", true, true);
+        KeywordSearchOptions searchOptions =
+            DEFAULT_OPTIONS.but().searchScopes(List.of(KeywordSearchScope.CONTENT)).build();
+        this.searchSource.search("my search", searchOptions, mock());
         verify(this.queryManager).createQuery("doccontent:my\\ search", "solr");
     }
 
     @Test
     void searchInNameAndContent() throws Exception
     {
-        this.wikiSearchResource.search("wiki", "my search", List.of("name", "content"), 10, 0, null, "asc", true, true);
+        KeywordSearchOptions searchOptions =
+            DEFAULT_OPTIONS.but().searchScopes(List.of(KeywordSearchScope.NAME, KeywordSearchScope.CONTENT)).build();
+        this.searchSource.search("my search", searchOptions, mock());
         verify(this.queryManager).createQuery("spaces:my\\ search OR spaces:search*"
             + " OR (name:my\\ search OR name:search* -name_exact:WebHome)^2"
             + " OR (reference:document\\:wiki\\:my\\ search)^1000"
@@ -176,8 +179,8 @@ class WikiSearchResourceImplTest
     void searchRespectsHidden(boolean showHidden) throws Exception
     {
         when(this.userProperties.displayHiddenDocuments()).thenReturn(showHidden);
-        this.wikiSearchResource.search("wiki", "my search", List.of("title"), 10, 0, null, "asc", true, true);
+        this.searchSource.search("my search", DEFAULT_OPTIONS, mock());
         verify(this.query, showHidden ? never() : times(1)).bindValue(eq("fq"),
-            argThat(arg -> arg instanceof List<?> list && list.contains("hidden:false")));
+            ArgumentMatchers.argThat(arg -> arg instanceof List<?> list && list.contains("hidden:false")));
     }
 }

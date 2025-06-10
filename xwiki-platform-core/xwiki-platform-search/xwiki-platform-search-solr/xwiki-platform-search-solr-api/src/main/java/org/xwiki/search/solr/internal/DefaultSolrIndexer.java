@@ -581,14 +581,15 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         return true;
     }
 
-    private void applyDeletion(IndexQueueEntry queueEntry)
+    private void applyDeletion(IndexQueueEntry queueEntry) throws SolrIndexerException
     {
+        String id = queueEntry.reference == null ? null : this.solrRefereceResolver.getId(queueEntry.reference);
         this.solrClientExecutor.execute(() -> {
             try {
-                if (queueEntry.reference == null) {
+                if (id == null) {
                     this.solrInstance.deleteByQuery(queueEntry.deleteQuery);
                 } else {
-                    this.solrInstance.delete(this.solrRefereceResolver.getId(queueEntry.reference));
+                    this.solrInstance.delete(id);
                 }
             } catch (Exception e) {
                 this.logger.error("Failed to delete document [{}] from the Solr server", queueEntry, e);

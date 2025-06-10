@@ -44,6 +44,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
+import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 
 /**
  * @version $Id$
@@ -73,15 +74,17 @@ public class PageHistoryResourceImpl extends XWikiResource implements PageHistor
         History history = new History();
 
         try {
+            String validOrder = HqlQueryUtils.getValidQueryOrder(order, "desc");
+
             // Note that the query is made to work with Oracle which treats empty strings as null.
             String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
                 + " from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
                 + " doc.space = :space and doc.name = :name and (doc.language = '' or doc.language is null)"
-                + " order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s", order, order, order);
+                + " order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s", validOrder, validOrder, validOrder);
 
             List<Object> queryResult = null;
-            queryResult = queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceId).bindValue("name",
-                    pageName).setLimit(number).setOffset(start).setWiki(wikiName).execute();
+            queryResult = this.queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceId)
+                .bindValue("name", pageName).setLimit(number).setOffset(start).setWiki(wikiName).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;

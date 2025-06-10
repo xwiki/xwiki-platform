@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal.store.hibernate.query;
 
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,6 +47,8 @@ public final class HqlQueryUtils
     private static final String COMMA = ",";
 
     private static final Pattern LEGACY_ORDINAL_PARAMS_PATTERN = Pattern.compile("([=\\s,\\(<>])\\?([=\\s,\\)<>]|$)");
+
+    private static final Set<String> VALID_ORDER = Set.of("asc", "desc");
 
     private HqlQueryUtils()
     {
@@ -202,5 +205,22 @@ public final class HqlQueryUtils
         }
 
         return columns.toString();
+    }
+
+    /**
+     * @param order the order
+     * @param def the default value to return if the value is not valid
+     * @return the valid value
+     * @since 17.5.0RC1
+     * @since 17.4.2
+     * @since 16.10.9
+     */
+    public static String getValidQueryOrder(String order, String def)
+    {
+        if (order == null || !VALID_ORDER.contains(order.toLowerCase())) {
+            return def;
+        }
+
+        return order;
     }
 }

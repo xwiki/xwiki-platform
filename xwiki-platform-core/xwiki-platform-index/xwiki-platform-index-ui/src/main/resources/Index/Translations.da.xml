@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>index.deletedDocuments.deleteAll=Slet alt
 index.administration.remainingTasks.heading=Resterende dokumentanalyser
-index.administration.remainingTasks.emptyQueue=Ikke flere dokumentanalyser
+index.administration.remainingTasks.emptyQueue=Ikke flere dokumentanalyser.
 admin.documentanalysis=Dokumentanalyse
 
 #######################################

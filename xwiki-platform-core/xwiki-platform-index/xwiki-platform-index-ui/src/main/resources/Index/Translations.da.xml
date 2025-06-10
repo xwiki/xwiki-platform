@@ -36,7 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Områder
+  <content>index.deletedDocuments.deleteAll=Slet alt
+index.administration.remainingTasks.heading=Resterende dokumentanalyser
+index.administration.remainingTasks.emptyQueue=Ikke flere dokumentanalyser
+admin.documentanalysis=Dokumentanalyse
+
+#######################################
+## until 16.3.0RC1
+#######################################
+
+index.spacesMacro.title=Områder
 index.spacesMacro.spaceIndex.title=Se områdeindhold
 index.spacesMacro.spaceIndex.alt=Indholdsfortegnelse
 index.spacesMacro.spaceAdministration.title=Se område-administration
@@ -44,5 +53,5 @@ index.spacesMacro.spaceAdministration.alt=Administrer område
 index.spacesMacro.createSpace.link=Opret nyt område
 index.spacesMacro.createSpace.defaultSpaceName=Navn på område
 index.spacesMacro.createSpace.submit=Opret
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+</content>
 </xwikidoc>

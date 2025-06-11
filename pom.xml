@@ -715,7 +715,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>carte-util</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>3.6.0</version>
+        <version>3.7</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>

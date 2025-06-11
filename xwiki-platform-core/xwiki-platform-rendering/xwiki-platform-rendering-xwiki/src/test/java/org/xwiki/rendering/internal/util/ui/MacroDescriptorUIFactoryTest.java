@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.util;
+package org.xwiki.rendering.internal.util.ui;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,11 +32,6 @@ import org.xwiki.model.reference.EntityReferenceString;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.properties.PropertyGroupDescriptor;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.internal.util.ui.MacroDescriptorUI;
-import org.xwiki.rendering.internal.util.ui.AbstractMacroUINode;
-import org.xwiki.rendering.internal.util.ui.MacroDescriptorUIFactory;
-import org.xwiki.rendering.internal.util.ui.MacroUINodeGroup;
-import org.xwiki.rendering.internal.util.ui.MacroUINodeParameter;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -50,14 +45,26 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link MacroDescriptorUIFactory}.
+ *
+ * @version $Id$
+ * @since 17.5.0RC1
+ */
 @ComponentTest
-class MacroParametersHelperTest
+class MacroDescriptorUIFactoryTest
 {
     @InjectMockComponents
     private MacroDescriptorUIFactory helper;
 
     @MockComponent
     private ContextualLocalizationManager localizationManager;
+
+    private enum MyEnum {
+        FOO,
+        BAR,
+        THING
+    }
 
     @Test
     void buildMacroDescriptorUI()
@@ -73,7 +80,7 @@ class MacroParametersHelperTest
         when(param2.getOrder()).thenReturn(2);
         when(param2.getId()).thenReturn("param2");
         when(param2.getName()).thenReturn("param2Name");
-        when(param2.getDisplayType()).thenReturn(String.class);
+        when(param2.getDisplayType()).thenReturn(Boolean.class);
 
         ParameterDescriptor param3 = mock(ParameterDescriptor.class);
         when(param3.isDeprecated()).thenReturn(true);
@@ -98,7 +105,7 @@ class MacroParametersHelperTest
         when(param5.getName()).thenReturn("param5Name");
         when(param5.getOrder()).thenReturn(5);
         when(param5.isMandatory()).thenReturn(true);
-        when(param5.getDisplayType()).thenReturn(String.class);
+        when(param5.getDisplayType()).thenReturn(MyEnum.class);
 
         ParameterDescriptor param6 = mock(ParameterDescriptor.class);
         when(param6.getId()).thenReturn("param6");
@@ -181,7 +188,7 @@ class MacroParametersHelperTest
         when(macroDescriptor.getId()).thenReturn(new MacroId("myMacro"));
         ContentDescriptor contentDescriptor = mock(ContentDescriptor.class);
         when(macroDescriptor.getContentDescriptor()).thenReturn(contentDescriptor);
-        when(contentDescriptor.isMandatory()).thenReturn(true);
+        when(contentDescriptor.isMandatory()).thenReturn(false);
         when(contentDescriptor.getType()).thenReturn(new DefaultParameterizedType(null, List.class, Block.class));
 
         Map<String, ParameterDescriptor> descriptorMap = new LinkedHashMap<>();
@@ -218,8 +225,9 @@ class MacroParametersHelperTest
         nodeParam2.setName("rendering.macro.myMacro.parameter.param2.nameTranslated");
         nodeParam2.setDescription("rendering.macro.myMacro.parameter.param2.descriptionTranslated");
         nodeParam2.setOrder(2);
-        nodeParam2.setDisplayType("java.lang.String");
-        nodeParam2.setEditTemplate("<input type=\"text\" name=\"param2\" />");
+        nodeParam2.setDisplayType("java.lang.Boolean");
+        nodeParam2.setEditTemplate("<input type=\"checkbox\" name=\"param2\" value=\"true\"/>\n"
+            + "<input type=\"hidden\" name=\"param2\" value=\"false\"/>");
 
         MacroUINodeParameter nodeParam3 = new MacroUINodeParameter("param3");
         nodeParam3.setName("rendering.macro.myMacro.parameter.param3.nameTranslated");
@@ -241,8 +249,13 @@ class MacroParametersHelperTest
         nodeParam5.setDescription("rendering.macro.myMacro.parameter.param5.descriptionTranslated");
         nodeParam5.setOrder(5);
         nodeParam5.setMandatory(true);
-        nodeParam5.setDisplayType("java.lang.String");
-        nodeParam5.setEditTemplate("<input type=\"text\" name=\"param5\" />");
+        nodeParam5.setCaseInsensitive(true);
+        nodeParam5.setDisplayType("org.xwiki.rendering.internal.util.ui.MacroDescriptorUIFactoryTest$MyEnum");
+        nodeParam5.setEditTemplate("<select name=\"param5\">"
+            + "<option value=\"FOO\">rendering.macro.myMacro.parameter.param5.value.FOOTranslated</option>"
+            + "<option value=\"BAR\">rendering.macro.myMacro.parameter.param5.value.BARTranslated</option>"
+            + "<option value=\"THING\">rendering.macro.myMacro.parameter.param5.value.THINGTranslated</option>"
+            + "</select>");
 
         MacroUINodeParameter nodeParam6 = new MacroUINodeParameter("param6");
         nodeParam6.setName("rendering.macro.myMacro.parameter.param6.nameTranslated");
@@ -323,7 +336,7 @@ class MacroParametersHelperTest
         MacroUINodeParameter nodeContent = new MacroUINodeParameter("$content");
         nodeContent.setName("rendering.macroContentTranslated");
         nodeContent.setDescription("rendering.macro.myMacrocontent.descriptionTranslated");
-        nodeContent.setMandatory(true);
+        nodeContent.setMandatory(false);
         nodeContent.setDisplayType("java.util.List<org.xwiki.rendering.block.Block>");
         nodeContent.setEditTemplate("<textarea name=\"$content\" rows=\"7\"></textarea>");
         nodeContent.setOrder(0);
@@ -353,6 +366,7 @@ class MacroParametersHelperTest
         defaultGroupNode.setName("rendering.macro.config.defaultOptionalGroup.nameTranslated");
         defaultGroupNode.setOrder(0);
         defaultGroupNode.setChildren(List.of(
+            "PARAMETER:$content",
             "PARAMETER:param2",
             "PARAMETER:param3",
             "PARAMETER:param11",
@@ -368,7 +382,6 @@ class MacroParametersHelperTest
             .setDescription("rendering.macro.myMacro.descriptionTranslated");
 
         expectedMacroDescriptorUI.setMandatoryNodes(List.of(
-            "PARAMETER:$content",
             "PARAMETER:param1", // mandatory and order 1
             "FEATURE:myFeature", // mandatory feature with best order
             "PARAMETER:param5",
@@ -515,7 +528,22 @@ class MacroParametersHelperTest
 
         MacroUINodeParameter typeNode = new MacroUINodeParameter("type")
             .setDisplayType("org.xwiki.model.EntityType")
-            .setEditTemplate("<input type=\"text\" name=\"type\" />")
+            .setEditTemplate("<select name=\"type\">"
+                + "<option value=\"WIKI\">WIKI</option>"
+                + "<option value=\"SPACE\">SPACE</option>"
+                + "<option value=\"DOCUMENT\">DOCUMENT</option>"
+                + "<option value=\"ATTACHMENT\">ATTACHMENT</option>"
+                + "<option value=\"OBJECT\">OBJECT</option>"
+                + "<option value=\"OBJECT_PROPERTY\">OBJECT_PROPERTY</option>"
+                + "<option value=\"CLASS_PROPERTY\">CLASS_PROPERTY</option>"
+                + "<option value=\"BLOCK\">BLOCK</option>"
+                + "<option value=\"PAGE\">PAGE</option>"
+                + "<option value=\"PAGE_ATTACHMENT\">PAGE_ATTACHMENT</option>"
+                + "<option value=\"PAGE_OBJECT\">PAGE_OBJECT</option>"
+                + "<option value=\"PAGE_OBJECT_PROPERTY\">PAGE_OBJECT_PROPERTY</option>"
+                + "<option value=\"PAGE_CLASS_PROPERTY\">PAGE_CLASS_PROPERTY</option>"
+                + "</select>")
+            .setCaseInsensitive(true)
             .setAdvanced(true)
             .setHidden(true);
 
@@ -525,9 +553,12 @@ class MacroParametersHelperTest
             .setHidden(true);
 
         MacroUINodeParameter authorNode = new MacroUINodeParameter("author")
-            .setDisplayType("org.xwiki.rendering.internal.util.MacroParametersHelperTest$TestEnum")
-            .setCaseInsensitive(false) // FIXME: should be true
-            .setEditTemplate("<input type=\"text\" name=\"author\" />")
+            .setDisplayType("org.xwiki.rendering.internal.util.ui.MacroDescriptorUIFactoryTest$TestEnum")
+            .setCaseInsensitive(true)
+            .setEditTemplate("<select name=\"author\">"
+                + "<option value=\"VALUE1\">VALUE1</option>"
+                + "<option value=\"VALUE2\">VALUE2</option>"
+                + "</select>")
             .setAdvanced(true);
 
         MacroUINodeGroup stringReferenceGroup = new MacroUINodeGroup("stringReference")

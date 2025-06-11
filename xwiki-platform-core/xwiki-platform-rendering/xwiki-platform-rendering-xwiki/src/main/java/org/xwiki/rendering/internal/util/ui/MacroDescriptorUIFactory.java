@@ -57,25 +57,17 @@ import org.xwiki.velocity.tools.EscapeTool;
 public class MacroDescriptorUIFactory
 {
     private static final String BOOLEAN_TEMPLATE_FALLBACK = """
-            <input type="checkbox" name="%1$s" value="true"/>
-            <input type="hidden" name="%1$s" value="false"/>
+        <input type="checkbox" name="%1$s" value="true"/>
+        <input type="hidden" name="%1$s" value="false"/>
         """;
 
-    private static final String ENUM_SELECT_TEMPLATE_FALLBACK = """
-            <select name="%s">%s</select>
-        """;
+    private static final String ENUM_SELECT_TEMPLATE_FALLBACK = "<select name=\"%s\">%s</select>";
 
-    private static final String ENUM_OPTION_TEMPLATE_FALLBACK = """
-            <option value="%s">%s</option>
-        """;
+    private static final String ENUM_OPTION_TEMPLATE_FALLBACK = "<option value=\"%s\">%s</option>";
 
-    private static final String TEXT_TEMPLATE_FALLBACK = """
-        <input type="text" name="%s" />
-        """;
+    private static final String TEXT_TEMPLATE_FALLBACK = "<input type=\"text\" name=\"%s\" />";
 
-    private static final String CONTENT_TEMPLATE = """
-        <textarea name="$content" rows="7"></textarea>
-        """;
+    private static final String CONTENT_TEMPLATE = "<textarea name=\"$content\" rows=\"7\"></textarea>";
 
     private static final String DEFAULT_GROUP_OPTIONALS_ID = "defaultOptionalGroup";
 
@@ -140,7 +132,7 @@ public class MacroDescriptorUIFactory
                 .setDisplayType(parameterDescriptor.getDisplayType().getTypeName())
                 .setDefaultValue(parameterDescriptor.getDefaultValue())
                 .setEditTemplate(getEditTemplate(parameterDescriptor, parameterTranslationKey))
-                .setCaseInsensitive(parameterDescriptor.getDisplayType() instanceof Enum)
+                .setCaseInsensitive(isEnum(parameterDescriptor.getDisplayType()))
                 .setName(getParameterTranslation(parameterTranslationKey + DOT_NAME, parameterDescriptor.getName()))
                 .setDescription(getParameterTranslation(parameterTranslationKey + DOT_DESCRIPTION,
                     parameterDescriptor.getDescription()))
@@ -335,15 +327,20 @@ public class MacroDescriptorUIFactory
         return result.trim();
     }
 
+    private boolean isEnum(Type displayType)
+    {
+        return (displayType instanceof Class classType && classType.isEnum());
+    }
+
     private String getEditTemplateFallback(ParameterDescriptor parameterDescriptor, String parameterTranslationKey)
     {
         Type parameterType = parameterDescriptor.getDisplayType();
         String result;
         if (parameterType == Boolean.class) {
             result = String.format(BOOLEAN_TEMPLATE_FALLBACK, escapeTool.xml(parameterDescriptor.getId()));
-        } else if (parameterType instanceof Enum enumType) {
+        } else if (isEnum(parameterType)) {
             StringBuilder options = new StringBuilder();
-            for (Object enumConstant : enumType.getDeclaringClass().getEnumConstants()) {
+            for (Object enumConstant : ((Class) parameterType).getEnumConstants()) {
                 String name = ((Enum) enumConstant).name();
                 String label = getParameterTranslation(parameterTranslationKey + ".value." + name, name);
                 options.append(String.format(ENUM_OPTION_TEMPLATE_FALLBACK, escapeTool.xml(name),

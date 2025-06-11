@@ -32,10 +32,13 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
+import org.xwiki.rendering.internal.util.ui.MacroDescriptorUI;
+import org.xwiki.rendering.internal.util.ui.MacroDescriptorUIFactory;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
+import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
@@ -95,6 +98,9 @@ class RenderingScriptServiceTest
 
     @MockComponent
     private MacroIdFactory macroIdFactory;
+
+    @MockComponent
+    private MacroDescriptorUIFactory macroDescriptorUIFactory;
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -312,5 +318,27 @@ class RenderingScriptServiceTest
         MacroId macroId = new MacroId("macroId");
         this.renderingScriptService.getMacroCategories(macroId);
         verify(this.macroCategoryManager).getMacroCategories(macroId);
+    }
+
+    @Test
+    void getMacroDescriptorUI() throws ParseException, MacroLookupException
+    {
+        String macroIdString = "macroId";
+        when(this.macroIdFactory.createMacroId(macroIdString)).thenReturn(null);
+        assertNull(this.renderingScriptService.getMacroDescriptorUI(macroIdString));
+
+        MacroId macroId = mock(MacroId.class);
+        when(this.macroIdFactory.createMacroId(macroIdString)).thenReturn(macroId);
+        when(this.macroManager.exists(macroId, true)).thenReturn(false);
+        assertNull(this.renderingScriptService.getMacroDescriptorUI(macroIdString));
+
+        when(this.macroManager.exists(macroId, true)).thenReturn(true);
+        MacroDescriptor macroDescriptor = mock(MacroDescriptor.class);
+        Macro macro = mock(Macro.class);
+        when(macro.getDescriptor()).thenReturn(macroDescriptor);
+        when(this.macroManager.getMacro(macroId)).thenReturn(macro);
+        MacroDescriptorUI macroDescriptorUI = mock(MacroDescriptorUI.class);
+        when(this.macroDescriptorUIFactory.buildMacroDescriptorUI(macroDescriptor)).thenReturn(macroDescriptorUI);
+        assertEquals(macroDescriptorUI, this.renderingScriptService.getMacroDescriptorUI(macroIdString));
     }
 }

@@ -49,8 +49,9 @@
      We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
      Once this file is migrated to native CSS, this hack can be removed. */
   &.hideleft {
-    /* We hide panels only when the screen is small enough.
-        Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. */
+    /* When the screen is small enough, we keep panels shown.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
+      ie. this media query does not short-circuit the admin preference. */
     @media (min-width: @screen-md-min) {
       -/**/-panel-column-left-width: 0;
 
@@ -69,8 +70,9 @@
   }
 
   &.hideright {
-    /* We hide panels only when the screen is small enough.
-        Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. */
+    /* When the screen is small enough, we keep panels shown.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
+      ie. this media query does not short-circuit the admin preference. */
     @media (min-width: @screen-md-min) {
       -/**/-panel-column-right-width: 0;
 
@@ -89,8 +91,9 @@
   }
 
   &.hidelefthideright {
-    /* We hide panels only when the screen is small enough.
-      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. */
+    /* When the screen is small enough, we keep panels shown.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
+      ie. this media query does not short-circuit the admin preference. */
     @media (min-width: @screen-md-min) {
       -/**/-panel-column-left-width: 0;
       -/**/-panel-column-right-width: 0;

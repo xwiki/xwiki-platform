@@ -277,6 +277,7 @@
         <algorithm/>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>smtp_server_password</name>
         <number>11</number>
         <picker>0</picker>

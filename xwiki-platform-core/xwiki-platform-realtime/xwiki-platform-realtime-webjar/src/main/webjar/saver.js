@@ -408,7 +408,7 @@ define('xwiki-realtime-saver', [
       };
       $(form).on('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
       this._revertList.push(() => {
-        $(document).off('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
+        $(form).off('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
       });
     }
 
@@ -545,9 +545,22 @@ define('xwiki-realtime-saver', [
       }
 
       const form = document.getElementById(this._config.formId);
-      const submitResultPromise = this._getSubmitResult(form);
+      const removeListeners = [];
+      const submitResultPromise = this._getSubmitResult(form, removeListeners);
 
+      let savePrevented = true;
+      $(button).on('xwiki:actions:save.realtime-saver', event => {
+        savePrevented = event.isDefaultPrevented();
+      });
       $(button).click();
+      $(button).off('xwiki:actions:save.realtime-saver');
+      if (savePrevented) {
+        // The save is prevented if the form has invalid data (e.g. missing mandatory title). In this case the
+        // xwiki:document:saved and xwiki:document:saveFailed events are not triggered, so we need to remove the
+        // corresponding event listeners and reject the save.
+        removeListeners.forEach(removeListener => removeListener());
+        throw new Error('Save prevented. Verify that the form has valid data.');
+      }
 
       this._afterSave(await submitResultPromise);
     }
@@ -558,7 +571,6 @@ define('xwiki-realtime-saver', [
     }
 
     _getSubmitResult(form, removeListeners) {
-      removeListeners = removeListeners || [];
       return new Promise((resolve, reject) => {
         this._once(form, removeListeners, 'xwiki:document:saved.realtime-saver', (event, data) => {
           resolve(data);

@@ -38,10 +38,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
-import org.xwiki.rendering.block.match.MacroMarkerBlockMatcher;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.util.ui.MacroDescriptorUI;
@@ -347,24 +345,37 @@ public class RenderingScriptService implements ScriptService
         return null;
     }
 
+    /**
+     * Extract macro parameters values from the given html fragment that is supposed to contain information
+     * representing the macro values.
+     * @param macroIdAsString the id of the macro to find in the html fragment
+     * @param html an html fragment containing information about the macro.
+     * @return a map of parameters also containing information about the content with the key {@code $content}.
+     * @since 17.5.0RC1
+     */
+    @Unstable
     public Map<String, String> getMacroParametersFromHTML(String macroIdAsString, String html)
     {
         MacroId macroId = this.resolveMacroId(macroIdAsString);
         Map<String, String> result = new LinkedHashMap<>();
         if (macroId != null) {
-            XDOM xdom = this.parse(String.format("<html><body>%s</body></html>", html),
-                Syntax.HTML_5_0.toIdString());
-            if (xdom != null) {
-                Block block = xdom.getFirstBlock(new MacroBlockMatcher(macroId.getId()), Block.Axes.DESCENDANT);
-                if (block instanceof MacroBlock macroBlock) {
-                    result.putAll(macroBlock.getParameters());
-                    if (macroBlock.getContent() != null) {
-                        result.put("$content", macroBlock.getContent());
-                    }
-                }
-            }
+            XDOM xdom = this.parse(String.format("<html><body>%s</body></html>", html), Syntax.HTML_5_0.toIdString());
+            extractMacroParameters(xdom, macroId, result);
         }
 
         return result;
+    }
+
+    private static void extractMacroParameters(XDOM xdom, MacroId macroId, Map<String, String> result)
+    {
+        if (xdom != null) {
+            Block block = xdom.getFirstBlock(new MacroBlockMatcher(macroId.getId()), Block.Axes.DESCENDANT);
+            if (block instanceof MacroBlock macroBlock) {
+                result.putAll(macroBlock.getParameters());
+                if (macroBlock.getContent() != null) {
+                    result.put("$content", macroBlock.getContent());
+                }
+            }
+        }
     }
 }

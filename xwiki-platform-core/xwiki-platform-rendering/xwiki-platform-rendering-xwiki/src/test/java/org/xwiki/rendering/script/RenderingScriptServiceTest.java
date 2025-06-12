@@ -19,16 +19,22 @@
  */
 package org.xwiki.rendering.script;
 
+import java.io.BufferedReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
@@ -58,10 +64,13 @@ import org.xwiki.test.mockito.StringReaderMatcher;
 import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -108,6 +117,10 @@ class RenderingScriptServiceTest
     @MockComponent
     @Named("plain/1.0")
     private Parser parser;
+
+    @MockComponent
+    @Named("html/5.0")
+    private Parser htmlParser;
 
     @MockComponent
     @Named("xwiki/2.0")
@@ -340,5 +353,39 @@ class RenderingScriptServiceTest
         MacroDescriptorUI macroDescriptorUI = mock(MacroDescriptorUI.class);
         when(this.macroDescriptorUIFactory.buildMacroDescriptorUI(macroDescriptor)).thenReturn(macroDescriptorUI);
         assertEquals(macroDescriptorUI, this.renderingScriptService.getMacroDescriptorUI(macroIdString));
+    }
+
+    @Test
+    void getMacroParametersFromHTML() throws ParseException
+    {
+        String macroIdString = "macroId/syntax";
+        String htmlFragment = "some html";
+        when(this.macroIdFactory.createMacroId(macroIdString)).thenReturn(null);
+        assertTrue(this.renderingScriptService.getMacroParametersFromHTML(macroIdString, htmlFragment).isEmpty());
+
+        MacroId macroId = mock(MacroId.class);
+        when(this.macroIdFactory.createMacroId(macroIdString)).thenReturn(macroId);
+        XDOM xdom = mock(XDOM.class);
+        when(this.htmlParser.parse(any())).then(invocationOnMock -> {
+            StringReader reader = invocationOnMock.getArgument(0);
+            String line = new BufferedReader(reader).readLine();
+            assertEquals("<html><body>some html</body></html>", line);
+            return xdom;
+        });
+        MacroBlock macroBlock = mock(MacroBlock.class);
+        when(xdom.getFirstBlock(any(), eq(Block.Axes.DESCENDANT))).then(invocationOnMock -> {
+            assertInstanceOf(MacroBlockMatcher.class, invocationOnMock.getArgument(0));
+            return macroBlock;
+        });
+        when(macroBlock.getParameters()).thenReturn(Map.of(
+            "paramFoo", "valueFoo",
+            "paramBar", "valueBar"
+        ));
+        when(macroBlock.getContent()).thenReturn("the content of macro");
+        assertEquals(Map.of(
+            "paramFoo", "valueFoo",
+            "paramBar", "valueBar",
+            "$content", "the content of macro"
+        ), this.renderingScriptService.getMacroParametersFromHTML(macroIdString, htmlFragment));
     }
 }

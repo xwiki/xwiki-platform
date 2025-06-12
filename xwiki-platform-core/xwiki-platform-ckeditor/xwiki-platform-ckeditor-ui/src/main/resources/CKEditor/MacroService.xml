@@ -247,6 +247,10 @@
     $response.sendError(404, $exceptiontool.getRootCauseMessage($job.status.error))
   #end
 #end
+
+#macro (getMacroParameters $macroId $html)
+  #set ($data = $services.rendering.getMacroParametersFromHTML($macroId, $html))
+#end
 {{/velocity}}
 
 {{velocity wiki="false"}}
@@ -262,6 +266,8 @@
     #getMacroList($request.syntaxId)
   #elseif ($request.data == 'descriptor')
     #maybeGetMacroDescriptor($request.macroId)
+  #elseif ($request.data == 'macroParameters')
+    #getMacroParameters($request.macroId, $request.macroHtml)
   #end
   #if ($data)
     #set ($discard = $response.setContentType('application/json'))

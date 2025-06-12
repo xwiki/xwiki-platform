@@ -300,6 +300,8 @@ public class MacroDescriptorUIFactory
         return (result != null) ? result : fallback;
     }
 
+    // TODO: double check there's no regression with https://jira.xwiki.org/browse/XWIKI-20491 and maybe remove
+    //  sourceDocument in macroEditor calls
     private String getEditTemplate(ParameterDescriptor parameterDescriptor, String parameterTranslationKey)
     {
         String result = "";

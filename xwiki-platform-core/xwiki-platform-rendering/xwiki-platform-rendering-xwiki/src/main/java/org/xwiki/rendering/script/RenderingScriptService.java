@@ -21,7 +21,9 @@ package org.xwiki.rendering.script;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -35,7 +37,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.MacroBlockMatcher;
+import org.xwiki.rendering.block.match.MacroMarkerBlockMatcher;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.util.ui.MacroDescriptorUI;
@@ -339,5 +345,26 @@ public class RenderingScriptService implements ScriptService
                 ExceptionUtils.getRootCauseMessage(e));
         }
         return null;
+    }
+
+    public Map<String, String> getMacroParametersFromHTML(String macroIdAsString, String html)
+    {
+        MacroId macroId = this.resolveMacroId(macroIdAsString);
+        Map<String, String> result = new LinkedHashMap<>();
+        if (macroId != null) {
+            XDOM xdom = this.parse(String.format("<html><body>%s</body></html>", html),
+                Syntax.HTML_5_0.toIdString());
+            if (xdom != null) {
+                Block block = xdom.getFirstBlock(new MacroBlockMatcher(macroId.getId()), Block.Axes.DESCENDANT);
+                if (block instanceof MacroBlock macroBlock) {
+                    result.putAll(macroBlock.getParameters());
+                    if (macroBlock.getContent() != null) {
+                        result.put("$content", macroBlock.getContent());
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }

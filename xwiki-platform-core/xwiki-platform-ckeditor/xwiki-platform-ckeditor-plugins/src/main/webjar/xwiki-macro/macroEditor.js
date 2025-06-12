@@ -22,6 +22,7 @@ define('macroEditorTranslationKeys', [], [
   'changeMacro',
   'submit',
   'descriptorRequestFailed',
+  'parametersRequestFailed',
   'installRequestFailed',
   'noParameters',
   'content',
@@ -35,17 +36,20 @@ define('macroEditorTranslationKeys', [], [
 define('macroParameterEnhancer', ['jquery'], function($) {
   'use strict';
 
-  let enhanceMacroParameters = function(macroDescriptor, macroCall) {
+  let enhanceMacroParameters = function(macroDescriptor, macroCall, macroParameters) {
     for (let parameterId in macroDescriptor.parametersMap) {
       let parameter = macroDescriptor.parametersMap[parameterId];
-      maybeSetParameterValue(parameter, macroCall);
+      maybeSetParameterValue(parameter, macroCall, macroParameters);
       maybeHideParameter(parameter);
     }
   },
 
-  maybeSetParameterValue = function(parameter, macroCall) {
+  maybeSetParameterValue = function(parameter, macroCall, macroParameters) {
     let parameterCall = macroCall.parameters[parameter.id.toLowerCase()];
-    if (parameter.id.toLowerCase() === '$content') {
+    let macroParameterValue = macroParameters[parameter.id.toLowerCase()];
+    if (macroParameterValue) {
+      parameterCall = macroParameterValue;
+    } else if (parameter.id.toLowerCase() === '$content') {
       parameterCall = macroCall.content;
     }
     // Check if the macro parameter is set.
@@ -351,23 +355,23 @@ define(
       '<div class="macro-parameters"></div>' +
     '</div>',
 
-  createMacroEditor = function(macroCall, macroDescriptorData) {
+  createMacroEditor = function(macroCall, macroDescriptorData, macroParameters) {
     // We'll perform changes of value in the descriptor, so we want to use a clone not the original instance.
     let macroDescriptor = structuredClone(macroDescriptorData.descriptor);
     let macroEditor = $(macroEditorTemplate);
     macroEditor.find('.macro-name').text(macroDescriptor.name);
     macroEditor.find('.macro-description').text(macroDescriptor.description);
-    macroParameterEnhancer.enhance(macroDescriptor, macroCall);
+    macroParameterEnhancer.enhance(macroDescriptor, macroCall, macroParameters);
     macroEditor.find('.macro-parameters').append(macroParameterTreeDisplayer
         .display(macroDescriptor, macroDescriptorData.requiredSkinExtensions));
     this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
     $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
   },
 
-  maybeCreateMacroEditor = function(requestNumber, macroCall, macroDescriptorData) {
+  maybeCreateMacroEditor = function(requestNumber, macroCall, macroDescriptorData, macroParameters) {
     // Check if the macro descriptor corresponds to the last request.
     if (this.prop('requestNumber') === requestNumber) {
-      createMacroEditor.call(this, macroCall, macroDescriptorData);
+      createMacroEditor.call(this, macroCall, macroDescriptorData, macroParameters);
       this.trigger('ready');
     }
   },
@@ -489,7 +493,7 @@ define(
         }, 1000);
         return emptyMandatoryParams.length === 0;
       },
-      update: function(macroCall, syntaxId, sourceDocumentReference) {
+      update: function(macroCall, syntaxId, sourceDocumentReference, widgetHtml) {
         var macroId = macroCall.name;
         if (syntaxId) {
           macroId += '/' + syntaxId;
@@ -500,9 +504,16 @@ define(
           .prop('requestNumber', requestNumber);
 
         // Load the macro descriptor
-        macroService.getMacroDescriptor(macroId, sourceDocumentReference)
-          .done(maybeCreateMacroEditor.bind(macroEditor, requestNumber, macroCall))
-          .fail(maybeShowError.bind(macroEditor, requestNumber, 'descriptorRequestFailed'));
+        // FIXME: only perform this call if needed
+        macroService.getMacroParametersFromHTML(macroId, widgetHtml)
+            // TODO: this should be probably improved with better $.then construction.
+          .done(function (parameters) {
+                macroService.getMacroDescriptor(macroId, sourceDocumentReference)
+                    .done(function (descriptor) {
+                      maybeCreateMacroEditor.bind(macroEditor, requestNumber, macroCall, descriptor, parameters)();
+                    })
+                    .fail(maybeShowError.bind(macroEditor, requestNumber, 'descriptorRequestFailed'));
+          }).fail(maybeShowError.bind(macroEditor, requestNumber, 'parametersRequestFailed'));
       }
     };
   },
@@ -522,9 +533,10 @@ define(
         macroEditorAPI.focus();
         submitButton.prop('disabled', false);
       });
-      macroEditorAPI = macroEditor.xwikiMacroEditor(macroCall, input.syntaxId);
+      macroEditorAPI = macroEditor.xwikiMacroEditor(macroCall, input.syntaxId, input.sourceDocumentReference,
+          input.widgetHtml);
     } else {
-      macroEditorAPI.update(macroCall, input.syntaxId, input.sourceDocumentReference);
+      macroEditorAPI.update(macroCall, input.syntaxId, input.sourceDocumentReference, input.widgetHtml);
     }
   },
 
@@ -602,13 +614,13 @@ define(
     }
   });
 
-  $.fn.xwikiMacroEditor = function(macroCall, syntaxId, sourceDocumentReference) {
+  $.fn.xwikiMacroEditor = function(macroCall, syntaxId, sourceDocumentReference, widgetHtml) {
     this.each(function() {
       var macroEditor = $(this);
       if (!macroEditor.data('macroEditorAPI')) {
         var macroEditorAPI = createMacroEditorAPI(macroEditor);
         macroEditor.data('macroEditorAPI', macroEditorAPI);
-        macroEditorAPI.update(macroCall, syntaxId, sourceDocumentReference);
+        macroEditorAPI.update(macroCall, syntaxId, sourceDocumentReference, widgetHtml);
       }
     });
     return this.data('macroEditorAPI');

@@ -40,7 +40,7 @@
     "vue": "3.5.16"
   },
   "devDependencies": {
-    "@types/node": "22.15.29",
+    "@types/node": "22.15.30",
     "@vitejs/plugin-react": "4.5.1",
     "typescript": "5.8.3",
     "vite": "6.3.5"

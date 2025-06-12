@@ -19,7 +19,7 @@
   "devDependencies": {
     "@tsconfig/node22": "22.0.2",
     "@types/jsdom": "21.1.7",
-    "@types/node": "22.14.0",
+    "@types/node": "22.15.31",
     "@vitejs/plugin-vue": "5.2.3",
     "@vitest/eslint-plugin": "1.2.2",
     "@vue/eslint-config-prettier": "10.2.0",

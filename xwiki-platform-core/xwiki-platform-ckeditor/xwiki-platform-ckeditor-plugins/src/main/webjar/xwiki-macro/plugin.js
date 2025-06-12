@@ -334,8 +334,22 @@
         _showMacroWizard: async function(macroWizard, macroCall) {
           // Show the macro wizard to insert or edit a macro and wait for the result.
           const widget = this;
+          let selectedWidgets = editor.widgets.selected;
+          let selectedWidget = (selectedWidgets.length > 0) ? selectedWidgets[0] : null;
+          let widgetHtml = "";
+          if (widget.editables && selectedWidget) {
+            let widgetElementClone =
+                CKEDITOR.htmlParser.fragment.fromHtml(jQuery(selectedWidget.wrapper.$).html()).children[0];
+            // the macroElement is a CKEDITOR.htmlParser.fragment
+            let macroElement = selectedWidget.downcast(widgetElementClone);
+            let writer = editor.dataProcessor.writer;
+            macroElement.writeHtml(writer);
+            widgetHtml = writer.getHtml();
+          }
+          // TODO: introduce back the list of hidden parameters based on config + editables
           const input = {
             macroCall: macroCall,
+            widgetHtml: widgetHtml,
             sourceDocumentReference: editor.config.sourceDocument.documentReference
           };
           let output;

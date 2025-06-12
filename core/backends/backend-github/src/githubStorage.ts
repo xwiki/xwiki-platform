@@ -304,40 +304,95 @@ export class GitHubStorage extends AbstractStorage {
   }
 
   async delete(page: string): Promise<{ success: boolean; error?: string }> {
-    const pageRestUrl = this.getPageRestURL(page, "");
+    // We only support the default branch in GitHubStorage right now.
+    // We can only get its name from the baseURL property, or by querying it.
+    // TODO: Support branches (https://jira.xwiki.org/browse/CRISTAL-563)
+    const branch = this.wikiConfig.baseURL.split("/").pop();
 
-    const headResponse = await fetch(pageRestUrl, {
-      method: "HEAD",
-      cache: "no-store",
-      headers: {
-        ...(await this.getCredentials()),
-        Accept: "application/vnd.github.object+json",
-      },
-    });
-    const sha =
-      headResponse.status >= 200 && headResponse.status < 300
-        ? headResponse.headers.get("ETag")!.slice(3, -1)
-        : undefined;
+    // Get the current HEAD before doing anything.
+    const headCommit = (
+      await (
+        await fetch(`${this.wikiConfig.baseRestURL}/git/ref/heads/${branch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/vnd.github+json",
+            ...(await this.getCredentials()),
+          },
+        })
+      ).json()
+    ).object.sha;
 
-    const success = await fetch(pageRestUrl, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/vnd.github+json",
-        ...(await this.getCredentials()),
+    // Create a new tree without the page we want removed.
+    // Using the tree creation API with a base tree and a node with a null sha
+    // will clone the base tree with the node removed.
+    const treeResponse = await fetch(
+      `${this.wikiConfig.baseRestURL}/git/trees`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/vnd.github+json",
+          ...(await this.getCredentials()),
+        },
+        body: JSON.stringify({
+          base_tree: branch,
+          tree: [
+            {
+              path: page,
+              mode: "040000",
+              type: "tree",
+              sha: null,
+            },
+          ],
+        }),
       },
-      body: JSON.stringify({
-        message: `Delete ${page}`,
-        sha: sha,
-      }),
-    }).then(async (response) => {
+    );
+
+    if (!treeResponse.ok) {
+      return { success: false, error: await treeResponse.text() };
+    }
+
+    // Create a child commit to the HEAD commit, referencing the new tree.
+    const commitResponse = await fetch(
+      `${this.wikiConfig.baseRestURL}/git/commits`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/vnd.github+json",
+          ...(await this.getCredentials()),
+        },
+        body: JSON.stringify({
+          tree: (await treeResponse.json()).sha,
+          message: `Delete ${page}`,
+          parents: [headCommit],
+        }),
+      },
+    );
+
+    if (!commitResponse.ok) {
+      return { success: false, error: await commitResponse.text() };
+    }
+
+    // Finally, we update the branch ref to target the new commit.
+    // We don't use "force" to ensure fast-forward only.
+    return await fetch(
+      `${this.wikiConfig.baseRestURL}/git/refs/heads/${branch}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/vnd.github+json",
+          ...(await this.getCredentials()),
+        },
+        body: JSON.stringify({
+          sha: (await commitResponse.json()).sha,
+        }),
+      },
+    ).then(async (response) => {
       if (response.ok) {
         return { success: true };
       } else {
         return { success: false, error: await response.text() };
       }
     });
-
-    return success;
   }
 
   async move(): Promise<{ success: boolean; error?: string }> {

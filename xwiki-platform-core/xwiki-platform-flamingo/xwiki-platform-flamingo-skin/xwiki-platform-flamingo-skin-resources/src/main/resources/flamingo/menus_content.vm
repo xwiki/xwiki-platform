@@ -158,10 +158,10 @@
       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
     #end
     #if ("$!extraAttribute" != '') ${extraAttribute}#end>
-    $services.icon.renderHTML($icon)
-    ## Screen readers benefit from having some kind of text alternative for an interactive element outside of the 
-    ## title attribute.
-    <span class="#if ($titleAsLabel)btn-label#{else}sr-only#end">$services.localization.render($titleKey)</span>
+      $services.icon.renderHTML($icon)
+      ## Screen readers benefit from having some kind of text alternative for an interactive element outside of the 
+      ## title attribute.
+      <span class="#if ($titleAsLabel)btn-label#{else}sr-only#end">$services.localization.render($titleKey)</span>
     </#if ("$!actionUrl" == '')button#{else}a#end>
     #if ($stringtool.isNotBlank("$!menuContent"))
       #if ("$!actionUrl" != '')

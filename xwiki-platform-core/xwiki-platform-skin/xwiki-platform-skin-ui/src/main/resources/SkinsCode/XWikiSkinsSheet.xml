@@ -83,8 +83,8 @@
   #foreach ($prop in $class.properties)
     #if ($prop.classType != 'TextArea')
     &lt;dt&gt;
-      &lt;label for="${className}_$escapetool.xml($doc.getObject($className).getNumber())_$escapetool.xml($prop.name)"&gt;
-        $escapetool.xml($prop.prettyName)
+      &lt;label for="${className}_$escapetool.xml($services.rendering.escape($doc.getObject($className).getNumber(), 'xwiki/2.1'))_$escapetool.xml($services.rendering.escape($prop.name, 'xwiki/2.1'))"&gt;
+        $escapetool.xml($services.rendering.escape($prop.prettyName, 'xwiki/2.1'))
       &lt;/label&gt;
     &lt;/dt&gt;
     &lt;dd&gt;

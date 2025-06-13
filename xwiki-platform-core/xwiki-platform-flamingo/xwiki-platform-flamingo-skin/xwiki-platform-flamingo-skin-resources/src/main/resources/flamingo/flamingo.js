@@ -192,7 +192,7 @@ require(['jquery', 'jquery-ui'], function($) {
     let updateLocalStorageValueForSide = function (side) {
       // If the panel is not here, do not take any action on local storage.
       // The user cannot act on or view the width preference, it should not be updated.
-      if($( '#' + side + 'Panels' ).length === 0) return;
+      if ($('#' + side + 'Panels').length === 0) return;
       // We only update the local storage when the last value is different enough from the default value.
       // This is important to keep this as long as we don't have a proper UI to reset the panel column size.
       // IMO it makes sense to keep it even when we eventually have this reset UI.

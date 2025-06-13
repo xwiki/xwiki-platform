@@ -31,8 +31,10 @@ import javax.inject.Provider;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+import ch.qos.logback.classic.Level;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -44,6 +46,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -59,6 +63,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -92,6 +97,9 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     @MockComponent
     private Provider<AttachmentValidator> attachmentValidatorProvider;
 
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @Mock
     private AttachmentValidator attachmentValidator;
 
@@ -104,14 +112,14 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     @Mock
     private HttpSession httpSession;
 
+    @Mock
+    private XWikiRequest xWikiRequest;
+
     @BeforeEach
     void setup(MockitoComponentManager mockitoComponentManager) throws Exception
     {
         when(this.contextProvider.get()).thenReturn(this.context);
-
-        XWikiRequest xWikiRequest = mock(XWikiRequest.class);
-        when(xWikiRequest.getSession()).thenReturn(this.httpSession);
-        when(this.context.getRequest()).thenReturn(xWikiRequest);
+        when(this.context.getRequest()).thenReturn(this.xWikiRequest);
         Utils.setComponentManager(mockitoComponentManager);
 
         Environment environment = mockitoComponentManager.registerMockComponent(Environment.class);
@@ -120,14 +128,27 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         when(this.attachmentValidatorProvider.get()).thenReturn(this.attachmentValidator);
     }
 
+    private void setupSession()
+    {
+        when(xWikiRequest.getSession()).thenReturn(this.httpSession);
+    }
+
     @Test
     void uploadAttachment() throws Exception
     {
-        String sessionId = "mySession";
-        when(this.httpSession.getId()).thenReturn(sessionId);
-
         DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Document");
         Part part = mock(Part.class);
+
+        // session is null
+        TemporaryAttachmentException temporaryAttachmentException =
+            assertThrows(TemporaryAttachmentException.class, () -> {
+                this.attachmentManager.uploadAttachment(documentReference, part);
+            });
+        assertEquals("Cannot find a user http session.", temporaryAttachmentException.getMessage());
+
+        setupSession();
+        String sessionId = "mySession";
+        when(this.httpSession.getId()).thenReturn(sessionId);
 
         String filename = "fileFoo.xml";
         when(part.getSubmittedFileName()).thenReturn(filename);
@@ -167,6 +188,14 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         XWiki xwiki = mock(XWiki.class);
         Part part = mock(Part.class);
 
+        // session is null
+        TemporaryAttachmentException temporaryAttachmentException =
+            assertThrows(TemporaryAttachmentException.class, () -> {
+                this.attachmentManager.uploadAttachment(documentReference, part, "newFilename");
+            });
+        assertEquals("Cannot find a user http session.", temporaryAttachmentException.getMessage());
+
+        setupSession();
         when(this.context.getWiki()).thenReturn(xwiki);
         when(xwiki.getSpacePreference(UPLOAD_MAXSIZE_PARAMETER, spaceReference, this.context))
             .thenReturn("42");
@@ -182,6 +211,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     @Test
     void uploadAttachmentInvalid() throws Exception
     {
+        setupSession();
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Document");
         SpaceReference spaceReference = documentReference.getLastSpaceReference();
 
@@ -216,6 +246,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     })
     void uploadAttachmentWithEmptyFilename(String filename) throws Exception
     {
+        setupSession();
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Document");
         SpaceReference spaceReference = documentReference.getLastSpaceReference();
 
@@ -249,6 +280,10 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         List<XWikiAttachment> expectedList = Arrays.asList(attachment1, attachment2, attachment3);
         when(temporaryAttachmentSession.getAttachments(documentReference)).thenReturn(expectedList);
 
+        // session is null
+        assertEquals(Collections.emptyList(), this.attachmentManager.getUploadedAttachments(documentReference));
+
+        setupSession();
         assertEquals(expectedList,
             this.attachmentManager.getUploadedAttachments(documentReference));
     }
@@ -268,6 +303,11 @@ class DefaultTemporaryAttachmentSessionsManagerTest
 
         when(temporaryAttachmentSession.getAttachment(documentReference, filename))
             .thenReturn(Optional.of(attachment1));
+
+        // session is null
+        assertEquals(Optional.empty(), this.attachmentManager.getUploadedAttachment(documentReference, filename));
+
+        setupSession();
         assertEquals(Optional.of(attachment1),
             this.attachmentManager.getUploadedAttachment(documentReference, filename));
     }
@@ -281,8 +321,18 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         when(httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);
 
         DocumentReference documentReference = mock(DocumentReference.class);
+        when(documentReference.toString()).thenReturn("reference");
         String filename = "foobar";
         when(temporaryAttachmentSession.removeAttachment(documentReference, filename)).thenReturn(true);
+
+        // session is null
+        assertFalse(this.attachmentManager.removeUploadedAttachment(documentReference, filename));
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Cannot find a user http session to remove attachment [foobar] from [reference].",
+            this.logCapture.getMessage(0));
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+
+        setupSession();
         assertTrue(this.attachmentManager.removeUploadedAttachment(documentReference, filename));
     }
 
@@ -294,20 +344,40 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
         when(httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);
         DocumentReference documentReference = mock(DocumentReference.class);
+        when(documentReference.toString()).thenReturn("reference");
         when(temporaryAttachmentSession.removeAttachments(documentReference)).thenReturn(true);
+
+        // session is null
+        assertFalse(this.attachmentManager.removeUploadedAttachments(documentReference));
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Cannot find a user http session to remove attachments from [reference].",
+            this.logCapture.getMessage(0));
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+
+        setupSession();
         assertTrue(this.attachmentManager.removeUploadedAttachments(documentReference));
     }
 
     @Test
-    void temporarilyAttach() throws TemporaryAttachmentException
+    void temporarilyAttach()
     {
         DocumentReference documentReference = mock(DocumentReference.class);
+        when(documentReference.toString()).thenReturn("reference");
         XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(attachment.toString()).thenReturn("attachment");
         String sessionId = "removeUploadedAttachmentsPlural";
         when(httpSession.getId()).thenReturn(sessionId);
         TemporaryAttachmentSession temporaryAttachmentSession = mock(TemporaryAttachmentSession.class);
         when(httpSession.getAttribute(ATTRIBUTE_KEY)).thenReturn(temporaryAttachmentSession);
 
+        // session is null
+        this.attachmentManager.temporarilyAttach(attachment, documentReference);
+        assertEquals(1, this.logCapture.size());
+        assertEquals("Cannot find a user http session to attach [attachment] to [reference].",
+            this.logCapture.getMessage(0));
+        assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
+
+        setupSession();
         this.attachmentManager.temporarilyAttach(attachment, documentReference);
         verify(temporaryAttachmentSession).addAttachment(documentReference, attachment);
 
@@ -344,6 +414,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
         when(temporaryAttachmentSession.getAttachment(documentReference, file1)).thenReturn(Optional.of(attachment1));
         when(temporaryAttachmentSession.getAttachment(documentReference, file2)).thenReturn(Optional.of(attachment2));
 
+        setupSession();
         this.attachmentManager.attachTemporaryAttachmentsInDocument(document, List.of(
             "foo",
             file1,

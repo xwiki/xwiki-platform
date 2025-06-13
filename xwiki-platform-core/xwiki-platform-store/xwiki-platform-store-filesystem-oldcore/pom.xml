@@ -31,7 +31,7 @@
   <name>XWiki Platform - Store - Filesystem - Old Core</name>
   <description>Implement various oldcore store APIs based on filesystem.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-store-filesystem-attachments</xwiki.extension.features>
   </properties>

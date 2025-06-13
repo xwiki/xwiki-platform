@@ -57,8 +57,9 @@ export class Logic {
 
     const logic = this;
 
-    const i18n = createI18n({ legacy: false });
-    this.i18nPromise = i18nResolver(i18n).then(() => true).catch(() => false);
+    const locale = document.documentElement.getAttribute("lang");
+    const i18n = createI18n({ legacy: false, locale });
+    this.i18nPromise = i18nResolver(i18n, locale).then(() => true).catch(() => false);
     this.vueInstance = createApp(XWikiLivedata)
       .mixin({
         mounted() {

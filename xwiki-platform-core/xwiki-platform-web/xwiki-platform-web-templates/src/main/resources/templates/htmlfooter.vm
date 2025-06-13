@@ -31,7 +31,7 @@
 ## We don't care about order for this extension point, none of the extensions should have 'visible' content.
 ## The primary use of this extension point is to gather modal elements that did not get loaded asynchronously.
 #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.body.end'))
-  $services.rendering.render($uix.execute(), 'xhtml/1.0')
+  $services.rendering.render($uix.execute(), 'html/5.0')
 #end
 </div>
 </body>

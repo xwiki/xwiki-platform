@@ -24,7 +24,7 @@
     ## Display UI Extensions before the title element
     ## --------------------------------------------------------
     #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.title.before'))
-      $services.rendering.render($uix.execute(), 'xhtml/1.0')
+      $services.rendering.render($uix.execute(), 'html/5.0')
     #end
     <div id="document-title"><h1>$titleToDisplay</h1></div>
     #if (!$doc.isNew())

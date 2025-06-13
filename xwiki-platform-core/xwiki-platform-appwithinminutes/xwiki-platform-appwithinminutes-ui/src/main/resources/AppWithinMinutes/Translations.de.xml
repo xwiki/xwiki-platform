@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=Feldeditor schließen und 
 platform.appwithinminutes.classEditorMoveFieldLabel=Bewegen
 platform.appwithinminutes.classEditorMoveFieldHint=Hier ziehen, um die Reihenfolge der Felder zu ändern
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Vorbelegung (kann leer gelassen werden)
+platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Anzeigename
+platform.appwithinminutes.classEditorFieldHintToolTip=Hinweis
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=Ok

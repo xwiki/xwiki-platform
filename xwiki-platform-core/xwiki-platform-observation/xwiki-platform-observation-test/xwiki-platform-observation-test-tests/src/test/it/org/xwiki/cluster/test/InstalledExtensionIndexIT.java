@@ -41,6 +41,9 @@ import org.xwiki.component.internal.embed.EmbeddableComponentManagerFactory;
 import org.xwiki.component.internal.multi.DefaultComponentManagerManager;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.configuration.internal.DefaultConfigurationSourceProvider;
+import org.xwiki.configuration.internal.SystemConfigurationSource;
+import org.xwiki.configuration.internal.SystemEnvConfigurationSource;
+import org.xwiki.configuration.internal.SystemPropertiesConfigurationSource;
 import org.xwiki.configuration.internal.XWikiPropertiesConfigurationSource;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.environment.internal.StandardEnvironment;
@@ -124,6 +127,12 @@ public class InstalledExtensionIndexIT extends AbstractClusterHttpIT
             new ComponentDeclaration(EmbeddableComponentManagerFactory.class.getName()));
         componentDeclarations.add(
             new ComponentDeclaration(XWikiPropertiesConfigurationSource.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(SystemConfigurationSource.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(SystemEnvConfigurationSource.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(SystemPropertiesConfigurationSource.class.getName()));
         componentDeclarations.add(
             new ComponentDeclaration(StandardEnvironment.class.getName()));
         componentDeclarations.add(

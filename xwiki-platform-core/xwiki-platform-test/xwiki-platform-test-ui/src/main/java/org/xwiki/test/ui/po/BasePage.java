@@ -55,6 +55,9 @@ import com.deque.html.axecore.selenium.AxeBuilder;
 public class BasePage extends BaseElement
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
+
+    private static final By EDIT_BUTTON_LOCATOR = By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]");
+
     /**
      * Used for sending keyboard shortcuts to.
      */
@@ -195,12 +198,21 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * @return whether the "edit" button is available on the current page
+     * @since 17.5.0RC1
+     * @since 17.4.1
+     */
+    public boolean isEditAvailable()
+    {
+        return getDriver().hasElementWithoutWaiting(EDIT_BUTTON_LOCATOR);
+    }
+
+    /**
      * Performs a click on the "edit" button.
      */
     public void edit()
     {
-        WebElement editMenuButton =
-            getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]"));
+        WebElement editMenuButton = getDriver().findElement(EDIT_BUTTON_LOCATOR);
         editMenuButton.click();
     }
 
@@ -209,7 +221,7 @@ public class BasePage extends BaseElement
      */
     public String getEditURL()
     {
-        return getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]")).getAttribute("href");
+        return getDriver().findElement(EDIT_BUTTON_LOCATOR).getAttribute("href");
     }
 
     /**

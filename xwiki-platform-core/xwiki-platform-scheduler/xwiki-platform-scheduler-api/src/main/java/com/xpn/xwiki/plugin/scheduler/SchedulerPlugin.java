@@ -48,6 +48,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -55,6 +56,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -108,6 +110,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     private Scheduler scheduler;
 
+    private boolean enabled;
+
     /**
      * Default plugin constructor.
      * 
@@ -121,21 +125,45 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     @Override
     public void init(XWikiContext context)
     {
-        Thread thread = new Thread(new ExecutionContextRunnable(new Runnable()
-        {
-            @Override
-            public void run()
+        // Check if the Scheduler plugin is enabled
+        this.enabled =
+            Utils.getComponent(ConfigurationSource.class, "xwikiproperties").getProperty("scheduler.enabled", true);
+
+        if (this.enabled) {
+            Thread thread = new Thread(new ExecutionContextRunnable(new Runnable()
             {
-                initAsync();
-            }
-        }, Utils.getComponentManager()));
-        thread.setName("XWiki Scheduler initialization");
-        thread.setDaemon(true);
+                @Override
+                public void run()
+                {
+                    initAsync();
+                }
+            }, Utils.getComponentManager()));
+            thread.setName("XWiki Scheduler initialization");
+            thread.setDaemon(true);
 
-        thread.start();
+            thread.start();
 
-        // Start listening to documents modifications
-        Utils.getComponent(ObservationManager.class).addListener(this);
+            // Start listening to documents modifications
+            Utils.getComponent(ObservationManager.class).addListener(this);
+        }
+    }
+
+    /**
+     * @return true if the scheduler plugin is enabled on this instance
+     * @since 17.5.0RC1
+     */
+    @Unstable
+    public boolean isEnabled()
+    {
+        return this.enabled;
+    }
+
+    private void checkEnabled() throws SchedulerPluginException
+    {
+        if (!isEnabled()) {
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_DISABLED,
+                "The Scheduler is disabled");
+        }
     }
 
     private void initAsync()
@@ -350,6 +378,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public JobState getJobStatus(BaseObject object, XWikiContext context) throws SchedulerException
     {
+        if (getScheduler() == null) {
+            return null;
+        }
+
         TriggerState state = getScheduler().getTriggerState(new TriggerKey(getObjectUniqueId(object)));
         return new JobState(state);
     }
@@ -359,6 +391,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public boolean scheduleJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        checkEnabled();
+
         boolean scheduled = true;
         try {
             // compute the job unique Id
@@ -450,6 +484,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public void pauseJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        checkEnabled();
+
         String job = getObjectUniqueId(object);
         try {
             getScheduler().pauseJob(new JobKey(job));
@@ -471,6 +507,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public void resumeJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        checkEnabled();
+
         String job = getObjectUniqueId(object);
         try {
             getScheduler().resumeJob(new JobKey(job));
@@ -493,6 +531,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public void triggerJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        checkEnabled();
+
         String job = getObjectUniqueId(object);
         try {
             getScheduler().triggerJob(new JobKey(job));
@@ -509,6 +549,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public void unscheduleJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        checkEnabled();
+
         try {
             deleteJob(object);
 
@@ -565,6 +607,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public Date getPreviousFireTime(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        if (!isEnabled()) {
+            return null;
+        }
+
         return getTrigger(object).getPreviousFireTime();
     }
 
@@ -576,6 +622,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public Date getNextFireTime(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        if (!isEnabled()) {
+            return null;
+        }
+
         return getTrigger(object).getNextFireTime();
     }
 

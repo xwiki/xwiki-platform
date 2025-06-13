@@ -37,7 +37,11 @@ import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.InformationPane;
+import org.xwiki.test.ui.po.RequiredRightsModal;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -436,6 +440,61 @@ class InplaceEditIT
         // Verify that the restored selection is visible (inside the viewport).
         // Note that we have to subtract 1 from the height because the floating toolbar is overlapping the text area.
         assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 1));
+
+        viewPage.cancel();
+    }
+
+    @Test
+    @Order(8)
+    void refreshOnRequiredRightsChange(TestUtils setup, TestReference testReference)
+    {
+        // Test that updating required rights refreshes the content.
+
+        // Grant alice script right on this page to allow using the Velocity macro.
+        setup.loginAsSuperAdmin();
+        setup.setRights(testReference, null, "XWiki.alice", "script", true);
+        setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
+
+        // Enter in-place edit mode.
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.clear();
+
+        // Insert the Velocity macro. The macro placeholder should be displayed.
+        richTextArea.sendKeys(Keys.ENTER, "/velocity");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/velocity", "Velocity");
+        richTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        richTextArea.waitForContentRefresh();
+
+        assertEquals("macro:velocity", richTextArea.getText());
+
+        InformationPane informationPane = viewPage.openInformationDocExtraPane();
+
+        RequiredRightsModal requiredRightsModal = informationPane.openRequiredRightsModal();
+        requiredRightsModal.setEnforceRequiredRights(true);
+        requiredRightsModal.clickSave(true);
+
+        richTextArea.waitForContentRefresh();
+
+        assertThat(richTextArea.getText(), startsWith("Failed to execute the [velocity] macro."));
+
+        viewPage.save();
+
+        assertTrue(viewPage.hasRequiredRightsWarning(true));
+
+        requiredRightsModal = viewPage.openRequiredRightsModal();
+        requiredRightsModal.setEnforcedRequiredRight("script");
+        requiredRightsModal.clickSave(true);
+
+        richTextArea.waitForContentRefresh();
+
+        assertEquals("macro:velocity", richTextArea.getText());
+
+        setup.getDriver().waitUntilCondition(driver -> !viewPage.hasRequiredRightsWarning(false));
 
         viewPage.cancel();
     }

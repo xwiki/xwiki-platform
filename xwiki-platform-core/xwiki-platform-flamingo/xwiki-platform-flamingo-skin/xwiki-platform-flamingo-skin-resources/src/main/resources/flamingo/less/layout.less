@@ -48,6 +48,17 @@
      doesn't interpret the double dash as the start of a HTML comment close.
      We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
      Once this file is migrated to native CSS, this hack can be removed. */
+
+  &.panel-left-width-Small {
+    -/**/-panel-column-left-width: 8vw;
+  }
+
+  &.panel-left-width-Large {
+    -/**/-panel-column-left-width: 24vw;
+  }
+
+  /* The functionality to hide the panel takes precedence over the panel size defaults. 
+    This ruleset should come after the rules for .panel-left-width-<WIDTH> */
   &.hideleft {
     /* When the screen is small enough, we keep panels shown.
       Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
@@ -61,14 +72,16 @@
     }
   }
 
-  &.panel-left-width-Small {
-    -/**/-panel-column-left-width: 8vw;
+  &.panel-right-width-Small {
+    -/**/-panel-column-right-width: 8vw;
   }
 
-  &.panel-left-width-Large {
-    -/**/-panel-column-left-width: 24vw;
+  &.panel-right-width-Large {
+    -/**/-panel-column-right-width: 24vw;
   }
-
+    
+  /* The functionality to hide the panel takes precedence over the panel size defaults. 
+    This ruleset should come after the rules for .panel-right-width-<WIDTH> */
   &.hideright {
     /* When the screen is small enough, we keep panels shown.
       Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
@@ -80,14 +93,6 @@
         display: none;
       }
     }
-  }
-
-  &.panel-right-width-Small {
-    -/**/-panel-column-right-width: 8vw;
-  }
-
-  &.panel-right-width-Large {
-    -/**/-panel-column-right-width: 24vw;
   }
 
   &.hidelefthideright {

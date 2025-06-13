@@ -984,16 +984,8 @@ public class TableLayoutElement extends BaseElement
             .moveToElement(element, 50, 0)
             .moveToElement(element, 0, 0)
             .perform();
-        By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
-        // Waits to have at least one popover visible and click on the edit action of the last one. While it does not
-        // seem to be possible in normal conditions, using selenium and moveToElement, several popover can be visible
-        // at the same time (especially on Chrome). We select the latest edit action, which is the one of the targeted
-        // property because the popover actions are appended at the end of the document.
-        getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(editActionSelector).isEmpty());
-        // Does not use findElementsWithoutWaiting to let a chance for the cursor to move to the targeted cell, and for
-        // its edit action popover to be displayed.
-        List<WebElement> popoverActions = getDriver().findElements(editActionSelector);
-        popoverActions.get(popoverActions.size() - 1).click();
+
+        element.findElement(By.cssSelector(".displayer-action-list span[title='Edit']")).click();
 
         // Selector of the edited field.
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));

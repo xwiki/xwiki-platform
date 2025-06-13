@@ -746,7 +746,7 @@ define('scrollUtils', ['jquery'], function($) {
     while (parent && !(parent.nodeType === Node.ELEMENT_NODE && hasVerticalScrollBar(parent))) {
       parent = parent.parentNode;
     }
-    return parent || document.scrollingElement || document.documentElement;
+    return parent || element.ownerDocument.scrollingElement || element.ownerDocument.documentElement;
   }
 
   function hasVerticalScrollBar(element) {

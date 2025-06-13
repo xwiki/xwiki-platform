@@ -137,9 +137,9 @@
  *
  * @param $id the id of the menu
  * @param $icon the icon of the menu
- * @param $content the content of the menu
+ * @param $menuContent the content of the menu
  * @param $titleKey translation key of the link title to use
- * @param $titleAsLabel if the link title should also be used as link label
+ * @param $titleAsLabel if the title should also be used as a visible label
  * @param $actionUrl (optional) the link of the top menu entry.
  *   If not provided, the top menu entry will act as an activator for the dropdown
  * @param $extraAttribute (optional) additional attributes to add (such as ref="nofollow" for example)
@@ -159,9 +159,9 @@
     #end
     #if ("$!extraAttribute" != '') ${extraAttribute}#end>
       $services.icon.renderHTML($icon)
-      #if ($titleAsLabel)
-        <span class="btn-label">$services.localization.render($titleKey)</span>
-      #end
+      ## Screen readers benefit from having some kind of text alternative for an interactive element outside of the 
+      ## title attribute.
+      <span class="#if ($titleAsLabel)btn-label#{else}sr-only#end">$services.localization.render($titleKey)</span>
     </#if ("$!actionUrl" == '')button#{else}a#end>
     #if ($stringtool.isNotBlank("$!menuContent"))
       #if ("$!actionUrl" != '')

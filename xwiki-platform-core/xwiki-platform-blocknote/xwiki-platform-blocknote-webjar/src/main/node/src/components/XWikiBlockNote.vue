@@ -96,7 +96,9 @@ export default {
       dirty: false,
       value: this.initialValue,
       editorProps: {
-        blockNoteOptions: {},
+        blockNoteOptions: {
+          defaultStyles: false,
+        },
         theme: "light",
       },
       editorContent,
@@ -148,6 +150,64 @@ export default {
 </script>
 
 <style>
+.xwiki-blocknote {
+  --cr-base-font-size: unset;
+  --cr-base-text-color: unset;
+  --cr-font-sans: unset;
+  --cr-font-size-x-large: 24px; /* --font-size-h2 */
+  --cr-font-size-large: 20px; /* --font-size-h3 */
+  --cr-font-size-medium: 17px; /* --font-size-h4 */
+  --cr-font-weight-normal: var(--font-weight-regular);
+  --cr-line-height-normal: unset;
+
+  .bn-container {
+    --bn-font-family: unset;
+  }
+
+  .bn-editor {
+    --bn-colors-editor-text: unset;
+    --bn-colors-editor-background: unset;
+    padding-inline: 0;
+
+    h5 {
+      font-size: unset; /* --font-size-h5 */
+    }
+
+    h6 {
+      font-size: 13px; /* --font-size-h6 */
+    }
+
+    [data-content-type="bulletListItem"] > p.bn-inline-content,
+    [data-content-type="numberedListItem"] > p.bn-inline-content {
+      margin: 0;
+    }
+
+    [data-content-type="table"] {
+      table {
+        margin-bottom: 0;
+      }
+
+      th, td {
+        border: 0 none;
+        border-top: 1px solid var(--table-border-color);
+        padding: 8px 10px; /* @table-cell-padding */
+
+        > p {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .bn-block-outer {
+    line-height: unset;
+  }
+
+  .bn-block-content {
+    padding: 0;
+  }
+}
+
 /**
  * Standalone edit mode
  */

@@ -50,13 +50,6 @@
      doesn't interpret the double dash as the start of a HTML comment close.
      We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
      Once this file is migrated to native CSS, this hack can be removed. */
-  &.hideleft {
-    -/**/-panel-column-left-width: 0;
-    
-    & #leftPanels {
-      display: none;
-    }
-  }
 
   &.panel-left-width-Small {
     -/**/-panel-column-left-width: 8vw;
@@ -66,10 +59,12 @@
     -/**/-panel-column-left-width: 24vw;
   }
 
-  &.hideright {
-    -/**/-panel-column-right-width: 0;
+  /* The functionality to hide the panel takes precedence over the panel size defaults. 
+    This ruleset should come after the rules for .panel-left-width-<WIDTH> */
+  &.hideleft {
+    -/**/-panel-column-left-width: 0;
 
-    & #rightPanels {
+    & #leftPanels {
       display: none;
     }
   }
@@ -80,6 +75,16 @@
 
   &.panel-right-width-Large {
     -/**/-panel-column-right-width: 24vw;
+  }
+
+  /* The functionality to hide the panel takes precedence over the panel size defaults. 
+    This ruleset should come after the rules for .panel-right-width-<WIDTH> */
+  &.hideright {
+    -/**/-panel-column-right-width: 0;
+
+    & #rightPanels {
+      display: none;
+    }
   }
 
   &.hidelefthideright {

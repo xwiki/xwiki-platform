@@ -248,7 +248,7 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
      * @return a promise that resolves to this document instance if the render request succeeds
      */
     render({outputSyntax, transformations} = {}) {
-      var queryString = {
+      const queryString = {
         xpage: 'get',
         outputTitle: true,
         // Render the default translation if this is a new document:
@@ -268,10 +268,12 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
       }
       return Promise.resolve($.get(this.getURL('view'), $.param(queryString, true))).then(html =&gt; {
         // Render succeeded.
-        var container = $('&lt;div/&gt;').html(html);
+        const container = $('&lt;div/&gt;').html(html);
+        const contentWrapper = container.find('#xwikicontent');
+        const isContentRenderedToHTML = !outputSyntax || outputSyntax.type.includes('html');
         return $.extend(this, {
           renderedTitle: container.find('#document-title h1').html(),
-          renderedContent: container.find('#xwikicontent').html()
+          renderedContent: isContentRenderedToHTML ? contentWrapper.html() : contentWrapper.text()
         });
       }).catch(() =&gt; {
         new XWiki.widgets.Notification(l10n['edit.inplace.page.renderFailed'], 'error');

@@ -36,7 +36,8 @@ $services.progress.startStep('Compute the content to display')
 ## Set the content type to text/plain when the output syntax is not HTML to avoid that other content is interpreted
 ## as HTML by the browser. This needs to be done before calling contentvars.vm as rendering the content can modify
 ## the content type when the document, e.g., produces JSON.
-#if ($response.getContentType() != 'text/plain')
+## Note that the content type can contain the charset, as in 'text/plain;charset=utf-8'.
+#if (!$response.getContentType().startsWith('text/plain'))
   #set ($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
   #if ($outputSyntax)
     #set ($syntaxType = $outputSyntax.type.toIdString())
@@ -45,9 +46,10 @@ $services.progress.startStep('Compute the content to display')
     #end
   #end
 #end
-## Make sure we don't escape the content since non-HTML output like JSON is produced by some documents when plain
-## output syntax is specified.
-#set ($noEscapeContent = true)
+## We're using HTML to output both the title and the content so in this case we need to escape the content if the content
+## is not rendered to HTML. If we output only the content then we don't escape it because non-HTML output like JSON is
+## produced by some documents when plain output syntax is specified.
+#set ($noEscapeContent = $request.outputTitle != 'true')
 #template("contentvars.vm")
 $services.progress.endStep()
 #if ($request.outputTitle == 'true')

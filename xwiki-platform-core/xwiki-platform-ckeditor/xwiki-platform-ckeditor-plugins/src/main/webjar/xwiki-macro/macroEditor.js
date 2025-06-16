@@ -493,7 +493,7 @@ define(
         }, 1000);
         return emptyMandatoryParams.length === 0;
       },
-      update: function(macroCall, syntaxId, sourceDocumentReference, widgetHtml) {
+      update: async function(macroCall, syntaxId, sourceDocumentReference, widgetHtml) {
         var macroId = macroCall.name;
         if (syntaxId) {
           macroId += '/' + syntaxId;

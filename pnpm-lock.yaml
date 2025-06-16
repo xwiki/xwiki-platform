@@ -4810,8 +4810,8 @@ importers:
         specifier: workspace:*
         version: link:../ds/api
       ts-essentials:
-        specifier: 10.1.0
-        version: 10.1.0(typescript@5.8.3)
+        specifier: 10.1.1
+        version: 10.1.1(typescript@5.8.3)
       typescript:
         specifier: 5.8.3
         version: 5.8.3
@@ -9867,8 +9867,8 @@ packages:
       typescript:
         optional: true
 
-  ts-essentials@10.1.0:
-    resolution: {integrity: sha512-LirrVzbhIpFQ9BdGfqLnM9r7aP9rnyfeoxbP5ZEkdr531IaY21+KdebRSsbvqu28VDJtcDDn+AlGn95t0c52zQ==}
+  ts-essentials@10.1.1:
+    resolution: {integrity: sha512-4aTB7KLHKmUvkjNj8V+EdnmuVTiECzn3K+zIbRthumvHu+j44x3w63xpfs0JL3NGIzGXqoQ7AV591xHO+XrOTw==}
     peerDependencies:
       typescript: '>=4.5.0'
     peerDependenciesMeta:
@@ -16293,7 +16293,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.8.3
 
-  ts-essentials@10.1.0(typescript@5.8.3):
+  ts-essentials@10.1.1(typescript@5.8.3):
     optionalDependencies:
       typescript: 5.8.3
 

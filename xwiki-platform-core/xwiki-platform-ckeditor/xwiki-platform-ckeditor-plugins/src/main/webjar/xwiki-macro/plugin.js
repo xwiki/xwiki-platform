@@ -247,14 +247,9 @@
           macro.add(stopMacroComment);
           return macro;
         },
-        // FIXME: this doesn't look good anymore with MacroDescriptorUI
         getParameterType: function(name) {
-          var descriptor = this.data.descriptor || {};
-          if (name === undefined) {
-            descriptor = descriptor.contentDescriptor || {};
-          } else if (typeof name === 'string') {
-            descriptor = (descriptor.parameterDescriptorMap || {})[name.toLowerCase()] || {};
-          }
+          let descriptor = this.data.descriptor || {};
+          descriptor = (descriptor.parametersMap || {})[name.toLowerCase()] || {};
           return descriptor.type;
         },
         init: function() {

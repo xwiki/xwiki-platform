@@ -122,16 +122,16 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   macroParameterGroupOptionalsTemplate =
-      '<div class="macro-parameter-group-optionals single-choice">' +
-        '<ul class="nav nav-tabs" role="tablist">' +
-          '<li class="active" role="presentation">' +
-            '<a class="macro-parameter-group-name" href="#groupId" aria-controls="groupId" role="tab"></a>' +
-          '</li>' +
-        '</ul>' +
-        '<div class="tab-content">' +
-          '<div id="groupId" class="macro-parameter-group-members tab-pane active" role="tabpanel"></div>' +
-        '</div>' +
-      '</div>',
+      `<div class="macro-parameter-group-optionals single-choice">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="active" role="presentation">
+            <a class="macro-parameter-group-name" href="#groupId" aria-controls="groupId" role="tab"></a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div id="groupId" class="macro-parameter-group-members tab-pane active" role="tabpanel"></div>
+        </div>
+      </div>`,
 
   displayOptionalNodes = function(parametersMap, optionalNodeList) {
     let output = $(macroParameterGroupOptionalsTemplate);
@@ -157,65 +157,71 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     return output;
   },
 
-  displayGroup = function(parametersMap, groupNode) {
-    return displayFeature(parametersMap, groupNode, groupNode.featureOnly);
-  },
-
   macroFeatureContainerTemplate =
-    '<div class="feature-container panel panel-default" id="feature-{{featureName}}">' +
-      '<div class="panel-heading">' +
-        '<span class="feature-title">{{featureTitle}}</span>' +
-        '<span class="mandatory"></span>' +
-      '</div>' +
-      '<div class="panel-body"></div>' +
-    '</div>',
+    `<div class="feature-container panel panel-default" id="feature-{{featureName}}">
+      <div class="panel-heading">
+        <span class="feature-title"></span>
+        <span class="mandatory"></span>
+      </div>
+      <div class="panel-body"></div>
+    </div>`,
 
-  macroFeatureContentTemplate =
-    '<div class="feature-parameter">' +
-      '<div class="feature-choice">' +
-        '<input type="radio" class="feature-radio" id="feature-radio-{{featureName}}-{{parameterId}}"' +
-      ' name="feature-radio-{{featureName}}" value="{{parameterKey}}" />' +
-        '<label class="feature-choice-name" for="feature-radio-{{featureName}}-{{parameterId}}">' +
-          '{{parameterLabel}}' +
-        '</label>' +
-      '</div>' +
-      '<div class="feature-choice-body"></div>' +
-    '</div>',
-
-  displayFeature = function (parametersMap, featureNode, isFeature) {
-    let name = (isFeature) ? featureNode.featureName : featureNode.name;
-    let output = $(macroFeatureContainerTemplate
-        .replaceAll("{{featureName}}", featureNode.id)
-        .replaceAll("{{featureTitle}}", name));
-    if (featureNode.mandatory) {
+  displayGroup = function (parametersMap, groupNode) {
+    let isFeature = groupNode.featureOnly;
+    let name = (isFeature) ? groupNode.featureName : groupNode.name;
+    let output = $(macroFeatureContainerTemplate);
+    output.attr('id', 'feature-' + groupNode.id);
+    output.find('.feature-title').text(name);
+    if (groupNode.mandatory) {
       output.find('.mandatory').text('(' + translations.get('required') + ')');
       output.addClass('mandatory');
     }
-    output.find('.panel-body').append(featureNode.children.map(nodeKey => {
-      let paramNode = parametersMap[nodeKey];
-      let nodeOutput = $(macroFeatureContentTemplate
-          .replaceAll("{{featureName}}", featureNode.id)
-          .replaceAll("{{parameterKey}}", nodeKey)
-          .replaceAll("{{parameterId}}", paramNode.id)
-          .replaceAll("{{parameterLabel}}", translations.get('selectFeature', paramNode.name)));
-      if (isFeature && featureNode.mandatory) {
-        nodeOutput.find('.feature-radio').on('change', function() {
-          $(this).parents('.feature-container').find('.feature-choice-body').removeClass('mandatory');
-          $(this).parents('.feature-parameter').find('.feature-choice-body').addClass('mandatory');
-        });
-      } else if (!isFeature) {
-        nodeOutput.find('.feature-choice').empty();
-      }
-      nodeOutput
-          .find('.feature-choice-body')
-          .append(displayMacroParameterTreeNode(parametersMap, paramNode));
-
-      if (isFeature) {
-        nodeOutput.find('.feature-choice-body').addClass('with-choice');
-      }
-      return nodeOutput;
-    }));
+    output.find('.panel-body').append(
+        groupNode.children.map(nodeKey =>
+            createGroupNodeValue(parametersMap, nodeKey, groupNode.id, isFeature, groupNode.mandatory)
+    ));
     return output;
+  },
+
+  macroFeatureContentTemplate =
+    `<div class="feature-parameter">
+      <div class="feature-choice">
+        <input type="radio" class="feature-radio" />
+        <label class="feature-choice-name"></label>
+      </div>
+      <div class="feature-choice-body"></div>
+    </div>`,
+
+  createGroupNodeValue = function (parametersMap, nodeKey, featureName, isFeature, isMandatory) {
+    let paramNode = parametersMap[nodeKey];
+    let radioName = 'feature-radio-' + featureName;
+    let radioId = radioName + '-' + paramNode.id;
+
+    let nodeOutput = $(macroFeatureContentTemplate);
+    nodeOutput.find('.feature-radio').attr({
+      'id': radioId,
+      'name': radioName,
+      'value': nodeKey
+    });
+    nodeOutput.find('.feature-choice-name').attr('for', radioId);
+    nodeOutput.find('.feature-choice-name').text(translations.get('selectFeature', paramNode.name));
+
+    if (isFeature && isMandatory) {
+      nodeOutput.find('.feature-radio').on('change', function() {
+        $(this).parents('.feature-container').find('.feature-choice-body').removeClass('mandatory');
+        $(this).parents('.feature-parameter').find('.feature-choice-body').addClass('mandatory');
+      });
+    } else if (!isFeature) {
+      nodeOutput.find('.feature-choice').empty();
+    }
+    nodeOutput
+        .find('.feature-choice-body')
+        .append(displayMacroParameterTreeNode(parametersMap, paramNode));
+
+    if (isFeature) {
+      nodeOutput.find('.feature-choice-body').addClass('with-choice');
+    }
+    return nodeOutput;
   },
 
   // The given node can be a group or a parameter.
@@ -505,12 +511,12 @@ define(
         // Load the macro descriptor
         // FIXME: only perform this call if needed
         try {
-          const parameters = await macroService.getMacroParametersFromHTML(macroId, widgetHtml)
+          const parameters = await macroService.getMacroParametersFromHTML(macroId, widgetHtml);
           try {
              const descriptor = await macroService.getMacroDescriptor(macroId, sourceDocumentReference);
              maybeCreateMacroEditor.call(macroEditor, requestNumber, macroCall, descriptor, parameters);
           } catch (e) {
-            maybeShowError.call(macroEditor, requestNumber, 'descriptorRequestFailed')
+            maybeShowError.call(macroEditor, requestNumber, 'descriptorRequestFailed');
           }
         } catch (e) {
           maybeShowError.call(macroEditor, requestNumber, 'parametersRequestFailed');

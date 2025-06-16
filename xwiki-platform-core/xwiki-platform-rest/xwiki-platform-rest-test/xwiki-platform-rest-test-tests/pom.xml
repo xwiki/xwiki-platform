@@ -45,6 +45,9 @@
       com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin
     </xwikiCfgPlugins>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+    <xwikiPropertiesAdditionalProperties>\
+      test.prchecker.excludePattern=.*:Test\.Execute\..*
+    </xwikiPropertiesAdditionalProperties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -70,6 +73,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

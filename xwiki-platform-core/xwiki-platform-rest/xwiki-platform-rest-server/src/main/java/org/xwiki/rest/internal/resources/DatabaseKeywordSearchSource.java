@@ -39,7 +39,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
@@ -293,37 +292,51 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
      * @param withPrettyNames render the author name
      * @param limit the maximum number of results
      * @param withUniquePages add pages only once
+     * @param baseURI the base URI for URLs in the search results
      * @return the list of {@link SearchResult}
      * @throws XWikiException
      */
-    private List<SearchResult> getPagesSearchResults(List<DocumentReference> queryResult, String wikiName,
+    private List<SearchResult> getPagesSearchResults(List<Object> queryResult, String wikiName,
         Boolean withPrettyNames, int limit, Boolean withUniquePages, URI baseURI) throws XWikiException
     {
         List<SearchResult> result = new ArrayList<>();
-        Set<DocumentReference> seenPages = new HashSet<>();
+        Set<String> seenPages = new HashSet<>();
         XWikiContext context = this.contextProvider.get();
         XWiki xwikiApi = new XWiki(context.getWiki(), context);
         ObjectFactory objectFactory = new ObjectFactory();
 
-        for (DocumentReference ref : queryResult) {
+        for (Object object : queryResult) {
             // Stop if there's a limit specified and we reach it.
             if (limit > 0 && result.size() >= limit) {
                 break;
             }
 
-            if ((!Boolean.TRUE.equals(withUniquePages) || seenPages.add(ref))
-                && this.authorizationManager.hasAccess(Right.VIEW, ref))
-            {
-                Document doc = xwikiApi.getDocument(ref).getTranslatedDocument();
+            Object[] fields = (Object[]) object;
+
+            String spaceId = (String) fields[1];
+            List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
+            String pageName = (String) fields[2];
+            String language = (String) fields[3];
+
+            String pageId = Utils.getPageId(wikiName, spaces, pageName);
+            String pageFullName = Utils.getPageFullName(wikiName, spaces, pageName);
+
+            if (withUniquePages && seenPages.contains(pageFullName)) {
+                continue;
+            }
+            seenPages.add(pageFullName);
+
+            /* Check if the user has the right to see the found document */
+            if (xwikiApi.hasAccessLevel("view", pageId)) {
+                Document doc = xwikiApi.getDocument(pageFullName).getTranslatedDocument();
                 String title = doc.getDisplayTitle();
                 SearchResult searchResult = objectFactory.createSearchResult();
                 searchResult.setType("page");
-                searchResult.setId(doc.getPrefixedFullName());
-                searchResult.setPageFullName(doc.getFullName());
+                searchResult.setId(pageId);
+                searchResult.setPageFullName(pageFullName);
                 searchResult.setTitle(title);
                 searchResult.setWiki(wikiName);
-                searchResult.setSpace(doc.getSpace());
-                String pageName = doc.getDocumentReference().getName();
+                searchResult.setSpace(spaceId);
                 searchResult.setPageName(pageName);
                 searchResult.setVersion(doc.getVersion());
                 searchResult.setAuthor(doc.getAuthor());
@@ -336,14 +349,13 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
                 }
 
                 String pageUri;
-                if (!doc.isTranslation()) {
+                if (StringUtils.isBlank(language)) {
                     pageUri = Utils.createURI(baseURI, PageResource.class, wikiName,
-                        Utils.getSpacesURLElements(ref), pageName).toString();
+                        Utils.getSpacesURLElements(spaces), pageName).toString();
                 } else {
-                    String language = doc.getRealLocale().toString();
                     searchResult.setLanguage(language);
                     pageUri = Utils.createURI(baseURI, PageTranslationResource.class, wikiName,
-                        Utils.getSpacesURLElements(ref), pageName, language).toString();
+                        Utils.getSpacesURLElements(spaces), pageName, language).toString();
                 }
 
                 Link pageLink = new Link();

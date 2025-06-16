@@ -17,9 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.util.ui;
+package org.xwiki.wysiwyg.internal.macro;
 
 import java.util.Comparator;
+
+import org.xwiki.wysiwyg.macro.AbstractMacroUINode;
+import org.xwiki.wysiwyg.macro.MacroUINodeParameter;
 
 /**
  * Comparator for ordering {@link AbstractMacroUINode}.

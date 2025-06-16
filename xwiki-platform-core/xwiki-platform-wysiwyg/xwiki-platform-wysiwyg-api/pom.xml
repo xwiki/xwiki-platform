@@ -73,6 +73,16 @@
       <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-displayer</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-velocity</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <!-- The HTMLCleanerTestSuite uses the deprecated XWikiComponentInitializer which initializes the ECM and some

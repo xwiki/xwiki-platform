@@ -21,9 +21,7 @@ package org.xwiki.rendering.script;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -37,13 +35,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.internal.util.ui.MacroDescriptorUI;
-import org.xwiki.rendering.internal.util.ui.MacroDescriptorUIFactory;
 import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
 import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
@@ -59,7 +53,6 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides Rendering-specific Scripting APIs.
@@ -70,7 +63,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("rendering")
 @Singleton
-@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class RenderingScriptService implements ScriptService
 {
     /**
@@ -100,9 +92,6 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private XWikiSyntaxEscaper escaper;
-
-    @Inject
-    private MacroDescriptorUIFactory macroDescriptorUIFactory;
 
     /**
      * @return the list of syntaxes for which a Parser is available
@@ -319,63 +308,5 @@ public class RenderingScriptService implements ScriptService
     public Set<String> getHiddenMacroCategories()
     {
         return this.macroCategoryManager.getHiddenCategories();
-    }
-
-    /**
-     * Get a macro descriptor UI information to be used for configuring a macro.
-     * @param macroIdAsString the identifier of a macro
-     * @return an instance of {@link MacroDescriptorUI} containing all info for configuring the macro or {@code null}
-     * if it couldn't be found or initialized.
-     *
-     * @since 17.5.0RC1
-     */
-    @Unstable
-    public MacroDescriptorUI getMacroDescriptorUI(String macroIdAsString)
-    {
-        try {
-            MacroId macroId = this.resolveMacroId(macroIdAsString);
-            if (macroId != null && this.macroManager.exists(macroId, true)) {
-                MacroDescriptor descriptor = this.macroManager.getMacro(macroId).getDescriptor();
-                return this.macroDescriptorUIFactory.buildMacroDescriptorUI(descriptor);
-            }
-        } catch (MacroLookupException e) {
-            this.logger.warn("Failed to lookup macro id [{}]. Root cause is: [{}]", macroIdAsString,
-                ExceptionUtils.getRootCauseMessage(e));
-        }
-        return null;
-    }
-
-    /**
-     * Extract macro parameters values from the given html fragment that is supposed to contain information
-     * representing the macro values.
-     * @param macroIdAsString the id of the macro to find in the html fragment
-     * @param html an html fragment containing information about the macro.
-     * @return a map of parameters also containing information about the content with the key {@code $content}.
-     * @since 17.5.0RC1
-     */
-    @Unstable
-    public Map<String, String> getMacroParametersFromHTML(String macroIdAsString, String html)
-    {
-        MacroId macroId = this.resolveMacroId(macroIdAsString);
-        Map<String, String> result = new LinkedHashMap<>();
-        if (macroId != null) {
-            XDOM xdom = this.parse(String.format("<html><body>%s</body></html>", html), Syntax.HTML_5_0.toIdString());
-            extractMacroParameters(xdom, macroId, result);
-        }
-
-        return result;
-    }
-
-    private static void extractMacroParameters(XDOM xdom, MacroId macroId, Map<String, String> result)
-    {
-        if (xdom != null) {
-            Block block = xdom.getFirstBlock(new MacroBlockMatcher(macroId.getId()), Block.Axes.DESCENDANT);
-            if (block instanceof MacroBlock macroBlock) {
-                result.putAll(macroBlock.getParameters());
-                if (macroBlock.getContent() != null) {
-                    result.put("$content", macroBlock.getContent());
-                }
-            }
-        }
     }
 }

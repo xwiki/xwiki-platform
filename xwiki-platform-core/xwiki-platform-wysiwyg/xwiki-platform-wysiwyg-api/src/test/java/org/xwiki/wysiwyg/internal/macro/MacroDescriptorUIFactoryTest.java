@@ -17,9 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.util.ui;
+package org.xwiki.wysiwyg.internal.macro;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +38,10 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wysiwyg.macro.AbstractMacroUINode;
+import org.xwiki.wysiwyg.macro.MacroDescriptorUI;
+import org.xwiki.wysiwyg.macro.MacroUINodeGroup;
+import org.xwiki.wysiwyg.macro.MacroUINodeParameter;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -250,7 +253,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam5.setOrder(5);
         nodeParam5.setMandatory(true);
         nodeParam5.setCaseInsensitive(true);
-        nodeParam5.setDisplayType("org.xwiki.rendering.internal.util.ui.MacroDescriptorUIFactoryTest$MyEnum");
+        nodeParam5.setDisplayType("org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactoryTest$MyEnum");
         nodeParam5.setEditTemplate("<select name=\"param5\">"
             + "<option value=\"FOO\">rendering.macro.myMacro.parameter.param5.value.FOOTranslated</option>"
             + "<option value=\"BAR\">rendering.macro.myMacro.parameter.param5.value.BARTranslated</option>"
@@ -392,30 +395,28 @@ class MacroDescriptorUIFactoryTest
             "GROUP:someGroup"
         ));
 
-        Map<String, AbstractMacroUINode> parametersMap = new HashMap<>(Map.of(
-            "PARAMETER:param1", nodeParam1,
-            "PARAMETER:param2", nodeParam2,
-            "PARAMETER:param3", nodeParam3,
-            "PARAMETER:param4", nodeParam4,
-            "PARAMETER:param5", nodeParam5,
-            "PARAMETER:param6", nodeParam6,
-            "PARAMETER:param7", nodeParam7,
-            "PARAMETER:param8", nodeParam8,
-            "PARAMETER:param9", nodeParam9,
-            "PARAMETER:param10", nodeParam10
-        ));
-        parametersMap.putAll(Map.of(
-            "PARAMETER:param11", nodeParam11,
-            "PARAMETER:param12", nodeParam12,
-            "PARAMETER:param13", nodeParam13,
-            "PARAMETER:param14", nodeParam14,
-            "PARAMETER:param15", nodeParam15,
-            "PARAMETER:param16", nodeParam16,
-            "FEATURE:myFeature", featureNode,
-            "GROUP:defaultOptionalGroup", defaultGroupNode,
-            "GROUP:someGroup", groupNode,
-            "PARAMETER:$content", nodeContent
-        ));
+        Map<String, AbstractMacroUINode> parametersMap = new LinkedHashMap<>();
+        parametersMap.put("PARAMETER:$content", nodeContent);
+        parametersMap.put("PARAMETER:param1", nodeParam1);
+        parametersMap.put("PARAMETER:param2", nodeParam2);
+        parametersMap.put("PARAMETER:param3", nodeParam3);
+        parametersMap.put("PARAMETER:param4", nodeParam4);
+        parametersMap.put("PARAMETER:param5", nodeParam5);
+        parametersMap.put("PARAMETER:param6", nodeParam6);
+        parametersMap.put("PARAMETER:param7", nodeParam7);
+        parametersMap.put("PARAMETER:param8", nodeParam8);
+        parametersMap.put("PARAMETER:param9", nodeParam9);
+        parametersMap.put("PARAMETER:param10", nodeParam10);
+        parametersMap.put("PARAMETER:param11", nodeParam11);
+        parametersMap.put("PARAMETER:param12", nodeParam12);
+        parametersMap.put("PARAMETER:param13", nodeParam13);
+        parametersMap.put("PARAMETER:param14", nodeParam14);
+        parametersMap.put("PARAMETER:param15", nodeParam15);
+        parametersMap.put("PARAMETER:param16", nodeParam16);
+        parametersMap.put("FEATURE:myFeature", featureNode);
+        parametersMap.put("GROUP:defaultOptionalGroup", defaultGroupNode);
+        parametersMap.put("GROUP:someGroup", groupNode);
+
         expectedMacroDescriptorUI.setParametersMap(parametersMap);
 
         MacroDescriptorUI macroDescriptorUI = this.helper.buildMacroDescriptorUI(macroDescriptor);
@@ -553,7 +554,7 @@ class MacroDescriptorUIFactoryTest
             .setHidden(true);
 
         MacroUINodeParameter authorNode = new MacroUINodeParameter("author")
-            .setDisplayType("org.xwiki.rendering.internal.util.ui.MacroDescriptorUIFactoryTest$TestEnum")
+            .setDisplayType("org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactoryTest$TestEnum")
             .setCaseInsensitive(true)
             .setEditTemplate("<select name=\"author\">"
                 + "<option value=\"VALUE1\">VALUE1</option>"

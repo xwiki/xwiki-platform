@@ -189,7 +189,7 @@
 
 #macro (maybeGetMacroDescriptor $macroIdAsString)
   #ckeditor_initRequiredSkinExtensions()
-  #set ($macroDescriptor = $services.rendering.getMacroDescriptorUI($macroIdAsString))
+  #set ($macroDescriptor = $services.wysiwyg.getMacroDescriptorUI($macroIdAsString))
   #if ($macroDescriptor)
     #set ($data = {
       'descriptor': $macroDescriptor,
@@ -249,7 +249,7 @@
 #end
 
 #macro (getMacroParameters $macroId $html)
-  #set ($data = $services.rendering.getMacroParametersFromHTML($macroId, $html))
+  #set ($data = $services.wysiwyg.getMacroParametersFromHTML($macroId, $html))
 #end
 {{/velocity}}
 

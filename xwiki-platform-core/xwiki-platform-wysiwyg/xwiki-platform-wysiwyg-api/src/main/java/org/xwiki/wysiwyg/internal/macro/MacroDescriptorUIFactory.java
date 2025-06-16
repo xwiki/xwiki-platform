@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.util.ui;
+package org.xwiki.wysiwyg.internal.macro;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -45,6 +45,10 @@ import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.velocity.tools.EscapeTool;
+import org.xwiki.wysiwyg.macro.AbstractMacroUINode;
+import org.xwiki.wysiwyg.macro.MacroDescriptorUI;
+import org.xwiki.wysiwyg.macro.MacroUINodeGroup;
+import org.xwiki.wysiwyg.macro.MacroUINodeParameter;
 
 /**
  * Factory in charge of building a {@link MacroDescriptorUI} based on a {@link MacroDescriptor}.
@@ -103,7 +107,7 @@ public class MacroDescriptorUIFactory
                 macroDescriptor.getDescription()))
             .setSupportsInlineMode(macroDescriptor.supportsInlineMode());
 
-        Map<String, AbstractMacroUINode> parametersMap = new HashMap<>();
+        Map<String, AbstractMacroUINode> parametersMap = new LinkedHashMap<>();
         Map<String, SortedSet<AbstractMacroUINode>> childrenMap = new HashMap<>();
         List<AbstractMacroUINode> mandatoryParameters = new ArrayList<>();
         List<AbstractMacroUINode> optionalParameters = new ArrayList<>();

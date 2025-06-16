@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.util.ui;
+package org.xwiki.wysiwyg.macro;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.stability.Unstable;
 
 /**
  * Representation of a macro descriptor used for the configuration UI.
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * @version $Id$
  * @since 17.5.0RC1
  */
+@Unstable
 public class MacroDescriptorUI
 {
     private final String id;

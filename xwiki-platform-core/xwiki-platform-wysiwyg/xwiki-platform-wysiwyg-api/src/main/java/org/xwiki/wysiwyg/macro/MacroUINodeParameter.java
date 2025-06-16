@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.util.ui;
+package org.xwiki.wysiwyg.macro;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a single parameter of the macro descriptor.
@@ -29,17 +30,24 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * @version $Id$
  * @since 17.5.0RC1
  */
+@Unstable
 public class MacroUINodeParameter extends AbstractMacroUINode
 {
     private boolean advanced;
+
     private boolean deprecated;
+
     private String displayType;
+
     private Object defaultValue;
+
     private boolean caseInsensitive;
+
     private String editTemplate;
 
     /**
      * Default constructor.
+     *
      * @param id the identifier of the parameter as indicated in the descriptor.
      */
     public MacroUINodeParameter(String id)

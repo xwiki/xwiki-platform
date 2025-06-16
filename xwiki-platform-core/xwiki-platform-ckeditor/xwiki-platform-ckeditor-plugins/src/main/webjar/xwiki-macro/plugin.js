@@ -339,7 +339,7 @@
           let widgetHtml = "";
           if (widget.editables && selectedWidget) {
             let widgetElementClone =
-                CKEDITOR.htmlParser.fragment.fromHtml(jQuery(selectedWidget.wrapper.$).html()).children[0];
+                CKEDITOR.htmlParser.fragment.fromHtml(widget.wrapper.$.innerHTML).children[0];
             // the macroElement is a CKEDITOR.htmlParser.fragment
             let macroElement = selectedWidget.downcast(widgetElementClone);
             let writer = editor.dataProcessor.writer;

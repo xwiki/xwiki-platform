@@ -267,7 +267,7 @@
   #elseif ($request.data == 'descriptor')
     #maybeGetMacroDescriptor($request.macroId)
   #elseif ($request.data == 'macroParameters')
-    #getMacroParameters($request.macroId, $request.macroHtml)
+    #getMacroParameters($request.macroId, $request.macroHTML)
   #end
   #if ($data)
     #set ($discard = $response.setContentType('application/json'))

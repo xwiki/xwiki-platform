@@ -69,15 +69,15 @@ define('macroService', ['jquery', 'xwiki-meta'], function ($, xcontext) {
       $.post(url, {
         data: 'macroParameters',
         macroId: macroId,
-        macroHtml: html
+        macroHTML: html
       }).done(function (parameters) {
         if (typeof parameters === 'object' && parameters !== null) {
           deferred.resolve(parameters);
         } else {
-          deferred.reject.apply(deferred, arguments);
+          deferred.reject(...arguments);
         }
-      }).fail(function () {
-        deferred.reject.apply(deferred, arguments);
+      }).fail(function (...args) {
+        deferred.reject(...args);
       });
       return deferred.promise();
     }

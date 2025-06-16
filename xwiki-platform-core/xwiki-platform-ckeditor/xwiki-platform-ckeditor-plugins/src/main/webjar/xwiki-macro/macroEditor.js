@@ -37,8 +37,7 @@ define('macroParameterEnhancer', ['jquery'], function($) {
   'use strict';
 
   let enhanceMacroParameters = function(macroDescriptor, macroCall, macroParameters) {
-    for (let parameterId in macroDescriptor.parametersMap) {
-      let parameter = macroDescriptor.parametersMap[parameterId];
+    for (let parameter in Object.values(macroDescriptor.parametersMap)) {
       maybeSetParameterValue(parameter, macroCall, macroParameters);
       maybeHideParameter(parameter);
     }
@@ -505,15 +504,17 @@ define(
 
         // Load the macro descriptor
         // FIXME: only perform this call if needed
-        macroService.getMacroParametersFromHTML(macroId, widgetHtml)
-            // TODO: this should be probably improved with better $.then construction.
-          .done(function (parameters) {
-                macroService.getMacroDescriptor(macroId, sourceDocumentReference)
-                    .done(function (descriptor) {
-                      maybeCreateMacroEditor.bind(macroEditor, requestNumber, macroCall, descriptor, parameters)();
-                    })
-                    .fail(maybeShowError.bind(macroEditor, requestNumber, 'descriptorRequestFailed'));
-          }).fail(maybeShowError.bind(macroEditor, requestNumber, 'parametersRequestFailed'));
+        try {
+          const parameters = await macroService.getMacroParametersFromHTML(macroId, widgetHtml)
+          try {
+             const descriptor = await macroService.getMacroDescriptor(macroId, sourceDocumentReference);
+             maybeCreateMacroEditor.call(macroEditor, requestNumber, macroCall, descriptor, parameters);
+          } catch (e) {
+            maybeShowError.call(macroEditor, requestNumber, 'descriptorRequestFailed')
+          }
+        } catch (e) {
+          maybeShowError.call(macroEditor, requestNumber, 'parametersRequestFailed');
+        }
       }
     };
   },

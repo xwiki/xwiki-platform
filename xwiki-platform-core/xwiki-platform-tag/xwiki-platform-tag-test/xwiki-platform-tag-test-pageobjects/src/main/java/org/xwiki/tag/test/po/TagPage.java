@@ -76,7 +76,7 @@ public class TagPage extends ViewPage
 
     public boolean hasConfirmationMessage()
     {
-        return getDriver().findElementsWithoutWaiting(
+        return getDriver().findElements(
             By.xpath("//div[@class='box infomessage' and contains(. ,'has been successfully deleted')]"))
             .size() == 1;
     }

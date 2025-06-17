@@ -502,24 +502,7 @@
 #set($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
 #set($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
 #set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($doc))
-## FIXME: the different icons should use the icon service
-#set ($iconWhenWatched = 'fa-bell')
-#set ($iconWhenNotSet = 'fa-bell-o')
-#set ($iconWhenBlocked = 'fa-bell-slash')
-#set ($iconWhenCustom = 'fa-bullhorn')
-#if ($watchedStatus == 'NOT_SET')
-  #set ($watchIcon = $iconWhenNotSet)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.notset', 'html/5.0', []))
-#elseif ($watchedStatus.isWatched())
-  #set ($watchIcon = $iconWhenWatched)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.followed', 'html/5.0', []))
-#elseif ($watchedStatus.isBlocked())
-  #set ($watchIcon = $iconWhenBlocked)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.blocked', 'html/5.0', []))
-#else
-  #set ($watchIcon = $iconWhenCustom)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.custom', 'html/5.0', []))
-#end
+#_notificationsWatchStatusIcon($watchedStatus)
 #set ($buttonTitle = $services.localization.render('notifications.watch.button.title', [$watchText]))
 {{html clean='false'}}
 &lt;div class="btn-group" id="watchButton">
@@ -696,6 +679,7 @@
 #end
 
 #set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($doc))
+#_notificationsWatchStatusIcon($watchedStatus)
 ## If the watched status informs that the filter is about children it means it's a filter for the space,
 ## so we should look for ancestor of the space.
 #set ($refForAncestorFirstFilter = $doc.getDocumentReference())

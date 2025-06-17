@@ -162,12 +162,16 @@ export default {
 
   .bn-container {
     --bn-font-family: unset;
+    --mantine-font-size-md: inherit;
+    --mantine-font-size-xs: 80%;
   }
 
   .bn-editor {
     --bn-colors-editor-text: unset;
     --bn-colors-editor-background: unset;
-    padding-inline: 0;
+    /* Overwrite the inline padding coming from BlockNote. Note that we don't set it to 0 because it leads to a
+      horizontal scrollbar in Firefox. */
+    padding-inline: 0 1px;
 
     h5 {
       font-size: unset; /* --font-size-h5 */
@@ -199,12 +203,30 @@ export default {
     }
   }
 
+  /* Overwrite styles coming from XWiki */
+  .bn-editor ~ * .container {
+    width: auto;
+    padding: 0;
+    margin: 0;
+  }
+
+  .bn-toolbar {
+    button, select {
+      --ai-size: 30px !important;
+    }
+  }
+
   .bn-block-outer {
     line-height: unset;
   }
 
   .bn-block-content {
     padding: 0;
+  }
+
+  .link-editor label {
+    line-height: 34px; /* @input-height-base */
+    margin-bottom: 0;
   }
 }
 

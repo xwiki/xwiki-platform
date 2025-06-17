@@ -17,7 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { EntityReference } from "@xwiki/cristal-model-api";
+import { toXWikiEntityReference } from "@/services/model/reference/XWikiEntityReference";
+import { DocumentReference, EntityReference, EntityType, SpaceReference } from "@xwiki/cristal-model-api";
 import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import { Container, injectable } from "inversify";
 
@@ -27,6 +28,31 @@ export class XWikiRemoteURLSerializer implements RemoteURLSerializer {
     container.bind("RemoteURLSerializer").to(XWikiRemoteURLSerializer).inSingletonScope().whenNamed("XWiki");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public serialize(reference?: EntityReference): string | undefined {}
+  public serialize(reference?: EntityReference): string | undefined {
+    if (!reference) {
+      return undefined;
+    }
+    switch (reference.type) {
+      case EntityType.WIKI:
+        // URL of the wiki home page.
+        return this.serialize(new SpaceReference(reference, "Main"));
+      case EntityType.SPACE:
+        // URL of the space home page.
+        return this.getDocumentURL(new DocumentReference("WebHome", reference));
+      case EntityType.DOCUMENT: {
+        return this.getDocumentURL(reference);
+      }
+      case EntityType.ATTACHMENT: {
+        return this.getAttachmentURL(reference);
+      }
+    }
+  }
+
+  private getDocumentURL(reference: EntityReference): string {
+    return new XWiki.Document(toXWikiEntityReference(reference)).getURL();
+  }
+
+  private getAttachmentURL(reference: EntityReference): string {
+    return new XWiki.Attachment(toXWikiEntityReference(reference)).getURL();
+  }
 }

@@ -1,2 +1,5 @@
 org.xwiki.search.solr.internal.rest.SOLRSearchSource
 org.xwiki.search.solr.internal.rest.WikisSearchQueryResourceImpl
+org.xwiki.search.solr.internal.rest.SearchResultConverter
+org.xwiki.search.solr.internal.rest.SolrKeywordSearchSource
+500:org.xwiki.search.solr.internal.rest.SolrDefaultKeywordSearchSource

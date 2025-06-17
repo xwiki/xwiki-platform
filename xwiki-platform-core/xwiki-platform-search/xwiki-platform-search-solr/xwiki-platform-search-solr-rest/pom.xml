@@ -34,7 +34,7 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>SOLR REST search</xwiki.extension.name>
 
-    <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.30</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -51,6 +51,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-query</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

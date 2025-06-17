@@ -25,6 +25,7 @@ define('macroWizard', ['macroSelector', 'macroEditor'], function(selectMacro, ed
       data.macroId = data.macroCall && data.macroCall.name;
       return insertMacroWizard(data);
     } else {
+      delete data.macroCall.parameters.$content;
       return data.macroCall;
     }
   },

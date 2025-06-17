@@ -36,10 +36,10 @@ define('macroEditorTranslationKeys', [], [
 define('macroParameterEnhancer', ['jquery'], function($) {
   'use strict';
 
-  let enhanceMacroParameters = function(macroDescriptor, macroCall, macroParameters) {
-    for (let parameter in Object.values(macroDescriptor.parametersMap)) {
+  let enhanceMacroParameters = function(macroDescriptor, macroCall, macroParameters, hiddenMacroParameters) {
+    for (let parameter of Object.values(macroDescriptor.parametersMap)) {
       maybeSetParameterValue(parameter, macroCall, macroParameters);
-      maybeHideParameter(parameter);
+      maybeHideParameter(parameter, hiddenMacroParameters);
     }
   },
 
@@ -62,10 +62,12 @@ define('macroParameterEnhancer', ['jquery'], function($) {
    * The following macro parameters should be hidden:
    * - parameters marked as "display hidden" in the descriptor and not having any value set
    * - deprecated parameters that don't have a value set
+   * - parameters that can be edited in-place depending on the configuration
    */
-  maybeHideParameter = function(parameter) {
+  maybeHideParameter = function(parameter, hiddenMacroParameters) {
     // We can't hide mandatory parameters that don't have a value set.
-    parameter.hidden = isHiddenParameterAndNoValue(parameter) || isDeprecatedParameterUnset(parameter);
+    parameter.hidden = isHiddenParameterAndNoValue(parameter) || isDeprecatedParameterUnset(parameter) ||
+        hiddenMacroParameters.indexOf(parameter.id) >= 0;
   },
 
   isHiddenParameterAndNoValue = function(macroParameter) {
@@ -360,23 +362,24 @@ define(
       '<div class="macro-parameters"></div>' +
     '</div>',
 
-  createMacroEditor = function(macroCall, macroDescriptorData, macroParameters) {
+  createMacroEditor = function(macroCall, macroDescriptorData, macroParameters ,hiddenMacroParameters) {
     // We'll perform changes of value in the descriptor, so we want to use a clone not the original instance.
     let macroDescriptor = structuredClone(macroDescriptorData.descriptor);
     let macroEditor = $(macroEditorTemplate);
     macroEditor.find('.macro-name').text(macroDescriptor.name);
     macroEditor.find('.macro-description').text(macroDescriptor.description);
-    macroParameterEnhancer.enhance(macroDescriptor, macroCall, macroParameters);
+    macroParameterEnhancer.enhance(macroDescriptor, macroCall, macroParameters, hiddenMacroParameters);
     macroEditor.find('.macro-parameters').append(macroParameterTreeDisplayer
         .display(macroDescriptor, macroDescriptorData.requiredSkinExtensions));
     this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
     $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
   },
 
-  maybeCreateMacroEditor = function(requestNumber, macroCall, macroDescriptorData, macroParameters) {
+  maybeCreateMacroEditor = function(requestNumber, macroCall, macroDescriptorData, macroParameters,
+      hiddenMacroParameters) {
     // Check if the macro descriptor corresponds to the last request.
     if (this.prop('requestNumber') === requestNumber) {
-      createMacroEditor.call(this, macroCall, macroDescriptorData, macroParameters);
+      createMacroEditor.call(this, macroCall, macroDescriptorData, macroParameters, hiddenMacroParameters);
       this.trigger('ready');
     }
   },
@@ -498,7 +501,7 @@ define(
         }, 1000);
         return emptyMandatoryParams.length === 0;
       },
-      update: async function(macroCall, syntaxId, sourceDocumentReference, widgetHtml) {
+      update: async function(macroCall, syntaxId, sourceDocumentReference, widgetHtml, hiddenMacroParameters) {
         var macroId = macroCall.name;
         if (syntaxId) {
           macroId += '/' + syntaxId;
@@ -514,7 +517,13 @@ define(
           const parameters = await macroService.getMacroParametersFromHTML(macroId, widgetHtml);
           try {
              const descriptor = await macroService.getMacroDescriptor(macroId, sourceDocumentReference);
-             maybeCreateMacroEditor.call(macroEditor, requestNumber, macroCall, descriptor, parameters);
+             try {
+               maybeCreateMacroEditor.call(macroEditor, requestNumber, macroCall, descriptor, parameters,
+                   hiddenMacroParameters);
+             } catch (e) {
+               console.error("Error with maybeCreateMacroEditor", e);
+               maybeShowError.call(macroEditor, requestNumber, 'Error when interpreting descriptor data');
+             }
           } catch (e) {
             maybeShowError.call(macroEditor, requestNumber, 'descriptorRequestFailed');
           }
@@ -531,6 +540,7 @@ define(
       name: input.macroId,
       parameters: {}
     };
+    let hiddenMacroParameters = input.hiddenMacroParameters || [];
     // We need to obey the specified macro identifier in case the user has just changed the macro.
     macroCall.name = input.macroId || macroCall.name;
     if (!macroEditorAPI) {
@@ -541,9 +551,10 @@ define(
         submitButton.prop('disabled', false);
       });
       macroEditorAPI = macroEditor.xwikiMacroEditor(macroCall, input.syntaxId, input.sourceDocumentReference,
-          input.widgetHtml);
+          input.widgetHtml, hiddenMacroParameters);
     } else {
-      macroEditorAPI.update(macroCall, input.syntaxId, input.sourceDocumentReference, input.widgetHtml);
+      macroEditorAPI.update(macroCall, input.syntaxId, input.sourceDocumentReference, input.widgetHtml,
+          hiddenMacroParameters);
     }
   },
 
@@ -621,13 +632,13 @@ define(
     }
   });
 
-  $.fn.xwikiMacroEditor = function(macroCall, syntaxId, sourceDocumentReference, widgetHtml) {
+  $.fn.xwikiMacroEditor = function(macroCall, syntaxId, sourceDocumentReference, widgetHtml, hiddenMacroParameters) {
     this.each(function() {
       var macroEditor = $(this);
       if (!macroEditor.data('macroEditorAPI')) {
         var macroEditorAPI = createMacroEditorAPI(macroEditor);
         macroEditor.data('macroEditorAPI', macroEditorAPI);
-        macroEditorAPI.update(macroCall, syntaxId, sourceDocumentReference, widgetHtml);
+        macroEditorAPI.update(macroCall, syntaxId, sourceDocumentReference, widgetHtml, hiddenMacroParameters);
       }
     });
     return this.data('macroEditorAPI');

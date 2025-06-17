@@ -33,8 +33,8 @@
     '</div>';
   var inlineMacroWidgetTemplate = blockMacroWidgetTemplate.replace(/div/g, 'span');
 
-  var nestedEditableTypeAttribute = 'data-xwiki-non-generated-content';
-  var nestedEditableNameAttribute = 'data-xwiki-parameter-name';
+  const nestedEditableTypeAttribute = 'data-xwiki-non-generated-content';
+  const nestedEditableNameAttribute = 'data-xwiki-parameter-name';
 
   var getNestedEditableType = function(nestedEditable) {
     var nestedEditableType;
@@ -248,9 +248,10 @@
           return macro;
         },
         getParameterType: function(name) {
-          let descriptor = this.data.descriptor || {};
-          descriptor = (descriptor.parametersMap || {})[name.toLowerCase()] || {};
-          return descriptor.type;
+          let parametersMap = (this.data.descriptor || {}).parameters || {};
+          let parameterName = (name === undefined) ? '$content' : name.toLowerCase();
+          let param = parametersMap[parameterName] || {};
+          return param.type;
         },
         init: function() {
           // Initialize the nested editables.
@@ -284,7 +285,14 @@
           }
         },
         simplifyMacroCall: function(macroCall) {
-          delete macroCall.parameters.$content;
+          if (this.editables.$content) {
+            delete macroCall.content;
+          }
+          Object.keys(this.editables).forEach(name => {
+            const parameterName = Object.keys(macroCall.parameters)
+                .find(key => key.toLowerCase() === name.toLowerCase());
+            delete macroCall.parameters[parameterName];
+          });
         },
         data: function(event) {
           this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));
@@ -329,21 +337,23 @@
         _showMacroWizard: async function(macroWizard, macroCall) {
           // Show the macro wizard to insert or edit a macro and wait for the result.
           const widget = this;
-          let selectedWidgets = editor.widgets.selected;
-          let selectedWidget = (selectedWidgets.length > 0) ? selectedWidgets[0] : null;
           let widgetHtml = "";
-          if (widget.editables && selectedWidget) {
+          let hiddenMacroParameters = [];
+          if (widget.editables) {
             let widgetElementClone =
                 CKEDITOR.htmlParser.fragment.fromHtml(widget.wrapper.$.innerHTML).children[0];
             // the macroElement is a CKEDITOR.htmlParser.fragment
-            let macroElement = selectedWidget.downcast(widgetElementClone);
+            let macroElement = widget.downcast(widgetElementClone);
             let writer = editor.dataProcessor.writer;
             macroElement.writeHtml(writer);
             widgetHtml = writer.getHtml();
+            if ((editor.config['xwiki-macro'] || {}).showInlineEditableParameters === false) {
+              hiddenMacroParameters = Object.keys(widget.editables);
+            }
           }
-          // TODO: introduce back the list of hidden parameters based on config + editables
           const input = {
             macroCall: macroCall,
+            hiddenMacroParameters: hiddenMacroParameters,
             widgetHtml: widgetHtml,
             sourceDocumentReference: editor.config.sourceDocument.documentReference
           };
@@ -468,7 +478,8 @@
                     });
 
                     // Retrieve required parameters.
-                    macroService.getMacroDescriptor(macro.id.id).done(function (descriptor) {
+                    macroService.getMacroDescriptor(macro.id.id).done(function (descriptorUI) {
+                      let descriptor = descriptorUI.descriptor;
                       // Show the insertion dialog if at least one of the parameters is mandatory.
                       if (descriptor.mandatoryNodes.length > 0) {
                         if (widget) {

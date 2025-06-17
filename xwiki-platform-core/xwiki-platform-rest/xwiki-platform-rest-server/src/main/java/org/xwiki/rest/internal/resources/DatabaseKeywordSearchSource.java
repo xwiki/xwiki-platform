@@ -63,6 +63,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 
 import static org.xwiki.rest.internal.resources.KeywordSearchScope.NAME;
 import static org.xwiki.rest.internal.resources.KeywordSearchScope.TITLE;
@@ -103,7 +104,8 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
     private EntityReferenceProvider defaultEntityReferenceProvider;
 
     @Inject
-    private QueryManager queryManager;
+    @Named("secure")
+    private QueryManager secureQueryManager;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -242,19 +244,15 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             if (StringUtils.isBlank(orderField)) {
                 orderClause = "doc.fullName asc";
             } else {
-                /* Check if the order parameter is a valid "asc" or "desc" string, otherwise use "asc" */
-                if ("asc".equals(options.order()) || "desc".equals(options.order())) {
-                    orderClause = String.format("doc.%s %s", orderField, options.order());
-                } else {
-                    orderClause = String.format("doc.%s asc", orderField);
-                }
+                orderClause =
+                    String.format("doc.%s %s", orderField, HqlQueryUtils.getValidQueryOrder(options.order(), "asc"));
             }
 
             // Add ordering
             f.format(") order by %s", orderClause);
             String queryString = f.toString();
 
-            Query query = this.queryManager.createQuery(queryString, Query.HQL)
+            Query query = this.secureQueryManager.createQuery(queryString, Query.HQL)
                 .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
                 .addFilter(this.hiddenDocumentFilterProvider.get()).setOffset(options.start())
                 // Worst case scenario when making the locale aware query:
@@ -396,7 +394,7 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             + " or lower(space.reference) like lower(:prefix) escape '!'"
             + " order by lower(space.reference), space.reference";
 
-        List<Object> queryResult = this.queryManager.createQuery(query, Query.HQL)
+        List<Object> queryResult = this.secureQueryManager.createQuery(query, Query.HQL)
             .bindValue("keywords", String.format("%%%s%%", escapedKeywords))
             .bindValue("prefix", String.format("%s%%", escapedKeywords))
             .setWiki(wikiName).setLimit(number).setOffset(start)
@@ -522,14 +520,14 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             exception */
             if (options.space() != null) {
                 queryResult =
-                    queryManager.createQuery(query, Query.XWQL)
+                    this.secureQueryManager.createQuery(query, Query.XWQL)
                         .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
                         .bindValue("space", options.space()).setLimit(options.number()).execute();
             } else {
                 queryResult =
-                    queryManager.createQuery(query, Query.XWQL)
-                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(
-                            options.number())
+                    this.secureQueryManager.createQuery(query, Query.XWQL)
+                        .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
+                        .setLimit(options.number())
                         .execute();
             }
 

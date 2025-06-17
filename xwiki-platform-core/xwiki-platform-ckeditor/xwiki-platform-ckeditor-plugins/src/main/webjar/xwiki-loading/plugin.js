@@ -116,6 +116,28 @@
           }
         });
       };
+
+      // Allow CKEditor plugins that require asynchronous initialization to delay the instance ready event until they
+      // are fully initialized (or the asynchronous initialization fails).
+      editor._instanceReadyPromises = [];
+      editor.delayInstanceReady = function(promise) {
+        editor._instanceReadyPromises.push(promise);
+      };
+
+      const originalFireOnce = editor.fireOnce;
+      editor.fireOnce = function(eventName, ...args) {
+        if (eventName === 'instanceReady') {
+          // Fire the instanceReady event only after all the instance ready promises have been settled. Note that we
+          // don't want to prevent the instanceReady event if the asynchronous plugin initialization fails because we
+          // consider such plugins as optional (we expect them to fail gracefully if they can't be initialized).
+          return Promise.allSettled(this._instanceReadyPromises).then(() => {
+            originalFireOnce.call(this, eventName, ...args);
+          });
+        } else {
+          // Fire the event immediately.
+          return originalFireOnce.call(this, eventName, ...args);
+        }
+      };
     }
   });
 })();

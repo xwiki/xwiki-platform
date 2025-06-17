@@ -27,7 +27,7 @@
   };
 
   CKEDITOR.plugins.add('xwiki-realtime', {
-    requires: 'notification',
+    requires: 'notification,xwiki-loading',
 
     init : function(editor) {
       applyStyleSheets(editor);
@@ -51,32 +51,36 @@
       // the space between the words you type to be lost.
       preserveSpaceCharAtTheEndOfLine(editor);
 
-      require([
-        'xwiki-realtime-loader',
-        'xwiki-ckeditor-realtime-adapter',
-        'xwiki-realtime-interface'
-      ], (Loader, Adapter, Interface) => {
-        enableRealtimeEditing(editor, Loader, Adapter).then(() => {
-          // The edited (HTML) content is normalized when the realtime editing is enabled (e.g. by adding some BR
-          // elements to ensure the HTML is the same across different browsers) which makes the editor dirty, although
-          // there aren't any real content changes (that would be noticed in the source wiki syntax). We reset the dirty
-          // state in order to avoid getting the leave confirmation when leaving the editor just after it was loaded.
-          editor.resetDirty();
-        });
-        editor._realtimeInterface = Interface;
-        editor._realtimeSource = {
-          // True if the editor was in the realtime session before switching to source.
-          realtime: false,
+      editor.delayInstanceReady(new Promise((resolve, reject) => {
+        require([
+          'xwiki-realtime-loader',
+          'xwiki-ckeditor-realtime-adapter',
+          'xwiki-realtime-interface'
+        ], (Loader, Adapter, Interface) => {
+          enableRealtimeEditing(editor, Loader, Adapter).then(() => {
+            // The edited (HTML) content is normalized when the realtime editing is enabled (e.g. by adding some BR
+            // elements to ensure the HTML is the same across different browsers) which makes the editor dirty, although
+            // there aren't any real content changes (that would be noticed in the source wiki syntax). We reset the
+            // dirty state in order to avoid getting the leave confirmation when leaving the editor just after it was
+            // loaded.
+            editor.resetDirty();
+            resolve();
+          }, reject);
+          editor._realtimeInterface = Interface;
+          editor._realtimeSource = {
+            // True if the editor was in the realtime session before switching to source.
+            realtime: false,
 
-          // The value of editor.checkDirty() before switching to source.
-          dirty: false,
+            // The value of editor.checkDirty() before switching to source.
+            dirty: false,
 
-          // The result of editor.getSnapshot() right after switching to source.
-          previousValue: null
-        };
-        editor.on('beforeSetMode', this.beforeSetMode.bind(this));
-        editor.on('mode', this.mode.bind(this));
-      });
+            // The result of editor.getSnapshot() right after switching to source.
+            previousValue: null
+          };
+          editor.on('beforeSetMode', this.beforeSetMode.bind(this));
+          editor.on('mode', this.mode.bind(this));
+        }, reject);
+      }));
     },
 
     mode: function(event) {

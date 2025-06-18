@@ -168,6 +168,7 @@ public class BaseSearchResult extends XWikiResource
                 return new ArrayList<>();
             }
 
+            QueryManager finalQueryManager = this.queryManager;
             Formatter f = new Formatter();
 
             /*
@@ -250,13 +251,17 @@ public class BaseSearchResult extends XWikiResource
                 orderClause = "doc.fullName asc";
             } else {
                 orderClause = String.format("doc.%s %s", orderField, HqlQueryUtils.getValidQueryOrder(order, "asc"));
+
+                if (!StringUtils.isAlphanumeric(orderField)) {
+                    finalQueryManager = this.secureQueryManager;
+                }
             }
 
             // Add ordering
             f.format(") order by %s", orderClause);
             String queryString = f.toString();
 
-            Query query = this.secureQueryManager.createQuery(queryString, Query.HQL)
+            Query query = finalQueryManager.createQuery(queryString, Query.HQL)
                     .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
                     .addFilter(Utils.getHiddenQueryFilter(this.componentManager)).setOffset(start)
                     // Worst case scenario when making the locale aware query:
@@ -394,7 +399,7 @@ public class BaseSearchResult extends XWikiResource
             + " or lower(space.reference) like lower(:prefix) escape '!'"
             + " order by lower(space.reference), space.reference";
 
-        List<Object> queryResult = this.secureQueryManager.createQuery(query, Query.HQL)
+        List<Object> queryResult = queryManager.createQuery(query, Query.HQL)
             .bindValue("keywords", String.format("%%%s%%", escapedKeywords))
             .bindValue("prefix", String.format("%s%%", escapedKeywords))
             .setWiki(wikiName).setLimit(number).setOffset(start)
@@ -468,6 +473,7 @@ public class BaseSearchResult extends XWikiResource
                 return result;
             }
 
+            QueryManager finalQueryManager = this.queryManager;
             Formatter f = new Formatter();
 
             /*
@@ -493,11 +499,10 @@ public class BaseSearchResult extends XWikiResource
             if (StringUtils.isBlank(orderField)) {
                 orderClause = "doc.fullName asc";
             } else {
-                /* Check if the order parameter is a valid "asc" or "desc" string, otherwise use "asc" */
-                if ("asc".equals(order) || "desc".equals(order)) {
-                    orderClause = String.format("doc.%s %s", orderField, order);
-                } else {
-                    orderClause = String.format("doc.%s asc", orderField);
+                orderClause = String.format("doc.%s %s", orderField, HqlQueryUtils.getValidQueryOrder(order, "asc"));
+
+                if (!StringUtils.isAlphanumeric(orderField)) {
+                    finalQueryManager = this.secureQueryManager;
                 }
             }
 
@@ -517,12 +522,12 @@ public class BaseSearchResult extends XWikiResource
             /* This is needed because if the :space placeholder is not in the query, setting it would cause an exception */
             if (space != null) {
                 queryResult =
-                    this.secureQueryManager.createQuery(query, Query.XWQL)
+                    finalQueryManager.createQuery(query, Query.XWQL)
                         .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
                         .bindValue("space", space).setLimit(number).execute();
             } else {
                 queryResult =
-                    this.secureQueryManager.createQuery(query, Query.XWQL)
+                    finalQueryManager.createQuery(query, Query.XWQL)
                         .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number)
                         .execute();
             }

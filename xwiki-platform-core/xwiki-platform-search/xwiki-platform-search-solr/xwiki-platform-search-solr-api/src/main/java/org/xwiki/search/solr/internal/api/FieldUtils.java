@@ -21,6 +21,8 @@ package org.xwiki.search.solr.internal.api;
 
 import java.util.Locale;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
  * Contains constants naming the Solr/Lucene index fields used by this module for indexing entities. Also contains
  * additional constants used for composing field names on multilingual fields.
@@ -47,6 +49,13 @@ public final class FieldUtils
      * versions of a document to be indexed. The value format is wiki:Space.Page_locale .
      */
     public static final String ID = "id";
+
+    /**
+     * The local id of the document as defined by {@link XWikiDocument#getId()}.
+     * 
+     * @since 17.8.0RC1
+     */
+    public static final String DOC_ID = "docid";
 
     /**
      * The reference of the entity, including the parameters and the entity type.
@@ -343,6 +352,27 @@ public final class FieldUtils
      * Underscore character, used to separate the field name from the suffix.
      */
     public static final String USCORE = "_";
+
+    /**
+     * The name of the dynamic field used to type simple string properties.
+     * 
+     * @since 17.8.0RC1
+     */
+    public static final String DYNAMIC_STRING = "*_string";
+
+    /**
+     * The name of the dynamic field used to index the lower case version of simple string properties.
+     * 
+     * @since 17.8.0RC1
+     */
+    public static final String DYNAMIC_STRING_LOWERCASE = "*_string_lowercase";
+
+    /**
+     * The type used to index exact strings as lower case.
+     * 
+     * @since 17.8.0RC1
+     */
+    public static final String TYPE_LOWERCASE = "lowercase";
 
     /**
      * Utility class.

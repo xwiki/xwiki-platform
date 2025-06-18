@@ -21,6 +21,7 @@ package org.xwiki.search.solr;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -45,7 +46,10 @@ public interface SolrCoreInitializer
      * @deprecated use {@link #initialize(XWikiSolrCore)} instead
      */
     @Deprecated(since = "16.1.0RC1")
-    void initialize(SolrClient client) throws SolrException;
+    default void initialize(SolrClient client) throws SolrException
+    {
+        initialize(new DefaultXWikiSolrCore(getCoreName(), getCoreName(), client));
+    }
 
     /**
      * Initialize the client after its creation.

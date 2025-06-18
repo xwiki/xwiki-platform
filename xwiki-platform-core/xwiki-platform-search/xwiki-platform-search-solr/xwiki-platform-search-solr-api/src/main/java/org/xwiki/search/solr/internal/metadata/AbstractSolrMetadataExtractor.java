@@ -260,13 +260,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
         solrDocument.setField(FieldUtils.WIKI, documentReference.getWikiReference().getName());
         solrDocument.setField(FieldUtils.NAME, documentReference.getName());
+        solrDocument.setField(FieldUtils.FULLNAME, this.localSerializer.serialize(documentReference));
 
         // Set the fields that are used to query / filter the document hierarchy.
         setHierarchyFields(solrDocument, documentReference.getParent());
 
-        Locale locale = getLocale(documentReference);
-        solrDocument.setField(FieldUtils.LOCALE, locale.toString());
-        solrDocument.setField(FieldUtils.LANGUAGE, locale.getLanguage());
+        Locale realLocale = getRealLocale(documentReference);
+        solrDocument.setField(FieldUtils.LOCALE, realLocale.toString());
+        solrDocument.setField(FieldUtils.LANGUAGE, realLocale.getLanguage());
+
+        solrDocument.setField(FieldUtils.DOC_ID, new XWikiDocument(documentReference,
+            documentReference.getLocale() != null ? documentReference.getLocale() : Locale.ROOT).getId());
 
         return true;
     }
@@ -319,7 +323,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         }
 
         // 4) Make sure that the original document's locale is there as well.
-        locales.add(getLocale(xdocument.getDocumentReference()));
+        locales.add(getRealLocale(xdocument.getDocumentReference()));
 
         return locales;
     }
@@ -338,7 +342,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @return the locale code of the referenced document.
      * @throws SolrIndexerException if problems occur.
      */
-    protected Locale getLocale(DocumentReference documentReference) throws SolrIndexerException
+    protected Locale getRealLocale(DocumentReference documentReference) throws SolrIndexerException
     {
         Locale locale = null;
 

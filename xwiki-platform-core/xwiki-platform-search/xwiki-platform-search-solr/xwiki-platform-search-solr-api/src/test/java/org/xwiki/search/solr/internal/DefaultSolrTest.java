@@ -22,6 +22,7 @@ package org.xwiki.search.solr.internal;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -134,6 +135,9 @@ class DefaultSolrTest
         inputDocument.addField(FieldUtils.LINKS_EXTENDED, "link1.1");
         inputDocument.addField(FieldUtils.LINKS_EXTENDED, "link1.2");
 
+        String propertyName = FieldUtils.PROPERTY_NAME + "_string";
+        inputDocument.addField(propertyName, "StringValue");
+
         String titleRootLocaleField = FieldUtils.getFieldName(FieldUtils.TITLE, Locale.ROOT);
         inputDocument.setField(titleRootLocaleField, "Some title");
 
@@ -145,6 +149,8 @@ class DefaultSolrTest
         assertEquals("", storedDocument.get(FieldUtils.DOCUMENT_LOCALE));
         assertEquals(Arrays.asList("link1", "link2"), storedDocument.getFieldValues(FieldUtils.LINKS));
         assertEquals(Arrays.asList("Some title"), storedDocument.get(titleRootLocaleField));
+        assertEquals(List.of("StringValue"), storedDocument.get(propertyName));
+        assertEquals(List.of("stringvalue"), storedDocument.get(propertyName + "_lowercase"));
     }
 
     @Test

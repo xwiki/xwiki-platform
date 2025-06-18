@@ -99,6 +99,7 @@
                   <directory>${project.build.directory}/node-src/src/</directory>
                   <includes>
                     <include>variables.less</include>
+                    <include>reactive.less</include>
                   </includes>
                 </resource>
               </resources>

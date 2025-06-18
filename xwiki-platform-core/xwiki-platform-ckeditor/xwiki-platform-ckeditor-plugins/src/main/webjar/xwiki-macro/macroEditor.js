@@ -99,7 +99,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       let parametersMap = macroParameterTree.parametersMap;
       output.append(macroParameterTree.mandatoryNodes.map(key => {
         let node = parametersMap[key];
-        return displayMacroParameterTreeNode(parametersMap, node);
+        return displayMacroParameterTreeNode(parametersMap, node, null);
       }));
       output.append(displayOptionalNodes(parametersMap, macroParameterTree.optionalNodes));
     }
@@ -116,10 +116,10 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     return output.children();
   },
 
-  displayMacroParameterTreeNode = function(parametersMap, node) {
+  displayMacroParameterTreeNode = function(parametersMap, node, featureRadioButton) {
     switch (node.type) {
       case 'GROUP': return displayGroup(parametersMap, node);
-      case 'PARAMETER': return displayMacroParameter(node);
+      case 'PARAMETER': return displayMacroParameter(node, featureRadioButton);
     }
   },
 
@@ -218,7 +218,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     }
     nodeOutput
         .find('.feature-choice-body')
-        .append(displayMacroParameterTreeNode(parametersMap, paramNode));
+        .append(displayMacroParameterTreeNode(parametersMap, paramNode, nodeOutput.find('.feature-radio')));
 
     if (isFeature) {
       nodeOutput.find('.feature-choice-body').addClass('with-choice');
@@ -237,10 +237,10 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     let childNodes = node.children || [node.key];
     let tabOutput;
     if (node.featureOnly) {
-      tabOutput = displayFeature(parametersMap, node, true);
+      tabOutput = displayGroup(parametersMap, node);
     } else {
       tabOutput = childNodes.map(nodeKey =>
-          displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey]));
+          displayMacroParameterTreeNode(parametersMap, parametersMap[nodeKey], null));
     }
 
     tabPanel
@@ -268,7 +268,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       '<div class="macro-parameter-description"></div>' +
     '</div>',
 
-  displayMacroParameter = function(parameter) {
+  displayMacroParameter = function(parameter, featureRadioButton) {
     let output = $(macroParameterTemplate);
     output.attr('data-id', parameter.id).attr('data-type', parameter.displayType);
     output.find('.macro-parameter-name').attr('for', 'parameter-' + parameter.id);
@@ -279,35 +279,26 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     output.find('.macro-parameter-description').text(parameter.description);
     output.toggleClass('mandatory', !!parameter.mandatory);
     output.toggleClass('hidden', !!parameter.hidden);
-    output.append(displayMacroParameterField(parameter));
+    output.append(displayMacroParameterField(parameter, featureRadioButton));
     return output;
   },
 
-  displayMacroParameterField = function(parameter) {
-    let field = $('<div></div>').addClass('macro-parameter-field').html(parameter.editTemplate);
-    // Look for input elements whose name matches the parameter id.
-    let valueInputs = field.find(':input').filter(function() {
-      return $(this).attr('name') === parameter.id;
-    });
-    // set the id of the input
-    valueInputs.first().attr('id', 'parameter-' + parameter.id);
-    let firstInputType = valueInputs.prop('type');
-    let value = parameter.hasOwnProperty('value') ? parameter.value : parameter.defaultValue;
+  getParameterValue = function (valueInputs, originalValue, isCaseInsensitive) {
     let matchesParameterValue = function(value) {
       return function() {
-        if (parameter.caseInsensitive) {
+        if (isCaseInsensitive) {
           return $(this).val().toUpperCase() === value.toUpperCase();
         } else {
           return $(this).val() === value;
         }
       };
     };
+    let value = originalValue;
+    let firstInputType = valueInputs.prop('type');
     if (firstInputType === 'checkbox' || firstInputType === 'radio') {
       // Keep only the input elements with the same type as the first one.
-      valueInputs = valueInputs.filter(function() {
-        return $(this).prop('type') === firstInputType;
-      });
-      if (parameter.caseInsensitive) {
+      valueInputs = valueInputs.filter(() => $(this).prop('type') === firstInputType);
+      if (isCaseInsensitive) {
         // Use the canonical value.
         value = valueInputs.filter(matchesParameterValue(value)).val() || value;
       }
@@ -329,7 +320,28 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
         });
       }
     }
-    // FIXME: we need to find a way to select automatically the parent radio button in case of feature
+    return value;
+  },
+
+  displayMacroParameterField = function(parameter, featureRadioButton) {
+    let field = $('<div></div>').addClass('macro-parameter-field').html(parameter.editTemplate);
+    // Look for input elements whose name matches the parameter id.
+    let valueInputs = field.find(':input').filter(function() {
+      return $(this).attr('name') === parameter.id;
+    });
+    // set the id of the input
+    valueInputs.first().attr('id', 'parameter-' + parameter.id);
+
+    let value = parameter.defaultValue;
+    if (parameter.hasOwnProperty('value')) {
+      value = parameter.value;
+      if (featureRadioButton) {
+        featureRadioButton.attr('checked', 'checked');
+      }
+    }
+
+    value = getParameterValue(valueInputs, value, parameter.caseInsensitive);
+
     // We pass the value as an array in order to properly handle radio inputs and checkboxes.
     valueInputs.val(Array.isArray(value) ? value : [value]);
     return field;

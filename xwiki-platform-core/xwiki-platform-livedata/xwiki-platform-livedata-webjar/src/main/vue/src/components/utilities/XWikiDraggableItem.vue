@@ -67,13 +67,4 @@ export default {
 .draggable-item .handle .fa {
   vertical-align: middle;
 }
-
-/* Responsive mode */
-@media screen and (max-width: var(--screen-xs-max)) {
-  .draggable-item .handle {
-    /* Always show the drag handle on small screens because we can't rely on hover. */
-    opacity: 1;
-  }
-}
-
 </style>

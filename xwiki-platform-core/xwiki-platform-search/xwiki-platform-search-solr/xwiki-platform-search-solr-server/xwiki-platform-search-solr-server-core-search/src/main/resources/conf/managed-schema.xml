@@ -65,13 +65,33 @@
        1.6: useDocValuesAsStored defaults to true.
     -->
 
-    <!-- XWIKI: the version of the schema from XWiki point of view.
-         The version should be updated when the configuration need to be updated for the core to work as expected.
-         It cause the whole schema to be re-created with embedded Solr setup.
+    <!-- XWiki changelog
 
-         160600000: added support for Ukrainian locale, this also requires a special JAR in the lib/ folder
+         16.6.0 (160600000) (major):
+           * added support for Ukrainian locale, this also requires a special JAR in the lib/ folder
+
+         17.3.0 (no schema version change) :
+           * "string" type moved to docValues="true"
+           * "lowercase" type implementation changed, and moved to docValues="true"
+
+         17.6.0 (170600000) (migration):
+           * a docId field has been added to store the XWiki document long local identifier (XWikiDocument#getId)
+    -->
+    <!-- XWIKI: the versions of the schema from XWiki point of view.
+    
+         There are two possibilities:
+           * increment both "__cversion" and "__cmversion": the "search" core configuration and data will be deleted and re-created
+                (only in the case of the embedded setup, the standalone setup is a bit more manual in this case)
+           * increment only "__cmversion": it won't recreate the "search" core, instead it will execute all SearchCoreMigration components
+                with versions greater than the current one
+
+         It's recommended to use migrations when possible (so only when the required changes can be fully done using SolrJ API):
+           * it avoid re-indexing sometimes huge instances
+           * it makes the upgrade of Solr standalone setups much easier
+           * it better support customizations of the Solr configuration
     -->
     <fieldType name="__cversion" class="solr.ExternalFileField" defVal="160600000"/>
+    <fieldType name="__cmversion" class="solr.ExternalFileField" defVal="170600000"/>
 
     <!-- Valid attributes for fields:
      name: mandatory - the name for the field
@@ -152,6 +172,8 @@
     <!-- The entity type: DOCUMENT, ATTACHMENT, OBJECT, OBJECT_PROPERTY -->
     <field name="type" type="string" indexed="true" stored="true" />
     <field name="wiki" type="string" indexed="true" stored="true" />
+    <!-- The unique identifier of the document in the wiki (see XWikiDocument#getId()) -->
+    <field name="docId" type="plong" indexed="true" stored="true" />
     <!-- The local space reference. For a document {@code A.B.C.Page} the value of this field is {@code A.B.C}.
       This field is analyzed and thus used for free text search.
       @deprecated since 7.2, use the "spaces" multiValued field instead -->

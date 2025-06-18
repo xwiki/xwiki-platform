@@ -17,29 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import eslint from "@eslint/js";
-import eslintConfigPrettier from "eslint-config-prettier";
-import eslintPluginVue from "eslint-plugin-vue";
-import globals from "globals";
-import typescriptEslint from "typescript-eslint";
+import { type DesignSystemLoader, registerAsyncComponent } from "@xwiki/cristal-api";
+import { type Container, injectable } from "inversify";
+import type { App } from "vue";
 
-export default [
-  eslint.configs.recommended,
-  ...typescriptEslint.configs.recommended,
-  ...eslintPluginVue.configs["flat/recommended"],
-  {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        XWiki: "readonly",
-        require: "readonly",
-        define: "readonly",
-        global: "readonly",
-      },
-      parserOptions: {
-        parser: typescriptEslint.parser,
-      },
-    },
-  },
-  eslintConfigPrettier,
-];
+@injectable("Singleton")
+export class XWikiDesignSystemLoader implements DesignSystemLoader {
+  public static bind(container: Container): void {
+    container.bind<DesignSystemLoader>("DesignSystemLoader").to(XWikiDesignSystemLoader).inSingletonScope();
+  }
+
+  loadDesignSystem(app: App): void {
+    registerAsyncComponent(app, "XBtn", () => import("@/components/ds/x-btn.vue"));
+  }
+}

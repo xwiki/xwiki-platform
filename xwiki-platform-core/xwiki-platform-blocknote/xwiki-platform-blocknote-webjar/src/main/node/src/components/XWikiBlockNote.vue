@@ -130,7 +130,7 @@ export default {
 
       const value = this.uniAstToMarkdown.toMarkdown(editorContent);
       if (value instanceof Error) {
-        throw error;
+        throw value;
       }
 
       this.value = value;

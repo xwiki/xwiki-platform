@@ -660,9 +660,23 @@
     })
   }
 
-  var old = $.fn.tooltip
+  let other = $.fn.tooltip
 
-  $.fn.tooltip             = Plugin
+  // Prevent overriding this tooltip implementation by jQuery UI as in XWiki we ship both implementations but want
+  // to always use the Bootstrap one.
+  Object.defineProperty($.fn, 'tooltip', {
+    configurable: true,
+    get: function () {
+      return Plugin
+    },
+    set: function (value) {
+      // For increased compatibility with other libraries, we store the first assigned value to allow restoring it
+      // using noConflict.
+      if (typeof other === 'undefined') {
+        other = value
+      }
+    }
+  })
   $.fn.tooltip.Constructor = Tooltip
 
 
@@ -670,7 +684,8 @@
   // ===================
 
   $.fn.tooltip.noConflict = function () {
-    $.fn.tooltip = old
+    delete $.fn.tooltip
+    $.fn.tooltip = other
     return this
   }
 

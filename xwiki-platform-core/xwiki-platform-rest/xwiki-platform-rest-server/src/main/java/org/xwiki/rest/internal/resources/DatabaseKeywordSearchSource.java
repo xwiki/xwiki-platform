@@ -104,6 +104,9 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
     private EntityReferenceProvider defaultEntityReferenceProvider;
 
     @Inject
+    private QueryManager queryManager;
+
+    @Inject
     @Named("secure")
     private QueryManager secureQueryManager;
 
@@ -161,6 +164,8 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             if (keywords == null) {
                 return new ArrayList<>();
             }
+
+            QueryManager finalQueryManager = this.queryManager;
 
             String orderField = options.orderField();
             /*
@@ -246,13 +251,17 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             } else {
                 orderClause =
                     String.format("doc.%s %s", orderField, HqlQueryUtils.getValidQueryOrder(options.order(), "asc"));
+
+                if (!StringUtils.isAlphanumeric(orderField)) {
+                    finalQueryManager = this.secureQueryManager;
+                }
             }
 
             // Add ordering
             f.format(") order by %s", orderClause);
             String queryString = f.toString();
 
-            Query query = this.secureQueryManager.createQuery(queryString, Query.HQL)
+            Query query = finalQueryManager.createQuery(queryString, Query.HQL)
                 .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
                 .addFilter(this.hiddenDocumentFilterProvider.get()).setOffset(options.start())
                 // Worst case scenario when making the locale aware query:
@@ -394,7 +403,7 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             + " or lower(space.reference) like lower(:prefix) escape '!'"
             + " order by lower(space.reference), space.reference";
 
-        List<Object> queryResult = this.secureQueryManager.createQuery(query, Query.HQL)
+        List<Object> queryResult = this.queryManager.createQuery(query, Query.HQL)
             .bindValue("keywords", String.format("%%%s%%", escapedKeywords))
             .bindValue("prefix", String.format("%s%%", escapedKeywords))
             .setWiki(wikiName).setLimit(number).setOffset(start)
@@ -454,16 +463,14 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
     {
         XWikiContext context = this.contextProvider.get();
 
-        XWiki xwikiApi = new XWiki(context.getWiki(), context);
-
         String database = context.getWikiId();
 
         try (Formatter f = new Formatter()) {
-            List<SearchResult> result = new ArrayList<SearchResult>();
-
             if (keywords == null) {
-                return result;
+                return new ArrayList<SearchResult>();
             }
+
+            QueryManager finalQueryManager = this.queryManager;
 
             String orderField = options.orderField();
             /*
@@ -491,15 +498,15 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             }
 
             /* Build the order clause. */
-            String orderClause = null;
+            String orderClause;
             if (StringUtils.isBlank(orderField)) {
                 orderClause = "doc.fullName asc";
             } else {
-                /* Check if the order parameter is a valid "asc" or "desc" string, otherwise use "asc" */
-                if ("asc".equals(options.order()) || "desc".equals(options.order())) {
-                    orderClause = String.format("doc.%s %s", orderField, options.order());
-                } else {
-                    orderClause = String.format("doc.%s asc", orderField);
+                orderClause =
+                    String.format("doc.%s %s", orderField, HqlQueryUtils.getValidQueryOrder(options.order(), "asc"));
+
+                if (!StringUtils.isAlphanumeric(orderField)) {
+                    finalQueryManager = this.secureQueryManager;
                 }
             }
 
@@ -520,85 +527,94 @@ public class DatabaseKeywordSearchSource implements KeywordSearchSource
             exception */
             if (options.space() != null) {
                 queryResult =
-                    this.secureQueryManager.createQuery(query, Query.XWQL)
+                    finalQueryManager.createQuery(query, Query.XWQL)
                         .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
                         .bindValue("space", options.space()).setLimit(options.number()).execute();
             } else {
                 queryResult =
-                    this.secureQueryManager.createQuery(query, Query.XWQL)
+                    finalQueryManager.createQuery(query, Query.XWQL)
                         .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase()))
                         .setLimit(options.number())
                         .execute();
             }
 
             /* Build the result. */
-            ObjectFactory objectFactory = new ObjectFactory();
-            for (Object object : queryResult) {
-                Object[] fields = (Object[]) object;
-
-                String spaceId = (String) fields[1];
-                List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
-                String pageName = (String) fields[2];
-                String className = (String) fields[3];
-                int objectNumber = (Integer) fields[4];
-
-                String id = Utils.getObjectId(options.wikiName(), spaces, pageName, className, objectNumber);
-
-                String pageId = Utils.getPageId(options.wikiName(), spaces, pageName);
-                String pageFullName = Utils.getPageFullName(options.wikiName(), spaces, pageName);
-
-                /*
-                 * Check if the user has the right to see the found document. We also prevent guest users to access
-                 * object data in order to avoid leaking important information such as emails to crawlers.
-                 */
-                if (xwikiApi.hasAccessLevel("view", pageId) && context.getUserReference() != null) {
-                    Document doc = xwikiApi.getDocument(pageFullName);
-                    String title = doc.getDisplayTitle();
-                    SearchResult searchResult = objectFactory.createSearchResult();
-                    searchResult.setType("object");
-                    searchResult.setId(id);
-                    searchResult.setPageFullName(pageFullName);
-                    searchResult.setTitle(title);
-                    searchResult.setWiki(options.wikiName());
-                    searchResult.setSpace(spaceId);
-                    searchResult.setPageName(pageName);
-                    searchResult.setVersion(doc.getVersion());
-                    searchResult.setClassName(className);
-                    searchResult.setObjectNumber(objectNumber);
-                    searchResult.setAuthor(doc.getAuthor());
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(doc.getDate());
-                    searchResult.setModified(calendar);
-
-                    if (options.withPrettyNames()) {
-                        searchResult.setAuthorName(
-                            context.getWiki().getPlainUserName(doc.getAuthorReference(), context));
-                    }
-
-                    List<String> restSpacesValue = Utils.getSpacesURLElements(spaces);
-
-                    String pageUri =
-                        Utils.createURI(baseURI, PageResource.class, options.wikiName(), restSpacesValue, pageName)
-                            .toString();
-                    Link pageLink = new Link();
-                    pageLink.setHref(pageUri);
-                    pageLink.setRel(Relations.PAGE);
-                    searchResult.getLinks().add(pageLink);
-
-                    String objectUri = Utils.createURI(baseURI, ObjectResource.class, options.wikiName(),
-                        restSpacesValue, pageName, className, objectNumber).toString();
-                    Link objectLink = new Link();
-                    objectLink.setHref(objectUri);
-                    objectLink.setRel(Relations.OBJECT);
-                    searchResult.getLinks().add(objectLink);
-
-                    result.add(searchResult);
-                }
-            }
-
-            return result;
+            return searchObjects(options, baseURI, queryResult, context);
         } finally {
             this.contextProvider.get().setWikiId(database);
         }
+    }
+
+    private List<SearchResult> searchObjects(KeywordSearchOptions options, URI baseURI, List<Object> queryResult,
+        XWikiContext context) throws UriBuilderException, XWikiException
+    {
+        List<SearchResult> result = new ArrayList<>();
+
+        XWiki xwikiApi = new XWiki(context.getWiki(), context);
+
+        /* Build the result. */
+        ObjectFactory objectFactory = new ObjectFactory();
+        for (Object object : queryResult) {
+            Object[] fields = (Object[]) object;
+
+            String spaceId = (String) fields[1];
+            List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
+            String pageName = (String) fields[2];
+            String className = (String) fields[3];
+            int objectNumber = (Integer) fields[4];
+
+            String id = Utils.getObjectId(options.wikiName(), spaces, pageName, className, objectNumber);
+
+            String pageId = Utils.getPageId(options.wikiName(), spaces, pageName);
+            String pageFullName = Utils.getPageFullName(options.wikiName(), spaces, pageName);
+
+            /*
+             * Check if the user has the right to see the found document. We also prevent guest users to access object
+             * data in order to avoid leaking important information such as emails to crawlers.
+             */
+            if (xwikiApi.hasAccessLevel("view", pageId) && context.getUserReference() != null) {
+                Document doc = xwikiApi.getDocument(pageFullName);
+                String title = doc.getDisplayTitle();
+                SearchResult searchResult = objectFactory.createSearchResult();
+                searchResult.setType("object");
+                searchResult.setId(id);
+                searchResult.setPageFullName(pageFullName);
+                searchResult.setTitle(title);
+                searchResult.setWiki(options.wikiName());
+                searchResult.setSpace(spaceId);
+                searchResult.setPageName(pageName);
+                searchResult.setVersion(doc.getVersion());
+                searchResult.setClassName(className);
+                searchResult.setObjectNumber(objectNumber);
+                searchResult.setAuthor(doc.getAuthor());
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(doc.getDate());
+                searchResult.setModified(calendar);
+
+                if (options.withPrettyNames()) {
+                    searchResult.setAuthorName(context.getWiki().getPlainUserName(doc.getAuthorReference(), context));
+                }
+
+                List<String> restSpacesValue = Utils.getSpacesURLElements(spaces);
+
+                String pageUri = Utils
+                    .createURI(baseURI, PageResource.class, options.wikiName(), restSpacesValue, pageName).toString();
+                Link pageLink = new Link();
+                pageLink.setHref(pageUri);
+                pageLink.setRel(Relations.PAGE);
+                searchResult.getLinks().add(pageLink);
+
+                String objectUri = Utils.createURI(baseURI, ObjectResource.class, options.wikiName(), restSpacesValue,
+                    pageName, className, objectNumber).toString();
+                Link objectLink = new Link();
+                objectLink.setHref(objectUri);
+                objectLink.setRel(Relations.OBJECT);
+                searchResult.getLinks().add(objectLink);
+
+                result.add(searchResult);
+            }
+        }
+
+        return result;
     }
 }

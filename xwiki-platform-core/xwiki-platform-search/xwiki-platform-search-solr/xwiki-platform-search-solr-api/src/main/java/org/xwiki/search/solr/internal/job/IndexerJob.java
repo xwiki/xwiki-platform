@@ -19,12 +19,19 @@
  */
 package org.xwiki.search.solr.internal.job;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -36,8 +43,13 @@ import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
+import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
+import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 /**
  * Provide progress information and store logging of an advanced indexing.
@@ -79,6 +91,15 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private SolrInstance solrInstance;
+
+    @Inject
+    private SolrUtils solrUtils;
+
+    @Inject
+    private SolrReferenceResolver solrReferenceResolver;
 
     @Override
     public String getType()
@@ -175,8 +196,65 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
             this.logger.info(
                 "{} documents added, {} deleted and {} updated during the synchronization of the Solr index.",
                 counter[Action.ADD.ordinal()], counter[Action.DELETE.ordinal()], counter[Action.UPDATE.ordinal()]);
+
+            if (getRequest().isCleanInvalid()) {
+                // Wait for the indexing to be fully applied
+                this.indexer.waitReady().get();
+
+                // Remove from the core all entries which don't have a docId set
+                deleteMissingId();
+
+                // TODO: Remove from the core all entries for which no corresponding DOCUMENT type entry exist (see
+                // https://jira.xwiki.org/browse/XWIKI-22949)
+            }
         } finally {
             this.progressManager.popLevelProgress(this);
         }
+    }
+
+    private void deleteMissingId() throws SolrServerException, IOException, SolrIndexerException
+    {
+        SolrQuery query = new SolrQuery(this.solrReferenceResolver.getQuery(getRequest().getRootReference()));
+        query.addFilterQuery("-" + FieldUtils.DOC_ID + ":*");
+        query.setFields(FieldUtils.ID);
+        query.setRows(10000);
+        // Cursor functionality requires a sort containing a uniqueKey field tie breaker
+        query.addSort(FieldUtils.ID, SolrQuery.ORDER.asc);
+
+        boolean commit = false;
+        String cursorMark = CursorMarkParams.CURSOR_MARK_START;
+        boolean done = false;
+        while (!done) {
+            query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
+            QueryResponse response = this.solrInstance.query(query);
+            SolrDocumentList results = response.getResults();
+            if (!results.isEmpty()) {
+                // Delete documents
+                commit |= delete(results);
+            }
+            String nextCursorMark = response.getNextCursorMark();
+            if (cursorMark.equals(nextCursorMark)) {
+                done = true;
+            }
+            cursorMark = nextCursorMark;
+        }
+
+        if (commit) {
+            // Commit
+            this.solrInstance.commit();
+        }
+    }
+
+    private boolean delete(SolrDocumentList results) throws SolrServerException, IOException
+    {
+        List<String> ids = results.stream().map(this.solrUtils::getId).toList();
+
+        if (!ids.isEmpty()) {
+            this.solrInstance.delete(ids);
+
+            return true;
+        }
+
+        return false;
     }
 }

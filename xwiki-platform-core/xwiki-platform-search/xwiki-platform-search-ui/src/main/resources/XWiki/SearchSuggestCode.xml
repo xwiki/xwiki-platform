@@ -42,7 +42,13 @@
 ## search suggest contructor.
 #set ($sources = [])
 #set ($searchSuggestConfig = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
-#foreach ($source in $searchSuggestConfig.getObjects('XWiki.SearchSuggestSourceClass'))
+#if ($request.getHeader('If-None-Match') == $searchSuggestConfig.version)
+  #set ($discard = $response.setStatus(304))
+  #rawResponse('')
+#else
+  #set ($discard = $response.setHeader('Cache-Control', 'must-revalidate'))
+  #set ($discard = $response.setHeader('ETag', $searchSuggestConfig.version))
+  #foreach ($source in $searchSuggestConfig.getObjects('XWiki.SearchSuggestSourceClass'))
   #if ($source.getProperty('activated').value == 1)
     #set ($engine = $source.getProperty('engine').value)
     #if ("$!engine" == '')
@@ -97,7 +103,8 @@
     #end
   #end
 #end
-#jsonResponse($sources)
+  #jsonResponse($sources)
+#end
 #end
 {{/velocity}}</content>
 </xwikidoc>

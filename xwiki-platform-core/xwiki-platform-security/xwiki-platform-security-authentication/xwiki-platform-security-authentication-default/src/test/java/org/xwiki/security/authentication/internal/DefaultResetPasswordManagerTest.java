@@ -363,7 +363,7 @@ class DefaultResetPasswordManagerTest
         ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
             () -> this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));
         assertEquals(exceptionMessage, resetPasswordException.getMessage());
-        verify(userDocument).removeXObject(xObject);
+        verify(userDocument).removeXObjects(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
         verify(this.xWiki).saveDocument(userDocument, saveComment, true, context);
     }
 
@@ -446,7 +446,7 @@ class DefaultResetPasswordManagerTest
         ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
             () -> this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));
         assertEquals(exceptionMessage, resetPasswordException.getMessage());
-        verify(userDocument).removeXObject(xObject);
+        verify(userDocument).removeXObjects(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
         verify(this.xWiki).saveDocument(userDocument, saveComment, true, context);
     }
 
@@ -486,7 +486,7 @@ class DefaultResetPasswordManagerTest
         ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
             () -> this.resetPasswordManager.checkVerificationCode(this.userReference, verificationCode));
         assertEquals(exceptionMessage, resetPasswordException.getMessage());
-        verify(userDocument).removeXObject(xObject);
+        verify(userDocument).removeXObjects(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
         verify(this.xWiki).saveDocument(this.userDocument, saveComment, true, context);
     }
 

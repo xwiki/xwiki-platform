@@ -12,6 +12,7 @@
     "@xwiki/cristal-api": "0.18.0",
     "@xwiki/cristal-authentication-api": "0.18.0",
     "@xwiki/cristal-document-api": "0.18.0",
+    "@xwiki/cristal-dsapi": "0.18.0",
     "@xwiki/cristal-editors-blocknote-headless": "0.18.0",
     "@xwiki/cristal-link-suggest-api": "0.18.0",
     "@xwiki/cristal-model-api": "0.18.0",
@@ -32,17 +33,17 @@
     "@vue/eslint-config-prettier": "10.2.0",
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "0.7.0",
-    "eslint": "9.28.0",
+    "eslint": "9.29.0",
     "eslint-plugin-vue": "10.2.0",
     "jiti": "2.4.2",
     "jsdom": "26.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.34.0",
+    "typescript-eslint": "8.34.1",
     "vite": "6.3.5",
     "vitest": "3.2.3",
-    "vue-tsc": "2.2.8"
+    "vue-tsc": "2.2.10"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

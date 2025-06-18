@@ -17,13 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { DesignSystemLoader, SkinManager } from "@xwiki/cristal-api";
 import { type Container, injectable } from "inversify";
-import type { SkinManager } from "@xwiki/cristal-api";
 import type { App, Component } from "vue";
 
 @injectable("Singleton")
 export class DefaultSkinManager implements SkinManager {
-  private designSystem: string = "xwiki";
+  public static readonly DEFAULT_DESIGN_SYSTEM = "xwiki";
+
+  private designSystem: string = DefaultSkinManager.DEFAULT_DESIGN_SYSTEM;
   private readonly templates: Map<string, Component> = new Map<string, Component>();
 
   public static bind(container: Container): void {
@@ -45,9 +47,27 @@ export class DefaultSkinManager implements SkinManager {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public loadDesignSystem(app: App, container: Container): void {
-    // Do nothing for now.
+    let designSystemLoader: DesignSystemLoader | null = null;
+
+    try {
+      designSystemLoader = container.get<DesignSystemLoader>("DesignSystemLoader", { name: this.designSystem });
+    } catch {
+      console.error("Exception while loading design system ", this.designSystem);
+
+      if (this.designSystem !== DefaultSkinManager.DEFAULT_DESIGN_SYSTEM) {
+        // Fallback to the default design system.
+        designSystemLoader = container.get<DesignSystemLoader>("DesignSystemLoader", {
+          name: DefaultSkinManager.DEFAULT_DESIGN_SYSTEM,
+        });
+      }
+    }
+
+    if (designSystemLoader) {
+      designSystemLoader.loadDesignSystem(app);
+    } else {
+      console.error("Cannot initialize design system.");
+    }
   }
 
   public setDesignSystem(designSystem: string): void {

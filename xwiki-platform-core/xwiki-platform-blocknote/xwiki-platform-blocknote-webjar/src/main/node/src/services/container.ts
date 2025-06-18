@@ -32,6 +32,7 @@ import { DefaultRemoteURLSerializerProvider } from "./model/url/DefaultRemoteURL
 import { XWikiRemoteURLParser } from "./model/url/XWikiRemoteURLParser";
 import { XWikiRemoteURLSerializer } from "./model/url/XWikiRemoteURLSerializer";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
+import { XWikiDesignSystemLoader } from "./skin/XWikiDesignSystemLoader";
 
 const container = new Container();
 container.bind("Container").toConstantValue(container);
@@ -55,5 +56,6 @@ DefaultLinkSuggestServiceProvider.bind(container);
 XWikiLinkSuggestService.bind(container);
 
 DefaultSkinManager.bind(container);
+XWikiDesignSystemLoader.bind(container);
 
 export { container };

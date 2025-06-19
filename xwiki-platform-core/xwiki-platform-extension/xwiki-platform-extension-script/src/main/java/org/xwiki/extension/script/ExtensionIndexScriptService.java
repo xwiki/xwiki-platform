@@ -24,11 +24,19 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.RemoteExtension;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.ExtensionIndex;
+import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.extension.index.IndexedExtensionQuery;
+import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.search.ExtensionQuery;
+import org.xwiki.extension.wrap.WrappingIndexedExtension;
+import org.xwiki.extension.wrap.WrappingRatingExtension;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.stability.Unstable;
 
 /**
  * Various script APIs related to indexed extensions.
@@ -76,6 +84,72 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
     }
 
     /**
+     * @param extension the current extension
+     * @return an {@link Extension} instance corresponding to the passed extension and supporting
+     *         {@link RatingExtension}
+     * @since 17.5.0RC1
+     * @since 17.4.2
+     * @since 16.10.9
+     */
+    @Unstable
+    public IndexedExtension getIndexedExtension(Extension extension)
+    {
+        if (extension instanceof IndexedExtension indexedExtension) {
+            return indexedExtension;
+        }
+
+        try {
+            return this.index.resolve(extension.getId());
+        } catch (ResolveException e) {
+            return new WrappingIndexedExtension<>(extension);
+        }
+    }
+
+    /**
+     * @param extension the current extension
+     * @return an {@link Extension} instance corresponding to the passed extension and supporting
+     *         {@link RatingExtension}
+     * @since 17.5.0RC1
+     * @since 17.4.2
+     * @since 16.10.9
+     */
+    @Unstable
+    public RatingExtension getRatingExtension(Extension extension)
+    {
+        if (extension instanceof RatingExtension ratingExtension) {
+            return ratingExtension;
+        }
+
+        try {
+            return this.index.resolve(extension.getId());
+        } catch (ResolveException e) {
+            return new WrappingRatingExtension<>(extension);
+        }
+    }
+
+    /**
+     * @param extension the current extension
+     * @return an {@link Extension} instance corresponding to the passed extension and supporting
+     *         {@link RemoteExtension}
+     * @since 17.5.0RC1
+     * @since 17.4.2
+     * @since 16.10.9
+     */
+    @Unstable
+    public RemoteExtension getRemoteExtension(Extension extension)
+    {
+        if (extension instanceof RemoteExtension remoteExtension) {
+            return remoteExtension;
+        }
+
+        try {
+            return this.index.resolve(extension.getId());
+        } catch (ResolveException e) {
+            return new WrappingRatingExtension<>(extension);
+        }
+    }
+
+    /**
      * @param <S> the type of the {@link ScriptService}
      * @param serviceName the name of the sub {@link ScriptService}
      * @return the {@link ScriptService} or null of none could be found
@@ -84,7 +158,7 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
     @SuppressWarnings("unchecked")
     public <S extends ScriptService> S get(String serviceName)
     {
-        return (S) this.scriptServiceManager.get(
-            ExtensionManagerScriptService.ROLEHINT + '.' + ExtensionIndexScriptService.ID + '.' + serviceName);
+        return (S) this.scriptServiceManager
+            .get(ExtensionManagerScriptService.ROLEHINT + '.' + ExtensionIndexScriptService.ID + '.' + serviceName);
     }
 }

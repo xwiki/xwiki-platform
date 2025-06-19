@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,7 +49,12 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
@@ -106,7 +114,7 @@ import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializ
  */
 @Component(roles = ExtensionIndexStore.class)
 @Singleton
-public class ExtensionIndexStore implements Initializable
+public class ExtensionIndexStore implements Initializable, Disposable
 {
     private static final int COMMIT_BATCH_SIZE = 100;
 
@@ -183,6 +191,15 @@ public class ExtensionIndexStore implements Initializable
     @Inject
     private ExtensionIndexSolrUtil extensionIndexSolrUtil;
 
+    @Inject
+    private CacheManager cacheManager;
+
+    private Cache<SolrExtension> cache;
+
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private Set<String> modifiedIds = ConcurrentHashMap.newKeySet();
+
     private int documentsToStore;
 
     @Override
@@ -193,6 +210,18 @@ public class ExtensionIndexStore implements Initializable
         } catch (SolrException e) {
             throw new InitializationException("Failed to get the extension index Solr core", e);
         }
+
+        try {
+            this.cache = this.cacheManager.createNewCache(new LRUCacheConfiguration("extension.index", 500));
+        } catch (Exception e) {
+            throw new InitializationException("Failed to create the group cache", e);
+        }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        this.cache.dispose();
     }
 
     /**
@@ -204,8 +233,29 @@ public class ExtensionIndexStore implements Initializable
         // Reset counter
         this.documentsToStore = 0;
 
-        // Commit
-        this.client.commit();
+        this.lock.writeLock().lock();
+
+        try {
+            // Commit
+            this.client.commit();
+
+            // Invalidate modified cached entries
+            this.modifiedIds.forEach(this.cache::remove);
+            this.modifiedIds.clear();
+        } finally {
+            this.lock.writeLock().unlock();
+        }
+    }
+
+    private void addMofiedId(String id)
+    {
+        this.lock.readLock().lock();
+
+        try {
+            this.modifiedIds.add(id);
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     /**
@@ -594,6 +644,9 @@ public class ExtensionIndexStore implements Initializable
         // Add the document to the Solr queue
         this.client.add(document);
 
+        // Remember the modified entry
+        addMofiedId((String) document.getFieldValue(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID));
+
         // Check if it should be auto committed
         ++this.documentsToStore;
         if (this.documentsToStore == COMMIT_BATCH_SIZE) {
@@ -615,7 +668,17 @@ public class ExtensionIndexStore implements Initializable
      */
     public SolrExtension getSolrExtension(ExtensionId extensionId) throws SolrServerException, IOException
     {
-        return toSolrExtension(this.client.getById(this.extensionIndexSolrUtil.toSolrId(extensionId)), extensionId);
+        String id = this.extensionIndexSolrUtil.toSolrId(extensionId);
+
+        SolrExtension solrExtension = this.cache.get(id);
+
+        if (solrExtension == null) {
+            solrExtension = toSolrExtension(this.client.getById(id), extensionId);
+
+            this.cache.set(id, solrExtension);
+        }
+
+        return solrExtension;
     }
 
     /**

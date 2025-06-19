@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { ComponentInit as ModelReferenceXWiki } from "@xwiki/cristal-model-reference-xwiki";
 import { Container } from "inversify";
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
@@ -27,6 +26,9 @@ import { XWikiLinkSuggestService } from "./link/XWikiLinkSuggestService";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
+import { XWikiModelReferenceHandler } from "./model/reference/XWikiModelReferenceHandler";
+import { XWikiModelReferenceParser } from "./model/reference/XWikiModelReferenceParser";
+import { XWikiModelReferenceSerializer } from "./model/reference/XWikiModelReferenceSerializer";
 import { DefaultRemoteURLParserProvider } from "./model/url/DefaultRemoteURLParserProvider";
 import { DefaultRemoteURLSerializerProvider } from "./model/url/DefaultRemoteURLSerializerProvider";
 import { XWikiRemoteURLParser } from "./model/url/XWikiRemoteURLParser";
@@ -40,9 +42,13 @@ container.bind("Container").toConstantValue(container);
 DefaultDocumentService.bind(container);
 
 DefaultModelReferenceParserProvider.bind(container);
+XWikiModelReferenceParser.bind(container);
+
 DefaultModelReferenceSerializerProvider.bind(container);
+XWikiModelReferenceSerializer.bind(container);
+
 DefaultModelReferenceHandlerProvider.bind(container);
-new ModelReferenceXWiki(container);
+XWikiModelReferenceHandler.bind(container);
 
 DefaultRemoteURLParserProvider.bind(container);
 XWikiRemoteURLParser.bind(container);

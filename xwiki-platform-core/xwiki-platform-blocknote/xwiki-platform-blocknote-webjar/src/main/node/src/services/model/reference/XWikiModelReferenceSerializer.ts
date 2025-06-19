@@ -17,19 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { EntityReference } from "@xwiki/cristal-model-api";
-import { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
+
+import { toXWikiEntityReference } from "@/services/model/reference/XWikiEntityReference";
+import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
+import { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
 import { Container, injectable } from "inversify";
 
 @injectable("Singleton")
-export class XWikiRemoteURLParser implements RemoteURLParser {
+export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
   public static bind(container: Container): void {
-    container.bind("RemoteURLParser").to(XWikiRemoteURLParser).inSingletonScope().whenNamed("XWiki");
+    container.bind("ModelReferenceSerializer").to(XWikiModelReferenceSerializer).inSingletonScope().whenNamed("XWiki");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public parse(url: string): EntityReference | undefined {
-    // TODO
-    throw new Error("Method not implemented.");
+  public serialize(reference?: EntityReference): string | undefined {
+    if (!reference) {
+      return undefined;
+    }
+    return this.getPrefix(reference.type) + XWiki.Model.serialize(toXWikiEntityReference(reference));
+  }
+
+  private getPrefix(type: EntityType): string {
+    switch (type) {
+      case EntityType.SPACE:
+        return "space:";
+      case EntityType.DOCUMENT:
+        return "doc:";
+      case EntityType.ATTACHMENT:
+        return "attach:";
+      default:
+        return "";
+    }
   }
 }

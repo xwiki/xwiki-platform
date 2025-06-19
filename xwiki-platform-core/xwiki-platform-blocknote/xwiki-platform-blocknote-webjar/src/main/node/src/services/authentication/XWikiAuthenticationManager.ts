@@ -26,15 +26,33 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
     container.bind("AuthenticationManager").to(XWikiAuthenticationManager).inSingletonScope().whenNamed("XWiki");
   }
 
-  public async start(): Promise<void> {}
+  public async start(): Promise<void> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
 
-  public async callback(): Promise<void> {}
+  public async callback(): Promise<void> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
 
-  public async getAuthorizationHeader(): Promise<string | undefined> {}
+  public async getAuthorizationHeader(): Promise<string | undefined> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
 
-  public async isAuthenticated(): Promise<boolean> {}
+  public async isAuthenticated(): Promise<boolean> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
 
-  public async getUserDetails(): Promise<UserDetails> {}
+  public async getUserDetails(): Promise<UserDetails> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
 
-  public async logout(): Promise<void> {}
+  public async logout(): Promise<void> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
 }

@@ -28,6 +28,7 @@ export class XWikiLinkSuggestService implements LinkSuggestService {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getLinks(query: string, linkType?: LinkType, mimetype?: string): Promise<Link[]> {
-    return [];
+    // TODO
+    return Promise.resolve([]);
   }
 }

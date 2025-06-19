@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { toXWikiEntityReference } from "@/services/model/reference/XWikiEntityReference";
+import { absoluteXWikiEntityReference, toXWikiEntityReference } from "@/services/model/reference/XWikiEntityReference";
 import { DocumentReference, EntityReference, EntityType, SpaceReference } from "@xwiki/cristal-model-api";
 import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import { Container, injectable } from "inversify";
@@ -49,10 +49,10 @@ export class XWikiRemoteURLSerializer implements RemoteURLSerializer {
   }
 
   private getDocumentURL(reference: EntityReference): string {
-    return new XWiki.Document(toXWikiEntityReference(reference)).getURL();
+    return new XWiki.Document(absoluteXWikiEntityReference(toXWikiEntityReference(reference))).getURL();
   }
 
   private getAttachmentURL(reference: EntityReference): string {
-    return new XWiki.Attachment(toXWikiEntityReference(reference)).getURL();
+    return new XWiki.Attachment(absoluteXWikiEntityReference(toXWikiEntityReference(reference))).getURL();
   }
 }

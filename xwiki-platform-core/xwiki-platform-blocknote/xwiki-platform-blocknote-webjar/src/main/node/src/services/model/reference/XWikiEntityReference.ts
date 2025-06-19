@@ -58,11 +58,13 @@ function toXWikiWikiReference(reference: WikiReference): XWikiEntityReference {
 }
 
 function toXWikiSpaceReference(reference: SpaceReference): XWikiEntityReference {
-  return reference.names.reduce(
-    (parent: XWikiEntityReference | undefined, name: string) =>
-      new XWiki.EntityReference(name, XWiki.EntityType.SPACE, parent),
-    reference.wiki ? toXWikiWikiReference(reference.wiki) : undefined
-  );
+  return !reference.names.length
+    ? undefined
+    : reference.names.reduce(
+        (parent: XWikiEntityReference | undefined, name: string) =>
+          new XWiki.EntityReference(name, XWiki.EntityType.SPACE, parent),
+        reference.wiki ? toXWikiWikiReference(reference.wiki) : undefined
+      );
 }
 
 function toXWikiDocumentReference(reference: DocumentReference): XWikiEntityReference {
@@ -109,4 +111,18 @@ function toCristalEntityReference(reference?: XWikiEntityReference): EntityRefer
   }
 }
 
-export { toCristalEntityReference, toXWikiEntityReference, type XWikiEntityReference };
+function absoluteXWikiEntityReference(reference: XWikiEntityReference): XWikiEntityReference {
+  return XWiki.Model.resolve(XWiki.Model.serialize(reference), reference.type, XWiki.currentDocument.documentReference);
+}
+
+function absoluteCristalEntityReference(reference: EntityReference): EntityReference {
+  return toCristalEntityReference(absoluteXWikiEntityReference(toXWikiEntityReference(reference)));
+}
+
+export {
+  absoluteCristalEntityReference,
+  absoluteXWikiEntityReference,
+  toCristalEntityReference,
+  toXWikiEntityReference,
+  type XWikiEntityReference,
+};

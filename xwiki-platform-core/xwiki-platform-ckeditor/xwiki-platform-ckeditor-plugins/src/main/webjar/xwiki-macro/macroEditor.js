@@ -103,7 +103,8 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       }));
       output.append(displayOptionalNodes(parametersMap, macroParameterTree.optionalNodes));
     }
-    if (macroParameterTree.mandatoryNodes.length < 1) {
+    // if there's only optional nodes and all nodes belongs to the same group, we don't display the tabs.
+    if (macroParameterTree.mandatoryNodes.length < 1 && macroParameterTree.optionalNodes.length < 2) {
       output.find('.nav-tabs').empty();
     }
 
@@ -342,8 +343,16 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
 
     value = getParameterValue(valueInputs, value, parameter.caseInsensitive);
 
-    // We pass the value as an array in order to properly handle radio inputs and checkboxes.
-    valueInputs.val(Array.isArray(value) ? value : [value]);
+    // We pass the value as an array in order to properly handle radio inputs and checkboxes
+    // and in case it's an object we properly serialize the value.
+    if (Array.isArray(value)) {
+      // do nothing
+    } else if (value && typeof value === 'object') {
+      value = [JSON.stringify(value)];
+    } else {
+      value = [value];
+    }
+    valueInputs.val(value);
     return field;
   };
 

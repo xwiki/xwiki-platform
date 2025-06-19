@@ -79,15 +79,21 @@ ul.macro-list .macro-extension {
 .macro-title {
   padding: 30px 1em 30px 1em;
   margin: -15px -15px 0 -15px;
-  background-color: #eeeeee;
+  background-color: #eeeeee; /* FIXME: use a theme color */
 }
 
 .macro-title .macro-name {
-  font-size: 23px; /* FIXME: base that rule on H1 */
+  font-size: var(--font-size-h1);
 }
 
 .feature-choice {
   margin-top: 1em;
+}
+
+.feature-container {
+  margin-top: 1em;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .feature-container.has-error {
@@ -137,7 +143,7 @@ ul.macro-list .macro-extension {
 .macro-parameter[data-type="boolean"] .macro-parameter-field,
 .macro-parameter[data-type="java.lang.Boolean"] .macro-parameter-field {
   position: absolute;
-  top: .5em;
+  top: 0;
 }
 .macro-parameter[data-type="boolean"] .macro-parameter-field input,
 .macro-parameter[data-type="java.lang.Boolean"] .macro-parameter-field input {

@@ -299,12 +299,31 @@ export class UniAstToBlockNoteConverter {
     inlineContent: InlineContent,
   ): EditorStyledText | EditorLink {
     switch (inlineContent.type) {
-      case "text":
+      case "text": {
+        const {
+          bold,
+          italic,
+          underline,
+          strikethrough,
+          code,
+          backgroundColor,
+          textColor,
+        } = inlineContent.styles;
+
         return {
           type: "text",
           text: inlineContent.content,
-          styles: inlineContent.styles,
+          styles: {
+            ...(bold && { bold }),
+            ...(italic && { italic }),
+            ...(underline && { underline }),
+            ...(strikethrough && { strike: true }),
+            ...(code && { code }),
+            ...(backgroundColor && { backgroundColor }),
+            ...(textColor && { textColor }),
+          },
         };
+      }
 
       case "link": {
         const href =

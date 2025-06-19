@@ -19,7 +19,7 @@
 ## ---------------------------------------------------------------------------
 ###
 #template('display_macros.vm')
-### Return a single comment field
+### Return a single comment field in edit mode
 ###
 ###
 ## requested field name containing the comment number (or not if it's a new comment)
@@ -45,7 +45,9 @@
 #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
 <input type='hidden' name='defaultEditorId' value="$escapetool.xml($defaultEditorId)" />
 
-<label for="$escapetool.xml($inputName)">$escapetool.xml($services.localization.render('core.viewers.comments.add.comment.label'))</label>
+<label class='sr-only' for="$escapetool.xml($inputName)">
+  $escapetool.xml($services.localization.render('core.viewers.comments.edit.comment.label'))
+</label>
 #initRequiredSkinExtensions()
 ## This startupFocus parameter is used by the CKEditor WYSIWYG editor.
 #set ($wysiwygEditorConfig = {

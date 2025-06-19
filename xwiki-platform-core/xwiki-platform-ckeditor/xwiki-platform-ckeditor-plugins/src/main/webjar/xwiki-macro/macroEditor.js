@@ -41,6 +41,42 @@ define('macroParameterEnhancer', ['jquery'], function($) {
       maybeSetParameterValue(parameter, macroCall, macroParameters);
       maybeHideParameter(parameter, hiddenMacroParameters);
     }
+    // remove hidden parameters from groups
+    let visitedGroups = [];
+    for (let [key, parameter] of Object.entries(macroDescriptor.parametersMap)) {
+      if (isNodeAGroup(key)) {
+        visitAndCleanGroup(parameter, visitedGroups, macroDescriptor.parametersMap);
+      }
+    }
+  },
+
+  visitAndCleanGroup = function(group, visitedGroups, parametersMap) {
+    if (visitedGroups.includes(group.id)) {
+      return;
+    }
+    let childrenToRemove = [];
+    for (let childId of group.children) {
+      let child = parametersMap[childId];
+      if (isNodeAGroup(childId)) {
+        visitAndCleanGroup(child, visitedGroups, parametersMap);
+      }
+      if (child.hidden) {
+        childrenToRemove.push(childId);
+      }
+    }
+    group.children = group.children.filter(element => !childrenToRemove.includes(element));
+    // if the group doesn't contain any children anymore we can just hide it
+    if (group.children.length === 0) {
+      group.hidden = true;
+    // if the group contains a single parameter then we don't consider it's a feature only.
+    } else if (group.children.length === 1) {
+      group.featureOnly = false;
+    }
+    visitedGroups.push(group.id);
+  },
+
+  isNodeAGroup = function (nodeId) {
+    return nodeId.startsWith('FEATURE:') || nodeId.startsWith('GROUP:');
   },
 
   maybeSetParameterValue = function(parameter, macroCall, macroParameters) {
@@ -105,7 +141,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     }
     // if there's only optional nodes and all nodes belongs to the same group, we don't display the tabs.
     if (macroParameterTree.mandatoryNodes.length < 1 && macroParameterTree.optionalNodes.length < 2) {
-      output.find('.nav-tabs').empty();
+      output.remove('.nav-tabs');
     }
 
     output.find('a[role="tab"]').on('click', function(event) {
@@ -215,7 +251,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
         $(this).parents('.feature-parameter').find('.feature-choice-body').addClass('mandatory');
       });
     } else if (!isFeature) {
-      nodeOutput.find('.feature-choice').empty();
+      nodeOutput.find('.feature-choice').remove();
     }
     nodeOutput
         .find('.feature-choice-body')

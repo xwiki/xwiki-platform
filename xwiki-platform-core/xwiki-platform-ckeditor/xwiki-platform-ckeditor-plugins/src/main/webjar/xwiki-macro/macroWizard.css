@@ -110,6 +110,10 @@ ul.macro-list .macro-extension {
   padding-right: 10px;
 }
 
+.macro-parameter:first-of-type {
+  margin-top: 0;
+}
+
 .feature-choice-body .macro-parameter {
   padding-left: 0;
 }

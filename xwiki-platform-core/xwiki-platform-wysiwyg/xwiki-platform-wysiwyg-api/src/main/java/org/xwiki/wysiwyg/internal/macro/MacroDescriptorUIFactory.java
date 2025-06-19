@@ -45,6 +45,7 @@ import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.velocity.tools.EscapeTool;
+import org.xwiki.wysiwyg.WysiwygConfiguration;
 import org.xwiki.wysiwyg.macro.AbstractMacroUINode;
 import org.xwiki.wysiwyg.macro.MacroDescriptorUI;
 import org.xwiki.wysiwyg.macro.MacroUINodeGroup;
@@ -80,6 +81,9 @@ public class MacroDescriptorUIFactory
 
     @Inject
     private ContextualLocalizationManager localizationManager;
+
+    @Inject
+    private WysiwygConfiguration wysiwygConfiguration;
 
     @Inject
     private HTMLDisplayerManager htmlDisplayerManager;
@@ -129,13 +133,10 @@ public class MacroDescriptorUIFactory
                 String.format("%s.parameter.%s", macroTranslationKey, parameterDescriptor.getId());
             boolean mandatory = parameterDescriptor.isMandatory();
             MacroUINodeParameter node = new MacroUINodeParameter(parameterDescriptor.getId());
-
             parametersMap.put(node.getKey(), node);
+
             node.setAdvanced(parameterDescriptor.isAdvanced())
                 .setDeprecated(parameterDescriptor.isDeprecated())
-                .setDisplayType(parameterDescriptor.getDisplayType().getTypeName())
-                .setDefaultValue(parameterDescriptor.getDefaultValue())
-                .setEditTemplate(getEditTemplate(parameterDescriptor, parameterTranslationKey))
                 .setCaseInsensitive(isEnum(parameterDescriptor.getDisplayType()))
                 .setName(getParameterTranslation(parameterTranslationKey + DOT_NAME, parameterDescriptor.getName()))
                 .setDescription(getParameterTranslation(parameterTranslationKey + DOT_DESCRIPTION,
@@ -143,6 +144,8 @@ public class MacroDescriptorUIFactory
                 .setMandatory(mandatory)
                 .setHidden(parameterDescriptor.isDisplayHidden())
                 .setOrder(parameterDescriptor.getOrder());
+
+            handleTypeValueAndTemplate(parameterDescriptor, node, parameterTranslationKey);
 
             PropertyGroupDescriptor groupDescriptor = parameterDescriptor.getGroupDescriptor();
             if (isGroupDescriptorDefined(groupDescriptor)) {
@@ -174,6 +177,26 @@ public class MacroDescriptorUIFactory
             .setParametersMap(parametersMap);
 
         return result;
+    }
+
+    private void handleTypeValueAndTemplate(ParameterDescriptor parameterDescriptor, MacroUINodeParameter node,
+        String parameterTranslationKey)
+    {
+        Type displayType = parameterDescriptor.getDisplayType();
+        Type parameterType = displayType;
+        Object defaultValue = parameterDescriptor.getDefaultValue();
+
+        if (wysiwygConfiguration.inferMacroParameterTypeBasedOnDefaultValue()
+            && displayType.equals(String.class)
+            && ("true".equals(defaultValue) || "false".equals(defaultValue))) {
+            parameterType = Boolean.class;
+            defaultValue = Boolean.valueOf(String.valueOf(defaultValue));
+        }
+
+        String editTemplate = getEditTemplate(parameterDescriptor, parameterType, parameterTranslationKey);
+        node.setDisplayType(parameterType.getTypeName())
+            .setDefaultValue(defaultValue)
+            .setEditTemplate(editTemplate);
     }
 
     private void handleFeaturesAndGroups(Map<String, List<MacroUINodeGroup>> featureMap,
@@ -306,7 +329,8 @@ public class MacroDescriptorUIFactory
 
     // TODO: double check there's no regression with https://jira.xwiki.org/browse/XWIKI-20491 and maybe remove
     //  sourceDocument in macroEditor calls
-    private String getEditTemplate(ParameterDescriptor parameterDescriptor, String parameterTranslationKey)
+    private String getEditTemplate(ParameterDescriptor parameterDescriptor, Type parameterType,
+        String parameterTranslationKey)
     {
         String result = "";
         try {
@@ -320,15 +344,15 @@ public class MacroDescriptorUIFactory
                 //  https://forum.xwiki.org/t/removal-of-data-property-group-mechansim/16976
                 displayerMap.put("data-property-group", StringUtils.join(groupDescriptor.getGroup(), "/"));
             }
-            result = this.htmlDisplayerManager.display(parameterDescriptor.getDisplayType(),
-                parameterDescriptor.getDefaultValue(), displayerMap, "edit");
+            result = this.htmlDisplayerManager
+                .display(parameterType, parameterDescriptor.getDefaultValue(), displayerMap, "edit");
         } catch (HTMLDisplayerException e) {
             this.logger.error("Error when computing edit template for parameter [{}] of type [{}]. "
                 + "Falling back on default template.", parameterDescriptor.getId(),
-                parameterDescriptor.getDisplayType(), e);
+                parameterType, e);
         }
         if (StringUtils.isEmpty(result)) {
-            result = getEditTemplateFallback(parameterDescriptor, parameterTranslationKey);
+            result = getEditTemplateFallback(parameterDescriptor, parameterType, parameterTranslationKey);
         }
         return result.trim();
     }
@@ -338,9 +362,9 @@ public class MacroDescriptorUIFactory
         return (displayType instanceof Class classType && classType.isEnum());
     }
 
-    private String getEditTemplateFallback(ParameterDescriptor parameterDescriptor, String parameterTranslationKey)
+    private String getEditTemplateFallback(ParameterDescriptor parameterDescriptor, Type parameterType,
+        String parameterTranslationKey)
     {
-        Type parameterType = parameterDescriptor.getDisplayType();
         String result;
         if (parameterType == Boolean.class) {
             result = String.format(BOOLEAN_TEMPLATE_FALLBACK, escapeTool.xml(parameterDescriptor.getId()));

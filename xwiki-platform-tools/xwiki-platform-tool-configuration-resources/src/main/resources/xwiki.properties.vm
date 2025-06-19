@@ -1679,4 +1679,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# You can change this back to "database" to restore the old behavior.
 # rest.keywordSearchSource=solr
 
+#-------------------------------------------------------------------------------------
+# WYSIWYG API
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.5.0]
+#-# Define if the type of the macro parameter should be inferred from their default value when no specific type is
+#-# indicated to build the macro configuration UI. This is currently used to automatically set the type to Boolean
+#-# when a parameter has a default value set to 'true' or 'false' and doesn't define a specific type.
+# wysiwyig.inferMacroParameterTypeBasedOnDefaultValue=true
+
 $!xwikiPropertiesAdditionalProperties

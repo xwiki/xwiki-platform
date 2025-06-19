@@ -106,19 +106,18 @@ var XWiki = (function (XWiki) {
      * Submits the form or go to a selected page according to selection.
      */
     onSuggestionSelected: function(event) {
-      if (event.memo.suggest == this.suggest) {
+      if (event.memo.suggest === this.suggest) {
         event.stop();
-        // Also stop the browser event that triggered the custom "xwiki:suggest:selected" event.
-        if (event.memo.originalEvent) {
-          Event.stop(event.memo.originalEvent);
-        }
         if (!event.memo.url) {
+          // Stop the browser event that triggered the custom "xwiki:suggest:selected" event.
+          if (event.memo.originalEvent) {
+            Event.stop(event.memo.originalEvent);
+          }
           // Submit form
           this.searchInput.up('form').submit();
         }
         else {
-          // Go to page
-          window.location = event.memo.url;
+          // The page anchor should be able to handle its own click event (event.memo.originalEvent here) itself.
         }
       }
     },

@@ -52,6 +52,7 @@ image.style.administration.liveData.type.hint=Type du style d'image (utilisé co
 image.style.administation.newImageStyle.label=Nouveau style d'image
 image.style.administation.newImageStyle.hint=Identifiant du nouveau style d'image.
 image.style.administation.newImageStyle.placeHolder=Identifiant
+### Missing: image.style.administation.newImageStyle.normalizedTitle=The new image style, following the naming conventions is [{0}].
 Image.Style.Code.ImageStyleClass_adjustableAlignment=Alignement paramétrable
 Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=Si coché, l'utilisateur est autorisé à modifier l'alignement de l'image.
 Image.Style.Code.ImageStyleClass_adjustableBorder=Bordure paramétrable
@@ -73,14 +74,16 @@ Image.Style.Code.ImageStyleClass_defaultBorder_hint=Si coché, l'image possède 
 Image.Style.Code.ImageStyleClass_defaultHeight=Hauteur par défaut
 Image.Style.Code.ImageStyleClass_defaultHeight_hint=Hauteur par défaut de l'image. Si la largeur par défaut est vide, cette dernière sera calculée d'après les proportions de l'image. Sinon l'image aura les dimensions définies.
 ### Missing: Image.Style.Code.ImageStyleClass_defaultTextWrap=Default Text Wrap
-### Missing: Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=When checked, the tewt will wrap around the image by default.
+Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=Lorsque cette option est cochée, par défaut le texte s'affichera autour de l'image.
 Image.Style.Code.ImageStyleClass_defaultWidth=Largeur par défaut
-Image.Style.Code.ImageStyleClass_defaultWidth_hint=Largeur par défaut de l'image. Si la hauteur par défaut est vide, cette dernière sera calculée d'après les proportions de l'image. Sinon l'image aura les dimensions définies.
+Image.Style.Code.ImageStyleClass_defaultWidth_hint=Largeur par défaut de l'image. Si la hauteur par défaut est vide, cette dernière sera calculée d'après les proportions de l'image. Sinon l'image aura ses dimensions originales.
 Image.Style.Code.ImageStyleClass_prettyName=Nom d'affichage
 Image.Style.Code.ImageStyleClass_prettyName_hint=Nom utilisateur du style d'image.
 Image.Style.Code.ImageStyleClass_type=Type
 Image.Style.Code.ImageStyleClass_type_hint=Type du style d'image (utilisé comme classe CSS).
 Image.Style.Code.ConfigurationClass_defaultStyle=Style par défaut
 Image.Style.Code.ConfigurationClass_defaultStyle_hint=Style par défaut pour ce wiki.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Forcer le style par défaut
+### Missing: Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=When checked, the constraints of the default style are forced in the image configuration, and users are forced to choose a style.
 </content>
 </xwikidoc>

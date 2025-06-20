@@ -22,7 +22,9 @@ package org.xwiki.rendering.wikimacro.internal;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -37,7 +39,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.PropertyGroupDescriptor;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -50,7 +54,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
@@ -81,7 +85,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     private Execution execution;
 
     @Inject
-    private AuthorizationManager authorization;
+    private DocumentAuthorizationManager authorization;
 
     /**
      * The logger to log.
@@ -228,7 +232,8 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                 }
             }
             contentDescriptor = new DefaultContentDescriptor(macroContentDescription,
-                macroContentVisibility.equals(MACRO_CONTENT_MANDATORY), contentType);
+                macroContentVisibility.equals(MACRO_CONTENT_MANDATORY), contentType)
+                .setOrder(macroDefinition.getIntValue(MACRO_CONTENT_ORDER_PROPERTY, -1));
         }
         return contentDescriptor;
     }
@@ -276,7 +281,9 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     private List<WikiMacroParameterDescriptor> buildParameterDescriptors(XWikiDocument doc) throws WikiMacroException
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = new ArrayList<>();
-        Collection<BaseObject> macroParameters = doc.getObjects(WIKI_MACRO_PARAMETER_CLASS);
+        Collection<BaseObject> macroParameters = doc.getXObjects(WIKI_MACRO_PARAMETER_CLASS_REFERENCE);
+        Map<List<String>, PropertyGroupDescriptor> groupDescriptorMap = new HashMap<>();
+
         if (macroParameters != null) {
             for (BaseObject macroParameter : macroParameters) {
                 // Vectors can contain null values
@@ -287,8 +294,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                 // Extract parameter definition.
                 String parameterName = macroParameter.getStringValue(PARAMETER_NAME_PROPERTY);
                 String parameterDescription = macroParameter.getStringValue(PARAMETER_DESCRIPTION_PROPERTY);
-                boolean parameterMandatory =
-                    (macroParameter.getIntValue(PARAMETER_MANDATORY_PROPERTY) == 0) ? false : true;
+                boolean parameterMandatory = (macroParameter.getIntValue(PARAMETER_MANDATORY_PROPERTY) != 0);
                 String parameterDefaultValue = macroParameter.getStringValue(PARAMETER_DEFAULT_VALUE_PROPERTY);
                 String type = macroParameter.getStringValue(PARAMETER_TYPE_PROPERTY);
                 Type parameterType;
@@ -326,9 +332,54 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                     parameterDefaultValue = null;
                 }
 
+                // handle group property by checking first if the descriptor hasn't been already created for the same
+                // group.
+
+                List<String> groupProperties = macroParameter.getListValue(PARAMETER_GROUP_PROPERTY);
+                PropertyGroupDescriptor groupDescriptor = null;
+                if (!groupProperties.isEmpty() && groupDescriptorMap.containsKey(groupProperties)) {
+                    groupDescriptor = groupDescriptorMap.get(groupProperties);
+                } else if (!groupProperties.isEmpty()) {
+                    groupDescriptor =
+                        new PropertyGroupDescriptor(groupProperties);
+                    groupDescriptorMap.put(groupProperties, groupDescriptor);
+                }
+
+                // Handle feature property in the group descriptor: note that it's expected that it might impact an
+                // already created group descriptor.
+                // See also implementation of
+                // org.xwiki.properties.internal.DefaultBeanDescriptor#handlePropertyFeatureAndGroupAnnotations
+                String featureProperty = macroParameter.getStringValue(PARAMETER_FEATURE_PROPERTY);
+                if (!StringUtils.isEmpty(featureProperty)) {
+                    if (groupDescriptor == null) {
+                        groupDescriptor = new PropertyGroupDescriptor(null);
+                    }
+                    groupDescriptor.setFeature(featureProperty);
+                    groupDescriptor
+                        .setFeatureMandatory(macroParameter.getIntValue(PARAMETER_FEATURE_MANDATORY_PROPERTY) != 0);
+                }
+
+                // just to avoid possible NPE with Map.of and groupDescriptor...
+                Map<String, Object> parametersMap = new HashMap<>(Map.of(
+                    WikiMacroParameterDescriptor.ADVANCED_PARAMETER_NAME,
+                    macroParameter.getIntValue(PARAMETER_ADVANCED_PROPERTY) != 0,
+                    WikiMacroParameterDescriptor.HIDDEN_PARAMETER_NAME,
+                    macroParameter.getIntValue(PARAMETER_HIDDEN_PROPERTY) != 0,
+                    WikiMacroParameterDescriptor.DEPRECATED_PARAMETER_NAME,
+                    macroParameter.getIntValue(PARAMETER_DEPRECATED_PROPERTY) != 0,
+                    WikiMacroParameterDescriptor.ORDER_PARAMETER_NAME,
+                    macroParameter.getIntValue(PARAMETER_ORDER_PROPERTY, -1)
+                ));
+                if (groupDescriptor != null) {
+                    parametersMap.put(WikiMacroParameterDescriptor.GROUP_PARAMETER_NAME, groupDescriptor);
+                }
+
+                WikiMacroParameterDescriptor wikiMacroParameterDescriptor =
+                    new WikiMacroParameterDescriptor(parameterName, parameterDescription,
+                        parameterMandatory, parameterDefaultValue, parameterType, parametersMap);
+
                 // Create the parameter descriptor.
-                parameterDescriptors.add(new WikiMacroParameterDescriptor(parameterName, parameterDescription,
-                    parameterMandatory, parameterDefaultValue, parameterType));
+                parameterDescriptors.add(wikiMacroParameterDescriptor);
             }
         }
 
@@ -372,12 +423,13 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         switch (visibility) {
             case GLOBAL:
                 // Verify that the user has programming rights
-                isAllowed = doc != null && this.authorization.hasAccess(Right.PROGRAM, authorReference, null);
+                isAllowed = doc != null && this.authorization.hasAccess(Right.PROGRAM, null, authorReference,
+                    documentReference);
                 break;
             case WIKI:
                 // Verify that the user has admin right on the macro wiki
-                isAllowed = doc != null && this.authorization.hasAccess(Right.ADMIN, authorReference,
-                    doc.getDocumentReference().getWikiReference());
+                isAllowed = doc != null && this.authorization.hasAccess(Right.ADMIN, EntityType.WIKI, authorReference,
+                    documentReference);
                 break;
             default:
                 isAllowed = true;

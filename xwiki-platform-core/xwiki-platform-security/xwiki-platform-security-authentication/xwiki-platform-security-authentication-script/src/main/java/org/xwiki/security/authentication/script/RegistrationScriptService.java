@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authentication.RegistrationConfiguration;
 import org.xwiki.security.script.SecurityScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service for accessing configuration related to registration.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.10RC1
  */
-@Unstable
 @Component
 @Named(SecurityScriptService.ROLEHINT + '.' + RegistrationScriptService.ID)
 @Singleton

@@ -19,8 +19,9 @@
  */
 package org.xwiki.url.internal.standard;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -28,11 +29,13 @@ import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -41,11 +44,15 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 6.1M2
  */
-public class StandardExtendedURLResourceReferenceSerializerTest
+@ComponentTest
+class StandardExtendedURLResourceReferenceSerializerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<StandardExtendedURLResourceReferenceSerializer> mocker =
-        new MockitoComponentMockingRule<>(StandardExtendedURLResourceReferenceSerializer.class);
+    @InjectMockComponents
+    private StandardExtendedURLResourceReferenceSerializer serializer;
+
+    @MockComponent
+    @Named("context")
+    private ComponentManager componentManager;
 
     public class TestResourceReference extends AbstractResourceReference
     {
@@ -56,41 +63,37 @@ public class StandardExtendedURLResourceReferenceSerializerTest
     }
 
     @Test
-    public void serialize() throws Exception
+    void serialize() throws Exception
     {
         TestResourceReference resource = new TestResourceReference();
 
         ResourceReferenceSerializer serializer = mock(ResourceReferenceSerializer.class);
 
-        ComponentManager componentManager = this.mocker.getInstance(ComponentManager.class, "context");
-        when(componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+        when(this.componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
             TestResourceReference.class, ExtendedURL.class), "standard")).thenReturn(serializer);
 
-        this.mocker.getComponentUnderTest().serialize(resource);
+        this.serializer.serialize(resource);
 
         // Verify the serializer is called and with the proper parameters
         verify(serializer).serialize(same(resource));
     }
 
     @Test
-    public void serializeWhenNoMatchingSerializer() throws Exception
+    void serializeWhenNoMatchingSerializer() throws Exception
     {
         TestResourceReference resource = new TestResourceReference();
 
-        ComponentManager componentManager = this.mocker.getInstance(ComponentManager.class, "context");
-        when(componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+        when(this.componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
             TestResourceReference.class, ExtendedURL.class), "standard")).thenThrow(
                 new ComponentLookupException("error"));
-        when(componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+        when(this.componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
             TestResourceReference.class, ExtendedURL.class))).thenThrow(
             new ComponentLookupException("error"));
 
-        try {
-            this.mocker.getComponentUnderTest().serialize(resource);
-            fail("Should have thrown an exception here");
-        } catch (UnsupportedResourceReferenceException expected) {
-            assertEquals("Failed to find serializer for Resource Reference [type = [test], parameters = []] and "
-                + "URL format [standard]", expected.getMessage());
-        }
+        Throwable exception = assertThrows(UnsupportedResourceReferenceException.class, () -> {
+            this.serializer.serialize(resource);
+        });
+        assertEquals("Failed to find serializer for Resource Reference [type = [test], parameters = []] and "
+            + "URL format [standard]", exception.getMessage());
     }
 }

@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -34,7 +33,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 15.9RC1
  */
-@Unstable
 public class EditConfirmationCheckerResults
 {
     private final List<Block> errorMessages = new ArrayList<>();

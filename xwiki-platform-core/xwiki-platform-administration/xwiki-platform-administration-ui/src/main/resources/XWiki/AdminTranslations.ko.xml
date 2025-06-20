@@ -140,6 +140,11 @@ administration.section.users.deleteUser.newAuthor.programming=프로그램 작�
 administration.section.users.deleteUser.newAuthor.script=스크립트
 admin.usersgroups.extensionrights=확장 권한
 
+# Groups section
+### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
+
 # Other Category
 admin.other=다른
 admin.other.description=확장을 위한 다양한 구성.

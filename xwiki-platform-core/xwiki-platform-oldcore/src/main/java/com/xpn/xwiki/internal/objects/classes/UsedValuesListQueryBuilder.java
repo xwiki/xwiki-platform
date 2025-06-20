@@ -42,7 +42,9 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.text.StringUtils;
 
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.store.DatabaseProduct;
 
 /**
  * Builds a query that returns the values used by a List property.
@@ -100,13 +102,29 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
     @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    @Inject
+    private HibernateStore hibernateStore;
+
     @Override
+    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     public Query build(ListClass listClass) throws QueryException
     {
-        String statement = String.format("select %1$s, count(*) as unfilterable0 " + "from BaseObject as obj, %2$s "
-            + "where obj.className = :className and obj.name <> :templateName"
-            + " and prop.id.id = obj.id and prop.id.name = :propertyName " + "group by %1$s "
-            + "order by count(*) desc", getSelectColumnAndFromTable(listClass));
+        String statement;
+
+        if (hibernateStore.getDatabaseProductName() == DatabaseProduct.ORACLE) {
+            statement = String.format("select %1$s, str(%1$s) as unfilterable1 "
+                + "from BaseObject as obj, %2$s "
+                + "where obj.className = :className and obj.name <> :templateName"
+                + " and prop.id.id = obj.id and prop.id.name = :propertyName "
+                + "order by unfilterable1 desc", getSelectColumnAndFromTable(listClass));
+        } else {
+            statement = String.format("select %1$s, count(*) as unfilterable0 "
+                + "from BaseObject as obj, %2$s "
+                + "where obj.className = :className and obj.name <> :templateName"
+                + " and prop.id.id = obj.id and prop.id.name = :propertyName "
+                + "group by %1$s "
+                + "order by unfilterable0 desc", getSelectColumnAndFromTable(listClass));
+        }
         Query query = this.queryManager.createQuery(statement, Query.HQL);
         bindParameterValues(query, listClass);
         query.addFilter(new ViewableValueFilter(listClass));

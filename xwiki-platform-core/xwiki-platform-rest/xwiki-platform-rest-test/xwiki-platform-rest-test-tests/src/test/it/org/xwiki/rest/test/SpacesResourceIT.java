@@ -20,13 +20,14 @@
 package org.xwiki.rest.test;
 
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.Assert;
 import org.junit.Test;
-import org.restlet.engine.io.ReaderInputStream;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.Relations;
@@ -100,6 +101,8 @@ public class SpacesResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(reference);
         this.testUtils.rest().savePage(reference, "content " + getTestMethodName(), "title " + getTestMethodName());
 
+        this.solrUtils.waitEmptyQueue();
+
         GetMethod getMethod = executeGet(String.format("%s?q=somethingthatcannotpossiblyexist",
             buildURI(SpaceSearchResource.class, getWiki(), Arrays.asList(getTestClassName()))));
         Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
@@ -129,7 +132,7 @@ public class SpacesResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(reference);
         this.testUtils.rest().savePage(reference);
         this.testUtils.rest().attachFile(new AttachmentReference("attachment.txt", reference),
-            new ReaderInputStream(new StringReader("content")), true);
+            new ReaderInputStream(new StringReader("content"), StandardCharsets.UTF_8), true);
 
         // Matches Sandbox.WebHome@XWikLogo.png
         GetMethod getMethod = executeGet(String.format("%s",

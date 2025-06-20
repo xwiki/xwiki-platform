@@ -20,13 +20,17 @@
 package org.xwiki.store.legacy.store.internal;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 
 import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.StreamProvider;
+import org.xwiki.store.StringStreamProvider;
 import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.serialization.SerializationStreamProvider;
 import org.xwiki.store.serialization.Serializer;
 
@@ -46,10 +50,10 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
     /**
      * The Constructor.
      *
-     * @param deleted the deleted attachment.
-     * @param provider a means of gettign the files used for storing the attachment.
+     * @param attachment the deleted attachment.
+     * @param provider a means of getting the files used for storing the attachment.
      * @param fileTools tools for getting file locks and backup/temporary files.
-     * @param deletedAttachmentSerializer a Serializer to serialize a DeletedAttachment.
+     * @param metaSerializer a Serializer to serialize a DeletedAttachment.
      * @param versionSerializer a Serializer which will serialize a list of XWikiAttachment objects.
      * @param context the legacy XWikiContext which might be needed to get the attachment archive.
      * @throws XWikiException if loading the attachment content or archive fails.
@@ -59,21 +63,49 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
         final Serializer<List<XWikiAttachment>, List<XWikiAttachment>> versionSerializer, final XWikiContext context)
         throws XWikiException
     {
+        //////////////////////////////////////////////
         // Save metadata about the deleted attachment.
+
         final StreamProvider metaProvider =
             new SerializationStreamProvider<XWikiAttachment>(metaSerializer, attachment);
         addSaver(metaProvider, fileTools, provider.getDeletedAttachmentMetaFile());
 
+        //////////////////////////////////////////////
         // Save the archive for the deleted attachment.
+
         final XWikiAttachmentArchive archive = attachment.loadArchive(context);
         if (archive == null) {
             throw new NullPointerException("Failed to load attachment archive, loadArchive() returned null");
         }
         new AttachmentArchiveSaveRunnable(archive, fileTools, provider, versionSerializer, context).runIn(this);
 
+        //////////////////////////////////////////////
         // Save the attachment's content.
-        final StreamProvider contentProvider = new AttachmentContentStreamProvider(attachment, context);
-        this.addSaver(contentProvider, fileTools, provider.getAttachmentContentFile());
+
+        File attachFile = provider.getAttachmentContentFile();
+        File linkAttachFile = StoreFileUtils.getLinkFile(attachFile);
+
+        // If the last archive is identical to the current version (which is the case except in very rare
+        // cases), don't duplicate content
+        XWikiAttachment archiveAttachment =
+            archive.getRevision(attachment, attachment.getVersion(), context);
+        // Really comparing the content could be very expensive so we assume comparing the size and date are
+        // enough
+        File finalAttachFile;
+        StreamProvider streamProvider;
+        if (archiveAttachment != null && Objects.equals(archiveAttachment.getDate(), attachment.getDate())
+            && archiveAttachment.getLongSize() == attachment.getLongSize()) {
+            // Create a link to the current version
+            finalAttachFile = linkAttachFile;
+            streamProvider = new StringStreamProvider(fileTools.getLinkContent(attachment), StandardCharsets.UTF_8);
+        } else {
+            // Save the content as is
+            finalAttachFile = attachFile;
+            streamProvider = new AttachmentContentStreamProvider(attachment, context);
+        }
+
+        // Save the attachment file
+        addSaver(streamProvider, fileTools, finalAttachFile);
     }
 
     /**

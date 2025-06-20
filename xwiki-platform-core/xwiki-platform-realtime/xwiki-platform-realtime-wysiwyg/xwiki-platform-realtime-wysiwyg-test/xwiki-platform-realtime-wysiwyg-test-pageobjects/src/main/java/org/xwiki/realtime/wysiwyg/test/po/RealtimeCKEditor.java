@@ -40,22 +40,14 @@ public class RealtimeCKEditor extends CKEditor
     }
 
     @Override
-    public CKEditor waitToLoad()
-    {
-        super.waitToLoad();
-        return this;
-    }
-
-    @Override
     public RealtimeRichTextAreaElement getRichTextArea()
     {
-        // The in-line frame element is renewed while editing so we can't cache it.
-        return new RealtimeRichTextAreaElement(getIframe());
+        return getRichTextArea(true);
     }
 
     @Override
-    public RealtimeCKEditorToolBar getToolBar()
+    public RealtimeRichTextAreaElement getRichTextArea(boolean wait)
     {
-        return new RealtimeCKEditorToolBar(this);
+        return new RealtimeRichTextAreaElement(this, wait);
     }
 }

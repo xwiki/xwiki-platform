@@ -25,41 +25,81 @@ define('modalTranslationKeys', [], [
 
 define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations) {
   'use strict';
-  var modalTemplate = 
-    '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
-      '<div class="modal-dialog" role="document">' +
-        '<div class="modal-content">' +
-          '<div class="modal-header">' +
-            '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-              '<span aria-hidden="true">&times;</span>' +
-            '</button>' +
-            '<h4 class="modal-title"></h4>' +
-          '</div>' +
-          '<div class="modal-body"></div>' +
-          '<div class="modal-footer">' +
-            '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>' +
-            '<button type="button" class="btn btn-primary" disabled="disabled">OK</button>' +
-          '</div>' +
+  // Fetch the cross icon from the icon theme to fill up the modal template.
+  let iconURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/iconThemes/icons?name=cross`;
+  // Default value taken until the fetch is fulfilled
+  var closeIconTemplate = `<span aria-hidden="true">&times;</span>`;
+  $.get(iconURL, function(response) {
+    // We override the close button content template if the request is successful
+    let iconMetadata = response.getElementsByTagName('icon')[0];
+    console.log(iconMetadata);
+    if (iconMetadata.getElementsByTagName('iconSetType')[0].textContent === 'IMAGE') {
+      closeIconTemplate = '<img src="' + iconMetadata.getElementsByTagName('url')[0].textContent +
+          '" alt="" />';
+    } else if (iconMetadata.getElementsByTagName('iconSetType')[0].textContent === 'FONT') {
+      closeIconTemplate = '<span class="' +
+          iconMetadata.getElementsByTagName('cssClass')[0].textContent +
+          '" aria-hidden="true"></span>';
+    }
+    // Once we retrieve the icon value, we
+    // 1. Replace all the uses of the icon in the DOM already generated
+    const closeButtons = document.querySelectorAll(
+      '.modal > .modal-dialog > .modal-content > .modal-header > button.close');
+    closeButtons.forEach((button)=> {
+      button.innerHTML = closeIconTemplate;
+    });
+    // 2. replace the modal template used to create new modals
+    closeButtonTemplate = closeIconTemplate;
+  });
+  let closeButtonTemplate = '<span aria-hidden="true">&times;</span>';
+  let modalTemplate = '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
+    '<div class="modal-dialog" role="document">' +
+      '<div class="modal-content">' +
+        '<div class="modal-header">' +
+          '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+            closeButtonTemplate +
+          '</button>' +
+          '<h4 class="modal-title"></h4>' +
+        '</div>' +
+        '<div class="modal-body"></div>' +
+        '<div class="modal-footer">' +
+          '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>' +
+          '<button type="button" class="btn btn-primary" disabled="disabled">OK</button>' +
         '</div>' +
       '</div>' +
-    '</div>',
+    '</div>' +
+  '</div>',
+  
 
-  createModal = function(definition) {
+  createModal = function (definition) {
+    // form(Boolean): Whether the modal is a form. Some basic form semantics and behaviour will be added if this is true
     definition = $.extend({
       title: '',
       content: '',
       acceptLabel: translations.get('ok'),
-      dismissLabel: translations.get('cancel')
+      dismissLabel: translations.get('cancel'),
+      form: false
     }, definition);
-    var modal = $(modalTemplate).addClass(definition['class']).appendTo(document.body);
+    let modal = $(modalTemplate).addClass(definition['class']).appendTo(document.body);
     modal.find('.close').attr({
       title: translations.get('close'),
       'aria-label': translations.get('close')
     });
     modal.find('.modal-title').text(definition.title);
     modal.find('.modal-body').html('').append(definition.content);
-    modal.find('.modal-footer .btn-primary').text(definition.acceptLabel);
+    const submitButton = modal.find('.modal-footer .btn-primary');
+    submitButton.text(definition.acceptLabel);
     modal.find('.modal-footer .btn[data-dismiss="modal"]').text(definition.dismissLabel);
+    if (definition.form) {
+      // We want the submit button to actually submit the form
+      submitButton.removeAttr('type');
+      // This modal should act and look like a form. We replace its content node by a form, so we can benefit from
+      // native form utilities, such as implicit form validation (pressing Enter on a text field)
+      const modalContent= modal.find('.modal-content');
+      const formModalContent = $('<form class="modal-content">');
+      formModalContent.append(modalContent.contents());
+      modalContent.replaceWith(formModalContent);
+    }
     return modal;
   },
 

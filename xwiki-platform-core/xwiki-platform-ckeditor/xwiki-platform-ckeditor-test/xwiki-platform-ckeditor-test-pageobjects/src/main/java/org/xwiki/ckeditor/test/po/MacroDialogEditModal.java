@@ -53,7 +53,7 @@ public class MacroDialogEditModal extends BaseElement
      * @since 15.10.6
      * @since 16.0.0RC1
      */
-    public MacroDialogEditModal setMacroParameter(String name, String value)
+    public MacroDialogEditModal setMacroParameter(String name, CharSequence... value)
     {
         WebElement parameterInput = getMacroParameterInput(name);
         parameterInput.clear();
@@ -71,14 +71,57 @@ public class MacroDialogEditModal extends BaseElement
      */
     public String getMacroParameter(String name)
     {
-        return getMacroParameterInput(name).getAttribute("value");
+        return getMacroParameterInput(name).getDomProperty("value");
     }
 
-    private WebElement getMacroParameterInput(String name)
+    public WebElement getMacroParameterInput(String name)
     {
         return getDriver().findElementWithoutWaitingWithoutScrolling(
             // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
             By.cssSelector("[class*=-editor-modal] .macro-parameter-field input[name='" + name + "']"));
+    }
+
+    /**
+     * Set the value of the macro content.
+     *
+     * @param content the macro content
+     * @return this modal
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public MacroDialogEditModal setMacroContent(CharSequence... content)
+    {
+        WebElement contentInput = getMacroContentInput();
+        contentInput.clear();
+        contentInput.sendKeys(content);
+        return this;
+    }
+
+    /**
+     * Retrieves the value of the macro content from the macro editor modal.
+     * 
+     * @return the value of the macro content
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public String getMacroContent()
+    {
+        return getMacroContentInput().getDomProperty("value");
+    }
+
+    /**
+     * @return the text area used to edit the macro content
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public WebElement getMacroContentInput()
+    {
+        return getDriver().findElementWithoutWaitingWithoutScrolling(
+            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+            By.cssSelector("[class*=-editor-modal] .macro-parameter-field textarea[name='$content']"));
     }
 
     /**

@@ -1,20 +1,20 @@
-<table width="100%">
+<table style="width: 100%">
 <tr>
-  <td width="25%" style="width: 25%; vertical-align: top;" valign="top">
+  <td style="width: 25%; vertical-align: top;">
     <strong>Pages</strong>
   </td>
-  <td style="vertical-align: top;" valign="top">
+  <td style="vertical-align: top;">
     <div>
-      <div style="background-color: #f5f5f5; color: #777777; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
+      <div style="background-color: #f5f5f5; color: #707070; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
       Home / NotificationsEmailTest / Title 2
       </div>
-      <a color="#0088CC" style="color: #0088CC; text-decoration: none;" href="https://externaldomain:4242/xwiki/bin/view/NotificationsEmailTest/Page2">Title 2</a>
+      <a style="color: #2f6faf; text-decoration: none;" href="https://externaldomain:4242/xwiki/bin/view/NotificationsEmailTest/Page2">Title 2</a>
     </div>
     created by                       <img src="cid:NotificationsEmailsITuser1.jpg" alt="N" width="16" height="16" style="vertical-align: middle;"/>
-                                <a color="#0088CC" style="color: #0088CC; text-decoration: none;" href="https://externaldomain:4242/xwiki/bin/view/XWiki/NotificationsEmailsITuser1">NotificationsEmailsITuser1</a>
+                                <a style="color: #2f6faf; text-decoration: none;" href="https://externaldomain:4242/xwiki/bin/view/XWiki/NotificationsEmailsITuser1">NotificationsEmailsITuser1</a>
 
     <div>
-      <small style="color: #777777; font-size: 0.8em;">
+      <small style="color: #767676; font-size: 0.8em;">
         moments ago
       </small>
     </div>
@@ -29,82 +29,82 @@
         </dt>
         <dd style="margin-left: 0">
           <dl>
-            <dt style="border: 1px solid #E8E8E8; border-left: 5px solid #E8E8E8; color: #656565; padding: .5em .2em;" data-property-name="title">
+            <dt style='border: 1px solid #e8e8e8; border-left: 5px solid #e8e8e8; color: #656565; padding: .5em .2em;' data-property-name="title">
               Title
             </dt>
             <dd style="margin-left: 0">
-              <div style="border: 1px solid #E8E8E8; font-family: Monospace; overflow: auto;">
+              <div style='border: 1px solid #e8e8e8; font-family: Monospace; overflow: auto;'>
                 <table>
                   <tr >
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">...</td>
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">...</td>
-                    <td class="diff-line " style="background-color: #eee; color: rgba(101, 101, 101, 0.5); font-family: Monospace; padding: .4em .5em;">@@ -1,0 +1,1 @@</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>...</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>...</td>
+                    <td class="diff-line " style='background-color: #eee; color: #656565; font-family: Monospace; padding: .4em .5em;'>@@ -1,0 +1,1 @@</td>
                   </tr>
                   <tr >
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;"></td>
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">1</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'></td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>1</td>
                     <td style="background-color: #ccffcc;">+Title 2</td>
                   </tr>
                 </table>
               </div>
             </dd>
-            <dt style="border: 1px solid #E8E8E8; border-left: 5px solid #E8E8E8; color: #656565; padding: .5em .2em;" data-property-name="author">
+            <dt style='border: 1px solid #e8e8e8; border-left: 5px solid #e8e8e8; color: #656565; padding: .5em .2em;' data-property-name="author">
               Author
             </dt>
             <dd style="margin-left: 0">
-              <div style="border: 1px solid #E8E8E8; font-family: Monospace; overflow: auto;">
+              <div style='border: 1px solid #e8e8e8; font-family: Monospace; overflow: auto;'>
                 <table>
                   <tr >
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">...</td>
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">...</td>
-                    <td class="diff-line " style="background-color: #eee; color: rgba(101, 101, 101, 0.5); font-family: Monospace; padding: .4em .5em;">@@ -1,1 +1,1 @@</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>...</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>...</td>
+                    <td class="diff-line " style='background-color: #eee; color: #656565; font-family: Monospace; padding: .4em .5em;'>@@ -1,1 +1,1 @@</td>
                   </tr>
                   <tr >
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">1</td>
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;"></td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>1</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'></td>
                     <td style="background-color: #ffcccc;">-XWiki.<del style="background-color: #ff9999; text-decoration: none;">XW</del>i<del style="background-color: #ff9999; text-decoration: none;">k</del>i<del style="background-color: #ff9999; text-decoration: none;">G</del>u<del style="background-color: #ff9999; text-decoration: none;">e</del>s<del style="background-color: #ff9999; text-decoration: none;">t</del></td>
                   </tr>
                   <tr >
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;"></td>
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">1</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'></td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>1</td>
                     <td style="background-color: #ccffcc;">+XWiki.<ins style="background-color: #99ff99; text-decoration: none;">Not</ins>i<ins style="background-color: #99ff99; text-decoration: none;">f</ins>i<ins style="background-color: #99ff99; text-decoration: none;">cationsEmailsIT</ins>us<ins style="background-color: #99ff99; text-decoration: none;">er1</ins></td>
                   </tr>
                 </table>
               </div>
             </dd>
-            <dt style="border: 1px solid #E8E8E8; border-left: 5px solid #E8E8E8; color: #656565; padding: .5em .2em;" data-property-name="defaultLanguage">
+            <dt style='border: 1px solid #e8e8e8; border-left: 5px solid #e8e8e8; color: #656565; padding: .5em .2em;' data-property-name="defaultLanguage">
               Default language
             </dt>
             <dd style="margin-left: 0">
-              <div style="border: 1px solid #E8E8E8; font-family: Monospace; overflow: auto;">
+              <div style='border: 1px solid #e8e8e8; font-family: Monospace; overflow: auto;'>
                 <table>
                   <tr >
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">...</td>
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">...</td>
-                    <td class="diff-line " style="background-color: #eee; color: rgba(101, 101, 101, 0.5); font-family: Monospace; padding: .4em .5em;">@@ -1,0 +1,1 @@</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>...</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>...</td>
+                    <td class="diff-line " style='background-color: #eee; color: #656565; font-family: Monospace; padding: .4em .5em;'>@@ -1,0 +1,1 @@</td>
                   </tr>
                   <tr >
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;"></td>
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">1</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'></td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>1</td>
                     <td style="background-color: #ccffcc;">+en</td>
                   </tr>
                 </table>
               </div>
             </dd>
-            <dt style="border: 1px solid #E8E8E8; border-left: 5px solid #E8E8E8; color: #656565; padding: .5em .2em;" data-property-name="content">
+            <dt style='border: 1px solid #e8e8e8; border-left: 5px solid #e8e8e8; color: #656565; padding: .5em .2em;' data-property-name="content">
               Content
             </dt>
             <dd style="margin-left: 0">
-              <div style="border: 1px solid #E8E8E8; font-family: Monospace; overflow: auto;">
+              <div style='border: 1px solid #e8e8e8; font-family: Monospace; overflow: auto;'>
                 <table>
                   <tr >
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">...</td>
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">...</td>
-                    <td class="diff-line " style="background-color: #eee; color: rgba(101, 101, 101, 0.5); font-family: Monospace; padding: .4em .5em;">@@ -1,0 +1,1 @@</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>...</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>...</td>
+                    <td class="diff-line " style='background-color: #eee; color: #656565; font-family: Monospace; padding: .4em .5em;'>@@ -1,0 +1,1 @@</td>
                   </tr>
                   <tr >
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;"></td>
-                    <td style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;">1</td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'></td>
+                    <td style='border-right: 1px solid #e8e8e8; color: #656565; font-family: Monospace; text-align: right; vertical-align: top;'>1</td>
                     <td style="background-color: #ccffcc;">+Content 2</td>
                   </tr>
                 </table>

@@ -19,14 +19,12 @@
  */
 package org.xwiki.index.tree.internal.nestedspaces;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.index.tree.internal.AbstractDocumentTreeNode;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
@@ -40,20 +38,8 @@ import org.xwiki.model.reference.EntityReference;
 @Component
 @Named("document/nestedSpaces")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DocumentTreeNode extends org.xwiki.index.tree.internal.nestedpages.DocumentTreeNode
+public class DocumentTreeNode extends AbstractDocumentTreeNode
 {
-    @Override
-    protected List<DocumentReference> getChildDocuments(DocumentReference documentReference, int offset, int limit)
-    {
-        return Collections.emptyList();
-    }
-
-    @Override
-    protected int getChildDocumentsCount(DocumentReference documentReference)
-    {
-        return 0;
-    }
-
     @Override
     protected EntityReference getParent(DocumentReference documentReference)
     {

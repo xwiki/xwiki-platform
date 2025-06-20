@@ -88,6 +88,10 @@ viewers.Comments = Class.create({
             this.addSubmitListener(this.form);
             this.addCancelListener();
             this.addPreview(this.form);
+            if(typeof CKEDITOR === 'undefined') {
+              // Focus on the textarea.
+              this.form["XWiki.XWikiComments_comment"].focus();
+            }
           }.bind(this)
         });
       }.bind(this));
@@ -114,6 +118,10 @@ viewers.Comments = Class.create({
       const button = $('openCommentForm');
       if (button) {
         button.hide();
+      }
+      const secondaryButton = $('loginAndComment');
+      if (secondaryButton) {
+        secondaryButton.hide();
       }
       this.formDisplayed = true;
     }
@@ -546,6 +554,7 @@ viewers.Comments = Class.create({
       commentPlaceHolder.addClass("hidden");
       this.formDisplayed = false;
       $('#openCommentForm').show();
+      $('#loginAndComment').show();
       this.form["XWiki.XWikiComments_replyto"].value = "";
       this.cancelPreview(this.form);
       // Cancel the edit mode so that leaving the page does not require confirmation.

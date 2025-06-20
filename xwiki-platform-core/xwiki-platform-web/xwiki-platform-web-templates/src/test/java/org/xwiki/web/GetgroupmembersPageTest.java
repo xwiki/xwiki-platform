@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,8 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.user.DefaultUserComponentList;
 import org.xwiki.user.internal.group.AbstractGroupCache.GroupCacheEntry;
-import org.xwiki.user.internal.group.MembersCache;
+import org.xwiki.user.internal.group.GroupMembersCache;
+import org.xwiki.user.internal.group.WikiGroupCache;
 import org.xwiki.user.script.GroupScriptService;
 import org.xwiki.user.script.UserScriptService;
 import org.xwiki.velocity.tools.JSONTool;
@@ -75,8 +77,10 @@ class GetgroupmembersPageTest extends PageTest
     private TemplateManager templateManager;
 
     private XWikiGroupService groupService;
-    
-    private MembersCache membersCache;
+
+    private GroupMembersCache membersCache;
+
+    private WikiGroupCache wikiGroupCache;
 
     @BeforeEach
     void setUp() throws Exception
@@ -91,8 +95,9 @@ class GetgroupmembersPageTest extends PageTest
 
         this.groupService = this.context.getWiki().getGroupService(this.context);
 
-        // Override the members cache component with a mock.
-        this.membersCache = this.componentManager.registerMockComponent(MembersCache.class);
+        // Override the members and wiki group cache components with mocks.
+        this.membersCache = this.componentManager.registerMockComponent(GroupMembersCache.class);
+        this.wikiGroupCache = this.componentManager.registerMockComponent(WikiGroupCache.class);
 
         // Make sure User and Group script services load properly.
         this.componentManager.getInstance(ScriptService.class, "user");
@@ -151,8 +156,9 @@ class GetgroupmembersPageTest extends PageTest
             .thenAnswer(invocationOnMock -> false);
 
         GroupCacheEntry groupCacheEntry = mock(GroupCacheEntry.class);
+        when(this.wikiGroupCache.get("xwiki")).thenReturn(Set.of(groupDocumentReference));
         when(this.membersCache.getCacheEntry(groupDocumentReference, true)).thenReturn(groupCacheEntry);
-        when(groupCacheEntry.getAll()).thenReturn(Arrays.asList(
+        when(groupCacheEntry.getDirect()).thenReturn(Arrays.asList(
             new DocumentReference("xwiki", "XWiki", "U1"),
             new DocumentReference("xwiki", "XWiki", "U2"),
             new DocumentReference("xwiki", "XWiki", "U3")
@@ -163,6 +169,7 @@ class GetgroupmembersPageTest extends PageTest
                 "U1",
                 "U2"));
         Map<String, Object> results = getJsonResultMap();
+        assertEquals(3, results.get("totalrows"));
         List<Map<String, Object>> rows = (List<Map<String, Object>>) results.get("rows");
         assertEquals(2, rows.size());
         assertEquals("U1", rows.get(0).get("doc_fullName"));

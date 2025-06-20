@@ -22,16 +22,16 @@ package org.xwiki.rest.internal.resources.attachments;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.mail.BodyPart;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.internet.ContentDisposition;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -40,6 +40,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
@@ -47,7 +49,6 @@ import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
@@ -63,7 +64,7 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
     private static final String NAME = "name";
 
     @Inject
-    private ContextualAuthorizationManager authorization;
+    private Container container;
 
     @Override
     public Attachments getAttachments(String wiki, String spaces, String page, Integer offset, Integer limit,
@@ -79,9 +80,8 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
     }
 
     @Override
-    public Response addAttachment(String wikiName, String spaceName, String pageName, Multipart multipart,
-        Boolean withPrettyNames, Boolean createPage)
-        throws XWikiRestException, AttachmentValidationException
+    public Response addAttachment(String wikiName, String spaceName, String pageName, Boolean withPrettyNames,
+        Boolean createPage) throws XWikiRestException, AttachmentValidationException
     {
         Document doc;
         ImmutablePair<String, InputStream> file;
@@ -95,7 +95,7 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            file = getFile(multipart);
+            file = getFile();
             if (file.getKey() == null || file.getValue() == null) {
                 throw new WebApplicationException(Status.BAD_REQUEST);
             }
@@ -119,7 +119,7 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
         }
     }
 
-    private ImmutablePair<String, InputStream> getFile(Multipart multipart) throws MessagingException, IOException
+    private ImmutablePair<String, InputStream> getFile() throws IOException, ServletException
     {
         // The original file name that was sent along with the file content. The value is read from the
         // Content-Disposition header.
@@ -129,23 +129,21 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
         // The file name submitted as a separate form field. When present, it overwrites the original file name.
         String overwritingFileName = null;
 
-        for (int i = 0; i < multipart.getCount(); i++) {
-            BodyPart bodyPart = multipart.getBodyPart(i);
-            if ("form-data".equalsIgnoreCase(bodyPart.getDisposition())) {
-                if (bodyPart.getFileName() != null) {
-                    // This body part represents the file itself.
-                    originalFileName = bodyPart.getFileName();
-                    inputStream = bodyPart.getInputStream();
-                } else {
-                    // This body part represents a plain form field.
-                    ContentDisposition contentDisposition =
-                        new ContentDisposition(bodyPart.getHeader("Content-Disposition")[0]);
-                    String fieldName = contentDisposition.getParameter(NAME);
-                    if ("filename".equals(fieldName)) {
-                        // This body part represents the form field used to overwrite the original file name.
-                        // We don't use bodyPart.getContent() because it doesn't use UTF-8 to read the input stream.
-                        overwritingFileName = IOUtils.toString(bodyPart.getInputStream(), StandardCharsets.UTF_8);
-                    }
+        HttpServletRequest request = ((ServletRequest) this.container.getRequest()).getHttpServletRequest();
+        Collection<Part> parts = request.getParts();
+
+        for (Part part : parts) {
+            String fileName = part.getSubmittedFileName();
+            if (fileName != null) {
+                // This body part represents the file itself.
+                originalFileName = fileName;
+                inputStream = part.getInputStream();
+            } else {
+                // This body part represents a plain form field.
+                if ("filename".equals(part.getName())) {
+                    // This body part represents the form field used to overwrite the original file name.
+                    // We don't use bodyPart.getContent() because it doesn't use UTF-8 to read the input stream.
+                    overwritingFileName = IOUtils.toString(part.getInputStream(), StandardCharsets.UTF_8);
                 }
             }
         }

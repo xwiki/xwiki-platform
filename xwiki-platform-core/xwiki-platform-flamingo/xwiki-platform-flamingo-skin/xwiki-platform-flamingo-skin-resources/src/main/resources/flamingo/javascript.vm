@@ -70,22 +70,23 @@
       'main': 'scriptaculous'
     }, {
       'name': 'moment',
-      'location': $stringtool.removeEnd($services.webjars.url('momentjs', ''), '/'),
+      'location': $stringtool.removeEnd($services.webjars.url('org.webjars.npm:moment', ''), '/'),
       'main': 'min/moment.min'
     }
   ],
   'paths': {
-    'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
+    'bootstrap': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-bootstrap', ""js/xwiki-bootstrap${jsExtension}""))",
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url($jqueryMigrateId, ""dist/jquery-migrate${jsExtension}""))",
     'jsTree': "#removeJsSuffix($services.webjars.url('jstree', ""jstree${jsExtension}""))",
-    'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
+    'moment-jdateformatparser': $services.webjars.url('org.webjars.npm:moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
     'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
+    'xwiki-document-lock': $xwiki.getSkinFile('uicomponents/lock/lock.js'),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
     'xwiki-form-validation-async': $xwiki.getSkinFile('uicomponents/tools/formAsyncValidation.js'),
@@ -104,6 +105,9 @@
     },
     'scriptaculous/dragdrop': ['scriptaculous/effects'],
     'selectize': ['jquery'],
+    'xwiki-document-lock': {
+      'exports': 'XWiki.DocumentLock'
+    },
     'xwiki-entityReference': {
       'exports': 'XWiki'
     }
@@ -260,18 +264,11 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   #set($searchSuggestConfigDocument = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
   #set($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestConfig'))
   #if($searchSuggestConfigObject.getProperty('activated').value == 1)
-    #set($searchSuggestConfigHash = '')
-    #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
-      #if($source.getValue('activated') == 1)
-        #set($sourceId = "${source.getValue('name')}:${source.getValue('url')}:${source.getValue('highlight')}:${source.getValue('icon')}}")
-        #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
-      #end
-    #end
-    $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
-      'forceSkinAction' : true,
-      'h' : $searchSuggestConfigHash.hashCode()
-    })##
-    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)##
+    <script src="${services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar',
+      'searchSuggest' + $jsExtension)}" defer="defer"></script>##
+    $xwiki.linkx.use(
+      $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css', {'evaluate': true}),
+      {'type': 'text/css', 'rel': 'stylesheet'})##
   #end
 #end
 #set($editActions = ['edit', 'inline', 'admin'])

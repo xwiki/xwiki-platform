@@ -155,6 +155,7 @@ download=application_put
 log-in=user_go
 log-out=user_go
 th=application_view_tile
+reposition=reposition
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept

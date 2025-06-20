@@ -27,7 +27,7 @@ import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanTree;
 import org.xwiki.job.internal.script.safe.SafeJobStatus;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to an extension plan.

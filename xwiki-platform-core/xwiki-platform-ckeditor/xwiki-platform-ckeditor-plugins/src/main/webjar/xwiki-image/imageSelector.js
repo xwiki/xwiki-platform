@@ -157,6 +157,10 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
           modal.find('.modal-dialog').addClass('modal-lg');
 
           modal.on('shown.bs.modal', function () {
+            if (modal.data('initialized') == true) {
+              // If the modal was already use, we make sure it's properly reset
+              updateSelectedImageReferences(null);
+            }
             initialize(modal);
           });
           selectButton.on('click', function () {
@@ -231,8 +235,12 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
     }
 
     function updateSelectedImageReferences(imageReferences, element) {
-      var documentReference = getDocumentReference(element.parents('.image-selector-modal').data('input'));
-      mapScopes[documentReference].updateSelectedImageReferences(imageReferences);
+      // If this method is called when the corresponding tab is not active (e.g., a slow asynchronous query leads
+      // to a call to this method while the tab is not active anymore), then the update is skipped.
+      if (element.parents(".tab-pane").hasClass('active')) {
+        var documentReference = getDocumentReference(element.parents('.image-selector-modal').data('input'));
+        mapScopes[documentReference].updateSelectedImageReferences(imageReferences);
+      }
     }
 
     function createLoader(uploadField, options, element) {

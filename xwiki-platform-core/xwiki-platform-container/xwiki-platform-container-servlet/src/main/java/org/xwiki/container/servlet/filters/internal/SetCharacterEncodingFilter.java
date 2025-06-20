@@ -21,23 +21,25 @@ package org.xwiki.container.servlet.filters.internal;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 /**
  * <p>
- * Example filter that sets the character encoding to be used in parsing the incoming request,
- * either unconditionally or only if the client did not specify a character encoding. Configuration
- * of this filter is based on the following initialization parameters:
+ * Filter that sets the character encoding to be used in parsing the incoming request,
+ * either unconditionally or only if the client did not specify a character encoding. Further, the default encoding of
+ * the response is set to the same character encoding. Configuration of this filter is based on the following
+ * initialization parameters:
  * </p>
  * <ul>
  * <li><strong>encoding</strong> - The character encoding to be configured for this request,
  * either conditionally or unconditionally based on the <code>ignore</code> initialization
- * parameter. This parameter is required, so there is no default.</li>
+ * parameter. This same encoding is also used as default for the response. This parameter is required, so there is no
+ * default.</li>
  * <li><strong>ignore</strong> - If set to "true", any character encoding specified by the client
  * is ignored, and the value returned by the <code>selectEncoding()</code> method is set. If set
  * to "false, <code>selectEncoding()</code> is called <strong>only</strong> if the client has not
@@ -49,9 +51,12 @@ import javax.servlet.ServletResponse;
  * characteristics of the incoming request (such as the values of the <code>Accept-Language</code>
  * and <code>User-Agent</code> headers, or a value stashed in the current user's session.
  * </p>
+ * <p>
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
- * @author Craig McClanahan
  * @version $Id$
+ * @since 17.0.0RC1
  */
 public class SetCharacterEncodingFilter implements Filter
 {
@@ -102,11 +107,15 @@ public class SetCharacterEncodingFilter implements Filter
     {
         // Conditionally select and set the character encoding to be used
         if (ignore || (request.getCharacterEncoding() == null)) {
-            String encoding = selectEncoding(request);
-            if (encoding != null) {
-                request.setCharacterEncoding(encoding);
+            String selectedEncoding = selectEncoding(request);
+            if (selectedEncoding != null) {
+                request.setCharacterEncoding(selectedEncoding);
             }
         }
+        // Set the default encoding for the response. Use the same encoding as the request as this is supposed to be
+        // the encoding that XWiki uses in general. It is not clear that XWiki in general supports any encoding besides
+        // UTF-8, though.
+        response.setCharacterEncoding(this.encoding);
         // Pass control on to the next filter
         chain.doFilter(request, response);
     }

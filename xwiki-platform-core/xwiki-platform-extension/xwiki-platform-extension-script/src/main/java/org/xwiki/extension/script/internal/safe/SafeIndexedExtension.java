@@ -20,7 +20,7 @@
 package org.xwiki.extension.script.internal.safe;
 
 import org.xwiki.extension.index.IndexedExtension;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to an indexed extension.

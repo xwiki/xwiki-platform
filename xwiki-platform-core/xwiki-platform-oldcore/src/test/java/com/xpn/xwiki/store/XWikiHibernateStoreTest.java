@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -45,13 +46,15 @@ import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
+import org.xwiki.store.hibernate.HibernateAdapter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -60,15 +63,19 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
+import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -81,6 +88,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 /**
@@ -89,8 +97,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ReferenceComponentList
 public class XWikiHibernateStoreTest
 {
+    private static final String WIKI_NAME = "wiki";
+
+    private static final WikiReference WIKI_REFERENCE = new WikiReference(WIKI_NAME);
+
     /**
      * A special component manager that mocks automatically all the dependencies of the component under test.
      */
@@ -105,6 +118,9 @@ public class XWikiHibernateStoreTest
      */
     @Mock
     private Session session;
+
+    @Mock
+    private HibernateAdapter adapter;
 
     /**
      * The Hibernate transaction.
@@ -125,6 +141,9 @@ public class XWikiHibernateStoreTest
     private QueryManager queryManager;
 
     @MockComponent
+    private HibernateConfiguration hibernateConfiguration;
+
+    @MockComponent
     private Provider<XWikiContext> contextProvider;
 
     @MockComponent
@@ -132,26 +151,29 @@ public class XWikiHibernateStoreTest
     private Provider<XWikiContext> readOnlyContextProvider;
 
     @MockComponent
-    @Named("local")
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
-
-    @MockComponent
-    @Named("currentmixed")
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
-
-    @MockComponent
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
-
-    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @MockComponent
+    private CoreConfiguration coreConfiguration;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
+    @AfterComponent
+    void afterComponent()
+    {
+        when(this.hibernateConfiguration.getOptimizedXObjectClasses()).thenReturn(Optional.empty());
+    }
+
     @BeforeEach
     void setUp(MockitoComponentManager componentManager) throws Exception
     {
+        Utils.setComponentManager(componentManager);
+        when(this.coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.XWIKI_2_1);
+
+        when(this.xcontext.getWikiId()).thenReturn(WIKI_NAME);
+        when(this.xcontext.getWikiReference()).thenReturn(WIKI_REFERENCE);
+
         // For XWikiHibernateBaseStore#initialize()
 
         ExecutionContext executionContext = mock(ExecutionContext.class);
@@ -175,8 +197,9 @@ public class XWikiHibernateStoreTest
         when(this.hibernateStore.getCurrentSession()).thenReturn(session);
         when(this.hibernateStore.getCurrentTransaction()).thenReturn(transaction);
 
+        when(this.hibernateStore.getAdapter()).thenReturn(this.adapter);
         // Default is schema mode
-        when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(true);
+        when(this.adapter.isConfiguredInSchemaMode()).thenReturn(true);
     }
 
     @Test
@@ -219,7 +242,7 @@ public class XWikiHibernateStoreTest
     @Test
     void executeDeleteWikiStatementForPostgreSQLWhenInDatabaseMode() throws Exception
     {
-        when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(false);
+        when(this.adapter.isConfiguredInSchemaMode()).thenReturn(false);
 
         Statement statement = mock(Statement.class);
         DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;
@@ -285,7 +308,7 @@ public class XWikiHibernateStoreTest
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
         this.store.createHibernateSequenceIfRequired(
-            new String[] { "whatever", "create sequence schema.hibernate_sequence" }, "schema", session);
+            new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", session);
 
         verify(session, never()).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery, never()).executeUpdate();
@@ -430,7 +453,6 @@ public class XWikiHibernateStoreTest
         when(query.execute()).thenReturn(translationList);
 
         when(queryManager.createQuery(any(String.class), eq(org.xwiki.query.Query.HQL))).thenReturn(query);
-        when(localEntityReferenceSerializer.serialize(documentReference.getParent())).thenReturn("Path.To");
 
         assertEquals(translationList, store.getTranslationList(doc, xcontext));
 
@@ -447,7 +469,6 @@ public class XWikiHibernateStoreTest
         // We are currently in the context of "xwiki"
         WikiReference currentWikiReference = new WikiReference("xwiki");
         when(this.xcontext.getWikiReference()).thenReturn(currentWikiReference);
-        when(this.compactWikiEntityReferenceSerializer.serialize(documentReference)).thenReturn("B.WebHome");
         List<String> resultList = new ArrayList<>();
         resultList.add("A.WebHome");
 
@@ -456,7 +477,6 @@ public class XWikiHibernateStoreTest
         when(this.session.createQuery(anyString(), same(String.class))).thenReturn(query);
         when(query.list()).thenReturn(resultList);
         DocumentReference expectedBacklink = new DocumentReference("xwiki", Arrays.asList("A"), "WebHome");
-        when(this.currentMixedDocumentReferenceResolver.resolve("A.WebHome")).thenReturn(expectedBacklink);
 
         List<DocumentReference> obtainedReferences = this.store.loadBacklinks(documentReference, true, this.xcontext);
         assertEquals(1, obtainedReferences.size());
@@ -474,7 +494,6 @@ public class XWikiHibernateStoreTest
         // We are currently in the context of "xwiki"
         WikiReference currentWikiReference = new WikiReference("xwiki");
         when(this.xcontext.getWikiReference()).thenReturn(currentWikiReference);
-        when(this.compactWikiEntityReferenceSerializer.serialize(documentReference)).thenReturn("subwiki:B.WebHome");
         List<String> resultList = new ArrayList<>();
         resultList.add("Foo.WebHome");
 
@@ -483,7 +502,6 @@ public class XWikiHibernateStoreTest
         when(this.session.createQuery(anyString(), same(String.class))).thenReturn(query);
         when(query.list()).thenReturn(resultList);
         DocumentReference expectedBacklink = new DocumentReference("xwiki", Arrays.asList("Foo"), "WebHome");
-        when(this.currentMixedDocumentReferenceResolver.resolve("Foo.WebHome")).thenReturn(expectedBacklink);
 
         List<DocumentReference> obtainedReferences = this.store.loadBacklinks(documentReference, true, this.xcontext);
         assertEquals(1, obtainedReferences.size());
@@ -491,5 +509,69 @@ public class XWikiHibernateStoreTest
         verify(query).setParameter("backlink", "subwiki:B.WebHome");
         verify(this.hibernateStore).beginTransaction();
         verify(this.hibernateStore).endTransaction(false);
+    }
+
+    @Test
+    void saveModifiedXObjects() throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference(WIKI_NAME, "space", "document"));
+
+        Query queryDocument = mock();
+        when(this.session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id"))
+            .thenReturn(queryDocument);
+        when(queryDocument.uniqueResult()).thenReturn(null);
+
+        LocalDocumentReference classReference = new LocalDocumentReference("space", "class");
+
+        BaseObject object1 = new BaseObject();
+        object1.setXClassReference(classReference);
+        document.addXObject(object1);
+
+        Query queryXObject = mock();
+        when(this.session.createQuery("select obj.id from BaseObject as obj where obj.id = :id", Long.class))
+            .thenReturn(queryXObject);
+        when(queryXObject.uniqueResult()).thenReturn(null);
+
+        // First save a new document
+
+        this.store.saveXWikiDoc(document, this.xcontext, true);
+
+        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, never()).update("com.xpn.xwiki.objects.BaseObject", object1);
+
+        // Save again of the same document
+
+        when(queryDocument.uniqueResult()).thenReturn(document.getId());
+        when(queryXObject.uniqueResult()).thenReturn(object1.getId());
+
+        this.store.saveXWikiDoc(document, this.xcontext, true);
+
+        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, never()).update("com.xpn.xwiki.objects.BaseObject", object1);
+
+        // Indicate that the xobject was modified
+
+        object1.setDirty(true);
+
+        this.store.saveXWikiDoc(document, this.xcontext, true);
+
+        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, times(1)).update("com.xpn.xwiki.objects.BaseObject", object1);
+
+        // Save again with no change
+
+        this.store.saveXWikiDoc(document, this.xcontext, true);
+
+        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, times(1)).update("com.xpn.xwiki.objects.BaseObject", object1);
+
+        // Save again but with disabled tracking
+
+        document.setChangeTracked(false);
+
+        this.store.saveXWikiDoc(document, this.xcontext, true);
+
+        verify(this.session).save("com.xpn.xwiki.objects.BaseObject", object1);
+        verify(this.session, times(2)).update("com.xpn.xwiki.objects.BaseObject", object1);
     }
 }

@@ -51,7 +51,7 @@
         &lt;li&gt;
           &lt;span class="btn btn-xs number$extraClassName"&gt;
             #if ($stepNumber &gt; $index)
-              &amp;${escapetool.h}10004;
+              $services.icon.renderHTML('check')
             #else
               $index
             #end

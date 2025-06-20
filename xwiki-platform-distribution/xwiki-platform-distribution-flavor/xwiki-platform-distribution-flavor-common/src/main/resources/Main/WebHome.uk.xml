@@ -53,7 +53,7 @@ XWiki може бути використана в якості основи зн
 
 Ви також можете використовувати [[Пісочницю&gt;&gt;Sandbox.WebHome]] для більшої кількості демо-контенту і в цілому як місце для експериментів з можливостями вашої вікі.
 
-{{box}}Дізнайтеся більше про те, як використовувати XWiki з [[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
+{{box}}Дізнайтеся більше про те, як використовувати XWiki з [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
 (%class="row"%)
 (((
@@ -63,7 +63,7 @@ XWiki може бути використана в якості основи зн
 
 Щоб доповнити можливості і функціональність вікі необхідними // вам // функціями, перейдіть до [[Менеджеру розширень&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]], де ви зможете знайти і встановити розширення.
 
-Для перегляду більше 900 створених спільнотою розширень для XWiki, перейдіть в [[Репозиторій розширень&gt;&gt;http://extensions.xwiki.org]].
+Для перегляду більше 900 створених спільнотою розширень для XWiki, перейдіть в [[Репозиторій розширень&gt;&gt;https://extensions.xwiki.org]].
 )))
 
 (%class="col-xs-12 col-sm-6"%)

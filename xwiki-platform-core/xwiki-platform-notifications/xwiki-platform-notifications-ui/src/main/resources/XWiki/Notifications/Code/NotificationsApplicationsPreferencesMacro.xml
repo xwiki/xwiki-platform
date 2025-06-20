@@ -349,8 +349,6 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
      * Initialization
      */
     self.init = function () {
-      // Replace the 'hidden' class by a call to jQuery.hide();
-      self.domElement.removeClass('hidden').hide();
       // Enable bootstrap switches
       $([self.switchAlert, self.switchEmail]).bootstrapSwitch({
         size: 'mini',
@@ -392,13 +390,6 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
      */
     self.setEmailState = function (state) {
       self.switchEmail.bootstrapSwitch('state', state);
-    };
-
-    /**
-     * Hide/Show the event type widget
-     */
-    self.toggleVisibility = function () {
-      self.domElement.toggle();
     };
 
     // Call init
@@ -539,9 +530,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       // Handle collapsing
       // Make sure the click listener is registered only once.
       self.collapseButton.off('click.toggleVisibility').on('click.toggleVisibility', function() {
-        for (var i = 0; i &lt; self.eventTypes.length; ++i) {
-          self.eventTypes[i].toggleVisibility();
-        }
+        this.classList.toggle("collapsed")
       });
 
       // Handle switch change
@@ -712,30 +701,49 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       <code>.notifPreferences tbody {
   margin-top: 2em;
 }
+
 .notifPreferences .appOdd {
-  background: #e5e5e5;
+  background: @breadcrumb-bg;
 }
+
 .notifPreferences .appEven {
-  background: #fafafa;
+  background: @xwiki-page-content-bg;
 }
+
 .notifPreferences .rowApp td, .notifPreferences .rowApp th{
   height: 3em;
 }
+
 .notifPreferences th:nth-child(1) {
   vertical-align: top;
   width: 250px;
 }
+
+/* Hide all of the eventType rows that are after a category toggler that is in the collapsed state. */
+.notifPreferences tr:has(&gt; td &gt; button.collapsed) ~ tr {
+  display: none;
+}
+
+.notifPreferences tr &gt; td &gt; button &gt; *:first-child {
+  transition: transform .2s ease-in-out;
+}
+
+.notifPreferences tr &gt; td &gt; button.collapsed &gt; *:first-child {
+  transform: rotate(90deg);
+}
+
 .notificationAppCell {
   vertical-align: top;
   width: 33%;
 }
+
 .notificationCollapseButtonCell {
   vertical-align: top;
   text-align: right;
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name>NotificationPreferencesTable</name>
@@ -991,7 +999,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
 {{html clean="false"}}
 &lt;div class="xform"&gt;
 &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.hint'))&lt;/p&gt;
-&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
+&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $!divData&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th scope="col"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;
@@ -1044,7 +1052,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       #end
       ## Collapse button
       &lt;td class="notificationCollapseButtonCell"&gt;
-        &lt;button type="button" class="btn btn-default btn-sm collapseButton"&gt;
+        &lt;button type="button" class="btn btn-default btn-sm collapseButton collapsed"&gt;
           $services.icon.renderHTML('caret-down')
           &lt;span class='sr-only'&gt;
             $escapetool.xml($services.localization.render('notifications.settings.applications.table.dropdown.toggle.label',[$type.applicationName]))
@@ -1056,7 +1064,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
     ## Display all events of this application
     ##
     #foreach($type in $app)
-      &lt;tr class="rowEventType hidden" data-eventtype="$type.eventType"&gt;
+      &lt;tr class="rowEventType" data-eventtype="$type.eventType"&gt;
         &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
         #displayPreference($type, 'alert')
         #if ($services.notification.areEmailsEnabled())

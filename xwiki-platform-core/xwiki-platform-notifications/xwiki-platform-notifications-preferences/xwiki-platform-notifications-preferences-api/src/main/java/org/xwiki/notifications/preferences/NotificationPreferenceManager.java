@@ -27,7 +27,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -102,7 +101,6 @@ public interface NotificationPreferenceManager
      * @throws NotificationException in case of problem for loading the preferences
      * @since 15.5RC1
      */
-    @Unstable
     default String getNotificationGroupingStrategy(UserReference userReference, String target)
         throws NotificationException
     {

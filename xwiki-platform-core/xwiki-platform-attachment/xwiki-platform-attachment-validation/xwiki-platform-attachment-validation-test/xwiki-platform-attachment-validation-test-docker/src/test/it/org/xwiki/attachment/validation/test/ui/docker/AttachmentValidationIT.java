@@ -21,6 +21,7 @@ package org.xwiki.attachment.validation.test.ui.docker;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.io.IOUtils;
@@ -39,6 +40,8 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -97,20 +100,24 @@ class AttachmentValidationIT
         // Check if the attachment validators are also executed when uploading attachment through the rest API.
         PutMethod putMethodText = restUploadImage(setup, subPage, TEXT_FILE_NAME);
         assertEquals(415, putMethodText.getStatusCode());
-        assertEquals("{"
-            + "\"message\":\"Invalid mimetype [text/plain]\","
-            + "\"translationKey\":\"attachment.validation.mimetype.rejected\","
-            + "\"translationParameters\":\"[[image/*], []]\""
-            + "}", putMethodText.getResponseBodyAsString());
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> mapResult = objectMapper.readValue(putMethodText.getResponseBodyAsStream(), Map.class);
+        Map<String, Object> expectedMap = Map.of(
+            "message", "Invalid mimetype [text/plain]",
+            "translationKey", "attachment.validation.mimetype.rejected",
+            "translationParameters", List.of(List.of("image/*"), List.of())
+        );
+        assertEquals(expectedMap, mapResult);
 
         PutMethod putMethodImage = restUploadImage(setup, subPage, IMAGE_FILE_NAME);
         assertEquals(413, putMethodImage.getStatusCode());
-        assertEquals("{"
-            + "\"message\":\"File size too big\","
-            + "\"translationKey\":\"attachment.validation.filesize.rejected\","
-            + "\"translationParameters\":\"[10 bytes]\""
-            + "}", putMethodImage.getResponseBodyAsString());
-
+        mapResult = objectMapper.readValue(putMethodImage.getResponseBodyAsStream(), Map.class);
+        expectedMap = Map.of(
+            "message", "File size too big",
+            "translationKey", "attachment.validation.filesize.rejected",
+            "translationParameters", List.of("10 bytes")
+        );
+        assertEquals(expectedMap, mapResult);
         // Check that no image are saved to the document after the various upload tries.
         page.reloadPage();
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();

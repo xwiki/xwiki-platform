@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReferenceResolver;
 

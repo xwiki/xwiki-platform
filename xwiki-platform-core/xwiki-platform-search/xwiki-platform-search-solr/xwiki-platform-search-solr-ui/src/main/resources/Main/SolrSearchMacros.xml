@@ -951,8 +951,7 @@ $value##
   ##
   ## Output the feed.
   ##
-  #set ($discard = $response.setContentType('application/rss+xml'))
-  $xwiki.feed.getFeedOutput($feed, 'rss_2.0')
+  #rawResponse($xwiki.feed.getFeedOutput($feed, 'rss_2.0'), 'application/rss+xml')
 #end
 
 #macro (handleSolrSearchRequest)

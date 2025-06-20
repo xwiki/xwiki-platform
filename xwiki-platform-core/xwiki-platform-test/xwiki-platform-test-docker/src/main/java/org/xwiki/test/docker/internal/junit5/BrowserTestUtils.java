@@ -22,6 +22,7 @@ package org.xwiki.test.docker.internal.junit5;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -48,21 +49,13 @@ public final class BrowserTestUtils
 
     private static final String LATEST = "latest";
 
-    private static final String SELENIUM_VERSION = LATEST;
+    private static final String SELENIUM_FIREFOX_DOCKER_IMAGE_NAME = "selenium/standalone-firefox:%s";
 
-    private static final String SELENIARM_VERSION = LATEST;
+    private static final String SELENIUM_CHROME_DOCKER_IMAGE_NAME = "selenium/standalone-chrome:%s";
 
-    private static final String SELENIUM_FIREFOX_DOCKER_IMAGE_NAME =
-        String.format("selenium/standalone-firefox:%s", SELENIUM_VERSION);
+    private static final String SELENIARM_FIREFOX_DOCKER_IMAGE_NAME = "seleniarm/standalone-firefox:%s";
 
-    private static final String SELENIUM_CHROME_DOCKER_IMAGE_NAME =
-        String.format("selenium/standalone-chrome:%s", SELENIUM_VERSION);
-
-    private static final String SELENIARM_FIREFOX_DOCKER_IMAGE_NAME =
-        String.format("seleniarm/standalone-firefox:%s", SELENIARM_VERSION);
-
-    private static final String SELENIARM_CHROME_DOCKER_IMAGE_NAME =
-        String.format("seleniarm/standalone-chromium:%s", SELENIARM_VERSION);
+    private static final String SELENIARM_CHROME_DOCKER_IMAGE_NAME = "seleniarm/standalone-chromium:%s";
 
     private static final boolean IS_ARM64 = System.getProperty("os.arch").equals("aarch64");
 
@@ -99,9 +92,9 @@ public final class BrowserTestUtils
      */
     public static DockerImageName getSeleniumDockerImageName(TestConfiguration testConfiguration)
     {
-        return IS_ARM64 ? DockerImageName.parse(getSeleniarmImageName(testConfiguration))
-            .asCompatibleSubstituteFor(getSeleniumImageName(testConfiguration))
-            : DockerImageName.parse(getSeleniumImageName(testConfiguration));
+        return IS_ARM64 ? DockerImageName.parse(getImageName(testConfiguration, true))
+            .asCompatibleSubstituteFor(getImageName(testConfiguration, false))
+            : DockerImageName.parse(getImageName(testConfiguration, false));
     }
 
     private static void pullImage(DockerClient dockerClient, String imageName)
@@ -124,15 +117,21 @@ public final class BrowserTestUtils
         }
     }
 
-    private static String getSeleniarmImageName(TestConfiguration testConfiguration)
+    private static String getImageTag(TestConfiguration testConfiguration)
     {
-        return CHROME.equals(testConfiguration.getBrowser()) ? SELENIARM_CHROME_DOCKER_IMAGE_NAME
-            : SELENIARM_FIREFOX_DOCKER_IMAGE_NAME;
+        return (StringUtils.isBlank(testConfiguration.getBrowserTag())) ? LATEST : testConfiguration.getBrowserTag();
     }
 
-    private static String getSeleniumImageName(TestConfiguration testConfiguration)
+    private static String getImageName(TestConfiguration testConfiguration, boolean useSeleniarm)
     {
-        return CHROME.equals(testConfiguration.getBrowser()) ? SELENIUM_CHROME_DOCKER_IMAGE_NAME
-            : SELENIUM_FIREFOX_DOCKER_IMAGE_NAME;
+        boolean isChrome = CHROME.equals(testConfiguration.getBrowser());
+        String imageTag = getImageTag(testConfiguration);
+        String baseImageName;
+        if (useSeleniarm) {
+            baseImageName = (isChrome) ? SELENIARM_CHROME_DOCKER_IMAGE_NAME : SELENIARM_FIREFOX_DOCKER_IMAGE_NAME;
+        } else {
+            baseImageName = (isChrome) ? SELENIUM_CHROME_DOCKER_IMAGE_NAME : SELENIUM_FIREFOX_DOCKER_IMAGE_NAME;
+        }
+        return String.format(baseImageName, imageTag);
     }
 }

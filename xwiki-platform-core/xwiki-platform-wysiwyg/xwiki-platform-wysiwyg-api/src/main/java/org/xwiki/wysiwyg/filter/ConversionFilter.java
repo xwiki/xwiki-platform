@@ -20,14 +20,16 @@
 package org.xwiki.wysiwyg.filter;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -38,32 +40,55 @@ import com.xpn.xwiki.web.Utils;
 /**
  * This filter is used to convert the values of request parameters that require HTML conversion before being processed.
  * A HTML editor can use this filter to convert its output to a specific syntax before it is saved.
+ * <p>
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
+ * @since 17.0.0RC1
  */
 public class ConversionFilter implements Filter
 {
     @Override
     public void destroy()
     {
+        // No cleanup needed.
     }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
         throws IOException, ServletException
     {
-        RequestParameterConverter converter = Utils.getComponent(RequestParameterConverter.class);
         Execution execution = Utils.getComponent(Execution.class);
         execution.pushContext(new ExecutionContext());
-        Optional<ServletRequest> servletRequest = converter.convert(req, res);
-        execution.popContext();
+        Optional<ServletRequest> servletRequest = Optional.of(req);
+        try {
+            servletRequest = convert(servletRequest, res);
+        } finally {
+            execution.popContext();
+        }
+
         if (servletRequest.isPresent()) {
             chain.doFilter(servletRequest.get(), res);
         }
     }
 
+    private Optional<ServletRequest> convert(Optional<ServletRequest> originalRequest, ServletResponse res)
+        throws IOException
+    {
+        List<RequestParameterConverter> converters = Utils.getComponentList(RequestParameterConverter.class);
+        Iterator<RequestParameterConverter> iterator = converters.iterator();
+        Optional<ServletRequest> convertedRequest = originalRequest;
+        while (convertedRequest.isPresent() && iterator.hasNext()) {
+            RequestParameterConverter converter = iterator.next();
+            convertedRequest = converter.convert(convertedRequest.get(), res);
+        }
+        return convertedRequest;
+    }
+
     @Override
     public void init(FilterConfig config) throws ServletException
     {
+        // No initialization needed.
     }
 }

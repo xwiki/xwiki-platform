@@ -31,6 +31,9 @@
     <tr>
         <th></th><th>$services.localization.render('version')</th><th>$services.localization.render('size')</th>
         <th>$services.localization.render('author')</th><th>$services.localization.render('date')</th>
+        #if ($services.attachment.configuration.commentsEnabled)
+          <th>$services.localization.render('core.viewers.attachments.livetable.comment')</th>
+        #end
     </tr>
 #foreach ($version in $attachment.getVersions())
     <tr#if($foreach.count % 2 == 1) class="table-odd"#else class="table-even"#end>
@@ -50,6 +53,9 @@
         <td>$attachrev.longSize</td>
         <td>$xwiki.getUserName($attachrev.getAuthor())</td>
         <td>$xwiki.formatDate($attachrev.getDate())</td>
+        #if ($services.attachment.configuration.commentsEnabled)
+          <td>$escapetool.xml($attachrev.comment)</td>
+        #end
     </tr>
 #end
 </table>

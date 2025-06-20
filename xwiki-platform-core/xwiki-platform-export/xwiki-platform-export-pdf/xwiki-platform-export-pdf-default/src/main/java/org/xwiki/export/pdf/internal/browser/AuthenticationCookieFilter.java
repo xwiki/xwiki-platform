@@ -26,11 +26,12 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+
+import jakarta.servlet.http.Cookie;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;
@@ -70,6 +71,22 @@ public class AuthenticationCookieFilter implements CookieFilter
     private Provider<XWikiContext> xcontextProvider;
 
     @Override
+    public boolean isFilterRequired()
+    {
+        try {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            PersistentLoginManagerInterface loginManager = this.persistentLoginManagerProvider.get();
+            String userName = loginManager.getRememberedUsername(xcontext.getRequest(), xcontext.getResponse());
+            String password = loginManager.getRememberedPassword(xcontext.getRequest(), xcontext.getResponse());
+            return userName != null && password != null;
+        } catch (Exception e) {
+            this.logger.warn("Skipping XWiki authentication cookie filtering because [{}].",
+                ExceptionUtils.getRootCauseMessage(e));
+            return false;
+        }
+    }
+
+    @Override
     public void filter(List<Cookie> cookies, CookieFilterContext cookieFilterContext)
     {
         try {
@@ -77,13 +94,18 @@ public class AuthenticationCookieFilter implements CookieFilter
             PersistentLoginManagerInterface loginManager = this.persistentLoginManagerProvider.get();
             String userName = loginManager.getRememberedUsername(xcontext.getRequest(), xcontext.getResponse());
             String password = loginManager.getRememberedPassword(xcontext.getRequest(), xcontext.getResponse());
+            if (userName == null || password == null) {
+                // No need to update the cookies if the user is not logged in or if the authentication cookies are not
+                // valid.
+                return;
+            }
             HttpServletRequest fakeRequest = new HttpServletRequestWrapper(xcontext.getRequest())
             {
                 @Override
                 public String getHeader(String name)
                 {
                     if ("X-Forwarded-For".equals(name)) {
-                        return cookieFilterContext.getBrowserIPAddress();
+                        return cookieFilterContext.getClientIPAddress();
                     } else {
                         return super.getHeader(name);
                     }
@@ -92,7 +114,7 @@ public class AuthenticationCookieFilter implements CookieFilter
                 @Override
                 public String getRemoteAddr()
                 {
-                    return cookieFilterContext.getBrowserIPAddress();
+                    return cookieFilterContext.getClientIPAddress();
                 }
             };
             HttpServletResponse fakeResponse = new HttpServletResponseWrapper(xcontext.getResponse())

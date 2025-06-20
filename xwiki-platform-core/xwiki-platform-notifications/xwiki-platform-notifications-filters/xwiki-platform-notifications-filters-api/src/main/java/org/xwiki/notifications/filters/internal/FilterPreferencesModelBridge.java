@@ -75,7 +75,8 @@ public interface FilterPreferencesModelBridge
      * @throws NotificationException if an error happens
      * @since 10.1RC1
      */
-    Map<String, Boolean> getToggleableFilterActivations(DocumentReference user) throws NotificationException;
+    Map<String, ToggleableNotificationFilterActivation> getToggleableFilterActivations(DocumentReference user)
+        throws NotificationException;
 
     /**
      * Delete a filter preference.

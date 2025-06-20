@@ -160,22 +160,10 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final Pattern COMPONENT_SPECIAL_CHARS = Pattern.compile("[<>,]+");
 
-    private static final long SCHEMA_VERSION_12_9 = 120900000;
-
-    private static final long SCHEMA_VERSION_13_3 = 130300000;
-
-    private static final long SCHEMA_VERSION_14_0 = 140000000;
-
-    private static final long SCHEMA_VERSION_15_5 = 150500000;
-
-    private static final long SCHEMA_VERSION_15_6 = 150600000;
-
-    private static final long SCHEMA_VERSION_15_9 = 150900000;
-
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_15_9;
+        return SCHEMA_VERSION_16_7;
     }
 
     @Override
@@ -260,13 +248,17 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             if (cversion >= SCHEMA_VERSION_15_6) {
                 // Cleanup previously required field from the index.
                 try {
-                    this.client.deleteByQuery("is_installed:[* TO *] OR is_from_environment:[* TO *]");
+                    this.core.getClient().deleteByQuery("is_installed:[* TO *] OR is_from_environment:[* TO *]");
                 } catch (SolrServerException | IOException e) {
                     throw new SolrException("Failed to cleanup is_installed field", e);
                 }
                 deleteField("is_installed", false);
                 deleteField("is_from_environment", false);
             }
+        }
+
+        if (cversion < SCHEMA_VERSION_16_7) {
+            setStringField(RemoteExtension.FIELD_SUPPORT_PLANS, true, false);
         }
     }
 

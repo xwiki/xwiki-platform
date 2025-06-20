@@ -1,9 +1,0 @@
-Package: xwiki-solr-extension_index
-Version: [[version]]
-Section: java
-Priority: optional
-Architecture: all
-Depends: 
-Maintainer: [[debian.maintainer]]
-License: [[debian.license]]
-Description: [[debian.description]]

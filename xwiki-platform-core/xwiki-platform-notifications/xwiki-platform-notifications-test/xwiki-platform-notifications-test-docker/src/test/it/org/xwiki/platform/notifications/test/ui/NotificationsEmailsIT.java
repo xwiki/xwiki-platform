@@ -22,6 +22,7 @@ package org.xwiki.platform.notifications.test.ui;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -29,14 +30,14 @@ import java.util.stream.Collectors;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.simplejavamail.api.email.Email;
 import org.simplejavamail.converter.EmailConverter;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.platform.notifications.test.po.NotificationWatchButtonElement;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
+import org.xwiki.platform.notifications.test.po.NotificationsWatchModal;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
@@ -80,165 +81,143 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
-public class NotificationsEmailsIT
+class NotificationsEmailsIT
 {
     private static final String FIRST_USER_NAME = NotificationsEmailsIT.class.getSimpleName() + "user1";
+
     private static final String SECOND_USER_NAME = NotificationsEmailsIT.class.getSimpleName() + "user2";
 
     private static final String FIRST_USER_PASSWORD = "notificationsUser1";
+
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";
 
     private static final String SYSTEM = "org.xwiki.platform";
 
     private static final String NOTIFICATIONS_EMAIL_TEST = "NotificationsEmailTest";
+
     private static final String EMAIL_FORMAT = "email";
+
     private static final String ALERT_FORMAT = "alert";
+
     private static final String CREATE = "create";
 
     public static final String USER_EMAIL = "test@xwiki.org";
+
     public static final String ADMIN_EMAIL = "admin@xwiki.org";
 
     private GreenMail mail;
 
-    @BeforeAll
-    public void setup(TestUtils testUtils, TestConfiguration testConfiguration) throws Exception
-    {
-        testUtils.loginAsSuperAdmin();
-        // Create the two users we will be using
-        testUtils.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
-        testUtils.createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "email", USER_EMAIL);
-
-        NotificationsUserProfilePage p;
-
-        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-        p.disableAllParameters();
-        // Enable own filter
-        p.getNotificationFilterPreferences().get(2).setEnabled(true);
-
-        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
-        p.disableAllParameters();
-
-        testUtils.loginAsSuperAdmin();
-        testUtils.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0,
-            "host", testConfiguration.getServletEngine().getHostIP(),
-            "port", "3025",
-            "sendWaitTime", "0",
-            "from", ADMIN_EMAIL);
-
-        // To ensure that this configuration is taken into account inside mail links.
-        testUtils.updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0, "server", "externaldomain",
-            "port", "4242", "secure", "1");
-
-        mail = new GreenMail(ServerSetupTest.SMTP);
-        mail.start();
-    }
-
-    @AfterAll
-    public void tearDown(TestUtils testUtils)
-    {
-        testUtils.deletePage("XWiki", FIRST_USER_NAME);
-        testUtils.deletePage("XWiki", SECOND_USER_NAME);
-        mail.stop();
-    }
-
     @Test
-    public void notificationsEmails(TestUtils testUtils) throws Exception
+    void notificationsEmails(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
-        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        NotificationsUserProfilePage p;
-        p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
-        p.getApplication(SYSTEM).setCollapsed(false);
-        p.setEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT, BootstrapSwitch.State.ON);
+        try {
+            intialize(setup, testConfiguration);
 
-        // We also enable on alert format to be able to wait on those notifications.
-        p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
+            setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+            NotificationsUserProfilePage p;
+            p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+            p.getApplication(SYSTEM).setCollapsed(false);
+            p.setEventTypeState(SYSTEM, CREATE, EMAIL_FORMAT, BootstrapSwitch.State.ON);
 
-        // Start watching the wiki so that we receive notifications
-        NotificationsTrayPage trayPage = new NotificationsTrayPage();
-        trayPage.showNotificationTray();
-        trayPage.setWikiWatchedState(true);
+            // We also enable on alert format to be able to wait on those notifications.
+            p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
-        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        DocumentReference page1 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page1");
-        DocumentReference page2 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page2");
+            // Start watching the wiki so that we receive notifications
+            NotificationWatchButtonElement watchButtonElement = new NotificationWatchButtonElement();
+            assertTrue(watchButtonElement.isNotSet());
+            // And he will watch the entire wiki.
+            NotificationsWatchModal notificationsWatchModal = watchButtonElement.openModal();
+            assertEquals(List.of(
+                NotificationsWatchModal.WatchOptions.WATCH_PAGE,
+                NotificationsWatchModal.WatchOptions.WATCH_WIKI
+            ), notificationsWatchModal.getAvailableOptions());
+            notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
 
-        testUtils.createPage(page1, "Content 1", "Title 1");
-        testUtils.createPage(page2, "Content 2", "Title 2");
+            setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+            DocumentReference page1 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page1");
+            DocumentReference page2 = new DocumentReference("xwiki", NOTIFICATIONS_EMAIL_TEST, "Page2");
 
-        // Wait for the notifications to be handled.
-        testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        testUtils.gotoPage(page1);
-        NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 2);
+            setup.createPage(page1, "Content 1", "Title 1");
+            setup.createPage(page2, "Content 2", "Title 2");
 
-        // Trigger the notification email job
-        testUtils.loginAsSuperAdmin();
-        SchedulerHomePage schedulerHomePage = SchedulerHomePage.gotoPage();
-        schedulerHomePage.clickJobActionTrigger("Notifications daily email");
+            // Wait for the notifications to be handled.
+            setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+            setup.gotoPage(page1);
+            NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + SECOND_USER_NAME, "xwiki", 2);
 
-        // Wait 30s instead of the default 5s to make sure the mail has enough time to arrive, even if the CI is slow.
-        assertTrue(mail.waitForIncomingEmail(30000L, 1), "Timeout reached for getting notification email.");
+            // Trigger the notification email job
+            setup.loginAsSuperAdmin();
+            SchedulerHomePage schedulerHomePage = SchedulerHomePage.gotoPage();
+            schedulerHomePage.clickJobActionTrigger("Notifications daily email");
 
-        assertEquals(1, mail.getReceivedMessages().length);
-        MimeMessage message = mail.getReceivedMessages()[0];
+            // Wait 30s instead of the default 5s to make sure the mail has enough time to arrive, even if the CI is slow.
+            assertTrue(this.mail.waitForIncomingEmail(30000L, 1), "Timeout reached for getting notification email.");
 
-        // Convert to org.simplejavamail.email because it is more simple to read
-        Email email = EmailConverter.mimeMessageToEmail(message);
-        assertTrue(email.getSubject().endsWith("event(s) on the wiki"));
-        assertEquals(ADMIN_EMAIL, email.getFromRecipient().getAddress());
-        assertEquals(1, email.getRecipients().size());
-        assertEquals(USER_EMAIL, email.getRecipients().get(0).getAddress());
+            assertEquals(1, this.mail.getReceivedMessages().length);
+            MimeMessage message = this.mail.getReceivedMessages()[0];
 
-        assertNotNull(email.getPlainText());
-        assertNotNull(email.getHTMLText());
-        assertNotNull(email.getAttachments());
-        assertFalse(email.getAttachments().isEmpty());
+            // Convert to org.simplejavamail.email because it is more simple to read
+            Email email = EmailConverter.mimeMessageToEmail(message);
+            assertTrue(email.getSubject().endsWith("event(s) on the wiki"));
+            assertEquals(ADMIN_EMAIL, email.getFromRecipient().getAddress());
+            assertEquals(1, email.getRecipients().size());
+            assertEquals(USER_EMAIL, email.getRecipients().get(0).getAddress());
 
-        // Events inside an email comes in random order, so we just verify that all the expected content is there
-        String plainTextContent = prepareMail(email.getPlainText());
+            assertNotNull(email.getPlainText());
+            assertNotNull(email.getHTMLText());
+            assertNotNull(email.getAttachments());
+            assertFalse(email.getAttachments().isEmpty());
 
-        String expectedContent;
-        expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedPlainTextMail1.txt")));
-        assertTrue(plainTextContent.contains(expectedContent),
-            String.format("Email is supposed to contain: [\n%s\n], but all we have is [\n%s\n].",
-                expectedContent, plainTextContent));
-        expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedPlainTextMail2.txt")));
-        assertTrue(plainTextContent.contains(expectedContent),
-            String.format("Email is supposed to contain: [\n%s\n], but all we we have is [\n%s\n].",
-                expectedContent, plainTextContent));
+            // Events inside an email comes in random order, so we just verify that all the expected content is there
+            String plainTextContent = prepareMail(email.getPlainText());
 
-        // We also check the html content, this time using Pattern to allow performing the checks while ignoring some
-        // elements such as random ids
-        String htmlTextContent = prepareMail(email.getHTMLText());
+            String expectedContent;
+            expectedContent =
+                prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedPlainTextMail1.txt")));
+            assertTrue(plainTextContent.contains(expectedContent),
+                String.format("Email is supposed to contain: [\n%s\n], but all we have is [\n%s\n].",
+                    expectedContent, plainTextContent));
+            expectedContent =
+                prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedPlainTextMail2.txt")));
+            assertTrue(plainTextContent.contains(expectedContent),
+                String.format("Email is supposed to contain: [\n%s\n], but all we we have is [\n%s\n].",
+                    expectedContent, plainTextContent));
 
-        expectedContent = IOUtils.toString(getClass().getResourceAsStream("/expectedHtmlMail1.txt"),
-            StandardCharsets.UTF_8);
-        // We escape everything and we pay attention to ignore whitespaces on each lines
-        expectedContent = Arrays.stream(expectedContent.split("\n"))
-            .map(str -> String.format("\\Q%s\\E\\s*", str.trim()))
-            .collect(Collectors.joining());
+            // We also check the html content, this time using Pattern to allow performing the checks while ignoring some
+            // elements such as random ids
+            String htmlTextContent = prepareMail(email.getHTMLText());
 
-        Pattern pattern = Pattern.compile(expectedContent, Pattern.COMMENTS);
-        assertTrue(pattern.matcher(htmlTextContent).find(), String.format("Email is supposed to contain: [\n%s\n], "
+            expectedContent = IOUtils.toString(getClass().getResourceAsStream("/expectedHtmlMail1.txt"),
+                StandardCharsets.UTF_8);
+            // We escape everything and we pay attention to ignore whitespaces on each lines
+            expectedContent = Arrays.stream(expectedContent.split("\n"))
+                .map(str -> String.format("\\Q%s\\E\\s*", str.trim()))
+                .collect(Collectors.joining());
+
+            Pattern pattern = Pattern.compile(expectedContent, Pattern.COMMENTS);
+            assertTrue(pattern.matcher(htmlTextContent).find(), String.format("Email is supposed to contain: [\n%s\n], "
                 + "but all we have is [\n%s\n].", expectedContent, htmlTextContent));
 
-        expectedContent = IOUtils.toString(getClass().getResourceAsStream("/expectedHtmlMail2.txt"),
-            StandardCharsets.UTF_8);
-        // We escape everything and we pay attention to ignore whitespaces on each lines
-        expectedContent = Arrays.stream(expectedContent.split("\n"))
-            .map(str -> String.format("\\Q%s\\E\\s*", str.trim()))
-            .collect(Collectors.joining());
+            expectedContent = IOUtils.toString(getClass().getResourceAsStream("/expectedHtmlMail2.txt"),
+                StandardCharsets.UTF_8);
+            // We escape everything and we pay attention to ignore whitespaces on each lines
+            expectedContent = Arrays.stream(expectedContent.split("\n"))
+                .map(str -> String.format("\\Q%s\\E\\s*", str.trim()))
+                .collect(Collectors.joining());
 
-        pattern = Pattern.compile(expectedContent, Pattern.COMMENTS);
-        assertTrue(pattern.matcher(htmlTextContent).find(), String.format("Email is supposed to contain: [\n%s\n], "
-            + "but all we have is [\n%s\n].", expectedContent, htmlTextContent));
+            pattern = Pattern.compile(expectedContent, Pattern.COMMENTS);
+            assertTrue(pattern.matcher(htmlTextContent).find(), String.format("Email is supposed to contain: [\n%s\n], "
+                + "but all we have is [\n%s\n].", expectedContent, htmlTextContent));
 
-        testUtils.rest().delete(page1);
-        testUtils.rest().delete(page2);
+            setup.rest().delete(page1);
+            setup.rest().delete(page2);
+        } finally {
+            cleanup(setup);
+        }
     }
 
-    private String prepareMail(String email) {
+    private String prepareMail(String email)
+    {
         StringBuilder stringBuilder = new StringBuilder();
         // Some part of the email is unique (dates), so we remove them before comparing emails
         Scanner scanner = new Scanner(email);
@@ -251,5 +230,48 @@ public class NotificationsEmailsIT
         }
         scanner.close();
         return stringBuilder.toString();
+    }
+
+    private void intialize(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        // Create the two users we will be using
+        setup.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
+        setup.createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD, "", "email", USER_EMAIL);
+
+        NotificationsUserProfilePage p;
+
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+        p.disableAllParameters();
+        // Enable own filter
+        p.getSystemNotificationFilterPreferences().get(2).setEnabled(true);
+
+        setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);
+        p.disableAllParameters();
+
+        setup.loginAsSuperAdmin();
+        setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0,
+            "host", testConfiguration.getServletEngine().getHostIP(),
+            "port", "3025",
+            "sendWaitTime", "0",
+            "from", ADMIN_EMAIL);
+
+        // To ensure that this configuration is taken into account inside mail links.
+        setup.updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0, "server", "externaldomain",
+            "port", "4242", "secure", "1");
+
+        this.mail = new GreenMail(ServerSetupTest.SMTP);
+        this.mail.start();
+    }
+
+    private void cleanup(TestUtils testUtils)
+    {
+        testUtils.deletePage("XWiki", FIRST_USER_NAME);
+        testUtils.deletePage("XWiki", SECOND_USER_NAME);
+        if (this.mail != null) {
+            this.mail.stop();
+        }
     }
 }

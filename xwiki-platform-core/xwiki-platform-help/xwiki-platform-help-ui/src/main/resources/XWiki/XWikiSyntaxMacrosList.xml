@@ -39,10 +39,10 @@
   <content>{{velocity}}
 ## If the translation key exists, use its value, otherwise use to the provided fallback value. 
 #macro (translateOrElse $translationKey $fallback)
- #if($services.localization.get($translationKey))
+  #if($services.localization.get($translationKey))
     $services.rendering.escape($services.localization.render($translationKey), 'xwiki/2.1')##
   #else
-    $fallback##
+    $services.rendering.escape($fallback, 'xwiki/2.1')##
   #end
 #end
 

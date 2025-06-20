@@ -51,6 +51,11 @@ public class XWikiGroupsDocumentInitializer extends AbstractMandatoryClassInitia
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiGroups");
 
     /**
+     * The name of the property containing the member references.
+     */
+    public static final String PROPERTY_MEMBER = "member";
+
+    /**
      * Used to bind a class to a document sheet.
      */
     @Inject
@@ -68,7 +73,7 @@ public class XWikiGroupsDocumentInitializer extends AbstractMandatoryClassInitia
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField("member", "Member", 30);
+        xclass.addTextField(PROPERTY_MEMBER, "Member", 30);
     }
 
     @Override

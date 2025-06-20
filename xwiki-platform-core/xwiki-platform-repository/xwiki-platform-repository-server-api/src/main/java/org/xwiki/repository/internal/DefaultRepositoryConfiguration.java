@@ -88,7 +88,7 @@ public class DefaultRepositoryConfiguration implements RepositoryConfiguration
     {
         BaseObject obj = getConfigurationObject();
 
-        return obj != null ? obj.getListValue(XWikiRepositoryModel.PROP_CONFIGURATION_VALIDTYPEs) : Collections
+        return obj != null ? obj.getListValue(XWikiRepositoryModel.PROP_CONFIGURATION_VALIDTYPES) : Collections
             .<String> emptyList();
     }
 

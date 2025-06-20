@@ -134,7 +134,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
             attach.setAttachment_content(new FilesystemAttachmentContent(contentFile, attach));
             attach.setContentStore(FileSystemStoreUtils.HINT);
             // Pass the document since it will be lost in the serialize/deserialize.
-            attach.setDoc(attachment.getDoc());
+            attach.setDoc(attachment.getDoc(), false);
         }
 
         final ListAttachmentArchive out = new ListAttachmentArchive(attachList);

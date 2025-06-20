@@ -20,11 +20,14 @@
 
 package org.xwiki.administration.test.po;
 
+import java.util.Objects;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.ui.po.BasePage;
-import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * Page Object for the Administration/Groups page.
@@ -34,14 +37,12 @@ import org.xwiki.test.ui.po.LiveTableElement;
  */
 public class GroupsPage extends BasePage
 {
-    private static final String GROUP_ACTION_XPATH_FORMAT =
-        "//table[@id = 'groupstable']//td[contains(@class, 'name') and normalize-space(.) = '%s']"
-            + "/following-sibling::td[contains(@class, 'actions')]/a[contains(@class, 'action%s')]";
-
-    private LiveTableElement groupsLiveTable = new LiveTableElement("groupstable");
+    private final LiveDataElement groupsLiveData = new LiveDataElement("groupstable");
 
     @FindBy(css = ".btn[data-target='#createGroupModal']")
     private WebElement createGroupButton;
+
+    private TableLayoutElement tableLayout;
 
     /**
      * Method to create a new Group.
@@ -49,10 +50,6 @@ public class GroupsPage extends BasePage
     public GroupsPage addNewGroup(String groupName)
     {
         clickCreateGroup().createGroup(groupName);
-
-        // The live table is refreshed.
-        this.groupsLiveTable.waitUntilReady();
-
         return this;
     }
 
@@ -72,49 +69,53 @@ public class GroupsPage extends BasePage
         return groupsPage;
     }
 
-    public LiveTableElement getGroupsTable()
+    public TableLayoutElement getGroupsTable()
     {
-        return groupsLiveTable;
-    }
-
-    public void filterGroups(String group)
-    {
-        groupsLiveTable.filterColumn("xwiki-livetable-groupstable-filter-1", group);
+        if (this.tableLayout == null) {
+            this.tableLayout = this.groupsLiveData.getTableLayout();
+        }
+        return this.tableLayout;
     }
 
     public DeleteGroupConfirmationModal clickDeleteGroup(String groupName)
     {
-        getDriver().findElementWithoutWaiting(By.xpath(String.format(GROUP_ACTION_XPATH_FORMAT, groupName, "delete")))
-            .click();
+        int rowNumber = getRowNumberByGroupName(groupName);
+        getGroupsTable().clickAction(rowNumber, "delete");
         return new DeleteGroupConfirmationModal();
     }
 
     public GroupsPage deleteGroup(String groupName)
     {
         clickDeleteGroup(groupName).clickOk();
-        // The live table is refreshed.
-        this.groupsLiveTable.waitUntilReady();
         return this;
-    }
-
-    public boolean canDeleteGroup(String groupName)
-    {
-        return !getDriver()
-            .findElementsWithoutWaiting(By.xpath(String.format(GROUP_ACTION_XPATH_FORMAT, groupName, "delete")))
-            .isEmpty();
     }
 
     public EditGroupModal clickEditGroup(String groupName)
     {
-        getDriver().findElementWithoutWaiting(By.xpath(String.format(GROUP_ACTION_XPATH_FORMAT, groupName, "edit")))
-            .click();
+        int rowNumber = getRowNumberByGroupName(groupName);
+        getGroupsTable().clickAction(rowNumber, "edit");
+
         return new EditGroupModal().waitUntilReady();
     }
 
     public String getMemberCount(String groupName)
     {
-        String xpath = "//table[@id = 'groupstable']//td[contains(@class, 'name') and normalize-space(.) = '"
-            + groupName + "']/following-sibling::td[contains(@class, 'members')]";
-        return getDriver().findElementWithoutWaiting(By.xpath(xpath)).getText();
+        int rowNumber = getRowNumberByGroupName(groupName);
+        return getGroupsTable().getCell("Members", rowNumber).getText();
+    }
+
+    private int getRowNumberByGroupName(String groupName)
+    {
+        String entryIndex = this.groupsLiveData.getTableLayout()
+            .getRows()
+            .stream()
+            .filter(it -> {
+                String rowGroupName = it.findElement(By.cssSelector("[data-title='Group Name']")).getText();
+                return Objects.equals(rowGroupName, groupName);
+            })
+            .findFirst()
+            .map(it -> it.getAttribute("data-livedata-entry-index"))
+            .get();
+        return Integer.parseInt(entryIndex) + 1;
     }
 }

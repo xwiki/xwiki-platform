@@ -21,8 +21,29 @@
   'use strict';
 
   CKEDITOR.plugins.add('xwiki-loading', {
-    init: function(editor) {
-      var loadingCounter = 0;
+    beforeInit: function(editor) {
+      let readOnlyCounter = 0;
+      let originalSetReadOnly = editor.setReadOnly.bind(editor);
+      editor.setReadOnly = function(readOnly) {
+        if (readOnly) {
+          readOnlyCounter++;
+          if (readOnlyCounter === 1) {
+            originalSetReadOnly(true);
+          }
+        } else if (readOnlyCounter > 0) {
+          readOnlyCounter--;
+          if (readOnlyCounter === 0) {
+            originalSetReadOnly(false);
+          }
+        }
+      };
+      // Initialize the read-only counter, in case the editor is created read-only or in case the editor is created
+      // hidden. See CKEDITOR-390: The inline editor loads as read-only in Safari
+      if (editor.readOnly) {
+        editor.setReadOnly(true);
+      }
+
+      let loadingCounter = 0;
       editor.setLoading = function(loading) {
         if (loading) {
           loadingCounter++;
@@ -69,6 +90,54 @@
           this.setReadOnly(false);
         }
       });
+
+      editor.toBeReady = function() {
+        return new Promise(resolve => {
+          function resolveWhenReady() {
+            // Announce that the editor is ready only after the event loop has finished, to allow the code that
+            // triggered the event to finish its execution. This is important for instance in the case of the refresh
+            // command which needs to end the editor loading state before it can restore the selection (the editing area
+            // needs to be visible and have the focus).
+            setTimeout(async () => {
+              // Double check that the editor is ready, because other event listeners or some remote change might have
+              // updated the editor status in the meantime.
+              await editor.toBeReady();
+              resolve();
+            }, 0);
+          }
+          if (loadingCounter > 0) {
+            this.once('endLoading', resolveWhenReady);
+          } else if (this.status === 'ready') {
+            resolve();
+          } else if (this.status === 'recreating') {
+            this.once('contentDom', resolveWhenReady);
+          } else {
+            this.on('instanceReady', resolveWhenReady);
+          }
+        });
+      };
+
+      // Allow CKEditor plugins that require asynchronous initialization to delay the instance ready event until they
+      // are fully initialized (or the asynchronous initialization fails).
+      editor._instanceReadyPromises = [];
+      editor.delayInstanceReady = function(promise) {
+        editor._instanceReadyPromises.push(promise);
+      };
+
+      const originalFireOnce = editor.fireOnce;
+      editor.fireOnce = function(eventName, ...args) {
+        if (eventName === 'instanceReady') {
+          // Fire the instanceReady event only after all the instance ready promises have been settled. Note that we
+          // don't want to prevent the instanceReady event if the asynchronous plugin initialization fails because we
+          // consider such plugins as optional (we expect them to fail gracefully if they can't be initialized).
+          return Promise.allSettled(this._instanceReadyPromises).then(() => {
+            originalFireOnce.call(this, eventName, ...args);
+          });
+        } else {
+          // Fire the event immediately.
+          return originalFireOnce.call(this, eventName, ...args);
+        }
+      };
     }
   });
 })();

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.attachment.configuration.AttachmentConfiguration;
 import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
 import org.xwiki.model.reference.AttachmentReference;
@@ -106,5 +107,12 @@ class AttachmentScriptServiceTest
         assertEquals(
             "Failed to check if [newName] exists [xwiki:Space.Target]. Cause: [XWikiException: Error number 0 in 0].",
             this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void getDefaultConfiguration()
+    {
+        AttachmentConfiguration configuration = this.attachmentScriptService.getConfiguration();
+        assertFalse(configuration.isCommentsEnabled());
     }
 }

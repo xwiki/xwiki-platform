@@ -19,11 +19,16 @@
  */
 package org.xwiki.search.solr.internal.job;
 
+import java.util.Comparator;
+import java.util.Objects;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.xwiki.model.internal.reference.comparator.DocumentReferenceComparator;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Compares the list of document references from two document iterators.
@@ -65,7 +70,7 @@ public class DiffDocumentIterator<T> extends AbstractDocumentIterator<DiffDocume
     /**
      * Used to compare document references.
      */
-    private final DocumentReferenceComparator documentReferenceComparator = new DocumentReferenceComparator();
+    private final Comparator<DocumentReference> documentReferenceComparator = getComparator();
 
     /**
      * The last entry taken from the {@link #previous} iterator.
@@ -145,6 +150,22 @@ public class DiffDocumentIterator<T> extends AbstractDocumentIterator<DiffDocume
         }
 
         return new ImmutablePair<DocumentReference, Action>(documentReference, action);
+    }
+
+    /**
+     * Get the comparator used for comparing document references. This method is public for testing purposes.
+     *
+     * @return the comparator for comparing document references
+     */
+    public static Comparator<DocumentReference> getComparator()
+    {
+        EntityReferenceSerializer<String> localEntityReferenceSerializer =
+            new LocalStringEntityReferenceSerializer(new DefaultSymbolScheme());
+        return Comparator.comparing(DocumentReference::getWikiReference)
+            // Compare by the whole space as string as this is also what we compare in the database and in Solr.
+            .thenComparing(documentReference -> localEntityReferenceSerializer.serialize(documentReference.getParent()))
+            .thenComparing(DocumentReference::getName)
+            .thenComparing(documentReference -> Objects.toString(documentReference.getLocale(), ""));
     }
 
     @Override

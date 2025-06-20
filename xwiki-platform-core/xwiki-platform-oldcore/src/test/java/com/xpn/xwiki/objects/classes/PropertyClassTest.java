@@ -23,16 +23,28 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.display.internal.DocumentDisplayer;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.objects.meta.TextAreaMetaClass;
@@ -42,8 +54,12 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -55,11 +71,31 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 public class PropertyClassTest
 {
+    protected static final String CUSTOM_DISPLAY = "test";
+
     @InjectMockitoOldcore
     private MockitoOldcore oldCore;
 
     @MockComponent
     private AuthorExecutor authorExecutor;
+
+    @MockComponent
+    @Named("configured")
+    private DocumentDisplayer documentDisplayer;
+
+    @MockComponent
+    private RenderingContext renderingContext;
+
+    // Needed for XWikiDocument#getRenderedContent.
+    @MockComponent
+    private JobProgressManager jobProgressManager;
+
+    @MockComponent
+    private RenderingCache renderingCache;
+
+    @MockComponent
+    @Named("html/5.0")
+    private BlockRenderer htmlRenderer;
 
     private BaseClass xclass = new BaseClass();
 
@@ -69,14 +105,17 @@ public class PropertyClassTest
         DocumentReference classReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Class");
         XWikiDocument classDocument = new XWikiDocument(classReference);
         classDocument.setSyntax(Syntax.XWIKI_2_1);
-        doReturn(classDocument).when(this.oldCore.getSpyXWiki()).getDocument(classReference,
-            this.oldCore.getXWikiContext());
-
         this.xclass.setOwnerDocument(classDocument);
 
         this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         this.oldCore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
         this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        this.oldCore.getMocker().registerMockComponent(ContextualLocalizationManager.class);
+
+        DocumentReference contextDocumentReference = new DocumentReference("wiki", "XWiki", "Context");
+        this.oldCore.getXWikiContext().setDoc(new XWikiDocument(contextDocumentReference));
+
+        when(this.renderingContext.getTargetSyntax()).thenReturn(Syntax.HTML_5_0);
     }
 
     /** Test the {@link PropertyClass#compareTo(PropertyClass)} method. */
@@ -125,6 +164,20 @@ public class PropertyClassTest
     }
 
     @Test
+    void displayCustomWithRestrictedDocument() throws Exception
+    {
+        DocumentReference authorReference = new DocumentReference("wiki", "XWiki", "Bob");
+
+        this.xclass.getOwnerDocument().setRestricted(true);
+        this.xclass.getOwnerDocument().setAuthorReference(authorReference);
+
+        displayCustomWithAuthor(authorReference, this.xclass.getDocumentReference());
+
+        verify(this.documentDisplayer).display(argThat(doc -> CUSTOM_DISPLAY.equals(doc.getContent())),
+            argThat(DocumentDisplayerParameters::isTransformationContextRestricted));
+    }
+
+    @Test
     public void displayCustomWithClassDisplayerAndClassIsNew() throws Exception
     {
         DocumentReference userReference = new DocumentReference("wiki", "XWiki", "Alice");
@@ -147,11 +200,24 @@ public class PropertyClassTest
     private void displayCustomWithAuthor(DocumentReference authorReference, DocumentReference secureDocument)
         throws Exception
     {
-        when(this.authorExecutor.call(any(Callable.class), eq(authorReference), eq(secureDocument)))
-            .thenReturn("output");
+        when(this.authorExecutor.call(any(), eq(authorReference), eq(secureDocument)))
+            .then(invocationOnMock -> {
+                Callable<String> callable = invocationOnMock.getArgument(0);
+                return callable.call();
+            });
+
+        String output = "output";
+        XDOM mockXDOM = mock();
+        when(this.documentDisplayer.display(any(), any())).thenReturn(mockXDOM);
+
+        doAnswer(invocationOnMock -> {
+            WikiPrinter printer = invocationOnMock.getArgument(1);
+            printer.print(output);
+            return null;
+        }).when(this.htmlRenderer).render(same(mockXDOM), any());
 
         PropertyClass propertyClass = new PropertyClass();
-        propertyClass.setCustomDisplay("test");
+        propertyClass.setCustomDisplay(CUSTOM_DISPLAY);
         propertyClass.setObject(this.xclass);
 
         StringBuffer buffer = new StringBuffer();
@@ -159,7 +225,7 @@ public class PropertyClassTest
         propertyClass.displayCustom(buffer, "date", "Path.To.Class_0_", "edit", new BaseObject(),
             this.oldCore.getXWikiContext());
 
-        assertEquals("output", buffer.toString());
+        assertEquals(output, buffer.toString());
     }
 
     @Test
@@ -184,5 +250,25 @@ public class PropertyClassTest
         PropertyMetaClass metaClass = new TextAreaMetaClass();
         propertyClass.setxWikiClass(metaClass);
         assertEquals("TextArea_editor", propertyClass.getFieldFullName());
+    }
+
+    @Test
+    void getReference()
+    {
+        PropertyClass propertyClass = new PropertyClass();
+        propertyClass.setName("tags");
+        propertyClass.setObject(this.xclass);
+        assertEquals(new ClassPropertyReference("tags", this.xclass.getReference()), propertyClass.getReference());
+
+        // Modify the property name.
+        propertyClass.setName("users");
+        assertEquals(new ClassPropertyReference("users", this.xclass.getReference()), propertyClass.getReference());
+
+        // Modify the class reference.
+        DocumentReference newClassReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "NewClass");
+        BaseClass newClass = new BaseClass();
+        newClass.setOwnerDocument(new XWikiDocument(newClassReference));
+        propertyClass.setObject(newClass);
+        assertEquals(new ClassPropertyReference("users", newClass.getReference()), propertyClass.getReference());
     }
 }

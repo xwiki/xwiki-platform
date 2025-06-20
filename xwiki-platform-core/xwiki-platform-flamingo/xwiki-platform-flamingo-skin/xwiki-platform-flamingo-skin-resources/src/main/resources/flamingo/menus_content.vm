@@ -27,7 +27,9 @@
 ## copy menu action. Checking if the user (or guest) doesn't have edit
 ## permissions on the whole wiki (including subwiki) is costly. Thus FTM we
 ## only check for view permissions.
-#set ($canCopy = $canView)
+## When the wiki server is in readonly mode, edit permissions are OFF everywhere. We can safely assume that the copy
+## action is not allowed.
+#set ($canCopy = $canView && !$xwiki.isReadOnly())
 
 #set ($nbUsers = $doc.getObjectNumbers("XWiki.XWikiUsers"))
 #set ($nbGroups = $doc.getObjectNumbers("XWiki.XWikiGroups"))
@@ -135,9 +137,9 @@
  *
  * @param $id the id of the menu
  * @param $icon the icon of the menu
- * @param $content the content of the menu
+ * @param $menuContent the content of the menu
  * @param $titleKey translation key of the link title to use
- * @param $titleAsLabel if the link title should also be used as link label
+ * @param $titleAsLabel if the title should also be used as a visible label
  * @param $actionUrl (optional) the link of the top menu entry.
  *   If not provided, the top menu entry will act as an activator for the dropdown
  * @param $extraAttribute (optional) additional attributes to add (such as ref="nofollow" for example)
@@ -149,7 +151,7 @@
  *#
 #macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute)
   <div class="btn-group" id="$id">
-    <#if ("$!actionUrl" == '')button#{else}a#end class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
+    <#if ("$!actionUrl" == '')button type="button"#{else}a#end class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
     #if ("$!actionUrl" != '')
       href="$actionUrl"
     #else
@@ -157,9 +159,9 @@
     #end
     #if ("$!extraAttribute" != '') ${extraAttribute}#end>
       $services.icon.renderHTML($icon)
-      #if ($titleAsLabel)
-        <span class="btn-label">$services.localization.render($titleKey)</span>
-      #end
+      ## Screen readers benefit from having some kind of text alternative for an interactive element outside of the 
+      ## title attribute.
+      <span class="#if ($titleAsLabel)btn-label#{else}sr-only#end">$services.localization.render($titleKey)</span>
     </#if ("$!actionUrl" == '')button#{else}a#end>
     #if ($stringtool.isNotBlank("$!menuContent"))
       #if ("$!actionUrl" != '')
@@ -350,7 +352,7 @@
     #end
     #set ($discard = $staticExtensions.add( { 'content': $rename, 'order': 30000}))
     #define ($delete)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove', $extraAttributes)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'trash', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $delete, 'order': 40000}))
   #end
@@ -450,7 +452,9 @@
         #end
         <dd>
           <ul>
-            #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+            #if ($canView)
+              #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+            #end
             $viewersContent
             ## Display Viewers menu UIX..
             #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])

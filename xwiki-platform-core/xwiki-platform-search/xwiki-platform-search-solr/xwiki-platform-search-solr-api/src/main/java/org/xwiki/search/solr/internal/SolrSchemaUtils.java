@@ -20,23 +20,25 @@
 package org.xwiki.search.solr.internal;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
+import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.schema.FieldType;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.XWikiSolrCore;
 
 /**
- * Helper for performing operations in a solr schema.
+ * Helper for performing operations in a Solr schema.
  *
  * @version $Id$
  * @since 15.0
@@ -47,22 +49,36 @@ import org.xwiki.search.solr.SolrException;
 public class SolrSchemaUtils
 {
     /**
+     * The name of the type used to store the version of the core schema.
+     */
+    public static final String SOLR_TYPENAME_CVERSION = "__cversion";
+
+    /**
+     * The name of the attribute holding the version value.
+     */
+    public static final String SOLR_VERSIONFIELDTYPE_VALUE = "defVal";
+
+    /**
      * Contains data of a solr core schema.
      *
      * @version $Id$
-     * @since 15.0
-     * @since 14.10.4
      */
-    private static class SolrCoreSchema
+    private static final class SolrCoreSchema
     {
-        private final String coreName;
-        private SolrClient solrClient;
+        private Map<String, FieldTypeRepresentation> types;
+
         private Map<String, Map<String, Object>> fields;
+
         private Map<String, Map<String, Object>> dynamicFields;
 
-        SolrCoreSchema(String name)
+        private Map<String, Set<String>> copyFields;
+
+        void reset()
         {
-            this.coreName = name;
+            this.types = null;
+            this.fields = null;
+            this.dynamicFields = null;
+            this.copyFields = null;
         }
     }
 
@@ -73,51 +89,55 @@ public class SolrSchemaUtils
 
     private final Map<String, SolrCoreSchema> coreSchemaMap = new HashMap<>();
 
-    @Inject
-    private Solr solr;
-
-    private SolrCoreSchema getSchema(String coreName)
+    private SolrCoreSchema getSchema(XWikiSolrCore core)
     {
-        return this.coreSchemaMap.computeIfAbsent(coreName, SolrCoreSchema::new);
-    }
-
-    private SolrClient getClient(String coreName) throws SolrException
-    {
-        SolrCoreSchema schema = getSchema(coreName);
-        if (schema.solrClient == null) {
-            schema.solrClient = this.solr.getClient(coreName);
-        }
-        return schema.solrClient;
-    }
-
-    /**
-     * Associate a client with to the given core.
-     * This method should mainly be used when initializing a core as calling {@link Solr#getClient(String)} might lead
-     * to a recursive call.
-     *
-     * @param coreName the name of the core for which to associate a client
-     * @param solrClient the solr client to associate
-     */
-    public void setClient(String coreName, SolrClient solrClient)
-    {
-        getSchema(coreName).solrClient = solrClient;
+        return this.coreSchemaMap.computeIfAbsent(core.getSolrName(), c -> new SolrCoreSchema());
     }
 
     /**
      * Retrieve all information about existing fields of the core.
      *
-     * @param coreName the name of the core for which to retrieve fields information
+     * @param core the core to search in
      * @param force if {@code true} reloads all information, else gets the information from the cache
      * @return the map of all fields
      * @throws SolrException in case of problem to request fields information
+     * @since 16.2.0RC1
      */
-    public Map<String, Map<String, Object>> getFields(String coreName, boolean force) throws SolrException
+    public Map<String, FieldTypeRepresentation> getFieldTypes(XWikiSolrCore core, boolean force) throws SolrException
     {
-        SolrCoreSchema schema = getSchema(coreName);
+        SolrCoreSchema schema = getSchema(core);
+        if (schema.types == null || force) {
+            SchemaResponse.FieldTypesResponse response;
+            try {
+                response = new SchemaRequest.FieldTypes().process(core.getClient());
+            } catch (Exception e) {
+                throw new SolrException("Failed to get the list of field types", e);
+            }
+
+            Map<String, FieldTypeRepresentation> map = new HashMap<>(response.getFieldTypes().size());
+            response.getFieldTypes().forEach(t -> map.put((String) t.getAttributes().get(FieldType.TYPE_NAME), t));
+            schema.types = map;
+        }
+
+        return schema.types;
+    }
+
+    /**
+     * Retrieve all information about existing fields of the core.
+     *
+     * @param core the core to search in
+     * @param force if {@code true} reloads all information, else gets the information from the cache
+     * @return the map of all fields
+     * @throws SolrException in case of problem to request fields information
+     * @since 16.2.0RC1
+     */
+    public Map<String, Map<String, Object>> getFields(XWikiSolrCore core, boolean force) throws SolrException
+    {
+        SolrCoreSchema schema = getSchema(core);
         if (schema.fields == null || force) {
             SchemaResponse.FieldsResponse response;
             try {
-                response = new SchemaRequest.Fields().process(getClient(coreName));
+                response = new SchemaRequest.Fields().process(core.getClient());
             } catch (Exception e) {
                 throw new SolrException("Failed to get the list of fields", e);
             }
@@ -133,18 +153,19 @@ public class SolrSchemaUtils
     /**
      * Retrieve all information about existing dynamic fields of the core.
      *
-     * @param coreName the name of the core for which to retrieve dynamic fields information
+     * @param core the core to search in
      * @param force if {@code true} reloads all information, else gets the information from the cache
      * @return the map of all dynamic fields
      * @throws SolrException in case of problem to request fields information
      */
-    public Map<String, Map<String, Object>> getDynamicFields(String coreName, boolean force) throws SolrException
+    public Map<String, Map<String, Object>> getDynamicFields(XWikiSolrCore core, boolean force) throws SolrException
     {
-        SolrCoreSchema schema = getSchema(coreName);
+        SolrCoreSchema schema = getSchema(core);
+
         if (schema.dynamicFields == null || force) {
             SchemaResponse.DynamicFieldsResponse response;
             try {
-                response = new SchemaRequest.DynamicFields().process(getClient(coreName));
+                response = new SchemaRequest.DynamicFields().process(core.getClient());
             } catch (Exception e) {
                 throw new SolrException("Failed to get the list of dynamic fields", e);
             }
@@ -158,53 +179,142 @@ public class SolrSchemaUtils
     }
 
     /**
+     * Retrieve all information about existing dynamic fields of the core.
+     *
+     * @param core the core to search in
+     * @param force if {@code true} reloads all information, else gets the information from the cache
+     * @return the map of all dynamic fields
+     * @throws SolrException in case of problem to request fields information
+     */
+    public Map<String, Set<String>> getCopyFields(XWikiSolrCore core, boolean force) throws SolrException
+    {
+        SolrCoreSchema schema = getSchema(core);
+
+        if (schema.copyFields == null || force) {
+            SchemaResponse.CopyFieldsResponse response;
+            try {
+                response = new SchemaRequest.CopyFields().process(core.getClient());
+            } catch (Exception e) {
+                throw new SolrException("Failed to get the list of copy fields", e);
+            }
+
+            Map<String, Set<String>> map = new ConcurrentHashMap<>(response.getCopyFields().size());
+            for (Map<String, Object> fields : response.getCopyFields()) {
+                Set<String> destinations =
+                    map.computeIfAbsent((String) fields.get("source"), k -> ConcurrentHashMap.newKeySet());
+                destinations.add((String) fields.get("dest"));
+            }
+            schema.copyFields = map;
+        }
+
+        return schema.copyFields;
+    }
+
+    /**
+     * Add a field type in the Solr schema.
+     * 
+     * @param core the core to update
+     * @param definition the definition of the field to add
+     * @param add true if the field type should be added, false for replace
+     * @throws SolrException when failing to add the field
+     * @since 16.2.0RC1
+     */
+    public void setFieldType(XWikiSolrCore core, FieldTypeDefinition definition, boolean add) throws SolrException
+    {
+        SolrCoreSchema schema = getSchema(core);
+
+        try {
+            if (add) {
+                new SchemaRequest.AddFieldType(definition).process(core.getClient());
+            } else {
+                new SchemaRequest.ReplaceFieldType(definition).process(core.getClient());
+            }
+        } catch (Exception e) {
+            throw new SolrException("Failed to add a field type in the Solr core", e);
+        }
+
+        // Add it to the cache
+        FieldTypeRepresentation representation = new FieldTypeRepresentation();
+        representation.setAttributes(definition.getAttributes());
+        representation.setAnalyzer(definition.getAnalyzer());
+        representation.setIndexAnalyzer(definition.getIndexAnalyzer());
+        representation.setMultiTermAnalyzer(definition.getMultiTermAnalyzer());
+        representation.setQueryAnalyzer(definition.getQueryAnalyzer());
+        representation.setSimilarity(definition.getSimilarity());
+
+        getFieldTypes(core, false).put((String) definition.getAttributes().get(FieldType.TYPE_NAME), representation);
+    }
+
+    /**
      * Add or replace a field in the Solr schema.
      *
-     * @param coreName the name of the solr core where to add or replace the field
+     * @param core the core to update
      * @param fieldAttributes the attributes of the field to add
      * @param dynamic true to create a dynamic field
      * @throws SolrException when failing to add the field
      */
-    public void setField(String coreName, Map<String, Object> fieldAttributes, boolean dynamic)
-        throws SolrException
+    public void setField(XWikiSolrCore core, Map<String, Object> fieldAttributes, boolean dynamic) throws SolrException
     {
         String name = (String) fieldAttributes.get(SOLR_FIELD_NAME);
-        try {
-            SolrClient solrClient = getClient(coreName);
-            if (dynamic) {
-                if (getDynamicFields(coreName, false).containsKey(name)) {
-                    new SchemaRequest.ReplaceDynamicField(fieldAttributes).process(solrClient);
-                } else {
-                    new SchemaRequest.AddDynamicField(fieldAttributes).process(solrClient);
-                }
-                // Add it to the cache
-                getSchema(coreName).dynamicFields.put(name, fieldAttributes);
-            } else {
-                if (getFields(coreName, false).containsKey(name)) {
-                    new SchemaRequest.ReplaceField(fieldAttributes).process(solrClient);
-                } else {
-                    new SchemaRequest.AddField(fieldAttributes).process(solrClient);
-                }
-                // Add it to the cache
-                getSchema(coreName).fields.put(name, fieldAttributes);
-            }
-
-        } catch (Exception e) {
-            throw new SolrException("Failed to set a field in the Solr core", e);
+        if (dynamic) {
+            setField(core, fieldAttributes, dynamic, !getDynamicFields(core, false).containsKey(name));
+        } else {
+            setField(core, fieldAttributes, dynamic, !getFields(core, false).containsKey(name));
         }
     }
 
     /**
      * Add or replace a field in the Solr schema.
      *
-     * @param coreName the name of the solr core where to add or replace the field
+     * @param core the core to update
+     * @param fieldAttributes the attributes of the field to add
+     * @param dynamic true to create a dynamic field
+     * @param add true if the field type should be added, false for replace
+     * @throws SolrException when failing to add the field
+     * @since 16.2.0RC1
+     */
+    public void setField(XWikiSolrCore core, Map<String, Object> fieldAttributes, boolean dynamic, boolean add)
+        throws SolrException
+    {
+        String name = (String) fieldAttributes.get(SOLR_FIELD_NAME);
+
+        try {
+            if (dynamic) {
+                if (add) {
+                    new SchemaRequest.AddDynamicField(fieldAttributes).process(core.getClient());
+                } else {
+                    new SchemaRequest.ReplaceDynamicField(fieldAttributes).process(core.getClient());
+                }
+
+                // Add it to the cache
+                getDynamicFields(core, false).put(name, fieldAttributes);
+            } else {
+                if (add) {
+                    new SchemaRequest.AddField(fieldAttributes).process(core.getClient());
+                } else {
+                    new SchemaRequest.ReplaceField(fieldAttributes).process(core.getClient());
+                }
+
+                // Add it to the cache
+                getFields(core, false).put(name, fieldAttributes);
+            }
+        } catch (Exception e) {
+            throw new SolrException(
+                String.format("Failed to set the field [%s] in the Solr core (dynamic: [%s])", name, dynamic), e);
+        }
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     *
+     * @param core the core to update
      * @param name the name of the field to set
      * @param type the type of the field to set
      * @param dynamic true to create a dynamic field
      * @param attributes attributed to add to the field definition
      * @throws SolrException when failing to add the field
      */
-    public void setField(String coreName, String name, String type, boolean dynamic, Object... attributes)
+    public void setField(XWikiSolrCore core, String name, String type, boolean dynamic, Object... attributes)
         throws SolrException
     {
         Map<String, Object> fieldAttributes = new HashMap<>();
@@ -213,24 +323,105 @@ public class SolrSchemaUtils
 
         MapUtils.putAll(fieldAttributes, attributes);
 
-        setField(coreName, fieldAttributes, dynamic);
+        setField(core, fieldAttributes, dynamic);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     *
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param type the type of the field to set
+     * @param dynamic true to create a dynamic field
+     * @param add true if the field type should be added, false for replace
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to add the field
+     */
+    public void setField(XWikiSolrCore core, String name, String type, boolean dynamic, boolean add,
+        Object... attributes) throws SolrException
+    {
+        Map<String, Object> fieldAttributes = new HashMap<>();
+        fieldAttributes.put(SOLR_FIELD_NAME, name);
+        fieldAttributes.put(FieldType.TYPE, type);
+
+        MapUtils.putAll(fieldAttributes, attributes);
+
+        setField(core, fieldAttributes, dynamic, add);
+    }
+
+    /**
+     * @param core the core to update
+     * @param name the name of the field to delete
+     * @param dynamic true to delete a dynamic field
+     * @throws SolrException when failing to delete the field
+     * @since 16.2.0RC1
+     */
+    public void deleteField(XWikiSolrCore core, String name, boolean dynamic) throws SolrException
+    {
+        try {
+            if (dynamic) {
+                new SchemaRequest.DeleteDynamicField(name).process(core.getClient());
+            } else {
+                new SchemaRequest.DeleteField(name).process(core.getClient());
+            }
+
+            // Remove the field from the cache
+            getFields(core, false).remove(name);
+        } catch (Exception e) {
+            throw new SolrException(String.format("Failed to delete the field [%s] (dynamic: [%s])", name, dynamic), e);
+        }
+    }
+
+    /**
+     * Add a copy field.
+     * 
+     * @param core the core to update
+     * @param source the source field name
+     * @param destinations the collection of the destination field names
+     * @throws SolrException when failing to add the field
+     * @since 16.2.0RC1
+     */
+    public void addCopyField(XWikiSolrCore core, String source, String... destinations) throws SolrException
+    {
+        addCopyField(core, source, List.of(destinations));
+    }
+
+    /**
+     * Add a copy field.
+     * 
+     * @param core the core to update
+     * @param source the source field name
+     * @param destinations the collection of the destination field names
+     * @throws SolrException when failing to add the field
+     * @since 16.2.0RC1
+     */
+    public void addCopyField(XWikiSolrCore core, String source, List<String> destinations) throws SolrException
+    {
+        try {
+            new SchemaRequest.AddCopyField(source, destinations).process(core.getClient());
+
+            // Add it to the cache
+            getCopyFields(core, false).computeIfAbsent(source, k -> ConcurrentHashMap.newKeySet()).addAll(destinations);
+        } catch (Exception e) {
+            throw new SolrException("Failed to add a copy field in the Solr core", e);
+        }
     }
 
     /**
      * Performs an explicit commit, causing pending documents to be committed for indexing.
      *
-     * @param coreName the solr core to commit
+     * @param core the core to commit
      * @throws SolrException when failing to commit
      */
-    public void commit(String coreName) throws SolrException
+    public void commit(XWikiSolrCore core) throws SolrException
     {
         try {
-            getClient(coreName).commit();
+            core.getClient().commit();
         } catch (Exception e) {
             throw new SolrException("Failed to commit", e);
         }
+
         // Reset the cache
-        getSchema(coreName).fields = null;
-        getSchema(coreName).dynamicFields = null;
+        getSchema(core).reset();
     }
 }

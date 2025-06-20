@@ -609,8 +609,8 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;
         &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))"
-           href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')" class="btn btn-xs"&gt;
-          &lt;span class="action-icon"&gt;$services.icon.renderHTML('pencil')&lt;/span&gt;
+           href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')" class="btn btn-xs btn-default"&gt;
+          $services.icon.renderHTML('pencil')
           &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))&lt;/span&gt;
         &lt;/a&gt;
       &lt;/div&gt;
@@ -658,15 +658,6 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
   &lt;/div&gt;
   #if (!$inEditMode)
     &lt;div class='half column'&gt;
-      #set ($isMessageStreamActive = $services.messageStream.isActive())
-      #if ($isMessageStreamActive &amp;&amp; !$isGuest)
-      &lt;div class='userMessage profile-section'&gt;
-        &lt;h1&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.sendMessage'))&lt;/h1&gt;
-
-          {{messageSender /}}
-
-      &lt;/div&gt;
-      #end
       &lt;div class='userRecentChanges'&gt;
       #if ($xcontext.user == $doc.fullName)
         &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.activity'))&lt;/h2&gt;

@@ -22,7 +22,10 @@ package org.xwiki.livedata.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -42,6 +45,7 @@ import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataLayoutDescriptor;
 import org.xwiki.livedata.LiveDataMeta;
+import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.OperatorDescriptor;
 import org.xwiki.livedata.LiveDataQuery.Source;
@@ -113,9 +117,41 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         mergedConfig.initialize();
 
         handleLayouts(config.getMeta().getLayouts(), mergedConfig.getMeta());
+        handlePageSizes(mergedConfig);
 
         // Translate using the context locale.
         return translate(mergedConfig);
+    }
+
+    /**
+     * If the pagination sizes are missing the limit defined in the query, add it to the allowed page limits.
+     *
+     * @param mergedConfiguration the live data configuration
+     */
+    private void handlePageSizes(LiveDataConfiguration mergedConfiguration)
+    {
+        Integer limit = mergedConfiguration.getQuery().getLimit();
+        if (limit != null) {
+            LiveDataMeta meta = mergedConfiguration.getMeta();
+            if (meta == null) {
+                meta = new LiveDataMeta();
+                mergedConfiguration.setMeta(meta);
+            }
+            LiveDataPaginationConfiguration pagination = meta.getPagination();
+            if (pagination == null) {
+                pagination = new LiveDataPaginationConfiguration();
+                meta.setPagination(pagination);
+            }
+            List<Integer> pageSizes = pagination.getPageSizes();
+            if (pageSizes == null) {
+                pageSizes = new ArrayList<>();
+                pagination.setPageSizes(pageSizes);
+            }
+            if (!pageSizes.contains(limit)) {
+                pageSizes.add(limit);
+                Collections.sort(pageSizes);
+            }
+        }
     }
 
     /**

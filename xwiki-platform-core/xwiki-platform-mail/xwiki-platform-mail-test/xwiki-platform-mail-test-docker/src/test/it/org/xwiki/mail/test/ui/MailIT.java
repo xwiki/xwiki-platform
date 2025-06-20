@@ -79,9 +79,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-mail-send-storage",
-        // Because of https://jira.xwiki.org/browse/XWIKI-17972 we need to install the jython jar manually in
-        // WEB-INF/lib.
-        "org.python:jython-slim:2.7.3",
         // The Scheduler plugin needs to be in WEB-INF/lib since it's defined in xwiki.properties and plugins are loaded
         // by XWiki at startup, i.e. before extensions are provisioned for the tests
         "org.xwiki.platform:xwiki-platform-scheduler-api"
@@ -264,7 +261,7 @@ class MailIT
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
         tableLayout.filterColumn("Status", "send_success");
         int count = tableLayout.countRows();
-        tableLayout.clickAction(1, "mailsendingaction_delete");
+        statusPage.clickAction(1, "mailsendingaction_delete");
 
         // Wait for the success message to be displayed
         statusPage.waitUntilContent("\\QThe mail has been deleted successfully\\E");
@@ -279,7 +276,7 @@ class MailIT
         MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
         tableLayout.filterColumn("Status", "send_error");
-        tableLayout.clickAction(1, "mailsendingaction_resend");
+        statusPage.clickAction(1, "mailsendingaction_resend");
 
         // Refresh the page and verify the mail to to@doe.com is in send_success state now
         statusPage = MailStatusAdministrationSectionPage.gotoPage();

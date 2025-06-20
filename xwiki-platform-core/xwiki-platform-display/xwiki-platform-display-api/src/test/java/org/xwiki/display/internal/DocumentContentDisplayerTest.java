@@ -106,7 +106,7 @@ public class DocumentContentDisplayerTest
 
         // The document being displayed.
         XDOM content = new XDOM(Collections.emptyList());
-        when(this.document.getXDOM()).thenReturn(content);
+        when(this.document.getPreparedXDOM()).thenReturn(content);
 
         // The reference of the current document musts be set as the value of the BASE meta data.
         DocumentReference currentDocRef = new DocumentReference("wiki", "Space", "Page");

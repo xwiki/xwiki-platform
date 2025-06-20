@@ -34,10 +34,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
+import org.xwiki.index.tree.internal.macro.DocumentSort;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.properties.converter.Converter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -50,10 +52,15 @@ import org.xwiki.query.QueryFilter;
  * @since 7.4.5
  */
 @Component
-@Named("space")
+@Named(SpaceTreeNode.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class SpaceTreeNode extends AbstractEntityTreeNode
 {
+    /**
+     * The component hint and also the tree node type.
+     */
+    public static final String HINT = "space";
+
     @Inject
     private LocalizationContext localizationContext;
 
@@ -83,6 +90,17 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
     @Named("documentOrSpaceReferenceResolver/nestedSpaces")
     private QueryFilter documentOrSpaceReferenceResolverFilter;
 
+    @Inject
+    private Converter<DocumentSort> documentSortConverter;
+
+    /**
+     * Default constructor.
+     */
+    public SpaceTreeNode()
+    {
+        super(HINT);
+    }
+
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
     {
@@ -106,10 +124,11 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
 
     protected Query getChildrenQuery(SpaceReference spaceReference, int offset, int limit) throws QueryException
     {
-        String orderBy = getOrderBy();
+        DocumentSort documentSort = this.documentSortConverter.convert(DocumentSort.class, getOrderBy());
+        String sortField = documentSort != null ? documentSort.getField() : null;
         Query query;
         if (areTerminalDocumentsShown()) {
-            if ("title".equals(orderBy)) {
+            if ("title".equals(sortField)) {
                 query = this.queryManager.getNamedQuery("nestedSpacesOrderedByTitle");
                 query.bindValue("locale", this.localizationContext.getCurrentLocale().toString());
             } else {
@@ -163,8 +182,8 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
 
     protected int getChildDocumentsCount(SpaceReference spaceReference) throws QueryException
     {
-        List<String> constraints = new ArrayList<String>();
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        List<String> constraints = new ArrayList<>();
+        Map<String, Object> parameters = new HashMap<>();
         return getChildDocumentsCount(spaceReference, constraints, parameters);
     }
 
@@ -174,7 +193,7 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
         constraints.add("doc.translation = 0");
         constraints.add("doc.space = :space");
 
-        parameters.put("space", this.localEntityReferenceSerializer.serialize(spaceReference));
+        parameters.put(HINT, this.localEntityReferenceSerializer.serialize(spaceReference));
 
         Query query = this.queryManager.createQuery(whereClause(constraints), Query.HQL);
         query.addFilter(this.countQueryFilter);

@@ -68,8 +68,11 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     @FindBy(xpath = "//div[@id='avatar']//img")
     private WebElement userAvatarImage;
 
-    @FindBy(css = ".activity-follow a")
-    private WebElement followUnfollowButton;
+    @FindBy(css = ".activity-follow .notificationWatchUserFollowing")
+    private WebElement followingContainer;
+
+    @FindBy(css = ".activity-follow .notificationWatchUserNotFollowing")
+    private WebElement notFollowingContainer;
 
     @FindBy(id = "disable")
     private WebElement disableButton;
@@ -161,19 +164,15 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
 
     public boolean isFollowed()
     {
-        String[] classNames = followUnfollowButton.getAttribute("class").split(" ");
-        for (String className : classNames) {
-            if ("unfollow".equals(className)) {
-                return true;
-            }
-        }
-
-        return false;
+        return followingContainer.isDisplayed();
     }
 
     public ProfileUserProfilePage toggleFollowButton()
     {
-        this.followUnfollowButton.click();
+        WebElement container = (isFollowed()) ? followingContainer : notFollowingContainer;
+        getDriver().findElementWithoutWaiting(container, By.tagName("button")).click();
+        container.findElement(By.className("dropdown-menu")).findElement(By.tagName("a")).click();
+        waitForNotificationSuccessMessage("Done");
         return new ProfileUserProfilePage(this.getUsername());
     }
 

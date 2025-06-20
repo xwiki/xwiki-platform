@@ -68,9 +68,9 @@ public class GlobalRightsAdministrationSectionPage extends AdministrationSection
 
     private void setAuthenticatedView(boolean enabled)
     {
-        String desiredAltValue = enabled ? "yes" : "no";
-
-        if (!this.forceAuthenticatedViewLink.getAttribute("alt").equals(desiredAltValue)) {
+        String desiredCheckedValue = enabled ? "checked" : null;
+        String initialCheckedValue = this.forceAuthenticatedViewLink.getAttribute("checked");
+        if (initialCheckedValue == null || !initialCheckedValue.equals(desiredCheckedValue)) {
             this.forceAuthenticatedViewLink.click();
 
             // Wait for the setting to apply. Wait longer than usual in this case in an attempt to avoid some false
@@ -78,8 +78,13 @@ public class GlobalRightsAdministrationSectionPage extends AdministrationSection
             int defaultTimeout = getDriver().getTimeout();
             try {
                 getDriver().setTimeout(defaultTimeout * 2);
-                getDriver().waitUntilElementHasAttributeValue(
-                    By.id(this.forceAuthenticatedViewLink.getAttribute("id")), "alt", desiredAltValue);
+                if (enabled) {
+                    getDriver().waitUntilElementHasAttributeValue(
+                        By.id(this.forceAuthenticatedViewLink.getAttribute("id")), "checked", "true");
+                } else {
+                    getDriver().waitUntilCondition(driver ->
+                        this.forceAuthenticatedViewLink.getAttribute("checked") == null);
+                }
             } finally {
                 // Restore the utils timeout for other tests.
                 getDriver().setTimeout(defaultTimeout);

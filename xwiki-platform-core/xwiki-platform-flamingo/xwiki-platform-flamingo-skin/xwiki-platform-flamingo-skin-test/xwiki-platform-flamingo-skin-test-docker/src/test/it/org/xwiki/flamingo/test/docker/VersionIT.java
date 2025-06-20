@@ -29,9 +29,12 @@ import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
@@ -52,7 +55,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     // Add the FileUploadPlugin which is needed by the test to upload attachment files
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"})
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+    // The script needs PR right.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
+        + ".*:Test\\.Execute\\..+"
+})
 class VersionIT
 {
     private static final String TITLE = "Page Title";
@@ -171,7 +178,7 @@ class VersionIT
         assertEquals(0, attachmentsPane.getNumberOfAttachments());
 
         // Revert to 3.1 (second update of the attachment)
-        vp = vp.openHistoryDocExtraPane().rollbackToVersion("3.1");
+        vp.openHistoryDocExtraPane().rollbackToVersion("3.1");
 
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
@@ -180,7 +187,7 @@ class VersionIT
         assertEquals("attachment2", utils.getDriver().findElement(By.tagName("html")).getText());
 
         // Revert to 2.1 (first update of the attachment)
-        vp = utils.gotoPage(testReference).openHistoryDocExtraPane().rollbackToVersion("2.1");
+        utils.gotoPage(testReference).openHistoryDocExtraPane().rollbackToVersion("2.1");
 
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
@@ -195,7 +202,7 @@ class VersionIT
         assertEquals(0, attachmentsPane.getNumberOfAttachments());
 
         // Revert to 2.1 (first update of the attachment)
-        vp = vp.openHistoryDocExtraPane().rollbackToVersion("2.1");
+        vp.openHistoryDocExtraPane().rollbackToVersion("2.1");
 
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
@@ -231,16 +238,15 @@ class VersionIT
         // Add a new attachment with the same name (4.1)
         utils.rest().attachFile(attachmentReference, "2".getBytes(), true);
 
-        ViewPage viewPage = utils.gotoPage(testReference);
+        utils.gotoPage(testReference);
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("file.txt"));
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
 
         // Revert to first attachment (2.1)
-        viewPage = utils.gotoPage(testReference);
-        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        HistoryPane historyPane = utils.gotoPage(testReference).openHistoryDocExtraPane();
 
-        viewPage = historyPane.rollbackToVersion("2.1");
+        historyPane.rollbackToVersion("2.1");
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("file.txt"));
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
@@ -358,9 +364,9 @@ class VersionIT
         assertEquals("script", objectEditPane.getFieldValue(objectEditPane.byPropertyName("levels")));
         assertEquals("1", objectEditPane.getFieldValue(objectEditPane.byPropertyName("allow")));
         objectEditPane.setFieldValue(objectEditPane.byPropertyName("allow"), "0");
-        // We want a minor version
+        // We want a minor version.
         objectEditPage.clickSaveAndContinue();
-        setup.gotoPage(testReference);
+        objectEditPage.clickCancel();
 
         setup.login(rollbackTestUser, rollbackTestUser);
 
@@ -463,10 +469,15 @@ class VersionIT
         assertEquals("1", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
 
         rightObject.setFieldValue(rightObject.byPropertyName("allow"), "0");
-        // We want a minor version
+        // We want a minor version.
         objectEditPage.clickSaveAndContinue();
 
-        setup.gotoPage(xwikiPreferences);
+        // We don't use the Cancel button to leave the edit mode because it takes us to the "view" mode which, depending
+        // on whether the XWiki.XWikiPreferences page has an XWiki.XWikiPreferences object or not, can be redirected to
+        // the "admin" mode (by the XWiki preferences sheet), which locks back the XWiki.XWikiPreferences page. We want
+        // to switch the user next, which doesn't remove the lock (see XWIKI-22430: Logging out does not unlock pages
+        // that were being edited), so we leave the edit mode by going to a page that doesn't add the edit lock back.
+        setup.gotoPage(xwikiPreferences.getLastSpaceReference());
 
         setup.login(deleteVersionTestUser, deleteVersionTestUser);
 
@@ -503,7 +514,9 @@ class VersionIT
                 rightObject.getFieldValue(rightObject.byPropertyName("users")));
             assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
             assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
-            objectEditPage.clickCancel();
+            // We don't use the Cancel button to leave the edit mode because the XWiki preferences sheet redirects to
+            // "admin" mode which locks back the page. Instead, we go to a page that doesn't add the edit lock back.
+            setup.gotoPage(xwikiPreferences.getLastSpaceReference());
         } finally {
             // Put back the page in the state it was before our changes
             setup.loginAsSuperAdmin();
@@ -567,10 +580,15 @@ class VersionIT
         assertEquals("1", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
 
         rightObject.setFieldValue(rightObject.byPropertyName("allow"), "0");
-        // We want a minor version
+        // We want a minor version.
         objectEditPage.clickSaveAndContinue();
 
-        setup.gotoPage(xwikiPreferences);
+        // We don't use the Cancel button to leave the edit mode because it takes us to the "view" mode which, depending
+        // on whether the XWiki.XWikiPreferences page has an XWiki.XWikiPreferences object or not, can be redirected to
+        // the "admin" mode (by the XWiki preferences sheet), which locks back the XWiki.XWikiPreferences page. We want
+        // to switch the user next, which doesn't remove the lock (see XWIKI-22430: Logging out does not unlock pages
+        // that were being edited), so we leave the edit mode by going to a page that doesn't add the edit lock back.
+        setup.gotoPage(xwikiPreferences.getLastSpaceReference());
 
         setup.login(deleteVersionTestUser, deleteVersionTestUser);
 
@@ -612,7 +630,6 @@ class VersionIT
             assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
             assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
             assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
-            objectEditPage.clickCancel();
 
             setup.gotoPage(xwikiPreferences, "view", "viewer=history");
             historyPane = new HistoryPane();
@@ -635,7 +652,9 @@ class VersionIT
             assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
             assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
             assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
-            objectEditPage.clickCancel();
+            // We don't use the Cancel button to leave the edit mode because the XWiki preferences sheet redirects to
+            // "admin" mode which locks back the page. Instead, we go to a page that doesn't add the edit lock back.
+            setup.gotoPage(xwikiPreferences.getLastSpaceReference());
         } finally {
             // Put back the page in the state it was before our changes
             setup.loginAsSuperAdmin();
@@ -644,5 +663,62 @@ class VersionIT
             historyPane = historyPane.showMinorEdits();
             historyPane.rollbackToVersion(latestVersionBeforeChanges);
         }
+    }
+
+    @Test
+    @Order(10)
+    void getRevisionsWithCriteria(TestUtils testUtils, TestReference testReference,
+        LogCaptureConfiguration logCaptureConfiguration) throws Exception
+    {
+        testUtils.rest().delete(testReference);
+        testUtils.rest().savePage(testReference, "Some content", "Title");
+        testUtils.rest().savePage(testReference, "Some content 1", "Title");
+        testUtils.rest().savePage(testReference, "Some content 1 2", "Title");
+        testUtils.rest().savePage(testReference, "Some content 1 2 3", "Title");
+        testUtils.rest().savePage(testReference, "Some content 1 2 3 4", "Title");
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals("5.1", historyPane.getCurrentVersion());
+        assertEquals(5, historyPane.getNumberOfVersions());
+
+        EntityReference targetTestReference =
+            testUtils.resolveDocumentReference("xwiki:Test.getRevisionsWithCriteriaFoo.WebHome");
+        String script = String.format("""
+            {{velocity}}
+            #set ($oldRef = "%s")
+            #set ($startAt = 0)
+            #set ($endAt = -1)
+            #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
+            #set ($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))
+            #set ($discard = $criteria.setRange($range))
+            #set ($myDoc = $xwiki.getDocument($oldRef))
+            #set ($xwikiDoc = $myDoc.document)
+            #set ($discard = $myDoc.document.loadArchive($xcontext.context))
+            XWiki Doc: $xwikiDoc
+            #set ($revisions = $xwikiDoc.getRevisions($criteria, $xcontext.context))
+            Revision: $revisions
+            #set ($newRef = $services.model.resolveDocument("%s"))
+            #set ($oldRef = $xwikiDoc.documentReference)
+            #set ($discard = $xwikiDoc.setDocumentReference($newRef))
+            XWiki Doc: $xwikiDoc
+            #set ($revisions = $xwikiDoc.getRevisions($criteria, $xcontext.context))
+            Revision: $revisions
+            ## Restore the original document reference on the cached document instance otherwise we can't delete the
+            ## document (without restarting the XWiki instance or clearing the cache).
+            #set ($discard = $xwikiDoc.setDocumentReference($oldRef))
+            {{/velocity}}
+            """, testReference, targetTestReference);
+
+        String obtainedResult = testUtils.executeWikiPlain(script, Syntax.XWIKI_2_1);
+        String expectedResult = String.format("""
+            XWiki Doc: %s
+            Revision: [5.1]
+            XWiki Doc: %s
+            Revision: [5.1]""", testUtils.serializeLocalReference(testReference),
+            testUtils.serializeLocalReference(targetTestReference));
+        assertEquals(expectedResult, obtainedResult);
+        logCaptureConfiguration.registerExpectedRegexes("^.*\\QDeprecated usage of method "
+            + "[com.xpn.xwiki.doc.XWikiDocument.setDocumentReference] in xwiki:Test.Execute\\E.*$");
     }
 }

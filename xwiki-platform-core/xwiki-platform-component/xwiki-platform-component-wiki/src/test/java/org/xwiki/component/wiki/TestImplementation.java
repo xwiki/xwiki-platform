@@ -36,12 +36,18 @@ public class TestImplementation implements TestRole, WikiComponent
 
     private WikiComponentScope scope;
 
+    private int roleTypePriority;
+
+    private int roleHintPriority;
+
     public TestImplementation(DocumentReference documentReference, DocumentReference authorReference,
-        WikiComponentScope scope)
+        WikiComponentScope scope, int roleTypePriority, int roleHintPriority)
     {
         this.documentReference = documentReference;
         this.authorReference = authorReference;
         this.scope = scope;
+        this.roleTypePriority = roleTypePriority;
+        this.roleHintPriority = roleHintPriority;
     }
 
     @Override
@@ -78,5 +84,17 @@ public class TestImplementation implements TestRole, WikiComponent
     public WikiComponentScope getScope()
     {
         return this.scope;
+    }
+
+    @Override
+    public int getRoleHintPriority()
+    {
+        return this.roleHintPriority;
+    }
+
+    @Override
+    public int getRoleTypePriority()
+    {
+        return this.roleTypePriority;
     }
 }

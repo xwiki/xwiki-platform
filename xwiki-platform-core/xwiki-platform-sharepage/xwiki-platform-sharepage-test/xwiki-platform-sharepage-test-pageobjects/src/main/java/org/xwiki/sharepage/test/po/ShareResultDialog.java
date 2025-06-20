@@ -32,7 +32,7 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ShareResultDialog extends BaseElement
 {
-    @FindBy(xpath = "//div[contains(@class, 'infomessage')]")
+    @FindBy(xpath = "//div[contains(@class, 'infomessage')]//div")
     private WebElement infoDiv;
 
     @FindBy(xpath = "//a[contains(@class, 'share-backlink')]")

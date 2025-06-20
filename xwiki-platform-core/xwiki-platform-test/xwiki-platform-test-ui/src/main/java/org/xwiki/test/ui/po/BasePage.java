@@ -55,6 +55,9 @@ import com.deque.html.axecore.selenium.AxeBuilder;
 public class BasePage extends BaseElement
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
+
+    private static final By EDIT_BUTTON_LOCATOR = By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]");
+
     /**
      * Used for sending keyboard shortcuts to.
      */
@@ -195,12 +198,21 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * @return whether the "edit" button is available on the current page
+     * @since 17.5.0RC1
+     * @since 17.4.1
+     */
+    public boolean isEditAvailable()
+    {
+        return getDriver().hasElementWithoutWaiting(EDIT_BUTTON_LOCATOR);
+    }
+
+    /**
      * Performs a click on the "edit" button.
      */
     public void edit()
     {
-        WebElement editMenuButton =
-            getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]"));
+        WebElement editMenuButton = getDriver().findElement(EDIT_BUTTON_LOCATOR);
         editMenuButton.click();
     }
 
@@ -209,7 +221,7 @@ public class BasePage extends BaseElement
      */
     public String getEditURL()
     {
-        return getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]")).getAttribute("href");
+        return getDriver().findElement(EDIT_BUTTON_LOCATOR).getAttribute("href");
     }
 
     /**
@@ -426,7 +438,6 @@ public class BasePage extends BaseElement
      */
     public LoginPage login()
     {
-        getDrawerMenu().toggle();
         this.loginLink.click();
         return new LoginPage();
     }
@@ -498,7 +509,7 @@ public class BasePage extends BaseElement
      */
     public void logout()
     {
-        getDrawerMenu().toggle();
+        getDrawerMenu().show();
         getDriver().findElement(By.id("tmLogout")).click();
         // Update the CSRF token because the context user has changed (it's guest user now). Otherwise, APIs like
         // TestUtils#createUser*(), which expect the currently cached token to be valid, will fail because they would be
@@ -511,7 +522,6 @@ public class BasePage extends BaseElement
      */
     public RegistrationPage register()
     {
-        getDrawerMenu().toggle();
         this.registerLink.click();
         return new RegistrationPage();
     }
@@ -687,23 +697,31 @@ public class BasePage extends BaseElement
             return;
         }
 
-        long startTime = System.currentTimeMillis();
-        // Run WCAG tests on the current UI page if the current URL + PO class name are not in the cache, or if checking
-        // the cache is disabled.
-        if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
-            XWikiWebDriver driver = this.getDriver();
-            AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
-            Results axeResult = axeBuilder.analyze(driver);
-            wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
-            long stopTime = System.currentTimeMillis();
-            long deltaTime = stopTime - startTime;
-            LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",
-                this.getPageURL(), this.getClass().getName(), deltaTime);
-            wcagContext.addWCAGTime(deltaTime);
-        } else {
-            // If the identifying pair is already in the cache, don't perform accessibility validation.
-            LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG-checked.",
-                this.getPageURL(), this.getClass().getName());
+        try {
+            long startTime = System.currentTimeMillis();
+            // Run WCAG tests on the current UI page if the current URL + PO class name are not in the cache, or if checking
+            // the cache is disabled.
+            if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
+                XWikiWebDriver driver = this.getDriver();
+                AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
+                Results axeResult = axeBuilder.analyze(driver);
+                wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
+                long stopTime = System.currentTimeMillis();
+                long deltaTime = stopTime - startTime;
+                LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",
+                    this.getPageURL(), this.getClass().getName(), deltaTime);
+                wcagContext.addWCAGTime(deltaTime);
+            } else {
+                // If the identifying pair is already in the cache, don't perform accessibility validation.
+                LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG-checked.",
+                    this.getPageURL(), this.getClass().getName());
+            }
+        } catch (Exception e) {
+            if (wcagContext.shouldWCAGStopOnError()) {
+                throw e;
+            } else {
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+            }
         }
     }
 

@@ -22,7 +22,6 @@ package org.xwiki.platform.security.requiredrights;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Analyze an object for required rights and returns a list of the missing required right.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.9RC1
  */
-@Unstable
 @Role
 public interface RequiredRightAnalyzer<T>
 {

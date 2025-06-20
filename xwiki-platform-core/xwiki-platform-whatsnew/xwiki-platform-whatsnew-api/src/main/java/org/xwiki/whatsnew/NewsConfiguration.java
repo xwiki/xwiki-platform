@@ -22,7 +22,6 @@ package org.xwiki.whatsnew;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the What's New extension.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.1RC1
  */
-@Unstable
 @Role
 public interface NewsConfiguration
 {

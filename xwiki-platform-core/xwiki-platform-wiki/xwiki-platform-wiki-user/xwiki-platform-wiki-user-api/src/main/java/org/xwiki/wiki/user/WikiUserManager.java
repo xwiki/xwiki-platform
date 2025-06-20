@@ -178,6 +178,7 @@ public interface WikiUserManager
      * @return the generated candidacy
      * @throws WikiUserManagerException if problems occur
      */
+    // TODO: this API should also trigger a dedicated event for admins to be aware about the request.
     MemberCandidacy askToJoin(String userId, String wikiId, String message) throws WikiUserManagerException;
 
     /**
@@ -187,6 +188,7 @@ public interface WikiUserManager
      * @param wikiId id of the wiki
      * @throws WikiUserManagerException if problems occur
      */
+    // TODO: this API should also trigger a dedicated event for admins to be aware about the request.
     void join(String userId, String wikiId) throws WikiUserManagerException;
 
     /**
@@ -196,6 +198,7 @@ public interface WikiUserManager
      * @param wikiId id of the wiki
      * @throws WikiUserManagerException if problems occur
      */
+    // TODO: this API should also trigger a dedicated event for admins to be aware about the request.
     void leave(String userId, String wikiId) throws WikiUserManagerException;
 
     /**
@@ -206,6 +209,7 @@ public interface WikiUserManager
      * @param privateComment private comment that only the administrator can see
      * @throws WikiUserManagerException if problems occur
      */
+    // TODO: this API should also trigger a dedicated event for admins to be aware about the request.
     void acceptRequest(MemberCandidacy request, String message, String privateComment)
         throws WikiUserManagerException;
 
@@ -217,6 +221,7 @@ public interface WikiUserManager
      * @param privateComment private comment that only the administrator can see
      * @throws WikiUserManagerException if problems occur
      */
+    // TODO: this API should also trigger a dedicated event for admins to be aware about the request.
     void refuseRequest(MemberCandidacy request, String message, String privateComment)
         throws WikiUserManagerException;
 
@@ -229,6 +234,7 @@ public interface WikiUserManager
      * @return The generated invitation
      * @throws WikiUserManagerException if problems occur
      */
+    // TODO: this API should also trigger a dedicated event for admins to be aware about the request.
     MemberCandidacy invite(String userId, String wikiId, String message) throws WikiUserManagerException;
 
     /**
@@ -238,6 +244,7 @@ public interface WikiUserManager
      * @param message message that goes along the acceptance
      * @throws WikiUserManagerException if problems occur
      */
+    // TODO: this API should also trigger a dedicated event for admins to be aware about the request.
     void acceptInvitation(MemberCandidacy invitation, String message) throws WikiUserManagerException;
 
     /**
@@ -247,6 +254,7 @@ public interface WikiUserManager
      * @param message message that goes along the refusal
      * @throws WikiUserManagerException if problems occur
      */
+    // TODO: this API should also trigger a dedicated event for admins to be aware about the request.
     void refuseInvitation(MemberCandidacy invitation, String message) throws WikiUserManagerException;
 
     /**
@@ -255,5 +263,6 @@ public interface WikiUserManager
      * @param candidacy Candidacy to cancel
      * @throws WikiUserManagerException if problems occur
      */
+    // TODO: this API should also trigger a dedicated event for admins to be aware about the request.
     void cancelCandidacy(MemberCandidacy candidacy) throws WikiUserManagerException;
 }

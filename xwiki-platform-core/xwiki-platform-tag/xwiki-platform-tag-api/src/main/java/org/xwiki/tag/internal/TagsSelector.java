@@ -71,8 +71,11 @@ public interface TagsSelector
      *
      * @param tag the tag to list documents for
      * @param includeHiddenDocuments when {@code true} hidden document are returned as well
+     * @param caseSensitive {@code true} if the case of the tag should be used in the query {@code false} for getting
+     * results whatever the case of the tag.
      * @return the list of serialized document reference of document containing a given tag
      * @throws TagException in cas of issue where retrieving the documents
      */
-    List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments) throws TagException;
+    List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, boolean caseSensitive)
+        throws TagException;
 }

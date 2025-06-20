@@ -54,7 +54,7 @@ Brug {{displayIcon name="home"/}} "brødkrumme-linien" ovenover titlen til at //
 På siden [[Sandbox&gt;&gt;Sandbox.WebHome]] kan du se eksempler på mere indhold og det et godt sted at eksperimentere med wikiens mange funktioner. 
 
  {{box}}
-Lær mere om XWiki med en engelske [[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
+Lær mere om XWiki med en engelske [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
 {{/box}}
 
 (%class="row"%)
@@ -65,7 +65,7 @@ Lær mere om XWiki med en engelske [[Getting Started Guide&gt;&gt;http://www.xwi
 
 Wikien kan udbygges med masser af funktionalitet, som du måske står og mangler. Derfor - kig  på [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] hvor der kan søges og installeres udvidelser.
 
-For at finde mere om de 900+ udvidelser, som andre XWiki-brugere har delt, gå til [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]].
+For at finde mere om de 900+ udvidelser, som andre XWiki-brugere har delt, gå til [[Extensions Repository&gt;&gt;https://extensions.xwiki.org]].
 )))
 
 (%class="col-xs-12 col-sm-6"%)

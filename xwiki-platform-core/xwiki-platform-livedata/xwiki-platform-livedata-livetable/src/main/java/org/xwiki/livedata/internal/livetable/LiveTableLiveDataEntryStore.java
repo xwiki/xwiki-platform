@@ -50,7 +50,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -104,7 +103,7 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
             // instead of serializing a map.
             ObjectMapper objectMapper =
                 JsonMapper.builder().enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER).build();
-            ObjectNode liveTableResults = getLiveTableResultsJSON(query, objectMapper);
+            JsonNode liveTableResults = getLiveTableResultsJSON(query, objectMapper);
             LiveData liveData = new LiveData();
             liveData.setCount(liveTableResults.path("totalrows").asLong());
             JsonNode rows = liveTableResults.path("rows");
@@ -117,7 +116,7 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         }
     }
 
-    private ObjectNode getLiveTableResultsJSON(LiveDataQuery query, ObjectMapper objectMapper) throws Exception
+    private JsonNode getLiveTableResultsJSON(LiveDataQuery query, ObjectMapper objectMapper) throws Exception
     {
         // Merge the parameters of this live data source with the parameters from the given query.
         Source originalSource = query.getSource();
@@ -139,7 +138,8 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
                 liveTableResultsJSON =
                     this.resultsRenderer.getLiveTableResultsFromPage("XWiki.LiveTableResults", query);
             }
-            return (ObjectNode) objectMapper.readTree(liveTableResultsJSON);
+
+            return objectMapper.readTree(liveTableResultsJSON);
         } finally {
             // Restore the original query source.
             query.setSource(originalSource);

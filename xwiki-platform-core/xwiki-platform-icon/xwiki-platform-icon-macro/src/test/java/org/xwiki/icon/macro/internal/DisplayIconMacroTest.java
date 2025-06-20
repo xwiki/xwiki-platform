@@ -165,8 +165,10 @@ class DisplayIconMacroTest
         IconSet defaultIconSet = mock(IconSet.class);
         when(this.iconSetManager.getDefaultIconSet()).thenReturn(defaultIconSet);
 
+        MacroTransformationContext context = new MacroTransformationContext();
+        context.setInline(true);
         List<Block> result =
-            this.displayIconMacro.execute(this.displayIconMacroParameters, null, new MacroTransformationContext());
+            this.displayIconMacro.execute(this.displayIconMacroParameters, null, context);
         assertEquals(result, List.of(new MetaDataBlock(List.of(new WordBlock("home")))));
         verify(this.iconRenderer).render("home", defaultIconSet);
         verifyNoInteractions(this.documentContextExecutor);
@@ -192,8 +194,10 @@ class DisplayIconMacroTest
     {
         when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, ICON_DOCUMENT_REFERENCE)).thenReturn(true);
 
+        MacroTransformationContext context = new MacroTransformationContext();
+        context.setInline(true);
         List<Block> result =
-            this.displayIconMacro.execute(this.displayIconMacroParameters, null, new MacroTransformationContext());
+            this.displayIconMacro.execute(this.displayIconMacroParameters, null, context);
         assertEquals(result, List.of(new MetaDataBlock(List.of(new WordBlock("home")))));
         verify(this.documentContextExecutor).call(any(), eq(this.iconDocument));
     }

@@ -31,24 +31,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 14.4.2
  * @since 14.5
  */
-@UITest(
-    extraJARs = {
-        "org.xwiki.platform:xwiki-platform-resource-temporary",
-        // Code macro highlighting works only if Jython is a core extension. It's not enough to use language=none in our
-        // test because we want to reproduce a bug in Paged.js where white-space between highlighted tokens is lost.
-        // TODO: Remove when https://jira.xwiki.org/browse/XWIKI-17972 is fixed
-        "org.python:jython-slim"
-    },
-    resolveExtraJARs = true,
-    // We need the Office server because we want to be able to test how the Office macro is exported to PDF.
-    office = true,
-    properties = {
-        // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference).
-        // Enabling debug logs also requires PR.
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
-            + ".*:(XWiki\\.OfficeImporterAdmin|PDFExportIT\\.EnableDebugLogs)"
-    }
-)
+@UITest
 @ExtendWith(PDFExportExecutionCondition.class)
 class AllIT
 {

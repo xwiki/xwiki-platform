@@ -44,12 +44,13 @@ help.tipsPanel.improveXWikiTip=Savez-vous que vous pouvez améliorer XWiki ? Pre
 help.tipsPanel.breadcrumbsTip=Cliquez sur les flèches à côté des éléments du fil d'ariane pour naviguer vers les pages soeurs et filles de la page courante.
 help.tipsPanel.advancedHiddenShortcutTip=Tapez le combo x+x+x+a pour activer ou désactiver le [[mode Avancé&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] et x+x+x+h pour activer ou désactiver [[l'affichage des pages cachées&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 help.tipsPanel.linkAutocompleteWYSIWYGTip=Lors de la rédaction dans l'éditeur WYSIWYG, saisissez ##[## puis des lettres et vous obtiendrez des suggestions pour créer des liens.
+### Missing: help.tipsPanel.WYSIWYGEditorTip=When editing in WYSIWYG mode, the {0}Alt + 0{1} shortcut ({0}⌥0{1} on macOS) opens a help modal with information about using the keyboard to navigate the editor.
 help.macroList.title=Macros disponibles
 help.macroList.id=Id
 help.macroList.name=Nom
 help.macroList.categories=Catégories
 help.macroList.description=Description
-help.macroList.visibility=Visiblité
+help.macroList.visibility=Visibilité
 
 ###############################################################################
 ## Deprecated

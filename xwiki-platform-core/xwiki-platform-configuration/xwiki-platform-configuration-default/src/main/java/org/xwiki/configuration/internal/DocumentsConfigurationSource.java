@@ -30,8 +30,8 @@ import org.xwiki.component.phase.InitializationException;
  * Composite Configuration Source that looks in the following Document sources (configuration in wiki pages) in that
  * order:
  * <ul>
- * <li>space preferences wiki page</li>
- * <li>wiki preferences wiki page</li>
+ * <li>current space preferences wiki page and all its parent spaces preferences pages</li>
+ * <li>current wiki preferences wiki page</li>
  * </ul>
  * Should be used when you need to look for configuration properties only in Documents (wiki pages).
  *

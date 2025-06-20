@@ -37,7 +37,6 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
-import com.google.common.collect.Iterables;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
@@ -102,8 +101,8 @@ public class ObjectSolrReferenceResolver extends AbstractSolrReferenceResolver
                 ObjectPropertyReference objectPropertyReference = objectProperty.getReference();
 
                 try {
-                    Iterables.addAll(result,
-                        this.objectPropertyResolverProvider.get().getReferences(objectPropertyReference));
+                    this.objectPropertyResolverProvider.get().getReferences(objectPropertyReference)
+                        .forEach(result::add);
                 } catch (Exception e) {
                     this.logger.error("Failed to resolve references for object property [" + objectPropertyReference
                         + "]", e);

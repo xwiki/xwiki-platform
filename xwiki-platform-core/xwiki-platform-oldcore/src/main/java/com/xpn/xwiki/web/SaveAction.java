@@ -45,11 +45,9 @@ import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
-import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
@@ -59,6 +57,7 @@ import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -125,6 +124,9 @@ public class SaveAction extends EditAction
 
     @Inject
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
 
     public SaveAction()
     {
@@ -236,18 +238,12 @@ public class SaveAction extends EditAction
             tdoc.readFromForm(form, context);
         }
 
-        // TODO: entirely rely on UserReference from the context
-        DocumentReference docUserReference = context.getUserReference();
-        UserReferenceResolver<DocumentReference> userReferenceResolver =
-            Utils.getComponent(
-                new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
-        UserReference userReference = userReferenceResolver.resolve(docUserReference);
-        DocumentAuthors authors = tdoc.getAuthors();
-        authors.setEffectiveMetadataAuthor(userReference);
-        authors.setOriginalMetadataAuthor(userReference);
+        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
+        tdoc.getAuthors().setOriginalMetadataAuthor(currentUserReference);
+        request.getEffectiveAuthor().ifPresent(tdoc.getAuthors()::setEffectiveMetadataAuthor);
 
         if (tdoc.isNew()) {
-            authors.setCreator(userReference);
+            tdoc.getAuthors().setCreator(currentUserReference);
         }
 
         // Make sure we have at least the meta data dirty status

@@ -56,6 +56,8 @@ public interface NotificationEmailRenderer
      * @return the plain text subject for the email
      * @throws NotificationException of error occurs
      * @since 9.10RC1
+     * @deprecated this method has never been used so implementing it has no meaning
      */
+    @Deprecated(since = "16.1.0RC1")
     String generateEmailSubject(CompositeEvent compositeEvent, String userId) throws NotificationException;
 }

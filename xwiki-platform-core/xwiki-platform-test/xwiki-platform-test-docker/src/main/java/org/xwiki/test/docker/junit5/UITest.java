@@ -19,6 +19,11 @@
  */
 package org.xwiki.test.docker.junit5;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -27,6 +32,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.test.docker.internal.junit5.MultiUserTestUtilsParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestLocalReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
@@ -34,11 +40,6 @@ import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
-
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Marks a test as being a functional UI Test.
@@ -53,6 +54,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(XWikiDockerExtension.class)
 @ExtendWith(TestReferenceParameterResolver.class)
 @ExtendWith(TestLocalReferenceParameterResolver.class)
+@ExtendWith(MultiUserTestUtilsParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public @interface UITest
@@ -114,6 +116,12 @@ public @interface UITest
     String jdbcDriverVersion() default "";
 
     /**
+     * @return the docker image tag to use for the browser (if not specified, uses the "latest" tag)
+     * @since 16.3.0RC1
+     */
+    String browserTag() default "";
+
+    /**
      * @return true if VNC container is started and recording is done and saved on test exit
      * @since 10.10RC1
      */
@@ -123,6 +131,12 @@ public @interface UITest
      * @return true if WCAG tests should be executed, false otherwise
      */
     boolean wcag() default false;
+
+    /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     * @since 16.1.0
+     */
+    boolean wcagStopOnError() default true;
 
     /**
      * @return the list of configuration properties to use when generating the XWiki configuration files such as
@@ -209,4 +223,14 @@ public @interface UITest
      * @since 14.5
      */
     boolean savePermanentDirectoryData() default false;
+
+    /**
+     * @return the list of network aliases to use for the servlet engine Docker container; this is useful when you need
+     *         to access the same XWiki instance using different domains, e.g. because you need to login with different
+     *         XWiki users in the same browser instance (but different tabs).
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    String[] servletEngineNetworkAliases() default {};
 }

@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Task for removing WatchListClass xobjects from page. This task should only be triggered when
- * {@link R160000000XWIKI17243DataMigration} has been done.
+ * {@link R160300000XWIKI17243DataMigration} has been done.
  * Note that this task might also create an autowatch xobject to get the new property if it's not defined, as we use
  * to fallback on the autowatch property defined in the WatchListClass xobject.
  *
@@ -79,6 +79,9 @@ public class WatchListObjectsRemovalTaskConsumer implements TaskConsumer
             AUTOMATIC_WATCH_CLASS_REFERENCE.appendParent(documentReference.getWikiReference());
         try {
             XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+
+            // Avoid modifying the cached document
+            document = document.clone();
 
             // We use to fallback on the old WatchClass xobject automaticwatch property when it was defined, so we
             // also take back this value and create the new autowatch xobject if needed.

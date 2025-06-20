@@ -165,7 +165,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   ## This variable should be true only for an authenticate user that matches the comment author.
   ## We don't allow guests to be edit or delete comments because we can't know if they are the comment author.
   #set ($isUserComment = $commentAuthor != '' && $services.model.resolveDocument($commentAuthor, 'user') == $xcontext.userReference)
-  <div id="xwikicomment_${comment.number}" class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
+  <div id="xwikicomment_${comment.number}" #if("$!comment.replyto" != '')data-replyto="$comment.replyto"#end class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($commentAuthor)#{else}#mediumUserAvatar($commentAuthor)#end</div>
     <div class="commentheader">
       <div>
@@ -196,7 +196,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
         <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
           href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')">
-          $services.icon.renderHTML('cross')
+          $services.icon.renderHTML('trash')
         </a>
        #end
       </div>## btn-group
@@ -216,17 +216,11 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <fieldset id="commentform">
         <legend class="sr-only">$services.localization.render('core.viewers.comments.add.title')</legend>
         <div class="commentavatar">#largeUserAvatar($xcontext.user)</div>
-        #if($xcontext.user != 'XWiki.XWikiGuest')
+        #if(!$isGuest)
           <label>$xwiki.getUserName($xcontext.user) $services.localization.render('core.viewers.comments.add.says')</label>
           <input type="hidden" name="${xCommentClass}_author" value="$xcontext.user"/>
         #else
           <label for="${xCommentClass}_author"><input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author" maxlength="255" /> says:</label>
-          <strong>
-            <a href='$xwiki.getURL('XWiki.XWikiLogin',
-                'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")&loginLink=1'>
-              $escapetool.xml($services.localization.render('login'))
-            </a>
-          </strong>
         #end
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -241,7 +235,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
             #end
           </div>
         </div>
-        #if($xcontext.user == 'XWiki.XWikiGuest' && $offerGuestsCaptcha)
+        #if($isGuest && $offerGuestsCaptcha)
           #displayCaptcha()
         #end
         <div>
@@ -256,10 +250,14 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #macro(displayCommentButton)
-<button type="button" id="openCommentForm" class="btn btn-default">
-  $services.icon.renderHTML('comment')
-  $services.localization.render('core.viewers.comments.add.comment.label')
-</button>
+  <button type="button" id="openCommentForm" class="btn btn-default">
+    $services.icon.renderHTML('comment')
+    #if(!$isGuest)
+      $services.localization.render('core.viewers.comments.add.comment.label')
+    #else
+      $services.localization.render('core.viewers.comments.add.commentAsGuest.label')
+    #end
+  </button>
 #end
 ##
 ##
@@ -332,7 +330,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.permalink')</div>
         </div>
         <div class="modal-body">
@@ -359,7 +357,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.delete')</div>
         </div>
         <div class="modal-body">
@@ -400,10 +398,41 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #error($services.localization.render('core.viewers.comments.edit.notFound'))
   #end
 #else
+#set ($comments = $doc.getComments())
+
+## Build a map on the form Date -> List<Comment object>
+## We also keep the set of keys when we have multiple comments at same date just to order them later (it should be a
+## very rare case but let's ensure we keep a deterministic order)
+#set ($commentMap = $collectiontool.getSortedMap())
+#set ($keysWithMultipleComments = $collectiontool.getSet())
+#foreach ($comment in $comments)
+  #set ($key = $comment.date)
+  #if ($commentMap.containsKey($key))
+    #set ($discard = $commentMap.get($key).add($comment))
+    #set ($discard = $keysWithMultipleComments.add($key))
+  #else
+    #set ($discard = $commentMap.put($key, [$comment]))
+  #end
+#end
+
+## We perform an ascending ordering of the keys
 #if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 1)
-  #set($comments = $doc.getComments())
+  #set ($orderSuffix = ':asc')
 #else
-  #set($comments = $doc.getComments(false))
+  #set ($orderSuffix = ':desc')
+  #set ($commentMap = $commentMap.descendingMap())
+#end
+
+## Ensure to order list with multiple entries if needed
+#foreach ($keyMultipleComment in $keysWithMultipleComments)
+  #set ($reorderedList = $collectiontool.sort($commentMap.get($keyMultipleComment), "number$orderSuffix"))
+  #set ($discard = $commentMap.put($keyMultipleComment, $reorderedList))
+#end
+
+## Finally obtained an ordered list
+#set ($comments = $collectiontool.getLinkedList())
+#foreach ($commentList in $commentMap.values())
+  #set ($discard = $comments.addAll($commentList))
 #end
 ##
 ##

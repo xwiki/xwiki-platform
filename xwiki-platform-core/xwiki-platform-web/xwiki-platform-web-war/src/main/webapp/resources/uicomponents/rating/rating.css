@@ -22,8 +22,7 @@
   display: inline;
 }
 
-.star-rating a,
-.star-rating .current-rating {
+.star-rating a {
   position: absolute;
   top: 0;
   left: 0;
@@ -66,7 +65,7 @@
   z-index: 2;
 }
 
-.star-rating .current-rating {
+.star-rating .average-rating {
   z-index: 1;
   background-position: left center;
 }
@@ -115,4 +114,35 @@ ul.locked a {
   margin-right: 5px;
   float: right;
   position: relative;
+}
+
+.star-rating .current-rating {
+  display: block;
+  height: 100%;
+}
+
+.average-rating {
+  position: relative;
+  color: transparent;
+  display: block;
+  height: 100%;
+  width: 100%;
+  /* Remove default background for Firefox */
+  background: none;
+}
+
+/* Remove default background for Chrome & Safari */
+.average-rating::-webkit-meter-bar {
+  background: none;
+  border: none;
+}
+
+/* Add the stars for Chrome & Safari */
+.average-rating::-webkit-meter-optimum-value {
+  background: url("star.gif") left repeat-x;
+}
+
+/* Add the stars for Firefox */
+.average-rating:-moz-meter-optimum::-moz-meter-bar {
+  background: url("star.gif") left repeat-x;
 }

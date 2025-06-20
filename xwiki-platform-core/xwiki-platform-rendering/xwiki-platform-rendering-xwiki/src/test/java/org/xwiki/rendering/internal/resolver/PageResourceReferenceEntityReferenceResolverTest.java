@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.resolver;
 
+import java.util.List;
+
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -65,7 +67,7 @@ class PageResourceReferenceEntityReferenceResolverTest
 
         DocumentReference baseReference = new DocumentReference("wiki", "space", "document");
         PageReference pageReference = new PageReference("wiki", "page1", "page2");
-        DocumentReference documentReference = new DocumentReference("wiki", "page1", "page2", "WebHome");
+        DocumentReference documentReference = new DocumentReference("wiki", List.of("page1", "page2"), "WebHome");
         when(this.currentEntityReferenceResolver.resolve(page.getBaseReferences().get(0), EntityType.DOCUMENT, null))
             .thenReturn(baseReference);
         when(this.defaultPageReferenceResolver.resolve("page1/page2", baseReference)).thenReturn(pageReference);

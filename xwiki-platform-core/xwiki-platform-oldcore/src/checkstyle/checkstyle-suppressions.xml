@@ -25,6 +25,6 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-  <suppress checks="FanOutComplexity" files="HqlQueryExecutor.java"/>
+  <!-- FanOut complexity of 28 on a max of 20 -->
   <suppress checks="FanOutComplexity" files="FOPXSLFORenderer.java"/>
 </suppressions>

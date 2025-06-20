@@ -24,6 +24,8 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -46,6 +48,8 @@ import com.xpn.xwiki.XWikiException;
 @Singleton
 public class LogoutAction extends XWikiAction
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogoutAction.class);
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -65,22 +69,29 @@ public class LogoutAction extends XWikiAction
         }
 
         // Process redirect
-        String redirect;
-        redirect = context.getRequest().getParameter("xredirect");
-        if (StringUtils.isEmpty(redirect)) {
-            DocumentReferenceResolver<EntityReference> resolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE);
+        // Redirect to the indicated URL only if the response hasn't already been committed
+        if (!response.isCommitted()) {
+            String redirect = context.getRequest().getParameter("xredirect");
+            if (StringUtils.isEmpty(redirect)) {
+                DocumentReferenceResolver<EntityReference> resolver =
+                    Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE);
 
-            // Get default document
-            DocumentReference reference = resolver.resolve(null, EntityType.DOCUMENT);
+                // Get default document
+                DocumentReference reference = resolver.resolve(null, EntityType.DOCUMENT);
 
-            // Set wiki reference to current wiki
-            reference = reference.setWikiReference(new WikiReference(context.getWikiId()));
+                // Set wiki reference to current wiki
+                reference = reference.setWikiReference(new WikiReference(context.getWikiId()));
 
-            // Create URL to the wiki home page
-            redirect = context.getWiki().getURL(reference, "view", context);
+                // Create URL to the wiki home page
+                redirect = context.getWiki().getURL(reference, "view", context);
+            }
+
+            sendRedirect(response, redirect);
+        } else {
+            LOGGER.debug("Skipping the redirect because the response already been committed"
+                + " (by a custom authenticator for example)");
         }
-        sendRedirect(response, redirect);
+
         return false;
     }
 }

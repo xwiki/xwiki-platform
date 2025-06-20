@@ -75,7 +75,7 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
 
     private Map<EntityReference, Set<NotificationFilterPreference>> preferenceFilterCache;
 
-    private Map<EntityReference, Map<String, Boolean>> toggleCache;
+    private Map<EntityReference, Map<String, ToggleableNotificationFilterActivation>> toggleCache;
 
     void invalidatePreferencefilter(EntityReference reference)
     {
@@ -132,10 +132,10 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
     }
 
     @Override
-    public Map<String, Boolean> getToggleableFilterActivations(DocumentReference userReference)
-        throws NotificationException
+    public Map<String, ToggleableNotificationFilterActivation> getToggleableFilterActivations(
+        DocumentReference userReference) throws NotificationException
     {
-        Map<String, Boolean> values = this.toggleCache.get(userReference);
+        Map<String, ToggleableNotificationFilterActivation> values = this.toggleCache.get(userReference);
         if (values != null) {
             return values;
         }

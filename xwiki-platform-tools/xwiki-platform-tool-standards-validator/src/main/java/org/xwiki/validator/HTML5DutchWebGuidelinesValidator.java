@@ -21,6 +21,7 @@ package org.xwiki.validator;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.DocumentType;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
 import org.xwiki.validator.ValidationError.Type;
@@ -59,6 +61,8 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
 
     private static final String SUBMIT_BUTTONS = StringUtils.join(Arrays.asList("button[type='submit']",
         "button:not([type])", "input[type='submit']", "input[type='image'][alt]:not([alt=''])"), ", ");
+
+    private static final String DOCTYPE_ATT_NAME = "name";
 
     /**
      * Message resources.
@@ -606,12 +610,25 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     public void validateRpd6s1()
     {
-        boolean validDocumentType = this.html5Document.childNodes().stream()
-            .filter(node -> node instanceof DocumentType)
-            .anyMatch(documentType -> "html".equalsIgnoreCase(documentType.attr("name")) && StringUtils
-                .isAllEmpty(documentType.attr("publicId"), documentType.attr("systemId")));
+        // Get the DOCTYPE
+        Optional<Node> docttype =
+            this.html5Document.childNodes().stream().filter(DocumentType.class::isInstance).findFirst();
 
-        assertTrue(Type.ERROR, "rpd6s1.doctype", validDocumentType);
+        // Make sure there is a DOCTYPE
+        if (docttype.isPresent()) {
+            DocumentType documentType = (DocumentType) docttype.get();
+
+            // Make sure the DOCTYPE name is "html"
+            assertTrue(Type.ERROR, "rpd6s1.doctypenothtml", "html".equals(documentType.name()));
+
+            // Make sure the DOCTYPE systemId is not set
+            assertTrue(Type.ERROR, "rpd6s1.doctypesystemid", StringUtils.isEmpty(documentType.systemId()));
+
+            // Make sure the DOCTYPE publicId is not set
+            assertTrue(Type.ERROR, "rpd6s1.doctypepublicid", StringUtils.isEmpty(documentType.publicId()));
+        } else {
+            addError(Type.ERROR, -1, -1, "rpd6s1.nodoctype");
+        }
     }
 
     /**
@@ -1160,12 +1177,16 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
                 if (id != null) {
                     // Looking for the label associated to the input.
                     boolean hasLabel = false;
-                    for (Element label : getElement(ELEM_BODY).getElementsByTag("label")) {
+                    String labelTagName = "label";
+                    for (Element label : getElement(ELEM_BODY).getElementsByTag(labelTagName)) {
                         if (id.equals(label.attr("for"))) {
                             hasLabel = true;
                             break;
                         }
                     }
+                    // From MDN webdocs: Alternatively, you can nest the <input> directly inside the <label>,
+                    // in which case the for and id attributes are not needed because the association is implicit
+                    hasLabel = hasLabel || input.parent().tag().getName().equals(labelTagName);
                     assertTrue(Type.ERROR, message, hasLabel);
                 }
             }

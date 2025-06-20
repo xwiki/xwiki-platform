@@ -27,12 +27,12 @@ import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -44,9 +44,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.CoreProtocolPNames;
-import org.restlet.data.Disposition;
-import org.restlet.data.MediaType;
-import org.restlet.representation.InputRepresentation;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionFile;
@@ -79,7 +76,6 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Named("org.xwiki.repository.internal.resources.ExtensionVersionFileRESTResource")
 @Path(Resources.EXTENSION_VERSION_FILE)
-@Singleton
 public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResource
 {
     @Inject
@@ -118,8 +114,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
         checkRights(extensionDocument);
 
-
-        ResourceReference resourceReference = repositoryManager.getDownloadReference(extensionDocument, extensionVersion);
+        ResourceReference resourceReference =
+            repositoryManager.getDownloadReference(extensionDocument, extensionVersion);
 
         ResponseBuilder response = null;
 
@@ -163,23 +159,17 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
             response = Response.status(subResponse.getStatusLine().getStatusCode());
 
-            // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
-            // Should probably use javax.ws.rs.ext.MessageBodyWriter
             HttpEntity entity = subResponse.getEntity();
-            InputRepresentation content =
-                new InputRepresentation(
-                    entity.getContent(), entity.getContentType() != null
-                        ? new MediaType(entity.getContentType().getValue()) : MediaType.APPLICATION_OCTET_STREAM,
-                    entity.getContentLength());
+
+            MediaType type = entity.getContentType() != null ? MediaType.valueOf(entity.getContentType().getValue())
+                : MediaType.APPLICATION_OCTET_STREAM_TYPE;
+            response.type(type);
 
             BaseObject extensionObject = getExtensionObject(extensionDocument);
-            String type = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
-
-            Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);
-            disposition.setFilename(extensionId + '-' + extensionVersion + '.' + type);
-            content.setDisposition(disposition);
-
-            response.entity(content);
+            String extensionType = this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+            response.entity(entity.getContent());
+            response.header("Content-Disposition",
+                "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");
         } else if (ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {
             ExtensionResourceReference extensionResource;
             if (resourceReference instanceof ExtensionResourceReference) {
@@ -231,20 +221,12 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         }
 
         // Get file
-        // TODO: find media type
         ExtensionFile extensionFile = downloadExtension.getFile();
-        long length = extensionFile.getLength();
 
-        // TODO: find a proper way to do a perfect proxy of the URL without directly using Restlet classes.
-        // Should probably use javax.ws.rs.ext.MessageBodyWriter
-        InputRepresentation content = new InputRepresentation(extensionFile.openStream(), MediaType.ALL, length);
-
-        Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);
-        disposition.setFilename(downloadExtension.getId().toString() + '.' + downloadExtension.getType());
-        content.setDisposition(disposition);
-
-        ResponseBuilder response = Response.ok();
-        response.entity(content);
+        // TODO: indicate a more accurate media type (probably need to add the concept in ExtensionFile)
+        ResponseBuilder response = Response.ok(extensionFile.openStream(), MediaType.WILDCARD_TYPE);
+        response.header("Content-Disposition", "attachment; filename=\"" + downloadExtension.getId().toString() + '.'
+            + downloadExtension.getType() + "\"");
 
         return response;
     }

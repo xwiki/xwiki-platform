@@ -19,13 +19,16 @@
  */
 package org.xwiki.realtime.wiki.test.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WindowType;
-import org.xwiki.realtime.wiki.test.po.RealtimeWikiEditor;
+import org.xwiki.realtime.wiki.test.po.RealtimeWikiEditPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -71,39 +74,74 @@ class RealtimeWikiEditorIT
 
     @Test
     @Order(1)
-    void toggleRealtimeWithSelf(TestReference testReference, TestUtils setup) throws Exception
+    void toggleRealtimeWithSelf(TestReference testReference, TestUtils setup)
     {
         // First tab
-        setup.gotoPage(testReference).editWiki();
-        RealtimeWikiEditor firstRtWikiEditor = new RealtimeWikiEditor();
+        RealtimeWikiEditPage firstRtWikiEditor = RealtimeWikiEditPage.gotoPage(testReference);
+        String firstUserId = firstRtWikiEditor.getToolbar().getUserId();
+        firstRtWikiEditor.sendKeys("one");
 
         // Second tab
         String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
-        setup.gotoPage(testReference).editWiki();
-        RealtimeWikiEditor secondRtWikiEditor = new RealtimeWikiEditor();
+        RealtimeWikiEditPage secondRtWikiEditor = RealtimeWikiEditPage.gotoPage(testReference);
+        String secondUserId = secondRtWikiEditor.getToolbar().getUserId();
 
         // We need to wait until the two tabs are connected.
-        secondRtWikiEditor.waitUntilEditingWith("alice");
+        secondRtWikiEditor.getToolbar().waitForCoeditor(firstUserId);
+        secondRtWikiEditor.waitUntilContentContains("one");
+        secondRtWikiEditor.sendKeys(Keys.END, Keys.ENTER, "two");
 
+        // First tab
         setup.getDriver().switchTo().window(firstTabHandle);
-        firstRtWikiEditor.waitUntilEditingWith("alice");
+        firstRtWikiEditor.getToolbar().waitForCoeditor(secondUserId);
+        firstRtWikiEditor.waitUntilContentContains("two");
 
         // Leave realtime editing on both tabs and then join again.
-        firstRtWikiEditor.leaveRealtimeEditing();
+        firstRtWikiEditor.getToolbar().leaveCollaboration();
+        firstRtWikiEditor.sendKeys(" 1");
 
+        // Second tab
         setup.getDriver().switchTo().window(secondTabHandle);
-        secondRtWikiEditor.leaveRealtimeEditing();
+        secondRtWikiEditor.getToolbar().leaveCollaboration();
+        secondRtWikiEditor.sendKeys(" 2");
 
+        // First tab
         setup.getDriver().switchTo().window(firstTabHandle);
-        firstRtWikiEditor.joinRealtimeEditing();
+        try {
+            firstRtWikiEditor.waitUntilContentContains("2");
+            fail("The user left the realtime session but remote changes were still applied.");
+        } catch (Exception e) {
+            assertEquals("one 1\ntwo", firstRtWikiEditor.getExactContent());
+        }
 
+        // Joining back the realtime session reloads the page currently.
+        firstUserId = firstRtWikiEditor.getToolbar().joinCollaboration().getUserId();
+        firstRtWikiEditor = new RealtimeWikiEditPage();
+        firstRtWikiEditor.sendKeys("end");
+
+        // Second tab
         setup.getDriver().switchTo().window(secondTabHandle);
-        secondRtWikiEditor.joinRealtimeEditing();
+        try {
+            secondRtWikiEditor.waitUntilContentContains("1");
+            fail("The user left the realtime session but remote changes were still applied.");
+        } catch (Exception e) {
+            assertEquals("one\ntwo 2", secondRtWikiEditor.getExactContent());
+        }
+
+        // Joining back the realtime session reloads the page currently.
+        secondUserId = secondRtWikiEditor.getToolbar().joinCollaboration().getUserId();
+        secondRtWikiEditor = new RealtimeWikiEditPage();
+        secondRtWikiEditor.waitUntilContentContains("end");
+        secondRtWikiEditor.sendKeys(Keys.END, Keys.ENTER, "finish");
 
         // The coeditors list should appear again.
-        secondRtWikiEditor.waitUntilEditingWith("alice");
+        secondRtWikiEditor.getToolbar().waitForCoeditor(firstUserId);
 
+        // First tab
         setup.getDriver().switchTo().window(firstTabHandle);
-        firstRtWikiEditor.waitUntilEditingWith("alice");
+        firstRtWikiEditor.getToolbar().waitForCoeditor(secondUserId);
+        firstRtWikiEditor.waitUntilContentContains("finish");
+
+        assertEquals("end\nfinish", firstRtWikiEditor.getExactContent());
     }
 }

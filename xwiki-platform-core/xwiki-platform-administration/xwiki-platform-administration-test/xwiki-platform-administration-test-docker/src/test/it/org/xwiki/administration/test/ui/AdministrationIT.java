@@ -24,8 +24,11 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.administration.test.po.PresentationAdministrationPage;
+import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.InformationPane;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,12 +46,12 @@ class AdministrationIT
      * Validate presence of default sections for Administration UIs (Global, Page).
      */
     @Test
-    void verifyAdministrationSections(TestUtils setup)
+    void verifyAdministrationSections(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
 
-        // Navigate to a (non existent for test performance reasons) page in view mode.
-        setup.gotoPage("NonExistentSpace", "NonExistentPage");
+        // Navigate to a page in view mode.
+        setup.createPage(testReference, "");
 
         // Verify that pages have an Admin menu and navigate to the wiki admin UI (which happens to be the global
         // admin UI too since we're on the main wiki).
@@ -71,11 +74,12 @@ class AdministrationIT
         assertTrue(wikiAdministrationPage.hasNotSection("PageRights"));
 
         // Select XWiki page administration.
-        setup.gotoPage("NonExistentSpace", "WebHome");
+        setup.gotoPage(testReference);
         page = new AdministrablePage();
         AdministrationPage pageAdministrationPage = page.clickAdministerPage();
-
-        assertEquals("Page Administration: NonExistentSpace", pageAdministrationPage.getDocumentTitle());
+        String fullName = setup.serializeLocalReference(testReference.getParent());
+        assertEquals("Page Administration: " + fullName,
+            pageAdministrationPage.getDocumentTitle());
         assertTrue(pageAdministrationPage.getBreadcrumbContent().endsWith("/Page Administration"));
 
         assertTrue(pageAdministrationPage.hasSection("Themes"));
@@ -88,5 +92,28 @@ class AdministrationIT
             "Editing", "emailSend", "emailStatus", "emailGeneral")
             .stream().forEach(sectionId -> assertTrue(pageAdministrationPage.hasNotSection(sectionId),
                 String.format("Menu section [%s] shouldn't be present.", sectionId)));
+    }
+
+    /**
+     * Validate that the show information setting of the Presentation section of the administration has an effect.
+     *
+     * @since 16.4.7
+     * @since 16.10.4
+     * @since 17.1.0RC1
+     */
+    @Test
+    void showPageInformationTabSettings(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.createPage(testReference, "");
+        // Check that the information tab is displayed by default.
+        assertTrue(new InformationPane().exists());
+        PresentationAdministrationPage adminPage = PresentationAdministrationPage.goToAdminSection();
+        adminPage.setShowInformation("No");
+        adminPage.save();
+        assertEquals("No", adminPage.getShowInformation());
+
+        setup.gotoPage(testReference);
+        assertTrue(new InformationPane().doesNotExist());
     }
 }

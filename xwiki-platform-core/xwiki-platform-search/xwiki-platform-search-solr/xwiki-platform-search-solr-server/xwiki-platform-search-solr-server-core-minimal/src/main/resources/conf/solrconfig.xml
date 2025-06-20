@@ -23,7 +23,7 @@
      this file, see http://wiki.apache.org/solr/SolrConfigXml.
 -->
 <config>
-  <luceneMatchVersion>${solr.version}</luceneMatchVersion>
+  <luceneMatchVersion>${lucene.version}</luceneMatchVersion>
 
   <!-- The default high-performance update handler -->
   <updateHandler class="solr.DirectUpdateHandler2">

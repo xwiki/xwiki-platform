@@ -191,7 +191,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         XWikiDocument document = new XWikiDocument(docReference, locale);
         XWikiDocument origDoc = new XWikiDocument(docReference, origLocale);
 
-        // Force invalidating the cache to be sure it return (and keep) the right document
+        // Force invalidating the cache to be sure it returns (and keep) the right document
         if (xcontext.getWiki().getStore() instanceof XWikiCacheStore) {
             ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(document);
             ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(origDoc);
@@ -207,6 +207,11 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
             origDoc = getDocument(origDoc, origVersion, xcontext);
         }
 
+        // Clone the document to be sure we don't leave an inconsistent document state in the cache
+        // TODO: optimize when https://jira.xwiki.org/browse/XWIKI-22510 is fixed
+        document = document.clone();
+
+        // Set the original document expected by listeners (so that they can know what changed)
         document.setOriginalDocument(origDoc);
 
         return document;

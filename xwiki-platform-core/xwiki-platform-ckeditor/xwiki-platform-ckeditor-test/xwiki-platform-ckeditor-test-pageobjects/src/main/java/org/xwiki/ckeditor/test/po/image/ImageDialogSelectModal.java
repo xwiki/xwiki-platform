@@ -25,6 +25,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogTreeSelectForm;
+import org.xwiki.ckeditor.test.po.image.select.ImageDialogUploadSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
 import org.xwiki.test.ui.po.BaseModal;
 
@@ -95,6 +96,18 @@ public class ImageDialogSelectModal extends BaseModal
     public ImageDialogUrlSelectForm switchToUrlTab()
     {
         return switchTab(".image-selector a[href='#urlTab-0']", ImageDialogUrlSelectForm::new);
+    }
+
+    /**
+     * Click on the Upload tab to switch to the upload selection form.
+     *
+     * @return an upload selection form page object
+     * @since 16.1.0RC1
+     * @since 15.10.7
+     */
+    public ImageDialogUploadSelectForm switchToUploadTab()
+    {
+        return switchTab(".image-selector a[href='#upload-0']", ImageDialogUploadSelectForm::new);
     }
 
     private <T> T switchTab(String cssSelector, Supplier<T> supplier)

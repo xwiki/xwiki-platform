@@ -23,7 +23,7 @@ import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingRemoteExtension;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a rating extension.
@@ -33,7 +33,6 @@ import org.xwiki.script.internal.safe.ScriptSafeProvider;
  * @since 8.3RC1
  */
 public class SafeRemoteExtension<T extends RemoteExtension> extends WrappingRemoteExtension<T>
-    implements RemoteExtension
 {
     /**
      * The provider of instances safe for public scripts.

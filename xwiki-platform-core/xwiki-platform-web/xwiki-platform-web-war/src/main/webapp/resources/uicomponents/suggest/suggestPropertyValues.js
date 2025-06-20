@@ -17,29 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($) {
-  var getSelectizeOptions = function(select) {
-    var loadURL = [
+define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-entityReference', 'xwiki-selectize'], function($, XWiki) {
+  function getSelectizeOptions(select) {
+    const classReference = XWiki.Model.resolve(
+      select.attr('data-className'),
+      XWiki.EntityType.DOCUMENT,
+      // The class name is usually specified using a local document reference but it can also be an absolute reference,
+      // so we resolve it relative to the current wiki.
+      new XWiki.WikiReference(XWiki.currentWiki)
+    );
+    const wikiReference = classReference.extractReference(XWiki.EntityType.WIKI);
+    const loadURL = [
       XWiki.contextPath, 'rest',
-      'wikis', encodeURIComponent(XWiki.currentWiki),
-      'classes', encodeURIComponent(select.attr('data-className')),
+      'wikis', encodeURIComponent(wikiReference.getName()),
+      'classes', encodeURIComponent(XWiki.Model.serialize(classReference.relativeTo(wikiReference))),
       'properties', encodeURIComponent(select.attr('data-propertyName')),
       'values'
     ].join('/');
 
-    var getLoad = function(getOptions) {
-      return function(text, callback) {
-        $.getJSON(loadURL, getOptions(text)).then(function(response) {
-          if (response && Array.isArray(response.propertyValues)) {
-            return response.propertyValues.map(getSuggestion);
+    function getLoad(getOptions) {
+      return async (text, callback) => {
+        try {
+          const response = await $.getJSON(loadURL, getOptions(text));
+          if (Array.isArray(response?.propertyValues)) {
+            callback(response.propertyValues.map(getSuggestion));
           } else {
-            return [];
+            callback([]);
           }
-        }).then(callback, callback);
+        } catch {
+          callback();
+        }
       };
     }
 
-    var options = {
+    const options = {
       create: true,
       load: getLoad(function(text) {
         return { 'fp': text, 'limit': 10 }
@@ -49,7 +60,7 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
       })
     };
 
-    var freeText = select.attr('data-freeText');
+    let freeText = select.attr('data-freeText');
     if (freeText) {
       freeText = freeText.toLowerCase();
       if (freeText === 'allowed') {
@@ -60,10 +71,10 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
     }
 
     return options;
-  };
+  }
 
-  var getSuggestion = function(propertyValue) {
-    var metaData = propertyValue.metaData || {};
+  function getSuggestion(propertyValue) {
+    const metaData = propertyValue.metaData || {};
     return {
       value: propertyValue.value,
       label: metaData.label,
@@ -71,7 +82,7 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
       url: metaData.url,
       hint: metaData.hint
     };
-  };
+  }
 
   $.fn.suggestPropertyValues = function() {
     return this.each(function() {
@@ -81,10 +92,10 @@ define('xwiki-suggestPropertyValues', ['jquery', 'xwiki-selectize'], function($)
 });
 
 require(['jquery', 'xwiki-suggestPropertyValues', 'xwiki-events-bridge'], function($) {
-  var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+  function init(event, data) {
+    const container = $(data?.elements || document);
     container.find('.suggest-propertyValues').suggestPropertyValues();
-  };
+  }
 
   $(document).on('xwiki:dom:updated', init);
   $(init);

@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.net.InetAddress;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
@@ -1397,9 +1398,10 @@ public privileged aspect XWikiCompatibilityAspect
         if (this.configuredSyntaxes == null) {
             ExtendedRenderingConfiguration extendedRenderingConfiguration =
                 Utils.getComponent(ExtendedRenderingConfiguration.class);
-            String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes",
-                extendedRenderingConfiguration.getDefaultContentSyntax().toIdString());
-            this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
+            this.configuredSyntaxes = extendedRenderingConfiguration.getConfiguredSyntaxes()
+              .stream()
+              .map(Syntax::toIdString)
+              .collect(Collectors.toList());
         }
         return this.configuredSyntaxes;
     }

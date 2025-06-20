@@ -22,6 +22,7 @@ package org.xwiki.attachment.validation.internal.step;
 import java.util.List;
 
 import javax.inject.Provider;
+import javax.ws.rs.core.Response;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,6 @@ import com.xpn.xwiki.XWikiContext;
 
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
-import static javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -82,7 +82,7 @@ class FileSizeAttachmentValidationStepTest
             () -> this.validationStep.validate(attachmentAccessWrapper));
 
         assertEquals("File size too big", exception.getMessage());
-        assertEquals(SC_REQUEST_ENTITY_TOO_LARGE, exception.getHttpStatus());
+        assertEquals(Response.Status.REQUEST_ENTITY_TOO_LARGE.getStatusCode(), exception.getHttpStatus());
         assertEquals("attachment.validation.filesize.rejected", exception.getTranslationKey());
         assertEquals(List.of("42 bytes"), exception.getTranslationParameters());
         assertEquals("fileuploadislarge", exception.getContextMessage());

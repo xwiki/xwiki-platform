@@ -13,3 +13,4 @@ org.xwiki.security.authentication.internal.DefaultRetrieveUsernameManager
 org.xwiki.security.authentication.internal.DisableAccountFailureStrategy
 org.xwiki.security.authentication.internal.R140600000XWIKI19869DataMigrationListener
 org.xwiki.security.authentication.internal.RegistrationConfigurationSource
+org.xwiki.security.authentication.internal.ResetPasswordRequestClassDocumentInitializer

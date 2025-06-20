@@ -21,7 +21,6 @@ package org.xwiki.rendering.macro.chart;
 
 import java.io.InputStreamReader;
 
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -35,7 +34,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
@@ -52,13 +52,12 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
 @AllComponents
-public class IntegrationTests
+public class IntegrationTests extends RenderingTest
 {
     private final static String WIKI_CONTENT_FILE = "wiki.txt";
 
-    @RenderingTestSuite.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         ModelContext modelContext = componentManager.registerMockComponent(ModelContext.class);

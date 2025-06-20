@@ -117,6 +117,9 @@ public class DefaultWikiUserConfigurationHelper implements WikiUserConfiguration
         // Get the document
         XWikiDocument document = getDocument(wikiId);
 
+        // Avoid modifying the cached document
+        document = document.clone();
+
         // Fill the object
         BaseObject object = document.getXObject(WikiUserClassDocumentInitializer.CONFIGURATION_CLASS, true, context);
         object.setStringValue(WikiUserClassDocumentInitializer.FIELD_USERSCOPE,

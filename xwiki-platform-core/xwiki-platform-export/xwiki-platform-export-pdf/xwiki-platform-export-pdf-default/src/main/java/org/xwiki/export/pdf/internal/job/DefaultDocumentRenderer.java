@@ -112,12 +112,12 @@ public class DefaultDocumentRenderer implements DocumentRenderer
         // context in order to match what the user sees in view mode (e.g. the user might be looking at a document
         // revision).
         XWikiContext xcontext = this.xcontextProvider.get();
-        XWikiDocument currentDocument = xcontext.getDoc();
-        if (currentDocument != null && documentReference.equals(currentDocument.getDocumentReference())) {
-            return currentDocument;
-        } else {
-            return xcontext.getWiki().getDocument(documentReference, xcontext).getTranslatedDocument(xcontext);
+        XWikiDocument document = xcontext.getDoc();
+        if (document == null || !documentReference.equals(document.getDocumentReference())) {
+            document = xcontext.getWiki().getDocument(documentReference, xcontext);
         }
+        // Return the document translation that matches the current locale.
+        return document.getTranslatedDocument(xcontext);
     }
 
     private XDOM display(XWikiDocument document, DocumentDisplayerParameters displayerParameters,

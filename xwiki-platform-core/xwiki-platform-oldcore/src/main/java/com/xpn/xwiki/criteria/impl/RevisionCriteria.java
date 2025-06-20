@@ -21,6 +21,8 @@ package com.xpn.xwiki.criteria.impl;
 
 import java.util.Date;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * information about document versions used to retreive a set of document versions.
  *
@@ -159,5 +161,22 @@ public class RevisionCriteria
     public void setIncludeMinorVersions(boolean includeMinorVersions)
     {
         this.includeMinorVersions = includeMinorVersions;
+    }
+
+    /**
+     * Checks that the criteria are all-inclusive.
+     *
+     * @return false if some revisions might be filtered out by these criteria, true otherwise.
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public boolean isAllInclusive()
+    {
+        return this.includeMinorVersions
+            && this.getAuthor().isEmpty()
+            && this.getRange().getSize() == 0
+            && this.getPeriod().getStart() == Long.MIN_VALUE
+            && this.getPeriod().getEnd() == Long.MAX_VALUE;
     }
 }

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.ContentSheet" locale="">
+<xwikidoc version="1.6" reference="CKEditor.ContentSheet" locale="">
   <web>CKEditor</web>
   <name>ContentSheet</name>
   <language/>
@@ -62,7 +62,7 @@
   &lt;html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()"&gt;
     &lt;head&gt;
       &lt;meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" /&gt;
-      ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the 
+      ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the
       ## "org.xwiki.platform.html.head" Extension Point. This extension point is also used in XWiki.XWikiPreferences
       #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter' : 'order'}))
         $services.rendering.render($uix.execute(), 'xhtml/1.0')
@@ -199,7 +199,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#body[contenteditable="true"] {
+      <code>body[role="textbox"] {
   /* We use padding (instead of margin) in order to support Bootstrap grid layouts and accomodate for the use of
   negative margins used by the .row class. */
   /* We need more space at the bottom in order to be sure that the magic line is visible all the time (see CKEDITOR-283:
@@ -262,13 +262,6 @@ del span.cke_widget_inline {
 ins del span.cke_widget_inline,
 del ins span.cke_widget_inline {
   text-decoration-line: underline line-through;
-}
-
-/* Prevent the horizontal scroll bar on IE11. We already limit the image width from the skin (in order to have
-  responsive images) but this is not enough for IE11 because the image element has a wrapper.
-  See CKEDITOR-143: Horizontal scroll bar displayed when inserting a large image on IE11 */
-.cke_widget_image {
-  max-width: 100%;
 }</code>
     </property>
     <property>

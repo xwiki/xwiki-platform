@@ -46,10 +46,12 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.VelocityTemplate;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Displays the title of a document.
@@ -110,7 +112,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     private ConfigurationSource xwikicfg;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     /**
      * Used to get the default document reference, which normally is used to represent the home page of a space.
@@ -175,11 +177,11 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 String title = rawTitle;
                 // Evaluate the title only if the document is not restricted and its content's author has script
                 // right, otherwise use the raw title.
-                if (!document.isRestricted() && this.authorizationManager.hasAccess(Right.SCRIPT,
-                    document.getContentAuthorReference(), document.getDocumentReference()))
-                {
-                    title = evaluateTitle(rawTitle, document, parameters);
+                if (!document.isRestricted() && this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+                    document.getContentAuthorReference(), document.getDocumentReference())) {
+                    title = evaluateTitle(document, parameters);
                 }
+
                 return parseTitle(title);
             } catch (Exception e) {
                 logger.warn("Failed to interpret title of document [{}].", document.getDocumentReference(), e);
@@ -223,13 +225,11 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     /**
      * Evaluates the Velocity script from the specified title.
      *
-     * @param title the title to evaluate
-     * @param documentReference a reference to the document whose title is evaluated
+     * @param document the document whose title is evaluated
      * @param parameters display parameters
      * @return the result of evaluating the Velocity script from the given title
      */
-    protected String evaluateTitle(String title, DocumentModelBridge document,
-        DocumentDisplayerParameters parameters)
+    protected String evaluateTitle(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
         StringWriter writer = new StringWriter();
         String namespace = defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated()
@@ -257,7 +257,10 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 // Make sure to synchronize the context wiki with the context document's wiki.
                 modelContext.setCurrentEntityReference(document.getDocumentReference().getWikiReference());
             }
-            velocityEngine.evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
+
+            VelocityTemplate preparedTitle = prepareTitle(document);
+
+            velocityEngine.evaluate(this.velocityManager.getVelocityContext(), writer, namespace, preparedTitle);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -268,6 +271,22 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
             }
         }
         return writer.toString();
+    }
+
+    private VelocityTemplate prepareTitle(DocumentModelBridge document) throws XWikiVelocityException
+    {
+        Object preparedTitle = document.getPreparedTitle();
+
+        if (!(preparedTitle instanceof VelocityTemplate)) {
+            preparedTitle = this.velocityManager.compile(
+                this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference()) + "#title",
+                new StringReader(document.getTitle()));
+        }
+
+        // Remember the prepared title
+        document.setPreparedTitle(preparedTitle);
+
+        return (VelocityTemplate) preparedTitle;
     }
 
     /**

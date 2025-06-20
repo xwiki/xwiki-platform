@@ -26,7 +26,7 @@ CKEDITOR.editorConfig = function(config) {
       '$1': {
         elements: {
           // Elements required because the editor input is a full HTML page.
-          html: true, head: true, link: true, script: true, body: true,
+          html: true, head: true, link: true, script: true, style: true, body: true,
           // Headings
           h1: true, h2: true, h3: true, h4: true, h5: true, h6: true,
           // Lists
@@ -115,6 +115,16 @@ CKEDITOR.editorConfig = function(config) {
           height: true,
           src: true,
           width: true
+        },
+        match: function(image) {
+          if (image.parent?.name?.toLowerCase() === 'figure' ||
+              (image.parent?.name?.toLowerCase() === 'a' && image.parent?.parent?.name?.toLowerCase() === 'figure')) {
+            const figure = image.getAscendant('figure');
+            // This is needed in order for this figure to be upcasted as a captioned image widget.
+            // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_config.html#cfg-image2_captionedClass
+            figure.addClass('image');
+          }
+          return true;
         }
       },
       // Allowed table header and table cell attributes.
@@ -133,10 +143,10 @@ CKEDITOR.editorConfig = function(config) {
         // * lone paragraphs, when inside a list item, table cell, definition list or block quote (in order to simplify
         //   the generated wiki syntax; they will be replaced by their child nodes)
         match: function(element) {
-          var loneParagraphParents = ['li', 'td', 'th', 'dd', 'blockquote'];
-          var name = element.name.toLowerCase();
-          var allowed = name !== 'div' && name !== 'span' && (
-            name !== 'p' || !element.parent || !element.parent.name ||
+          const loneParagraphParents = ['li', 'td', 'th', 'dd', 'blockquote'];
+          const name = element.name.toLowerCase();
+          const allowed = name !== 'div' && name !== 'span' && (
+            name !== 'p' || !element.parent?.name ||
             element.parent.children.length > 1 || loneParagraphParents.indexOf(element.parent.name.toLowerCase()) < 0
           );
           if (!allowed && name === 'p') {
@@ -163,6 +173,8 @@ CKEDITOR.editorConfig = function(config) {
       'xwiki-macro',
       'xwiki-maximize',
       'xwiki-office',
+      'xwiki-realtime',
+      'xwiki-rights',
       'xwiki-save',
       'xwiki-selection',
       'xwiki-slash',
@@ -302,6 +314,7 @@ CKEDITOR.editorConfig = function(config) {
       },
       'xwiki-macro': {label: 'xwiki-toolbar.otherMacros'}
     },
+    versionCheck: false,
     'xwiki-macro': {
       // You can restrict here the type of content the users can input when editing the macro content / parameters
       // in-line using nested editables, depending on the macro content / parameter type.

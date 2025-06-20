@@ -1,7 +1,7 @@
-<wikiFarm>
-  <wiki name="wiki">
-    <wikiSpace name="test">
-      <wikiDocument name="page1">
+<wiki name="xwiki">
+  <wikiSpace name="space">
+    <wikiSpace name="nestedspace">
+      <wikiDocument name="document">
         <p>
           <parameters>
             <entry>
@@ -11,18 +11,156 @@
           </parameters>
         </p>
         <wikiDocumentLocale>
-          <wikiDocumentRevision revision="1.42">
+          <p>
+            <parameters>
+              <entry>
+                <string>creation_author</string>
+                <string>XWiki.creator</string>
+              </entry>
+              <entry>
+                <string>creation_date</string>
+                <date>2000-01-01 00:00:00.0 UTC</date>
+              </entry>
+              <entry>
+                <string>lastrevision</string>
+                <string>1.52</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiDocumentRevision revision="1.52">
             <p>
               <parameters>
                 <entry>
+                  <string>parent_reference</string>
+                  <org.xwiki.model.reference.EntityReference>
+                    <name>parent</name>
+                    <type>DOCUMENT</type>
+                  </org.xwiki.model.reference.EntityReference>
+                </entry>
+                <entry>
+                  <string>title</string>
+                  <string>title</string>
+                </entry>
+                <entry>
+                  <string>syntax</string>
+                  <org.xwiki.rendering.syntax.Syntax>
+                    <type>
+                      <name>syntax</name>
+                      <id>syntax</id>
+                    </type>
+                    <version>1.0</version>
+                  </org.xwiki.rendering.syntax.Syntax>
+                </entry>
+                <entry>
+                  <string>hidden</string>
+                  <boolean>true</boolean>
+                </entry>
+                <entry>
+                  <string>revision_author</string>
+                  <string>XWiki.author</string>
+                </entry>
+                <entry>
+                  <string>revision_original_author</string>
+                  <string>XWiki.author</string>
+                </entry>
+                <entry>
+                  <string>revision_comment</string>
+                  <string>comment</string>
+                </entry>
+                <entry>
+                  <string>revision_date</string>
+                  <date>2000-01-02 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>revision_minor</string>
+                  <boolean>true</boolean>
+                </entry>
+                <entry>
+                  <string>content_author</string>
+                  <string>XWiki.contentAuthor</string>
+                </entry>
+                <entry>
+                  <string>content_date</string>
+                  <date>2000-01-03 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
                   <string>content</string>
-                  <string>content1</string>
+                  <string>content</string>
                 </entry>
               </parameters>
             </p>
+            <wikiAttachment name="attachment.txt" size="10">
+              <p>
+                <content>AAECAwQFBgcICQ==</content>
+                <parameters>
+                  <entry>
+                    <string>revision_author</string>
+                    <string>XWiki.attachmentAuthor</string>
+                  </entry>
+                  <entry>
+                    <string>revision_comment</string>
+                    <string>attachment comment</string>
+                  </entry>
+                  <entry>
+                    <string>revision_date</string>
+                    <date>2000-01-05 00:00:00.0 UTC</date>
+                  </entry>
+                  <entry>
+                    <string>revision</string>
+                    <string>25.1</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiAttachment>
+            <wikiClass>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>name</string>
+                    <string>space.nestedspace.document</string>
+                  </entry>
+                </parameters>
+              </p>
+              <wikiClassProperty name="prop1" type="com.xpn.xwiki.objects.classes.NumberClass">
+                <wikiClassPropertyField name="disabled" value="0"/>
+                <wikiClassPropertyField name="name" value="prop1"/>
+                <wikiClassPropertyField name="number" value="1"/>
+                <wikiClassPropertyField name="numberType" value="long"/>
+                <wikiClassPropertyField name="prettyName" value="Prop1"/>
+                <wikiClassPropertyField name="size" value="30"/>
+                <wikiClassPropertyField name="unmodifiable" value="0"/>
+              </wikiClassProperty>
+            </wikiClass>
+            <wikiObject name="space.nestedspace.document[0]">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>name</string>
+                    <string>space.nestedspace.document</string>
+                  </entry>
+                  <entry>
+                    <string>class_reference</string>
+                    <string>space.nestedspace.document</string>
+                  </entry>
+                  <entry>
+                    <string>guid</string>
+                    <string>e2167721-2a64-430c-9520-bac1c0ee68cb</string>
+                  </entry>
+                  <entry>
+                    <string>number</string>
+                    <int>0</int>
+                  </entry>
+                </parameters>
+              </p>
+              <wikiObjectProperty name="prop1">
+                <p>
+                  <value t="java.lang.Long">1</value>
+                </p>
+              </wikiObjectProperty>
+            </wikiObject>
           </wikiDocumentRevision>
         </wikiDocumentLocale>
       </wikiDocument>
     </wikiSpace>
-  </wiki>
-</wikiFarm>
+  </wikiSpace>
+</wiki>

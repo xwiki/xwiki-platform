@@ -19,7 +19,7 @@
  */
 package org.xwiki.index.test.po;
 
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -36,10 +36,8 @@ public class DocumentsMacroPage extends ViewPage
         return new DocumentsMacroPage();
     }
 
-    public LiveTableElement getDocumentsExampleLiveTable()
+    public LiveDataElement getDocumentsExampleLiveTable()
     {
-        LiveTableElement lt = new LiveTableElement("example");
-        lt.waitUntilReady();
-        return lt;
+        return new LiveDataElement("example");
     }
 }

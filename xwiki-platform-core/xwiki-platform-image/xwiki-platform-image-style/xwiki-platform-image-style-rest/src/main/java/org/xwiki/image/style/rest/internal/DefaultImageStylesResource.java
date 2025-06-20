@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -39,10 +39,6 @@ import org.xwiki.image.style.rest.ImageStylesResource;
 import org.xwiki.image.style.rest.model.jaxb.Style;
 import org.xwiki.image.style.rest.model.jaxb.Styles;
 import org.xwiki.rest.XWikiRestComponent;
-
-import com.xpn.xwiki.XWikiContext;
-
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 
 /**
  * Default image style rest endpoint implementation.
@@ -61,9 +57,6 @@ public class DefaultImageStylesResource implements ImageStylesResource, XWikiRes
     @Inject
     private ImageStyleManager imageStyleManager;
 
-    @Inject
-    private Provider<XWikiContext> contextProvider;
-
     @Override
     public Styles getStyles(String wikiName) throws ImageStyleException
     {
@@ -73,30 +66,25 @@ public class DefaultImageStylesResource implements ImageStylesResource, XWikiRes
     }
 
     @Override
-    public Map<String, String> getDefaultStyleIdentifier(String wikiName, String documentReference)
-        throws ImageStyleException
+    public Response getDefaultStyleIdentifier(String wikiName, String documentReference) throws ImageStyleException
     {
         String defaultStyle = this.imageStyleConfiguration.getDefaultStyle(wikiName, documentReference);
         boolean forceDefaultStyle = this.imageStyleConfiguration.getForceDefaultStyle(wikiName, documentReference);
-        Map<String, String> response;
+        Response response;
         if (StringUtils.isEmpty(defaultStyle)) {
-            this.contextProvider.get().getResponse().setStatus(NO_CONTENT.getStatusCode());
-            response = Map.of();
+            response = Response.ok(Map.of()).build();
         } else {
-            response = Map.of(
-                "defaultStyle", defaultStyle,
-                "forceDefaultStyle", Boolean.toString(forceDefaultStyle)
-            );
+            response = Response
+                .ok(Map.of("defaultStyle", defaultStyle, "forceDefaultStyle", Boolean.toString(forceDefaultStyle)))
+                .build();
         }
+
         return response;
     }
 
     private List<Style> convert(Set<ImageStyle> imageStyles)
     {
-        return imageStyles
-            .stream()
-            .map(this::convert)
-            .collect(Collectors.toList());
+        return imageStyles.stream().map(this::convert).collect(Collectors.toList());
     }
 
     private Style convert(ImageStyle imageStyle)
@@ -114,6 +102,7 @@ public class DefaultImageStylesResource implements ImageStylesResource, XWikiRes
         style.setDefaultAlignment(imageStyle.getDefaultAlignment());
         style.setAdjustableTextWrap(imageStyle.getAdjustableTextWrap());
         style.setDefaultTextWrap(imageStyle.getDefaultTextWrap());
+
         return style;
     }
 }

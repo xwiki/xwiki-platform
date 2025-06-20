@@ -64,7 +64,7 @@
   padding: 0px;
 }
 
-.leftsidecolumns, #contentcolumn {
+#contentcolumn {
   float: none !important;
 }
 
@@ -91,9 +91,4 @@
 }
 .recentChangesMoreActions {
   display: none;
-}
-
-/* Fix XWIKI-5567 */
-.box {
-  overflow: visible;
 }

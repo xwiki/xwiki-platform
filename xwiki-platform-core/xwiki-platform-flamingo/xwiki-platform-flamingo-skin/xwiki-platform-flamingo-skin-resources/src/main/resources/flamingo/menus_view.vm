@@ -33,8 +33,8 @@
 
     ## Right menu
     #xwikitopmenurightstart()
+      #displaySimpleSecureUIX('org.xwiki.platform.topmenu.right', 'revert')
       #displayDrawerActivator()
-      #displaySimpleSecureUIX('org.xwiki.platform.topmenu.right')
     #xwikitopmenurightend()
 
   ## End of Top Menu

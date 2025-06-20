@@ -44,6 +44,7 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -131,6 +132,12 @@ class ImagePluginTest
         when(attachment.getMimeType()).thenReturn("image/notsupported");
         when(attachment.getDate()).thenReturn(new Date(0));
         assertSame(attachment, this.plugin.downloadAttachment(attachment, new XWikiContext()));
+    }
+
+    @Test
+    void downloadAttachmentWhenNull()
+    {
+        assertNull(this.plugin.downloadAttachment(null, new XWikiContext()));
     }
 
     @Test

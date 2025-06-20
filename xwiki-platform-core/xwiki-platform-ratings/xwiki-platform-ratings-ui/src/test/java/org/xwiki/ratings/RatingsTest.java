@@ -28,11 +28,9 @@ import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.ratings.script.RatingsScriptService;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
-import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -51,9 +49,6 @@ import static org.mockito.Mockito.when;
  */
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
-@ComponentList({
-    ControlCharactersFilter.class
-})
 class RatingsTest extends PageTest
 {
     @Test

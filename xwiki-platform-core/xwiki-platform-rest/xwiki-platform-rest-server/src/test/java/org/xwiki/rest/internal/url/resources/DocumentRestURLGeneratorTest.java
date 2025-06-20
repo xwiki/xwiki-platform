@@ -20,6 +20,7 @@
 package org.xwiki.rest.internal.url.resources;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Provider;
@@ -74,9 +75,11 @@ class DocumentRestURLGeneratorTest
     @Test
     void getURLWithoutLocale() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/page",
-            this.generator.getURL(documentReference).toString());
+            this.generator.getURL(new DocumentReference("wiki", "space", "page")).toString());
+
+        assertEquals("http://localhost/rest/wikis/wiki/spaces/space1/spaces/space2/pages/page",
+            this.generator.getURL(new DocumentReference("wiki", List.of("space1", "space2"), "page")).toString());
     }
 
     @Test
@@ -101,6 +104,14 @@ class DocumentRestURLGeneratorTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "pa/ge");
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/pa%2Fge",
+            this.generator.getURL(documentReference).toString());
+    }
+
+    @Test
+    void getURLWithSeveralSpaces() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", List.of("space1", "space2"), "page");
+        assertEquals("http://localhost/rest/wikis/wiki/spaces/space1/spaces/space2/pages/page",
             this.generator.getURL(documentReference).toString());
     }
 }

@@ -30,7 +30,7 @@ beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [<]
 onSpecialSymbol [!]
 endFormat [NONE] [[style]=[color: #666666; ]]
-beginFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
+beginFormat [NONE] [[style]=[font-style: italic; color: #3C7A7A; ]]
 onSpecialSymbol [-]
 onSpecialSymbol [-]
 onSpace
@@ -46,7 +46,7 @@ onWord [connector]
 onSpace
 onWord [instead]
 onNewLine
-endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
+endFormat [NONE] [[style]=[font-style: italic; color: #3C7A7A; ]]
 beginFormat [NONE] [[style]=[color: #666666; ]]
 onSpecialSymbol [<]
 endFormat [NONE] [[style]=[color: #666666; ]]
@@ -146,12 +146,12 @@ onSpecialSymbol [/]
 onSpecialSymbol [>]
 endFormat [NONE] [[style]=[color: #666666; ]]
 onNewLine
-beginFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
+beginFormat [NONE] [[style]=[font-style: italic; color: #3C7A7A; ]]
 onSpecialSymbol [-]
 onSpecialSymbol [-]
 onSpecialSymbol [>]
 onNewLine
-endFormat [NONE] [[style]=[font-style: italic; color: #408080; ]]
+endFormat [NONE] [[style]=[font-style: italic; color: #3C7A7A; ]]
 endGroup [[class]=[code]]
 endGroup [[class]=[box]]
 endMacroMarkerStandalone [code] [] [<!-- disable to use ajp connector instead

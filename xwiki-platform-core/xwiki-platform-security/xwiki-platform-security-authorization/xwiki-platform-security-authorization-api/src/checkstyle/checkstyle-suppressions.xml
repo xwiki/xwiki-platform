@@ -25,7 +25,7 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-  <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
+  <!-- Small Fan-Out complexity issue (23 against a max of 20) but it would need a big refactor to be fixed. -->
   <suppress checks="ClassFanOutComplexity" files="DefaultSecurityCache.java"/>
 
   <!-- Error because of the usage of 8 parameters in private constructor. This is not easy to improve to avoid

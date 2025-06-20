@@ -19,17 +19,28 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
+import org.apache.solr.client.solrj.request.GenericSolrRequest;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.CoreAdminParams.CoreAdminAction;
+import org.apache.solr.common.util.NamedList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
@@ -62,20 +73,29 @@ public class RemoteSolr extends AbstractSolr implements Initializable
      */
     public static final String DEFAULT_CORE_PREFIX = "xwiki";
 
+    /**
+     * Only used by unit test to disable the server version gathering at init.
+     */
+    private static final boolean REQUEST_VERSION =
+        Boolean.parseBoolean(System.getProperty("xwiki.solr.remote.requestVersion", "true"));
+
     @Inject
     private SolrConfiguration configuration;
 
     private HttpSolrClient rootClient;
+
+    private int solrMajorVersion;
 
     @Override
     public void initialize() throws InitializationException
     {
         String baseURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", null);
 
-        // RETRO COMPATIBILITY: the seach core used to be configured using "solr.remote.url" property
+        // RETRO COMPATIBILITY: the search core used to be configured using "solr.remote.url" property
         String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
         if (searchCoreURL != null) {
-            this.clients.put(SolrClientInstance.CORE_NAME, new HttpSolrClient.Builder(searchCoreURL).build());
+            this.cores.put(SolrClientInstance.CORE_NAME, new DefaultXWikiSolrCore(SolrClientInstance.CORE_NAME,
+                toSolrCoreName(SolrClientInstance.CORE_NAME), new HttpSolrClient.Builder(searchCoreURL).build()));
 
             // If the base URL is not provided try to guess it from the search core URL
             if (baseURL == null) {
@@ -91,7 +111,41 @@ public class RemoteSolr extends AbstractSolr implements Initializable
             baseURL = DEFAULT_BASE_URL;
         }
 
+        // Create the root client
         this.rootClient = new HttpSolrClient.Builder(baseURL).build();
+
+        if (REQUEST_VERSION) {
+            // Gather information about the server
+            NamedList<Object> systemInfo;
+            try {
+                systemInfo = this.rootClient
+                    .request(new GenericSolrRequest(SolrRequest.METHOD.GET, CommonParams.SYSTEM_INFO_PATH));
+            } catch (Exception e) {
+                throw new InitializationException("Failed to access the Solr server information", e);
+            }
+            String version = (String) systemInfo.findRecursive("lucene", "solr-impl-version");
+            if (version != null) {
+                this.solrMajorVersion = Integer.parseInt(StringUtils.substringBefore(version, '.'));
+            } else {
+                throw new InitializationException(
+                    "The Solr server does not give any information about its version in lucene -> solr-impl-version."
+                        + " Received [" + systemInfo + "].");
+            }
+        }
+    }
+
+    private Set<String> getCores() throws SolrServerException, IOException
+    {
+        CoreAdminRequest request = new CoreAdminRequest();
+        request.setAction(CoreAdminAction.STATUS);
+        CoreAdminResponse response = request.process(this.rootClient);
+
+        Set<String> cores = new HashSet<>();
+        for (int i = 0; i < response.getCoreStatus().size(); i++) {
+            cores.add(response.getCoreStatus().getName(i));
+        }
+
+        return cores;
     }
 
     HttpSolrClient getRootClient()
@@ -100,34 +154,71 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     }
 
     @Override
-    protected SolrClient getInternalSolrClient(String coreName)
+    protected int getSolrMajorVersion()
     {
-        // Prefix Solr cores to avoid collision with other non-xwiki cores
-
-        StringBuilder corePath =
-            new StringBuilder(this.configuration.getInstanceConfiguration(TYPE, "corePrefix", DEFAULT_CORE_PREFIX));
-
-        if (!coreName.equals(SolrClientInstance.CORE_NAME)) {
-            corePath.append('_');
-            corePath.append(coreName);
-        }
-
-        return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + corePath).build();
+        return this.solrMajorVersion;
     }
 
     @Override
-    protected SolrClient createCore(SolrCoreInitializer initializer) throws SolrException
+    protected SolrClient getInternalSolrClient(String solrCoreName) throws SolrException
+    {
+        // Check if the core exists
+        try {
+            if (getCores().contains(solrCoreName)) {
+                return new HttpSolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
+            }
+        } catch (Exception e) {
+            throw new SolrException("Failed to get the list of cores", e);
+        }
+
+        // If not, return null
+        return null;
+    }
+
+    private String getCorePrefix()
+    {
+        return this.configuration.getInstanceConfiguration(TYPE, "corePrefix", DEFAULT_CORE_PREFIX);
+    }
+
+    @Override
+    protected String toSolrCoreName(String xwikiCoreName, int majorVersion)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        // Prefix Solr cores to avoid collision with other non-xwiki cores
+        builder.append(getCorePrefix());
+
+        // In Solr 8 the name of the search core was just "<prefix>"
+        if (majorVersion > 8 || !xwikiCoreName.equals(SolrClientInstance.CORE_NAME)) {
+            builder.append('_');
+
+            builder.append(super.toSolrCoreName(xwikiCoreName, majorVersion));
+        }
+
+        return builder.toString();
+    }
+
+    @Override
+    protected String toXWikiCoreName(String solrCoreName)
+    {
+        String prefixedCoreName = super.toXWikiCoreName(solrCoreName);
+
+        return StringUtils.removeStart(prefixedCoreName, getCorePrefix());
+    }
+
+    @Override
+    protected SolrClient createSolrClient(String solrCoreName, boolean isCache) throws SolrException
     {
         CoreAdminRequest coreAdminRequest = new CoreAdminRequest.Create();
 
-        coreAdminRequest.setCoreName(initializer.getCoreName());
+        coreAdminRequest.setCoreName(solrCoreName);
 
         try {
-            coreAdminRequest.process(this.rootClient);
+            coreAdminRequest.process(getRootClient());
         } catch (Exception e) {
             throw new SolrException("Failed to create a new core", e);
         }
 
-        return getInternalSolrClient(initializer.getCoreName());
+        return getInternalSolrClient(solrCoreName);
     }
 }

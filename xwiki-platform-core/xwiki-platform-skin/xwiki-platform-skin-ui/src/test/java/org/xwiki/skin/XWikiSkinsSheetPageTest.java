@@ -70,6 +70,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -262,10 +263,12 @@ class XWikiSkinsSheetPageTest extends PageTest
 
     private void verifyNoErrors(Document document)
     {
-        assertTrue(document.getElementsByTag("img").isEmpty());
         assertEquals(0, document.getElementsByClass("xwikirenderingerror").size());
         assertEquals(0, document.getElementsContainingText("{{html").size());
         assertEquals(0, document.getElementsContainingText("$").size());
+        for (Element img : document.getElementsByTag("img")) {
+            assertFalse(img.hasAttr("onerror"));
+        }
     }
 
     private Document render(XWikiDocument doc) throws XWikiException

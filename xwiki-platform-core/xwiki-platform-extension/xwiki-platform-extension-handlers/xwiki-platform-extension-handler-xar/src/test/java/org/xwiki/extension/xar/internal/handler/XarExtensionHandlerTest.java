@@ -27,7 +27,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,6 +71,9 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -115,6 +117,8 @@ public class XarExtensionHandlerTest
     @Before
     public void setUp() throws Exception
     {
+        this.oldcore.addWiki("wiki");
+
         // mock
 
         this.contextUser = new DocumentReference(getXWikiContext().getWikiId(), "XWiki", "ExtensionUser");
@@ -231,6 +235,20 @@ public class XarExtensionHandlerTest
         }
     }
 
+    private void assertPageRemoved(String wiki, String space, String page) throws Throwable
+    {
+        XWikiDocument document =
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference(wiki, space, page), getXWikiContext());
+        assertTrue("Document " + wiki + ":" + space + "." + page + " has not been removed", document.isNew());
+    }
+
+    private void assertPageNotRemoved(String wiki, String space, String page) throws Throwable
+    {
+        XWikiDocument document =
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference(wiki, space, page), getXWikiContext());
+        assertFalse("Document " + wiki + ":" + space + "." + page + " has been removed", document.isNew());
+    }
+
     // Tests
 
     @Test
@@ -284,49 +302,49 @@ public class XarExtensionHandlerTest
         XWikiDocument page =
             this.oldcore.getSpyXWiki().getDocument(existingDocument.getDocumentReference(), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space.page has not been saved in the database", page.isNew());
+        assertFalse("Document wiki:space.page has not been saved in the database", page.isNew());
 
-        Assert.assertNull(page.getXObject(object.getXClassReference()));
+        assertNull(page.getXObject(object.getXClassReference()));
 
-        Assert.assertEquals("Wrong content", "content", page.getContent());
-        Assert.assertEquals("Wrong creator", new DocumentReference("wiki", "space", "existingcreator"),
+        assertEquals("Wrong content", "content", page.getContent());
+        assertEquals("Wrong creator", new DocumentReference("wiki", "space", "existingcreator"),
             page.getCreatorReference());
-        Assert.assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
-        Assert.assertEquals("Wrong content author", this.contextUser, page.getContentAuthorReference());
-        Assert.assertEquals("Wrong version", "2.1", page.getVersion());
-        Assert.assertEquals("Wrong version", Locale.ROOT, page.getLocale());
-        Assert.assertFalse("Document is hidden", page.isHidden());
-        Assert.assertFalse("Document is minor edit", page.isMinorEdit());
+        assertEquals("Wrong author", this.contextUser, page.getAuthorReference());
+        assertEquals("Wrong content author", this.contextUser, page.getContentAuthorReference());
+        assertEquals("Wrong version", "2.1", page.getVersion());
+        assertEquals("Wrong version", Locale.ROOT, page.getLocale());
+        assertFalse("Document is hidden", page.isHidden());
+        assertFalse("Document is minor edit", page.isMinorEdit());
 
         BaseClass baseClass = page.getXClass();
-        Assert.assertNotNull(baseClass.getField("property"));
-        Assert.assertEquals("property", baseClass.getField("property").getName());
-        Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+        assertNotNull(baseClass.getField("property"));
+        assertEquals("property", baseClass.getField("property").getName());
+        assertSame(NumberClass.class, baseClass.getField("property").getClass());
 
         // space.pagewithattachment
 
         XWikiDocument pagewithattachment = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "pagewithattachment"), getXWikiContext());
-        Assert.assertFalse(pagewithattachment.isNew());
-        Assert.assertEquals("Wrong version", "1.1", pagewithattachment.getVersion());
-        Assert.assertEquals("Wrong creator", this.contextUser, pagewithattachment.getCreatorReference());
-        Assert.assertEquals("Wrong author", this.contextUser, pagewithattachment.getAuthorReference());
-        Assert.assertEquals("Wrong content author", this.contextUser, pagewithattachment.getContentAuthorReference());
+        assertFalse(pagewithattachment.isNew());
+        assertEquals("Wrong version", "1.1", pagewithattachment.getVersion());
+        assertEquals("Wrong creator", this.contextUser, pagewithattachment.getCreatorReference());
+        assertEquals("Wrong author", this.contextUser, pagewithattachment.getAuthorReference());
+        assertEquals("Wrong content author", this.contextUser, pagewithattachment.getContentAuthorReference());
 
         XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
-        Assert.assertNotNull(attachment);
-        Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
-        Assert.assertEquals("attachment content",
+        assertNotNull(attachment);
+        assertEquals("attachment.txt", attachment.getFilename());
+        assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
+        assertEquals("attachment content",
             IOUtils.toString(attachment.getContentInputStream(getXWikiContext()), StandardCharsets.UTF_8));
-        Assert.assertEquals(this.contextUser, attachment.getAuthorReference());
+        assertEquals(this.contextUser, attachment.getAuthorReference());
 
         // space1.page1
 
         XWikiDocument page1 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space1.page1 has not been saved in the database", page1.isNew());
+        assertFalse("Document wiki:space1.page1 has not been saved in the database", page1.isNew());
 
         assertEquals(Arrays.asList(xarInstalledExtension),
             this.installedExtensionRepository.getXarInstalledExtensions(page1.getDocumentReference()));
@@ -342,16 +360,16 @@ public class XarExtensionHandlerTest
         XWikiDocument defaultTranslated =
             this.oldcore.getSpyXWiki().getDocument(translatedReference, getXWikiContext());
 
-        Assert.assertNotNull("Document wiki:translated.translated has not been saved in the database",
+        assertNotNull("Document wiki:translated.translated has not been saved in the database",
             defaultTranslated);
-        Assert.assertFalse("Document wiki:translated.translated has not been saved in the database",
+        assertFalse("Document wiki:translated.translated has not been saved in the database",
             defaultTranslated.isNew());
 
-        Assert.assertEquals("Wrong content", "default content", defaultTranslated.getContent());
-        Assert.assertEquals("Wrong creator", this.contextUser, defaultTranslated.getCreatorReference());
-        Assert.assertEquals("Wrong author", this.contextUser, defaultTranslated.getAuthorReference());
-        Assert.assertEquals("Wrong content author", this.contextUser, defaultTranslated.getContentAuthorReference());
-        Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
+        assertEquals("Wrong content", "default content", defaultTranslated.getContent());
+        assertEquals("Wrong creator", this.contextUser, defaultTranslated.getCreatorReference());
+        assertEquals("Wrong author", this.contextUser, defaultTranslated.getAuthorReference());
+        assertEquals("Wrong content author", this.contextUser, defaultTranslated.getContentAuthorReference());
+        assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         assertEquals(Arrays.asList(xarInstalledExtension), this.installedExtensionRepository
             .getXarInstalledExtensions(defaultTranslated.getDocumentReferenceWithLocale()));
@@ -360,16 +378,16 @@ public class XarExtensionHandlerTest
         XWikiDocument translated =
             this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
-        Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
+        assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
-        Assert.assertFalse("Document wiki:translated.translated in langauge tr has not been saved in the database",
+        assertFalse("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated.isNew());
 
-        Assert.assertEquals("Wrong content", "tr content", translated.getContent());
-        Assert.assertEquals("Wrong creator", this.contextUser, translated.getCreatorReference());
-        Assert.assertEquals("Wrong author", this.contextUser, translated.getAuthorReference());
-        Assert.assertEquals("Wrong content author", this.contextUser, translated.getContentAuthorReference());
-        Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
+        assertEquals("Wrong content", "tr content", translated.getContent());
+        assertEquals("Wrong creator", this.contextUser, translated.getCreatorReference());
+        assertEquals("Wrong author", this.contextUser, translated.getAuthorReference());
+        assertEquals("Wrong content author", this.contextUser, translated.getContentAuthorReference());
+        assertEquals("Wrong version", "1.1", translated.getVersion());
 
         assertEquals(Arrays.asList(xarInstalledExtension),
             this.installedExtensionRepository.getXarInstalledExtensions(translated.getDocumentReferenceWithLocale()));
@@ -378,16 +396,16 @@ public class XarExtensionHandlerTest
         XWikiDocument translated2 =
             this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
 
-        Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
+        assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);
-        Assert.assertFalse("Document wiki:translated.translated in langauge fr has not been saved in the database",
+        assertFalse("Document wiki:translated.translated in langauge fr has not been saved in the database",
             translated2.isNew());
 
-        Assert.assertEquals("Wrong content", "fr content", translated2.getContent());
-        Assert.assertEquals("Wrong creator", this.contextUser, translated2.getCreatorReference());
-        Assert.assertEquals("Wrong author", this.contextUser, translated2.getAuthorReference());
-        Assert.assertEquals("Wrong content author", this.contextUser, translated2.getContentAuthorReference());
-        Assert.assertEquals("Wrong version", "1.1", translated2.getVersion());
+        assertEquals("Wrong content", "fr content", translated2.getContent());
+        assertEquals("Wrong creator", this.contextUser, translated2.getCreatorReference());
+        assertEquals("Wrong author", this.contextUser, translated2.getAuthorReference());
+        assertEquals("Wrong content author", this.contextUser, translated2.getContentAuthorReference());
+        assertEquals("Wrong version", "1.1", translated2.getVersion());
 
         assertEquals(Arrays.asList(xarInstalledExtension),
             this.installedExtensionRepository.getXarInstalledExtensions(translated2.getDocumentReferenceWithLocale()));
@@ -397,7 +415,7 @@ public class XarExtensionHandlerTest
         XWikiDocument hiddenpage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "hiddenpage"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage.isNew());
+        assertFalse("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage.isNew());
 
         assertTrue("Document is not hidden", hiddenpage.isHidden());
 
@@ -406,8 +424,8 @@ public class XarExtensionHandlerTest
         XWikiDocument mandatorypage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "mandatory"), getXWikiContext());
 
-        Assert.assertEquals("Document wiki:space.mandatory has been overwritten", "1.1", mandatorypage.getVersion());
-        Assert.assertEquals("mandatory title", mandatorypage.getTitle());
+        assertEquals("Document wiki:space.mandatory has been overwritten", "1.1", mandatorypage.getVersion());
+        assertEquals("mandatory title", mandatorypage.getTitle());
 
         // space.mandatoryconfiguration
 
@@ -427,16 +445,16 @@ public class XarExtensionHandlerTest
         XWikiDocument movedpage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "movedpage"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space.movedpage has been removed", movedpage.isNew());
-        Assert.assertEquals("content 1.0", movedpage.getContent());
+        assertFalse("Document wiki:space.movedpage has been removed", movedpage.isNew());
+        assertEquals("content 1.0", movedpage.getContent());
 
         // space.dependencypage
 
         XWikiDocument dependencypage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "dependencypage"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space.dependencypage has been removed", dependencypage.isNew());
-        Assert.assertEquals("otherdependency 1.0", dependencypage.getContent());
+        assertFalse("Document wiki:space.dependencypage has been removed", dependencypage.isNew());
+        assertEquals("otherdependency 1.0", dependencypage.getContent());
     }
 
     @Test
@@ -463,42 +481,42 @@ public class XarExtensionHandlerTest
         XWikiDocument page =
             this.oldcore.getSpyXWiki().getDocument(existingDocument.getDocumentReference(), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space.page has not been saved in the database", page.isNew());
+        assertFalse("Document wiki:space.page has not been saved in the database", page.isNew());
 
-        Assert.assertNull(page.getXObject(object.getXClassReference()));
+        assertNull(page.getXObject(object.getXClassReference()));
 
-        Assert.assertEquals("Wrong content", "content", page.getContent());
-        Assert.assertEquals("Wrong creator", new DocumentReference("wiki", "space", "existingcreator"),
+        assertEquals("Wrong content", "content", page.getContent());
+        assertEquals("Wrong creator", new DocumentReference("wiki", "space", "existingcreator"),
             page.getCreatorReference());
-        Assert.assertEquals("Wrong author", xarAuthorReference, page.getAuthorReference());
-        Assert.assertEquals("Wrong content author", xarContentAuthorReference, page.getContentAuthorReference());
-        Assert.assertEquals("Wrong version", "2.1", page.getVersion());
-        Assert.assertEquals("Wrong version", Locale.ROOT, page.getLocale());
-        Assert.assertFalse("Document is hidden", page.isHidden());
+        assertEquals("Wrong author", xarAuthorReference, page.getAuthorReference());
+        assertEquals("Wrong content author", xarContentAuthorReference, page.getContentAuthorReference());
+        assertEquals("Wrong version", "2.1", page.getVersion());
+        assertEquals("Wrong version", Locale.ROOT, page.getLocale());
+        assertFalse("Document is hidden", page.isHidden());
 
         BaseClass baseClass = page.getXClass();
-        Assert.assertNotNull(baseClass.getField("property"));
-        Assert.assertEquals("property", baseClass.getField("property").getName());
-        Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+        assertNotNull(baseClass.getField("property"));
+        assertEquals("property", baseClass.getField("property").getName());
+        assertSame(NumberClass.class, baseClass.getField("property").getClass());
 
         // space.pagewithattachment
 
         XWikiDocument pagewithattachment = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "pagewithattachment"), getXWikiContext());
-        Assert.assertFalse(pagewithattachment.isNew());
-        Assert.assertEquals("Wrong version", "1.1", pagewithattachment.getVersion());
-        Assert.assertEquals("Wrong creator", xarCreatorReference, pagewithattachment.getCreatorReference());
-        Assert.assertEquals("Wrong author", xarAuthorReference, pagewithattachment.getAuthorReference());
-        Assert.assertEquals("Wrong content author", xarContentAuthorReference,
+        assertFalse(pagewithattachment.isNew());
+        assertEquals("Wrong version", "1.1", pagewithattachment.getVersion());
+        assertEquals("Wrong creator", xarCreatorReference, pagewithattachment.getCreatorReference());
+        assertEquals("Wrong author", xarAuthorReference, pagewithattachment.getAuthorReference());
+        assertEquals("Wrong content author", xarContentAuthorReference,
             pagewithattachment.getContentAuthorReference());
 
         XWikiAttachment attachment = pagewithattachment.getAttachment("attachment.txt");
-        Assert.assertNotNull(attachment);
-        Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
-        Assert.assertEquals("attachment content",
+        assertNotNull(attachment);
+        assertEquals("attachment.txt", attachment.getFilename());
+        assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
+        assertEquals("attachment content",
             IOUtils.toString(attachment.getContentInputStream(getXWikiContext()), StandardCharsets.UTF_8));
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "attachmentauthor"),
+        assertEquals(new DocumentReference("wiki", "XWiki", "attachmentauthor"),
             attachment.getAuthorReference());
 
         // space1.page1
@@ -506,62 +524,62 @@ public class XarExtensionHandlerTest
         XWikiDocument page1 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space1.page1 has not been saved in the database", page1.isNew());
+        assertFalse("Document wiki:space1.page1 has not been saved in the database", page1.isNew());
 
         // translated.translated
         DocumentReference translatedReference = new DocumentReference("wiki", "translated", "translated");
         XWikiDocument defaultTranslated =
             this.oldcore.getSpyXWiki().getDocument(translatedReference, getXWikiContext());
 
-        Assert.assertNotNull("Document wiki:translated.translated has not been saved in the database",
+        assertNotNull("Document wiki:translated.translated has not been saved in the database",
             defaultTranslated);
-        Assert.assertFalse("Document wiki:translated.translated has not been saved in the database",
+        assertFalse("Document wiki:translated.translated has not been saved in the database",
             defaultTranslated.isNew());
 
-        Assert.assertEquals("Wrong content", "default content", defaultTranslated.getContent());
-        Assert.assertEquals("Wrong creator", xarCreatorReference, defaultTranslated.getCreatorReference());
-        Assert.assertEquals("Wrong author", xarAuthorReference, defaultTranslated.getAuthorReference());
-        Assert.assertEquals("Wrong content author", xarContentAuthorReference,
+        assertEquals("Wrong content", "default content", defaultTranslated.getContent());
+        assertEquals("Wrong creator", xarCreatorReference, defaultTranslated.getCreatorReference());
+        assertEquals("Wrong author", xarAuthorReference, defaultTranslated.getAuthorReference());
+        assertEquals("Wrong content author", xarContentAuthorReference,
             defaultTranslated.getContentAuthorReference());
-        Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
+        assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
         XWikiDocument translated =
             this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
-        Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
+        assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
-        Assert.assertFalse("Document wiki:translated.translated in langauge tr has not been saved in the database",
+        assertFalse("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated.isNew());
 
-        Assert.assertEquals("Wrong content", "tr content", translated.getContent());
-        Assert.assertEquals("Wrong creator", xarCreatorReference, translated.getCreatorReference());
-        Assert.assertEquals("Wrong author", xarAuthorReference, translated.getAuthorReference());
-        Assert.assertEquals("Wrong content author", xarContentAuthorReference, translated.getContentAuthorReference());
-        Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
+        assertEquals("Wrong content", "tr content", translated.getContent());
+        assertEquals("Wrong creator", xarCreatorReference, translated.getCreatorReference());
+        assertEquals("Wrong author", xarAuthorReference, translated.getAuthorReference());
+        assertEquals("Wrong content author", xarContentAuthorReference, translated.getContentAuthorReference());
+        assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // translated.translated.fr
         XWikiDocument translated2 =
             this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
 
-        Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
+        assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);
-        Assert.assertFalse("Document wiki:translated.translated in langauge fr has not been saved in the database",
+        assertFalse("Document wiki:translated.translated in langauge fr has not been saved in the database",
             translated2.isNew());
 
-        Assert.assertEquals("Wrong content", "fr content", translated2.getContent());
-        Assert.assertEquals("Wrong creator", xarCreatorReference, translated2.getCreatorReference());
-        Assert.assertEquals("Wrong author", xarAuthorReference, translated2.getAuthorReference());
-        Assert.assertEquals("Wrong content author", xarContentAuthorReference, translated2.getContentAuthorReference());
-        Assert.assertEquals("Wrong version", "1.1", translated2.getVersion());
+        assertEquals("Wrong content", "fr content", translated2.getContent());
+        assertEquals("Wrong creator", xarCreatorReference, translated2.getCreatorReference());
+        assertEquals("Wrong author", xarAuthorReference, translated2.getAuthorReference());
+        assertEquals("Wrong content author", xarContentAuthorReference, translated2.getContentAuthorReference());
+        assertEquals("Wrong version", "1.1", translated2.getVersion());
 
         // space.hiddenpage
 
         XWikiDocument hiddenpage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "hiddenpage"), getXWikiContext());
 
-        Assert.assertNotNull("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage);
-        Assert.assertFalse("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage.isNew());
+        assertNotNull("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage);
+        assertFalse("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage.isNew());
 
         assertTrue("Document is not hidden", hiddenpage.isHidden());
     }
@@ -591,6 +609,7 @@ public class XarExtensionHandlerTest
         XWikiDocument deletedpagewithmodifications = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space1", "modified"), getXWikiContext());
         deletedpagewithmodifications.setContent("modified content");
+        this.oldcore.getSpyXWiki().saveDocument(deletedpagewithmodifications, getXWikiContext());
 
         // upgrade
 
@@ -605,36 +624,36 @@ public class XarExtensionHandlerTest
         XWikiDocument samepage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext());
 
-        Assert.assertFalse("Document samespace has been removed from the database", samepage.isNew());
-        Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
+        assertFalse("Document samespace has been removed from the database", samepage.isNew());
+        assertEquals("Wrong versions", "1.1", samepage.getVersion());
 
         // space.page
 
         XWikiDocument modifiedpage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
+        assertFalse("Document wiki:space.page has not been saved in the database", modifiedpage.isNew());
 
-        Assert.assertEquals("Wrong content", "content 2", modifiedpage.getContent());
-        Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
-        Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
-        Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
+        assertEquals("Wrong content", "content 2", modifiedpage.getContent());
+        assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
+        assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
+        assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
-        Assert.assertEquals("Wrong customclass", "customclass2", modifiedpage.getCustomClass());
-        Assert.assertEquals("Wrong defaultTemplate", "defaultTemplate2", modifiedpage.getDefaultTemplate());
-        Assert.assertEquals("Wrong hidden", true, modifiedpage.isHidden());
-        Assert.assertEquals("Wrong ValidationScript", "validationScript2", modifiedpage.getValidationScript());
+        assertEquals("Wrong customclass", "customclass2", modifiedpage.getCustomClass());
+        assertEquals("Wrong defaultTemplate", "defaultTemplate2", modifiedpage.getDefaultTemplate());
+        assertEquals("Wrong hidden", true, modifiedpage.isHidden());
+        assertEquals("Wrong ValidationScript", "validationScript2", modifiedpage.getValidationScript());
 
         BaseClass baseClass = modifiedpage.getXClass();
-        Assert.assertNotNull(baseClass.getField("property"));
-        Assert.assertEquals("property", baseClass.getField("property").getName());
-        Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+        assertNotNull(baseClass.getField("property"));
+        assertEquals("property", baseClass.getField("property").getName());
+        assertSame(NumberClass.class, baseClass.getField("property").getClass());
 
         XWikiAttachment attachment = modifiedpage.getAttachment("attachment.txt");
-        Assert.assertNotNull(attachment);
-        Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
-        Assert.assertEquals("attachment content",
+        assertNotNull(attachment);
+        assertEquals("attachment.txt", attachment.getFilename());
+        assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
+        assertEquals("attachment content",
             IOUtils.toString(attachment.getContentInputStream(getXWikiContext()), StandardCharsets.UTF_8));
 
         // space2.page2
@@ -642,7 +661,7 @@ public class XarExtensionHandlerTest
         XWikiDocument newPage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space2", "page2"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space2.page2 has not been saved in the database", newPage.isNew());
+        assertFalse("Document wiki:space2.page2 has not been saved in the database", newPage.isNew());
 
         // space1.page1
 
@@ -670,7 +689,7 @@ public class XarExtensionHandlerTest
         pagewithobject = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "pagewithobject"), getXWikiContext());
 
-        Assert.assertNull("Document wiki:space.pagewithobject does not contain an XWiki.XWikiGroups object",
+        assertNull("Document wiki:space.pagewithobject does not contain an XWiki.XWikiGroups object",
             pagewithobject.getXObject(new LocalDocumentReference("XWiki", "XWikiGroups")));
 
         // space.movedpage
@@ -678,23 +697,23 @@ public class XarExtensionHandlerTest
         XWikiDocument movedpage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "movedpage"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space.movedpage has been removed", movedpage.isNew());
-        Assert.assertEquals("content 2.0", movedpage.getContent());
+        assertFalse("Document wiki:space.movedpage has been removed", movedpage.isNew());
+        assertEquals("content 2.0", movedpage.getContent());
 
         // space.dependencypage
 
         XWikiDocument dependencypage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space", "dependencypage"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space.dependencypage has been removed", dependencypage.isNew());
-        Assert.assertEquals("otherdependency 2.0", dependencypage.getContent());
+        assertFalse("Document wiki:space.dependencypage has been removed", dependencypage.isNew());
+        assertEquals("otherdependency 2.0", dependencypage.getContent());
 
         // space1.modified
 
         XWikiDocument space1modified = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space1", "modified"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space.modified has been removed from the database", space1modified.isNew());
+        assertFalse("Document wiki:space.modified has been removed from the database", space1modified.isNew());
     }
 
     @Test
@@ -724,6 +743,7 @@ public class XarExtensionHandlerTest
         XWikiDocument deletedpagewithmodifications = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space1", "modified"), getXWikiContext());
         deletedpagewithmodifications.setContent("modified content");
+        this.oldcore.getSpyXWiki().saveDocument(deletedpagewithmodifications, getXWikiContext());
 
         // upgrade
 
@@ -738,35 +758,35 @@ public class XarExtensionHandlerTest
         XWikiDocument samepage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "samespace", "samepage"), getXWikiContext());
 
-        Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
+        assertEquals("Wrong versions", "1.1", samepage.getVersion());
 
         // space.page
 
         XWikiDocument modifiedpage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
+        assertFalse("Document wiki:space.page has not been saved in the database", modifiedpage.isNew());
 
-        Assert.assertEquals("Wrong content", "content 2", modifiedpage.getContent());
-        Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
-        Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
-        Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
+        assertEquals("Wrong content", "content 2", modifiedpage.getContent());
+        assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
+        assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
+        assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
-        Assert.assertEquals("Wrong customclass", "customclass2", modifiedpage.getCustomClass());
-        Assert.assertEquals("Wrong defaultTemplate", "defaultTemplate2", modifiedpage.getDefaultTemplate());
-        Assert.assertEquals("Wrong hidden", true, modifiedpage.isHidden());
-        Assert.assertEquals("Wrong ValidationScript", "validationScript2", modifiedpage.getValidationScript());
+        assertEquals("Wrong customclass", "customclass2", modifiedpage.getCustomClass());
+        assertEquals("Wrong defaultTemplate", "defaultTemplate2", modifiedpage.getDefaultTemplate());
+        assertEquals("Wrong hidden", true, modifiedpage.isHidden());
+        assertEquals("Wrong ValidationScript", "validationScript2", modifiedpage.getValidationScript());
 
         BaseClass baseClass = modifiedpage.getXClass();
-        Assert.assertNotNull(baseClass.getField("property"));
-        Assert.assertEquals("property", baseClass.getField("property").getName());
-        Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+        assertNotNull(baseClass.getField("property"));
+        assertEquals("property", baseClass.getField("property").getName());
+        assertSame(NumberClass.class, baseClass.getField("property").getClass());
 
         XWikiAttachment attachment = modifiedpage.getAttachment("attachment.txt");
-        Assert.assertNotNull(attachment);
-        Assert.assertEquals("attachment.txt", attachment.getFilename());
-        Assert.assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
-        Assert.assertEquals("attachment content",
+        assertNotNull(attachment);
+        assertEquals("attachment.txt", attachment.getFilename());
+        assertEquals(18, attachment.getContentLongSize(getXWikiContext()));
+        assertEquals("attachment content",
             IOUtils.toString(attachment.getContentInputStream(getXWikiContext()), StandardCharsets.UTF_8));
 
         // space2.page2
@@ -774,7 +794,7 @@ public class XarExtensionHandlerTest
         XWikiDocument newPage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space2", "page2"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space2.page2 has not been saved in the database", newPage.isNew());
+        assertFalse("Document wiki:space2.page2 has not been saved in the database", newPage.isNew());
 
         // space1.page1
 
@@ -802,7 +822,7 @@ public class XarExtensionHandlerTest
         pagewithobject = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space", "pagewithobject"), getXWikiContext());
 
-        Assert.assertNull("Document wiki:space.pagewithobject does not contain an XWiki.XWikiGroups object",
+        assertNull("Document wiki:space.pagewithobject does not contain an XWiki.XWikiGroups object",
             pagewithobject.getXObject(new LocalDocumentReference("XWiki", "XWikiGroups")));
 
         // space1.modified
@@ -810,7 +830,7 @@ public class XarExtensionHandlerTest
         XWikiDocument space1modified = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space1", "modified"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki:space1.modified has been removed from the database", space1modified.isNew());
+        assertFalse("Document wiki:space1.modified has been removed from the database", space1modified.isNew());
     }
 
     @Test
@@ -833,41 +853,41 @@ public class XarExtensionHandlerTest
         XWikiDocument samepage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext());
 
-        Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
+        assertEquals("Wrong versions", "1.1", samepage.getVersion());
 
         // space.page
 
         XWikiDocument modifiedpage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki.space.page has not been saved in the database", modifiedpage.isNew());
+        assertFalse("Document wiki:space.page has not been saved in the database", modifiedpage.isNew());
 
-        Assert.assertEquals("Wrong content", "content", modifiedpage.getContent());
-        Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
-        Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
-        Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
+        assertEquals("Wrong content", "content", modifiedpage.getContent());
+        assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
+        assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
+        assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
         BaseClass baseClass = modifiedpage.getXClass();
-        Assert.assertNotNull(baseClass.getField("property"));
-        Assert.assertEquals("property", baseClass.getField("property").getName());
-        Assert.assertSame(NumberClass.class, baseClass.getField("property").getClass());
+        assertNotNull(baseClass.getField("property"));
+        assertEquals("property", baseClass.getField("property").getName());
+        assertSame(NumberClass.class, baseClass.getField("property").getClass());
 
         // The attachment does not exist in version 1.0
-        Assert.assertNull(modifiedpage.getAttachment("attachment.txt"));
+        assertNull(modifiedpage.getAttachment("attachment.txt"));
 
         // space2.page2
 
         XWikiDocument newPage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space2", "page2"), getXWikiContext());
 
-        assertTrue("Document wiki.space2.page2 has not been removed from the database", newPage.isNew());
+        assertTrue("Document wiki:space2.page2 has not been removed from the database", newPage.isNew());
 
         // space1.page1
 
         XWikiDocument removedPage =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki.space1.page1 has not been saved in the database", removedPage.isNew());
+        assertFalse("Document wiki:space1.page1 has not been saved in the database", removedPage.isNew());
     }
 
     @Test
@@ -886,16 +906,11 @@ public class XarExtensionHandlerTest
         // validate
 
         // space.page belong to several extensions
-        XWikiDocument page =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
+        assertPageNotRemoved("wiki", "space", "page");
 
-        Assert.assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
-
-        // space1.page1 only belong to the uninstalled extension
-        XWikiDocument page1 =
-            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
-
-        assertTrue("Document wiki.space1.page1 has not been removed from the database", page1.isNew());
+        // pages which only belong to the uninstalled extension
+        assertPageRemoved("wiki", "space1", "page1");
+        assertPageRemoved("wiki", "space", "class");
     }
 
     @Test
@@ -922,7 +937,7 @@ public class XarExtensionHandlerTest
         XWikiDocument page =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
+        assertFalse("Document wiki:space.page has been removed from the database", page.isNew());
     }
 
     @Test
@@ -931,14 +946,17 @@ public class XarExtensionHandlerTest
         install(this.collisionextension1, "wiki", this.contextUser);
         install(this.collisionextension2, "wiki", this.contextUser);
 
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext()).isNew());
+
         // uninstall
 
         uninstall(this.collisionextension1, "wiki");
 
-        XWikiDocument page = this.oldcore.getSpyXWiki()
-            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext());
+        // validate
 
-        assertFalse(page.isNew());
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext()).isNew());
     }
 
     @Test
@@ -946,14 +964,37 @@ public class XarExtensionHandlerTest
     {
         install(this.collisionextension1, null, this.contextUser);
         install(this.collisionextension2, null, this.contextUser);
+
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext()).isNew());
+
+        // uninstall
+
+        uninstall(this.collisionextension1, null);
+
+        // validate
+
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext()).isNew());
     }
 
     @Test
     public void testUninstallExtensionWithCommonDocumentOnRootAndWiki() throws Throwable
     {
         install(this.collisionextension1, "wiki", this.contextUser);
-
         install(this.collisionextension2, null, this.contextUser);
+
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext()).isNew());
+
+        // uninstall
+
+        uninstall(this.collisionextension1, "wiki");
+
+        // validate
+
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext()).isNew());
     }
 
     @Test
@@ -961,6 +1002,18 @@ public class XarExtensionHandlerTest
     {
         install(this.collisionextension1, null, this.contextUser);
         install(this.collisionextension2, "wiki", this.contextUser);
+
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext()).isNew());
+
+        // uninstall
+
+        uninstall(this.collisionextension1, null);
+
+        // validate
+
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext()).isNew());
     }
 
     @Test
@@ -979,18 +1032,18 @@ public class XarExtensionHandlerTest
         XWikiDocument pageWiki1 = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space1", "page1"), getXWikiContext());
 
-        Assert.assertFalse(pageWiki1.isNew());
+        assertFalse(pageWiki1.isNew());
 
         XWikiDocument pageWiki2 = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki2", "space1", "page1"), getXWikiContext());
 
-        Assert.assertFalse(pageWiki2.isNew());
+        assertFalse(pageWiki2.isNew());
 
         XWikiDocument overwrittenpage = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space", "overwrittenpage"), getXWikiContext());
 
-        Assert.assertFalse(overwrittenpage.isNew());
-        Assert.assertEquals("1.1", overwrittenpage.getVersion());
+        assertFalse(overwrittenpage.isNew());
+        assertEquals("1.1", overwrittenpage.getVersion());
 
         // uninstall
 
@@ -1089,8 +1142,8 @@ public class XarExtensionHandlerTest
         XWikiDocument pageWiki1 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse(pageWiki1.isNew());
-        Assert.assertEquals("1.1", pageWiki1.getVersion());
+        assertFalse(pageWiki1.isNew());
+        assertEquals("1.1", pageWiki1.getVersion());
 
         pageWiki1.setContent("modified content");
         this.oldcore.getSpyXWiki().saveDocument(pageWiki1, getXWikiContext());
@@ -1098,8 +1151,8 @@ public class XarExtensionHandlerTest
         pageWiki1 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse(pageWiki1.isNew());
-        Assert.assertEquals("2.1", pageWiki1.getVersion());
+        assertFalse(pageWiki1.isNew());
+        assertEquals("2.1", pageWiki1.getVersion());
 
         // install on root
 
@@ -1110,10 +1163,10 @@ public class XarExtensionHandlerTest
         pageWiki1 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse(pageWiki1.isNew());
-        Assert.assertEquals("2.1", pageWiki1.getVersion());
+        assertFalse(pageWiki1.isNew());
+        assertEquals("2.1", pageWiki1.getVersion());
         // Make sure modifications are kept
-        Assert.assertEquals("modified content", pageWiki1.getContent());
+        assertEquals("modified content", pageWiki1.getContent());
     }
 
     @Test
@@ -1130,14 +1183,14 @@ public class XarExtensionHandlerTest
         XWikiDocument pageWiki1 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse(pageWiki1.isNew());
-        Assert.assertEquals("1.1", pageWiki1.getVersion());
+        assertFalse(pageWiki1.isNew());
+        assertEquals("1.1", pageWiki1.getVersion());
 
         pageWiki1 = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "samespace", "samepage"),
             getXWikiContext());
 
-        Assert.assertFalse(pageWiki1.isNew());
-        Assert.assertEquals("1.1", pageWiki1.getVersion());
+        assertFalse(pageWiki1.isNew());
+        assertEquals("1.1", pageWiki1.getVersion());
 
         XWikiDocument pageWiki2 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki2", "space", "page"), getXWikiContext());
@@ -1158,26 +1211,26 @@ public class XarExtensionHandlerTest
         pageWiki1 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse(pageWiki1.isNew());
-        Assert.assertEquals("2.1", pageWiki1.getVersion());
+        assertFalse(pageWiki1.isNew());
+        assertEquals("2.1", pageWiki1.getVersion());
 
         pageWiki1 = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "samespace", "samepage"),
             getXWikiContext());
 
-        Assert.assertFalse(pageWiki1.isNew());
-        Assert.assertEquals("1.1", pageWiki1.getVersion());
+        assertFalse(pageWiki1.isNew());
+        assertEquals("1.1", pageWiki1.getVersion());
 
         pageWiki2 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki2", "space", "page"), getXWikiContext());
 
-        Assert.assertFalse(pageWiki2.isNew());
-        Assert.assertEquals("1.1", pageWiki1.getVersion());
+        assertFalse(pageWiki2.isNew());
+        assertEquals("1.1", pageWiki1.getVersion());
 
         pageWiki2 = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki2", "samespace", "samepage"),
             getXWikiContext());
 
-        Assert.assertFalse(pageWiki2.isNew());
-        Assert.assertEquals("1.1", pageWiki2.getVersion());
+        assertFalse(pageWiki2.isNew());
+        assertEquals("1.1", pageWiki2.getVersion());
     }
 
     @Test
@@ -1202,9 +1255,9 @@ public class XarExtensionHandlerTest
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 
-        Assert.assertFalse(this.oldcore.getSpyXWiki()
+        assertFalse(this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space1", "page1"), getXWikiContext()).isNew());
-        Assert.assertFalse(this.oldcore.getSpyXWiki()
+        assertFalse(this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki2", "space1", "page1"), getXWikiContext()).isNew());
         assertTrue(this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("newwiki", "space1", "page1"), getXWikiContext()).isNew());
@@ -1212,11 +1265,11 @@ public class XarExtensionHandlerTest
         this.observation.notify(new WikiCreatingEvent("newwiki"), null, this.oldcore.getXWikiContext());
         this.observation.notify(new WikiCreatedEvent("newwiki"), null, this.oldcore.getXWikiContext());
 
-        Assert.assertFalse(this.oldcore.getSpyXWiki()
+        assertFalse(this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space1", "page1"), getXWikiContext()).isNew());
-        Assert.assertFalse(this.oldcore.getSpyXWiki()
+        assertFalse(this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki2", "space1", "page1"), getXWikiContext()).isNew());
-        Assert.assertFalse(this.oldcore.getSpyXWiki()
+        assertFalse(this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("newwiki", "space1", "page1"), getXWikiContext()).isNew());
     }
 }

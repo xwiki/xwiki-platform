@@ -22,19 +22,8 @@ package org.xwiki.rest.internal;
 /**
  * @version $Id$
  */
-public class Constants extends org.xwiki.rest.Constants
+public interface Constants
 {
-    /**
-     * The key used to store the XWiki component manager in the current Restlet context.
-     */
-    public static final String XWIKI_COMPONENT_MANAGER = "xwikiComponentManager";
-
-    /**
-     * The key used to store the the list of JAX-RS resources that are implemented as components with per-lookup policy
-     * and that have been instantiated during this request. These components are released at the end of the request.
-     */
-    public static final String RELEASABLE_COMPONENT_REFERENCES = "rest.releasableComponentReferences";
-
     /**
      * The key used to store allowed values for an object property in an XWiki object representation.
      *
@@ -42,5 +31,5 @@ public class Constants extends org.xwiki.rest.Constants
      *      com.xpn.xwiki.XWikiContext, com.xpn.xwiki.api.Document, com.xpn.xwiki.objects.BaseObject, boolean,
      *      com.xpn.xwiki.api.XWiki, Boolean)
      */
-    public static final String ALLOWED_VALUES_ATTRIBUTE_NAME = "allowedValues";
+    String ALLOWED_VALUES_ATTRIBUTE_NAME = "allowedValues";
 }

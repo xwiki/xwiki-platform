@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=Masquer le panneau de conf
 platform.appwithinminutes.classEditorMoveFieldLabel=Déplacer
 platform.appwithinminutes.classEditorMoveFieldHint=Glissez-Déposez pour changer l'odre
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Valeur par défaut
+platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Nom simple
+platform.appwithinminutes.classEditorFieldHintToolTip=Astuce
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -142,7 +144,9 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Ajouter
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Supprimer
 appWithinMinutes.templateProviderEditor.hint=Les éléments d’une application sont des pages wiki contenant des données structurées.
+appWithinMinutes.templateProviderEditor.icon.name=Icône
 appWithinMinutes.templateProviderEditor.icon.hint=Icône associée à chaque élément de l’application.
+appWithinMinutes.templateProviderEditor.description.name=Description
 appWithinMinutes.templateProviderEditor.description.hint=Courte description d’un élément de l’application.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Espace à partir duquel des entrées peuvent être créées
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Si aucun emplacement n’est sélectionné, les entrées peuvent être créées depuis n’importe quelle page.
@@ -150,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Emplacement de
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Si aucun emplacement n’est sélectionné, les éléments peuvent être créées partout dans le wiki.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Désactiver les restrictions d’emplacement des éléments
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Permet de n’utiliser les emplacements précisés précédemment que comme des suggestions. L’utilisateur pourra donc modifier l’emplacement d’un élément lors de sa création.
+### Missing: appWithinMinutes.templateProviderEditor.terminal.name=Terminal
 appWithinMinutes.templateProviderEditor.terminal.hint=Détermine si les éléments de l’application doivent être contenus dans des pages terminales.
 
 ### Wizard Step 3: Application Presentation

@@ -274,7 +274,7 @@ public abstract class AbstractEscapingTest implements FileTest
                     // ignore 404 (the page is still rendered)
                     break;
                 case HttpStatus.SC_INTERNAL_SERVER_ERROR:
-                    // ignore 500 (internal server error), which is used by the standard exception.vm error display
+                    // ignore 500 (internal server error)
                     break;
                 default:
                     throw new RuntimeException("HTTP GET request returned status " + statusCode + " ("

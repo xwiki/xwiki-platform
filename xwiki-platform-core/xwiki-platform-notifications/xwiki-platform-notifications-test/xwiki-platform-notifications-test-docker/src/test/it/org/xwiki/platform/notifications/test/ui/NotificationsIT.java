@@ -19,10 +19,8 @@
  */
 package org.xwiki.platform.notifications.test.ui;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,9 +28,11 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
+import org.xwiki.platform.notifications.test.po.NotificationWatchButtonElement;
 import org.xwiki.platform.notifications.test.po.NotificationsRSS;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
+import org.xwiki.platform.notifications.test.po.NotificationsWatchModal;
 import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -69,12 +69,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
-public class NotificationsIT
+class NotificationsIT
 {
     private static final String FIRST_USER_NAME = NotificationsIT.class.getSimpleName() + "user1";
+
     private static final String SECOND_USER_NAME = NotificationsIT.class.getSimpleName() + "user2";
 
     private static final String FIRST_USER_PASSWORD = "notificationsUser1";
+
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";
 
     // Number of pages that have to be created in order for the notifications badge to show «X+»
@@ -124,6 +126,7 @@ public class NotificationsIT
     @AfterEach
     public void tearDown(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
         setup.deletePage("XWiki", FIRST_USER_NAME);
         setup.deletePage("XWiki", SECOND_USER_NAME);
         setup.forceGuestUser();
@@ -131,7 +134,7 @@ public class NotificationsIT
 
     @Test
     @Order(1)
-    public void simpleNotifications(TestUtils setup, TestReference testReference) throws Exception
+    void simpleNotifications(TestUtils setup, TestReference testReference) throws Exception
     {
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
@@ -152,12 +155,15 @@ public class NotificationsIT
         p.getApplication(SYSTEM).setCollapsed(false);
         p.setEventTypeState(SYSTEM, CREATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
-        tray.showNotificationTray();
-        assertFalse(tray.isPageOnlyWatched());
-        assertFalse(tray.arePageAndChildrenWatched());
-        assertFalse(tray.isWikiWatched());
+        NotificationWatchButtonElement watchButtonElement = new NotificationWatchButtonElement();
+        assertTrue(watchButtonElement.isNotSet());
         // And he will watch the entire wiki.
-        tray.setWikiWatchedState(true);
+        NotificationsWatchModal notificationsWatchModal = watchButtonElement.openModal();
+        assertEquals(List.of(
+            NotificationsWatchModal.WatchOptions.WATCH_PAGE,
+            NotificationsWatchModal.WatchOptions.WATCH_WIKI
+        ), notificationsWatchModal.getAvailableOptions());
+        notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
 
         // We create a lot of pages in order to test the notification badge
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
@@ -223,7 +229,7 @@ public class NotificationsIT
 
     @Test
     @Order(2)
-    public void compositeNotifications(TestUtils setup, TestReference testReference,
+    void compositeNotifications(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
         NotificationsUserProfilePage p;
@@ -240,18 +246,28 @@ public class NotificationsIT
         p.setEventTypeState(SYSTEM, ADD_COMMENT, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
         List<SystemNotificationFilterPreference> minorEvent = p.getSystemNotificationFilterPreferences()
-                .stream()
-                .filter(fp -> fp.getFilterName().equals("Minor Event (Alert)"))
-                .collect(Collectors.toList());
+            .stream()
+            .filter(fp -> fp.getName().equals("Minor Event (Alert)"))
+            .toList();
 
         assertEquals(1, minorEvent.size());
         minorEvent.get(0).setEnabled(false);
         setup.gotoPage("Main", "WebHome");
+        NotificationWatchButtonElement watchButtonElement = new NotificationWatchButtonElement();
+        assertTrue(watchButtonElement.isNotSet());
+        // And he will watch the entire wiki.
+        NotificationsWatchModal notificationsWatchModal = watchButtonElement.openModal();
+        assertEquals(List.of(
+            NotificationsWatchModal.WatchOptions.WATCH_PAGE,
+            NotificationsWatchModal.WatchOptions.WATCH_SPACE,
+            NotificationsWatchModal.WatchOptions.WATCH_WIKI
+        ), notificationsWatchModal.getAvailableOptions());
+        notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
+
         tray = new NotificationsTrayPage();
         tray.showNotificationTray();
         tray.clearAllNotifications();
-        // Watch the entire wiki so that we receive notifications
-        tray.setWikiWatchedState(true);
+
 
         // Create a page, edit it 20 times, and finally add a comment
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
@@ -297,9 +313,9 @@ public class NotificationsIT
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         ServletEngine servletEngine = testConfiguration.getServletEngine();
-            notificationsRSS.loadEntries(
-                String.format("%s:%s", servletEngine.getInternalIP(), servletEngine.getInternalPort()),
-                String.format("%s:%s", servletEngine.getIP(), servletEngine.getPort()));
+        notificationsRSS.loadEntries(
+            String.format("%s:%s", servletEngine.getInternalIP(), servletEngine.getInternalPort()),
+            String.format("%s:%s", servletEngine.getIP(), servletEngine.getPort()));
         assertEquals(2, notificationsRSS.getEntries().size());
 
         // FIXME: This needs to be enabled back once XWIKI-21059 is fixed.
@@ -315,7 +331,7 @@ public class NotificationsIT
 
     @Test
     @Order(3)
-    public void notificationDisplayerClass(TestUtils setup, TestReference testReference) throws Exception
+    void notificationDisplayerClass(TestUtils setup, TestReference testReference) throws Exception
     {
         try {
             // Create the pages and a custom displayer for "update" events
@@ -328,12 +344,11 @@ public class NotificationsIT
             setup.createPage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest",
                 "Page used for the tests of the NotificationDisplayerClass XObject.", "Test page 2");
 
-            Map<String, String> notificationDisplayerParameters = new HashMap<String, String>()
-            {{
-                put("XWiki.Notifications.Code.NotificationDisplayerClass_0_eventType", "update");
-                put("XWiki.Notifications.Code.NotificationDisplayerClass_0_notificationTemplate",
-                    "This is a test template");
-            }};
+            Map<String, String> notificationDisplayerParameters = Map.of(
+                "XWiki.Notifications.Code.NotificationDisplayerClass_0_eventType", "update",
+                "XWiki.Notifications.Code.NotificationDisplayerClass_0_notificationTemplate",
+                    "This is a test template"
+            );
 
             ObjectEditPage editObjects = setup.editObjects(testReference.getLastSpaceReference().getName(),
                 "NotificationDisplayerClassTest");
@@ -352,9 +367,15 @@ public class NotificationsIT
             p.setEventTypeState(SYSTEM, UPDATE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
             // Watch the entire wiki so that we receive notifications
-            NotificationsTrayPage tray = new NotificationsTrayPage();
-            tray.showNotificationTray();
-            tray.setWikiWatchedState(true);
+            NotificationWatchButtonElement watchButtonElement = new NotificationWatchButtonElement();
+            assertTrue(watchButtonElement.isNotSet());
+            // And he will watch the entire wiki.
+            NotificationsWatchModal notificationsWatchModal = watchButtonElement.openModal();
+            assertEquals(List.of(
+                NotificationsWatchModal.WatchOptions.WATCH_PAGE,
+                NotificationsWatchModal.WatchOptions.WATCH_WIKI
+            ), notificationsWatchModal.getAvailableOptions());
+            notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
 
             // Login as second user and modify ARandomPageThatShouldBeModified
             setup.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
@@ -372,7 +393,7 @@ public class NotificationsIT
 
             // Ensure the notification has been received.
             NotificationsTrayPage.waitOnNotificationCount("xwiki:XWiki." + FIRST_USER_NAME, "xwiki", 1);
-            tray = new NotificationsTrayPage();
+            NotificationsTrayPage tray = new NotificationsTrayPage();
             assertEquals("This is a test template", tray.getNotificationRawContent(0));
         } finally {
             setup.loginAsSuperAdmin();
@@ -381,27 +402,37 @@ public class NotificationsIT
         }
     }
 
-
     @Test
     @Order(4)
-    public void ownEventNotifications(TestUtils setup, TestReference testReference) throws Exception
+    void ownEventNotifications(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
 
         DocumentReference page2 = new DocumentReference("page2", testReference.getLastSpaceReference());
         try {
+            int filterPreferenceNumber = 4;
             NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             List<SystemNotificationFilterPreference> preferences = p.getSystemNotificationFilterPreferences();
 
             // Now let's do some changes (own even filter)
+            SystemNotificationFilterPreference filterPreference = preferences.get(filterPreferenceNumber);
             p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
-            assertEquals("Own Events Filter", preferences.get(2).getFilterName());
-            preferences.get(2).setEnabled(false);
+            assertEquals("Own Events Filter", filterPreference.getName());
+            filterPreference.setEnabled(false);
+            setup.gotoPage(page2);
+            p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            assertFalse(p.getSystemNotificationFilterPreferences().get(filterPreferenceNumber).isEnabled());
 
             // Watch the entire wiki so that we receive notifications
-            NotificationsTrayPage tray = new NotificationsTrayPage();
-            tray.showNotificationTray();
-            tray.setWikiWatchedState(true);
+            NotificationWatchButtonElement watchButtonElement = new NotificationWatchButtonElement();
+            assertTrue(watchButtonElement.isNotSet());
+            // And he will watch the entire wiki.
+            NotificationsWatchModal notificationsWatchModal = watchButtonElement.openModal();
+            assertEquals(List.of(
+                NotificationsWatchModal.WatchOptions.WATCH_PAGE,
+                NotificationsWatchModal.WatchOptions.WATCH_WIKI
+            ), notificationsWatchModal.getAvailableOptions());
+            notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
 
             setup.createPage(testReference, "", "");
             // Ensure the notification has been received.
@@ -409,15 +440,16 @@ public class NotificationsIT
             NotificationsTrayPage notificationsTrayPage = new NotificationsTrayPage();
             assertEquals(1, notificationsTrayPage.getNotificationsCount());
             assertEquals(String.format("created by %s\n" + "moments ago", FIRST_USER_NAME),
-                    notificationsTrayPage.getNotificationDescription(0));
+                notificationsTrayPage.getNotificationDescription(0));
             assertEquals(testReference.getLastSpaceReference().getName(), notificationsTrayPage.getNotificationPage(0));
 
             // Go back to enable the own even filter
             p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             preferences = p.getSystemNotificationFilterPreferences();
-            assertEquals("Own Events Filter", preferences.get(2).getFilterName());
-            assertFalse(preferences.get(2).isEnabled());
-            preferences.get(2).setEnabled(true);
+            filterPreference = preferences.get(filterPreferenceNumber);
+            assertEquals("Own Events Filter", filterPreference.getName());
+            assertFalse(filterPreference.isEnabled());
+            filterPreference.setEnabled(true);
             setup.createPage(page2, "", "Page 2");
             setup.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
             notificationsTrayPage = new NotificationsTrayPage();
@@ -429,14 +461,14 @@ public class NotificationsIT
             assertEquals(testReference.getLastSpaceReference().getName(), notificationsTrayPage.getNotificationPage(0));
         } finally {
             // Clean up
-            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
-            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), "page2");
+            setup.rest().delete(testReference);
+            setup.rest().delete(page2);
         }
     }
 
     @Test
     @Order(5)
-    public void guestUsersDontSeeNotificationMenu(TestUtils setup)
+    void guestUsersDontSeeNotificationMenu(TestUtils setup)
     {
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         // Move to any page in view mode so that the notification menu is visible. Note that we use a non-existing page

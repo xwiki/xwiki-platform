@@ -333,7 +333,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
-        return TagQueryUtils.getDocumentsWithTag(tag, context);
+        return TagQueryUtils.getDocumentsWithTag(tag, false, false);
     }
 
     /**
@@ -349,7 +349,13 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, XWikiContext context)
         throws XWikiException
     {
-        return TagQueryUtils.getDocumentsWithTag(tag, includeHiddenDocuments, context);
+        return getDocumentsWithTag(tag, includeHiddenDocuments, false);
+    }
+
+    private List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, boolean caseSensitive)
+        throws XWikiException
+    {
+        return TagQueryUtils.getDocumentsWithTag(tag, includeHiddenDocuments, caseSensitive);
     }
 
     /**
@@ -390,7 +396,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult addTagToDocument(String tag, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return addTagToDocument(tag, context.getWiki().getDocument(documentName, context), context);
+        XWikiDocument document = context.getWiki().getDocument(documentName, context);
+
+        // Avoid modifying the cached document
+        document = document.clone();
+
+        return addTagToDocument(tag, document, context);
     }
 
     /**
@@ -437,7 +448,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult addTagsToDocument(String tags, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return addTagsToDocument(tags, context.getWiki().getDocument(documentName, context), context);
+        XWikiDocument document = context.getWiki().getDocument(documentName, context);
+
+        // Avoid modifying the cached document
+        document = document.clone();
+
+        return addTagsToDocument(tags, document, context);
     }
 
     /**
@@ -507,7 +523,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult removeTagFromDocument(String tag, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return removeTagFromDocument(tag, context.getWiki().getDocument(documentName, context), context);
+        XWikiDocument document = context.getWiki().getDocument(documentName, context);
+
+        // Avoid modifying the cached document
+        document = document.clone();
+
+        return removeTagFromDocument(tag, document, context);
     }
 
     /**
@@ -560,10 +581,13 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     protected TagOperationResult renameTag(String tag, String newTag, XWikiContext context) throws XWikiException
     {
+        // if the user is renaming a tag to change its case, we want to ensure that we only retrieve tags based on
+        // the case. Else we want to rename the tag for all pages whatever the case.
+        boolean caseSensitive = StringUtils.equalsIgnoreCase(tag, newTag);
         // Since we're renaming a tag, we want to rename it even if the document is hidden. A hidden document is still
         // accessible to users, it's just not visible for simple users; it doesn't change permissions.
-        List<String> docNamesToProcess = getDocumentsWithTag(tag, true, context);
-        if (StringUtils.equals(tag, newTag) || docNamesToProcess.size() == 0 || StringUtils.isBlank(newTag)) {
+        List<String> docNamesToProcess = getDocumentsWithTag(tag, true, caseSensitive);
+        if (StringUtils.equals(tag, newTag) || docNamesToProcess.isEmpty() || StringUtils.isBlank(newTag)) {
             return TagOperationResult.NO_EFFECT;
         }
 
@@ -571,6 +595,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         for (String docName : docNamesToProcess) {
             XWikiDocument doc = context.getWiki().getDocument(docName, context);
+
+            // Avoid modifying the cached document
+            doc = doc.clone();
+
             List<String> tags = getTagsFromDocument(doc);
 
             if (tags.contains(newTag)) {

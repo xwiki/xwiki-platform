@@ -48,10 +48,10 @@ core.menu.admin.wiki=Administrar wiki
 platform.wiki.panel.title=Informação do Wiki
 
 # MESSAGES
-platform.wiki.currentwiki.welcome=Bem-vindo ao Wiki {0}{1}{2}
+platform.wiki.currentwiki.welcome=Bem-vindo ao {0}{1}{2} wiki.
 platform.wiki.currentwiki.currentUserIsOwner=Você é o dono dessa wiki.
 platform.wiki.currentwiki.currentUserIsAdmin=Você é um dos administradores dessa wiki.
-platform.wiki.currentwiki.joinNeedToLogin=Para se juntar a este
+platform.wiki.currentwiki.joinNeedToLogin=Para ingressar neste wiki, você precisa estar logado.
 platform.wiki.currentwiki.currentUserNotMember=Você não é um membro dessa wiki.
 platform.wiki.currentwiki.currentuserCanJoin=Se você quiser, você pode {0}se juntar a essa wiki{1}.
 platform.wiki.currentwiki.currentUserIsMember=Você é um membro dessa wiki.
@@ -75,14 +75,14 @@ platform.wiki.currentwiki.invitationCancelSaveComment=Convite cancelado {0} ({1}
 platform.wiki.currentwiki.invitationCancelNotification=Seu convite foi cancelado e já não é mais válido.
 platform.wiki.currentwiki.invitationCancelSuccess=Convite cancelado com sucesso.
 platform.wiki.currentwiki.invitationCancelFailure=Erro, você não pode cancelar esse convite.
-platform.wiki.currentwiki.candidateReviewFailure=Erro, você não pode cancelar esse convite
+platform.wiki.currentwiki.candidateReviewFailure=Erro, você não pode cancelar este convite.
 
 # LABELS
 platform.wiki.currentwiki.prop.wikiprettyname.label=Nome de Exibição
 platform.wiki.currentwiki.prop.description.label=Descrição
 platform.wiki.currentwiki.prop.owner.label=Dono
-### Missing: platform.wiki.currentwiki.prop.membershipType.label=Membership Type
-### Missing: platform.wiki.currentwiki.prop.secure.label=Secure (SSL)
+platform.wiki.currentwiki.prop.membershipType.label=Tipo de Membro
+platform.wiki.currentwiki.prop.secure.label=Seguro (SSL)
 platform.wiki.currentwiki.member.add=Adicione ou convide usuários para o wiki
 platform.wiki.currentwiki.gadget.wikiInformation.label=Informação Wiki
 platform.wiki.currentwiki.gadget.topActiveUsers.label=Contribuidores mais Ativos
@@ -93,7 +93,7 @@ platform.wiki.currentwiki.invitation.view.label=Ver Convite
 platform.wiki.currentwiki.joinrequest.cancel.label=Cancelar solicitação
 platform.wiki.currentwiki.joinreques.request.label=Solicitar Entrada
 platform.wiki.currentwiki.join.label=Junte-se
-### Missing: platform.wiki.currentwiki.leave.label=Leave Wiki
+platform.wiki.currentwiki.leave.label=Sair da Wiki
 platform.wiki.currentwiki.invite.username.label=Nome de usuário
 platform.wiki.currentwiki.invite.message.label=Mensagem
 platform.wiki.currentwiki.invite.button.label=Convidar
@@ -115,23 +115,24 @@ WikiManager.WikiCandidateMemberClass_type_request=Requisição
 WikiManager.WikiCandidateMemberClass_type_invitation=Convite
 
 # HINTS
-platform.wiki.currentwiki.prop.wikiprettyname.hint=O nome de exibição do wiki
-### Missing: platform.wiki.currentwiki.prop.description.hint=A brief description of the wiki and its purpose.
-### Missing: platform.wiki.currentwiki.prop.owner.hint=A user who has all the rights on the wiki.
-### Missing: platform.wiki.currentwiki.prop.membershipType.hint=The way users can join this wiki.
-### Missing: platform.wiki.currentwiki.prop.secure.hint=If enabled, all this wiki''s generated externals URLs will start with {0}https:~/~/{1}.
+platform.wiki.currentwiki.prop.wikiprettyname.hint=O nome de exibição do wiki.
+platform.wiki.currentwiki.prop.description.hint=Uma breve descrição do wiki e sua finalidade.
+platform.wiki.currentwiki.prop.owner.hint=Um usuário que possui todos os direitos sobre o wiki.
+platform.wiki.currentwiki.prop.membershipType.hint=A forma como os usuários podem ingressar neste wiki.
+platform.wiki.currentwiki.prop.secure.hint=Se ativado, todos os URLs externos gerados por este wiki começarão com {0}https:~/~/{1}.
 platform.wiki.currentwiki.invite.username.hint=Nome do usuário para adicionar à wiki.
 platform.wiki.currentwiki.invite.message.hint=Mensagem a enviar para o usuário.
 platform.wiki.currentwiki.candidates.hint=Usuários que requisitaram ou foram convidados a se juntar à wiki.
-### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
+platform.wiki.currentwiki.candidates.empty=Nenhum usuário solicitou ou foi convidado para ingressar no wiki.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Gerenciar configurações como nome da wiki, descrição, dono e tipos de memros.
 admin.xwiki.workspaceusers.description=Gerenciar membros da wiki: adicionar, remover, convidar, aceitar ou rejeitar membros da wiki.
 admin.xwiki.usersconfiguration.title=Configuração
 admin.xwiki.members.title=Membros atuais
-### Missing: admin.xwiki.users.title=All Users
-    
+admin.xwiki.users.title=Todos os usuários
+
 # DRAWER ITEM
-### Missing: platform.wiki.drawer.homeWiki=Home</content>
+### Missing: platform.wiki.drawer.homeWiki=Home
+</content>
 </xwikidoc>

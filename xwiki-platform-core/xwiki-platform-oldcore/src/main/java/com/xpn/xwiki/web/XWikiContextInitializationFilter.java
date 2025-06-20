@@ -22,23 +22,21 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -48,27 +46,19 @@ import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * This filter can be used to initialize the XWiki context before processing a request.
+ * <p>
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
- * @since 13.4RC1
+ * @since 17.0.0RC1
  */
 public class XWikiContextInitializationFilter implements Filter
 {
     /**
-     * The filter configuration object.
-     */
-    private FilterConfig filterConfig;
-
-    /**
      * XWiki context mode.
      */
     private int mode;
-
-    @Override
-    public void destroy()
-    {
-        this.filterConfig = null;
-    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -90,8 +80,6 @@ public class XWikiContextInitializationFilter implements Filter
     @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
-        this.filterConfig = filterConfig;
-
         try {
             this.mode = Integer.parseInt(filterConfig.getInitParameter("mode"));
         } catch (Exception e) {
@@ -105,15 +93,34 @@ public class XWikiContextInitializationFilter implements Filter
      * @param request the request being processed
      * @param response the response
      * @throws ServletException if the initialization fails
+     * @deprecated use {@link #initializeXWikiContext(ServletRequest, ServletResponse)} instead
+     */
+    @Deprecated(since = "17.0.0RC1")
+    protected void initializeXWikiContext(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response)
+        throws ServletException
+    {
+        initializeXWikiContext(JakartaServletBridge.toJakarta(request), JakartaServletBridge.toJakarta(response));
+    }
+
+    /**
+     * Initializes the XWiki context.
+     * 
+     * @param request the request being processed
+     * @param response the response
+     * @throws ServletException if the initialization fails
+     * @since 17.0.0RC1
      */
     protected void initializeXWikiContext(ServletRequest request, ServletResponse response) throws ServletException
     {
         try {
             // Not all request types specify an action (e.g. GWT-RPC) so we default to the empty string.
             String action = "";
-            XWikiServletContext xwikiEngine = new XWikiServletContext(this.filterConfig.getServletContext());
-            XWikiServletRequest xwikiRequest = new XWikiServletRequest((HttpServletRequest) request);
-            XWikiServletResponse xwikiResponse = new XWikiServletResponse((HttpServletResponse) response);
+            XWikiServletContext xwikiEngine =
+                new XWikiServletContext(JakartaServletBridge.toJavax(request.getServletContext()));
+            XWikiServletRequest xwikiRequest =
+                new XWikiServletRequest(JakartaServletBridge.toJavax((HttpServletRequest) request));
+            XWikiServletResponse xwikiResponse =
+                new XWikiServletResponse(JakartaServletBridge.toJavax((HttpServletResponse) response));
 
             // Create the XWiki context.
             XWikiContext context = Utils.prepareContext(action, xwikiRequest, xwikiResponse, xwikiEngine);
@@ -140,11 +147,7 @@ public class XWikiContextInitializationFilter implements Filter
             // Initialize the current user.
             XWikiUser user = context.getWiki().checkAuth(context);
             if (user != null) {
-                DocumentReferenceResolver<String> documentReferenceResolver =
-                    Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
-                SpaceReference defaultUserSpace =
-                    new SpaceReference(XWiki.SYSTEM_SPACE, new WikiReference(context.getWikiId()));
-                DocumentReference userReference = documentReferenceResolver.resolve(user.getUser(), defaultUserSpace);
+                DocumentReference userReference = user.getUserReference();
                 context.setUserReference(
                     XWikiRightService.GUEST_USER.equals(userReference.getName()) ? null : userReference);
             }

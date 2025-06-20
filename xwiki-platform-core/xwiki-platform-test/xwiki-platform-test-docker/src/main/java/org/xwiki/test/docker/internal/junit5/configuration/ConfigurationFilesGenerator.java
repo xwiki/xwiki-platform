@@ -90,17 +90,17 @@ public class ConfigurationFilesGenerator
 
     /**
      * @param configurationFileTargetDirectory the location where to generate the config files
-     * @param version the XWiki version for which to generate config files (used to get the config resources for the
-     * right version)
+     * @param platformVersion the XWiki version for which to generate config files (used to get the config resources for
+     *            the right version)
      * @param resolver the artifact resolver to use (can contain resolved artifacts in cache)
      * @throws Exception if an error occurs during config generation
      */
-    public void generate(File configurationFileTargetDirectory, String version, ArtifactResolver resolver)
+    public void generate(File configurationFileTargetDirectory, String platformVersion, ArtifactResolver resolver)
         throws Exception
     {
         VelocityContext context = createVelocityContext();
         Artifact artifact = new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
-            JAR, version);
+            JAR, platformVersion);
         File configurationJARFile = resolver.resolveArtifact(artifact).getArtifact().getFile();
 
         configurationFileTargetDirectory.mkdirs();
@@ -128,9 +128,9 @@ public class ConfigurationFilesGenerator
         }
 
         // Copy a logback config file for testing. This allows putting overrides in it that are needed only for the
-        // tests. Only do this in the CI for now (or if debug is true) since this is currently used for debugging
+        // tests. Only do this in the CI for now (or if verbose is true) since this is currently used for debugging
         // problems.
-        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isDebug()) {
+        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isVerbose()) {
             copyLogbackConfigFile(configurationFileTargetDirectory);
         }
     }
@@ -174,8 +174,10 @@ public class ConfigurationFilesGenerator
         props.setProperty("xwikiCfgPlugins",
             "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
         props.setProperty("xwikiCfgVirtualUsepath", "1");
         props.setProperty("xwikiCfgEditCommentMandatory", "0");
@@ -202,12 +204,12 @@ public class ConfigurationFilesGenerator
         repositories.add(String.format("maven-local:maven:file://%s", localRepo));
 
         if (!this.repositoryResolver.getSession().isOffline()) {
-            repositories.add("maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public");
+            repositories.add("maven-xwiki:maven:https://nexus-snapshots.xwiki.org/repository/public-proxy");
             // Allow snapshot extensions to be resolved too when not offline
             // Note that the xwiki-commons-extension-repository-maven-snapshots artifact is added in
             // WARBuilder when resolving distribution artifacts.
             repositories.add(
-                "maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots");
+                "maven-xwiki-snapshot:maven:https://nexus-snapshots.xwiki.org/repository/snapshots");
         }
 
         props.setProperty("xwikiExtensionRepositories", StringUtils.join(repositories, ','));

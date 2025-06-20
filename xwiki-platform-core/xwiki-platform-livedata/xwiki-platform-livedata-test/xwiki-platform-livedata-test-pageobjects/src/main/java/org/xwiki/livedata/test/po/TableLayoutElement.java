@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
@@ -75,6 +76,18 @@ public class TableLayoutElement extends BaseElement
     private static final String CLASS_HTML_ATTRIBUTE = "class";
 
     private final LiveDataElement liveData;
+
+    private static final Pattern PAGINATION_SENTENCE_PATTERN =
+        Pattern.compile("^Entries (?<firstEntry>\\d+) - (?<lastEntry>\\d+) out of (?<totalEntries>\\d+)$");
+
+    /**
+     * @return the list of rows {@link WebElement}s
+     * @since 16.1.0RC1
+     */
+    public List<WebElement> getRows()
+    {
+        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody > tr"));
+    }
 
     /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
@@ -525,6 +538,13 @@ public class TableLayoutElement extends BaseElement
             } else {
                 element.sendKeys(content);
             }
+            try {
+                // Wait for the duration of the debounce, to make sure the text filtering process is started before
+                // continuing.
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         } else if (classes.contains("filter-date")) {
             element.click();
             DateRangePicker picker = new DateRangePicker(element);
@@ -553,7 +573,7 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = findColumnIndex(columnLabel);
 
         WebElement element = getRoot().findElement(By.cssSelector(String.format(".column-header-names > th:nth-child"
-            + "(%d) .sort-icon", columnIndex)));
+            + "(%d) .handle", columnIndex)));
         element.click();
 
         waitUntilReady();
@@ -665,8 +685,10 @@ public class TableLayoutElement extends BaseElement
     public WebElement getFilter(String columnLabel)
     {
         int columnIndex = findColumnIndex(columnLabel);
-        return getRoot()
-            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
+        By cssSelector = By.cssSelector(String.format(
+            ".column-filters > th:nth-child(%1$d) input, "
+            + ".column-filters > th:nth-child(%1$d) select", columnIndex));
+        return getRoot().findElement(cssSelector);
     }
 
     /**
@@ -679,6 +701,24 @@ public class TableLayoutElement extends BaseElement
             .map(it -> it.getAttribute("value")).collect(Collectors.toSet());
     }
 
+    private String getPaginationEntriesString()
+    {
+        return getRoot().findElement(By.className("pagination-current-entries")).getText().trim();
+    }
+
+    private java.util.regex.Matcher getPaginationMatcher()
+    {
+        return PAGINATION_SENTENCE_PATTERN.matcher(getPaginationEntriesString());
+    }
+
+    public long getTotalEntries()
+    {
+        java.util.regex.Matcher paginationMatcher = getPaginationMatcher();
+        if (!paginationMatcher.matches()) {
+            throw new IllegalStateException("Matcher does not match: " + getPaginationEntriesString());
+        }
+        return Long.parseLong(paginationMatcher.group("totalEntries"));
+    }
 
     /**
      * Clicks on an action button identified by its name, on a given row.
@@ -688,9 +728,29 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, String actionName)
     {
-        getRoot().findElement(By.cssSelector(
-            String.format("tbody tr:nth-child(%d) [name='%s']", rowNumber, actionName)))
-            .click();
+        clickAction(rowNumber, getActionSelector(actionName));
+    }
+
+    /**
+     * @param rowNumber the row number to inspect
+     * @param actionName the expected action
+     * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 16.2.0RC1
+     */
+    public boolean hasAction(int rowNumber, String actionName)
+    {
+        return !findElementsInRow(rowNumber, getActionSelector(actionName)).isEmpty();
+    }
+
+    /**
+     * Clicks on an action based on a row and the provided selector.
+     *
+     * @param rowNumber the row number, for instance 3 for the third row
+     * @param selector the selector to find the action element in the row
+     */
+    public void clickAction(int rowNumber, By selector)
+    {
+        findElementInRow(rowNumber, selector).click();
     }
 
     /**
@@ -732,8 +792,25 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement findElementInRow(int rowNumber, By by)
     {
-        return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)))
-            .findElement(by);
+        return getRowElement(rowNumber).findElement(by);
+    }
+
+    /**
+     * Return a list of elements matching a given selector in a row.
+     *
+     * @param rowNumber the number of the row to search on (starting at index 1)
+     * @param by the selector of the elements to search for
+     * @return the list of matched elements
+     * @since 16.2.0RC1
+     */
+    public List<WebElement> findElementsInRow(int rowNumber, By by)
+    {
+        return getRowElement(rowNumber).findElements(by);
+    }
+
+    private WebElement getRowElement(int rowNumber)
+    {
+        return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)));
     }
 
     /**
@@ -907,31 +984,29 @@ public class TableLayoutElement extends BaseElement
             .moveToElement(element, 50, 0)
             .moveToElement(element, 0, 0)
             .perform();
-        By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
-        // Waits to have at least one popover visible and click on the edit action of the last one. While it does not
-        // seem to be possible in normal conditions, using selenium and moveToElement, several popover can be visible
-        // at the same time (especially on Chrome). We select the latest edit action, which is the one of the targeted
-        // property because the popover actions are appended at the end of the document.
-        getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(editActionSelector).isEmpty());
-        // Does not use findElementsWithoutWaiting to let a chance for the cursor to move to the targeted cell, and for
-        // its edit action popover to be displayed.
-        List<WebElement> popoverActions = getDriver().findElements(editActionSelector);
-        popoverActions.get(popoverActions.size() - 1).click();
-        
+
+        element.findElement(By.cssSelector(".displayer-action-list span[title='Edit']")).click();
+
         // Selector of the edited field.
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
 
         // Waits for the text input to be displayed.
         getDriver().waitUntilElementIsVisible(element, selector);
 
-        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
+        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements
         // displayed in the live data (they are the same as the one of the inline edit mode).
         new FormContainerElement(By.cssSelector(".livedata-displayer .edit"))
             .setFieldValue(element.findElement(selector), newValue);
 
         if (save) {
             // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
-            new Actions(getDriver().getWrappedDriver()).click(getDriver().findElement(By.tagName("h1"))).perform();
+            // Click close to the left border of the h1 to avoid clicking on a potential date picker that is
+            // hopefully not that close to the left.
+            WebElement h1 = getDriver().findElement(By.tagName("h1"));
+            int width = h1.getRect().getWidth();
+            // Calculate the offset from the center to be close to the left border of the h1.
+            int xOffset = -(width / 2 - 2);
+            new Actions(getDriver().getWrappedDriver()).moveToElement(h1, xOffset, 0).click().perform();
         } else {
             // Press escape to cancel the edition.
             new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
@@ -980,5 +1055,10 @@ public class TableLayoutElement extends BaseElement
             uri = initialUri;
         }
         return uri.toASCIIString();
+    }
+
+    private static By getActionSelector(String actionName)
+    {
+        return By.cssSelector(String.format(".actions-container .action.action_%s", actionName));
     }
 }

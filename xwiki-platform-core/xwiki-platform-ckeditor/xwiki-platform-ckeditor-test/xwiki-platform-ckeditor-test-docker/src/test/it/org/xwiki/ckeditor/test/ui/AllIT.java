@@ -39,23 +39,23 @@ public class AllIT
     }
 
     @Nested
-    @DisplayName("Image Plugin")
-    class NestedImagePluginIT extends ImagePluginIT
+    @DisplayName("Image")
+    class NestedImageIT extends ImageIT
     {
     }
 
     @Nested
-    @DisplayName("TextArea Editor")
+    @DisplayName("TextArea Property Editor")
     class NestedTextAreaIT extends TextAreaIT
     {
     }
 
     @Nested
-    @DisplayName("Link Plugin")
-    class NestedLinkPluginIT extends LinkPluginIT
+    @DisplayName("Link")
+    class NestedLinkIT extends LinkIT
     {
     }
-    
+
     @Nested
     @DisplayName("Quick Actions")
     class NestedQuickActionsIT extends QuickActionsIT
@@ -67,11 +67,22 @@ public class AllIT
     class NestedUndoRedoIT extends UndoRedoIT
     {
     }
-    
+
     @Nested
     @DisplayName("Localization")
     class NestedLocalizationIT extends LocalizationIT
     {
     }
-    
+
+    @Nested
+    @DisplayName("Filter")
+    class NestedFilterIT extends FilterIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Table")
+    class NestedTableIT extends TableIT
+    {
+    }
 }

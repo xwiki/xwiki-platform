@@ -21,13 +21,14 @@ package org.xwiki.realtime.wysiwyg.test.po;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.IntConsumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -58,10 +59,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
             // Wait for the specified coeditor position to be available in the DOM.
             if (wait) {
-                getFromIFrame(() -> {
-                    getDriver().waitUntilCondition(driver -> getContainer());
-                    return null;
-                });
+                getDriver().waitUntilCondition(driver -> getFromEditedContent(this::getContainer));
             }
         }
 
@@ -72,32 +70,30 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
         public String getAvatarURL()
         {
-            return getFromIFrame(() -> getContainer().getAttribute("src"));
+            return getFromEditedContent(() -> getContainer().getDomAttribute("src"));
         }
 
         public String getAvatarHint()
         {
-            return getFromIFrame(() -> getContainer().getAttribute("title"));
+            return getFromEditedContent(() -> getContainer().getDomAttribute("title"));
         }
 
         public Point getLocation()
         {
-            return getFromIFrame(() -> getContainer().getLocation());
+            return getFromEditedContent(() -> getContainer().getLocation());
         }
 
         public CoeditorPosition waitForLocation(Point point)
         {
-            return getFromIFrame(() -> {
-                getDriver().waitUntilCondition(driver -> {
-                    try {
-                        return getContainer().getLocation().equals(point);
-                    } catch (StaleElementReferenceException e) {
-                        // The coeditor position (caret indicator) can be updated while we're waiting for it.
-                        return false;
-                    }
-                });
-                return this;
-            });
+            getDriver().waitUntilCondition(driver -> getFromEditedContent(() -> {
+                try {
+                    return getContainer().getLocation().equals(point);
+                } catch (StaleElementReferenceException e) {
+                    // The coeditor position (caret indicator) can be updated while we're waiting for it.
+                    return false;
+                }
+            }));
+            return this;
         }
 
         /**
@@ -106,7 +102,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
         @SuppressWarnings("unchecked")
         public boolean isVisible()
         {
-            return getFromIFrame(() -> {
+            return getFromEditedContent(() -> {
                 WebElement root = getDriver().findElementWithoutWaitingWithoutScrolling(By.tagName("html"));
                 int viewportHeight = Integer.parseInt(root.getDomProperty("clientHeight"));
                 int viewportWidth = Integer.parseInt(root.getDomProperty("clientWidth"));
@@ -128,11 +124,12 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     /**
      * Creates a new realtime rich text area element.
      * 
-     * @param iframe the in-line frame used by the realtime rich text area
+     * @param editor the CKEditor instance that owns this rich text area
+     * @param wait whether to wait or not for the content to be editable
      */
-    public RealtimeRichTextAreaElement(WebElement iframe)
+    public RealtimeRichTextAreaElement(CKEditor editor, boolean wait)
     {
-        super(iframe);
+        super(editor, wait);
     }
 
     /**
@@ -140,8 +137,8 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
      */
     public List<CoeditorPosition> getCoeditorPositions()
     {
-        return getFromIFrame(() -> getDriver().findElementsWithoutWaiting(By.className("rt-user-position")).stream()
-            .map(element -> element.getAttribute("id")).map(CoeditorPosition::new).collect(Collectors.toList()));
+        return getFromEditedContent(() -> getDriver().findElementsWithoutWaiting(By.className("realtime-user-position"))
+            .stream().map(element -> element.getDomAttribute("id")).map(CoeditorPosition::new).toList());
     }
 
     /**
@@ -151,5 +148,67 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     public CoeditorPosition getCoeditorPosition(String coeditorId)
     {
         return new CoeditorPosition("rt-user-" + coeditorId, true);
+    }
+
+    @Override
+    public void waitUntilTextContains(String textFragment)
+    {
+        repeatedWait(timeout -> waitUntilTextContains(textFragment, timeout));
+    }
+
+    @Override
+    public void waitUntilContentContains(String html)
+    {
+        repeatedWait(timeout -> waitUntilContentContains(html, timeout));
+    }
+
+    /**
+     * When testing realtime editing we often need to switch between the browser tabs. The problem is that browsers are
+     * throttling (slowing down) timers in inactive tabs, and sometimes they can even suspend the inactive tabs. This
+     * means we can have a situation where the test is switching the tab very fast, immediately after typing something
+     * in the rich text area, before the change event is handled, so before the change is propagated to the other users.
+     * Waiting on the other tab for the change to arrive can lead to a timeout in this case. The overcome this problem
+     * we use this strategy:
+     * <ul>
+     * <li>wait for a short period of time (a fraction of the default timeout, e.g. 2s instead of 10)</li>
+     * <li>temporarily reactivate each of the existing browser tabs by switching to each of them (to give them a chance
+     * to process the change)</li>
+     * <li>go back to the initial tab and repeat</li>
+     * </ul>
+     * Alternatively we could have waited for each change to be propagated when it happened (e.g. each time the user
+     * typed something) but we felt this was reducing the realtime editing aspect (making it more a turn-based editing).
+     * 
+     * @param wait the wait to perform
+     */
+    private void repeatedWait(IntConsumer wait)
+    {
+        int interval = 2;
+        int repetitions = 5;
+        for (int i = 0; i < repetitions - 1; i++) {
+            try {
+                wait.accept(interval);
+                return;
+            } catch (Exception e) {
+                // Ignore the exception and try again after reactivating each of the browser windows.
+            }
+            reactivateEachBrowserWindow();
+        }
+        wait.accept(interval);
+    }
+
+    private void reactivateEachBrowserWindow()
+    {
+        String initialHandle = getDriver().getWindowHandle();
+        getDriver().getWindowHandles().forEach(handle -> {
+            if (!handle.equals(initialHandle)) {
+                getDriver().switchTo().window(handle);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+        getDriver().switchTo().window(initialHandle);
     }
 }

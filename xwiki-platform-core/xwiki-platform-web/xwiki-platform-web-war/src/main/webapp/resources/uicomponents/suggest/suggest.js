@@ -494,8 +494,14 @@ var XWiki = (function(XWiki){
 
     if (!$(this.options.parentContainer).down('.suggestItems')) {
       // If the suggestion top container is not in the DOM already, we create it and inject it
-
-      var div = new Element("div", { 'class': "suggestItems "+ this.options.className });
+      
+      // We populate the suggestion container with information that was not on the page.
+      // This meaningful change in the DOM must be announced 
+      // so that assistive technology users can notice it without trouble.
+      let div = new Element("div", { 
+        'class': "suggestItems "+ this.options.className,
+        'role': 'alert'
+      });
 
       // Get position of target textfield
       var pos = $(this.options.parentContainer).tagName.toLowerCase() == 'body' ? this.fld.cumulativeOffset() : this.fld.positionedOffset();
@@ -1033,11 +1039,14 @@ var XWiki = (function(XWiki){
   /**
    * Reset timeout
    */
-  resetTimeout: function()
+  resetTimeout: function(timeout)
   {
+    if(!timeout) {
+      timeout = 1000;
+    }
     clearTimeout(this.toID);
     var pointer = this;
-    this.toID = setTimeout(function () { pointer.clearSuggestions() }, 1000);
+    this.toID = setTimeout(function () { pointer.clearSuggestions() }, timeout);
   },
 
   /**

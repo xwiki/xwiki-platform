@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.WebHome" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.WebHome" locale="">
   <web>AnnotationCode</web>
   <name>WebHome</name>
   <language/>
@@ -36,5 +36,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>This is the space for the Annotations scripts, powering the annotation feature.</content>
 </xwikidoc>

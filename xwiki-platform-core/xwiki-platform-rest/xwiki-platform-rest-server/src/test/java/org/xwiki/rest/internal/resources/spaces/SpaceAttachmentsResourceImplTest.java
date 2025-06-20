@@ -19,17 +19,22 @@
  */
 package org.xwiki.rest.internal.resources.spaces;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.rest.internal.resources.AbstractAttachmentsResourceTest;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -51,6 +56,9 @@ class SpaceAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 {
     @InjectMockComponents
     private SpaceAttachmentsResourceImpl spaceAttachmentsResource;
+
+    @MockComponent
+    private ContextualAuthorizationManager authorization;
 
     @BeforeEach
     @Override
@@ -74,7 +82,17 @@ class SpaceAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         when(query.setLimit(5)).thenReturn(query);
 
         XWikiAttachment xwikiAttachment = mock(XWikiAttachment.class);
-        List<Object> results = Collections.singletonList(new Object[] {"Path.To", "Page", "1.3", xwikiAttachment});
+        AttachmentReference xwikiAttachmentReference = mock(AttachmentReference.class, "image");
+        when(xwikiAttachment.getReference()).thenReturn(xwikiAttachmentReference);
+        when(this.authorization.hasAccess(Right.VIEW, xwikiAttachmentReference)).thenReturn(true);
+
+        XWikiAttachment forbiddenAttachment = mock(XWikiAttachment.class);
+        AttachmentReference forbiddenAttachmentReference = mock(AttachmentReference.class, "forbidden");
+        when(forbiddenAttachment.getReference()).thenReturn(forbiddenAttachmentReference);
+        when(this.authorization.hasAccess(Right.VIEW, forbiddenAttachmentReference)).thenReturn(false);
+
+        List<Object> results = Arrays.asList(new Object[] {"Path.To", "Page", "1.3", xwikiAttachment},
+            new Object[] {"Path.To", "ForbiddenPage", "1.3", forbiddenAttachment});
         when(query.execute()).thenReturn(results);
 
         SpaceReference spaceReference = new SpaceReference("test", "Path", "To");
@@ -89,6 +107,8 @@ class SpaceAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
             this.spaceAttachmentsResource.getAttachments("test", "Path/spaces/To", "", "xyz", "", "", 10, 5, false);
 
         verify(query).bindValue("localSpaceReference", "Path.To");
+        verify(this.authorization).hasAccess(Right.VIEW, xwikiAttachmentReference);
+        verify(this.authorization).hasAccess(Right.VIEW, forbiddenAttachmentReference);
 
         assertEquals(Collections.singletonList(attachment), attachments.getAttachments());
     }

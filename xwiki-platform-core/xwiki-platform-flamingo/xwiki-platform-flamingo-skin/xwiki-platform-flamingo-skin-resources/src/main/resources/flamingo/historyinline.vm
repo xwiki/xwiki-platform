@@ -34,9 +34,7 @@
 #set ($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == 'true'))
 ## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
 #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
-#set ($versions = $tdoc.getRevisions($criteria))
-#set ($discard = $collectiontool.reverseModifiable($versions))
-#set ($totalVersions = $versions.size())
+#set ($totalVersions = $tdoc.getRevisionsCount($criteria))
 #if ($totalVersions == 0)
   #warning ($services.localization.render('core.viewers.history.empty'))
 #else
@@ -76,21 +74,19 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       <input type="hidden" name="language" value="$!xcontext.locale" />
       <table class="table table-striped table-hover responsive-table">
         <caption class="sr-only">$services.localization.render('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])</caption>
-## Print the table header
         <thead>
           <tr>
           #if ($displayCompare)
             <th scope="col">$services.localization.render('core.viewers.history.from')</th>
             <th scope="col">$services.localization.render('core.viewers.history.to')</th>
           #end
-            <th scope="col">$services.localization.render('core.viewers.history.version')</th>
-            <th scope="col">$services.localization.render('core.viewers.history.author')</th>
-            <th scope="col">$services.localization.render('core.viewers.history.date')</th>
-  ## Might be disabled in certain wikis.
-          #if($xwiki.hasEditComment())
+          <th scope="col">$services.localization.render('core.viewers.history.version')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.author')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.date')</th>
+          #if ($xwiki.hasEditComment())
             <th scope="col">$services.localization.render('core.viewers.history.comment')</th>
           #end
-  ## Editors see the Revert button. Admins see the Revert and Delete buttons.
+          ## Editors see the Revert button. Admins see the Revert and Delete buttons.
           #if ($hasEdit)
             <th scope="col" #if($hasAdmin)colspan="2"#end>
               $services.localization.render('core.viewers.history.actions')
@@ -116,8 +112,14 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
             <input type="radio" name="rev2" id="rev2_$version" value="$version"/>
           </td>
         #end
+        ## If there's no summary, then there's one less column to span for the message in the version column.
+        #if ($xwiki.hasEditComment())
+          #set ($versionColspan = 4)
+        #else
+          #set ($versionColspan = 3)
+        #end
         #set ($_versionURL = $tdoc.getURL('view', $escapetool.url({'rev' : $version})))
-        <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))" colspan="4">$services.localization.render('core.viewers.history.extension.label', ["<a href='$_versionURL'>", '</a>', "<strong>", $escapetool.xml($documentExtension.name), $escapetool.xml($documentExtension.id.version), '</strong>'])</td>
+        <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))" colspan="${versionColspan}">$services.localization.render('core.viewers.history.extension.label', ["<a href='$_versionURL'>", '</a>', "<strong>", $escapetool.xml($documentExtension.name), $escapetool.xml($documentExtension.id.version), '</strong>'])</td>
         #if ($hasEdit || $hasAdmin)
           #set ($_rollbackURL = $tdoc.getURL('rollback', "form_token=$!{services.csrf.getToken()}&amp;rev=${escapetool.url($version)}$lang"))
           <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><a href="$_rollbackURL" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.rollback')</a></td>

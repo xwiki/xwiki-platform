@@ -19,13 +19,11 @@
  */
 package org.xwiki.configuration.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -49,8 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
 /**
@@ -61,17 +57,30 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class SpacesConfigurationSourceTest
 {
+    private static final WikiReference WIKI_REFERENCE = new WikiReference("wiki");
+
+    private static final SpaceReference SPACE_REFERENCE = new SpaceReference("space1", WIKI_REFERENCE);
+
+    private static final SpaceReference SUBSPACE_REFERENCE = new SpaceReference("space2", SPACE_REFERENCE);
+
     @InjectMockComponents
     private SpacesConfigurationSource spacesSource;
 
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;
-    
+
     @MockComponent
     @Named("space")
     private ConfigurationSource spaceConfiguration;
-    
-    private Map<String, Map<String, String>> spacesPreferences = new HashMap<>();
+
+    private final MapConfigurationSource spaceMap = new MapConfigurationSource();
+
+    private final MapConfigurationSource subSpaceMap = new MapConfigurationSource();
+
+    private final MapConfigurationSource noMap = new MapConfigurationSource();
+
+    private final Map<SpaceReference, MapConfigurationSource> spaceConfigurations =
+        Map.of(SPACE_REFERENCE, this.spaceMap, SUBSPACE_REFERENCE, this.subSpaceMap);
 
     private XWikiContext xcontext;
 
@@ -80,91 +89,75 @@ class SpacesConfigurationSourceTest
     {
         this.xcontext = new XWikiContext();
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
-        when(this.spaceConfiguration.getProperty(any(), same(String.class))).then((Answer<String>) invocation -> {
-            Map<String, String> spacePreferences = getSpacePreferences();
-            if (spacePreferences != null) {
-                return spacePreferences.get(invocation.getArgument(0));
-            }
-            return null;
+
+        when(this.spaceConfiguration.getProperty(any())).then((Answer<?>) invocation -> {
+            return getSpaceConfiguration().getProperty(invocation.getArgument(0));
         });
-        when(spaceConfiguration.getProperty(any())).then(invocation -> {
-            Map<String, String> spacePreferences = getSpacePreferences();
-            if (spacePreferences != null) {
-                return spacePreferences.get(invocation.getArgument(0));
-            }
-            return null;
+        when(this.spaceConfiguration.getProperty(any(), any(Object.class))).then((Answer<?>) invocation -> {
+            return getSpaceConfiguration().getProperty(invocation.getArgument(0), invocation.<Object>getArgument(1));
         });
-        when(spaceConfiguration.getProperty(any(), anyString())).then(invocation -> {
-            Map<String, String> spacePreferences = getSpacePreferences();
-            if (spacePreferences != null) {
-                String key = invocation.getArgument(0);
-                if (spacePreferences.containsKey(key)) {
-                    return spacePreferences.get(key);
-                }
-            }
-            return invocation.getArgument(1);
+        when(this.spaceConfiguration.getProperty(any(), any(Class.class))).then((Answer<?>) invocation -> {
+            return getSpaceConfiguration().getProperty(invocation.getArgument(0), invocation.<Class<?>>getArgument(1));
         });
-        when(spaceConfiguration.containsKey(any())).then((Answer<Boolean>) invocation -> {
-            Map<String, String> spacePreferences = getSpacePreferences();
-            if (spacePreferences != null) {
-                return spacePreferences.containsKey(invocation.getArgument(0));
-            }
-            return false;
+        when(this.spaceConfiguration.getProperty(any(), any(), any())).then((Answer<?>) invocation -> {
+            return getSpaceConfiguration().getProperty(invocation.getArgument(0), invocation.getArgument(1),
+                invocation.getArgument(2));
         });
-        when(spaceConfiguration.getKeys()).then((Answer<List<String>>) invocation -> {
-            Map<String, String> spacePreferences = getSpacePreferences();
-            if (spacePreferences != null) {
-                return new ArrayList<>(spacePreferences.keySet());
-            }
-            return Collections.emptyList();
+        when(this.spaceConfiguration.containsKey(any())).then((Answer<Boolean>) invocation -> {
+            return getSpaceConfiguration().containsKey(invocation.getArgument(0));
         });
-        when(spaceConfiguration.isEmpty()).then((Answer<Boolean>) invocation -> {
-            Map<String, String> spacePreferences = getSpacePreferences();
-            if (spacePreferences != null) {
-                return spacePreferences.isEmpty();
-            }
-            return true;
+        when(this.spaceConfiguration.getKeys()).then((Answer<List<String>>) invocation -> {
+            return getSpaceConfiguration().getKeys();
         });
+        when(this.spaceConfiguration.getKeys(any())).then((Answer<List<String>>) invocation -> {
+            return getSpaceConfiguration().getKeys(invocation.getArgument(0));
+        });
+        when(this.spaceConfiguration.isEmpty()).then((Answer<Boolean>) invocation -> {
+            return getSpaceConfiguration().isEmpty();
+        });
+        when(this.spaceConfiguration.isEmpty(any())).then((Answer<Boolean>) invocation -> {
+            return getSpaceConfiguration().isEmpty(invocation.getArgument(0));
+        });
+
+        this.spaceMap.setProperty("pref", "prefvalue1");
+        this.spaceMap.setProperty("pref1", "pref1value1");
+        this.subSpaceMap.setProperty("pref", "prefvalue2");
+        this.subSpaceMap.setProperty("pref2", "pref2value2");
     }
 
-    private Map<String, String> getSpacePreferences()
+    private ConfigurationSource getSpaceConfiguration()
     {
-        if (xcontext.getDoc() != null) {
-            return spacesPreferences.get(xcontext.getDoc().getDocumentReference().getParent().getName());
+        if (this.xcontext.getDoc() != null) {
+            MapConfigurationSource map =
+                this.spaceConfigurations.get(this.xcontext.getDoc().getDocumentReference().getParent());
+            if (map != null) {
+                return map;
+            }
         }
 
-        return null;
+        return this.noMap;
     }
 
+    private void switchTo(SpaceReference reference)
+    {
+        this.xcontext.setDoc(new XWikiDocument(new DocumentReference("document", reference)));
+    }
+
+    private void assertKeys(Set<String> expected, List<String> actual)
+    {
+        assertEquals(expected, new HashSet<>(actual));        
+    }
+    
     @Test
     void containsKey()
     {
-        WikiReference wikiReference = new WikiReference("wiki");
-        SpaceReference space1Reference = new SpaceReference("space1", wikiReference);
-        SpaceReference space2Reference = new SpaceReference("space2", space1Reference);
-
-        Map<String, String> space1Preferences = new LinkedHashMap<>();
-        space1Preferences.put("pref", "prefvalue1");
-        space1Preferences.put("pref1", "pref1value1");
-        Map<String, String> space2Preferences = new LinkedHashMap<>();
-        space2Preferences.put("pref", "prefvalue2");
-        space2Preferences.put("pref2", "pref2value2");
-        this.spacesPreferences.put(space1Reference.getName(), space1Preferences);
-        this.spacesPreferences.put(space2Reference.getName(), space2Preferences);
-
-        // Tests
-
-        assertTrue(this.spacesSource.isEmpty());
         assertFalse(this.spacesSource.containsKey("nopref"));
-        assertEquals(Arrays.asList(), this.spacesSource.getKeys());
         assertNull(this.spacesSource.getProperty("nopref"));
         assertNull(this.spacesSource.getProperty("nopref", String.class));
         assertEquals("defaultvalue", this.spacesSource.getProperty("nopref", "defaultvalue"));
 
-        this.xcontext.setDoc(new XWikiDocument(new DocumentReference("document", space1Reference)));
-        assertFalse(this.spacesSource.isEmpty());
+        switchTo(SPACE_REFERENCE);
         assertFalse(this.spacesSource.containsKey("nopref"));
-        assertEquals(Arrays.asList("pref", "pref1"), this.spacesSource.getKeys());
         assertNull(this.spacesSource.getProperty("nopref"));
         assertNull(this.spacesSource.getProperty("nopref", String.class));
         assertEquals("defaultvalue", this.spacesSource.getProperty("nopref", "defaultvalue"));
@@ -178,10 +171,8 @@ class SpacesConfigurationSourceTest
         assertFalse(this.spacesSource.containsKey("pref2"));
         assertNull(this.spacesSource.getProperty("pref2"));
 
-        this.xcontext.setDoc(new XWikiDocument(new DocumentReference("document", space2Reference)));
-        assertFalse(this.spacesSource.isEmpty());
+        switchTo(SUBSPACE_REFERENCE);
         assertFalse(this.spacesSource.containsKey("nopref"));
-        assertEquals(Arrays.asList("pref", "pref2", "pref1"), this.spacesSource.getKeys());
         assertNull(this.spacesSource.getProperty("nopref"));
         assertNull(this.spacesSource.getProperty("nopref", String.class));
         assertEquals("defaultvalue", this.spacesSource.getProperty("nopref", "defaultvalue"));
@@ -194,5 +185,42 @@ class SpacesConfigurationSourceTest
         assertEquals("pref1value1", this.spacesSource.getProperty("pref1"));
         assertTrue(this.spacesSource.containsKey("pref2"));
         assertEquals("pref2value2", this.spacesSource.getProperty("pref2"));
+    }
+
+    @Test
+    void isEmpty()
+    {
+        assertTrue(this.spacesSource.isEmpty());
+        assertTrue(this.spacesSource.isEmpty("pref1"));
+        assertTrue(this.spacesSource.isEmpty("other"));
+
+        switchTo(SPACE_REFERENCE);
+        assertFalse(this.spacesSource.isEmpty());
+        assertFalse(this.spacesSource.isEmpty("pref1"));
+        assertTrue(this.spacesSource.isEmpty("other"));
+
+        switchTo(SUBSPACE_REFERENCE);
+        assertFalse(this.spacesSource.isEmpty());
+        assertFalse(this.spacesSource.isEmpty("pref2"));
+        assertTrue(this.spacesSource.isEmpty("other"));
+    }
+
+    @Test
+    void getKeys()
+    {
+        assertKeys(Set.of(), this.spacesSource.getKeys());
+        assertEquals(Arrays.asList(), this.spacesSource.getKeys());
+        assertEquals(Arrays.asList(), this.spacesSource.getKeys("pref"));
+        assertEquals(Arrays.asList(), this.spacesSource.getKeys("other"));
+
+        switchTo(SPACE_REFERENCE);
+        assertKeys(Set.of("pref", "pref1"), this.spacesSource.getKeys());
+        assertKeys(Set.of("pref1"), this.spacesSource.getKeys("pref1"));
+        assertKeys(Set.of(), this.spacesSource.getKeys("other"));
+
+        switchTo(SUBSPACE_REFERENCE);
+        assertKeys(Set.of("pref", "pref2", "pref1"), this.spacesSource.getKeys());
+        assertKeys(Set.of("pref2"), this.spacesSource.getKeys("pref2"));
+        assertKeys(Set.of(), this.spacesSource.getKeys("other"));
     }
 }

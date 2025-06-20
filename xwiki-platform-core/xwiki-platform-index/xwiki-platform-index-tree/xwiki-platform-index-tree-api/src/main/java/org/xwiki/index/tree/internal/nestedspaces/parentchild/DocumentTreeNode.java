@@ -19,9 +19,6 @@
  */
 package org.xwiki.index.tree.internal.nestedspaces.parentchild;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -29,12 +26,11 @@ import javax.inject.Provider;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.index.tree.internal.AbstractDocumentTreeNode;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
+import org.xwiki.tree.TreeNode;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -49,57 +45,20 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("document/parentChildOnNestedSpaces")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DocumentTreeNode extends org.xwiki.index.tree.internal.nestedpages.DocumentTreeNode
+public class DocumentTreeNode extends AbstractDocumentTreeNode
 {
     @Inject
-    @Named("explicit")
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
-
-    @Inject
-    @Named("compact")
-    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
+    @Named("childDocuments/parentChildOnNestedSpaces")
+    private TreeNode childDocuments;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     @Override
-    protected List<DocumentReference> getChildDocuments(DocumentReference documentReference, int offset, int limit)
-        throws QueryException
+    public void initialize() throws InitializationException
     {
-        Query query = getChildDocumentsQuery(documentReference);
-        query.setOffset(offset);
-        query.setLimit(limit);
-        List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
-        for (Object result : query.execute()) {
-            documentReferences.add(this.explicitDocumentReferenceResolver.resolve((String) result, documentReference));
-        }
-        return documentReferences;
-    }
-
-    private Query getChildDocumentsQuery(DocumentReference documentReference) throws QueryException
-    {
-        Query query = this.queryManager.createQuery(
-            "where doc.translation = 0 and doc.space = :space and "
-                + "doc.parent in (:absoluteRef, :localRef, :relativeRef) " + "order by lower(doc.name), doc.name",
-            Query.HQL);
-        query.bindValue("space", this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
-        query.bindValue("absoluteRef", this.defaultEntityReferenceSerializer.serialize(documentReference));
-        query.bindValue("localRef", this.localEntityReferenceSerializer.serialize(documentReference));
-        query.bindValue("relativeRef",
-            this.compactEntityReferenceSerializer.serialize(documentReference, documentReference.getParent()));
-        query.setWiki(documentReference.getWikiReference().getName());
-        if (Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"))) {
-            query.addFilter(this.hiddenDocumentQueryFilterProvider.get());
-        }
-        return query;
-    }
-
-    @Override
-    protected int getChildDocumentsCount(DocumentReference documentReference) throws QueryException
-    {
-        Query query = getChildDocumentsQuery(documentReference);
-        query.addFilter(this.countQueryFilter);
-        return ((Long) query.execute().get(0)).intValue();
+        super.initialize();
+        this.childNodes.addTreeNode(this.childDocuments, nodeId -> true);
     }
 
     @Override

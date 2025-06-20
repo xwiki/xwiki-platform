@@ -37,7 +37,6 @@ import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -51,7 +50,6 @@ import static org.mockito.Mockito.when;
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
 @ComponentList({
-    ControlCharactersFilter.class,
     ModelScriptService.class,
     TranslationMacro.class
 })

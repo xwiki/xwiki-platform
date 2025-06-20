@@ -80,7 +80,7 @@ if [ -z "$JETTY_STOP_PORT" ]; then
 fi
 
 # The location where to store the process id
-XWIKI_LOCK_DIR="/var/tmp"
+XWIKI_LOCK_DIR="${PRGDIR}/tmp"
 
 # The number of seconds to wait for the XWiki lock file to be removed before exiting.
 XWIKI_WAIT_TIME=30
@@ -169,8 +169,8 @@ if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
   echo "No Java found. You need Java installed to use this script."
   exit 0
 fi
-if [ "$JAVA_VERSION" -lt 8 ]; then
-  echo This script requires Java 8 or greater.
+if [ "$JAVA_VERSION" -lt ${xwiki.java.version} ]; then
+  echo This script requires Java ${xwiki.java.version} or greater.
   exit 0
 fi
 

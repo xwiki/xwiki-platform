@@ -31,14 +31,18 @@
   width: @xwiki-drawer-width;
   right: 0;
   overflow: hidden;
+  // Fallback for browsers that don't support dvh.
   height: 100vh;
+  height: 100dvh;
   margin-right: -@xwiki-drawer-width;
   transition: margin-right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
   padding: 0;
   border: 0;
   overflow-y: auto;
   // We overwrite max-height over browser defaults for dialog
+  // Fallback for browsers that don't support dvh.
   max-height: 100vh;
+  max-height: 100dvh;
   
   &::backdrop {
     opacity: 0;
@@ -187,7 +191,7 @@
   margin: 12px 0;
 }
 
-// Special styling for login/logout/register =============================
-#tmLogin, #tmLogout, #tmRegister {
+// Special styling for logout =============================
+#tmLogout {
   font-style: italic;
 }

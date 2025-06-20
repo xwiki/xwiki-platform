@@ -28,6 +28,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.LocalFileDetector;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
@@ -117,11 +119,43 @@ public class AttachmentsPane extends BaseElement
      */
     public void setFileToUpload(final String filePath)
     {
+        setFileToUpload(filePath, false);
+    }
+
+    /**
+     * Fills the URL with the specified file path.
+     *
+     * @param filePath the path to the file to upload in URL form (the file *must* exist in the target directory).
+     * @param local if true, the file will be searched on the local filesystem.
+     * @since 15.10.13
+     * @since 16.4.4
+     * @since 16.9.0RC1
+     */
+    public void setFileToUpload(final String filePath, final boolean local)
+    {
         final List<WebElement> inputs = this.pane.findElements(By.className("uploadFileInput"));
         WebElement input = inputs.get(inputs.size() - 1);
+        if (local) {
+            ((RemoteWebElement) input).setFileDetector(new LocalFileDetector());
+        }
         // Clean the field before setting the value in case of successive uploads.
         input.clear();
         input.sendKeys(filePath);
+    }
+
+    /**
+     * Fills the upload comment.
+     *
+     * @param comment the upload comment.
+     * @since 16.3.0RC1
+     */
+    public void setUploadComment(final String comment)
+    {
+        final List<WebElement> inputs = this.pane.findElements(By.id("xwikiuploadcomment"));
+        WebElement input = inputs.get(inputs.size() - 1);
+        // Clean the field before setting the value in case of successive uploads.
+        input.clear();
+        input.sendKeys(comment);
     }
 
     /**

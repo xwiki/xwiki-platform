@@ -121,9 +121,9 @@
     </p>
     #if ($request.previousUIId && $request.previousUIVersion && $wiki == $request.wiki)
       ## We shouldn't get here unless JavaScript is disabled (the form is submitted with AJAX normally).
-      <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
+      #info($services.localization.render('extensions.advancedSearch.noResults',
         ["<strong>$!escapetool.xml($request.previousUIId)</strong>",
-        "<strong>$!escapetool.xml($request.previousUIVersion)</strong>"])</div>
+        "<strong>$!escapetool.xml($request.previousUIVersion)</strong>"]))
     #end
   </form>
 #end

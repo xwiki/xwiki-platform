@@ -22,7 +22,6 @@ package org.xwiki.refactoring.splitter.criterion.naming;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.stability.Unstable;
 
 /**
  * Interface for defining various criteria for naming new documents generated while splitting.
@@ -58,7 +57,6 @@ public interface NamingCriterion
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     NamingCriterionParameters getParameters();
 
     /**
@@ -70,6 +68,5 @@ public interface NamingCriterion
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     DocumentReference getDocumentReference(XDOM newDoc);
 }

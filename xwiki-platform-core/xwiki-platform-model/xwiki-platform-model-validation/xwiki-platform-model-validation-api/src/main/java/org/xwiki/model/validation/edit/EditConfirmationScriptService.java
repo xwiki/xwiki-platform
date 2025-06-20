@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.validation.edit.internal.EditConfirmationCheckersManager;
 import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * This class provides the script services for handling document edit confirmation.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named(ModelValidationScriptService.ID + "." + EditConfirmationScriptService.ID)
-@Unstable
 public class EditConfirmationScriptService implements ScriptService
 {
     /**
@@ -66,7 +64,6 @@ public class EditConfirmationScriptService implements ScriptService
      *
      * @since 15.10RC1
      */
-    @Unstable
     public void force()
     {
         this.editConfirmationCheckersManager.force();

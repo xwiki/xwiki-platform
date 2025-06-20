@@ -241,7 +241,6 @@
 ### MANAGE CANDIDACIES ###
 #set ($candidateClass = 'WikiManager.WikiCandidateMemberClass')
 #set ($xwikiGroupsClass = 'XWiki.XWikiGroups')
-#set ($messageStream = $services.messageStream)
 #set ($wiki = $services.wiki.getById($services.wiki.currentWikiId))
 #set ($wikiPrettyName = $wiki.prettyName)
 #if ("$!wikiPrettyName" == '')
@@ -259,25 +258,10 @@
       #if ($candidacy &amp;&amp; $candidacy.status == 'PENDING')
         #if ($request.acceptUser)
           #set ($success = $services.wiki.user.acceptRequest($candidacy, $request.reviewerComment, $request.reviewerPrivateComment))
-          #if ($success)
-            #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.joinRequestAcceptedNotification', [$wikiPrettyName]))
-          #end
         #elseif ($request.rejectUser)
           #set ($success = $services.wiki.user.refuseRequest($candidacy, $request.reviewerComment, $request.reviewerPrivateComment))
-          #if ($success)
-            #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.joinRequestRejectedNotification', [$wikiPrettyName]))
-          #end
         #end
-        ## Notify the user.
-        #if ("$!{request.reviewerComment}" != '')
-          ## FIXME: replace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
-          #set ($notificationMessage = "${notificationMessage}
-    $services.localization.render('platform.wiki.currentwiki.candidateHandledComment') ${request.reviewerComment}")
-        #end
-        #set ($userDocumentReference = $services.model.resolveDocument($candidacy.userId))
-        #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
         #if ($success)
-
           #if ($request.acceptUser)
             {{info}}{{translation key="platform.wiki.currentwiki.candidateAcceptedSuccess"/}}{{/info}}
           #else
@@ -331,17 +315,7 @@
       #set ($discard = $names.removeAll($alreadyInvited))
       ##
       #foreach ($userName in $names)
-        #set ($temp = $services.wiki.user.invite($userName, $wiki.id, $message))
-        ## Notify the user.
-        #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.inviteNotification', [$wikiPrettyName]))
-        #if ("$!message" != '')
-          ## FIXME: remplace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
-          #set ($notificationMessage = "$notificationMessage
-    $services.localization.render('platform.wiki.currentwiki.candidateHandledComment') $message")
-        #end
-        #set ($userDocumentReference = $services.model.resolveDocument($userName))
-        #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
-
+        #set ($discard = $services.wiki.user.invite($userName, $wiki.id, $message))
         {{info}}$services.localization.render('platform.wiki.currentwiki.inviteSuccess', [$xwiki.getUserName($userName, false)]){{/info}}
 
       #end
@@ -354,10 +328,6 @@
         ## Remove the invitation
         #set ($success = $services.wiki.user.cancelCandidacy($candidateMember))
         #if($success)
-          ## Notify the user.
-          #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.invitationCancelNotification'))
-          #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userId))
-          #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
 
           {{info}}{{translation key="platform.wiki.currentwiki.invitationCancelSuccess"/}}{{/info}}
 

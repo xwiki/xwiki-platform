@@ -30,6 +30,7 @@ $services.localization.render('notallowed')
 #else
 #template("startpage.vm")
 <div class="main layoutsubsection">
+#template("hierarchy.vm")
 ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
 <main id="mainContentArea">
 #if ($xwiki.exists("XWiki.AccessDenied"))

@@ -24,11 +24,10 @@
      * metadata-complete="true" is used to disable scanning the web application and its libraries for classes that use
        annotations to define components of a web application (Servlets etc.). Thus leading to a faster startup.
 -->
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-  version="3.1"
-  metadata-complete="true">
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0" metadata-complete="true">
 
   <!-- "absolute-ordering" specifies which web fragment JARs (according to the names in their WEB-INF/web-fragment.xml
        files) have to be scanned for SCIs (javax.servlet.ServletContainerInitializer), fragments and annotations.
@@ -50,10 +49,31 @@
     <filter-class>org.xwiki.resource.servlet.RoutingFilter</filter-class>
   </filter>
 
+  <!-- Filter which inject a response wrapper in charge of resolving the relative URL on XWiki side instead of application
+       server side, to reduce setup requirements. -->
+  <filter>
+    <filter-name>ResolveRelativeRedirectFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.ResolveRelativeRedirectFilter</filter-class>
+  </filter>
+
+  <!-- Filter in charge of fixing the request base URL base on proxy headers. -->
+  <filter>
+    <filter-name>SourceURLResolverFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SourceURLResolverFilter</filter-class>
+  </filter>
+
+  <!-- Filter which inject a response wrapper in charge of converting the redirect location into a safe URL. -->
+  <filter>
+    <filter-name>SafeRedirectFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SafeRedirectFilter</filter-class>
+  </filter>
+
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
-       without affecting the whole container (and the other applications hosted). -->
+       without affecting the whole container (and the other applications hosted).
+       The same encoding is also used as default for the response when the encoding is not explicitly
+       specified with the content type. -->
   <filter>
     <filter-name>Set Character Encoding</filter-name>
     <filter-class>org.xwiki.container.servlet.filters.internal.SetCharacterEncodingFilter</filter-class>
@@ -154,6 +174,21 @@
   </filter-mapping>
 
   <filter-mapping>
+    <filter-name>SourceURLResolverFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>ResolveRelativeRedirectFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>SafeRedirectFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
     <filter-name>RequestRestorer</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
@@ -192,7 +227,7 @@
 
   <filter-mapping>
     <filter-name>XWikiRESTContextInitializationFilter</filter-name>
-    <servlet-name>RestletServlet</servlet-name>
+    <servlet-name>RESTServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
@@ -278,17 +313,16 @@
     -->
   </servlet>
 
-  <!-- RESTful API Restlet servlet -->
+  <!-- REST Service -->
   <servlet>
-    <servlet-name>RestletServlet</servlet-name>
-    <servlet-class>
-      org.xwiki.rest.internal.XWikiRestletServlet
-    </servlet-class>
+    <servlet-name>RESTServlet</servlet-name>
+    <servlet-class>org.xwiki.rest.jersey.internal.XWikiRESTServlet</servlet-class>
+    <multipart-config/>
   </servlet>
 
   <!-- RESTful API mapping -->
   <servlet-mapping>
-    <servlet-name>RestletServlet</servlet-name>
+    <servlet-name>RESTServlet</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 

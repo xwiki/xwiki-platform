@@ -46,6 +46,11 @@ public final class DefaultResetPasswordRequestResponse implements ResetPasswordR
         this.verificationCode = verificationCode;
     }
 
+    DefaultResetPasswordRequestResponse(UserReference reference)
+    {
+        this(reference, null);
+    }
+
     /**
      * @return the user for whom a reset password request is performed.
      */

@@ -19,152 +19,39 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.Locale;
-
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.url.URLSecurityManager;
+import org.xwiki.jakartabridge.JavaxToJakartaWrapper;
 
-public class XWikiServletResponse implements XWikiResponse
+@Deprecated(since = "17.0.0RC1")
+public class XWikiServletResponse extends HttpServletResponseWrapper
+    implements XWikiResponse, JavaxToJakartaWrapper<jakarta.servlet.http.HttpServletResponse>
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletResponse.class);
-
-    private HttpServletResponse response;
-
     public XWikiServletResponse(HttpServletResponse response)
     {
-        this.response = response;
+        super(response);
     }
 
+    // JavaxToJakartaWrapper
+
     @Override
-    public int getStatus()
+    public jakarta.servlet.http.HttpServletResponse getJakarta()
     {
-        return this.response.getStatus();
+        if (getResponse() instanceof JavaxToJakartaWrapper wrapper) {
+            return (jakarta.servlet.http.HttpServletResponse) wrapper.getJakarta();
+        }
+
+        return null;
     }
+
+    // XWikiResponse
 
     @Override
     public HttpServletResponse getHttpServletResponse()
     {
-        return this.response;
-    }
-
-    @Override
-    public void sendRedirect(String redirect) throws IOException
-    {
-        if (!StringUtils.isBlank(redirect)) {
-            URI uri;
-            try {
-                uri = getURLSecurityManager().parseToSafeURI(redirect);
-                this.response.sendRedirect(uri.toString());
-            } catch (URISyntaxException | SecurityException e) {
-                LOGGER.warn(
-                    "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
-                        + "If the request was legitimate, please check the URL security configuration. You "
-                        + "might need to add the domain related to this request in the list of trusted domains in "
-                        + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
-                    redirect);
-                LOGGER.debug("Original error preventing the redirect: ", e);
-            }
-        }
-    }
-
-    private URLSecurityManager getURLSecurityManager()
-    {
-        return Utils.getComponent(URLSecurityManager.class);
-    }
-
-    @Override
-    public void setContentType(String type)
-    {
-        this.response.setContentType(type);
-    }
-
-    @Override
-    public void setBufferSize(int i)
-    {
-        this.response.setBufferSize(i);
-    }
-
-    @Override
-    public int getBufferSize()
-    {
-        return this.response.getBufferSize();
-    }
-
-    @Override
-    public void flushBuffer() throws IOException
-    {
-        this.response.flushBuffer();
-    }
-
-    @Override
-    public void resetBuffer()
-    {
-        this.response.resetBuffer();
-    }
-
-    @Override
-    public boolean isCommitted()
-    {
-        return this.response.isCommitted();
-    }
-
-    @Override
-    public void reset()
-    {
-        this.response.reset();
-    }
-
-    @Override
-    public void setContentLength(int length)
-    {
-        this.response.setContentLength(length);
-    }
-
-    @Override
-    public void setContentLengthLong(long len)
-    {
-        this.response.setContentLengthLong(len);
-    }
-
-    @Override
-    public String getCharacterEncoding()
-    {
-        return this.response.getCharacterEncoding();
-    }
-
-    @Override
-    public ServletOutputStream getOutputStream() throws IOException
-    {
-        return this.response.getOutputStream();
-    }
-
-    @Override
-    public PrintWriter getWriter() throws IOException
-    {
-        return this.response.getWriter();
-    }
-
-    @Override
-    public void setCharacterEncoding(String s)
-    {
-        this.response.setCharacterEncoding(s);
-    }
-
-    @Override
-    public void addCookie(Cookie cookie)
-    {
-        this.response.addCookie(cookie);
+        return (HttpServletResponse) getResponse();
     }
 
     public void addCookie(String cookieName, String cookieValue, int age)
@@ -172,7 +59,7 @@ public class XWikiServletResponse implements XWikiResponse
         Cookie cookie = new Cookie(cookieName, cookieValue);
         cookie.setVersion(1);
         cookie.setMaxAge(age);
-        this.response.addCookie(cookie);
+        getHttpServletResponse().addCookie(cookie);
     }
 
     /**
@@ -190,143 +77,5 @@ public class XWikiServletResponse implements XWikiResponse
             cookie.setPath(cookie.getPath());
             addCookie(cookie);
         }
-    }
-
-    @Override
-    public void setLocale(Locale locale)
-    {
-        this.response.setLocale(locale);
-    }
-
-    @Override
-    public Locale getLocale()
-    {
-        return this.response.getLocale();
-    }
-
-    @Override
-    public void setDateHeader(String name, long value)
-    {
-        this.response.setDateHeader(name, value);
-    }
-
-    @Override
-    public void setIntHeader(String name, int value)
-    {
-        this.response.setIntHeader(name, value);
-    }
-
-    @Override
-    public void setHeader(String name, String value)
-    {
-        this.response.setHeader(name, value);
-    }
-
-    @Override
-    public void addHeader(String name, String value)
-    {
-        this.response.addHeader(name, value);
-    }
-
-    @Override
-    public void addDateHeader(String name, long value)
-    {
-        this.response.addDateHeader(name, value);
-    }
-
-    @Override
-    public void addIntHeader(String name, int value)
-    {
-        this.response.addIntHeader(name, value);
-    }
-
-    @Override
-    public void setStatus(int i)
-    {
-        this.response.setStatus(i);
-    }
-
-    /**
-     * @deprecated
-     */
-    @Override
-    @Deprecated
-    public void setStatus(int i, String s)
-    {
-        this.response.setStatus(i, s);
-    }
-
-    @Override
-    public boolean containsHeader(String name)
-    {
-        return this.response.containsHeader(name);
-    }
-
-    @Override
-    public String encodeURL(String s)
-    {
-        return this.response.encodeURL(s);
-    }
-
-    @Override
-    public String encodeRedirectURL(String s)
-    {
-        return this.response.encodeRedirectURL(s);
-    }
-
-    /**
-     * @deprecated
-     */
-    @Override
-    @Deprecated
-    public String encodeUrl(String s)
-    {
-        return this.response.encodeUrl(s);
-    }
-
-    /**
-     * @deprecated
-     */
-    @Override
-    @Deprecated
-    public String encodeRedirectUrl(String s)
-    {
-        return this.response.encodeRedirectUrl(s);
-    }
-
-    @Override
-    public void sendError(int i, String s) throws IOException
-    {
-        this.response.sendError(i, s);
-    }
-
-    @Override
-    public void sendError(int i) throws IOException
-    {
-        this.response.sendError(i);
-    }
-
-    @Override
-    public String getContentType()
-    {
-        return this.response.getContentType();
-    }
-
-    @Override
-    public String getHeader(String s)
-    {
-        return this.response.getHeader(s);
-    }
-
-    @Override
-    public Collection<String> getHeaders(String s)
-    {
-        return this.response.getHeaders(s);
-    }
-
-    @Override
-    public Collection<String> getHeaderNames()
-    {
-        return this.response.getHeaderNames();
     }
 }

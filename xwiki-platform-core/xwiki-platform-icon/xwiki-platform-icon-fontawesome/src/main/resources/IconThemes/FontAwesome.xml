@@ -39,8 +39,8 @@
   <content>## General settings
 xwiki.iconset.type = font
 xwiki.iconset.css = $services.webjars.url('org.webjars:font-awesome', 'css/font-awesome.min.css')
-xwiki.iconset.render.wiki = {{html clean="false"}}&lt;span class="fa fa-$icon" aria-hidden='true'&gt;&lt;/span&gt;{{/html}}
-xwiki.iconset.render.html = &lt;span class="fa fa-$icon" aria-hidden='true'&gt;&lt;/span&gt;
+xwiki.iconset.render.wiki = {{html clean="false"}}&lt;span class="fa fa-$icon" aria-hidden="true"&gt;&lt;/span&gt;{{/html}}
+xwiki.iconset.render.html = &lt;span class="fa fa-$icon" aria-hidden="true"&gt;&lt;/span&gt;
 xwiki.iconset.icon.cssClass = fa fa-$icon
 
 ## XWiki Icon Set (see: http://design.xwiki.org/xwiki/bin/view/Proposal/XWiki+Icon+Set).
@@ -200,6 +200,7 @@ filter = filter
 table_sort = sort
 fast-backward = fast-backward
 arrow_in = window-minimize
+reposition = arrows
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check
@@ -391,6 +392,7 @@ user = user
 user_add=user-plus
 user_delete=user-times
 vcard = vcard-o
+wand = magic
 weather_clouds = cloud
 weather_sun = sun-o
 weather_snow=snowflake-o

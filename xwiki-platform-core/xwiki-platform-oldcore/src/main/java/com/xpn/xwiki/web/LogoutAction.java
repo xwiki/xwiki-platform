@@ -88,8 +88,8 @@ public class LogoutAction extends XWikiAction
 
             sendRedirect(response, redirect);
         } else {
-            LOGGER.debug("Skipping the redirect because the response already been committed"
-                + " (by a custom authenticator for example)");
+            LOGGER.debug("Skipping the redirect because the response has already been committed"
+                + " (e.g. by a custom authenticator)");
         }
 
         return false;

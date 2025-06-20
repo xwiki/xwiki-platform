@@ -188,188 +188,13 @@
 #end
 
 #macro (maybeGetMacroDescriptor $macroIdAsString)
-  #set ($macroId = $services.rendering.resolveMacroId($macroIdAsString))
-  #if ($macroId)
-    #set ($macroDescriptor = $services.rendering.getMacroDescriptor($macroId))
-    #if (!$macroDescriptor &amp;&amp; $macroId.syntax)
-      ## Try the macro id without the syntax.
-      #set ($macroId = $services.rendering.resolveMacroId($macroId.id))
-      #set ($macroDescriptor = $services.rendering.getMacroDescriptor($macroId))
-    #end
-    #if ($macroDescriptor)
-      #getMacroDescriptor($macroDescriptor)
-    #end
-  #end
-#end
-
-#macro (getMacroDescriptor $macroDescriptor)
-  ## Translate the macro name and description.
-  #set ($macroTranslationKey = "rendering.macro.$macroDescriptor.id")
   #ckeditor_initRequiredSkinExtensions()
-  #set ($data = {
-    'id': $macroDescriptor.id,
-    'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
-    'description': "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)",
-    'defaultCategory': $macroDescriptor.defaultCategory,
-    'supportsInlineMode': $macroDescriptor.supportsInlineMode(),
-    'parameterDescriptorMap': {}
-  })
-  #if ($macroDescriptor.contentDescriptor)
-    ## Translate the content label and description.
-    ## Treat the macro content as if it is the last macro parameter.
-    #set ($data.contentDescriptor = {
-      'name': "#maybeTranslate('rendering.macroContent' 'Content')",
-      'description': "#maybeTranslate(""${macroTranslationKey}.content.description""
-        $macroDescriptor.contentDescriptor.description)",
-      'mandatory': $macroDescriptor.contentDescriptor.mandatory,
-      'deprecated': $macroDescriptor.contentDescriptor.deprecated,
-      'advanced': $macroDescriptor.contentDescriptor.advanced,
-      'defaultValue': $macroDescriptor.contentDescriptor.defaultValue,
-      'type': $macroDescriptor.contentDescriptor.type,
-      'editTemplate': '&lt;textarea name="$content" rows="7"&gt;&lt;/textarea&gt;',
-      'index': $macroDescriptor.parameterDescriptorMap.size()
+  #set ($macroDescriptor = $services.wysiwyg.getMacroDescriptorUI($macroIdAsString))
+  #if ($macroDescriptor)
+    #set ($data = {
+      'descriptor': $macroDescriptor,
+      'requiredSkinExtensions': "#ckeditor_getRequiredSkinExtensions()"
     })
-    #fixDescriptorType($data.contentDescriptor)
-  #end
-  #set ($groupDescriptorTree = {})
-  #foreach ($entry in $macroDescriptor.parameterDescriptorMap.entrySet())
-    #set ($parameterDescriptor = $entry.value)
-    ## Translate the parameter name and description.
-    #set ($parameterTranslationKey = "${macroTranslationKey}.parameter.$parameterDescriptor.id")
-    #set ($translatedParameterDescriptor = {
-      'id': $parameterDescriptor.id,
-      'name': "#maybeTranslate(""${parameterTranslationKey}.name"" $parameterDescriptor.name)",
-      'description': "#maybeTranslate(""${parameterTranslationKey}.description"" $parameterDescriptor.description)",
-      'mandatory': $parameterDescriptor.mandatory,
-      'deprecated': $parameterDescriptor.deprecated,
-      'advanced': $parameterDescriptor.advanced,
-      'defaultValue': $parameterDescriptor.defaultValue,
-      'type': $parameterDescriptor.displayType,
-      'hidden' : $parameterDescriptor.displayHidden,
-      'index': $foreach.index
-    })
-    #set ($translatedParameterDescriptor.caseInsensitive = $translatedParameterDescriptor.type.isEnum())
-    #set ($groupDescriptor = $parameterDescriptor.groupDescriptor)
-    #if ($groupDescriptor)
-      #handleMacroParameterGroup($groupDescriptor $groupDescriptorTree $translatedParameterDescriptor)
-    #end
-    #if ($translatedParameterDescriptor.type.getName() == 'java.lang.String'
-        &amp;&amp; ($parameterDescriptor.defaultValue == 'false' || $parameterDescriptor.defaultValue == 'true')
-        &amp;&amp; $macroDescriptor.parametersBeanClass.getSimpleName() == 'WikiMacroParameters')
-      #set ($translatedParameterDescriptor.defaultValue = $parameterDescriptor.defaultValue == 'true')
-      #set ($translatedParameterDescriptor.type = $translatedParameterDescriptor.defaultValue.getClass())
-    #end
-    #set ($htmlDisplayerParameters = {'name': $parameterDescriptor.id})
-    #if ($translatedParameterDescriptor.group)
-      #set ($discard = $htmlDisplayerParameters.put('data-property-group',
-        $stringtool.join($translatedParameterDescriptor.group, '/')))
-    #end
-    #set ($translatedParameterDescriptor.editTemplate = $services.display.html.display(
-      $translatedParameterDescriptor.type, $translatedParameterDescriptor.defaultValue, $htmlDisplayerParameters, 'edit'
-    ))
-    #if ("$!translatedParameterDescriptor.editTemplate" == '')
-      #set ($translatedParameterDescriptor.editTemplate = "#getMacroParameterEditTemplate(
-        $translatedParameterDescriptor)")
-    #end
-    #set ($translatedParameterDescriptor.editTemplate = $translatedParameterDescriptor.editTemplate.trim())
-    #fixDescriptorType($translatedParameterDescriptor)
-    #set ($discard = $data.parameterDescriptorMap.put($entry.key, $translatedParameterDescriptor))
-  #end
-  #if ($groupDescriptorTree.groups)
-    #set ($data.groupDescriptorTree = $groupDescriptorTree.groups)
-  #end
-  #set ($data.requiredSkinExtensions = "#ckeditor_getRequiredSkinExtensions()")
-#end
-
-#macro (fixDescriptorType $descriptor)
-  ## The goal of this code is to obtain a normalized string representation of the type specified in the descriptor.
-  ## See XCOMMONS-1583: Define a stable way to serialize types
-  ##
-  ## The type specified in the descriptor can be any implementation of java.lang.reflect.Type, not necessarily a
-  ## java.lang.Class. We can't use toString() because the return of Class#toString() is different than Class#getName().
-  ## We can't use Type#getTypeName() either because the access to this method is restricted from Velocity. The only
-  ## option for now is to try #getName() first and fall back on #toString() for types that are not instances of
-  ## java.lang.Class.
-  #set ($typeName = $descriptor.type.getName())
-  #if ("$!typeName" == '')
-    ## Probably not a java.lang.Class. Fall back on #toString().
-    #set ($typeName = "$!descriptor.type")
-  #end
-  ## Remove whitespace from the type name in order to have a single string representation.
-  #set ($descriptor.type = $typeName.replaceAll('\s+', ''))
-#end
-
-## Builds the group tree with the following structure:
-##
-## {
-##   'parentGroupId': {
-##     'id': 'parentGroupId',
-##     'name': 'Parent Group',
-##     'feature': 'someFeature',
-##     'groups': {
-##       'childGroupId': {...},
-##       ...
-##     }
-##   },
-##   ...
-## }
-#macro (handleMacroParameterGroup $groupDescriptor $groupDescriptorTree $translatedParameterDescriptor)
-  #if ($groupDescriptor.group &amp;&amp; $groupDescriptor.group.size() &gt; 0)
-    #set ($translatedParameterDescriptor.group = $groupDescriptor.group)
-    #set ($parentGroup = $groupDescriptorTree)
-    #foreach ($groupId in $groupDescriptor.group)
-      #if (!$parentGroup.groups)
-        #set ($parentGroup.groups = {})
-      #end
-      #set ($childGroup = $parentGroup.groups.get($groupId))
-      #if (!$childGroup)
-        #if ($groupId == $translatedParameterDescriptor.id)
-          #set ($groupName = $translatedParameterDescriptor.name)
-        #else
-          #set ($groupTranslationKey = "${macroTranslationKey}.group.$groupId")
-          #set ($groupName = "#maybeTranslate(""${groupTranslationKey}.name"" $groupId)")
-        #end
-        #set ($childGroup = {
-          'id': $groupId,
-          'name': $groupName
-        })
-        #set ($discard = $parentGroup.groups.put($groupId, $childGroup))
-      #end
-      #set ($parentGroup = $childGroup)
-    #end
-    #if ("$!groupDescriptor.feature" != '')
-      #set ($parentGroup.feature = $groupDescriptor.feature)
-    #end
-  #elseif ($groupDescriptor.feature)
-    ## This group is made of a single parameter. The feature then refers to this parameter.
-    #set ($translatedParameterDescriptor.feature = $groupDescriptor.feature)
-  #end
-#end
-
-#macro (getMacroParameterEditTemplate $translatedParameterDescriptor)
-  #if ($translatedParameterDescriptor.type.getName() == 'boolean'
-      || $translatedParameterDescriptor.type.getName() == 'java.lang.Boolean')
-    &lt;input type="checkbox" name="$escapetool.xml($translatedParameterDescriptor.id)" value="true"/&gt;##
-    ## We need to submit something in case the checkbox is not checked.
-    &lt;input type="hidden" name="$escapetool.xml($translatedParameterDescriptor.id)" value="false"/&gt;
-  #elseif ($translatedParameterDescriptor.type.isEnum())
-    #if ($translatedParameterDescriptor.defaultValue)
-      #set ($enumValues = $translatedParameterDescriptor.defaultValue.values())
-    #else
-      ## A parameter of type enum that doesn't have a default value is very unlikely. We attempt to read the list of
-      ## possible values from the enum type in this case, which is currently forbidden, but at least it will generate
-      ## a warning in the logs that will help us investigate the problem.
-      #set ($enumValues = $translatedParameterDescriptor.type.getEnumConstants())
-    #end
-    &lt;select name="$escapetool.xml($translatedParameterDescriptor.id)"&gt;##
-      #foreach ($enumValue in $enumValues)
-        #set ($value = $enumValue.name())
-        #set ($label = "#maybeTranslate(""${parameterTranslationKey}.value.$value"" $enumValue)")
-        &lt;option value="$escapetool.xml($value)"&gt;$escapetool.xml($label)&lt;/option&gt;##
-      #end
-    &lt;/select&gt;
-  #else
-    &lt;input type="text" name="$escapetool.xml($translatedParameterDescriptor.id)"/&gt;
   #end
 #end
 
@@ -422,6 +247,10 @@
     $response.sendError(404, $exceptiontool.getRootCauseMessage($job.status.error))
   #end
 #end
+
+#macro (getMacroParameters $macroId $html)
+  #set ($data = $services.wysiwyg.getMacroParametersFromHTML($macroId, $html))
+#end
 {{/velocity}}
 
 {{velocity wiki="false"}}
@@ -437,6 +266,8 @@
     #getMacroList($request.syntaxId)
   #elseif ($request.data == 'descriptor')
     #maybeGetMacroDescriptor($request.macroId)
+  #elseif ($request.data == 'macroParameters')
+    #getMacroParameters($request.macroId, $request.macroHTML)
   #end
   #if ($data)
     #set ($discard = $response.setContentType('application/json'))

@@ -78,6 +78,12 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- Needed for the MacroUIFactory to properly get the edit template -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-html</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!--Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -779,6 +779,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Wait for the content to be synchronized before applying the macro parameter changes, otherwise we might
         // overwrite the text typed in the second tab.
         firstTextArea.waitUntilTextContains("two");
+        firstMacroEditModal.setMacroContent("one two");
         firstMacroEditModal.clickSubmit();
         firstTextArea.waitForContentRefresh();
 
@@ -794,6 +795,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilTextContains("Some title");
         // Verify that the remote change (which included a macro parameter update) didn't steal the focus.
         secondMacroEditModal.getMacroParameterInput("cssClass").sendKeys("a");
+        secondMacroEditModal.setMacroParameter("title", "Some title");
         secondMacroEditModal.clickSubmit();
         secondTextArea.waitForContentRefresh();
 

@@ -55,6 +55,34 @@ define('macroService', ['jquery', 'xwiki-meta'], function ($, xcontext) {
     return deferred.promise();
   };
 
+  let getMacroParametersFromHTML = function (macroId, html) {
+    let deferred = $.Deferred();
+    if (html === "") {
+      return deferred.resolve({});
+    } else {
+      let sourceDocumentReference = XWiki.currentDocument.documentReference;
+      let url = new XWiki.Document(sourceDocumentReference).getURL('get', $.param({
+        outputSyntax: 'plain',
+        language: $('html').attr('lang'),
+        sheet: 'CKEditor.MacroService',
+      }));
+      $.post(url, {
+        data: 'macroParameters',
+        macroId: macroId,
+        macroHTML: html
+      }).done(function (parameters) {
+        if (typeof parameters === 'object' && parameters !== null) {
+          deferred.resolve(parameters);
+        } else {
+          deferred.reject(...arguments);
+        }
+      }).fail(function (...args) {
+        deferred.reject(...args);
+      });
+      return deferred.promise();
+    }
+  };
+
   var macrosBySyntax = {};
 
   var getMacros = function (syntaxId, force) {
@@ -107,6 +135,7 @@ define('macroService', ['jquery', 'xwiki-meta'], function ($, xcontext) {
   return {
     getMacroDescriptor: getMacroDescriptor,
     installMacro: installMacro,
-    getMacros: getMacros
+    getMacros: getMacros,
+    getMacroParametersFromHTML: getMacroParametersFromHTML
   };
 });

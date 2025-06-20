@@ -25,6 +25,9 @@ define('macroWizard', ['macroSelector', 'macroEditor'], function(selectMacro, ed
       data.macroId = data.macroCall && data.macroCall.name;
       return insertMacroWizard(data);
     } else {
+      // the content value is available in macroCall.content, we delete it as parameter because we don't want it to
+      // be serialized in the macro parameters of the macro.
+      delete data.macroCall.parameters.$content;
       return data.macroCall;
     }
   },

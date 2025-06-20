@@ -334,12 +334,15 @@ macroSelector.filter.category.placeholder=Select a category...
 
 macroEditor.title=Edit Macro
 macroEditor.more=More
+macroEditor.required=Required
 macroEditor.changeMacro=Change Macro
 macroEditor.submit=Submit
 macroEditor.content=Content
 macroEditor.noParameters=This macro has no parameters.
 macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+macroEditor.parametersRequestFailed=Failed to retrieve the parameters for {0}.
 macroEditor.installRequestFailed=Failed to install the {0} macro.
+macroEditor.selectFeature=Select parameter {0}
 
 
 imageEditor.modal.changeImage.button=Change Image

@@ -3213,3 +3213,16 @@ Recursive title display detected!##
 #macro (unwrapXPropertyDisplay $displayOutput)
 $!stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="false" wiki="false"}}'), '{{/html}}')##
 #end
+
+#**
+ * Provide a spinner icon. Right now, this supports Font Awesome and will fallback on a Silk like gif whenever
+ * the wiki is using another iconTheme.
+ * @since 17.5.0RC1
+ *#
+#macro (spinner)
+  #if ($services.icon.currentIconSetName == 'Font Awesome')
+  <span class="fa fa-spinner fa-spin"></span>
+  #else
+  <img src="$escapetool.xml($xwiki.getSkinFile('icons/xwiki/spinner.gif'))" alt=""/>
+  #end
+#end

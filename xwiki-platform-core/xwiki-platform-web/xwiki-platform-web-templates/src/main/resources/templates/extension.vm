@@ -577,11 +577,25 @@ $namespace##
   </dd>
 #end
 
-#macro (spinner)
-  #if ($services.icon.currentIconSetName == 'Font Awesome')
-    <span class="fa fa-spinner fa-spin"></span>
+#set ($_dependencyStatusIcon = {
+  'core': 'cog',
+  'remote-core': 'cog',
+  'remote-core-incompatible': 'cog',
+  'installed': 'plugin',
+  'remote-installed': 'plugin',
+  'installed-invalid': 'plugin',
+  'remote-installed-invalid': 'plugin',
+  'installed-dependency': 'plugin',
+  'remote-installed-dependency': 'plugin',
+  'remote-installed-incompatible': 'plugin',
+  'remote': 'world',
+  'unknown': 'error'
+})
+#macro(_displayStatusIcon $status)
+  #if($!status == 'loading')
+    #spinner()
   #else
-    <img src="$escapetool.xml($xwiki.getSkinFile('icons/xwiki/spinner.gif'))"/>
+    $services.icon.renderHTML($!_dependencyStatusIcon.get($status))
   #end
 #end
 
@@ -622,29 +636,7 @@ $namespace##
     #set ($dependencyName = "<a href=""$escapetool.xml($dependencyURL)"" class=""extension-link"">#displayExtensionName($dependencyExtension)</a>")
   #end
   <div class="dependency-item extension-item-$escapetool.xml($dependencyStatus)">
-    #if($!dependencyStatus == 'core' ||
-      $!dependencyStatus == 'remote-core' ||
-      $!dependencyStatus == 'remote-core-incompatible')
-      $services.icon.renderHTML('cog')
-    #end
-    #if($!dependencyStatus == 'installed' ||
-      $!dependencyStatus == 'remote-installed' ||
-      $!dependencyStatus == 'installed-invalid' ||
-      $!dependencyStatus == 'remote-installed-invalid' ||
-      $!dependencyStatus == 'installed-dependency' ||
-      $!dependencyStatus == 'remote-installed-dependency' ||
-      $!dependencyStatus == 'remote-installed-incompatible')
-      $services.icon.renderHTML('plugin')
-    #end
-    #if($!dependencyStatus == 'remote')
-      $services.icon.renderHTML('world')
-    #end
-    #if($!dependencyStatus == 'loading')
-      #spinner()
-    #end
-    #if($!dependencyStatus == 'unknown')
-      $services.icon.renderHTML('error')
-    #end
+    #_displayStatusIcon($dependencyStatus)
     <span class="extension-name">${dependencyName}</span><span
           class="extension-version">$!escapetool.xml($dependencyVersion)</span>
     #if ($extensionNamespace.startsWith('wiki:'))
@@ -1130,24 +1122,7 @@ $namespace##
     </div>
     <div class="extension-header">
       <h2 class="extension-title">
-        #if($!extensionStatus == 'core' ||
-            $!extensionStatus == 'remote-core')
-          $services.icon.renderHTML('cog')
-        #end
-        #if($!extensionStatus == 'installed' ||
-            $!extensionStatus == 'remote-installed' ||
-            $!extensionStatus == 'installed-dependency' ||
-            $!extensionStatus == 'remote-installed-dependency' ||
-            $!extensionStatus == 'installed-invalid' ||
-            $!extensionStatus == 'remote-installed-invalid')
-          $services.icon.renderHTML('plugin')
-        #end
-        #if($!extensionStatus == 'remote')
-          $services.icon.renderHTML('world')
-        #end
-        #if($!extensionStatus == 'loading')
-          #spinner()
-        #end
+        #_displayStatusIcon($extensionStatus)
         <span class="extension-name">#displayExtensionName($extension)</span>
         <span class="extension-version">$escapetool.xml($extension.id.version)</span>
         #if ($extensionStatusMessage)

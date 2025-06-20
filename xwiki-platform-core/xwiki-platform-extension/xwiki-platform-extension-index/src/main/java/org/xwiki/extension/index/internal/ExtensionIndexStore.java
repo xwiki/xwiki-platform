@@ -214,7 +214,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         try {
             this.cache = this.cacheManager.createNewCache(new LRUCacheConfiguration("extension.index", 500));
         } catch (Exception e) {
-            throw new InitializationException("Failed to create the group cache", e);
+            throw new InitializationException("Failed to create the extension index cache", e);
         }
     }
 

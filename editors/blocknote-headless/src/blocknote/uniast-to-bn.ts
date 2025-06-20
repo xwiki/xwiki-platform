@@ -285,9 +285,9 @@ export class UniAstToBlockNoteConverter {
         url,
         caption: image.caption ?? "",
         showPreview: true,
-        // NOTE: 512 is the default width applied by BlockNote when inserting images in the editor
-        //       or when converting from Markdown / HTML
-        previewWidth: image.widthPx ?? 512,
+        // TODO: BlockNote specifies an invalid type for previewWidth property on image blocks, which forces us to
+        // perform a cast. Remove the cast after https://github.com/TypeCellOS/BlockNote/issues/1765 is fixed.
+        previewWidth: image.widthPx ?? (undefined as unknown as number),
         backgroundColor: "default",
         textAlignment: image.styles.alignment ?? "left",
         name: image.alt ?? "",

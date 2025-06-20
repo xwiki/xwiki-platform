@@ -87,14 +87,6 @@
   {{/html}}
 #end
 
-#macro (spinner)
-  #if ($services.icon.currentIconSetName == 'Font Awesome')
-    &lt;span class="fa fa-spinner fa-spin"&gt;&lt;/span&gt;
-  #else
-    &lt;img src="$escapetool.xml($xwiki.getSkinFile('icons/xwiki/spinner.gif'))" /&gt;
-  #end
-#end
-
 #macro (displayPDFExportStatus)
   &lt;fieldset class="xform"&gt;
     &lt;legend&gt;

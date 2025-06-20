@@ -52,7 +52,7 @@ public class MacroUINodeParameter extends AbstractMacroUINode
      */
     public MacroUINodeParameter(String id)
     {
-        super(AbstractMacroUINodeType.PARAMETER, id);
+        super(MacroUINodeType.PARAMETER, id);
     }
 
     /**

@@ -544,7 +544,6 @@ public class WysiwygEditorScriptService implements ScriptService
     /**
      * @param macroIdAsString a string representing a macro id
      * @return the resolved macro id or {@code null} if resolving the given string fails
-     * @since 10.10RC1
      */
     private MacroId resolveMacroId(String macroIdAsString)
     {

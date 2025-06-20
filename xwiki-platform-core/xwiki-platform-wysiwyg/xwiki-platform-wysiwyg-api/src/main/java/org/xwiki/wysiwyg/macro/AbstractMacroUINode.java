@@ -33,7 +33,7 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public abstract class AbstractMacroUINode
 {
-    private final AbstractMacroUINodeType type;
+    private final MacroUINodeType type;
     private final String id;
     private String name;
     private String description;
@@ -46,7 +46,7 @@ public abstract class AbstractMacroUINode
      * @param type the type of the node
      * @param id its identifier
      */
-    protected AbstractMacroUINode(AbstractMacroUINodeType type, String id)
+    protected AbstractMacroUINode(MacroUINodeType type, String id)
     {
         this.type = type;
         this.id = id;
@@ -72,7 +72,7 @@ public abstract class AbstractMacroUINode
     /**
      * @return the type of the node.
      */
-    public AbstractMacroUINodeType getType()
+    public MacroUINodeType getType()
     {
         return type;
     }

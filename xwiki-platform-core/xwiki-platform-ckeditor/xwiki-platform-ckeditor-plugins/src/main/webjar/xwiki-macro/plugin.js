@@ -757,7 +757,7 @@
       }
       var updatingWidget = !!widget?.element;
       if (updatingWidget && widget.element.getName() === expectedElementName) {
-        // we remove all nested editable so that they're rebuilt.
+        // Ensure to use the nested editable values coming from the macroCall.
         this.cleanupEditables(widget);
         // We have edited a macro and the macro type (inline vs. block) didn't change.
         // We can safely update the existing macro widget.
@@ -816,9 +816,11 @@
     },
 
     cleanupEditables: function (widget) {
-      // TODO: we should only remove the editables that have been modified in the dialog
-      for (let item in widget.editables) {
-        widget.editables[item].$.remove();
+      // remove the inplace editable elements only if the configuration allows to edit them in the macro config UI.
+      if ((editor.config['xwiki-macro'] || {}).showInlineEditableParameters === true) {
+        for (let item in widget.editables) {
+          widget.editables[item].$.remove();
+        }
       }
     },
 

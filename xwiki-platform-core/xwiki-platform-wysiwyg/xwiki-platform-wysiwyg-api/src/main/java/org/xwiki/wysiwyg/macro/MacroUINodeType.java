@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * @since 17.5.0RC1
  */
 @Unstable
-public enum AbstractMacroUINodeType
+public enum MacroUINodeType
 {
     /**
      * A simple parameter.

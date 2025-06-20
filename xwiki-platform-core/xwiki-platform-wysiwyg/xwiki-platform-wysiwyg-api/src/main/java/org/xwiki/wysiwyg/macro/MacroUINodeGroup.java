@@ -49,7 +49,7 @@ public class MacroUINodeGroup extends AbstractMacroUINode
      */
     public MacroUINodeGroup(String id)
     {
-        super(AbstractMacroUINodeType.GROUP, id);
+        super(MacroUINodeType.GROUP, id);
         this.children = new ArrayList<>();
     }
 

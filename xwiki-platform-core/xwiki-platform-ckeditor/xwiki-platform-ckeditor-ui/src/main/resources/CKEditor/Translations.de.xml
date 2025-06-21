@@ -305,12 +305,15 @@ macroSelector.install.notAllowed=Sie dürfen diese Erweiterung nicht installiere
 macroSelector.filter.category.placeholder=Eine Kategorie auswählen…
 macroEditor.title=Makro bearbeiten
 macroEditor.more=Mehr
+macroEditor.required=Erforderlich
 macroEditor.changeMacro=Makro ändern
 macroEditor.submit=Übernehmen
 macroEditor.content=Inhalt
 macroEditor.noParameters=Dieses Makro hat keine Parameter.
 macroEditor.descriptorRequestFailed=Fehler beim Abrufen des {0} Makro Deskriptors.
+macroEditor.parametersRequestFailed=Die Parameter für {0} konnten nicht gefunden werden.
 macroEditor.installRequestFailed=Das Makro {0} konnte nicht installiert werden.
+macroEditor.selectFeature=Parameter {0} auswählen
 
 
 imageEditor.modal.changeImage.button=Bild ändern

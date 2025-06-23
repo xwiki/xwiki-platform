@@ -193,7 +193,25 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public BaseProperty fromString(String value)
     {
+        return fromString(value, null);
+    }
+
+    @Override
+    public BaseProperty fromString(String value, BaseProperty baseProperty)
+    {
         return null;
+    }
+
+    /**
+     * Retrieve the already existing base property based on current name, or create a new one.
+     *
+     * @return the existing {@link BaseProperty} or a new one.
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    protected BaseProperty getCurrentOrNewProperty(BaseProperty property)
+    {
+        return (property != null) ? property : newProperty();
     }
 
     public BaseProperty newPropertyfromXML(Element ppcel)
@@ -698,7 +716,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
     public BaseProperty fromStringArray(String[] strings)
     {
-        return fromString(strings[0]);
+        return fromStringArray(strings, null);
+    }
+
+    public BaseProperty fromStringArray(String[] strings, BaseProperty baseProperty)
+    {
+        return fromString(strings[0], baseProperty);
     }
 
     public boolean isValidColumnTypes(Property hibprop)
@@ -709,7 +732,13 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public BaseProperty fromValue(Object value)
     {
-        BaseProperty property = newProperty();
+        return fromValue(value, null);
+    }
+
+    @Override
+    public BaseProperty fromValue(Object value, BaseProperty baseProperty)
+    {
+        BaseProperty property = getCurrentOrNewProperty(baseProperty);
         if (property != null) {
             property.setValue(value);
             return property;

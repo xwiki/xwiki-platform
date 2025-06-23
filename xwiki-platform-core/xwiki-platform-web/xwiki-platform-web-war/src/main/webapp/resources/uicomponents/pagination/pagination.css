@@ -62,10 +62,6 @@
   gap: .2rem;
 }
 
-.controlPagination a, .controlPagination span {
-  font-size: 1.3rem;
-}
-
 .noPrevPagination , .prevPagination {
   & > *:last-child {
     /* We want to make sure the icon is rotated. We expect the icon to be the last child in this link.*/

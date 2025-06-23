@@ -647,10 +647,6 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   display: block;
 }
 
-button.search-result-highlightAll:after {
-  content: ' \bb';
-}
-
 .search-result-debug {
   white-space: pre;
 }

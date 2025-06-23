@@ -2218,7 +2218,7 @@ $displayName##
   #if($contextFirstPage != 0)
     #_paginationPageLink(0 $parameters)
   #end
-    #if($contextFirstPage > 1) <li aria-hidden="true">...</li> #end
+  #if($contextFirstPage > 1) <li aria-hidden="true">...</li> #end
   #foreach ($i in [$contextFirstPage .. $contextLastPage])
     #_paginationPageLink($i $parameters)
   #end

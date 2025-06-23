@@ -226,7 +226,7 @@ public class PinnedChildPagesManager
         // We're going to add a slash at the end of the page name for nested child pages in order to distinguish them
         // from terminal child pages. This means we need to escape the slash that may appear in the page name. We chose
         // to use a partial URL escaping because it's easy to decode.
-        name = name.replace("%", "%25").replace(NESTED_PAGE_MARKER, "%2F");
+        name = name.replace("%", "%25").replace(NESTED_PAGE_MARKER, "%2F").replace("+", "%2B");
         if (!isTerminalPage) {
             name += '/';
         }

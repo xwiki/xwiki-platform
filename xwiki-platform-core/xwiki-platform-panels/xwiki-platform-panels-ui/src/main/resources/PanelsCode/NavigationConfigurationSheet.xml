@@ -809,7 +809,7 @@ require([
         // Pinned child pages storage requires partial URL escaping because entries that correspond to nested pages are
         // suffixed with slash (in order to distinguish them from terminal pages). We don't need to add the slash suffix
         // here because top level pages are always nested.
-        return topLevelSpaceName.replaceAll('%', '%25').replaceAll('/', '%2F');
+        return topLevelSpaceName.replaceAll('%', '%25').replaceAll('/', '%2F').replaceAll('+', '%2B');
       });
     // We need to ensure to never send a unique value to the server to avoid having a unique string splitted using
     // standard separators. See also XWIKI-22885

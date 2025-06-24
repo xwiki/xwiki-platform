@@ -107,10 +107,6 @@
     ## Note: Both the admin actions and the more actions menus are now merged into one.
     #if ($displayAdminMenu || $displayMoreActionsMenu)
       #displayOptionsMenu()
-      #if ($canView)
-        #template("export_modal.vm")
-        #exportModal()
-      #end
     #end
   #end
   #set ($discard = $topStaticExtensions.add( { 'content': "$!actionsMenu", 'order': 40000}))

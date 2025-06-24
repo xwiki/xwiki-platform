@@ -497,6 +497,11 @@
                         inline: descriptor.supportsInlineMode
                       };
 
+                      // Set an empty default content when it is mandatory.
+                      if (descriptor.mandatoryNodes.includes('$content')) {
+                        insertParam.content = " ";
+                      }
+
                       // Insert the empty macro.
                       macroPlugin.insertOrUpdateMacroWidget(editor, insertParam, widget);
                     });

@@ -138,34 +138,20 @@
   display: none;
 }
 
-/* Switch rows and columns for small screens. The width uses em as the required width depends on the font size. */
-@media (max-width: 42em) {
-  #required-rights-dialog .rights-selection ul {
-    grid-template-columns: repeat(2, minmax(max-content, 1fr));
-    grid-template-rows: repeat(auto-fill, 1fr);
-  }
-
-  #required-rights-dialog .rights-selection li {
-    grid-column: span 2;
-    grid-row: span 1;
-  }
-
-  #required-rights-dialog .rights-selection li p {
-    text-align: start;
-    margin: auto 0;
-  }
+/* Vertical layout for when the dialog isn't wide enough to display the rights horizontally. */
+#required-rights-dialog .rights-selection ul.vertical {
+  grid-template-columns: repeat(2, minmax(max-content, 1fr));
+  grid-template-rows: repeat(auto-fill, 1fr);
 }
 
-/* In "wide" layout, make the dialog wide enough to fit the required rights selection. */
-@media (min-width: 42em) {
-  #required-rights-dialog .modal-dialog {
-    min-width: min-content;
-  }
+#required-rights-dialog .rights-selection ul.vertical li {
+  grid-column: span 2;
+  grid-row: span 1;
+}
 
-  /* When setting the minimum width to min-content, the required rights results shouldn't contribute to that width. */
-  #required-rights-dialog #required-rights-results {
-    contain: inline-size;
-  }
+#required-rights-dialog .rights-selection ul.vertical li p {
+  text-align: start;
+  margin: auto 0;
 }
 
 /* Styles for the warning box above the content. */

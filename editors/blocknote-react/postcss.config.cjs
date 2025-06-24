@@ -17,10 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import { generateConfigVue } from "../../vite.config";
-import { UserConfig } from "vite";
-
-const config: UserConfig = generateConfigVue(import.meta.url);
-
-export default config;
+module.exports = {
+  plugins: {
+    "postcss-preset-mantine": {},
+  },
+};

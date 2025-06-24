@@ -17,10 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import {
+  BlockNoteViewWrapper,
+  BlockNoteViewWrapperProps,
+} from "./components/BlockNoteViewWrapper";
+import i18n from "./i18n";
+import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.layer.css";
+import { useEffect } from "react";
 
-import { generateConfigVue } from "../../vite.config";
-import { UserConfig } from "vite";
+export const App: React.FC<BlockNoteViewWrapperProps> = (props) => {
+  useEffect(() => {
+    if (props.lang !== i18n.language) {
+      i18n.changeLanguage(props.lang);
+    }
+  }, [props.lang]);
 
-const config: UserConfig = generateConfigVue(import.meta.url);
-
-export default config;
+  return (
+    <MantineProvider>
+      <BlockNoteViewWrapper {...props} />
+    </MantineProvider>
+  );
+};

@@ -18,21 +18,38 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { AttachmentsService } from "@xwiki/cristal-attachments-api";
+import { DocumentService } from "@xwiki/cristal-document-api";
 import { EntityType } from "@xwiki/cristal-model-api";
-import type { Link, LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
+import {
+  ModelReferenceHandler,
+  ModelReferenceParser,
+  ModelReferenceSerializer,
+} from "@xwiki/cristal-model-reference-api";
+import {
+  RemoteURLParser,
+  RemoteURLSerializer,
+} from "@xwiki/cristal-model-remote-url-api";
+import type {
+  Link,
+  LinkSuggestService,
+  LinkType,
+} from "@xwiki/cristal-link-suggest-api";
 import type {
   AttachmentReference,
   DocumentReference,
 } from "@xwiki/cristal-model-api";
-import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 
-/**
- * @since 0.16
- */
-enum LinkType {
-  PAGE,
-  ATTACHMENT,
-}
+type LinkEditionContext = {
+  linkSuggestService: LinkSuggestService;
+  modelReferenceParser: ModelReferenceParser;
+  modelReferenceSerializer: ModelReferenceSerializer;
+  modelReferenceHandler: ModelReferenceHandler;
+  remoteURLParser: RemoteURLParser;
+  remoteURLSerializer: RemoteURLSerializer;
+  attachmentsService: AttachmentsService;
+  documentService: DocumentService;
+};
 
 /**
  * Describe a link suggestion action (i.e., a search result entry).
@@ -59,13 +76,11 @@ type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
  *
  * @since 0.16
  */
-function createLinkSuggestor(
-  linkSuggest?: LinkSuggestService,
-  modelReferenceParser?: ModelReferenceParser,
-): LinkSuggestor {
+function createLinkSuggestor({
+  linkSuggestService,
+  modelReferenceParser,
+}: LinkEditionContext): LinkSuggestor {
   // Return an array of suggestions from a query
-  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
-  // eslint-disable-next-line max-statements
   return async ({ query }) => {
     // TODO: add upload attachment action
     // TODO: add create new page action
@@ -73,11 +88,7 @@ function createLinkSuggestor(
     let links: Link[];
 
     try {
-      if (linkSuggest) {
-        links = await linkSuggest.getLinks(query);
-      } else {
-        links = [];
-      }
+      links = await linkSuggestService.getLinks(query);
     } catch (e) {
       console.group("Failed to fetch remote links");
       console.error(e);
@@ -125,4 +136,4 @@ function queryEqualityOperator(query: string) {
 }
 
 export { createLinkSuggestor };
-export type { LinkSuggestion, LinkSuggestor, LinkType };
+export type { LinkEditionContext, LinkSuggestion, LinkSuggestor, LinkType };

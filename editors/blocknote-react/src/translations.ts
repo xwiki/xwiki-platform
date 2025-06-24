@@ -18,9 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { generateConfigVue } from "../../vite.config";
-import { UserConfig } from "vite";
+import en from "./langs/translation-en.json";
 
-const config: UserConfig = generateConfigVue(import.meta.url);
-
-export default config;
+export default {
+  en,
+} satisfies Record<string, Record<string, string>>;

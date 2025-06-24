@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { EditorType } from ".";
 import {
   BlockNoteEditor,
   CustomBlockConfig,
@@ -65,12 +64,4 @@ function createCustomBlockSpec<
   };
 }
 
-function upgradeEditorType(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  editor: BlockNoteEditor<any, any, any>,
-): EditorType {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return editor as any;
-}
-
-export { createCustomBlockSpec, upgradeEditorType };
+export { createCustomBlockSpec };

@@ -48,7 +48,6 @@ const { t } = useI18n({
 
 const cristal = inject<CristalApp>("cristal")!;
 const container = cristal.getContainer();
-const skinManager = cristal.getSkinManager();
 const documentService = container.get<DocumentService>(documentServiceName);
 const loading = documentService.isLoading();
 const error = documentService.getError();
@@ -105,6 +104,9 @@ async function loadEditor(currentPage: PageData | undefined): Promise<void> {
 
   editorProps.value = {
     theme: "light",
+    // TODO: make this customizable
+    // https://jira.xwiki.org/browse/CRISTAL-457
+    lang: "en",
   };
 
   editorContent.value = markdownToUniAst.parseMarkdown(currentPage.source);
@@ -242,7 +244,6 @@ const provider = shallowRef<HocuspocusProvider | null>(null);
                 :editor-props
                 :editor-content
                 :container
-                :skin-manager
                 :realtime-server-u-r-l
                 @instant-change="saveStatus = SaveStatus.UNSAVED"
                 @debounced-change="save"

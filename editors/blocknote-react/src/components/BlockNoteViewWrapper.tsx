@@ -18,11 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DefaultFormattingToolbar } from "./DefaultFormattingToolbar";
+import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
+import { ImageFilePanel } from "./images/ImageFilePanel";
+import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import {
   BlockType,
   EditorBlockSchema,
   EditorInlineContentSchema,
+  EditorLanguage,
   EditorSchema,
   EditorStyleSchema,
   EditorType,
@@ -30,17 +33,16 @@ import {
   createDictionary,
   querySuggestionsMenuItems,
 } from "../blocknote";
+import { LinkEditionContext } from "../misc/linkSuggest";
 import { BlockNoteEditorOptions } from "@blocknote/core";
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
   FilePanelController,
-  FilePanelProps,
   FormattingToolbar,
   FormattingToolbarController,
   LinkToolbarController,
-  LinkToolbarProps,
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
@@ -51,9 +53,8 @@ import {
   // eslint-disable-next-line import/named
   HocuspocusProviderConfiguration,
 } from "@hocuspocus/provider";
-import { ReactivueChild } from "@xwiki/cristal-reactivue";
 import { useEffect, useState } from "react";
-import { ShallowRef } from "vue";
+import { useTranslation } from "react-i18next";
 
 type DefaultEditorOptionsType = BlockNoteEditorOptions<
   EditorBlockSchema,
@@ -78,6 +79,11 @@ type BlockNoteViewWrapperProps = {
   theme?: "light" | "dark";
 
   /**
+   * The editor's language
+   */
+  lang: EditorLanguage;
+
+  /**
    * The editor's initial content
    * If realtime is enabled, this content may be replaced by the other users' own editor content
    */
@@ -98,50 +104,16 @@ type BlockNoteViewWrapperProps = {
   onChange?: (editor: EditorType) => void;
 
   /**
-   * Message to display while syncing changes with other users
+   * Link edition utilities
    */
-  pendingSyncMessage: string;
-
-  /**
-   * Prepend the default formatting toolbar for the provided block types
-   * For all these blocks, the custom-provided `formattingToolbar` will be *appended* to the default toolbar instead of replacing it
-   */
-  prefixDefaultFormattingToolbarFor: Array<BlockType["type"]>;
-
-  /**
-   * Replace BlockNote's default formatting toolbar with a custom one
-   * Can be used together with `prefixDefaultFormattingToolbarFor` to make this one be _appended_ to the default one
-   */
-  formattingToolbar: ReactivueChild<{
-    editor: EditorType;
-    currentBlock: BlockType;
-  }>;
-
-  /**
-   * Replace BlockNote's link toolbar with a custom one
-   */
-  linkToolbar: ReactivueChild<{
-    editor: EditorType;
-    linkToolbarProps: LinkToolbarProps;
-  }>;
-
-  /**
-   * Replace BlockNote's file/image panel with a custom one
-   */
-  filePanel: ReactivueChild<{
-    editor: EditorType;
-    filePanelProps: FilePanelProps<
-      EditorInlineContentSchema,
-      EditorStyleSchema
-    >;
-  }>;
+  linkEditionCtx: LinkEditionContext;
 
   /**
    * Make the wrapper forward some data through references
    */
   refs?: {
-    editorRef?: ShallowRef<EditorType | null>;
-    providerRef?: ShallowRef<HocuspocusProvider | null>;
+    setEditor?: (editor: EditorType) => void;
+    setProvider?: (provider: HocuspocusProvider) => void;
   };
 };
 
@@ -149,28 +121,29 @@ type BlockNoteViewWrapperProps = {
  * BlockNote editor wrapper
  */
 // eslint-disable-next-line max-statements
-function BlockNoteViewWrapper({
+const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   blockNoteOptions,
   theme,
   content,
   realtime,
   onChange,
-  pendingSyncMessage,
-  formattingToolbar: CustomFormattingToolbar,
-  prefixDefaultFormattingToolbarFor,
-  linkToolbar: CustomLinkToolbar,
-  filePanel: CustomFilePanel,
-  refs: { editorRef, providerRef } = {},
-}: BlockNoteViewWrapperProps) {
+  lang,
+  linkEditionCtx,
+  refs: { setEditor, setProvider } = {},
+}: BlockNoteViewWrapperProps) => {
+  const { t } = useTranslation();
+
   const schema = createBlockNoteSchema();
 
   const provider = realtime?.hocusPocus
     ? new HocuspocusProvider(realtime.hocusPocus)
     : undefined;
 
-  if (providerRef && provider) {
-    providerRef.value = provider;
-  }
+  useEffect(() => {
+    if (provider) {
+      setProvider?.(provider);
+    }
+  }, [provider, setProvider]);
 
   // Prevent changes in the editor until the provider has synced with other clients
   const [ready, setReady] = useState(!provider);
@@ -188,8 +161,8 @@ function BlockNoteViewWrapper({
     // Editor's schema, with custom blocks definition
     schema,
     dropCursor: multiColumnDropCursor,
-    // Merges the default dictionary with the multi-column dictionary.
-    dictionary: createDictionary(),
+    // Use the provided language for the dictionary
+    dictionary: createDictionary(lang),
     // The default drop cursor only shows up above and below blocks - we replace
     // it with the multi-column one that also shows up on the sides of blocks.
     tables: {
@@ -197,9 +170,9 @@ function BlockNoteViewWrapper({
     },
   });
 
-  if (editorRef) {
-    editorRef.value = editor;
-  }
+  useEffect(() => {
+    setEditor?.(editor);
+  }, [setEditor, editor]);
 
   // When realtime is activated, the first user to join the session sets the content for everybody.
   // The rest of the participants will just retrieve the editor content from the realtime server.
@@ -262,7 +235,7 @@ function BlockNoteViewWrapper({
 
       replaceContent(content);
     }
-  }, [provider]);
+  }, [provider, setProvider]);
 
   // Disconnect from the realtime provider when the component is unmounted
   // Otherwise, our user profile may be left over and still be displayed to other users
@@ -279,7 +252,7 @@ function BlockNoteViewWrapper({
   if (!ready) {
     return (
       <h3>
-        <em>{pendingSyncMessage}</em>
+        <em>{t("blocknote.realtime.pendingSync")}</em>
       </h3>
     );
   }
@@ -302,45 +275,42 @@ function BlockNoteViewWrapper({
       />
 
       <FormattingToolbarController
-        formattingToolbar={() => {
-          const currentBlock = editor.getTextCursorPosition().block;
-
-          return (
-            <FormattingToolbar>
-              {
-                // Prepend the default formatting toolbar for blocks that require it
-                prefixDefaultFormattingToolbarFor.includes(
-                  currentBlock.type,
-                ) && (
-                  <DefaultFormattingToolbar
-                    disableButtons={{ createLink: true }}
-                  />
-                )
-              }
-
-              <CustomFormattingToolbar
-                editor={editor}
-                currentBlock={currentBlock}
-              />
-            </FormattingToolbar>
-          );
-        }}
+        formattingToolbar={(props) => (
+          <CustomFormattingToolbar
+            formattingToolbarProps={props}
+            linkEditionCtx={linkEditionCtx}
+          />
+        )}
       />
 
       <LinkToolbarController
         linkToolbar={(props) => (
-          <CustomLinkToolbar editor={editor} linkToolbarProps={props} />
+          <FormattingToolbar>
+            <CustomLinkToolbar
+              linkToolbarProps={props}
+              linkEditionCtx={linkEditionCtx}
+            />
+          </FormattingToolbar>
         )}
       />
 
       <FilePanelController
-        filePanel={(props) => (
-          <CustomFilePanel editor={editor} filePanelProps={props} />
-        )}
+        filePanel={(props) => {
+          const block = props.block as BlockType;
+
+          return block.type === "image" ? (
+            <ImageFilePanel
+              linkEditionCtx={linkEditionCtx}
+              currentBlock={block}
+            />
+          ) : (
+            <>Unknown block type: {block.type}</>
+          );
+        }}
       />
     </BlockNoteView>
   );
-}
+};
 
 export type { BlockNoteViewWrapperProps, EditorSchema };
 export { BlockNoteViewWrapper };

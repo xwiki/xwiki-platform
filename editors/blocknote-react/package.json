@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-editors-blocknote-headless",
-  "version": "0.19.0-rc.0",
+  "name": "@xwiki/cristal-editors-blocknote-react",
+  "version": "0.18.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "editors/blocknote-headless",
+    "directory": "editors/blocknote-react",
     "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
@@ -14,46 +14,47 @@
   },
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.tsx"
   },
-  "main": "./src/index.ts",
+  "main": "./src/index.tsx",
   "scripts": {
-    "build": "pnpm compile",
+    "build": "tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "vitest --run"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
-  "types": "dist/index.d.ts",
+  "types": "./dist/index.d.ts",
   "dependencies": {
     "@blocknote/core": "0.31.3",
+    "@blocknote/mantine": "0.31.3",
+    "@blocknote/react": "0.31.3",
+    "@blocknote/xl-multi-column": "0.31.3",
     "@hocuspocus/provider": "2.15.2",
+    "@mantine/core": "8.1.1",
+    "@mantine/hooks": "8.1.1",
+    "@types/react-dom": "19.1.6",
     "@xwiki/cristal-attachments-api": "workspace:*",
-    "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
-    "@xwiki/cristal-dsapi": "workspace:*",
-    "@xwiki/cristal-editors-blocknote-react": "workspace:*",
     "@xwiki/cristal-fn-utils": "workspace:*",
-    "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "@xwiki/cristal-uniast": "workspace:*",
-    "eventemitter3": "5.0.1",
-    "inversify": "7.5.2",
+    "i18next": "25.2.1",
     "lodash-es": "4.17.21",
-    "vue": "3.5.16",
-    "vue-i18n": "11.1.5"
-  },
-  "peerDependencies": {
-    "reflect-metadata": "0.2.2"
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-i18next": "15.5.3",
+    "react-icons": "5.5.0"
   },
   "devDependencies": {
     "@types/lodash-es": "4.17.12",
+    "@types/react": "19.1.7",
+    "@vitejs/plugin-react": "4.5.1",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "reflect-metadata": "0.2.2",
+    "postcss": "8.5.6",
+    "postcss-preset-mantine": "1.17.0",
+    "postcss-simple-vars": "7.0.1",
     "vite": "6.3.5",
     "vue-tsc": "2.2.10"
   },

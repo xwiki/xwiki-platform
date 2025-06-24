@@ -19,18 +19,17 @@
  */
 
 import { Heading4, Heading5, Heading6 } from "./blocks/Headings";
+import translations from "../translations";
 import {
   Block,
   BlockNoteEditor,
   BlockNoteSchema,
-  Dictionary,
   Link,
   StyledText,
   combineByGroup,
   defaultBlockSpecs,
   filterSuggestionItems,
 } from "@blocknote/core";
-// @ts-expect-error can be removed once the moduleResolution for this module is moved to bundle
 import * as locales from "@blocknote/core/locales";
 import {
   DefaultReactSuggestionItem,
@@ -44,6 +43,13 @@ import {
   withMultiColumn,
 } from "@blocknote/xl-multi-column";
 
+/**
+ * Create the BlockNote editor's schema
+ *
+ * Contains all the blocks usable inside the editor
+ *
+ * @returns The created schema
+ */
 function createBlockNoteSchema() {
   // Get rid of some block types
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -67,14 +73,25 @@ function createBlockNoteSchema() {
   return withMultiColumn(blockNoteSchema);
 }
 
-function createDictionary(): Dictionary & Record<string, unknown> {
+/**
+ * Create a translated dictionary for the BlockNote editor
+ *
+ * @param lang - The dictionary's language
+ *
+ * @returns The dictionary in the requested language
+ */
+function createDictionary(lang: EditorLanguage) {
   return {
-    ...locales.en,
+    ...locales[lang],
 
-    // // First-party extensions
-    multi_column: multiColumnLocales.en,
+    // First-party extensions
+    multi_column: multiColumnLocales[lang],
   };
 }
+
+type EditorLanguage = keyof typeof locales &
+  keyof typeof multiColumnLocales &
+  keyof typeof translations;
 
 function querySuggestionsMenuItems(
   editor: EditorType,
@@ -153,6 +170,7 @@ export type {
   BlockType,
   EditorBlockSchema,
   EditorInlineContentSchema,
+  EditorLanguage,
   EditorLink,
   EditorSchema,
   EditorStyleSchema,

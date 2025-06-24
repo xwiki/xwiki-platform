@@ -41,6 +41,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -50,6 +51,7 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -128,6 +130,9 @@ public class WysiwygEditorScriptService implements ScriptService
     @Inject
     @Named("html/5.0")
     private Parser html5Parser;
+
+    @Inject
+    private RenderingContext renderingContext;
 
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
@@ -516,6 +521,10 @@ public class WysiwygEditorScriptService implements ScriptService
         Map<String, String> result = new LinkedHashMap<>();
         if (macroId != null) {
             String htmlToParse = String.format("<html><body>%s</body></html>", html);
+            // Ensure to render the inplace editable parameters with the proper syntax. 
+            if (this.renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
+                mutableRenderingContext.setTargetSyntax(this.xcontextProvider.get().getDoc().getSyntax());
+            }
             XDOM xdom = null;
             try {
                 xdom = this.html5Parser.parse(new StringReader(htmlToParse));

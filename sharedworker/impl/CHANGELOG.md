@@ -1,5 +1,27 @@
 # @xwiki/cristal-sharedworker-impl
 
+## 0.19.0
+
+### Minor Changes
+
+- 3eea53e: Cristal 0.19 Release
+
+### Patch Changes
+
+- Updated dependencies [3eea53e]
+  - @xwiki/cristal-api@0.19.0
+  - @xwiki/cristal-alerts-default@0.19.0
+  - @xwiki/cristal-authentication-default@0.19.0
+  - @xwiki/cristal-backend-dexie@0.19.0
+  - @xwiki/cristal-backend-github@0.19.0
+  - @xwiki/cristal-backend-nextcloud@0.19.0
+  - @xwiki/cristal-backend-xwiki@0.19.0
+  - @xwiki/cristal-configuration-api@0.19.0
+  - @xwiki/cristal-configuration-web@0.19.0
+  - @xwiki/cristal-document-api@0.19.0
+  - @xwiki/cristal-extension-manager@0.19.0
+  - @xwiki/cristal-sharedworker-api@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes

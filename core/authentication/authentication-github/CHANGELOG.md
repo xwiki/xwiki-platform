@@ -1,5 +1,18 @@
 # @xwiki/cristal-authentication-github
 
+## 0.19.0
+
+### Minor Changes
+
+- 3eea53e: Cristal 0.19 Release
+
+### Patch Changes
+
+- Updated dependencies [3eea53e]
+  - @xwiki/cristal-api@0.19.0
+  - @xwiki/cristal-authentication-api@0.19.0
+  - @xwiki/cristal-authentication-github-state@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes

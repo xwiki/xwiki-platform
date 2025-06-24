@@ -1,5 +1,16 @@
 # @xwiki/cristal-info-actions-default
 
+## 0.19.0
+
+### Minor Changes
+
+- 3eea53e: Cristal 0.19 Release
+
+### Patch Changes
+
+- Updated dependencies [3eea53e]
+  - @xwiki/cristal-info-actions-api@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes

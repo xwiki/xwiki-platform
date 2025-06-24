@@ -1,5 +1,23 @@
 # @xwiki/cristal-hierarchy-xwiki
 
+## 0.19.0
+
+### Minor Changes
+
+- 3eea53e: Cristal 0.19 Release
+
+### Patch Changes
+
+- Updated dependencies [3eea53e]
+  - @xwiki/cristal-api@0.19.0
+  - @xwiki/cristal-authentication-api@0.19.0
+  - @xwiki/cristal-backend-api@0.19.0
+  - @xwiki/cristal-hierarchy-api@0.19.0
+  - @xwiki/cristal-model-api@0.19.0
+  - @xwiki/cristal-model-reference-api@0.19.0
+  - @xwiki/cristal-model-remote-url-api@0.19.0
+  - @xwiki/cristal-xwiki-utils@0.19.0
+
 ## 0.18.0
 
 ### Minor Changes

@@ -277,9 +277,12 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    * Firing updateCount event when an attachment is successfully uploaded.
    */
   $(document).on('xwiki:html5upload:done', function() {
-    $("#docAttachments").data('liveData').updateEntries().then(() => {
-      updateCount($("#docAttachments").data('liveData').data.data.count);
-    });
+    let attachmentSectionLivedata = $("#docAttachments");
+    if (attachmentSectionLivedata.length) {
+      attachmentSectionLivedata.data('liveData').updateEntries().then(() => {
+        updateCount($("#docAttachments").data('liveData').data.data.count);
+      });
+    }
   });
 
   /**

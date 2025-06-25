@@ -19,10 +19,10 @@
  */
 define('macroWizard', ['macroSelector', 'macroEditor'], function(selectMacro, editMacro) {
   'use strict';
-  var selectOtherMacroOrFinish = function(data) {
+  function selectOtherMacroOrFinish(data) {
     if (data.action === 'changeMacro') {
       delete data.action;
-      data.macroId = data.macroCall && data.macroCall.name;
+      data.macroId = data.macroCall?.name;
       return insertMacroWizard(data);
     } else {
       // the content value is available in macroCall.content, we delete it as parameter because we don't want it to
@@ -30,22 +30,22 @@ define('macroWizard', ['macroSelector', 'macroEditor'], function(selectMacro, ed
       delete data.macroCall.parameters.$content;
       return data.macroCall;
     }
-  },
+  }
 
-  insertMacroWizard = function(data) {
+  function insertMacroWizard(data) {
     return selectMacro(data).then(editMacro).then(selectOtherMacroOrFinish);
-  },
+  }
 
-  editMacroWizard = function(data) {
+  function editMacroWizard(data) {
     return editMacro(data).then(selectOtherMacroOrFinish);
-  },
+  }
 
-  isMacroCall = function(input) {
+  function isMacroCall(input) {
     return typeof input === 'object' && input !== null &&
       ((typeof input.name === 'string' && input.name !== '') ||
       (typeof input.parameters === 'object' && input.parameters !== null) ||
       typeof input.content === 'string');
-  };
+  }
 
   /**
    * The macro wizard can be called with (macroCall), (macroCall, syntaxId), (syntaxId) or (options) where options is an
@@ -56,7 +56,7 @@ define('macroWizard', ['macroSelector', 'macroEditor'], function(selectMacro, ed
     //  the jshint annotation can be removed.
     /*jshint maxcomplexity:13 */
     // Process the function arguments.
-    var data = {}, index = 0;
+    let data = {}, index = 0;
     if (typeof arguments[index] === 'object' && arguments[index] !== null) {
       if (isMacroCall(arguments[index])) {
         data.macroCall = arguments[index++];

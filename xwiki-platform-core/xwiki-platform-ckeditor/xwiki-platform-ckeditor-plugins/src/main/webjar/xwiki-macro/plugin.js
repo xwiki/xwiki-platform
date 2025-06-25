@@ -170,10 +170,13 @@
       };
 
       var ensureMacroWidgetVisible = function(macroWidget) {
+        // Hide the macro placeholder by default (we want to check if the macro widget is visible without its
+        // placeholder).
+        const placeholder = $(macroWidget.element.$).children('.macro-placeholder').addClass('hidden');
         if (!isWidgetVisible(macroWidget)) {
-          // Show a placeholder if the macro widget is not visible, either because the macro doesn't have ouput or
+          // Show the placeholder if the macro widget is not visible, either because the macro doesn't have ouput or
           // because its output is not visible).
-          $(macroWidget.element.$).children('.macro-placeholder.hidden').removeClass('hidden');
+          placeholder.removeClass('hidden');
         }
       };
 
@@ -337,25 +340,15 @@
         _showMacroWizard: async function(macroWizard, macroCall) {
           // Show the macro wizard to insert or edit a macro and wait for the result.
           const widget = this;
-          let widgetHtml = "";
-          let hiddenMacroParameters = [];
-          if (widget.editables) {
-            let widgetElementClone =
-                CKEDITOR.htmlParser.fragment.fromHtml(widget.wrapper.$.innerHTML).children[0];
-            // the macroElement is a CKEDITOR.htmlParser.fragment
-            let macroElement = widget.downcast(widgetElementClone);
-            let writer = editor.dataProcessor.writer;
-            macroElement.writeHtml(writer);
-            widgetHtml = writer.getHtml();
-            if ((editor.config['xwiki-macro'] || {}).showInlineEditableParameters === false) {
-              hiddenMacroParameters = Object.keys(widget.editables);
-            }
-          }
           const input = {
-            macroCall: macroCall,
-            hiddenMacroParameters: hiddenMacroParameters,
-            widgetHtml: widgetHtml,
-            sourceDocumentReference: editor.config.sourceDocument.documentReference
+            macroCall,
+            inlineParameters: Object.entries(widget.editables || {}).reduce((acc, [parameterName, editable]) => {
+              acc[parameterName] = editable.getData();
+              return acc;
+            }, {}),
+            showInlineParameters: (editor.config['xwiki-macro'] || {}).showInlineEditableParameters,
+            sourceDocumentReference: editor.config.sourceDocument.documentReference,
+            syntaxId: editor.config.sourceSyntax,
           };
           let output;
           try {
@@ -462,7 +455,7 @@
             var command = this;
 
             // Find the macro we are going to insert.
-            macroService.getMacros(XWiki.docsyntax).done(function (macros) {
+            macroService.getMacros(editor.config.sourceSyntax).done(function (macros) {
               macros.forEach(function (macro) {
                 if (macro.id.id === macroCall.id) {
 
@@ -554,7 +547,7 @@
                                                 'success',
                                                 5000);
                         // Update the cache for future insertions.
-                        macroService.getMacros(XWiki.docsyntax, true);
+                        macroService.getMacros(editor.config.sourceSyntax, true);
 
                         // Update the pre-inserted widget
                         insertMacro(evt.data);
@@ -649,7 +642,7 @@
         };
 
         // Register macros in Quick Actions plugin
-        macroService.getMacros(XWiki.docsyntax).done(function (macros) {
+        macroService.getMacros(editor.config.sourceSyntax).done(function (macros) {
 
           // Keep track of how many groups we created
           var macroGroupsCount = 0;

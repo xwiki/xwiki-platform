@@ -19,9 +19,7 @@
  */
 package org.xwiki.wysiwyg.script;
 
-import java.io.StringReader;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -37,10 +35,6 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -57,8 +51,8 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
-import org.xwiki.wysiwyg.macro.MacroDescriptorUI;
 import org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactory;
+import org.xwiki.wysiwyg.macro.MacroDescriptorUI;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -124,10 +118,6 @@ public class WysiwygEditorScriptService implements ScriptService
 
     @Inject
     private MacroIdFactory macroIdFactory;
-
-    @Inject
-    @Named("html/5.0")
-    private Parser html5Parser;
 
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
@@ -499,46 +489,6 @@ public class WysiwygEditorScriptService implements ScriptService
                 ExceptionUtils.getRootCauseMessage(e));
         }
         return null;
-    }
-
-    /**
-     * Extract macro parameters values from the given html fragment that is supposed to contain information
-     * representing the macro values.
-     * @param macroIdAsString the id of the macro to find in the html fragment
-     * @param html an html fragment containing information about the macro.
-     * @return a map of parameters also containing information about the content with the key {@code $content}.
-     * @since 17.5.0RC1
-     */
-    @Unstable
-    public Map<String, String> getMacroParametersFromHTML(String macroIdAsString, String html)
-    {
-        MacroId macroId = this.resolveMacroId(macroIdAsString);
-        Map<String, String> result = new LinkedHashMap<>();
-        if (macroId != null) {
-            String htmlToParse = String.format("<html><body>%s</body></html>", html);
-            XDOM xdom = null;
-            try {
-                xdom = this.html5Parser.parse(new StringReader(htmlToParse));
-                extractMacroParameters(xdom, macroId, result);
-            } catch (ParseException e) {
-                this.logger.error("Error while parsing html for macro [{}]: [{}]", macroIdAsString, htmlToParse, e);
-            }
-        }
-
-        return result;
-    }
-
-    private static void extractMacroParameters(XDOM xdom, MacroId macroId, Map<String, String> result)
-    {
-        if (xdom != null) {
-            Block block = xdom.getFirstBlock(new MacroBlockMatcher(macroId.getId()), Block.Axes.DESCENDANT);
-            if (block instanceof MacroBlock macroBlock) {
-                result.putAll(macroBlock.getParameters());
-                if (macroBlock.getContent() != null) {
-                    result.put("$content", macroBlock.getContent());
-                }
-            }
-        }
     }
 
     /**

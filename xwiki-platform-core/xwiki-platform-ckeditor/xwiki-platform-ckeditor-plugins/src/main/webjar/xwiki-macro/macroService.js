@@ -24,16 +24,16 @@
 define('macroService', ['jquery', 'xwiki-meta'], function ($, xcontext) {
   'use strict';
 
-  var macroDescriptors = {};
+  const macroDescriptors = {};
 
-  var getMacroDescriptor = function (macroId, maybeSourceDocumentReference) {
-    var deferred = $.Deferred();
-    var macroDescriptor = macroDescriptors[macroId];
+  function getMacroDescriptor(macroId, maybeSourceDocumentReference) {
+    const deferred = $.Deferred();
+    const macroDescriptor = macroDescriptors[macroId];
     if (macroDescriptor) {
       deferred.resolve(macroDescriptor);
     } else {
-      var sourceDocumentReference = maybeSourceDocumentReference || XWiki.currentDocument.documentReference;
-      var url = new XWiki.Document(sourceDocumentReference).getURL('get', $.param({
+      const sourceDocumentReference = maybeSourceDocumentReference || XWiki.currentDocument.documentReference;
+      const url = new XWiki.Document(sourceDocumentReference).getURL('get', $.param({
         outputSyntax: 'plain',
         language: $('html').attr('lang'),
         sheet: 'CKEditor.MacroService'
@@ -46,30 +46,32 @@ define('macroService', ['jquery', 'xwiki-meta'], function ($, xcontext) {
           macroDescriptors[macroId] = macroDescriptor;
           deferred.resolve(macroDescriptor);
         } else {
-          deferred.reject.apply(deferred, arguments);
+          deferred.reject(...arguments);
         }
       }).fail(function () {
-        deferred.reject.apply(deferred, arguments);
+        deferred.reject(...arguments);
       });
     }
     return deferred.promise();
-  };
+  }
 
-  let getMacroParametersFromHTML = function (macroId, html) {
+  let getMacroParametersFromHTML = function (
+    macroId,
+    parameters = {},
+    sourceDocumentReference = XWiki.currentDocument.documentReference
+  ) {
     let deferred = $.Deferred();
-    if (html === "") {
-      return deferred.resolve({});
+    if (!Object.keys(parameters).length) {
+      return deferred.resolve(parameters);
     } else {
-      let sourceDocumentReference = XWiki.currentDocument.documentReference;
       let url = new XWiki.Document(sourceDocumentReference).getURL('get', $.param({
-        outputSyntax: 'plain',
         language: $('html').attr('lang'),
         sheet: 'CKEditor.MacroService',
       }));
       $.post(url, {
         data: 'macroParameters',
-        macroId: macroId,
-        macroHTML: html
+        macroId,
+        macroParameters: JSON.stringify(parameters),
       }).done(function (parameters) {
         if (typeof parameters === 'object' && parameters !== null) {
           deferred.resolve(parameters);
@@ -83,15 +85,15 @@ define('macroService', ['jquery', 'xwiki-meta'], function ($, xcontext) {
     }
   };
 
-  var macrosBySyntax = {};
+  const macrosBySyntax = {};
 
-  var getMacros = function (syntaxId, force) {
-    var deferred = $.Deferred();
-    var macros = macrosBySyntax[syntaxId || ''];
+  function getMacros(syntaxId, force) {
+    const deferred = $.Deferred();
+    const macros = macrosBySyntax[syntaxId || ''];
     if (macros && !force) {
       deferred.resolve(macros);
     } else {
-      var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
+      const url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
         outputSyntax: 'plain',
         language: $('html').attr('lang')
       }));
@@ -101,24 +103,24 @@ define('macroService', ['jquery', 'xwiki-meta'], function ($, xcontext) {
       }).done(function (macros) {
         // Bulletproofing: check if the returned data is json since it could some HTML representing an error
         if (typeof macros === 'object' && Array.isArray(macros.list)) {
-          var macroList = macros.list;
+          let macroList = macros.list;
           if (Array.isArray(macros.notinstalled)) {
             macroList = macroList.concat(macros.notinstalled);
           }
           macrosBySyntax[syntaxId || ''] = macroList;
           deferred.resolve(macroList);
         } else {
-          deferred.reject.apply(deferred, arguments);
+          deferred.reject(...arguments);
         }
       }).fail(function () {
-        deferred.reject.apply(deferred, arguments);
+        deferred.reject(...arguments);
       });
     }
     return deferred.promise();
-  };
+  }
 
-  var installMacro = function (extensionId, extensionVersion) {
-    var url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
+  function installMacro(extensionId, extensionVersion) {
+    const url = new XWiki.Document('MacroService', 'CKEditor').getURL('get', $.param({
       outputSyntax: 'plain',
       language: $('html').attr('lang')
     }));
@@ -130,12 +132,12 @@ define('macroService', ['jquery', 'xwiki-meta'], function ($, xcontext) {
       /*jshint camelcase: false */
       'form_token': xcontext.form_token
     });
-  };
+  }
 
   return {
-    getMacroDescriptor: getMacroDescriptor,
-    installMacro: installMacro,
-    getMacros: getMacros,
-    getMacroParametersFromHTML: getMacroParametersFromHTML
+    getMacroDescriptor,
+    installMacro,
+    getMacros,
+    getMacroParametersFromHTML
   };
 });

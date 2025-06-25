@@ -265,7 +265,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
 
   // The given node can be a group or a parameter.
   fillNodeTab = function(parametersMap, node, tab, tabPanel) {
-    var id = 'macroParameterTreeNode-' + node.id;
+    const id = 'macroParameterTreeNode-' + node.id;
     tab.attr({
       'href': '#' + id,
       'aria-controls': id
@@ -291,8 +291,8 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
 
   // Make the macro parameter grouping (tabs) invisible if there is only one visible tab and it contains a single item.
   toggleMacroParameterGroupVisibility = function(group) {
-    var visibleTabs = group.find('ul[role="tablist"]').first().children().not('.hidden');
-    var firstVisibleTabPanel = group.find('.tab-content').first().children().not('.hidden').first();
+    const visibleTabs = group.find('ul[role="tablist"]').first().children().not('.hidden');
+    const firstVisibleTabPanel = group.find('.tab-content').first().children().not('.hidden').first();
     group.toggleClass('invisible', visibleTabs.length < 2 && firstVisibleTabPanel.children().not('.hidden').length < 2);
   },
 
@@ -419,7 +419,7 @@ define(
       '<div class="macro-parameters"></div>' +
     '</div>',
 
-  createMacroEditor = function(macroCall, macroDescriptorData, macroParameters ,hiddenMacroParameters) {
+  createMacroEditor = function(macroCall, macroDescriptorData, macroParameters, hiddenMacroParameters) {
     // We'll perform changes of value in the descriptor, so we want to use a clone not the original instance.
     let macroDescriptor = structuredClone(macroDescriptorData.descriptor);
     let macroEditor = $(macroEditorTemplate);
@@ -558,33 +558,40 @@ define(
         }, 1000);
         return emptyMandatoryParams.length === 0;
       },
-      update: async function(macroCall, syntaxId, sourceDocumentReference, widgetHtml, hiddenMacroParameters) {
-        var macroId = macroCall.name;
+      update: async function(
+        macroCall,
+        syntaxId,
+        sourceDocumentReference,
+        inlineParameters = {},
+        showInlineParameters = true
+      ) {
+        let macroId = macroCall.name;
         if (syntaxId) {
           macroId += '/' + syntaxId;
         }
-        var requestNumber = (macroEditor.prop('requestNumber') || 0) + 1;
+        const requestNumber = (macroEditor.prop('requestNumber') || 0) + 1;
         macroEditor.empty().addClass('loading')
           .attr('data-macroId', macroId)
           .prop('requestNumber', requestNumber);
 
-        // Load the macro descriptor
-        // FIXME: only perform this call if needed
+        // Convert inline parameter values, if needed, and load the macro descriptor.
         try {
-          const parameters = await macroService.getMacroParametersFromHTML(macroId, widgetHtml);
+          const parameters = showInlineParameters ? await macroService.getMacroParametersFromHTML(macroId,
+            inlineParameters, sourceDocumentReference) : {};
           try {
              const descriptor = await macroService.getMacroDescriptor(macroId, sourceDocumentReference);
              try {
+              const hiddenMacroParameters = showInlineParameters ? [] : Object.keys(inlineParameters);
                maybeCreateMacroEditor.call(macroEditor, requestNumber, macroCall, descriptor, parameters,
                    hiddenMacroParameters);
              } catch (e) {
                console.error("Error with maybeCreateMacroEditor", e);
                maybeShowError.call(macroEditor, requestNumber, 'Error when interpreting descriptor data');
              }
-          } catch (e) {
+          } catch {
             maybeShowError.call(macroEditor, requestNumber, 'descriptorRequestFailed');
           }
-        } catch (e) {
+        } catch {
           maybeShowError.call(macroEditor, requestNumber, 'parametersRequestFailed');
         }
       }
@@ -592,32 +599,31 @@ define(
   },
 
   load = function(input, macroEditor) {
-    var macroEditorAPI = macroEditor.data('macroEditorAPI');
-    var macroCall = input.macroCall || {
+    let macroEditorAPI = macroEditor.data('macroEditorAPI');
+    const macroCall = input.macroCall || {
       name: input.macroId,
       parameters: {}
     };
-    let hiddenMacroParameters = input.hiddenMacroParameters || [];
     // We need to obey the specified macro identifier in case the user has just changed the macro.
     macroCall.name = input.macroId || macroCall.name;
     if (!macroEditorAPI) {
       // Initialize the macro editor.
-      var submitButton = $(this).find('.modal-footer .btn-primary');
+      const submitButton = $(this).find('.modal-footer .btn-primary');
       macroEditor.on('ready', function(event) {
         macroEditorAPI.focus();
         submitButton.prop('disabled', false);
       });
       macroEditorAPI = macroEditor.xwikiMacroEditor(macroCall, input.syntaxId, input.sourceDocumentReference,
-          input.widgetHtml, hiddenMacroParameters);
+          input.inlineParameters, input.showInlineParameters);
     } else {
-      macroEditorAPI.update(macroCall, input.syntaxId, input.sourceDocumentReference, input.widgetHtml,
-          hiddenMacroParameters);
+      macroEditorAPI.update(macroCall, input.syntaxId, input.sourceDocumentReference, input.inlineParameters,
+        input.showInlineParameters);
     }
   },
 
   install = function(input, macroEditor) {
-    var macroId = input.macroId + '' + input.syntaxId;
-    var requestNumber = (macroEditor.prop('requestNumber') || 0) + 1;
+    const macroId = input.macroId + '' + input.syntaxId;
+    const requestNumber = (macroEditor.prop('requestNumber') || 0) + 1;
 
     macroEditor.empty().addClass('loading')
       .attr('data-macroId', macroId)
@@ -635,16 +641,16 @@ define(
     acceptLabel: translations.get('submit'),
     form: true,
     onLoad: function() {
-      var modal = this;
-      var submitButton = modal.find('.modal-footer .btn-primary');
+      const modal = this;
+      const submitButton = modal.find('.modal-footer .btn-primary');
       modal.on('show.bs.modal', function(event) {
         submitButton.prop('disabled', true);
       }).on('shown.bs.modal', function(event) {
-        var macroEditor = modal.find('.macro-editor');
-        var input = modal.data('input');
+        const macroEditor = modal.find('.macro-editor');
+        const input = modal.data('input');
 
         // Install the macro extension (if not already installed)
-        if (input.macroCategories && input.macroCategories.includes('_notinstalled')) {
+        if (input.macroCategories?.includes('_notinstalled')) {
           install.call(this, input, macroEditor);
         } else {
           load.call(this, input, macroEditor);
@@ -654,32 +660,32 @@ define(
         // Ideally we would handle this propagation by making the modal a dialog and using method="dialog" on the form
         event.preventDefault();
         event.stopPropagation();
-        var macroEditor = modal.find('.macro-editor');
-        var macroEditorAPI = macroEditor.xwikiMacroEditor();
+        const macroEditor = modal.find('.macro-editor');
+        const macroEditorAPI = macroEditor.xwikiMacroEditor();
         if (macroEditorAPI.validate()) {
-          var output = modal.data('input');
+          const output = modal.data('input');
           delete output.action;
-          var macroDescriptor = macroEditor.data('macroDescriptor');
+          const macroDescriptor = macroEditor.data('macroDescriptor');
           // Preserve the in-line/block mode if possible. Note that we consider the macro in-line if no value is
           // specified, because the caret is placed in an in-line context most of the time (e.g. inside a paragraph) in
           // order to allow the user to type text).
-          var inline = (!output.macroCall || output.macroCall.inline !== false) && macroDescriptor.supportsInlineMode;
+          const inline = (!output.macroCall || output.macroCall.inline !== false) && macroDescriptor.supportsInlineMode;
           output.macroCall = macroEditorAPI.getMacroCall();
           output.macroCall.descriptor = macroDescriptor;
           output.macroCall.inline = inline;
           modal.data('output', output).modal('hide');
         }
       });
-      var changeMacroButton = $('<button type="button" class="btn btn-default pull-left"></button>')
+      const changeMacroButton = $('<button type="button" class="btn btn-default pull-left"></button>')
         .text(translations.get('changeMacro'))
         .prependTo(submitButton.parent());
       changeMacroButton.on('click', function(event) {
-        var macroEditor = modal.find('.macro-editor');
-        var macroEditorAPI = macroEditor.xwikiMacroEditor();
-        var output = modal.data('input');
+        const macroEditor = modal.find('.macro-editor');
+        const macroEditorAPI = macroEditor.xwikiMacroEditor();
+        const output = modal.data('input');
         output.action = 'changeMacro';
         // Preserve the in-line/block mode if possible.
-        var inline = output.macroCall ? output.macroCall.inline : undefined;
+        const inline = output.macroCall ? output.macroCall.inline : undefined;
         output.macroCall = macroEditorAPI.getMacroCall();
         if (output.macroCall) {
           output.macroCall.inline = inline;
@@ -689,13 +695,19 @@ define(
     }
   });
 
-  $.fn.xwikiMacroEditor = function(macroCall, syntaxId, sourceDocumentReference, widgetHtml, hiddenMacroParameters) {
+  $.fn.xwikiMacroEditor = function(
+    macroCall,
+    syntaxId,
+    sourceDocumentReference,
+    inlineParameters,
+    showInlineParameters
+  ) {
     this.each(function() {
-      var macroEditor = $(this);
+      const macroEditor = $(this);
       if (!macroEditor.data('macroEditorAPI')) {
-        var macroEditorAPI = createMacroEditorAPI(macroEditor);
+        const macroEditorAPI = createMacroEditorAPI(macroEditor);
         macroEditor.data('macroEditorAPI', macroEditorAPI);
-        macroEditorAPI.update(macroCall, syntaxId, sourceDocumentReference, widgetHtml, hiddenMacroParameters);
+        macroEditorAPI.update(macroCall, syntaxId, sourceDocumentReference, inlineParameters, showInlineParameters);
       }
     });
     return this.data('macroEditorAPI');

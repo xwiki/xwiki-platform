@@ -248,33 +248,37 @@
   #end
 #end
 
-#macro (getMacroParameters $macroId $html)
-  #set ($data = $services.wysiwyg.getMacroParametersFromHTML($macroId, $html))
+#macro (getMacroParameters $macroId $macroParameters)
+  #set ($macroId = $services.rendering.resolveMacroId($macroId))
+  #set ($macroParameters = $jsontool.fromString($macroParameters))
+  #foreach($macroParameter in $macroParameters.entrySet())
+    ## TODO: Do we need to take into account the macro parameter type? We could have a macro parameter that is editable
+    ## inline but whose value is not a List&lt;Block&gt; but rather a String (plain text).
+    #set ($macroParameter.value = $services.wysiwyg.fromAnnotatedXHTML($macroParameter.value, $macroId.syntax))
+  #end
+  #set ($data = $macroParameters)
 #end
-{{/velocity}}
 
-{{velocity wiki="false"}}
+#set ($data = $NULL)
 #if ("$!request.action" == 'install')
   #if ($services.csrf.isTokenValid($request.form_token))
     #installMacroExtension($request.extensionId, $request.extensionVersion)
   #else
     $response.sendError(403)
   #end
-#elseif ("$!request.data" != '')
-  #set ($data = $NULL)
-  #if ($request.data == 'list')
-    #getMacroList($request.syntaxId)
-  #elseif ($request.data == 'descriptor')
-    #maybeGetMacroDescriptor($request.macroId)
-  #elseif ($request.data == 'macroParameters')
-    #getMacroParameters($request.macroId, $request.macroHTML)
-  #end
-  #if ($data)
-    #set ($discard = $response.setContentType('application/json'))
-    $jsontool.serialize($data)
-  #else
-    $response.sendError(404)
-  #end
+#elseif ($request.data == 'list')
+  #getMacroList($request.syntaxId)
+#elseif ($request.data == 'descriptor')
+  #maybeGetMacroDescriptor($request.macroId)
+#elseif ($request.data == 'macroParameters')
+  #getMacroParameters($request.macroId, $request.macroParameters)
+#end
+#if ($response.isCommitted())
+  ## Do nothing.
+#elseif ($data)
+  #jsonResponse($data)
+#elseif ("$!request.action" != '' || "$!request.data" != '')
+  $response.sendError(404)
 #end
 {{/velocity}}</content>
 </xwikidoc>

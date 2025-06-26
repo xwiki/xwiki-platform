@@ -56,6 +56,10 @@
       "matchDepPatterns": "@blocknote/.+"
     },
     {
+      "groupName": "mantine",
+      "matchDepPatterns": "@mantine/.+"
+    },
+    {
       "groupName": "react",
       "matchDepPatterns": "^react(-.+)?"
     },

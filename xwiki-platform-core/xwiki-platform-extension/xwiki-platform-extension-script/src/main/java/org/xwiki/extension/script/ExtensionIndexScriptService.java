@@ -87,7 +87,7 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
      * @param extension the current extension
      * @return an {@link Extension} instance corresponding to the passed extension and supporting
      *         {@link RatingExtension}
-     * @since 17.5.0RC1
+     * @since 17.5.0
      * @since 17.4.2
      * @since 16.10.9
      */
@@ -109,7 +109,7 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
      * @param extension the current extension
      * @return an {@link Extension} instance corresponding to the passed extension and supporting
      *         {@link RatingExtension}
-     * @since 17.5.0RC1
+     * @since 17.5.0
      * @since 17.4.2
      * @since 16.10.9
      */
@@ -131,7 +131,7 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
      * @param extension the current extension
      * @return an {@link Extension} instance corresponding to the passed extension and supporting
      *         {@link RemoteExtension}
-     * @since 17.5.0RC1
+     * @since 17.5.0
      * @since 17.4.2
      * @since 16.10.9
      */

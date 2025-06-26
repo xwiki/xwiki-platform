@@ -90,7 +90,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
     private static final String SCHEMA_PATH = "conf/managed-schema.xml";
 
-    private static final long SEARCH_CORE_SCHEMA_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_16_6;
+    private static final long SEARCH_CORE_MAJOR_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_16_6;
 
     private static final String CORE_PROPERTIES_FILENAME = "core.properties";
 
@@ -363,7 +363,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
         // Check the version of the schema
         File schemaFile = this.solrSearchCorePath.resolve(SCHEMA_PATH).toFile();
-        if (!schemaFile.exists() || SEARCH_CORE_SCHEMA_VERSION > getCoreVersion(schemaFile)) {
+        if (!schemaFile.exists() || SEARCH_CORE_MAJOR_VERSION > getCoreVersion(schemaFile)) {
             return false;
         }
 

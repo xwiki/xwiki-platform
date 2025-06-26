@@ -98,7 +98,7 @@
               // selection and the editing area had the focus when the selection was saved.
               scrollIntoView: focus && !focus.preventScroll,
               applyDOMRange: domRange => {
-                maybeMoveToFirstNestedEditable(editor, domRange, !focus.preventScroll);
+                maybeOptimizeRange(editor, domRange, !focus.preventScroll);
                 this.setSelection(editor, [domRange], focus);
               }
             });
@@ -219,7 +219,7 @@
     editable?.focus(options);
   }
 
-  function maybeMoveToFirstNestedEditable(editor, range, shouldMove) {
+  function maybeOptimizeRange(editor, range, shouldMove) {
     const selectedWidget = shouldMove && getSelectedWidget(editor, range);
     const firstNestedEditable = Object.values(selectedWidget?.editables)[0];
     if (firstNestedEditable) {
@@ -228,6 +228,11 @@
       ckRange.moveToElementEditablePosition(firstNestedEditable);
       range.setStart(ckRange.startContainer.$, ckRange.startOffset);
       range.collapse(true);
+    } else if (selectedWidget && !selectedWidget.inline) {
+      // The selected widget doesn't have any nested editable areas, so everything inside the widget is read-only. This
+      // means we cannot place the caret inside the widget. At the same time the widget is not inline, which means we
+      // cannot place the caret right before (to the left of) the widget. We select the widget wrapper instead.
+      range.selectNode(selectedWidget.wrapper.$);
     }
   }
 

@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search</artifactId>
-    <version>17.5.0-SNAPSHOT</version>
+    <version>17.6.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-search-webjar</artifactId>

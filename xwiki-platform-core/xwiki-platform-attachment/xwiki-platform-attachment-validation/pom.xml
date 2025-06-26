@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment</artifactId>
-    <version>17.5.0-SNAPSHOT</version>
+    <version>17.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-attachment-validation</artifactId>
   <name>XWiki Platform - Attachment - Validation - Parent POM</name>

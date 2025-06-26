@@ -29,7 +29,7 @@ import org.xwiki.rest.internal.resources.DefaultKeywordSearchSource;
  * configuration to prefer the Solr-based implementation.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Component
 @Singleton

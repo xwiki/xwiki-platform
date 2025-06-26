@@ -31,7 +31,7 @@ import org.xwiki.stability.Unstable;
  * Representation of a macro descriptor used for the configuration UI.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Unstable
 public class MacroDescriptorUI

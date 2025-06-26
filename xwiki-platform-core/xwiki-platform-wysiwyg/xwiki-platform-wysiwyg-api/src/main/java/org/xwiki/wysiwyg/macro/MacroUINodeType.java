@@ -25,7 +25,7 @@ import org.xwiki.stability.Unstable;
  * Possible types of nodes.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Unstable
 public enum MacroUINodeType

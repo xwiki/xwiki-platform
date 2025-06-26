@@ -31,7 +31,7 @@ import org.xwiki.wysiwyg.WysiwygConfiguration;
  * Default implementation of {@link WysiwygConfiguration}.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Component
 @Singleton

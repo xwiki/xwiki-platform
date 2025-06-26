@@ -473,7 +473,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * @return an instance of {@link MacroDescriptorUI} containing all info for configuring the macro or {@code null}
      * if it couldn't be found or initialized.
      *
-     * @since 17.5.0RC1
+     * @since 17.5.0
      */
     @Unstable
     public MacroDescriptorUI getMacroDescriptorUI(String macroIdAsString)

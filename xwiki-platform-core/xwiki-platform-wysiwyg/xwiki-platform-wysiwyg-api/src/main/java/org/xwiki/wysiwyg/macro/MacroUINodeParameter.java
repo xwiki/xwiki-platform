@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Represents a single parameter of the macro descriptor.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Unstable
 public class MacroUINodeParameter extends AbstractMacroUINode

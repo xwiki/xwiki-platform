@@ -39,7 +39,7 @@ import org.xwiki.rest.model.jaxb.SearchResult;
  * Default implementation of {@link KeywordSearchSource} that uses the configured source for search.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Component
 @Singleton

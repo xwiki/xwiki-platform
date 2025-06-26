@@ -23,7 +23,7 @@ package org.xwiki.rest.internal.resources;
  * Enumeration representing the different scopes for keyword searches in the wiki and space search REST API.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 public enum KeywordSearchScope
 {

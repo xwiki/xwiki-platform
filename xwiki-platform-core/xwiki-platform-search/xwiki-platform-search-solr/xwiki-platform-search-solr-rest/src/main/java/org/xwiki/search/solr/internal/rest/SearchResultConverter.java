@@ -55,7 +55,7 @@ import com.xpn.xwiki.XWikiException;
  * Converts Solr search results into {@link SearchResult} objects for REST API responses.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Component(roles = SearchResultConverter.class)
 @Singleton

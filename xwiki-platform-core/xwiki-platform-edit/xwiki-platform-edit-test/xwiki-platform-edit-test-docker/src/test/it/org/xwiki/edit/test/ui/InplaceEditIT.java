@@ -467,9 +467,8 @@ class InplaceEditIT
         qa.waitForItemSelected("/velocity", "Velocity");
         richTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        // Close the macro dialog.
-        new MacroDialogEditModal().waitUntilReady().clickCancel();
 
+        new MacroDialogEditModal().waitUntilReady().setMacroContent(" ").clickSubmit();
         richTextArea.waitForContentRefresh();
 
         assertEquals("macro:velocity", richTextArea.getText());

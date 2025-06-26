@@ -1179,22 +1179,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
-        // Insert an empty Velocity macro.
+        // Insert a Velocity macro.
         secondTextArea.sendKeys("before", Keys.RETURN);
         secondTextArea.sendKeys("/velo");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/velo", "Velocity");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitForContentRefresh();
-        String text = secondTextArea.getText();
-        assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
-
-        // Edit the inserted Velocity macro.
-        secondTextArea.sendKeys(Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
         secondTextArea.waitForContentRefresh();
-        text = secondTextArea.getText();
+        String text = secondTextArea.getText();
         assertTrue(text.contains("superadmin"));
         assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
         String secondRefreshCounter = secondTextArea.getRefreshCounter();
@@ -1257,10 +1251,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitForContentRefresh();
-
-        // Edit the inserted Velocity macro to add some script.
-        firstTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("injected").clickSubmit();
         firstTextArea.waitForContentRefresh();
         text = firstTextArea.getText();
@@ -1344,10 +1334,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitForContentRefresh();
-
-        // Edit the inserted Velocity macro.
-        secondTextArea.sendKeys(Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
         secondTextArea.waitUntilTextContains("superadmin");
 
@@ -1363,6 +1349,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
+        new MacroDialogEditModal().waitUntilReady().setMacroContent(" ").clickSubmit();
         firstTextArea.waitUntilTextContains("default content\nFailed to execute the [velocity] macro.");
 
         // Verify that we're editing alone.

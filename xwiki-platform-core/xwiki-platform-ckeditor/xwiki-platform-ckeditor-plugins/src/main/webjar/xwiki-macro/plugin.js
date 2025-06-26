@@ -473,6 +473,7 @@
                     // Retrieve required parameters.
                     macroService.getMacroDescriptor(macro.id.id).done(function (descriptorUI) {
                       let descriptor = descriptorUI.descriptor;
+
                       // Show the insertion dialog if at least one of the parameters is mandatory.
                       if (descriptor.mandatoryNodes.length > 0) {
                         if (widget) {
@@ -484,9 +485,11 @@
                             name: macro.id.id
                           });
                         }
+                        return;
                       }
-                      // Minimal insertion parameters
-                      let insertParam = {
+
+                      // No mandatory parameters. Insert the macro without specifying any parameters.
+                      macroPlugin.insertOrUpdateMacroWidget(editor, {
                         name: macro.id.id,
                         parameters: {},
                         // We consider the macro call to be inline if the macro supports inline mode, as indicated by
@@ -495,15 +498,7 @@
                         // 'xwiki-macro-maybe-install-insert' editor command is used mainly by quick actions which are
                         // triggered by the user typing text, so in an inline context.
                         inline: descriptor.supportsInlineMode
-                      };
-
-                      // Set an empty default content when it is mandatory.
-                      if (descriptor.mandatoryNodes.includes('$content')) {
-                        insertParam.content = " ";
-                      }
-
-                      // Insert the empty macro.
-                      macroPlugin.insertOrUpdateMacroWidget(editor, insertParam, widget);
+                      }, widget);
                     });
                   };
 
@@ -576,6 +571,7 @@
 
                     return;
                   }
+
                   insertMacro();
                 }
               });

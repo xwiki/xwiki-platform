@@ -598,12 +598,14 @@ class QuickActionsIT extends AbstractCKEditorIT
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
+        // Close the macro dialog.
+        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
+        macroEditModal.setMacroContent("test");
+        macroEditModal.clickSubmit();
+
         // The content is reloaded after a macro is inserted.
         textArea = editor.getRichTextArea();
-        // Close the macro dialog.
-        new MacroDialogEditModal().waitUntilReady().clickCancel();
 
-        // Note that we didn't modify the default info message because inline macros are not editable in-place.
-        assertSourceEquals("one {{velocity/}} two");
+        assertSourceEquals("one {{velocity}}test{{/velocity}} two");
     }
 }

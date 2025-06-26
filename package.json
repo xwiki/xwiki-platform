@@ -48,7 +48,7 @@
     "globals": "16.2.0",
     "happy-dom": "18.0.1",
     "nx": "21.2.0",
-    "prettier": "3.5.3",
+    "prettier": "3.6.0",
     "publint": "0.3.12",
     "rimraf": "6.0.1",
     "typescript": "5.8.3",

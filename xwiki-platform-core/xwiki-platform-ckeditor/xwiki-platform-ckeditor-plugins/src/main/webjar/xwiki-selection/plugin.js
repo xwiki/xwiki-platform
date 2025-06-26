@@ -228,10 +228,12 @@
       ckRange.moveToElementEditablePosition(firstNestedEditable);
       range.setStart(ckRange.startContainer.$, ckRange.startOffset);
       range.collapse(true);
-    } else if (selectedWidget && !selectedWidget.inline) {
+    } else if (selectedWidget && !range.collapsed) {
       // The selected widget doesn't have any nested editable areas, so everything inside the widget is read-only. This
-      // means we cannot place the caret inside the widget. At the same time the widget is not inline, which means we
-      // cannot place the caret right before (to the left of) the widget. We select the widget wrapper instead.
+      // means we cannot place the caret inside the widget. We select the entire widget wrapper in order to highlight
+      // the widget. Note that we don't do this when the range is collapsed because when editing in realtime someone may
+      // insert a widget just after your caret and you wouldn't want that widget to be suddenly selected while you are
+      // typing.
       range.selectNode(selectedWidget.wrapper.$);
     }
   }

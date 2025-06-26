@@ -55,7 +55,7 @@ import org.xwiki.wysiwyg.macro.MacroUINodeParameter;
  * Factory in charge of building a {@link MacroDescriptorUI} based on a {@link MacroDescriptor}.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Component(roles = { MacroDescriptorUIFactory.class })
 @Singleton

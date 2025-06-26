@@ -33,7 +33,7 @@ import org.xwiki.stability.Unstable;
  * only bound to a feature but not to a group, then we consider that this is a "featureOnly" group.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Unstable
 public class MacroUINodeGroup extends AbstractMacroUINode

@@ -30,7 +30,7 @@ import org.xwiki.wysiwyg.macro.MacroUINodeParameter;
  * order is given, to compute order based on hidden, advanced or deprecated field, before falling back on identifier.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 public class MacroUINodeComparator implements Comparator<AbstractMacroUINode>
 {

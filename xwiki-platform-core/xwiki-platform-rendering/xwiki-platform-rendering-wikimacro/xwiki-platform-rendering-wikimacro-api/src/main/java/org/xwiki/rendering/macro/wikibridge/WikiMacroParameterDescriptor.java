@@ -82,7 +82,7 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
      * Constant to be used in the parameters map of the constructor to define the order: the accepted value should be
      * of type {@link Integer}.
      * @see #getOrder()
-     * @since 17.5.0RC1
+     * @since 17.5.0
      */
     @Unstable
     public static final String ORDER_PARAMETER_NAME = "order";

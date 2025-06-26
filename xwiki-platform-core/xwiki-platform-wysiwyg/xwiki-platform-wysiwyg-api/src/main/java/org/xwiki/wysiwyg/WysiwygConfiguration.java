@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * Configuration options for the Wysiwyg Module.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Role
 @Unstable

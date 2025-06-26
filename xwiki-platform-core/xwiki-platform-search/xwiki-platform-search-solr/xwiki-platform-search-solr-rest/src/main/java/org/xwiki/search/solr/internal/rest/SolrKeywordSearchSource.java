@@ -66,7 +66,7 @@ import static org.xwiki.rest.internal.resources.KeywordSearchScope.TITLE;
  * A {@link KeywordSearchSource} implementation that uses Solr to search for wiki pages.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Component
 @Singleton

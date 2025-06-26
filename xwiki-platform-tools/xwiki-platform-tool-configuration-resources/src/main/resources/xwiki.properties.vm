@@ -467,7 +467,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # Events distribution
 #-------------------------------------------------------------------------------------
 
-#-# [Since 17.5.0RC1]
+#-# [Since 17.5.0]
 #-# Indicate the unique identifier of the instance among the members of a cluster.
 #-# By default it is automatically generated from a UUID and stored in the permanent directory.
 # observation.remote.id = node1

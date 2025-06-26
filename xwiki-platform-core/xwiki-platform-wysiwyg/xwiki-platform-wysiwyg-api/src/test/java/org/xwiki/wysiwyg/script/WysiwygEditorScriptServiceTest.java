@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  * Tests for {@link WysiwygEditorScriptService}.
  * 
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @ComponentTest
 class WysiwygEditorScriptServiceTest

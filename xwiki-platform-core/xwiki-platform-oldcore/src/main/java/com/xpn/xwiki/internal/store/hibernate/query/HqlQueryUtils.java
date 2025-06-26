@@ -211,7 +211,7 @@ public final class HqlQueryUtils
      * @param order the order
      * @param def the default value to return if the value is not valid
      * @return the valid value
-     * @since 17.5.0RC1
+     * @since 17.5.0
      * @since 17.4.2
      * @since 16.10.9
      */

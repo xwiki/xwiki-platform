@@ -201,7 +201,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Since it's a page creation, we're not in inplace editable page and so we'll have a reload.
         setup.getDriver().addPageNotYetReloadedMarker();
-        summaryModal.clickSave(true);
+        summaryModal.clickSave(false);
         setup.getDriver().waitUntilPageIsReloaded();
         ViewPage viewPage = new ViewPage();
         assertEquals("New content", viewPage.getContent());

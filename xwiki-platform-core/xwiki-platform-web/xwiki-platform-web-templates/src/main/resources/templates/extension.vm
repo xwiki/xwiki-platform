@@ -577,6 +577,28 @@ $namespace##
   </dd>
 #end
 
+#set ($_dependencyStatusIcon = {
+  'core': 'cog',
+  'remote-core': 'cog',
+  'remote-core-incompatible': 'cog',
+  'installed': 'plugin',
+  'remote-installed': 'plugin',
+  'installed-invalid': 'plugin',
+  'remote-installed-invalid': 'plugin',
+  'installed-dependency': 'plugin',
+  'remote-installed-dependency': 'plugin',
+  'remote-installed-incompatible': 'plugin',
+  'remote': 'world',
+  'unknown': 'error'
+})
+#macro(_displayStatusIcon $status)
+  #if($!status == 'loading')
+    #spinner()
+  #else
+    $services.icon.renderHTML($!_dependencyStatusIcon.get($status))
+  #end
+#end
+
 #**
  * NOTE: We explicitly overwrite the $extensionNamespace global variable because we want the dependency status to be
  * determined for the given namespace. See #determineExtensionStatus() macro.
@@ -614,6 +636,7 @@ $namespace##
     #set ($dependencyName = "<a href=""$escapetool.xml($dependencyURL)"" class=""extension-link"">#displayExtensionName($dependencyExtension)</a>")
   #end
   <div class="dependency-item extension-item-$escapetool.xml($dependencyStatus)">
+    #_displayStatusIcon($dependencyStatus)
     <span class="extension-name">${dependencyName}</span><span
           class="extension-version">$!escapetool.xml($dependencyVersion)</span>
     #if ($extensionNamespace.startsWith('wiki:'))
@@ -1099,6 +1122,7 @@ $namespace##
     </div>
     <div class="extension-header">
       <h2 class="extension-title">
+        #_displayStatusIcon($extensionStatus)
         <span class="extension-name">#displayExtensionName($extension)</span>
         <span class="extension-version">$escapetool.xml($extension.id.version)</span>
         #if ($extensionStatusMessage)

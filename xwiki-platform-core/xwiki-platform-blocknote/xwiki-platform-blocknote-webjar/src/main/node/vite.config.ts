@@ -18,12 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { fileURLToPath, URL } from "node:url";
-
-import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import react from "@vitejs/plugin-react";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath, URL } from "node:url";
+import { defineConfig } from "vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -49,7 +47,7 @@ export default defineConfig({
     // define process to avoid runtime error with jquery
     "process.env": {},
   },
-  plugins: [react(), vue()],
+  plugins: [vue()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

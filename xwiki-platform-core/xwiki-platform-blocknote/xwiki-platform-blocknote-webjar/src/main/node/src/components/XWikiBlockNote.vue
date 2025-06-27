@@ -25,7 +25,6 @@
         :editor-props
         :editor-content
         :container
-        :skin-manager
         :realtime-server-u-r-l
         @instant-change="dirty = true"
         @debounced-change="updateValue"
@@ -110,9 +109,6 @@ export default {
     editor() {
       return this.$refs.editor;
     },
-    skinManager() {
-      return this.container.get("SkinManager");
-    },
     realtimeServerURL() {
       return this.logic.realtimeServerURL;
     },
@@ -191,7 +187,8 @@ export default {
         margin-bottom: 0;
       }
 
-      th, td {
+      th,
+      td {
         border: 0 none;
         border-top: 1px solid var(--table-border-color);
         padding: 8px 10px; /* @table-cell-padding */
@@ -211,7 +208,8 @@ export default {
   }
 
   .bn-toolbar {
-    button, select {
+    button,
+    select {
       --ai-size: 30px !important;
     }
   }

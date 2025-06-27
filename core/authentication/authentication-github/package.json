@@ -27,7 +27,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-authentication-github-state": "workspace:*",
-    "axios": "1.9.0",
+    "axios": "1.10.0",
     "inversify": "7.5.4",
     "js-cookie": "3.0.5",
     "vue": "3.5.16"

@@ -25,7 +25,7 @@
   "dependencies": {
     "@xwiki/cristal-attachments-api": "workspace:*",
     "filesize.js": "2.0.0",
-    "vue": "3.5.16",
+    "vue": "3.5.17",
     "vue-i18n": "11.1.5"
   },
   "devDependencies": {

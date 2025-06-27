@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "inversify": "7.5.4",
-    "vue": "3.5.16"
+    "vue": "3.5.17"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

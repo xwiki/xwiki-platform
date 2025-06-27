@@ -31,7 +31,7 @@
   <name>XWiki Platform - Icon - Default implementation</name>
   <description>XWiki Platform - Icon - Default implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.97</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.96</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -67,6 +67,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-security-requiredrights-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

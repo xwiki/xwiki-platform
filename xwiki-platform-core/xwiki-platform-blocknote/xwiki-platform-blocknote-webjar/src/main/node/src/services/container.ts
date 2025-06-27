@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { DefaultLogger } from "@xwiki/cristal-api";
+import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/cristal-attachments-default";
 import { Container } from "inversify";
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
@@ -35,9 +37,12 @@ import { XWikiRemoteURLParser } from "./model/url/XWikiRemoteURLParser";
 import { XWikiRemoteURLSerializer } from "./model/url/XWikiRemoteURLSerializer";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { XWikiDesignSystemLoader } from "./skin/XWikiDesignSystemLoader";
+import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
+import { XWikiStorage } from "./storage/XWikiStorage";
 
 const container = new Container();
 container.bind("Container").toConstantValue(container);
+container.bind("Logger").to(DefaultLogger).inSingletonScope();
 
 DefaultDocumentService.bind(container);
 
@@ -63,5 +68,9 @@ XWikiLinkSuggestService.bind(container);
 
 DefaultSkinManager.bind(container);
 XWikiDesignSystemLoader.bind(container);
+
+DefaultStorageProvider.bind(container);
+XWikiStorage.bind(container);
+new DefaultAttachmentsComponentInit(container);
 
 export { container };

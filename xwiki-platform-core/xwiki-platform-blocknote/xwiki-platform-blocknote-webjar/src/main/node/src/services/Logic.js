@@ -20,6 +20,7 @@
 import XWikiBlockNote from "@/components/XWikiBlockNote.vue";
 import { container } from "@/services/container";
 import { i18nResolver } from "@/services/i18nResolver";
+import { createPinia } from "pinia";
 import { createApp, reactive } from "vue";
 import { createI18n } from "vue-i18n";
 
@@ -57,6 +58,7 @@ export class Logic {
       })
       .provide("logic", this)
       .provide("container", container)
+      .use(createPinia())
       .use(i18n);
 
     skinManager.loadDesignSystem(this._vueApp, container);

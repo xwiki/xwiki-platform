@@ -20,7 +20,7 @@
 <template>
   <div class="xwiki-blocknote">
     <suspense>
-      <BlocknoteEditor
+      <!---<BlocknoteEditor
         ref="editor"
         :editor-props
         :editor-content
@@ -28,7 +28,7 @@
         :realtime-server-u-r-l
         @instant-change="dirty = true"
         @debounced-change="updateValue"
-      ></BlocknoteEditor>
+      ></BlocknoteEditor>-->
     </suspense>
     <input v-if="name" ref="valueInput" type="hidden" :name :value :form :disabled />
     <input v-if="name" type="hidden" name="RequiresConversion" :value="name" :form :disabled />
@@ -38,8 +38,9 @@
 </template>
 
 <script>
-import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
+//import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
 import { MarkdownToUniAstConverter, UniAstToMarkdownConverter, createConverterContext } from "@xwiki/cristal-uniast";
+import { getActivePinia } from "pinia";
 
 export default {
   name: "XWikiBlockNote",
@@ -47,7 +48,7 @@ export default {
   inject: ["logic", "container"],
 
   components: {
-    BlocknoteEditor,
+    //BlocknoteEditor,
   },
 
   props: {
@@ -90,6 +91,13 @@ export default {
     const markdownToUniAst = new MarkdownToUniAstConverter(converterContext);
     const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
     const editorContent = markdownToUniAst.parseMarkdown(this.initialValue);
+
+    console.log('Active pinia: ', getActivePinia());
+    try {
+      this.container.get("AttachmentsService");
+    } catch (e) {
+      console.warn("Failed to get AttachmentsService: ", e);
+    }
 
     return {
       dirty: false,

@@ -31,7 +31,7 @@
     "@xwiki/cristal-rendering-wikimodel": "workspace:*",
     "dompurify": "3.2.6",
     "inversify": "7.5.4",
-    "marked": "15.0.12",
+    "marked": "16.0.0",
     "marked-base-url": "1.1.6"
   },
   "peerDependencies": {

@@ -55,71 +55,66 @@ ${revision ? "Revision " + revision : ""}
   return html;
 }
 
-app.get("/xwiki/rest/cristal/page", (req: Request, res: Response) => {
-  res.appendHeader("Access-Control-Allow-Origin", "*");
+app.get(
+  "/xwiki/rest/cristal/wikis/xwiki/spaces/*page",
+  (req: Request, res: Response) => {
+    res.appendHeader("Access-Control-Allow-Origin", "*");
 
-  const id: string = req.query.page as string;
-  let page: string = "";
-  let name: string = "";
-  let revision: string | undefined = undefined;
-  let text: string = "";
-  let html: string = "";
+    const id: string = (req.params.page as unknown as Array<string>)
+      .filter((_v: string, i: number) => i % 2 == 0)
+      .join(".");
 
-  switch (id) {
-    case "Main.WebHome":
-      page = "Main.WebHome";
-      name = "WebHome";
-      revision = (req.query.revision as string) || undefined;
-      text = `= Welcome to ${page} =
+    let page: string = "";
+    let name: string = "";
+    let revision: string | undefined = undefined;
+    let text: string = "";
+    let html: string = "";
+
+    switch (id) {
+      case "Main.WebHome":
+        page = "Main.WebHome";
+        name = "WebHome";
+        revision = (req.query.revision as string) || undefined;
+        text = `= Welcome to ${page} =
 
 XWiki is the best tool to organize your knowledge.
 
 [[XWiki Syntax>>Page2.WebHome]]
 ${revision ? "Revision " + revision : ""}
 }`;
-      html = getHtml(page, revision, { offline: false });
-      break;
+        html = getHtml(page, revision, { offline: false });
+        break;
 
-    case "Main.Offline":
-      page = "Main.Offline";
-      name = "Offline";
-      html = getHtml(page, revision, { offline: true });
-      break;
+      case "Main.Offline":
+        page = "Main.Offline";
+        name = "Offline";
+        html = getHtml(page, revision, { offline: true });
+        break;
 
-    case "Main.NewPage.WebHome":
-      res.sendStatus(404);
-      return;
+      case "Main.NewPage.WebHome":
+        res.sendStatus(404);
+        return;
 
-    default:
-      page = id;
-      name = "WebHome";
-      html = getHtml(page, revision, { offline: false });
-  }
+      default:
+        page = id;
+        name = "WebHome";
+        html = getHtml(page, revision, { offline: false });
+    }
 
-  res.json({
-    "@context": "https://schema.org",
-    "@type": "CreativeWork",
-    identifier: id,
-    name: name,
-    headline: page,
-    headlineRaw: page,
-    creator: page,
-    encodingFormat: "xwiki/2.1",
-    text: text,
-    html: html,
-  });
-});
-
-app.get("/xwiki/rest/cristal/panel", (req: Request, res: Response) => {
-  const panel = req.query.panel || "Main.WebHome";
-
-  res.appendHeader("Access-Control-Allow-Origin", "*");
-
-  res.json({
-    content: `<div>${panel}</div>`,
-    source: `= ${panel} =`,
-  });
-});
+    res.json({
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      identifier: id,
+      name: name,
+      headline: page,
+      headlineRaw: page,
+      creator: page,
+      encodingFormat: "xwiki/2.1",
+      text: text,
+      html: html,
+    });
+  },
+);
 
 app.get(
   "/xwiki/rest/wikis/xwiki/spaces/Main/pages/WebHome",

@@ -80,11 +80,10 @@ export class XWikiStorage extends AbstractStorage {
 
   getPageRestURL(page: string, syntax: string, revision?: string): string {
     this.logger?.debug("XWiki Loading page", page);
-    const url = new URL(this.wikiConfig.baseURL + this.wikiConfig.baseRestURL);
-    const searchParams = new URLSearchParams([
-      ["page", page],
-      ["format", syntax],
-    ]);
+    const url = new URL(
+      this.buildPageRestBaseURL(page, ["rest", "cristal", "wikis", "xwiki"]),
+    );
+    const searchParams = new URLSearchParams([["format", syntax]]);
     if (revision) {
       searchParams.append("revision", revision);
     }
@@ -305,7 +304,7 @@ export class XWikiStorage extends AbstractStorage {
   }
 
   async save(page: string, title: string, content: string): Promise<unknown> {
-    const url = this.buildSavePageURL(page, ["rest", "wikis", "xwiki"]);
+    const url = this.buildPageRestBaseURL(page, ["rest", "wikis", "xwiki"]);
 
     const response = await fetch(url, {
       method: "PUT",
@@ -355,7 +354,7 @@ export class XWikiStorage extends AbstractStorage {
   }
 
   async delete(page: string): Promise<{ success: boolean; error?: string }> {
-    const url = this.buildSavePageURL(page, ["rest", "wikis", "xwiki"]);
+    const url = this.buildPageRestBaseURL(page, ["rest", "wikis", "xwiki"]);
 
     const success = await fetch(url, {
       method: "DELETE",
@@ -390,7 +389,7 @@ export class XWikiStorage extends AbstractStorage {
     return headers;
   }
 
-  private buildSavePageURL(page: string, segments: string[]) {
+  private buildPageRestBaseURL(page: string, segments: string[]) {
     const url = this.wikiConfig.baseURL;
     const referenceParts = page.split(".");
     for (let i = 0; i < referenceParts.length; i++) {

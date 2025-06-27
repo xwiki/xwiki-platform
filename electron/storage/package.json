@@ -40,7 +40,7 @@
   },
   "peerDependencies": {
     "electron": "37.1.0",
-    "reflect-metadata": "0.2.2"
+    "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@types/node": "22.15.30",

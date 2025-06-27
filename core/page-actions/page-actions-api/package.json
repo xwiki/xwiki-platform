@@ -24,17 +24,18 @@
   },
   "dependencies": {
     "inversify": "7.5.4",
-    "vue": "3.5.17",
     "vue-i18n": "11.1.5"
   },
   "peerDependencies": {
-    "reflect-metadata": "0.2.2"
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.3",
-    "vite": "6.3.5"
+    "vite": "6.3.5",
+    "vue": "3.5.17"
   },
   "publishConfig": {
     "exports": {

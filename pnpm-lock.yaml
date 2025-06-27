@@ -109,9 +109,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-router:
         specifier: 4.5.1
         version: 4.5.1(vue@3.5.17(typescript@5.8.3))
@@ -128,6 +125,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -156,9 +156,9 @@ importers:
 
   core/alerts/alerts-api:
     dependencies:
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -172,6 +172,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/alerts/alerts-default:
     dependencies:
@@ -187,9 +190,6 @@ importers:
       pinia:
         specifier: 3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -203,6 +203,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/alerts/alerts-ui:
     dependencies:
@@ -215,9 +218,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -237,6 +237,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -249,9 +252,9 @@ importers:
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -262,6 +265,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/attachments/attachments-default:
     dependencies:
@@ -289,9 +295,6 @@ importers:
       pinia:
         specifier: 3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -305,6 +308,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/attachments/attachments-ui:
     dependencies:
@@ -350,9 +356,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -387,6 +390,9 @@ importers:
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.15.30)(happy-dom@18.0.1)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -451,9 +457,6 @@ importers:
       js-cookie:
         specifier: 3.0.5
         version: 3.0.5
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@types/js-cookie':
         specifier: 3.0.6
@@ -470,15 +473,15 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/authentication/authentication-github-state:
     dependencies:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@types/js-cookie':
         specifier: 3.0.6
@@ -495,6 +498,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/authentication/authentication-github-ui:
     dependencies:
@@ -522,9 +528,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -553,6 +556,9 @@ importers:
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.15.30)(happy-dom@18.0.1)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -605,9 +611,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@types/js-cookie':
         specifier: 3.0.6
@@ -624,6 +627,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/authentication/authentication-nextcloud-ui:
     dependencies:
@@ -642,9 +648,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -673,6 +676,9 @@ importers:
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.15.30)(happy-dom@18.0.1)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -697,9 +703,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -728,6 +731,9 @@ importers:
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.15.30)(happy-dom@18.0.1)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -960,9 +966,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -976,6 +979,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/configuration/configuration-api:
     dependencies:
@@ -1039,9 +1045,9 @@ importers:
       '@xwiki/cristal-date-api':
         specifier: workspace:*
         version: link:../date-api
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1052,6 +1058,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -1064,9 +1073,9 @@ importers:
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1077,6 +1086,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/document/document-default:
     dependencies:
@@ -1098,9 +1110,6 @@ importers:
       pinia:
         specifier: 3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@vue/test-utils':
         specifier: 2.4.6
@@ -1120,15 +1129,15 @@ importers:
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.15.30)(happy-dom@18.0.1)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/extra-tabs/extra-tabs-api:
     dependencies:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -1145,6 +1154,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/extra-tabs/extra-tabs-default:
     dependencies:
@@ -1182,9 +1194,9 @@ importers:
       '@xwiki/cristal-extra-tabs-api':
         specifier: workspace:*
         version: link:../extra-tabs-api
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1198,6 +1210,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -1210,9 +1225,9 @@ importers:
       filesize.js:
         specifier: 2.0.0
         version: 2.0.0
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -1226,6 +1241,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -1520,9 +1538,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -1545,6 +1560,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -1588,9 +1606,9 @@ importers:
       bootstrap-icons:
         specifier: 1.13.1
         version: 1.13.1
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@vue/test-utils':
         specifier: 2.4.6
@@ -1604,15 +1622,18 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
 
   core/info-actions/info-actions-api:
     dependencies:
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -1623,6 +1644,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/info-actions/info-actions-default:
     dependencies:
@@ -1663,9 +1687,9 @@ importers:
       '@xwiki/cristal-info-actions-api':
         specifier: workspace:*
         version: link:../info-actions-api
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
       vue-router:
         specifier: 4.5.1
         version: 4.5.1(vue@3.5.17(typescript@5.8.3))
@@ -1685,6 +1709,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -2386,9 +2413,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -2405,6 +2429,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/page-actions/page-actions-default:
     dependencies:
@@ -2472,9 +2499,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -2494,6 +2518,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -2664,9 +2691,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -2695,6 +2719,9 @@ importers:
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.15.30)(happy-dom@18.0.1)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -2769,7 +2796,7 @@ importers:
         specifier: 1.13.2
         version: 1.13.2
       reflect-metadata:
-        specifier: 0.2.2
+        specifier: 0.x
         version: 0.2.2
       vue-i18n:
         specifier: 11.1.5
@@ -2812,7 +2839,7 @@ importers:
         specifier: workspace:*
         version: link:../../link-suggest/link-suggest-api
       reflect-metadata:
-        specifier: 0.2.2
+        specifier: 0.x
         version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
@@ -2830,9 +2857,9 @@ importers:
 
   core/uiextension/uiextension-api:
     dependencies:
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2843,6 +2870,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/uiextension/uiextension-default:
     dependencies:
@@ -2880,9 +2910,9 @@ importers:
       '@xwiki/cristal-uiextension-api':
         specifier: workspace:*
         version: link:../uiextension-api
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2893,6 +2923,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -2960,9 +2993,9 @@ importers:
       '@xwiki/cristal-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2973,6 +3006,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -2985,9 +3021,9 @@ importers:
       '@xwiki/cristal-configuration-api':
         specifier: workspace:*
         version: link:../../configuration/configuration-api
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2998,6 +3034,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/wiki-config/wiki-config-default:
     dependencies:
@@ -3013,9 +3052,9 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3026,6 +3065,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   core/xwiki/xwiki-utils:
     devDependencies:
@@ -3056,9 +3098,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -3072,6 +3111,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   ds/api:
     dependencies:
@@ -3084,9 +3126,9 @@ importers:
       '@xwiki/cristal-navigation-tree-api':
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-api
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3097,6 +3139,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
   ds/dsfr:
     dependencies:
@@ -3115,9 +3160,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@vue/test-utils':
         specifier: 2.4.6
@@ -3134,6 +3176,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -3167,16 +3212,10 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
     devDependencies:
-      '@vue/runtime-dom':
-        specifier: 3.5.17
-        version: 3.5.17
       '@vue/test-utils':
         specifier: 2.4.6
         version: 2.4.6
@@ -3195,6 +3234,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -3222,9 +3264,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -3250,6 +3289,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -3298,9 +3340,6 @@ importers:
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -3323,6 +3362,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -3380,9 +3422,6 @@ importers:
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -3402,6 +3441,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -3625,9 +3667,6 @@ importers:
       utility-types:
         specifier: 3.11.0
         version: 3.11.0
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -3659,6 +3698,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -4087,15 +4129,6 @@ importers:
       '@xwiki/cristal-rename-filesystem':
         specifier: workspace:*
         version: link:../../core/rename/rename-filesystem
-      inversify:
-        specifier: 7.5.4
-        version: 7.5.4(reflect-metadata@0.2.2)
-      react:
-        specifier: 19.1.0
-        version: 19.1.0
-      react-dom:
-        specifier: 19.1.0
-        version: 19.1.0(react@19.1.0)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4106,9 +4139,9 @@ importers:
       '@types/node':
         specifier: 22.15.30
         version: 22.15.30
-      '@vitejs/plugin-react':
-        specifier: 4.5.1
-        version: 4.5.1(vite@6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+      '@vitejs/plugin-vue':
+        specifier: 6.0.0
+        version: 6.0.0(vite@6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
       typescript:
         specifier: 5.8.3
         version: 5.8.3
@@ -4282,9 +4315,6 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4295,6 +4325,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -4505,9 +4538,6 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -4530,6 +4560,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -4545,9 +4578,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4564,6 +4594,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -4659,9 +4692,9 @@ importers:
       comlink:
         specifier: 4.4.2
         version: 4.4.2
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
+      reflect-metadata:
+        specifier: 0.x
+        version: 0.2.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4675,6 +4708,9 @@ importers:
       vite-plugin-comlink:
         specifier: 5.1.0
         version: 5.1.0(comlink@4.4.2)(vite@6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -4726,9 +4762,6 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-router:
         specifier: 4.5.1
         version: 4.5.1(vue@3.5.17(typescript@5.8.3))
@@ -4745,6 +4778,9 @@ importers:
       vite-plugin-comlink:
         specifier: 5.1.0
         version: 5.1.0(comlink@4.4.2)(vite@6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -4829,9 +4865,6 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
       vue-i18n:
         specifier: 11.1.5
         version: 11.1.5(vue@3.5.17(typescript@5.8.3))
@@ -4866,6 +4899,9 @@ importers:
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.15.30)(happy-dom@18.0.1)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -4928,42 +4964,21 @@ importers:
       '@xwiki/cristal-browser-default':
         specifier: workspace:*
         version: link:../core/browser/browser-default
-      '@xwiki/cristal-configuration-api':
-        specifier: workspace:*
-        version: link:../core/configuration/configuration-api
       '@xwiki/cristal-configuration-web':
         specifier: workspace:*
         version: link:../core/configuration/configuration-web
       '@xwiki/cristal-lib':
         specifier: workspace:*
         version: link:../lib
-      '@xwiki/cristal-navigation-tree-default':
-        specifier: workspace:*
-        version: link:../core/navigation-tree/navigation-tree-default
-      '@xwiki/cristal-navigation-tree-nextcloud':
-        specifier: workspace:*
-        version: link:../core/navigation-tree/navigation-tree-nextcloud
-      '@xwiki/cristal-navigation-tree-xwiki':
-        specifier: workspace:*
-        version: link:../core/navigation-tree/navigation-tree-xwiki
       '@xwiki/cristal-settings-browser':
         specifier: workspace:*
         version: link:../core/settings/settings-browser
       express:
         specifier: 5.1.0
         version: 5.1.0
-      react:
-        specifier: 19.1.0
-        version: 19.1.0
-      react-dom:
-        specifier: 19.1.0
-        version: 19.1.0(react@19.1.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
-      vue-router:
-        specifier: 4.5.1
-        version: 4.5.1(vue@3.5.17(typescript@5.8.3))
     devDependencies:
       '@eslint/eslintrc':
         specifier: 3.3.1
@@ -4977,33 +4992,18 @@ importers:
       '@types/node':
         specifier: 22.15.30
         version: 22.15.30
-      '@vitejs/plugin-react':
-        specifier: 4.5.1
-        version: 4.5.1(vite@6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
       '@vitejs/plugin-vue':
         specifier: 6.0.0
         version: 6.0.0(vite@6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
       globals:
         specifier: 16.2.0
         version: 16.2.0
-      inversify:
-        specifier: 7.5.4
-        version: 7.5.4(reflect-metadata@0.2.2)
-      reflect-metadata:
-        specifier: 0.2.2
-        version: 0.2.2
       typescript:
         specifier: 5.8.3
         version: 5.8.3
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
-      vite-plugin-dts:
-        specifier: 4.5.4
-        version: 4.5.4(@types/node@22.15.30)(rollup@4.41.1)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
-      vite-plugin-vuetify:
-        specifier: 2.1.1
-        version: 2.1.1(vite@6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))(vuetify@3.8.10)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -5019,9 +5019,6 @@ importers:
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
-      vue:
-        specifier: 3.5.17
-        version: 3.5.17(typescript@5.8.3)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -5035,6 +5032,9 @@ importers:
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
@@ -6561,14 +6561,8 @@ packages:
   '@volar/typescript@2.4.14':
     resolution: {integrity: sha512-p8Z6f/bZM3/HyCdRNFZOEEzts51uV8WHeN8Tnfnm2EBv6FDB2TQLzfVx7aJvnl8ofKAOnS64B2O8bImBFaauRw==}
 
-  '@vue/compiler-core@3.5.16':
-    resolution: {integrity: sha512-AOQS2eaQOaaZQoL1u+2rCJIKDruNXVBZSiUD3chnUrsoX5ZTQMaCvXlWNIfxBJuU15r1o7+mpo5223KVtIhAgQ==}
-
   '@vue/compiler-core@3.5.17':
     resolution: {integrity: sha512-Xe+AittLbAyV0pabcN7cP7/BenRBNcteM4aSDCtRvGw0d9OL+HG1u/XHLY/kt1q4fyMeZYXyIYrsHuPSiDPosA==}
-
-  '@vue/compiler-dom@3.5.16':
-    resolution: {integrity: sha512-SSJIhBr/teipXiXjmWOVWLnxjNGo65Oj/8wTEQz0nqwQeP75jWZ0n4sF24Zxoht1cuJoWopwj0J0exYwCJ0dCQ==}
 
   '@vue/compiler-dom@3.5.17':
     resolution: {integrity: sha512-+2UgfLKoaNLhgfhV5Ihnk6wB4ljyW1/7wUIog2puUqajiC29Lp5R/IKDdkebh9jTbTogTbsgB+OY9cEWzG95JQ==}
@@ -6623,9 +6617,6 @@ packages:
     resolution: {integrity: sha512-BOHhm8HalujY6lmC3DbqF6uXN/K00uWiEeF22LfEsm9Q93XeJ/plHTepGwf6tqFcF7GA5oGSSAAUock3VvzaCA==}
     peerDependencies:
       vue: 3.5.17
-
-  '@vue/shared@3.5.16':
-    resolution: {integrity: sha512-c/0fWy3Jw6Z8L9FmTyYfkpM5zklnqqa9+a6dz3DvONRKW2NEbh46BP0FHuLFSWi2TnQEtp91Z6zOWNrU6QiyPg==}
 
   '@vue/shared@3.5.17':
     resolution: {integrity: sha512-CabR+UN630VnsJO/jHWYBC1YVXyMq94KKp6iF5MQgZJs5I8cmjw6oVMO1oDbtBkENSHSSn/UadWlW/OAgdmKrg==}
@@ -8492,9 +8483,6 @@ packages:
 
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
-
-  loupe@3.1.3:
-    resolution: {integrity: sha512-kkIp7XSkP78ZxJEsSxW3712C6teJVoeHHwgo9zJ380de7IYyJ2ISlxojcH2pC5OFLewESmnRi/+XCDIEEVyoug==}
 
   loupe@3.1.4:
     resolution: {integrity: sha512-wJzkKwJrheKtknCOKNEtDK4iqg/MxmZheEMtSTYvnzRdEYaZzmgH976nenp8WdJRdx5Vc1X/9MO0Oszl6ezeXg==}
@@ -12418,14 +12406,6 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.1.0
 
-  '@vue/compiler-core@3.5.16':
-    dependencies:
-      '@babel/parser': 7.27.5
-      '@vue/shared': 3.5.16
-      entities: 4.5.0
-      estree-walker: 2.0.2
-      source-map-js: 1.2.1
-
   '@vue/compiler-core@3.5.17':
     dependencies:
       '@babel/parser': 7.27.5
@@ -12433,11 +12413,6 @@ snapshots:
       entities: 4.5.0
       estree-walker: 2.0.2
       source-map-js: 1.2.1
-
-  '@vue/compiler-dom@3.5.16':
-    dependencies:
-      '@vue/compiler-core': 3.5.16
-      '@vue/shared': 3.5.16
 
   '@vue/compiler-dom@3.5.17':
     dependencies:
@@ -12489,9 +12464,9 @@ snapshots:
   '@vue/language-core@2.2.0(typescript@5.8.3)':
     dependencies:
       '@volar/language-core': 2.4.14
-      '@vue/compiler-dom': 3.5.16
+      '@vue/compiler-dom': 3.5.17
       '@vue/compiler-vue2': 2.7.16
-      '@vue/shared': 3.5.16
+      '@vue/shared': 3.5.17
       alien-signals: 0.4.14
       minimatch: 9.0.5
       muggle-string: 0.4.1
@@ -12502,9 +12477,9 @@ snapshots:
   '@vue/language-core@2.2.10(typescript@5.8.3)':
     dependencies:
       '@volar/language-core': 2.4.14
-      '@vue/compiler-dom': 3.5.16
+      '@vue/compiler-dom': 3.5.17
       '@vue/compiler-vue2': 2.7.16
-      '@vue/shared': 3.5.16
+      '@vue/shared': 3.5.17
       alien-signals: 1.0.13
       minimatch: 9.0.5
       muggle-string: 0.4.1
@@ -12534,8 +12509,6 @@ snapshots:
       '@vue/shared': 3.5.17
       vue: 3.5.17(typescript@5.8.3)
 
-  '@vue/shared@3.5.16': {}
-
   '@vue/shared@3.5.17': {}
 
   '@vue/test-utils@2.4.6':
@@ -12548,6 +12521,7 @@ snapshots:
       upath: 2.0.1
       vue: 3.5.17(typescript@5.8.3)
       vuetify: 3.8.10(typescript@5.8.3)(vite-plugin-vuetify@2.1.1)(vue@3.5.17(typescript@5.8.3))
+    optional: true
 
   '@xmldom/xmldom@0.8.10': {}
 
@@ -12979,7 +12953,7 @@ snapshots:
       assertion-error: 2.0.1
       check-error: 2.1.1
       deep-eql: 5.0.2
-      loupe: 3.1.3
+      loupe: 3.1.4
       pathval: 2.0.0
 
   chalk@4.1.2:
@@ -14748,8 +14722,6 @@ snapshots:
       is-unicode-supported: 0.1.0
 
   longest-streak@3.1.0: {}
-
-  loupe@3.1.3: {}
 
   loupe@3.1.4: {}
 
@@ -16729,7 +16701,8 @@ snapshots:
       '@unrs/resolver-binding-win32-ia32-msvc': 1.7.11
       '@unrs/resolver-binding-win32-x64-msvc': 1.7.11
 
-  upath@2.0.1: {}
+  upath@2.0.1:
+    optional: true
 
   update-browserslist-db@1.1.3(browserslist@4.25.0):
     dependencies:
@@ -16886,6 +16859,7 @@ snapshots:
       vuetify: 3.8.10(typescript@5.8.3)(vite-plugin-vuetify@2.1.1)(vue@3.5.17(typescript@5.8.3))
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   vite@6.3.5(@types/node@22.15.30)(sugarss@4.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0):
     dependencies:

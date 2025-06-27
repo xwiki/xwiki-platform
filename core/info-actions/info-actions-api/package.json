@@ -23,13 +23,15 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test": "vitest --run"
   },
-  "dependencies": {
-    "vue": "3.5.17"
+  "peerDependencies": {
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.8.3",
-    "vite": "6.3.5"
+    "vite": "6.3.5",
+    "vue": "3.5.17"
   },
   "publishConfig": {
     "exports": {

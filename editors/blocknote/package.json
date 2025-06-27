@@ -41,11 +41,11 @@
     "@xwiki/cristal-uniast": "workspace:*",
     "inversify": "7.5.4",
     "lodash-es": "4.17.21",
-    "vue": "3.5.17",
     "vue-i18n": "11.1.5"
   },
   "peerDependencies": {
-    "reflect-metadata": "0.2.2"
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
   },
   "devDependencies": {
     "@types/lodash-es": "4.17.12",
@@ -54,6 +54,7 @@
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.3",
     "vite": "6.3.5",
+    "vue": "3.5.17",
     "vue-tsc": "2.2.10"
   },
   "publishConfig": {

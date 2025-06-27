@@ -33,12 +33,12 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "inversify": "7.5.4",
-    "vue": "3.5.17",
     "vue-i18n": "11.1.5",
     "vuetify": "3.8.10"
   },
   "peerDependencies": {
-    "reflect-metadata": "0.2.2"
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
   },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",
@@ -47,6 +47,7 @@
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.3",
     "vite": "6.3.5",
+    "vue": "3.5.17",
     "vue-tsc": "2.2.10"
   },
   "publishConfig": {

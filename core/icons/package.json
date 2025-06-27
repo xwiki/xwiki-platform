@@ -25,14 +25,18 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "bootstrap-icons": "1.13.1",
-    "vue": "3.5.17"
+    "bootstrap-icons": "1.13.1"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
   },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.8.3",
     "vite": "6.3.5",
+    "vue": "3.5.17",
     "vue-tsc": "2.2.10"
   },
   "keywords": [

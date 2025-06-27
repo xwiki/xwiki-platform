@@ -29,18 +29,19 @@
     "@xwiki/cristal-authentication-github-state": "workspace:*",
     "axios": "1.10.0",
     "inversify": "7.5.4",
-    "js-cookie": "3.0.5",
-    "vue": "3.5.17"
+    "js-cookie": "3.0.5"
   },
   "peerDependencies": {
-    "reflect-metadata": "0.2.2"
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
   },
   "devDependencies": {
     "@types/js-cookie": "3.0.6",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.3",
-    "vite": "6.3.5"
+    "vite": "6.3.5",
+    "vue": "3.5.17"
   },
   "publishConfig": {
     "exports": {

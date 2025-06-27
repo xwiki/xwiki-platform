@@ -30,6 +30,9 @@
     "inversify": "7.5.4",
     "lodash-es": "4.17.21"
   },
+  "peerDependencies": {
+    "reflect-metadata": "0.x"
+  },
   "devDependencies": {
     "@types/lodash-es": "4.17.12",
     "reflect-metadata": "0.2.2",

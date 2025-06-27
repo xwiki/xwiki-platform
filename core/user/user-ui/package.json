@@ -24,13 +24,17 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@xwiki/cristal-authentication-api": "workspace:*",
-    "vue": "3.5.17"
+    "@xwiki/cristal-authentication-api": "workspace:*"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.8.3",
     "vite": "6.3.5",
+    "vue": "3.5.17",
     "vue-tsc": "2.2.10"
   },
   "publishConfig": {

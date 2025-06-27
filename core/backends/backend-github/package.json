@@ -32,7 +32,7 @@
     "mime": "4.0.7"
   },
   "peerDependencies": {
-    "reflect-metadata": "0.2.2"
+    "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

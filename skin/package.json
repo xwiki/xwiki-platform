@@ -53,9 +53,12 @@
     "@xwiki/cristal-wiki-config-api": "workspace:*",
     "inversify": "7.5.4",
     "reflect-metadata": "0.2.2",
-    "vue": "3.5.17",
     "vue-i18n": "11.1.5",
     "vue-router": "4.5.1"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
   },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",
@@ -67,6 +70,7 @@
     "vite": "6.3.5",
     "vitest": "3.2.4",
     "vitest-mock-extended": "3.1.0",
+    "vue": "3.5.17",
     "vue-tsc": "2.2.10"
   },
   "publishConfig": {

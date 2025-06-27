@@ -31,7 +31,7 @@
     "xml-escape": "1.1.0"
   },
   "peerDependencies": {
-    "reflect-metadata": "0.2.2"
+    "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@types/xml-escape": "1.1.3",

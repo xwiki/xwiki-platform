@@ -94,9 +94,12 @@
     "inversify": "7.5.4",
     "pinia": "3.0.2",
     "reflect-metadata": "0.2.2",
-    "vue": "3.5.17",
     "vue-i18n": "11.1.5",
     "vue-router": "4.5.1"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
   },
   "devDependencies": {
     "@shoelace-style/shoelace": "2.20.1",
@@ -104,6 +107,7 @@
     "@xwiki/cristal-dsapi": "workspace:*",
     "typescript": "5.8.3",
     "vite": "6.3.5",
+    "vue": "3.5.17",
     "vue-tsc": "2.2.10"
   },
   "publishConfig": {

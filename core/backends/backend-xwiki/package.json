@@ -29,7 +29,7 @@
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-utils-inversify": "workspace:*",
     "@xwiki/cristal-xwiki-utils": "workspace:*",
-    "inversify": "7.5.2"
+    "inversify": "7.5.4"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

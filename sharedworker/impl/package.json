@@ -40,7 +40,7 @@
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",
     "comlink": "4.4.2",
-    "inversify": "7.5.2",
+    "inversify": "7.5.4",
     "reflect-metadata": "0.2.2",
     "vue": "3.5.16",
     "vue-router": "4.5.1"

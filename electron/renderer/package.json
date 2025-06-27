@@ -33,7 +33,7 @@
     "@xwiki/cristal-model-remote-url-filesystem-default": "workspace:*",
     "@xwiki/cristal-navigation-tree-filesystem": "workspace:*",
     "@xwiki/cristal-rename-filesystem": "workspace:*",
-    "inversify": "7.5.2",
+    "inversify": "7.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "reflect-metadata": "0.2.2",

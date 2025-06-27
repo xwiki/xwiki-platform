@@ -24,7 +24,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "inversify": "7.5.2"
+    "inversify": "7.5.4"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

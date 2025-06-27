@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@xwiki/cristal-info-actions-api": "workspace:*",
-    "inversify": "7.5.2",
+    "inversify": "7.5.4",
     "lodash-es": "4.17.21"
   },
   "peerDependencies": {

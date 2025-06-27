@@ -29,7 +29,7 @@
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-utils-inversify": "workspace:*",
     "fast-xml-parser": "5.2.4",
-    "inversify": "7.5.2"
+    "inversify": "7.5.4"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

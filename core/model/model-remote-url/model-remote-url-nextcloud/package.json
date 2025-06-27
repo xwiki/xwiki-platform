@@ -27,7 +27,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
-    "inversify": "7.5.2"
+    "inversify": "7.5.4"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

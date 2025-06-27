@@ -22,7 +22,6 @@
 
 import { chrome } from "../.electron-vendors.cache.json";
 import { injectAppVersion } from "../version/inject-app-version-plugin.mjs";
-import react from "@vitejs/plugin-react";
 import vue from "@vitejs/plugin-vue";
 import { join } from "node:path";
 
@@ -65,7 +64,7 @@ const config = {
   worker: {
     format: "es",
   },
-  plugins: [react(), vue(), injectAppVersion()],
+  plugins: [vue(), injectAppVersion()],
 };
 
 export default config;

@@ -20,16 +20,13 @@
 
 import { defineConfig } from "vite";
 import Vue from "@vitejs/plugin-vue";
-import dts from "vite-plugin-dts";
-import react from "@vitejs/plugin-react"
-
 import { resolve } from "path";
 
 export default defineConfig({
   build: {
     sourcemap: true,
     input: {
-      main: resolve(__dirname, "index.html")
+      main: resolve(__dirname, "index.html"),
     },
     rollupOptions: {
       output: {
@@ -39,33 +36,20 @@ export default defineConfig({
             return "wikimodel";
           }
           return null;
-        }
-      }
-    }
+        },
+      },
+    },
   },
   plugins: [
-    react(),
     Vue({
-      include: [/\.vue$/, /\.md$/],
       template: {
         compilerOptions: {
-          isCustomElement: (tag) =>
-            tag.startsWith("sl-") || tag.startsWith("solid-")
-        }
-      }
-    })
+          isCustomElement: (tag) => tag.startsWith("sl-"),
+        },
+      },
+    }),
   ],
   worker: {
-    format: "es"
+    format: "es",
   },
-  optimizeDeps: {
-    esbuildOptions: {
-      tsconfigRaw: {
-        compilerOptions: {
-          // Workaround for a vite bug (see https://github.com/vitejs/vite/issues/13736)
-          experimentalDecorators: true
-        }
-      }
-    }
-  }
 });

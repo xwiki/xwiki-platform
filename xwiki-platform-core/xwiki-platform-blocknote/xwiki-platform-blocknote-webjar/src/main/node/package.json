@@ -23,7 +23,7 @@
     "@xwiki/cristal-uniast": "0.19.0",
     "inversify": "7.5.4",
     "pinia": "3.0.2",
-    "vue": "3.5.17",
+    "vue": "3.5.16",
     "vue-i18n": "11.1.7"
   },
   "devDependencies": {

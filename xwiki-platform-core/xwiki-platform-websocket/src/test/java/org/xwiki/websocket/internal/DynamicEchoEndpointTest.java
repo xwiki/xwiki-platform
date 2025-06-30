@@ -19,11 +19,6 @@
  */
 package org.xwiki.websocket.internal;
 
-import jakarta.websocket.CloseReason;
-import jakarta.websocket.MessageHandler;
-import jakarta.websocket.RemoteEndpoint.Basic;
-import jakarta.websocket.Session;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -38,8 +33,14 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.websocket.WebSocketContext;
 
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.RemoteEndpoint.Basic;
+import jakarta.websocket.Session;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -106,7 +107,7 @@ class DynamicEchoEndpointTest
 
         this.echoEndPoint.onOpen(this.session, null);
 
-        verify(this.session).addMessageHandler(this.messageHandlerCaptor.capture());
+        verify(this.session).addMessageHandler(eq(String.class), this.messageHandlerCaptor.capture());
         this.messageHandlerCaptor.getValue().onMessage("Hi there!");
 
         verify(this.session.getBasicRemote()).sendObject("[test] test:Users.Alice -> Hi there!");

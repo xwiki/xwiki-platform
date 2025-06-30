@@ -40,7 +40,7 @@
 attachment.validation.filesize.errorMessage=Le fichier {0} est trop volumineux ({1}). Taille maximum : {2}.
 attachment.validation.mimetype.errorMessage=Le fichier {0} est d''un type non valide {1}.
 attachment.validation.mimetype.allowedMimetypes=Mimetypes autorisés : {0}
-attachment.validation.mimetype.blockerMimetypes=Types de fichiers bloquants : {0}
+attachment.validation.mimetype.blockerMimetypes=Types de fichiers bloqués : {0}
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes=Types de fichiers autorisés
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes.hint=Définir la liste des types de fichiers autorisés comme pièces jointes. Par défaut, cette liste est vide, mais vous pouvez définir une liste de types autorisés, en les séparant par des virgules. Notez qu'un astérisque (*) peut être utilisé pour accepter tout type de fichier multimédia. Une fois que la liste n'est plus vide, toute pièce jointe n'étant pas dans la liste sera rejetée. Par exemple, si vous voulez autoriser seulement les fichiers en texte brut et les images de tout type, vous pouvez définir la liste comme suit : text/plain,image/*
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=Types de fichiers bloqués 

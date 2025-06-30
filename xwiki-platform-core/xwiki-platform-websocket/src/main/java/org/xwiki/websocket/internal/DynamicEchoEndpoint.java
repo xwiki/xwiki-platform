@@ -19,18 +19,18 @@
  */
 package org.xwiki.websocket.internal;
 
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
-import org.xwiki.websocket.AbstractXWikiEndpoint;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
+
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
+import org.xwiki.websocket.AbstractXWikiEndpoint;
 
 /**
  * A dynamically registered WebSocket end-point that echoes all messages is receives.

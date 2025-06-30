@@ -1660,7 +1660,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # Scheduler
 #-------------------------------------------------------------------------------------
 
-#-# [Since 17.5.0]
+#-# [Since 17.5.0, 17.4.1]
 #-# "true" (the default) if the scheduler should be enabled on this instance.
 #-# Disabling the scheduler is often used as a workaround to avoid duplicates in a cluster.
 #-# 

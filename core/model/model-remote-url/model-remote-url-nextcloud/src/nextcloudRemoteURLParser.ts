@@ -66,11 +66,11 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
         urlMatch.length == 3 ? urlMatch[1].toString() : undefined,
       );
     } else if (
-      segments.length >= 2 &&
-      segments[segments.length - 1] == "page.json"
+      segments[segments.length - 1].endsWith(".md") &&
+      segments[segments.length - 2] != "attachments"
     ) {
       return this.buildDocumentReference(
-        segments.slice(0, segments.length - 1),
+        segments,
         urlMatch.length == 3 ? urlMatch[1].toString() : undefined,
       );
     } else {
@@ -97,12 +97,13 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
     segments: string[],
     username: string | undefined,
   ) {
+    const spaces = segments.slice(0, segments.length - 2);
+    const newSpaces = [];
+    newSpaces.push(...spaces.slice(0, spaces.length - 1));
+    newSpaces.push(spaces[spaces.length - 1].slice(1));
     return new AttachmentReference(
       segments[segments.length - 1],
-      this.buildDocumentReference(
-        segments.slice(0, segments.length - 2),
-        username,
-      ),
+      this.buildDocumentReference(newSpaces, username),
     );
   }
 
@@ -111,7 +112,7 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
     username: string | undefined,
   ) {
     return new DocumentReference(
-      segments[segments.length - 1],
+      this.removeExtension(segments[segments.length - 1]),
       this.buildSpaceReference(
         segments.slice(0, segments.length - 1),
         username,
@@ -128,6 +129,13 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
 
   private getWikiConfig() {
     return this.cristalApp.getWikiConfig();
+  }
+
+  private removeExtension(file: string): string {
+    if (!file.includes(".")) {
+      return file;
+    }
+    return file.slice(0, file.lastIndexOf("."));
   }
 }
 

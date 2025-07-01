@@ -28,10 +28,15 @@ import {
 import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import { inject, injectable } from "inversify";
 import type { CristalApp } from "@xwiki/cristal-api";
+import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 
 @injectable()
 class NextcloudRemoteURLSerializer implements RemoteURLSerializer {
-  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  constructor(
+    @inject("CristalApp") private readonly cristalApp: CristalApp,
+    @inject("AuthenticationManagerProvider")
+    private readonly authenticationManagerProvider: AuthenticationManagerProvider,
+  ) {}
 
   serialize(reference?: EntityReference): string | undefined {
     if (!reference) {
@@ -41,33 +46,39 @@ class NextcloudRemoteURLSerializer implements RemoteURLSerializer {
       case EntityType.WIKI:
         throw new Error("Not implemented");
       case EntityType.SPACE:
-        return this.serializeSpace(reference as SpaceReference);
+        return this.serializeSpace(reference);
       case EntityType.DOCUMENT:
-        return `${this.serializeDocument(reference as DocumentReference)}/page.json`;
+        return `${this.serializeDocument(reference)}.md`;
       case EntityType.ATTACHMENT:
-        return this.serializeAttachment(reference as AttachmentReference);
+        return this.serializeAttachment(reference);
     }
   }
 
   private serializeSpace(spaceReference: SpaceReference) {
     const spaces = spaceReference.names.join("/");
-    return `${this.getRootURL(spaceReference.wiki?.name)}/${spaces}`;
+    const userId = this.authenticationManagerProvider.get()?.getUserId?.();
+    return `${this.getRootURL(spaceReference.wiki?.name ?? userId ?? "")}/${spaces}`;
   }
 
   private serializeDocument(documentReference: DocumentReference) {
     return `${this.serializeSpace(documentReference.space!)}/${documentReference.name}`;
   }
 
-  private serializeAttachment(attachmentReference: AttachmentReference) {
-    return `${this.serializeDocument(attachmentReference.document)}/attachments/${attachmentReference.name}`;
+  private serializeMeta(documentReference: DocumentReference) {
+    return `${this.serializeSpace(documentReference.space!)}/.${documentReference.name}`;
   }
 
-  private getRootURL(username?: string) {
+  private serializeAttachment(attachmentReference: AttachmentReference) {
+    return `${this.serializeMeta(attachmentReference.document)}/attachments/${attachmentReference.name}`;
+  }
+
+  private getRootURL(username: string) {
     const config = this.cristalApp.getWikiConfig();
-    return `${config.baseRestURL}${config.storageRoot ?? "/files/${username}/.cristal"}`.replace(
+    const url = (config.storageRoot ?? "/files/${username}/.cristal").replace(
       "${username}",
-      username ?? "",
+      username,
     );
+    return `${config.baseRestURL}${url}`;
   }
 }
 

@@ -85,7 +85,9 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
       <SearchBox
         placeholder={t("blocknote.linkEditor.placeholder")}
         initialValue={
-          current?.url ? getTitleFromRefUrl(current.url, linkEditionCtx) : ""
+          current?.url
+            ? getSerializedReference(current.url, linkEditionCtx)
+            : ""
         }
         getSuggestions={(query) =>
           suggestLink({ query }).then((suggestions) =>
@@ -108,7 +110,7 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
   );
 };
 
-function getTitleFromRefUrl(
+function getSerializedReference(
   url: string,
   linkEditionCtx: LinkEditionContext,
 ): string {
@@ -117,7 +119,7 @@ function getTitleFromRefUrl(
   );
 
   return reference
-    ? linkEditionCtx.modelReferenceHandler.getTitle(reference)
+    ? linkEditionCtx.modelReferenceSerializer.serialize(reference)!
     : url;
 }
 

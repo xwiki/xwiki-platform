@@ -169,7 +169,7 @@ export class NextcloudOAuth2AuthenticationManager
   async getUserDetails(): Promise<UserDetails> {
     const config = this.cristalApp.getWikiConfig();
 
-    const userId = Cookies.get(this.getUserIdCookieKey());
+    const userId = this.getUserIdFromCookie();
     return {
       profile: `${config.baseURL}/u/${userId}`,
       username: userId,
@@ -200,6 +200,10 @@ export class NextcloudOAuth2AuthenticationManager
     return (
       this.getTokenType() !== undefined && this.getAccessToken() !== undefined
     );
+  }
+
+  getUserId(): string | undefined {
+    return this.getUserIdFromCookie();
   }
 
   private getTokenType() {
@@ -286,5 +290,9 @@ export class NextcloudOAuth2AuthenticationManager
         );
       }
     });
+  }
+
+  private getUserIdFromCookie() {
+    return Cookies.get(this.getUserIdCookieKey());
   }
 }

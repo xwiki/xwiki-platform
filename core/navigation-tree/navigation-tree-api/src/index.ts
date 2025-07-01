@@ -32,7 +32,7 @@ type NavigationTreeNode = {
   id: string;
   label: string;
   /** the location of the corresponding page on Cristal */
-  location: SpaceReference;
+  location: SpaceReference | DocumentReference;
   url: string;
   has_children: boolean;
   /**

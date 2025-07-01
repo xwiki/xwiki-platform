@@ -19,8 +19,10 @@
  */
 
 import {
+  AttachmentReference,
   DocumentReference,
   EntityReference,
+  EntityType,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
 import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
@@ -28,7 +30,7 @@ import { injectable } from "inversify";
 
 @injectable()
 export class GitHubModelReferenceParser implements ModelReferenceParser {
-  parse(reference: string): EntityReference {
+  parse(reference: string, type?: EntityType): EntityReference {
     if (/^https?:\/\//.test(reference)) {
       throw new Error(`[${reference}] is not a valid entity reference`);
     }
@@ -36,6 +38,17 @@ export class GitHubModelReferenceParser implements ModelReferenceParser {
     if (segments[0] == "") {
       segments = segments.slice(1);
     }
+    if (type === EntityType.ATTACHMENT) {
+      return new AttachmentReference(
+        segments[segments.length - 1],
+        this.buildDocumentReference(segments.slice(0, segments.length - 1)),
+      );
+    } else {
+      return this.buildDocumentReference(segments);
+    }
+  }
+
+  private buildDocumentReference(segments: string[]) {
     return new DocumentReference(
       segments[segments.length - 1],
       new SpaceReference(undefined, ...segments.slice(0, segments.length - 1)),

@@ -61,8 +61,8 @@ const api: APITypes = {
   listChildren(page: string): Promise<Array<string>> {
     return ipcRenderer.invoke("listChildren", { page });
   },
-  deletePage(path: string): Promise<void> {
-    return ipcRenderer.invoke("deletePage", { path });
+  deletePage(reference: string): Promise<void> {
+    return ipcRenderer.invoke("deletePage", { path: reference });
   },
   search(
     query: string,
@@ -77,11 +77,15 @@ const api: APITypes = {
     return ipcRenderer.invoke("search", { query, type, mimetype });
   },
   movePage(
-    path: string,
-    newPath: string,
+    reference: string,
+    newReference: string,
     preserveChildren: boolean,
   ): Promise<void> {
-    return ipcRenderer.invoke("movePage", { path, newPath, preserveChildren });
+    return ipcRenderer.invoke("movePage", {
+      reference,
+      newReference,
+      preserveChildren,
+    });
   },
 };
 contextBridge.exposeInMainWorld("fileSystemStorage", api);

@@ -50,7 +50,7 @@ type TreeItem = {
   title: string;
   href: string;
   children?: Array<TreeItem>;
-  _location: SpaceReference;
+  _location: SpaceReference | DocumentReference;
   _is_terminal: boolean;
 };
 

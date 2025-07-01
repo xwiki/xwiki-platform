@@ -18,13 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { SpaceReference } from "@xwiki/cristal-model-api";
+import { EntityType } from "@xwiki/cristal-model-api";
 import { name as NavigationTreeSourceName } from "@xwiki/cristal-navigation-tree-api";
 import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
 import { Container, inject, injectable } from "inversify";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { DocumentReference } from "@xwiki/cristal-model-api";
+import type { ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";
+import type { RemoteURLParserProvider } from "@xwiki/cristal-model-remote-url-api";
 import type {
   NavigationTreeNode,
   NavigationTreeSource,
@@ -42,6 +44,10 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
     @inject("CristalApp") private readonly cristalApp: CristalApp,
     @inject("AuthenticationManagerProvider")
     private readonly authenticationManagerProvider: AuthenticationManagerProvider,
+    @inject("RemoteURLParserProvider")
+    private readonly remoteURLParserProvider: RemoteURLParserProvider,
+    @inject("ModelReferenceSerializerProvider")
+    private readonly modelReferenceSerializerProvider: ModelReferenceSerializerProvider,
   ) {
     this.logger = logger;
     this.logger.setModule(
@@ -66,11 +72,11 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
       headers.Authorization = authorization;
     }
 
-    const navigationTreeRequestUrl = new URL(
-      this.cristalApp.getWikiConfig().storage.getPageRestURL(currentId, ""),
-    );
     try {
-      const response = await fetch(navigationTreeRequestUrl, {
+      const input = this.cristalApp
+        .getWikiConfig()
+        .storage.getPageRestURL(currentId, "");
+      const response = await fetch(input, {
         headers: headers,
       });
       const jsonResponse = await response.json();
@@ -83,35 +89,40 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
                 path: string;
                 type: string;
                 git_url: string;
+                url: string;
               }) => {
-                if (treeNode.type == "dir" && treeNode.name != "attachments") {
-                  const currentPageData = await this.cristalApp.getPage(
-                    treeNode.path,
+                const parse = this.remoteURLParserProvider
+                  .get()!
+                  .parse(
+                    treeNode.url,
+                    treeNode.type === "dir"
+                      ? EntityType.SPACE
+                      : EntityType.DOCUMENT,
                   );
-                  const gitResponse = await fetch(treeNode.git_url, {
-                    headers: headers,
-                  });
+                if (parse?.type === EntityType.DOCUMENT) {
+                  const modelReferenceSerializer =
+                    this.modelReferenceSerializerProvider.get()!;
+                  const page = modelReferenceSerializer.serialize(parse);
+                  if (!page) {
+                    throw new Error(
+                      `Could not serialize page [${treeNode.path}]`,
+                    );
+                  }
+                  const currentPageData = await this.cristalApp.getPage(page);
                   return {
-                    id: treeNode.path,
-                    label:
-                      currentPageData && currentPageData.name
-                        ? currentPageData.name
-                        : treeNode.name,
-                    location: new SpaceReference(
-                      undefined,
-                      ...treeNode.path.split("/"),
-                    ),
+                    id: page,
+                    label: this.computeLabel(currentPageData, parse, treeNode),
+                    location: parse,
                     url: this.cristalApp.getRouter().resolve({
                       name: "view",
                       params: {
-                        page: treeNode.path,
+                        page,
                       },
                     }).href,
-                    has_children: (
-                      (await gitResponse.json()) as {
-                        tree: Array<{ type: string }>;
-                      }
-                    ).tree.some((n) => n.type == "tree"),
+                    has_children: jsonResponse.some(
+                      (it: { path: string; type: string }) =>
+                        it.path === page && it.type == "dir",
+                    ),
                     is_terminal: false,
                   };
                 }
@@ -125,6 +136,23 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
       this.logger.debug("Could not load navigation tree.");
     }
     return navigationTree;
+  }
+
+  /**
+   * @param names - a list of objects with a name property
+   * @returns the first element that is not undefined with a name that is not undefined or the empty string
+   */
+  private computeLabel(
+    ...names: (
+      | {
+          name: string | undefined;
+        }
+      | undefined
+    )[]
+  ) {
+    return names
+      .filter((it) => it?.name !== undefined && it.name !== "")
+      .map((it) => it!.name)[0];
   }
 
   getParentNodesId(page: DocumentReference): Array<string> {

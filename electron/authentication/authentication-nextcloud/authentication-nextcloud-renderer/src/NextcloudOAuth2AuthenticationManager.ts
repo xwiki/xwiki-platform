@@ -46,6 +46,8 @@ interface AuthenticationWindow extends Window {
       baseUrl: string,
       authenticationBaseUrl: string,
     ) => Promise<void>;
+
+    getUserId: () => string | undefined;
   };
 }
 declare const window: AuthenticationWindow;
@@ -98,5 +100,9 @@ export class NextcloudOAuth2AuthenticationManager
 
   async logout(): Promise<void> {
     await window.authenticationNextcloud.logout("oauth2");
+  }
+
+  getUserId(): string | undefined {
+    return window.authenticationNextcloud.getUserId();
   }
 }

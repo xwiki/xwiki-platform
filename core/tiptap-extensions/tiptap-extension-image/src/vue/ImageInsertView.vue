@@ -129,7 +129,7 @@ function convertLink(link: Link) {
     type: link.type,
     title: link.label,
     segments,
-    imageURL: remoteURLSerializer?.serialize(attachmentReference),
+    imageURL: link.url,
   };
 }
 

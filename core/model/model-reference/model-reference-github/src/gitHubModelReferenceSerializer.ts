@@ -18,12 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
-  DocumentReference,
-  EntityReference,
-  EntityType,
-  SpaceReference,
-} from "@xwiki/cristal-model-api";
+import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
 
 import { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
 import { injectable } from "inversify";
@@ -44,13 +39,11 @@ export class GitHubModelReferenceSerializer
       case WIKI:
         throw new Error("Wiki currently not supported from GitHub");
       case SPACE: {
-        const spaceReference = reference as SpaceReference;
-        return spaceReference.names.join("/");
+        return reference.names.join("/");
       }
       case DOCUMENT: {
-        const documentReference = reference as DocumentReference;
-        const spaces = this.serialize(documentReference.space);
-        const name = documentReference.name;
+        const spaces = this.serialize(reference.space);
+        const name = reference.name;
         if (spaces === undefined || spaces == "") {
           return name;
         } else {
@@ -58,7 +51,7 @@ export class GitHubModelReferenceSerializer
         }
       }
       case ATTACHMENT: {
-        throw new Error("Attachments currently not supported from GitHub");
+        return this.serialize(reference.document) + "/" + reference.name;
       }
       default:
         throw new Error(`Unknown reference type [${type}]`);

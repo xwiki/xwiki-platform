@@ -18,14 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { EntityReference } from "@xwiki/cristal-model-api";
+import type { EntityReference, EntityType } from "@xwiki/cristal-model-api";
 
 /**
  * @since 0.12
  * @throws {@link Error} in case of issue when parsing the url
  */
 interface RemoteURLParser {
-  parse(url: string): EntityReference | undefined;
+  /**
+   * @param url - the url to parse
+   * @param type - an optional expected type of the parsed url
+   * @since 0.20
+   */
+  parse(url: string, type?: EntityType): EntityReference | undefined;
 }
 
 export { type RemoteURLParser };

@@ -839,6 +839,9 @@ importers:
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../backend-api
+      '@xwiki/cristal-page-default':
+        specifier: workspace:*
+        version: link:../../page/page-default
       '@xwiki/cristal-utils-inversify':
         specifier: workspace:*
         version: link:../../../utils/inversify
@@ -876,6 +879,9 @@ importers:
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../backend-api
+      '@xwiki/cristal-page-default':
+        specifier: workspace:*
+        version: link:../../page/page-default
       '@xwiki/cristal-utils-inversify':
         specifier: workspace:*
         version: link:../../../utils/inversify
@@ -1749,6 +1755,15 @@ importers:
       '@xwiki/cristal-link-suggest-api':
         specifier: workspace:*
         version: link:../link-suggest-api
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
+      '@xwiki/cristal-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../model/model-remote-url/model-remote-url-api
       inversify:
         specifier: 7.5.4
         version: 7.5.4(reflect-metadata@0.2.2)
@@ -2165,12 +2180,18 @@ importers:
       vite:
         specifier: 7.0.0
         version: 7.0.0(@types/node@22.15.32)(tsx@4.20.3)(yaml@2.8.0)
+      vitest-mock-extended:
+        specifier: 3.1.0
+        version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.15.32)(happy-dom@18.0.1)(tsx@4.20.3)(yaml@2.8.0))
 
   core/model/model-remote-url/model-remote-url-nextcloud:
     dependencies:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../../api
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../../../authentication/authentication-api
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model-api
@@ -2193,6 +2214,9 @@ importers:
       vite:
         specifier: 7.0.0
         version: 7.0.0(@types/node@22.15.32)(tsx@4.20.3)(yaml@2.8.0)
+      vitest-mock-extended:
+        specifier: 3.1.0
+        version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.15.32)(happy-dom@18.0.1)(tsx@4.20.3)(yaml@2.8.0))
 
   core/model/model-remote-url/model-remote-url-xwiki:
     dependencies:
@@ -2314,6 +2338,12 @@ importers:
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
+      '@xwiki/cristal-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../model/model-remote-url/model-remote-url-api
       '@xwiki/cristal-navigation-tree-api':
         specifier: workspace:*
         version: link:../navigation-tree-api
@@ -2524,6 +2554,44 @@ importers:
       vue-tsc:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.3)
+
+  core/page/page-api:
+    dependencies:
+      inversify:
+        specifier: 7.5.4
+        version: 7.5.4(reflect-metadata@0.2.2)
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+      vite:
+        specifier: 7.0.0
+        version: 7.0.0(@types/node@22.15.32)(tsx@4.20.3)(yaml@2.8.0)
+
+  core/page/page-default:
+    dependencies:
+      '@xwiki/cristal-page-api':
+        specifier: workspace:*
+        version: link:../page-api
+      yaml:
+        specifier: 2.8.0
+        version: 2.8.0
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+      vite:
+        specifier: 7.0.0
+        version: 7.0.0(@types/node@22.15.32)(tsx@4.20.3)(yaml@2.8.0)
 
   core/rename/rename-api:
     dependencies:
@@ -4247,6 +4315,9 @@ importers:
       '@xwiki/cristal-model-remote-url-filesystem-api':
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-api
+      '@xwiki/cristal-page-default':
+        specifier: workspace:*
+        version: link:../../core/page/page-default
       '@xwiki/cristal-utils-inversify':
         specifier: workspace:*
         version: link:../../utils/inversify
@@ -10002,14 +10073,6 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
-
-  ts-essentials@10.0.4:
-    resolution: {integrity: sha512-lwYdz28+S4nicm+jFi6V58LaAIpxzhg9rLdgNC1VsdP/xiFBseGhF1M/shwCk6zMmwahBZdXcl34LVHrEang3A==}
-    peerDependencies:
-      typescript: '>=4.5.0'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   ts-essentials@10.1.1:
     resolution: {integrity: sha512-4aTB7KLHKmUvkjNj8V+EdnmuVTiECzn3K+zIbRthumvHu+j44x3w63xpfs0JL3NGIzGXqoQ7AV591xHO+XrOTw==}
@@ -16536,10 +16599,6 @@ snapshots:
     dependencies:
       typescript: 5.8.3
 
-  ts-essentials@10.0.4(typescript@5.8.3):
-    optionalDependencies:
-      typescript: 5.8.3
-
   ts-essentials@10.1.1(typescript@5.8.3):
     optionalDependencies:
       typescript: 5.8.3
@@ -16903,7 +16962,7 @@ snapshots:
 
   vitest-mock-extended@3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.15.32)(happy-dom@18.0.1)(tsx@4.20.3)(yaml@2.8.0)):
     dependencies:
-      ts-essentials: 10.0.4(typescript@5.8.3)
+      ts-essentials: 10.1.1(typescript@5.8.3)
       typescript: 5.8.3
       vitest: 3.2.4(@types/debug@4.1.12)(@types/node@22.15.32)(happy-dom@18.0.1)(tsx@4.20.3)(yaml@2.8.0)
 

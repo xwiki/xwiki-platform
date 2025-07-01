@@ -101,13 +101,17 @@ export interface Storage {
   ): Promise<unknown>;
 
   /**
-   *
-   * @param page - the page where to save attachments at
-   * @param files - the files to save
-   *
+   * @param page - the serialized reference of the page
+   * @param files - the list of files to upload
+   * @returns (since 0.20) an optional list of resolved attachments URL (in the same order as the provided files). This
+   *   is useful in the case where the url cannot be resolved from the name of the file and its document reference
+   *   alone.
    * @since 0.9
    */
-  saveAttachments(page: string, files: File[]): Promise<unknown>;
+  saveAttachments(
+    page: string,
+    files: File[],
+  ): Promise<undefined | (undefined | string)[]>;
 
   /**
    * Delete a page.

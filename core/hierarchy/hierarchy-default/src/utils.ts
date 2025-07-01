@@ -44,12 +44,9 @@ export async function getPageHierarchyFromPath(
   const hierarchy: Array<PageHierarchyItem> = [];
   const fileHierarchy = [];
   if (page.type == EntityType.SPACE) {
-    fileHierarchy.push(...(page as SpaceReference).names);
+    fileHierarchy.push(...page.names);
   } else if (page.type == EntityType.DOCUMENT) {
-    fileHierarchy.push(
-      ...(page as DocumentReference).space!.names,
-      (page as DocumentReference).name,
-    );
+    fileHierarchy.push(...(page.space?.names ?? []), page.name);
   }
   let currentFile = "";
 

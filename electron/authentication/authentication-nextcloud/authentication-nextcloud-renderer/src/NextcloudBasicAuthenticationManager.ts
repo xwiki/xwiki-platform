@@ -84,4 +84,8 @@ export class NextcloudBasicAuthenticationManager
   async logout(): Promise<void> {
     await window.authenticationNextcloud.logout("basic");
   }
+
+  getUserId(): string | undefined {
+    return this.authenticationState.username.value;
+  }
 }

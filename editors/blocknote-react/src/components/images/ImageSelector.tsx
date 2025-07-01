@@ -62,14 +62,22 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
         linkEditionCtx.documentService.getCurrentDocumentReferenceString()
           .value ?? "";
 
-      await linkEditionCtx.attachmentsService.upload(currentPageName, [file]);
-
-      const parser =
-        linkEditionCtx.modelReferenceParser?.parse(currentPageName);
-
-      const url = linkEditionCtx.remoteURLSerializer?.serialize(
-        new AttachmentReference(file.name, parser as DocumentReference),
+      const uploadedFilesUrls = await linkEditionCtx.attachmentsService.upload(
+        currentPageName,
+        [file],
       );
+
+      let url: string | undefined;
+      if (uploadedFilesUrls && uploadedFilesUrls[0]) {
+        url = uploadedFilesUrls[0];
+      } else {
+        const parser =
+          linkEditionCtx.modelReferenceParser?.parse(currentPageName);
+
+        url = linkEditionCtx.remoteURLSerializer?.serialize(
+          new AttachmentReference(file.name, parser as DocumentReference),
+        );
+      }
 
       if (url) {
         onSelected(url);

@@ -47,8 +47,14 @@ interface AttachmentsService {
    * Upload the provided list of files to a given page
    * @param page - the page where to save the files
    * @param files - the list of files to upload
+   * @returns (since 0.20) an optional list of resolved attachments URL (in the same order as the provided files). This
+   *   is useful in the case where the url cannot be resolved from the name of the file and its document reference
+   *   alone.
    */
-  upload(page: string, files: File[]): Promise<void>;
+  upload(
+    page: string,
+    files: File[],
+  ): Promise<(string | undefined)[] | undefined>;
 }
 
 export { type AttachmentsService };

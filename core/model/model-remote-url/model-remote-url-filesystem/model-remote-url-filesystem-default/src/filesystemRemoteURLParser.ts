@@ -42,7 +42,7 @@ class FileSystemRemoteURLParser implements RemoteURLParser {
       urlStr = urlStr.split("://", 2)[1];
     }
 
-    let segments = decodeURIComponent(urlStr).split("/");
+    let segments = urlStr.split("/");
     if (segments[0] === "" || segments[0] === ".") {
       segments = segments.slice(1);
     }
@@ -51,14 +51,15 @@ class FileSystemRemoteURLParser implements RemoteURLParser {
       segments = segments.slice(0, segments.length - 1);
     }
 
-    if (
-      segments.length >= 3 &&
-      segments[segments.length - 2] == "attachments"
-    ) {
+    segments = segments.map(decodeURIComponent);
+
+    // Hidden elements are only allowed in the path of attachments (e.g., a/.b/file_1.png)
+    if (segments.some((e) => e.startsWith("."))) {
       return new AttachmentReference(
         segments[segments.length - 1],
         new DocumentReference(
-          segments[segments.length - 3],
+          // Remove the starting dot from the hidden directory containing the document attached metadata
+          segments[segments.length - 3].slice(1),
           new SpaceReference(
             undefined,
             ...segments.splice(0, segments.length - 3),
@@ -67,13 +68,20 @@ class FileSystemRemoteURLParser implements RemoteURLParser {
       );
     } else {
       return new DocumentReference(
-        segments[segments.length - 1],
+        this.removeExtension(segments[segments.length - 1]),
         new SpaceReference(
           undefined,
           ...segments.splice(0, segments.length - 1),
         ),
       );
     }
+  }
+
+  private removeExtension(file: string): string {
+    if (!file.includes(".")) {
+      return file;
+    }
+    return file.slice(0, file.lastIndexOf("."));
   }
 }
 

@@ -43,7 +43,7 @@ export interface APITypes {
 
   listChildren(page: string): Promise<Array<string>>;
 
-  deletePage(path: string): Promise<void>;
+  deletePage(reference: string): Promise<void>;
 
   /**
    *
@@ -66,15 +66,15 @@ export interface APITypes {
   /**
    * Move a page.
    *
-   * @param path - the path to the page to move
-   * @param newPath - the new path for the page
+   * @param reference - the reference of the page to move
+   * @param newReference - the new reference of the page
    * @param preserveChildren - whether to move children
    *
-   * @since 0.14
+   * @since 0.20
    */
   movePage(
-    path: string,
-    newPath: string,
+    reference: string,
+    newReference: string,
     preserveChildren: boolean,
   ): Promise<void>;
 }

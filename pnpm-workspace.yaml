@@ -42,6 +42,7 @@ packages:
   - "core/model/model-remote-url/*"
   - "core/model/model-remote-url/model-remote-url-filesystem/*"
   - "core/navigation-tree/*"
+  - "core/page/*"
   - "core/page-actions/*"
   - "core/reactivue"
   - "core/rename/*"

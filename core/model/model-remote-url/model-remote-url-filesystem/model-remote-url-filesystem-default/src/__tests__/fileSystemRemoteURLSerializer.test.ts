@@ -31,14 +31,14 @@ describe("FileSystemRemoteURLSerializer", () => {
     const serialize = fileSystemRemoteURLSerializer.serialize(
       new DocumentReference("c", new SpaceReference(undefined, "a", "b")),
     );
-    expect(serialize).toEqual("cristalfs://a/b/c");
+    expect(serialize).toEqual("cristalfs://a/b/c.md");
   });
 
   it("serialize a document reference with special chars", () => {
     const serialize = fileSystemRemoteURLSerializer.serialize(
       new DocumentReference("c/d", new SpaceReference(undefined, "a", "b")),
     );
-    expect(serialize).toEqual("cristalfs://a/b/c%2Fd");
+    expect(serialize).toEqual("cristalfs://a/b/c%2Fd.md");
   });
 
   it("serialize an attachment reference ", () => {
@@ -48,6 +48,6 @@ describe("FileSystemRemoteURLSerializer", () => {
         new DocumentReference("c", new SpaceReference(undefined, "a", "b")),
       ),
     );
-    expect(serialize).toEqual("cristalfs://a/b/c/attachments/file.pdf");
+    expect(serialize).toEqual("cristalfs://a/b/.c/attachments/file.pdf");
   });
 });

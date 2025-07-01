@@ -78,6 +78,7 @@ function initComponent() {
   );
 }
 
+// eslint-disable-next-line max-statements
 describe("DefaultMarkdownRenderer", () => {
   it("renders content without markup unchanged", () => {
     const defaultMarkdownRenderer = initComponent();
@@ -102,6 +103,33 @@ describe("DefaultMarkdownRenderer", () => {
     const defaultMarkdownRenderer = initComponent();
     expect(defaultMarkdownRenderer.render("[[Cristal|Main.WebHome]]")).toBe(
       '<p><a href="https://cristal.xwiki.org" class="internal-link">Cristal</a></p>\n',
+    );
+  });
+
+  it("renders internal links in a sentence", () => {
+    const defaultMarkdownRenderer = initComponent();
+    expect(
+      defaultMarkdownRenderer.render("Hello [[Cristal|Main.WebHome]] World"),
+    ).toBe(
+      '<p>Hello <a href="https://cristal.xwiki.org" class="internal-link">Cristal</a> World</p>\n',
+    );
+  });
+
+  it("renders internal links in a sentence, in a paragraph", () => {
+    const defaultMarkdownRenderer = initComponent();
+    expect(
+      defaultMarkdownRenderer.render(
+        `Line 1
+
+Hello [[Cristal|Main.WebHome]] World
+
+Line 3`,
+      ),
+    ).toBe(
+      `<p>Line 1</p>
+<p>Hello <a href="https://cristal.xwiki.org" class="internal-link">Cristal</a> World</p>
+<p>Line 3</p>
+`,
     );
   });
 

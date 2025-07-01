@@ -66,7 +66,7 @@ class GitHubPageRevisionManager implements PageRevisionManager {
         `${this.cristalApp.getWikiConfig().baseRestURL}/commits`,
       );
       historyRequestUrl.search = new URLSearchParams([
-        ["path", currentId],
+        ["path", `${currentId}.md`],
       ]).toString();
 
       try {

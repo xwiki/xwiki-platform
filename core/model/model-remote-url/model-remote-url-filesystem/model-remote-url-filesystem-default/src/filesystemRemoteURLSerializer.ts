@@ -44,7 +44,7 @@ class FileSystemRemoteURLSerializer implements RemoteURLSerializer {
         const spaces = documentReference.space?.names
           .map(encodeURIComponent)
           .join("/");
-        return `${protocol}://${spaces}/${encodeURIComponent(documentReference.name)}`;
+        return `${protocol}://${spaces}/${encodeURIComponent(documentReference.name)}.md`;
       }
       case EntityType.ATTACHMENT: {
         const attachmentReference = reference as AttachmentReference;
@@ -52,7 +52,7 @@ class FileSystemRemoteURLSerializer implements RemoteURLSerializer {
         const spaces = documentReference.space?.names
           .map(encodeURIComponent)
           .join("/");
-        return `${protocol}://${spaces}/${encodeURIComponent(documentReference.name)}/attachments/${encodeURIComponent(attachmentReference.name)}`;
+        return `${protocol}://${spaces}/.${encodeURIComponent(documentReference.name)}/attachments/${encodeURIComponent(attachmentReference.name)}`;
       }
     }
   }

@@ -21,7 +21,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import messages from "../../translations";
 import XBreadcrumb from "../x-breadcrumb.vue";
 import { navigationTreeSelectPropsDefaults } from "@xwiki/cristal-dsapi";
-import { SpaceReference } from "@xwiki/cristal-model-api";
+import { EntityType, SpaceReference } from "@xwiki/cristal-model-api";
 import { inject, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { VTextField } from "vuetify/components/VTextField";
@@ -57,7 +57,7 @@ const props = withDefaults(
   defineProps<NavigationTreeSelectProps>(),
   navigationTreeSelectPropsDefaults,
 );
-const model = defineModel<SpaceReference>();
+const model = defineModel<SpaceReference | DocumentReference>();
 
 const openedLocationDialog: Ref<boolean> = ref(false);
 const hierarchy: Ref<Array<PageHierarchyItem>> = ref([]);
@@ -72,10 +72,17 @@ onMounted(async () => {
 });
 
 async function treeNodeClickAction(node: NavigationTreeNode) {
-  selectedPage = referenceHandler.createDocumentReference(
-    node.location.names[node.location.names.length - 1],
-    new SpaceReference(node.location.wiki, ...node.location.names.slice(0, -1)),
-  );
+  if (node.location.type == EntityType.SPACE) {
+    selectedPage = referenceHandler.createDocumentReference(
+      node.location.names[node.location.names.length - 1],
+      new SpaceReference(
+        node.location.wiki,
+        ...node.location.names.slice(0, -1),
+      ),
+    );
+  } else {
+    selectedPage = node.location;
+  }
   model.value = node.location;
   hierarchy.value = await hierarchyResolver.getPageHierarchy(selectedPage);
 }

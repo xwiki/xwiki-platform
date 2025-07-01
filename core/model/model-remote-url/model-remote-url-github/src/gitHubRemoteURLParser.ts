@@ -22,6 +22,7 @@ import {
   AttachmentReference,
   DocumentReference,
   EntityReference,
+  EntityType,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
 import { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
@@ -32,37 +33,62 @@ import type { CristalApp } from "@xwiki/cristal-api";
 class GitHubRemoteURLParser implements RemoteURLParser {
   constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
 
-  parse(urlStr: string): EntityReference | undefined {
+  parse(urlStr: string, type?: EntityType): EntityReference | undefined {
     const baseURL = this.getWikiConfig().baseURL;
     const baseRestURL = this.getWikiConfig().baseRestURL;
 
     if (urlStr.includes("://") && urlStr.startsWith(baseRestURL)) {
-      const segments = this.computeSegments(
-        urlStr.replace(`${baseRestURL}/`, ""),
-      );
+      return this.parseSpaceOrPage(urlStr, baseRestURL, type);
+    } else if (urlStr.includes("://") && urlStr.startsWith(baseURL)) {
+      return this.parseAttachment(urlStr, baseURL);
+    } else {
+      return undefined;
+    }
+  }
 
+  private parseAttachment(urlStr: string, baseURL: string) {
+    const segments = this.computeSegments(urlStr.replace(`${baseURL}/`, ""));
+
+    if (
+      segments.length >= 3 &&
+      segments[segments.length - 2] == "attachments"
+    ) {
+      return new AttachmentReference(
+        segments[segments.length - 1].split("?")[0],
+        this.buildDocumentReference(
+          segments[segments.length - 3].slice(1), // remove the starting dot
+          segments.splice(0, segments.length - 3),
+        ),
+      );
+    } else {
+      return undefined;
+    }
+  }
+
+  private parseSpaceOrPage(
+    urlStr: string,
+    baseRestURL: string,
+    type:
+      | EntityType
+      | undefined
+      | EntityType.WIKI
+      | EntityType.SPACE
+      | EntityType.ATTACHMENT,
+  ) {
+    const segments = this.computeSegments(
+      urlStr.replace(`${baseRestURL}/contents/`, "").replace(/\?.*/, ""),
+    );
+
+    if (type === EntityType.DOCUMENT) {
       return this.buildDocumentReference(
         segments[segments.length - 1],
         segments.splice(0, segments.length - 1),
       );
-    } else if (urlStr.includes("://") && urlStr.startsWith(baseURL)) {
-      const segments = this.computeSegments(urlStr.replace(`${baseURL}/`, ""));
-
-      if (
-        segments.length >= 3 &&
-        segments[segments.length - 2] == "attachments"
-      ) {
-        return new AttachmentReference(
-          segments[segments.length - 1],
-          this.buildDocumentReference(
-            segments[segments.length - 3],
-            segments.splice(0, segments.length - 3),
-          ),
-        );
-      }
+    } else if (type == EntityType.SPACE) {
+      return new SpaceReference(undefined, ...segments);
+    } else {
+      return undefined;
     }
-
-    return undefined;
   }
 
   private computeSegments(urlStr: string) {
@@ -82,13 +108,20 @@ class GitHubRemoteURLParser implements RemoteURLParser {
     spaces: string[],
   ) {
     return new DocumentReference(
-      documentReferenceName,
-      new SpaceReference(undefined, ...spaces),
+      this.removeExtension(documentReferenceName),
+      spaces.length > 0 ? new SpaceReference(undefined, ...spaces) : undefined,
     );
   }
 
   private getWikiConfig() {
     return this.cristalApp.getWikiConfig();
+  }
+
+  private removeExtension(file: string): string {
+    if (!file.includes(".")) {
+      return file;
+    }
+    return file.slice(0, file.lastIndexOf("."));
   }
 }
 

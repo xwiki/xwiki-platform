@@ -27,6 +27,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
+    "@xwiki/cristal-page-default": "workspace:*",
     "@xwiki/cristal-utils-inversify": "workspace:*",
     "fast-xml-parser": "5.2.4",
     "inversify": "7.5.4"

@@ -20,10 +20,8 @@
 
 import {
   AttachmentReference,
-  DocumentReference,
   EntityReference,
   EntityType,
-  SpaceReference,
 } from "@xwiki/cristal-model-api";
 import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import { inject, injectable } from "inversify";
@@ -41,19 +39,15 @@ class GitHubRemoteURLSerializer implements RemoteURLSerializer {
       case EntityType.WIKI:
         throw new Error("Not implemented");
       case EntityType.SPACE: {
-        const spaceReference = reference as SpaceReference;
-        const spaces = spaceReference.names.join("/");
+        const spaces = reference.names.join("/");
         return `${this.getBaseRestURL()}/${spaces}`;
       }
       case EntityType.DOCUMENT: {
-        const documentReference = reference as DocumentReference;
-        const spaces = documentReference.space?.names.join("/");
-        return `${this.getBaseRestURL()}/${spaces}/${documentReference.name}`;
+        const spaces = reference.space?.names.join("/");
+        return `${this.getBaseRestURL()}/${spaces}/${reference.name}`;
       }
       case EntityType.ATTACHMENT: {
-        return this.serializeAttachmentReference(
-          reference as AttachmentReference,
-        );
+        return this.serializeAttachmentReference(reference);
       }
     }
   }
@@ -61,8 +55,15 @@ class GitHubRemoteURLSerializer implements RemoteURLSerializer {
   private serializeAttachmentReference(
     attachmentReference: AttachmentReference,
   ) {
-    const spaces = attachmentReference.document.space?.names.join("/");
-    return `${this.getBaseURL()}/${spaces}/${attachmentReference.document.name}/${attachmentReference.name}`;
+    const segments = [
+      ...(attachmentReference.document.space?.names ?? []),
+      "." + attachmentReference.document.name,
+      "attachments",
+      attachmentReference.name,
+    ]
+      .map(encodeURIComponent)
+      .join("/");
+    return `${this.getBaseURL()}/${segments}`;
   }
 
   private getBaseURL() {

@@ -93,14 +93,17 @@ export default class FileSystemStorage extends AbstractStorage {
     await fileSystemStorage.savePage(path, content, title);
   }
 
-  async saveAttachments(page: string, files: File[]): Promise<unknown> {
-    return Promise.all(files.map((file) => this.saveAttachment(page, file)));
+  async saveAttachments(
+    page: string,
+    files: File[],
+  ): Promise<undefined | (undefined | string)[]> {
+    await Promise.all(files.map((file) => this.saveAttachment(page, file)));
+    return undefined;
   }
 
   async delete(page: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const path = await fileSystemStorage.resolvePath(page);
-      await fileSystemStorage.deletePage(path);
+      await fileSystemStorage.deletePage(page);
       return { success: true };
     } catch (error) {
       return { success: false, error: (error as Error).message };
@@ -113,9 +116,7 @@ export default class FileSystemStorage extends AbstractStorage {
     preserveChildren: boolean,
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const path = await fileSystemStorage.resolvePath(page);
-      const newPath = await fileSystemStorage.resolvePath(newPage);
-      await fileSystemStorage.movePage(path, newPath, preserveChildren);
+      await fileSystemStorage.movePage(page, newPage, preserveChildren);
       return { success: true };
     } catch (error) {
       return { success: false, error: (error as Error).message };

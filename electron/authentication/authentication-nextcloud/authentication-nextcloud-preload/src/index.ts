@@ -21,6 +21,8 @@
 import { UserDetails } from "@xwiki/cristal-authentication-api";
 import { contextBridge, ipcRenderer } from "electron";
 
+let loggedInUserId: string | undefined = undefined;
+
 contextBridge.exposeInMainWorld("authenticationNextcloud", {
   async loginOauth2(
     baseUrl: string,
@@ -46,9 +48,15 @@ contextBridge.exposeInMainWorld("authenticationNextcloud", {
   },
 
   async getUserDetails(mode: string): Promise<UserDetails> {
-    return ipcRenderer.invoke("authentication:nextcloud:userDetails", {
-      mode,
-    });
+    const userDetails: UserDetails = await ipcRenderer.invoke(
+      "authentication:nextcloud:userDetails",
+      {
+        mode,
+      },
+    );
+
+    loggedInUserId = userDetails.username;
+    return userDetails;
   },
 
   async getAuthorizationValue(
@@ -73,5 +81,9 @@ contextBridge.exposeInMainWorld("authenticationNextcloud", {
       baseUrl,
       authenticationBaseUrl,
     });
+  },
+
+  getUserId(): string | undefined {
+    return loggedInUserId;
   },
 });

@@ -32,7 +32,7 @@
   <label for="xwikidocparentinput">$services.localization.render('core.editors.content.parentField.label') <a id='hideEditParentTrigger' href='#'>$services.localization.render('core.editors.content.parentField.edit.hide')</a></label>
   <input type="text" id="xwikidocparentinput" name="parent" value="$!{escapetool.xml("$!docParent")}" size="30" class="suggestDocuments "/>
 </div>
-#if ($editor != 'inline')
+#if ($editor != 'inline' && !$request.section)
 <dl id="titleinput" class="form-group">
   <dt>
     <label for="xwikidoctitleinput">
@@ -56,7 +56,11 @@
 <dl id="contentMeta">
   <dt>
     <label for="content">
-      $escapetool.xml($services.localization.render('core.editors.content.contentField.label'))
+      #if(!$request.section)
+        $escapetool.xml($services.localization.render('core.editors.content.contentField.label'))
+      #else
+        $escapetool.xml($services.localization.render('core.editors.section.contentField.label'))
+      #end
     </label>
   </dt>
   ## Content area has an empty <dd> because the content text area is far below and couldn't be moved here,

@@ -305,12 +305,15 @@ macroSelector.install.notAllowed=不允许您安装这个扩展
 macroSelector.filter.category.placeholder=选择一个类别…
 ### Missing: macroEditor.title=Edit Macro
 ### Missing: macroEditor.more=More
+macroEditor.required=要求
 ### Missing: macroEditor.changeMacro=Change Macro
 ### Missing: macroEditor.submit=Submit
 ### Missing: macroEditor.content=Content
 ### Missing: macroEditor.noParameters=This macro has no parameters.
 ### Missing: macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+macroEditor.parametersRequestFailed=未能检索到{0}的参数。
 macroEditor.installRequestFailed=安装宏 {0} 失败。
+macroEditor.selectFeature=选择参数{0}
 
 
 imageEditor.modal.changeImage.button=改变图片

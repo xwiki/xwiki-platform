@@ -101,9 +101,9 @@ notifications.settings.filters.preferences.system.table.isEnabled=Est actif ?
 notifications.settings.filters.preferences.custom.title=Filtres personnalisés
 notifications.settings.filters.preferences.custom.hint=Créez des filtres pour définir les notifications que vous souhaitez recevoir.
 ## Header definition for notification filter preferences
-### Missing: notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifier
-### Missing: notifications.settings.filters.preferences.custom.table.scope=Scope
-### Missing: notifications.settings.filters.preferences.custom.table.location=Location
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifiant
+notifications.settings.filters.preferences.custom.table.scope=Champ d'application
+notifications.settings.filters.preferences.custom.table.location=Emplacement
 ### Missing: notifications.settings.filters.preferences.custom.table.filterType=Filter Action
 notifications.settings.filters.preferences.custom.table.eventTypes=Événements
 notifications.settings.filters.preferences.custom.table.notificationFormats=Formats
@@ -151,7 +151,7 @@ notifications.settings.applications.title=Applications
 notifications.settings.applications.hint=Voici la liste des applications qui peuvent envoyer des notifications. Vous pouvez les activer ou les désactiver.
 notifications.settings.applications.forGuest=Connectez-vous ou inscrivez-vous pour gérer vos paramètres de notification.
 notifications.settings.applications.appName=Nom
-### Missing: notifications.settings.applications.table.dropdown.toggle.label=Toggle the details for notifications from the {0} application.
+notifications.settings.applications.table.dropdown.toggle.label=Activer ou désactiver les détails des notifications pour l''application {0}.
 notifications.settings.events=Événements
 notifications.settings.watch.title=Pages surveillées
 notifications.settings.watch.autowatchmode=Surveillance automatique de pages
@@ -230,15 +230,15 @@ notifications.switches.changeStatusError=Échec lors du chargement du status des
 
 ## Watch button and modal
 
-### Missing: notifications.watch.button.title=Current notification setting for this page: {0} - Click to change it
+notifications.watch.button.title=Paramètres de notifications actuels pour cette page : {0} - Cliquez pour les changer
 notifications.watch.button.status.notset=Non défini
-### Missing: notifications.watch.button.status.followed=Followed
-### Missing: notifications.watch.button.status.blocked=Blocked
-### Missing: notifications.watch.button.status.custom=Custom
-### Missing: notifications.watch.modal.title=Notification settings for this page
-### Missing: notifications.watch.modal.description.options=You can change the current notification settings with the following options: 
-### Missing: notifications.watch.modal.description.ancestoroption=You can either go to {0} and modify the notification settings there or directly apply settings on the current page with the following options: 
-### Missing: notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Followed page watch settings
+notifications.watch.button.status.followed=Suivi
+notifications.watch.button.status.blocked=Bloqué
+notifications.watch.button.status.custom=Personnalisé
+notifications.watch.modal.title=Paramètres de notification pour cette page
+notifications.watch.modal.description.options=Vous pouvez changer les paramètres de notification actuels en parcourant ces options : 
+notifications.watch.modal.description.ancestoroption=Vous pouvez aller à {0} et modifier les paramètres de notification, ou directement appliquer les paramètres sur la page courante en parcourant les options suivantes : 
+notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Paramètres des pages suivies
 notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Vous suivez cette page : vous recevrez des notifications.
 ### Missing: notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Followed page by parent watch settings
 ### Missing: notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are following this page through a parent in the hierarchy: you will receive notifications for it.

@@ -245,10 +245,10 @@ notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FOR
 notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Paramètres de suivi pour la page et ses enfants
 notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Vous suivez cette page et ses enfants : vous recevrez des notifications pour celles-ci.
 notifications.watch.modal.title.NOT_SET=Pas de paramètres de suivi configurés
-### Missing: notifications.watch.modal.description.NOT_SET=You haven't configured any settings for watching this page yet and so you are not following this page: you won't receive notifications for it.
-### Missing: notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Blocked page watch settings
+notifications.watch.modal.description.NOT_SET=Vous n'avez pas encore configuré de paramètres de suivi pour cette page, aussi, vous ne la suivez pas : vous ne recevrez pas de notifications pour celle-ci.
+notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Paramètres de suivi de page configurés sur "bloquer"
 notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Vous ignorez cette page : vous ne recevrez aucune notification.
-### Missing: notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Blocked page by parent watch settings
+notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Paramètres de blocage de notification par page parent
 ### Missing: notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page through a parent in the hierarchy: you won't receive any notifications for it.
 ### Missing: notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Blocked page and children watch settings
 ### Missing: notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page and its children: you won't receive any notifications for it.

@@ -41,9 +41,11 @@ define('entityResourceSuggester', [
       if (response.documentElement) {
         let results = response.getElementsByTagName('rs');
         let containsExactMatch = false;
-        for (var i = 0; i < results.length; i++) {
+        let inputReference = XWiki.Model.resolve(input, XWiki.EntityType.DOCUMENT);
+        let inputResourceReference = $resource.convertEntityReferenceToResourceReference(inputReference, base);
+        for (let i = 0; i < results.length; i++) {
           let result = convertSearchResultToResource(results.item(i), entityType, base);
-          containsExactMatch = result.entityReference === input;
+          containsExactMatch = isSameResource(result.reference, inputResourceReference);
           suggestions.push(result);
         }
         if (!containsExactMatch) {
@@ -60,6 +62,10 @@ define('entityResourceSuggester', [
     });
   };
 
+  let isSameResource = function (resource1, resource2) {
+    return JSON.stringify(resource1) === JSON.stringify(resource2);
+  };
+
   var suggestCreateDocument = function(input, base, suggestions, deferred) {
     $.post(new XWiki.Document('LinkNameStrategyHelper', 'CKEditor').getURL('get'), {
       outputSyntax: 'plain',
@@ -68,7 +74,11 @@ define('entityResourceSuggester', [
       action: 'suggest'
     }).done(function(data) {
       data.forEach(function (item) {
-        suggestions.push(createDocumentFromLinkNameStrategyHelperResult(item, base));
+        if (item.type === 'exactMatch') {
+          suggestions = handleExactMatch(item, base, suggestions);
+        } else {
+          suggestions.push(createDocumentFromLinkNameStrategyHelperResult(item, base));
+        }
       });
       deferred.resolve(suggestions);
     }).fail(function(data) {
@@ -77,12 +87,26 @@ define('entityResourceSuggester', [
     });
   };
 
+  let handleExactMatch = function(item, base, suggestions) {
+    let entityReference = XWiki.Model.resolve(item.reference, XWiki.EntityType.DOCUMENT);
+    let resourceReference = $resource.convertEntityReferenceToResourceReference(entityReference, base);
+    suggestions = suggestions.filter(element => !isSameResource(element.reference, resourceReference));
+    suggestions.unshift(createDocumentFromLinkNameStrategyHelperResult(item, base));
+    return suggestions;
+  };
+
   var createDocumentFromLinkNameStrategyHelperResult = function (item, base) {
-    var entityReference = XWiki.Model.resolve(item.reference, XWiki.EntityType.DOCUMENT);
+    let entityReference = XWiki.Model.resolve(item.reference, XWiki.EntityType.DOCUMENT);
+    let title = item.title;
+    if (!title && item.type !== 'exactMatch') {
+      title = translations.get('create.' + item.type);
+    } else if (!title) {
+      title = (entityReference.name !== 'WebHome') ? entityReference.name : entityReference.parent.name;
+    }
     return {
       reference: $resource.convertEntityReferenceToResourceReference(entityReference, base),
       entityReference: entityReference,
-      title: translations.get('create.' + item.type),
+      title: title,
       location: item.location
     };
   };

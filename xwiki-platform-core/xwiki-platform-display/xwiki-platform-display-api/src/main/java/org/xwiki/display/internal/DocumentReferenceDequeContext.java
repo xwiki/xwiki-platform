@@ -19,8 +19,8 @@
  */
 package org.xwiki.display.internal;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -71,8 +71,8 @@ public class DocumentReferenceDequeContext
             (Deque<DocumentReference>) econtext.getProperty(contextKey);
 
         if (documentReferenceStack == null) {
-            documentReferenceStack = new LinkedList<>();
-            econtext.newProperty(contextKey).inherited().initial(documentReferenceStack).declare();
+            documentReferenceStack = new ArrayDeque<>();
+            econtext.newProperty(contextKey).inherited().initial(documentReferenceStack).makeFinal().declare();
         }
 
         return documentReferenceStack;

@@ -117,18 +117,21 @@ public class InternalHtmlNotificationRendererTest
         when(eventRenderer.render(compositeEvent)).thenReturn(block);
         when(eventStatus.getStatus()).thenReturn(false);
 
-        String expectedResult = "<div data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" data-eventdate=\"42\" "
+        String expectedResult = "<div role=\"listitem\" data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" " 
+            + "data-eventdate=\"42\" "
             + "class=\"notification-event notification-event-unread\">"
             + "<div class=\"my-composite-event\"></div></div>";
         assertEquals(expectedResult, this.notificationRenderer.render(compositeEvent, eventStatus));
 
         when(eventStatus.getStatus()).thenReturn(true);
-        expectedResult = "<div data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" data-eventdate=\"42\" "
+        expectedResult = "<div role=\"listitem\" data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" " 
+            + "data-eventdate=\"42\" "
             + "class=\"notification-event\">"
             + "<div class=\"my-composite-event\"></div></div>";
         assertEquals(expectedResult, this.notificationRenderer.render(compositeEvent, eventStatus));
 
-        expectedResult = "<div data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" data-eventdate=\"42\" "
+        expectedResult = "<div role=\"listitem\" data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" " 
+            + "data-eventdate=\"42\" "
             + "class=\"notification-event\">"
             + "<div class=\"my-composite-event\"></div></div>";
         assertEquals(expectedResult, this.notificationRenderer.render(compositeEvent, null));
@@ -175,10 +178,12 @@ public class InternalHtmlNotificationRendererTest
         when(eventRenderer.render(compositeEvent2)).thenReturn(block2);
         when(eventStatus2.getStatus()).thenReturn(true);
 
-        expectedResult = "<div data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" data-eventdate=\"42\" "
+        expectedResult = "<div role=\"listitem\" data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" " 
+            + "data-eventdate=\"42\" "
             + "class=\"notification-event notification-event-unread\">"
             + "<div class=\"my-composite-event1\"></div></div>"
-            + "<div data-eventtype=\"BarType\" data-ids=\"oneId\" data-eventdate=\"12\" class=\"notification-event\">"
+            + "<div role=\"listitem\" data-eventtype=\"BarType\" data-ids=\"oneId\" data-eventdate=\"12\" " 
+            + "class=\"notification-event\">"
             + "<div class=\"my-composite-event2\"></div></div>"
             + "<div class=\"notifications-macro-load-more\"></div>";
 
@@ -187,10 +192,12 @@ public class InternalHtmlNotificationRendererTest
             Arrays.asList(eventStatus1, eventStatus2),
             true));
 
-        expectedResult = "<div data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" data-eventdate=\"42\" "
+        expectedResult = "<div role=\"listitem\" data-eventtype=\"FooType\" data-ids=\"foo,bar,baz\" " 
+            + "data-eventdate=\"42\" "
             + "class=\"notification-event\">"
             + "<div class=\"my-composite-event1\"></div></div>"
-            + "<div data-eventtype=\"BarType\" data-ids=\"oneId\" data-eventdate=\"12\" class=\"notification-event\">"
+            + "<div role=\"listitem\" data-eventtype=\"BarType\" data-ids=\"oneId\" data-eventdate=\"12\" " 
+            + "class=\"notification-event\">"
             + "<div class=\"my-composite-event2\"></div></div>"
             + "<div class=\"notifications-macro-load-more\"></div>";
 

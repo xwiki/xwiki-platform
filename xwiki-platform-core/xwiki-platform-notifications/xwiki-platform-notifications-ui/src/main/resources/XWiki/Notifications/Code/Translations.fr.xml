@@ -102,7 +102,7 @@ notifications.settings.filters.preferences.custom.title=Filtres personnalisés
 notifications.settings.filters.preferences.custom.hint=Créez des filtres pour définir les notifications que vous souhaitez recevoir.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifiant
-notifications.settings.filters.preferences.custom.table.scope=Champ d'application
+notifications.settings.filters.preferences.custom.table.scope=Portée
 notifications.settings.filters.preferences.custom.table.location=Emplacement
 ### Missing: notifications.settings.filters.preferences.custom.table.filterType=Filter Action
 notifications.settings.filters.preferences.custom.table.eventTypes=Événements
@@ -230,7 +230,7 @@ notifications.switches.changeStatusError=Échec lors du chargement du status des
 
 ## Watch button and modal
 
-notifications.watch.button.title=Paramètres de notifications actuels pour cette page : {0} - Cliquez pour les changer
+notifications.watch.button.title=Paramètres de notifications actuels pour cette page : {0} - Cliquez pour les modifier
 notifications.watch.button.status.notset=Non défini
 notifications.watch.button.status.followed=Suivi
 notifications.watch.button.status.blocked=Bloqué
@@ -244,7 +244,7 @@ notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=P
 notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Vous suivez cette page via une page parent dans la hiérarchie : vous recevrez des notifications pour celle-ci.
 notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Paramètres de suivi pour la page et ses enfants
 notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Vous suivez cette page et ses enfants : vous recevrez des notifications pour celles-ci.
-notifications.watch.modal.title.NOT_SET=Pas de paramètres de suivi configurés
+notifications.watch.modal.title.NOT_SET=Aucun paramètre de suivi configuré
 notifications.watch.modal.description.NOT_SET=Vous n'avez pas encore configuré de paramètres de suivi pour cette page, aussi, vous ne la suivez pas : vous ne recevrez pas de notifications pour celle-ci.
 notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Paramètres de suivi de page configurés sur "bloquer"
 notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Vous ignorez cette page : vous ne recevrez aucune notification.
@@ -262,7 +262,7 @@ notifications.watch.modal.option.watchwiki.title=Suivre l'intégralité du wiki
 notifications.watch.modal.option.watchwiki.hint=Cette option est globale : vous recevrez des notifications pour toutes les pages du wiki.
 notifications.watch.modal.option.blockpage.title=Bloquer la page courante
 notifications.watch.modal.option.blockpage.hint=Vous bloquerez toutes les notifications pour la page actuelle seulement.
-notifications.watch.modal.option.blockspace.title=Bloqué la page courante et ses enfants
+notifications.watch.modal.option.blockspace.title=Bloquer la page courante et ses enfants
 notifications.watch.modal.option.blockspace.hint=Vous bloquerez toutes les notifications pour cette page et ses enfants.
 notifications.watch.modal.option.unwatchpage.title=Ne plus suivre la page actuelle
 notifications.watch.modal.option.unwatchpage.hint=Vous ne recevrez plus de notification au sujet de cette page précise.

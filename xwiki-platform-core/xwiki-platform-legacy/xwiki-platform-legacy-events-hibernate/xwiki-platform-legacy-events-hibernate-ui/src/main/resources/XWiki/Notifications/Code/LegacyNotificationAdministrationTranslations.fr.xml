@@ -36,10 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>legacy.event.migration.description=XWiki a bascul\u00E9 vers un nouveau syst\u00E8me de stockage des \u00E9v\u00E9nements (notifications) depuis la version 12.6. La copie des \u00E9v\u00E9nements de l'ancien vers le nouveau stockage pouvant \u00EAtre longue (particuli\u00E8rement pour les wikis anciens ayant un gros historique) et cette migration n'\u00E9tant pas toujours souhait\u00E9e, l'administrateur est libre de l'ex\u00E9cuter ou non. Sachez qu'en cas de non copie les anciens \u00E9v\u00E9nements n'appara\u00EEtront plus. La migration s'effectue en arri\u00E8re-plan.
+  <content>legacy.event.migration.description=XWiki a basculé vers un nouveau système de stockage des événements (notifications) depuis la version 12.6. La copie des événements de l'ancien vers le nouveau stockage pouvant être longue (particulièrement pour les wikis anciens ayant un gros historique) et cette migration n'étant pas toujours souhaitée, l'administrateur est libre de l'exécuter ou non. Sachez qu'en cas de non copie, les anciens événements n'apparaîtront plus. La migration s'effectue en arrière-plan.
 ### Missing: legacy.event.count.store=Number of events in the standard store
 ### Missing: legacy.event.count.legacy=Number of events in the legacy store
 legacy.event.migration.alltime=Tout
 legacy.event.migration.since=Depuis
-legacy.event.migration.start=D\u00E9marrer la migration</content>
+legacy.event.migration.start=D\u00E9marrer la migration
+</content>
 </xwikidoc>

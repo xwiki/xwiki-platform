@@ -39,10 +39,10 @@
   <content>platform.core.profile.category.notifications=Notifications
 notifications.filters.cancel=Annuler
 notifications.filters.submit=Enregistrer
-notifications.filters.type.label=Type de filtre :
+notifications.filters.type.label=Type de filtre :
 notifications.filters.type.hint=Comment le filtre doit agir sur un évènement à l'endroit indiqué
-notifications.filters.location.label=Portée du filtre :
-notifications.filters.location.hint=Quelle partie du wiki doit être concernée par le filtre ?
+notifications.filters.location.label=Portée du filtre :
+notifications.filters.location.hint=Quelle partie du wiki doit être concernée par le filtre ?
 
 ## Advanced filters options
 notifications.settings.filters.advanced=Options de filtrage avancées

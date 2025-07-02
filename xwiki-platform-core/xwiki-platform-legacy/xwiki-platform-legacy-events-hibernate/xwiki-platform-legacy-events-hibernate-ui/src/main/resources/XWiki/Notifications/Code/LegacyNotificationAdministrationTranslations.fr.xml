@@ -37,10 +37,10 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>legacy.event.migration.description=XWiki a basculé vers un nouveau système de stockage des événements (notifications) depuis la version 12.6. La copie des événements de l'ancien vers le nouveau stockage pouvant être longue (particulièrement pour les wikis anciens ayant un gros historique) et cette migration n'étant pas toujours souhaitée, l'administrateur est libre de l'exécuter ou non. Sachez qu'en cas de non copie, les anciens événements n'apparaîtront plus. La migration s'effectue en arrière-plan.
-### Missing: legacy.event.count.store=Number of events in the standard store
-### Missing: legacy.event.count.legacy=Number of events in the legacy store
+legacy.event.count.store=Nombre d'évènements dans le stockage standard
+legacy.event.count.legacy=Nombre d'évènements dans l'ancienne base de données
 legacy.event.migration.alltime=Tout
 legacy.event.migration.since=Depuis
-legacy.event.migration.start=D\u00E9marrer la migration
+legacy.event.migration.start=Commencer la migration
 </content>
 </xwikidoc>

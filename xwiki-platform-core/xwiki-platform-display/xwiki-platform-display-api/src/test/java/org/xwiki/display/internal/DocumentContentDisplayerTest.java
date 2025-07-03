@@ -47,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -110,6 +111,8 @@ public class DocumentContentDisplayerTest
         // The document being displayed.
         XDOM content = new XDOM(Collections.emptyList());
         when(this.document.getPreparedXDOM()).thenReturn(content);
+
+        when(this.document.getDocumentReference()).thenReturn(mock());
 
         // The reference of the current document musts be set as the value of the BASE meta data.
         DocumentReference currentDocRef = new DocumentReference("wiki", "Space", "Page");

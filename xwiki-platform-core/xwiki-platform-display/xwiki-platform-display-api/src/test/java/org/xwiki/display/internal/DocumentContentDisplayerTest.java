@@ -57,7 +57,10 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({ DefaultDocumentContentAsyncParser.class })
+@ComponentList({
+    DefaultDocumentContentAsyncParser.class,
+    DocumentReferenceDequeContext.class
+})
 public class DocumentContentDisplayerTest
 {
     @InjectMockComponents

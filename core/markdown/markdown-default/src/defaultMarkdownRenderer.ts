@@ -44,17 +44,17 @@ export class DefaultMarkdownRenderer implements MarkdownRenderer {
     this.md = markdownit();
     const modelReferenceParser = this.modelReferenceParserProvider.get()!;
     const remoteURLSerializer = this.remoteURLSerializerProvider.get()!;
-    this.md.core.ruler.before(
-      "linkify",
-      "markdown-internal-links",
+    this.md.inline.ruler.before(
+      "link",
+      "cristal-internal-links",
       parseInternalLinks(modelReferenceParser, remoteURLSerializer),
     );
-    // This declaration needs to happen after markdown-internal-links, otherwise an error is thrown because
-    // markdown-internal-links is not found. But, "markdown-internal-images" is executed before
-    // "markdown-internal-links"
-    this.md.core.ruler.before(
-      "markdown-internal-links",
-      "markdown-internal-images",
+    // This declaration needs to happen after cristal-internal-links, otherwise an error is thrown because
+    // cristal-internal-links is not found. But, "cristal-internal-images" is executed before
+    // "cristal-internal-links"
+    this.md.inline.ruler.before(
+      "cristal-internal-links",
+      "cristal-internal-images",
       parseInternalImages(modelReferenceParser, remoteURLSerializer),
     );
   }

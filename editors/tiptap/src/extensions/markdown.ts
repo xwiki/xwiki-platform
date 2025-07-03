@@ -37,16 +37,16 @@ export default function (
       this.parent?.();
       this.editor.storage.markdown.parser.md =
         this.editor.storage.markdown.parser.md.use((md: MarkdownIt) => {
-          md.core.ruler.before(
-            "linkify",
-            "markdown-internal-links",
+          md.inline.ruler.before(
+            "link",
+            "cristal-internal-links",
             parseInternalLinks(modelReferenceParser, remoteURLSerializer),
           );
           // Is it important for the images to be parsed before the links, otherwise the exclamation mark prefixing the
           // image links is just ignored as the rest of the syntax is the same.
-          md.core.ruler.before(
-            "markdown-internal-links",
-            "markdown-internal-images",
+          md.inline.ruler.before(
+            "cristal-internal-links",
+            "cristal-internal-images",
             parseInternalImages(modelReferenceParser, remoteURLSerializer),
           );
         });

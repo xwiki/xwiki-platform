@@ -47,6 +47,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -70,6 +71,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList(DocumentReferenceDequeContext.class)
 class DocumentTitleDisplayerTest
 {
     @InjectMockComponents

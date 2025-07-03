@@ -5,4 +5,5 @@ org.xwiki.display.internal.DocumentContentAsyncExecutor
 org.xwiki.display.internal.DefaultDocumentDisplayer
 org.xwiki.display.internal.DocumentContentAsyncRenderer
 org.xwiki.display.internal.DocumentContentDisplayer
+org.xwiki.display.internal.DocumentReferenceDequeContext
 org.xwiki.display.internal.DocumentTitleDisplayer

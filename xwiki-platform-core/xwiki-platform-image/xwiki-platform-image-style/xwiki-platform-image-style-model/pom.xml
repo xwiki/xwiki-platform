@@ -27,7 +27,7 @@
     <artifactId>xwiki-platform-image-style</artifactId>
     <version>17.6.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image-style-model</artifactId>
+  <artifactId>main</artifactId>
   <name>XWiki Platform - Image - Style - Model</name>
   <packaging>jar</packaging>
   <description>JAXB model for the image styles REST endpoints.</description>

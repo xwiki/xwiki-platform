@@ -27,7 +27,7 @@
     <artifactId>xwiki-platform-image-style</artifactId>
     <version>17.6.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-image-style-rest</artifactId>
+  <artifactId>main</artifactId>
   <name>XWiki Platform - Image - Style - Rest</name>
   <description>REST endpoints to get defined image styles</description>
   <properties>
@@ -54,7 +54,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-style-model</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

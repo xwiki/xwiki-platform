@@ -88,13 +88,13 @@ public class BlocknoteRealtimeEndpoint extends Endpoint implements EndpointCompo
         this.logger.info("BlocknoteRealtimeEndpoint opened. session [{}], config [{}]", session, config);
         this.context.run(session, () -> {
             var roomId = this.documentReferenceResolver.resolve(session.getPathParameters().get("room"));
-            if (this.contextualAuthorizationManager.hasAccess(EDIT, roomId)) {
-                var newRoom = this.rooms.computeIfAbsent(roomId, r -> new Room(r, () -> this.rooms.remove(r)));
+            // TODO: remove the "true", it's a bypass to test with websocat
+            if (true || this.contextualAuthorizationManager.hasAccess(EDIT, roomId)) {
+                var newRoom = this.rooms.computeIfAbsent(roomId, rid -> new Room(rid, () -> this.rooms.remove(rid)));
                 newRoom.register(session);
                 this.roomsById.put(session.getId(), newRoom);
-                session.addMessageHandler(String.class, message -> {
-                    newRoom.broadcast(session.getId(), message);
-                });
+                // TODO: the String is not working with yjs, we need to move to a binary model, need to RTFM.
+                session.addMessageHandler(String.class, message -> newRoom.broadcast(session.getId(), message));
             } else {
                 try {
                     session.close(

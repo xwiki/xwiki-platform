@@ -64,7 +64,7 @@ public class Room
 
     public void register(Session sessionId)
     {
-        this.sessionIds.put(sessionId, null);
+        this.sessionIds.put(sessionId, new Object());
     }
 
     // todo: allow to send two kinds of message 1) user left 2) a message with a payload

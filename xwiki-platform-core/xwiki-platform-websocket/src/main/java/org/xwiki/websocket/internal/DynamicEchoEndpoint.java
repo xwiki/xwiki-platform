@@ -53,7 +53,6 @@ public class DynamicEchoEndpoint extends AbstractXWikiEndpoint
     public void onOpen(Session session, EndpointConfig config)
     {
         this.context.run(session, () -> {
-            this.bridge.hasProgrammingRights()
             if (this.bridge.getCurrentUserReference() == null) {
                 close(session, CloseReason.CloseCodes.CANNOT_ACCEPT,
                     "We don't accept connections from guest users. Please login first.");

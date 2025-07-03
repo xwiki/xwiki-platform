@@ -44,7 +44,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-style-rest</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

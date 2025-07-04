@@ -95,9 +95,11 @@ function notifyChanges(): void {
   const content = extractEditorContent();
 
   // TODO: error reporting
-  if (!(content instanceof Error)) {
-    emit("debounced-change", content);
+  if (content instanceof Error) {
+    throw content;
   }
+
+  emit("debounced-change", content);
 }
 
 const notifyChangesDebounced = debounce(notifyChanges, 500);

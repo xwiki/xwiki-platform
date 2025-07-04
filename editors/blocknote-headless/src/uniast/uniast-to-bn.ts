@@ -80,6 +80,7 @@ export class UniAstToBlockNoteConverter {
               props: {
                 ...this.convertBlockStyles(block.styles),
                 level: block.level,
+                isToggleable: false,
               },
             };
 

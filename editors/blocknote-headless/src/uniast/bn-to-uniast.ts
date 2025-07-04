@@ -26,7 +26,7 @@ import {
   EditorStyleSchema,
   EditorStyledText,
 } from "@xwiki/cristal-editors-blocknote-react";
-import { tryFallibleOrError } from "@xwiki/cristal-fn-utils";
+import { assertUnreachable, tryFallibleOrError } from "@xwiki/cristal-fn-utils";
 import {
   Block,
   BlockStyles,
@@ -65,7 +65,8 @@ export class BlockNoteToUniAstConverter {
       if (
         block.type !== "bulletListItem" &&
         block.type !== "numberedListItem" &&
-        block.type !== "checkListItem"
+        block.type !== "checkListItem" &&
+        block.type !== "toggleListItem"
       ) {
         const converted = this.convertBlock(block);
 
@@ -95,7 +96,19 @@ export class BlockNoteToUniAstConverter {
     return out;
   }
 
-  private convertBlock(block: BlockType): Block | null {
+  private convertBlock(
+    block: Exclude<
+      BlockType,
+      {
+        // List items are to be handled through the `convertListItem` method
+        type:
+          | "bulletListItem"
+          | "numberedListItem"
+          | "checkListItem"
+          | "toggleListItem";
+      }
+    >,
+  ): Block | null {
     const dontExpectChildren = () => {
       if (block.children.length > 0) {
         console.error({ unexpextedChildrenInBlock: block });
@@ -232,24 +245,28 @@ export class BlockNoteToUniAstConverter {
           styles: {},
         };
 
-      case "bulletListItem":
-      case "numberedListItem":
-      case "checkListItem":
-        throw new Error(
-          "Block should have been handled elsewhere in BlockNote to UniAst converter: " +
-            block.type,
-        );
+      default:
+        assertUnreachable(block);
     }
   }
 
   private convertListItem(
     block: Extract<
       BlockType,
-      { type: "bulletListItem" | "numberedListItem" | "checkListItem" }
+      {
+        type:
+          | "bulletListItem"
+          | "numberedListItem"
+          | "checkListItem"
+          | "toggleListItem";
+      }
     >,
     currentList: Extract<Block, { type: "list" }> | null,
   ): ListItem {
     switch (block.type) {
+      // TODO: togglable list items are not supported by Markdown, so we convert it as raw here
+      // Should we convert them differently?
+      case "toggleListItem":
       case "bulletListItem":
         return {
           content: [
@@ -304,6 +321,9 @@ export class BlockNoteToUniAstConverter {
           ],
           styles: this.convertBlockStyles(block.props),
         };
+
+      default:
+        assertUnreachable(block);
     }
   }
 

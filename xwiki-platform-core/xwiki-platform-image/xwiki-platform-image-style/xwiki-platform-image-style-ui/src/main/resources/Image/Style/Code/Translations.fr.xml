@@ -84,6 +84,6 @@ Image.Style.Code.ImageStyleClass_type_hint=Type du style d'image (utilisé comme
 Image.Style.Code.ConfigurationClass_defaultStyle=Style par défaut
 Image.Style.Code.ConfigurationClass_defaultStyle_hint=Style par défaut pour ce wiki.
 Image.Style.Code.ConfigurationClass_forceDefaultStyle=Forcer le style par défaut
-Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=Si coché, les contraintes du style par défaut sont imposées dans la configuration de l'image, et l'utilisateur est forcé de choisir un style.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=Si coché, les contraintes du style par défaut sont imposées dans la configuration de l'image et les utilisateurs sont obligés de choisir un style.
 </content>
 </xwikidoc>

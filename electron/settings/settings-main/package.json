@@ -26,7 +26,7 @@
   "dependencies": {
     "@xwiki/cristal-configuration-api": "workspace:*",
     "@xwiki/cristal-settings-api": "workspace:*",
-    "electron-store": "10.0.1"
+    "electron-store": "10.1.0"
   },
   "peerDependencies": {
     "electron": "37.1.0"

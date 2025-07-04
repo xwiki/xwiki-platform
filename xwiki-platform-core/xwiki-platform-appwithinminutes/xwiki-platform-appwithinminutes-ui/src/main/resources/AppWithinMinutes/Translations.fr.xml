@@ -129,8 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=Masquer le panneau de conf
 platform.appwithinminutes.classEditorMoveFieldLabel=Déplacer
 platform.appwithinminutes.classEditorMoveFieldHint=Glissez-Déposez pour changer l'odre
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Valeur par défaut
-platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Nom simple
-platform.appwithinminutes.classEditorFieldHintToolTip=Astuce
+platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Nom court
+platform.appwithinminutes.classEditorFieldHintToolTip=Indice
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
@@ -154,7 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Emplacement de
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Si aucun emplacement n’est sélectionné, les éléments peuvent être créées partout dans le wiki.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Désactiver les restrictions d’emplacement des éléments
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Permet de n’utiliser les emplacements précisés précédemment que comme des suggestions. L’utilisateur pourra donc modifier l’emplacement d’un élément lors de sa création.
-### Missing: appWithinMinutes.templateProviderEditor.terminal.name=Terminal
+appWithinMinutes.templateProviderEditor.terminal.name=Terminale
 appWithinMinutes.templateProviderEditor.terminal.hint=Détermine si les éléments de l’application doivent être contenus dans des pages terminales.
 
 ### Wizard Step 3: Application Presentation

@@ -41,6 +41,6 @@ captcha.admin.defaultCaptchaName.label=CAPTCHA par défaut
 captcha.admin.defaultCaptchaName.hint=Le CAPTCHA à proposer par défaut. Utilisez le Gestionnaire d'extensions pour rechercher et installer d'autres types de CAPTCHA.
 captcha.admin.configure.title=Configurer {0}
 captcha.admin.sample.title=Exemple de CAPTCHA
-captcha.admin.sample.description=De quoi aura l'air le CAPTCHA configuré lorsqu'il sera affiché dans un formulaire, par exemple.
+captcha.admin.sample.description=Comment le CAPTCHA configuré s'affichera lorsqu'il sera, par exemple, affiché dans un formulaire.
 </content>
 </xwikidoc>

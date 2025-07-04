@@ -20,6 +20,7 @@
 package org.xwiki.blocknote.realtime.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,7 +33,6 @@ import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
 
 import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -40,26 +40,19 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.websocket.EndpointComponent;
 import org.xwiki.websocket.WebSocketContext;
 
+import static jakarta.websocket.CloseReason.CloseCodes.CANNOT_ACCEPT;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.security.authorization.Right.EDIT;
 
 /**
  * @version $Id$
- * @since x.y.z
+ * @since 17.6.0RC1
  */
 @Component
 @Singleton
-@Named("blocknote")
-public class BlocknoteRealtimeEndpoint extends Endpoint implements EndpointComponent
+@Named("yjs")
+public class YjsRealtimeEndpoint extends Endpoint implements EndpointComponent
 {
-    // The client side keeps the connection alive by sending a PING message from time to time, using a timer
-    // (setTimeout). The browsers are slowing down timers used by inactive tabs / windows (that don't have
-    // the user focus). This is called timer throttling and can go up to 1 minute, which means inactive browser tabs
-    // won't be able to send PING messages more often than every minute. For this reason, we set the session idle
-    // timeout a little bit higher than the timer throttling value to make sure the WebSocket connection is not closed
-    // in background tabs.
-    // See https://developer.chrome.com/blog/timer-throttling-in-chrome-88/
-    private static final long TIMEOUT_MILLISECONDS = 65000;
 
     @Inject
     private Logger logger;
@@ -71,11 +64,12 @@ public class BlocknoteRealtimeEndpoint extends Endpoint implements EndpointCompo
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Inject
-    private DocumentAccessBridge bridge;
-
-    @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    /**
+     * A map of rooms, a room corresponds to a {@link DocumentReference} and contains the set of currently active
+     * {@link Session}.
+     */
     private final Map<DocumentReference, Room> rooms = new ConcurrentHashMap<>();
 
     private final Map<String, Room> roomsById = new ConcurrentHashMap<>();
@@ -83,27 +77,29 @@ public class BlocknoteRealtimeEndpoint extends Endpoint implements EndpointCompo
     @Override
     public void onOpen(Session session, EndpointConfig config)
     {
-        // Close the session if we don't receive any message from the user in TIMEOUT_MILLISECONDS.
-        session.setMaxIdleTimeout(TIMEOUT_MILLISECONDS);
-        this.logger.info("BlocknoteRealtimeEndpoint opened. session [{}], config [{}]", session, config);
         this.context.run(session, () -> {
             var roomId = this.documentReferenceResolver.resolve(session.getPathParameters().get("room"));
             // TODO: remove the "true", it's a bypass to test with websocat
             if (true || this.contextualAuthorizationManager.hasAccess(EDIT, roomId)) {
-                var newRoom = this.rooms.computeIfAbsent(roomId, rid -> new Room(rid, () -> this.rooms.remove(rid)));
-                newRoom.register(session);
-                this.roomsById.put(session.getId(), newRoom);
-                // TODO: the String is not working with yjs, we need to move to a binary model, need to RTFM.
-                session.addMessageHandler(String.class, message -> newRoom.broadcast(session.getId(), message));
+                startNewSession(session, roomId);
             } else {
                 try {
                     session.close(
-                        new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "Current user is not allowed to "
-                            + "edit the current document"));
+                        new CloseReason(CANNOT_ACCEPT, "Current user is not allowed to edit the current document"));
                 } catch (IOException e) {
                     this.logger.warn("Failed to close session. Cause: [{}]", getRootCauseMessage(e));
                 }
             }
+        });
+    }
+
+    private void startNewSession(Session session, DocumentReference roomId)
+    {
+        var newRoom = this.rooms.computeIfAbsent(roomId, rid -> new Room(() -> this.rooms.remove(rid)));
+        this.roomsById.put(session.getId(), newRoom);
+        // TODO: the String is not working with yjs, we need to move to a binary model, need to RTFM.
+        session.addMessageHandler(InputStream.class, message -> {
+            newRoom.handleMessage(session, message);
         });
     }
 
@@ -112,6 +108,8 @@ public class BlocknoteRealtimeEndpoint extends Endpoint implements EndpointCompo
     {
         super.onClose(session, closeReason);
         this.logger.info("BlocknoteRealtimeEndpoint opened. session [{}], close reason [{}]", session, closeReason);
-        this.roomsById.get(session.getId()).disconnect(session);
+        String sessionId = session.getId();
+        this.roomsById.get(sessionId).disconnect(session);
+        this.roomsById.remove(sessionId);
     }
 }

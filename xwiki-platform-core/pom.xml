@@ -254,8 +254,8 @@
     <module>xwiki-platform-xar</module>
     <module>xwiki-platform-xclass</module>
     <module>xwiki-platform-xml</module>
+    <module>xwiki-platform-yjs</module>
     <module>xwiki-platform-zipexplorer</module>
-    <module>xwiki-platform-blocknote-realtime</module>
   </modules>
   <profiles>
     <!-- Profile to build Legacy modules -->

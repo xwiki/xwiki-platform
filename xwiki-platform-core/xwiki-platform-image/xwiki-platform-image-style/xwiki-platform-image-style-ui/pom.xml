@@ -56,7 +56,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>xwiki-platform-image-style-rest</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
       <optional>true</optional>

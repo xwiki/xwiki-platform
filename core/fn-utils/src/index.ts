@@ -111,4 +111,27 @@ function tryFallibleOrError<T>(func: () => T): T | Error {
   }
 }
 
-export { assertInArray, assertUnreachable, tryFallible, tryFallibleOrError };
+/**
+ * Provide a type for expressions type inference
+ *
+ * This is actually an identity function - the provided value is returned as is, with no other operation.
+ *
+ * @since 0.20
+ *
+ * @param value - The value to return
+ * @returns - The provided value
+ *
+ * @example `[1].concat("Hello")` // Type error
+ * @example `provideTypeInference<number | string>([1].concat("Hello"))` // Works
+ */
+function provideTypeInference<T>(value: T): T {
+  return value;
+}
+
+export {
+  assertInArray,
+  assertUnreachable,
+  provideTypeInference,
+  tryFallible,
+  tryFallibleOrError,
+};

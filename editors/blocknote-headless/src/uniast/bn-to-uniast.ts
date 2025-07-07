@@ -26,7 +26,11 @@ import {
   EditorStyleSchema,
   EditorStyledText,
 } from "@xwiki/cristal-editors-blocknote-react";
-import { assertUnreachable, tryFallibleOrError } from "@xwiki/cristal-fn-utils";
+import {
+  assertUnreachable,
+  provideTypeInference,
+  tryFallibleOrError,
+} from "@xwiki/cristal-fn-utils";
 import {
   Block,
   BlockStyles,
@@ -65,13 +69,12 @@ export class BlockNoteToUniAstConverter {
       if (
         block.type !== "bulletListItem" &&
         block.type !== "numberedListItem" &&
-        block.type !== "checkListItem" &&
-        block.type !== "toggleListItem"
+        block.type !== "checkListItem"
       ) {
         const converted = this.convertBlock(block);
 
         if (converted !== null) {
-          out.push(converted);
+          out.push(...(Array.isArray(converted) ? converted : [converted]));
         }
 
         continue;
@@ -101,14 +104,10 @@ export class BlockNoteToUniAstConverter {
       BlockType,
       {
         // List items are to be handled through the `convertListItem` method
-        type:
-          | "bulletListItem"
-          | "numberedListItem"
-          | "checkListItem"
-          | "toggleListItem";
+        type: "bulletListItem" | "numberedListItem" | "checkListItem";
       }
     >,
-  ): Block | null {
+  ): Block | Block[] | null {
     const dontExpectChildren = () => {
       if (block.children.length > 0) {
         console.error({ unexpextedChildrenInBlock: block });
@@ -127,14 +126,16 @@ export class BlockNoteToUniAstConverter {
         };
 
       case "heading":
-        dontExpectChildren();
-
-        return {
-          type: "heading",
-          level: block.props.level,
-          content: block.content.map((item) => this.convertInlineContent(item)),
-          styles: this.convertBlockStyles(block.props),
-        };
+        return [
+          provideTypeInference<Block>({
+            type: "heading",
+            level: block.props.level,
+            content: block.content.map((item) =>
+              this.convertInlineContent(item),
+            ),
+            styles: this.convertBlockStyles(block.props),
+          }),
+        ].concat(this.convertBlocks(block.children));
 
       case "Heading4":
         dontExpectChildren();
@@ -254,19 +255,12 @@ export class BlockNoteToUniAstConverter {
     block: Extract<
       BlockType,
       {
-        type:
-          | "bulletListItem"
-          | "numberedListItem"
-          | "checkListItem"
-          | "toggleListItem";
+        type: "bulletListItem" | "numberedListItem" | "checkListItem";
       }
     >,
     currentList: Extract<Block, { type: "list" }> | null,
   ): ListItem {
     switch (block.type) {
-      // TODO: togglable list items are not supported by Markdown, so we convert it as raw here
-      // Should we convert them differently?
-      case "toggleListItem":
       case "bulletListItem":
         return {
           content: [

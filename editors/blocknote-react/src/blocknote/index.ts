@@ -53,7 +53,8 @@ import {
 function createBlockNoteSchema() {
   // Get rid of some block types
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { audio, video, file, ...remainingBlockSpecs } = defaultBlockSpecs;
+  const { audio, video, file, toggleListItem, ...remainingBlockSpecs } =
+    defaultBlockSpecs;
 
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {

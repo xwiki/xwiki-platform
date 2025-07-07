@@ -29,6 +29,8 @@
   </parent>
   <artifactId>xwiki-platform-yjs</artifactId>
   <name>XWiki Platform - YJS - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Modules supporting the use of yjs in XWiki</description>
   <modules>
     <module>xwiki-platform-yjs-websocket</module>
   </modules>

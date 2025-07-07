@@ -27,88 +27,141 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import jakarta.inject.Inject;
 import jakarta.websocket.Session;
 
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+
+import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP;
+
 /**
+ * This object stored the list of currently active sessions for a room. A room is usually containing the users editing a
+ * given document in realtime.
+ *
  * @version $Id$
  * @since 17.6.0RC1
  */
+@Component(roles = Room.class)
+@InstantiationStrategy(PER_LOOKUP)
 public class Room
 {
-    private final Runnable clearRoom;
+    @Inject
+    private Logger logger;
+
+    private Runnable clearRoom;
 
     private final Map<Session, Long> sessionIds = new ConcurrentHashMap<>();
 
-    public Room(Runnable clearRoom)
+    /**
+     * Initialize the room. This method must be call directly after instantiation.
+     *
+     * @param clearRoom a clear room runnable action, that needs to be called once the room becomes empty again.
+     */
+    public void init(Runnable clearRoom)
     {
         this.clearRoom = clearRoom;
     }
 
+    /**
+     * Disconnect a session from the room.
+     *
+     * @param session the session to disconnect.
+     */
     public void disconnect(Session session)
     {
         Long clientID = this.sessionIds.get(session);
-        if(clientID == null) {
+        if (clientID == null) {
             return;
         }
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(output);
         try {
-            codedOutputStream.writeUInt64NoTag(4);
-            codedOutputStream.writeUInt64NoTag(clientID);
-            codedOutputStream.flush();
-            this.broadcast(session, ByteBuffer.wrap(output.toByteArray()));
+            this.broadcast(session, buildDisconnectMessage(clientID));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            this.logger.warn("Failed to build the disconnect message for client id [{}]. Cause: [{}]", clientID,
+                getRootCauseMessage(e));
         }
 
         this.sessionIds.remove(session);
         if (this.sessionIds.isEmpty()) {
-            // TODO: check if really thead safe, what's happening is another user joins the session at the same time
-            // the last one is leaving?
             this.clearRoom.run();
         }
     }
 
-    public void register(Session sessionId)
+    private static ByteBuffer buildDisconnectMessage(Long clientID) throws IOException
     {
-        // TODO: remove this method
-//        this.sessionIds.put(sessionId, -1L);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(output);
+        codedOutputStream.writeUInt64NoTag(4);
+        codedOutputStream.writeUInt64NoTag(clientID);
+        codedOutputStream.flush();
+        return ByteBuffer.wrap(output.toByteArray());
     }
 
-    // todo: allow to send two kinds of message 1) user left 2) a message with a payload
-    // todo: check how to customize the client y-websocket to handle this.
-    public void handleMessage(Session session, InputStream message)
+    /**
+     * Handles a message. Reads the message and check the first integer. If its value is {@code 2}, save the second
+     * integer and save it as the client id of the current session. That way, when the session is closed, the id of the
+     * disconnected session is broadcasted to all other clients of the same room. Clients can then remove the client id
+     * from their local awareness state (i.e., the cursor of selection of the closed session are quickly hidden instead
+     * of waiting for a timeout). If the value is not {@code 2}, the message is instead broadcasted to all other
+     * sessions connected to the same room. We perform this logic to have a reactive handling of awareness without
+     * having to implement fully yjs. If a good yjs library for java is available someday, this logic could be improved
+     * to change the awareness server side.
+     *
+     * @param session the session from which the message originated
+     * @param stream the input steam of the received message
+     */
+    public void handleMessage(Session session, InputStream stream)
     {
         try {
-            ByteBuffer wrap = ByteBuffer.wrap(message.readAllBytes());
-            CodedInputStream codedInputStream = CodedInputStream.newInstance(wrap.array());
-            var messageId = codedInputStream.readUInt64();
-            if(messageId == 2) {
+            ByteBuffer byteBuffer = ByteBuffer.wrap(stream.readAllBytes());
+            CodedInputStream codedInputStream = CodedInputStream.newInstance(byteBuffer.array());
+            // Read the first unsigned int of the message, of it's 2 (0 being a synchronization message, and 1 an
+            // awareness message)
+            if (codedInputStream.readUInt64() == 2) {
                 var clientId = codedInputStream.readUInt64();
                 this.sessionIds.put(session, clientId);
             } else {
-                wrap.rewind();
-                broadcast(session, wrap);
+                // Rewind the buffer so that the broadcast use a non-consumed buffer.
+                byteBuffer.rewind();
+                broadcast(session, byteBuffer);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            this.logger.warn("Failed to read a message. Cause: [{}]", getRootCauseMessage(e));
         }
     }
 
-    public void broadcast(Session session, ByteBuffer wrap) throws IOException
+    /**
+     * Send a binary message to all the sessions of the room, except the session sending the message.
+     *
+     * @param sendingSession the session sending the message
+     * @param data the message to broadcast to all other sessions of the room
+     */
+    public void broadcast(Session sendingSession, ByteBuffer data)
     {
-        for (Session session2 : this.sessionIds.keySet()) {
-            if (!Objects.equals(session.getId(), session2.getId())) {
+        this.sessionIds.keySet()
+            .stream()
+            .filter(receivedSession -> !Objects.equals(sendingSession.getId(), receivedSession.getId()))
+            .forEach(session -> {
                 try {
-                    session2.getBasicRemote().sendBinary(wrap);
+                    session.getBasicRemote().sendBinary(data);
                 } catch (IOException e) {
                     // We disconnect the session in case of error
-                    this.disconnect(session2);
+                    this.disconnect(session);
                 }
-            }
-        }
+            });
+    }
+
+    /**
+     * @return an immutable copy of the currently registered session ids
+     */
+    public Map<Session, Long> getSessionIds()
+    {
+        return ImmutableMap.copyOf(this.sessionIds);
     }
 }

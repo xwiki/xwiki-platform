@@ -31,9 +31,12 @@ import jakarta.websocket.CloseReason;
 import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -45,15 +48,17 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 import static org.xwiki.security.authorization.Right.EDIT;
 
 /**
+ * Provides a websocket endpoint to support realtime collaboration using yjs.
+ *
  * @version $Id$
  * @since 17.6.0RC1
  */
 @Component
 @Singleton
 @Named("yjs")
+@ServerEndpoint("{room}")
 public class YjsRealtimeEndpoint extends Endpoint implements EndpointComponent
 {
-
     @Inject
     private Logger logger;
 
@@ -65,6 +70,10 @@ public class YjsRealtimeEndpoint extends Endpoint implements EndpointComponent
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
 
     /**
      * A map of rooms, a room corresponds to a {@link DocumentReference} and contains the set of currently active
@@ -79,8 +88,7 @@ public class YjsRealtimeEndpoint extends Endpoint implements EndpointComponent
     {
         this.context.run(session, () -> {
             var roomId = this.documentReferenceResolver.resolve(session.getPathParameters().get("room"));
-            // TODO: remove the "true", it's a bypass to test with websocat
-            if (true || this.contextualAuthorizationManager.hasAccess(EDIT, roomId)) {
+            if (this.contextualAuthorizationManager.hasAccess(EDIT, roomId)) {
                 startNewSession(session, roomId);
             } else {
                 try {
@@ -95,19 +103,26 @@ public class YjsRealtimeEndpoint extends Endpoint implements EndpointComponent
 
     private void startNewSession(Session session, DocumentReference roomId)
     {
-        var newRoom = this.rooms.computeIfAbsent(roomId, rid -> new Room(() -> this.rooms.remove(rid)));
-        this.roomsById.put(session.getId(), newRoom);
-        // TODO: the String is not working with yjs, we need to move to a binary model, need to RTFM.
-        session.addMessageHandler(InputStream.class, message -> {
-            newRoom.handleMessage(session, message);
+        var newRoom = this.rooms.computeIfAbsent(roomId, rid -> {
+            try {
+                Room room = this.componentManager.getInstance(Room.class);
+                room.init(() -> this.rooms.remove(roomId));
+                return room;
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Failed to instantiate a new [{}]. Cause: [{}]", Room.class, getRootCauseMessage(e));
+                return null;
+            }
         });
+        this.roomsById.put(session.getId(), newRoom);
+        if (newRoom != null) {
+            session.addMessageHandler(InputStream.class, message -> newRoom.handleMessage(session, message));
+        }
     }
 
     @Override
     public void onClose(Session session, CloseReason closeReason)
     {
         super.onClose(session, closeReason);
-        this.logger.info("BlocknoteRealtimeEndpoint opened. session [{}], close reason [{}]", session, closeReason);
         String sessionId = session.getId();
         this.roomsById.get(sessionId).disconnect(session);
         this.roomsById.remove(sessionId);

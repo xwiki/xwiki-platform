@@ -39,7 +39,7 @@ import org.xwiki.webjars.WebJarsUrlFactory;
  * Publishes the BlockNote editor's stylesheet as a RequireJS module (to be loaded with the CSS RequireJS plugin).
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.6.0RC1
  */
 @Component
 @Named(BlockNoteCSSRequireJSModuleUIExtension.ID)

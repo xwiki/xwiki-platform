@@ -36,7 +36,7 @@ import org.xwiki.uiextension.UIExtension;
  * Extends the Edit menu with an entry that opens the standalone edit mode using BlockNote as the WYSIWYG editor.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.6.0RC1
  */
 @Component
 @Named(StandaloneEditActionUIExtension.ID)

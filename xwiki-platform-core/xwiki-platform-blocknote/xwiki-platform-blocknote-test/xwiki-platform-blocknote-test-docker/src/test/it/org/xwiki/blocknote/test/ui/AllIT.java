@@ -27,7 +27,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * All UI tests for the BlockNote integration.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.6.0RC1
  */
 @UITest
 class AllIT

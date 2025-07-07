@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.blocknote.realtime.internal;
+package org.xwiki.yjs.websocket.internal;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -125,6 +125,10 @@ public class Room
             // awareness message)
             if (codedInputStream.readUInt64() == 2) {
                 var clientId = codedInputStream.readUInt64();
+                // Preserve the client id to find it back when the session closes. Nothing specific is required
+                // server-side during session start. When a user joins the session they update their awareness status
+                // locally, then the change is propagated to other members of the session by broadcasting the patch as a
+                // usual yjs doc patch.
                 this.sessionIds.put(session, clientId);
             } else {
                 // Rewind the buffer so that the broadcast use a non-consumed buffer.
@@ -139,20 +143,20 @@ public class Room
     /**
      * Send a binary message to all the sessions of the room, except the session sending the message.
      *
-     * @param sendingSession the session sending the message
+     * @param fromSession the session sending the message
      * @param data the message to broadcast to all other sessions of the room
      */
-    public void broadcast(Session sendingSession, ByteBuffer data)
+    public void broadcast(Session fromSession, ByteBuffer data)
     {
         this.sessionIds.keySet()
             .stream()
-            .filter(receivedSession -> !Objects.equals(sendingSession.getId(), receivedSession.getId()))
-            .forEach(session -> {
+            .filter(toSession -> !Objects.equals(fromSession.getId(), toSession.getId()))
+            .forEach(toSession -> {
                 try {
-                    session.getBasicRemote().sendBinary(data);
+                    toSession.getBasicRemote().sendBinary(data);
                 } catch (IOException e) {
                     // We disconnect the session in case of error
-                    this.disconnect(session);
+                    this.disconnect(toSession);
                 }
             });
     }

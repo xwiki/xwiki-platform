@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.blocknote.realtime.internal;
+package org.xwiki.yjs.websocket.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -128,7 +128,6 @@ class RoomTest
         assertEquals(Map.of(this.session2, 2L), this.room.getSessionIds());
         this.room.disconnect(this.session2);
         verify(runnable).run();
-
     }
 
     private static ByteArrayOutputStream buildRegistrationMessage(int clientId) throws IOException

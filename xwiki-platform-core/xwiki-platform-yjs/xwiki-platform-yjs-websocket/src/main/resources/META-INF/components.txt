@@ -1,2 +1,2 @@
-org.xwiki.blocknote.realtime.internal.Room
-org.xwiki.blocknote.realtime.internal.YjsRealtimeEndpoint
+org.xwiki.yjs.websocket.internal.Room
+org.xwiki.yjs.websocket.internal.YjsRealtimeEndpoint

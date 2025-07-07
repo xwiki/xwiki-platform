@@ -46,6 +46,8 @@ import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.internal.util.VelocityDetector;
 import org.xwiki.webjars.WebJarsUrlFactory;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Manager for creating and caching {@link IconTemplateRenderer} instances based on templates.
  * <p>
@@ -70,6 +72,10 @@ public class IconTemplateRendererManager implements Initializable
         Pattern.compile("^\\s*\\$services\\.webjars\\.url\\s*\\(%s(?:,%s(?:,%s)?)?\\)\\s*$"
             .formatted(ARGUMENT, ARGUMENT, ARGUMENT));
 
+    // Match icons in the form [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")||data-xwiki-lightbox="false"]].
+    private static final Pattern SKIN_FILE_PATTERN =
+        Pattern.compile("^([^#$]*)\\$xwiki\\.getSkinFile\\(\"([^\"$#]*)\\$\\{icon\\}([^\"$#]*)\"\\)([^#$]*)$");
+
     @Inject
     private VelocityDetector velocityDetector;
 
@@ -87,6 +93,9 @@ public class IconTemplateRendererManager implements Initializable
 
     @Inject
     private CacheManager cacheManager;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
 
     private Cache<IconTemplateRenderer> cache;
 
@@ -142,6 +151,12 @@ public class IconTemplateRendererManager implements Initializable
             if (webJarRenderer.isPresent()) {
                 return webJarRenderer.get();
             }
+
+            Optional<IconTemplateRenderer> skinFileRenderer = getSkinFileRenderer(template);
+
+            if (skinFileRenderer.isPresent()) {
+                return skinFileRenderer.get();
+            }
         }
 
         return getVelocityRenderer(template);
@@ -184,6 +199,25 @@ public class IconTemplateRendererManager implements Initializable
             } else {
                 throw new IconException("Invalid number of arguments for webjar URL: " + arguments.size());
             }
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<IconTemplateRenderer> getSkinFileRenderer(String template)
+    {
+        Matcher skinFileMatcher = SKIN_FILE_PATTERN.matcher(template);
+        if (skinFileMatcher.matches()) {
+            String start = skinFileMatcher.group(1);
+            String iconPrefix = skinFileMatcher.group(2);
+            String iconSuffix = skinFileMatcher.group(3);
+            String end = skinFileMatcher.group(4);
+
+            return Optional.of((icon, documentReference) -> {
+                XWikiContext context = this.contextProvider.get();
+                String fileName = iconPrefix + icon + iconSuffix;
+                return start + context.getWiki().getSkinFile(fileName, context) + end;
+            });
         }
 
         return Optional.empty();

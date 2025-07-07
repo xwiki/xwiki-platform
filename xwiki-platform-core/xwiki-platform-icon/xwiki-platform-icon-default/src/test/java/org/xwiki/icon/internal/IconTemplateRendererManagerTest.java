@@ -19,6 +19,8 @@
  */
 package org.xwiki.icon.internal;
 
+import jakarta.inject.Provider;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
@@ -37,6 +39,9 @@ import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.internal.util.VelocityDetector;
 import org.xwiki.webjars.WebJarsUrlFactory;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -73,6 +78,9 @@ class IconTemplateRendererManagerTest
 
     @MockComponent
     private WebJarsUrlFactory webJarsUrlFactory;
+
+    @MockComponent
+    private Provider<XWikiContext> xwikiContextProvider;
 
     private Cache<IconTemplateRenderer> cache;
 
@@ -158,6 +166,27 @@ class IconTemplateRendererManagerTest
         IconTemplateRenderer renderer = this.iconTemplateRendererManager.getRenderer(template);
 
         assertEquals(expectedURL, renderer.render("icon", null));
+        verifyNoInteractions(this.velocityManager, this.velocityRenderer);
+    }
+
+    @Test
+    void getRendererShouldHandleSkinFileTemplate() throws Exception
+    {
+        String template =
+            "[[image:path:$xwiki.getSkinFile(\"icons/silk/${icon}.png\")||data-xwiki-lightbox=\"false\"]]";
+        String expectedSkinFile = "/default/icon-path/home.png";
+        String expected = "[[image:path:/default/icon-path/home.png||data-xwiki-lightbox=\"false\"]]";
+
+        XWikiContext mockContext = mock();
+        XWiki mockXWiki = mock();
+        when(this.xwikiContextProvider.get()).thenReturn(mockContext);
+        when(mockContext.getWiki()).thenReturn(mockXWiki);
+        when(mockXWiki.getSkinFile("icons/silk/home.png", mockContext)).thenReturn(expectedSkinFile);
+
+        IconTemplateRenderer renderer = this.iconTemplateRendererManager.getRenderer(template);
+
+        assertEquals(expected, renderer.render("home", null));
+
         verifyNoInteractions(this.velocityManager, this.velocityRenderer);
     }
 

@@ -34,7 +34,7 @@ import org.xwiki.container.Container;
  * Configuration source based on the current request parameters.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.6.0RC1
  */
 @Component
 @Singleton

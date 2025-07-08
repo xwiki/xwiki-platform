@@ -30,15 +30,13 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  *     the cursor on items, were also disabled.
  */
 import { navigationTreePropsDefaults } from "@xwiki/cristal-dsapi";
+import { SpaceReference } from "@xwiki/cristal-model-api";
 import { inject, onBeforeMount, ref, watch } from "vue";
 import { VTreeview } from "vuetify/labs/VTreeview";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { NavigationTreeProps } from "@xwiki/cristal-dsapi";
-import type {
-  DocumentReference,
-  SpaceReference,
-} from "@xwiki/cristal-model-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type {
   NavigationTreeSource,
   NavigationTreeSourceProvider,
@@ -75,8 +73,9 @@ const props = withDefaults(
 );
 
 onBeforeMount(async () => {
+  const newRootNodes: Array<TreeItem> = [];
   for (const node of await getChildNodes("")) {
-    rootNodes.value.push({
+    newRootNodes.push({
       id: node.id,
       title: node.label,
       href: node.url,
@@ -84,6 +83,18 @@ onBeforeMount(async () => {
       _location: node.location,
       _is_terminal: node.is_terminal,
     });
+  }
+  if (props.showRootNode) {
+    rootNodes.value.push({
+      id: "",
+      title: "Root",
+      href: ".",
+      children: newRootNodes,
+      _location: new SpaceReference(),
+      _is_terminal: false,
+    });
+  } else {
+    rootNodes.value.push(...newRootNodes);
   }
   await expandTree();
 
@@ -101,6 +112,7 @@ async function expandTree() {
     const newExpandedNodes = treeSource.getParentNodesId(
       props.currentPageReference!,
       props.includeTerminals,
+      props.showRootNode,
     );
     let i;
     let currentNodes = rootNodes.value;
@@ -173,7 +185,11 @@ function clearSelection() {
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
 async function onDocumentDelete(page: DocumentReference) {
-  const parents = treeSource.getParentNodesId(page, props.includeTerminals);
+  const parents = treeSource.getParentNodesId(
+    page,
+    props.includeTerminals,
+    props.showRootNode,
+  );
   let currentItem: TreeItem | undefined = undefined;
   let currentItemChildren: TreeItem[] | undefined = rootNodes.value;
   let notFound = false;
@@ -202,7 +218,11 @@ async function onDocumentDelete(page: DocumentReference) {
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
 async function onDocumentUpdate(page: DocumentReference) {
-  const parents = treeSource.getParentNodesId(page, props.includeTerminals);
+  const parents = treeSource.getParentNodesId(
+    page,
+    props.includeTerminals,
+    props.showRootNode,
+  );
   let currentParent: string | undefined = undefined;
   let currentItems: TreeItem[] | undefined = rootNodes.value;
   let notFound = false;
@@ -245,10 +265,12 @@ async function onDocumentUpdate(page: DocumentReference) {
     return;
   }
   const newItems = await getChildNodes(currentParent ? currentParent : "");
-  const currentPageParents = treeSource.getParentNodesId(
-    props.currentPageReference!,
-    props.includeTerminals,
-  );
+  const currentPageParents = props.currentPageReference
+    ? treeSource.getParentNodesId(
+        props.currentPageReference!,
+        props.includeTerminals,
+      )
+    : [];
   newItemsLoop: for (const newItem of newItems) {
     for (const i of currentItems!.keys()) {
       if (newItem.id == currentItems![i].id) {

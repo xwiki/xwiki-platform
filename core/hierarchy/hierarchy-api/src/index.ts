@@ -43,11 +43,13 @@ interface PageHierarchyResolver {
    * Returns the page hierarchy for a given page.
    *
    * @param page - the reference to the page for which to compute the hierarchy
+   * @param includeHomePage - whether to include a segment for the home page (default: true)
    * @returns the page hierarchy
-   * @since 0.15
+   * @since 0.20
    */
   getPageHierarchy(
     page: DocumentReference | SpaceReference,
+    includeHomePage?: boolean,
   ): Promise<Array<PageHierarchyItem>>;
 }
 

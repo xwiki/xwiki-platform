@@ -54,17 +54,20 @@ class DefaultPageHierarchyResolver implements PageHierarchyResolver {
 
   async getPageHierarchy(
     page: DocumentReference | SpaceReference,
+    includeHomePage: boolean = true,
   ): Promise<Array<PageHierarchyItem>> {
-    const hierarchy: Array<PageHierarchyItem> = [
-      {
-        label: "Home",
-        pageId: this.cristalApp.getWikiConfig().homePage,
-        url: this.cristalApp.getRouter().resolve({
-          name: "view",
-          params: { page: this.cristalApp.getWikiConfig().homePage },
-        }).href,
-      },
-    ];
+    const hierarchy: Array<PageHierarchyItem> = includeHomePage
+      ? [
+          {
+            label: "Home",
+            pageId: this.cristalApp.getWikiConfig().homePage,
+            url: this.cristalApp.getRouter().resolve({
+              name: "view",
+              params: { page: this.cristalApp.getWikiConfig().homePage },
+            }).href,
+          },
+        ]
+      : [];
     if (page.type == EntityType.DOCUMENT) {
       hierarchy.push({
         label: (page as DocumentReference).name,

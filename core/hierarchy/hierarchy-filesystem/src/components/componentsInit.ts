@@ -54,17 +54,20 @@ class FileSystemPageHierarchyResolver implements PageHierarchyResolver {
 
   async getPageHierarchy(
     page: DocumentReference | SpaceReference,
+    includeHomePage: boolean = true,
   ): Promise<Array<PageHierarchyItem>> {
-    let hierarchy: Array<PageHierarchyItem> = [
-      {
-        label: "Home",
-        pageId: this.cristalApp.getWikiConfig().homePage,
-        url: this.cristalApp.getRouter().resolve({
-          name: "view",
-          params: { page: "index" },
-        }).href,
-      },
-    ];
+    let hierarchy: Array<PageHierarchyItem> = includeHomePage
+      ? [
+          {
+            label: "Home",
+            pageId: this.cristalApp.getWikiConfig().homePage,
+            url: this.cristalApp.getRouter().resolve({
+              name: "view",
+              params: { page: "index" },
+            }).href,
+          },
+        ]
+      : [];
     if (page != null) {
       hierarchy = hierarchy.concat(
         await getPageHierarchyFromPath(page, this.cristalApp),

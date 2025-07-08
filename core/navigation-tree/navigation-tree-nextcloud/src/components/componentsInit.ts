@@ -149,8 +149,13 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
     return subdirectories;
   }
 
-  getParentNodesId(page: DocumentReference): Array<string> {
-    return getParentNodesIdFromPath(page);
+  getParentNodesId(
+    page: DocumentReference,
+    _includeTerminal?: boolean,
+    includeRootNode?: boolean,
+  ): Array<string> {
+    // Nextcloud implementation does not handle terminal pages.
+    return getParentNodesIdFromPath(page, includeRootNode);
   }
 
   private removeExtension(file: string): string {

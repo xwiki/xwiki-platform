@@ -88,8 +88,13 @@ class FileSystemNavigationTreeSource implements NavigationTreeSource {
     return navigationTree;
   }
 
-  getParentNodesId(page: DocumentReference): Array<string> {
-    return getParentNodesIdFromPath(page);
+  getParentNodesId(
+    page: DocumentReference,
+    _includeTerminal?: boolean,
+    includeRootNode?: boolean,
+  ): Array<string> {
+    // FileSystem implementation does not handle terminal pages.
+    return getParentNodesIdFromPath(page, includeRootNode);
   }
 }
 

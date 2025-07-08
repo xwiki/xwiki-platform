@@ -49,8 +49,13 @@ class DefaultNavigationTreeSource implements NavigationTreeSource {
     return [];
   }
 
-  getParentNodesId(page: DocumentReference): Array<string> {
-    return getParentNodesIdFromPath(page);
+  getParentNodesId(
+    page: DocumentReference,
+    _includeTerminal?: boolean,
+    includeRootNode?: boolean,
+  ): Array<string> {
+    // The default implementation does not handle terminal pages.
+    return getParentNodesIdFromPath(page, includeRootNode);
   }
 }
 

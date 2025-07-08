@@ -83,8 +83,9 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
   getParentNodesId(
     page: DocumentReference,
     includeTerminal: boolean = true,
+    includeRootNode?: boolean,
   ): Array<string> {
-    const result = [];
+    const result = includeRootNode ? [""] : [];
     if (page.space) {
       let currentParent = "";
       for (const parent of page.space!.names) {

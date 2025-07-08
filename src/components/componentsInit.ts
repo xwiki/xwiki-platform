@@ -66,6 +66,7 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
   // eslint-disable-next-line max-statements
   async getPageHierarchy(
     page: DocumentReference | SpaceReference,
+    includeHomePage: boolean = true,
   ): Promise<Array<PageHierarchyItem>> {
     let documentId = this.referenceSerializer.serialize(page)!;
     if (page.type == EntityType.SPACE) {
@@ -117,7 +118,11 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
           }
         },
       );
-      hierarchy[0].label = "Home";
+      if (includeHomePage) {
+        hierarchy[0].label = "Home";
+      } else {
+        hierarchy.shift();
+      }
       return hierarchy;
     } catch (error) {
       this.logger.error(error);

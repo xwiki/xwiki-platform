@@ -21,6 +21,7 @@ package org.xwiki.yjs.websocket.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +32,6 @@ import jakarta.websocket.CloseReason;
 import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
-import jakarta.websocket.server.ServerEndpoint;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -44,6 +44,7 @@ import org.xwiki.websocket.EndpointComponent;
 import org.xwiki.websocket.WebSocketContext;
 
 import static jakarta.websocket.CloseReason.CloseCodes.CANNOT_ACCEPT;
+import static jakarta.websocket.CloseReason.CloseCodes.UNEXPECTED_CONDITION;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.security.authorization.Right.EDIT;
 
@@ -56,9 +57,10 @@ import static org.xwiki.security.authorization.Right.EDIT;
 @Component
 @Singleton
 @Named("yjs")
-@ServerEndpoint("{room}")
 public class YjsRealtimeEndpoint extends Endpoint implements EndpointComponent
 {
+    private static final String ROOM_QUERY_PARAMETER = "room";
+
     @Inject
     private Logger logger;
 
@@ -87,16 +89,28 @@ public class YjsRealtimeEndpoint extends Endpoint implements EndpointComponent
     public void onOpen(Session session, EndpointConfig config)
     {
         this.context.run(session, () -> {
-            var roomId = this.documentReferenceResolver.resolve(session.getPathParameters().get("room"));
-            if (this.contextualAuthorizationManager.hasAccess(EDIT, roomId)) {
-                startNewSession(session, roomId);
-            } else {
-                try {
+            try {
+                List<String> room = session.getRequestParameterMap().get(ROOM_QUERY_PARAMETER);
+
+                if (room == null || room.isEmpty()) {
                     session.close(
-                        new CloseReason(CANNOT_ACCEPT, "Current user is not allowed to edit the current document"));
-                } catch (IOException e) {
-                    this.logger.warn("Failed to close session. Cause: [{}]", getRootCauseMessage(e));
+                        new CloseReason(UNEXPECTED_CONDITION,
+                            "The [%s] query parameter is mandatory.".formatted(ROOM_QUERY_PARAMETER)));
+                } else if (room.size() > 1) {
+                    session.close(
+                        new CloseReason(UNEXPECTED_CONDITION,
+                            "The [%s] query parameter is expected only once.".formatted(ROOM_QUERY_PARAMETER)));
+                } else {
+                    var roomId = this.documentReferenceResolver.resolve(room.get(0));
+                    if (this.contextualAuthorizationManager.hasAccess(EDIT, roomId)) {
+                        startNewSession(session, roomId);
+                    } else {
+                        session.close(
+                            new CloseReason(CANNOT_ACCEPT, "Current user is not allowed to edit the current document"));
+                    }
                 }
+            } catch (IOException e) {
+                this.logger.warn("Failed to close session. Cause: [{}]", getRootCauseMessage(e));
             }
         });
     }
@@ -109,7 +123,8 @@ public class YjsRealtimeEndpoint extends Endpoint implements EndpointComponent
                 room.init(() -> this.rooms.remove(roomId));
                 return room;
             } catch (ComponentLookupException e) {
-                this.logger.warn("Failed to instantiate a new [{}]. Cause: [{}]", Room.class, getRootCauseMessage(e));
+                this.logger.warn("Failed to instantiate a new [{}]. Cause: [{}]", Room.class,
+                    getRootCauseMessage(e));
                 return null;
             }
         });

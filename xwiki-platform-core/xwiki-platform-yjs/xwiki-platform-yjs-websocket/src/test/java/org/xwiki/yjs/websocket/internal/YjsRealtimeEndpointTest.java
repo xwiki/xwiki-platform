@@ -20,6 +20,7 @@
 package org.xwiki.yjs.websocket.internal;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -32,6 +33,8 @@ import jakarta.websocket.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -45,6 +48,8 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.websocket.WebSocketContext;
 
 import static jakarta.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
+import static jakarta.websocket.CloseReason.CloseCodes.UNEXPECTED_CONDITION;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -92,6 +97,9 @@ class YjsRealtimeEndpointTest
     @Mock
     private Room room;
 
+    @Captor
+    private ArgumentCaptor<CloseReason> closeReasonCaptor;
+
     @BeforeEach
     void setUp()
     {
@@ -104,6 +112,7 @@ class YjsRealtimeEndpointTest
         when(this.session.getId()).thenReturn("session-id");
         when(this.documentReferenceResolver.resolve("My.Doc")).thenReturn(DOCUMENT_REFERENCE);
         when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, DOCUMENT_REFERENCE)).thenReturn(true);
+        when(this.session.getRequestParameterMap()).thenReturn(Map.of());
     }
 
     @Test
@@ -118,15 +127,41 @@ class YjsRealtimeEndpointTest
     void onOpenWithEditRight() throws Exception
     {
         when(this.contextComponentManager.getInstance(Room.class)).thenReturn(this.room);
+        when(this.session.getRequestParameterMap()).thenReturn(Map.of("room", List.of(DOCUMENT_REFERENCE_STR)));
         this.yjsRealtimeEndpoint.onOpen(this.session, this.config);
         verify(this.room).init(any());
         verify(this.session).addMessageHandler(eq(InputStream.class), any(MessageHandler.Whole.class));
     }
 
     @Test
+    void onOpenMissingRoomParam() throws Exception
+    {
+        when(this.contextComponentManager.getInstance(Room.class)).thenReturn(this.room);
+        this.yjsRealtimeEndpoint.onOpen(this.session, this.config);
+        verify(this.session).close(this.closeReasonCaptor.capture());
+        CloseReason closeReason = this.closeReasonCaptor.getValue();
+        assertEquals(UNEXPECTED_CONDITION, closeReason.getCloseCode());
+        assertEquals("The [room] query parameter is mandatory.", closeReason.getReasonPhrase());
+    }
+
+    @Test
+    void onOpenMissingManyRoomParams() throws Exception
+    {
+        when(this.contextComponentManager.getInstance(Room.class)).thenReturn(this.room);
+        when(this.session.getRequestParameterMap()).thenReturn(Map.of("room", List.of(DOCUMENT_REFERENCE_STR,
+            "one too many string")));
+        this.yjsRealtimeEndpoint.onOpen(this.session, this.config);
+        verify(this.session).close(this.closeReasonCaptor.capture());
+        CloseReason closeReason = this.closeReasonCaptor.getValue();
+        assertEquals(UNEXPECTED_CONDITION, closeReason.getCloseCode());
+        assertEquals("The [room] query parameter is expected only once.", closeReason.getReasonPhrase());
+    }
+
+    @Test
     void onClose() throws Exception
     {
         when(this.contextComponentManager.getInstance(Room.class)).thenReturn(this.room);
+        when(this.session.getRequestParameterMap()).thenReturn(Map.of("room", List.of(DOCUMENT_REFERENCE_STR)));
         this.yjsRealtimeEndpoint.onOpen(this.session, this.config);
         this.yjsRealtimeEndpoint.onClose(this.session, new CloseReason(NORMAL_CLOSURE, "some reason"));
         verify(this.room).disconnect(this.session);

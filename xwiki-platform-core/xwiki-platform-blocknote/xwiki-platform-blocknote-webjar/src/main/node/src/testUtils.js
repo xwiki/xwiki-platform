@@ -22,13 +22,17 @@ import { useI18n } from "vue-i18n";
 
 const modules = {};
 global.define = (id, deps, factory) => {
+  if (!factory) {
+    factory = deps;
+    deps = [];
+  }
   if (typeof factory === "function") {
     modules[id] = factory(...getModules(deps));
   } else {
     modules[id] = factory;
   }
 };
-global.require = (deps, callback) => {
+global.require = global.requirejs = (deps, callback) => {
   callback(...getModules(deps));
 };
 function getModules(deps) {

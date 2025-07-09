@@ -21,7 +21,7 @@ import { Logic } from "@/services/Logic";
 import { mockI18n } from "@/testUtils";
 import { describe, it, vi } from "vitest";
 
-define("xwiki-l10n!xwiki-blocknote-translation-keys", () => {});
+define("xwiki-l10n!xwiki-blocknote-translation-keys", () => ({}));
 
 global.matchMedia = vi.fn().mockImplementation((query) => ({
   matches: false,

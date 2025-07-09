@@ -19,8 +19,11 @@
  */
 import { I18n } from "vue-i18n";
 
-declare const define: (moduleName: string, moduleDefinition: unknown) => void;
-declare const require: (modules: string[], onLoad: (...args: any[]) => void, onError?: (error: Error) => void) => void;
+declare global {
+  // RequireJS API.
+  const define: (moduleName: string, moduleDefinition: unknown) => void;
+  const requirejs: (modules: string[], onLoad: (...args: unknown[]) => void, onError?: (error: Error) => void) => void;
+}
 
 type Config = {
   locale: string;
@@ -40,10 +43,13 @@ async function fetchTranslation(): Promise<Translation> {
     keys: [],
   });
   const translation = await new Promise<Translation>((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require(["xwiki-blocknote-translation-keys", "xwiki-l10n!xwiki-blocknote-translation-keys"], (config, messages) => {
-      resolve({ config, messages });
-    }, reject);
+    requirejs(
+      ["xwiki-blocknote-translation-keys", "xwiki-l10n!xwiki-blocknote-translation-keys"],
+      (config, messages) => {
+        resolve({ config: config as Config, messages: messages as Record<string, string> });
+      },
+      reject
+    );
   });
   // Add back the prefix to the keys.
   const messages: Record<string, string> = {};

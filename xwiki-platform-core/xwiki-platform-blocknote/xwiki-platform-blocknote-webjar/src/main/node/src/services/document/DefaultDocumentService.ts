@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { toCristalEntityReference } from "@/services/model/reference/XWikiEntityReference";
 import type { PageData } from "@xwiki/cristal-api";
 import { DocumentChange, DocumentService } from "@xwiki/cristal-document-api";
 import type { DocumentReference } from "@xwiki/cristal-model-api";
 import { Container, injectable } from "inversify";
-import type { Ref } from "vue";
+import { type Ref, ref } from "vue";
+import { toCristalEntityReference, XWiki } from "../model/reference/XWikiEntityReference";
 
 @injectable("Singleton")
 export class DefaultDocumentService implements DocumentService {
@@ -36,11 +36,11 @@ export class DefaultDocumentService implements DocumentService {
   }
 
   public getCurrentDocumentReference(): Ref<DocumentReference | undefined> {
-    return Ref(toCristalEntityReference(XWiki.currentDocument.documentReference));
+    return ref(toCristalEntityReference(XWiki.currentDocument.documentReference) as DocumentReference);
   }
 
   public getCurrentDocumentReferenceString(): Ref<string | undefined> {
-    return Ref(XWiki.Model.serialize(XWiki.currentDocument.documentReference));
+    return ref(XWiki.Model.serialize(XWiki.currentDocument.documentReference));
   }
 
   public getCurrentDocumentRevision(): Ref<string | undefined> {

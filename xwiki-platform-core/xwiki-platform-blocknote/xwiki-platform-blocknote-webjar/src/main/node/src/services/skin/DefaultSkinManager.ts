@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { DesignSystemLoader, SkinManager } from "@xwiki/cristal-api";
-import { type Container, injectable } from "inversify";
-import type { App, Component } from "vue";
+import { Container, injectable } from "inversify";
+import { App, Component } from "vue";
 
 @injectable("Singleton")
 export class DefaultSkinManager implements SkinManager {

@@ -40,7 +40,7 @@ import { XWikiDesignSystemLoader } from "./skin/XWikiDesignSystemLoader";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { XWikiStorage } from "./storage/XWikiStorage";
 
-const container = new Container();
+const container: Container = new Container();
 container.bind("Container").toConstantValue(container);
 container.bind("Logger").to(DefaultLogger).inSingletonScope();
 

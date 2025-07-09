@@ -37,112 +37,123 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
-import { MarkdownToUniAstConverter, UniAstToMarkdownConverter, createConverterContext } from "@xwiki/cristal-uniast";
+import { EditorLanguage } from "@xwiki/cristal-editors-blocknote-react";
+import {
+  MarkdownToUniAstConverter,
+  UniAst,
+  UniAstToMarkdownConverter,
+  createConverterContext,
+} from "@xwiki/cristal-uniast";
+import { Container } from "inversify";
+import { computed, inject, ref, shallowRef, useTemplateRef } from "vue";
+import { Logic } from "../services/Logic";
 
-export default {
-  name: "XWikiBlockNote",
+//
+// Injected
+//
+const logic = inject<Logic>("logic")!;
+const container = inject<Container>("container")!;
 
-  inject: ["logic", "container"],
+//
+// Props
+//
+const {
+  name = undefined,
+  initialValue = "",
+  form = undefined,
+  disabled = false,
+  inputSyntax = "markdown/1.2",
+  outputSyntax = "xwiki/2.1",
+} = defineProps<{
+  // The key used to submit the edited content.
+  name?: string;
 
-  components: {
-    BlocknoteEditor,
+  // The initial content when the editor is created.
+  initialValue?: string;
+
+  // The ID of the form this editor is associated with.
+  form?: string;
+
+  // Prevent the edited content and the conversion metadata from being submitted.
+  disabled?: boolean;
+
+  // The syntax of the edited content, as expected by the editor.
+  inputSyntax?: string;
+
+  // The syntax of the edited content, as expected by the back-end storage.
+  outputSyntax?: string;
+}>();
+
+//
+// Data
+//
+const value = ref(initialValue);
+const dirty = ref(false);
+
+const converterContext = createConverterContext(container);
+const markdownToUniAst = new MarkdownToUniAstConverter(converterContext);
+const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
+
+const editorContent = shallowRef<UniAst | Error>(markdownToUniAst.parseMarkdown(initialValue));
+const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]>({
+  blockNoteOptions: {
+    defaultStyles: true,
   },
+  theme: "light",
+  lang: getLanguage(),
+});
 
-  props: {
-    // The key used to submit the edited content.
-    name: {
-      type: String,
-      default: null,
-    },
+//
+// Computed
+//
+const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
+const editorInstance = useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
+const realtimeServerURL = computed(() => {
+  return logic.realtimeServerURL;
+});
 
-    // The initial content when the editor is created.
-    initialValue: {
-      type: String,
-      default: "",
-    },
+//
+// Methods
+//
+function updateValue(editorContent?: UniAst | Error): string {
+  if (!dirty.value) {
+    // The value is already up-to-date.
+    return value.value;
+  }
 
-    // The ID of the form this editor is associated with.
-    form: {
-      type: String,
-      default: null,
-    },
+  const instantUpdate = !editorContent;
+  editorContent = editorContent || editorInstance.value?.getContent();
+  if (!editorContent || editorContent instanceof Error) {
+    throw editorContent || new Error("Could not get the editor content.");
+  }
 
-    // Prevent the edited content and the conversion metadata from being submitted.
-    disabled: Boolean,
+  const newValue = uniAstToMarkdown.toMarkdown(editorContent as UniAst);
+  if (newValue instanceof Error) {
+    throw newValue;
+  }
 
-    // The syntax of the edited content, as expected by the editor.
-    inputSyntax: {
-      type: String,
-      default: "markdown/1.2",
-    },
+  value.value = newValue;
+  dirty.value = false;
 
-    // The syntax of the edited content, as expected by the back-end storage.
-    outputSyntax: {
-      type: String,
-      default: "xwiki/2.1",
-    },
-  },
+  if (instantUpdate) {
+    // Update the value input immediately. This is important for instance when the form containing the BlockNote
+    // editor is submitted. Alternatively, we have to delay the form submission until the next tick when Vue will
+    // have updated the value input, but that is more complex.
+    valueInput.value!.value = newValue;
+  }
 
-  data() {
-    const converterContext = createConverterContext(this.container);
-    const markdownToUniAst = new MarkdownToUniAstConverter(converterContext);
-    const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
-    const editorContent = markdownToUniAst.parseMarkdown(this.initialValue);
+  return newValue;
+}
 
-    return {
-      dirty: false,
-      value: this.initialValue,
-      editorProps: {
-        blockNoteOptions: {
-          defaultStyles: false,
-        },
-        theme: "light",
-      },
-      editorContent,
-      uniAstToMarkdown,
-    };
-  },
+function getLanguage(): EditorLanguage {
+  return (document.documentElement.lang || "en") as EditorLanguage;
+}
 
-  computed: {
-    editor() {
-      return this.$refs.editor;
-    },
-    realtimeServerURL() {
-      return this.logic.realtimeServerURL;
-    },
-  },
-
-  methods: {
-    updateValue(editorContent) {
-      if (!this.dirty) {
-        // The value is already up-to-date.
-        return this.value;
-      }
-
-      const instantUpdate = !editorContent;
-      editorContent = editorContent || this.editor.getContent();
-
-      const value = this.uniAstToMarkdown.toMarkdown(editorContent);
-      if (value instanceof Error) {
-        throw value;
-      }
-
-      this.value = value;
-      this.dirty = false;
-
-      if (instantUpdate) {
-        // Update the value input immediately. This is important for instance when the form containing the BlockNote
-        // editor is submitted. Alternatively, we have to delay the form submission until the next tick when Vue will
-        // have updated the value input, but that is more complex.
-        this.$refs.valueInput.value = value;
-      }
-
-      return this.value;
-    },
-  },
-};
+defineExpose({
+  updateValue,
+});
 </script>
 
 <style>

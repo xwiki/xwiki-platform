@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { toCristalEntityReference } from "@/services/model/reference/XWikiEntityReference";
 import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
 import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import { Container, injectable } from "inversify";
+import { toCristalEntityReference, XWiki } from "./XWikiEntityReference";
 
 type ResourceReference = {
   type: string;
@@ -30,7 +30,7 @@ type ResourceReference = {
 @injectable("Singleton")
 export class XWikiModelReferenceParser implements ModelReferenceParser {
   // See ResourceType in xwiki-rendering-api.
-  public static readonly RESOURCE_TYPES = [
+  public static readonly RESOURCE_TYPES: string[] = [
     "unknown",
     "doc",
     "page",
@@ -99,6 +99,6 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
   }
 
   private parseEntityReference(reference: string, type: number): EntityReference {
-    return toCristalEntityReference(XWiki.Model.resolve(reference, type));
+    return toCristalEntityReference(XWiki.Model.resolve(reference, type))!;
   }
 }

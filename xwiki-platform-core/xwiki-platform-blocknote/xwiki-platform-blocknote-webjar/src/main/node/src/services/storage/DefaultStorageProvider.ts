@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Storage } from "@xwiki/cristal-api";
+import { type Storage } from "@xwiki/cristal-api";
 import { StorageProvider } from "@xwiki/cristal-backend-api";
 import { Container, inject, injectable, named } from "inversify";
 

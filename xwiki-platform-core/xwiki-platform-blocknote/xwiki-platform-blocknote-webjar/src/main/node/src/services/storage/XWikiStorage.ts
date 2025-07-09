@@ -23,7 +23,7 @@ import { Container, inject, injectable } from "inversify";
 
 @injectable("Singleton")
 export class XWikiStorage extends AbstractStorage {
-  public static bind(container: Container): void {
+  public static override bind(container: Container): void {
     container.bind("Storage").to(XWikiStorage).inSingletonScope().whenNamed("XWiki");
   }
 

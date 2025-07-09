@@ -28,6 +28,6 @@ export class XWikiDesignSystemLoader implements DesignSystemLoader {
   }
 
   loadDesignSystem(app: App): void {
-    registerAsyncComponent(app, "XBtn", () => import("@/components/ds/x-btn.vue"));
+    registerAsyncComponent(app, "XBtn", () => import("../../components/ds/x-btn.vue"));
   }
 }

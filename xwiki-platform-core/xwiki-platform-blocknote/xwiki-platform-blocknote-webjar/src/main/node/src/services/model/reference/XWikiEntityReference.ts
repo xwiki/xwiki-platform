@@ -35,11 +35,32 @@ type XWikiEntityReference = {
   getReversedReferenceChain: () => XWikiEntityReference[];
 };
 
-function toXWikiEntityReference(reference?: EntityReference): XWikiEntityReference | undefined {
-  if (!reference) {
-    return undefined;
-  }
-  switch (reference.type) {
+declare const XWiki: {
+  EntityReference: new (name: string, type: number, parent?: XWikiEntityReference | undefined) => XWikiEntityReference;
+  EntityType: {
+    WIKI: number;
+    SPACE: number;
+    DOCUMENT: number;
+    ATTACHMENT: number;
+  };
+  Model: {
+    resolve: (referenceString: string, type: number, contextReference?: XWikiEntityReference) => XWikiEntityReference;
+    serialize: (reference: XWikiEntityReference) => string;
+  };
+  Document: new (reference: XWikiEntityReference) => {
+    getURL: () => string;
+  };
+  Attachment: new (reference: XWikiEntityReference) => {
+    getURL: () => string;
+  };
+  currentDocument: {
+    documentReference: XWikiEntityReference;
+  };
+};
+
+function toXWikiEntityReference(reference: EntityReference): XWikiEntityReference {
+  const referenceType = reference.type;
+  switch (referenceType) {
     case EntityType.WIKI:
       return toXWikiWikiReference(reference);
     case EntityType.SPACE:
@@ -49,7 +70,7 @@ function toXWikiEntityReference(reference?: EntityReference): XWikiEntityReferen
     case EntityType.ATTACHMENT:
       return toXWikiAttachmentReference(reference);
     default:
-      throw new Error(`Unsupported entity type: ${reference.type}`);
+      throw new Error(`Unsupported entity type: ${referenceType}`);
   }
 }
 
@@ -58,13 +79,16 @@ function toXWikiWikiReference(reference: WikiReference): XWikiEntityReference {
 }
 
 function toXWikiSpaceReference(reference: SpaceReference): XWikiEntityReference {
-  return !reference.names.length
-    ? undefined
-    : reference.names.reduce(
-        (parent: XWikiEntityReference | undefined, name: string) =>
-          new XWiki.EntityReference(name, XWiki.EntityType.SPACE, parent),
-        reference.wiki ? toXWikiWikiReference(reference.wiki) : undefined
-      );
+  if (reference.names.length) {
+    const wikiReference = reference.wiki ? toXWikiWikiReference(reference.wiki) : undefined;
+    return reference.names.reduce(
+      (parent: XWikiEntityReference | undefined, name: string) =>
+        new XWiki.EntityReference(name, XWiki.EntityType.SPACE, parent),
+      wikiReference
+    )!;
+  } else {
+    throw new Error("XWiki space references must have at least one space name.");
+  }
 }
 
 function toXWikiDocumentReference(reference: DocumentReference): XWikiEntityReference {
@@ -83,7 +107,7 @@ function toXWikiAttachmentReference(reference: AttachmentReference): XWikiEntity
   );
 }
 
-function toCristalEntityReference(reference?: XWikiEntityReference): EntityReference {
+function toCristalEntityReference(reference?: XWikiEntityReference): EntityReference | undefined {
   if (!reference) {
     return undefined;
   }
@@ -92,7 +116,7 @@ function toCristalEntityReference(reference?: XWikiEntityReference): EntityRefer
       return new WikiReference(reference.name);
     case XWiki.EntityType.SPACE:
       return new SpaceReference(
-        toCristalEntityReference(reference.extractReference(XWiki.EntityType.WIKI)),
+        toCristalEntityReference(reference.extractReference(XWiki.EntityType.WIKI)) as WikiReference,
         ...reference
           .getReversedReferenceChain()
           .filter((item: XWikiEntityReference) => item.type === XWiki.EntityType.SPACE)
@@ -101,11 +125,11 @@ function toCristalEntityReference(reference?: XWikiEntityReference): EntityRefer
     case XWiki.EntityType.DOCUMENT:
       return new DocumentReference(
         reference.name,
-        toCristalEntityReference(reference.parent),
+        toCristalEntityReference(reference.parent) as SpaceReference,
         reference.name !== "WebHome"
       );
     case XWiki.EntityType.ATTACHMENT:
-      return new AttachmentReference(reference.name, toCristalEntityReference(reference.parent));
+      return new AttachmentReference(reference.name, toCristalEntityReference(reference.parent) as DocumentReference);
     default:
       throw new Error(`Unsupported entity type: ${reference.type}`);
   }
@@ -115,7 +139,7 @@ function absoluteXWikiEntityReference(reference: XWikiEntityReference): XWikiEnt
   return XWiki.Model.resolve(XWiki.Model.serialize(reference), reference.type, XWiki.currentDocument.documentReference);
 }
 
-function absoluteCristalEntityReference(reference: EntityReference): EntityReference {
+function absoluteCristalEntityReference(reference: EntityReference): EntityReference | undefined {
   return toCristalEntityReference(absoluteXWikiEntityReference(toXWikiEntityReference(reference)));
 }
 
@@ -124,5 +148,6 @@ export {
   absoluteXWikiEntityReference,
   toCristalEntityReference,
   toXWikiEntityReference,
+  XWiki,
   type XWikiEntityReference,
 };

@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { absoluteXWikiEntityReference, toXWikiEntityReference } from "@/services/model/reference/XWikiEntityReference";
 import { DocumentReference, EntityReference, EntityType, SpaceReference } from "@xwiki/cristal-model-api";
 import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import { Container, injectable } from "inversify";
+import { absoluteXWikiEntityReference, toXWikiEntityReference, XWiki } from "../reference/XWikiEntityReference";
 
 @injectable("Singleton")
 export class XWikiRemoteURLSerializer implements RemoteURLSerializer {

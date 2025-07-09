@@ -17,29 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-async function fetchTranslation() {
+import { I18n } from "vue-i18n";
+
+declare const define: (moduleName: string, moduleDefinition: unknown) => void;
+declare const require: (modules: string[], onLoad: (...args: any[]) => void, onError?: (error: Error) => void) => void;
+
+type Config = {
+  locale: string;
+  prefix: string;
+  keys: string[];
+};
+
+type Translation = {
+  config: Config;
+  messages: Record<string, string>;
+};
+
+async function fetchTranslation(): Promise<Translation> {
   define("xwiki-blocknote-translation-keys", {
     locale: document.documentElement.getAttribute("lang"),
     prefix: "blocknote.",
     keys: [],
   });
-  const { config, l10n } = await new Promise((resolve, reject) => {
+  const translation = await new Promise<Translation>((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require(["xwiki-blocknote-translation-keys", "xwiki-l10n!xwiki-blocknote-translation-keys"], (config, l10n) => {
-      resolve({ config, l10n });
+    require(["xwiki-blocknote-translation-keys", "xwiki-l10n!xwiki-blocknote-translation-keys"], (config, messages) => {
+      resolve({ config, messages });
     }, reject);
   });
   // Add back the prefix to the keys.
-  const messages = {};
-  for (const [key, value] of Object.entries(l10n)) {
+  const messages: Record<string, string> = {};
+  for (const [key, value] of Object.entries(translation.messages)) {
     if (typeof value === "string") {
-      messages[`${config.prefix}${key}`] = value;
+      messages[`${translation.config.prefix}${key}`] = value;
     }
   }
-  return { config, messages };
+  return { config: translation.config, messages };
 }
 
-export async function i18nResolver(i18n) {
-  const translation = await fetchTranslation();
-  i18n.global.setLocaleMessage(translation.config.locale, translation.messages);
+export async function i18nResolver(i18n: I18n): Promise<I18n> {
+  try {
+    const translation = await fetchTranslation();
+    i18n.global.setLocaleMessage(translation.config.locale, translation.messages);
+  } catch (error) {
+    console.error("Failed to load translations: ", error);
+  }
+
+  return i18n;
 }

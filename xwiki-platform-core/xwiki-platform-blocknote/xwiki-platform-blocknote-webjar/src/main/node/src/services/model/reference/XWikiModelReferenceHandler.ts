@@ -17,18 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import { absoluteCristalEntityReference } from "@/services/model/reference/XWikiEntityReference";
-import {
-  AttachmentReference,
-  DocumentReference,
-  EntityReference,
-  EntityType,
-  SpaceReference,
-  WikiReference,
-} from "@xwiki/cristal-model-api";
+import { DocumentReference, EntityReference, EntityType, SpaceReference } from "@xwiki/cristal-model-api";
 import { ModelReferenceHandler } from "@xwiki/cristal-model-reference-api";
 import { Container, injectable } from "inversify";
+import { absoluteCristalEntityReference } from "./XWikiEntityReference";
 
 @injectable("Singleton")
 export class XWikiModelReferenceHandler implements ModelReferenceHandler {
@@ -43,21 +35,21 @@ export class XWikiModelReferenceHandler implements ModelReferenceHandler {
 
   public getTitle(reference: EntityReference): string {
     const absoluteReference = absoluteCristalEntityReference(reference);
-    switch (absoluteReference.type) {
+    switch (absoluteReference?.type) {
       case EntityType.WIKI:
-        return (absoluteReference as WikiReference).name;
+        return absoluteReference.name;
       case EntityType.SPACE:
-        return [...(absoluteReference as SpaceReference).names].pop()!;
+        return [...absoluteReference.names].pop()!;
       case EntityType.DOCUMENT: {
-        const name = (absoluteReference as DocumentReference).name;
+        const name = absoluteReference.name;
         if (name === "WebHome") {
-          return this.getTitle((absoluteReference as DocumentReference).space!);
+          return this.getTitle(absoluteReference.space!);
         } else {
           return name;
         }
       }
       case EntityType.ATTACHMENT:
-        return (absoluteReference as AttachmentReference).name;
+        return absoluteReference.name;
     }
     return "";
   }

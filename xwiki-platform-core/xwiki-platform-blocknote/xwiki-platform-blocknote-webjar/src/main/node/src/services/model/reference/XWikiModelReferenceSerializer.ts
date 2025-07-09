@@ -20,7 +20,7 @@
 import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
 import { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
 import { Container, injectable } from "inversify";
-import { toXWikiEntityReference, XWiki } from "./XWikiEntityReference";
+import { toXWikiEntityReference } from "./XWikiEntityReference";
 
 @injectable("Singleton")
 export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {

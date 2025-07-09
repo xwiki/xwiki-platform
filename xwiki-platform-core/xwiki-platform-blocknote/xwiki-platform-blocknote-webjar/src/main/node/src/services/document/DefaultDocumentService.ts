@@ -22,7 +22,7 @@ import { DocumentChange, DocumentService } from "@xwiki/cristal-document-api";
 import type { DocumentReference } from "@xwiki/cristal-model-api";
 import { Container, injectable } from "inversify";
 import { type Ref, ref } from "vue";
-import { toCristalEntityReference, XWiki } from "../model/reference/XWikiEntityReference";
+import { toCristalEntityReference } from "../model/reference/XWikiEntityReference";
 
 @injectable("Singleton")
 export class DefaultDocumentService implements DocumentService {

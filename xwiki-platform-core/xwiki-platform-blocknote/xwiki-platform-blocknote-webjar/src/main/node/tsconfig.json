@@ -25,7 +25,7 @@
     "skipLibCheck": true,
     "declaration": true,
     "isolatedModules": true,
-    "isolatedDeclarations": true,
+    "isolatedDeclarations": false,
     "resolveJsonModule": true,
     "strict": true,
     "noImplicitOverride": true

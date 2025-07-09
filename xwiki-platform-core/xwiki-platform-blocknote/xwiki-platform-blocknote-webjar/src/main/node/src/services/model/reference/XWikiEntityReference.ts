@@ -35,28 +35,34 @@ type XWikiEntityReference = {
   getReversedReferenceChain: () => XWikiEntityReference[];
 };
 
-declare const XWiki: {
-  EntityReference: new (name: string, type: number, parent?: XWikiEntityReference | undefined) => XWikiEntityReference;
-  EntityType: {
-    WIKI: number;
-    SPACE: number;
-    DOCUMENT: number;
-    ATTACHMENT: number;
+declare global {
+  const XWiki: {
+    EntityReference: new (
+      name: string,
+      type: number,
+      parent?: XWikiEntityReference | undefined
+    ) => XWikiEntityReference;
+    EntityType: {
+      WIKI: number;
+      SPACE: number;
+      DOCUMENT: number;
+      ATTACHMENT: number;
+    };
+    Model: {
+      resolve: (referenceString: string, type: number, contextReference?: XWikiEntityReference) => XWikiEntityReference;
+      serialize: (reference: XWikiEntityReference) => string;
+    };
+    Document: new (reference: XWikiEntityReference) => {
+      getURL: () => string;
+    };
+    Attachment: new (reference: XWikiEntityReference) => {
+      getURL: () => string;
+    };
+    currentDocument: {
+      documentReference: XWikiEntityReference;
+    };
   };
-  Model: {
-    resolve: (referenceString: string, type: number, contextReference?: XWikiEntityReference) => XWikiEntityReference;
-    serialize: (reference: XWikiEntityReference) => string;
-  };
-  Document: new (reference: XWikiEntityReference) => {
-    getURL: () => string;
-  };
-  Attachment: new (reference: XWikiEntityReference) => {
-    getURL: () => string;
-  };
-  currentDocument: {
-    documentReference: XWikiEntityReference;
-  };
-};
+}
 
 function toXWikiEntityReference(reference: EntityReference): XWikiEntityReference {
   const referenceType = reference.type;
@@ -148,6 +154,5 @@ export {
   absoluteXWikiEntityReference,
   toCristalEntityReference,
   toXWikiEntityReference,
-  XWiki,
   type XWikiEntityReference,
 };

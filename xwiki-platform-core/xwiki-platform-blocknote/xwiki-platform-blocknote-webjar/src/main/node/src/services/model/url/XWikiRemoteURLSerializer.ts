@@ -20,7 +20,7 @@
 import { DocumentReference, EntityReference, EntityType, SpaceReference } from "@xwiki/cristal-model-api";
 import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import { Container, injectable } from "inversify";
-import { absoluteXWikiEntityReference, toXWikiEntityReference, XWiki } from "../reference/XWikiEntityReference";
+import { absoluteXWikiEntityReference, toXWikiEntityReference } from "../reference/XWikiEntityReference";
 
 @injectable("Singleton")
 export class XWikiRemoteURLSerializer implements RemoteURLSerializer {

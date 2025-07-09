@@ -20,7 +20,7 @@
 import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
 import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import { Container, injectable } from "inversify";
-import { toCristalEntityReference, XWiki } from "./XWikiEntityReference";
+import { toCristalEntityReference } from "./XWikiEntityReference";
 
 type ResourceReference = {
   type: string;

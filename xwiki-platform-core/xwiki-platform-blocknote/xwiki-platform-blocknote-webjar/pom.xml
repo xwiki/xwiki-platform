@@ -86,6 +86,27 @@
             </configuration>
           </execution>
           <execution>
+            <!-- Update pnpm-lock.yaml -->
+            <id>copy-pnpm-lock</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>
+                src/main/node
+              </outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/node/</directory>
+                  <includes>
+                    <include>pnpm-lock.yaml</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
             <!-- Copy the generated Vue components to the WebJar folder. -->
             <id>copy-vue-components</id>
             <phase>process-resources</phase>
@@ -99,9 +120,6 @@
               <resources>
                 <resource>
                   <directory>${project.build.directory}/node/dist</directory>
-                </resource>
-                <resource>
-                  <directory>${project.build.directory}/node/src/</directory>
                 </resource>
               </resources>
             </configuration>

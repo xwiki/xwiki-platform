@@ -18,9 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import react from "@vitejs/plugin-react";
 import vue from "@vitejs/plugin-vue";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -33,7 +34,6 @@ export default defineConfig({
       fileName: (format, entryName) => `${entryName}.${format}.js`,
       formats: ["es"],
     },
-    sourcemap: true,
     rollupOptions: {
       external: ["jquery", "vue", "vue-i18n"],
       output: {
@@ -42,17 +42,13 @@ export default defineConfig({
         },
       },
     },
+    sourcemap: true,
   },
   define: {
-    // define process to avoid runtime error with jquery
+    // Define process to avoid runtime error with jQuery.
     "process.env": {},
   },
-  plugins: [vue()],
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-    },
-  },
+  plugins: [react(), vue()],
   esbuild: {
     tsconfigRaw: {
       compilerOptions: {

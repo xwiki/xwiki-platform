@@ -32,7 +32,7 @@ global.define = (id, deps, factory) => {
     modules[id] = factory;
   }
 };
-global.require = global.requirejs = (deps, callback) => {
+global.requirejs = (deps, callback) => {
   callback(...getModules(deps));
 };
 function getModules(deps) {

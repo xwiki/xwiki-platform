@@ -24,6 +24,7 @@ packages:
   - "core/backends/*"
   - "core/browser/*"
   - "core/configuration/*"
+  - "core/collaboration/*"
   - "core/date/*"
   - "core/document/*"
   - "core/extra-tabs/*"

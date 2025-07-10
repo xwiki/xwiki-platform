@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-editors-blocknote-headless",
+  "name": "@xwiki/cristal-collaboration-api",
   "version": "0.19.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "editors/blocknote-headless",
+    "directory": "/core/configuration/collaboration-api",
     "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
@@ -18,44 +18,25 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
-    "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json && vite build",
+    "build": "tsc --project tsconfig.json && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
     "test": "vitest --run"
   },
-  "types": "dist/index.d.ts",
   "dependencies": {
-    "@blocknote/core": "0.33.0",
-    "@xwiki/cristal-attachments-api": "workspace:*",
-    "@xwiki/cristal-authentication-api": "workspace:*",
-    "@xwiki/cristal-document-api": "workspace:*",
-    "@xwiki/cristal-dsapi": "workspace:*",
-    "@xwiki/cristal-editors-blocknote-react": "workspace:*",
-    "@xwiki/cristal-fn-utils": "workspace:*",
-    "@xwiki/cristal-icons": "workspace:*",
-    "@xwiki/cristal-link-suggest-api": "workspace:*",
-    "@xwiki/cristal-model-api": "workspace:*",
-    "@xwiki/cristal-model-reference-api": "workspace:*",
-    "@xwiki/cristal-model-remote-url-api": "workspace:*",
-    "@xwiki/cristal-uniast": "workspace:*",
-    "eventemitter3": "5.0.1",
+    "@xwiki/cristal-api": "workspace:*",
     "inversify": "7.5.4",
-    "lodash-es": "4.17.21",
-    "vue-i18n": "11.1.5"
+    "yjs": "13.6.26"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
-    "@types/lodash-es": "4.17.12",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
+    "typescript": "5.8.3",
     "vite": "7.0.0",
-    "vue": "3.5.17",
-    "vue-tsc": "2.2.10"
+    "vue": "3.5.17"
   },
   "publishConfig": {
     "exports": {

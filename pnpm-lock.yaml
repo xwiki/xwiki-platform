@@ -989,6 +989,108 @@ importers:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
 
+  core/collaboration/collaboration-api:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      inversify:
+        specifier: 7.5.4
+        version: 7.5.4(reflect-metadata@0.2.2)
+      yjs:
+        specifier: 13.6.26
+        version: 13.6.26
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+      vite:
+        specifier: 7.0.0
+        version: 7.0.0(@types/node@22.15.32)(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
+
+  core/collaboration/collaboration-hocuspocus:
+    dependencies:
+      '@hocuspocus/provider':
+        specifier: 2.15.2
+        version: 2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26)
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-collaboration-api':
+        specifier: workspace:*
+        version: link:../collaboration-api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../document/document-api
+      inversify:
+        specifier: 7.5.4
+        version: 7.5.4(reflect-metadata@0.2.2)
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+      vite:
+        specifier: 7.0.0
+        version: 7.0.0(@types/node@22.15.32)(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
+
+  core/collaboration/collaboration-xwiki:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-collaboration-api':
+        specifier: workspace:*
+        version: link:../collaboration-api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../document/document-api
+      inversify:
+        specifier: 7.5.4
+        version: 7.5.4(reflect-metadata@0.2.2)
+      lib0:
+        specifier: 0.2.109
+        version: 0.2.109
+      y-websocket:
+        specifier: 3.0.0
+        version: 3.0.0(yjs@13.6.26)
+      yjs:
+        specifier: 13.6.26
+        version: 13.6.26
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+      vite:
+        specifier: 7.0.0
+        version: 7.0.0(@types/node@22.15.32)(tsx@4.20.3)(yaml@2.8.0)
+      vue:
+        specifier: 3.5.17
+        version: 3.5.17(typescript@5.8.3)
+
   core/configuration/configuration-api:
     dependencies:
       utility-types:
@@ -3366,9 +3468,6 @@ importers:
 
   editors/blocknote:
     dependencies:
-      '@hocuspocus/provider':
-        specifier: 2.15.2
-        version: 2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26)
       '@xwiki/cristal-alerts-api':
         specifier: workspace:*
         version: link:../../core/alerts/alerts-api
@@ -3378,6 +3477,9 @@ importers:
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../../core/backends/backend-api
+      '@xwiki/cristal-collaboration-api':
+        specifier: workspace:*
+        version: link:../../core/collaboration/collaboration-api
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
@@ -3442,9 +3544,6 @@ importers:
       '@blocknote/core':
         specifier: 0.33.0
         version: 0.33.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26))(@types/hast@3.0.4)
-      '@hocuspocus/provider':
-        specifier: 2.15.2
-        version: 2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26)
       '@xwiki/cristal-attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api
@@ -3530,9 +3629,6 @@ importers:
       '@blocknote/xl-multi-column':
         specifier: 0.33.0
         version: 0.33.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26))(@tiptap/pm@2.13.0)(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@hocuspocus/provider':
-        specifier: 2.15.2
-        version: 2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26)
       '@mantine/core':
         specifier: 8.1.1
         version: 8.1.1(@mantine/hooks@8.1.1(react@19.1.0))(@types/react@19.1.7)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -4450,6 +4546,12 @@ importers:
       '@xwiki/cristal-browser-api':
         specifier: workspace:*
         version: link:../core/browser/browser-api
+      '@xwiki/cristal-collaboration-api':
+        specifier: workspace:*
+        version: link:../core/collaboration/collaboration-api
+      '@xwiki/cristal-collaboration-hocuspocus':
+        specifier: workspace:*
+        version: link:../core/collaboration/collaboration-hocuspocus
       '@xwiki/cristal-configuration-api':
         specifier: workspace:*
         version: link:../core/configuration/configuration-api
@@ -8507,6 +8609,11 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
+  lib0@0.2.109:
+    resolution: {integrity: sha512-jP0gbnyW0kwlx1Atc4dcHkBbrVAkdHjuyHxtClUPYla7qCmwIif1qZ6vQeJdR5FrOVdn26HvQT0ko01rgW7/Xw==}
+    engines: {node: '>=16'}
+    hasBin: true
+
   lines-and-columns@2.0.3:
     resolution: {integrity: sha512-cNOjgCnLB+FnvWWtyRTzmB3POJ+cXxTA81LoW7u8JdmhfXzriropYwpjShnz1QLLWsQwY7nIxoDmcPTwphDK9w==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -10630,6 +10737,12 @@ packages:
     peerDependencies:
       yjs: ^13.0.0
 
+  y-websocket@3.0.0:
+    resolution: {integrity: sha512-mUHy7AzkOZ834T/7piqtlA8Yk6AchqKqcrCXjKW8J1w2lPtRDjz8W5/CvXz9higKAHgKRKqpI3T33YkRFLkPtg==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+    peerDependencies:
+      yjs: ^13.5.6
+
   y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
@@ -11347,7 +11460,7 @@ snapshots:
 
   '@hocuspocus/common@2.15.2':
     dependencies:
-      lib0: 0.2.108
+      lib0: 0.2.109
 
   '@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26)':
     dependencies:
@@ -14755,6 +14868,10 @@ snapshots:
     dependencies:
       isomorphic.js: 0.2.5
 
+  lib0@0.2.109:
+    dependencies:
+      isomorphic.js: 0.2.5
+
   lines-and-columns@2.0.3: {}
 
   linkify-it@5.0.0:
@@ -17173,7 +17290,7 @@ snapshots:
 
   y-prosemirror@1.3.5(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.40.0)(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26):
     dependencies:
-      lib0: 0.2.108
+      lib0: 0.2.109
       prosemirror-model: 1.25.1
       prosemirror-state: 1.4.3
       prosemirror-view: 1.40.0
@@ -17182,7 +17299,13 @@ snapshots:
 
   y-protocols@1.0.6(yjs@13.6.26):
     dependencies:
-      lib0: 0.2.108
+      lib0: 0.2.109
+      yjs: 13.6.26
+
+  y-websocket@3.0.0(yjs@13.6.26):
+    dependencies:
+      lib0: 0.2.109
+      y-protocols: 1.0.6(yjs@13.6.26)
       yjs: 13.6.26
 
   y18n@5.0.8: {}
@@ -17212,7 +17335,7 @@ snapshots:
 
   yjs@13.6.26:
     dependencies:
-      lib0: 0.2.108
+      lib0: 0.2.109
 
   yn@3.1.1: {}
 

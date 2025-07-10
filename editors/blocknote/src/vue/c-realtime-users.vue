@@ -19,60 +19,21 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import NoAvatar from "../../images/noavatar.png";
-import {
-  HocuspocusProvider,
-  WebSocketStatus,
-  // eslint-disable-next-line import/named
-  onAwarenessChangeParameters,
-  // eslint-disable-next-line import/named
-  onStatusParameters,
-} from "@hocuspocus/provider";
+import { Status } from "@xwiki/cristal-collaboration-api";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import { ref, watch } from "vue";
+import type { User } from "@xwiki/cristal-collaboration-api";
 
-const { provider } = defineProps<{
-  provider: HocuspocusProvider | null;
+const { status, users } = defineProps<{
+  status: Status;
+  users: User[];
 }>();
-
-// We don't assign a status yet, as we don't know if realtime is enabled or not
-// (the providerRef may be empty now but filled later)
-const status = ref<WebSocketStatus>();
-
-watch(
-  () => provider,
-  (provider) => {
-    if (!provider) {
-      return;
-    }
-
-    // Now that we now we have a provider, we can indicate it's connecting
-    status.value = WebSocketStatus.Connecting;
-
-    // As soon as the provider's status changes, update it
-    provider.on("status", (event: onStatusParameters) => {
-      status.value = event.status;
-    });
-
-    provider.on("awarenessChange", (event: onAwarenessChangeParameters) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      users.value = Array.from(event.states.values() as any);
-    });
-  },
-  {
-    immediate: true,
-  },
-);
-
-const users = ref<
-  { user: { name: string; color: string }; clientId: string }[]
->([]);
 </script>
 
 <template>
   <!-- this element produce content only if a provider has been initialized -->
-  <span v-if="provider" class="connection-status">
+  <span class="connection-status">
     <span
-      v-if="status === WebSocketStatus.Disconnected"
+      v-if="status === Status.Disconnected"
       class="connection-status-offline"
     >
       <c-icon
@@ -84,7 +45,7 @@ const users = ref<
     </span>
 
     <span
-      v-if="status === WebSocketStatus.Connecting"
+      v-if="status === Status.Connecting"
       class="connection-status-connecting"
     >
       <c-icon
@@ -95,10 +56,7 @@ const users = ref<
       <span class="connection-status-label">Connecting</span>
     </span>
 
-    <span
-      v-if="status === WebSocketStatus.Connected"
-      class="connection-status-users"
-    >
+    <span v-if="status === Status.Connected" class="connection-status-users">
       <x-avatar
         v-for="{ clientId, user } in users.filter((user) => user.user)"
         :key="clientId"

@@ -41,6 +41,8 @@
     "@xwiki/cristal-backend-nextcloud": "workspace:*",
     "@xwiki/cristal-backend-xwiki": "workspace:*",
     "@xwiki/cristal-browser-api": "workspace:*",
+    "@xwiki/cristal-collaboration-api": "workspace:*",
+    "@xwiki/cristal-collaboration-hocuspocus": "workspace:*",
     "@xwiki/cristal-configuration-api": "workspace:*",
     "@xwiki/cristal-date-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",

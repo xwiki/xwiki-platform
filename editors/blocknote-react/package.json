@@ -28,7 +28,6 @@
     "@blocknote/mantine": "0.33.0",
     "@blocknote/react": "0.33.0",
     "@blocknote/xl-multi-column": "0.33.0",
-    "@hocuspocus/provider": "2.15.2",
     "@mantine/core": "8.1.1",
     "@mantine/hooks": "8.1.1",
     "@types/react-dom": "19.1.6",

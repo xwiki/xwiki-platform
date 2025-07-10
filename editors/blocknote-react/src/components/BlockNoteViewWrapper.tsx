@@ -47,14 +47,9 @@ import {
   useCreateBlockNote,
 } from "@blocknote/react";
 import { multiColumnDropCursor } from "@blocknote/xl-multi-column";
-import {
-  HocuspocusProvider,
-  // BUG: ESLint incorrectly reports this as an error even though it's not (TODO: investigate)
-  // eslint-disable-next-line import/named
-  HocuspocusProviderConfiguration,
-} from "@hocuspocus/provider";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { CollaborationInitializer } from "@xwiki/cristal-collaboration-api";
 
 type DefaultEditorOptionsType = BlockNoteEditorOptions<
   EditorBlockSchema,
@@ -93,7 +88,7 @@ type BlockNoteViewWrapperProps = {
    * Realtime options
    */
   realtime?: {
-    hocusPocus: HocuspocusProviderConfiguration;
+    collaborationProvider: () => CollaborationInitializer;
     user: { name: string; color: string };
   };
 
@@ -113,7 +108,6 @@ type BlockNoteViewWrapperProps = {
    */
   refs?: {
     setEditor?: (editor: EditorType) => void;
-    setProvider?: (provider: HocuspocusProvider) => void;
   };
 };
 
@@ -129,32 +123,26 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   onChange,
   lang,
   linkEditionCtx,
-  refs: { setEditor, setProvider } = {},
+  refs: { setEditor } = {},
 }: BlockNoteViewWrapperProps) => {
   const { t } = useTranslation();
+  const collaborationProvider = realtime?.collaborationProvider;
 
   const schema = createBlockNoteSchema();
 
-  const provider = realtime?.hocusPocus
-    ? new HocuspocusProvider(realtime.hocusPocus)
-    : undefined;
-
-  useEffect(() => {
-    if (provider) {
-      setProvider?.(provider);
-    }
-  }, [provider, setProvider]);
+  const initializer: CollaborationInitializer | undefined =
+    collaborationProvider ? collaborationProvider() : undefined;
 
   // Prevent changes in the editor until the provider has synced with other clients
-  const [ready, setReady] = useState(!provider);
+  const [ready, setReady] = useState(!initializer);
 
   // Creates a new editor instance.
   const editor = useCreateBlockNote({
     ...blockNoteOptions,
-    collaboration: provider
+    collaboration: initializer?.provider
       ? {
-          provider,
-          fragment: provider.document.getXmlFragment("document-store"),
+          provider: initializer.provider,
+          fragment: initializer.doc.getXmlFragment("document-store"),
           user: realtime!.user,
         }
       : undefined,
@@ -199,18 +187,18 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       }, 1);
     };
 
-    if (provider) {
+    if (initializer?.provider) {
       console.debug("Trying to connect to realtime server...");
 
-      provider.on("synced", () => {
+      initializer.initialized.then(() => {
         console.debug("Connected to realtime server and synced!");
 
-        const initialContentLoaded = provider.document
+        const initialContentLoaded = initializer.doc
           .getMap("configuration")
           .get("initialContentLoaded");
 
         if (!initialContentLoaded) {
-          provider.document
+          initializer.doc
             .getMap("configuration")
             .set("initialContentLoaded", true);
 
@@ -224,8 +212,8 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
         setReady(true);
       });
 
-      provider.on("destroy", () => {
-        provider.destroy();
+      initializer.provider.on("destroy", () => {
+        initializer.provider.destroy();
       });
     } else {
       // If we don't have a provider, we can simply load the content directly
@@ -235,7 +223,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
       replaceContent(content);
     }
-  }, [provider, setProvider]);
+  }, [initializer]);
 
   // Disconnect from the realtime provider when the component is unmounted
   // Otherwise, our user profile may be left over and still be displayed to other users
@@ -245,7 +233,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
         "BlockNoteView is being unmounted, disconnecting from the realtime provider...",
       );
 
-      provider?.disconnect();
+      initializer?.provider?.disconnect();
     };
   }, []);
 

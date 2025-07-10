@@ -33,6 +33,11 @@ interface WikiConfig {
    */
   realtimeURL?: string;
   /**
+   * Realtime provider hint. When undefined, the default hocuspocus provider is used.
+   * @since 0.20
+   */
+  realtimeHint?: string;
+  /**
    * Authentication server base URL.
    * @since 0.15
    */

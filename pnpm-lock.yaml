@@ -3550,6 +3550,9 @@ importers:
       '@xwiki/cristal-authentication-api':
         specifier: workspace:*
         version: link:../../core/authentication/authentication-api
+      '@xwiki/cristal-collaboration-api':
+        specifier: workspace:*
+        version: link:../../core/collaboration/collaboration-api
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
@@ -3641,6 +3644,9 @@ importers:
       '@xwiki/cristal-attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api
+      '@xwiki/cristal-collaboration-api':
+        specifier: workspace:*
+        version: link:../../core/collaboration/collaboration-api
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api

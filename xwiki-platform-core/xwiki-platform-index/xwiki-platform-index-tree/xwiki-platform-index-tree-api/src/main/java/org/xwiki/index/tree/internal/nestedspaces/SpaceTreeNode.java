@@ -137,7 +137,7 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
         } else {
             // Query only the spaces table.
             query = this.queryManager.createQuery(
-                "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
+                "select reference, 0 as terminal from XWikiSpace space order by lower(name), name", Query.HQL);
         }
 
         query.setWiki(spaceReference.getWikiReference().getName());

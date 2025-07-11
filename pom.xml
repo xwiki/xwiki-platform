@@ -74,7 +74,7 @@
     <jetty.server.apache-el.version>9.0.96</jetty.server.apache-el.version>
     <netty.version>4.2.7.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.5.1</dockerJava.version>
+    <dockerJava.version>3.5.3</dockerJava.version>
     <!-- Used for CVSS score calculation -->
     <metaeffekt.version>0.147.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>

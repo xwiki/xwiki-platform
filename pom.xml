@@ -714,7 +714,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>6.0</version>
+        <version>6.1</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -726,7 +726,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <!-- Note: has a different release cycle than CSS4J "core" -->
-        <version>6.0</version>
+        <version>6.1</version>
       </dependency>
 
       <!-- Carte XML DTD -->

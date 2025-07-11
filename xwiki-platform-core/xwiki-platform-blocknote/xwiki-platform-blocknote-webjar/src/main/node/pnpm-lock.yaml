@@ -15,6 +15,15 @@ importers:
 
   .:
     dependencies:
+      '@blocknote/core':
+        specifier: 0.31.3
+        version: 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
+      '@blocknote/mantine':
+        specifier: 0.31.3
+        version: 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@mantine/core':
+        specifier: 8.1.1
+        version: 8.1.1(@mantine/hooks@8.1.1(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@xwiki/cristal-api':
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)

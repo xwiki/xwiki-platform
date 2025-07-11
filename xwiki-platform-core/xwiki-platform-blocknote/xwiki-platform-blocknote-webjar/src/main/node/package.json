@@ -9,6 +9,9 @@
     "lint": "eslint \"./src/**/*.{js,ts,vue}\" --fix --max-warnings=0"
   },
   "dependencies": {
+    "@blocknote/core": "0.31.3",
+    "@blocknote/mantine": "0.31.3",
+    "@mantine/core": "8.1.1",
     "@xwiki/cristal-api": "0.19.0",
     "@xwiki/cristal-attachments-default": "0.19.0",
     "@xwiki/cristal-authentication-api": "0.19.0",

@@ -38,6 +38,12 @@
 </template>
 
 <script setup lang="ts">
+// We shouldn't have to import these styles normally, because they are imported by the BlocknoteEditor component, but
+// for some reason Vite doesn't see this and thus doesn't include them in the generated CSS bundle.
+import "@mantine/core/styles.layer.css";
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/mantine/style.css";
+
 import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
 import { EditorLanguage } from "@xwiki/cristal-editors-blocknote-react";
 import {
@@ -99,7 +105,9 @@ const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
 const editorContent = shallowRef<UniAst | Error>(markdownToUniAst.parseMarkdown(initialValue));
 const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]>({
   blockNoteOptions: {
-    defaultStyles: true,
+    // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
+    // consistency between edit and view modes.
+    defaultStyles: false,
   },
   theme: "light",
   lang: getLanguage(),

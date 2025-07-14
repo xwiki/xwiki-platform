@@ -224,7 +224,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private static final String TM_FAILEDDOCUMENTPARSE = "core.document.error.failedParse";
 
-    private static final String CLOSE_HTML_MACRO = "{{/html}}";
+    private static final String[] HTML_MACRO_SEARCH_STRINGS = new String[] { "{{html", "{{/html" };
+
+    private static final String[] HTML_MACRO_REPLACE_STRINGS = new String[] { "&#123;&#123;html", "&#123;&#123;/html" };
 
     /**
      * An attachment waiting to be deleted at next document save.
@@ -4058,14 +4060,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             // macro syntax since it's not needed for pure text
             if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
                 && (HTMLUtils.containsElementText(result) || result.indexOf("{") != -1)) {
-                result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
-                // Escape closing HTML macro syntax.
-                int startIndex = 0;
-                // Start searching at the last match to avoid scanning the whole string again.
-                while ((startIndex = result.indexOf(CLOSE_HTML_MACRO, startIndex)) != -1) {
-                    result.replace(startIndex, startIndex + 2, "&#123;&#123;");
-                }
-                result.append(CLOSE_HTML_MACRO);
+                // Escapes closing and opening HTML macro syntax. We need to escape the opening HTML macro syntax in
+                // addition to the closing one as otherwise, the wrapping HTML macro might not close correctly.
+                // For simplicity, to avoid having to deal with complex expressions that would need to be
+                // synchronized with the parser, match just the start of the opening/closing macro syntax.
+                return "{{html clean=\"false\" wiki=\"false\"}}"
+                    + StringUtils.replaceEach(result.toString(), HTML_MACRO_SEARCH_STRINGS, HTML_MACRO_REPLACE_STRINGS)
+                    + "{{/html}}";
             }
 
             return result.toString();

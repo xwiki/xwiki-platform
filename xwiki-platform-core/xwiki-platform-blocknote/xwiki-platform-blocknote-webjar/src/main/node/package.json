@@ -25,7 +25,7 @@
     "@xwiki/cristal-model-reference-api": "0.19.0",
     "@xwiki/cristal-model-remote-url-api": "0.19.0",
     "@xwiki/cristal-uniast": "0.19.0",
-    "inversify": "7.5.2",
+    "inversify": "7.6.1",
     "pinia": "3.0.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -60,7 +60,7 @@
       "@xwiki/cristal-model-api": "0.19.0",
       "@xwiki/cristal-model-reference-api": "0.19.0",
       "@xwiki/cristal-model-remote-url-api": "0.19.0",
-      "inversify": "7.5.2"
+      "inversify": "7.6.1"
     },
     "onlyBuiltDependencies": [
       "esbuild"

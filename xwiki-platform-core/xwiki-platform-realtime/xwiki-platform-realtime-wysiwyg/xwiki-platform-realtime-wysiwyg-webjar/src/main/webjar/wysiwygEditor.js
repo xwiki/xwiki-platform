@@ -101,8 +101,13 @@ define('xwiki-realtime-wysiwyg', [
       return XWiki.EditLock.lock();
     }
 
+    _setConnectionStatus(status) {
+      this._connection.status = status;
+      this._editor.setConnectionStatus(status);
+    }
+
     _startRealtimeSync() {
-      this._connection.status = ConnectionStatus.CONNECTING;
+      this._setConnectionStatus(ConnectionStatus.CONNECTING);
 
       // List of pretty names of all users (mapped with their server ID).
       this._connection.userData = {};
@@ -419,7 +424,7 @@ define('xwiki-realtime-wysiwyg', [
 
       await this._createSaver(info);
 
-      this._connection.status = ConnectionStatus.CONNECTED;
+      this._setConnectionStatus(ConnectionStatus.CONNECTED);
 
       // Initialize the edited content with the content from the realtime session.
       await this._onRemote(info);
@@ -494,7 +499,7 @@ define('xwiki-realtime-wysiwyg', [
         // Temporarily disconnected.
         // The internal state is set to 'connecting' because 'disconnected' is used when the user leaves the realtime
         // session. We show 'Disconnected' on the toolbar to indicate that the user is offline.
-        this._connection.status = ConnectionStatus.CONNECTING;
+        this._setConnectionStatus(ConnectionStatus.CONNECTING);
         this._connection.toolbar.onConnectionStatusChange(0 /* disconnected */);
         // Disable the editor while we're disconnected because ChainPad doesn't support very well merging changes made
         // offline, especially if we stay offline for a long time.
@@ -548,7 +553,7 @@ define('xwiki-realtime-wysiwyg', [
       }
 
       console.debug("Aborting the realtime session!");
-      this._connection.status = ConnectionStatus.DISCONNECTED;
+      this._setConnectionStatus(ConnectionStatus.DISCONNECTED);
 
       // Stop the realtime content synchronization (leave the WYSIWYG editor Netflux channel associated with the edited
       // document field).
@@ -582,7 +587,7 @@ define('xwiki-realtime-wysiwyg', [
 
     _pauseRealtimeSync() {
       if (this._connection.status === ConnectionStatus.CONNECTED) {
-        this._connection.status = ConnectionStatus.PAUSED;
+        this._setConnectionStatus(ConnectionStatus.PAUSED);
         this._connection.pauseDepth = 1;
         this._connection.remoteContentBeforePause = this._connection.chainpad.getUserDoc();
       } else if (this._connection.status === ConnectionStatus.PAUSED) {
@@ -592,7 +597,7 @@ define('xwiki-realtime-wysiwyg', [
 
     async _resumeRealtimeSync() {
       if (this._connection.status === ConnectionStatus.PAUSED && --this._connection.pauseDepth === 0) {
-        this._connection.status = ConnectionStatus.CONNECTED;
+        this._setConnectionStatus(ConnectionStatus.CONNECTED);
         const remoteContentAfterPause = this._connection.chainpad.getUserDoc();
         const localContentAfterPause = this._patchedEditor.getHyperJSON();
         if (remoteContentAfterPause === this._connection.remoteContentBeforePause) {

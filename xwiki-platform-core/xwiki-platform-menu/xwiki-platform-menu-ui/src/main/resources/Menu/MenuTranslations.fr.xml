@@ -81,7 +81,7 @@ rendering.macro.menu.description=Affiche un menu créé en utilisant une syntaxe
 rendering.macro.menu.parameter.id.name=Id
 rendering.macro.menu.parameter.id.description=Identifiant de menu optionnel qui sera lié à l'élément html qui englobe le menu. Vous pouvez utiliser cet identifiant dans du code JavaScript pour accéder au menu DOM, ou dans des tests fonctionnels pour vérifier les éléments du menu.
 rendering.macro.menu.parameter.label.name=Libellé
-### Missing: rendering.macro.menu.parameter.label.description=Optional menu label used to describe the content of the menu. Especially important for assistive technologies and accessibility of the menu.
+rendering.macro.menu.parameter.label.description=Étiquette de menu facultative utilisée pour décrire le contenu du menu. Particulièrement important pour les technologies d'assistance et l'accessibilité du menu.
 rendering.macro.menu.parameter.type.name=Type
 rendering.macro.menu.parameter.type.description=Le type de menu (optionnel) détermine l'apparence et le comportement du menu. Valeurs possibles : horizontal (valeur par défaut) et vertical.
 rendering.macro.menu.content.description=Définit la structure du menu en utilisant la syntaxe wiki. Chaque élément du menu devrait être un élément de liste, et devrait contenir l'étiquette du menu ou un lien. Vous pouvez utiliser des listes imbriquées pour les sous-menus.
@@ -89,7 +89,7 @@ rendering.macro.menu.content.description=Définit la structure du menu en utilis
 # Menu UI
 menu.ui.openSubMenu=Ouvrir le sous-menu.
 menu.ui.closeSubMenu=Fermer le sous-menu.
-### Missing: menu.ui.horizontal.toggler.description=Toggle the horizontal menu.
+menu.ui.horizontal.toggler.description=Active le menu horizontal.
 
 # Menu WebHome
 menu.description=Ceci est une application simple qui vous permet de créer des menus de navigation à afficher soit horizontalement comme une barre supérieure après l'en-tête de page, soit verticalement dans un panneau latéral.

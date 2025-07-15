@@ -326,13 +326,6 @@
     await new Promise((resolve, reject) => {
       require(['xwiki-realtime-wysiwyg'], asyncRequireCallback(RealtimeWysiwygEditor => {
         editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), realtimeContext);
-
-        // When someone is offline, they may have left their tab open for a long time and the lock may have
-        // disappeared. We're refreshing it when the editor is focused so that other users will know that someone is
-        // editing the document.
-        editor.on('focus', () => {
-          editor._realtime.lockDocument();
-        });
       }, resolve, reject), reject);
     });
   }

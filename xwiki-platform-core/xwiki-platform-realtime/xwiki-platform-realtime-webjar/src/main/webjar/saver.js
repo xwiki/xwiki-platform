@@ -118,7 +118,7 @@ define('xwiki-realtime-saver', [
           push = immediate = true;
         } else {
           // Remember the last time when the content became dirty in order to be able to save immediately when the save
-          // interval is reached (even if the use is still making changes).
+          // interval is reached (even if the user is still making changes).
           this._dirtyTimestamp = now();
         }
       }

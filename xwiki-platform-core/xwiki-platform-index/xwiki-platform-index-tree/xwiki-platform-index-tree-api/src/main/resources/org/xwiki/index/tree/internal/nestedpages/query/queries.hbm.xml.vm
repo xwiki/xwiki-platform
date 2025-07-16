@@ -114,7 +114,7 @@
 
     ) xwikiPage
 
-    order by lower(xwikiPage.title) $order, xwikiPage.title $order
+    order by BEFORE_ORDER_MODIFIER xwikiPage.title AFTER_ORDER_MODIFIER $order, xwikiPage.title $order
   </sql-query>
 #end
 
@@ -143,7 +143,7 @@
 
     ) xwikiPage
 
-    order by lower(xwikiPage.pageName) $order, xwikiPage.pageName $order
+    order by BEFORE_ORDER_MODIFIER xwikiPage.pageName AFTER_ORDER_MODIFIER $order, xwikiPage.pageName $order
   </sql-query>
 #end
 
@@ -206,7 +206,8 @@
             tdoc.XWD_WEB = XWS_REFERENCE and
             tdoc.XWD_NAME = 'WebHome' and
             tdoc.XWD_LANGUAGE = :locale)
-        order by lower(coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME)) $order,
+        order by BEFORE_ORDER_MODIFIER coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME)
+            AFTER_ORDER_MODIFIER $order,
             coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME) $order
   </sql-query>
 #end

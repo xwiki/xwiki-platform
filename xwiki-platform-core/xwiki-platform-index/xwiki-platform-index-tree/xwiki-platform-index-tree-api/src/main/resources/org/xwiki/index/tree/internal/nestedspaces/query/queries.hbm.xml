@@ -47,6 +47,11 @@
     slow on MySql, because there were many constraints applied to the union instead of the inner selects and so MySql
     could not use the indexes. -->
 
+  <!--
+    The placeholders BEFORE_ORDER_MODIFIER and AFTER_ORDER_MODIFIER are replaced when loading this file.
+    They modify the sorting by either wrapping the expression in lower() (default) or adding a configured collation.
+   -->
+
   <resultset name = "XWikiPageOrSpaceReference">
     <return-scalar column="reference" type="string" />
     <!-- This type information is very important because we want Hibernate to convert 0 and 1 into false and true. -->

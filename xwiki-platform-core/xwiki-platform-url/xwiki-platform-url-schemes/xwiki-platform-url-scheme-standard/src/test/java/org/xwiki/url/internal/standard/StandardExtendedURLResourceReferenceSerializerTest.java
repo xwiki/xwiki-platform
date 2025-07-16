@@ -19,24 +19,23 @@
  */
 package org.xwiki.url.internal.standard;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for {@link StandardExtendedURLResourceReferenceSerializer}.
@@ -50,45 +49,57 @@ class StandardExtendedURLResourceReferenceSerializerTest
     @InjectMockComponents
     private StandardExtendedURLResourceReferenceSerializer serializer;
 
-    @MockComponent
-    @Named("context")
-    private ComponentManager componentManager;
-
-    public class TestResourceReference extends AbstractResourceReference
+    public static class TestResourceReference extends AbstractResourceReference
     {
-        public TestResourceReference()
+        TestResourceReference()
         {
             setType(new ResourceType("test"));
         }
     }
 
+    @BeforeComponent
+    void setUp(MockitoComponentManager componentManager) throws Exception
+    {
+        // Register the real mockito component manager as the context component manager so we can easily mock
+        // components on it. This needs to be done before the component to test is initialized.
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+    }
+
     @Test
-    void serialize() throws Exception
+    void serialize(MockitoComponentManager componentManager) throws Exception
     {
         TestResourceReference resource = new TestResourceReference();
 
-        ResourceReferenceSerializer serializer = mock(ResourceReferenceSerializer.class);
-
-        when(this.componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
-            TestResourceReference.class, ExtendedURL.class), "standard")).thenReturn(serializer);
+        ResourceReferenceSerializer<TestResourceReference, ExtendedURL> testResourceReferenceSerializer =
+            componentManager.registerMockComponent(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+                TestResourceReference.class, ExtendedURL.class), "standard");
 
         this.serializer.serialize(resource);
 
         // Verify the serializer is called and with the proper parameters
-        verify(serializer).serialize(same(resource));
+        verify(testResourceReferenceSerializer).serialize(same(resource));
     }
 
     @Test
-    void serializeWhenNoMatchingSerializer() throws Exception
+    void serializeWithFallback(MockitoComponentManager componentManager) throws Exception
     {
         TestResourceReference resource = new TestResourceReference();
 
-        when(this.componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
-            TestResourceReference.class, ExtendedURL.class), "standard")).thenThrow(
-                new ComponentLookupException("error"));
-        when(this.componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
-            TestResourceReference.class, ExtendedURL.class))).thenThrow(
-            new ComponentLookupException("error"));
+        // Register a resource reference serializer without name.
+        ResourceReferenceSerializer<TestResourceReference, ExtendedURL> testResourceReferenceSerializer =
+            componentManager.registerMockComponent(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+                TestResourceReference.class, ExtendedURL.class));
+
+        this.serializer.serialize(resource);
+
+        // Verify the serializer is called and with the proper parameters
+        verify(testResourceReferenceSerializer).serialize(same(resource));
+    }
+
+    @Test
+    void serializeWhenNoMatchingSerializer()
+    {
+        TestResourceReference resource = new TestResourceReference();
 
         Throwable exception = assertThrows(UnsupportedResourceReferenceException.class, () -> {
             this.serializer.serialize(resource);

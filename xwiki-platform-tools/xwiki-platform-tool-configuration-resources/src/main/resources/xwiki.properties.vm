@@ -1689,4 +1689,17 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# when a parameter has a default value set to 'true' or 'false' and doesn't define a specific type.
 # wysiwyig.inferMacroParameterTypeBasedOnDefaultValue=true
 
+#-------------------------------------------------------------------------------------
+# Index Tree
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.6.0]
+#-# Define the database collation used for sorting entries in index trees. This can be used to enable locale-based
+#-# sorting like sorting accented characters at the same place or directly after their non-accented variants.
+#-# When this is set to a non-empty value, the default lowercase transformation for sorting is removed to allow for
+#-# locale-specific lowercase sort handling. Ensure you're using a case-insensitive collation if you want to keep
+#-# case-insensitive sorting. Possible values depend on the used database engine and its configuration, a possible
+#-# value for MariaDB is utf8mb4_general_ci. By default, no collation is configured.
+# index.sortCollation=
+
 $!xwikiPropertiesAdditionalProperties

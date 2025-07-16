@@ -1373,9 +1373,8 @@ XWiki.Annotation = Class.create({
     bubble.toggleClassName('hidden');
     // position the bubble
     // By default, we position it to the right and under the coordinates
-    // Position it horizontally. The width of the bubble is fixed at 560px
-    // We keep a 5px margin of error to avoid unexpected edge cases.
-    if ((horizontalCoordinate &lt; 565) || (horizontalCoordinate + 565 &lt; window.innerWidth) ) {
+    // Position it horizontally. The width of the bubble is fixed at 560px to which we add a 20px left margin
+    if ((horizontalCoordinate &lt; 580) || (horizontalCoordinate + 580 &lt; window.innerWidth) ) {
       bubble.style.left = horizontalCoordinate + 'px';
     }
     else {

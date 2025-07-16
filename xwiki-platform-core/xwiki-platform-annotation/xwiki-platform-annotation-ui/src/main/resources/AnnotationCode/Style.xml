@@ -294,7 +294,7 @@
   z-index: 2;
   border-radius: 0 10px 10px 10px;
   box-shadow: 0 2px 4px -1px $theme.linkColor;
-  margin-left: 20px;
+  margin-left: 20px; /* Take care when updating this hard-coded value, script on AnnotationCode.Script relies on it. */
 }
 
 .annotation-bubble:before, .annotation-bubble:after {

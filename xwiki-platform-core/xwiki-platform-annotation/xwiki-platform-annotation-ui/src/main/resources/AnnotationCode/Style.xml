@@ -289,7 +289,7 @@
 .annotation-bubble {
   background: $theme.backgroundSecondaryColor;
   border: 1px dotted $theme.borderColor;
-  width: 560px;
+  width: 560px; /* Take care when updating this hard-coded value, script on AnnotationCode.Script relies on it. */
   position: absolute;
   z-index: 2;
   border-radius: 0 10px 10px 10px;
@@ -314,6 +314,28 @@
   top: 0;
   left: -10px;
   border-right-color: $theme.backgroundSecondaryColor;
+}
+
+.annotation-bubble.annotation-bubble-position-left {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 0;
+  
+  &amp;:before, &amp;:after {
+    border-right: none;
+    left: unset;
+    border-left: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+
+  &amp;:before {
+    right: -11px;
+    border-left-color: $theme.borderColor;
+  }
+
+  &amp;:after {
+    right: -10px;
+    border-left-color: $theme.backgroundSecondaryColor;
+  }
 }
 
 .annotation-box {

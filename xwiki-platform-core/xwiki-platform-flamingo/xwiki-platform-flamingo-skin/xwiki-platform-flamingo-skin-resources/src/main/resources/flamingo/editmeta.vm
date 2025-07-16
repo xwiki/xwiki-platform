@@ -37,7 +37,7 @@
   <dt>
     #set ($titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
     #set ($wysiwygWithOptionalTitle = $editor == 'wysiwyg' && !$titleIsMandatory)
-    <label for="xwikidoctitleinput"#if ($wysiwygWithOptionalTitle)class="sr-only"#end>
+    <label for="xwikidoctitleinput"#if ($wysiwygWithOptionalTitle) class="sr-only"#end>
       $escapetool.xml($services.localization.render('core.editors.content.titleField.label'))
       #if ($titleIsMandatory)
         <span class="xRequired">$escapetool.xml($services.localization.render('core.validation.required'))</span>

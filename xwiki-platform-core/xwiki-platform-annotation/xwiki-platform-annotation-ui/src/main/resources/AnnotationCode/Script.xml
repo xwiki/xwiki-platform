@@ -1363,13 +1363,13 @@ XWiki.Annotation = Class.create({
   },
 
   displayLoadingBubble : function(verticalCoordinate, horizontalCoordinate) {
-    // create a bubble element with the form
+    // create a bubble element wrapping the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
-    // and a nice loading panel inside
+    // Add a nice loading panel inside
     bubble.insert({top : new Element('div', {'class' : 'loading'})});
-    // and put it in the content
+    // and insert the bubble in the content
     document.body.insert({bottom : bubble});
-    // make it hidden for the moment
+    // keep the bubble hidden for the moment
     bubble.toggleClassName('hidden');
     // position the bubble
     // By default, we position it to the right and under the coordinates

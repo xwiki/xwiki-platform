@@ -334,7 +334,9 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     let firstInputType = valueInputs.prop('type');
     if (firstInputType === 'checkbox' || firstInputType === 'radio') {
       // Keep only the input elements with the same type as the first one.
-      valueInputs = valueInputs.filter(() => $(this).prop('type') === firstInputType);
+      valueInputs = valueInputs.filter(function() {
+        return $(this).prop('type') === firstInputType;
+      });
       if (isCaseInsensitive) {
         // Use the canonical value.
         value = valueInputs.filter(matchesParameterValue(value)).val() || value;
@@ -357,7 +359,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
         });
       }
     }
-    return value;
+    return [value, valueInputs];
   },
 
   displayMacroParameterField = function(parameter, featureRadioButton) {
@@ -377,7 +379,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       }
     }
 
-    value = getParameterValue(valueInputs, value, parameter.caseInsensitive);
+    [value, valueInputs] = getParameterValue(valueInputs, value, parameter.caseInsensitive);
 
     // We pass the value as an array in order to properly handle radio inputs and checkboxes
     // and in case it's an object we properly serialize the value.

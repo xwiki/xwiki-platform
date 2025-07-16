@@ -39,6 +39,8 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
@@ -349,6 +351,12 @@ class InplaceEditIT
         qa.waitForItemSubmitted();
         richTextArea.waitForContentRefresh();
 
+        richTextArea.sendKeys(Keys.UP, "/velocity");
+        qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/velocity", "Velocity");
+        richTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
         assertEquals("a first line\nNo pages found\nmacro:id", richTextArea.getText());
         viewPage.cancel();
     }
@@ -462,13 +470,18 @@ class InplaceEditIT
         richTextArea.clear();
 
         // Insert the Velocity macro. The macro placeholder should be displayed.
-        richTextArea.sendKeys(Keys.ENTER, "/velocity");
+        richTextArea.sendKeys("/velocity");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/velocity", "Velocity");
         richTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        new MacroDialogEditModal().waitUntilReady().setMacroContent(" ").clickSubmit();
+        // check the behaviour of boolean parameters of macro.
+        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
+        assertTrue(macroEditModal.getMacroParameterInput("wiki").isSelected());
+        macroEditModal.setMacroContent("#set($discard = $NULL)");
+        macroEditModal.setMacroParameterCheckbox("wiki", false);
+        macroEditModal.clickSubmit();
         richTextArea.waitForContentRefresh();
 
         assertEquals("macro:velocity", richTextArea.getText());
@@ -498,5 +511,11 @@ class InplaceEditIT
         setup.getDriver().waitUntilCondition(driver -> !viewPage.hasRequiredRightsWarning(false));
 
         viewPage.cancel();
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
+        String content = wikiEditPage.getContent();
+        assertEquals("{{velocity wiki=\"false\"}}\n"
+            + "#set($discard = $NULL)\n"
+            + "{{/velocity}}", content);
+        wikiEditPage.clickCancel();
     }
 }

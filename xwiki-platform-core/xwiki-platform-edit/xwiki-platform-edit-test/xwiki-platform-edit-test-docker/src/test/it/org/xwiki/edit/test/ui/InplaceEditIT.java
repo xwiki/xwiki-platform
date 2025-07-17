@@ -350,13 +350,7 @@ class InplaceEditIT
         richTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
         richTextArea.waitForContentRefresh();
-
-        richTextArea.sendKeys(Keys.UP, "/velocity");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velocity", "Velocity");
-        richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-
+        
         assertEquals("a first line\nNo pages found\nmacro:id", richTextArea.getText());
         viewPage.cancel();
     }

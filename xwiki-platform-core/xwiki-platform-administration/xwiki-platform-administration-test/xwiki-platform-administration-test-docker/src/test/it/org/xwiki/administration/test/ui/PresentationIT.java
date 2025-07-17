@@ -20,6 +20,7 @@
 package org.xwiki.administration.test.ui;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationSectionPage;
@@ -42,6 +43,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class PresentationIT
 {
+    @BeforeAll
+    void beforeAll(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+    }
+
     @AfterAll
     void afterAll(TestUtils setup)
     {
@@ -65,16 +72,10 @@ class PresentationIT
     @Test
     void showPageInformationTabSettings(TestUtils setup, TestReference testReference)
     {
-        setup.loginAsSuperAdmin();
         ViewPage viewPage = setup.createPage(testReference, "");
         // Check that the information tab is displayed by default.
         assertTrue(viewPage.hasInformationDocExtraPane());
-        AdministrablePage administrablePage = new AdministrablePage();
-
-        // Navigate to the Presentation administration section.
-        administrablePage.clickAdministerWiki().clickSection("Look & Feel", "Presentation");
-        PresentationAdministrationSectionPage presentationSectionPage =
-            new PresentationAdministrationSectionPage();
+        PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
         assertEquals(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT,
             presentationSectionPage.getShowInformation());
 
@@ -92,16 +93,12 @@ class PresentationIT
     @Test
     void showPageAttachmentsTab(TestUtils setup, TestReference testReference)
     {
-        setup.loginAsSuperAdmin();
         setup.createPage(testReference, "");
         AttachmentsViewPage viewPage = new AttachmentsViewPage();
         // Check that the attachments tab is available by default.
         assertTrue(viewPage.isAttachmentsDocExtraPaneAvailable());
 
-        AdministrablePage administrablePage = new AdministrablePage();
-        administrablePage.clickAdministerWiki().clickSection("Look & Feel", "Presentation");
-        PresentationAdministrationSectionPage presentationSectionPage =
-            new PresentationAdministrationSectionPage();
+        PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
         assertEquals(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT,
             presentationSectionPage.getShowAttachments());
 
@@ -115,5 +112,35 @@ class PresentationIT
         setup.gotoPage(testReference);
         viewPage = new AttachmentsViewPage();
         assertFalse(viewPage.isAttachmentsDocExtraPaneAvailable());
+    }
+
+    @Test
+    void showPageCommentsTab(TestUtils setup, TestReference testReference)
+    {
+        ViewPage viewPage = setup.createPage(testReference, "");
+        // Check that the comments tab is displayed by default.
+        assertTrue(viewPage.hasCommentsDocExtraPane());
+        PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
+        assertEquals(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT,
+            presentationSectionPage.getShowComments());
+
+        presentationSectionPage.setShowComments(PresentationAdministrationSectionPage.ShowTabValue.NO);
+        presentationSectionPage.clickSave();
+
+        assertEquals(PresentationAdministrationSectionPage.ShowTabValue.NO,
+            presentationSectionPage.getShowComments());
+
+        // Check that the comments tab is no longer displayed.
+        viewPage = setup.gotoPage(testReference);
+        assertFalse(viewPage.hasCommentsDocExtraPane());
+    }
+
+    private static PresentationAdministrationSectionPage gotoPresentationAdministration()
+    {
+        AdministrablePage administrablePage = new AdministrablePage();
+
+        // Navigate to the Presentation administration section.
+        administrablePage.clickAdministerWiki().clickSection("Look & Feel", "Presentation");
+        return new PresentationAdministrationSectionPage();
     }
 }

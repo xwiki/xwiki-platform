@@ -135,6 +135,27 @@ class PresentationIT
         assertFalse(viewPage.hasCommentsDocExtraPane());
     }
 
+    @Test
+    void showPageHistoryTab(TestUtils setup, TestReference testReference)
+    {
+        ViewPage viewPage = setup.createPage(testReference, "");
+        // Check that the history tab is displayed by default.
+        assertTrue(viewPage.hasHistoryDocExtraPane());
+        PresentationAdministrationSectionPage presentationSectionPage = gotoPresentationAdministration();
+        assertEquals(PresentationAdministrationSectionPage.ShowTabValue.DEFAULT,
+            presentationSectionPage.getShowHistory());
+
+        presentationSectionPage.setShowHistory(PresentationAdministrationSectionPage.ShowTabValue.NO);
+        presentationSectionPage.clickSave();
+
+        assertEquals(PresentationAdministrationSectionPage.ShowTabValue.NO,
+            presentationSectionPage.getShowHistory());
+
+        // Check that the history tab is no longer displayed.
+        viewPage = setup.gotoPage(testReference);
+        assertFalse(viewPage.hasHistoryDocExtraPane());
+    }
+
     private static PresentationAdministrationSectionPage gotoPresentationAdministration()
     {
         AdministrablePage administrablePage = new AdministrablePage();

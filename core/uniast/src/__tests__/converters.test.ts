@@ -77,7 +77,7 @@ describe("MarkdownToUniAstConverter", () => {
   const converterContext = getConverterContext();
 
   const mdToUniAst = new MarkdownToUniAstConverter(converterContext);
-  const uniAstToMd = new UniAstToMarkdownConverter(converterContext);
+  const uniAstToMd = new UniAstToMarkdownConverter();
 
   function testTwoWayConversion(expected: {
     startingFrom: string;
@@ -927,6 +927,191 @@ describe("MarkdownToUniAstConverter", () => {
           },
           {
             type: "break",
+          },
+        ],
+      },
+    });
+  });
+
+  test("parse XWiki-specific syntax elements", () => {
+    testTwoWayConversion({
+      startingFrom: [
+        "A [[title|documentReference]] B",
+        "C ![[title|imageReference]] D",
+        "E {{someInlineMacro /}} F",
+      ].join("\n"),
+      convertsBackTo: [
+        "A [[title|documentReference]] B",
+        "C ![[title|imageReference]] D",
+        "E {{someInlineMacro /}} F",
+      ].join("\n"),
+      withUniAst: {
+        blocks: [
+          {
+            content: [
+              {
+                content: "A ",
+                styles: {},
+                type: "text",
+              },
+              {
+                content: [
+                  {
+                    content: "title",
+                    styles: {},
+                    type: "text",
+                  },
+                ],
+                target: {
+                  type: "internal",
+                  parsedReference: null,
+                  rawReference: "documentReference",
+                },
+                type: "link",
+              },
+              {
+                content: " B\nC ",
+                styles: {},
+                type: "text",
+              },
+              {
+                alt: "title",
+                styles: {
+                  alignment: "left",
+                },
+                target: {
+                  type: "internal",
+                  parsedReference: null,
+                  rawReference: "imageReference",
+                },
+                type: "image",
+              },
+              {
+                content: " D\nE ",
+                styles: {},
+                type: "text",
+              },
+              {
+                name: "someInlineMacro",
+                params: {},
+                type: "inlineMacro",
+              },
+              {
+                content: " F",
+                styles: {},
+                type: "text",
+              },
+            ],
+            styles: {},
+            type: "paragraph",
+          },
+        ],
+      },
+    });
+  });
+
+  test("parse various macros syntaxes", () => {
+    testTwoWayConversion({
+      startingFrom: [
+        "{{macro/}}",
+        "{{ macro/}}",
+        "{{macro /}}",
+        "{{  macro  / }}",
+        "{{macro param1=1/}}",
+        '{{macro param1="1"/}}',
+        "{{macro param1=1 /}}",
+        '{{macro param1="1" /}}',
+        '{{macro param1="1" param2="2" /}}',
+        '{{macro param1="param1Value" param2="param2Value" param3="param3Value" /}}',
+        '{{macro param1="some \\\\" escaped quote and }} closing braces and \\\\\\ escaped backslashes" /}}',
+      ].join("\n\n"),
+      convertsBackTo: [
+        "{{macro /}}",
+        "{{macro /}}",
+        "{{macro /}}",
+        "{{macro /}}",
+        '{{macro param1="1" /}}',
+        '{{macro param1="1" /}}',
+        '{{macro param1="1" /}}',
+        '{{macro param1="1" /}}',
+        '{{macro param1="1" param2="2" /}}',
+        '{{macro param1="param1Value" param2="param2Value" param3="param3Value" /}}',
+        '{{macro param1="some \\\\" escaped quote and }} closing braces and \\\\\\ escaped backslashes" /}}',
+      ].join("\n\n"),
+      withUniAst: {
+        blocks: [
+          {
+            name: "macro",
+            params: {},
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {},
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {},
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {},
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {
+              param1: "1",
+            },
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {
+              param1: "1",
+            },
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {
+              param1: "1",
+            },
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {
+              param1: "1",
+            },
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {
+              param1: "1",
+              param2: "2",
+            },
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {
+              param1: "param1Value",
+              param2: "param2Value",
+              param3: "param3Value",
+            },
+            type: "macroBlock",
+          },
+          {
+            name: "macro",
+            params: {
+              param1:
+                'some " escaped quote and }} closing braces and \\ escaped backslashes',
+            },
+            type: "macroBlock",
           },
         ],
       },

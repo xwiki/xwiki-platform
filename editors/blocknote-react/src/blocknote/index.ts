@@ -19,6 +19,7 @@
  */
 
 import { Heading4, Heading5, Heading6 } from "./blocks/Headings";
+import { MACRO_NAME_PREFIX, Macro } from "./utils";
 import translations from "../translations";
 import {
   Block,
@@ -28,6 +29,7 @@ import {
   StyledText,
   combineByGroup,
   defaultBlockSpecs,
+  defaultInlineContentSpecs,
   filterSuggestionItems,
 } from "@blocknote/core";
 import * as locales from "@blocknote/core/locales";
@@ -42,6 +44,7 @@ import {
   locales as multiColumnLocales,
   withMultiColumn,
 } from "@blocknote/xl-multi-column";
+import { filterMap } from "@xwiki/cristal-fn-utils";
 
 /**
  * Create the BlockNote editor's schema
@@ -50,7 +53,7 @@ import {
  *
  * @returns The created schema
  */
-function createBlockNoteSchema() {
+function createBlockNoteSchema(macros: Macro[]) {
   // Get rid of some block types
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { audio, video, file, toggleListItem, ...remainingBlockSpecs } =
@@ -68,6 +71,31 @@ function createBlockNoteSchema() {
       Heading4: Heading4.block,
       Heading5: Heading5.block,
       Heading6: Heading6.block,
+
+      // Macros
+      ...Object.fromEntries(
+        filterMap(macros, (macro) =>
+          macro.blockNote.type === "block"
+            ? [`${MACRO_NAME_PREFIX}${macro.name}`, macro.blockNote.block.block]
+            : null,
+        ),
+      ),
+    },
+
+    inlineContentSpecs: {
+      ...defaultInlineContentSpecs,
+
+      // Macros
+      ...Object.fromEntries(
+        filterMap(macros, (macro) =>
+          macro.blockNote.type === "inline"
+            ? [
+                `${MACRO_NAME_PREFIX}${macro.name}`,
+                macro.blockNote.inlineContent.inlineContent,
+              ]
+            : null,
+        ),
+      ),
     },
   });
 
@@ -97,17 +125,26 @@ type EditorLanguage = keyof typeof locales &
 function querySuggestionsMenuItems(
   editor: EditorType,
   query: string,
+  macros: Macro[],
 ): DefaultReactSuggestionItem[] {
   return filterSuggestionItems(
     combineByGroup(
       getDefaultReactSlashMenuItems(editor),
 
-      // // First-party extension blocks
+      // First-party extension blocks
       getMultiColumnSlashMenuItems(editor),
 
       // Custom blocks
       [Heading4, Heading5, Heading6].map((custom) =>
         custom.slashMenuEntry(editor),
+      ),
+
+      // Macros
+      // TODO: decide how to show inline macros as the menu is only shown for block suggestions
+      filterMap(macros, (macro) =>
+        !macro.hidden && macro.blockNote.type === "block"
+          ? macro.blockNote.block.slashMenuEntry(editor)
+          : null,
       ),
     ),
     query,

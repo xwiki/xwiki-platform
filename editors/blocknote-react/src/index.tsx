@@ -18,11 +18,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { App } from "./App";
+import { XWikiMacroHTMLBlockMacro } from "./blocknote/macros/XWikiMacroHtmlBlock";
+import { XWikiMacroInlineHTMLMacro } from "./blocknote/macros/XWikiMacroInlineHtml";
+import {
+  MACRO_NAME_PREFIX,
+  Macro,
+  MacroCreationArgs,
+  createMacro,
+} from "./blocknote/utils";
 import { BlockNoteViewWrapperProps } from "./components/BlockNoteViewWrapper";
 import { LinkEditionContext } from "./misc/linkSuggest";
 import { createRoot } from "react-dom/client";
 
-export function mountBlockNote(
+/**
+ * Mount a BlockNote editor inside a DOM container
+ *
+ * @param containerEl - The container to put BlockNote in (must be empty and be a block type component, e.g. `<div>`)
+ * @param props - Properties to setup the editor with
+ *
+ * @returns - An unmount function to properly dispose of the editor
+ *
+ * @since 0.19
+ */
+function mountBlockNote(
   containerEl: HTMLElement,
   props: BlockNoteViewWrapperProps,
 ): { unmount: () => void } {
@@ -44,6 +62,24 @@ export function mountBlockNote(
   };
 }
 
-export type { BlockNoteViewWrapperProps, LinkEditionContext };
+/**
+ * A set of default macros to use in BlockNote
+ *
+ * These are not enabled by default as some integrations may want to fully disable macros support.
+ * In such case, simply ignore this.
+ *
+ * Otherwise, you can provide this object's values entirely or select only a few macros and pass them to the setup function.
+ */
+const DEFAULT_MACROS = {
+  XWikiMacroHTMLBlockMacro,
+  XWikiMacroInlineHTMLMacro,
+};
 
+export { DEFAULT_MACROS, MACRO_NAME_PREFIX, createMacro, mountBlockNote };
+export type {
+  BlockNoteViewWrapperProps,
+  LinkEditionContext,
+  Macro,
+  MacroCreationArgs,
+};
 export * from "./blocknote";

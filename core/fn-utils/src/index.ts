@@ -128,9 +128,33 @@ function provideTypeInference<T>(value: T): T {
   return value;
 }
 
+/**
+ * Filter and map an array's values
+ *
+ * Combines both `.filter` and `.map` with the additional benefit of conditional type predicates
+ *
+ * @since 0.20
+ *
+ * @example `filterMap([1, 2, 3], value => value >= 2 ? value.toString() : null) // ['2', '3']`
+ *
+ * @param array - The array to map
+ * @param filterMap - The function performing the mapping and filtering. Returning `null` or `undefined` corresponds to filter values out.
+ *
+ * @returns The filtered and mapped array
+ */
+function filterMap<T, U>(
+  array: T[],
+  filterMap: (value: T, index: number) => U | null | undefined,
+): U[] {
+  return array
+    .map(filterMap)
+    .filter((value) => value !== null && value !== undefined);
+}
+
 export {
   assertInArray,
   assertUnreachable,
+  filterMap,
   provideTypeInference,
   tryFallible,
   tryFallibleOrError,

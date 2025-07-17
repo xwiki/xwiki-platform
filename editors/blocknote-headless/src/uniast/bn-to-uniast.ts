@@ -25,6 +25,7 @@ import {
   EditorLink,
   EditorStyleSchema,
   EditorStyledText,
+  MACRO_NAME_PREFIX,
 } from "@xwiki/cristal-editors-blocknote-react";
 import {
   assertUnreachable,
@@ -114,6 +115,15 @@ export class BlockNoteToUniAstConverter {
         throw new Error("Unexpected children in block type: " + block.type);
       }
     };
+
+    // Convert macros
+    if (block.type.startsWith(MACRO_NAME_PREFIX)) {
+      return {
+        type: "macroBlock",
+        name: block.type.substring(MACRO_NAME_PREFIX.length),
+        params: block.props,
+      };
+    }
 
     switch (block.type) {
       case "paragraph":
@@ -348,6 +358,17 @@ export class BlockNoteToUniAstConverter {
   private convertInlineContent(
     inlineContent: EditorStyledText | Link<EditorStyleSchema>,
   ): InlineContent {
+    // Handle macros
+    if (inlineContent.type.startsWith(MACRO_NAME_PREFIX)) {
+      return {
+        type: "inlineMacro",
+        name: inlineContent.type.substring(MACRO_NAME_PREFIX.length),
+        params:
+          // @ts-expect-error: the AST is dynamically-typed with macros, so the types are incorrect here
+          inlineContent.props,
+      };
+    }
+
     switch (inlineContent.type) {
       case "text": {
         const {
@@ -398,7 +419,16 @@ export class BlockNoteToUniAstConverter {
     const reference = this.context.parseReferenceFromUrl(url);
 
     return reference
-      ? { type: "internal", reference }
+      ? {
+          type: "internal",
+          parsedReference: reference,
+          // TODO: preserve the raw reference from the original UniAst
+          //
+          // Waiting for solved issue in BlockNote:
+          // > https://github.com/TypeCellOS/BlockNote/issues/1840
+          //
+          rawReference: this.context.serializeReference(reference),
+        }
       : { type: "external", url };
   }
 }

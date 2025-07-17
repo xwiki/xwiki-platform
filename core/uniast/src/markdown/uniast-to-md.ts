@@ -27,7 +27,6 @@ import {
   Text,
   UniAst,
 } from "../ast";
-import { ConverterContext } from "../interface";
 import { tryFallibleOrError } from "@xwiki/cristal-fn-utils";
 
 /**
@@ -36,8 +35,6 @@ import { tryFallibleOrError } from "@xwiki/cristal-fn-utils";
  * @since 0.16
  */
 export class UniAstToMarkdownConverter {
-  constructor(public context: ConverterContext) {}
-
   toMarkdown(uniAst: UniAst): string | Error {
     const { blocks } = uniAst;
 
@@ -87,8 +84,8 @@ export class UniAstToMarkdownConverter {
       case "break":
         return "---";
 
-      case "macro":
-        throw new Error("TODO: handle macros");
+      case "macroBlock":
+        return this.convertMacro(block.name, block.params);
     }
   }
 
@@ -111,7 +108,7 @@ export class UniAstToMarkdownConverter {
     // TODO: alt text
     return image.target.type === "external"
       ? `![${image.alt}](${image.target.url})`
-      : `![[${image.alt}|${this.context.serializeReference(image.target.reference)}]]`;
+      : `![[${image.alt}|${image.target.rawReference}]]`;
   }
 
   private convertTable(table: Extract<Block, { type: "table" }>): string {
@@ -157,9 +154,26 @@ export class UniAstToMarkdownConverter {
             return `[${this.convertInlineContents(inlineContent.content)}](${inlineContent.target.url})`;
 
           case "internal":
-            return `[[${this.convertInlineContents(inlineContent.content)}|${this.context.serializeReference(inlineContent.target.reference)}]]`;
+            return `[[${this.convertInlineContents(inlineContent.content)}|${inlineContent.target.rawReference}]]`;
         }
+
+        break;
+
+      case "inlineMacro":
+        return this.convertMacro(inlineContent.name, inlineContent.params);
     }
+  }
+
+  private convertMacro(
+    name: string,
+    parameters: Record<string, boolean | number | string>,
+  ): string {
+    return `{{${name}${Object.entries(parameters)
+      .map(
+        ([name, value]) =>
+          ` ${name}="${value.toString().replace(/\\/g, "\\\\\\").replace(/"/g, '\\\\"')}"`,
+      )
+      .join("")} /}}`;
   }
 
   // eslint-disable-next-line max-statements

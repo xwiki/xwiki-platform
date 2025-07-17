@@ -81,14 +81,26 @@ export class MarkdownToUniAstConverter {
 
   private convertBlock(block: RootContent): Block {
     switch (block.type) {
-      case "paragraph":
+      case "paragraph": {
+        const content = block.children.flatMap((item) =>
+          this.convertInline(item, {}),
+        );
+
+        // Paragraphs only made of a single inline macro are actually block macros
+        if (content.length === 1 && content[0].type === "inlineMacro") {
+          return {
+            type: "macroBlock",
+            name: content[0].name,
+            params: content[0].params,
+          };
+        }
+
         return {
           type: "paragraph",
-          content: block.children.flatMap((item) =>
-            this.convertInline(item, {}),
-          ),
+          content,
           styles: {},
         };
+      }
 
       case "heading":
         return {
@@ -286,144 +298,321 @@ export class MarkdownToUniAstConverter {
 
   // eslint-disable-next-line max-statements
   private convertText(text: string, styles: TextStyles): InlineContent[] {
-    if (!text.includes("[")) {
-      return [{ type: "text", content: text, styles }];
-    }
-
     const out: InlineContent[] = [];
 
     let treated = 0;
-    let match: number;
-    let previousMatch = 0;
 
-    while ((match = text.substring(treated).indexOf("[")) !== -1) {
-      match += treated;
-      treated += 2;
+    while (true) {
+      // Try to find the first XWiki-specific-element syntax in the text (precedence order)
+      const firstItem = findFirstMatchIn(text.substring(treated), [
+        { name: "image", match: "![[" },
+        { name: "link", match: "[[" },
+        { name: "macro", match: "{{" },
+      ]);
 
-      const previous = match > 0 ? text.charAt(match - 1) : null;
-
-      if (text.charAt(match + 1) !== "[") {
-        continue;
-      }
-
-      // TODO: ensure we're not just after an escaped backslash
-      // => count preceding backslashes
-      if (previous === "\\") {
-        continue;
-      }
-
-      const isImage = previous === "!";
-
-      let i;
-      let escaping = false;
-      let closing = false;
-      let closed = false;
-
-      for (i = match + 1; i < text.length; i++) {
-        if (escaping) {
-          escaping = false;
-          continue;
-        }
-
-        const char = text.charAt(i);
-
-        if (char === "\\") {
-          escaping = true;
-          continue;
-        }
-
-        if (char === "]") {
-          if (closing) {
-            closed = true;
-            break;
-          }
-
-          closing = true;
-          continue;
-        }
-      }
-
-      if (!closed) {
+      // If none is found, exit immediately
+      // This also means texts that don't contain any specific syntax will have a very low conversion cost
+      if (!firstItem) {
         break;
       }
 
-      treated = i + 1;
+      const match = treated + firstItem.offset;
 
-      const substr = text.substring(match + 2, i - 1);
+      // Ensure the current element is not being escaped with backslashes
+      const precedingBackslashes = text.substring(0, match).match(/\\+/);
 
-      let title: string | null;
-      let targetStr: string;
-
-      const pipeCharPos = substr.indexOf("|");
-
-      if (pipeCharPos !== -1) {
-        title = substr.substring(0, pipeCharPos);
-        targetStr = substr.substring(pipeCharPos + 1);
-      } else {
-        title = null;
-        targetStr = substr;
+      // Backslashes are counted as pairs, as two consecutive backslashes are not escaping the next character
+      if (precedingBackslashes && precedingBackslashes[0].length % 2 !== 0) {
+        continue;
       }
 
-      const precedingContent = text.substring(
-        previousMatch,
-        match - (isImage ? 1 : 0),
-      );
-
-      if (precedingContent.length > 0) {
+      // Push the text between the last match and the current one as plain text
+      if (text.substring(treated, match).length > 0) {
         out.push({
           type: "text",
-          content: precedingContent,
+          content: text.substring(treated, match),
           styles,
         });
       }
 
-      previousMatch = i + 1;
+      switch (firstItem.name) {
+        case "image":
+        case "link": {
+          const isImage = firstItem.name === "image";
 
-      const reference = this.context.parseReference(
-        targetStr,
-        isImage ? EntityType.ATTACHMENT : EntityType.DOCUMENT,
-      );
+          let i;
 
-      const target: LinkTarget =
-        reference !== null
-          ? { type: "internal", reference }
-          : {
-              type: "external",
-              // NOTE: If reference is invalid, fall back to a URL
-              // Probably not the best way to do it
-              url: targetStr,
-            };
+          // Is the next character being escaped?
+          let escaping = false;
+          // Is the link or image being closed?
+          let closing = false;
+          // Has the link or image been closed properly?
+          let closed = false;
 
-      title ??= reference
-        ? this.context.getDisplayName(reference)
-        : "<invalid reference>";
+          for (i = match + firstItem.match.length; i < text.length; i++) {
+            if (escaping) {
+              escaping = false;
 
-      out.push(
-        isImage
-          ? {
-              type: "image",
-              target,
-              styles: { alignment: "left" },
-              alt: title,
+              continue;
             }
-          : {
-              type: "link",
-              target,
-              content: [{ type: "text", content: title, styles }],
-            },
-      );
+
+            const char = text.charAt(i);
+
+            if (char === "\\") {
+              escaping = true;
+              continue;
+            }
+
+            if (char === "]") {
+              if (closing) {
+                closed = true;
+                break;
+              }
+
+              closing = true;
+              continue;
+            }
+          }
+
+          if (!closed) {
+            break;
+          }
+
+          treated = i + 1;
+
+          const substr = text.substring(match + firstItem.match.length, i - 1);
+
+          let title: string | null;
+          let targetStr: string;
+
+          const pipeCharPos = substr.indexOf("|");
+
+          if (pipeCharPos !== -1) {
+            title = substr.substring(0, pipeCharPos);
+            targetStr = substr.substring(pipeCharPos + 1);
+          } else {
+            title = null;
+            targetStr = substr;
+          }
+
+          const reference = this.context.parseReference(
+            targetStr,
+            isImage ? EntityType.ATTACHMENT : EntityType.DOCUMENT,
+          );
+
+          const target: LinkTarget = {
+            type: "internal",
+            rawReference: targetStr,
+            parsedReference: reference,
+          };
+
+          title ??= reference
+            ? this.context.getDisplayName(reference)
+            : "<invalid reference>";
+
+          out.push(
+            isImage
+              ? {
+                  type: "image",
+                  target,
+                  styles: { alignment: "left" },
+                  alt: title,
+                }
+              : {
+                  type: "link",
+                  target,
+                  content: [{ type: "text", content: title, styles }],
+                },
+          );
+
+          break;
+        }
+
+        case "macro": {
+          // Find the macro's name
+          const macroNameMatch = text
+            .substring(match + firstItem.match.length)
+            .match(
+              // This weird group matches valid accentuated Unicode letters
+              /\s*([A-Za-zÀ-ÖØ-öø-ÿ\d]+)(\s+(?=[A-Za-zÀ-ÖØ-öø-ÿ\d/])|(?=\/))/,
+            );
+
+          if (!macroNameMatch) {
+            treated = match + firstItem.match.length;
+            out.push({ type: "text", content: firstItem.match, styles: {} });
+            break;
+          }
+
+          const macroName = macroNameMatch[1];
+
+          let i;
+
+          // Is the next character being escaped?
+          let escaping = false;
+
+          // Parameters are built character by character
+          // First the name is parsed from the source, then the value
+          let buildingParameter: { name: string; value: string | null } | null =
+            null;
+
+          // The list of parsed parameters
+          const parameters: Record<string, string> = {};
+
+          // Is the macro being closed?
+          let closingMacro = false;
+
+          for (
+            i = match + firstItem.match.length + macroNameMatch[0].length;
+            i < text.length;
+            i++
+          ) {
+            // Escaping is possible only inside parameter values
+            if (escaping) {
+              if (!buildingParameter || buildingParameter.value === null) {
+                throw new Error("Unexpected");
+              }
+
+              escaping = false;
+              buildingParameter.value += text[i];
+
+              continue;
+            }
+
+            // If we're not building a parameter, we are expecting one thing between...
+            if (!buildingParameter) {
+              // ...a space (no particular meaning)
+              if (text[i] === " ") {
+                continue;
+              }
+
+              // ...a valid identifier character which will begin the parameter's name
+              if (text[i].match(/[A-Za-zÀ-ÖØ-öø-ÿ_\d]/)) {
+                buildingParameter = { name: text[i], value: null };
+                continue;
+              }
+
+              // ...or a closing slash which indicates the macro has no more parameter
+              if (text[i] === "/") {
+                closingMacro = true;
+                break;
+              }
+
+              // Invalid character, stop building macro here
+              break;
+            }
+
+            // If we're building a parameter's name, we are expecting one thing between...
+            if (buildingParameter.value === null) {
+              // ...a valid identifier character which will continue the parameter's name
+              if (text[i].match(/[A-Za-zÀ-ÖØ-öø-ÿ_\d]/)) {
+                buildingParameter.name += text[i];
+                continue;
+              }
+
+              // ...or an '=' operator sign which indicates we are going to assign a value to the parameter
+              if (text[i] === "=") {
+                // Usually parameters start with a double quote to indicate they have a string-like value
+                if (text[i + 1] === '"') {
+                  i += 1;
+                  buildingParameter.value = "";
+                  continue;
+                }
+
+                // But unquoted integers are also accepted
+                const number = text
+                  .substring(i + 1)
+                  .match(/\d+(?=[^A-Za-zÀ-ÖØ-öø-ÿ\d])/);
+
+                if (!number) {
+                  // Invalid character, stop building macro here
+                  break;
+                }
+
+                parameters[buildingParameter.name] = number[0];
+                buildingParameter = null;
+
+                i += number[0].length;
+                continue;
+              }
+
+              // Invalid character, stop building macro here
+              break;
+            }
+
+            // If we reach this point, we are building the parameter's value.
+            // Which means we are expecting either:
+            // ...an escaping character
+            if (text[i] === "\\") {
+              escaping = true;
+            }
+            // ...a closing double quote to indicate the parameter's value's end
+            else if (text[i] === '"') {
+              parameters[buildingParameter.name] = buildingParameter.value;
+              buildingParameter = null;
+            }
+            // ...or any other character that will continue the parameter's value
+            else {
+              buildingParameter.value += text[i];
+            }
+          }
+
+          // When the macro closes, we expect double braces afterwards
+          const closingBraces = text.substring(i).match(/\s*}}/);
+
+          // If the macro has not been closed properly (with a '/') or doesn't have the closing braces, it's invalid
+          if (!closingMacro || !closingBraces) {
+            treated = match + firstItem.match.length;
+            out.push({ type: "text", content: firstItem.match, styles: {} });
+          }
+          // Otherwise, we can properly build the macro
+          else {
+            treated = i + 1 + closingBraces[0].length;
+
+            // NOTE: If a paragraph only contains an inline macro, it will be converted to a macro block instead
+            //       by the calling function
+            out.push({
+              type: "inlineMacro",
+              name: macroName,
+              params: parameters,
+            });
+          }
+
+          break;
+        }
+
+        default:
+          assertUnreachable(firstItem.name);
+      }
     }
 
-    if (text.substring(previousMatch).length > 0) {
+    // Push the leftover text after the last XWiki-specific element as plain text
+    if (text.substring(treated).length > 0) {
       out.push({
         type: "text",
-        content: text.substring(previousMatch),
+        content: text.substring(treated),
         styles,
       });
     }
 
     return out;
   }
+}
+
+function findFirstMatchIn<K extends string>(
+  subject: string,
+  candidates: Array<{ name: K; match: string }>,
+): { name: K; match: string; offset: number } | null {
+  let first: { name: K; match: string; offset: number } | null = null;
+
+  for (const { name, match } of candidates) {
+    const offset = subject.indexOf(match);
+
+    if (offset !== -1 && (first === null || first.offset > offset)) {
+      first = { name, match, offset };
+    }
+  }
+
+  return first;
 }
 
 /**

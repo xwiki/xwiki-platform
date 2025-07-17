@@ -54,9 +54,10 @@ type Block =
     } & Image)
   | { type: "break" }
   | {
-      type: "macro";
+      /** @since 0.20 */
+      type: "macroBlock";
       name: string;
-      props: Record<string, boolean | number | string>;
+      params: Record<string, boolean | number | string>;
     };
 
 /**
@@ -120,6 +121,12 @@ type InlineContent =
       type: "link";
       target: LinkTarget;
       content: Exclude<InlineContent, { type: "link" }>[];
+    }
+  | {
+      /** @since 0.20 */
+      type: "inlineMacro";
+      name: string;
+      params: Record<string, boolean | number | string>;
     };
 
 /**
@@ -147,7 +154,19 @@ type TextStyles = {
  * @since 0.16
  */
 type LinkTarget =
-  | { type: "internal"; reference: EntityReference }
+  | {
+      type: "internal";
+
+      /** @since 0.20 */
+      rawReference: string;
+
+      /**
+       * Will be `null` if the raw reference is invalid and can't be parsed
+       *
+       * @since 0.20
+       */
+      parsedReference: EntityReference | null;
+    }
   | { type: "external"; url: string };
 
 export type {

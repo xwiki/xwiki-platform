@@ -31,7 +31,10 @@ import {
   DocumentService,
   name as documentServiceName,
 } from "@xwiki/cristal-document-api";
-import { BlocknoteEditor as CBlockNoteView } from "@xwiki/cristal-editors-blocknote-headless";
+import {
+  BlocknoteEditor as CBlockNoteView,
+  DEFAULT_MACROS,
+} from "@xwiki/cristal-editors-blocknote-headless";
 import { ModelReferenceHandlerProvider } from "@xwiki/cristal-model-reference-api";
 import { CArticle } from "@xwiki/cristal-skin";
 import {
@@ -100,7 +103,7 @@ const editorInstance =
 // Tools for UniAst handling
 const converterContext = createConverterContext(container);
 const markdownToUniAst = new MarkdownToUniAstConverter(converterContext);
-const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
+const uniAstToMarkdown = new UniAstToMarkdownConverter();
 
 // Saving status
 const saveStatus = ref<SaveStatus>(SaveStatus.SAVED);
@@ -127,6 +130,7 @@ async function loadEditor(currentPage: PageData | undefined): Promise<void> {
     // TODO: make this customizable
     // https://jira.xwiki.org/browse/CRISTAL-457
     lang: "en",
+    macros: Object.values(DEFAULT_MACROS),
   };
 
   editorContent.value = markdownToUniAst.parseMarkdown(currentPage.source);

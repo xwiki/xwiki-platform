@@ -517,9 +517,17 @@ define(
       value = isBooleanType(parameterDescriptor.displayType) ? value[0] : value.join();
     }
     let defaultValue = parameterDescriptor.defaultValue;
-    if (value !== '' && (defaultValue === undefined || defaultValue === null || (defaultValue + '') !== value)) {
+    if (value !== '' && !isValueSameAsDefaultValue(value, defaultValue)) {
       macroCall.parameters[parameterDescriptor.id] = value;
     }
+  },
+
+  isValueSameAsDefaultValue = function (value, defaultValue) {
+    if (defaultValue === undefined || defaultValue === null) {
+      return false;
+    } else if (typeof defaultValue === 'object') {
+      return JSON.stringify(defaultValue) === value;
+    } else return (defaultValue + '') === value;
   },
 
   isBooleanType = function(type) {

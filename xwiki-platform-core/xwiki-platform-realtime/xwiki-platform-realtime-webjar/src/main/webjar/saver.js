@@ -121,6 +121,11 @@ define('xwiki-realtime-saver', [
           // interval is reached (even if the user is still making changes).
           this._dirtyTimestamp = now();
         }
+      } else if (this._isSomeoneSaving()) {
+        // Avoid auto-saving more often than the SAVE_INTERVAL. It's possible that the SAVE_INTERVAL is reached for
+        // multiple users that are editing at the same time. In this case the auto-save should be triggered for only one
+        // of them. For the others the auto-save should be delayed until the SAVE_INTERVAL is reached again.
+        delete this._dirtyTimestamp;
       }
       if (push) {
         // Push the state of this saver to the other clients.

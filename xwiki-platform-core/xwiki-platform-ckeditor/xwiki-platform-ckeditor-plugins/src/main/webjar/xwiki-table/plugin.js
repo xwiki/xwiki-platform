@@ -74,8 +74,7 @@
     // Create a warning message for the accessibility without headers.
     const warningMessage = document.createElement('span');
     warningMessage.classList.add('box', 'warningmessage');
-    warningMessage.textContent = CKEDITOR.tools.htmlEncode(
-      editor.localization.get('xwiki-table.header.accessibilityWarning'));
+    warningMessage.textContent = editor.localization.get('xwiki-table.header.accessibilityWarning');
     // We navigate the structure of the tab to insert this message exactly next to the header.
     infoTab.elements[0].children[0].children.splice(4, 0, {
       type : 'html',

@@ -101,7 +101,7 @@ class LoginIT
         LoginPage.gotoPage();
         LoginPage loginPage = new LoginPage();
         loginPage.loginAs("Admin", "wrong password");
-        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        assertTrue(loginPage.hasInvalidCredentialsErrorMessage(), "Obtained message: "+ loginPage.getErrorMessages());
         logCaptureConfiguration.registerExpected("Authentication failure with login [Admin]");
 
         loginPage.loginAs("non existent user", "admin");

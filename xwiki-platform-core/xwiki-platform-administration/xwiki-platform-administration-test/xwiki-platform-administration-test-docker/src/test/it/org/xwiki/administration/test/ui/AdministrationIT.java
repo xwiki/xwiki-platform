@@ -76,7 +76,7 @@ class AdministrationIT
         page = new AdministrablePage();
         AdministrationPage pageAdministrationPage = page.clickAdministerPage();
         String fullName = setup.serializeLocalReference(testReference.getParent());
-        assertEquals("Page Administration: " + fullName, 
+        assertEquals("Page Administration: " + fullName,
             pageAdministrationPage.getDocumentTitle());
         assertTrue(pageAdministrationPage.getBreadcrumbContent().endsWith("/Page Administration"));
 

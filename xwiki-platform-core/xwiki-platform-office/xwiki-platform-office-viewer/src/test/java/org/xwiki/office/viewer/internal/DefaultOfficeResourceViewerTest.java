@@ -77,6 +77,9 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLSecurityManager;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
@@ -97,6 +100,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@WireMockTest
 @ComponentTest
 class DefaultOfficeResourceViewerTest
 {
@@ -527,9 +531,12 @@ class DefaultOfficeResourceViewerTest
     }
 
     @Test
-    void viewURLWithDistantFile() throws Exception
+    void viewURLWithDistantFile(WireMockRuntimeInfo wmRuntimeInfo) throws Exception
     {
-        ResourceReference resourceReference = new ResourceReference("http://mydomain.com/myfile", ResourceType.URL);
+        int httpPort = wmRuntimeInfo.getHttpPort();
+        String url = String.format("http://localhost:%s/myfile", httpPort);
+        WireMock.stubFor(WireMock.get(WireMock.urlEqualTo("/myfile")).willReturn(WireMock.ok()));
+        ResourceReference resourceReference = new ResourceReference(url, ResourceType.URL);
         when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(
             "url:" + resourceReference.getReference());
 
@@ -537,12 +544,12 @@ class DefaultOfficeResourceViewerTest
         DocumentReference ownerDocRef = new DocumentReference("xwiki", "Owner", "Document");
         when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(ownerDocRef);
 
-        URL resourceUrl = new URL("http://mydomain.com/myfile");
+        URL resourceUrl = new URL(url);
         when(this.urlSecurityManager.isDomainTrusted(resourceUrl)).thenReturn(false);
 
-        Exception expectedException = new Exception("The requested resource [http://mydomain.com/myfile] does not "
+        Exception expectedException = new Exception(String.format("The requested resource [%s] does not "
             + "belong to the list of trusted domains. "
-            + "Please ask your administrator to add it to the list of trusted domains to access it.");
+            + "Please ask your administrator to add it to the list of trusted domains to access it.", url));
 
         Exception exception =
             assertThrows(Exception.class, () -> this.officeResourceViewer.createView(resourceReference, parameters));

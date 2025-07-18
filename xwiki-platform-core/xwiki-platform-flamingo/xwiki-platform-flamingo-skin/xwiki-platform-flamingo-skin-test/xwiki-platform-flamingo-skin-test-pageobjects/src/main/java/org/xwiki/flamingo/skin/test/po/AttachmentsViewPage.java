@@ -32,6 +32,19 @@ public class AttachmentsViewPage extends ViewPage
 {
     private static final String ATTACHMENTS = "attachments";
 
+    private static final String ATTACHMENTSLINK = "Attachmentslink";
+
+    /**
+     * @return if the attachments pane is available
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean isAttachmentsDocExtraPaneAvailable()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(ATTACHMENTSLINK));
+    }
+
     /**
      * Open the attachments docextra tab.
      *
@@ -39,7 +52,7 @@ public class AttachmentsViewPage extends ViewPage
      */
     public AttachmentsPane openAttachmentsDocExtraPane()
     {
-        getDriver().findElement(By.id("Attachmentslink")).click();
+        getDriver().findElement(By.id(ATTACHMENTSLINK)).click();
         waitForDocExtraPaneActive(ATTACHMENTS);
         return new AttachmentsPane();
     }

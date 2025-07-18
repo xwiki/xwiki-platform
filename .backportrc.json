@@ -1,0 +1,12 @@
+{
+  "repoOwner": "xwiki",
+  "repoName": "xwiki-platform",
+  "targetBranchChoices": [],
+  "branchLabelMapping": {
+    "^backport (.+)$": "$1"
+  },
+  "autoAssign": true,
+  "publishStatusCommentOnAbort": false,
+  "publishStatusCommentOnFailure": true,
+  "copySourcePRReviewers": true
+}

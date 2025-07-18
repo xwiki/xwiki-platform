@@ -36,6 +36,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -46,6 +47,8 @@ import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -94,6 +97,12 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
     @Named("context")
     private Provider<ComponentManager> contextComponentManagerProvider;
 
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> userReferenceResolver;
+
+    @Inject
+    private LocalizationManager localizationManager;
+
     @FunctionalInterface
     private interface RenameLambda
     {
@@ -126,11 +135,10 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
      * clear whether the content author deserves to be updated or not (even without the side effects).
      * 
      * @param document the document to be saved
-     * @param comment the revision comment
-     * @param minorEdit whether it's a minor edit or not
+     * @param commentTranslationKey the revision comment translation key
      * @throws XWikiException if saving the document fails
      */
-    private void saveDocumentPreservingContentAuthor(XWikiDocument document, String comment, boolean minorEdit)
+    private void saveDocumentPreservingAuthors(XWikiDocument document, String commentTranslationKey)
         throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -138,8 +146,11 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         document.setContentDirty(false);
         // Make sure the version is incremented.
         document.setMetaDataDirty(true);
-        document.setAuthorReference(xcontext.getUserReference());
-        xcontext.getWiki().saveDocument(document, comment, minorEdit, xcontext);
+        document.getAuthors().setOriginalMetadataAuthor(
+            this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE));
+        Locale defaultLocale = this.localizationManager.getDefaultLocale();
+        String comment = this.localizationManager.getTranslationPlain(commentTranslationKey, defaultLocale);
+        xcontext.getWiki().saveDocument(document, comment, true, xcontext);
     }
 
     private boolean renameLinks(XWikiDocument document, boolean relative, RenameLambda renameLambda)
@@ -205,6 +216,31 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         }
     }
 
+    private void maybeSaveDocumentPreservingAuthors(XWikiDocument documentToModify, boolean modified,
+        DocumentReference currentDocumentReference, boolean relative, EntityReference oldTarget,
+        EntityReference newTarget) throws XWikiException
+    {
+        if (modified) {
+            if (relative) {
+                saveDocumentPreservingAuthors(documentToModify,
+                    "refactoring.referenceUpdater.saveMessage.relativeLink");
+
+                info("Updated the relative links from [{}].", currentDocumentReference);
+            } else {
+                saveDocumentPreservingAuthors(documentToModify, "refactoring.referenceUpdater.saveMessage.backlinks");
+
+                info("The links from [{}] that were targeting [{}] have been updated to target [{}].",
+                    documentToModify.getDocumentReferenceWithLocale(), oldTarget, newTarget);
+            }
+        } else {
+            if (relative) {
+                info("No relative links to update in [{}].", currentDocumentReference);
+            } else {
+                info("No back-links to update in [{}].", currentDocumentReference);
+            }
+        }
+    }
+
     private void renameLinks(XWikiDocument document, EntityReference oldTarget, EntityReference newTarget,
         XWikiContext xcontext, boolean relative, RenameLambda renameLambda) throws XWikiException
     {
@@ -233,36 +269,28 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
             return;
         }
 
+        // Avoid modifying the cached document
+        XWikiDocument documentToModify;
+        if (document.isCached()) {
+            documentToModify = document.clone();
+        } else {
+            documentToModify = document;
+        }
+
         // Document content
-        boolean modified = renameLinks(document, relative, renameLambda);
+        boolean modified = renameLinks(documentToModify, relative, renameLambda);
 
         // XObjects properties
-        for (List<BaseObject> xobjects : document.getXObjects().values()) {
+        for (List<BaseObject> xobjects : documentToModify.getXObjects().values()) {
             for (BaseObject xobject : xobjects) {
                 if (xobject != null) {
-                    modified |= renameLinks(xobject, document, renderer, xcontext, relative, renameLambda);
+                    modified |= renameLinks(xobject, documentToModify, renderer, xcontext, relative, renameLambda);
                 }
             }
         }
 
-        if (modified) {
-            if (relative) {
-                saveDocumentPreservingContentAuthor(document, "Updated the relative links.", true);
-
-                info("Updated the relative links from [{}].", currentDocumentReference);
-            } else {
-                saveDocumentPreservingContentAuthor(document, "Renamed back-links.", false);
-
-                info("The links from [{}] that were targeting [{}] have been updated to target [{}].",
-                    document.getDocumentReferenceWithLocale(), oldTarget, newTarget);
-            }
-        } else {
-            if (relative) {
-                info("No relative links to update in [{}].", currentDocumentReference);
-            } else {
-                info("No back-links to update in [{}].", currentDocumentReference);
-            }
-        }
+        maybeSaveDocumentPreservingAuthors(documentToModify, modified, currentDocumentReference, relative, oldTarget,
+            newTarget);
     }
 
     private void renameLinks(DocumentReference documentReference, DocumentReference oldLinkTarget,

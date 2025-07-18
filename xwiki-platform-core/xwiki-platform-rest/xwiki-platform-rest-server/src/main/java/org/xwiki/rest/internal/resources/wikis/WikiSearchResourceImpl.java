@@ -21,12 +21,16 @@ package org.xwiki.rest.internal.resources.wikis;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.BaseSearchResult;
+import org.xwiki.rest.internal.resources.KeywordSearchOptions;
+import org.xwiki.rest.internal.resources.KeywordSearchScope;
+import org.xwiki.rest.internal.resources.KeywordSearchSource;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
 
@@ -37,31 +41,39 @@ import org.xwiki.rest.resources.wikis.WikiSearchResource;
 @Named("org.xwiki.rest.internal.resources.wikis.WikiSearchResourceImpl")
 public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSearchResource
 {
+    @Inject
+    private KeywordSearchSource keywordSearchSource;
+
     @Override
     public SearchResults search(String wikiName, String keywords, List<String> searchScopeStrings, Integer number,
         Integer start, String orderField, String order, Boolean withPrettyNames, Boolean isLocaleAware)
             throws XWikiRestException
     {
-        try {
-            SearchResults searchResults = objectFactory.createSearchResults();
-            searchResults.setTemplate(String.format("%s?%s",
-                Utils.createURI(uriInfo.getBaseUri(), WikiSearchResource.class, wikiName).toString(),
-                SEARCH_TEMPLATE_INFO));
+        SearchResults searchResults = objectFactory.createSearchResults();
+        searchResults.setTemplate(String.format("%s?%s",
+            Utils.createURI(uriInfo.getBaseUri(), WikiSearchResource.class, wikiName).toString(),
+            SEARCH_TEMPLATE_INFO));
 
-            if (wikiName != null) {
-                Utils.getXWikiContext(componentManager).setWikiId(wikiName);
-            }
-
-            List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
-
-            searchResults.getSearchResults().addAll(
-                search(searchScopes, keywords, getXWikiContext().getWikiId(), null, Utils.getXWiki(componentManager)
-                    .getRightService().hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start,
-                    true, orderField, order, withPrettyNames, isLocaleAware));
-
-            return searchResults;
-        } catch (Exception e) {
-            throw new XWikiRestException(e);
+        if (wikiName != null) {
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
         }
+
+        List<KeywordSearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
+
+        KeywordSearchOptions searchOptions = KeywordSearchOptions.builder()
+            .searchScopes(searchScopes)
+            .wikiName(getXWikiContext().getWikiId())
+            .space(null)
+            .number(number)
+            .start(start)
+            .orderField(orderField)
+            .order(order)
+            .withPrettyNames(withPrettyNames)
+            .isLocaleAware(isLocaleAware)
+            .build();
+        searchResults.getSearchResults().addAll(
+            this.keywordSearchSource.search(keywords, searchOptions, this.uriInfo.getBaseUri()));
+
+        return searchResults;
     }
 }

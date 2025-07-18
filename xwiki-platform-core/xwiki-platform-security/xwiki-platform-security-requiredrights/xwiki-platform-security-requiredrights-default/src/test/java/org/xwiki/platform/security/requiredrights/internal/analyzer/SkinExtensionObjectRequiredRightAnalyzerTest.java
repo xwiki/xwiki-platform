@@ -41,6 +41,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -65,13 +66,19 @@ class SkinExtensionObjectRequiredRightAnalyzerTest
     private SkinExtensionObjectRequiredRightAnalyzer analyzer;
 
     @ParameterizedTest
-    @CsvSource(value = { "always, programming",
-        "currentPage, script",
-        "onDemand, script" })
-    void analyze(String use, Right requiredRight) throws RequiredRightsException
+    @CsvSource(value = {
+        "always, admin, false",
+        "always, admin, true",
+        "currentPage, script, false",
+        "currentPage, script, true",
+        "onDemand, script, false",
+        "onDemand, script, true"
+    })
+    void analyze(String use, Right requiredRight, boolean parse) throws RequiredRightsException
     {
         BaseObject object = mock();
         when(object.getStringValue("use")).thenReturn(use);
+        when(object.getIntValue("parse")).thenReturn(parse ? 1 : 0);
         ObjectReference objectReference = mock();
         doReturn(objectReference).when(object).getReference();
 
@@ -81,20 +88,35 @@ class SkinExtensionObjectRequiredRightAnalyzerTest
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
         assertEquals(objectReference, analysisResult.getEntityReference());
         if ("always".equals(use)) {
-            verify(this.translationMessageSupplierProvider).get("security.requiredrights.object.skinExtension.always");
+            if (parse) {
+                verify(this.translationMessageSupplierProvider)
+                    .get("security.requiredrights.object.parsedSkinExtension.always");
+            } else {
+                verify(this.translationMessageSupplierProvider)
+                    .get("security.requiredrights.object.skinExtension.always");
+            }
+        } else if (parse) {
+            verify(this.translationMessageSupplierProvider).get("security.requiredrights.object.parsedSkinExtension");
         } else {
             verify(this.translationMessageSupplierProvider).get("security.requiredrights.object.skinExtension");
         }
 
         verify(this.xObjectDisplayerProvider).get(object);
-        assertEquals(1, analysisResult.getRequiredRights().size());
+        assertEquals(parse ? 2 : 1, analysisResult.getRequiredRights().size());
         RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
-        if (requiredRight.equals(Right.PROGRAM)) {
-            assertNull(requiredRightResult.getEntityType());
+        if (requiredRight.equals(Right.ADMIN)) {
+            assertEquals(EntityType.WIKI, requiredRightResult.getEntityType());
         } else {
             assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
         }
         assertFalse(requiredRightResult.isManualReviewNeeded());
+
+        if (parse) {
+            RequiredRight secondResult = analysisResult.getRequiredRights().get(1);
+            assertEquals(Right.PROGRAM, secondResult.getRight());
+            assertNull(secondResult.getEntityType());
+            assertTrue(secondResult.isManualReviewNeeded());
+        }
     }
 }

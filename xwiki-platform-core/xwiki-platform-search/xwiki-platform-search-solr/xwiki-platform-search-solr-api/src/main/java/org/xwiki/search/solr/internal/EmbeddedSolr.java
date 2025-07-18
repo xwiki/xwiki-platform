@@ -20,6 +20,8 @@
 package org.xwiki.search.solr.internal;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -89,6 +92,10 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
     private static final long SEARCH_CORE_SCHEMA_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_16_6;
 
+    private static final String CORE_PROPERTIES_FILENAME = "core.properties";
+
+    private static final String DATA_DIR_PROPERTY = "dataDir";
+
     /**
      * Solr configuration.
      */
@@ -126,6 +133,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
             // Validate and create the search core
             if (Files.exists(this.solrSearchCorePath)) {
+
                 // Make sure the core setup is up to date
                 if (!isSearchCoreValid()) {
                     // Recreate the home folder
@@ -311,8 +319,35 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         return -1;
     }
 
-    private boolean isSearchCoreValid()
+    private boolean isSearchCoreValid() throws IOException
     {
+
+        // Due to https://jira.xwiki.org/browse/XWIKI-22741 the cache on windows was
+        // being put in the wrong place. Let's check and clean it up if we find it
+        {
+
+            File corePropertiesFile = getCacheCorePropertiesFile(this.solrSearchCorePath);
+            if (corePropertiesFile.exists()) {
+                Properties properties = new Properties();
+                try (FileInputStream in = new FileInputStream(corePropertiesFile)) {
+                    properties.load(in);
+                }
+
+                String dataDirPropertyValue = properties.getProperty(DATA_DIR_PROPERTY);
+                if (dataDirPropertyValue != null && !dataDirPropertyValue.contains(File.separator)) {
+                    this.logger.warn("The Solr search core index is configured to be stored at the wrong location [{}]",
+                        dataDirPropertyValue);
+                    File badCacheLocation = new File(corePropertiesFile.getParent(), dataDirPropertyValue);
+                    if (badCacheLocation.exists()) {
+                        this.logger.info("Removing the old Solr search core index files from [{}]",
+                            badCacheLocation.getAbsolutePath());
+                        FileUtils.deleteDirectory(badCacheLocation);
+                    }
+                    return false;
+                }
+            }
+        }
+
         // Exists but is unusable.
         if (!Files.isDirectory(this.solrSearchCorePath) || !Files.isWritable(this.solrSearchCorePath)
             || !Files.isReadable(this.solrSearchCorePath)) {
@@ -443,7 +478,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                 if (entry.isDirectory()) {
                     Files.createDirectories(targetPath);
                 } else if ((force != null && force.contains(entry.getName())) || (!Files.exists(targetPath)
-                    && (!skipCoreProperties || !entry.getName().equals("core.properties")))) {
+                    && (!skipCoreProperties || !entry.getName().equals(CORE_PROPERTIES_FILENAME)))) {
                     FileUtils.copyInputStreamToFile(CloseShieldInputStream.wrap(zstream), targetPath.toFile());
                 }
             }
@@ -460,12 +495,22 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         createCacheCore(this.solrSearchCorePath, toSolrCoreName(SolrClientInstance.CORE_NAME));
     }
 
+    private File getCacheCorePropertiesFile(Path corePath)
+    {
+        File corePropertiesFile = corePath.resolve(CORE_PROPERTIES_FILENAME).toFile();
+        return corePropertiesFile;
+    }
+
     private void createCacheCore(Path corePath, String solrCoreName) throws IOException
     {
-        // Indicate the path of the data
-        Path dataPath = getCacheCoreDataDir(corePath, solrCoreName);
-        FileUtils.write(corePath.resolve("core.properties").toFile(), "dataDir=" + dataPath, StandardCharsets.UTF_8,
-            true);
+        Path dataDir = getCacheCoreDataDir(corePath, solrCoreName);
+        File corePropertiesFile = getCacheCorePropertiesFile(corePath);
+        Properties coreProperties = new Properties();
+        coreProperties.setProperty(DATA_DIR_PROPERTY, dataDir.toString());
+        // we recreate this file every time this gets called.
+        try (FileOutputStream out = new FileOutputStream(corePropertiesFile, false);) {
+            coreProperties.store(out, "");
+        }
     }
 
     private Path getCacheCoreDataDir(Path corePath, String solrCoreName)

@@ -72,11 +72,11 @@ repository.supportplan.sheet.description=此页面控制 ExtensionSupportPlan �
 repository.supportplan.sheet.noObject=当前页面没有预期的 ExtensionSupportPlan 对象。
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
-### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
-### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
+ExtensionCode.ExtensionSupportPlanClass_supporter=支持者
+ExtensionCode.ExtensionSupportPlanClass_summary=总结
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_url=URL
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_content=Details
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_active=Active
-### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+ExtensionCode.ExtensionSupportPlanClass_paying=付款
 </content>
 </xwikidoc>

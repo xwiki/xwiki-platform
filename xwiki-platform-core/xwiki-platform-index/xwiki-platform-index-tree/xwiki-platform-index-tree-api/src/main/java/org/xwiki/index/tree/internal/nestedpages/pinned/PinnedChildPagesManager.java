@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -41,6 +40,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -78,6 +79,9 @@ public class PinnedChildPagesManager
     @Inject
     private ContextualLocalizationManager contextLocalization;
 
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
+
     /**
      * @param childReference the child document for which to retrieve the parent entity
      * @return the parent entity where the specified child document can be pinned.
@@ -111,10 +115,30 @@ public class PinnedChildPagesManager
      */
     public void setPinnedChildPages(EntityReference parentReference, List<DocumentReference> pagesToPin)
     {
+        final EntityReference parentEntityReference;
+        if (parentReference instanceof DocumentReference) {
+            if (parentReference.getName().equals(getDefaultDocumentName())) {
+                parentEntityReference = parentReference.getParent();
+            } else {
+                throw new IllegalArgumentException(String.format("Invalid parent reference [%s], only nested document "
+                    + "reference are allowed.", parentReference));
+            }
+        } else {
+            parentEntityReference = parentReference;
+        }
         // Make sure we pin only the pages that are children of the specified parent.
-        List<DocumentReference> pinnedChildPages =
-            pagesToPin.stream().filter(childReference -> Objects.equals(getParent(childReference), parentReference))
-                .collect(Collectors.toList());
+        List<DocumentReference> pinnedChildPages = pagesToPin
+            .stream()
+            .filter(childReference -> {
+                if (!Objects.equals(getParent(childReference), parentEntityReference)) {
+                    this.logger.warn("Page [{}] is not a child of [{}] so it won't be pinned.", childReference,
+                        parentEntityReference);
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+            .toList();
         getPinnedChildPagesStorage(parentReference)
             .ifPresent(storageReference -> setPinnedChildPages(storageReference, pinnedChildPages));
     }
@@ -153,10 +177,14 @@ public class PinnedChildPagesManager
             XWikiContext xcontext = this.xcontextProvider.get();
             // Clone the document to avoid modifying the cached instance.
             XWikiDocument storageDocument = xcontext.getWiki().getDocument(storageReference, xcontext).clone();
-            DocumentReference classReference = new DocumentReference(PinnedChildPagesClassInitializer.CLASS_REFERENCE,
-                storageReference.getWikiReference());
+            if (storageDocument.isNew()) {
+                storageDocument.setHidden(true);
+            }
+            storageDocument.getAuthors().setOriginalMetadataAuthor(
+                this.currentUserReferenceResolver.resolve(CurrentUserReference.INSTANCE));
             List<String> value = serializePinnedChildPages(pinnedChildPages);
-            storageDocument.setStringListValue(classReference, PinnedChildPagesClassInitializer.PROPERTY_NAME, value);
+            storageDocument.setStringListValue(PinnedChildPagesClassInitializer.CLASS_REFERENCE,
+                PinnedChildPagesClassInitializer.PROPERTY_NAME, value);
             String saveComment =
                 this.contextLocalization.getTranslationPlain("index.tree.pinnedChildPages.saveComment");
             xcontext.getWiki().saveDocument(storageDocument, saveComment, true, xcontext);
@@ -188,7 +216,7 @@ public class PinnedChildPagesManager
 
     private List<String> serializePinnedChildPages(List<DocumentReference> pinnedChildPages)
     {
-        return pinnedChildPages.stream().map(this::serializePinnedChildPage).collect(Collectors.toList());
+        return pinnedChildPages.stream().map(this::serializePinnedChildPage).toList();
     }
 
     private String serializePinnedChildPage(DocumentReference pinnedChildPage)
@@ -198,7 +226,7 @@ public class PinnedChildPagesManager
         // We're going to add a slash at the end of the page name for nested child pages in order to distinguish them
         // from terminal child pages. This means we need to escape the slash that may appear in the page name. We chose
         // to use a partial URL escaping because it's easy to decode.
-        name = name.replace("%", "%25").replace(NESTED_PAGE_MARKER, "%2F");
+        name = name.replace("%", "%25").replace(NESTED_PAGE_MARKER, "%2F").replace("+", "%2B");
         if (!isTerminalPage) {
             name += '/';
         }
@@ -210,7 +238,7 @@ public class PinnedChildPagesManager
     {
         return pinnedChildPages.stream()
             .map(pinnedChildPage -> resolvePinnedChildPage(storageReference, pinnedChildPage))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private DocumentReference resolvePinnedChildPage(DocumentReference storageReference, String pinnedChildPage)

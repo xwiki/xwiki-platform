@@ -60,8 +60,15 @@ public class ResourceReferenceRenamer
     private EntityReferenceResolver<ResourceReference> entityReferenceResolver;
 
     @Inject
+    @Named("relative")
+    private EntityReferenceResolver<ResourceReference> relativeEntityReferenceResolver;
+
+    @Inject
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
+
+    @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     @Inject
     private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
@@ -152,8 +159,6 @@ public class ResourceReferenceRenamer
         DocumentReference absoluteResolvedDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(absoluteResolvedEntityReference);
 
-        boolean isRelativePageReferenceOutsideOfParent = false;
-
         // If the link targets the old (renamed) document reference and it's an absolute reference
         // (i.e. its resolution without any given parameter gives same result than its resolution with the
         // currentDocument) then we must update it
@@ -193,14 +198,26 @@ public class ResourceReferenceRenamer
                 newTargetReference = new AttachmentReference(linkEntityReference.getName(), newReference);
             }
 
-            String newReferenceString =
-                this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference);
-
+            String newReferenceString = getNewTargetReference(resourceReference, newTargetReference,
+                currentDocumentReference);
             resourceReference.setReference(newReferenceString);
             resourceReference.setType(newResourceType);
             result = true;
         }
         return result;
+    }
+
+    private String getNewTargetReference(ResourceReference resourceReference, EntityReference newTargetReference,
+        EntityReference currentReference)
+    {
+        EntityReference entityReference =
+            this.relativeEntityReferenceResolver.resolve(resourceReference, null, (Object) null);
+        // If the reference contains the wiki name, then we should keep the absolute serialization.
+        if (entityReference.extractReference(EntityType.WIKI) != null) {
+            return this.defaultEntityReferenceSerializer.serialize(newTargetReference, currentReference);
+        } else {
+            return this.compactEntityReferenceSerializer.serialize(newTargetReference, currentReference);
+        }
     }
 
     private boolean isPageReferenceOutOfParent(ResourceReference resourceReference,
@@ -232,7 +249,6 @@ public class ResourceReferenceRenamer
         // current link, use the old document's reference to fill in blanks.
         EntityReference oldLinkReference =
             this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
-        EntityReference absoluteResolvedReference = this.entityReferenceResolver.resolve(resourceReference, null);
 
         boolean docExists = false;
         EntityType entityType = linkEntityReference.getType();
@@ -254,20 +270,16 @@ public class ResourceReferenceRenamer
                 && documentReferenceTarget.equals(updatedEntities.get(documentReference))));
 
         // We should update the reference if:
-        //  - it's relative: the resolution of the reference without any parameter, and the resolution of the reference
-        //                   with the new reference should give different results
         //  - it doesn't match any reference moved in the same job, i.e. in the same hierarchy
         //  - the new and old link references don`t match
         //  - the link refers to a doc that exists
-        boolean shouldBeUpdated = !absoluteResolvedReference.equals(linkEntityReference)
-            && !anyMatchInMovedReferences
+        boolean shouldBeUpdated = !anyMatchInMovedReferences
             && !linkEntityReference.equals(oldLinkReference)
             && docExists;
 
         if (shouldBeUpdated) {
             // Serialize the old (original) link relative to the new document's location, in compact form.
-            String serializedLinkReference =
-                this.compactEntityReferenceSerializer.serialize(oldLinkReference, newReference);
+            String serializedLinkReference = getNewTargetReference(resourceReference, oldLinkReference, newReference);
             resourceReference.setReference(serializedLinkReference);
             result = true;
         }

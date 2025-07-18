@@ -21,10 +21,10 @@ package org.xwiki.realtime.internal;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.model.validation.edit.XWikiDocumentLockEditConfirmationChecker;
@@ -51,7 +51,7 @@ public class XWikiRealtimeDocumentLockEditConfirmationChecker extends XWikiDocum
     private Provider<XWikiContext> xwikiContextProvider;
 
     @Inject
-    private RealtimeEditorManager realtimeEditorManager;
+    private RealtimeSessionManager realtimeSessionManager;
 
     Optional<EditConfirmationCheckerResult> parentCheck()
     {
@@ -64,8 +64,7 @@ public class XWikiRealtimeDocumentLockEditConfirmationChecker extends XWikiDocum
     {
         XWikiContext context = this.xwikiContextProvider.get();
         XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
-        if (realtimeEditorManager.sessionIsActive(tdoc.getDocumentReference(), tdoc.getRealLocale(),
-            realtimeEditorManager.getSelectedEditor())) {
+        if (realtimeSessionManager.canJoinSession(tdoc.getDocumentReference(), tdoc.getRealLocale())) {
             return Optional.empty();
         }
         return parentCheck();

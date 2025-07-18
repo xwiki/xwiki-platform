@@ -52,15 +52,16 @@ tour.homepageTour.pageContent.title=Содержание страницы
 tour.homepageTour.pageContent.contentA=Это место, где отображается содержимое текущей страницы.
 tour.homepageTour.pageContent.contentB=Отредактируйте эту страницу, чтобы добавить таблицы, списки, макросы и структуру, чтобы упорядочить свои знания.
 tour.homepageTour.pageMenu.title=Меню cтраницы
-tour.homepageTour.pageMenu.contentA=Это меню содержит действия, связанные со страницей. Обладая соответствующими правами, вы можете редактировать, создавать или удалять страницы.
-tour.homepageTour.pageMenu.contentB=Кнопка {0} отображает дополнительные действия, таких как Экспорт, Печать и Поделиться.
+tour.homepageTour.pageMenu.contentA=Это меню содержит действия, связанные со страницей. Обладая соответствующими правами, вы можете редактировать, создавать, наблюдать за страницами и многое другое.
+tour.homepageTour.pageMenu.contentB=Кнопка {0} предлагает дополнительные действия, такие как администрирование, копирование/перемещение/переименование/удаление, экспорт, печать, аннотирование и поделиться.
 tour.homepageTour.pageTabs.title=Вкладки страницы
 tour.homepageTour.pageTabs.contentA=Комментарии - отличный способ обсудить содержание страницы.
 tour.homepageTour.pageTabs.contentB=Вы можете прикрепить файлы, сравнить версии страницы или просмотреть информацию о странице.
 tour.homepageTour.header.title=Заголовок
-tour.homepageTour.header.contentA=Вы можете искать контент, следить за изменениями страниц или получить доступ к своему профилю.
+tour.homepageTour.header.contentA=Вы можете искать контент, просматривать уведомления или получить доступ к своему профилю пользователя.
 tour.homepageTour.header.contentB=Кнопка {0} отображает действия, связанные с вики, такие как Администрирование и Индексы.
 tour.homepageTour.tourComplete.title=Тур завершен
 tour.homepageTour.tourComplete.contentA=На этом ваш тур по интерфейсу и основным функциям XWiki завершен.
-tour.homepageTour.tourComplete.contentB=Для получения более подробной информации о каждой функции, обратитесь к {0} документации {1}.</content>
+tour.homepageTour.tourComplete.contentB=Для получения более подробной информации о каждой функции, обратитесь к {0} документации {1}.
+</content>
 </xwikidoc>

@@ -21,13 +21,16 @@ package org.xwiki.container.servlet.internal;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionEvent;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.container.servlet.events.HttpSessionCreatedEvent;
+import org.xwiki.container.servlet.events.HttpSessionDestroyedEvent;
 import org.xwiki.container.servlet.events.SessionCreatedEvent;
 import org.xwiki.container.servlet.events.SessionDestroyedEvent;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -63,17 +66,20 @@ class HttpSessionManagerTest
     {
         assertTrue(this.httpSessionManager.getSessionList().isEmpty());
         HttpSessionEvent httpSessionEvent = mock(HttpSessionEvent.class);
-        HttpSession httpSession = mock(HttpSession.class);
-        when(httpSessionEvent.getSession()).thenReturn(httpSession);
+        HttpSession jakartaSession = mock(HttpSession.class);
+        when(httpSessionEvent.getSession()).thenReturn(jakartaSession);
+        javax.servlet.http.HttpSession javaxSession = JakartaServletBridge.toJavax(jakartaSession);
 
         this.httpSessionManager.sessionCreated(httpSessionEvent);
         assertEquals(1,  this.httpSessionManager.getSessionList().size());
-        assertEquals(httpSession, this.httpSessionManager.getSessionList().get(0));
-        verify(this.observationManager).notify(any(SessionCreatedEvent.class), eq(httpSession), isNull());
+        assertEquals(jakartaSession, this.httpSessionManager.getSessionList().get(0));
+        verify(this.observationManager).notify(any(HttpSessionCreatedEvent.class), eq(jakartaSession), isNull());
+        verify(this.observationManager).notify(any(SessionCreatedEvent.class), eq(javaxSession), isNull());
 
         this.httpSessionManager.sessionDestroyed(httpSessionEvent);
         assertTrue(this.httpSessionManager.getSessionList().isEmpty());
-        verify(this.observationManager).notify(any(SessionDestroyedEvent.class), eq(httpSession), isNull());
+        verify(this.observationManager).notify(any(HttpSessionDestroyedEvent.class), eq(jakartaSession), isNull());
+        verify(this.observationManager).notify(any(SessionDestroyedEvent.class), eq(javaxSession), isNull());
     }
 
 

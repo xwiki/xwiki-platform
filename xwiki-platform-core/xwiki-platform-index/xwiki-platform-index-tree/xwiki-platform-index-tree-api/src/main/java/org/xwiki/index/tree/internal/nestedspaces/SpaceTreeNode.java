@@ -34,10 +34,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
+import org.xwiki.index.tree.internal.macro.DocumentSort;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.properties.converter.Converter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -88,6 +90,9 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
     @Named("documentOrSpaceReferenceResolver/nestedSpaces")
     private QueryFilter documentOrSpaceReferenceResolverFilter;
 
+    @Inject
+    private Converter<DocumentSort> documentSortConverter;
+
     /**
      * Default constructor.
      */
@@ -119,10 +124,11 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
 
     protected Query getChildrenQuery(SpaceReference spaceReference, int offset, int limit) throws QueryException
     {
-        String orderBy = getOrderBy();
+        DocumentSort documentSort = this.documentSortConverter.convert(DocumentSort.class, getOrderBy());
+        String sortField = documentSort != null ? documentSort.getField() : null;
         Query query;
         if (areTerminalDocumentsShown()) {
-            if ("title".equals(orderBy)) {
+            if ("title".equals(sortField)) {
                 query = this.queryManager.getNamedQuery("nestedSpacesOrderedByTitle");
                 query.bindValue("locale", this.localizationContext.getCurrentLocale().toString());
             } else {
@@ -131,7 +137,7 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
         } else {
             // Query only the spaces table.
             query = this.queryManager.createQuery(
-                "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
+                "select reference, 0 as terminal from XWikiSpace space order by lower(name), name", Query.HQL);
         }
 
         query.setWiki(spaceReference.getWikiReference().getName());

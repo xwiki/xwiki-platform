@@ -25,6 +25,7 @@ import java.net.URL;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Provider;
@@ -61,6 +63,7 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -183,6 +186,8 @@ public class MockitoOldcore
     private QueryManager queryManager;
 
     private WikiDescriptorManager wikiDescriptorManager;
+
+    private Set<String> wikis = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     protected Map<DocumentReference, XWikiDocument> documents = new ConcurrentHashMap<>();
 
@@ -394,6 +399,12 @@ public class MockitoOldcore
             when(cacheControl.isCacheReadAllowed((ChronoLocalDateTime) any())).thenReturn(true);
         }
 
+        // Make sure a LoggerConfiguration is available by default
+        if (!getMocker().hasComponent(LoggerConfiguration.class)) {
+            LoggerConfiguration loggerConfiguration = getMocker().registerMockComponent(LoggerConfiguration.class);
+            when(loggerConfiguration.isDeprecatedLogEnabled()).thenReturn(true);
+        }
+
         // Expose a XWikiStubContextProvider if none is exist
         if (!getMocker().hasComponent(XWikiStubContextProvider.class)) {
             XWikiStubContextProvider conetxtProvider =
@@ -528,11 +539,11 @@ public class MockitoOldcore
                 // Also note that setting a non null request forces us to set a non null URL as otherwise it would lead
                 // to another NPE...
                 XWikiRequest originalRequest = getXWikiContext().getRequest();
-                if (getXWikiContext().getRequest() == null) {
+                if (originalRequest == null) {
                     getXWikiContext().setRequest(new XWikiServletRequestStub());
                 }
                 URL originalURL = getXWikiContext().getURL();
-                if (getXWikiContext().getURL() == null) {
+                if (originalURL == null) {
                     getXWikiContext().setURL(new URL("http://localhost:8080"));
                 }
                 stubContextProvider.initialize(getXWikiContext());
@@ -662,6 +673,10 @@ public class MockitoOldcore
                     document = new XWikiDocument(reference, reference.getLocale());
                     document.setSyntax(Syntax.PLAIN_1_0);
                     document.setOriginalDocument(document.clone());
+                } else {
+                    // Clone the document to make sure the test store behave as a real store (i.e. cannot be corrupted
+                    // by modifying the XWikiDocument instance and always return a new instance)
+                    document = document.clone();
                 }
 
                 return document;
@@ -719,6 +734,12 @@ public class MockitoOldcore
                 return null;
             }
         }).when(getMockStore()).saveXWikiDoc(anyXWikiDocument(), anyXWikiContext());
+        doAnswer(invocation -> {
+            XWikiDocument document = invocation.getArgument(0);
+            XWikiContext xcontext = invocation.getArgument(1);
+            getMockStore().saveXWikiDoc(document, xcontext);
+            return null;
+        }).when(getMockStore()).saveXWikiDoc(anyXWikiDocument(), anyXWikiContext(), anyBoolean());
         when(getMockStore().getLimitSize(any(), any(), any())).thenReturn(255);
 
         // XWikiVersioningStoreInterface
@@ -1147,6 +1168,14 @@ public class MockitoOldcore
                     return getXWikiContext().getWikiId();
                 }
             });
+            when(this.wikiDescriptorManager.getAllIds()).then(new Answer<Collection<String>>()
+            {
+                @Override
+                public Collection<String> answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return wikis;
+                }
+            });
         }
 
         // A default implementation of UserReferenceResolver<CurrentUserReference> is expected by
@@ -1245,7 +1274,9 @@ public class MockitoOldcore
 
         XWikiDocument savedDocument = document.clone();
 
-        documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
+        this.documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
+
+        this.wikis.add(document.getDocumentReference().getWikiReference().getName());
 
         // Set the document as it's original document
         savedDocument.setOriginalDocument(savedDocument.clone());
@@ -1486,5 +1517,10 @@ public class MockitoOldcore
     public UserPropertiesResolver getMockAllUserPropertiesResolver()
     {
         return this.allUserPropertiesResolver;
+    }
+
+    public void addWiki(String wikiId)
+    {
+        this.wikis.add(wikiId);
     }
 }

@@ -35,6 +35,11 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroIdFactory;
+import org.xwiki.rendering.macro.MacroLookupException;
+import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -42,9 +47,12 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
+import org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactory;
+import org.xwiki.wysiwyg.macro.MacroDescriptorUI;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -59,6 +67,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("wysiwyg")
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class WysiwygEditorScriptService implements ScriptService
 {
     /**
@@ -100,6 +109,15 @@ public class WysiwygEditorScriptService implements ScriptService
 
     @Inject
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    @Inject
+    private MacroDescriptorUIFactory macroDescriptorUIFactory;
+
+    @Inject
+    private MacroManager macroManager;
+
+    @Inject
+    private MacroIdFactory macroIdFactory;
 
     /**
      * Checks if there is a parser and a renderer available for the specified syntax.
@@ -446,6 +464,45 @@ public class WysiwygEditorScriptService implements ScriptService
             return Syntax.valueOf(syntaxId);
         } catch (ParseException e) {
             throw new RuntimeException(String.format("Invalid syntax [%s]", syntaxId), e);
+        }
+    }
+
+    /**
+     * Get a macro descriptor UI information to be used for configuring a macro.
+     * @param macroIdAsString the identifier of a macro
+     * @return an instance of {@link MacroDescriptorUI} containing all info for configuring the macro or {@code null}
+     * if it couldn't be found or initialized.
+     *
+     * @since 17.5.0
+     */
+    @Unstable
+    public MacroDescriptorUI getMacroDescriptorUI(String macroIdAsString)
+    {
+        try {
+            MacroId macroId = this.resolveMacroId(macroIdAsString);
+            if (macroId != null && this.macroManager.exists(macroId, true)) {
+                MacroDescriptor descriptor = this.macroManager.getMacro(macroId).getDescriptor();
+                return this.macroDescriptorUIFactory.buildMacroDescriptorUI(descriptor);
+            }
+        } catch (MacroLookupException e) {
+            this.logger.warn("Failed to lookup macro id [{}]. Root cause is: [{}]", macroIdAsString,
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+        return null;
+    }
+
+    /**
+     * @param macroIdAsString a string representing a macro id
+     * @return the resolved macro id or {@code null} if resolving the given string fails
+     */
+    private MacroId resolveMacroId(String macroIdAsString)
+    {
+        try {
+            return this.macroIdFactory.createMacroId(macroIdAsString);
+        } catch (ParseException e) {
+            this.logger.warn("Failed to resolve macro id [{}]. Root cause is: [{}]", macroIdAsString,
+                ExceptionUtils.getRootCauseMessage(e));
+            return null;
         }
     }
 }

@@ -47,6 +47,11 @@
     slow on MySql, because there were many constraints applied to the union instead of the inner selects and so MySql
     could not use the indexes. -->
 
+  <!--
+    The placeholders BEFORE_ORDER_MODIFIER and AFTER_ORDER_MODIFIER are replaced when loading this file.
+    They modify the sorting by either wrapping the expression in lower() (default) or adding a configured collation.
+   -->
+
   <resultset name = "XWikiPageOrSpaceReference">
     <return-scalar column="reference" type="string" />
     <!-- This type information is very important because we want Hibernate to convert 0 and 1 into false and true. -->
@@ -82,7 +87,8 @@
 
     ) xwikiPageOrSpace
 
-    order by xwikiPageOrSpace.terminal, lower(xwikiPageOrSpace.title), xwikiPageOrSpace.title
+    order by xwikiPageOrSpace.terminal, BEFORE_ORDER_MODIFIER xwikiPageOrSpace.title AFTER_ORDER_MODIFIER,
+        xwikiPageOrSpace.title
   </sql-query>
 
   <!-- This query follows the SQL-2013 ANSI standard, but it uses a non-core feature F591 "Derived tables" which is
@@ -109,6 +115,7 @@
 
     ) xwikiPageOrSpace
 
-    order by xwikiPageOrSpace.terminal, lower(xwikiPageOrSpace.pageOrSpaceName), xwikiPageOrSpace.pageOrSpaceName
+    order by xwikiPageOrSpace.terminal, BEFORE_ORDER_MODIFIER xwikiPageOrSpace.pageOrSpaceName AFTER_ORDER_MODIFIER,
+        xwikiPageOrSpace.pageOrSpaceName
   </sql-query>
 </hibernate-mapping>

@@ -1,2 +1,0 @@
-backport stable-15.10.x:
-  - head-branch: ['^weblate']

@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceReference;
@@ -51,7 +52,10 @@ public class DownloadRevAction extends DownloadAction
         String filename = getFileName();
         XWikiAttachment attachment;
 
-        if (context.getWiki().hasAttachmentRecycleBin(context) && request.getParameter("rid") != null) {
+        // Compute a XWikiAttachment object from the filename passed in the request
+        if (filename != null && context.getWiki().hasAttachmentRecycleBin(context)
+            && request.getParameter("rid") != null)
+        {
             int recycleId = Integer.parseInt(request.getParameter("rid"));
             attachment = new XWikiAttachment(doc, filename);
             attachment =
@@ -61,12 +65,24 @@ public class DownloadRevAction extends DownloadAction
             int id = Integer.parseInt(request.getParameter("id"));
             attachment = doc.getAttachmentList().get(id);
         } else {
+            // Note: doc.getAttachment return null when the filename is null
             attachment = doc.getAttachment(filename);
         }
+
         if (attachment == null) {
-            Object[] args = { filename };
+            Object[] args;
+            String message;
+            if (filename == null) {
+                ResourceReference resourceReference =
+                    Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+                args = new Object[] { resourceReference };
+                message = "No attachment found for resource [{0}]";
+            } else {
+                args = new Object[] { filename };
+                message = "Attachment [{0}] not found";
+            }
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment {0} not found", null, args);
+                XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, message, null, args);
         }
 
         synchronized (attachment) {
@@ -105,6 +121,13 @@ public class DownloadRevAction extends DownloadAction
         // Extract the Attachment file name from the parsed request URL that was done before this Action is called
         ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
         EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
-        return entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT).getName();
+
+        String filename = null;
+        EntityReference attachmentReference =  entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT);
+        if (attachmentReference != null) {
+            filename = attachmentReference.getName();
+        }
+
+        return filename;
     }
 }

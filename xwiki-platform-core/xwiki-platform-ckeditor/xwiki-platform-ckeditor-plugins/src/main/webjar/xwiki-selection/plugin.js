@@ -55,7 +55,7 @@
       var editable = editor.editable();
       if (editable) {
         const domRanges = this.getSelection(editor);
-        editor._.textSelection = this.textSelection.from(editable.$, domRanges);
+        editor._.textSelection = (editor._.textSelection || this.textSelection).from(editable.$, domRanges);
         // Remember to also restore the focus when restoring the selection. In order to know if we have to restore the
         // focus we need to check the active element on the top level window. We can't rely on the focus state of the
         // editable area because the focus is lost when the user switches to a different browser tab or a different
@@ -67,33 +67,95 @@
       }
     },
 
-    restoreSelection: function(editor, ranges) {
-      var editable = editor.editable();
-      var textSelection = editor._.textSelection;
+    restoreSelection: async function(editor, options) {
+      const editable = editor.editable();
+      let textSelection = editor._.textSelection;
+      let {ranges, beforeApply} = options || {};
       if (editable && textSelection) {
-        const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
-        if (focus) {
-          // This is mostly needed for the Source mode. For the WYSIWYG mode we take care of focusing the editable area
-          // that contains the selection when we apply it.
-          editable.$.focus(focus);
+        const notification = this._showRestoringSelectionNotification(editor);
+        try {
+          if (!ranges) {
+            textSelection = await textSelection.transform(editable.$);
+          }
+
+          beforeApply?.();
+          beforeApply = () => {};
+
+          const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
+          if (focus) {
+            // This is mostly needed for the Source mode. For the WYSIWYG mode we take care of focusing the editable
+            // area that contains the selection when we apply it.
+            editable.$.focus(focus);
+          }
+
+          if (ranges) {
+            // Apply the provided selection.
+            this.setSelection(editor, ranges, focus);
+          } else {
+            // Apply the transformed saved text selection.
+            textSelection.applyTo(editable.$, {
+              // Scroll the restored selection into view if the editor content was overwritten since we saved the
+              // selection and the editing area had the focus when the selection was saved.
+              scrollIntoView: focus && !focus.preventScroll,
+              applyDOMRange: domRange => {
+                maybeOptimizeRange(editor, domRange, !focus.preventScroll);
+                this.setSelection(editor, [domRange], focus);
+              }
+            });
+          }
+        } catch (e) {
+          console.error("Failed to restore selection: ", e);
+          beforeApply?.();
+        } finally {
+          notification.hide();
         }
-        if (ranges) {
-          // Apply the provided selection.
-          this.setSelection(editor, ranges, focus);
-        } else {
-          // Restore the saved text selection.
-          // Scroll the restored selection into view if the editor content was overwritten since we saved the selection
-          // and the editing area had the focus when the selection was saved.
-          const scrollIntoView = focus && !focus.preventScroll;
-          textSelection.applyTo(editable.$, {
-            scrollIntoView,
-            applyDOMRange: domRange => {
-              maybeMoveToFirstNestedEditable(editor, domRange, !focus.preventScroll);
-              this.setSelection(editor, [domRange], focus);
-            }
-          });
-        }
+      } else {
+        beforeApply?.();
       }
+    },
+
+    _showRestoringSelectionNotification: function(editor) {
+      if (editor._.restoringSelectionNotification) {
+        // Abort the ongoing selection restore operation.
+        editor._.restoringSelectionNotification.hide();
+      } else {
+        // Register the abort listener only once, when the notification is created for the first time.
+        editor.on('notificationHide', (event) => {
+          if (event.data.notification === editor._.restoringSelectionNotification) {
+            delete editor._.restoringSelectionNotification;
+            // Abort the ongoing selection restore operation.
+            editor._.textSelection?.abortApplyTo?.();
+          }
+        });
+      }
+
+      // Create a new notification.
+      const notification = editor._.restoringSelectionNotification = new CKEDITOR.plugins.notification(editor, {
+        message: editor.localization.get('xwiki-selection.restoring'),
+        type: 'progress',
+      });
+      // Show the notification only if the selection restore takes more than usual, to avoid flickering.
+      setTimeout(() => {
+        if (notification === editor._.restoringSelectionNotification) {
+          notification.show();
+          this._showFakeProgress(notification);
+        }
+      }, 1000);
+
+      return notification;
+    },
+
+    _showFakeProgress: function(notification) {
+      let step = 0;
+      const interval = setInterval(() => {
+        if (notification.isVisible()) {
+          // Reaches 63% after 5 seconds and 99% after 9 seconds. Replace 4 with a higher number to slow down the
+          // progression.
+          notification.update({progress: 1 - Math.exp(-1 * step++ / 4)});
+        } else {
+          clearInterval(interval);
+        }
+      }, 1000);
     },
 
     isEditingAreaFocused: function(editor) {
@@ -157,7 +219,7 @@
     editable?.focus(options);
   }
 
-  function maybeMoveToFirstNestedEditable(editor, range, shouldMove) {
+  function maybeOptimizeRange(editor, range, shouldMove) {
     const selectedWidget = shouldMove && getSelectedWidget(editor, range);
     const firstNestedEditable = Object.values(selectedWidget?.editables)[0];
     if (firstNestedEditable) {
@@ -166,6 +228,13 @@
       ckRange.moveToElementEditablePosition(firstNestedEditable);
       range.setStart(ckRange.startContainer.$, ckRange.startOffset);
       range.collapse(true);
+    } else if (selectedWidget && !range.collapsed) {
+      // The selected widget doesn't have any nested editable areas, so everything inside the widget is read-only. This
+      // means we cannot place the caret inside the widget. We select the entire widget wrapper in order to highlight
+      // the widget. Note that we don't do this when the range is collapsed because when editing in realtime someone may
+      // insert a widget just after your caret and you wouldn't want that widget to be suddenly selected while you are
+      // typing.
+      range.selectNode(selectedWidget.wrapper.$);
     }
   }
 
@@ -186,6 +255,7 @@
   }
 
   CKEDITOR.plugins.add('xwiki-selection', {
+    requires: 'notification',
     onLoad: function() {
       require(['textSelection'], function(textSelection) {
         CKEDITOR.plugins.xwikiSelection.textSelection = textSelection;
@@ -237,23 +307,138 @@
           }
         }, true);
       });
+
+      // When content is pasted or inserted into the editor, the Widget plugin scans the new content for widgets to be
+      // upcasted. When widgets are upcasted the content is transformed and the caret may end up inside the read-only
+      // part of the widget or inside one of its nested editable areas. If this is the case then we need to focus either
+      // the widget or the nested editable, otherwise the caret gets hidden and the user can't get it back without using
+      // the mouse.
+      editor.widgets?.on('checkWidgets', event => {
+        const selection = editor.getSelection();
+        if (selection?.isCollapsed()) {
+          const container = selection.getStartElement();
+          const widget = editor.widgets.getByElement(container);
+          if (widget) {
+            // The caret is inside a widget.
+            if (container.isReadOnly()) {
+              // The caret is hidden inside the read-only part of the widget. We focus the widget in order to select it.
+              widget.focus();
+            } else {
+              // The caret is inside a nested editable area. Some browsers (e.g. Chrome) don't show the caret if the
+              // nested editable area is not focused.
+              CKEDITOR.plugins.widget.getNestedEditable(widget.wrapper, container)?.focus();
+              // In Firefox, if we focus the nested editable area then the user can't move the caret outside of it using
+              // the keyboard. We need to focus again the root editable area to fix this...
+              editor.editable().focus();
+            }
+          }
+        }
+      });
     }
   });
 })();
 
-define('node-module', ['jquery'], function($) {
-  return {
-    load: function(name, req, onLoad, config) {
-      $.get(req.toUrl(name + '.js'), function(text) {
-        onLoad.fromText('define(function(require, exports, module) {' + text + '});');
-      }, 'text');
-    }
-  };
-});
+(function() {
+  const currentScript = document.currentScript.src;
+  let diffWorkerPath = 'diffWorker.js?evaluate=true';
+  if (currentScript.endsWith('webjar.bundle.min.js')) {
+    // The 'xwiki-selection' plugin is bundled with the other plugins rather than being loaded separately.
+    diffWorkerPath = 'xwiki-selection/' + diffWorkerPath;
+  }
+  const diffWorkerURL = new URL(diffWorkerPath, currentScript).href;
 
-define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], function($, diff, scrollUtils) {
+  define('xwiki-diff-service', [], function() {
+    class DiffService {
+      constructor() {
+        // Reuse the same worker to serve a queue of diff computation requests.
+        this._queue = [];
+        // Have the worker ready before the first diff computation is requested (because worker creation is costly).
+        this._recreateWorker();
+      }
+
+      /**
+       * Schedule a diff computation.
+       *
+       * @param {string} previous the previous version of the text
+       * @param {string} next the next version of the text
+       * @returns {object} an object like {cancel: function, promise: Promise} that allows to cancel the diff
+       *   computation or to wait for the computed diff
+       */
+      diff(previous, next) {
+        const entry = {previous, next};
+        this._queue.push(entry);
+        if (this._queue.length === 1) {
+          // Start the diff computation if this is the only entry in the queue.
+          this._processQueue();
+        }
+
+        return {
+          // A promise that resolves with the computed diff or rejects with an error (e.g. when the diff computation is
+          // cancelled).
+          promise: new Promise((resolve, reject) => {
+            entry.resolve = resolve;
+            entry.reject = reject;
+          }),
+
+          /**
+           * Unschedule or terminate the diff computation.
+           */
+          cancel: () => {
+            const error = new Error('Diff computation cancelled.');
+            const index = this._queue.indexOf(entry);
+            if (index === 0) {
+              // Stop the current diff computation.
+              this._worker.onerror(error);
+            } else if (index > 0) {
+              // Unschedule the diff computation.
+              this._queue.splice(index, 1);
+              entry.reject(error);
+            }
+          }
+        };
+      }
+
+      _recreateWorker() {
+        this._worker = new Worker(diffWorkerURL);
+        this._worker.onerror = error => {
+          this._worker.terminate();
+          if (this._queue.length) {
+            // A diff computation error occurred or the diff computation was cancelled.
+            this._queue.shift().reject(error);
+            this._recreateWorker();
+            // Continue with the next diff computation.
+            this._processQueue();
+          } else {
+            // Worker initialization error.
+            throw error;
+          }
+        };
+        this._worker.onmessage = event => {
+          // We received the computed diff.
+          this._queue.shift().resolve(event.data);
+          // Continue with the next diff computation.
+          this._processQueue();
+        };
+      }
+
+      _processQueue() {
+        if (this._queue.length) {
+          const {previous, next} = this._queue[0];
+          // Ask the worker to compute the diff.
+          this._worker.postMessage([previous, next]);
+        }
+      }
+    }
+
+    return DiffService;
+  });
+})();
+
+define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], function($, DiffService, scrollUtils) {
+  const diffService = new DiffService();
+
   function isTextInput(element) {
-    return typeof element.setSelectionRange === 'function';
+    return typeof element?.setSelectionRange === 'function';
   }
 
   function getTextSelection(root, ranges) {
@@ -397,9 +582,9 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
   }
 
   const maybeVisitText = (visitor, node) => node.nodeType === Node.TEXT_NODE &&
-    (visitor.before(node) || visitor.after(node));
-  const maybeVisitBeforeElement = (visitor, element) => canPlaceCaretBeforeElement(element) && visitor.before(element);
-  const maybeVisitAfterElement = (visitor, element) => canPlaceCaretAfterElement(element) && visitor.after(element);
+    (visitor.before(node) || visitor.after(node)),
+    maybeVisitBeforeElement = (visitor, element) => canPlaceCaretBeforeElement(element) && visitor.before(element),
+    maybeVisitAfterElement = (visitor, element) => canPlaceCaretAfterElement(element) && visitor.after(element);
 
   function canPlaceCaretBeforeElement(element) {
     return element.hasAttribute('tabindex') || (element.nodeName === 'BR' &&
@@ -470,8 +655,10 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
     };
   }
 
-  function changeText(textSelection, newText) {
-    const changes = diff(textSelection.text, newText);
+  async function changeText(textSelection, newText) {
+    const {promise, cancel} = diffService.diff(textSelection.text, newText);
+    textSelection.abortApplyTo = cancel;
+    const changes = await promise;
     const startOffset = findTextOffsetInChanges(changes, textSelection.startOffset);
     const endOffset = textSelection.endOffset === textSelection.startOffset ? startOffset :
       findTextOffsetInChanges(changes, textSelection.endOffset);
@@ -507,35 +694,6 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
     return newOffset;
   }
 
-  function scrollSelectionIntoView(element, range) {
-    if (isTextInput(element)) {
-      // See https://bugs.chromium.org/p/chromium/issues/detail?id=331233
-      var fullText = element.value;
-      element.value = fullText.substring(0, range.endOffset);
-      // Scroll to the bottom.
-      element.scrollTop = element.scrollHeight;
-      var canScroll = element.scrollHeight > element.clientHeight;
-      element.value = fullText;
-      if (canScroll) {
-        // Scroll to center the selection.
-        element.scrollTop += element.clientHeight / 2;
-      }
-    } else {
-      scrollUtils.centerVertically(getScrollTarget(range), 65);
-    }
-  }
-
-  function getScrollTarget(range) {
-    // Try the child node at the specified offset, or the last child if the offset is greater than the number of
-    // children, or the node itself if it doesn't have child nodes (e.g. if it's a text node).
-    let target = range.startContainer.childNodes[range.startOffset] || range.startContainer.lastChild ||
-      range.startContainer;
-    if (target.nodeType !== Node.ELEMENT_NODE) {
-      target = target.previousElementSibling || target.parentNode;
-    }
-    return target;
-  }
-
   return {
     from: function(root, ranges) {
       return $.extend({}, this, getTextSelection(root, ranges));
@@ -554,15 +712,9 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
         }
       }, options);
 
-      var range;
-      if (isTextInput(element)) {
-        range = this.withText(element.value);
-      } else {
-        range = this.withText(getVisibleText(element)).asRange(element);
-      }
-
+      const range = isTextInput(element) ? this : this.asRange(element);
       if (options.scrollIntoView) {
-        scrollSelectionIntoView(element, range);
+        scrollUtils.scrollSelectionIntoView(element, range);
       }
 
       if (isTextInput(element)) {
@@ -572,11 +724,17 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
       }
     },
 
-    withText: function(text) {
-      if (this.text === text) {
-        return this;
+    transform: async function(textOrElement) {
+      const text = isTextInput(textOrElement) ? textOrElement.value :
+        (textOrElement?.nodeType === Node.ELEMENT_NODE ? getVisibleText(textOrElement) : textOrElement);
+      if (typeof text === 'string' && text !== this.text) {
+        // Text selection transformation is asynchronous which means the text can change while we are waiting for the
+        // Web Worker to compute the diff. This means we need to trigger a new transformation until the text doesn't
+        // change.
+        return await $.extend({}, this, await changeText(this, text)).transform(textOrElement);
       } else {
-        return $.extend({}, this, changeText(this, text));
+        // No change or unknown input type. Text selection remains the same.
+        return this;
       }
     },
 
@@ -590,44 +748,39 @@ define('scrollUtils', ['jquery'], function($) {
   /**
    * Look for the first ancestor, starting from the given element, that has vertical scroll.
    */
-  var getVerticalScrollParent = function(element) {
-    var parent = element.parentNode;
+  function getVerticalScrollParent(element) {
+    let parent = element.parentNode;
     while (parent && !(parent.nodeType === Node.ELEMENT_NODE && hasVerticalScrollBar(parent))) {
       parent = parent.parentNode;
     }
-    return parent;
-  };
+    return parent || element.ownerDocument.scrollingElement || element.ownerDocument.documentElement;
+  }
 
-  var hasVerticalScrollBar = function(element) {
-    var overflowY = $(element).css('overflow-y');
-    // Use a delta to detect the vertical scroll bar, in order to overcome a bug in Chrome.
-    // See https://bugs.chromium.org/p/chromium/issues/detail?id=34224 (Incorrect scrollHeight on the <body> element)
-    var delta = 4;
-    return element.scrollHeight > (element.clientHeight + delta) && overflowY !== 'hidden' &&
-      // The HTML and BODY tags can have vertical scroll bars even if overflow is visible.
-      (overflowY !== 'visible' || element === element.ownerDocument.documentElement ||
-        element === element.ownerDocument.body);
-  };
+  function hasVerticalScrollBar(element) {
+    const overflowY = $(element).css('overflow-y');
+    // There is content that exceeds the element's height and this excess content is neither hidden nor visible.
+    return element.scrollHeight > element.clientHeight && (overflowY.includes('scroll') || overflowY.includes('auto'));
+  }
 
   /**
    * Compute the top offset of the given element within the specified ancestor.
    */
-  var getRelativeTopOffset = function(element, ancestor) {
+  function getRelativeTopOffset(element, ancestor) {
     // Save the vertical scroll position so that we can restore it afterwards.
-    var originalScrollTop = ancestor.scrollTop;
+    const originalScrollTop = ancestor.scrollTop;
     // Scroll the contents of the specified ancestor to the top, temporarily, so that the element offset, relative to
     // its ancestor, is positive.
     ancestor.scrollTop = 0;
-    var relativeTopOffset = $(element).offset().top - $(ancestor).offset().top;
+    const relativeTopOffset = $(element).offset().top - $(ancestor).offset().top;
     // Restore the previous vertical scroll position.
     ancestor.scrollTop = originalScrollTop;
     return relativeTopOffset;
-  };
+  }
 
-  var isCenteredVertically = function(verticalScrollParent, padding, position) {
+  function isCenteredVertically(verticalScrollParent, padding, position) {
     return position >= (verticalScrollParent.scrollTop + padding) &&
       position <= (verticalScrollParent.scrollTop + verticalScrollParent.clientHeight - padding);
-  };
+  }
 
   /**
    * Center the given element vertically within its scroll parent, if needed.
@@ -636,25 +789,87 @@ define('scrollUtils', ['jquery'], function($) {
    * @param padding the amount of pixels from the top and from the bottom of the scroll parent that delimits the center
    *          area; when specified, the element is centered vertically only if it's not already in the center area
    *          defined by this padding
+   * @param verticalRange the vertical segment of the given element that should be centered, defaults to the entire
+   *          element
    */
-  var centerVertically = function(element, padding) {
-    var verticalScrollParent = getVerticalScrollParent(element);
+  function centerVertically(
+    element,
+    padding = 0,
+    verticalRange = {startOffset: 0, endOffset: element.clientHeight}
+  ) {
+    const verticalScrollParent = getVerticalScrollParent(element);
     if (verticalScrollParent) {
-      var relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent);
+      const rangeHeight = verticalRange.endOffset - verticalRange.startOffset;
+      const relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent) + verticalRange.startOffset;
       if (!padding || !isCenteredVertically(verticalScrollParent, padding, relativeTopOffset)) {
-        // Center the element by removing half of the scroll parent height (i.e. half of the visible vertical space)
-        // from the element's relative position. If this is a negative value then the browser will use 0 instead.
-        var scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight / 2);
-        verticalScrollParent.scrollTop = scrollTop;
+        if (rangeHeight < verticalScrollParent.clientHeight) {
+          // Center the specified vertical range inside the scroll parent.
+          verticalScrollParent.scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight - rangeHeight) / 2;
+        } else {
+          // Align the top of the specified vertical range to the top of the scroll parent.
+          verticalScrollParent.scrollTop = relativeTopOffset;
+        }
       }
     }
-  };
+  }
+
+  function scrollSelectionIntoView(element, range) {
+    const padding = 65;
+    if (typeof element?.setSelectionRange === 'function') {
+      // We handle text areas differently because we want to center the selected text.
+      // See https://bugs.chromium.org/p/chromium/issues/detail?id=331233
+      const fullText = element.value;
+      const styleBackup = element.style.cssText;
+      // Determine the scroll offset corresponding to the start and end of the text selection.
+      element.style.height = element.style.minHeight = 0;
+      element.style.overflowY = 'hidden';
+      // Cut the text after the selection start.
+      element.value = fullText.substring(0, range.startOffset);
+      const scrollStartOfset = element.scrollHeight;
+      // Cut the text after the selection end.
+      element.value = fullText.substring(0, range.endOffset);
+      const scrollEndOffset = element.scrollHeight;
+      const selectionHeight = scrollEndOffset - scrollStartOfset;
+      // Restore the full text and the text area styles.
+      element.value = fullText;
+      element.style.cssText = styleBackup;
+      const canScrollVertically = element.scrollHeight > element.clientHeight;
+      if (canScrollVertically) {
+        if (selectionHeight < element.clientHeight) {
+          // Center the selection inside the text area.
+          element.scrollTop = scrollStartOfset - (element.clientHeight - selectionHeight) / 2;
+        } else {
+          // Align the selection start to the top of the text area.
+          element.scrollTop = scrollStartOfset;
+        }
+      } else {
+        centerVertically(element, padding, {
+          startOffset: scrollStartOfset,
+          endOffset: scrollEndOffset
+        });
+      }
+    } else {
+      centerVertically(getScrollTarget(range), padding);
+    }
+  }
+
+  function getScrollTarget(range) {
+    // Try the child node at the specified offset, or the last child if the offset is greater than the number of
+    // children, or the node itself if it doesn't have child nodes (e.g. if it's a text node).
+    let target = range.startContainer.childNodes[range.startOffset] || range.startContainer.lastChild ||
+      range.startContainer;
+    if (target.nodeType !== Node.ELEMENT_NODE) {
+      target = target.previousElementSibling || target.parentNode;
+    }
+    return target;
+  }
 
   return {
-    getVerticalScrollParent: getVerticalScrollParent,
-    hasVerticalScrollBar: hasVerticalScrollBar,
-    getRelativeTopOffset: getRelativeTopOffset,
-    isCenteredVertically: isCenteredVertically,
-    centerVertically: centerVertically
+    getVerticalScrollParent,
+    hasVerticalScrollBar,
+    getRelativeTopOffset,
+    isCenteredVertically,
+    centerVertically,
+    scrollSelectionIntoView
   };
 });

@@ -396,7 +396,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult addTagToDocument(String tag, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return addTagToDocument(tag, context.getWiki().getDocument(documentName, context), context);
+        XWikiDocument document = context.getWiki().getDocument(documentName, context);
+
+        // Avoid modifying the cached document
+        document = document.clone();
+
+        return addTagToDocument(tag, document, context);
     }
 
     /**
@@ -443,7 +448,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult addTagsToDocument(String tags, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return addTagsToDocument(tags, context.getWiki().getDocument(documentName, context), context);
+        XWikiDocument document = context.getWiki().getDocument(documentName, context);
+
+        // Avoid modifying the cached document
+        document = document.clone();
+
+        return addTagsToDocument(tags, document, context);
     }
 
     /**
@@ -513,7 +523,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult removeTagFromDocument(String tag, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return removeTagFromDocument(tag, context.getWiki().getDocument(documentName, context), context);
+        XWikiDocument document = context.getWiki().getDocument(documentName, context);
+
+        // Avoid modifying the cached document
+        document = document.clone();
+
+        return removeTagFromDocument(tag, document, context);
     }
 
     /**
@@ -580,6 +595,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         for (String docName : docNamesToProcess) {
             XWikiDocument doc = context.getWiki().getDocument(docName, context);
+
+            // Avoid modifying the cached document
+            doc = doc.clone();
+
             List<String> tags = getTagsFromDocument(doc);
 
             if (tags.contains(newTag)) {

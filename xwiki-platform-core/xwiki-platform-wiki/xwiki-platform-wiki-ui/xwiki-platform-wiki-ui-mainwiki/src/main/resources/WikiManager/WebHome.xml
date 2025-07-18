@@ -115,6 +115,6 @@
   properties="$stringtool.join($columns, ',')"
   limit=10
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
-#set($docextras=[])
+#set ($displayDocExtra = false)
 {{/velocity}}</content>
 </xwikidoc>

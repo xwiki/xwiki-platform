@@ -499,6 +499,7 @@ class CreateActionTest
         // current document = xwiki:Main.WebHome
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
         XWikiDocument document = mock(XWikiDocument.class);
+        when(document.clone()).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
         when(document.getLocalReferenceMaxLength()).thenReturn(255);
@@ -854,13 +855,12 @@ class CreateActionTest
             new DocumentReference("xwiki", Arrays.asList("XWiki"), "TemplateProviderClass");
 
         // Mock to return at least 1 existing template provider
-        when(mockTemplateProvidersQuery.execute()).thenReturn(new ArrayList<Object>(Arrays.asList(fullName)));
+        when(this.mockTemplateProvidersQuery.execute()).thenReturn(new ArrayList<Object>(Arrays.asList(fullName)));
 
         // Mock the template document as existing.
         XWikiDocument templateProviderDocument = mock(XWikiDocument.class);
+        when(templateProviderDocument.clone()).thenReturn(templateProviderDocument);
         when(templateProviderDocument.getDocumentReference()).thenReturn(resolvedDocumentReference);
-        oldcore.getDocuments().put(new DocumentReference(resolvedDocumentReference, Locale.ROOT),
-            templateProviderDocument);
         // Mock the provider object (template + spaces properties)
         BaseObject templateProviderObject = mock(BaseObject.class);
         when(templateProviderObject.getListValue("creationRestrictions")).thenReturn(allowedSpaces);
@@ -878,27 +878,28 @@ class CreateActionTest
             when(templateProviderObject.getStringValue("action")).thenReturn(action);
         }
         when(templateProviderDocument.getXObject(templateProviderClassReference)).thenReturn(templateProviderObject);
+        this.oldcore.getDocuments().put(new DocumentReference(resolvedDocumentReference, Locale.ROOT),
+            templateProviderDocument);
 
         // Mock the template document as existing
         String templateDocumentName =
             resolvedDocumentReference.getName().substring(0, resolvedDocumentReference.getName().indexOf("Provider"));
         DocumentReference templateDocumentReference =
             new DocumentReference(templateDocumentName, new SpaceReference(resolvedDocumentReference.getParent()));
-        mockTemplateDocumentExisting(templateDocumentFullName, templateDocumentReference);
+        mockTemplateDocumentExisting(templateDocumentReference);
     }
 
     /**
-     * @param templateDocumentFullName
      * @param templateDocumentReference
      * @throws XWikiException
      */
-    private void mockTemplateDocumentExisting(String templateDocumentFullName,
-        DocumentReference templateDocumentReference) throws XWikiException
+    private void mockTemplateDocumentExisting(DocumentReference templateDocumentReference) throws XWikiException
     {
         XWikiDocument templateDocument = mock(XWikiDocument.class);
+        when(templateDocument.clone()).thenReturn(templateDocument);
         when(templateDocument.getDocumentReference()).thenReturn(templateDocumentReference);
         when(templateDocument.getDefaultEditMode(context)).thenReturn("edit");
-        oldcore.getDocuments().put(new DocumentReference(templateDocumentReference, Locale.ROOT), templateDocument);
+        this.oldcore.getDocuments().put(new DocumentReference(templateDocumentReference, Locale.ROOT), templateDocument);
     }
 
     @Test
@@ -1281,7 +1282,6 @@ class CreateActionTest
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&template=XWiki.MyTemplate
-        String templateDocumentFullName = "XWiki.MyTemplate";
         DocumentReference templateDocumentReference =
             new DocumentReference("MyTemplate", Arrays.asList("XWiki"), "xwiki");
         when(mockRequest.getParameter("spaceReference")).thenReturn("X");
@@ -1289,7 +1289,7 @@ class CreateActionTest
         when(mockRequest.getParameter("template")).thenReturn("XWiki.MyTemplate");
 
         // Mock the passed template document as existing.
-        mockTemplateDocumentExisting(templateDocumentFullName, templateDocumentReference);
+        mockTemplateDocumentExisting(templateDocumentReference);
 
         // Run the action
         String result = action.render(context);

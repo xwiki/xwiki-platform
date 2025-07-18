@@ -883,6 +883,16 @@ public class LegacyTestWiki extends AbstractTestWiki
                             return userObject;
                         }
                     });
+                    allowing(mockedDocument)
+                        .getXObject(with(equal(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE)));
+                    will(new CustomAction("return the user group object")
+                    {
+                        @Override
+                        public Object invoke(Invocation invocation)
+                        {
+                            return null;
+                        }
+                    });
                 }
             });
         }

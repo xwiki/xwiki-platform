@@ -21,9 +21,7 @@ package org.xwiki.refactoring.internal.job;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -92,11 +90,8 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
         EntityReference destination = this.request.getDestination();
 
-        try {
-            checkSourceDestination(entityReference, destination);
+        if (isSourceDestinationCompatible(entityReference, destination, true)) {
             super.getEntities(entityReference);
-        } catch (InternalCopyOrMoveJobException e) {
-            this.logger.error(e.getMessage());
         }
     }
 
@@ -118,9 +113,8 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
         EntityReference destination = this.request.getDestination();
 
-        try {
-            checkSourceDestination(source, destination);
-        } catch (InternalCopyOrMoveJobException e) {
+        // We already have logged possible problems as part of the call in #getEntities.
+        if (!isSourceDestinationCompatible(source, destination, false)) {
             return;
         }
 
@@ -141,25 +135,32 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         }
     }
 
-    private void checkSourceDestination(EntityReference source, EntityReference destination)
-        throws InternalCopyOrMoveJobException
+    private boolean isSourceDestinationCompatible(EntityReference source, EntityReference destination, boolean log)
     {
+        boolean result = true;
         if (processOnlySameSourceDestinationTypes() && source.getType() != destination.getType()) {
-            throw new InternalCopyOrMoveJobException(
-                String.format("You cannot change the entity type (from [%s] to [%s]).",
+            if (log) {
+                this.logger.error("You cannot change the entity type (from [{}] to [{}]).",
                     source.getType(),
-                    destination.getType()));
+                    destination.getType());
+            }
+            result = false;
         }
 
         if (isDescendantOrSelf(destination, source)) {
-            throw new InternalCopyOrMoveJobException(
-                String.format("Cannot make [%s] a descendant of itself.", source));
+            if (log) {
+                this.logger.error("Cannot make [{}] a descendant of itself.", source);
+            }
+            result = false;
         }
 
         if (source.getParent() != null && source.getParent().equals(destination)) {
-            throw new InternalCopyOrMoveJobException(
-                String.format("Cannot move [%s] into [%s], it's already there.", source, destination));
+            if (log) {
+                this.logger.error("Cannot move [{}] into [{}], it's already there.", source, destination);
+            }
+            result = false;
         }
+        return result;
     }
 
     private boolean isDescendantOrSelf(EntityReference alice, EntityReference bob)
@@ -306,16 +307,36 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
     protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference) throws Exception
     {
-        if (!hasAccess(Right.VIEW, oldReference)) {
-            this.logger.error("You don't have sufficient permissions over the source document [{}].", oldReference);
-            return false;
-        } else if (!hasAccess(Right.EDIT, newReference)
-            || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
-            this.logger.error("You don't have sufficient permissions over the destination document [{}].",
-                newReference);
-            return false;
+        boolean isWebPreferences =
+            isSpacePreferencesReference(oldReference) && isSpacePreferencesReference(newReference);
+        DocumentReference oldHomeReference = getSpaceHomeReference(oldReference);
+        boolean result = true;
+        // if we're trying to move a WebPreferences not as part of moving a WebHome we treat it with standard rights
+        // like we do for other pages.
+        if (!isWebPreferences || !this.concernedEntities.containsKey(oldHomeReference)) {
+            if (!hasAccess(Right.VIEW, oldReference)) {
+                this.logger.error("You don't have sufficient permissions over the source document [{}].", oldReference);
+                result = false;
+            } else if (!hasAccess(Right.EDIT, newReference)
+                || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
+                this.logger.error("You don't have sufficient permissions over the destination document [{}].",
+                    newReference);
+                result = false;
+            }
+        // else if we're moving a WebHome as part of moving its WebHome we check rights on the space itself.
+        // Note that we don't perform other checks regarding overwriting because WebPreferences is checked last:
+        //   - if there's only a WebPreferences document alone in the destination then it's ok to overwrite it as
+        //   we're creating a new space (since we move WebHome)
+        //   - if we're overwriting also WebHome then we already performed the check if it's allowed to overwrite it
+        } else {
+            if (!hasAccess(Right.EDIT, oldHomeReference)) {
+                this.logger.error("You don't have sufficient permissions over the home document of WebPreferences "
+                        + "[{}].",
+                    newReference);
+                result = false;
+            }
         }
-        return true;
+        return result;
     }
 
     protected void maybePerformRefactoring(DocumentReference oldReference, DocumentReference newReference)
@@ -349,14 +370,14 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
             // Step 2: Delete the destination document if needed.
             this.progressManager.startStep(this);
-            if (this.modelBridge.exists(newReference)) {
-                if (this.request.isInteractive() && !this.modelBridge.canOverwriteSilently(newReference)
-                    && !confirmOverwrite(oldReference, newReference)) {
-                    this.logger.warn(
-                        "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
-                        oldReference, newReference);
-                    return false;
-                }
+            if (this.modelBridge.exists(newReference)
+                && this.request.isInteractive()
+                && !this.modelBridge.canOverwriteSilently(newReference)
+                && !confirmOverwrite(oldReference, newReference)) {
+                this.logger.warn(
+                    "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
+                    oldReference, newReference);
+                return false;
             }
             this.progressManager.endStep(this);
 
@@ -411,19 +432,6 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
         entityReferences.add(this.request.getDestination());
         return getCommonParent(entityReferences);
-    }
-
-    /**
-     * @return the list of references that have been selected to be refactored.
-     * @since 16.10.0RC1
-     */
-    public Map<EntityReference, EntityReference> getSelectedEntities()
-    {
-        return this.concernedEntities.values().stream()
-            .filter(EntitySelection::isSelected)
-            .filter(entity -> entity.getTargetEntityReference().isPresent())
-            .collect(Collectors.toMap(EntitySelection::getEntityReference,
-                entity -> entity.getTargetEntityReference().get()));
     }
 
     /**

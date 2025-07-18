@@ -27,10 +27,16 @@
   };
 
   CKEDITOR.plugins.add('xwiki-realtime', {
-    requires: 'notification',
+    requires: 'notification,xwiki-loading',
 
     init : function(editor) {
       applyStyleSheets(editor);
+
+      if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
+        // When editing in-place we need to maximize the parent of the editable area in order to have the user caret
+        // indicators visible (they are injected after the editable area).
+        editor.element.getParent().addClass('cke_editable_fullscreen');
+      }
 
       // CKEditor's HTML parser doesn't preserve the space character typed at the end of a line of text. For instance,
       // the following:
@@ -45,32 +51,36 @@
       // the space between the words you type to be lost.
       preserveSpaceCharAtTheEndOfLine(editor);
 
-      require([
-        'xwiki-realtime-loader',
-        'xwiki-ckeditor-realtime-adapter',
-        'xwiki-realtime-interface'
-      ], (Loader, Adapter, Interface) => {
-        enableRealtimeEditing(editor, Loader, Adapter).then(() => {
+      editor.delayInstanceReady(new Promise((resolve, reject) => {
+        require([
+          'xwiki-realtime-loader',
+          'xwiki-ckeditor-realtime-adapter',
+          'xwiki-realtime-interface'
+        ], asyncRequireCallback(async (Loader, Adapter, Interface) => {
+          await enableRealtimeEditing(editor, Loader, Adapter);
+
           // The edited (HTML) content is normalized when the realtime editing is enabled (e.g. by adding some BR
           // elements to ensure the HTML is the same across different browsers) which makes the editor dirty, although
-          // there aren't any real content changes (that would be noticed in the source wiki syntax). We reset the dirty
-          // state in order to avoid getting the leave confirmation when leaving the editor just after it was loaded.
+          // there aren't any real content changes (that would be noticed in the source wiki syntax). We reset the
+          // dirty state in order to avoid getting the leave confirmation when leaving the editor just after it was
+          // loaded.
           editor.resetDirty();
-        });
-        editor._realtimeInterface = Interface;
-        editor._realtimeSource = {
-          // True if the editor was in the realtime session before switching to source.
-          realtime: false,
 
-          // The value of editor.checkDirty() before switching to source.
-          dirty: false,
+          editor._realtimeInterface = Interface;
+          editor._realtimeSource = {
+            // True if the editor was in the realtime session before switching to source.
+            realtime: false,
 
-          // The result of editor.getSnapshot() right after switching to source.
-          previousValue: null
-        };
-        editor.on('beforeSetMode', this.beforeSetMode.bind(this));
-        editor.on('mode', this.mode.bind(this));
-      });
+            // The value of editor.checkDirty() before switching to source.
+            dirty: false,
+
+            // The result of editor.getSnapshot() right after switching to source.
+            previousValue: null
+          };
+          editor.on('beforeSetMode', this.beforeSetMode.bind(this));
+          editor.on('mode', this.mode.bind(this));
+        }, resolve, reject), reject);
+      }));
     },
 
     mode: function(event) {
@@ -155,10 +165,8 @@
           editor.once('dataReady', dataReady);
 
           // Show a notification explaining that we temporarily left the realtime session.
-          editor.showNotification(
-            editor.localization.get('xwiki-realtime.notification.sourcearea.temporarilyLeftSession'),
-            'info',
-            5000);
+          editor.showNotification(editor.localization.get(
+            'xwiki-realtime.notification.sourcearea.temporarilyLeftSession'));
         }
 
       } else if (editor.mode === 'source' && newMode === 'wysiwyg') {
@@ -193,9 +201,6 @@
                 if (editor._realtime._realtimeContext.channels.wysiwyg_users > 0) {
                   /*jshint +W106 */
 
-                  // Bring the autosave checkbox back.
-                  editor._realtimeInterface.realtimeAllowed(false);
-
                   // Show a notification explaining that we are not rejoining the realtime session.
                   editor.showNotification(
                     editor.localization.get('xwiki-realtime.notification.sourcearea.notRejoiningSession'),
@@ -207,8 +212,7 @@
                   // Show a notification explaining that we are rejoining the session because we are alone.
                   editor.showNotification(
                     editor.localization.get('xwiki-realtime.notification.sourcearea.rejoiningSession.alone'),
-                    'success',
-                    5000);
+                    'success');
                   realtimeCheckbox.prop('checked', true);
                   editor._realtime._startRealtimeSync();
                 }
@@ -216,8 +220,7 @@
                 // Join the realtime session.
                 editor.showNotification(
                   editor.localization.get('xwiki-realtime.notification.sourcearea.rejoiningSession.noChanges'),
-                  'success',
-                  5000);
+                  'success');
                 realtimeCheckbox.prop('checked', true);
 
                 const readOnly = function () {
@@ -308,7 +311,7 @@
     textNode.$.replaceData(textNode.getLength() - whitespaceLength, whitespaceLength, whitespaceSuffix);
   }
 
-  function enableRealtimeEditing(editor, Loader, Adapter) {
+  async function enableRealtimeEditing(editor, Loader, Adapter) {
     const info = {
       type: 'wysiwyg',
       field: editor.name,
@@ -319,24 +322,23 @@
       compatible: ['wysiwyg', 'wiki']
     };
 
-    return Loader.bootstrap(info).then(realtimeContext => {
-      return new Promise((resolve, reject) => {
-        require(['xwiki-realtime-wysiwyg'], RealtimeWysiwygEditor => {
-          editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), realtimeContext);
-
-          // When someone is offline, they may have left their tab open for a long time and the lock may have
-          // disappeared. We're refreshing it when the editor is focused so that other users will know that someone is
-          // editing the document.
-          editor.on('focus', () => {
-            editor._realtime.lockDocument();
-          });
-
-          resolve(editor._realtime);
-        }, reject);
-      });
-    }, (error) => {
-      console.debug(`Realtime editing is disabled for [${info.field}] field because: ${error}`);
+    const realtimeContext = await Loader.bootstrap(info);
+    await new Promise((resolve, reject) => {
+      require(['xwiki-realtime-wysiwyg'], asyncRequireCallback(RealtimeWysiwygEditor => {
+        editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), realtimeContext);
+      }, resolve, reject), reject);
     });
+  }
+
+  /**
+   * This covers two problems:
+   *   1. the error callback passed to require() is not called when there is an exception in the success callback
+   *   2. the success callback is not called if marked as async
+   */
+  function asyncRequireCallback(asyncCallback, resolve, reject) {
+    return (...args) => {
+      Promise.try(asyncCallback, ...args).then(resolve).catch(reject);
+    };
   }
 
   // Add support for synchronizing the upload widgets when realtime editing is enabled.

@@ -19,7 +19,11 @@
  */
 package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -33,6 +37,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.platform.security.requiredrights.MacroParameterRequiredRightsAnalyzer;
+import org.xwiki.platform.security.requiredrights.MacroRequiredRight;
 import org.xwiki.platform.security.requiredrights.MacroRequiredRightsAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
@@ -41,6 +47,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.script.ScriptMacro;
 
 /**
@@ -106,8 +113,9 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
 
                 if (macro instanceof ScriptMacro) {
                     result = this.scriptMacroAnalyzer.analyze(macroBlock);
-                } else if (macro != null && this.shouldMacroContentBeParsed(macro)) {
-                    result = analyzeMacroContent(macroBlock, macroBlock.getContent());
+                } else if (macro != null) {
+                    result = new ArrayList<>(maybeAnalyzeMacroContent(macroBlock, macro));
+                    result.addAll(maybeAnalyzeParameters(macroBlock, macro));
                 } else {
                     result = List.of();
                 }
@@ -115,6 +123,64 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
         }
 
         return result;
+    }
+
+    private List<RequiredRightAnalysisResult> maybeAnalyzeParameters(MacroBlock macroBlock, Macro<?> macro)
+    {
+        Map<String, ParameterDescriptor> parameterDescriptorMap = macro.getDescriptor().getParameterDescriptorMap();
+
+        ComponentManager componentManager = this.componentManagerProvider.get();
+        DefaultMacroRequiredRightReporter reporter = this.macroRequiredRightReporterProvider.get();
+
+        for (Map.Entry<String, String> parameter : macroBlock.getParameters().entrySet()) {
+            ParameterDescriptor parameterDescriptor = parameterDescriptorMap.get(parameter.getKey().toLowerCase());
+
+            if (parameterDescriptor != null && parameter.getValue() != null) {
+                if (parameterDescriptor.getParameterType() != null) {
+                    analyzeMacroParameter(macroBlock, parameter, parameterDescriptor, componentManager, reporter,
+                        parameterDescriptor.getParameterType());
+                }
+
+                if (!Objects.equals(parameterDescriptor.getDisplayType(), parameterDescriptor.getParameterType())
+                    && parameterDescriptor.getDisplayType() != null)
+                {
+                    analyzeMacroParameter(macroBlock, parameter, parameterDescriptor, componentManager, reporter,
+                        parameterDescriptor.getDisplayType());
+                }
+            }
+        }
+
+        return reporter.getResults();
+    }
+
+    private static void analyzeMacroParameter(MacroBlock macroBlock, Map.Entry<String, String> parameter,
+        ParameterDescriptor parameterDescriptor, ComponentManager componentManager,
+        DefaultMacroRequiredRightReporter reporter, Type parameterType)
+    {
+        try {
+            Type componentType = new DefaultParameterizedType(null, MacroParameterRequiredRightsAnalyzer.class,
+                parameterType);
+            if (componentManager.hasComponent(componentType)) {
+                MacroParameterRequiredRightsAnalyzer<?> analyzer = componentManager.getInstance(componentType);
+                analyzer.analyze(macroBlock, parameterDescriptor, parameter.getValue(), reporter);
+            }
+        } catch (Exception e) {
+            reporter.report(macroBlock, List.of(MacroRequiredRight.MAYBE_PROGRAM),
+                "security.requiredrights.macro.analyzer.parameterError",
+                parameterDescriptor.getId(), macroBlock.getId(), ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
+
+    private List<RequiredRightAnalysisResult> maybeAnalyzeMacroContent(MacroBlock macroBlock, Macro<?> macro)
+        throws RequiredRightsException
+    {
+        ContentDescriptor contentDescriptor = macro.getDescriptor().getContentDescriptor();
+
+        if (contentDescriptor != null && Block.LIST_BLOCK_TYPE.equals(contentDescriptor.getType())) {
+            return analyzeMacroContent(macroBlock, macroBlock.getContent());
+        }
+
+        return List.of();
     }
 
     private Optional<RequiredRightAnalyzer<MacroBlock>> getMacroBlockRequiredRightAnalyzer(MacroBlock macroBlock)
@@ -148,11 +214,5 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
         } catch (ComponentLookupException e) {
             return Optional.empty();
         }
-    }
-
-    private boolean shouldMacroContentBeParsed(Macro<?> macro)
-    {
-        ContentDescriptor contentDescriptor = macro.getDescriptor().getContentDescriptor();
-        return contentDescriptor != null && Block.LIST_BLOCK_TYPE.equals(contentDescriptor.getType());
     }
 }

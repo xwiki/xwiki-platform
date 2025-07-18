@@ -121,4 +121,12 @@ public interface SolrConfiguration
      * @since 12.5RC1
      */
     SynchronizeAtStartupMode synchronizeAtStartupMode();
+
+    /**
+     * @return the size of the batch for the synchronization job between the database and SOLR index
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    int getSynchronizationBatchSize();
 }

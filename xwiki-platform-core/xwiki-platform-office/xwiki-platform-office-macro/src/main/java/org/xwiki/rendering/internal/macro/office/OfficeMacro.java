@@ -158,4 +158,10 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
 
         return resourceReference;
     }
+
+    @Override
+    public boolean isExecutionIsolated(OfficeMacroParameters parameters, String content)
+    {
+        return true;
+    }
 }

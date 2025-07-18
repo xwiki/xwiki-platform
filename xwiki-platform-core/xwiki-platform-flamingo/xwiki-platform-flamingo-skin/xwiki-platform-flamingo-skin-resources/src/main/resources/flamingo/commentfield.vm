@@ -19,66 +19,43 @@
 ## ---------------------------------------------------------------------------
 ###
 #template('display_macros.vm')
-### Return a single comment field
+### Return a single comment field in edit mode
 ###
 ###
-## requested field name containing the comment number
+## requested field name containing the comment number (or not if it's a new comment)
 ## (e.g. XWiki.XWikiComments_42_comment)
-#set ($name = $escapetool.xml($request.name))
+#set ($inputName = $request.name)
 ## the number of the comment, if no number is provided we generate a field for a new comment.
 #set ($number = $numbertool.toNumber($request.number).intValue())
 
-## the 'comment' field from the XWikiComments class is used as a template for the field to display
-#set ($xCommentClass = 'XWiki.XWikiComments')
-#set ($commentClass = $xwiki.getDocument($xCommentClass).getxWikiClass())
-
-
-## the number of the comment, if no number is provided we generate a field for a new comment.
+## the number of the comment, if no number is provided we create a new one
 #if ($number && $number > -1)
-  #set ($commentObj = $doc.getObject($xCommentClass, $number))
-  #set ($value = $commentObj.getValue('comment'))
+  #set ($commentObj = $doc.getObject('XWiki.XWikiComments', $number))
+  #set ($withNumber = true)
 #else
-  #set ($commentObj = $doc.newObject($xCommentClass))
-  #set ($value = '')
+  #set ($commentObj = $doc.newObject('XWiki.XWikiComments'))
+  #set ($withNumber = false)
 #end
-
 ## Forces the value of the comment to the content from the request if it exists.
 #if ($request.content)
-  #set ($value = $request.content)
+  #set ($discard = $commentObj.set('comment', $request.content))
 #end
-
-## We can't simply call $doc.display() on this object because we would get comment as the
-## field name. Instead we want the field name to be XWiki.XWikiComments_comment for new comments
-## and XWiki.XWikiComments_N_comment for edited comments.
-## To achieve this we add a new property to the comment class by copying the comment property and changing the name.
-#set ($commentObjClass = $commentObj.getxWikiClass())
-#set ($commentObjBaseClass = $commentObjClass.getXWikiClass())
-#set ($commentField = $commentClass.getXWikiClass().get('comment'))
-
-## In theory this should never occur, but apparently it happened in XWIKI-18717 in weird conditions,
-## so we're bullet-proofing
-#if ("$!commentField" != '')
-#set ($discard = $commentObjBaseClass.put($name, $commentField))
-#set ($discard = $commentObjBaseClass.get($name).setName($name))
-
-## attribution of the value to the new field in the object.
-#set ($discard = $commentObj.set($name, $value))
-
-#set ($fieldToDisplay = $commentObjClass.get($name))
 
 ## We need to know the type of editor used for comments in order to hide/display the preview button.
 #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
 <input type='hidden' name='defaultEditorId' value="$escapetool.xml($defaultEditorId)" />
 
-<label for="$name">$services.localization.render('core.viewers.comments.add.comment.label')</label>
+<label class='sr-only' for="$escapetool.xml($inputName)">
+  $escapetool.xml($services.localization.render('core.viewers.comments.edit.comment.label'))
+</label>
 #initRequiredSkinExtensions()
+## This startupFocus parameter is used by the CKEditor WYSIWYG editor.
+#set ($wysiwygEditorConfig = {
+  'startupFocus': true
+})
 ## display of the comment field
-$doc.displayEdit($fieldToDisplay, '', $commentObj)
+$commentObj.display('comment', 'edit', true, $withNumber)
 
 ## ensure to load the appropriate JSX for the editor.
 #getRequiredSkinExtensions($requiredSkinExtensions)
 #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
-
-## reset the temporary added field.
-#set ($discard = $commentObjBaseClass.removeField($name))
-#end

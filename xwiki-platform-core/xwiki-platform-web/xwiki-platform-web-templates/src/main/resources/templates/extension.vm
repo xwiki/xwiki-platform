@@ -175,7 +175,7 @@
 #set ($name = $name.substring($mathtool.add($name.indexOf(':'), 1)))
 #end
 #end
-${name}##
+${escapetool.xml($name)}##
 #end
 
 #macro (displayExtensionActionButtons $extension $readOnly)
@@ -326,7 +326,8 @@ ${name}##
 #end
 
 #macro (displayExtensionRating $extension)
-  #set ($rating = $extension.getRating())
+  #set ($ratingExtension = $services.extension.index.getRatingExtension($extension))
+  #set ($rating = $ratingExtension.getRating())
   #if ($rating != $NULL)
     #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
     <div class="extension-rating">
@@ -604,21 +605,22 @@ $namespace##
   #end
   #set ($dependencyStatus = 'unknown')
   #set ($dependencyStatusMessage = $NULL)
-  #set ($dependencyName = $dependencyId)
+  #set ($dependencyName = $escapetool.xml($dependencyId))
   #if ($dependencyExtension)
     ## The extension status is determined for the $extensionNamespace . The name of this parameter is very important
     ## because it has to overwrite the global variable with the same name.
     #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage $dependencyOrExtension.versionConstraint)
     #set ($dependencyURL = "#getExtensionURL($dependencyId $dependencyVersion)")
-    #set ($dependencyName = "<a href=""$dependencyURL"" class=""extension-link"">#displayExtensionName($dependencyExtension)</a>")
+    #set ($dependencyName = "<a href=""$escapetool.xml($dependencyURL)"" class=""extension-link"">#displayExtensionName($dependencyExtension)</a>")
   #end
-  <div class="dependency-item extension-item-$dependencyStatus">
-    <span class="extension-name">${dependencyName}</span><span class="extension-version">$!dependencyVersion</span>
+  <div class="dependency-item extension-item-$escapetool.xml($dependencyStatus)">
+    <span class="extension-name">${dependencyName}</span><span
+          class="extension-version">$!escapetool.xml($dependencyVersion)</span>
     #if ($extensionNamespace.startsWith('wiki:'))
       <span class="extension-namespace">$services.localization.render('extensions.info.dependency.wiki', ["#wikiHomePageLink($extensionNamespace)"])</span>
     #end
     #if ("$!dependencyStatusMessage" != '')
-      <span class="extension-status">$dependencyStatusMessage</span>
+      <span class="extension-status">$escapetool.xml($dependencyStatusMessage)</span>
     #end
   </div>
 #end
@@ -739,7 +741,7 @@ $namespace##
       'installplan': 'extensions.install.error.alreadyInstalled',
       'uninstallplan': 'extensions.uninstall.error.notInstalled'
     })
-    <div class="infomessage">$services.localization.render($emptyPlanMessageKeys.get($plan.jobType))</div>
+    #info($services.localization.render($emptyPlanMessageKeys.get($plan.jobType)))
   #else
     <dl>
     #foreach($entry in $extensionsByAction.entrySet())
@@ -1111,14 +1113,15 @@ $namespace##
       #if ("$!extension.summary" != '')
         <div class="extension-summary">$escapetool.xml($extension.summary)</div>
       #end
-      #set ($extensionSupportPlans = $extension.supportPlans)
+      #set ($remoteExtension = $services.extension.index.getRemoteExtension($extension))
+      #set ($extensionSupportPlans = $remoteExtension.supportPlans)
       #set ($extensionSupporters = $extensionSupportPlans.supporters)
       #if ($extensionSupportPlans && !$extensionSupporters.isEmpty())
         <div class="supported-by">
           <h3>$escapetool.xml($services.localization.render('extensions.info.support.supportedBy'))</h3>
           #displayExtensionSupportPlans($extensionSupportPlans)
         </div>
-      #elseif ($extension.isRecommended())
+      #elseif ($remoteExtension.isRecommended())
         <div class="extension-recommended">$escapetool.xml($services.localization.render('extensions.info.recommended'))</div>
       #end
 
@@ -1185,15 +1188,15 @@ $namespace##
     #if ($extension)
       #displayExtension($extension, $readOnly)
     #else
-      <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
+      #info($services.localization.render('extensions.advancedSearch.noResults',
         ["<strong>$!escapetool.xml($request.extensionId)</strong>",
-        "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
+        "<strong>$!escapetool.xml($request.extensionVersion)</strong>"]))
 
       ## DEBUG START: Check if there is any job status associated with the specified extension.
       #getExtensionJobStatus($request.extensionId, $request.extensionVersion $jobStatus)
       #if ($jobStatus)
         ## Normally we shouldn't get here.
-        <div class="errormessage">We found an extension job associated with the missing extension:</div>
+        #error("We found an extension job associated with the missing extension:")
         #displayExtensionJobStatus($jobStatus)
       #end
       ## DEBUG STOP
@@ -1212,6 +1215,7 @@ $namespace##
   #if ($extensionConfig.installJAROnRoot)
     #set ($discard = $installPlanRequest.rewriter.installExtensionTypeOnRootNamespace('jar'))
     #set ($discard = $installPlanRequest.rewriter.installExtensionTypeOnRootNamespace('webjar'))
+    #set ($discard = $installPlanRequest.rewriter.installExtensionTypeOnRootNamespace('webjar-node'))
   #end
   #set ($discard = $extensionManager.createInstallPlan($installPlanRequest))
   #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')
@@ -1357,7 +1361,7 @@ $namespace##
       ## Send error back.
       $response.sendError(400, $errorMessage)
     #else
-      <div class="errormessage">$errorMessage #printThrowable($lastError)</div>
+      #error("$errorMessage #printThrowable($lastError)")
     #end
   #else
     ## Redirect to extension display.
@@ -1688,9 +1692,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
     #end
     ##
     #if ($outdated.isEmpty() && $invalid.isEmpty())
-      <div class="successmessage">
-        $services.localization.render('platform.extension.updater.noUpdatesAvailable')
-      </div>
+      #success($services.localization.render('platform.extension.updater.noUpdatesAvailable'))
     #else
       #displayExtensionUpdaterPlanActionByNamespace($invalid 'invalid')
       #displayExtensionUpdaterPlanActionByNamespace($outdated 'outdated')

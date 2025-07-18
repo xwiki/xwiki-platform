@@ -67,7 +67,6 @@
         // sure relative references within the edited content are properly resolved and serialized.
         htmlConverter: editor.config.sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.HTMLConverter',
-          outputSyntax: 'plain',
           language: editor.getContentLocale(),
           formToken: document.documentElement.dataset.xwikiFormToken || ''
         }))
@@ -216,7 +215,7 @@
       }
     },
 
-    endLoading: function(editor) {
+    endLoading: async function(editor) {
       if (editor.editable()) {
         $(editor.container.$).find('.cke_button__source_icon').first().removeClass('loading');
       }
@@ -228,8 +227,9 @@
       // We have to set the flag before setting the command state in order to be taken into account.
       sourceCommand.running = false;
       sourceCommand.setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
-      editor.setLoading(false);
-      CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+      await CKEDITOR.plugins.xwikiSelection.restoreSelection(editor, {
+        beforeApply: () => editor.setLoading(false)
+      });
     }
   });
 })();

@@ -41,15 +41,11 @@
     #set ($discard = $editConfirmation.put('title', $services.localization.render($titleKey)))
     #define ($message)
       #if ($checkResult.isError())
-        <div class="box errormessage">
-          #set ($messageKey = 'platform.core.editConfirmation.errors')
-          $escapetool.xml($services.localization.render($messageKey))
-        </div>
+        #set ($messageKey = 'platform.core.editConfirmation.errors')
+        #error($escapetool.xml($services.localization.render($messageKey)))
       #else
-        <div class="box warningmessage">
-          #set ($messageKey = 'platform.core.editConfirmation.warnings')
-          $escapetool.xml($services.localization.render($messageKey))
-        </div>
+        #set ($messageKey = 'platform.core.editConfirmation.warnings')
+        #warning($escapetool.xml($services.localization.render($messageKey)))
       #end
       #if (!$checkResult.errorMessages.isEmpty())
         #foreach ($block in $checkResult.errorMessages)

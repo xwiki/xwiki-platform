@@ -19,8 +19,8 @@ importers:
         specifier: 0.31.3
         version: 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
       '@blocknote/mantine':
-        specifier: 0.31.3
-        version: 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: 0.34.0
+        version: 0.34.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mantine/core':
         specifier: 8.1.1
         version: 8.1.1(@mantine/hooks@8.1.1(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -247,14 +247,34 @@ packages:
       '@hocuspocus/provider':
         optional: true
 
+  '@blocknote/core@0.34.0':
+    resolution: {integrity: sha512-0bAzs7wh+w+62n0qOCgMaxHBe9z4kpG2iANcHi7M7BMFcldGh7AGzaRc9AN4B+zLn9zafZdZMEFCq1dDPHsKSg==}
+    peerDependencies:
+      '@hocuspocus/provider': ^2.15.2
+    peerDependenciesMeta:
+      '@hocuspocus/provider':
+        optional: true
+
   '@blocknote/mantine@0.31.3':
     resolution: {integrity: sha512-Kql4zjl6liRXroDi45r3aMp+MdJgwkuyvXZ6Qz4+TkxByd4/HWFynWEtFI1XOLTso/45Q+hOPrpxZPTITea99Q==}
     peerDependencies:
       react: ^18.0 || ^19.0 || >= 19.0.0-rc
       react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
 
+  '@blocknote/mantine@0.34.0':
+    resolution: {integrity: sha512-gbFwWCYmNPl1h2JAhD17F8+DT27EzCJ8j1DnKJVQFT/SQIJWWDzlh1yS9wRHH6bGrHivkVsJSIcbgncY2iGaFw==}
+    peerDependencies:
+      react: ^18.0 || ^19.0 || >= 19.0.0-rc
+      react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
+
   '@blocknote/react@0.31.3':
     resolution: {integrity: sha512-Y2BbZChxvVKfoV1dShxiM+cepm5mHJmQHw0pEMtHx+fLlyfdkLkFbIIVNMIYm12Ba6UFhzDMOlCK23WW0NHb/Q==}
+    peerDependencies:
+      react: ^18.0 || ^19.0 || >= 19.0.0-rc
+      react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
+
+  '@blocknote/react@0.34.0':
+    resolution: {integrity: sha512-jq1E2O1ghHF+MneyN8D9LlKpQN1nycPEEyWp2zEpAPxNj0jZZYiTIxCkk6N6gEwJrT7KM3y1geuaP63EKbUnRA==}
     peerDependencies:
       react: ^18.0 || ^19.0 || >= 19.0.0-rc
       react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
@@ -3057,6 +3077,57 @@ snapshots:
       - sugar-high
       - supports-color
 
+  '@blocknote/core@0.34.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)':
+    dependencies:
+      '@emoji-mart/data': 1.2.1
+      '@shikijs/types': 3.2.1
+      '@tiptap/core': 2.25.0(@tiptap/pm@2.25.0)
+      '@tiptap/extension-bold': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))
+      '@tiptap/extension-code': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))
+      '@tiptap/extension-gapcursor': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)
+      '@tiptap/extension-history': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)
+      '@tiptap/extension-horizontal-rule': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)
+      '@tiptap/extension-italic': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))
+      '@tiptap/extension-link': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)
+      '@tiptap/extension-paragraph': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))
+      '@tiptap/extension-strike': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))
+      '@tiptap/extension-table-cell': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))
+      '@tiptap/extension-table-header': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))
+      '@tiptap/extension-text': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))
+      '@tiptap/extension-underline': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))
+      '@tiptap/pm': 2.25.0
+      emoji-mart: 5.6.0
+      hast-util-from-dom: 5.0.1
+      prosemirror-dropcursor: 1.8.2
+      prosemirror-highlight: 0.13.0(@shikijs/types@3.2.1)(@types/hast@3.0.4)(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-transform@1.10.4)(prosemirror-view@1.40.0)
+      prosemirror-model: 1.25.1
+      prosemirror-state: 1.4.3
+      prosemirror-tables: 1.7.1
+      prosemirror-transform: 1.10.4
+      prosemirror-view: 1.40.0
+      rehype-format: 5.0.1
+      rehype-parse: 9.0.1
+      rehype-remark: 10.0.1
+      rehype-stringify: 10.0.1
+      remark-gfm: 4.0.1
+      remark-parse: 11.0.0
+      remark-rehype: 11.1.2
+      remark-stringify: 11.0.0
+      unified: 11.0.5
+      uuid: 8.3.2
+      y-prosemirror: 1.3.7(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.40.0)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
+      y-protocols: 1.0.6(yjs@13.6.27)
+      yjs: 13.6.27
+    optionalDependencies:
+      '@hocuspocus/provider': 2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
+    transitivePeerDependencies:
+      - '@types/hast'
+      - highlight.js
+      - lowlight
+      - refractor
+      - sugar-high
+      - supports-color
+
   '@blocknote/mantine@0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
@@ -3077,9 +3148,51 @@ snapshots:
       - sugar-high
       - supports-color
 
+  '@blocknote/mantine@0.34.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@blocknote/core': 0.34.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
+      '@blocknote/react': 0.34.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@mantine/core': 7.17.8(@mantine/hooks@7.17.8(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@mantine/hooks': 7.17.8(react@19.1.0)
+      '@mantine/utils': 6.0.22(react@19.1.0)
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-icons: 5.5.0(react@19.1.0)
+    transitivePeerDependencies:
+      - '@hocuspocus/provider'
+      - '@types/hast'
+      - '@types/react'
+      - highlight.js
+      - lowlight
+      - refractor
+      - sugar-high
+      - supports-color
+
   '@blocknote/react@0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
+      '@emoji-mart/data': 1.2.1
+      '@floating-ui/react': 0.26.28(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tiptap/core': 2.25.0(@tiptap/pm@2.25.0)
+      '@tiptap/pm': 2.25.0
+      '@tiptap/react': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      emoji-mart: 5.6.0
+      lodash.merge: 4.6.2
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-icons: 5.5.0(react@19.1.0)
+    transitivePeerDependencies:
+      - '@hocuspocus/provider'
+      - '@types/hast'
+      - highlight.js
+      - lowlight
+      - refractor
+      - sugar-high
+      - supports-color
+
+  '@blocknote/react@0.34.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@blocknote/core': 0.34.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
       '@emoji-mart/data': 1.2.1
       '@floating-ui/react': 0.26.28(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tiptap/core': 2.25.0(@tiptap/pm@2.25.0)

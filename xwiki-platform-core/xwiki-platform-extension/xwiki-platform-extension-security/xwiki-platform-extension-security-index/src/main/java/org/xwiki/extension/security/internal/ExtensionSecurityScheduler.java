@@ -81,8 +81,9 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
                 return thread;
             });
 
-            this.executor.scheduleWithFixedDelay(this, 0, this.extensionSecurityConfiguration.getScanDelay(), HOURS);
+            // Create the future before scheduling so run() can always complete it.
             this.completableFuture = new CompletableFuture<>();
+            this.executor.scheduleWithFixedDelay(this, 0, this.extensionSecurityConfiguration.getScanDelay(), HOURS);
         }
         return this.completableFuture;
     }
@@ -94,7 +95,7 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
      *     is enabled, or {@code false} once a first job is done after the restart and the security scan is disabled.
      *     {@code null} is returned if restart is called before {@link #start()} is ever called
      */
-    public CompletableFuture<Boolean> restart()
+    public synchronized CompletableFuture<Boolean> restart()
     {
         if (!this.started) {
             return null;

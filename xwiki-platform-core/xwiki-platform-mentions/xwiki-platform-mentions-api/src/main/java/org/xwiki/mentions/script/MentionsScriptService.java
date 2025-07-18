@@ -31,6 +31,7 @@ import org.xwiki.mentions.MentionsConfiguration;
 import org.xwiki.mentions.MentionsFormatter;
 import org.xwiki.mentions.internal.MentionFormatterProvider;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 import static org.xwiki.mentions.MentionsConfiguration.MENTION_TASK_ID;
 
@@ -72,6 +73,18 @@ public class MentionsScriptService implements ScriptService
     public String getSelfMentionsColor()
     {
         return this.configuration.getSelfMentionsColor();
+    }
+
+    /**
+     *
+     * @see MentionsConfiguration#getSelfMentionsForeground()
+     * @return the mentions foreground color configuration value for the current user.
+     * @since 17.5.0RC1
+     */
+    @Unstable
+    public String getSelfMentionsForeground()
+    {
+        return this.configuration.getSelfMentionsForeground();
     }
 
     /**

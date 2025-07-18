@@ -15,6 +15,10 @@ input[type="time"],
 select,
 textarea {
   &:extend(.form-control all);
+  /* Bootstrap sets shadows on elements by default.
+    Since `XWIKI-20603: Updated XS Design (Minimalist Skin)`, XWiki has a more flat design,
+    and those elements should not come with a shadow. */
+  box-shadow: none;
   display: inline-block;
   max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
   width: auto;

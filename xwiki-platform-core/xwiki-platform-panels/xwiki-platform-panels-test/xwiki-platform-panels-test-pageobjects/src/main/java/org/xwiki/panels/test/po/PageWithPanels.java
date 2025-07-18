@@ -89,7 +89,8 @@ public class PageWithPanels extends BasePage
     
     public boolean panelIsToggled(String panelSide) {
         WebElement panelToggle = (Objects.equals(panelSide, RIGHT)) ? rightPanelsToggle : leftPanelsToggle;
-        return Objects.equals(panelToggle.getDomAttribute("aria-expanded"), "true");
+        return Objects.equals(panelToggle.getDomAttribute("aria-expanded"), "true") 
+            || Objects.equals(panelToggle.getDomAttribute("aria-expanded"), null);
     }
     
     public void togglePanel(String panelSide) {
@@ -105,9 +106,11 @@ public class PageWithPanels extends BasePage
         WebElement panelResizeHandle = (Objects.equals(panelSide, RIGHT)) ?
             rightPanelsResizeHandle : leftPanelsResizeHandle;
         // Define the drag and drop action
-        Actions action = new Actions(this.getDriver());
+        Actions action = new Actions(this.getDriver().getWrappedDriver());
         action.clickAndHold(panelResizeHandle);
-        action.moveByOffset(panelSizeDiff, 0);
+        int panelSideInvert = Objects.equals(panelSide, RIGHT)? 1 : -1;
+        // We need to correct a bit the shift induced by the exact place where the handled is taken.
+        action.moveByOffset((panelSizeDiff + 6) * panelSideInvert, 0);
         action.release();
         action.perform();
     }

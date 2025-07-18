@@ -259,14 +259,14 @@ public interface WikiMacroConstants
     /**
      * Constant for representing the order of the parameter.
      *
-     * @since 17.5.0RC1
+     * @since 17.5.0
      */
     String PARAMETER_ORDER_PROPERTY = "order";
 
     /**
      * Constant for representing the order the content should have to be displayed among other parameters.
      *
-     * @since 17.5.0RC1
+     * @since 17.5.0
      */
     String MACRO_CONTENT_ORDER_PROPERTY = "contentOrder";
 }

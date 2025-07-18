@@ -30,7 +30,7 @@ import org.xwiki.rest.model.jaxb.SearchResult;
  * A component role that provides search results for a keyword query with the given options.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Role
 public interface KeywordSearchSource

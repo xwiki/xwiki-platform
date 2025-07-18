@@ -3,7 +3,7 @@
   "browser"  : true,
   "eqeqeq"   : false,
   "eqnull"   : true,
-  "es3"      : true,
+  "esversion": 6,
   "expr"     : true,
   "jquery"   : true,
   "latedef"  : true,

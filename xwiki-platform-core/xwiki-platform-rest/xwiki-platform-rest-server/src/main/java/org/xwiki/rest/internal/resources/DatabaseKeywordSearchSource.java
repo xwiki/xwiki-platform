@@ -72,7 +72,7 @@ import static org.xwiki.rest.internal.resources.KeywordSearchScope.TITLE;
  * A {@link KeywordSearchSource} implementation that searches in the database.
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 // This is old code from BaseSearchResult copied to a new class. While some checkstyle violations were fixed, most of
 // the following aren't that simple to fix.

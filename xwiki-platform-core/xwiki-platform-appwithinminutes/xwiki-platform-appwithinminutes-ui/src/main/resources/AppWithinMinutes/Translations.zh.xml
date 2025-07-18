@@ -144,7 +144,9 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=增加
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=删除
 appWithinMinutes.templateProviderEditor.hint=应用实体是wiki页面里面的结构化数据。
+appWithinMinutes.templateProviderEditor.icon.name=图标
 appWithinMinutes.templateProviderEditor.icon.hint=应用实体指定图标。
+appWithinMinutes.templateProviderEditor.description.name=描述
 appWithinMinutes.templateProviderEditor.description.hint=应用内实体的简短介绍输入。
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=这里是建立实体的表单
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=实体当没有被选择的时候，可以应用所有页面。
@@ -152,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=这里建立�
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=这些实体可以在任何wiki页面建立，当没有被指定范围的时候。
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=不能强制实体应用范围
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=关于建立应用实体范围的建议，最好的方式是应用实体不限定使用范围。
+appWithinMinutes.templateProviderEditor.terminal.name=终端
 appWithinMinutes.templateProviderEditor.terminal.hint=应用实体是否在这个页面终止。
 
 ### Wizard Step 3: Application Presentation

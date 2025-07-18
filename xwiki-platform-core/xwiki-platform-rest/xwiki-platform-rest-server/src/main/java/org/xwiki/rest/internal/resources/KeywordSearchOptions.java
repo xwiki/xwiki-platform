@@ -35,7 +35,7 @@ import java.util.List;
  * @param isLocaleAware if the search should consider the current locale
  *
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 public record KeywordSearchOptions(List<KeywordSearchScope> searchScopes, String wikiName,
                                    String space, int number, int start, String orderField, String order,

@@ -660,7 +660,7 @@
     })
   }
 
-  var other = $.fn.tooltip
+  let other = $.fn.tooltip
 
   // Prevent overriding this tooltip implementation by jQuery UI as in XWiki we ship both implementations but want
   // to always use the Bootstrap one.

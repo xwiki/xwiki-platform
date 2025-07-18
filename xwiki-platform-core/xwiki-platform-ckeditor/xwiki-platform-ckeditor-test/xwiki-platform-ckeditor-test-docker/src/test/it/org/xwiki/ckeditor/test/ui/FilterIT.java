@@ -107,7 +107,15 @@ class FilterIT extends AbstractCKEditorIT
         // Check that the escaped style content is in the macro output.
         assertThat(html, containsString("content: '\\3C'"));
         // Check that the comment-escaped output is in the HTML comment.
-        assertThat(html, containsString("content: '<\\'"));
+        try {
+            // The macro source is kept in an attribute, so it should be escaped. This is the behavior we see at runtime
+            // when getting the inner HTML of the editing area.
+            assertThat(html, containsString("content: '&lt;\\'"));
+        } catch (AssertionError e) {
+            // The version of Chrome used to run the Docker tests (or maybe the Chrome WebDriver) doesn't escape '<' in
+            // the attribute value, as it happens at runtime.
+            assertThat(html, containsString("content: '<\\'"));
+        }
 
         this.textArea.sendKeys(" end");
         // Verify that the origial style content is preserved.

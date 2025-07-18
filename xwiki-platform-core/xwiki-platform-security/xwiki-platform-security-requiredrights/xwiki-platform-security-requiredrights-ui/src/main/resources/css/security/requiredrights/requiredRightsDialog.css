@@ -161,6 +161,11 @@
   #required-rights-dialog .modal-dialog {
     min-width: min-content;
   }
+
+  /* When setting the minimum width to min-content, the required rights results shouldn't contribute to that width. */
+  #required-rights-dialog #required-rights-results {
+    contain: inline-size;
+  }
 }
 
 /* Styles for the warning box above the content. */

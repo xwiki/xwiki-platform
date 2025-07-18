@@ -19,7 +19,6 @@
  */
 package org.xwiki.icon.internal;
 
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public class DefaultIconRenderer implements IconRenderer
     private SkinExtension jsExtension;
 
     @Inject
-    private VelocityRenderer velocityRenderer;
+    private IconTemplateRendererManager iconTemplateRendererManager;
 
     @Override
     public String render(String iconName, IconSet iconSet) throws IconException
@@ -91,14 +90,8 @@ public class DefaultIconRenderer implements IconRenderer
         // Add the icon set resources
         use(iconSet);
 
-        // Interpret the velocity command
-        StringWriter contentToParse = new StringWriter();
-        contentToParse.write("#set($icon = \"");
-        contentToParse.write(icon.getValue());
-        contentToParse.write("\")\n");
-        contentToParse.write(renderer);
-
-        return this.velocityRenderer.render(contentToParse.toString(), iconSet.getSourceDocumentReference());
+        return this.iconTemplateRendererManager.getRenderer(renderer)
+            .render(icon.getValue(), iconSet.getSourceDocumentReference());
     }
 
     @Override
@@ -120,7 +113,8 @@ public class DefaultIconRenderer implements IconRenderer
 
     private void activeCSS(IconSet iconSet) throws IconException
     {
-        String url = this.velocityRenderer.render(iconSet.getCss(), iconSet.getSourceDocumentReference());
+        String url = this.iconTemplateRendererManager.getRenderer(iconSet.getCss())
+            .render(null, iconSet.getSourceDocumentReference());
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("rel", "stylesheet");
         this.linkExtension.use(url, parameters);

@@ -337,7 +337,11 @@
    */
   function asyncRequireCallback(asyncCallback, resolve, reject) {
     return (...args) => {
-      Promise.try(asyncCallback, ...args).then(resolve).catch(reject);
+      try {
+        Promise.resolve(asyncCallback(...args)).then(resolve).catch(reject);
+      } catch (error) {
+        reject(error);
+      }
     };
   }
 

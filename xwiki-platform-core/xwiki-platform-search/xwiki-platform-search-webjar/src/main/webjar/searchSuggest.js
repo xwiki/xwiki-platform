@@ -110,7 +110,7 @@ var XWiki = (function (XWiki) {
         event.stop();
         if (!event.memo.url) {
           // Stop the browser event that triggered the custom "xwiki:suggest:selected" event.
-          if (event.memo.originalEvent) {
+          if (event.memo.originalEvent.type === 'click' && event.memo.originalEvent) {
             Event.stop(event.memo.originalEvent);
           }
           // Submit form
@@ -118,6 +118,10 @@ var XWiki = (function (XWiki) {
         }
         else {
           // The page anchor should be able to handle its own click event (event.memo.originalEvent here) itself.
+          if (event.memo.originalEvent.type !== 'click' && event.memo.originalEvent) {
+            Event.stop(event.memo.originalEvent);
+            window.location = event.memo.url;
+          }
         }
       }
     },

@@ -247,15 +247,6 @@ export class BlockNoteToUniAstConverter {
         };
       }
 
-      case "column":
-      case "columnList":
-        // TODO: support columns
-        return {
-          type: "paragraph",
-          content: [],
-          styles: {},
-        };
-
       default:
         assertUnreachable(block);
     }

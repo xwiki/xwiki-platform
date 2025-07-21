@@ -47,7 +47,6 @@ import {
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
-import { multiColumnDropCursor } from "@blocknote/xl-multi-column";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { CollaborationInitializer } from "@xwiki/cristal-collaboration-api";
@@ -155,7 +154,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       : undefined,
     // Editor's schema, with custom blocks definition
     schema,
-    dropCursor: multiColumnDropCursor,
     // Use the provided language for the dictionary
     dictionary: createDictionary(lang),
     // The default drop cursor only shows up above and below blocks - we replace
@@ -295,7 +293,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
       <FilePanelController
         filePanel={(props) => {
-          const block = props.block as BlockType;
+          const block = props.block as unknown as BlockType;
 
           return block.type === "image" ? (
             <ImageFilePanel

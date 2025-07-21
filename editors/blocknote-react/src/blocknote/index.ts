@@ -37,13 +37,6 @@ import {
   DefaultReactSuggestionItem,
   getDefaultReactSlashMenuItems,
 } from "@blocknote/react";
-import {
-  ColumnBlock,
-  ColumnListBlock,
-  getMultiColumnSlashMenuItems,
-  locales as multiColumnLocales,
-  withMultiColumn,
-} from "@blocknote/xl-multi-column";
 import { filterMap } from "@xwiki/cristal-fn-utils";
 
 /**
@@ -62,10 +55,6 @@ function createBlockNoteSchema(macros: Macro[]) {
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
       ...remainingBlockSpecs,
-
-      // First-party extension blocks
-      column: ColumnBlock,
-      columnList: ColumnListBlock,
 
       // Custom blocks
       Heading4: Heading4.block,
@@ -99,7 +88,7 @@ function createBlockNoteSchema(macros: Macro[]) {
     },
   });
 
-  return withMultiColumn(blockNoteSchema);
+  return blockNoteSchema;
 }
 
 /**
@@ -110,17 +99,10 @@ function createBlockNoteSchema(macros: Macro[]) {
  * @returns The dictionary in the requested language
  */
 function createDictionary(lang: EditorLanguage) {
-  return {
-    ...locales[lang],
-
-    // First-party extensions
-    multi_column: multiColumnLocales[lang],
-  };
+  return locales[lang];
 }
 
-type EditorLanguage = keyof typeof locales &
-  keyof typeof multiColumnLocales &
-  keyof typeof translations;
+type EditorLanguage = keyof typeof locales & keyof typeof translations;
 
 function querySuggestionsMenuItems(
   editor: EditorType,
@@ -130,9 +112,6 @@ function querySuggestionsMenuItems(
   return filterSuggestionItems(
     combineByGroup(
       getDefaultReactSlashMenuItems(editor),
-
-      // First-party extension blocks
-      getMultiColumnSlashMenuItems(editor),
 
       // Custom blocks
       [Heading4, Heading5, Heading6].map((custom) =>

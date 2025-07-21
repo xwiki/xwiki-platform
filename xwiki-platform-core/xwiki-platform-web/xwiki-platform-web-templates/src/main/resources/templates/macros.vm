@@ -2247,7 +2247,7 @@ $displayName##
   #if($pageNumber == $parameters.crtPage)
     <span class="currentPage btn btn-primary btn-xs">$displayedPageNumber</span>
   #else
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem} #if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}"
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}"
       class="btn btn-default btn-xs"
       title="$services.localization.render('platform.livetable.paginationPageTitle', [$displayedPageNumber])">$displayedPageNumber</a>
   #end
@@ -2279,8 +2279,7 @@ $displayName##
   #if($parameters.crtPage > 0)
     #set($prevPage = $parameters.crtPage - 1)
     #set($firstItem = $prevPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}
-      #if($parameters.itemsPerPage !=$parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination btn btn-xs btn-default">##
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage !=$parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination btn btn-xs btn-default">##
       <span class="sr-only">$services.localization.render('platform.livetable.paginationPagePrevious')</span>##
       $services.icon.renderHTML('caret-right')##
     </a>

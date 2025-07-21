@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="AnnotationCode.AnnotationConfig" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.AnnotationConfig" locale="">
   <web>AnnotationCode</web>
   <name>AnnotationConfig</name>
   <language/>
@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content/>
   <attachment>
     <filename>AnnotationsSectionIcon.png</filename>
@@ -570,6 +571,43 @@
     </property>
     <property>
       <sectionOrder>500</sectionOrder>
+    </property>
+  </object>
+  <object>
+    <name>AnnotationCode.AnnotationConfig</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>fbc8af6b-ec95-452d-b199-f7b798f56e6d</guid>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <prettyName>Level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>edit|script|wiki_admin|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <property>
+      <level>wiki_admin</level>
     </property>
   </object>
 </xwikidoc>

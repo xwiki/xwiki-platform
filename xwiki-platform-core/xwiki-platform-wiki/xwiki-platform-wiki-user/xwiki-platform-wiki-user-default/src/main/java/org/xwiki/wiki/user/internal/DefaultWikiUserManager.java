@@ -216,6 +216,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
+        // Avoid modifying the cached document
+        groupDoc.clone();
+
         // Add a member object
         // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
         List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
@@ -237,6 +240,9 @@ public class DefaultWikiUserManager implements WikiUserManager
 
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
+
+        // Avoid modifying the cached document
+        groupDoc.clone();
 
         // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
         List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
@@ -261,6 +267,9 @@ public class DefaultWikiUserManager implements WikiUserManager
     {
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
+
+        // Avoid modifying the cached document
+        groupDoc.clone();
 
         // Get the member objects
         List<BaseObject> objects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
@@ -293,6 +302,9 @@ public class DefaultWikiUserManager implements WikiUserManager
     {
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
+
+        // Avoid modifying the cached document
+        groupDoc.clone();
 
         // Get the member objects
         List<BaseObject> objects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
@@ -436,6 +448,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
+        // Avoid modifying the cached document
+        groupDoc.clone();
+
         // Add a candidacy object
         XWikiContext xcontext = xcontextProvider.get();
         try {
@@ -500,6 +515,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(request.getWikiId());
 
+        // Avoid modifying the cached document
+        groupDoc.clone();
+
         // Get the candidacy object
         BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, request.getId());
 
@@ -534,6 +552,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(request.getWikiId());
 
+        // Avoid modifying the cached document
+        groupDoc.clone();
+
         // Get the candidacy object
         BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, request.getId());
 
@@ -556,6 +577,9 @@ public class DefaultWikiUserManager implements WikiUserManager
     {
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(candidacy.getWikiId());
+
+        // Avoid modifying the cached document
+        groupDoc.clone();
 
         // Get the candidacy object
         BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, candidacy.getId());
@@ -580,6 +604,9 @@ public class DefaultWikiUserManager implements WikiUserManager
 
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
+
+        // Avoid modifying the cached document
+        groupDoc.clone();
 
         // Add a candidacy object
         try {
@@ -619,6 +646,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(invitation.getWikiId());
 
+        // Avoid modifying the cached document
+        groupDoc.clone();
+
         // Get the candidacy object
         BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, invitation.getId());
 
@@ -642,6 +672,9 @@ public class DefaultWikiUserManager implements WikiUserManager
 
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(invitation.getWikiId());
+
+        // Avoid modifying the cached document
+        groupDoc.clone();
 
         // Get the candidacy object
         BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, invitation.getId());

@@ -37,7 +37,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($docextras=[])
+#set ($displayDocExtra = false)
 #macro (printException $exception)
   #if($exception.message)
     {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$exception.message]){{/error}}

@@ -1549,6 +1549,22 @@ class PDFExportIT
         viewPage.waitForNotificationErrorMessage("Failed to export as PDF: The connection has been closed.");
     }
 
+    @Test
+    @Order(32)
+    void lazyLoadedImage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LazyLoadedImage"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 3 pages: cover page and 2 content pages.
+            assertEquals(3, pdf.getNumberOfPages());
+            assertEquals("LazyLoadedImage\n3 / 3\nsecond \u00A0page\n", pdf.getTextFromPage(2));
+            List<PDFImage> images = pdf.getImagesFromPage(2);
+            assertEquals(1, images.size());
+            assertEquals(512, images.get(0).getRawWidth());
+        }
+    }
+
     private void markPageReady(TestUtils setup)
     {
         setup.getDriver().executeScript("document.documentElement.dataset.xwikiPageReady = 'true';");

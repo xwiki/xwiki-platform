@@ -300,6 +300,7 @@ define('resourcePicker', [
       resourceReferenceInput.on('keydown', stopPropagationIfShowingSuggestions).typeahead({
         afterSelect: selectResource.bind(resourcePicker),
         delay: 500,
+        showHintOnFocus: true,
         displayText: function(resource) {
           // HACK: The string returned by this function is passed to the highlighter where we need to access all the
           // resource properties in order to be able to display the resource suggestion.

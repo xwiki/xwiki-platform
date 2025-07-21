@@ -289,6 +289,9 @@ public class DefaultIOService implements IOService
                 // if the document doesn't exist already skip it
                 return;
             }
+            // Avoid modifying the cached document
+            document = document.clone();
+
             // and the document object on it
             BaseObject annotationObject =
                 document.getXObject(this.configuration.getAnnotationClassReference(),

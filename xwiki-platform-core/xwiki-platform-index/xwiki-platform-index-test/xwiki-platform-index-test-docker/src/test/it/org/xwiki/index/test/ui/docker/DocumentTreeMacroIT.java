@@ -19,16 +19,13 @@
  */
 package org.xwiki.index.test.ui.docker;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -39,6 +36,10 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Functional tests for the Document Tree Macro.
  *
@@ -46,6 +47,7 @@ import org.xwiki.tree.test.po.TreeNodeElement;
  * @since 16.10.3
  * @since 17.0.0RC1
  */
+@ExtendWith(DynamicTestConfigurationExtension.class)
 @UITest
 class DocumentTreeMacroIT
 {
@@ -218,16 +220,16 @@ class DocumentTreeMacroIT
         setup.loginAsSuperAdmin();
         // Clean up.
         setup.deletePage(testReference, true);
-        createPage(setup, alice, "","");
-        createPage(setup, subAlice, "","");
-        createPage(setup, bob, "","");
-        createPage(setup, carol, "","");
-        createPage(setup, eve, "","");
-        createPage(setup, subEve, "","");
-        createPage(setup, subEveChild, "","");
-        createPage(setup, subEve2, "","");
-        createPage(setup, fiona, "","");
-        createPage(setup, fionaTerminal, "","");
+        createPage(setup, alice, "", "");
+        createPage(setup, subAlice, "", "");
+        createPage(setup, bob, "", "");
+        createPage(setup, carol, "", "");
+        createPage(setup, eve, "", "");
+        createPage(setup, subEve, "", "");
+        createPage(setup, subEveChild, "", "");
+        createPage(setup, subEve2, "", "");
+        createPage(setup, fiona, "", "");
+        createPage(setup, fionaTerminal, "", "");
 
         // By default only top nodes are displayed
         TreeElement tree = getDocumentTree(setup, testReference, Map.of("root", getNodeId(testReference)));
@@ -317,11 +319,11 @@ class DocumentTreeMacroIT
         setup.loginAsSuperAdmin();
         // Clean up.
         setup.deletePage(testReference, true);
-        createPage(setup, alice, "","");
-        createPage(setup, subAlice, "","");
-        createPage(setup, eve, "","");
-        createPage(setup, subEve, "","");
-        createPage(setup, subEve2, "","");
+        createPage(setup, alice, "", "");
+        createPage(setup, subAlice, "", "");
+        createPage(setup, eve, "", "");
+        createPage(setup, subEve, "", "");
+        createPage(setup, subEve2, "", "");
 
         // By default only top nodes of current page are displayed
         TreeElement tree = getChildrenTree(setup, testReference, Map.of());
@@ -335,6 +337,38 @@ class DocumentTreeMacroIT
         // Set root to Eve displays only Eve nodes
         tree = getChildrenTree(setup, testReference, Map.of("root", getNodeId(eve)));
         assertNodeLabels(tree.getTopLevelNodes(), "SubEve", "SubEve2");
+    }
+
+    @Test
+    @Order(4)
+    void sortWithCollation(TestUtils setup, TestReference testReference)
+    {
+        DocumentReference alice =
+            new DocumentReference("WebHome", new SpaceReference("Alice", testReference.getLastSpaceReference()));
+        DocumentReference bob =
+            new DocumentReference("WebHome", new SpaceReference("Öl", testReference.getLastSpaceReference()));
+        DocumentReference george =
+            new DocumentReference("WebHome", new SpaceReference("Zeit", testReference.getLastSpaceReference()));
+
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference, true);
+
+        try {
+            createPage(setup, alice, "Ö Alice", "");
+            createPage(setup, bob, "A Öl", "");
+            createPage(setup, george, "Zeit", "");
+
+            // Sort by title with collation
+            TreeElement tree = getDocumentTree(setup, testReference, Map.of());
+            assertNodeLabels(tree.getTopLevelNodes(), "A Öl", "Ö Alice", "Zeit");
+
+            // Sort by name with collation (even if document titles are displayed).
+            tree = getChildrenTree(setup, testReference, Map.of("sort", "name"));
+            assertNodeLabels(tree.getTopLevelNodes(), "Ö Alice", "A Öl", "Zeit");
+        } finally {
+            // Cleanup.
+            setup.deletePage(testReference, true);
+        }
     }
 
     private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title, String content)

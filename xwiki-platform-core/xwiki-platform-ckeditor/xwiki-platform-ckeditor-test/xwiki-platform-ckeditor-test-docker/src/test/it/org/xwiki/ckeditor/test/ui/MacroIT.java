@@ -19,14 +19,9 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
@@ -39,6 +34,10 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests how rendering macros are integrated in CKEditor.
@@ -72,12 +71,6 @@ class MacroIT extends AbstractCKEditorIT
         CKEditorConfigurationPane.open().setLoadJavaScriptSkinExtensions(true).clickSave();
 
         createAndLoginStandardUser(setup);
-    }
-
-    @BeforeEach
-    void beforeEach(TestUtils setup, TestReference testReference)
-    {
-        edit(setup, testReference);
     }
 
     @AfterEach
@@ -147,5 +140,73 @@ class MacroIT extends AbstractCKEditorIT
 
         assertEquals("before\nmacro:id\nafter", this.textArea.getText());
         assertSourceEquals("before\n\n{{id name=\"foo\"/}}\n\nafter");
+    }
+
+    @Test
+    @Order(4)
+    void editInlineParametersWithTheMacroEditModal(TestUtils setup, TestReference testReference)
+    {
+        edit(setup, testReference, true);
+        setSource("""
+            before
+
+            {{info title="Parent Info"}}
+            **one**
+
+            {{success title="Child Success"}}
+            __two__
+            {{/success}}
+
+            //three//
+            {{/info}}
+
+            after""");
+
+        // Change the title parameter and the macro content inline.
+        this.textArea.sendKeys(Keys.PAGE_UP, Keys.DOWN, Keys.HOME, "The ", Keys.DOWN, Keys.END, ".1");
+
+        // Edit the outer macro and assert the parameter values.
+        MacroDialogEditModal macroEditModal = this.editor.getBalloonToolBar().editMacro();
+        assertEquals("The Parent Info", macroEditModal.getMacroParameter("title"));
+        assertEquals("""
+            **one.1**
+
+            {{success title="Child Success"}}
+            __two__
+            {{/success}}
+
+            //three//""", macroEditModal.getMacroContent());
+
+        macroEditModal.setMacroParameter("title", "Modified Parent Info");
+        macroEditModal.setMacroContent("""
+            **one.1**
+
+            {{success title="Child Success"}}
+            --two--
+            {{/success}}
+
+            //three//""").clickSubmit();
+
+        this.textArea.waitForContentRefresh();
+
+        // Modify again the tile parameter and the macro content inline.
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.RIGHT));
+        this.textArea.sendKeys("Final");
+        this.textArea.sendKeys(Keys.PAGE_UP, Keys.UP, Keys.DOWN, Keys.DOWN, Keys.HOME, "zero ");
+
+        assertSourceEquals("""
+            before
+
+            {{info title="Final Parent Info"}}
+            **zero one.1**
+
+            {{success title="Child Success"}}
+            --two--
+            {{/success}}
+
+            //three//
+            {{/info}}
+
+            after""");
     }
 }

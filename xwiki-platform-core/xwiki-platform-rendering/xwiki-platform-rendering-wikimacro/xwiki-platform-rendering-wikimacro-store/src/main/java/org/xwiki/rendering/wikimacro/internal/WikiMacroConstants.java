@@ -139,6 +139,7 @@ public interface WikiMacroConstants
      * Constant for representing if the macro execution is isolated.
      *
      * @since 17.3.0RC1
+     * @since 16.10.9
      */
     String MACRO_EXECUTION_ISOLATED_PROPERTY = "executionIsolated";
 
@@ -254,4 +255,18 @@ public interface WikiMacroConstants
      * @since 16.10.6
      */
     String PARAMETER_DEPRECATED_PROPERTY = "deprecated";
+
+    /**
+     * Constant for representing the order of the parameter.
+     *
+     * @since 17.5.0
+     */
+    String PARAMETER_ORDER_PROPERTY = "order";
+
+    /**
+     * Constant for representing the order the content should have to be displayed among other parameters.
+     *
+     * @since 17.5.0
+     */
+    String MACRO_CONTENT_ORDER_PROPERTY = "contentOrder";
 }

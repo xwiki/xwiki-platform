@@ -1,3 +1,4 @@
+org.xwiki.wysiwyg.internal.DefaultWysiwygConfiguration
 org.xwiki.wysiwyg.internal.cleaner.DefaultHTMLCleaner
 org.xwiki.wysiwyg.internal.cleaner.EmptyAttributeFilter
 org.xwiki.wysiwyg.internal.cleaner.EmptyLineFilter
@@ -5,9 +6,10 @@ org.xwiki.wysiwyg.internal.cleaner.LineBreakFilter
 org.xwiki.wysiwyg.internal.cleaner.NestedAnchorsFilter
 org.xwiki.wysiwyg.internal.cleaner.StandAloneMacroFilter
 org.xwiki.wysiwyg.internal.converter.DefaultHTMLConverter
+org.xwiki.wysiwyg.internal.converter.DefaultRequestParameterConverter
+org.xwiki.wysiwyg.internal.converter.HTMLRequestParameterConverter
 org.xwiki.wysiwyg.internal.filter.http.MutableHttpServletRequestFactory
 org.xwiki.wysiwyg.internal.importer.OfficeAttachmentImporter
 org.xwiki.wysiwyg.internal.importer.OfficeMacroImporter
+org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactory
 org.xwiki.wysiwyg.script.WysiwygEditorScriptService
-org.xwiki.wysiwyg.internal.converter.DefaultRequestParameterConverter
-org.xwiki.wysiwyg.internal.converter.HTMLRequestParameterConverter

@@ -335,12 +335,12 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
                 String dataDirPropertyValue = properties.getProperty(DATA_DIR_PROPERTY);
                 if (dataDirPropertyValue != null && !dataDirPropertyValue.contains(File.separator)) {
-                    // it's bugged
-                    this.logger.info("Found XWIKI-22741 bug!");
+                    this.logger.warn("The Solr search core index is configured to be stored at the wrong location [{}]",
+                        dataDirPropertyValue);
                     File badCacheLocation = new File(corePropertiesFile.getParent(), dataDirPropertyValue);
                     if (badCacheLocation.exists()) {
-                        this.logger
-                            .info("Removing old Solr Search Cache files from: " + badCacheLocation.getAbsolutePath());
+                        this.logger.info("Removing the old Solr search core index files from [{}]",
+                            badCacheLocation.getAbsolutePath());
                         FileUtils.deleteDirectory(badCacheLocation);
                     }
                     return false;

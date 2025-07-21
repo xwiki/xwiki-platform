@@ -32,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.SuggestInputElement;
@@ -90,6 +91,9 @@ class ObjectEditorIT
 
     @Test
     @Order(1)
+    @IgnoreBrowser(value = "chrome", reason = "Chrome has recently started to ignore the unhandledPromptBehavior "
+        + "capability which allows us to handle alerts shown before page unload. "
+        + "See https://issues.chromium.org/issues/351858989#comment30 .")
     void preventUsersToLeaveTheEditorWithoutSaving(TestUtils testUtils, TestReference testReference)
     {
         // fixture

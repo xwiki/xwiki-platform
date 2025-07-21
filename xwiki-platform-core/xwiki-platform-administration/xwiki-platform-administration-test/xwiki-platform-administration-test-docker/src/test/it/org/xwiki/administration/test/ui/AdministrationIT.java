@@ -24,11 +24,9 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.administration.test.po.PresentationAdministrationPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.InformationPane;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -92,28 +90,5 @@ class AdministrationIT
             "Editing", "emailSend", "emailStatus", "emailGeneral")
             .stream().forEach(sectionId -> assertTrue(pageAdministrationPage.hasNotSection(sectionId),
                 String.format("Menu section [%s] shouldn't be present.", sectionId)));
-    }
-
-    /**
-     * Validate that the show information setting of the Presentation section of the administration has an effect.
-     *
-     * @since 16.4.7
-     * @since 16.10.4
-     * @since 17.1.0RC1
-     */
-    @Test
-    void showPageInformationTabSettings(TestUtils setup, TestReference testReference)
-    {
-        setup.loginAsSuperAdmin();
-        setup.createPage(testReference, "");
-        // Check that the information tab is displayed by default.
-        assertTrue(new InformationPane().exists());
-        PresentationAdministrationPage adminPage = PresentationAdministrationPage.goToAdminSection();
-        adminPage.setShowInformation("No");
-        adminPage.save();
-        assertEquals("No", adminPage.getShowInformation());
-
-        setup.gotoPage(testReference);
-        assertTrue(new InformationPane().doesNotExist());
     }
 }

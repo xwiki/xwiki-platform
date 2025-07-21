@@ -69,8 +69,8 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
     }
 
     /**
-     * @param offset the maximum number of events to return
-     * @param limit the maximum number of events to return
+     * @param offset the index where to start returning events
+     * @param limit the maximum number of events to return, -1 for no limit (0 return no results)
      */
     public SimpleEventQuery(long offset, long limit)
     {

@@ -102,7 +102,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     /**
      * The default size of the batch.
      */
-    public static final int SOLR_INDEXER_BATCH_SIZE_DEFAULT = 50;
+    public static final int SOLR_INDEXER_BATCH_SIZE_DEFAULT = 1000;
 
     /**
      * The name of the configuration property containing the batch maximum length.
@@ -112,7 +112,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     /**
      * The default length of the data above which the batch is sent without waiting.
      */
-    public static final int SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT = 10000;
+    public static final int SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT = 10000000;
 
     /**
      * The name of the configuration property containing the batch size.

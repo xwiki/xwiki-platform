@@ -76,6 +76,7 @@
   ],
   'paths': {
     'bootstrap': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-bootstrap', ""js/xwiki-bootstrap${jsExtension}""))",
+    'css': $xwiki.getSkinFile('uicomponents/require/css.js'),
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
@@ -174,6 +175,21 @@ require.config($jsontool.serialize($requireConfig));
 define('jQueryNoConflict', ['jquery'], function($) {
   return $.noConflict();
 });
+##
+## Add support for loading ECMAScript modules with RequireJS.
+##
+(function () {
+  const originalCreateNode = require.createNode;
+  require.createNode = function(config, moduleName, stringURL) {
+    const scriptElement = originalCreateNode.apply(this, arguments);
+    const url = new URL(stringURL, window.location.href);
+    if (url.pathname.endsWith('.es.js')) {
+      scriptElement.type = 'module';
+    }
+    return scriptElement;
+  };
+}());
+##
 if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
   require(['jquery', 'bootstrap'], function ($) {
     // Fix incompatibilities between BootStrap and Prototype

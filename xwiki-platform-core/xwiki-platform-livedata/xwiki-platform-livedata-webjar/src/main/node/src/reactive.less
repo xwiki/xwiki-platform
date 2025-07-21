@@ -1,0 +1,113 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+/* TODO: This file must be removed once XWIKI-23315 is done. Additionally, all the selectors can be moved back to their
+ respective Vue components (see their name in comment above each of them). */
+// Note: media queries cannot currently use CSS variables, forcing us to rely on LESS to generate a CSS with the
+// rights max-width values.
+@media screen and (max-width: @screen-xs-max) {
+  .xwiki-livedata {
+    // LayoutTable
+    .layout-table .responsive-table > thead {
+      /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use flex display
+        because we have two rows, property names and filters, that we want to display as two equally sized columns. */
+      display: flex;
+
+      > tr {
+        /* We want the property names column to have the same width as the filter column. */
+        flex: 1;
+        /* We need to set the width in order to be able to trim long property names. */
+        width: calc(50vw - @grid-gutter-width);
+      }
+    }
+
+    // LayoutTableHeaderFilters
+    .layout-table .column-filters th {
+      /* Overwrite the filters width so they don't overflow the table. */
+      width: 100%;
+      border-top: none;
+    }
+
+    // LayoutTableHeaderNames.vue
+    .layout-table th.draggable-item {
+      /* Overwrite the draggable-item display in order to show the property names (table header) as a column. */
+      display: block;
+      /* Trim long property names. */
+
+      .property-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .layout-table .resize-handle {
+      /* The columns cannot be resized in responsive mode. */
+      display: none;
+    }
+
+
+    // LivedataAdvancedPanelFilter
+    .livedata-advanced-panel-filter .delete-filter-group {
+      /* Always show the delete icon on small screens because we can't rely on hover. */
+      display: inline-block;
+    }
+
+    // LivedataAdvancedPanelFilterEntry
+    .livedata-filter-container .delete-filter {
+      /* Always show the delete icon on small screens because we can't rely on hover. */
+      visibility: visible;
+    }
+
+    // LivedataAdvancedPanelProperties
+    .livedata-advanced-panel-properties .handle {
+      /* Always show the drag handler on small screens because we cannot rely on hover. */
+      opacity: 1;
+    }
+
+    // LivedataAdvancedPanelSort
+    .livedata-advanced-panel-sort .delete-sort {
+      /* Always show the delete icon on small screens because we cannot rely on hover. */
+      visibility: visible;
+    }
+
+    // XWikiDraggableItem
+    .draggable-item .handle {
+      /* Always show the drag handle on small screens because we can't rely on hover. */
+      opacity: 1;
+    }
+
+    // LivedataPagination
+    /* Stack the pagination elements vertically. */
+    .livedata-pagination {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+    }
+
+    /* Hide the page size element. */
+    .livedata-pagination .pagination-page-size {
+      display: none;
+    }
+
+    .livedata-pagination .pagination-indexes {
+      margin-left: 0;
+    }
+  }
+}

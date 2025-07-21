@@ -672,12 +672,13 @@ public class XWikiDocumentTest
         PropertyClass propertyInterface = mock(PropertyClass.class);
         when(xClass.get("mock")).thenReturn(propertyInterface);
         doAnswer(call -> {
-            call.getArgument(0, StringBuffer.class).append("{{/html}}content{{/html}}");
+            call.getArgument(0, StringBuffer.class).append("{{/html }}content{{/html}}{{html wiki=\"true\"}}");
             return null;
         }).when(propertyInterface).displayView(any(StringBuffer.class), eq("mock"), any(String.class), eq(object),
             anyBoolean(), any(XWikiContext.class));
 
-        assertEquals("{{html clean=\"false\" wiki=\"false\"}}&#123;&#123;/html}}content&#123;&#123;/html}}{{/html}}",
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}"
+                + "&#123;&#123;/html }}content&#123;&#123;/html}}&#123;&#123;html wiki=\"true\"}}{{/html}}",
             this.document.display("mock", "view", object, this.oldcore.getXWikiContext()));
     }
 

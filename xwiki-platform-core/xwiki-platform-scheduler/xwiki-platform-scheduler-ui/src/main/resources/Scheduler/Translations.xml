@@ -36,7 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>scheduler.applicationsPanelEntryLabel=Scheduler</content>
+  <content>scheduler.disabled=The Scheduler is disabled in this instance. Not job will be running.
+scheduler.applicationsPanelEntryLabel=Scheduler
+</content>
   <object>
     <name>Scheduler.Translations</name>
     <number>0</number>

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.AnnotationClass" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.AnnotationClass" locale="">
   <web>AnnotationCode</web>
   <name>AnnotationClass</name>
   <language/>
@@ -36,7 +36,8 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="XWiki.ClassSheet"/}}</content>
+  <enforceRequiredRights>true</enforceRequiredRights>
+  <content>{{include reference="XWiki.ClassSheet" author="target"/}}</content>
   <class>
     <name>AnnotationCode.AnnotationClass</name>
     <customClass/>
@@ -167,14 +168,16 @@
       <classname/>
       <customDisplay/>
       <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
       <name>target</name>
       <number>7</number>
       <picker>1</picker>
       <prettyName>Target</prettyName>
-      <size>30</size>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
       <separators/>
+      <size>30</size>
       <sort>none</sort>
       <sql/>
       <unmodifiable>0</unmodifiable>

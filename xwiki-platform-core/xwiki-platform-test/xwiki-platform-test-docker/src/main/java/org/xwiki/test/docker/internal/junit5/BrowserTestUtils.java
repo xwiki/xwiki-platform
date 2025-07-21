@@ -111,7 +111,7 @@ public final class BrowserTestUtils
             template.awaitCompletion();
         } catch (InterruptedException e) {
             LOGGER.warn("Interrupted thread [{}]. Root cause: [{}]", Thread.currentThread().getName(),
-                org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage(e));
+                org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage(e));
             // Restore interrupted state to be a good citizen...
             Thread.currentThread().interrupt();
         }

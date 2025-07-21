@@ -29,8 +29,10 @@
   'css': {
     'liveData': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'xwiki-platform-livedata.css'),
-    'liveDataLess': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+    'liveDataLessVariables': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
       'variables.less', {'evaluate': true}),
+    'liveDataLessReactive': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'reactive.less', {'evaluate': true}),
     'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css'),
     'selectize': [
       $services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
@@ -108,7 +110,8 @@
   loadCSS(paths.css.liveData);
   // Load a small less file with the declarations of a few LESS values that are not exported
   // elsewhere
-  loadCSS(paths.css.liveDataLess);
+  loadCSS(paths.css.liveDataLessVariables);
+  loadCSS(paths.css.liveDataLessReactive);
 
 // End JavaScript-only code.
 }).apply("]]#", $jsontool.serialize([$paths]));

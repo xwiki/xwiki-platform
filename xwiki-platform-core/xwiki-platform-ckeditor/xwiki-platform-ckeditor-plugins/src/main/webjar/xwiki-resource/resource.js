@@ -45,7 +45,8 @@ define('resource', ['l10n!resource'], function(translations) {
       label: translations.get('attach.label'),
       icon: 'glyphicon glyphicon-paperclip',
       placeholder: translations.get('attach.placeholder'),
-      entityType: 'attachment'
+      entityType: 'attachment',
+      mustBeSelected: true
     },
     data: {
       label: translations.get('data.label'),
@@ -57,7 +58,8 @@ define('resource', ['l10n!resource'], function(translations) {
       icon: 'glyphicon glyphicon-file',
       placeholder: translations.get('doc.placeholder'),
       allowEmptyReference: true,
-      entityType: 'document'
+      entityType: 'document',
+      mustBeSelected: true
     },
     icon: {
       label: translations.get('icon.label'),
@@ -92,7 +94,8 @@ define('resource', ['l10n!resource'], function(translations) {
     user: {
       label: translations.get('user.label'),
       icon: 'glyphicon glyphicon-user',
-      placeholder: translations.get('user.placeholder')
+      placeholder: translations.get('user.placeholder'),
+      mustBeSelected: true
     }
   };
 

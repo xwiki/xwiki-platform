@@ -465,8 +465,10 @@ public class XWikiCacheStore extends AbstractXWikiStore
         } else {
             getCache().set(key, document);
 
-            // Also update exist cache
-            getPageExistCache().set(key, Boolean.TRUE);
+            // Also update exist cache, but only if it doesn't already have the value as cache writes are expensive.
+            if (!Boolean.TRUE.equals(getPageExistCache().get(key))) {
+                getPageExistCache().set(key, Boolean.TRUE);
+            }
         }
 
         LOGGER.debug("Document [{}] was put in cache", key);

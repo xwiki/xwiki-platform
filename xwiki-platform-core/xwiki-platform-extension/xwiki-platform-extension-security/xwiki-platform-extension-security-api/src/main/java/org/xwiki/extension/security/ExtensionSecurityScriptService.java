@@ -33,7 +33,7 @@ import org.xwiki.extension.script.ExtensionManagerScriptService;
 import org.xwiki.extension.security.internal.ExtensionSecuritySolrClient;
 import org.xwiki.script.service.ScriptService;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Script service for the extension security extension. Gives access to the configuration.

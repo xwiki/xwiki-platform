@@ -32,6 +32,7 @@ import org.xwiki.skinx.internal.JsDocumentSkinExtension;
 import org.xwiki.skinx.internal.JsFileSkinExtension;
 import org.xwiki.skinx.internal.LinkSkinExtension;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -62,6 +63,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     VelocityRenderer.class,
     DefaultDocumentContextExecutor.class,
     AuthorExecutor.class,
+    IconTemplateRendererManager.class,
+    VelocityDetector.class,
 })
 @Inherited
 public @interface DefaultIconManagerComponentList

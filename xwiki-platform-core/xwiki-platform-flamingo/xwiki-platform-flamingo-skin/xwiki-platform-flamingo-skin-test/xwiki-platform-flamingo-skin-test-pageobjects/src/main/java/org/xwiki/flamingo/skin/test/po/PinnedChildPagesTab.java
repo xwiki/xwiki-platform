@@ -61,7 +61,7 @@ public class PinnedChildPagesTab extends BaseElement
     private WebElement getPageByTitle(String pageTitle)
     {
         return getDriver().findElementWithoutWaiting(getTreeElement(),
-            By.xpath("(.//li[contains(@class, 'jstree-node')]/a[. = '" + pageTitle + "'])"));
+            By.xpath("(.//li[contains(@class, 'jstree-node')]/a[. = '%s'])".formatted(pageTitle)));
     }
 
     /**

@@ -119,7 +119,7 @@ define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'jquery-ui-touch-punch
     // terminal child pages. This means we need to escape the slash that may appear in the page name. We chose to use a
     // partial URL escaping because it's easy to decode.
     let childPageName = childPageReference.name === webHome ? childPageReference.parent.name : childPageReference.name;
-    childPageName = childPageName.replaceAll('%', '%25').replaceAll('/', '%2F');
+    childPageName = childPageName.replaceAll('%', '%25').replaceAll('/', '%2F').replaceAll('+', '%2B');
     if (childPageReference.name === webHome) {
       childPageName += '/';
     }

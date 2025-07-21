@@ -40,11 +40,12 @@
 ## First, set a shortcut to our Scheduler plugin
 ##
 #set ($scheduler = $xwiki.scheduler)
+#set ($schedulerEnabled = $scheduler.enabled)
 ##
 ## If the sheet is called with an action ($request.do), let us first process this action
 ## Possible values are : "schedule", "pause", "resume", "unschedule", "delete"
 ##
-#if ("$!request.do" != '' &amp;&amp; "$!request.which" != '')
+#if ($schedulerEnabled &amp;&amp; "$!request.do" != '' &amp;&amp; "$!request.which" != '')
   ##
   ## Obtain the Job document and object for which the action has been called
   ##
@@ -141,38 +142,47 @@
 #end
 $services.localization.render('xe.scheduler.welcome')
 
+#if (!$schedulerEnabled)
+{{warning}}
+  {{translation key="scheduler.disabled"/}}
+{{/warning}}
+
+#end
 = $services.localization.render('xe.scheduler.jobs.list') =
 
 ##
 ## Retrieve all scheduler jobs
 ## Display their name, status, possible next fire time, and available actions
 ##
-|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.name')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.status')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.next')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.actions')
+|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.name')#if ($schedulerEnabled)|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.status')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.next')#end|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.actions')
 #foreach ($docName in $services.query.xwql('from doc.object(XWiki.SchedulerJobClass) as jobs where doc.fullName &lt;&gt; ''XWiki.SchedulerJobTemplate''').execute())
   #set ($jobHolder = $xwiki.getDocument($docName))
   #set ($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
-  #set ($status = $scheduler.getJobStatus($job).value)
-  #if ($status == '')
-    #set ($status = 'None')
+  #if ($schedulerEnabled)
+    #set ($status = $scheduler.getJobStatus($job).value)
+    #if ($status == '')
+      #set ($status = 'None')
+    #end
+    #set ($firetime = '')
+    #if ($status != 'None')
+      #set ($firetime = $scheduler.getNextFireTime($job))
+    #else
+      #set ($firetime = $services.localization.render('xe.scheduler.jobs.next.undefined'))
+    #end
+    #set ($actions = ['trigger'])
+    #if ($status == 'None')
+      #set ($ok = $actions.add('schedule'))
+    #elseif($status == 'Normal')
+      #set ($ok = $actions.addAll(['pause', 'unschedule']))
+    #elseif ($status == 'Paused')
+      #set ($ok = $actions.addAll(['resume', 'unschedule']))
+    #end
+    #set ($ok = $actions.add('delete'))
   #end
-  #set ($firetime = '')
-  #if ($status != 'None')
-    #set ($firetime = $scheduler.getNextFireTime($job))
-  #else
-    #set ($firetime = $services.localization.render('xe.scheduler.jobs.next.undefined'))
-  #end
-  #set ($actions = ['trigger'])
-  #if ($status == 'None')
-    #set ($ok = $actions.add('schedule'))
-  #elseif($status == 'Normal')
-    #set ($ok = $actions.addAll(['pause', 'unschedule']))
-  #elseif ($status == 'Paused')
-    #set ($ok = $actions.addAll(['resume', 'unschedule']))
-  #end
-  #set ($ok = $actions.add('delete'))
-|$job.get('jobName')|$status|$firetime|**$services.localization.render('xe.scheduler.jobs.actions.access')** [[$services.localization.render('xe.scheduler.jobs.actions.view')&gt;&gt;$services.rendering.escape($jobHolder.fullName, 'xwiki/2.1')]]#if($jobHolder.hasAccessLevel('programming')) [[$services.localization.render('xe.scheduler.jobs.actions.edit')&gt;&gt;path:${jobHolder.getURL('edit')}]]#end **$services.localization.render('xe.scheduler.jobs.actions.manage')**#foreach($action in $actions) [[$services.localization.render("xe.scheduler.jobs.actions.$action")&gt;&gt;path:$doc.getURL('view', $escapetool.url({'do': $action, 'which': $jobHolder.fullName, 'form_token': $services.csrf.token}))]]#end
+|$job.get('jobName')#if($schedulerEnabled)|$status|$firetime#end|**$services.localization.render('xe.scheduler.jobs.actions.access')** [[$services.localization.render('xe.scheduler.jobs.actions.view')&gt;&gt;$services.rendering.escape($jobHolder.fullName, 'xwiki/2.1')]]#if($jobHolder.hasAccessLevel('programming'))#if ($schedulerEnabled) [[$services.localization.render('xe.scheduler.jobs.actions.edit')&gt;&gt;path:${jobHolder.getURL('edit')}]]#end#end#if ($schedulerEnabled) **$services.localization.render('xe.scheduler.jobs.actions.manage')**#foreach($action in $actions) [[$services.localization.render("xe.scheduler.jobs.actions.$action")&gt;&gt;path:$doc.getURL('view', $escapetool.url({'do': $action, 'which': $jobHolder.fullName, 'form_token': $services.csrf.token}))]]#end#end
 
 #end
+#if ($schedulerEnabled)
 #if ($doc.hasAccessLevel('programming'))
 ##
 ## Job creation is offered only for programmers, because the job page needs to be saved 
@@ -209,6 +219,7 @@ $services.localization.render('xe.scheduler.welcome')
 
   {{warning}}$services.localization.render('xe.scheduler.jobs.warning'){{/warning}}
 
+#end
 #end
 {{/velocity}}</content>
 </xwikidoc>

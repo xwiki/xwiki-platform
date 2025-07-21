@@ -35,4 +35,10 @@ public class AllIT
     class NestedAnnotationsIT extends AnnotationsIT
     {
     }
+
+    @Nested
+    @DisplayName("Annotations Administration Tests")
+    class NestedAnnotationsAdministrationIT extends AnnotationsAdministrationIT
+    {
+    }
 }

@@ -96,6 +96,6 @@
 #end
 &lt;/div&gt;
 {{/html}}
-#set($docextras=[])
+#set ($displayDocExtra = false)
 {{/velocity}}</content>
 </xwikidoc>

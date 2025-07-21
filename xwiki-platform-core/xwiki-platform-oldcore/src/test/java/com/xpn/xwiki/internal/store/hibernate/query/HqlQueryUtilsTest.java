@@ -65,6 +65,18 @@ public class HqlQueryUtilsTest
             HqlQueryUtils.toCompleteStatement("order by doc.name"));
         assertEquals("select doc.fullName from XWikiDocument doc , XWikiSpace space",
             HqlQueryUtils.toCompleteStatement(", XWikiSpace space"));
+    }
 
+    @Test
+    public void getValidQueryOrder()
+    {
+        assertEquals("asc", HqlQueryUtils.getValidQueryOrder("asc", "desc"));
+        assertEquals("desc", HqlQueryUtils.getValidQueryOrder("desc", "asc"));
+        assertEquals("ASC", HqlQueryUtils.getValidQueryOrder("ASC", "desc"));
+        assertEquals("DESC", HqlQueryUtils.getValidQueryOrder("DESC", "asc"));
+
+        assertEquals("desc", HqlQueryUtils.getValidQueryOrder(null, "desc"));
+        assertEquals("desc", HqlQueryUtils.getValidQueryOrder("wrong", "desc"));
+        assertEquals("asc", HqlQueryUtils.getValidQueryOrder("wrong", "asc"));
     }
 }

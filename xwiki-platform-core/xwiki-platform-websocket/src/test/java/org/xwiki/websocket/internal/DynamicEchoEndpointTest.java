@@ -40,6 +40,7 @@ import org.xwiki.websocket.WebSocketContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -106,7 +107,7 @@ class DynamicEchoEndpointTest
 
         this.echoEndPoint.onOpen(this.session, null);
 
-        verify(this.session).addMessageHandler(this.messageHandlerCaptor.capture());
+        verify(this.session).addMessageHandler(eq(String.class), this.messageHandlerCaptor.capture());
         this.messageHandlerCaptor.getValue().onMessage("Hi there!");
 
         verify(this.session.getBasicRemote()).sendObject("[test] test:Users.Alice -> Hi there!");

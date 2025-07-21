@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,21 +59,27 @@ public class SkinExtensionObjectRequiredRightAnalyzer implements RequiredRightAn
         String use = object.getStringValue("use");
         boolean isAlways = Objects.equals(use, "always");
 
-        RequiredRight requiredRight;
+        List<RequiredRight> requiredRights = new ArrayList<>();
         String translationKey;
         if (isAlways) {
-            requiredRight = RequiredRight.PROGRAM;
+            requiredRights.add(RequiredRight.WIKI_ADMIN);
             translationKey = "security.requiredrights.object.skinExtension.always";
         } else {
-            requiredRight = RequiredRight.SCRIPT;
+            requiredRights.add(RequiredRight.SCRIPT);
             translationKey = "security.requiredrights.object.skinExtension";
+        }
+
+        boolean parse = object.getIntValue("parse") == 1;
+        if (parse) {
+            requiredRights.add(RequiredRight.MAYBE_PROGRAM);
+            translationKey = translationKey.replace("skin", "parsedSkin");
         }
 
         return List.of(new RequiredRightAnalysisResult(
             object.getReference(),
             this.translationMessageSupplierProvider.get(translationKey),
             this.xObjectDisplayerProvider.get(object),
-            List.of(requiredRight)
+            requiredRights
         ));
     }
 }

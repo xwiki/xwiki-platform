@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="AnnotationCode.CreateForm" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.CreateForm" locale="">
   <web>AnnotationCode</web>
   <name>CreateForm</name>
   <language/>
@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>{{template name="display_macros.vm" /}}
 
 {{include reference="AnnotationCode.Macros" /}}
@@ -73,4 +74,41 @@
 {{/html}}
 #end
 {{/velocity}}</content>
+  <object>
+    <name>AnnotationCode.CreateForm</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>5343dc2f-bcac-4364-bd49-75b75d8ece16</guid>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <prettyName>Level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>edit|script|wiki_admin|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <property>
+      <level>script</level>
+    </property>
+  </object>
 </xwikidoc>

@@ -216,6 +216,31 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         }
     }
 
+    private void maybeSaveDocumentPreservingAuthors(XWikiDocument documentToModify, boolean modified,
+        DocumentReference currentDocumentReference, boolean relative, EntityReference oldTarget,
+        EntityReference newTarget) throws XWikiException
+    {
+        if (modified) {
+            if (relative) {
+                saveDocumentPreservingAuthors(documentToModify,
+                    "refactoring.referenceUpdater.saveMessage.relativeLink");
+
+                info("Updated the relative links from [{}].", currentDocumentReference);
+            } else {
+                saveDocumentPreservingAuthors(documentToModify, "refactoring.referenceUpdater.saveMessage.backlinks");
+
+                info("The links from [{}] that were targeting [{}] have been updated to target [{}].",
+                    documentToModify.getDocumentReferenceWithLocale(), oldTarget, newTarget);
+            }
+        } else {
+            if (relative) {
+                info("No relative links to update in [{}].", currentDocumentReference);
+            } else {
+                info("No back-links to update in [{}].", currentDocumentReference);
+            }
+        }
+    }
+
     private void renameLinks(XWikiDocument document, EntityReference oldTarget, EntityReference newTarget,
         XWikiContext xcontext, boolean relative, RenameLambda renameLambda) throws XWikiException
     {
@@ -244,36 +269,28 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
             return;
         }
 
+        // Avoid modifying the cached document
+        XWikiDocument documentToModify;
+        if (document.isCached()) {
+            documentToModify = document.clone();
+        } else {
+            documentToModify = document;
+        }
+
         // Document content
-        boolean modified = renameLinks(document, relative, renameLambda);
+        boolean modified = renameLinks(documentToModify, relative, renameLambda);
 
         // XObjects properties
-        for (List<BaseObject> xobjects : document.getXObjects().values()) {
+        for (List<BaseObject> xobjects : documentToModify.getXObjects().values()) {
             for (BaseObject xobject : xobjects) {
                 if (xobject != null) {
-                    modified |= renameLinks(xobject, document, renderer, xcontext, relative, renameLambda);
+                    modified |= renameLinks(xobject, documentToModify, renderer, xcontext, relative, renameLambda);
                 }
             }
         }
 
-        if (modified) {
-            if (relative) {
-                saveDocumentPreservingAuthors(document, "refactoring.referenceUpdater.saveMessage.relativeLink");
-
-                info("Updated the relative links from [{}].", currentDocumentReference);
-            } else {
-                saveDocumentPreservingAuthors(document, "refactoring.referenceUpdater.saveMessage.backlinks");
-
-                info("The links from [{}] that were targeting [{}] have been updated to target [{}].",
-                    document.getDocumentReferenceWithLocale(), oldTarget, newTarget);
-            }
-        } else {
-            if (relative) {
-                info("No relative links to update in [{}].", currentDocumentReference);
-            } else {
-                info("No back-links to update in [{}].", currentDocumentReference);
-            }
-        }
+        maybeSaveDocumentPreservingAuthors(documentToModify, modified, currentDocumentReference, relative, oldTarget,
+            newTarget);
     }
 
     private void renameLinks(DocumentReference documentReference, DocumentReference oldLinkTarget,

@@ -57,23 +57,23 @@ public abstract class AbstractExtendedURLResourceReferenceSerializer
     public ExtendedURL serialize(ResourceReference reference, String formatId)
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
-        // Step 1: Try to locate a Serializer registered for the specific passed resource type and for the passed URL
-        //         format id
         ResourceReferenceSerializer<ResourceReference, ExtendedURL> serializer;
+        DefaultParameterizedType roleType = new DefaultParameterizedType(null,
+            ResourceReferenceSerializer.class, reference.getClass(), ExtendedURL.class);
         try {
-            serializer = this.componentManager.getInstance(new DefaultParameterizedType(null,
-                ResourceReferenceSerializer.class, reference.getClass(), ExtendedURL.class), formatId);
-        } catch (ComponentLookupException e) {
-            // Step 2: Try to locate a Serializer registered only for the specific passed resource type and for all URL
-            //         format ids
-            try {
-                serializer = this.componentManager.getInstance(new DefaultParameterizedType(null,
-                    ResourceReferenceSerializer.class, reference.getClass(), ExtendedURL.class));
-            } catch (ComponentLookupException cle) {
-                throw new UnsupportedResourceReferenceException(String.format(
-                    "Failed to find serializer for Resource Reference [%s] and URL format [%s]", reference, formatId),
-                    cle);
+            // Step 1: Try to locate a Serializer registered for the specific passed resource type and for the passed
+            // URL format id
+            if (this.componentManager.hasComponent(roleType, formatId)) {
+                serializer = this.componentManager.getInstance(roleType, formatId);
+            } else {
+                // Step 2: Try to locate a Serializer registered only for the specific passed resource type and for all
+                // URL format ids
+                serializer = this.componentManager.getInstance(roleType);
             }
+        } catch (ComponentLookupException e) {
+            throw new UnsupportedResourceReferenceException(String.format(
+                "Failed to find serializer for Resource Reference [%s] and URL format [%s]", reference, formatId),
+                e);
         }
 
         return serializer.serialize(reference);

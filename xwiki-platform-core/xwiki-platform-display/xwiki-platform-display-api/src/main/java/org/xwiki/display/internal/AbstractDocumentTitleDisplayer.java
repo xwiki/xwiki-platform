@@ -23,7 +23,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -34,8 +33,6 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -61,14 +58,6 @@ import org.xwiki.velocity.XWikiVelocityException;
  */
 public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplayer
 {
-    /**
-     * The key used to store on the XWiki context map the stack of references to documents whose titles are currently
-     * being evaluated (in the current execution context). This stack is used to prevent infinite recursion, which can
-     * happen if the title displayer is called on the current document from the title field or from a script within the
-     * first content heading.
-     */
-    private static final String DOCUMENT_REFERENCE_STACK_KEY = "internal.displayer.title.documentReferenceStack";
-
     /**
      * The object used for logging.
      */
@@ -101,11 +90,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
-    /**
-     * Execution context handler, needed for accessing the XWiki context map.
-     */
     @Inject
-    private Execution execution;
+    private DocumentReferenceDequeContext documentReferenceDequeContext;
 
     @Inject
     @Named("xwikicfg")
@@ -135,7 +121,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     {
         // Protect against infinite recursion which can happen for instance if the document title displayer is called on
         // the current document from the title field or from a script within the first content heading.
-        Deque<DocumentReference> documentReferenceStack = getDocumentReferenceDeque();
+        Deque<DocumentReference> documentReferenceStack =
+            this.documentReferenceDequeContext.getDocumentReferenceDeque("title");
 
         if (documentReferenceStack.contains(document.getDocumentReference())) {
             this.logger.warn(
@@ -153,20 +140,6 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         }
     }
 
-    private Deque<DocumentReference> getDocumentReferenceDeque()
-    {
-        ExecutionContext econtext = this.execution.getContext();
-
-        Deque<DocumentReference> documentReferenceStack =
-            (Deque<DocumentReference>) econtext.getProperty(DOCUMENT_REFERENCE_STACK_KEY);
-
-        if (documentReferenceStack == null) {
-            documentReferenceStack = new LinkedList<>();
-            econtext.newProperty(DOCUMENT_REFERENCE_STACK_KEY).inherited().initial(documentReferenceStack).declare();
-        }
-
-        return documentReferenceStack;
-    }
 
     private XDOM displayTitle(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {

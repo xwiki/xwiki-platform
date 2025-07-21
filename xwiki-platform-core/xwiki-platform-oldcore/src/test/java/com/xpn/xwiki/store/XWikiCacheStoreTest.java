@@ -56,7 +56,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -87,10 +89,10 @@ class XWikiCacheStoreTest
         this.oldcore.getMocker().registerMockComponent(ObservationManager.class);
 
         CacheManager cacheManager = this.oldcore.getMocker().registerMockComponent(CacheManager.class);
-        this.cache = new MapCache<>();
+        this.cache = spy(new MapCache<>());
         when(cacheManager.<XWikiDocument>createNewCache(isCacheConfiguration("xwiki.store.pagecache")))
             .thenReturn(this.cache);
-        this.existCache = new MapCache<>();
+        this.existCache = spy(new MapCache<>());
         when(cacheManager.<Boolean>createNewCache(isCacheConfiguration("xwiki.store.pageexistcache")))
             .thenReturn(existCache);
     }
@@ -123,8 +125,10 @@ class XWikiCacheStoreTest
 
         // Make sure only the existing document has been put in the cache
         assertSame(existingDocument, this.cache.get("4:wiki5:space4:page0:"));
+        String noPageKey = "4:wiki5:space6:nopage0:";
+        assertNull(this.cache.get(noPageKey));
         assertTrue(this.existCache.get("4:wiki5:space4:page0:"));
-        assertFalse(this.existCache.get("4:wiki5:space6:nopage0:"));
+        assertFalse(this.existCache.get(noPageKey));
 
         store.saveXWikiDoc(existingDocument, this.oldcore.getXWikiContext());
 
@@ -155,7 +159,15 @@ class XWikiCacheStoreTest
 
         assertTrue(cacheDocument.isMetaDataDirty());
 
-        assertNotSame(cacheDocument, store.loadXWikiDoc(documentReference, this.oldcore.getXWikiContext()));
+        XWikiDocument newCachedDocument = store.loadXWikiDoc(documentReference, this.oldcore.getXWikiContext());
+        assertNotSame(cacheDocument, newCachedDocument);
+
+        String key = "4:wiki5:space4:page0:";
+        assertSame(newCachedDocument, this.cache.get(key));
+        assertTrue(this.existCache.get(key));
+        // Verify that while the page cache is set twice, the page exists cache is only set once.
+        verify(this.existCache).set(eq(key), any());
+        verify(this.cache, times(2)).set(eq(key), any());
     }
 
     @Test

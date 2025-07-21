@@ -118,9 +118,14 @@ define('xwiki-realtime-saver', [
           push = immediate = true;
         } else {
           // Remember the last time when the content became dirty in order to be able to save immediately when the save
-          // interval is reached (even if the use is still making changes).
+          // interval is reached (even if the user is still making changes).
           this._dirtyTimestamp = now();
         }
+      } else if (this._isSomeoneSaving()) {
+        // Avoid auto-saving more often than the SAVE_INTERVAL. It's possible that the SAVE_INTERVAL is reached for
+        // multiple users that are editing at the same time. In this case the auto-save should be triggered for only one
+        // of them. For the others the auto-save should be delayed until the SAVE_INTERVAL is reached again.
+        delete this._dirtyTimestamp;
       }
       if (push) {
         // Push the state of this saver to the other clients.
@@ -408,7 +413,7 @@ define('xwiki-realtime-saver', [
       };
       $(form).on('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
       this._revertList.push(() => {
-        $(document).off('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
+        $(form).off('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
       });
     }
 
@@ -545,9 +550,22 @@ define('xwiki-realtime-saver', [
       }
 
       const form = document.getElementById(this._config.formId);
-      const submitResultPromise = this._getSubmitResult(form);
+      const removeListeners = [];
+      const submitResultPromise = this._getSubmitResult(form, removeListeners);
 
+      let savePrevented = true;
+      $(button).on('xwiki:actions:save.realtime-saver', event => {
+        savePrevented = event.isDefaultPrevented();
+      });
       $(button).click();
+      $(button).off('xwiki:actions:save.realtime-saver');
+      if (savePrevented) {
+        // The save is prevented if the form has invalid data (e.g. missing mandatory title). In this case the
+        // xwiki:document:saved and xwiki:document:saveFailed events are not triggered, so we need to remove the
+        // corresponding event listeners and reject the save.
+        removeListeners.forEach(removeListener => removeListener());
+        throw new Error('Save prevented. Verify that the form has valid data.');
+      }
 
       this._afterSave(await submitResultPromise);
     }
@@ -558,7 +576,6 @@ define('xwiki-realtime-saver', [
     }
 
     _getSubmitResult(form, removeListeners) {
-      removeListeners = removeListeners || [];
       return new Promise((resolve, reject) => {
         this._once(form, removeListeners, 'xwiki:document:saved.realtime-saver', (event, data) => {
           resolve(data);

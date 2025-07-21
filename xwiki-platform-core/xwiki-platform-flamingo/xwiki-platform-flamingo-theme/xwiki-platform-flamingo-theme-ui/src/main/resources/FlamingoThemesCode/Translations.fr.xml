@@ -53,6 +53,7 @@ platform.flamingo.themes.title.preview=Prévisualiser
 platform.flamingo.themes.autorefresh=Actualiser automatiquement
 platform.flamingo.themes.refresh=Actualiser
 platform.flamingo.themes.refreshwarning=L'actualisation peut prendre quelques secondes et la prévisualisation peut ne pas être fidèle à 100%.
+platform.flamingo.themes.preview.iframe.label=Aperçu du thème.
 platform.flamingo.themes.loading=Chargement...
 platform.flamingo.themes.category.logos=Logos
 platform.flamingo.themes.category.base-colors=Couleurs de base

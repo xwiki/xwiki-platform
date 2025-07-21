@@ -48,6 +48,6 @@ Temporary provide a link for robots to index all extension.
 In the future, this link will be provided via a sitemap.
 [[ExtensionCode.AllExtensionsList]]
 )))
-#set($docextras=[])
+#set ($displayDocExtra = false)
 {{/velocity}}</content>
 </xwikidoc>

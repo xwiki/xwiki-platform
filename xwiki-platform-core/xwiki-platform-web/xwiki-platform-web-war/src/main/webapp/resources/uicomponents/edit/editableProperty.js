@@ -130,7 +130,24 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       // Allow others to enhance the editor.
       $(document).trigger('xwiki:dom:updated', {'elements': editor.toArray()});
       // Focus the first visible input.
-      editor.find(':input').filter(':visible').focus();
+      var editInput = editor.find(':input').filter(':visible');
+      // If we cannot find any kind of editInput, then we're in a weird edge case
+      // and we don't want to apply any of the following changes.
+      if (!editInput) {
+        return;
+      }
+      editInput.focus();
+      // Make sure the edit input has an ID, and use the name of the input as a fallback.
+      // We add some random UUID to make sure we don't inadvertently collide with another ID.
+      if (!editInput.attr('id')) {
+        let id = editInput.attr('name');
+        if (typeof crypto?.randomUUID === 'function') {
+          id += '-' + crypto.randomUUID();
+        }
+        editInput.attr('id', id);
+      }
+      // Bind the label to the newly generated edit input.
+      editableProperty.find('label').attr('for', editInput.attr('id'));
     }).catch(() => {
       new XWiki.widgets.Notification(l10n['web.editableProperty.editFailed'], 'error');
       return Promise.reject();
@@ -148,11 +165,15 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       .next('.editableProperty-editor').filter(':visible').trigger('xwiki:actions:cancel').hide();
     editableProperty.find('.editableProperty-save, .editableProperty-cancel').hide();
     editableProperty.find('.editableProperty-edit').show();
+    // Remove the for attribute from the label, resetting it to its default state.
+    editableProperty.find('label').removeAttr('for');
   };
 
   var save = function(editableProperty) {
     // Disable the save and cancel actions while the property is being saved.
     editableProperty.find('.editableProperty-save, .editableProperty-cancel').addClass('disabled');
+    // Remove the for attribute from the label, resetting it to its default state.
+    editableProperty.find('label').removeAttr('for');
     // Show progress notification message.
     var notification = new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.inprogress'],
       'inprogress');

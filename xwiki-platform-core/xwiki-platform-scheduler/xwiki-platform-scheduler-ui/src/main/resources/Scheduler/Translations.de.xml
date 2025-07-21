@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>scheduler.applicationsPanelEntryLabel=Planer
+  <content>scheduler.disabled=Der Planer ist in diesem Fall deaktiviert. Es wird kein Job ausgeführt.
+scheduler.applicationsPanelEntryLabel=Planer
 </content>
 </xwikidoc>

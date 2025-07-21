@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="AnnotationCode.Script" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.Script" locale="">
   <web>AnnotationCode</web>
   <name>Script</name>
   <language/>
@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>
 </content>
   <object>
@@ -1968,25 +1969,23 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>level</name>
         <number>1</number>
-        <picker>0</picker>
-        <prettyName>level</prettyName>
+        <prettyName>Level</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators> ,|</separators>
         <size>1</size>
-        <sort>none</sort>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>edit|programming</values>
+        <values>edit|script|wiki_admin|programming</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
     <property>
-      <level>programming</level>
+      <level>wiki_admin</level>
     </property>
   </object>
 </xwikidoc>

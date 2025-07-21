@@ -40,11 +40,6 @@ define('xwiki-ckeditor-realtime-adapter', [
       this._CKEDITOR = CKEDITOR;
       this._widgetCache = {};
 
-      // Disable temporary attachment upload for now.
-      if (this._ckeditor.config['xwiki-upload']) {
-        this._ckeditor.config['xwiki-upload'].isTemporaryAttachmentSupported = false;
-      }
-
       // Realtime synchronization must be paused while the editor is locked.
       this._lockCallbacks = [];
       this._ckeditor.on('startLoading', () => {
@@ -413,6 +408,37 @@ define('xwiki-ckeditor-realtime-adapter', [
           resolve();
         }
       });
+    }
+
+    /** @inheritdoc */
+    setConnectionStatus(status) {
+      if (status === 2 /* Connected */) {
+        // Disable temporary attachment upload for now.
+        if (this._ckeditor.config['xwiki-upload'] && !Object.hasOwn(this, '_wasTemporaryAttachmentSupported')) {
+          this._wasTemporaryAttachmentSupported = this._ckeditor.config['xwiki-upload'].isTemporaryAttachmentSupported;
+          this._ckeditor.config['xwiki-upload'].isTemporaryAttachmentSupported = false;
+        }
+
+        // When someone is offline, they may have left their tab open for a long time and the lock may have disappeared.
+        // We're refreshing it when the editor is focused so that other users will know that someone is editing the
+        // document.
+        if (!this._focusHandler) {
+          this._focusHandler = this._ckeditor.on('focus', () => {
+            this._ckeditor._realtime.lockDocument();
+          });
+        }
+      } else if (status === 0 /* Disconnected */) {
+        // Restore the temporary attachment upload support when leaving the realtime session.
+        if (this._ckeditor.config['xwiki-upload'] && Object.hasOwn(this, '_wasTemporaryAttachmentSupported')) {
+          this._ckeditor.config['xwiki-upload'].isTemporaryAttachmentSupported = this._wasTemporaryAttachmentSupported;
+          delete this._wasTemporaryAttachmentSupported;
+        }
+
+        if (this._focusHandler) {
+          this._focusHandler.removeListener();
+          delete this._focusHandler;
+        }
+      }
     }
   }
 

@@ -907,6 +907,18 @@ require([
   };
 
   /**
+   * Lazy image loading (when the image is scrolled into view port) doesn't make sense for PDF export (printing).
+   * Paged.js needs to wait for all images to be loaded (even if they are not in the view port) in order to know how to
+   * split the content into print pages (e.g. to know if an image fits on the current print page or has to be moved to
+   * the next one).
+   */
+  function preventLazyImageLoading() {
+    document.querySelectorAll('#xwikicontent img[loading="lazy"]').forEach(image =&gt; {
+      image.removeAttribute('loading');
+    });
+  }
+
+  /**
    * Removes the image size (width and height) from the image URL query string in order to prevent the server-side
    * resize of the image, thus allowing the full size image to be included in the generated PDF.
    */
@@ -947,6 +959,7 @@ require([
     storeFormFieldValues();
     makeTableCellWidthRelative();
     preserveWhiteSpaceInCodeBlocks();
+    preventLazyImageLoading();
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page

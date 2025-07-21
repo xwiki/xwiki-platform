@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesManager;
 import org.xwiki.index.tree.pinned.PinnedChildPagesResource;

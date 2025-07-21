@@ -40,7 +40,7 @@ import org.xwiki.container.servlet.HttpServletUtils;
  * URL.
  * 
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 public class SourceURLResolverFilter implements Filter
 {

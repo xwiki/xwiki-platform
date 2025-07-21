@@ -19,53 +19,57 @@
  */
 package com.xpn.xwiki.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.AssertionsKt.assertNull;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.util.Util}.
  *
  * @version $Id$
  */
-public class UtilTest
+class UtilTest
 {
     @Test
-    public void testConvertToAlphaNumeric()
+    void convertToAlphaNumeric()
     {
-        Assert.assertEquals("Search", Util.convertToAlphaNumeric("Search"));
-        Assert.assertEquals("Search", Util.convertToAlphaNumeric("S.earch"));
-        Assert.assertEquals("e", Util.convertToAlphaNumeric("e$%\u00a3#^()"));
-        Assert.assertEquals("e", Util.convertToAlphaNumeric(":\u0205!"));
+        assertEquals("Search", Util.convertToAlphaNumeric("Search"));
+        assertEquals("Search", Util.convertToAlphaNumeric("S.earch"));
+        assertEquals("e", Util.convertToAlphaNumeric("e$%\u00a3#^()"));
+        assertEquals("e", Util.convertToAlphaNumeric(":\u0205!"));
     }
 
     @Test
-    public void testIsValidXMLElementName()
+    void isValidXMLElementName()
     {
-        Assert.assertTrue(Util.isValidXMLElementName("myprop"));
-        Assert.assertTrue(Util.isValidXMLElementName("my_prop"));
-        Assert.assertTrue(Util.isValidXMLElementName("my_prop-1"));
-        Assert.assertTrue(Util.isValidXMLElementName("my_prop-1.1"));
-        Assert.assertFalse(Util.isValidXMLElementName("ns:my_prop-1"));
-        Assert.assertFalse(Util.isValidXMLElementName("1prop"));
-        Assert.assertFalse(Util.isValidXMLElementName("xmlprop"));
-        Assert.assertFalse(Util.isValidXMLElementName("XMLprop"));
-        Assert.assertFalse(Util.isValidXMLElementName("xMLprop"));
-        Assert.assertFalse(Util.isValidXMLElementName("Xmlprop"));
-        Assert.assertFalse(Util.isValidXMLElementName("ns my_prop"));
-        Assert.assertFalse(Util.isValidXMLElementName("ns,my_prop"));
+        assertTrue(Util.isValidXMLElementName("myprop"));
+        assertTrue(Util.isValidXMLElementName("my_prop"));
+        assertTrue(Util.isValidXMLElementName("my_prop-1"));
+        assertTrue(Util.isValidXMLElementName("my_prop-1.1"));
+        assertFalse(Util.isValidXMLElementName("ns:my_prop-1"));
+        assertFalse(Util.isValidXMLElementName("1prop"));
+        assertFalse(Util.isValidXMLElementName("xmlprop"));
+        assertFalse(Util.isValidXMLElementName("XMLprop"));
+        assertFalse(Util.isValidXMLElementName("xMLprop"));
+        assertFalse(Util.isValidXMLElementName("Xmlprop"));
+        assertFalse(Util.isValidXMLElementName("ns my_prop"));
+        assertFalse(Util.isValidXMLElementName("ns,my_prop"));
     }
 
     @Test
-    public void testNormalizeLanguage()
+    void normalizeLanguage()
     {
-        Assert.assertNull(Util.normalizeLanguage(null));
-        Assert.assertEquals("", Util.normalizeLanguage(""));
-        Assert.assertEquals("", Util.normalizeLanguage("  "));
-        Assert.assertEquals("default", Util.normalizeLanguage("default"));
-        Assert.assertEquals("default", Util.normalizeLanguage("DeFault"));
-        Assert.assertEquals("default", Util.normalizeLanguage("invalid code"));
-        Assert.assertEquals("en", Util.normalizeLanguage("en"));
-        Assert.assertEquals("en", Util.normalizeLanguage("En_"));
-        Assert.assertEquals("de_AT", Util.normalizeLanguage("DE_at"));
+        assertNull(Util.normalizeLanguage(null));
+        assertEquals("", Util.normalizeLanguage(""));
+        assertEquals("", Util.normalizeLanguage("  "));
+        assertEquals("default", Util.normalizeLanguage("default"));
+        assertEquals("default", Util.normalizeLanguage("DeFault"));
+        assertEquals("default", Util.normalizeLanguage("invalid code"));
+        assertEquals("en", Util.normalizeLanguage("en"));
+        assertEquals("en", Util.normalizeLanguage("En_"));
+        assertEquals("de_AT", Util.normalizeLanguage("DE_at"));
     }
 }

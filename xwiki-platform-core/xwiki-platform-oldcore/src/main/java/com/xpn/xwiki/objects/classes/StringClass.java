@@ -35,7 +35,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
-import static org.apache.commons.lang.StringEscapeUtils.escapeJavaScript;
+import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 public class StringClass extends PropertyClass
 {
@@ -141,7 +141,7 @@ public class StringClass extends PropertyClass
         String path = xwiki.getURL(new LocalDocumentReference("Main", "WebHome"), "view", xWikiContext);
         String stringBuilder = String.format("%s?%s&", path, new EscapeTool().url(getParametersMap()));
         input.setOnFocus(String.format("new ajaxSuggest(this, {script:\"%s\", varname:\"input\"} )",
-            escapeJavaScript(stringBuilder)));
+            escapeEcmaScript(stringBuilder)));
     }
 
     private Map<String, String> getParametersMap()

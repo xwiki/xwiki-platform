@@ -99,12 +99,13 @@
           }
         });
 
-        // Update the source text area height after the HTML to Wiki Syntax conversion is done.
-        editor.on('modeReady', function() {
+        // Update the source text area height after the HTML to Wiki Syntax conversion is done, but before restoring the
+        // selection because scrolling the selection into view depends on the text area height.
+        CKEDITOR.plugins.xwikiSource.addModeChangeHandler(editor, () => {
           if (editor.mode === 'source') {
             updateSourceAreaHeight(editor);
           }
-        });
+        }, 7);
       }
     }
   });

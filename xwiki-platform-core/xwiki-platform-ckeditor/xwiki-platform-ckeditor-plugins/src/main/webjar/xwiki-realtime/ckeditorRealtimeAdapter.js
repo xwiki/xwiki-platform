@@ -170,8 +170,8 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    onBeforeDestroy(callback) {
-      this._ckeditor.on('beforeDestroy', callback);
+    onBeforeDestroy(callback, isAsync) {
+      this._ckeditor.on(isAsync ? 'beforeDestroyAsync' : 'beforeDestroy', callback);
     }
 
     /** @inheritdoc */

@@ -78,8 +78,6 @@ import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 
-import net.sf.json.JSONObject;
-
 /**
  * @version $Id$
  * @deprecated since 5.2, use Filter framework instead
@@ -1453,13 +1451,13 @@ public class Package
     }
 
     /**
-     * Outputs the content of this package in the JSON format
+     * Outputs the content of this package in the JSON format.
      *
      * @param wikiContext the XWiki context
-     * @return a representation of this package under the JSON format
-     * @since 2.2M1
+     * @return a representation of this package that can be easily serialized in the JSON format
+     * @since 17.6.0RC1
      */
-    public JSONObject toJSON(XWikiContext wikiContext)
+    public Object toJSON(XWikiContext wikiContext)
     {
         Map<String, Object> json = new HashMap<String, Object>();
 
@@ -1499,9 +1497,7 @@ public class Package
         json.put("infos", infos);
         json.put("files", files);
 
-        JSONObject jsonObject = JSONObject.fromObject(json);
-
-        return jsonObject;
+        return json;
     }
 
     private SAXReader getSAXReader()

@@ -1434,13 +1434,6 @@
                 <features>com.google.inject:guice</features>
               </extensionOverride>
               <extensionOverride>
-                <id>net.sf.json-lib:json-lib:jdk15</id>
-                <features>
-                  net.sf.json-lib:json-lib,
-                  net.sf.json-lib:json-lib:jdk13
-                </features>
-              </extensionOverride>
-              <extensionOverride>
                 <id>com.sun.activation:jakarta.activation</id>
                 <features>
                   javax.activation:activation,

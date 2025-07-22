@@ -21,7 +21,7 @@
 #**
  * Export modal
  *#
-#macro(exportModal)
+#define($exportModal)
   #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
   <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
       aria-hidden="true">

@@ -130,13 +130,40 @@
           // Fire the instanceReady event only after all the instance ready promises have been settled. Note that we
           // don't want to prevent the instanceReady event if the asynchronous plugin initialization fails because we
           // consider such plugins as optional (we expect them to fail gracefully if they can't be initialized).
-          return Promise.allSettled(this._instanceReadyPromises).then(() => {
+          return Promise.allSettled(this._instanceReadyPromises).then((results) => {
+            logRejectedPromises(
+              `The [${editor.name}] editor is ready, but there were some initialization errors: `,
+              results
+            );
             originalFireOnce.call(this, eventName, ...args);
           });
         } else {
           // Fire the event immediately.
           return originalFireOnce.call(this, eventName, ...args);
         }
+      };
+
+      function logRejectedPromises(message, results) {
+        const errors = results
+          .filter((result) => result.status === "rejected")
+          .map((result) => result.reason);
+        if (errors.length) {
+          console.warn(message, errors);
+        }
+      }
+
+      // Allow plugins to register asynchronous destroy handlers that will be called before the editor is destroyed.
+      const originalDestroy = editor.destroy;
+      editor.destroy = async function(...args) {
+        const promises = [];
+        // Collect the asynchronous destroy handlers.
+        this.fire('beforeDestroyAsync', {promises});
+        // Wait for all the asynchronous destroy handlers to be settled.
+        logRejectedPromises(
+          `We encountered some errors while destroying the [${this.name}] editor: `,
+          await Promise.allSettled(promises)
+        );
+        return originalDestroy.call(this, ...args);
       };
     }
   });

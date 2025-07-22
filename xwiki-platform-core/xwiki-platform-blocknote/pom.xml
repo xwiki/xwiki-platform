@@ -28,7 +28,7 @@
     <version>17.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-blocknote</artifactId>
-  <name>XWiki Platform - BlockNote</name>
+  <name>XWiki Platform - BlockNote Integration</name>
   <packaging>pom</packaging>
   <description>Integrates BlockNote editor in XWiki.</description>
   <dependencyManagement>

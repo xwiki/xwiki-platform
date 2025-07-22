@@ -28,9 +28,9 @@
     <version>17.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-blocknote-test-pageobjects</artifactId>
-  <name>XWiki Platform - BlockNote - Tests - Page Objects</name>
+  <name>XWiki Platform - BlockNote Integration - Tests - Page Objects</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - BlockNote - Tests - Page Objects</description>
+  <description>XWiki Platform - BlockNote Integration - Tests - Page Objects</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

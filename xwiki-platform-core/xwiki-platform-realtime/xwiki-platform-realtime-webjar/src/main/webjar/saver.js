@@ -366,9 +366,20 @@ define('xwiki-realtime-saver', [
     /**
      * Stop the autosave when the user disallows realtime or when the WebSocket is disconnected.
      */
-    stop() {
+    async stop() {
       // Cancel the scheduled save.
       clearTimeout(this._saveTimer);
+
+      if (this._chainpad) {
+        // Push uncommitted changes to the server before disconnecting.
+        await new Promise(resolve => {
+          this._chainpad.sync();
+          this._chainpad.onSettle(() => {
+            delete this._chainpad;
+            resolve();
+          });
+        });
+      }
 
       // Disconnect from the realtime channel and revert the changes made by this saver (i.e. remove event listeners,
       // restore action buttons behaviour).

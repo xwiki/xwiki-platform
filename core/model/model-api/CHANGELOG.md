@@ -1,5 +1,11 @@
 # @xwiki/cristal-model-api
 
+## 0.20.0-rc.0
+
+### Minor Changes
+
+- Cristal 0.20-rc-1 Release
+
 ## 0.19.0
 
 ### Minor Changes

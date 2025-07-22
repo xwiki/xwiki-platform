@@ -29,8 +29,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.util.Util;
 
-import net.sf.json.JSONObject;
-
 /**
  * @version $Id$
  * @deprecated since 5.2, use Filter framework instead
@@ -301,10 +299,10 @@ public class PackageAPI extends Api
     }
 
     /**
-     * @return a representation of this package under the JSON format
-     * @since 2.2M1
+     * @return a representation of this package that can be easily serialized in the JSON format
+     * @since 17.6.0RC1
      */
-    public JSONObject toJSON()
+    public Object toJSON()
     {
         return this.pack.toJSON(getXWikiContext());
     }

@@ -1377,7 +1377,7 @@ XWiki.Annotation = Class.create({
     let bubbleWidth = bubble.offsetWidth 
       + parseInt(getComputedStyle(bubble).marginLeft) 
       + parseInt(getComputedStyle(bubble).marginRight);
-    if (horizontalCoordinate &lt; bubbleWidth || horizontalCoordinate + bubbleWidth &lt; window.innerWidth ) {
+    if (horizontalCoordinate &lt; bubbleWidth || horizontalCoordinate + bubbleWidth &lt; window.innerWidth) {
       bubble.style.left = horizontalCoordinate + 'px';
     } else {
       // There isn't enough space on the right of the window to fit the modal, and there is enough on the left.

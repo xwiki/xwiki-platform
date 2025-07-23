@@ -1369,24 +1369,22 @@ XWiki.Annotation = Class.create({
     bubble.insert({top : new Element('div', {'class' : 'loading'})});
     // and insert the bubble in the content
     document.body.insert({bottom : bubble});
-    // keep the bubble hidden for the moment
-    bubble.toggleClassName('hidden');
+    // put this bubble in the bubbles stack
+    this.bubbles.push(bubble);
     // position the bubble
     // By default, we position it to the right and under the coordinates
-    // Position it horizontally. The width of the bubble is fixed at 560px to which we add a 20px left margin
-    if ((horizontalCoordinate &lt; 580) || (horizontalCoordinate + 580 &lt; window.innerWidth) ) {
+    // Position it horizontally.
+    let bubbleWidth = bubble.offsetWidth 
+      + parseInt(getComputedStyle(bubble).marginLeft) 
+      + parseInt(getComputedStyle(bubble).marginRight);
+    if (horizontalCoordinate &lt; bubbleWidth || horizontalCoordinate + bubbleWidth &lt; window.innerWidth ) {
       bubble.style.left = horizontalCoordinate + 'px';
-    }
-    else {
+    } else {
       // There isn't enough space on the right of the window to fit the modal, and there is enough on the left.
-      bubble.style.right = (window.innerWidth-horizontalCoordinate) + 'px';
+      bubble.style.right = (window.innerWidth - horizontalCoordinate) + 'px';
       bubble.toggleClassName('annotation-bubble-position-left');
     }
     bubble.style.top = verticalCoordinate + 'px';
-    // make it visible
-    bubble.toggleClassName('hidden');
-    // put this bubble in the bubbles stack
-    this.bubbles.push(bubble);
 
     return bubble;
   },

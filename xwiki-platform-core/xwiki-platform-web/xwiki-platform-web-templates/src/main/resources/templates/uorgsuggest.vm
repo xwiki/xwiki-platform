@@ -43,10 +43,7 @@
   #set ($query = $query.bindValue('input').anyChars().literal($input).anyChars().query())
   #set ($rawResults = $query.execute())
   #set ($results = [])
-  #set ($limit = $numbertool.toNumber($request.limit))
-  #if ("$!limit" == '')
-    #set ($limit = 10)
-  #end
+  #getAndValidateQueryLimitFromRequest('limit', 10, $limit)
   ## Iterate over the results and select the first N results (based on the limit request parameter) that are accessible
   ## to the current user.
   #foreach ($rawResult in $rawResults)

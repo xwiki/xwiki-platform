@@ -40,6 +40,7 @@ import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.Class;
 import org.xwiki.rest.model.jaxb.Classes;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -93,6 +94,9 @@ class ClassesResourceImplTest
     @MockComponent
     private ModelFactory modelFactory;
 
+    @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
     @Mock
     private XWiki xWiki;
 
@@ -142,12 +146,14 @@ class ClassesResourceImplTest
             when(zeclass.getId()).thenReturn(availableClasses.get(i));
             restClasses.add(zeclass);
         }
+
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
 
     @Test
     void classesNoConstraint() throws XWikiRestException
     {
-        Classes xwikiClasses = resource.getClasses("xwiki", 0, -1);
+        Classes xwikiClasses = resource.getClasses("xwiki", 0, 100);
         assertEquals(4, xwikiClasses.getClazzs().size());
     }
 
@@ -157,7 +163,7 @@ class ClassesResourceImplTest
         when(authorization.hasAccess(eq(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "Protected"))))
             .thenReturn(false);
 
-        Classes xwikiClasses = resource.getClasses("xwiki", 0, -1);
+        Classes xwikiClasses = resource.getClasses("xwiki", 0, 100);
         assertEquals(3, xwikiClasses.getClazzs().size());
 
         for (Class clazz : xwikiClasses.getClazzs()) {

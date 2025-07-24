@@ -190,6 +190,8 @@
   #set ($limit = $mathtool.max($numbertool.toNumber($request.limit).intValue(), 1))
   #if ("$!limit" == '')
     #set ($limit = 15)
+  #else
+    #validateQueryLimit($limit)
   #end
   #if ($nodeId == '#' &amp;&amp; $docTreeConfig.showRoot)
     #maybeAddNode($actualNodeId $children)

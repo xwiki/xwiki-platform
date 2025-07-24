@@ -41,6 +41,6 @@ public interface AttachmentHistoryResource
             @PathParam("pageName") String pageName,
             @PathParam("attachmentName") String attachmentName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number
+            @QueryParam("number") Integer number
     ) throws XWikiRestException;
 }

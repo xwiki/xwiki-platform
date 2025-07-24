@@ -42,6 +42,8 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
         Integer start, String orderField, String order, Boolean withPrettyNames, Boolean isLocaleAware)
             throws XWikiRestException
     {
+        int limit = validateAndGetLimit(number);
+
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
             searchResults.setTemplate(String.format("%s?%s",
@@ -56,7 +58,7 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
 
             searchResults.getSearchResults().addAll(
                 search(searchScopes, keywords, getXWikiContext().getWikiId(), null, Utils.getXWiki(componentManager)
-                    .getRightService().hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start,
+                    .getRightService().hasProgrammingRights(Utils.getXWikiContext(componentManager)), limit, start,
                     true, orderField, order, withPrettyNames, isLocaleAware));
 
             return searchResults;

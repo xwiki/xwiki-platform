@@ -52,7 +52,7 @@ public interface WikiChildrenResource
     @GET Pages getChildren(
         @PathParam("wikiName") String wikiName,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("limit") @DefaultValue("-1") Integer limit,
+        @QueryParam("limit") Integer limit,
         @QueryParam("search") @DefaultValue("") String search
     ) throws XWikiRestException;
 }

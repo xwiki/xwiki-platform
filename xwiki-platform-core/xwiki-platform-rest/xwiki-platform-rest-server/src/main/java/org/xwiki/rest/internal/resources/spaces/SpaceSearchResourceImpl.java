@@ -44,6 +44,8 @@ public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSe
     {
         List<String> spaces = parseSpaceSegments(spaceName);
 
+        int limit = validateAndGetLimit(number);
+
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
             searchResults.setTemplate(String.format("%s?%s",
@@ -56,7 +58,7 @@ public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSe
                 .addAll(search(searchScopes, keywords, wikiName, Utils.getLocalSpaceId(spaces),
                     Utils.getXWiki(componentManager).getRightService()
                         .hasProgrammingRights(Utils.getXWikiContext(componentManager)),
-                    number, start, true, orderField, order, withPrettyNames, isLocaleAware));
+                    limit, start, true, orderField, order, withPrettyNames, isLocaleAware));
 
             return searchResults;
         } catch (Exception e) {

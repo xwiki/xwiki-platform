@@ -27,10 +27,13 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.rest.resources.pages.PageTranslationHistoryResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
 import org.xwiki.test.ui.TestUtils;
@@ -127,5 +130,66 @@ public class PageTranslationResourceIT extends AbstractHttpIT
 
         assertFalse(this.testUtils.rest().exists(this.referenceDefault));
         assertFalse(this.testUtils.rest().exists(this.referenceFR));
+    }
+
+    @Test
+    public void testPageTranslationHistoryResourcePaginationAndErrors() throws Exception
+    {
+        // Setup: Create a page and a translation with several versions
+        Locale language = Locale.FRENCH;
+        assertFalse(this.testUtils.rest().exists(this.referenceDefault));
+        String uri = buildURI(PageTranslationResource.class, getWiki(), this.space, this.pageName, language);
+
+        try {
+            // Save translation versions using PUT to the translation resource
+            Page translationPage = this.objectFactory.createPage();
+            translationPage.setContent("v1fr");
+            translationPage.setTitle("title1fr");
+            executePutXml(uri, translationPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+                TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+
+            translationPage.setContent("v2fr");
+            translationPage.setTitle("title2fr");
+            executePutXml(uri, translationPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+                TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+
+            translationPage.setContent("v3fr");
+            translationPage.setTitle("title3fr");
+            executePutXml(uri, translationPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+                TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+
+            // Test: number=-1 should return error
+            GetMethod getMethod = executeGet("%s?number=-1".formatted(
+                buildURI(PageTranslationHistoryResource.class, getWiki(), this.space, this.pageName, language)));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+
+            // Test: number=1001 should return error
+            getMethod = executeGet("%s?number=1001".formatted(
+                buildURI(PageTranslationHistoryResource.class, getWiki(), this.space, this.pageName, language)));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+
+            // Test: pagination with number=1
+            getMethod = executeGet("%s?number=1".formatted(
+                buildURI(PageTranslationHistoryResource.class, getWiki(), this.space, this.pageName, language)));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            History history = (History) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, history.getHistorySummaries().size());
+
+            String firstVersion = history.getHistorySummaries().get(0).getVersion();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet("%s?number=1&start=1".formatted(
+                buildURI(PageTranslationHistoryResource.class, getWiki(), this.space, this.pageName, language)));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            history = (History) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, history.getHistorySummaries().size());
+            Assert.assertNotEquals(firstVersion, history.getHistorySummaries().get(0).getVersion());
+        } finally {
+            // Cleanup: Delete the page.
+            executeDelete(uri, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+                TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        }
     }
 }

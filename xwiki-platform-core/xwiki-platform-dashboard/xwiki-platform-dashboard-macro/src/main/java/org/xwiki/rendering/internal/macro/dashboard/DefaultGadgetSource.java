@@ -31,7 +31,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.job.event.status.JobProgressManager;
@@ -62,6 +64,7 @@ import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -81,6 +84,8 @@ public class DefaultGadgetSource implements GadgetSource
      */
     protected static final EntityReference GADGET_CLASS =
         new EntityReference("GadgetClass", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+
+    private static final String SOURCE_SYNTAX_PARAMETER_NAME = "data-source-syntax";
 
     static final Pattern TRANSLATION_SCRIPT_PATTERN =
         Pattern.compile("\\s*\\$services\\.localization\\.render\\(\\s*'([a-zA-Z0-9.]+)'\\s*\\)\\s*");
@@ -130,6 +135,9 @@ public class DefaultGadgetSource implements GadgetSource
 
     @Inject
     private ContextualLocalizationManager localizationManager;
+
+    @Inject
+    private Logger logger;
 
     /**
      * Prepare the parser to parse the title and content of the gadget into blocks.
@@ -319,6 +327,18 @@ public class DefaultGadgetSource implements GadgetSource
         String classParameterName = "class";
         GroupBlock metadataContainer = new GroupBlock();
         metadataContainer.setParameter(classParameterName, DashboardMacro.METADATA);
+
+        try {
+            XWikiDocument sourceDocumentInstance =
+                getXWikiContext().getWiki().getDocument(sourceDoc, getXWikiContext());
+            metadataContainer.setParameter(SOURCE_SYNTAX_PARAMETER_NAME,
+                sourceDocumentInstance.getSyntax().toIdString());
+        } catch (XWikiException e) {
+            this.logger.warn(
+                "Failed to get the source document [{}] for the dashboard metadata. "
+                    + "The dashboard might use an incorrect syntax. Root cause: [{}].",
+                sourceDoc, ExceptionUtils.getRootCauseMessage(e));
+        }
 
         // generate anchors for the urls
         XWikiContext xContext = getXWikiContext();

@@ -371,6 +371,37 @@ class DocumentTreeMacroIT
         }
     }
 
+    @Test
+    @Order(5)
+    void testLimit(TestUtils setup, TestReference testReference)
+    {
+        DocumentReference alice =
+            new DocumentReference("WebHome", new SpaceReference("Alice", testReference.getLastSpaceReference()));
+        DocumentReference bob =
+            new DocumentReference("WebHome", new SpaceReference("Bob", testReference.getLastSpaceReference()));
+        DocumentReference carol =
+            new DocumentReference("WebHome", new SpaceReference("Carol", testReference.getLastSpaceReference()));
+        DocumentReference denis =
+            new DocumentReference("WebHome", new SpaceReference("Denis", testReference.getLastSpaceReference()));
+
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference, true);
+
+        createPage(setup, alice, "Alice", "");
+        createPage(setup, bob, "Bob", "");
+        createPage(setup, carol, "Carol", "");
+        createPage(setup, denis, "Denis", "");
+
+        // Limit to 2 nodes. We need at least 4 pages for this, as we show up to one more page than the limit.
+        TreeElement tree = getDocumentTree(setup, testReference, Map.of("limit", "2"));
+        assertNodeLabels(tree.getTopLevelNodes(), "Alice", "Bob", "2 more ...");
+
+        // Limit to 2000 nodes
+        tree = getDocumentTree(setup, testReference, Map.of("limit", "2000"));
+        // FIXME: the tree is simply empty when the limit is too high, the error that is returned is simply ignored.
+        assertNodeLabels(tree.getTopLevelNodes());
+    }
+
     private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title, String content)
     {
         // We don't care what parent page is used, we just want to avoid creating orphan pages in order to not interfere

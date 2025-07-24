@@ -832,10 +832,15 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 # security.script.save.checkAuthor = true
 
 #-# [Since 13.10]
-#-# Prevent against DOS attacks by limiting the number of entries returned by DB queries, for guest users.
+#-# Prevent DOS attacks by limiting the number of entries returned by search queries and the REST API.
+#-# The query items limit shouldn't be set below 100 (default maximum page size of Live Data/LiveTable).
+#-# The query items limit can be set to -1 to disable any limits (not recommended for instances that are reachable
+#-# from the internet).
+#-# Before XWiki 16.10.11, 17.4.4, and 17.7.0RC1, this limit had a default value of 100 and was only used for guest
+#-# users in a single place.
 #-#
 #-# The default is:
-# security.queryItemsLimit = 100
+# security.queryItemsLimit = 1000
 
 #-# [Since 13.10.1]
 #-# [Since 14.0RC1]

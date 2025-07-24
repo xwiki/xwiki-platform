@@ -61,6 +61,8 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
     @Override
     public Classes getClasses(String wikiName, Integer start, Integer number) throws XWikiRestException
     {
+        int limit = validateAndGetLimit(number);
+
         String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         try {
@@ -69,7 +71,7 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
             List<String> classNames = Utils.getXWikiApi(componentManager).getClassList();
             Collections.sort(classNames);
 
-            RangeIterable<String> ri = new RangeIterable<String>(classNames, start, number);
+            RangeIterable<String> ri = new RangeIterable<String>(classNames, start, limit);
 
             Classes classes = objectFactory.createClasses();
 

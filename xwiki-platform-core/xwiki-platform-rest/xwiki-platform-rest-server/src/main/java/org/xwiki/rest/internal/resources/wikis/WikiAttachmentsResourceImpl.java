@@ -49,6 +49,7 @@ public class WikiAttachmentsResourceImpl extends BaseAttachmentsResource impleme
         filters.put("author", author);
         filters.put("fileTypes", fileTypes);
 
-        return super.getAttachments(new WikiReference(wiki), filters, offset, limit, withPrettyNames);
+        return super.getAttachments(new WikiReference(wiki), filters, offset, validateAndGetLimit(limit),
+            withPrettyNames);
     }
 }

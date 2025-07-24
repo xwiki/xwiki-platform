@@ -37,6 +37,6 @@ public interface SpacesResource
     @GET Spaces getSpaces(
             @PathParam("wikiName") String wikiName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number
+            @QueryParam("number") Integer number
     ) throws XWikiRestException;
 }

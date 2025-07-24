@@ -135,7 +135,8 @@
 });
 
       require(
-        ['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro', 'xwiki-bootstrap-switch'],
+        ['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro', 'xwiki-bootstrap-switch',
+        'xwiki-platform-notifications-webjar'],
         function($, l10n) {
 
   function save(checked, filterName, objectNumber, docURL) {

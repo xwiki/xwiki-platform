@@ -19,12 +19,16 @@
  */
 package org.xwiki.wysiwyg.internal.converter;
 
+import java.io.IOException;
 import java.io.StringReader;
+import java.util.Map;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -45,6 +49,7 @@ import org.xwiki.wysiwyg.filter.MutableJakartaServletRequest;
 /**
  * The default {@link RequestParameterConverter} implementation, converting parameter values, where needed, from a
  * specified input syntax to a specified output syntax (without execution any rendering transformations).
+ * For backward compatibility reasons this converter also perform a call to any other converter registered.
  *
  * @version $Id$
  * @since 13.5RC1
@@ -75,6 +80,28 @@ public class DefaultRequestParameterConverter extends AbstractRequestParameterCo
     protected String getConverterParameterName()
     {
         return "RequiresConversion";
+    }
+
+    @Override
+    public Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException
+    {
+        // Perform the call for the standard conversion related to the parameter name
+        Optional<ServletRequest> result = super.convert(request, response);
+
+        // and then loop over the other converters to ensure they're also properly called.
+        try {
+            for (Map.Entry<String, Object> entry : contextComponentManager.getInstanceMap(
+                RequestParameterConverter.class).entrySet()) {
+                // We want to ensure to not call again this current instance.
+                if (!"default".equals(entry.getKey()) && result.isPresent()) {
+                    RequestParameterConverter converter = (RequestParameterConverter) entry.getValue();
+                    result = converter.convert(result.get(), response);
+                }
+            }
+        } catch (ComponentLookupException e) {
+            this.logger.error("Error while getting RequestParameterConverter", e);
+        }
+        return result;
     }
 
     @Override

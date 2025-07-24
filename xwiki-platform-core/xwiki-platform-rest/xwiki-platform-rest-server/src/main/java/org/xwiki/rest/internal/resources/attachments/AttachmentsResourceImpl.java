@@ -76,7 +76,7 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
         filters.put("fileTypes", fileTypes);
 
         return super.getAttachments(new DocumentReference(wiki, parseSpaceSegments(spaces), page), filters, offset,
-            limit, withPrettyNames);
+            validateAndGetLimit(limit), withPrettyNames);
     }
 
     @Override

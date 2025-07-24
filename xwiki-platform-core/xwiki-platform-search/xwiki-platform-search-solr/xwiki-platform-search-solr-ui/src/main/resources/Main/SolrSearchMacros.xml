@@ -836,10 +836,7 @@ $value##
   #end
   ##
   ## Pagination
-  #set ($rows = $numbertool.toNumber($request.rows).intValue())
-  #if ("$!rows" == '')
-    #set ($rows = 10)
-  #end
+  #getAndValidateQueryLimitFromRequest('rows', 10, $rows)
   #set ($start = $numbertool.toNumber($request.firstIndex).intValue())
   #if ("$!start" == '')
     #set ($start = 0)

@@ -39,7 +39,7 @@ public interface SpaceSearchResource
             @PathParam("spaceName") @Encoded String spaceName,
             @QueryParam("q") String keywords,
             @QueryParam("scope") List<String> searchScopeStrings,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("orderField") String orderField,
             @QueryParam("order") @DefaultValue("asc") String order,

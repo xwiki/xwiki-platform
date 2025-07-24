@@ -45,7 +45,7 @@ public interface AttachmentsResource
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
             @QueryParam("name") @DefaultValue("") String name,
             @QueryParam("author") @DefaultValue("") String author,

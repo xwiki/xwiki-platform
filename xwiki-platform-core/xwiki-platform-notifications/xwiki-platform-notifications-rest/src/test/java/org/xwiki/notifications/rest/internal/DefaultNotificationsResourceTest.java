@@ -26,15 +26,19 @@ import java.util.Map;
 
 import javax.inject.Provider;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -45,8 +49,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiResponse;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -82,6 +89,9 @@ class DefaultNotificationsResourceTest
     @MockComponent
     private RSSFeedRenderer rssFeedRenderer;
 
+    @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
     private XWikiContext context;
     private XWiki wiki;
     private XWikiResponse response;
@@ -101,6 +111,7 @@ class DefaultNotificationsResourceTest
         when(this.context.getWiki()).thenReturn(this.wiki);
         this.response = mock(XWikiResponse.class);
         when(this.context.getResponse()).thenReturn(this.response);
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
 
     @Test
@@ -112,6 +123,60 @@ class DefaultNotificationsResourceTest
             null, null, null, null, null, null, null, null));
         verify(this.wiki).checkAuth(this.context);
         verify(this.response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { -1, 1001 })
+    void getgetNotificationsRSSLimitErrors(int limit) throws Exception
+    {
+        String userId = "XWiki.Admin";
+        XWikiUser wikiUser = mock();
+        when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
+        DocumentReference userIdDocReference = mock();
+        when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
+        when(wikiUser.getUserReference()).thenReturn(userIdDocReference);
+        String maxCountString = String.valueOf(limit);
+        WebApplicationException exception = assertThrows(WebApplicationException.class,
+            () -> this.notificationsResource.getNotificationsRSS(null, userId,
+                null, null, null, null, null, null, maxCountString, null, null, null, null, null, null, null));
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, exception.getResponse().getStatus());
+        assertThat(exception.getResponse().getEntity().toString(), containsString("Invalid limit value: " + limit));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { -1, 1001 })
+    void getNotificationsLimitErrors(int limit) throws Exception
+    {
+        String userId = "XWiki.Admin";
+        XWikiUser wikiUser = mock();
+        when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
+
+        String maxCountString = String.valueOf(limit);
+        WebApplicationException exception = assertThrows(WebApplicationException.class,
+            () -> this.notificationsResource.getNotifications(
+                null, userId, null, true, null, null, null, null, null, maxCountString, null,
+                null, null, null, null, null, null, null, null, null
+            ));
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, exception.getResponse().getStatus());
+        assertThat(exception.getResponse().getEntity().toString(), containsString("Invalid limit value: " + limit));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { -1, 1001 })
+    void getNotificationsCountLimitErrors(int limit) throws Exception
+    {
+        String userId = "XWiki.Admin";
+        XWikiUser wikiUser = mock();
+        when(this.wiki.checkAuth(this.context)).thenReturn(wikiUser);
+
+        String maxCountString = String.valueOf(limit);
+        WebApplicationException exception = assertThrows(WebApplicationException.class,
+            () -> this.notificationsResource.getNotificationsCount(
+                null, userId, null, null, null, null, maxCountString, null,
+                null, null, null, null, null, null, null, null
+            ));
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, exception.getResponse().getStatus());
+        assertThat(exception.getResponse().getEntity().toString(), containsString("Invalid limit value: " + limit));
     }
 
     @Test

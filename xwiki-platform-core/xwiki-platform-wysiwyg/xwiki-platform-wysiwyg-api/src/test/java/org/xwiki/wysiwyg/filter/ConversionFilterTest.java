@@ -62,6 +62,9 @@ class ConversionFilterTest
     @MockComponent
     private Execution execution;
 
+    @MockComponent
+    private RequestParameterConverter defaultParameterConverter;
+
     @Mock
     private ServletRequest request;
 
@@ -78,60 +81,28 @@ class ConversionFilterTest
     }
 
     @Test
-    void doFilterNoConverter() throws Exception
-    {
-        this.conversionFilter.doFilter(this.request, this.response, this.chain);
-
-        verify(this.execution).pushContext(any(ExecutionContext.class));
-        verify(this.execution).popContext();
-        verify(this.chain).doFilter(this.request, this.response);
-    }
-
-    @Test
     void doFilter() throws Exception
     {
-        RequestParameterConverter firstConverter =
-            this.componentManager.registerMockComponent(RequestParameterConverter.class, "first");
-        RequestParameterConverter secondConverter =
-            this.componentManager.registerMockComponent(RequestParameterConverter.class, "second");
-
         ServletRequest reqFromFirstFilter = mock(ServletRequest.class);
-        when(firstConverter.convert(this.request, this.response)).thenReturn(Optional.of(reqFromFirstFilter));
-
-        ServletRequest reqFromSecondFilter = mock(ServletRequest.class);
-        when(secondConverter.convert(reqFromFirstFilter, this.response)).thenReturn(Optional.of(reqFromSecondFilter));
-
+        when(defaultParameterConverter.convert(this.request, this.response))
+            .thenReturn(Optional.of(reqFromFirstFilter));
         this.conversionFilter.doFilter(this.request, this.response, this.chain);
-
-        verify(this.chain).doFilter(reqFromSecondFilter, this.response);
+        verify(this.chain).doFilter(reqFromFirstFilter, this.response);
     }
 
     @Test
     void doFilterWithoutChaining() throws Exception
     {
-        RequestParameterConverter firstConverter =
-            this.componentManager.registerMockComponent(RequestParameterConverter.class, "first");
-        RequestParameterConverter secondConverter =
-            this.componentManager.registerMockComponent(RequestParameterConverter.class, "second");
-
-        when(firstConverter.convert(this.request, this.response)).thenReturn(Optional.empty());
-
+        when(defaultParameterConverter.convert(this.request, this.response)).thenReturn(Optional.empty());
         this.conversionFilter.doFilter(this.request, this.response, this.chain);
-
-        verify(secondConverter, never()).convert(any(ServletRequest.class), eq(this.response));
         verify(this.chain, never()).doFilter(any(ServletRequest.class), eq(this.response));
     }
 
     @Test
     void doFilterWithException() throws Exception
     {
-        RequestParameterConverter firstConverter =
-            this.componentManager.registerMockComponent(RequestParameterConverter.class, "first");
-        RequestParameterConverter secondConverter =
-            this.componentManager.registerMockComponent(RequestParameterConverter.class, "second");
-
         IOException exception = new IOException("failure");
-        when(firstConverter.convert(this.request, this.response)).thenThrow(exception);
+        when(defaultParameterConverter.convert(this.request, this.response)).thenThrow(exception);
 
         try {
             this.conversionFilter.doFilter(this.request, this.response, this.chain);
@@ -139,8 +110,6 @@ class ConversionFilterTest
         } catch (IOException e) {
             assertSame(exception, e);
         }
-
-        verify(secondConverter, never()).convert(any(ServletRequest.class), eq(this.response));
         verify(this.chain, never()).doFilter(any(ServletRequest.class), eq(this.response));
         verify(this.execution).popContext();
     }

@@ -163,6 +163,10 @@ public class AuthServiceConfiguration
     {
         XWikiDocument configurationDocument =
             xcontext.getWiki().getDocument(new DocumentReference(DOC_REFERENCE, wiki), xcontext);
+
+        // Void modifying cached document
+        configurationDocument = configurationDocument.clone();
+
         BaseObject configurationObject =
             configurationDocument.getXObject(AuthServiceConfigurationClassInitializer.CLASS_REFERENCE, true, xcontext);
 

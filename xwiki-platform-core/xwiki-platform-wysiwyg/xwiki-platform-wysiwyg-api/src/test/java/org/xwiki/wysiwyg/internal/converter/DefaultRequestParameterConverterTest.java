@@ -20,6 +20,7 @@
 package org.xwiki.wysiwyg.internal.converter;
 
 import java.io.Reader;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -140,11 +141,11 @@ class DefaultRequestParameterConverterTest
         RequestParameterConverter converter1 = mock(RequestParameterConverter.class);
         RequestParameterConverter converter2 = mock(RequestParameterConverter.class);
         RequestParameterConverter defaultConverter = mock(RequestParameterConverter.class);
-        when(this.contextComponentManager.getInstanceMap(RequestParameterConverter.class)).thenReturn(Map.of(
-            "converter1", converter1,
-            "default", defaultConverter,
-            "converter2", converter2
-        ));
+        Map<String, Object> instanceMap = new LinkedHashMap<>();
+        instanceMap.put("converter1", converter1);
+        instanceMap.put("default", defaultConverter);
+        instanceMap.put("converter2", converter2);
+        when(this.contextComponentManager.getInstanceMap(RequestParameterConverter.class)).thenReturn(instanceMap);
 
         ServletRequest request2 = mock(ServletRequest.class);
 

@@ -704,7 +704,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         String repositoryId = this.utils.get(Extension.FIELD_REPOSITORY, document);
 
-        return this.extensionManager.getRepository(repositoryId);
+        return repositoryId != null ? this.extensionManager.getRepository(repositoryId) : null;
     }
 
     public ExtensionId getExtensionId(SolrDocument document)

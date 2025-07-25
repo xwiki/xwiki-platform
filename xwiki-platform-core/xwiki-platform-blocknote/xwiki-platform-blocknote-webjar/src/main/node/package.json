@@ -52,7 +52,7 @@
     "typescript-eslint": "8.35.0",
     "vite": "6.3.5",
     "vitest": "3.2.4",
-    "vue-tsc": "2.2.10"
+    "vue-tsc": "3.0.4"
   },
   "pnpm": {
     "overrides": {

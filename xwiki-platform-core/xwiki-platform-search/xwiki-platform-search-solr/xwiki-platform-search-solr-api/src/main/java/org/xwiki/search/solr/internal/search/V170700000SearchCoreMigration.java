@@ -17,47 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.search.solr.internal.search;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.search.solr.Solr;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.search.solr.SolrException;
-import org.xwiki.search.solr.internal.search.SearchCoreInitializer;
+import org.xwiki.search.solr.XWikiSolrCore;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 
 /**
- * A wrapper around the new {@link Solr} API for the search core.
+ * Add the docId field.
  * 
  * @version $Id$
- * @since 12.2
+ * @since 17.7.0RC1
  */
 @Component
+@Named("170700000")
 @Singleton
-public class SolrClientInstance extends AbstractSolrInstance
+public class V170700000SearchCoreMigration extends AbstractSearchCoreMigration
 {
-    /**
-     * The name of the core containing the XWiki search index.
-     */
-    public static final String CORE_NAME = SearchCoreInitializer.CORE_NAME;
-
     @Inject
-    private Solr solr;
+    @Named("local")
+    private EntityReferenceSerializer<String> localSerializer;
 
     @Override
-    public void initialize() throws InitializationException
+    public long getVersion()
     {
-        try {
-            this.server = this.solr.getCore(SearchCoreInitializer.CORE_NAME);
-        } catch (SolrException e) {
-            throw new InitializationException("Failed to create the solr client for core [search]", e);
+        return 170500000;
+    }
+
+    @Override
+    public void migrate(XWikiSolrCore core) throws SolrException
+    {
+        if (this.solrSchema.getFields(core, false).get(FieldUtils.DOC_ID) == null) {
+            // Add the docId field to the schema
+            this.solrSchema.setStringField(core, FieldUtils.DOC_ID, false, false);
         }
 
-        if (this.server == null) {
-            throw new InitializationException(
-                "No core with name [" + SearchCoreInitializer.CORE_NAME + "] could be found");
-        }
+        // The standard re-index is taking care of re-indexing document with missing docId
     }
 }

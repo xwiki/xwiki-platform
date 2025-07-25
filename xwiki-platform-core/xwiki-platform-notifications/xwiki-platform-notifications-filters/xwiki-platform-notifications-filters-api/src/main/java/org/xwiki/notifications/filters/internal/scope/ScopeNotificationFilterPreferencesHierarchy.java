@@ -46,14 +46,22 @@ public class ScopeNotificationFilterPreferencesHierarchy
     {
         this.preferences = preferences;
 
-        // Compare preferences 2 by 2 to see if some are children of the other
-        for (ScopeNotificationFilterPreference pref : preferences) {
-            for (ScopeNotificationFilterPreference otherPref : preferences) {
-                if (pref == otherPref) {
+        List<ScopeNotificationFilterPreference> potentialParents = preferences.stream()
+            .filter(ScopeNotificationFilterPreference::isPotentialParent)
+            .toList();
+
+        List<ScopeNotificationFilterPreference> potentialChildren = preferences.stream()
+            .filter(ScopeNotificationFilterPreference::isPotentialChild)
+            .toList();
+
+        // Compare potential parents and potential children to see if some are children of the other.
+        for (ScopeNotificationFilterPreference potentialParent : potentialParents) {
+            for (ScopeNotificationFilterPreference potentialChild : potentialChildren) {
+                if (potentialChild == potentialParent) {
                     continue;
                 }
-                if (otherPref.isParentOf(pref)) {
-                    otherPref.addChild(pref);
+                if (potentialParent.isParentOf(potentialChild)) {
+                    potentialParent.addChild(potentialChild);
                 }
             }
         }

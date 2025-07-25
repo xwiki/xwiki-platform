@@ -127,6 +127,22 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     /**
+     * @return true if the current filter preference is a potential parent of other preferences, false otherwise.
+     */
+    public boolean isPotentialParent()
+    {
+        return getFilterType() == NotificationFilterType.EXCLUSIVE;
+    }
+
+    /**
+     * @return true if the current filter preference is a potential child of other preferences, false otherwise.
+     */
+    public boolean isPotentialChild()
+    {
+        return getFilterType() == NotificationFilterType.INCLUSIVE;
+    }
+
+    /**
      * @return the resolved reference of the current notification preference.
      */
     public EntityReference getScopeReference()

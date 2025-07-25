@@ -319,7 +319,7 @@ XWiki.Dashboard = Class.create( {
       return;
     }
     button.addClassName('loading');
-    require(['gadgetWizard'], (gadgetWizard)=> {
+    require(['gadgetWizard'], (gadgetWizard) => {
       gadgetWizard(gadget, this.sourceSyntax).then(callback).finally(() => {
         button.removeClassName('loading');
       });

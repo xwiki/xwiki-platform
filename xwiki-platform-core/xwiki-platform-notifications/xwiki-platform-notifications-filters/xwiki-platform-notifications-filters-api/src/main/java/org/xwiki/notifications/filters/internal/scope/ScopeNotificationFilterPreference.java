@@ -121,13 +121,16 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
         //
         // So a filter could be the parent of an other only if the other is an inclusive filter and if the current
         // is a exclusive filter
-        return getFilterType() == NotificationFilterType.EXCLUSIVE
-                && other.getFilterType() == NotificationFilterType.INCLUSIVE
-                && other.getScopeReference().hasParent(this.getScopeReference());
+        return isPotentialParent()
+            && other.isPotentialChild()
+            && other.getScopeReference().hasParent(this.getScopeReference());
     }
 
     /**
-     * @return true if the current filter preference is a potential parent of other preferences, false otherwise.
+     * @return true if the current filter preference is a potential parent of other preferences, false otherwise
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
      */
     public boolean isPotentialParent()
     {
@@ -135,7 +138,10 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     }
 
     /**
-     * @return true if the current filter preference is a potential child of other preferences, false otherwise.
+     * @return true if the current filter preference is a potential child of other preferences, false otherwise
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
      */
     public boolean isPotentialChild()
     {

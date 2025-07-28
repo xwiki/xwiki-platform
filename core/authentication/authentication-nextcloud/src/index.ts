@@ -19,6 +19,7 @@
  */
 
 import { NextcloudBasicAuthenticationManager } from "./NextcloudBasicAuthenticationManager";
+import { NextcloudLoginFlowAuthenticationManager } from "./NextcloudLoginFlowAuthenticationManager";
 import { NextcloudOAuth2AuthenticationManager } from "./NextcloudOAuth2AuthenticationManager";
 import { NextcloudAuthenticationState } from "@xwiki/cristal-authentication-nextcloud-state";
 import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
@@ -31,6 +32,11 @@ export class ComponentInit {
       .to(NextcloudBasicAuthenticationManager)
       .inSingletonScope()
       .whenNamed("Nextcloud/basic");
+    container
+      .bind<AuthenticationManager>("AuthenticationManager")
+      .to(NextcloudLoginFlowAuthenticationManager)
+      .inSingletonScope()
+      .whenNamed("Nextcloud/login-flow");
     container
       .bind<AuthenticationManager>("AuthenticationManager")
       .to(NextcloudOAuth2AuthenticationManager)

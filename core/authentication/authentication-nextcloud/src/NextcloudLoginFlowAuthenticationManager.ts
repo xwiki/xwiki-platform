@@ -19,7 +19,6 @@
  */
 
 import { AuthenticationManager } from "@xwiki/cristal-authentication-api";
-import { NextcloudAuthenticationState } from "@xwiki/cristal-authentication-nextcloud-state";
 import { inject, injectable } from "inversify";
 import Cookies from "js-cookie";
 import type { CristalApp, WikiConfig } from "@xwiki/cristal-api";
@@ -27,19 +26,15 @@ import type { UserDetails } from "@xwiki/cristal-authentication-api";
 import type { CookieAttributes } from "js-cookie";
 
 /**
- * {@link AuthenticationManager} for the Nextcloud backend, using Basic auth.
+ * {@link AuthenticationManager} for the Nextcloud backend, using login flow v2.
  *
- * @since 0.16
+ * @since 0.20
  */
 @injectable()
-export class NextcloudBasicAuthenticationManager
+export class NextcloudLoginFlowAuthenticationManager
   implements AuthenticationManager
 {
-  constructor(
-    @inject("CristalApp") private readonly cristalApp: CristalApp,
-    @inject(NextcloudAuthenticationState)
-    private readonly authenticationState: NextcloudAuthenticationState,
-  ) {}
+  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
 
   private readonly accessTokenCookieKeyPrefix = "accessToken";
 
@@ -53,27 +48,52 @@ export class NextcloudBasicAuthenticationManager
   async start(): Promise<void> {
     const config = this.cristalApp.getWikiConfig();
 
-    this.authenticationState.callback.value = () => {
-      Cookies.set(
-        this.getAccessTokenCookieKey(config.name),
-        btoa(
-          `${this.authenticationState.username.value}:${this.authenticationState.password.value}`,
-        ),
-        this.cookiesOptions,
-      );
-      Cookies.set(
-        this.getUserIdCookieKey(config.name),
-        this.authenticationState.username.value,
-        this.cookiesOptions,
-      );
-      // We reload the content on successful login.
-      window.location.reload();
-    };
-    this.authenticationState.modalOpened.value = true;
+    const loginFlowUrl = `${config.baseURL}/index.php/login/v2`;
+
+    const loginFlowResponse = await fetch(loginFlowUrl, { method: "POST" });
+    const jsonLoginFlowResponse: {
+      poll: { token: string; endpoint: string };
+      login: string;
+    } = await loginFlowResponse.json();
+
+    window.open(jsonLoginFlowResponse.login, "_blank");
+
+    // This interval handles polling Nextcloud for the access token.
+    // It will return a 404 error until the login process has succeeded.
+    const intervalId = setInterval(async () => {
+      const response = await fetch(jsonLoginFlowResponse.poll.endpoint, {
+        method: "POST",
+        body: new URLSearchParams({
+          token: jsonLoginFlowResponse.poll.token,
+        }),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+      if (response.ok) {
+        const jsonResponse: {
+          loginName: string;
+          appPassword: string;
+        } = await response.json();
+        Cookies.set(
+          this.getAccessTokenCookieKey(config.name),
+          btoa(`${jsonResponse.loginName}:${jsonResponse.appPassword}`),
+          this.cookiesOptions,
+        );
+        Cookies.set(
+          this.getUserIdCookieKey(config.name),
+          jsonResponse.loginName,
+          this.cookiesOptions,
+        );
+        clearInterval(intervalId);
+        // We reload the content on successful login.
+        window.location.reload();
+      }
+    }, 3000);
   }
 
   async callback(): Promise<void> {
-    console.warn("No callback registered for basic auth.");
+    console.warn("No callback registered for login flow.");
   }
 
   async getUserDetails(): Promise<UserDetails> {
@@ -114,12 +134,12 @@ export class NextcloudBasicAuthenticationManager
 
   private getAccessTokenCookieKey(configName?: string) {
     const config = this.resolveConfig(configName);
-    return `${this.accessTokenCookieKeyPrefix}-basic-${config?.baseURL}`;
+    return `${this.accessTokenCookieKeyPrefix}-login-flow-${config?.baseURL}`;
   }
 
   private getUserIdCookieKey(configName?: string) {
     const config = this.resolveConfig(configName);
-    return `${this.userIdCookieKeyPrefix}-basic-${config?.baseURL}`;
+    return `${this.userIdCookieKeyPrefix}-login-flow-${config?.baseURL}`;
   }
 
   private resolveConfig(configName?: string): WikiConfig {

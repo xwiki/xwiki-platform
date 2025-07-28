@@ -41,16 +41,23 @@ contextBridge.exposeInMainWorld("authenticationNextcloud", {
     });
   },
 
+  async loginFlow(baseUrl: string): Promise<void> {
+    return ipcRenderer.invoke("authentication:nextcloud:loginFlow", {
+      baseUrl,
+    });
+  },
+
   async isLoggedIn(mode: string): Promise<boolean> {
     return ipcRenderer.invoke("authentication:nextcloud:isLoggedIn", {
       mode,
     });
   },
 
-  async getUserDetails(mode: string): Promise<UserDetails> {
+  async getUserDetails(baseUrl: string, mode: string): Promise<UserDetails> {
     const userDetails: UserDetails = await ipcRenderer.invoke(
       "authentication:nextcloud:userDetails",
       {
+        baseUrl,
         mode,
       },
     );

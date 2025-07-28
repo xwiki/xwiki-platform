@@ -37,7 +37,7 @@ import {
 } from "./storage.js";
 import { UserDetails } from "@xwiki/cristal-authentication-api";
 import axios from "axios";
-import { BrowserWindow, ipcMain } from "electron";
+import { BrowserWindow, ipcMain, shell } from "electron";
 
 const callbackUrl = "http://callback/";
 
@@ -158,6 +158,57 @@ export function load(
   );
 
   ipcMain.handle(
+    "authentication:nextcloud:loginFlow",
+    async (
+      _event,
+      {
+        baseUrl,
+      }: {
+        baseUrl: string;
+      },
+    ): Promise<void> => {
+      const loginFlowUrl = `${baseUrl}/index.php/login/v2`;
+
+      const loginFlowResponse = await fetch(loginFlowUrl, { method: "POST" });
+      const jsonLoginFlowResponse: {
+        poll: { token: string; endpoint: string };
+        login: string;
+      } = await loginFlowResponse.json();
+
+      shell.openExternal(jsonLoginFlowResponse.login);
+
+      // This interval handles polling Nextcloud for the access token.
+      // It will return a 404 error until the login process has succeeded.
+      const intervalId = setInterval(async () => {
+        const response = await fetch(jsonLoginFlowResponse.poll.endpoint, {
+          method: "POST",
+          body: new URLSearchParams({
+            token: jsonLoginFlowResponse.poll.token,
+          }),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        });
+        if (response.ok) {
+          const jsonResponse: {
+            loginName: string;
+            appPassword: string;
+          } = await response.json();
+          setAccessToken(
+            btoa(`${jsonResponse.loginName}:${jsonResponse.appPassword}`),
+            "login-flow",
+          );
+          setTokenType("Basic", "login-flow");
+          setUserId(jsonResponse.loginName, "login-flow");
+          clearInterval(intervalId);
+          // We reload the content on successful login.
+          reload(browserWindow);
+        }
+      }, 3000);
+    },
+  );
+
+  ipcMain.handle(
     "authentication:nextcloud:isLoggedIn",
     async (_event, { mode }: { mode: string }) => {
       const tokenType = getTokenType(mode);
@@ -176,8 +227,8 @@ export function load(
       return {
         profile: `${baseUrl}/u/${userId}`,
         username: userId,
-        name: userId!, // TODO: Find a way to get the display name.
-        avatar: `${baseUrl}/avatar/${userId}/64`,
+        name: userId!, // TODO: Find a way to get the display name (CRISTAL-589).
+        avatar: `${baseUrl}/avatar/${userId}/64`, // We want the 64x64 avatar.
       };
     },
   );

@@ -21,6 +21,7 @@
 import { UserDetails } from "@xwiki/cristal-authentication-api";
 import { NextcloudAuthenticationState } from "@xwiki/cristal-authentication-nextcloud-state";
 import { inject, injectable } from "inversify";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 
 interface AuthenticationWindow extends Window {
@@ -29,7 +30,7 @@ interface AuthenticationWindow extends Window {
 
     isLoggedIn(mode: string): Promise<boolean>;
 
-    getUserDetails(mode: string): Promise<UserDetails>;
+    getUserDetails(baseUrl: string, mode: string): Promise<UserDetails>;
 
     getAuthorizationValue(mode: string): Promise<{
       tokenType: string;
@@ -46,6 +47,7 @@ export class NextcloudBasicAuthenticationManager
   implements AuthenticationManager
 {
   constructor(
+    @inject("CristalApp") private readonly cristalApp: CristalApp,
     @inject(NextcloudAuthenticationState)
     private readonly authenticationState: NextcloudAuthenticationState,
   ) {}
@@ -78,7 +80,11 @@ export class NextcloudBasicAuthenticationManager
   }
 
   async getUserDetails(): Promise<UserDetails> {
-    return window.authenticationNextcloud.getUserDetails("basic");
+    const config = this.cristalApp.getWikiConfig();
+    return window.authenticationNextcloud.getUserDetails(
+      config.baseURL,
+      "basic",
+    );
   }
 
   async logout(): Promise<void> {

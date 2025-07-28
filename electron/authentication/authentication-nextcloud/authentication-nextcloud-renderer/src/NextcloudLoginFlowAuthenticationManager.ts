@@ -19,17 +19,13 @@
  */
 
 import { UserDetails } from "@xwiki/cristal-authentication-api";
-import AsyncLock from "async-lock";
 import { inject, injectable } from "inversify";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 
 interface AuthenticationWindow extends Window {
   authenticationNextcloud: {
-    loginOauth2: (
-      baseUrl: string,
-      authenticationBaseUrl: string,
-    ) => Promise<void>;
+    loginFlow: (baseUrl: string) => Promise<void>;
 
     isLoggedIn(mode: string): Promise<boolean>;
 
@@ -53,20 +49,15 @@ interface AuthenticationWindow extends Window {
 declare const window: AuthenticationWindow;
 
 @injectable()
-export class NextcloudOAuth2AuthenticationManager
+export class NextcloudLoginFlowAuthenticationManager
   implements AuthenticationManager
 {
   constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
 
-  private readonly lock = new AsyncLock();
-
   async start(): Promise<void> {
     const config = this.cristalApp.getWikiConfig();
 
-    await window.authenticationNextcloud.loginOauth2(
-      config.baseURL,
-      config.authenticationBaseURL!,
-    );
+    await window.authenticationNextcloud.loginFlow(config.baseURL);
   }
 
   async callback(): Promise<void> {
@@ -76,34 +67,28 @@ export class NextcloudOAuth2AuthenticationManager
   async getAuthorizationHeader(): Promise<string | undefined> {
     const authenticated = await this.isAuthenticated();
     if (authenticated) {
-      // We lock this process to avoid sending multiple refresh requests at the
-      // same time.
-      await this.lock.acquire("refresh", async () => {
-        await window.authenticationNextcloud.refreshToken(
-          this.cristalApp.getWikiConfig().baseURL,
-          this.cristalApp.getWikiConfig().authenticationBaseURL!,
-        );
-      });
       const { tokenType, accessToken } =
-        await window.authenticationNextcloud.getAuthorizationValue("oauth2");
+        await window.authenticationNextcloud.getAuthorizationValue(
+          "login-flow",
+        );
       return `${tokenType} ${accessToken}`;
     }
   }
 
   async isAuthenticated(): Promise<boolean> {
-    return window.authenticationNextcloud.isLoggedIn("oauth2");
+    return window.authenticationNextcloud.isLoggedIn("login-flow");
   }
 
   async getUserDetails(): Promise<UserDetails> {
     const config = this.cristalApp.getWikiConfig();
     return window.authenticationNextcloud.getUserDetails(
       config.baseURL,
-      "oauth2",
+      "login-flow",
     );
   }
 
   async logout(): Promise<void> {
-    await window.authenticationNextcloud.logout("oauth2");
+    await window.authenticationNextcloud.logout("login-flow");
   }
 
   getUserId(): string | undefined {

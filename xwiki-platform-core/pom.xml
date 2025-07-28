@@ -150,25 +150,7 @@
             </revapi.differences>
             -->
 
-            <revapi.differences>
-              <justification>Stop using json-lib because it hasn't been maintained for a long time and it depends on the old commons-lang (2.x) which has known security vulnerabilities.</justification>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method net.sf.json.JSONObject com.xpn.xwiki.plugin.packaging.Package::toJSON(com.xpn.xwiki.XWikiContext)</old>
-                  <new>method java.lang.Object com.xpn.xwiki.plugin.packaging.Package::toJSON(com.xpn.xwiki.XWikiContext)</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method net.sf.json.JSONObject com.xpn.xwiki.plugin.packaging.PackageAPI::toJSON()</old>
-                  <new>method java.lang.Object com.xpn.xwiki.plugin.packaging.PackageAPI::toJSON()</new>
-                  <justification>Velocity scripts using this API should continue to work as long as they don't rely on the fact that the return value is of type net.sf.json.JSONObject</justification>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

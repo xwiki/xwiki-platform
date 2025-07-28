@@ -338,7 +338,9 @@
                       insertedObject = insertedElement.find('.xobject');
                     } else if (insertedElement.hasClass('xobject')) {
                       // clean up the deletion array if we add back a deleted object.
-                      let xclassName = self.getXClassNameFromXObjectId(insertedElement.attr('id'));
+                      insertedObject = insertedElement.filter('.xobject');
+                      // clean up the deletion array if we add back a deleted object.
+                      let xclassName = self.getXClassNameFromXObjectId(insertedObject.attr('id'));
                       if (self.editorStatus.deletedXObjects[xclassName] !== undefined) {
                         let deletionArray = self.editorStatus.deletedXObjects[xclassName];
                         // be sure to remove the requested object number from the array first.
@@ -350,11 +352,11 @@
                           delete self.editorStatus.deletedXObjects[xclassName];
                         }
                       }
-                      self.enhanceObjectUX(insertedElement, false);
-                      let classId = insertedElement.attr('id').replace(/^xobject_/, "xclass_").replace(/_\d+$/, "");
+                      self.enhanceObjectUX(insertedObject, false);
+                      let classId = insertedObject.attr('id').replace(/^xobject_/, "xclass_").replace(/_\d+$/, "");
                       let xclass = $('#' + CSS.escape(classId));
                       if (xclass.length > 0) {
-                        xclass.find('.add_xobject').before(insertedElement);
+                        xclass.find('.add_xobject').before(insertedObject);
                         self.updateXObjectCount(xclass);
                       }
                       insertedObject = insertedElement;

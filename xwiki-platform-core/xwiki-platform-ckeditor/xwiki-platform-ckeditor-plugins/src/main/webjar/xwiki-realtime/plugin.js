@@ -77,176 +77,126 @@
             // The result of editor.getSnapshot() right after switching to source.
             previousValue: null
           };
-          editor.on('beforeSetMode', this.beforeSetMode.bind(this));
-          editor.on('mode', this.mode.bind(this));
+          editor.on('beforeModeUnload', this.onBeforeModeUnload.bind(this));
+          CKEDITOR.plugins.xwikiSource?.addModeChangeHandler(editor, this.onModeChanged.bind(this), 10);
+          editor.on('modeReady', this.onModeReady.bind(this));
         }, resolve, reject), reject);
       }));
     },
 
-    mode: function(event) {
-      // The user should not be able to join the realtime editing session while in source mode.
-      // We disable the allow realtime checkbox while in source mode, and enable it when we go back to wysiwyg.
+    onBeforeModeUnload: function(event) {
       const editor = event.editor;
-      const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
-
-      realtimeCheckbox.prop('disabled', editor.mode !== 'wysiwyg');
+      if (editor.mode === 'wysiwyg') {
+        // Store the dirty state before leaving the WYSIWYG mode.
+        editor._realtimeSource.dirty = editor.checkDirty();
+      } else if (editor.mode === 'source') {
+        // Update the dirty state before leaving the Source mode because we can join the realtime session when switching
+        // to WYSIWYG mode only if the content is not dirty (or there is no one else in the editing session). The
+        // content is dirty if there are unsaved changes made before switching to Source mode or while in Source mode.
+        editor._realtimeSource.dirty = editor._realtimeSource.dirty ||
+          (editor._realtimeSource.previousValue !== editor.getSnapshot());
+      }
     },
 
-    beforeSetMode: function(event) {
-
-      const newMode = event.data;
-      const editor = event.editor;
+    onModeChanged: async function(editor, {previousMode}) {
       const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
 
-      // This handles the switching between wysiwyg and source mode.
-      // The switch between wysiwyg and source modes marks the editor as dirty.
-      // But we would like to rely on the dirty state of the editor to decide wether
-      // or not to re-join the realtime session after editing the source.
-      // To determine wether or not the editor is dirty, CKEditor compares the current
-      // snapshot of the content to a snapshot saved during a editor.resetDirty() call.
-      // We need to keep track of the dirty state ourselves by saving a snapshot.
+      // This handles the switching between wysiwyg and source mode. The switch between wysiwyg and source modes marks
+      // the editor as dirty. But we would like to rely on the dirty state of the editor to decide wether or not to
+      // re-join the realtime session after editing the source. To determine wether or not the editor is dirty, CKEditor
+      // compares the current snapshot of the content to a snapshot saved during a editor.resetDirty() call. We need to
+      // keep track of the dirty state ourselves by saving a snapshot.
 
-      // When switching back to wysiwyg, even without editing the source, the content
-      // can be marked as dirty, making switching back and forth between wysiwyg and source
-      // leave the realtime session permanently even when no changes were made.
-      // To prevent that, we reset the dirty state when the realtime-tracked dirty
-      // state is clean.
+      // When switching back to wysiwyg, even without editing the source, the content can be marked as dirty, making
+      // switching back and forth between wysiwyg and source leave the realtime session permanently even when no changes
+      // were made. To prevent that, we reset the dirty state when the realtime-tracked dirty state is clean.
 
-      // We use the beforeSetMode event to capture the dirty state prior to the mode change,
-      // and abort the realtime session before the iframe (when in framed wysiwyg) is destroyed.
-      // We use the dataReady event to restore the dirty state once the mode change is done.
-      // and re-join the realtime session if suitable.
+      // We use a mode change handler to capture the dirty state prior to the mode change, and abort the realtime
+      // session before the iframe (when in framed wysiwyg) is destroyed. We use the modeReady event to restore the
+      // dirty state once the mode change is done. and re-join the realtime session if suitable.
 
-      // We keep track of the realtime status before switching to source mode in the
-      // editor._realtimeSource attribute.
+      // We keep track of the realtime status before switching to source mode in the editor._realtimeSource attribute.
 
-      if (editor.mode === 'wysiwyg' && newMode === 'source') {
-        // Switching from wysiwyg to source mode.
+      if (previousMode === 'wysiwyg' && editor.mode === 'source') {
+        // Switching from WYSIWYG to Source mode.
 
-        // Store the realtime state before switching to source mode
-        // in order to restore the state when switching back to wysiwyg mode.
+        // Store the realtime state before switching to Source mode in order to restore the state when switching back to
+        // WYSIWYG mode.
         editor._realtimeSource.realtime = realtimeCheckbox.prop('checked');
 
-        // When using the iframed editor, switching to source destroys the iframe,
-        // preventing the realtime framework from applying new patches.
-        // We need to leave the realtime session when switching to source mode
-        // in order to avoid unexpected behaviour.
+        // When using the iframed editor, switching to source destroys the iframe, preventing the realtime framework
+        // from applying new patches. We need to leave the realtime session when switching to source mode in order to
+        // avoid unexpected behaviour.
         if (editor._realtimeSource.realtime) {
-
-          // Store the dirty state before switching to source mode.
-          editor._realtimeSource.dirty = editor.checkDirty();
-
-          // Abort the realtime session.
-          editor._realtime._onAbort();
-
-          // Show the user that we left the realtime session.
-          realtimeCheckbox.prop('checked', false);
-
-
-          // We listen for the `dataReady` event and not the `mode` event
-          // because the xwiki-source plugin listens for `mode` to update
-          // the content of the sourcearea.
-          // Because of this, dataReady is fired only once after a switch
-          // to source.
-          const dataReady = function() {
-            // After switching to source.
-
-            // Bulletproofing, when switching to source, setData is called multiple times.
-            if (editor.mode !== 'source') {
-              editor.once('dataReady', dataReady);
-              return;
-            }
-
-            // Once the mode switch is done, we store a snapshot of the editor
-            // allowing to check if changes were made when switching back to wysiwyg.
-            editor._realtimeSource.previousValue = editor.getSnapshot();
-          };
-
-          editor.once('dataReady', dataReady);
-
-          // Show a notification explaining that we temporarily left the realtime session.
-          editor.showNotification(editor.localization.get(
-            'xwiki-realtime.notification.sourcearea.temporarilyLeftSession'));
+          await this.onSourceFromWYSIWYG(editor, realtimeCheckbox);
         }
-
-      } else if (editor.mode === 'source' && newMode === 'wysiwyg') {
-        // Swithing from source to wysiwyg mode.
-
-        // We only need to change the behavior if we were in a realtime session before switching to source.
-        if (editor._realtimeSource.realtime) {
-
-          // Before switching to wysiwyg, check wether the source was edited.
-          const sourceDirty = editor._realtimeSource.previousValue !== editor.getSnapshot();
-
-          // There are unsaved changes if there were unsaved changes before switching to source
-          // or if there were changes made while we were in source view.
-          const dirty = editor._realtimeSource.dirty || sourceDirty;
-
-          const dataReady = function () {
-            // After switching to wysiwyg.
-
-            // Bulletproofing, in iframe mode, when switching to wysiwyg, setData is called multiple times.
-            if (editor.mode !== 'wysiwyg') {
-              editor.once('dataReady', dataReady);
-              return;
-            }
-
-            // Update the realtime channels to prepare joining the realtime session,
-            // as well as knowing if there are users in the session.
-            editor._realtime._updateChannels().then(() => {
-
-              // When the editor is dirty, we can join only if we are alone.
-              if (dirty) {
-                /*jshint -W106 */
-                if (editor._realtime._realtimeContext.channels.wysiwyg_users > 0) {
-                  /*jshint +W106 */
-
-                  // Show a notification explaining that we are not rejoining the realtime session.
-                  editor.showNotification(
-                    editor.localization.get('xwiki-realtime.notification.sourcearea.notRejoiningSession'),
-                    'warning',
-                    5000);
-                } else {
-                  // Join the realtime session.
-
-                  // Show a notification explaining that we are rejoining the session because we are alone.
-                  editor.showNotification(
-                    editor.localization.get('xwiki-realtime.notification.sourcearea.rejoiningSession.alone'),
-                    'success');
-                  realtimeCheckbox.prop('checked', true);
-                  editor._realtime._startRealtimeSync();
-                }
-              } else {
-                // Join the realtime session.
-                editor.showNotification(
-                  editor.localization.get('xwiki-realtime.notification.sourcearea.rejoiningSession.noChanges'),
-                  'success');
-                realtimeCheckbox.prop('checked', true);
-
-                const readOnly = function () {
-                  // Bulletproofing, the readOnly event is triggered when making the editor read-write
-                  // but also when making the editor read-only.
-                  // We know that the realtime sync is ready when the editor is made read-write.
-                  if (editor.readOnly) {
-                    editor.once('readOnly', readOnly);
-                    return;
-                  }
-                  // There are no unsaved changes.
-                  // But the editor might consider itself dirty because of the mode change.
-                  editor.resetDirty();
-                };
-                editor.once('readOnly', readOnly);
-
-                editor._realtime._startRealtimeSync();
-
-              }
-            });
-          };
-
-          editor.once('dataReady', dataReady);
-        }
-
+      } else if (previousMode === 'source' && editor.mode === 'wysiwyg' && editor._realtimeSource.realtime) {
+        // Swithing from Source back to WYSIWYG mode, which had realtime enabled before the switch.
+        await this.onWYSIWYGFromSource(editor, realtimeCheckbox);
       }
+    },
+
+    onSourceFromWYSIWYG: async function(editor, realtimeCheckbox) {
+      // Abort the realtime session. This operation is asynchronous because we want to push uncommitted work before
+      // disconnecting.
+      await editor._realtime._onAbort();
+
+      // Show the user that we left the realtime session.
+      realtimeCheckbox.prop('checked', false);
+
+      // Show a notification explaining that we temporarily left the realtime session.
+      editor.showNotification(editor.localization.get(
+        'xwiki-realtime.notification.sourcearea.temporarilyLeftSession'));
+    },
+
+    onWYSIWYGFromSource: async function(editor, realtimeCheckbox) {
+      // Update the realtime channels to prepare joining the realtime session, as well as knowing if there are users
+      // in the session.
+      await editor._realtime._updateChannels();
+
+      let translationKey = 'xwiki-realtime.notification.sourcearea.rejoiningSession.noChanges';
+      let rejoin = true;
+
+      // When the editor is dirty, we can join only if we are alone.
+      if (editor._realtimeSource.dirty) {
+        /*jshint -W106 */
+        if (editor._realtime._realtimeContext.channels.wysiwyg_users > 0) {
+          /*jshint +W106 */
+
+          translationKey = 'xwiki-realtime.notification.sourcearea.notRejoiningSession';
+          rejoin = false;
+        } else {
+          translationKey = 'xwiki-realtime.notification.sourcearea.rejoiningSession.alone';
+        }
+      }
+
+      editor.showNotification(
+        editor.localization.get(translationKey),
+        rejoin ? 'success' : 'warning',
+        rejoin ? undefined : 5000
+      );
+      if (rejoin) {
+        realtimeCheckbox.prop('checked', true);
+        editor._realtime._startRealtimeSync();
+      }
+    },
+
+    onModeReady: function(event) {
+      const editor = event.editor;
+
+      if (editor.mode === 'source') {
+        // Once the mode switch is done, we store a snapshot of the source allowing to check if changes were made when
+        // switching back to WYSIWYG.
+        editor._realtimeSource.previousValue = editor.getSnapshot();
+      } else if (editor.mode === 'wysiwyg' && !editor._realtimeSource.dirty) {
+        // There are no unsaved changes. But the editor might consider itself dirty because of the mode change.
+        editor.resetDirty();
+      }
+
+      // The user should not be able to join the realtime editing session while in source mode. We disable the allow
+      // realtime checkbox while in source mode, and enable it when we go back to wysiwyg.
+      const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
+      realtimeCheckbox.prop('disabled', editor.mode !== 'wysiwyg');
     }
   });
 
@@ -326,13 +276,6 @@
     await new Promise((resolve, reject) => {
       require(['xwiki-realtime-wysiwyg'], asyncRequireCallback(RealtimeWysiwygEditor => {
         editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), realtimeContext);
-
-        // When someone is offline, they may have left their tab open for a long time and the lock may have
-        // disappeared. We're refreshing it when the editor is focused so that other users will know that someone is
-        // editing the document.
-        editor.on('focus', () => {
-          editor._realtime.lockDocument();
-        });
       }, resolve, reject), reject);
     });
   }

@@ -39,12 +39,10 @@ import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.render.ScriptXWikiServletRequest;
-
-import net.sf.json.JSON;
-import net.sf.json.JSONObject;
 
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -109,11 +107,11 @@ class FileUploaderPageTest extends PageTest
 
         when(attachment.getFilename()).thenReturn("test.txt");
 
-        JSON json = renderJSONPage(documentReference);
+        JsonNode json = renderJSONPage(documentReference);
 
-        assertEquals(1, ((JSONObject) json).get("uploaded"));
-        assertEquals("/xwiki/bin/download/CKEditor/FileUploader/test.txt", ((JSONObject) json).get("url"));
-        assertEquals("test.txt", ((JSONObject) json).get("fileName"));
+        assertEquals(1, json.get("uploaded").asInt());
+        assertEquals("/xwiki/bin/download/CKEditor/FileUploader/test.txt", json.get("url").asText());
+        assertEquals("test.txt", json.get("fileName").asText());
     }
 
     @Test
@@ -128,11 +126,11 @@ class FileUploaderPageTest extends PageTest
         when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(documentReference, "upload",
             "test.txt")).thenThrow(new AttachmentValidationException("message", 42, "translationKey", null));
 
-        JSONObject json = renderJSONPage(documentReference);
+        JsonNode json = renderJSONPage(documentReference);
 
-        assertEquals(0, json.get("uploaded"));
-        assertEquals(400, json.getJSONObject("error").get("number"));
-        assertEquals("translationKey", json.getJSONObject("error").get("message"));
+        assertEquals(0, json.get("uploaded").asInt());
+        assertEquals(400, json.get("error").get("number").asInt());
+        assertEquals("translationKey", json.get("error").get("message").asText());
     }
 
     @Test
@@ -147,11 +145,12 @@ class FileUploaderPageTest extends PageTest
         when(this.temporaryAttachmentsScriptService.uploadTemporaryAttachment(documentReference, "upload",
             "test.txt")).thenThrow(mock(TemporaryAttachmentException.class));
 
-        JSONObject json = renderJSONPage(documentReference);
+        JsonNode json = renderJSONPage(documentReference);
 
-        assertEquals(0, json.get("uploaded"));
-        assertEquals(400, json.getJSONObject("error").get("number"));
-        assertEquals("ckeditor.upload.error.emptyReturn", json.getJSONObject("error").get("message"));
+        assertEquals(0, json.get("uploaded").asInt());
+        assertEquals(400, json.get("error").get("number").asInt());
+        assertEquals("ckeditor.upload.error.emptyReturn", json.get("error").get("message")
+            .asText());
     }
 
     @Test
@@ -171,12 +170,12 @@ class FileUploaderPageTest extends PageTest
 
         when(attachment.getFilename()).thenReturn("__fileCreatedFromDataURI__.zip");
 
-        JSON json = renderJSONPage(documentReference);
+        JsonNode json = renderJSONPage(documentReference);
 
-        assertEquals(1, ((JSONObject) json).get("uploaded"));
+        assertEquals(1, json.get("uploaded").asInt());
         assertEquals("/xwiki/bin/download/CKEditor/FileUploader/__fileCreatedFromDataURI__.zip",
-            ((JSONObject) json).get("url"));
-        assertEquals("__fileCreatedFromDataURI__.zip", ((JSONObject) json).get("fileName"));
+            json.get("url").asText());
+        assertEquals("__fileCreatedFromDataURI__.zip", json.get("fileName").asText());
     }
 
     @Test
@@ -200,13 +199,13 @@ class FileUploaderPageTest extends PageTest
             return attachment;
         });
 
-        JSON json = renderJSONPage(documentReference);
+        JsonNode json = renderJSONPage(documentReference);
 
         String filename = attachment.getFilename();
-        assertEquals(1, ((JSONObject) json).get("uploaded"));
+        assertEquals(1, json.get("uploaded").asInt());
         assertEquals(String.format("/xwiki/bin/download/CKEditor/FileUploader/%s", filename),
-            ((JSONObject) json).get("url"));
-        assertEquals(filename, ((JSONObject) json).get("fileName"));
+            json.get("url").asText());
+        assertEquals(filename, json.get("fileName").asText());
     }
 
     private void setAttachmentSupportStatus(boolean status)

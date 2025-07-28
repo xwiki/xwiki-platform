@@ -138,7 +138,18 @@ class EditClassIT
         DocumentReference editObjectsTestClass = getTestClassDocumentReference(reference);
         ClassEditPage cep = setup.editClass(editObjectsTestClass);
         cep.addPropertyWithoutWaiting("a<b c", "String");
-        cep.waitForNotificationErrorMessage("Failed: Property names must follow these naming rules:");
+        String errorMessage =
+        setup.getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-error')]")).getText();
+        assertEquals("Failed:Property names must follow these naming rules:\n"
+            + "Names can contain letters, numbers, and the following characters: \"., -, _, :\"\n"
+            + "Names must not start with a number or punctuation character.\n"
+            + "Names must not start with the letters xml (or XML, or Xml, etc).\n"
+            + "Names cannot contain spaces.", errorMessage);
+        /*cep.waitForNotificationErrorMessage("Failed:Property names must follow these naming rules:<br/>"
+            + "Names can contain letters, numbers, and the following characters: \"., -, _, :\"<br/>"
+            + "Names must not start with a number or punctuation character.<br/>"
+            + "Names must not start with the letters xml (or XML, or Xml, etc).<br/>"
+            + "Names cannot contain spaces.");*/
     }
 
     private DocumentReference getTestClassDocumentReference(TestReference reference)

@@ -21,6 +21,7 @@
 package org.xwiki.icon.macro;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.classloader.xwiki.internal.ThreadClassloaderExecutionContextInitializer;
 import org.xwiki.environment.Environment;
 import org.xwiki.icon.Icon;
 import org.xwiki.icon.IconException;
@@ -51,7 +52,9 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-@AllComponents
+// Exclude the thread class loader execution context initializer as it is missing dependencies. It is included as a
+// dependency through the dependency on the webjars API.
+@AllComponents(excludes = ThreadClassloaderExecutionContextInitializer.class)
 public class IntegrationTests extends RenderingTest
 {
     private static final DocumentReference ICON_DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Icon", "Document");

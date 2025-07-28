@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>17.6.0-SNAPSHOT</version>
+    <version>17.7.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -44,17 +44,17 @@
       <artifactId>requirejs</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>vue-i18n</artifactId>
-      <version>11.1.5</version>
-    </dependency>
-    <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>vue-i18n</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- Used by the date filter. -->

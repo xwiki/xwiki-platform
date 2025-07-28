@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-index-tree-rest</artifactId>
-    <version>17.6.0-SNAPSHOT</version>
+    <version>17.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-index-tree-rest-api</artifactId>
   <name>XWiki Platform - Index - Tree - Rest - API</name>

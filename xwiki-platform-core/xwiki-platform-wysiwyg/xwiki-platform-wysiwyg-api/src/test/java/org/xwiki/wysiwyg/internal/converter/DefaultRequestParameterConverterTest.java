@@ -20,6 +20,7 @@
 package org.xwiki.wysiwyg.internal.converter;
 
 import java.io.Reader;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,6 +53,7 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wysiwyg.converter.RequestParameterConverter;
 import org.xwiki.wysiwyg.internal.filter.http.MutableHttpServletRequestFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -136,11 +138,29 @@ class DefaultRequestParameterConverterTest
         when(this.renderingContext.getTransformationId()).thenReturn("transformationId");
         when(this.renderingContext.isRestricted()).thenReturn(false);
 
+        RequestParameterConverter converter1 = mock(RequestParameterConverter.class);
+        RequestParameterConverter converter2 = mock(RequestParameterConverter.class);
+        RequestParameterConverter defaultConverter = mock(RequestParameterConverter.class);
+        Map<String, Object> instanceMap = new LinkedHashMap<>();
+        instanceMap.put("converter1", converter1);
+        instanceMap.put("default", defaultConverter);
+        instanceMap.put("converter2", converter2);
+        when(this.contextComponentManager.getInstanceMap(RequestParameterConverter.class)).thenReturn(instanceMap);
+
+        ServletRequest request2 = mock(ServletRequest.class);
+
+        when(converter1.convert(any(), eq(this.response))).then(invocationOnMock -> {
+            ServletRequest request = invocationOnMock.getArgument(0);
+            assertEquals("converted content", request.getParameter("test"));
+            assertEquals(1, request.getParameterMap().size());
+
+            return Optional.of(request2);
+        });
+        ServletRequest request3 = mock(ServletRequest.class);
+        when(converter2.convert(request2, this.response)).thenReturn(Optional.of(request3));
+
         Optional<ServletRequest> filteredRequest = this.converter.convert(this.request, this.response);
-
-        assertEquals("converted content", filteredRequest.get().getParameter("test"));
-        assertEquals(1, filteredRequest.get().getParameterMap().size());
-
+        assertEquals(Optional.of(request3), filteredRequest);
         verify((MutableRenderingContext) this.renderingContext).push(transformation, xdom, outputSyntax,
             "transformationId", false, outputSyntax);
         verify((MutableRenderingContext) this.renderingContext).pop();

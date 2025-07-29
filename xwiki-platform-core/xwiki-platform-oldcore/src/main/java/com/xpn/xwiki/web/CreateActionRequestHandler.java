@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -534,7 +535,7 @@ public class CreateActionRequestHandler
     private boolean matchesRestriction(String spaceStringReferenceToTest, String allowedSpaceRestriction)
     {
         return allowedSpaceRestriction.equals(spaceStringReferenceToTest)
-            || StringUtils.startsWith(spaceStringReferenceToTest, String.format("%s.", allowedSpaceRestriction));
+            || Strings.CS.startsWith(spaceStringReferenceToTest, String.format("%s.", allowedSpaceRestriction));
     }
 
     private List<String> getTemplateProviderRestrictions(BaseObject templateObject, String restrictionsProperty)

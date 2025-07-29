@@ -29,6 +29,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -92,7 +93,7 @@ public class DefaultUIExtensionManager implements UIExtensionManager
         try {
             List<UIExtension> allExtensions = componentManager.getInstanceList(UIExtension.class);
             for (UIExtension extension : allExtensions) {
-                if (StringUtils.equals(extension.getExtensionPointId(), extensionPointId)) {
+                if (Strings.CS.equals(extension.getExtensionPointId(), extensionPointId)) {
                     extensions.add(extension);
                 }
             }

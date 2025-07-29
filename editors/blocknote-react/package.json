@@ -39,7 +39,7 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "@xwiki/cristal-uniast": "workspace:*",
-    "i18next": "25.2.1",
+    "i18next": "25.3.2",
     "lodash-es": "4.17.21",
     "react": "19.1.0",
     "react-dom": "19.1.0",

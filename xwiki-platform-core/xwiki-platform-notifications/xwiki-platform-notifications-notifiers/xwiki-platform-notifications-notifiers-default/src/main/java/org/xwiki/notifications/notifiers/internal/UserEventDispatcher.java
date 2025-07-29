@@ -30,7 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -292,7 +292,7 @@ public class UserEventDispatcher
         }
 
         // FIXME: reuse constant from EventType once it's moved (see https://jira.xwiki.org/browse/XWIKI-21669)
-        if (StringUtils.equals(event.getType(), "delete")) {
+        if (Strings.CS.equals(event.getType(), "delete")) {
             this.cleanUpFilterProcessingQueue.addCleanUpTask(user, event.getDocument());
         }
 

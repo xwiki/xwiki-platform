@@ -27,7 +27,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -70,7 +70,7 @@ public class DefaultRequiredSkinExtensionsRecorder implements RequiredSkinExtens
         StringBuilder requiredSkinExtensions = new StringBuilder();
         for (Map.Entry<String, String> entry : this.requiredSkinExtensionsMap.entrySet()) {
             requiredSkinExtensions
-                .append(StringUtils.removeStart(getImportString(entry.getKey()), entry.getValue()).trim());
+                .append(Strings.CS.removeStart(getImportString(entry.getKey()), entry.getValue()).trim());
         }
         return requiredSkinExtensions.toString();
     }

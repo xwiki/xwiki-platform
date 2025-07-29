@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest;
 
@@ -249,7 +250,7 @@ public class SavedRequestRestorerFilter implements Filter
                 SavedRequest savedRequest = savedRequests.get(savedRequestId);
                 // Only reuse this request if the new request is for the same resource (URL)
                 if (savedRequest != null
-                    && StringUtils.equals(savedRequest.getRequestUrl(), request.getRequestURL().toString())) {
+                    && Strings.CS.equals(savedRequest.getRequestUrl(), request.getRequestURL().toString())) {
                     // Remove the saved request from the session
                     savedRequests.remove(savedRequestId);
                     // Return the SavedRequest

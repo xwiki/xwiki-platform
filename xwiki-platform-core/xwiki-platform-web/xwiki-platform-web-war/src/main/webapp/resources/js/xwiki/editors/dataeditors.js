@@ -110,15 +110,17 @@
         });
 
         // We want to the user to be prevented if he tries to leave the editor before saving.
-        $(document).on("beforeunload", function(event) {
-          if (Object.keys(this.editorStatus.addedXObjects).length > 0
-            || Object.keys(this.editorStatus.deletedXObjects).length > 0) {
+        // We cannot use jQuery style to listen on event for this one as apparently it's not working
+        // See: https://stackoverflow.com/questions/4376596/jquery-unload-or-beforeunload
+        window.onbeforeunload = function(event) {
+          if (Object.keys(self.editorStatus.addedXObjects).length > 0
+            || Object.keys(self.editorStatus.deletedXObjects).length > 0) {
             event.preventDefault();
             event.returnValue = "";
           } else {
             return;
           }
-        });
+        };
       }
 
       /**

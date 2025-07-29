@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
@@ -105,7 +105,7 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
     public DistributionStep getStep(String stepId)
     {
         for (DistributionStep step : getSteps()) {
-            if (StringUtils.equals(step.getId(), stepId)) {
+            if (Strings.CS.equals(step.getId(), stepId)) {
                 return step;
             }
         }

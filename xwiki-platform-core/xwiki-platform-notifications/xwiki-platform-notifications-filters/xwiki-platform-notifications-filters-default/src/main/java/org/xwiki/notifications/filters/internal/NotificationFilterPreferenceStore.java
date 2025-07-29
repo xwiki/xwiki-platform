@@ -31,7 +31,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -132,7 +132,7 @@ public class NotificationFilterPreferenceStore
         throws NotificationException
     {
         for (NotificationFilterPreference preference : getPreferencesOfUser(user)) {
-            if (StringUtils.equals(preference.getId(), filterPreferenceId)) {
+            if (Strings.CS.equals(preference.getId(), filterPreferenceId)) {
                 return preference;
             }
         }
@@ -151,7 +151,7 @@ public class NotificationFilterPreferenceStore
         throws NotificationException
     {
         for (NotificationFilterPreference preference : getPreferencesOfWiki(wikiReference)) {
-            if (StringUtils.equals(preference.getId(), filterPreferenceId)) {
+            if (Strings.CS.equals(preference.getId(), filterPreferenceId)) {
                 return preference;
             }
         }
@@ -331,7 +331,7 @@ public class NotificationFilterPreferenceStore
 
     private long getInternalIdFromId(String filterPreferenceId) throws NotificationException
     {
-        if (StringUtils.startsWith(filterPreferenceId, NotificationFilterPreference.DB_ID_FILTER_PREFIX)) {
+        if (Strings.CS.startsWith(filterPreferenceId, NotificationFilterPreference.DB_ID_FILTER_PREFIX)) {
             return Long.parseLong(
                 filterPreferenceId.substring(NotificationFilterPreference.DB_ID_FILTER_PREFIX.length()));
         } else {

@@ -36,12 +36,12 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.internal.attachment.PartAttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
+import org.xwiki.internal.attachment.PartAttachmentAccessWrapper;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPluginApi;
@@ -100,7 +100,7 @@ public final class FileUploadUtils
         if (!parts.isEmpty()) {
             List<FileItem> items = new ArrayList<>(parts.size());
             for (Part part : parts) {
-                if (StringUtils.startsWith(part.getName(), UploadAction.FILE_FIELD_NAME)) {
+                if (Strings.CS.startsWith(part.getName(), UploadAction.FILE_FIELD_NAME)) {
                     attachmentValidator.validateAttachment(new PartAttachmentAccessWrapper(part));
                 }
                 items.add(new PartFileItem(part));

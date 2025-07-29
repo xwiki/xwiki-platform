@@ -27,6 +27,7 @@ import java.util.Objects;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dom4j.Element;
 import org.dom4j.io.DocumentResult;
 import org.slf4j.Logger;
@@ -223,7 +224,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
             throw new IllegalStateException("BaseElement#setName could not be called when a reference has been set.");
         }
 
-        if (!StringUtils.equals(name, this.name)) {
+        if (!Strings.CS.equals(name, this.name)) {
             this.name = name;
             this.referenceCache = null;
 
@@ -499,7 +500,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         BaseElement<R> newBaseElement = (BaseElement<R>) newElement;
 
         // Pretty name
-        if (!StringUtils.equals(newBaseElement.getPrettyName(), getPrettyName())) {
+        if (!Strings.CS.equals(newBaseElement.getPrettyName(), getPrettyName())) {
             setPrettyName(newBaseElement.getPrettyName());
             modified = true;
         }

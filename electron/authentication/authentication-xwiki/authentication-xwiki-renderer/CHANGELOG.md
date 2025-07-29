@@ -1,5 +1,17 @@
 # @xwiki/cristal-electron-authentication-xwiki-renderer
 
+## 0.20.0
+
+### Minor Changes
+
+- Cristal 0.20 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.20.0
+  - @xwiki/cristal-authentication-api@0.20.0
+
 ## 0.20.0-rc.0
 
 ### Minor Changes

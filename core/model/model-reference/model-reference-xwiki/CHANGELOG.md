@@ -1,5 +1,18 @@
 # @xwiki/cristal-model-reference-xwiki
 
+## 0.20.0
+
+### Minor Changes
+
+- Cristal 0.20 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-document-api@0.20.0
+  - @xwiki/cristal-model-api@0.20.0
+  - @xwiki/cristal-model-reference-api@0.20.0
+
 ## 0.20.0-rc.0
 
 ### Minor Changes

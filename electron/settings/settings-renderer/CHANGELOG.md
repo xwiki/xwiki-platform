@@ -1,5 +1,17 @@
 # @xwiki/cristal-electron-settings-renderer
 
+## 0.20.0
+
+### Minor Changes
+
+- Cristal 0.20 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.20.0
+  - @xwiki/cristal-settings-api@0.20.0
+
 ## 0.20.0-rc.0
 
 ### Minor Changes

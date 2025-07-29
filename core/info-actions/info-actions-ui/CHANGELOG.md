@@ -1,5 +1,18 @@
 # @xwiki/cristal-info-actions-ui
 
+## 0.20.0
+
+### Minor Changes
+
+- Cristal 0.20 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.20.0
+  - @xwiki/cristal-icons@0.20.0
+  - @xwiki/cristal-info-actions-api@0.20.0
+
 ## 0.20.0-rc.0
 
 ### Minor Changes

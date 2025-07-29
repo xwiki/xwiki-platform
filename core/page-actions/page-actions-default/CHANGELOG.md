@@ -1,5 +1,16 @@
 # @xwiki/cristal-page-actions-default
 
+## 0.20.0
+
+### Minor Changes
+
+- Cristal 0.20 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-page-actions-api@0.20.0
+
 ## 0.20.0-rc.0
 
 ### Minor Changes

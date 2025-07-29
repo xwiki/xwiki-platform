@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.1",
-    "@eslint/js": "9.29.0",
+    "@eslint/js": "9.32.0",
     "@playwright/test": "1.53.1",
     "@types/node": "22.15.32",
     "@vitejs/plugin-vue": "6.0.0",

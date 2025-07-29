@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@types/lodash-es": "4.17.12",
-    "@types/react": "19.1.7",
+    "@types/react": "19.1.8",
     "@vitejs/plugin-react": "4.7.0",
     "@xwiki/cristal-dev-config": "workspace:*",
     "postcss": "8.5.6",

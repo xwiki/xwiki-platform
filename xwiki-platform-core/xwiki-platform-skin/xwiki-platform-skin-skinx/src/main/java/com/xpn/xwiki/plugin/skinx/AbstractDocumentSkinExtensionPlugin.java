@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -268,7 +269,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                 if (obj == null) {
                     continue;
                 }
-                if (StringUtils.equals(obj.getStringValue(USE_FIELDNAME), "currentPage")) {
+                if (Strings.CS.equals(obj.getStringValue(USE_FIELDNAME), "currentPage")) {
                     return true;
                 }
             }

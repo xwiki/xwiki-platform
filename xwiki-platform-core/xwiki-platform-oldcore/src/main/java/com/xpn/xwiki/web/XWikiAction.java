@@ -38,6 +38,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -396,7 +397,7 @@ public abstract class XWikiAction implements LegacyAction
         DefaultJobProgress actionProgress = null;
         String docName = "";
 
-        boolean debug = StringUtils.equals(context.getRequest().get("debug"), "true");
+        boolean debug = Strings.CS.equals(context.getRequest().get("debug"), "true");
 
         String sasync = context.getRequest().get("async");
 
@@ -425,7 +426,7 @@ public abstract class XWikiAction implements LegacyAction
             // Verify that the requested wiki exists
             try {
                 // Don't show init screen if async is forced to false
-                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization || StringUtils.equals(sasync, "false"), context);
+                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization || Strings.CS.equals(sasync, "false"), context);
 
                 // If XWiki is still initializing display initialization template
                 if (xwiki == null) {

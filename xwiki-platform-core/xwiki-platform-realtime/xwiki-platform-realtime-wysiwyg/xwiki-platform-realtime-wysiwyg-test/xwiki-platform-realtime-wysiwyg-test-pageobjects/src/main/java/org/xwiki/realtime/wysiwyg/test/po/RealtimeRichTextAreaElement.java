@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntConsumer;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -65,7 +65,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
         public String getCoeditorId()
         {
-            return StringUtils.removeStart(id, "rt-user-");
+            return Strings.CS.removeStart(id, "rt-user-");
         }
 
         public String getAvatarURL()

@@ -41,6 +41,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -386,7 +387,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
                 // Adjust path for links inside CSS files.
                 while (fileName.startsWith("../")) {
-                    fileName = StringUtils.removeStart(fileName, "../");
+                    fileName = Strings.CS.removeStart(fileName, "../");
                 }
 
                 if (wikiId == null) {

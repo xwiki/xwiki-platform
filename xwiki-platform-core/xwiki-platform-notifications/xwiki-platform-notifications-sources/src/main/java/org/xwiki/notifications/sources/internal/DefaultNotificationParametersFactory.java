@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.CaseUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -521,7 +522,7 @@ public class DefaultNotificationParametersFactory
         if (StringUtils.isBlank(parameters.get(ParametersKey.WIKIS))
             && StringUtils.isBlank(parameters.get(ParametersKey.PAGES))
             && StringUtils.isBlank(parameters.get(ParametersKey.SPACES))
-            && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
+            && !Strings.CS.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
             handleLocationParameter(currentWiki, notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
         }
     }

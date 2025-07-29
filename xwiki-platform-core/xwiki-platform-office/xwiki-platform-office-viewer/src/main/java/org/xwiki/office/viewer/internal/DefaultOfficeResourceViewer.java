@@ -37,6 +37,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.Cache;
@@ -408,7 +409,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
         // Check if the view has expired.
         String currentVersion = this.documentAccessBridge.getAttachmentVersion(attachmentReference);
-        if (view != null && !StringUtils.equals(currentVersion, view.getVersion())) {
+        if (view != null && !Strings.CS.equals(currentVersion, view.getVersion())) {
             // Flush the cached view.
             this.attachmentCache.remove(cacheKey);
             view = null;

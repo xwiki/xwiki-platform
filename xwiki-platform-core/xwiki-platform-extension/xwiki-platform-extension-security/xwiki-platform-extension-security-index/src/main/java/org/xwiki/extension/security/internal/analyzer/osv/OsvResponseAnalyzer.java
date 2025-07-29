@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Strings;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -44,7 +45,6 @@ import org.xwiki.extension.security.internal.analyzer.osv.model.response.VulnObj
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
-import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
@@ -115,7 +115,7 @@ public class OsvResponseAnalyzer
     {
         Optional<String> first = vulnObject.getAliases()
             .stream()
-            .filter(it -> startsWith(it, "CVE-"))
+            .filter(it -> Strings.CS.startsWith(it, "CVE-"))
             .findFirst();
         if (first.isEmpty()) {
             // We fall back to the first id if no CVE id is found.

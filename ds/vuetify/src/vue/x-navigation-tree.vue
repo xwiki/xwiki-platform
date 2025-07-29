@@ -32,7 +32,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import { navigationTreePropsDefaults } from "@xwiki/cristal-dsapi";
 import { SpaceReference } from "@xwiki/cristal-model-api";
 import { inject, onBeforeMount, ref, watch } from "vue";
-import { VTreeview } from "vuetify/labs/VTreeview";
+import { VTreeview } from "vuetify/components/VTreeview";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { NavigationTreeProps } from "@xwiki/cristal-dsapi";

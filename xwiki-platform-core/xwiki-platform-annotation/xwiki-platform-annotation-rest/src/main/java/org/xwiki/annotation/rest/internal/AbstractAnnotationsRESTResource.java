@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.annotation.AnnotationServiceException;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationAddRequest;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationField;
@@ -76,14 +77,14 @@ public abstract class AbstractAnnotationsRESTResource extends AbstractAnnotation
             AnnotationRequest.Request requestedFields = new AnnotationRequest.Request();
             for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
                 String name = entry.getKey();
-                if (StringUtils.startsWith(name, ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX)) {
+                if (Strings.CS.startsWith(name, ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX)) {
                     for (String value : entry.getValue()) {
                         AnnotationField field = new AnnotationField();
                         field.setName(StringUtils.substringAfter(name, ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX));
                         field.setValue(value);
                         annotationFields.add(field);
                     }
-                } else if (StringUtils.equals(name, ANNOTATION_REQUEST_REQUESTED_FIELD_PARAMETER)) {
+                } else if (Strings.CS.equals(name, ANNOTATION_REQUEST_REQUESTED_FIELD_PARAMETER)) {
                     requestedFields.getFields().addAll(entry.getValue());
                 }
             }

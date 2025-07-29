@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.configuration.ConfigurationSource;
@@ -126,7 +127,7 @@ public class ContextAndActionURLNormalizer extends org.xwiki.url.internal.contai
     protected List<String> getActionAndWikiServletMapping()
     {
         String result = super.getActionServletMapping();
-        if (StringUtils.equals(this.virtualWikiServletMapping, result)) {
+        if (Strings.CS.equals(this.virtualWikiServletMapping, result)) {
             // Virtual wiki, also include the wiki identifier
             return Arrays.asList(this.virtualWikiServletMapping,
                 this.context.getCurrentEntityReference().getRoot().getName());

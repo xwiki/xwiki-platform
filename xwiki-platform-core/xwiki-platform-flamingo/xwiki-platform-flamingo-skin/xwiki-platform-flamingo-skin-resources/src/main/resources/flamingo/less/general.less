@@ -199,9 +199,11 @@ body {
         }
       }
 
-      /* Remove the underlining from links with the btn class.
-       Those are already styled differently from their neighboring text. */
-      & a.btn {
+      /* Remove the underlining from links styled like buttons.
+       Those are already different enough from their neighboring text. */
+      & a.btn,
+      & a.button,
+      & .buttonwrapper a {
         .not-inline-link();
       }
 

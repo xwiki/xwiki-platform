@@ -602,8 +602,8 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
         #set ($enableClass = "hidden")
         #set ($disableClass = "")
       #end
-      &lt;a href="#" id="enable" class="btn btn-success $enableClass"&gt;$services.icon.renderHTML('unlock') $services.localization.render('platform.core.profile.category.profile.enableAccount')&lt;/a&gt;
-      &lt;a href="#" id="disable" class="btn btn-warning $disableClass"&gt;$services.icon.renderHTML('lock') $services.localization.render('platform.core.profile.category.profile.disableAccount')&lt;/a&gt;
+      &lt;button id="enable" class="btn btn-success $enableClass"&gt;$services.icon.renderHTML('unlock') $services.localization.render('platform.core.profile.category.profile.enableAccount')&lt;/button&gt;
+      &lt;button id="disable" class="btn btn-warning $disableClass"&gt;$services.icon.renderHTML('lock') $services.localization.render('platform.core.profile.category.profile.disableAccount')&lt;/button&gt;
     #end
     &lt;div class='userInfo'&gt;
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)

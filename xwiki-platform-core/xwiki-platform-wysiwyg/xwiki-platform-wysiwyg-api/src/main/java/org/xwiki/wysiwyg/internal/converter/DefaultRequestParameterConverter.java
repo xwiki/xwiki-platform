@@ -19,7 +19,6 @@
  */
 package org.xwiki.wysiwyg.internal.converter;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +27,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -83,19 +81,20 @@ public class DefaultRequestParameterConverter extends AbstractRequestParameterCo
     }
 
     @Override
-    public Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException
+    public JakartaRequestParameterConversionResult convert(ServletRequest request)
     {
-        // Perform the call for the standard conversion related to the parameter name
-        Optional<ServletRequest> result = super.convert(request, response);
-
+        JakartaRequestParameterConversionResult result = super.convert(request);
         // and then loop over the other converters to ensure they're also properly called.
         try {
             for (Map.Entry<String, Object> entry : contextComponentManager.getInstanceMap(
                 RequestParameterConverter.class).entrySet()) {
                 // We want to ensure to not call again this current instance.
-                if (!"default".equals(entry.getKey()) && result.isPresent()) {
+                if (!"default".equals(entry.getKey())) {
                     RequestParameterConverter converter = (RequestParameterConverter) entry.getValue();
-                    result = converter.convert(result.get(), response);
+                    JakartaRequestParameterConversionResult intermediateResult = converter.convert(result.getRequest());
+                    result.getErrors().putAll(intermediateResult.getErrors());
+                    result.getOutput().putAll(intermediateResult.getOutput());
+
                 }
             }
         } catch (ComponentLookupException e) {

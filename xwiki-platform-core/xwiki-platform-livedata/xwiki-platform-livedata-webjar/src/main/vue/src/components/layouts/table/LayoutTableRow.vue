@@ -86,9 +86,6 @@ export default {
   },
 
   computed: {
-    data() {
-      return this.logic.data;
-    },
     properties() {
       return this.logic.getPropertyDescriptors();
     },

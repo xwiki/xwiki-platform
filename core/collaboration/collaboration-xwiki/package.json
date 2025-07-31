@@ -40,7 +40,7 @@
     "reflect-metadata": "0.2.2",
     "typescript": "5.8.3",
     "vite": "7.0.6",
-    "vue": "3.5.17"
+    "vue": "3.5.18"
   },
   "publishConfig": {
     "exports": {

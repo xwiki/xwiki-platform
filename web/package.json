@@ -37,7 +37,7 @@
     "@xwiki/cristal-lib": "workspace:*",
     "@xwiki/cristal-settings-browser": "workspace:*",
     "express": "5.1.0",
-    "vue": "3.5.17"
+    "vue": "3.5.18"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.1",

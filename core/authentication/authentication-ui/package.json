@@ -45,7 +45,7 @@
     "typescript": "5.8.3",
     "vite": "7.0.6",
     "vitest": "3.2.4",
-    "vue": "3.5.17",
+    "vue": "3.5.18",
     "vue-tsc": "2.2.12"
   },
   "publishConfig": {

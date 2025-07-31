@@ -62,7 +62,7 @@
   "engines": {
     "node": "22.17.1"
   },
-  "packageManager": "pnpm@10.13.1",
+  "packageManager": "pnpm@10.14.0",
   "pnpm": {
     "ignoredBuiltDependencies": [
       "electron-winstaller",

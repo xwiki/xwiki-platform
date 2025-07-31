@@ -569,6 +569,7 @@ Get the actual notifications.
     }
     &amp;:hover,
     &amp;:focus {
+      outline: revert;
       background-color: @navbar-default-link-hover-bg;
       color: @navbar-default-link-hover-color;
     }

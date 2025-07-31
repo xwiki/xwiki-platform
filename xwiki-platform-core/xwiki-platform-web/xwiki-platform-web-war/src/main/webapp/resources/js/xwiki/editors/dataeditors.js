@@ -508,7 +508,7 @@
               let notification = new XWiki.widgets.Notification(l10n['class.addProperty.inProgress'], "inprogress");
               $.post(ref).done(function(data) {
                 $('#xclassContent').append(data);
-                let insertedPropertyElt = $('#xclassContent :last-child');
+                let insertedPropertyElt = $('#xclassContent > div.xproperty:last-child');
                 // Expand the newly inserted property, since the user will probably want to edit it once it was added
                 self.expandCollapseMetaProperty(insertedPropertyElt);
                 // Make teh newly added property sortable

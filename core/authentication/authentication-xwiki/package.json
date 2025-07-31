@@ -26,7 +26,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
-    "axios": "1.10.0",
+    "axios": "1.11.0",
     "inversify": "7.6.1",
     "js-cookie": "3.0.5"
   },

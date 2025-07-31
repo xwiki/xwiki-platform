@@ -195,6 +195,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     if (initializer?.provider) {
       console.debug("Trying to connect to realtime server...");
 
+      // eslint-disable-next-line promise/catch-or-return
       initializer.initialized.then(() => {
         console.debug("Connected to realtime server and synced!");
 
@@ -202,6 +203,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           .getMap("configuration")
           .get("initialContentLoaded");
 
+        // eslint-disable-next-line promise/always-return
         if (!initialContentLoaded) {
           initializer.doc
             .getMap("configuration")

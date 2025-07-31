@@ -106,6 +106,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
       setSuggestions({ status: "loading" });
 
+      // eslint-disable-next-line promise/catch-or-return,promise/always-return
       getSuggestions(search).then((suggestions) => {
         setSuggestions({ status: "resolved", suggestions });
       });

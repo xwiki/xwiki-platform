@@ -66,7 +66,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DatabaseDocumentIteratorTest
 {
-    private static final String ORDER_CLAUSE = " order by doc.space, doc.name, doc.language nulls first";
+    private static final String ORDER_CLAUSE = " order by doc.id asc";
 
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;

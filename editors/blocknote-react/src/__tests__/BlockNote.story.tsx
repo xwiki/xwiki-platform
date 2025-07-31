@@ -50,7 +50,9 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
 
 function linkEditionCtxMock(): LinkEditionContext {
   return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     attachmentsService: null as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     documentService: null as any,
     linkSuggestService: {
       async getLinks() {
@@ -74,6 +76,7 @@ function linkEditionCtxMock(): LinkEditionContext {
         ];
       },
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     modelReferenceHandler: null as any,
     modelReferenceParser: {
       parse(reference, type) {
@@ -114,7 +117,9 @@ function linkEditionCtxMock(): LinkEditionContext {
         throw new Error("Invalid reference provided");
       },
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     remoteURLParser: null as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     remoteURLSerializer: null as any,
   };
 }

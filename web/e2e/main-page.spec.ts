@@ -25,20 +25,10 @@ import { FormPageObject } from "./pageObjects/Form";
 import { HistoryExtraTabPageObject } from "./pageObjects/HistoryExtraTab";
 import { NavigationTreePageObject } from "./pageObjects/NavigationTree";
 import { SidebarPageObject } from "./pageObjects/Sidebar";
+import { screenshotIfTestFailed } from "./screenshot-failures";
 
 test.afterEach(async ({ page }, testInfo) => {
-  if (testInfo.status !== testInfo.expectedStatus) {
-    // Get a unique place for the screenshot.
-    const screenshotPath = testInfo.outputPath(`failure.png`);
-    // Add it to the report.
-    testInfo.attachments.push({
-      name: "screenshot",
-      path: screenshotPath,
-      contentType: "image/png",
-    });
-    // Take the screenshot itself.
-    await page.screenshot({ path: screenshotPath, timeout: 5000 });
-  }
+  await screenshotIfTestFailed(page, testInfo);
 });
 
 // A set of variability setting
@@ -128,7 +118,9 @@ configs.forEach(
       await expect(navigationTreeNodes[1].getText()).toContainText(
         "Terminal Page",
       );
-      expect(await navigationTreeNodes[1].getLinkTarget()).toEqual("#/Terminal/view");
+      expect(await navigationTreeNodes[1].getLinkTarget()).toEqual(
+        "#/Terminal/view",
+      );
       await expect(navigationTreeNodes[2].getText()).toContainText(
         "Deep Page Root",
       );
@@ -189,11 +181,10 @@ configs.forEach(
       expect(await editorHeader.getAttribute("placeholder")).toEqual("NewPage");
       await expect(editorHeader).toBeEmpty();
       expect(await editorContent.getAttribute("data-placeholder")).toEqual(
-        "Type '/' to show the available actions"
+        "Type '/' to show the available actions",
       );
       expect(await editorContent.textContent()).toBe("");
     });
-
 
     test(`[${name}] has working navigation`, async ({ page }) => {
       await page.goto(localDefaultPage);
@@ -243,23 +234,33 @@ configs.forEach(
         designSystem,
       );
 
-      await (configurationForm.findInputFromLabel("Name").setValue("Test Configuration"));
-      await (configurationForm.findSelectFromLabel("Type").setValue("XWiki"));
-      await configurationForm.submit()
+      await configurationForm
+        .findInputFromLabel("Name")
+        .setValue("Test Configuration");
+      await configurationForm.findSelectFromLabel("Type").setValue("XWiki");
+      await configurationForm.submit();
 
-      await expect(page.getByText('Editing Test Configuration (XWiki)')).toBeVisible();
+      await expect(
+        page.getByText("Editing Test Configuration (XWiki)"),
+      ).toBeVisible();
       const configurationEditForm = new FormPageObject(
         page,
         page.locator("form").filter({ visible: true }).nth(1),
         designSystem,
       );
 
-      await (configurationEditForm.findSelectFromLabel("Design System").setValue("shoelace"));
-      await configurationEditForm.submit()
+      await configurationEditForm
+        .findSelectFromLabel("Design System")
+        .setValue("shoelace");
+      await configurationEditForm.submit();
 
       const newConfiguration = page.locator(".grid-container >div").last();
-      await expect(newConfiguration.locator(".wiki-name")).toContainText("Test Configuration");
-      await expect(newConfiguration.locator(".ds-name")).toContainText("Design System: shoelace");
+      await expect(newConfiguration.locator(".wiki-name")).toContainText(
+        "Test Configuration",
+      );
+      await expect(newConfiguration.locator(".ds-name")).toContainText(
+        "Design System: shoelace",
+      );
     });
 
     if (offlineDefaultPage) {

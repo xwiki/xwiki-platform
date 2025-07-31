@@ -49,7 +49,7 @@ export default [...compat.extends("eslint:recommended", "prettier"), {
         sourceType: "script",
 
         parserOptions: {
-            project: ["./tsconfig.json"],
+            project: ["./tsconfig.test.json"],
         },
     },
 }];

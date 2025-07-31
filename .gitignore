@@ -81,6 +81,7 @@ coverage
 
 test-results/
 playwright-report/
+.cache/
 
 ## CI specific
 unit-tests.xml

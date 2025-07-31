@@ -105,6 +105,17 @@ public class ClassEditPage extends EditPage
         getDriver().waitUntilElementDisappears(propertyLocator);
     }
 
+    /**
+     * Test that a property is present in the editor.
+     * @param propertyName the name of the property
+     * @return {@code true} if the property can be found.
+     * @since 17.7.0RC1
+     */
+    public boolean hasProperty(String propertyName)
+    {
+        return getDriver().hasElement(By.id("xproperty_" + propertyName));
+    }
+
     private FormContainerElement getForm()
     {
         if (this.form == null) {

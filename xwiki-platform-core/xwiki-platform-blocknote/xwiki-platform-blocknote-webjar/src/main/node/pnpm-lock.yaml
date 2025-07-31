@@ -28,8 +28,8 @@ importers:
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)
       '@xwiki/cristal-attachments-default':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)
+        specifier: 0.20.0
+        version: 0.20.0(reflect-metadata@0.2.2)(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3))
       '@xwiki/cristal-authentication-api':
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)
@@ -1126,26 +1126,52 @@ packages:
   '@xwiki/cristal-api@0.19.0':
     resolution: {integrity: sha512-W2v6R9o+oB5dARFEkY1OUmcJ7vsO++a3xxcEJMwcJBL2rrd+HLQm8aPVuc793ReM6wMYEnw2KEjzrYBwyRMBRw==}
 
+  '@xwiki/cristal-api@0.20.0':
+    resolution: {integrity: sha512-8URG3i4AbW85U4Ph81UEyJN4L4MQX0bUlBSmegyVelXk+APML8QZkUk+Ho7hMg5deVyL/9iL6vVW0q92nIMjVg==}
+    peerDependencies:
+      reflect-metadata: 0.x
+      vue: 3.x
+
   '@xwiki/cristal-attachments-api@0.19.0':
     resolution: {integrity: sha512-RPTdA65TDB/qenOBkZbWntm26tGnjZA8p8Ev5jFO1DX1TWkuKPmylbSI/TI2Cx1JS6fi+GUT8+vkqyYjNicRQw==}
 
-  '@xwiki/cristal-attachments-default@0.19.0':
-    resolution: {integrity: sha512-K28C0nLl+qLs4uS103YyUaKTpUK02tFiORsLf+zihKVrX7WpM/UAibOOy/0dgqolOgKCfs1put872Q/YeBuEOQ==}
+  '@xwiki/cristal-attachments-api@0.20.0':
+    resolution: {integrity: sha512-pY4y+7ZfRj1PeiRiqV3rPUpQdGMH7TIj2/m3RyrVz9lGUK6tT10CT6PnO9GiI3ui4iK9dek9IlX8wcb6jeONnw==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      reflect-metadata: 0.x
+      vue: 3.x
+
+  '@xwiki/cristal-attachments-default@0.20.0':
+    resolution: {integrity: sha512-x0izBj1kejEoEuFFsEH+rnXE8APS755Vkr95GmxMjdwjgJORP8uNQBnq4328WDuLkqFvYbe2RYUjUuvO1Ny2tg==}
+    peerDependencies:
+      reflect-metadata: 0.x
+      vue: 3.x
 
   '@xwiki/cristal-authentication-api@0.19.0':
     resolution: {integrity: sha512-IuN/6MXHWn01sYkKIqB8xotKVSmFyEEhR01QbDTlDAbEAuJGH/7DxrDfy3fO4dFx3gy59S94zhzMy+2TMgb9dA==}
     peerDependencies:
       reflect-metadata: 0.2.2
 
+  '@xwiki/cristal-authentication-api@0.20.0':
+    resolution: {integrity: sha512-zv2mc4Ld0bZUzpo53jzgYXZTEd7b1lS/pUQI3mu06LiXCmXMLvcTnlahpAw6WRxy73LcCRPLRsZz953ZIl/TsQ==}
+    peerDependencies:
+      reflect-metadata: 0.x
+
   '@xwiki/cristal-backend-api@0.19.0':
     resolution: {integrity: sha512-/ThyYGWPCJ7GH9aMNDULx3IwBRP4oB3GSt9QFki1l2OGclozXufyNZ1EkwvC+iHzhDBwSetYu67HiSLZZTcvfw==}
     peerDependencies:
       reflect-metadata: 0.2.2
 
+  '@xwiki/cristal-backend-api@0.20.0':
+    resolution: {integrity: sha512-CFnceGsk4Hg8nmGxxIEo7whi0PCGCd9RTBz6Z/2sJFH4T0O1k7bK2RDzlopsgDUjksvztbP2/z7hk1bMCosn0g==}
+    peerDependencies:
+      reflect-metadata: 0.x
+
   '@xwiki/cristal-configuration-api@0.19.0':
     resolution: {integrity: sha512-Mq2t83gydM3ioG3zjzjHvTD2fc+gnFdbgqjes56Dx33wu9NOTF5adFwKfVSfaDF6twW/o9h7wO6wXEdCLZnCxQ==}
+
+  '@xwiki/cristal-configuration-api@0.20.0':
+    resolution: {integrity: sha512-HXhtrQND+Is27I4tmXwRZGVIe9LPW4X0QUDkujdmqmHVkDReeeju291KFHmna+WVzTfxOgFL62yhIxola5g9Vg==}
 
   '@xwiki/cristal-document-api@0.19.0':
     resolution: {integrity: sha512-6b3V/EVTEfrGmhF75UQBcKOYp9q3/9Aqs/x0L0wZ57b1P7Wdj7bGkBnP1iEX+IGfAuKMDxns99HwpkKF0yyrkg==}
@@ -4006,6 +4032,15 @@ snapshots:
       - reflect-metadata
       - typescript
 
+  '@xwiki/cristal-api@0.20.0(reflect-metadata@0.2.2)(vue@3.5.16(typescript@5.8.3))':
+    dependencies:
+      '@xwiki/cristal-authentication-api': 0.20.0(reflect-metadata@0.2.2)
+      '@xwiki/cristal-configuration-api': 0.20.0
+      inversify: 7.5.2(reflect-metadata@0.2.2)
+      reflect-metadata: 0.2.2
+      vue: 3.5.16(typescript@5.8.3)
+      vue-router: 4.5.1(vue@3.5.16(typescript@5.8.3))
+
   '@xwiki/cristal-attachments-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)':
     dependencies:
       '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
@@ -4015,11 +4050,18 @@ snapshots:
       - reflect-metadata
       - typescript
 
-  '@xwiki/cristal-attachments-default@0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)':
+  '@xwiki/cristal-attachments-api@0.20.0(reflect-metadata@0.2.2)(vue@3.5.16(typescript@5.8.3))':
     dependencies:
-      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)
-      '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
-      '@xwiki/cristal-backend-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)
+      '@xwiki/cristal-authentication-api': 0.20.0(reflect-metadata@0.2.2)
+      '@xwiki/cristal-model-api': 0.19.0
+      reflect-metadata: 0.2.2
+      vue: 3.5.16(typescript@5.8.3)
+
+  '@xwiki/cristal-attachments-default@0.20.0(reflect-metadata@0.2.2)(typescript@5.8.3)(vue@3.5.16(typescript@5.8.3))':
+    dependencies:
+      '@xwiki/cristal-attachments-api': 0.20.0(reflect-metadata@0.2.2)(vue@3.5.16(typescript@5.8.3))
+      '@xwiki/cristal-authentication-api': 0.20.0(reflect-metadata@0.2.2)
+      '@xwiki/cristal-backend-api': 0.20.0(reflect-metadata@0.2.2)(vue@3.5.16(typescript@5.8.3))
       '@xwiki/cristal-model-api': 0.19.0
       '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)
       '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)
@@ -4034,6 +4076,10 @@ snapshots:
     dependencies:
       reflect-metadata: 0.2.2
 
+  '@xwiki/cristal-authentication-api@0.20.0(reflect-metadata@0.2.2)':
+    dependencies:
+      reflect-metadata: 0.2.2
+
   '@xwiki/cristal-backend-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)':
     dependencies:
       '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.8.3)
@@ -4042,7 +4088,19 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
+  '@xwiki/cristal-backend-api@0.20.0(reflect-metadata@0.2.2)(vue@3.5.16(typescript@5.8.3))':
+    dependencies:
+      '@xwiki/cristal-api': 0.20.0(reflect-metadata@0.2.2)(vue@3.5.16(typescript@5.8.3))
+      inversify: 7.5.2(reflect-metadata@0.2.2)
+      reflect-metadata: 0.2.2
+    transitivePeerDependencies:
+      - vue
+
   '@xwiki/cristal-configuration-api@0.19.0':
+    dependencies:
+      utility-types: 3.11.0
+
+  '@xwiki/cristal-configuration-api@0.20.0':
     dependencies:
       utility-types: 3.11.0
 

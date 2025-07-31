@@ -37,7 +37,7 @@
     "eslint": "9.32.0",
     "eslint-plugin-vue": "10.3.0",
     "flush-promises": "1.0.2",
-    "jiti": "2.4.2",
+    "jiti": "2.5.1",
     "jquery": "3.7.1",
     "jsdom": "26.1.0",
     "lodash": "4.17.21",

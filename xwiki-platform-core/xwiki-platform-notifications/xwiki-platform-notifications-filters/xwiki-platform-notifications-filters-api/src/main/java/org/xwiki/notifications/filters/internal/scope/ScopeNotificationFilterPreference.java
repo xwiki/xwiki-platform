@@ -129,8 +129,8 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     /**
      * @return true if the current filter preference is a potential parent of other preferences, false otherwise
      * @since 17.7.0RC1
-     * @since 17.4.3
-     * @since 16.10.10
+     * @since 17.4.4
+     * @since 16.10.11
      */
     public boolean isPotentialParent()
     {
@@ -140,8 +140,8 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     /**
      * @return true if the current filter preference is a potential child of other preferences, false otherwise
      * @since 17.7.0RC1
-     * @since 17.4.3
-     * @since 16.10.10
+     * @since 17.4.4
+     * @since 16.10.11
      */
     public boolean isPotentialChild()
     {

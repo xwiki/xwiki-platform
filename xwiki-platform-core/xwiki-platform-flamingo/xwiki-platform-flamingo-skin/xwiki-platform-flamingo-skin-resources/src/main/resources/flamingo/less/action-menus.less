@@ -83,6 +83,15 @@
     }
   }
 }
+
+// Top navbar
+#xwikimainmenu .nav > li {
+  min-height: @navbar-height;
+  & > a, & > button, & > form, & > form > button {
+    height: 100%;
+  }
+}
+
 // Authentication buttons ========================================================
 // Reduce the spacing between both items if there's both
 li:has(#tmLogin) + li #tmRegister {
@@ -182,15 +191,15 @@ li:has(+ li #tmRegister) #tmLogin {
 // Navbar avatar ==========================================================
 
 .navbar-avatar {
-  > a {
+  > a.icon-navbar {
     max-height: @navbar-height;
+    display: flex;
+    align-items: center;
 
     > img {
       @avatar-size: floor((ceil((@navbar-height / 2)) / 2)) * 2;
       border-radius: @thumbnail-border-radius;
       height: @avatar-size;
-      margin-top: -@navbar-padding-vertical + (@navbar-height / 2) - (@avatar-size / 2);
-      vertical-align: middle;
       width: @avatar-size;
     }
   }

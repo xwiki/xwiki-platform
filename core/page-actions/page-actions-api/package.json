@@ -23,7 +23,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "inversify": "7.5.4",
+    "inversify": "7.6.1",
     "vue-i18n": "11.1.10"
   },
   "peerDependencies": {

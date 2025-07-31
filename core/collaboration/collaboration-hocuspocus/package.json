@@ -27,7 +27,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-collaboration-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
-    "inversify": "7.5.4"
+    "inversify": "7.6.1"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",

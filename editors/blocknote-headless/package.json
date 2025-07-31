@@ -42,7 +42,7 @@
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "@xwiki/cristal-uniast": "workspace:*",
     "eventemitter3": "5.0.1",
-    "inversify": "7.5.4",
+    "inversify": "7.6.1",
     "lodash-es": "4.17.21",
     "vue-i18n": "11.1.10"
   },

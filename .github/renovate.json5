@@ -60,6 +60,10 @@
       "matchDepPatterns": "@mantine/.+"
     },
     {
+      "groupName": "playwright",
+      "matchDepPatterns": "@playwright/.+"
+    },
+    {
       "groupName": "react",
       "matchDepPatterns": "^react(-.+)?"
     },

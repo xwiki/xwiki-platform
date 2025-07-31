@@ -109,7 +109,7 @@ class DefaultClickListener implements ClickListener {
         const page = href.replace(location.origin + location.pathname, "");
         if (!page.startsWith("#")) {
           this.cristal.setCurrentPage(page, "view");
-          this.cristal.loadPage().then();
+          this.cristal.loadPage();
         } else {
           window.location.href = page;
           return;
@@ -117,7 +117,7 @@ class DefaultClickListener implements ClickListener {
       } else {
         // Case 2: the link points to an external server, in this case we try to resolve it to a known page.
         // Otherwise, the link is considered as external.
-        this.cristal.loadPageFromURL(href).then();
+        this.cristal.loadPageFromURL(href);
       }
     }
   }

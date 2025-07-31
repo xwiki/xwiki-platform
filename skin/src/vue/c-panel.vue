@@ -47,6 +47,7 @@ export default {
         .getContainer()
         .get<StorageProvider>("StorageProvider")
         .get();
+      // eslint-disable-next-line promise/catch-or-return
       storage
         .getPanelContent(panelName, "", "html")
         .then(async (panelData: PageData) => {
@@ -60,6 +61,7 @@ export default {
           }
           logger?.debug("Panel content is ", panelData.html);
           contentMap.get(props.panelName).value.currentContent = panelData.html;
+          // eslint-disable-next-line promise/always-return
           logger?.debug("Panel css is ", panelData.css);
           ContentTools.loadCSS(panelData.css);
           // ContentTools.loadJS(panelContent.js);

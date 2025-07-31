@@ -67,15 +67,16 @@ if (process.env.NODE_ENV !== "development") {
  */
 app
   .whenReady()
+  // eslint-disable-next-line promise/always-return
   .then(async () => {
     await load();
-    restoreOrCreateWindow().then((w) => {
-      loadBrowser(w);
-      loadGitHubAuthentication(w, loadFile);
-      loadNextcloudAuthentication(w, loadFile);
-      loadXWikiAuthentication(w, loadFile);
-      loadSettings();
-    });
+    const w = await restoreOrCreateWindow();
+    loadBrowser(w);
+    loadGitHubAuthentication(w, loadFile);
+    loadNextcloudAuthentication(w, loadFile);
+    loadXWikiAuthentication(w, loadFile);
+    loadSettings();
+
     /**
      * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.
      */

@@ -68,9 +68,8 @@ export default defineComponent({
         .get();
       logger?.debug("Ready to get edit field", props.name);
       editFieldValue.value = "";
-      storage.getEditField(document, props.name).then(function (
-        editField: string,
-      ) {
+      // eslint-disable-next-line promise/catch-or-return,promise/always-return
+      storage.getEditField(document, props.name).then((editField: string) => {
         editFieldValue.value = editField;
       });
     } else {

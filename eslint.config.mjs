@@ -3,6 +3,7 @@ import js from "@eslint/js";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import eslintPluginImport from "eslint-plugin-import";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import pluginPromise from "eslint-plugin-promise";
 import eslintPluginTsdoc from "eslint-plugin-tsdoc";
 import pluginVue from "eslint-plugin-vue";
 import globals from "globals";
@@ -112,4 +113,5 @@ export default [
       "vue/no-deprecated-slot-attribute": "off",
     },
   },
+  pluginPromise.configs["flat/recommended"],
 ];

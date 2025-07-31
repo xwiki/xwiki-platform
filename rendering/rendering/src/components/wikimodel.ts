@@ -46,7 +46,8 @@ export class WikiModel2 {
   public async isWikiModelLoaded(): Promise<boolean> {
     // TODO get rid of any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sleep = (ms: any) => new Promise((r) => setTimeout(r, ms));
+    const sleep = (ms: any) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
 
     for (let i = 0; i < 10; i++) {
       // @ts-expect-error TODO describe

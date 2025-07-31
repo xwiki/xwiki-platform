@@ -55,6 +55,9 @@ importers:
       eslint-plugin-prettier:
         specifier: 5.5.1
         version: 5.5.1(eslint-config-prettier@10.1.5(eslint@9.32.0))(eslint@9.32.0)(prettier@3.6.2)
+      eslint-plugin-promise:
+        specifier: 7.2.1
+        version: 7.2.1(eslint@9.32.0)
       eslint-plugin-tsdoc:
         specifier: 0.4.0
         version: 0.4.0
@@ -7762,6 +7765,12 @@ packages:
       eslint-config-prettier:
         optional: true
 
+  eslint-plugin-promise@7.2.1:
+    resolution: {integrity: sha512-SWKjd+EuvWkYaS+uN2csvj0KoP43YTu7+phKQ5v+xw6+A0gutVX2yqCeCkC3uLCJFiPfR2dD8Es5L7yUsmvEaA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
+
   eslint-plugin-tsdoc@0.4.0:
     resolution: {integrity: sha512-MT/8b4aKLdDClnS8mP3R/JNjg29i0Oyqd/0ym6NnQf+gfKbJJ4ZcSh2Bs1H0YiUMTBwww5JwXGTWot/RwyJ7aQ==}
 
@@ -13980,6 +13989,11 @@ snapshots:
       synckit: 0.11.8
     optionalDependencies:
       eslint-config-prettier: 10.1.5(eslint@9.32.0)
+
+  eslint-plugin-promise@7.2.1(eslint@9.32.0):
+    dependencies:
+      '@eslint-community/eslint-utils': 4.7.0(eslint@9.32.0)
+      eslint: 9.32.0
 
   eslint-plugin-tsdoc@0.4.0:
     dependencies:

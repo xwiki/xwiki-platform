@@ -43,8 +43,9 @@ const { profile, name, error, avatar } = await getUserProfile(
   authenticationManager,
 );
 
-function logout() {
-  authenticationManager.logout().then(() => browserApi.reload());
+async function logout() {
+  await authenticationManager.logout();
+  browserApi.reload();
 }
 </script>
 

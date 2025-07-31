@@ -74,7 +74,7 @@ export default {
           let path = "/" + cristal?.getCurrentPage() + "/view";
           logger?.debug("pushing path in router", path);
           cristal?.getRouter().push({ path: path });
-          cristal?.loadPage().then(function () {});
+          cristal?.loadPage();
         }
       },
       false,

@@ -36,7 +36,9 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test XClass editing.
@@ -150,6 +152,25 @@ class EditClassIT
             + "Names must not start with a number or punctuation character.<br/>"
             + "Names must not start with the letters xml (or XML, or Xml, etc).<br/>"
             + "Names cannot contain spaces.");*/
+    }
+
+    /**
+     * Test adding and removing a property without leaving the class editor UI.
+     */
+    @Test
+    @Order(4)
+    void addAndDeleteProperty(TestUtils setup, TestReference reference) throws Exception
+    {
+        setup.rest().savePage(reference, "Some content", "");
+        ClassEditPage classEditPage = setup.editClass(reference);
+        classEditPage.addProperty("age", "Number");
+        classEditPage.addProperty("color", "String");
+        classEditPage.deleteProperty("color");
+        classEditPage.clickSaveAndView();
+
+        classEditPage = setup.editClass(reference);
+        assertTrue(classEditPage.hasProperty("age"));
+        assertFalse(classEditPage.hasProperty("color"));
     }
 
     private DocumentReference getTestClassDocumentReference(TestReference reference)

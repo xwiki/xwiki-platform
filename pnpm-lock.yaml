@@ -33,7 +33,7 @@ importers:
         version: 8.38.0(eslint@9.32.0)(typescript@5.8.3)
       '@vitejs/plugin-vue':
         specifier: 6.0.1
-        version: 6.0.1(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
+        version: 6.0.1(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
       '@vitest/coverage-v8':
         specifier: 3.2.4
         version: 3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
@@ -86,14 +86,14 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vite-plugin-css-injected-by-js:
         specifier: 3.5.2
-        version: 3.5.2(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+        version: 3.5.2(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
       vite-plugin-dts:
         specifier: 4.5.4
-        version: 4.5.4(@types/node@22.16.5)(rollup@4.41.1)(typescript@5.8.3)(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+        version: 4.5.4(@types/node@22.16.5)(rollup@4.41.1)(typescript@5.8.3)(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
@@ -126,8 +126,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -154,8 +154,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/alerts/alerts-api:
     dependencies:
@@ -173,8 +173,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -204,8 +204,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -238,8 +238,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -266,8 +266,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -309,8 +309,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -385,8 +385,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
@@ -412,8 +412,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/authentication/authentication-default:
     dependencies:
@@ -437,8 +437,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/authentication/authentication-github:
     dependencies:
@@ -474,8 +474,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -499,8 +499,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -554,8 +554,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
@@ -606,8 +606,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/authentication/authentication-nextcloud-state:
     dependencies:
@@ -628,8 +628,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -674,8 +674,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
@@ -729,8 +729,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
@@ -772,8 +772,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/backends/backend-api:
     dependencies:
@@ -794,8 +794,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/backends/backend-dexie:
     dependencies:
@@ -825,8 +825,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/backends/backend-github:
     dependencies:
@@ -865,8 +865,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/backends/backend-nextcloud:
     dependencies:
@@ -905,8 +905,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/backends/backend-xwiki:
     dependencies:
@@ -942,8 +942,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
@@ -961,8 +961,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/browser/browser-default:
     dependencies:
@@ -986,8 +986,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1014,8 +1014,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1048,8 +1048,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1088,8 +1088,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1107,8 +1107,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/configuration/configuration-web:
     dependencies:
@@ -1123,8 +1123,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/date/date-api:
     dependencies:
@@ -1145,8 +1145,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/date/date-ui:
     dependencies:
@@ -1167,8 +1167,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1195,8 +1195,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1235,8 +1235,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
@@ -1263,8 +1263,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1294,8 +1294,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/extra-tabs/extra-tabs-ui:
     dependencies:
@@ -1319,8 +1319,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1350,8 +1350,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1368,8 +1368,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/hierarchy/hierarchy-api:
     dependencies:
@@ -1387,8 +1387,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/hierarchy/hierarchy-default:
     dependencies:
@@ -1415,8 +1415,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/hierarchy/hierarchy-filesystem:
     dependencies:
@@ -1446,8 +1446,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/hierarchy/hierarchy-github:
     dependencies:
@@ -1477,8 +1477,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/hierarchy/hierarchy-nextcloud:
     dependencies:
@@ -1508,8 +1508,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/hierarchy/hierarchy-xwiki:
     dependencies:
@@ -1551,8 +1551,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/history/history-api:
     dependencies:
@@ -1570,8 +1570,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/history/history-default:
     dependencies:
@@ -1595,8 +1595,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/history/history-github:
     dependencies:
@@ -1626,8 +1626,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/history/history-ui:
     dependencies:
@@ -1669,8 +1669,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1709,8 +1709,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/icons:
     dependencies:
@@ -1731,8 +1731,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1753,8 +1753,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1784,8 +1784,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/info-actions/info-actions-ui:
     dependencies:
@@ -1818,8 +1818,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -1846,8 +1846,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/link-suggest/link-suggest-nextcloud:
     dependencies:
@@ -1889,8 +1889,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/link-suggest/link-suggest-xwiki:
     dependencies:
@@ -1923,8 +1923,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/markdown/markdown-api:
     dependencies:
@@ -1939,8 +1939,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/markdown/markdown-default:
     dependencies:
@@ -1976,8 +1976,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
@@ -1991,8 +1991,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/model/model-click-listener:
     dependencies:
@@ -2025,8 +2025,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/model/model-local-url:
     dependencies:
@@ -2047,8 +2047,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
@@ -2075,8 +2075,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/model/model-reference/model-reference-filesystem:
     dependencies:
@@ -2100,8 +2100,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/model/model-reference/model-reference-github:
     dependencies:
@@ -2125,8 +2125,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/model/model-reference/model-reference-nextcloud:
     dependencies:
@@ -2150,8 +2150,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/model/model-reference/model-reference-xwiki:
     dependencies:
@@ -2181,8 +2181,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
@@ -2215,8 +2215,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-api:
     devDependencies:
@@ -2227,8 +2227,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-default:
     dependencies:
@@ -2255,8 +2255,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/model/model-remote-url/model-remote-url-github:
     dependencies:
@@ -2283,8 +2283,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
@@ -2317,8 +2317,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
@@ -2348,8 +2348,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/navigation-tree/navigation-tree-api:
     dependencies:
@@ -2367,8 +2367,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/navigation-tree/navigation-tree-default:
     dependencies:
@@ -2395,8 +2395,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/navigation-tree/navigation-tree-filesystem:
     dependencies:
@@ -2429,8 +2429,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/navigation-tree/navigation-tree-github:
     dependencies:
@@ -2469,8 +2469,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/navigation-tree/navigation-tree-nextcloud:
     dependencies:
@@ -2503,8 +2503,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/navigation-tree/navigation-tree-xwiki:
     dependencies:
@@ -2540,8 +2540,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/page-actions/page-actions-api:
     dependencies:
@@ -2562,8 +2562,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -2593,8 +2593,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/page-actions/page-actions-ui:
     dependencies:
@@ -2651,8 +2651,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -2676,8 +2676,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/page/page-default:
     dependencies:
@@ -2695,8 +2695,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/rename/rename-api:
     dependencies:
@@ -2711,8 +2711,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/rename/rename-default:
     dependencies:
@@ -2736,8 +2736,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/rename/rename-filesystem:
     dependencies:
@@ -2764,8 +2764,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/settings/settings-api:
     devDependencies:
@@ -2779,8 +2779,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/settings/settings-browser:
     dependencies:
@@ -2804,8 +2804,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/settings/settings-configurations:
     dependencies:
@@ -2829,8 +2829,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/settings/settings-configurations-ui:
     dependencies:
@@ -2887,8 +2887,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
@@ -2921,8 +2921,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
@@ -3041,8 +3041,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3072,8 +3072,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/uiextension/uiextension-ui:
     dependencies:
@@ -3094,8 +3094,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3155,8 +3155,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest-mock-extended:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
@@ -3177,8 +3177,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3205,8 +3205,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3236,8 +3236,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3254,8 +3254,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   dev/config:
     devDependencies:
@@ -3263,8 +3263,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   dev/test-utils:
     dependencies:
@@ -3282,8 +3282,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3310,8 +3310,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3347,8 +3347,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3405,8 +3405,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3460,8 +3460,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3522,7 +3522,7 @@ importers:
         version: 4.17.12
       '@vitejs/plugin-vue':
         specifier: 6.0.1
-        version: 6.0.1(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
+        version: 6.0.1(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -3533,8 +3533,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3612,8 +3612,8 @@ importers:
         specifier: 0.2.2
         version: 0.2.2
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3689,7 +3689,7 @@ importers:
     devDependencies:
       '@playwright/experimental-ct-react':
         specifier: 1.54.1
-        version: 1.54.1(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(yaml@2.8.0)
+        version: 1.54.1(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(yaml@2.8.0)
       '@types/lodash-es':
         specifier: 4.17.12
         version: 4.17.12
@@ -3698,7 +3698,7 @@ importers:
         version: 19.1.9
       '@vitejs/plugin-react':
         specifier: 4.7.0
-        version: 4.7.0(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+        version: 4.7.0(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -3712,8 +3712,8 @@ importers:
         specifier: 7.0.1
         version: 7.0.1(postcss@8.5.6)
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue-tsc:
         specifier: 2.2.12
         version: 2.2.12(typescript@5.8.3)
@@ -3869,8 +3869,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -3900,8 +3900,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/authentication/authentication-github/authentication-github-main:
     dependencies:
@@ -3925,8 +3925,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/authentication/authentication-github/authentication-github-preload:
     dependencies:
@@ -3944,8 +3944,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/authentication/authentication-github/authentication-github-renderer:
     dependencies:
@@ -3972,8 +3972,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -4000,8 +4000,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/authentication/authentication-nextcloud/authentication-nextcloud-preload:
     dependencies:
@@ -4019,8 +4019,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/authentication/authentication-nextcloud/authentication-nextcloud-renderer:
     dependencies:
@@ -4053,8 +4053,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -4081,8 +4081,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/authentication/authentication-xwiki/authentication-xwiki-preload:
     dependencies:
@@ -4100,8 +4100,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/authentication/authentication-xwiki/authentication-xwiki-renderer:
     dependencies:
@@ -4125,8 +4125,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/browser:
     dependencies:
@@ -4156,8 +4156,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/link-suggest/link-suggest-filesystem:
     dependencies:
@@ -4190,8 +4190,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/main:
     dependencies:
@@ -4227,8 +4227,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/preload:
     dependencies:
@@ -4258,8 +4258,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/renderer:
     dependencies:
@@ -4314,13 +4314,13 @@ importers:
         version: 22.16.5
       '@vitejs/plugin-vue':
         specifier: 6.0.1
-        version: 6.0.1(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
+        version: 6.0.1(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
       typescript:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/settings/settings-main:
     dependencies:
@@ -4344,8 +4344,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/settings/settings-preload:
     dependencies:
@@ -4360,8 +4360,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/settings/settings-renderer:
     dependencies:
@@ -4385,8 +4385,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/state:
     devDependencies:
@@ -4397,8 +4397,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   electron/storage:
     dependencies:
@@ -4449,11 +4449,11 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vite-plugin-node:
         specifier: 7.0.0
-        version: 7.0.0(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+        version: 7.0.0(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
 
   extension-manager:
     dependencies:
@@ -4474,8 +4474,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   extensions/menubuttons:
     dependencies:
@@ -4499,8 +4499,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -4740,8 +4740,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -4774,8 +4774,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -4811,8 +4811,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   rendering/rendering:
     dependencies:
@@ -4848,8 +4848,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue-tsc:
         specifier: 2.2.12
         version: 2.2.12(typescript@5.8.3)
@@ -4863,8 +4863,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue-tsc:
         specifier: 2.2.12
         version: 2.2.12(typescript@5.8.3)
@@ -4885,11 +4885,11 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vite-plugin-comlink:
         specifier: 5.1.0
-        version: 5.1.0(comlink@4.4.2)(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+        version: 5.1.0(comlink@4.4.2)(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -4955,11 +4955,11 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vite-plugin-comlink:
         specifier: 5.1.0
-        version: 5.1.0(comlink@4.4.2)(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+        version: 5.1.0(comlink@4.4.2)(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -5073,8 +5073,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
@@ -5110,8 +5110,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   utils/inversify:
     dependencies:
@@ -5129,8 +5129,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   web:
     dependencies:
@@ -5176,7 +5176,7 @@ importers:
         version: 22.16.5
       '@vitejs/plugin-vue':
         specifier: 6.0.1
-        version: 6.0.1(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
+        version: 6.0.1(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
       globals:
         specifier: 16.3.0
         version: 16.3.0
@@ -5184,8 +5184,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue-tsc:
         specifier: 2.2.12
         version: 2.2.12(typescript@5.8.3)
@@ -5212,8 +5212,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       vite:
-        specifier: 7.0.0
-        version: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+        specifier: 7.0.6
+        version: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.17
         version: 3.5.17(typescript@5.8.3)
@@ -9350,6 +9350,10 @@ packages:
     resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
     engines: {node: '>=12'}
 
+  picomatch@4.0.3:
+    resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
+    engines: {node: '>=12'}
+
   pify@4.0.1:
     resolution: {integrity: sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==}
     engines: {node: '>=6'}
@@ -10577,8 +10581,8 @@ packages:
       yaml:
         optional: true
 
-  vite@7.0.0:
-    resolution: {integrity: sha512-ixXJB1YRgDIw2OszKQS9WxGHKwLdCsbQNkpJN171udl6szi/rIySHL6/Os3s2+oE4P/FLD4dxg4mD7Wust+u5g==}
+  vite@7.0.6:
+    resolution: {integrity: sha512-MHFiOENNBd+Bd9uvc8GEsIzdkn1JxMmEeYX35tI3fv0sJBUTfW5tQsoaOwuY4KhBI09A3dUJ/DXf2yxPVPUceg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -11894,10 +11898,10 @@ snapshots:
       - tsx
       - yaml
 
-  '@playwright/experimental-ct-react@1.54.1(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(yaml@2.8.0)':
+  '@playwright/experimental-ct-react@1.54.1(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(yaml@2.8.0)':
     dependencies:
       '@playwright/experimental-ct-core': 1.54.1(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
-      '@vitejs/plugin-react': 4.7.0(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+      '@vitejs/plugin-react': 4.7.0(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -12642,7 +12646,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.7.11':
     optional: true
 
-  '@vitejs/plugin-react@4.7.0(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))':
+  '@vitejs/plugin-react@4.7.0(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))':
     dependencies:
       '@babel/core': 7.28.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.0)
@@ -12650,14 +12654,14 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue@6.0.1(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))':
+  '@vitejs/plugin-vue@6.0.1(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-beta.29
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue: 3.5.17(typescript@5.8.3)
 
   '@vitest/coverage-v8@3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))':
@@ -12687,13 +12691,13 @@ snapshots:
       chai: 5.2.0
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.4(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))':
+  '@vitest/mocker@3.2.4(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))':
     dependencies:
       '@vitest/spy': 3.2.4
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -14195,6 +14199,10 @@ snapshots:
   fdir@6.4.6(picomatch@4.0.2):
     optionalDependencies:
       picomatch: 4.0.2
+
+  fdir@6.4.6(picomatch@4.0.3):
+    optionalDependencies:
+      picomatch: 4.0.3
 
   figures@3.2.0:
     dependencies:
@@ -15917,6 +15925,8 @@ snapshots:
 
   picomatch@4.0.2: {}
 
+  picomatch@4.0.3: {}
+
   pify@4.0.1: {}
 
   pinia@3.0.2(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3)):
@@ -16839,8 +16849,8 @@ snapshots:
 
   tinyglobby@0.2.14:
     dependencies:
-      fdir: 6.4.6(picomatch@4.0.2)
-      picomatch: 4.0.2
+      fdir: 6.4.6(picomatch@4.0.3)
+      picomatch: 4.0.3
 
   tinypool@1.1.1: {}
 
@@ -17176,7 +17186,7 @@ snapshots:
       debug: 4.4.1(supports-color@5.5.0)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -17191,19 +17201,19 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-comlink@5.1.0(comlink@4.4.2)(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)):
+  vite-plugin-comlink@5.1.0(comlink@4.4.2)(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)):
     dependencies:
       comlink: 4.4.2
       json5: 2.2.3
       magic-string: 0.30.12
       source-map: 0.7.4
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
-  vite-plugin-css-injected-by-js@3.5.2(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)):
+  vite-plugin-css-injected-by-js@3.5.2(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)):
     dependencies:
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
-  vite-plugin-dts@4.5.4(@types/node@22.16.5)(rollup@4.41.1)(typescript@5.8.3)(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)):
+  vite-plugin-dts@4.5.4(@types/node@22.16.5)(rollup@4.41.1)(typescript@5.8.3)(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)):
     dependencies:
       '@microsoft/api-extractor': 7.52.8(@types/node@22.16.5)
       '@rollup/pluginutils': 5.1.4(rollup@4.41.1)
@@ -17216,28 +17226,28 @@ snapshots:
       magic-string: 0.30.17
       typescript: 5.8.3
     optionalDependencies:
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
       - supports-color
 
-  vite-plugin-node@7.0.0(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)):
+  vite-plugin-node@7.0.0(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       chalk: 4.1.2
       debounce: 2.2.0
       debug: 4.4.1(supports-color@5.5.0)
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vuetify@2.1.1(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))(vuetify@3.9.2):
+  vite-plugin-vuetify@2.1.1(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))(vuetify@3.9.2):
     dependencies:
       '@vuetify/loader-shared': 2.1.0(vue@3.5.17(typescript@5.8.3))(vuetify@3.9.2)
       debug: 4.4.1(supports-color@5.5.0)
       upath: 2.0.1
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue: 3.5.17(typescript@5.8.3)
       vuetify: 3.9.2(typescript@5.8.3)(vite-plugin-vuetify@2.1.1)(vue@3.5.17(typescript@5.8.3))
     transitivePeerDependencies:
@@ -17259,11 +17269,11 @@ snapshots:
       tsx: 4.20.3
       yaml: 2.8.0
 
-  vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0):
+  vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0):
     dependencies:
       esbuild: 0.25.5
-      fdir: 6.4.6(picomatch@4.0.2)
-      picomatch: 4.0.2
+      fdir: 6.4.6(picomatch@4.0.3)
+      picomatch: 4.0.3
       postcss: 8.5.6
       rollup: 4.41.1
       tinyglobby: 0.2.14
@@ -17284,7 +17294,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+      '@vitest/mocker': 3.2.4(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
@@ -17302,7 +17312,7 @@ snapshots:
       tinyglobby: 0.2.14
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
-      vite: 7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      vite: 7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vite-node: 3.2.4(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
@@ -17385,7 +17395,7 @@ snapshots:
       vue: 3.5.17(typescript@5.8.3)
     optionalDependencies:
       typescript: 5.8.3
-      vite-plugin-vuetify: 2.1.1(vite@7.0.0(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))(vuetify@3.9.2)
+      vite-plugin-vuetify: 2.1.1(vite@7.0.6(@types/node@22.16.5)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))(vuetify@3.9.2)
 
   w3c-keyname@2.2.8: {}
 

@@ -24,7 +24,7 @@
     "test": "vitest --run"
   },
   "peerDependencies": {
-    "electron": "37.1.0"
+    "electron": "37.2.4"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

@@ -258,6 +258,8 @@
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-yjs</module>
     <module>xwiki-platform-zipexplorer</module>
+    <module>xwiki-platform-lib-a</module>
+    <module>xwiki-platform-lib-b</module>
   </modules>
   <profiles>
     <!-- Profile to build Legacy modules -->

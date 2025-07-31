@@ -33,7 +33,7 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "inversify": "7.5.4",
-    "vue-i18n": "11.1.5",
+    "vue-i18n": "11.1.10",
     "vuetify": "3.9.2"
   },
   "peerDependencies": {

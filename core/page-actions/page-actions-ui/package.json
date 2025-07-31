@@ -35,7 +35,7 @@
     "@xwiki/cristal-page-actions-api": "workspace:*",
     "@xwiki/cristal-rename-api": "workspace:*",
     "inversify": "7.5.4",
-    "vue-i18n": "11.1.5"
+    "vue-i18n": "11.1.10"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",

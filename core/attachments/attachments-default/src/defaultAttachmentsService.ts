@@ -191,7 +191,7 @@ export class DefaultAttachmentsService implements AttachmentsService {
     this.store.startUploading();
     let resolvedAttachments = undefined;
     try {
-      resolvedAttachments = this.storageProvider
+      resolvedAttachments = await this.storageProvider
         .get()
         .saveAttachments(page, files);
     } finally {

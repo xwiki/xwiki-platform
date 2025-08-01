@@ -42,8 +42,8 @@
     "@xwiki/cristal-uniast": "workspace:*",
     "i18next": "25.3.2",
     "lodash-es": "4.17.21",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
     "react-i18next": "15.5.3",
     "react-icons": "5.5.0"
   },

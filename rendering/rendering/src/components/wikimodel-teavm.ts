@@ -53,10 +53,10 @@ export class WikiModel {
 
   public parse(source: string): string {
     try {
-      console.log("In teaVM wrapper code");
+      console.debug("In teaVM wrapper code");
       return WikiModelTeaVM.parse(source);
     } catch (e) {
-      console.log("Exception rendering", e);
+      console.error("Exception rendering", e);
       return "Exception rendering: " + e;
     }
   }

@@ -134,7 +134,7 @@ export class CristalLoader {
       loggerConfig.setDefaultLevel("debug");
     }
     this.logger = this.getLogger("index.ts");
-    this.logger?.info("Logging initialized");
+    this.logger?.debug("Logging initialized");
   }
 
   public getConfigFromPathName(pathname: string): string {

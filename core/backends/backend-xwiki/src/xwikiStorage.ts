@@ -35,7 +35,7 @@ import type { AuthenticationManagerProvider } from "@xwiki/cristal-authenticatio
 
 /**
  * The type of individual attachments.
- * @since 0.9
+ * @since 0.21
  */
 type Attachment = {
   id: string;
@@ -48,7 +48,7 @@ type Attachment = {
   mimeType: string;
   author: string;
   authorName: string | null;
-  date: Date;
+  date: number;
   xwikiRelativeUrl: string;
   xwikiAbsoluteUrl: string;
   // TODO: add hierarchy
@@ -219,7 +219,7 @@ export class XWikiStorage extends AbstractStorage {
           mimetype: mimeType,
           href: xwikiAbsoluteUrl,
           size,
-          date,
+          date: new Date(date),
           author,
         };
       },

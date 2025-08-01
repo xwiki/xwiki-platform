@@ -78,7 +78,6 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
     app.component("XContainer", VContainer);
     app.component("XRow", VRow);
     app.component("XCol", VCol);
-    app.component("XTextField", VTextField);
 
     // Custom wrapped components
     registerAsyncComponent(app, "XLoad", () => import("../vue/x-load.vue"));

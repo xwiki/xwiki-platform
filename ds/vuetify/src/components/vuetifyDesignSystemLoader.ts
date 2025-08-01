@@ -22,7 +22,7 @@ import { registerAsyncComponent } from "@xwiki/cristal-api";
 import { injectable } from "inversify";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
-import { VCol, VContainer, VRow, VTextField } from "vuetify/components";
+import { VCol, VContainer, VRow } from "vuetify/components";
 
 import * as directives from "vuetify/directives";
 import { aliases, mdi } from "vuetify/iconsets/mdi-svg";

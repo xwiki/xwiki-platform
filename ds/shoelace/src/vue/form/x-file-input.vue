@@ -65,7 +65,6 @@ is not supported by shoelace currently.
       </div>
     </div>
   </div>
-  <br />
 </template>
 
 <style scoped>

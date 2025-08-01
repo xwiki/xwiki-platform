@@ -23,8 +23,6 @@ import { CTemplate } from "@xwiki/cristal-skin";
 import "./index.css";
 </script>
 <template>
-  <suspense>
-    <CTemplate name="view" />
-  </suspense>
+  <CTemplate name="view" />
 </template>
 <style scoped></style>

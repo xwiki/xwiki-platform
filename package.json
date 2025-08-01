@@ -79,11 +79,6 @@
         "dependencies": {
           "y-prosemirror": "1.2.13"
         }
-      },
-      "@xwiki/cristal-editors-blocknote-headless": {
-        "dependencies": {
-          "yjs": "=13.6.26"
-        }
       }
     }
   }

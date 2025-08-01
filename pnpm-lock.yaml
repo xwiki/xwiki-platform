@@ -4,7 +4,7 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-packageExtensionsChecksum: sha256-z7zb5jMOH2foQ7zAm+ODbuySqM0vH5ccm35qqHVSUvE=
+packageExtensionsChecksum: sha256-H0OsZ+cssnQpUbSM2euZmMd15bJwF6teFA4AiTFh3q4=
 
 importers:
 
@@ -319,7 +319,7 @@ importers:
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.17.0)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vitest-mock-extended:
         specifier: 3.1.0
-        version: 3.1.0(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.17.0)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
+        version: 3.1.0(typescript@5.9.2)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.17.0)(happy-dom@18.0.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.9.2)
@@ -3555,7 +3555,7 @@ importers:
     dependencies:
       '@blocknote/core':
         specifier: 0.35.0
-        version: 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26))(@types/hast@3.0.4)
+        version: 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
       '@xwiki/cristal-attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api
@@ -3607,9 +3607,6 @@ importers:
       vue-i18n:
         specifier: 11.1.11
         version: 11.1.11(vue@3.5.18(typescript@5.9.2))
-      yjs:
-        specifier: '=13.6.26'
-        version: 13.6.26
     devDependencies:
       '@types/lodash-es':
         specifier: 4.17.12
@@ -8842,11 +8839,6 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  lib0@0.2.109:
-    resolution: {integrity: sha512-jP0gbnyW0kwlx1Atc4dcHkBbrVAkdHjuyHxtClUPYla7qCmwIif1qZ6vQeJdR5FrOVdn26HvQT0ko01rgW7/Xw==}
-    engines: {node: '>=16'}
-    hasBin: true
-
   lib0@0.2.114:
     resolution: {integrity: sha512-gcxmNFzA4hv8UYi8j43uPlQ7CGcyMJ2KQb5kZASw6SnAKAf10hK12i2fjrS3Cl/ugZa5Ui6WwIu1/6MIXiHttQ==}
     engines: {node: '>=16'}
@@ -11055,10 +11047,6 @@ packages:
   yauzl@2.10.0:
     resolution: {integrity: sha512-p4a9I6X6nu6IhoGmBqAcbJy1mlC4j27vEPZX9F4L4/vZT3Lyq1VkFHw/V/PUcB9Buo+DG3iHkT0x3Qya58zc3g==}
 
-  yjs@13.6.26:
-    resolution: {integrity: sha512-wiARO3wixu7mtoRP5f7LqpUtsURP9SmNgXUt3RlnZg4qDuF7dUjthwIvwxIDmK55dPw4Wl4QdW5A3ag0atwu7g==}
-    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
-
   yjs@13.6.27:
     resolution: {integrity: sha512-OIDwaflOaq4wC6YlPBy2L6ceKeKuF7DeTxx+jPzv1FHn9tCZ0ZwSRnUBxD05E3yed46fv/FWJbvR+Ud7x0L7zw==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
@@ -11208,57 +11196,6 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@blocknote/core@0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26))(@types/hast@3.0.4)':
-    dependencies:
-      '@emoji-mart/data': 1.2.1
-      '@shikijs/types': 3.2.1
-      '@tiptap/core': 2.13.0(@tiptap/pm@2.13.0)
-      '@tiptap/extension-bold': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))
-      '@tiptap/extension-code': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))
-      '@tiptap/extension-gapcursor': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))(@tiptap/pm@2.13.0)
-      '@tiptap/extension-history': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))(@tiptap/pm@2.13.0)
-      '@tiptap/extension-horizontal-rule': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))(@tiptap/pm@2.13.0)
-      '@tiptap/extension-italic': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))
-      '@tiptap/extension-link': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))(@tiptap/pm@2.13.0)
-      '@tiptap/extension-paragraph': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))
-      '@tiptap/extension-strike': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))
-      '@tiptap/extension-table-cell': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))
-      '@tiptap/extension-table-header': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))
-      '@tiptap/extension-text': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))
-      '@tiptap/extension-underline': 2.13.0(@tiptap/core@2.13.0(@tiptap/pm@2.13.0))
-      '@tiptap/pm': 2.13.0
-      emoji-mart: 5.6.0
-      hast-util-from-dom: 5.0.1
-      prosemirror-dropcursor: 1.8.2
-      prosemirror-highlight: 0.13.0(@shikijs/types@3.2.1)(@types/hast@3.0.4)(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-transform@1.10.4)(prosemirror-view@1.40.0)
-      prosemirror-model: 1.25.1
-      prosemirror-state: 1.4.3
-      prosemirror-tables: 1.7.1
-      prosemirror-transform: 1.10.4
-      prosemirror-view: 1.40.0
-      rehype-format: 5.0.1
-      rehype-parse: 9.0.1
-      rehype-remark: 10.0.1
-      rehype-stringify: 10.0.1
-      remark-gfm: 4.0.1
-      remark-parse: 11.0.0
-      remark-rehype: 11.1.2
-      remark-stringify: 11.0.0
-      unified: 11.0.5
-      uuid: 8.3.2
-      y-prosemirror: 1.3.5(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.40.0)(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.27)
-      y-protocols: 1.0.6(yjs@13.6.27)
-      yjs: 13.6.27
-    optionalDependencies:
-      '@hocuspocus/provider': 2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26)
-    transitivePeerDependencies:
-      - '@types/hast'
-      - highlight.js
-      - lowlight
-      - refractor
-      - sugar-high
-      - supports-color
-
   '@blocknote/core@0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)':
     dependencies:
       '@emoji-mart/data': 1.2.1
@@ -11297,7 +11234,7 @@ snapshots:
       remark-stringify: 11.0.0
       unified: 11.0.5
       uuid: 8.3.2
-      y-prosemirror: 1.3.5(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.40.0)(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.27)
+      y-prosemirror: 1.3.5(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.40.0)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
       y-protocols: 1.0.6(yjs@13.6.27)
       yjs: 13.6.27
     optionalDependencies:
@@ -11868,19 +11805,6 @@ snapshots:
   '@hocuspocus/common@2.15.2':
     dependencies:
       lib0: 0.2.114
-
-  '@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.26)':
-    dependencies:
-      '@hocuspocus/common': 2.15.2
-      '@lifeomic/attempt': 3.1.0
-      lib0: 0.2.108
-      ws: 8.18.2
-      y-protocols: 1.0.6(yjs@13.6.27)
-      yjs: 13.6.26
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    optional: true
 
   '@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
     dependencies:
@@ -15402,10 +15326,6 @@ snapshots:
     dependencies:
       isomorphic.js: 0.2.5
 
-  lib0@0.2.109:
-    dependencies:
-      isomorphic.js: 0.2.5
-
   lib0@0.2.114:
     dependencies:
       isomorphic.js: 0.2.5
@@ -17849,7 +17769,7 @@ snapshots:
       y-protocols: 1.0.6(yjs@13.6.27)
       yjs: 13.6.27
 
-  y-prosemirror@1.3.5(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.40.0)(y-protocols@1.0.6(yjs@13.6.26))(yjs@13.6.27):
+  y-prosemirror@1.3.5(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.40.0)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27):
     dependencies:
       lib0: 0.2.114
       prosemirror-model: 1.25.1
@@ -17893,10 +17813,6 @@ snapshots:
     dependencies:
       buffer-crc32: 0.2.13
       fd-slicer: 1.1.0
-
-  yjs@13.6.26:
-    dependencies:
-      lib0: 0.2.109
 
   yjs@13.6.27:
     dependencies:

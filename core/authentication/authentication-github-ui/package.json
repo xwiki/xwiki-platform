@@ -32,7 +32,7 @@
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "@xwiki/cristal-uiextension-default": "workspace:*",
     "inversify": "7.6.1",
-    "vue-i18n": "11.1.10"
+    "vue-i18n": "11.1.11"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",

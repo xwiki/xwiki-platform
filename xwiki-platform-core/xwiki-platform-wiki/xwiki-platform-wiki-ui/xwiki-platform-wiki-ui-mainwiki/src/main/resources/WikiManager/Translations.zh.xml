@@ -113,24 +113,24 @@ platform.wiki.users.join.request.cancelNo=否
 platform.wiki.users.join.request.cancelSuccess=用户{0}{1}{2}成功取消了加入Wiki{3}{4}{5}的请求。
 platform.wiki.users.join.request.saveNotification=用户''{0}'' ({1})已请求加入Wiki''{2}'' ({3})。
 platform.wiki.users.join.request.success=用户{0}{1}{2}已成功发送加入 wiki {3}{4}{5}的请求。
-platform.wiki.users.join.confirmation=你确定要加入维基 {0}{1}{2} 吗？
+platform.wiki.users.join.confirmation=你确定要加入Wiki {0}{1}{2} 吗？
 platform.wiki.users.join.yes=是
 platform.wiki.users.join.no=不
-platform.wiki.users.join.success=用户{0}{1}{2}成功加入了维基{3}{4}{5}。
-platform.wiki.users.leave.error.userIsOwner=用户 {0}{1}{2} 是维基 {3}{4}{5} 的所有者。维基的所有者不能离开，除非维基被删除或所有者被更改。
+platform.wiki.users.join.success=用户{0}{1}{2}成功加入了Wiki{3}{4}{5}。
+platform.wiki.users.leave.error.userIsOwner=用户 {0}{1}{2} 是Wiki {3}{4}{5} 的所有者。Wiki的所有者不能离开，除非Wiki被删除或所有者被更改。
 platform.wiki.users.leave.confirmation=你确定要离开 wiki {0}{1}{2} 吗？
 platform.wiki.users.leave.confirmation.yes=是
 platform.wiki.users.leave.confirmation.no=不
 platform.wiki.users.leave.success=用户{0}{1}{2}已成功离开 wiki {3}{4}{5}。
-platform.wiki.users.join.title=加入维基
-platform.wiki.users.leave.title=离开维基 "{0}"
+platform.wiki.users.join.title=加入Wiki
+platform.wiki.users.leave.title=离开Wiki "{0}"
 platform.wiki.users.leave.empty=离开 Wiki
 platform.wiki.users.delete.title=删除 Wiki "{0}"
 platform.wiki.users.delete.empty=删除 Wiki
-platform.wiki.users.invitation.reply.hint=一条回复消息，可供维基管理员查看，其中可以说明你的决定。
-platform.wiki.users.join.request.hint=要加入 {0}{1}{2} 这个维基，你必须首先提交加入请求。提交后，维基管理员将审核并考虑你的请求。
-platform.wiki.users.join.request.message.hint=一条可由维基管理员查看的消息，用于激励此加入请求。
-platform.wiki.users.invitation.title=您已被邀请加入维基 {0}{1}{2}。
+platform.wiki.users.invitation.reply.hint=一条回复消息，可供Wiki管理员查看，其中可以说明你的决定。
+platform.wiki.users.join.request.hint=要加入 {0}{1}{2} 这个Wiki，你必须首先提交加入请求。提交后，Wiki管理员将审核并考虑你的请求。
+platform.wiki.users.join.request.message.hint=一条可由Wiki管理员查看的消息，用于激励此加入请求。
+platform.wiki.users.invitation.title=您已被邀请加入Wiki {0}{1}{2}。
 platform.wiki.users.invitation.message.label=邀请信息
 platform.wiki.users.invitation.reply.title=回复
 platform.wiki.users.invitation.accept.label=接受
@@ -151,13 +151,13 @@ platform.wiki.users.profile.activity.show=显示活动
 
 ## Wiki Deletion
 platform.wiki.delete.confirmation=你确定要删除这个 wiki {0}{1}{2} 吗？这个操作无法撤销！
-platform.wiki.delete.confirmation.retypeWikiId=请在此处重复维基的标识符：
+platform.wiki.delete.confirmation.retypeWikiId=请在此处重复Wiki的标识符：
 platform.wiki.delete.error.wikiIdDoesNotMatch=输入应删除的 wiki 的确切标识符。
-platform.wiki.delete.success=用户 {0}{1}{2} 成功删除了维基 ''{3}''。
+platform.wiki.delete.success=用户 {0}{1}{2} 成功删除了Wiki ''{3}''。
 
 ## Wiki macro
-platform.wiki.macro.noWikis=目前还没有创建任何维基（除了主维基）。
-rendering.macro.wikis.name=维基
+platform.wiki.macro.noWikis=目前还没有创建任何Wiki（除了主Wiki）。
+rendering.macro.wikis.name=Wiki
 rendering.macro.wikis.description=List all Wikis
 
 ## LegacyWorkspaces macro
@@ -165,7 +165,7 @@ rendering.macro.workspaces.name=工作区（旧版）
 rendering.macro.workspaces.description=已弃用的宏，由于兼容性问题不应在此使用。请使用 "wikis" 宏代替。
 
 ## Browse
-platform.wiki.browse=浏览维基
+platform.wiki.browse=浏览Wiki
 ### Missing: platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=名称
 platform.wiki.browse.description=描述
@@ -184,9 +184,9 @@ platform.wiki.browse._actions.delete=删除
 WikiManager.WikiUserClass_membershipType_open=任何用户都可以加入
 WikiManager.WikiUserClass_membershipType_request=任何全局用户都可以申请加入，但管理员必须接受
 WikiManager.WikiUserClass_membershipType_invite=只有管理员可以发送邀请加入此 wiki
-WikiManager.WikiUserClass_userScope_local_only=维基中仅提供本地用户
-WikiManager.WikiUserClass_userScope_global_only=只有全局用户可以在维基中访问
-WikiManager.WikiUserClass_userScope_local_and_global=全球和本地用户都可在维基中使用
+WikiManager.WikiUserClass_userScope_local_only=Wiki中仅提供本地用户
+WikiManager.WikiUserClass_userScope_global_only=只有全局用户可以在Wiki中访问
+WikiManager.WikiUserClass_userScope_local_and_global=全球和本地用户都可在Wiki中使用
 platform.wiki.prop.wikiname=Wiki 标识符
 platform.wiki.prop.wikiprettyname=漂亮名称
 platform.wiki.prop.wikialias=别名
@@ -197,10 +197,10 @@ platform.wiki.prop.membershipType.hint=用户加入此 wiki 的方式。
 
 ## Wizard
 platform.wiki.create.wizard.desc.wikiname=新站点的唯一标识符。
-platform.wiki.create.wizard.desc.wikiprettyname=维基的显示名称。
-platform.wiki.create.wizard.desc.wikialias=将要指向维基的域名。
+platform.wiki.create.wizard.desc.wikiprettyname=Wiki的显示名称。
+platform.wiki.create.wizard.desc.wikialias=将要指向Wiki的域名。
 platform.wiki.create.wizard.desc.newTemplateHint=用于此新站点的模板（所有页面将被克隆）。
-platform.wiki.create.wizard.desc.description=对维基及其目的的简要描述。
+platform.wiki.create.wizard.desc.description=对Wiki及其目的的简要描述。
 platform.wiki.create.wizard.desc.owner=一个用户将始终拥有对此 wiki 的所有权限，不受管理设置中配置的权限影响。
 platform.wiki.create.wizard.desc.members=可以参与 Wiki 的用户。
 platform.wiki.create.wizard.step.nameAndType=步骤 1 — 选择一个名称
@@ -211,18 +211,18 @@ platform.wiki.create.wizard.step.cleaningUp=清理
 platform.wiki.create.wizard.step.provisioning.cleanUp=清理并删除此 wiki
 platform.wiki.create.wizard.step.cleaningup.success=Wiki {0} 已成功删除。
 platform.wiki.create.wizard.step.cleaningup.error=错误，wiki {0} 未被删除。
-platform.wiki.create.wizard.step.cleaningUp.confirmmessage=您即将删除维基 {0}。请确认。
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=您即将删除Wiki {0}。请确认。
 platform.wiki.create.wizard.step.cleaningUp.confirm=确认
-platform.wiki.create.wizard.setAsTemplate.label=这个维基将成为一个模板
+platform.wiki.create.wizard.setAsTemplate.label=这个Wiki将成为一个模板
 platform.wiki.create.wizard.template.noTemplate=无模板（默认）
 platform.wiki.create.wizard.userScope.label=用户范围
-platform.wiki.create.wizard.userScope.hint=选择哪些用户可以访问维基
+platform.wiki.create.wizard.userScope.hint=选择哪些用户可以访问Wiki
 platform.wiki.create.wizard.template.label=模板
 platform.wiki.create.wizard.flavortemplate.label=风味 / 模板
 platform.wiki.create.wizard.flavortemplate.hint=用于新 wiki 的初始内容的口味或模板
 platform.wiki.create.wizard.flavortemplate.flavorTab=风味
 platform.wiki.create.wizard.flavortemplate.templateTab=模板
-platform.wiki.create.wizard.step.dw=点击"创建"按钮后，将创建维基并启动分发向导以帮助您初始化维基。如果您跳过向导，您的维基将是空的。
+platform.wiki.create.wizard.step.dw=点击"创建"按钮后，将创建Wiki并启动分发向导以帮助您初始化Wiki。如果您跳过向导，您的Wiki将是空的。
 platform.wiki.create.wizard.step.previous=上一步
 platform.wiki.create.wizard.step.next=下一步
 platform.wiki.create.wizard.step.create=创建
@@ -230,11 +230,11 @@ platform.wiki.create.wizard.step.creation=创建 Wiki
 platform.wiki.create.wizard.step.creation.wait=请等待 wiki 创建完成。
 platform.wiki.create.wizard.step.creation.complete=wiki {0} 已成功创建。您现在可以访问它了。
 platform.wiki.create.wizard.step.creation.errorlog=然而，在创建过程中生成了错误，您可能需要查看它们。
-platform.wiki.create.wizard.step.creation.error=创建维基 {0} 失败。建议删除它。
+platform.wiki.create.wizard.step.creation.error=创建Wiki {0} 失败。建议删除它。
 platform.wiki.create.wizard.step.creation.go=前往 Wiki
 
 ## Admin
-admin.wikis.description=维基管理。
+admin.wikis.description=Wiki管理。
 admin.wikis.templates=Wiki 模板
 admin.wikis.templates.description=管理 Wiki 模板
 admin.wikis.templates.hint=模板是一个将被视为创建新 Wiki 模板的 Wiki。当用户选择一个模板来创建新 Wiki 时，模板中的所有内容都会被复制到新 Wiki 中。
@@ -247,13 +247,13 @@ platform.wiki.sheet.erroraliasdoesnotexists=Wiki 别名"{0}"不存在。
 platform.wiki.sheet.title.settings=Wiki 属性
 platform.wiki.sheet.title.createnewalias=创建新别名
 platform.wiki.sheet.title.viewaliases=查看别名
-platform.wiki.sheet.desc.wikiprettyname=维基的显示名称。
+platform.wiki.sheet.desc.wikiprettyname=Wiki的显示名称。
 platform.wiki.sheet.desc.owner=一个将拥有此 wiki 所有权限的用户。
 platform.wiki.sheet.desc.secure=如果启用，所有这个 wiki 生成的外部 URL 都将以"https"开头。
 platform.wiki.sheet.desc.port=用于所有此 wiki 生成的外部 URL 的端口。如果未设置，则从配置和主 wiki 继承。仅适用于基于域的 URL。
-platform.wiki.sheet.desc.iswikitemplate=指示在创建新维基时是否可将此维基用作模板。
-platform.wiki.sheet.desc.server=用于访问维基的别名。
-platform.wiki.sheet.desc.description=一个简短的维基描述。
+platform.wiki.sheet.desc.iswikitemplate=指示在创建新Wiki时是否可将此Wiki用作模板。
+platform.wiki.sheet.desc.server=用于访问Wiki的别名。
+platform.wiki.sheet.desc.description=一个简短的Wiki描述。
 platform.wiki.sheet.desc.homepage=Wiki 的主页。
 platform.wiki.sheet.prop.wikiprettyname=漂亮名称
 platform.wiki.sheet.prop.owner=所有者
@@ -263,7 +263,7 @@ platform.wiki.sheet.prop.description=描述
 platform.wiki.sheet.prop.server=别名
 platform.wiki.sheet.prop.homepage=主页
 platform.wiki.sheet.prop.iswikitemplate=Wiki 模板
-platform.wiki.sheet.descriptor=本页面定义了如何访问"{0}"维基，以及它的某些属性。更多配置请前往
+platform.wiki.sheet.descriptor=本页面定义了如何访问"{0}"Wiki，以及它的某些属性。更多配置请前往
 platform.wiki.sheet.descriptor.admin=Wiki 的管理页面。
 platform.wiki.sheet.aliases=别名是 Wiki 的另一个名称。您可以添加别名来为 Wiki 创建不同的 URL。
 
@@ -292,14 +292,14 @@ admin.wikis.template=Wiki 模板
 platform.wiki.create.wizard.step.provisioning=系统正在配置 Wiki。
 platform.wiki.create.wizard.step.provisioning.wait=请等待系统配置 Wiki。
 platform.wiki.create.wizard.step.provisioning.complete=Wiki 已接近准备就绪。请点击“完成”以执行最后操作。
-platform.wiki.create.wizard.step.provisioning.error=该维基 {0} 已创建，但模板中包含的一些页面未复制。您可能应该将其删除。
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning.error=该Wiki {0} 已创建，但模板中包含的一些页面未复制。您可能应该将其删除。
+platform.wiki.create.wizard.step.provisioning.finalize=完成
 
 #######################################
 ## until 9.5-rc-1
 #######################################
-platform.wiki.delete.confirmation.yes=Yes, please delete this Wiki!
-### Missing: platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.confirmation.yes=是的，请删除这个Wiki！
+platform.wiki.delete.confirmation.no=不，带我回去！
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

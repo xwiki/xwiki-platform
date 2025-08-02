@@ -136,27 +136,27 @@ platform.wiki.users.invitation.reply.title=回复
 platform.wiki.users.invitation.accept.label=接受
 platform.wiki.users.invitation.reject.label=拒绝
 platform.wiki.users.invitation.postpone.label=稍后
-### Missing: platform.wiki.users.join.request.message.label=Message
-### Missing: platform.wiki.users.join.request.send.label=Send Request
-### Missing: platform.wiki.users.join.request.cancel.label=Back
+platform.wiki.users.join.request.message.label=消息
+platform.wiki.users.join.request.send.label=发送请求
+platform.wiki.users.join.request.cancel.label=后
 
 ## User profile
 platform.wiki.users.profile.joinedwikis.label=已加入的Wiki
 platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=你还不是任何Wiki的成员。
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=该用户还不是任何Wiki的成员。
 platform.wiki.users.profile.activity.title={0} 的活动
-platform.wiki.users.profile.activity.hint=Generates an activity stream for the given Wiki(s).
-platform.wiki.users.profile.activity.multipletitle=Activity of Wikis {0}
+platform.wiki.users.profile.activity.hint=为指定的 wiki(s)生成活动流。
+platform.wiki.users.profile.activity.multipletitle=wikis {0} 的活动
 platform.wiki.users.profile.activity.show=显示活动
 
 ## Wiki Deletion
-platform.wiki.delete.confirmation=Are you sure you want to delete the Wiki {0}{1}{2}? This action cannot be reverted!
-platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the Wiki here:
-platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the Wiki that should be deleted.
-platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the Wiki ''{3}''.
+platform.wiki.delete.confirmation=你确定要删除这个 wiki {0}{1}{2} 吗？这个操作无法撤销！
+platform.wiki.delete.confirmation.retypeWikiId=请在此处重复维基的标识符：
+platform.wiki.delete.error.wikiIdDoesNotMatch=输入应删除的 wiki 的确切标识符。
+platform.wiki.delete.success=用户 {0}{1}{2} 成功删除了维基 ''{3}''。
 
 ## Wiki macro
-platform.wiki.macro.noWikis=There are currently no Wikis created (except the main one).
+platform.wiki.macro.noWikis=目前还没有创建任何维基（除了主维基）。
 ### Missing: rendering.macro.wikis.name=Wikis
 rendering.macro.wikis.description=List all Wikis
 

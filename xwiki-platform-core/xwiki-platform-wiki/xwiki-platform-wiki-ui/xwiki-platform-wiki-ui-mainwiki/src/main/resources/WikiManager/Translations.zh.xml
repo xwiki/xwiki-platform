@@ -106,12 +106,12 @@ platform.wiki.users.invitation.userAcceptedNotification=用户''{0}'' ({1}) 已�
 platform.wiki.users.invitation.userAcceptedSuccess=用户 {0}{1}{2} 成功接受邀请并加入了wiki {3}{4}{5}。
 platform.wiki.users.invitation.userRejectedSuccess=用户 {0}{1}{2} 成功拒绝了加入 wiki {3}{4}{5} 的邀请。
 platform.wiki.users.join.error.needInvitation=这个 wiki 只能通过邀请加入。要这样做，你需要从一个管理员那里收到邀请。
-platform.wiki.users.join.request.pendingRequestExists=用户{0}{1}{2}已经有一个加入wiki {3}{4}{5}的待处理请求。请等待维基管理员审核。
-### Missing: platform.wiki.users.join.request.cancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
-### Missing: platform.wiki.users.join.request.cancelYes=Yes
-### Missing: platform.wiki.users.join.request.cancelNo=No
-### Missing: platform.wiki.users.join.request.cancelSuccess=The user {0}{1}{2} successfully cancelled the request to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.request.saveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
+platform.wiki.users.join.request.pendingRequestExists=用户{0}{1}{2}已经有一个加入wiki {3}{4}{5}的待处理请求。请等待Wiki管理员审核。
+platform.wiki.users.join.request.cancelConfirmation=您确定要取消加入Wiki的请求{0}{1}{2}吗？
+platform.wiki.users.join.request.cancelYes=是
+platform.wiki.users.join.request.cancelNo=否
+platform.wiki.users.join.request.cancelSuccess=用户{0}{1}{2}成功取消了加入Wiki{3}{4}{5}的请求。
+platform.wiki.users.join.request.saveNotification=用户''{0}'' ({1})已请求加入Wiki''{2}'' ({3})。
 ### Missing: platform.wiki.users.join.request.success=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.join.confirmation=Are you sure you want to join the wiki {0}{1}{2}?
 ### Missing: platform.wiki.users.join.yes=Yes
@@ -283,7 +283,7 @@ platform.wiki.users.profile.activity.show=显示活动
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
+admin.wikis=Wiki实例
 ### Missing: admin.wikis.template=Wiki Template
 
 #######################################

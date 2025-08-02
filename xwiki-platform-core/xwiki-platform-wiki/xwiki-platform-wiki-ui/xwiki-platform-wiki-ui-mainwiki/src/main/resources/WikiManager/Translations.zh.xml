@@ -100,9 +100,9 @@ platform.wiki.csrf.error=无效的安全令牌。请重试您的操作。
 
 ## Users
 platform.wiki.users.userAlreadyMemberOfWiki=用户 {0}{1}{2} 已经是wiki {3}{4}{5}的成员。
-### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
-### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
+platform.wiki.users.userNotMemberOfWiki=用户 {0}{1}{2} 不是 wiki {3}{4}{5} 的成员。
+platform.wiki.users.logInToContinue=要继续，您需要先 {0}登录{1}。
+platform.wiki.users.invitation.userAcceptedNotification=用户''{0}'' ({1}) 已接受加入维基 ''{2}'' ({3}) 的邀请。
 ### Missing: platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
 ### Missing: platform.wiki.users.join.error.needInvitation=This wiki is invite only. To do so, you need to receive an invitation from one of its admins.

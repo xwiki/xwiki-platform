@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: admin.wikis=Wikis
+  <content>admin.wikis=Wiki实例
 admin.wikis.descriptor=描述符号
 admin.wikis.descriptor.description=配置Wiki描述符号
 admin.wiki.description=描述您的Wiki（好听的名称和描述）并设置其所有者和主页。

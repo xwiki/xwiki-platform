@@ -146,7 +146,7 @@ platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=你还不是任何Wik
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=该用户还不是任何Wiki的成员。
 platform.wiki.users.profile.activity.title={0} 的活动
 platform.wiki.users.profile.activity.hint=为指定的 wiki(s)生成活动流。
-platform.wiki.users.profile.activity.multipletitle=wikis {0} 的活动
+platform.wiki.users.profile.activity.multipletitle=Wikis {0} 的活动
 platform.wiki.users.profile.activity.show=显示活动
 
 ## Wiki Deletion
@@ -162,7 +162,7 @@ rendering.macro.wikis.description=List all Wikis
 
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=工作区（旧版）
-rendering.macro.workspaces.description=已弃用的宏，由于兼容性问题不应在此使用。请使用 "wikis" 宏代替。
+rendering.macro.workspaces.description=已弃用的宏，由于兼容性问题不应在此使用。请使用 "Wikis" 宏代替。
 
 ## Browse
 platform.wiki.browse=浏览Wiki

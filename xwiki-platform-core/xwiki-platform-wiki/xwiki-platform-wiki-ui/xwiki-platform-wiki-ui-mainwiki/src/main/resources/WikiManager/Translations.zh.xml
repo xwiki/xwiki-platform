@@ -136,9 +136,9 @@ platform.wiki.users.invitation.reply.title=回复
 platform.wiki.users.invitation.accept.label=接受
 platform.wiki.users.invitation.reject.label=拒绝
 platform.wiki.users.invitation.postpone.label=稍后
-### Missing: platform.wiki.users.join.request.message.label=Message
-### Missing: platform.wiki.users.join.request.send.label=Send Request
-### Missing: platform.wiki.users.join.request.cancel.label=Back
+platform.wiki.users.join.request.message.label=消息
+platform.wiki.users.join.request.send.label=发送请求
+platform.wiki.users.join.request.cancel.label=后
 
 ## User profile
 platform.wiki.users.profile.joinedwikis.label=已加入的Wiki

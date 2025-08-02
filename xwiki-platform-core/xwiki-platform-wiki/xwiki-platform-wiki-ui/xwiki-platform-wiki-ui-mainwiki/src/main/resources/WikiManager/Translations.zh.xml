@@ -258,14 +258,14 @@ platform.wiki.sheet.desc.homepage=Wiki 的主页。
 platform.wiki.sheet.prop.wikiprettyname=漂亮名称
 platform.wiki.sheet.prop.owner=所有者
 platform.wiki.sheet.prop.secure=安全（SSL）
-### Missing: platform.wiki.sheet.prop.port=Port
-### Missing: platform.wiki.sheet.prop.description=Description
-### Missing: platform.wiki.sheet.prop.server=Alias
-### Missing: platform.wiki.sheet.prop.homepage=Homepage
-### Missing: platform.wiki.sheet.prop.iswikitemplate=Wiki template
-platform.wiki.sheet.descriptor=This page defines how to access the "{0}" Wiki, and some properties about it. For more configurations, please go to the
-platform.wiki.sheet.descriptor.admin=administration page of the Wiki.
-platform.wiki.sheet.aliases=An alias is another name for the Wiki. You can add aliases to create different URLs for the Wiki.
+platform.wiki.sheet.prop.port=端口
+platform.wiki.sheet.prop.description=描述
+platform.wiki.sheet.prop.server=别名
+platform.wiki.sheet.prop.homepage=主页
+platform.wiki.sheet.prop.iswikitemplate=Wiki 模板
+platform.wiki.sheet.descriptor=本页面定义了如何访问"{0}"维基，以及它的某些属性。更多配置请前往
+platform.wiki.sheet.descriptor.admin=Wiki 的管理页面。
+platform.wiki.sheet.aliases=别名是 Wiki 的另一个名称。您可以添加别名来为 Wiki 创建不同的 URL。
 
 ###############################################################################
 ## Deprecated
@@ -278,28 +278,28 @@ platform.wiki.sheet.aliases=An alias is another name for the Wiki. You can add a
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing={0}应用管理插件{1}未安装。请安装后重试。
 
 #######################################
 ## until 6.4RC1
 #######################################
 admin.wikis=Wiki实例
-### Missing: admin.wikis.template=Wiki Template
+admin.wikis.template=Wiki 模板
 
 #######################################
 ## until 7.0M2
 #######################################
-platform.wiki.create.wizard.step.provisioning=The system is provisioning the Wiki.
-platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the Wiki.
-platform.wiki.create.wizard.step.provisioning.complete=The Wiki is almost ready. Please click on "finalize" to perform the last operation.
-platform.wiki.create.wizard.step.provisioning.error=The Wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning=系统正在配置 Wiki。
+platform.wiki.create.wizard.step.provisioning.wait=请等待系统配置 Wiki。
+platform.wiki.create.wizard.step.provisioning.complete=Wiki 已接近准备就绪。请点击“完成”以执行最后操作。
+platform.wiki.create.wizard.step.provisioning.error=该维基 {0} 已创建，但模板中包含的一些页面未复制。您可能应该将其删除。
+platform.wiki.create.wizard.step.provisioning.finalize=完成
 
 #######################################
 ## until 9.5-rc-1
 #######################################
-platform.wiki.delete.confirmation.yes=Yes, please delete this Wiki!
-### Missing: platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.confirmation.yes=是的，请删除这个维基！
+platform.wiki.delete.confirmation.no=不，带我回去！
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

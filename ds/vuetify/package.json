@@ -34,7 +34,7 @@
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "inversify": "7.7.0",
     "vue-i18n": "11.1.11",
-    "vuetify": "3.9.2"
+    "vuetify": "3.9.3"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",

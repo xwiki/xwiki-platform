@@ -120,7 +120,6 @@ export default {
     // which automatically insert the component in the html
     async loadFilter(filterId) {
       const component = await componentStore.load("filter", filterId ?? this.filterId);
-      console.log('filter loaded');
       if (!component) {
         throw new Error(`Unknown filter [${filterId}]`);
       }

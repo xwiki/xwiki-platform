@@ -91,7 +91,7 @@ export default {
         const component = this;
         // Wait for the icon component to be fully rendered before copying its content.
         this.$nextTick(() => {
-          require(['xwiki-bootstrap-switch'], () => {
+          require(["xwiki-bootstrap-switch"], () => {
             this.jQuery(this.$refs.input).bootstrapSwitch({
               size: "mini",
               state: component.innerChecked,
@@ -126,8 +126,8 @@ export default {
                   },
                 });
               },
-            })
-          })
+            });
+          });
         });
       }
     },

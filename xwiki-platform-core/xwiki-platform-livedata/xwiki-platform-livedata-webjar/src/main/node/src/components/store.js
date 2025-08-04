@@ -24,63 +24,58 @@
  * The values are the components
  */
 const store = {};
+/**
+ * The awaiting map has the same structure as the store, but contains promises that exists only of a component is
+ * required before it is registered. The promises are resolved once the requested component is registered.
+ */
 const awaiting = {};
 
 const componentStore = {
+  register(kind, key, componentProvider) {
+    if (!store[kind]) {
+      store[kind] = {};
+    }
+    store[kind][key] = componentProvider;
 
-    register(kind, key, componentProvider)
-    {
-        if (!store[kind]) {
-            store[kind] = {};
-        }
-        store[kind][key] = componentProvider;
-        if (awaiting?.[kind]?.[key]) {
-            console.log(`STORE: [${kind}][${key}] registered and required`)
-            componentProvider().then(resolved => {
-                store[kind][key] = resolved;
-                console.log(`STORE: [${kind}][${key}] resolved on request`)
-                awaiting[kind][key].resolve(resolved);
-                delete awaiting[kind][key];
-            });
-        } else {
-            console.log(`STORE: [${kind}][${key}] registered and not required`)
-        }
-    },
+    // If the component was requested before registation, it is resolved and registered directly.
+    if (awaiting?.[kind]?.[key]) {
+      componentProvider().then((resolved) => {
+        store[kind][key] = resolved;
+        awaiting[kind][key].resolve(resolved);
+        delete awaiting[kind][key];
+      });
+    }
+  },
 
-    async load(kind, key)
-    {
-        if (!store[kind] || !store[kind][key]) {
-            console.log(`STORE: [${kind}][${key}] is missing from the store`)
-            if (awaiting?.[kind]?.[key]) {
-                console.log(`STORE: [${kind}][${key}] was already requested while missing`)
-                return awaiting[kind][key].promise;
-            }
-            console.log(`STORE: [${kind}][${key}] is requested while missing for the first time`)
+  async load(kind, key) {
+    if (!store[kind] || !store[kind][key]) {
+      // If the component was already awaited for, we return the same promise again.
+      if (awaiting?.[kind]?.[key]) {
+        return awaiting[kind][key].promise;
+      }
 
-            let _resolve;
-            const promise = new Promise((resolve) => {
-                _resolve = resolve
-            });
-            if (!awaiting[kind]) {
-                awaiting[kind] = {}
-            }
-            awaiting[kind][key] = {promise: promise, resolve: _resolve};
-            console.log(`STORE: [${kind}][${key}] return a pending promise`)
-            return promise;
-        } else {
-            console.log(`STORE: [${kind}][${key}] is found in the store`)
-            // On the first access, we resolve the component provider and save its result instead.
-            // On the next access, the cached result is returned without a lookup.
-            // This is fine since the result of the componentProvider function is expected to be stable.
-            if (typeof store[kind][key] === "function") {
-                console.log(`STORE: [${kind}][${key}] is resolved on request`)
-                store[kind][key] = await store[kind][key]()
-            }
+      // Otherwise, a promise is created and stored in the awaiting map. Once the expected component is registered,
+      // the promise is resolved.
+      let _resolve;
+      const promise = new Promise((resolve) => {
+        _resolve = resolve;
+      });
+      if (!awaiting[kind]) {
+        awaiting[kind] = {};
+      }
+      awaiting[kind][key] = { promise: promise, resolve: _resolve };
+      return promise;
+    } else {
+      // On the first access, we resolve the component provider and save its result instead.
+      // On the next access, the cached result is returned without a lookup.
+      // This is fine since the result of the componentProvider function is expected to be stable.
+      if (typeof store[kind][key] === "function") {
+        store[kind][key] = await store[kind][key]();
+      }
 
-            console.log(`STORE: [${kind}][${key}] return a resolved component`)
-            return store[kind][key];
-        }
-    },
+      return store[kind][key];
+    }
+  },
 };
 
-export {componentStore};
+export { componentStore };

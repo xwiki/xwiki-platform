@@ -34,7 +34,7 @@
     "@types/lodash-es": "4.17.12",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
-    "typescript": "5.8.3",
+    "typescript": "5.9.2",
     "vite": "7.0.6"
   },
   "publishConfig": {

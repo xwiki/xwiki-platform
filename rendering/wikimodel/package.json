@@ -28,7 +28,7 @@
   "types": "dist/index.d.ts",
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "typescript": "5.8.3",
+    "typescript": "5.9.2",
     "vite": "7.0.6",
     "vue-tsc": "2.2.12"
   },

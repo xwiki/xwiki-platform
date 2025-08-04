@@ -30,7 +30,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "vue": "3.5.16",
-    "vue-i18n": "11.1.5"
+    "vue-i18n": "11.1.11"
   },
   "devDependencies": {
     "@eslint/js": "9.32.0",

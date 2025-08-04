@@ -191,7 +191,7 @@ export class MarkdownToUniAstConverter {
       case "html":
         throw new Error("TODO: handle blocks of type " + block.type);
 
-      // NOTE: These are handled in the `tokenToInline` function below
+      // NOTE: These are handled in the `convertInline` function below
       case "text":
       case "delete":
       case "strong":

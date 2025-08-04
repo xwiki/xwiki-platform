@@ -83,6 +83,7 @@ export default [
       "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
       curly: "error",
       "max-statements": "error",
+      "import/no-cycle": "error",
     },
   },
   {

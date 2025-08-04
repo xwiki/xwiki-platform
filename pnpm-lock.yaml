@@ -3694,8 +3694,8 @@ importers:
         version: 5.5.0(react@19.1.1)
     devDependencies:
       '@playwright/experimental-ct-react':
-        specifier: 1.54.1
-        version: 1.54.1(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(vite@7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(yaml@2.8.0)
+        specifier: 1.54.2
+        version: 1.54.2(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(vite@7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(yaml@2.8.0)
       '@types/lodash-es':
         specifier: 4.17.12
         version: 4.17.12
@@ -5175,8 +5175,8 @@ importers:
         specifier: 9.32.0
         version: 9.32.0
       '@playwright/test':
-        specifier: 1.54.1
-        version: 1.54.1
+        specifier: 1.54.2
+        version: 1.54.2
       '@types/node':
         specifier: 22.17.0
         version: 22.17.0
@@ -5985,17 +5985,17 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@playwright/experimental-ct-core@1.54.1':
-    resolution: {integrity: sha512-iwFdf95m9RCze47jv4hVbg3tDtsh3GFU1StiLludrPStHlZOtDj9/0GImTKrRmXHQCDcQRmQ9HZfJuGGxlWM3g==}
+  '@playwright/experimental-ct-core@1.54.2':
+    resolution: {integrity: sha512-W4XXNJEsCtuHP8Rm3XoQQraljvk+1yK1aqQnJ5/G601FHVWHFoyq+wkplWxlggmFVNWAK4ReB9VlZ3xkgkqFMg==}
     engines: {node: '>=18'}
 
-  '@playwright/experimental-ct-react@1.54.1':
-    resolution: {integrity: sha512-hqa/JhMK3qUqwqx8jm0/RJ3lbpGojA3f7UBhp3clFy8hnzMVu0SDba3JemWikS+JhiqYHjxL6Bn6dGxyikCImA==}
+  '@playwright/experimental-ct-react@1.54.2':
+    resolution: {integrity: sha512-W12fcW0jB2DgMkuZqQNazuWRPCX9ySsGzvEUeBpxpv2kora2f1bD0Lm1mRM7tXD9l7TeclAAsP59aamDKITe6w==}
     engines: {node: '>=18'}
     hasBin: true
 
-  '@playwright/test@1.54.1':
-    resolution: {integrity: sha512-FS8hQ12acieG2dYSksmLOF7BNxnVf2afRJdCuM1eMSxj6QTSE6G4InGF7oApGgDb65MX7AwMVlIkpru0yZA4Xw==}
+  '@playwright/test@1.54.2':
+    resolution: {integrity: sha512-A+znathYxPf+72riFd1r1ovOLqsIIB0jKIoPjyK2kqEIe30/6jF6BC7QNluHuwUmsD2tv1XZVugN8GqfTMOxsA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -9385,13 +9385,13 @@ packages:
   pkg-types@2.2.0:
     resolution: {integrity: sha512-2SM/GZGAEkPp3KWORxQZns4M+WSeXbC2HEvmOIJe3Cmiv6ieAJvdVhDldtHqM5J1Y7MrR1XhkBT/rMlhh9FdqQ==}
 
-  playwright-core@1.54.1:
-    resolution: {integrity: sha512-Nbjs2zjj0htNhzgiy5wu+3w09YetDx5pkrpI/kZotDlDUaYk0HVA5xrBVPdow4SAUIlhgKcJeJg4GRKW6xHusA==}
+  playwright-core@1.54.2:
+    resolution: {integrity: sha512-n5r4HFbMmWsB4twG7tJLDN9gmBUeSPcsBZiWSE4DnYz9mJMAFqr2ID7+eGC9kpEnxExJ1epttwR59LEWCk8mtA==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.54.1:
-    resolution: {integrity: sha512-peWpSwIBmSLi6aW2auvrUtf2DqY16YYcCMO8rTVx486jKmDTJg7UAhyrraP98GB8BoPURZP8+nxO7TSd4cPr5g==}
+  playwright@1.54.2:
+    resolution: {integrity: sha512-Hu/BMoA1NAdRUuulyvQC0pEqZ4vQbGfn8f7wPXcnqQmM+zct9UliKxsIkLNmz/ku7LElUNqmaiv1TG/aL5ACsw==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -11887,10 +11887,10 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@playwright/experimental-ct-core@1.54.1(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)':
+  '@playwright/experimental-ct-core@1.54.2(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)':
     dependencies:
-      playwright: 1.54.1
-      playwright-core: 1.54.1
+      playwright: 1.54.2
+      playwright-core: 1.54.2
       vite: 6.3.5(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
     transitivePeerDependencies:
       - '@types/node'
@@ -11905,9 +11905,9 @@ snapshots:
       - tsx
       - yaml
 
-  '@playwright/experimental-ct-react@1.54.1(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(vite@7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(yaml@2.8.0)':
+  '@playwright/experimental-ct-react@1.54.2(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(vite@7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))(yaml@2.8.0)':
     dependencies:
-      '@playwright/experimental-ct-core': 1.54.1(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
+      '@playwright/experimental-ct-core': 1.54.2(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       '@vitejs/plugin-react': 4.7.0(vite@7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
     transitivePeerDependencies:
       - '@types/node'
@@ -11924,9 +11924,9 @@ snapshots:
       - vite
       - yaml
 
-  '@playwright/test@1.54.1':
+  '@playwright/test@1.54.2':
     dependencies:
-      playwright: 1.54.1
+      playwright: 1.54.2
 
   '@popperjs/core@2.11.8': {}
 
@@ -15963,11 +15963,11 @@ snapshots:
       exsolve: 1.0.7
       pathe: 2.0.3
 
-  playwright-core@1.54.1: {}
+  playwright-core@1.54.2: {}
 
-  playwright@1.54.1:
+  playwright@1.54.2:
     dependencies:
-      playwright-core: 1.54.1
+      playwright-core: 1.54.2
     optionalDependencies:
       fsevents: 2.3.2
 

@@ -30,7 +30,7 @@
     "@xwiki/cristal-page-default": "workspace:*",
     "@xwiki/cristal-utils-inversify": "workspace:*",
     "fast-xml-parser": "5.2.4",
-    "inversify": "7.6.1"
+    "inversify": "7.7.0"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x"

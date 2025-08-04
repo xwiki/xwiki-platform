@@ -26,7 +26,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-collaboration-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
-    "inversify": "7.6.1",
+    "inversify": "7.7.0",
     "lib0": "0.2.114",
     "y-websocket": "3.0.0",
     "yjs": "13.6.27"

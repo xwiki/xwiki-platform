@@ -36,7 +36,7 @@
     "@xwiki/cristal-model-remote-url-filesystem-api": "workspace:*",
     "@xwiki/cristal-page-default": "workspace:*",
     "@xwiki/cristal-utils-inversify": "workspace:*",
-    "inversify": "7.6.1",
+    "inversify": "7.7.0",
     "mime": "4.0.7"
   },
   "peerDependencies": {

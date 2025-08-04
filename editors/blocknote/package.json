@@ -39,7 +39,7 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",
     "@xwiki/cristal-uniast": "workspace:*",
-    "inversify": "7.6.1",
+    "inversify": "7.7.0",
     "lodash-es": "4.17.21",
     "vue-i18n": "11.1.11"
   },

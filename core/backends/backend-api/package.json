@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "inversify": "7.6.1"
+    "inversify": "7.7.0"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x"

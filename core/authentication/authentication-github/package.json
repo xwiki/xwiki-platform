@@ -28,7 +28,7 @@
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-authentication-github-state": "workspace:*",
     "axios": "1.11.0",
-    "inversify": "7.6.1",
+    "inversify": "7.7.0",
     "js-cookie": "3.0.5"
   },
   "peerDependencies": {

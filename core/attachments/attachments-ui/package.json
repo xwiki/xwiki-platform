@@ -36,7 +36,7 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "@xwiki/cristal-user-ui": "workspace:*",
-    "inversify": "7.6.1",
+    "inversify": "7.7.0",
     "vue-i18n": "11.1.11",
     "vue-router": "4.5.1"
   },

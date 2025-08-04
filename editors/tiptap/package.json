@@ -59,7 +59,7 @@
     "@xwiki/cristal-tiptap-extension-image": "workspace:*",
     "@xwiki/cristal-tiptap-link-suggest-ui": "workspace:*",
     "eventemitter3": "5.0.1",
-    "inversify": "7.6.1",
+    "inversify": "7.7.0",
     "lodash-es": "4.17.21",
     "markdown-it": "14.1.0",
     "pinia": "3.0.2",

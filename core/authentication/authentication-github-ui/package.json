@@ -31,7 +31,7 @@
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "@xwiki/cristal-uiextension-default": "workspace:*",
-    "inversify": "7.6.1",
+    "inversify": "7.7.0",
     "vue-i18n": "11.1.11"
   },
   "peerDependencies": {

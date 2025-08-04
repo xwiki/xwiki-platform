@@ -104,6 +104,7 @@ export default {
   // or the default one as fallback
   async mounted() {
     const value = await componentStore.load("displayer", this.displayerId);
+    console.log(`displayer [${this.displayerId}] loaded`, value);
     this.displayerComponent = markRaw(value);
   },
 };

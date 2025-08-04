@@ -140,6 +140,7 @@ export default {
     // which automatically insert the component in the html
     async loadLayout(layoutId) {
       const component = await componentStore.load("layout", layoutId);
+      console.log('layout loaded');
       if (!component) {
         throw new Error(`Unknown layout [${layoutId}]`);
       }

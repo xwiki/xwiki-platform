@@ -23,15 +23,18 @@ import { componentStore } from "xwiki-livedata";
  * Register the custom displayer used for the notification Live Data.
  */
 (function initNotificationDisplayers() {
-  componentStore.register("displayer", "scope", async () => {
-    return (await import("./components/DisplayerScope.vue")).default;
-  });
+  setTimeout(() => {
+    componentStore.register("displayer", "scope", async () => {
+      return (await import("./components/DisplayerScope.vue")).default;
+    });
 
-  componentStore.register("displayer", "staticList", async () => {
-    return (await import("./components/DisplayerStaticList.vue")).default;
-  });
+    componentStore.register("displayer", "staticList", async () => {
+      return (await import("./components/DisplayerStaticList.vue")).default;
+    });
 
-  componentStore.register("displayer", "toggle", async () => {
-    return (await import("./components/DisplayerToggle.vue")).default;
-  });
+    componentStore.register("displayer", "toggle", async () => {
+      require()
+      return (await import("./components/DisplayerToggle.vue")).default;
+    });
+  }, 1000);
 })();

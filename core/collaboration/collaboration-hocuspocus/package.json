@@ -23,7 +23,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@hocuspocus/provider": "2.15.2",
+    "@hocuspocus/provider": "2.15.3",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-collaboration-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",

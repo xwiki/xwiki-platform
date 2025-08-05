@@ -50,12 +50,12 @@ export class XWikiCollaborationProvider implements CollaborationManager {
   }
 
   async get(): Promise<() => CollaborationInitializer> {
-    const { createXWikiWebsocketProvider } = await import(
-      "./xwikiProviderWebsocket"
+    const { createXWikiWebSocketProvider } = await import(
+      "./xwikiProviderWebSocket"
     );
 
     return () => {
-      const provider = createXWikiWebsocketProvider(
+      const provider = createXWikiWebSocketProvider(
         this.cristalApp.getWikiConfig().realtimeURL!,
         this.documentService.getCurrentDocumentReferenceString().value!,
       );

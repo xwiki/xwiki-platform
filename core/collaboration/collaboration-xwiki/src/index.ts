@@ -18,6 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ComponentInit } from "./componentInit";
-import { createXWikiWebsocketProvider } from "./xwikiProviderWebsocket";
+import { createXWikiWebSocketProvider } from "./xwikiProviderWebSocket";
 
-export { ComponentInit, createXWikiWebsocketProvider };
+export { ComponentInit, createXWikiWebSocketProvider };

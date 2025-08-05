@@ -40,7 +40,7 @@ function readClientId(handlerDecoder: decoding.Decoder) {
  * @param room - the string serialization of the room
  * @since 0.20
  */
-export function createXWikiWebsocketProvider(
+export function createXWikiWebSocketProvider(
   url: string,
   room: string,
 ): WebsocketProvider {
@@ -49,8 +49,8 @@ export function createXWikiWebsocketProvider(
   const doc = new Doc();
   // Creates a new editor instance.
   const websocketProvider = new WebsocketProvider(
-    // Since Websocket provider force having a roomname that is concatenated to the url with a '/'.
-    // Therefore, we have to artificially split out the last segment to have it concatenated back by Websocket
+    // Since WebSocket provider force having a roomname that is concatenated to the url with a '/'.
+    // Therefore, we have to artificially split out the last segment to have it concatenated back by WebSocket
     // provider later.
     splits.slice(0, splits.length - 1).join("/"),
     roomname,

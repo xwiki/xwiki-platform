@@ -2,9 +2,12 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "declarationMap": true
   },
-  "extends": "./../../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "include": [
     "./src/index.ts",
     "./src/**/*"

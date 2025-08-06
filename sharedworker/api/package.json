@@ -14,18 +14,16 @@
   },
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts"
+    }
   },
-  "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
+    "build": "rimraf dist && tsc --project tsconfig.json",
     "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "vitest --run"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
-  "types": "dist/index.d.ts",
+  "types": "./src/index.ts",
   "dependencies": {
     "comlink": "4.4.2"
   },
@@ -36,25 +34,6 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.9.2",
-    "vite": "7.0.6",
-    "vite-plugin-comlink": "5.1.0",
-    "vue": "3.5.18",
-    "vue-tsc": "2.2.12"
-  },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "import": {
-          "types": "./dist/index.d.ts",
-          "default": "./dist/index.es.js"
-        },
-        "require": {
-          "types": "./dist/index.d.cts",
-          "default": "./dist/index.umd.js"
-        }
-      }
-    },
-    "main": "./dist/index.es.js",
-    "types": "./dist/index.d.ts"
+    "vue": "3.5.18"
   }
 }

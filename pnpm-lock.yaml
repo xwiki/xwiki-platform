@@ -172,9 +172,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.9.2)
@@ -265,9 +262,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.9.2)
@@ -420,9 +414,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/authentication/authentication-default:
     dependencies:
@@ -1113,9 +1104,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/configuration/configuration-web:
     dependencies:
@@ -1759,9 +1747,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.9.2)
@@ -1945,9 +1930,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/markdown/markdown-default:
     dependencies:
@@ -2681,9 +2663,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/page/page-default:
     dependencies:
@@ -2784,9 +2763,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
 
   core/settings/settings-browser:
     dependencies:
@@ -3046,9 +3022,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.9.2)
@@ -3210,9 +3183,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.9.2)
@@ -4890,18 +4860,9 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      vite:
-        specifier: 7.0.6
-        version: 7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0)
-      vite-plugin-comlink:
-        specifier: 5.1.0
-        version: 5.1.0(comlink@4.4.2)(vite@7.0.6(@types/node@24.1.0)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.3)(yaml@2.8.0))
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.9.2)
-      vue-tsc:
-        specifier: 2.2.12
-        version: 2.2.12(typescript@5.9.2)
 
   sharedworker/impl:
     dependencies:

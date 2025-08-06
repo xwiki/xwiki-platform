@@ -14,36 +14,20 @@
   },
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts"
+    }
   },
-  "main": "./src/index.ts",
   "scripts": {
-    "build": "tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "test": "vitest --run"
+    "build": "rimraf dist && tsc --project tsconfig.json",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
+  "types": "./src/index.ts",
   "dependencies": {
     "utility-types": "3.11.0"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "typescript": "5.9.2",
-    "vite": "7.0.6"
-  },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "import": {
-          "types": "./dist/index.d.ts",
-          "default": "./dist/index.es.js"
-        },
-        "require": {
-          "types": "./dist/index.d.cts",
-          "default": "./dist/index.umd.js"
-        }
-      }
-    },
-    "main": "./dist/index.es.js",
-    "types": "./dist/index.d.ts"
+    "typescript": "5.9.2"
   }
 }

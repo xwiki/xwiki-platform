@@ -449,11 +449,42 @@ public class DefaultMergeManagerTest
             newobj.setStringValue("newtest", "newtest");
             this.nextDocument.addXObject(newobj);
 
-            merge();
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            // We get 2 logs: one for the change on existing property, one for the new property.
+            assertEquals(2, logs.size());
+            assertEquals("Collision found on object [Object wiki:space.page^classspace.class[0]]",
+                logs.get(0).getFormattedMessage());
+            assertEquals("Collision found on object [Object wiki:space.page^classspace.class[0]]",
+                logs.get(1).getFormattedMessage());
 
-            BaseObject mergedobj = this.currentDocument.getXObject(this.xclass.getReference(), 0);
-
+            BaseObject mergedobj = ((XWikiDocument) result.getMergeResult()).getXObject(this.xclass.getReference(), 0);
             assertNull(mergedobj);
+        }
+
+        @Test
+        public void testMergeCurrentObjectRemovedFallbackNext() throws Exception
+        {
+            this.configuration.setConflictFallbackVersion(MergeConfiguration.ConflictFallbackVersion.NEXT);
+            this.xobject.setStringValue("test", "");
+            this.xobject.setStringValue("previoustest", "previoustest");
+            this.previousDocument.addXObject(this.xobject);
+
+            BaseObject newobj = this.xobject.clone();
+            newobj.setStringValue("test", "test2");
+            newobj.setStringValue("newtest", "newtest");
+            this.nextDocument.addXObject(newobj);
+
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            // We get a single log because at second pass the object is set.
+            assertEquals(1, logs.size());
+            assertEquals("Collision found on object [Object wiki:space.page^classspace.class[0]]", logs.get(0).getFormattedMessage());
+
+            BaseObject mergedobj = ((XWikiDocument) result.getMergeResult()).getXObject(this.xclass.getReference(), 0);
+            assertEquals(newobj, mergedobj);
         }
 
         @Test

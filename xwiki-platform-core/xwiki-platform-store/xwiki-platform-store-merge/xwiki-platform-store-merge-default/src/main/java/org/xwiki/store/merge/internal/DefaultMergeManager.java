@@ -574,6 +574,10 @@ public class DefaultMergeManager implements MergeManager
                             // TODO: manage conflict properly
                             attachmentMergeResult.getLog().error(ERROR_COLLISION_ATTACHMENT,
                                 previousAttachment.getReference());
+                            if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT) {
+                                mergedDocument.addAttachment(nextAttachment);
+                                attachmentMergeResult.setModified(true);
+                            }
                         }
                         break;
                     default:

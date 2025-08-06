@@ -1113,7 +1113,6 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
   overflow: hidden;
   position: relative;
   width: ${boxSize}px;
-  
 }
 .gallery .current {
   background-color: $theme.highlightColor;

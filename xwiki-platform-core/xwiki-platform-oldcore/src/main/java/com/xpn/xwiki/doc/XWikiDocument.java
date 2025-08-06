@@ -64,6 +64,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
@@ -224,7 +225,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private static final String TM_FAILEDDOCUMENTPARSE = "core.document.error.failedParse";
 
-    private static final String CLOSE_HTML_MACRO = "{{/html}}";
+    private static final String[] HTML_MACRO_SEARCH_STRINGS = new String[] { "{{html", "{{/html" };
+
+    private static final String[] HTML_MACRO_REPLACE_STRINGS = new String[] { "&#123;&#123;html", "&#123;&#123;/html" };
 
     /**
      * An attachment waiting to be deleted at next document save.
@@ -2589,7 +2592,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private boolean isRedirectAbsolute(XWikiContext context)
     {
-        return StringUtils.equals("1", context.getWiki().Param("xwiki.redirect.absoluteurl"));
+        return Strings.CS.equals("1", context.getWiki().Param("xwiki.redirect.absoluteurl"));
     }
 
     public String getURL(String action, boolean redirect, XWikiContext context)
@@ -4058,14 +4061,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             // macro syntax since it's not needed for pure text
             if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
                 && (HTMLUtils.containsElementText(result) || result.indexOf("{") != -1)) {
-                result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
-                // Escape closing HTML macro syntax.
-                int startIndex = 0;
-                // Start searching at the last match to avoid scanning the whole string again.
-                while ((startIndex = result.indexOf(CLOSE_HTML_MACRO, startIndex)) != -1) {
-                    result.replace(startIndex, startIndex + 2, "&#123;&#123;");
-                }
-                result.append(CLOSE_HTML_MACRO);
+                // Escapes closing and opening HTML macro syntax. We need to escape the opening HTML macro syntax in
+                // addition to the closing one as otherwise, the wrapping HTML macro might not close correctly.
+                // For simplicity, to avoid having to deal with complex expressions that would need to be
+                // synchronized with the parser, match just the start of the opening/closing macro syntax.
+                return "{{html clean=\"false\" wiki=\"false\"}}"
+                    + StringUtils.replaceEach(result.toString(), HTML_MACRO_SEARCH_STRINGS, HTML_MACRO_REPLACE_STRINGS)
+                    + "{{/html}}";
             }
 
             return result.toString();
@@ -7514,7 +7516,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         // If the copied document has a title set to the original page name then set the new title to be the new page
         // name.
-        if (StringUtils.equals(newdoc.getTitle(), getPrettyName(this.getDocumentReference()))) {
+        if (Strings.CS.equals(newdoc.getTitle(), getPrettyName(this.getDocumentReference()))) {
             newdoc.setTitle(getPrettyName(newDocumentReference));
         }
 
@@ -9536,7 +9538,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // /////////////////////////////////
         // Document
 
-        if (!StringUtils.equals(getContent(), document.getContent())) {
+        if (!Strings.CS.equals(getContent(), document.getContent())) {
             setContent(document.getContent());
             modified = true;
         }
@@ -9550,12 +9552,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             modified = true;
         }
 
-        if (!StringUtils.equals(getTitle(), document.getTitle())) {
+        if (!Strings.CS.equals(getTitle(), document.getTitle())) {
             setTitle(document.getTitle());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultTemplate(), document.getDefaultTemplate())) {
+        if (!Strings.CS.equals(getDefaultTemplate(), document.getDefaultTemplate())) {
             setDefaultTemplate(document.getDefaultTemplate());
             modified = true;
         }
@@ -9564,12 +9566,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             modified = true;
         }
 
-        if (!StringUtils.equals(getCustomClass(), document.getCustomClass())) {
+        if (!Strings.CS.equals(getCustomClass(), document.getCustomClass())) {
             setCustomClass(document.getCustomClass());
             modified = true;
         }
 
-        if (!StringUtils.equals(getValidationScript(), document.getValidationScript())) {
+        if (!Strings.CS.equals(getValidationScript(), document.getValidationScript())) {
             setValidationScript(document.getValidationScript());
             modified = true;
         }

@@ -307,6 +307,18 @@ class LiveDataIT
         liveDataElement.waitUntilReady();
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
+
+        // Switch to another language to assert that the text is still correctly translated.
+        try {
+            testUtils.setWikiPreference("default_language", "fr");
+            testUtils.getDriver().navigate().refresh();
+            liveDataElement.waitUntilReady();
+            assertEquals(List.of(
+                    "(1) Le titre de certaines pages est calculé. Filtrer et trier sur ces titres ne fonctionnera pas normalement pour ces pages."),
+                liveDataElement.getFootnotesText());
+        } finally {
+            testUtils.setWikiPreference("default_language", "en");
+        }
     }
 
     private void createXObjects(TestUtils testUtils, DocumentReference testReference)

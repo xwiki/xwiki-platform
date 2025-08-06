@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
@@ -115,7 +115,7 @@ public class SecurityTest extends AbstractComponentTestCase
             testExecution(false, false, false, false);
             Assert.fail("Should have thrown an exception here!");
         } catch (MacroExecutionException expected) {
-            Assert.assertTrue(StringUtils.startsWith(expected.getMessage(),
+            Assert.assertTrue(Strings.CS.startsWith(expected.getMessage(),
                 "The execution of the [groovy] script macro is not allowed."));
         }
     }

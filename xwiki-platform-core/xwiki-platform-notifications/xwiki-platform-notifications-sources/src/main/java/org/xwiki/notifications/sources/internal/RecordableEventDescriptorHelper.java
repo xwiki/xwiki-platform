@@ -24,6 +24,7 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -31,7 +32,6 @@ import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.text.StringUtils;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -71,7 +71,7 @@ public class RecordableEventDescriptorHelper
     public boolean hasDescriptor(String eventType, DocumentReference user) throws EventStreamException
     {
         return getRecordableEventDescriptor(user).stream()
-                .anyMatch(descriptor -> StringUtils.equals(eventType, descriptor.getEventType()));
+                .anyMatch(descriptor -> Strings.CS.equals(eventType, descriptor.getEventType()));
     }
 
     private Collection<RecordableEventDescriptor> getRecordableEventDescriptor(DocumentReference user)

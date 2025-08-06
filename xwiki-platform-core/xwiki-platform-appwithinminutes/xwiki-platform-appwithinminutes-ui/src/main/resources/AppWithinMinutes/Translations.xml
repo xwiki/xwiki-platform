@@ -151,7 +151,9 @@ platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Add
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Delete
 
 appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
+appWithinMinutes.templateProviderEditor.icon.name=Icon
 appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
+appWithinMinutes.templateProviderEditor.description.name=Description
 appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
@@ -159,6 +161,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to creat
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
+appWithinMinutes.templateProviderEditor.terminal.name=Terminal
 appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
 
 ### Wizard Step 3: Application Presentation

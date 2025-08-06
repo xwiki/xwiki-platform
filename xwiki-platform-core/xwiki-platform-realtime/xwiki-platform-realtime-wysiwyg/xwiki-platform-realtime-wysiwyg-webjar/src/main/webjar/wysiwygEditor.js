@@ -101,8 +101,13 @@ define('xwiki-realtime-wysiwyg', [
       return XWiki.EditLock.lock();
     }
 
+    _setConnectionStatus(status) {
+      this._connection.status = status;
+      this._editor.setConnectionStatus(status);
+    }
+
     _startRealtimeSync() {
-      this._connection.status = ConnectionStatus.CONNECTING;
+      this._setConnectionStatus(ConnectionStatus.CONNECTING);
 
       // List of pretty names of all users (mapped with their server ID).
       this._connection.userData = {};
@@ -149,18 +154,26 @@ define('xwiki-realtime-wysiwyg', [
 
       // Leave the realtime session and stop the autosave when the editor is destroyed. We have to do this because the
       // editor can be destroyed without the page being reloaded (e.g. when editing in-place).
-      this._editor.onBeforeDestroy(() => {
-        // Flush the uncommitted work back to the server. There is no guarantee that the work is actually committed but
-        // at least we try.
-        flushUncommittedWork();
+      this._editor.onBeforeDestroy((event) => {
         $(form).off('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', flushUncommittedWork);
-
         $(form).off('xwiki:actions:reload', resetContent);
 
-        // Notify the others that we're not editing anymore.
-        this._realtimeContext.destroy();
-        this._onAbort();
-      });
+        if (this._connection.status === ConnectionStatus.CONNECTED) {
+          // Flush the uncommitted work back to the server. There is no guarantee that the work is actually committed
+          // but at least we try.
+          flushUncommittedWork();
+
+          // Disconnect (and destroy the editor) only after all uncommitted work has been pushed to the server.
+          event.data.promises.push(new Promise(resolve => {
+            this._connection.chainpad.onSettle(async () => {
+              // Notify the others that we're not editing anymore.
+              this._realtimeContext.destroy();
+              await this._onAbort();
+              resolve();
+            });
+          }));
+        }
+      }, true);
 
       this._addNetfluxChannelToSubmittedData();
 
@@ -419,7 +432,7 @@ define('xwiki-realtime-wysiwyg', [
 
       await this._createSaver(info);
 
-      this._connection.status = ConnectionStatus.CONNECTED;
+      this._setConnectionStatus(ConnectionStatus.CONNECTED);
 
       // Initialize the edited content with the content from the realtime session.
       await this._onRemote(info);
@@ -494,7 +507,7 @@ define('xwiki-realtime-wysiwyg', [
         // Temporarily disconnected.
         // The internal state is set to 'connecting' because 'disconnected' is used when the user leaves the realtime
         // session. We show 'Disconnected' on the toolbar to indicate that the user is offline.
-        this._connection.status = ConnectionStatus.CONNECTING;
+        this._setConnectionStatus(ConnectionStatus.CONNECTING);
         this._connection.toolbar.onConnectionStatusChange(0 /* disconnected */);
         // Disable the editor while we're disconnected because ChainPad doesn't support very well merging changes made
         // offline, especially if we stay offline for a long time.
@@ -502,41 +515,40 @@ define('xwiki-realtime-wysiwyg', [
       }
     }
 
-    _beforeReconnecting(callback) {
+    async _beforeReconnecting(callback) {
       const oldChannel = this._channel;
-      this._updateChannels().then(() => {
-        if (this._channel === oldChannel) {
-          // The Netflux channel used before the WebSocket connection closed is still available so we can still use it.
-          callback(this._channel, this._patchedEditor.getHyperJSON());
+      await this._updateChannels();
+      if (this._channel === oldChannel) {
+        // The Netflux channel used before the WebSocket connection closed is still available so we can still use it.
+        callback(this._channel, this._patchedEditor.getHyperJSON());
+      } else {
+        // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
+        // abort the current realtime session.
+        await this._onAbort();
+        if (
+          !this._saver.isDirty() ||
+          !this._realtimeContext.channels.wysiwyg_users // jshint ignore:line
+        ) {
+          // Either we don't have any unsaved local changes or there's no one else connected to the realtime session.
+          // We can rejoin the realtime session using the new Netflux channel.
+          //
+          // The editor was previously put in read-only mode when we got disconnected from the WebSocket (i.e. when
+          // the WebSocket connection status changed, see above). The editor takes into account nested calls to
+          // setReadOnly so we need to make sure the previous setEditable(false) has a corresponding call to
+          // setEditable(true). The user won't be able to edit right away because the editor is put back in read-only
+          // mode while we reconnect to the realtime session (in _startRealtimeSync).
+          this.setEditable(true);
+          this._startRealtimeSync();
         } else {
-          // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
-          // abort the current realtime session.
-          this._onAbort();
-          if (
-            !this._saver.isDirty() ||
-            !this._realtimeContext.channels.wysiwyg_users // jshint ignore:line
-          ) {
-            // Either we don't have any unsaved local changes or there's no one else connected to the realtime session.
-            // We can rejoin the realtime session using the new Netflux channel.
-            //
-            // The editor was previously put in read-only mode when we got disconnected from the WebSocket (i.e. when
-            // the WebSocket connection status changed, see above). The editor takes into account nested calls to
-            // setReadOnly so we need to make sure the previous setEditable(false) has a corresponding call to
-            // setEditable(true). The user won't be able to edit right away because the editor is put back in read-only
-            // mode while we reconnect to the realtime session (in _startRealtimeSync).
-            this.setEditable(true);
-            this._startRealtimeSync();
-          } else {
-            // We can't rejoin the realtime session using the new Netflux channel because we would lose the unsaved
-            // local changes. Let the user decide what to do.
-            Interface.getAllowRealtimeCheckbox().prop('checked', false);
-            this._realtimeContext.displayReloadModal();
-          }
+          // We can't rejoin the realtime session using the new Netflux channel because we would lose the unsaved
+          // local changes. Let the user decide what to do.
+          Interface.getAllowRealtimeCheckbox().prop('checked', false);
+          this._realtimeContext.displayReloadModal();
         }
-      });
+      }
     }
 
-    _onAbort() {
+    async _onAbort() {
       if (this._connection.status === ConnectionStatus.DISCONNECTED) {
         // We already left the realtime session.
         return;
@@ -548,7 +560,7 @@ define('xwiki-realtime-wysiwyg', [
       }
 
       console.debug("Aborting the realtime session!");
-      this._connection.status = ConnectionStatus.DISCONNECTED;
+      this._setConnectionStatus(ConnectionStatus.DISCONNECTED);
 
       // Stop the realtime content synchronization (leave the WYSIWYG editor Netflux channel associated with the edited
       // document field).
@@ -558,7 +570,7 @@ define('xwiki-realtime-wysiwyg', [
       this._realtimeContext.setRealtimeEnabled(false);
 
       // Stop the autosave (and leave the saver Netflux channel associated with the edited document).
-      this._saver?.stop();
+      await this._saver?.stop();
 
       // Remove the realtime edit toolbar.
       this._connection.toolbar.destroy();
@@ -582,7 +594,7 @@ define('xwiki-realtime-wysiwyg', [
 
     _pauseRealtimeSync() {
       if (this._connection.status === ConnectionStatus.CONNECTED) {
-        this._connection.status = ConnectionStatus.PAUSED;
+        this._setConnectionStatus(ConnectionStatus.PAUSED);
         this._connection.pauseDepth = 1;
         this._connection.remoteContentBeforePause = this._connection.chainpad.getUserDoc();
       } else if (this._connection.status === ConnectionStatus.PAUSED) {
@@ -592,7 +604,7 @@ define('xwiki-realtime-wysiwyg', [
 
     async _resumeRealtimeSync() {
       if (this._connection.status === ConnectionStatus.PAUSED && --this._connection.pauseDepth === 0) {
-        this._connection.status = ConnectionStatus.CONNECTED;
+        this._setConnectionStatus(ConnectionStatus.CONNECTED);
         const remoteContentAfterPause = this._connection.chainpad.getUserDoc();
         const localContentAfterPause = this._patchedEditor.getHyperJSON();
         if (remoteContentAfterPause === this._connection.remoteContentBeforePause) {

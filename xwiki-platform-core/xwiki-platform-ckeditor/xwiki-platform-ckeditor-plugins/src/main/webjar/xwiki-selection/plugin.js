@@ -98,7 +98,7 @@
               // selection and the editing area had the focus when the selection was saved.
               scrollIntoView: focus && !focus.preventScroll,
               applyDOMRange: domRange => {
-                maybeMoveToFirstNestedEditable(editor, domRange, !focus.preventScroll);
+                maybeOptimizeRange(editor, domRange, !focus.preventScroll);
                 this.setSelection(editor, [domRange], focus);
               }
             });
@@ -219,7 +219,7 @@
     editable?.focus(options);
   }
 
-  function maybeMoveToFirstNestedEditable(editor, range, shouldMove) {
+  function maybeOptimizeRange(editor, range, shouldMove) {
     const selectedWidget = shouldMove && getSelectedWidget(editor, range);
     const firstNestedEditable = Object.values(selectedWidget?.editables)[0];
     if (firstNestedEditable) {
@@ -228,6 +228,13 @@
       ckRange.moveToElementEditablePosition(firstNestedEditable);
       range.setStart(ckRange.startContainer.$, ckRange.startOffset);
       range.collapse(true);
+    } else if (selectedWidget && !range.collapsed) {
+      // The selected widget doesn't have any nested editable areas, so everything inside the widget is read-only. This
+      // means we cannot place the caret inside the widget. We select the entire widget wrapper in order to highlight
+      // the widget. Note that we don't do this when the range is collapsed because when editing in realtime someone may
+      // insert a widget just after your caret and you wouldn't want that widget to be suddenly selected while you are
+      // typing.
+      range.selectNode(selectedWidget.wrapper.$);
     }
   }
 
@@ -746,7 +753,7 @@ define('scrollUtils', ['jquery'], function($) {
     while (parent && !(parent.nodeType === Node.ELEMENT_NODE && hasVerticalScrollBar(parent))) {
       parent = parent.parentNode;
     }
-    return parent || document.scrollingElement || document.documentElement;
+    return parent || element.ownerDocument.scrollingElement || element.ownerDocument.documentElement;
   }
 
   function hasVerticalScrollBar(element) {

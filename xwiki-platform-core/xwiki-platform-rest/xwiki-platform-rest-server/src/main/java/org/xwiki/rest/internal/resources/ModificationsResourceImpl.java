@@ -41,6 +41,7 @@ import org.xwiki.rest.resources.ModificationsResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
+import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 
 import static org.xwiki.security.authorization.Right.VIEW;
 
@@ -62,16 +63,18 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
             Boolean withPrettyNames) throws XWikiRestException
     {
         try {
+            String validOrder = HqlQueryUtils.getValidQueryOrder(order, "desc");
+
             History history = new History();
 
             String query = String.format("select doc.space, doc.name, doc.language, rcs.id, rcs.date, rcs.author,"
                 + " rcs.comment from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
                 + " rcs.date > :date order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
-                    order, order, order);
+                validOrder, validOrder, validOrder);
 
             List<Object> queryResult = null;
-            queryResult = queryManager.createQuery(query, Query.XWQL).bindValue("date", new Date(ts)).setLimit(number)
-                    .setOffset(start).setWiki(wikiName).execute();
+            queryResult = this.queryManager.createQuery(query, Query.XWQL).bindValue("date", new Date(ts))
+                .setLimit(number).setOffset(start).setWiki(wikiName).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;

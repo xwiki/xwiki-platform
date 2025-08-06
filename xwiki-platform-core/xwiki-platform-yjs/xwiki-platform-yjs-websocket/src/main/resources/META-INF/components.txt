@@ -1,0 +1,2 @@
+org.xwiki.yjs.websocket.internal.Room
+org.xwiki.yjs.websocket.internal.YjsRealtimeEndpoint

@@ -49,12 +49,31 @@
     },
 
     getFullData: function(editor) {
-      var isFullData = editor.config.fullData;
+      const isFullData = editor.config.fullData;
       editor.config.fullData = true;
-      var fullData = editor.getData();
+      // The full data is sometimes used to restore the editor content and unfortunately CKEditor has a problem with
+      // the content that it finds after the BODY tag (e.g. the user avatars when editing in realtime). The HTML is
+      // "fixed" by moving the content inside the BODY tag. In order to avoid this we temporarily remove the content
+      // after the BODY tag.
+      const contentAfterBody = [];
+      const editable = editor.editable()?.$;
+      if (editable?.tagName.toUpperCase() === 'BODY') {
+        while (editable.nextSibling) {
+          contentAfterBody.push(editable.nextSibling);
+          editable.nextSibling.remove();
+        }
+      }
+      const fullData = editor.getData();
+      // Restore the content after the BODY tag.
+      editable?.after(...contentAfterBody);
       editor.config.fullData = isFullData;
       return fullData;
-    }
+    },
+
+    addModeChangeHandler: function(editor, handler, priority = 0) {
+      editor._.modeChangeHandlers = editor._.modeChangeHandlers || [];
+      editor._.modeChangeHandlers.push({handler, priority});
+    },
   };
 
   CKEDITOR.plugins.add('xwiki-source', {
@@ -80,6 +99,7 @@
         editor.on('beforeSetMode', this.onBeforeSetMode.bind(this));
         editor.on('beforeModeUnload', this.onBeforeModeUnload.bind(this));
         editor.on('mode', this.onMode.bind(this));
+        CKEDITOR.plugins.xwikiSource.addModeChangeHandler(editor, this.onModeChanged.bind(this), 5);
 
         // The default source command is not asynchronous so it becomes (re)enabled right after the editing mode is
         // changed. In our case switching between WYSIWYG and Source mode is asynchronous because we need to convert the
@@ -124,20 +144,34 @@
       }
     },
 
-    onMode: function(event) {
+    onMode: async function(event) {
       var editor = event.editor;
-      var promise;
-      if (editor.mode === 'wysiwyg' && editor._.previousMode === 'source') {
-        // Convert from wiki syntax to HTML.
-        promise = this.maybeConvertHTML(editor, true);
-      } else if (editor.mode === 'source' && editor._.previousMode === 'wysiwyg') {
-        // Convert from HTML to wiki syntax.
-        promise = this.maybeConvertHTML(editor, false);
-      } else if (this.isModeSupported(editor.mode)) {
-        promise = $.Deferred().resolve(editor);
+      if (this.isModeSupported(editor.mode)) {
+        try {
+          await this.callModeChangeHandlers(editor);
+        } finally {
+          await this.endLoading(editor);
+          editor.fire('modeReady');
+        }
       }
-      if (promise) {
-        promise.always(this.endLoading.bind(this)).done(editor.fire.bind(editor, 'modeReady'));
+    },
+
+    callModeChangeHandlers: async function(editor) {
+      editor._.modeChangeHandlers.sort((a, b) => a.priority - b.priority);
+      for (const {handler} of editor._.modeChangeHandlers) {
+        await handler(editor, {
+          previousMode: editor._.previousMode,
+        });
+      }
+    },
+
+    onModeChanged: async function(editor, {previousMode}) {
+      if (editor.mode === 'wysiwyg' && previousMode === 'source') {
+        // Convert from wiki syntax to HTML.
+        await this.maybeConvertHTML(editor, true);
+      } else if (editor.mode === 'source' && previousMode === 'wysiwyg') {
+        // Convert from HTML to wiki syntax.
+        await this.maybeConvertHTML(editor, false);
       }
     },
 

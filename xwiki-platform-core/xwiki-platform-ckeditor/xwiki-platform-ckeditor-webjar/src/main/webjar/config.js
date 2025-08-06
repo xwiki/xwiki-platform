@@ -325,7 +325,9 @@ CKEDITOR.editorConfig = function(config) {
       nestedEditableTypes: {
         // The type used when the macro content / parameter supports any wiki syntax (no restrictions).
         'java.util.List<org.xwiki.rendering.block.Block>': {}
-      }
+      },
+      // You can decide here to not see the inline editable parameters in the macro config UI.
+      showInlineEditableParameters: true
     },
     'xwiki-save': {
       leaveConfirmation: true

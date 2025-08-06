@@ -142,7 +142,7 @@
         ##
         &lt;dt&gt;
           &lt;label for="XWiki.TemplateProviderClass_0_icon"&gt;
-            $escapetool.xml($doc.displayPrettyName('icon'))
+            $escapetool.xml($services.localization.render('appWithinMinutes.templateProviderEditor.icon.name'))
           &lt;/label&gt;
           &lt;span class="xHint"&gt;
             $services.localization.render('appWithinMinutes.templateProviderEditor.icon.hint')
@@ -154,7 +154,7 @@
         ##
         &lt;dt&gt;
           &lt;label for="XWiki.TemplateProviderClass_0_description"&gt;
-            $escapetool.xml($doc.displayPrettyName('description'))
+            $escapetool.xml($services.localization.render('appWithinMinutes.templateProviderEditor.description.name'))
           &lt;/label&gt;
           &lt;span class="xHint"&gt;
             $services.localization.render('appWithinMinutes.templateProviderEditor.description.hint')
@@ -211,7 +211,7 @@
         #if ($isAdvancedUser || $isSuperAdmin)
           &lt;dt&gt;
             &lt;label for="XWiki.TemplateProviderClass_0_terminal"&gt;
-              $escapetool.xml($doc.displayPrettyName('terminal'))
+              $escapetool.xml($services.localization.render('appWithinMinutes.templateProviderEditor.terminal.name'))
             &lt;/label&gt;
             &lt;span class="xHint"&gt;
               $escapetool.xml($services.localization.render('appWithinMinutes.templateProviderEditor.terminal.hint'))

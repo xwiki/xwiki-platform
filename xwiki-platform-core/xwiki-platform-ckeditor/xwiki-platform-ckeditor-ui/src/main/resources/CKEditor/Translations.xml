@@ -63,9 +63,6 @@ ckeditor.plugin.link.defaultLabel=type the link label
 ckeditor.plugin.link.openInNewTab=Open Link in New Tab
 ckeditor.plugin.link.upload=Upload Attachment
 ckeditor.plugin.link.uploadHint=Link to a newly uploaded attachment.
-ckeditor.plugin.link.uploadProgress=Uploading {0}...
-ckeditor.plugin.link.uploadSuccess=Successfully uploaded {0}
-ckeditor.plugin.link.uploadError=Failed to upload {0}
 
 ckeditor.plugin.list.listType.none=None
 
@@ -167,9 +164,6 @@ ckeditor.plugin.image.slash.currentPageBadge=This page
 ckeditor.plugin.image.slash.externalBadge=External
 ckeditor.plugin.image.slash.loading=Loading...
 ckeditor.plugin.image.slash.upload=Upload Image
-ckeditor.plugin.image.slash.uploadProgress=Uploading {0}...
-ckeditor.plugin.image.slash.uploadSuccess=Successfully uploaded {0}
-ckeditor.plugin.image.slash.uploadError=Failed to upload {0}
 
 ckeditor.plugin.slash.group.Layout=Layout
 ckeditor.plugin.slash.group.Content=Content
@@ -334,12 +328,15 @@ macroSelector.filter.category.placeholder=Select a category...
 
 macroEditor.title=Edit Macro
 macroEditor.more=More
+macroEditor.required=Required
 macroEditor.changeMacro=Change Macro
 macroEditor.submit=Submit
 macroEditor.content=Content
 macroEditor.noParameters=This macro has no parameters.
 macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+macroEditor.parametersRequestFailed=Failed to retrieve the parameters for {0}.
 macroEditor.installRequestFailed=Failed to install the {0} macro.
+macroEditor.selectFeature=Select parameter {0}
 
 
 imageEditor.modal.changeImage.button=Change Image
@@ -363,6 +360,14 @@ imageSelector.modal.initialization.fail=Failed to retrieve the image selection f
 ## Deprecated since 14.10
 imageEditor.modal.backToEditor.button=Back
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=Document Tree
+
+## Deprecated since 16.10.10, 17.4.3, 17.6.0RC1
+ckeditor.plugin.link.uploadProgress=Uploading {0}...
+ckeditor.plugin.link.uploadSuccess=Successfully uploaded {0}
+ckeditor.plugin.link.uploadError=Failed to upload {0}
+ckeditor.plugin.image.slash.uploadProgress=Uploading {0}...
+ckeditor.plugin.image.slash.uploadSuccess=Successfully uploaded {0}
+ckeditor.plugin.image.slash.uploadError=Failed to upload {0}
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

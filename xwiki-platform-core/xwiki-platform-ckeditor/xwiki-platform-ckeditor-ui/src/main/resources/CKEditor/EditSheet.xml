@@ -413,7 +413,9 @@ define('xwiki-ckeditor', [
     container.find('.ckeditor-textarea').each(function() {
       // Wrap in try/catch so that a failure to load one editor doesn't affect the other editors.
       try {
-        createEditor(ckeditor, this);
+        createEditor(ckeditor, this).then(() =&gt; {
+          this.classList.remove('loading');
+        });
       } catch(e) {
         console.log(e);
       }
@@ -567,6 +569,13 @@ define('xwiki-ckeditor', [
   cursor: wait;
   overflow: hidden;
   resize: none;
+}
+
+/* Hide the form action bar while the editor is loading in order to avoid UI flickering (because the editor may enhance
+  or replace the form action bar). */
+main &gt; div:has(.ckeditor-textarea.loading) ~ .bottom-editor,
+#xwikicontent.loading ~ form#inplace-editing {
+  visibility: hidden;
 }
 
 /* Show the modal above the CKEditor dialogs */

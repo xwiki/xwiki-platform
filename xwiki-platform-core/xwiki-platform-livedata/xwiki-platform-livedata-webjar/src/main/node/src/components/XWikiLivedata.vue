@@ -35,7 +35,7 @@
     <LivedataFootnotes v-if="layoutLoaded" />
 
     <!-- Persistent configuration module (if supported by the config) -->
-    <LivedataPersistentConfiguration v-if="data.id" />
+    <LivedataPersistentConfiguration v-if="dataId" />
 
     <!-- Displays a loader until the component is fully mounted. -->
     <div v-if="!layoutLoaded" class="loading"></div>
@@ -64,8 +64,8 @@ export default {
   },
 
   computed: {
-    data() {
-      return this.logic.data;
+    dataId() {
+      return this.logic.data.id;
     },
     // The id of the layout to be displayed
     layoutId() {

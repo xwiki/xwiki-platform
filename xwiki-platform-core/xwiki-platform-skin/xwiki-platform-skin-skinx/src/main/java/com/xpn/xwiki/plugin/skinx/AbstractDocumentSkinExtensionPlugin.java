@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,8 +220,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                     try {
                         XWikiDocument doc = context.getWiki().getDocument(extension, context);
                         // Only add the extension as being "always used" if the page holding it has been saved with
-                        // programming rights.
-                        if (getAuthorizationManager().hasAccess(Right.PROGRAM, null,
+                        // wiki admin rights.
+                        if (getAuthorizationManager().hasAccess(Right.ADMIN, EntityType.WIKI,
                             doc.getAuthorReference(), doc.getDocumentReference())) {
                             extensions.add(extension);
                         }
@@ -268,7 +269,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                 if (obj == null) {
                     continue;
                 }
-                if (StringUtils.equals(obj.getStringValue(USE_FIELDNAME), "currentPage")) {
+                if (Strings.CS.equals(obj.getStringValue(USE_FIELDNAME), "currentPage")) {
                     return true;
                 }
             }
@@ -386,13 +387,13 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         if (document.getObject(getExtensionClassName()) != null) {
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
-                if (getAuthorizationManager().hasAccess(Right.PROGRAM, null,
+                if (getAuthorizationManager().hasAccess(Right.ADMIN, EntityType.WIKI,
                     document.getAuthorReference(), document.getDocumentReference())) {
                     getAlwaysUsedExtensions().add(document.getDocumentReference());
 
                     return;
                 } else {
-                    // in case the extension lost its programming rights upon this save.
+                    // in case the extension lost wiki admin right upon this save.
                     remove = true;
                 }
             } else {

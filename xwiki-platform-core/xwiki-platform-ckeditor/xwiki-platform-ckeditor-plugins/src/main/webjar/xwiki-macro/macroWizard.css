@@ -28,7 +28,7 @@ ul.macro-list > li.selected {
 }
 
 ul.macro-list .macro-name,
-ul.macro-parameters .macro-parameter-name {
+.macro-parameters .macro-parameter-name {
   color: #333;
   color: $theme.textColor;
 }
@@ -36,10 +36,8 @@ ul.macro-parameters .macro-parameter-name {
 ul.macro-list .macro-description,
 ul.macro-list .macro-extension,
 .macro-editor .macro-description,
-ul.macro-parameters .macro-parameter-description,
-ul.macro-parameters > li.more,
-ul.macro-parameters > li.empty,
-ul.macro-parameter-group-members > li.more {
+.macro-parameters .macro-parameter-description,
+.macro-parameters > .empty {
   color: #656565;
   color: $theme.textSecondaryColor;
   font-size: smaller;
@@ -53,8 +51,14 @@ ul.macro-list .macro-extension {
 .macro-description::first-letter,
 .macro-parameter-name::first-letter,
 .macro-parameter-description::first-letter,
-.macro-parameter-group-name::first-letter {
+.macro-parameter-group-name::first-letter,
+.feature-title:first-letter,
+.feature-choice-name:first-letter {
   text-transform: capitalize;
+}
+
+.macro-parameter-name {
+  font-size: medium;
 }
 
 .dropdown-menu > li.macro-category > a {
@@ -68,27 +72,68 @@ ul.macro-list .macro-extension {
   margin-right: 5px;
 }
 
-.macro-editor .macro-name {
-  font-size: larger;
+.macro-parameters {
+  margin-top: 10px;
 }
 
-ul.macro-parameters {
-  border-top: 1px dashed #E8E8E8;
-  border-top: 1px dashed $theme.borderColor;
-  list-style: none;
-  margin: .5em 0;
-  padding: 0;
+.macro-title {
+  padding: 30px 1em 30px 1em;
+  margin: -15px -15px 0 -15px;
+  background-color: #eeeeee; /* FIXME: use a theme color */
 }
 
-ul.macro-parameters > li,
-ul.macro-parameter-group-members > li {
-  padding: .5em 0;
+.macro-title .macro-name {
+  font-size: var(--font-size-h1);
 }
 
-.macro-parameter.mandatory .macro-parameter-name:after {
-  color: #CC3333;
-  color: $theme.notificationErrorColor;
-  content: ' *';
+.feature-choice {
+  margin-top: 1em;
+}
+
+.feature-container {
+  margin-top: 1em;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.feature-container.has-error {
+  border: $theme.notificationErrorColor dashed 1px;
+}
+
+.feature-choice-body.with-choice {
+  padding-left: 1.5em;
+}
+
+.macro-parameter {
+  margin-top: 0.5em;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.macro-parameter:first-of-type {
+  margin-top: 0;
+}
+
+.feature-choice-body .macro-parameter {
+  padding-left: 0;
+}
+
+.macro-parameter-name-container .mandatory, .panel-heading .mandatory {
+  font-size: smaller;
+  padding-left: 0.5em;
+  vertical-align: top;
+  font-weight: 300;
+}
+
+.macro-parameter-name, .feature-choice-name {
+  color: #222222; /* FIXME: use color theme (should be text color less variable?)*/
+  font-size: 1em;
+  font-weight: 500;
+  margin-bottom: 0.3em;
+}
+
+.macro-parameter-group-optionals {
+  padding-top: 1em;
 }
 
 .macro-parameter[data-type="boolean"],
@@ -102,7 +147,7 @@ ul.macro-parameter-group-members > li {
 .macro-parameter[data-type="boolean"] .macro-parameter-field,
 .macro-parameter[data-type="java.lang.Boolean"] .macro-parameter-field {
   position: absolute;
-  top: .5em;
+  top: 0;
 }
 .macro-parameter[data-type="boolean"] .macro-parameter-field input,
 .macro-parameter[data-type="java.lang.Boolean"] .macro-parameter-field input {
@@ -114,36 +159,6 @@ ul.macro-parameter-group-members > li {
   margin-bottom: 5px;
 }
 
-ul.macro-parameters > .more,
-ul.macro-parameter-group-members > .more {
-  cursor: pointer;
-}
-ul.macro-parameters > .more a,
-ul.macro-parameter-group-members > .more a {
-  color: #656565;
-  color: $theme.textSecondaryColor;
-}
-
-ul.macro-parameters .arrow {
-  display: inline-block;
-  height: 0;
-  width: 0;
-}
-ul.macro-parameters .arrow-down {
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid #656565;
-  border-top: 4px solid $theme.textSecondaryColor;
-  margin-bottom: 1px;
-}
-ul.macro-parameters .arrow-right {
-  border-bottom: 4px solid transparent;
-  border-left: 4px solid #656565;
-  border-left: 4px solid $theme.textSecondaryColor;
-  border-top: 4px solid transparent;
-  margin-right: 4px;
-}
-
 .macro-parameter-group:not(.invisible) > .tab-content {
   border-bottom: 1px solid $theme.borderColor;
   border-left: 1px solid $theme.borderColor;
@@ -151,7 +166,7 @@ ul.macro-parameters .arrow-right {
   padding: .5em;
 }
 
-ul.macro-parameter-group-members {
+.macro-parameter-group-members {
   padding: 0;
   list-style: none;
 }

@@ -199,7 +199,7 @@ public class BasePage extends BaseElement
 
     /**
      * @return whether the "edit" button is available on the current page
-     * @since 17.5.0RC1
+     * @since 17.5.0
      * @since 17.4.1
      */
     public boolean isEditAvailable()

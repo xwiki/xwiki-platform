@@ -217,10 +217,6 @@ class UserEventDispatcherTest
         when(this.userEventManager.isListening(event2Result1, mainUserFoo, NotificationFormat.ALERT)).thenReturn(true);
         // verify(this.events).saveEventStatus(new DefaultEventStatus(event2Result1, mainUserFooStr, false))
 
-        SimpleEventQuery queryMailE2R1 = new SimpleEventQuery(0, 0)
-            .eq(Event.FIELD_ID, event2Result1Id)
-            .withMail(mainUserFooStr);
-        when(this.events.search(queryMailE2R1)).thenReturn(searchResult0Hit);
         when(this.userEventManager.isListening(event2Result1, mainUserFoo, NotificationFormat.EMAIL)).thenReturn(true);
         // verify(this.events).saveMailEntityEvent(new DefaultEventStatus(event2Result1, mainUserFooStr))
 
@@ -233,11 +229,6 @@ class UserEventDispatcherTest
 
         // verify(this.userEventManager, never()).isListening(event2Result1, mainUserBar, NotificationFormat.ALERT)
         // verify(this.events, never()).saveEventStatus(new DefaultEventStatus(event2Result1, mainUserBarStr, false))
-
-        SimpleEventQuery queryMailE2R1Bar = new SimpleEventQuery(0, 0)
-            .eq(Event.FIELD_ID, event2Result1Id)
-            .withMail(mainUserBarStr);
-        when(this.events.search(queryMailE2R1Bar)).thenReturn(searchResultHits);
 
         // verify(this.userEventManager, never()).isListening(event2Result1, mainUserBar, NotificationFormat.EMAIL)
         // verify(this.events, never()).saveMailEntityEvent(new DefaultEventStatus(event2Result1, mainUserBarStr))
@@ -259,10 +250,6 @@ class UserEventDispatcherTest
         when(this.userEventManager.isListening(event3Result1, mainUserFoo, NotificationFormat.ALERT)).thenReturn(false);
         // verify(this.events, never()).saveEventStatus(new DefaultEventStatus(event3Result1, mainUserFooStr, false))
 
-        SimpleEventQuery queryMailE3R1 = new SimpleEventQuery(0, 0)
-            .eq(Event.FIELD_ID, event3Result1Id)
-            .withMail(mainUserFooStr);
-        when(this.events.search(queryMailE3R1)).thenReturn(searchResult0Hit);
         when(this.userEventManager.isListening(event3Result1, mainUserFoo, NotificationFormat.EMAIL)).thenReturn(false);
         // verify(this.events, never()).saveMailEntityEvent(new DefaultEventStatus(event3Result1, mainUserFooStr))
 
@@ -273,10 +260,6 @@ class UserEventDispatcherTest
         when(this.userEventManager.isListening(event3Result1, mainUserBar, NotificationFormat.ALERT)).thenReturn(true);
         // verify(this.events).saveEventStatus(new DefaultEventStatus(event3Result1, mainUserBarStr, false))
 
-        SimpleEventQuery queryMailE3R1Bar = new SimpleEventQuery(0, 0)
-            .eq(Event.FIELD_ID, event3Result1Id)
-            .withMail(mainUserBarStr);
-        when(this.events.search(queryMailE3R1Bar)).thenReturn(searchResult0Hit);
         when(this.userEventManager.isListening(event3Result1, mainUserBar, NotificationFormat.EMAIL)).thenReturn(true);
         // verify(this.events).saveMailEntityEvent(new DefaultEventStatus(event3Result1, mainUserBarStr))
 
@@ -350,9 +333,9 @@ class UserEventDispatcherTest
 
         verify(this.events).saveEventStatus(new DefaultEventStatus(event2Result1, mainUserFooStr, false));
         verify(this.events).saveMailEntityEvent(new DefaultEntityEvent(event2Result1, mainUserFooStr));
-        verify(this.userEventManager, never()).isListening(event2Result1, mainUserBar, NotificationFormat.ALERT);
+        verify(this.userEventManager).isListening(event2Result1, mainUserBar, NotificationFormat.ALERT);
         verify(this.events, never()).saveEventStatus(new DefaultEventStatus(event2Result1, mainUserBarStr, false));
-        verify(this.userEventManager, never()).isListening(event2Result1, mainUserBar, NotificationFormat.EMAIL);
+        verify(this.userEventManager).isListening(event2Result1, mainUserBar, NotificationFormat.EMAIL);
         verify(this.events, never()).saveMailEntityEvent(new DefaultEntityEvent(event2Result1, mainUserBarStr));
         verify(this.events).prefilterEvent(event2Result1);
         verify(futureE2R1).join();
@@ -366,7 +349,7 @@ class UserEventDispatcherTest
 
         verify(this.events, never()).search(queryStatusE1R2);
         verify(this.events, never()).search(queryMailE1R2);
-        verify(this.userEventManager, never()).isListening(event1Result2, mainUserBar, NotificationFormat.ALERT);
+        verify(this.userEventManager).isListening(event1Result2, mainUserBar, NotificationFormat.ALERT);
         verify(this.events, never()).saveEventStatus(new DefaultEventStatus(event1Result2, mainUserBarStr, false));
         verify(this.events).saveMailEntityEvent(new DefaultEntityEvent(event1Result2, mainUserBarStr));
         verify(this.events).prefilterEvent(event1Result2);

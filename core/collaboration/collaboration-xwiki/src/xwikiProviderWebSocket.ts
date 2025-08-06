@@ -38,7 +38,7 @@ function readClientId(handlerDecoder: decoding.Decoder) {
  *
  * @param url - the url of the websocket endpoint
  * @param room - the string serialization of the room
- * @since 0.20
+ * @since 0.21
  */
 export function createXWikiWebSocketProvider(
   url: string,

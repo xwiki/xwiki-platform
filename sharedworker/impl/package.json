@@ -40,16 +40,17 @@
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",
     "comlink": "4.4.2",
-    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "vue-router": "4.5.1"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
+    "inversify": "7.7.0",
     "typescript": "5.9.2",
     "vite": "7.0.6",
     "vite-plugin-comlink": "5.1.0",

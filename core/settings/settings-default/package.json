@@ -25,12 +25,15 @@
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-settings-api": "workspace:*",
-    "inversify": "7.7.0"
+    "@xwiki/cristal-settings-api": "workspace:*"
+  },
+  "peerDependencies": {
+    "inversify": "7.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
+    "inversify": "7.7.0",
     "typescript": "5.9.2",
     "vite": "7.0.6",
     "vitest-mock-extended": "3.1.0"

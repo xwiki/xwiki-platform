@@ -23,12 +23,13 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test": "vitest --run"
   },
-  "dependencies": {
-    "inversify": "7.7.0"
+  "peerDependencies": {
+    "inversify": "7.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
+    "inversify": "7.7.0",
     "typescript": "5.9.2",
     "vite": "7.0.6"
   },

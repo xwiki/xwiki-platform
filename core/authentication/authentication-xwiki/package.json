@@ -27,15 +27,16 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
     "axios": "1.11.0",
-    "inversify": "7.7.0",
     "js-cookie": "3.0.5"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@types/js-cookie": "3.0.6",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6"

@@ -27,14 +27,15 @@
     "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
-    "@xwiki/cristal-history-api": "workspace:*",
-    "inversify": "7.7.0"
+    "@xwiki/cristal-history-api": "workspace:*"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6"

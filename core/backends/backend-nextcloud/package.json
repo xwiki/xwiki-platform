@@ -29,14 +29,15 @@
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-page-default": "workspace:*",
     "@xwiki/cristal-utils-inversify": "workspace:*",
-    "fast-xml-parser": "5.2.4",
-    "inversify": "7.7.0"
+    "fast-xml-parser": "5.2.4"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6"

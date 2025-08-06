@@ -25,15 +25,16 @@
   },
   "dependencies": {
     "@xwiki/cristal-info-actions-api": "workspace:*",
-    "inversify": "7.7.0",
     "lodash-es": "4.17.21"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@types/lodash-es": "4.17.12",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6"

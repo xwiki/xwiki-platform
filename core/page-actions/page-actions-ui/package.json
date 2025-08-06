@@ -34,16 +34,17 @@
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "@xwiki/cristal-page-actions-api": "workspace:*",
     "@xwiki/cristal-rename-api": "workspace:*",
-    "inversify": "7.7.0",
     "vue-i18n": "11.1.11"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6",

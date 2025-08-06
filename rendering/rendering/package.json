@@ -30,16 +30,17 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-rendering-wikimodel": "workspace:*",
     "dompurify": "3.2.6",
-    "inversify": "7.7.0",
     "marked": "16.1.1",
     "marked-base-url": "1.1.7"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@types/dompurify": "3.2.0",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6",

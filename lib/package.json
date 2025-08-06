@@ -93,13 +93,13 @@
     "@xwiki/cristal-skin": "workspace:*",
     "@xwiki/cristal-uiextension-default": "workspace:*",
     "@xwiki/cristal-wiki-config-default": "workspace:*",
-    "inversify": "7.7.0",
     "pinia": "3.0.2",
     "reflect-metadata": "0.2.2",
     "vue-i18n": "11.1.11",
     "vue-router": "4.5.1"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
@@ -107,6 +107,7 @@
     "@shoelace-style/shoelace": "2.20.1",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
+    "inversify": "7.7.0",
     "typescript": "5.9.2",
     "vite": "7.0.6",
     "vue": "3.5.18",

@@ -26,14 +26,15 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-hierarchy-api": "workspace:*",
     "@xwiki/cristal-hierarchy-default": "workspace:*",
-    "@xwiki/cristal-model-api": "workspace:*",
-    "inversify": "7.7.0"
+    "@xwiki/cristal-model-api": "workspace:*"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6"

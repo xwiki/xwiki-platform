@@ -21,14 +21,15 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
-    "inversify": "7.7.0",
     "vue-i18n": "11.1.11"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6",

@@ -36,11 +36,11 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "@xwiki/cristal-user-ui": "workspace:*",
-    "inversify": "7.7.0",
     "vue-i18n": "11.1.11",
     "vue-router": "4.5.1"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
@@ -49,6 +49,7 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dev-test-utils": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6",

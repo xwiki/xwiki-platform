@@ -29,10 +29,10 @@
     "@gouvfr/dsfr": "1.11.2",
     "@gouvminint/vue-dsfr": "5.11.0",
     "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-dsapi": "workspace:*",
-    "inversify": "7.7.0"
+    "@xwiki/cristal-dsapi": "workspace:*"
   },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
@@ -40,6 +40,7 @@
     "@vue/test-utils": "2.4.6",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
+    "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.0.6",

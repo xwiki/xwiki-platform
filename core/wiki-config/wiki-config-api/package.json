@@ -20,6 +20,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc --project tsconfig.json",
+    "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "types": "./src/index.ts",

@@ -18,6 +18,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {

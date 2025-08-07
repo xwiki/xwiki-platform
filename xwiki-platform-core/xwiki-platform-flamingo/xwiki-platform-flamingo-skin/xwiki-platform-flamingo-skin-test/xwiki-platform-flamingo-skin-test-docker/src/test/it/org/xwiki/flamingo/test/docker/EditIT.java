@@ -129,7 +129,7 @@ public class EditIT
      */
     @Test
     @Order(2)
-    public void minorEdit(TestUtils setup, TestReference reference)
+    public void minorEdit(TestUtils setup, TestReference reference) throws Exception
     {
         setup.deletePage(reference);
         ViewPage vp = setup.gotoPage(reference);
@@ -139,14 +139,20 @@ public class EditIT
         // Save & Continue = minor edit.
         wep.clickSaveAndContinue();
 
+        wep.setContent("version=1.2");
+        wep.clickSaveAndContinue();
+
         wep.setContent("version=2.1");
 
         // Save & View = major edit
         wep.clickSaveAndView();
 
-        // Verify that the revision exists by navigating to it and by asserting its content
-        setup.gotoPage(reference, "view", "rev=2.1");
+        // Verify that the revisions exists by navigating to it and by asserting its content
+        setup.gotoPage(reference, "view", "rev=1.2");
+        vp = new ViewPage();
+        assertEquals("version=1.2", vp.getContent());
 
+        setup.gotoPage(reference, "view", "rev=2.1");
         vp = new ViewPage();
         assertEquals("version=2.1", vp.getContent());
 
@@ -159,6 +165,22 @@ public class EditIT
         setup.gotoPage(reference, "view", "rev=2.2");
         vp = new ViewPage();
         assertEquals("version=2.2", vp.getContent());
+
+        try {
+            // Verify that disabling the minor edit from preference hide it and prevent using it
+            setup.setWikiPreference("minoredit", "0");
+            wep = vp.editWiki();
+            assertFalse(wep.hasMinorEdit());
+
+            wep.setContent("version=3.1");
+            wep.clickSaveAndContinue();
+
+            setup.gotoPage(reference, "view", "rev=3.1");
+            vp = new ViewPage();
+            assertEquals("version=3.1", vp.getContent());
+        } finally {
+            setup.setWikiPreference("minoredit", "1");
+        }
     }
 
     /**

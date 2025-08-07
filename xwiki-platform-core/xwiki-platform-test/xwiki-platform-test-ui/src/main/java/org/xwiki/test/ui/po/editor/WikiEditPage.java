@@ -162,6 +162,15 @@ public class WikiEditPage extends PreviewableEditPage
     }
 
     /**
+     * @return {@code true} if the minor edit checkbox is displayed.
+     * @since 17.7.0
+     */
+    public boolean hasMinorEdit()
+    {
+        return getDriver().hasElement(By.name("minorEdit")) && this.minorEditCheckBox.isDisplayed();
+    }
+
+    /**
      * Set <code>comment</code> for this change.
      */
     public void setEditComment(String comment)

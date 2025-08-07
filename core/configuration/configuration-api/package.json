@@ -14,9 +14,7 @@
   },
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts"
-    }
+    "types": "./src/index.ts"
   },
   "scripts": {
     "build": "rimraf dist && tsc --project tsconfig.json",
@@ -30,5 +28,10 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.9.2"
+  },
+  "publishConfig": {
+    "exports": {
+      "types": "./dist/index.d.ts"
+    }
   }
 }

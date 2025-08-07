@@ -14,9 +14,7 @@
   },
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts"
-    }
+    "types": "./src/index.ts"
   },
   "scripts": {
     "build": "rimraf dist && tsc --project tsconfig.json",
@@ -34,5 +32,10 @@
     "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2"
+  },
+  "publishConfig": {
+    "exports": {
+      "types": "./dist/index.d.ts"
+    }
   }
 }

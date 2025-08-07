@@ -4233,7 +4233,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         // Read the minor edit checkbox from the form
-        setMinorEdit(eform.isMinorEdit());
+        boolean minorEdit = context.getWiki().hasMinorEdit(context) && eform.isMinorEdit();
+        setMinorEdit(minorEdit);
 
         String tags = eform.getTags();
         if (!StringUtils.isEmpty(tags)) {

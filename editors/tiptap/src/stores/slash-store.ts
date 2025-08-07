@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ActionCategoryDescriptor } from "../components/extensions/slash";
+import { Actions } from "./actions";
+import { Getters } from "./getters";
+import { State } from "./state";
+import { ActionCategoryDescriptor } from "../components/extensions/actionCategoryDescriptor";
 import { Store, StoreDefinition, defineStore } from "pinia";
-
-type Props = { items: ActionCategoryDescriptor[] };
-
-type State = {
-  props: Props;
-};
-
-type Getters = {
-  items: (state: State) => ActionCategoryDescriptor[];
-};
-
-type Actions = {
-  updateProps: (props: Props) => void;
-};
 
 export type SlashStore = Store<"slash-store", State, Getters, Actions>;
 const store: StoreDefinition<"slash-store", State, Getters, Actions> =
@@ -55,4 +44,3 @@ const store: StoreDefinition<"slash-store", State, Getters, Actions> =
     },
   });
 export default store;
-export { type Props };

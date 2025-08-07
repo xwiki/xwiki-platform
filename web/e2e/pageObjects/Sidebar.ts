@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -28,15 +28,13 @@ import type { Locator, Page } from "@playwright/test";
 export class SidebarPageObject {
   private sidebarLocator: Locator;
 
-  constructor(
-    private readonly page: Page,
-  ) {
+  constructor(private readonly page: Page) {
     this.sidebarLocator = this.page.locator("#sidebar");
   }
 
   async openSidebar(): Promise<void> {
     await expect(this.sidebarLocator.locator("..")).toBeVisible();
-    if (!await this.sidebarLocator.isVisible()) {
+    if (!(await this.sidebarLocator.isVisible())) {
       const openSidebar = this.page.locator(".open-sidebar");
       await openSidebar.nth(0).click();
     }
@@ -45,10 +43,10 @@ export class SidebarPageObject {
 
   async hideSidebar(): Promise<void> {
     await expect(this.sidebarLocator.locator("..")).toBeVisible();
-    if (!await this.sidebarLocator.isHidden()) {
-      const hideSidebar = this.page.locator(".hide-sidebar:visible").or(
-        this.page.locator(".close-sidebar:visible")
-      );
+    if (!(await this.sidebarLocator.isHidden())) {
+      const hideSidebar = this.page
+        .locator(".hide-sidebar:visible")
+        .or(this.page.locator(".close-sidebar:visible"));
       await hideSidebar.nth(0).click();
     }
     await expect(this.sidebarLocator).toBeHidden();

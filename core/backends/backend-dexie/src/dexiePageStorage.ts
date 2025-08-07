@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import Dexie from "dexie";
+import { default as Dexie } from "dexie";
 import type { Table } from "dexie";
 
 export default class DexiePageStorage extends Dexie {

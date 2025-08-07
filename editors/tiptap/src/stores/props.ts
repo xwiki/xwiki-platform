@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,3 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
+import { ActionCategoryDescriptor } from "../components/extensions/actionCategoryDescriptor";
+
+type Props = { items: ActionCategoryDescriptor[] };
+export { type Props };

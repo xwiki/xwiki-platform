@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { User } from "../extensions/collaboration";
+import { User } from "../extensions/user";
 import noavatar from "../images/noavatar.png";
 import { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 

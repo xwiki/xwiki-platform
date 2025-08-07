@@ -1,21 +1,21 @@
 <!--
-See the LICENSE file distributed with this work for additional
-information regarding copyright ownership.
+  See the LICENSE file distributed with this work for additional
+  information regarding copyright ownership.
 
-This is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License as
-published by the Free Software Foundation; either version 2.1 of
-the License, or (at your option) any later version.
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
 
-This software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-Lesser General Public License for more details.
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public
-License along with this software; if not, write to the Free
-Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
 import CConnectionStatus from "./c-connection-status.vue";
@@ -25,9 +25,10 @@ import { computeCurrentUser } from "./compute-current-user";
 import { initOnQuitHelper } from "./on-quit-helper";
 import { loadLinkSuggest } from "../components/extensions/link-suggest";
 import { Slash } from "../components/extensions/slash";
-import { CollaborationKit, User } from "../extensions/collaboration";
+import { CollaborationKit } from "../extensions/collaborationKit";
 import initLinkExtension from "../extensions/link";
 import initMarkdown from "../extensions/markdown";
+import { User } from "../extensions/user";
 import messages from "../translations";
 import Placeholder from "@tiptap/extension-placeholder";
 import Table from "@tiptap/extension-table";

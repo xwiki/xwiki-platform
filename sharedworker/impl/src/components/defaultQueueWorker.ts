@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import Worker from "./worker?sharedworker";
+import { default as Worker } from "./worker?sharedworker";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import * as Comlink from "comlink";
 import { inject, injectable } from "inversify";

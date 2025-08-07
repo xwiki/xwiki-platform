@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggest";
+import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggestion-action-descriptor";
 import { Store, StoreDefinition, defineStore } from "pinia";
 
 type State = {

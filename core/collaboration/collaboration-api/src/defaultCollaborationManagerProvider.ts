@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { collaborationManagerName } from "./index";
+import { collaborationManagerName } from "./collaborationManagerName";
 import { inject, injectable } from "inversify";
 import type { CollaborationManager } from "./collaborationManager";
 import type { CollaborationManagerProvider } from "./collaborationManagerProvider";

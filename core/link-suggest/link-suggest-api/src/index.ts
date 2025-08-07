@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,49 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DefaultLinkSuggestServiceProvider } from "./DefaultLinkSuggestServiceProvider";
 import { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
-import { Container } from "inversify";
+import { ComponentInit } from "./componentInit";
+import { LinkType } from "./linkType";
+import type { Link } from "./link";
 import type { LinkSuggestService } from "./linkSuggestService";
-
-/**
- * @since 0.11
- */
-enum LinkType {
-  PAGE,
-  ATTACHMENT,
-}
-
-/**
- * Minimal data required to describe a link.
- * @since 0.8
- */
-type Link = {
-  id: string;
-  url: string;
-  reference: string;
-  label: string;
-  hint: string;
-  type: LinkType;
-};
 
 /**
  * The component id of LinkSuggestService.
  * @since 0.8
  */
 const name = "LinkSuggestService";
-
-/**
- * @since 0.11
- */
-class ComponentInit {
-  constructor(container: Container) {
-    container
-      .bind<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
-      .to(DefaultLinkSuggestServiceProvider)
-      .inSingletonScope();
-  }
-}
 
 export {
   ComponentInit,

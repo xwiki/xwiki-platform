@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,43 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 import { AutoSaver } from "./autoSaver";
+import { CollaborationKitOptions } from "./collaborationKitOptions";
 import { TiptapCollabProvider } from "@hocuspocus/provider";
 import { Extension } from "@tiptap/core";
-import Collaboration from "@tiptap/extension-collaboration";
-import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
+import { default as Collaboration } from "@tiptap/extension-collaboration";
+import { default as CollaborationCursor } from "@tiptap/extension-collaboration-cursor";
 import * as Y from "yjs";
-
-interface CollaborationKitOptions {
-  /**
-   * The collaboration channel. Users that want to edit the content collaboratively must use the same channel.
-   */
-  channel: string;
-
-  /**
-   * The user that is editing the content.
-   */
-  user: User;
-
-  /**
-   * The function that saves the content, called by the auto-saver.
-   */
-  saveCallback: (authors: User[]) => Promise<void>;
-
-  /**
-   * The URL of the realtime server.
-   */
-  baseUrl: string;
-}
-
-export interface User {
-  /**
-   * The user's name, displayed near the user's cursor.
-   */
-  name: string;
-  avatar: string;
-}
 
 export const CollaborationKit = Extension.create<CollaborationKitOptions>({
   name: "cristalCollaborationKit",

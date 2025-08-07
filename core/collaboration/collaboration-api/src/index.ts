@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-const collaborationManagerName: string = "collaborationManager";
-const collaborationManagerProviderName: string = "collaborationManagerProvider";
+import { collaborationManagerName } from "./collaborationManagerName";
+import { collaborationManagerProviderName } from "./collaborationManagerProviderName";
 import { ComponentInit } from "./componentInit";
 import { Status } from "./status";
 import type { CollaborationInitializer } from "./collaborationInitializer";

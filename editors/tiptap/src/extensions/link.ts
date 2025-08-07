@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import Link from "@tiptap/extension-link";
+import { default as Link } from "@tiptap/extension-link";
 import { EntityReference } from "@xwiki/cristal-model-api";
 import { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
 import { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";

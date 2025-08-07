@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,13 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { ActionCategoryDescriptor } from "./actionCategoryDescriptor";
+import { ActionDescriptor } from "./actionDescriptor";
 import { queryEqualityOperator } from "./filter-helper";
 import { CommandParams } from "./menu-helpers";
-import slashStore, { Props, SlashStore } from "../../stores/slash-store";
+import { Props } from "../../stores/props";
+import slashStore, { SlashStore } from "../../stores/slash-store";
 import Selector from "../../vue/c-tiptap-selector.vue";
-import { Editor, Extension, Range } from "@tiptap/core";
+import { Extension } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
-import Suggestion from "@tiptap/suggestion";
+import { default as Suggestion } from "@tiptap/suggestion";
 import { createPinia } from "pinia";
 import { App, createApp } from "vue";
 
@@ -52,39 +55,6 @@ const Slash = Extension.create({
     ];
   },
 });
-
-/**
- * Define the descriptor for action categories.
- * A category is composed of the action title and a set of actions linked to
- * that category.
- * @since 0.8
- */
-interface ActionCategoryDescriptor {
-  actions: ActionDescriptor[];
-  title: string;
-}
-
-/**
- * Defines the structure of a slash action descriptor.
- *
- * @since 0.8
- */
-export interface ActionDescriptor {
-  title: string;
-  /**
-   * An optional sort field to be used instead of the title when sorting the
-   * actions.
-   */
-  sortField?: string;
-  command: (commandParams: { editor: Editor; range: Range }) => void;
-  icon: string;
-  hint: string;
-  /**
-   * A list of strings that are not expected to be displayed but that are used
-   * when filtering for actions in the UI.
-   */
-  aliases?: string[];
-}
 
 function getHeadingAction(level: number): ActionDescriptor {
   return {

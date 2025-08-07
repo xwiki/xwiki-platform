@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -80,19 +80,22 @@ export class BreadcrumbPageObject {
   }
 
   private async findItemsVuetify(): Promise<BreadcrumbSegmentElement[]> {
-    return await this.findItemsInternal(".page-header .v-breadcrumbs li a", (element) => {
-      return {
-        getText() {
-          return element;
-        },
-        getLink() {
-          return element;
-        },
-        async getLinkTarget() {
-          return (await this.getLink().getAttribute("href"))!;
-        },
-      };
-    });
+    return await this.findItemsInternal(
+      ".page-header .v-breadcrumbs li a",
+      (element) => {
+        return {
+          getText() {
+            return element;
+          },
+          getLink() {
+            return element;
+          },
+          async getLinkTarget() {
+            return (await this.getLink().getAttribute("href"))!;
+          },
+        };
+      },
+    );
   }
 
   private async findItemsInternal(

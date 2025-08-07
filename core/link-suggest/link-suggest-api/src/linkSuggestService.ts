@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,7 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Link, LinkType } from "./index";
+import { Link } from "./link";
+import { LinkType } from "./linkType";
 
 /**
  * Provide the operation to get links suggestions.

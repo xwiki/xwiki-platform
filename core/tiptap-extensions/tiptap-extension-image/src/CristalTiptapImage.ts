@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import ImageView from "./vue/ImageView.vue";
-import Image from "@tiptap/extension-image";
+import { default as Image } from "@tiptap/extension-image";
 import { VueNodeViewRenderer } from "@tiptap/vue-3";
 import { EntityReference } from "@xwiki/cristal-model-api";
 import { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";

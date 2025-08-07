@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,13 +19,14 @@
  */
 
 import { queryEqualityOperator } from "./filter-helper";
+import { LinkSuggestionActionDescriptor } from "./link-suggestion-action-descriptor";
+import { LinkType } from "./link-type";
 import linkSuggestStore, {
   LinkSuggestStore,
 } from "../../stores/link-suggest-store";
 import LinkSuggestVue from "../../vue/c-tiptap-link-suggest.vue";
-
 import { PluginKey } from "@tiptap/pm/state";
-import Suggestion from "@tiptap/suggestion";
+import { default as Suggestion } from "@tiptap/suggestion";
 import { Editor, Extension, Range } from "@tiptap/vue-3";
 import { SkinManager } from "@xwiki/cristal-api";
 import { Link } from "@xwiki/cristal-link-suggest-api";
@@ -39,25 +40,6 @@ import { Container } from "inversify";
 import { createPinia } from "pinia";
 import { App, createApp } from "vue";
 import type { LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
-
-/**
- * @since 0.11
- */
-enum LinkType {
-  PAGE,
-  ATTACHMENT,
-}
-
-/**
- * Describe a link suggestion action (i.e., a search result entry).
- */
-export interface LinkSuggestionActionDescriptor {
-  title: string;
-  segments: string[];
-  reference: string;
-  url: string;
-  type: LinkType;
-}
 
 /**
  * Initialize a link suggest tiptap extension with the provided components.

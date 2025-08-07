@@ -1,4 +1,4 @@
-/*
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -99,6 +99,7 @@ function createBlockNoteSchema(macros: Macro[]) {
  * @returns The dictionary in the requested language
  */
 function createDictionary(lang: EditorLanguage) {
+  // eslint-disable-next-line import/namespace
   return locales[lang];
 }
 

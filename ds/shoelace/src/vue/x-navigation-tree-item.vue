@@ -25,7 +25,7 @@
  */
 import "@shoelace-style/shoelace/dist/components/tree-item/tree-item";
 import { inject, ref, useTemplateRef } from "vue";
-import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item";
+import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item.d.ts";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type {
   NavigationTreeNode,

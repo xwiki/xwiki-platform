@@ -18,13 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import MarkdownIt from "markdown-it";
 import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import type { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
-import type { Token } from "markdown-it";
+import type { RuleInline } from "markdown-it/lib/parser_inline.mjs";
+import type { default as StateInline } from "markdown-it/lib/rules_inline/state_inline.mjs";
+import type { default as Token } from "markdown-it/lib/token.mjs";
 
 // eslint-disable-next-line max-statements
-function parseInternalImageLabel(state: MarkdownIt.StateInline, start: number) {
+function parseInternalImageLabel(state: StateInline, start: number) {
   let level, found, marker;
   const max = state.posMax;
   const oldPos = state.pos;
@@ -56,9 +57,9 @@ function parseInternalImageLabel(state: MarkdownIt.StateInline, start: number) {
 export function parseInternalImages(
   modelReferenceParser: ModelReferenceParser,
   remoteURLSerializer: RemoteURLSerializer,
-): MarkdownIt.ParserInline.RuleInline {
+): RuleInline {
   // eslint-disable-next-line max-statements
-  return (state: MarkdownIt.StateInline & { linkLevel?: number }, silent) => {
+  return (state: StateInline & { linkLevel?: number }, silent: boolean) => {
     if (state.src.charCodeAt(state.pos) !== 33 /* ! */) {
       return false;
     }

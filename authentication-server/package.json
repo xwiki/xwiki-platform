@@ -14,10 +14,11 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsc --project tsconfig.json &&  esbuild ./src/index.ts --bundle --outfile=dist/index.cjs --platform=node",
+    "build": "esbuild ./src/index.ts --bundle --outfile=dist/index.cjs --platform=node",
     "clean": "rimraf dist",
     "dev": "tsx src/index.ts",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "express": "5.1.0"

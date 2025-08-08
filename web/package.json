@@ -13,26 +13,24 @@
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
-  "exports": {
-    ".": "./src/index.ts"
-  },
+  "type": "module",
   "scripts": {
-    "build": "pnpm compile",
+    "build": "vite build",
     "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json && vite build",
     "dev": "vite dev",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
     "quickstart": "pnpm run build --scope @xwiki/cristal-app && NODE_ENV=production node src/server.js",
     "start": "pnpm run build && NODE_ENV=production node src/server.js",
     "start:e2e:xwiki": "pnpm run -C ../sources/xwiki/mock-server dev",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "typecheck": "vue-tsc"
   },
   "dependencies": {
     "@xwiki/cristal-authentication-github": "workspace:*",
     "@xwiki/cristal-authentication-nextcloud": "workspace:*",
     "@xwiki/cristal-authentication-xwiki": "workspace:*",
     "@xwiki/cristal-browser-default": "workspace:*",
+    "@xwiki/cristal-configuration-api": "workspace:*",
     "@xwiki/cristal-configuration-web": "workspace:*",
     "@xwiki/cristal-lib": "workspace:*",
     "@xwiki/cristal-settings-browser": "workspace:*",

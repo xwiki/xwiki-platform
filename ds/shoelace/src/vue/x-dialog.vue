@@ -20,7 +20,7 @@
 <script lang="ts" setup>
 import "@shoelace-style/shoelace/dist/components/dialog/dialog";
 import { useTemplateRef } from "vue";
-import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog";
+import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.d.ts";
 
 defineProps<{
   title: string;

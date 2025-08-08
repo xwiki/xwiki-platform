@@ -14,6 +14,10 @@
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
   "type": "module",
+  "exports": {
+    "./vitest.config": "./src/vitest.config.ts",
+    "./vitest-vue.config": "./src/vitest-vue.config.ts"
+  },
   "devDependencies": {
     "typescript": "5.9.2",
     "vite": "7.0.6"

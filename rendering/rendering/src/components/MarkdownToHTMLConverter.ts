@@ -19,12 +19,13 @@
  */
 
 import macro from "./marked-macro";
-import DOMPurify from "dompurify";
+import { default as DOMPurify } from "dompurify";
 import { inject, injectable } from "inversify";
 import { marked } from "marked";
 import { baseUrl } from "marked-base-url";
 import type { Converter } from "../api/converter";
 import type { Logger, WikiConfig } from "@xwiki/cristal-api";
+import type { Config } from "dompurify";
 
 /**
  * @deprecated use \@xwiki/cristal-markdown-api and \@xwiki/cristal-markdown-default instead, the macro parsing
@@ -37,7 +38,7 @@ export class MarkdownToHTMLConverter implements Converter {
 
   private logger: Logger;
   public markedInit: boolean;
-  public sanitizeConfig: DOMPurify.Config = {
+  public sanitizeConfig: Config = {
     ADD_TAGS: ["#comment"],
     ADD_ATTR: ["macroname"],
     FORCE_BODY: true,
@@ -80,7 +81,7 @@ export class MarkdownToHTMLConverter implements Converter {
     }
     const html = marked(source) as string;
     this.logger?.debug("HTML before sanitize", html);
-    content = DOMPurify.sanitize(html, this.sanitizeConfig) as string;
+    content = DOMPurify.sanitize(html, this.sanitizeConfig);
     this.logger?.debug("HTML after sanitize", content);
     return content;
   }

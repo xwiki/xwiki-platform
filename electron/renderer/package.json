@@ -14,10 +14,10 @@
   },
   "type": "module",
   "scripts": {
-    "build": "pnpm compile",
+    "build": "vite build",
     "clean": "rimraf dist",
-    "compile": "vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@xwiki/cristal-browser-electron": "workspace:*",

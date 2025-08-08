@@ -18,12 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { defineConfig } from "vitest/config";
+import defaultConfig from "./vitest.config";
+import { defineConfig, mergeConfig } from "vitest/config";
+import type { UserConfig } from "vite";
 
-export default defineConfig({
-  test: {
-    reporters: ["junit"],
-    outputFile: "unit-tests.xml",
-    passWithNoTests: true,
-  },
-});
+const config: UserConfig = mergeConfig(
+  defaultConfig,
+  defineConfig({
+    test: {
+      environment: "happy-dom",
+    },
+  }),
+);
+export default config;

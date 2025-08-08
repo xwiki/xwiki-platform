@@ -15,15 +15,15 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/index.ts"
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
-    "build": "rimraf dist && tsc --project tsconfig.json",
+    "build": "rimraf dist && tsc",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "peerDependencies": {
     "reflect-metadata": "0.x",
     "vue": "3.x"

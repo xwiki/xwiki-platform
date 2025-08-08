@@ -3,7 +3,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "resolveJsonModule": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "moduleResolution": "bundler"
   },
   "extends": "./../tsconfig.json",
   "include": [

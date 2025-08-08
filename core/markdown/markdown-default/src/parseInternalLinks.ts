@@ -18,13 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import MarkdownIt from "markdown-it";
 import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import type { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
+import type { RuleInline } from "markdown-it/lib/parser_inline.mjs";
+import type { default as StateInline } from "markdown-it/lib/rules_inline/state_inline.mjs";
 
 // eslint-disable-next-line max-statements
 function parseInternalLinkLabel(
-  state: MarkdownIt.StateInline,
+  state: StateInline,
   start: number,
   disableNested: boolean,
 ) {
@@ -69,9 +70,9 @@ function parseInternalLinkLabel(
 export function parseInternalLinks(
   modelReferenceParser: ModelReferenceParser,
   remoteURLSerializer: RemoteURLSerializer,
-): MarkdownIt.ParserInline.RuleInline {
+): RuleInline {
   // eslint-disable-next-line max-statements
-  return (state: MarkdownIt.StateInline & { linkLevel?: number }, silent) => {
+  return (state: StateInline & { linkLevel?: number }, silent: boolean) => {
     if (state.src.charCodeAt(state.pos) !== 91 /* [ */) {
       return false;
     }

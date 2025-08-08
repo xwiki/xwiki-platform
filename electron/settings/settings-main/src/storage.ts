@@ -34,7 +34,12 @@ const schema = {
   },
 };
 
-const storeInstance: Store = new Store({
+type StoreType = {
+  _raw: string;
+  configuration: object;
+};
+
+const storeInstance: Store<StoreType> = new Store<StoreType>({
   name: "settings",
   // Here, we want to keep in the store the raw string representation of the
   // file, since it should be parsed and serialized by the SettingsManager
@@ -45,39 +50,23 @@ const storeInstance: Store = new Store({
   schema,
 });
 
-function set<T>(key: string, value: T) {
-  // @ts-expect-error type resolution failing because of electron-store library bug
-  storeInstance.set(key, value);
-}
-
-function get<T>(key: string): T {
-  // @ts-expect-error type resolution failing because of electron-store library bug
-  return storeInstance.get(key) as T;
-}
-
-function rm(key: string) {
-  // @ts-expect-error type resolution failing because of electron-store library bug
-  storeInstance.delete(key);
-}
-
 function setSettings(value: string): void {
-  set(settingsKey, value);
+  storeInstance.set(settingsKey, value);
 }
 
 function getSettings(): string {
-  // @ts-expect-error type resolution failing because of electron-store library bug
   if (storeInstance.size < 2) {
     setSettings(JSON.stringify(defaultSettings, null, 2));
   }
-  return get(settingsKey);
+  return storeInstance.get(settingsKey);
 }
 
 function deleteSettings(): void {
-  rm(settingsKey);
+  storeInstance.delete(settingsKey);
 }
 
 function getConfigurations(): Configurations {
-  return get(configurationKey);
+  return storeInstance.get(configurationKey) as Configurations;
 }
 
 export { deleteSettings, getConfigurations, getSettings, setSettings };

@@ -19,7 +19,7 @@
  */
 
 import localConfig from "./vite.config";
-import { mergeConfig } from "vitest/config";
 import defaultConfig from "@xwiki/cristal-dev-config/vitest-vue.config";
+import { mergeConfig } from "vitest/config";
 
 export default mergeConfig(defaultConfig, localConfig);

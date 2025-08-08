@@ -55,7 +55,7 @@
 import Field from "./c-field.vue";
 import { inject } from "vue";
 import type { CristalApp, Document, Logger } from "@xwiki/cristal-api";
-import type { PropType } from "vue/dist/vue";
+import type { PropType } from "vue";
 
 let logger: Logger;
 

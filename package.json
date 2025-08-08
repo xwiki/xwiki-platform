@@ -25,7 +25,8 @@
     "start": "nx run @xwiki/cristal-web:start",
     "start:electron": "concurrently --kill-others 'pnpm run start:electron:ui' 'pnpm run dev:cristal-realtime' 'pnpm run dev:cristal-authentication-server'",
     "start:electron:ui": "nx build @xwiki/cristal-electron-main && nx build @xwiki/cristal-electron-renderer && nx build @xwiki/cristal-electron-storage && nx run @xwiki/cristal-electron:start",
-    "test": "nx run-many -t test"
+    "test": "nx run-many -t test",
+    "typecheck": "nx run-many -t typecheck"
   },
   "devDependencies": {
     "@changesets/cli": "2.29.5",

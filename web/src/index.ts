@@ -29,6 +29,8 @@ import { ComponentInit as AuthenticationXWikiComponentInit } from "@xwiki/crista
 import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-default";
 import { ComponentInit as BrowserSettingsComponentInit } from "@xwiki/cristal-settings-browser";
 import { loadConfig } from "@xwiki/cristal-configuration-web";
+import { type Container } from "inversify";
+import { type Configuration } from "@xwiki/cristal-configuration-api";
 
 CristalAppLoader.init(
   [
@@ -45,7 +47,7 @@ CristalAppLoader.init(
   true,
   false,
   "XWiki",
-  async (container) => {
+  async (container: Container) => {
     await defaultComponentsList(container);
     new BrowserComponentInit(container);
     new AuthenticationGitHubComponentInit(container);
@@ -53,7 +55,7 @@ CristalAppLoader.init(
     new AuthenticationXWikiComponentInit(container);
     new BrowserSettingsComponentInit(container);
   },
-  async (container, configuration) => {
+  async (container: Container, configuration: Configuration) => {
     await conditionalComponentsList(container, configuration);
   },
 );

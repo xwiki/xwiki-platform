@@ -5,8 +5,7 @@
     "resolveJsonModule": true,
     "types": [
       "vite/client",
-      "@xwiki/cristal-dsapi",
-      "@shoelace-style/shoelace/dist/types/vue"
+      "@xwiki/cristal-dsapi"
     ],
     "isolatedDeclarations": false
   },

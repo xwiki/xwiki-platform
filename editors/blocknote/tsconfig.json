@@ -3,7 +3,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "lib": [
-      "dom", "ESNext"
+      "dom",
+      "ESNext"
     ],
     "isolatedDeclarations": false,
     "jsx": "preserve",
@@ -12,7 +13,9 @@
     ]
   },
   "extends": "./../../tsconfig.json",
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "exclude": [
     "**/*.spec.ts",
     "**/*.test.ts"

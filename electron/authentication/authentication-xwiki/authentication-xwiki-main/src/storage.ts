@@ -34,49 +34,39 @@ const schema = {
   },
 };
 
-const storeInstance: Store = new Store({
+type StoreType = {
+  tokenType: string;
+  accessToken: string;
+};
+
+const storeInstance: Store<StoreType> = new Store<StoreType>({
   name: "authentication-xwiki-main",
   schema,
   // TODO: add encryption key
 });
 
-function set<T>(key: string, value: T) {
-  // @ts-expect-error type resolution failing because of electron-store library bug
-  storeInstance.set(key, value);
-}
-
-function get<T>(key: string): T {
-  // @ts-expect-error type resolution failing because of electron-store library bug
-  return storeInstance.get(key) as T;
-}
-
-function rm(key: string) {
-  // @ts-expect-error type resolution failing because of electron-store library bug
-  storeInstance.delete(key);
-}
-
 function setTokenType(value: string): void {
-  set(tokenTypeKey, value);
+  storeInstance.set(tokenTypeKey, value);
 }
 
 function setAccessToken(value: string): void {
-  set(accessTokenKey, value);
+  storeInstance.set(accessTokenKey, value);
 }
 
 function getTokenType(): string {
-  return get(tokenTypeKey);
+  return storeInstance.get(tokenTypeKey);
 }
 
 function getAccessToken(): string {
-  return get(accessTokenKey);
+  return storeInstance.get(accessTokenKey);
 }
 
 function deleteTokenType(): void {
-  rm(tokenTypeKey);
+  storeInstance.delete(tokenTypeKey);
 }
 
 function deleteAccessToken(): void {
-  rm(accessTokenKey);
+  storeInstance.delete(accessTokenKey);
 }
 
 export {

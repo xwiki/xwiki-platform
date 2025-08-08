@@ -32,14 +32,14 @@ pipeline {
                 sh 'pnpm install'
             }
         }
-        stage('Lint') {
-            steps {
-                sh 'pnpm lint'
-            }
-        }
         stage('Build') {
             steps {
                  sh 'pnpm build'
+            }
+        }
+        stage('Lint') {
+            steps {
+                sh 'pnpm lint'
             }
         }
         stage('PubLint') {

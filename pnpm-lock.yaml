@@ -5130,6 +5130,9 @@ importers:
       '@xwiki/cristal-browser-default':
         specifier: workspace:*
         version: link:../core/browser/browser-default
+      '@xwiki/cristal-configuration-api':
+        specifier: workspace:*
+        version: link:../core/configuration/configuration-api
       '@xwiki/cristal-configuration-web':
         specifier: workspace:*
         version: link:../core/configuration/configuration-web

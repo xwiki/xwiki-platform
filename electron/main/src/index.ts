@@ -23,7 +23,7 @@ import { restoreOrCreateWindow } from "./mainWindow";
 import { loadFile } from "./reload";
 import "./security-restrictions";
 // @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
-import loadBrowser from "@xwiki/cristal-browser-electron/main";
+import { default as loadBrowser } from "@xwiki/cristal-browser-electron/main";
 import { load as loadGitHubAuthentication } from "@xwiki/cristal-electron-authentication-github-main";
 import { load as loadNextcloudAuthentication } from "@xwiki/cristal-electron-authentication-nextcloud-main";
 import { load as loadXWikiAuthentication } from "@xwiki/cristal-electron-authentication-xwiki-main";

@@ -37,7 +37,7 @@ import { navigationTreePropsDefaults } from "@xwiki/cristal-dsapi";
 import { SpaceReference } from "@xwiki/cristal-model-api";
 import { inject, onBeforeMount, ref, useTemplateRef, watch } from "vue";
 import "@shoelace-style/shoelace/dist/components/tree/tree";
-import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item";
+import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item.d.ts";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { NavigationTreeProps } from "@xwiki/cristal-dsapi";

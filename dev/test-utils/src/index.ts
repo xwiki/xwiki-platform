@@ -53,8 +53,9 @@ function makeInjectable(clazz: object): object {
 }
 
 function mockI18n() {
+  // @ts-expect-error mockReturnValue is provided externally
   useI18n.mockReturnValue({
-    t: (tKey) => tKey,
+    t: (tKey: string) => tKey,
   });
 }
 

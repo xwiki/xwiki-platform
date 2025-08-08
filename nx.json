@@ -5,6 +5,7 @@
       "options": {
         "cacheableOperations": [
           "build",
+          "typecheck",
           "test",
           "lint",
           "start"
@@ -30,10 +31,20 @@
         "^default"
       ],
       "dependsOn": [
-        "^build"
+        "^build",
+        "typecheck"
       ],
       "outputs": [
         "{projectRoot}/dist"
+      ]
+    },
+    "typecheck": {
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "dependsOn": [
+        "^build"
       ]
     },
     "clean": {

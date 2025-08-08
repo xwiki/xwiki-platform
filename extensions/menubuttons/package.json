@@ -14,18 +14,20 @@
   },
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./dist/index.d.ts"
+    }
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
+    "build": "vite build",
     "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "typecheck": "vue-tsc"
   },
-  "types": "dist/index.d.ts",
+  "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",

@@ -14,9 +14,18 @@
   },
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./preload": "./src/electron/preload/index.ts",
-    "./main": "./src/electron/main/index.ts"
+    ".": {
+      "types": "./dist/default/index.d.ts",
+      "import": "./src/index.ts"
+    },
+    "./preload": {
+      "types": "./src/electron/preload/index.ts",
+      "import": "./src/electron/preload/index.ts"
+    },
+    "./main": {
+      "types": "./src/electron/main/index.ts",
+      "import": "./src/electron/main/index.ts"
+    }
   },
   "main": "./src/index.ts",
   "scripts": {

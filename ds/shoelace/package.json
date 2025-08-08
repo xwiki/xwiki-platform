@@ -14,17 +14,20 @@
   },
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
+    }
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
+    "build": "vite build",
     "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "typecheck": "vue-tsc"
   },
+  "types": "./dist/index.d.ts",
   "dependencies": {
     "@shoelace-style/shoelace": "2.20.1",
     "@xwiki/cristal-api": "workspace:*",

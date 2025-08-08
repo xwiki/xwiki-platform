@@ -19,9 +19,9 @@
 -->
 <script lang="ts" setup>
 import { DsfrAlert } from "@gouvminint/vue-dsfr";
-import type { DsfrAlertType } from "@gouvminint/vue-dsfr/types/components/DsfrAlert/DsfrAlert.vue";
+import type { AlertProps } from "@xwiki/cristal-dsapi";
 
-defineProps<{ title: string; type: DsfrAlertType; description: string }>();
+defineProps<AlertProps>();
 </script>
 
 <template>

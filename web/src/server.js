@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
+import express from "express";
+import path from "path";
+import fs from "fs";
 
 const app = express();
 

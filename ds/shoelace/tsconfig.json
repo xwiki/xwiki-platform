@@ -3,7 +3,10 @@
     "rootDir": "src",
     "outDir": "dist",
     "isolatedDeclarations": false,
-    "types": ["@shoelace-style/shoelace/dist/types/vue"]
+    "types": [
+      "./node_modules/@shoelace-style/shoelace/dist/types/vue/index.d.ts"
+    ],
+    "allowImportingTsExtensions": true
   },
   "extends": "./../../tsconfig.json",
   "include": [

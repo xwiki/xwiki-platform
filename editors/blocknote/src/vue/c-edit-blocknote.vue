@@ -21,7 +21,6 @@
 import cRealtimeUsers from "./c-realtime-users.vue";
 import cSaveStatus, { SaveStatus } from "./c-save-status.vue";
 import messages from "../translations";
-import { AlertsService } from "@xwiki/cristal-alerts-api";
 import { CristalApp, PageData } from "@xwiki/cristal-api";
 import {
   Status,
@@ -46,6 +45,7 @@ import {
 import { debounce } from "lodash-es";
 import { inject, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import type { AlertsService } from "@xwiki/cristal-alerts-api";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type {
   CollaborationInitializer,

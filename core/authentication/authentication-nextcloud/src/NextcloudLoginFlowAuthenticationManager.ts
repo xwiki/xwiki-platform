@@ -23,7 +23,6 @@ import { inject, injectable } from "inversify";
 import Cookies from "js-cookie";
 import type { CristalApp, WikiConfig } from "@xwiki/cristal-api";
 import type { UserDetails } from "@xwiki/cristal-authentication-api";
-import type { CookieAttributes } from "js-cookie";
 
 /**
  * {@link AuthenticationManager} for the Nextcloud backend, using login flow v2.
@@ -40,7 +39,7 @@ export class NextcloudLoginFlowAuthenticationManager
 
   private readonly userIdCookieKeyPrefix = "userId";
 
-  private readonly cookiesOptions: CookieAttributes = {
+  private readonly cookiesOptions: Cookies.CookieAttributes = {
     secure: true,
     sameSite: "strict",
   };

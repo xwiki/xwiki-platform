@@ -52,85 +52,83 @@ const schema = {
   },
 };
 
-const storeInstance: Store = new Store({
+type StoreType = {
+  tokenType: string;
+  accessToken: string;
+  refreshToken: string;
+  expiryDate: number;
+  userId: string;
+};
+
+const storeInstance: Store<StoreType> = new Store<StoreType>({
   name: "authentication-nextcloud-main",
   schema,
   // TODO: add encryption key
 });
 
-function set<T>(key: string, value: T, mode: string) {
-  // @ts-expect-error type resolution failing because of electron-store library bug
-  storeInstance.set(`${key}-${mode}`, value);
-}
-
-function get<T>(key: string, mode: string): T {
-  // @ts-expect-error type resolution failing because of electron-store library bug
-  return storeInstance.get(`${key}-${mode}`) as T;
-}
-
-function rm(key: string, mode: string) {
-  // @ts-expect-error type resolution failing because of electron-store library bug
-  storeInstance.delete(`${key}-${mode}`);
-}
-
 function setTokenType(value: string, mode: string): void {
-  set(tokenTypeKey, value, mode);
+  storeInstance.set(`${tokenTypeKey}-${mode}`, value);
 }
 
 function setAccessToken(value: string, mode: string): void {
-  set(accessTokenKey, value, mode);
+  storeInstance.set(`${accessTokenKey}-${mode}`, value);
 }
 
 function setRefreshToken(value: string, mode: string): void {
-  set(refreshTokenKey, value, mode);
+  storeInstance.set(`${refreshTokenKey}-${mode}`, value);
 }
 
 function setExpiryDate(value: number, mode: string): void {
-  set(expiryDateKey, value, mode);
+  storeInstance.set(`${expiryDateKey}-${mode}`, value);
 }
 
 function setUserId(value: string, mode: string): void {
-  set(userIdKey, value, mode);
+  storeInstance.set(`${userIdKey}-${mode}`, value);
 }
 
 function getTokenType(mode: string): string {
-  return get(tokenTypeKey, mode);
+  return storeInstance.get(`${tokenTypeKey}-${mode}`);
 }
 
 function getAccessToken(mode: string): string {
-  return get(accessTokenKey, mode);
+  return storeInstance.get(`${accessTokenKey}-${mode}`);
 }
 
 function getRefreshToken(mode: string): string {
-  return get(refreshTokenKey, mode);
+  return storeInstance.get(`${refreshTokenKey}-${mode}`);
 }
 
 function getExpiryDate(mode: string): number {
-  return get(expiryDateKey, mode);
+  return storeInstance.get(`${expiryDateKey}-${mode}`);
 }
 
 function getUserId(mode: string): string {
-  return get(userIdKey, mode);
+  return storeInstance.get(`${userIdKey}-${mode}`);
 }
 
 function deleteTokenType(mode: string): void {
-  rm(tokenTypeKey, mode);
+  // @ts-expect-error resolution failing because of electron-store library bug
+  storeInstance.delete(`${tokenTypeKey}-${mode}`);
 }
 
 function deleteAccessToken(mode: string): void {
-  rm(accessTokenKey, mode);
+  // @ts-expect-error resolution failing because of electron-store library bug
+  storeInstance.delete(`${accessTokenKey}-${mode}`);
 }
 
 function deleteRefreshToken(mode: string): void {
-  rm(refreshTokenKey, mode);
+  // @ts-expect-error resolution failing because of electron-store library bug
+  storeInstance.delete(`${refreshTokenKey}-${mode}`);
 }
 
 function deleteExpiryDate(mode: string): void {
-  rm(expiryDateKey, mode);
+  // @ts-expect-error resolution failing because of electron-store library bug
+  storeInstance.delete(`${expiryDateKey}-${mode}`);
 }
 
 function deleteUserId(mode: string): void {
-  rm(userIdKey, mode);
+  // @ts-expect-error resolution failing because of electron-store library bug
+  storeInstance.delete(`${userIdKey}-${mode}`);
 }
 
 export {

@@ -14,19 +14,28 @@
   },
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./preload": "./src/electron/preload/index.ts",
-    "./main": "./src/electron/main/index.ts"
+    ".": {
+      "types": "./dist/default/index.d.ts",
+      "import": "./src/index.ts"
+    },
+    "./preload": {
+      "types": "./src/electron/preload/index.ts",
+      "import": "./src/electron/preload/index.ts"
+    },
+    "./main": {
+      "types": "./src/electron/main/index.ts",
+      "import": "./src/electron/main/index.ts"
+    }
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
+    "build": "vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts",
     "clean": "rimraf dist",
-    "compile": "tsc --project tsconfig.json --noEmit && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "typecheck": "tsc"
   },
+  "types": "./dist/default/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",

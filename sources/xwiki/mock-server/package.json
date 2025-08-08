@@ -14,13 +14,17 @@
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
   },
   "scripts": {
     "clean": "rimraf dist",
     "dev": "nodemon src/index.ts",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
+  "types": "./src/index.ts",
   "dependencies": {
     "dotenv": "17.2.1",
     "express": "5.1.0"

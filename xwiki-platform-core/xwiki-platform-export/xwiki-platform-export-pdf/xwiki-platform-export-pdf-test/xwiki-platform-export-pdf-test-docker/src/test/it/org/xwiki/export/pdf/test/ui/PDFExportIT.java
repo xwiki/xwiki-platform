@@ -776,7 +776,15 @@ class PDFExportIT
     @Order(12)
     void codeMacro(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
+        boolean wcagEnabled = setup.getWCAGUtils().getWCAGContext().isWCAGEnabled();
+        // We always disable WCAG validation.
+        // Here, the test `scrollable-region-focusable` fails while this is now a browser feature in Chrome.
+        // The docker tests run on Chrome.
+        // See https://github.com/dequelabs/axe-core/issues/4788
+        setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(false);
         ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "CodeMacro"));
+        // We set back the WCAG validation in the state it was in before this BasePage initialization.
+        setup.getWCAGUtils().getWCAGContext().setWCAGEnabled(wcagEnabled);
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
         try (PDFDocument pdf = export(exportOptions, testConfiguration)) {

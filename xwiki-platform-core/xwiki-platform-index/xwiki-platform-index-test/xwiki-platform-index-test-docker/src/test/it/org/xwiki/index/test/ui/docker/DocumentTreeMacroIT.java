@@ -375,8 +375,6 @@ class DocumentTreeMacroIT
         }
     }
 
-<<<<<<< HEAD
-=======
     @Test
     @Order(5)
     void testLimit(TestUtils setup, TestReference testReference)
@@ -478,8 +476,7 @@ class DocumentTreeMacroIT
         assertFalse(tree.hasNode(getNodeId(alice)));
         assertFalse(tree.hasNode(getNodeId(subAlice)));
     }
-
->>>>>>> 03885700b2b (XWIKI-23390: Document tree macro does not properly open to the selected node when the showRoot parameter is set to "true")
+    
     private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title, String content)
     {
         // We don't care what parent page is used, we just want to avoid creating orphan pages in order to not interfere

@@ -67,6 +67,7 @@ import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
+import org.xwiki.search.solr.internal.search.SearchCoreInitializer;
 
 /**
  * Embedded Solr server running in the same JVM.
@@ -90,7 +91,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
     private static final String SCHEMA_PATH = "conf/managed-schema.xml";
 
-    private static final long SEARCH_CORE_SCHEMA_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_16_6;
+    private static final long SEARCH_CORE_MAJOR_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_16_6;
 
     private static final String CORE_PROPERTIES_FILENAME = "core.properties";
 
@@ -299,8 +300,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         try (FileReader reader = new FileReader(schemaFile)) {
             XMLStreamReader xmlReader = factory.createXMLStreamReader(reader);
 
-            for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
-                if (xmlReader.getLocalName().equals("fieldType")
+            for (xmlReader.nextTag(); xmlReader.hasNext(); xmlReader.next()) {
+                if (xmlReader.isStartElement() && xmlReader.getLocalName().equals("fieldType")
                     && SolrSchemaUtils.SOLR_TYPENAME_CVERSION.equals(xmlReader.getAttributeValue(null, "name"))) {
                     String version = xmlReader.getAttributeValue(null, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE);
                     if (version != null) {
@@ -363,7 +364,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
         // Check the version of the schema
         File schemaFile = this.solrSearchCorePath.resolve(SCHEMA_PATH).toFile();
-        if (!schemaFile.exists() || SEARCH_CORE_SCHEMA_VERSION > getCoreVersion(schemaFile)) {
+        if (!schemaFile.exists() || SEARCH_CORE_MAJOR_VERSION > getCoreVersion(schemaFile)) {
             return false;
         }
 
@@ -446,8 +447,11 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     private void updateCore(Path corePath)
     {
         try {
-            if (this.componentManager.hasComponent(SolrCoreInitializer.class,
-                toXWikiCoreName(corePath.getFileName().toString()))) {
+            String xwikiCoreName = toXWikiCoreName(corePath.getFileName().toString());
+
+            // Make sure minimal package based Solr cores have the right solrconfig
+            if (this.componentManager.hasComponent(SolrCoreInitializer.class, xwikiCoreName)
+                && !SearchCoreInitializer.CORE_NAME.equals(xwikiCoreName)) {
                 Path solrconfig = corePath.resolve(SOLRCONFIG_PATH);
 
                 // If Solr was upgraded, reset the solrconfig.xml

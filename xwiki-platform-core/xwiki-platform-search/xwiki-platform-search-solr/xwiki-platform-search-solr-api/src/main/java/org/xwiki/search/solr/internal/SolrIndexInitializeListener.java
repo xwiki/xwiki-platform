@@ -130,6 +130,9 @@ public class SolrIndexInitializeListener implements EventListener
                 }
 
                 if (request != null) {
+                    // Remove invalid entries after the synchronization
+                    request.setCleanInvalid(true);
+
                     this.solrIndexer.get().startIndex(request);
                 }
             } catch (SolrIndexerException | WikiManagerException e) {

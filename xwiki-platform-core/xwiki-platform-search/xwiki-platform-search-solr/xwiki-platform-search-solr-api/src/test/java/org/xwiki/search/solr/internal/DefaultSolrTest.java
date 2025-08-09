@@ -148,6 +148,12 @@ class DefaultSolrTest
     }
 
     @Test
+    void searchClientAtomicUpdate() throws Exception
+    {
+        
+    }
+
+    @Test
     void testClient() throws Exception
     {
         Solr solr = this.componentManager.getInstance(Solr.class);

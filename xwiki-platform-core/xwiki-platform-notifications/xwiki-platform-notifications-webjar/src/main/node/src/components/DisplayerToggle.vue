@@ -91,40 +91,42 @@ export default {
         const component = this;
         // Wait for the icon component to be fully rendered before copying its content.
         this.$nextTick(() => {
-          this.jQuery(this.$refs.input).bootstrapSwitch({
-            size: "mini",
-            state: component.innerChecked,
-            disabled: component.innerDisabled,
-            labelText: this.$refs.icon.$el.outerHTML,
-            /*
-             Send a xwiki:livedata:toggle event with the following event data:
-             - the data of the toggle
-             - the new state of the toggle
-             - the disabled status of the toggle
-             - a callback. When the callback is called, the toggle component is updated with the provided data, state,
-                and disabled status.
-            */
-            onSwitchChange(event, state) {
-              const toggleData = component.innerData;
-              const disabledVal = component.innerDisabled;
-              component.logic.triggerEvent("toggle", {
-                data: toggleData,
-                checked: state,
-                disabled: disabledVal,
-                callback: function({
-                  data = toggleData,
-                  checked = state,
-                  disabled = disabledVal,
-                }) {
-                  component.innerData = data;
-                  component.innerChecked = checked;
-                  component.innerDisabled = disabled;
-                  // The last parameter is skip, preventing to call onSwitchChange again.
-                  this.jQuery(component.$refs.input).bootstrapSwitch("state", checked, true);
-                  this.jQuery(component.$refs.input).bootstrapSwitch("disabled", disabled);
-                },
-              });
-            },
+          require(["xwiki-bootstrap-switch"], () => {
+            this.jQuery(this.$refs.input).bootstrapSwitch({
+              size: "mini",
+              state: component.innerChecked,
+              disabled: component.innerDisabled,
+              labelText: this.$refs.icon.$el.outerHTML,
+              /*
+               Send a xwiki:livedata:toggle event with the following event data:
+               - the data of the toggle
+               - the new state of the toggle
+               - the disabled status of the toggle
+               - a callback. When the callback is called, the toggle component is updated with the provided data, state,
+                  and disabled status.
+              */
+              onSwitchChange(event, state) {
+                const toggleData = component.innerData;
+                const disabledVal = component.innerDisabled;
+                component.logic.triggerEvent("toggle", {
+                  data: toggleData,
+                  checked: state,
+                  disabled: disabledVal,
+                  callback: function({
+                    data = toggleData,
+                    checked = state,
+                    disabled = disabledVal,
+                  }) {
+                    component.innerData = data;
+                    component.innerChecked = checked;
+                    component.innerDisabled = disabled;
+                    // The last parameter is skip, preventing to call onSwitchChange again.
+                    this.jQuery(component.$refs.input).bootstrapSwitch("state", checked, true);
+                    this.jQuery(component.$refs.input).bootstrapSwitch("disabled", disabled);
+                  },
+                });
+              },
+            });
           });
         });
       }

@@ -3261,3 +3261,35 @@ Recursive title display detected!##
 #macro (unwrapXPropertyDisplay $displayOutput)
 $!stringtool.removeEnd($stringtool.removeStart($displayOutput, '{{html clean="false" wiki="false"}}'), '{{/html}}')##
 #end
+
+#**
+ * XWiki Standard use only.
+ * $watchStatus is a WatchedEntityReference.WatchedStatus returned by script services 
+ * similar to $services.notification.watch.getLocationWatchedStatus
+ * Returns the FA4 class of the icon corresponding to the provided watchStatus in $watchIcon
+ * AND
+ * Returns the status label in $watchText
+ * @since 17.4.2
+ * @since 17.5.0RC1
+ *#
+#macro (_notificationsWatchStatusIcon $watchedStatus)
+## FIXME: the different icons should use the icon service
+## They should be added to the XWiki Icon set
+#set ($iconWhenWatched = 'fa-bell')
+#set ($iconWhenNotSet = 'fa-bell-o')
+#set ($iconWhenBlocked = 'fa-bell-slash')
+#set ($iconWhenCustom = 'fa-bullhorn')
+#if ($watchedStatus == 'NOT_SET')
+  #set ($watchIcon = $iconWhenNotSet)
+  #set ($watchText = $services.localization.render('notifications.watch.button.status.notset', 'html/5.0', []))
+#elseif ($watchedStatus.isWatched())
+  #set ($watchIcon = $iconWhenWatched)
+  #set ($watchText = $services.localization.render('notifications.watch.button.status.followed', 'html/5.0', []))
+#elseif ($watchedStatus.isBlocked())
+  #set ($watchIcon = $iconWhenBlocked)
+  #set ($watchText = $services.localization.render('notifications.watch.button.status.blocked', 'html/5.0', []))
+#else
+  #set ($watchIcon = $iconWhenCustom)
+  #set ($watchText = $services.localization.render('notifications.watch.button.status.custom', 'html/5.0', []))
+#end
+#end

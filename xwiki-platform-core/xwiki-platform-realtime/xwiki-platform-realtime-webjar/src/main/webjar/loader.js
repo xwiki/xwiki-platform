@@ -39,14 +39,6 @@ define('xwiki-realtime-loader', [
     isForced: window.location.href.indexOf('force=1') >= 0,
   },
 
-  // FIXME: The real-time JavaScript code is not loaded anymore on the "lock" page so this code is not really used. We
-  // need to decide if we want to re-add the real-time JavaScript code on the lock page and how.
-  getDocLock = module.getDocLock = function() {
-    const lockedBy = document.querySelectorAll('p.xwikimessage .wikilink a');
-    const force = document.querySelectorAll('a[href*="force=1"][href*="/edit/"]');
-    return (lockedBy.length && force.length) ? force[0] : null;
-  },
-
   getRTEditorURL = module.getEditorURL = function(href, info) {
     const currentURL = new URL(href);
     const baseURL = new URL("?", currentURL).toString();
@@ -58,19 +50,7 @@ define('xwiki-realtime-loader', [
 
   allRt = {
     state: false
-  },
-
-  // Returns a promise that resolves with the list of editor channels available for the specified field of the current
-  // document in the current language.
-  checkSocket = function(field) {
-    const path = `${doc.language}/${field}/`;
-    return doc.getChannels({path}).then(function(channels) {
-      return channels.filter(channel => channel?.path?.length > 2 && channel?.userCount > 0)
-        .map(channel => channel.path.slice(2).join('/'));
-    });
-  },
-
-  lock = getDocLock();
+  };
 
   class RealtimeContext {
     constructor(info) {
@@ -197,81 +177,7 @@ define('xwiki-realtime-loader', [
     }
   }
 
-  module.checkSessions = function(info) {
-    if (lock) {
-      // Found an edit lock link.
-      checkSocket(info.field).then(types => {
-        // Determine if it's a realtime session.
-        if (types.length) {
-          console.debug('Found an active realtime session.');
-          displayModal(null, types, null, info);
-        } else {
-          console.debug("Couldn't find an active realtime session.");
-          module.whenReady(function(rt) {
-            if (rt) {
-              displayModal(null, null, null, info);
-            }
-          });
-        }
-      });
-    } else {
-      // Do nothing.
-    }
-  };
-
-  let displayModal = module.displayModal = function(createType, existingTypes, callback, info) {
-    if (XWiki.widgets.RealtimeCreateModal) {
-      return;
-    }
-    existingTypes = existingTypes || [];
-    XWiki.widgets.RealtimeCreateModal = Class.create(XWiki.widgets.ModalPopup, {
-      initialize: function($super) {
-        $super(
-          this.createContent(),
-          {
-            'show': {method: this.showDialog, keys: []},
-            'close': {method: this.closeDialog, keys: ['Esc']}
-          },
-          {
-            displayCloseButton: true,
-            verticalPosition: 'center',
-            // FIXME: Use color theme or remove this line.
-            backgroundColor: '#FFF',
-            removeOnClose: true
-          }
-        );
-        this.showDialog();
-        this.setClass('realtime-create-session');
-        // FIXME: Use a better (namespaced) event name.
-        $(document).trigger('insertButton');
-      },
-
-      /**
-       * Gets the content of the modal dialog using AJAX.
-       */
-      createContent : function() {
-        let message = Messages.requestASession;
-        if (existingTypes.length > 1) {
-          message = Messages['redirectDialog.pluralPrompt'];
-        } else if (existingTypes.length === 1) {
-          message = Messages.sessionInProgress;
-        }
-
-        const content = createModalContent(message, Messages.get('redirectDialog.create', info.name));
-        const classesButtons = existingTypes.map(type => 'realtime-button-' + type).join(' ');
-        const buttonsDiv = content.find('.realtime-buttons').addClass(classesButtons).data('modal', this);
-        buttonsDiv.find('button').on('click', function() {
-          callback();
-          buttonsDiv.data('modal').closeDialog();
-        }).toggle(!!createType);
-
-        return content[0];
-      }
-    });
-    return new XWiki.widgets.RealtimeCreateModal();
-  },
-
-  displayCustomModal = function(content) {
+  let displayCustomModal = function(content) {
     XWiki.widgets.RealtimeRequestModal = Class.create(XWiki.widgets.ModalPopup, {
       initialize : function($super) {
         $super(
@@ -526,9 +432,9 @@ define('xwiki-realtime-loader', [
     }
   },
 
-  // Join a channel with all users on this page (realtime, offline AND lock page)
-  // 1. This channel allows users on "lock" page to contact the editing user and request a collaborative session, using
-  //    the `request` and `answer` commands
+  // Join a channel with all users on this page:
+  // 1. This channel allows users to contact the editing user and request a collaborative session, using the `request`
+  //    and `answer` commands
   // 2. It is also used to know if someone else is editing the document concurrently (at least 2 users with 1 editing
   //    offline). In this case, a warning message can be displayed.
   //
@@ -562,7 +468,7 @@ define('xwiki-realtime-loader', [
   },
 
   onRequestMessage = function(data, channel) {
-    if (lock || !data.field || !data.type) {
+    if (!data.field || !data.type) {
       return;
     }
     const response = {
@@ -617,7 +523,7 @@ define('xwiki-realtime-loader', [
 
   onJoinMessage = function(data, sender, network) {
     const realtimeContext = RealtimeContext.instances[data.field];
-    if (lock || !realtimeContext) {
+    if (!realtimeContext) {
       return;
     // Someone has started editing the same document field as us.
     } else if (!data.realtime || !realtimeContext.realtimeEnabled) {
@@ -635,7 +541,7 @@ define('xwiki-realtime-loader', [
 
   onIsSomeoneOfflineMessage = function(data, sender, network) {
     const offlineFields = RealtimeContext.getOfflineEditedFields(data.fields);
-    if (!lock && offlineFields.length) {
+    if (offlineFields.length) {
       network.sendto(sender, JSON.stringify({
         cmd: 'displayWarning',
         fields: offlineFields
@@ -764,14 +670,10 @@ define('xwiki-realtime-loader', [
 
     bootstrap: async function(info) {
       this.setAvailableRt(info);
-      if (lock) {
-        // Found a lock link. Check active sessions.
-        this.checkSessions(info);
-        throw new Error('Lock detected');
       // We currently support editing in realtime only the content field (using either the Wiki editor, the standalone
       // WYSIWYG editor or the Inplace editor).
-      } else if (info.field === 'content' && window.XWiki.editor === info.type) {
-        // There is no edit lock and the current editor is supported. Check if we can join a realtime session.
+      if (info.field === 'content' && window.XWiki.editor === info.type) {
+        // The current editor is supported. Check if we can join a realtime session.
         const realtimeContext = new RealtimeContext(info);
         const keys = await realtimeContext.updateChannels();
         if (!keys[info.type] || !keys.saver || !keys.userData) {

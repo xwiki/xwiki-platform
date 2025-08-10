@@ -39,32 +39,4 @@ define('xwiki-realtime-wikiEditor-loader', [
       new RealtimeWikiEditor(realtimeContext);
     });
   });
-
-  function getWikiLock() {
-    const force = document.querySelectorAll('a[href*="editor=wiki"][href*="force=1"][href*="/edit/"]');
-    return !!force.length;
-  }
-
-  function displayButtonModal() {
-    // TODO: This JavaScript code is not loaded anymore on the edit lock page so we need to decide what to do with it
-    // (either drop it or find a clean way to load it on the edit lock page).
-    const lock = Loader.getDocLock();
-    const wikiLock = getWikiLock();
-    let button = $();
-    if ($('.realtime-button-' + info.type).length) {
-      button = $('<button class="btn btn-success"></button>').text(
-        Loader.messages.get('redirectDialog.join', info.name));
-      $('.realtime-button-' + info.type).prepend(button).prepend('<br/>');
-    } else if (lock && wikiLock) {
-      button = $('<button class="btn btn-primary"></button>').text(
-        Loader.messages.get('redirectDialog.create', info.name));
-      $('.realtime-buttons').append('<br/>').append(button);
-    }
-    button.on('click', function() {
-      window.location.href = Loader.getEditorURL(window.location.href, info);
-    });
-  }
-
-  displayButtonModal();
-  $(document).on('insertButton', displayButtonModal);
 });

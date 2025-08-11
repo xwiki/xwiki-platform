@@ -84,6 +84,7 @@ class TableIT extends AbstractCKEditorIT
         textArea.sendKeys("three", Keys.BACK_SPACE);
 
         // Check the result.
-        assertSourceEquals("|(((\none\n\ntwo\n)))| \n|thre| \n| | \n| | \n\n ");
+        assertSourceEquals("|=(((\none\n\ntwo\n)))|= \n|=(% scope=\"col\" %) |= \n"
+            + "| | \n|thre| \n\n ");
     }
 }

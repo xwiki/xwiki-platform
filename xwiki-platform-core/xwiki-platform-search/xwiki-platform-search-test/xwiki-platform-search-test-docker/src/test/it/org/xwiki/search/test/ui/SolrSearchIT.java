@@ -22,6 +22,7 @@ package org.xwiki.search.test.ui;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,7 @@ import org.xwiki.test.ui.TestUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -51,8 +53,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class SolrSearchIT
 {
+    private static final Pattern EXPECTED_ERROR_CODE =
+        Pattern.compile(".*HTTP\\s(ERROR|Status)\\s400.*", Pattern.DOTALL);
     private static final String EXPECTED_ERROR =
-        "Error 400 Invalid parameter value 2000 for %s: Must be a positive integer and less than or equal to 1000";
+        "Invalid parameter value 2000 for %s: Must be a positive integer and less than or equal to 1000";
 
     private static final String NB_PARAMETER = "nb";
 
@@ -140,7 +144,11 @@ class SolrSearchIT
             "The search should return 20 results when the results per page is set to 20.");
 
         searchPage = searchPage.setResultsPerPage(2000, false);
-        assertEquals(EXPECTED_ERROR.formatted("rows"), searchPage.getPageTitle());
+        String pageSource = setup.getDriver().getPageSource();
+        String formattedExpectedError = EXPECTED_ERROR.formatted("rows");
+        // Depending on the servlet engine the error might be in the title or in the page body.
+        assertThat(pageSource, matchesRegex(EXPECTED_ERROR_CODE));
+        assertThat(pageSource, containsString(formattedExpectedError));
     }
 
     @Test
@@ -162,12 +170,16 @@ class SolrSearchIT
         DocumentReference suggestSolrService = new DocumentReference("xwiki", "XWiki", "SuggestSolrService");
         setup.gotoPage(suggestSolrService, GET_ACTION, parameters);
 
-        String json = setup.getDriver().getPageSource();
-        assertThat(json, containsString(testDocumentTitle));
+        String pageSource = setup.getDriver().getPageSource();
+        assertThat(pageSource, containsString(testDocumentTitle));
 
         parameters.put(NB_PARAMETER, "2000");
         setup.gotoPage(suggestSolrService, GET_ACTION, parameters);
 
-        assertEquals(EXPECTED_ERROR.formatted(NB_PARAMETER), setup.getDriver().getTitle());
+        pageSource = setup.getDriver().getPageSource();
+        String formattedExpectedError = EXPECTED_ERROR.formatted(NB_PARAMETER);
+        // Depending on the servlet engine the error might be in the title or in the page body.
+        assertThat(pageSource, matchesRegex(EXPECTED_ERROR_CODE));
+        assertThat(pageSource, containsString(formattedExpectedError));
     }
 }

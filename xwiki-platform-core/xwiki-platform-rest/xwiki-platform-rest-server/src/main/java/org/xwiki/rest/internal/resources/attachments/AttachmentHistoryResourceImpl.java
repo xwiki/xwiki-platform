@@ -51,6 +51,8 @@ public class AttachmentHistoryResourceImpl extends XWikiResource implements Atta
     public Attachments getAttachmentHistory(String wikiName, String spaceName, String pageName, String attachmentName,
             Integer start, Integer number) throws XWikiRestException
     {
+        int limit = validateAndGetLimit(number);
+        
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
             Document doc = documentInfo.getDocument();
@@ -68,7 +70,7 @@ public class AttachmentHistoryResourceImpl extends XWikiResource implements Atta
                 versionList.add(version);
             }
 
-            RangeIterable<Version> ri = new RangeIterable<Version>(versionList, start, number);
+            RangeIterable<Version> ri = new RangeIterable<Version>(versionList, start, limit);
 
             for (Version version : ri) {
                 com.xpn.xwiki.api.Attachment xwikiAttachmentAtVersion =

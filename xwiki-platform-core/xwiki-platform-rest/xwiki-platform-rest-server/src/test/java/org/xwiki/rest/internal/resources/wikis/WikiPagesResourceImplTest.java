@@ -21,7 +21,6 @@ package org.xwiki.rest.internal.resources.wikis;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -33,7 +32,6 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -43,6 +41,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Pages;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -79,6 +78,9 @@ class WikiPagesResourceImplTest
     private QueryManager queryManager;
 
     @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
+    @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @MockComponent
@@ -102,7 +104,7 @@ class WikiPagesResourceImplTest
 
     @BeforeEach
     void setUp(MockitoComponentManager componentManager)
-        throws ComponentLookupException, URISyntaxException, IllegalAccessException
+        throws Exception
     {
         Utils.setComponentManager(componentManager);
 
@@ -119,6 +121,8 @@ class WikiPagesResourceImplTest
         Provider<XWikiContext> contextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         this.context = contextProvider.get();
         when(this.context.getURLFactory()).thenReturn(urlFactory);
+
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
 
     @Test

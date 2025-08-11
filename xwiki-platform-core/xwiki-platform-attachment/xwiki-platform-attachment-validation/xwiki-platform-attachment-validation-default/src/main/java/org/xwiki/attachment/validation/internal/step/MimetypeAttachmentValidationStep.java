@@ -37,7 +37,7 @@ import org.xwiki.attachment.validation.AttachmentValidationStep;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.tika.internal.TikaUtils;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Validate the attachment mimetype based on configured lists of allowed and blocker mimetypes.

@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.internal.resources.tags;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
@@ -30,7 +29,6 @@ import org.xwiki.query.QueryException;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.DomainObjectFactory;
-import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Pages;
 import org.xwiki.rest.resources.tags.PagesForTagsResource;
@@ -50,28 +48,17 @@ public class PagesForTagsResourceImpl extends XWikiResource implements PagesForT
     {
         String database = Utils.getXWikiContext(componentManager).getWikiId();
 
+        int limit = validateAndGetLimit(number);
+
         try {
             Pages pages = objectFactory.createPages();
 
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             String[] tagNamesArray = tagNames.split(",");
+            List<String> documentNames = getDocumentsWithTags(tagNamesArray, start, limit);
 
-            List<String> documentNames = new ArrayList<String>();
-            for (String tagName : tagNamesArray) {
-                List<String> documentNamesForTag = getDocumentsWithTag(tagName);
-
-                /* Avoid duplicates */
-                for (String documentName : documentNamesForTag) {
-                    if (!documentNames.contains(documentName)) {
-                        documentNames.add(documentName);
-                    }
-                }
-            }
-
-            RangeIterable<String> ri = new RangeIterable<String>(documentNames, start, number);
-
-            for (String documentName : ri) {
+            for (String documentName : documentNames) {
                 Document doc = Utils.getXWikiApi(componentManager).getDocument(documentName);
                 if (doc != null) {
                     pages.getPageSummaries().add(DomainObjectFactory
@@ -88,15 +75,31 @@ public class PagesForTagsResourceImpl extends XWikiResource implements PagesForT
         }
     }
 
-    private List<String> getDocumentsWithTag(String tag) throws QueryException
+    private List<String> getDocumentsWithTags(String[] tags, Integer start, Integer limit) throws QueryException
     {
-        String query =
-                "select doc.fullName from XWikiDocument as doc, BaseObject as obj, DBStringListProperty as prop "
-                        + "where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id "
-                        + "and prop.id.name='tags' and :tag in elements(prop.list) order by doc.name asc";
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append(
+            "select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj, DBStringListProperty as prop ");
+        queryBuilder.append("where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id ");
+        queryBuilder.append("and prop.id.name='tags' and (");
 
-        List<String> documentsWithTag = queryManager.createQuery(query, Query.HQL).bindValue("tag", tag).execute();
+        for (int i = 0; i < tags.length; i++) {
+            if (i > 0) {
+                queryBuilder.append(" or ");
+            }
+            queryBuilder.append(":tag").append(i).append(" in elements(prop.list)");
+        }
 
-        return documentsWithTag;
+        queryBuilder.append(") order by doc.fullName asc");
+
+        Query query = this.queryManager.createQuery(queryBuilder.toString(), Query.HQL)
+            .setLimit(limit)
+            .setOffset(start);
+
+        for (int i = 0; i < tags.length; i++) {
+            query.bindValue("tag" + i, tags[i].trim());
+        }
+
+        return query.execute();
     }
 }

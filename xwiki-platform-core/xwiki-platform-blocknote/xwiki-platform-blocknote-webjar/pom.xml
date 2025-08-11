@@ -20,20 +20,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-blocknote</artifactId>
-    <version>17.6.0-SNAPSHOT</version>
+    <version>17.7.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-blocknote-webjar</artifactId>
-  <name>XWiki Platform - BlockNote - WebJar</name>
+  <name>XWiki Platform - BlockNote Integration - WebJar</name>
+  <description>The front-end resources (JavaScript, CSS) required by the BlockNote integration in XWiki.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>BlockNote WebJar</xwiki.extension.name>
+    <xwiki.extension.name>BlockNote Integration WebJar (Experimental)</xwiki.extension.name>
     <!-- Category for the Extension Manager -->
     <xwiki.extension.category>webjar</xwiki.extension.category>
      <!-- Vite is already taking care of minification and bundling in an efficient way. -->
@@ -124,6 +124,28 @@
               </resources>
             </configuration>
           </execution>
+          <execution>
+            <!-- Copy the package descriptor. -->
+            <id>copy-package-descriptor</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>
+                ${project.build.outputDirectory}/META-INF/node
+              </outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/node</directory>
+                  <includes>
+                    <include>package.json</include>
+                    <include>pnpm-lock.yaml</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <!-- Skip jsHint because we use ESLint through the frontend-maven-plugin -->
@@ -192,6 +214,23 @@
         </executions>
         <configuration>
           <workingDirectory>${project.build.directory}/node</workingDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
+        <configuration>
+          <properties>
+            <preProjectText>This product includes software that was not developed by 'XWiki' (https://www.xwiki.org) and which has a different license than the XWiki code (LGPL 2.1):
+
+  - BlockNote (https://github.com/TypeCellOS/BlockNote), MPL-2.0 license
+  - Inversify (https://github.com/inversify/monorepo), MIT license
+  - Mantine (https://github.com/mantinedev/mantine), MIT license
+  - Pinia (https://github.com/vuejs/pinia), MIT license
+  - React (https://github.com/facebook/react), MIT license
+
+For a complete list, including transitive dependencies, please check the META-INF/node/pnpm-lock.yaml file included in this JAR.</preProjectText>
+          </properties>
         </configuration>
       </plugin>
     </plugins>

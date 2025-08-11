@@ -20,8 +20,6 @@
 package org.xwiki.wysiwyg.filter;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 
 import jakarta.servlet.Filter;
@@ -61,9 +59,10 @@ public class ConversionFilter implements Filter
     {
         Execution execution = Utils.getComponent(Execution.class);
         execution.pushContext(new ExecutionContext());
-        Optional<ServletRequest> servletRequest = Optional.of(req);
+        RequestParameterConverter defaultConverter = Utils.getComponent(RequestParameterConverter.class);
+        Optional<ServletRequest> servletRequest;
         try {
-            servletRequest = convert(servletRequest, res);
+            servletRequest = defaultConverter.convert(req, res);
         } finally {
             execution.popContext();
         }
@@ -71,19 +70,6 @@ public class ConversionFilter implements Filter
         if (servletRequest.isPresent()) {
             chain.doFilter(servletRequest.get(), res);
         }
-    }
-
-    private Optional<ServletRequest> convert(Optional<ServletRequest> originalRequest, ServletResponse res)
-        throws IOException
-    {
-        List<RequestParameterConverter> converters = Utils.getComponentList(RequestParameterConverter.class);
-        Iterator<RequestParameterConverter> iterator = converters.iterator();
-        Optional<ServletRequest> convertedRequest = originalRequest;
-        while (convertedRequest.isPresent() && iterator.hasNext()) {
-            RequestParameterConverter converter = iterator.next();
-            convertedRequest = converter.convert(convertedRequest.get(), res);
-        }
-        return convertedRequest;
     }
 
     @Override

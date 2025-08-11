@@ -33,7 +33,6 @@ import javax.inject.Named;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
@@ -108,9 +107,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({ DefaultBatchOperationExecutor.class, DefaultExecution.class, ReadOnlyXWikiContextProvider.class })
+@ComponentList({
+    DefaultBatchOperationExecutor.class,
+    DefaultExecution.class,
+    ReadOnlyXWikiContextProvider.class
+})
 @ReferenceComponentList
-public class XWikiMockitoTest
+class XWikiMockitoTest
 {
     @MockComponent
     private DocumentRevisionProvider documentRevisionProvider;
@@ -140,7 +143,7 @@ public class XWikiMockitoTest
     private XWikiStoreInterface store;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.componentManager.registerMockComponent(ResourceReferenceManager.class);
         this.componentManager.registerMockComponent(Environment.class);
@@ -163,24 +166,19 @@ public class XWikiMockitoTest
         execution.setContext(executionContext);
 
         when(this.store.loadXWikiDoc(any(XWikiDocument.class), any(XWikiContext.class)))
-            .thenAnswer(new Answer<XWikiDocument>()
-            {
-                @Override
-                public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiDocument target = invocation.getArgument(0);
-                    DocumentReference reference = target.getDocumentReference();
+            .thenAnswer((Answer<XWikiDocument>) invocation -> {
+                XWikiDocument target = invocation.getArgument(0);
+                DocumentReference reference = target.getDocumentReference();
 
-                    XWikiDocument document = documents.get(reference);
+                XWikiDocument document = documents.get(reference);
 
-                    if (document == null) {
-                        document = new XWikiDocument(reference, target.getLocale());
-                        document.setSyntax(Syntax.PLAIN_1_0);
-                        document.setOriginalDocument(document.clone());
-                    }
-
-                    return document;
+                if (document == null) {
+                    document = new XWikiDocument(reference, target.getLocale());
+                    document.setSyntax(Syntax.PLAIN_1_0);
+                    document.setOriginalDocument(document.clone());
                 }
+
+                return document;
             });
     }
 
@@ -191,7 +189,7 @@ public class XWikiMockitoTest
      *      to the attached file</a>
      */
     @Test
-    public void copyDocumentPreservesAttachmentsVersion() throws Exception
+    void copyDocumentPreservesAttachmentsVersion() throws Exception
     {
         DocumentReference targetReference = new DocumentReference("bar", "Space", "Target");
         DocumentReference targetReferenceWithLocale = new DocumentReference("bar", "Space", "Target", Locale.ROOT);
@@ -220,7 +218,7 @@ public class XWikiMockitoTest
      * Verify that {@link XWiki#rollback(XWikiDocument, String, boolean, boolean, XWikiContext)} fires the right events.
      */
     @Test
-    public void rollbackFiresEvents() throws Exception
+    void rollbackFiresEvents() throws Exception
     {
         ObservationManager observationManager = this.componentManager.getInstance(ObservationManager.class);
 
@@ -256,7 +254,7 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void deleteAllDocumentsAndWithoutSendingToTrash() throws Exception
+    void deleteAllDocumentsAndWithoutSendingToTrash() throws Exception
     {
         XWiki xwiki = new XWiki();
 
@@ -286,7 +284,7 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void deleteDocument() throws Exception
+    void deleteDocument() throws Exception
     {
         final DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -299,15 +297,9 @@ public class XWikiMockitoTest
 
         ObservationManager observation = this.componentManager.getInstance(ObservationManager.class);
 
-        ArgumentMatcher<XWikiDocument> matcher = new ArgumentMatcher<XWikiDocument>()
-        {
-            @Override
-            public boolean matches(XWikiDocument argument)
-            {
-                return argument.getDocumentReference().equals(documentReference)
-                    && argument.getOriginalDocument() == originalDocument;
-            }
-        };
+        ArgumentMatcher<XWikiDocument> matcher =
+            argument -> argument.getDocumentReference().equals(documentReference)
+            && argument.getOriginalDocument() == originalDocument;
 
         // Make sure the right events have been sent
         verify(observation).notify(eq(new DocumentDeletingEvent(documentReference)), argThat(matcher),
@@ -319,7 +311,7 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void getPlainUserName() throws XWikiException
+    void getPlainUserName() throws XWikiException
     {
         XWikiDocument document = mock(XWikiDocument.class);
         DocumentReference userReference = new DocumentReference("wiki", "XWiki", "user");
@@ -330,32 +322,33 @@ public class XWikiMockitoTest
 
         when(userObject.getStringValue("first_name")).thenReturn("first<name");
         when(userObject.getStringValue("last_name")).thenReturn("last'name");
-        assertEquals("first<name last'name", xwiki.getPlainUserName(userReference, context));
+        assertEquals("first<name last'name", this.xwiki.getPlainUserName(userReference, context));
 
         when(userObject.getStringValue("first_name")).thenReturn("first<name");
         when(userObject.getStringValue("last_name")).thenReturn("");
-        assertEquals("first<name", xwiki.getPlainUserName(userReference, context));
+        assertEquals("first<name", this.xwiki.getPlainUserName(userReference, context));
 
         when(userObject.getStringValue("first_name")).thenReturn("");
         when(userObject.getStringValue("last_name")).thenReturn("last'name");
-        assertEquals("last'name", xwiki.getPlainUserName(userReference, context));
+        assertEquals("last'name", this.xwiki.getPlainUserName(userReference, context));
     }
 
     @Test
-    public void getURLWithDotsAndBackslashInSpaceName() throws Exception
+    void getURLWithDotsAndBackslashInSpaceName()
     {
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
-        context.setURLFactory(urlFactory);
+        this.context.setURLFactory(urlFactory);
 
         DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space.withdot.and\\and:"), "page");
 
-        this.xwiki.getURL(reference, "view", null, null, context);
+        this.xwiki.getURL(reference, "view", null, null, this.context);
 
-        verify(urlFactory).createURL("space\\.withdot\\.and\\\\and\\:", "page", "view", null, null, "wiki", context);
+        verify(urlFactory).createURL("space\\.withdot\\.and\\\\and\\:", "page", "view", null, null, "wiki",
+            this.context);
     }
 
     @Test
-    public void getURLWithLocale() throws Exception
+    void getURLWithLocale()
     {
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
         context.setURLFactory(urlFactory);
@@ -370,7 +363,7 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void getEntityURLWithDefaultAction() throws Exception
+    void getEntityURLWithDefaultAction()
     {
         DocumentReference documentReference = new DocumentReference("tennis", Arrays.asList("Path", "To"), "Success");
         AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
@@ -387,20 +380,14 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void getSpacePreference() throws Exception
+    void getSpacePreference() throws Exception
     {
         this.componentManager.registerMockComponent(ConfigurationSource.class, "wiki");
         ConfigurationSource spaceConfiguration =
             this.componentManager.registerMockComponent(ConfigurationSource.class, "space");
 
-        when(this.xwikiCfgConfigurationSource.getProperty(any(), anyString())).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.getArgument(1);
-            }
-        });
+        when(this.xwikiCfgConfigurationSource.getProperty(any(), anyString())).then(
+            (Answer<String>) invocation -> invocation.getArgument(1));
 
         WikiReference wikiReference = new WikiReference("wiki");
         SpaceReference space1Reference = new SpaceReference("space1", wikiReference);
@@ -436,11 +423,8 @@ public class XWikiMockitoTest
         spacesPreferences.put(space1Reference.getName(), space1Preferences);
         spacesPreferences.put(space2Reference.getName(), space2Preferences);
 
-        when(spaceConfiguration.getProperty(any(), same(String.class))).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
+        when(spaceConfiguration.getProperty(any(), same(String.class))).then(
+            (Answer<String>) invocation -> {
                 if (context.getDoc() != null) {
                     Map<String, String> spacePreferences =
                         spacesPreferences.get(context.getDoc().getDocumentReference().getParent().getName());
@@ -448,10 +432,9 @@ public class XWikiMockitoTest
                         return spacePreferences.get(invocation.getArgument(0));
                     }
                 }
-
                 return null;
             }
-        });
+        );
 
         this.context.setDoc(new XWikiDocument(new DocumentReference("document", space1Reference)));
         assertEquals("prefvalue1", this.xwiki.getSpacePreference("pref", this.context));
@@ -485,7 +468,7 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void getDocumentWithEntityReference() throws Exception
+    void getDocumentWithEntityReference() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Main", "WebHome");
 
@@ -497,7 +480,7 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void getDocumentWithPageReference() throws Exception
+    void getDocumentWithPageReference() throws Exception
     {
         PageReference pageReference = new PageReference("wiki", "Main", "Space");
         PageObjectReference pageObjectReference = new PageObjectReference("object", pageReference);
@@ -530,7 +513,7 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void getExistsWithPageReference() throws Exception
+    void getExistsWithPageReference() throws Exception
     {
         PageReference pageReference = new PageReference("wiki", "Main", "Space");
         DocumentReference webhomeDocumentReference =
@@ -553,7 +536,7 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void parseGroovyFromPage() throws Exception
+    void parseGroovyFromPage() throws Exception
     {
         ParseGroovyFromString parser = this.componentManager.registerMockComponent(ParseGroovyFromString.class);
 
@@ -566,15 +549,10 @@ public class XWikiMockitoTest
 
         String result = "result";
 
-        when(parser.parseGroovyFromString(document.getContent(), this.context)).then(new Answer<Object>()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                assertSame(document, ((XWikiContext) invocation.getArgument(1)).get(XWikiDocument.CKEY_SDOC));
+        when(parser.parseGroovyFromString(document.getContent(), this.context)).then(invocation -> {
+            assertSame(document, ((XWikiContext) invocation.getArgument(1)).get(XWikiDocument.CKEY_SDOC));
 
-                return result;
-            }
+            return result;
         });
 
         assertEquals(result, this.xwiki.parseGroovyFromPage("Space.Document", this.context));
@@ -582,7 +560,7 @@ public class XWikiMockitoTest
     }
 
     @Test
-    public void getServerURLWhenPathBased() throws MalformedURLException, WikiManagerException
+    void getServerURLWhenPathBased() throws MalformedURLException, WikiManagerException
     {
         this.context.setMainXWiki("mainwiki");
         this.context.setWikiId("mainwiki");
@@ -646,7 +624,7 @@ public class XWikiMockitoTest
         when(debugConfig.isMinify()).thenReturn(true);
 
         when(currentSkin.getResource("test.css")).thenReturn(cssSource);
-        // test.min.css is missing so it should fall-back on test.css
+        // test.min.css is missing so it should fallback on test.css
         assertEquals("path/to/test.css", this.xwiki.getSkinFile("test.css", this.context));
 
         when(currentSkin.getResource("test.min.css")).thenReturn(cssMinified);

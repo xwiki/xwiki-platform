@@ -39,7 +39,6 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
-import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -350,13 +349,7 @@ class InplaceEditIT
         richTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
         richTextArea.waitForContentRefresh();
-
-        richTextArea.sendKeys(Keys.UP, "/velocity");
-        qa = new AutocompleteDropdown();
-        qa.waitForItemSelected("/velocity", "Velocity");
-        richTextArea.sendKeys(Keys.ENTER);
-        qa.waitForItemSubmitted();
-
+        
         assertEquals("a first line\nNo pages found\nmacro:id", richTextArea.getText());
         viewPage.cancel();
     }

@@ -199,10 +199,7 @@
   #if (!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
-  #set($limit = $numbertool.toNumber($request.get('limit')).intValue())
-  #if (!$limit)
-    #set ($limit = 15)
-  #end
+  #getAndValidateQueryLimitFromRequest('limit', 15, $limit)
   ######## WIKI UI MAINWIKI CUSTOMIZATION #########
   ## The descriptors are always hidden, so we don't filter on the hidden column.
   #set($query = $services.query.hql($sql).addFilter('currentlanguage').setLimit($limit).setOffset($offset).bindValues($sqlParams))

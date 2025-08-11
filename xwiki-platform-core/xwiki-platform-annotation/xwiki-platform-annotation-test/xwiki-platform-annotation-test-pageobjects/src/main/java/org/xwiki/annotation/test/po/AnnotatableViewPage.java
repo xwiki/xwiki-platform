@@ -39,6 +39,8 @@ public class AnnotatableViewPage extends BaseElement
     private static final String XWIKI_SYNTAX_1_WARNING =
         "Annotations are not available for pages written in XWiki/1.0 syntax.";
 
+    private static final String ANNOTATIONSLINK = "Annotationslink";
+
     private AnnotationsPane annotationsPane;
 
     private AnnotationsWindow annotationsWindow;
@@ -322,5 +324,16 @@ public class AnnotatableViewPage extends BaseElement
     public WebElement getAnnotationTextById(int id)
     {
         return getDriver().findElement(By.cssSelector(String.format("span.annotation.ID%d", id)));
+    }
+
+    /**
+     * @return if the annotations doc extra pane is available
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean isAnnotationsDocExtraPaneAvailable()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(ANNOTATIONSLINK));
     }
 }

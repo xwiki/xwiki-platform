@@ -48,7 +48,7 @@ public class SpaceAttachmentsResourceImpl extends BaseAttachmentsResource implem
         filters.put("author", author);
         filters.put("fileTypes", fileTypes);
 
-        return super.getAttachments(new SpaceReference(wiki, parseSpaceSegments(spaces)), filters, offset, limit,
-            withPrettyNames);
+        return super.getAttachments(new SpaceReference(wiki, parseSpaceSegments(spaces)), filters, offset,
+            validateAndGetLimit(limit), withPrettyNames);
     }
 }

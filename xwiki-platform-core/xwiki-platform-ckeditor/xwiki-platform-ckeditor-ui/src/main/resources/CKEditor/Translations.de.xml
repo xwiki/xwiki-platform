@@ -60,9 +60,6 @@ ckeditor.plugin.link.defaultLabel=Link-Text eingeben
 ckeditor.plugin.link.openInNewTab=Link in neuem Tab öffnen
 ckeditor.plugin.link.upload=Anhang hochladen
 ckeditor.plugin.link.uploadHint=Link zu einem neu hochgeladenen Anhang.
-ckeditor.plugin.link.uploadProgress=Hochladen {0}...
-ckeditor.plugin.link.uploadSuccess=Erfolgreich hochgeladen {0}
-ckeditor.plugin.link.uploadError=Hochladen fehlgeschlagen {0}
 ckeditor.plugin.list.listType.none=Kein
 ckeditor.plugin.macro.placeholder=Makro:{0}
 ckeditor.plugin.macro.buttonHint=XWiki Makro
@@ -92,6 +89,7 @@ ckeditor.plugin.save.leaveConfirmationMessage=Es existieren ungespeicherte Ände
 ckeditor.plugin.save.failed=Der Inhalt kann nicht gespeichert werden aufgrund eines internen Fehlers im CKEditor. Sie sollten versuchen wichtige Änderungen zu kopieren und den Editor neu zu laden.
 ckeditor.plugin.source.conversionFailed=Fehler beim Ausführen der Konvertierung.
 ckeditor.plugin.selection.restoring=Auswahl wiederherstellen...
+ckeditor.plugin.table.header.accessibilityWarning=Mit Überschriften wird die Tabelle besser verständlich.
 ckeditor.plugin.toolbar.basicStyles=Einfache Stile
 ckeditor.plugin.toolbar.lists=Listen
 ckeditor.plugin.toolbar.bulletedlist=Liste mit Aufzählungszeichen
@@ -153,9 +151,6 @@ ckeditor.plugin.image.slash.currentPageBadge=Diese Seite
 ckeditor.plugin.image.slash.externalBadge=Extern
 ckeditor.plugin.image.slash.loading=Lädt...
 ckeditor.plugin.image.slash.upload=Bild hochladen
-ckeditor.plugin.image.slash.uploadProgress=Lädt {0}...
-ckeditor.plugin.image.slash.uploadSuccess={0} wurde erfolgreich hochgeladen
-ckeditor.plugin.image.slash.uploadError=Hochladen fehlgeschlagen {0}
 ckeditor.plugin.slash.group.Layout=Gestaltung
 ckeditor.plugin.slash.group.Content=Inhalt
 ckeditor.plugin.slash.group.Formatting=Formatierung
@@ -339,6 +334,12 @@ imageSelector.modal.initialization.fail=Fehler beim Abrufen des Bildauswahlformu
 ## Deprecated since 14.10
 imageEditor.modal.backToEditor.button=Zurück
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=Dokumentenbaum
+ckeditor.plugin.link.uploadProgress=Hochladen {0}...
+ckeditor.plugin.link.uploadSuccess=Erfolgreich hochgeladen {0}
+ckeditor.plugin.link.uploadError=Hochladen fehlgeschlagen {0}
+ckeditor.plugin.image.slash.uploadProgress=Lädt {0}...
+ckeditor.plugin.image.slash.uploadSuccess={0} wurde erfolgreich hochgeladen
+ckeditor.plugin.image.slash.uploadError=Hochladen fehlgeschlagen {0}
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

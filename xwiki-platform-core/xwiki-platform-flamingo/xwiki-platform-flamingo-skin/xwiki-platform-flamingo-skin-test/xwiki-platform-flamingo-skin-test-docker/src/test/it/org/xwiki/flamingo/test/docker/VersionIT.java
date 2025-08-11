@@ -19,9 +19,14 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -32,17 +37,27 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ChangesPane;
+import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.HistoryPane;
+import org.xwiki.test.ui.po.SourceViewer;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.diff.DocumentDiffSummary;
+import org.xwiki.test.ui.po.diff.EntityDiff;
+import org.xwiki.test.ui.po.diff.RawChanges;
+import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -68,10 +83,10 @@ class VersionIT
 
     private static final String CONTENT2 = "Second version of Content";
 
-    @BeforeAll
-    void setup(TestUtils setup)
+    @BeforeEach
+    void beforeEach(TestUtils testUtils)
     {
-        setup.loginAsSuperAdmin();
+        testUtils.loginAsSuperAdmin();
     }
 
     @Test
@@ -720,5 +735,367 @@ class VersionIT
         assertEquals(expectedResult, obtainedResult);
         logCaptureConfiguration.registerExpectedRegexes("^.*\\QDeprecated usage of method "
             + "[com.xpn.xwiki.doc.XWikiDocument.setDocumentReference] in xwiki:Test.Execute\\E.*$");
+    }
+
+    private void assertDiff(List<String> actualLines, String... expectedLines)
+    {
+        if (expectedLines.length > 0 && !expectedLines[0].startsWith("@@")) {
+            assertEquals(List.of(expectedLines), actualLines.subList(1, actualLines.size()));
+        } else {
+            assertEquals(List.of(expectedLines), actualLines);
+        }
+    }
+
+    private File getFileToUpload(TestConfiguration testConfiguration, String filename)
+    {
+        return new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/" + filename);
+    }
+
+    @Test
+    @Order(11)
+    void versionNavigation(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    {
+        // Version 1.1
+        ViewPage viewPage = testUtils.createPage(testReference, "one\ntwo\nthree", "Test");
+
+        // Change the content and the meta data.
+        Map<String, String> queryMap = new HashMap<>();
+        queryMap.put("content", "one\n**two**\nfour");
+        queryMap.put("title", "Compare verSions test");
+        queryMap.put("parent", "Sandbox.WebHome");
+        queryMap.put("commentinput", "Changed content and meta data.");
+        queryMap.put("minorEdit", "true");
+        // Version 1.2
+        testUtils.gotoPage(testReference, "save", queryMap);
+
+        queryMap = new HashMap<>();
+        queryMap.put("title", "Compare versions test");
+        queryMap.put("commentinput", "Fix typo in title.");
+        queryMap.put("minorEdit", "true");
+        // Version 1.3
+        testUtils.gotoPage(testReference, "save", queryMap);
+
+        viewPage = testUtils.gotoPage(testReference);
+        // Add objects.
+        ObjectEditPage objectEditPage = ObjectEditPage.gotoPage(testReference);
+        FormContainerElement form = objectEditPage.addObject("XWiki.JavaScriptExtension");
+        Map<String, String> assignment = new HashMap<>();
+        assignment.put("XWiki.JavaScriptExtension_0_name", "JavaScript code");
+        assignment.put("XWiki.JavaScriptExtension_0_code", "var tmp = alice;\nalice = bob;\nbob = tmp;");
+        assignment.put("XWiki.JavaScriptExtension_0_use", "onDemand");
+        form.fillFieldsByName(assignment);
+        // Version 1.4
+        objectEditPage.clickSaveAndContinue();
+        assignment.put("XWiki.JavaScriptExtension_0_name", "Code snippet");
+        assignment.put("XWiki.JavaScriptExtension_0_code", "var tmp = alice;\nalice = 2 * bob;\nbob = tmp;");
+        form.fillFieldsByName(assignment);
+        // Version 1.5
+        objectEditPage.clickSaveAndContinue();
+
+        // Create class.
+        ClassEditPage classEditPage = objectEditPage.editClass();
+        // Version 1.6
+        classEditPage.addProperty("age", "Number");
+        // Version 1.7
+        classEditPage.addProperty("color", "String");
+        classEditPage.getNumberClassEditElement("age").setNumberType("integer");
+        // Version 1.8
+        classEditPage.clickSaveAndContinue();
+        // Version 1.9
+        classEditPage.deleteProperty("color");
+        // Version 1.10
+        viewPage = classEditPage.clickSaveAndView();
+
+        // Attach files.
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        // TODO: Update this code when we (re)add support for uploading multiple files at once.
+        // Version 2.1, 3.1, 4.1
+        for (String fileName : new String[] {"SmallAttachment.txt", "SmallAttachment2.txt", "SmallAttachment.txt"}) {
+            attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, fileName).getAbsolutePath());
+            attachmentsPane.waitForUploadToFinish(fileName);
+            attachmentsPane.clickHideProgress();
+        }
+        // Version 5.1
+        attachmentsPane.deleteAttachmentByFileByName("SmallAttachment2.txt");
+
+        // Add comments.
+        testUtils.createUserAndLogin("Alice", "ecila");
+        viewPage = testUtils.gotoPage(testReference);
+        CommentsTab commentsTab = viewPage.openCommentsDocExtraPane();
+        // Version 5.2
+        commentsTab.postComment("first line\nsecond line", true);
+        commentsTab.editCommentByID(0, "first line\nline in between\nsecond line");
+
+        // Version 5.5
+        commentsTab.replyToCommentByID(0, "this is a reply");
+        commentsTab.deleteCommentByID(1);
+
+        testUtils.loginAsSuperAdmin();
+
+        viewPage = testUtils.gotoPage(testReference);
+        HistoryPane historyTab = viewPage.openHistoryDocExtraPane().showMinorEdits();
+        String currentVersion = historyTab.getCurrentVersion();
+        // If the document has many versions, like in this case, the versions are paginated and currently there's
+        // no way to compare two versions from two different pagination pages using the UI. Thus we have to build the
+        // URL and load the compare page manually. Update the code when we remove this UI limitation.
+        // ChangesPane changesPane = historyTab.compare("1.1", currentVersion).getChangesPane();
+        String queryString = String.format("viewer=changes&rev1=1.1&rev2=%s", currentVersion);
+        testUtils.gotoPage(testReference, "view", queryString);
+        ChangesPane changesPane = new ChangesPane();
+
+        // Version summary.
+        String today = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+        assertTrue(changesPane.getFromVersionSummary().startsWith(
+            "From version 1.1\nedited by superadmin\non " + today));
+        assertTrue(changesPane.getToVersionSummary().startsWith(
+            "To version " + currentVersion + "\nedited by Alice\non " + today));
+        assertEquals("Change comment: Deleted object", changesPane.getChangeComment());
+
+        RawChanges rawChanges = changesPane.getRawChanges();
+
+        // Diff summary.
+        DocumentDiffSummary diffSummary = rawChanges.getDiffSummary();
+        assertThat(List.of("Page properties", "Attachments", "Objects", "Class properties"),
+            containsInAnyOrder(diffSummary.getItems().toArray()));
+        assertEquals("(4 modified, 0 added, 0 removed)", diffSummary.getPagePropertiesSummary());
+        assertEquals("(0 modified, 1 added, 0 removed)", diffSummary.getAttachmentsSummary());
+        assertEquals("(0 modified, 2 added, 0 removed)", diffSummary.getObjectsSummary());
+        assertEquals("(0 modified, 1 added, 0 removed)", diffSummary.getClassPropertiesSummary());
+        assertEquals(List.of("SmallAttachment.txt"), diffSummary.toggleAttachmentsDetails().getAddedAttachments());
+        assertEquals(List.of("XWiki.JavaScriptExtension[0]", "XWiki.XWikiComments[0]"), diffSummary
+            .toggleObjectsDetails().getAddedObjects());
+        assertEquals(List.of("age"), diffSummary.toggleClassPropertiesDetails().getAddedClassProperties());
+
+        // Diff details.
+        assertThat(List.of("Page properties", "SmallAttachment.txt", "XWiki.JavaScriptExtension[0]",
+            "XWiki.XWikiComments[0]", "age"), containsInAnyOrder(rawChanges.getChangedEntities().toArray()));
+
+        // Page properties changes.
+        EntityDiff pageProperties = rawChanges.getEntityDiff("Page properties");
+        assertThat(List.of("Title", "Parent", "Author", "Content"),
+            containsInAnyOrder(pageProperties.getPropertyNames().toArray()));
+        assertDiff(pageProperties.getDiff("Title"), "-<del>T</del>est",
+            "+<ins>Compar</ins>e<ins> ver</ins>s<ins>ions </ins>t<ins>est</ins>");
+        assertDiff(pageProperties.getDiff("Parent"), "+Sandbox.WebHome");
+        assertDiff(pageProperties.getDiff("Author"), "-XWiki.<del>superadm</del>i<del>n</del>",
+            "+XWiki.<ins>Al</ins>i<ins>ce</ins>");
+        assertDiff(pageProperties.getDiff("Content"), "@@ -1,3 +1,3 @@", " one", "-two",
+            "-<del>th</del>r<del>ee</del>", "+<ins>**</ins>two<ins>**</ins>", "+<ins>fou</ins>r");
+
+        // Attachment changes.
+        EntityDiff attachmentDiff = rawChanges.getEntityDiff("SmallAttachment.txt");
+        assertThat(List.of("Author", "Size", "Content"),
+            containsInAnyOrder(attachmentDiff.getPropertyNames().toArray()));
+        assertDiff(attachmentDiff.getDiff("Author"), "+XWiki.superadmin");
+        assertDiff(attachmentDiff.getDiff("Size"), "+27 bytes");
+        assertDiff(attachmentDiff.getDiff("Content"), "+This is a small attachment.");
+
+        // Object changes.
+        EntityDiff jsxDiff = rawChanges.getEntityDiff("XWiki.JavaScriptExtension[0]");
+        assertThat(List.of("Caching policy", "Name", "Use this extension", "Code"),
+            containsInAnyOrder(jsxDiff.getPropertyNames().toArray()));
+        assertDiff(jsxDiff.getDiff("Caching policy"), "+long");
+        assertDiff(jsxDiff.getDiff("Name"), "+Code snippet");
+        assertDiff(jsxDiff.getDiff("Use this extension"), "+onDemand");
+        assertDiff(jsxDiff.getDiff("Code"), "+var tmp = alice;", "+alice = 2 * bob;", "+bob = tmp;");
+
+        // Comment changes.
+        EntityDiff commentDiff = rawChanges.getEntityDiff("XWiki.XWikiComments[0]");
+        assertThat(List.of("Author", "Date", "Comment"),
+            containsInAnyOrder(commentDiff.getPropertyNames().toArray()));
+        assertDiff(commentDiff.getDiff("Author"), "+XWiki.Alice");
+        assertEquals(2, commentDiff.getDiff("Date").size());
+        assertDiff(commentDiff.getDiff("Comment"), "+first line", "+line in between", "+second line");
+
+        // Class property changes.
+        EntityDiff ageDiff = rawChanges.getEntityDiff("age");
+        assertThat(List.of("Name", "Number", "Pretty Name", "Size", "Number Type"),
+            containsInAnyOrder(ageDiff.getPropertyNames().toArray()));
+        assertDiff(ageDiff.getDiff("Name"), "+age");
+        assertDiff(ageDiff.getDiff("Number"), "+1");
+        assertDiff(ageDiff.getDiff("Pretty Name"), "+age");
+        assertDiff(ageDiff.getDiff("Size"), "+30");
+        assertDiff(ageDiff.getDiff("Number Type"), "+integer");
+
+        // Version navigation
+        queryString = "viewer=changes&rev1=1.2&rev2=5.4";
+        testUtils.gotoPage(testReference, "view", queryString);
+        changesPane = new ChangesPane();
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("5.4", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        changesPane.clickPreviousChange();
+        changesPane = new ChangesPane();
+        assertEquals("1.1", changesPane.getFromVersion());
+        assertEquals("1.2", changesPane.getToVersion());
+        assertFalse(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertFalse(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        changesPane.clickNextChange();
+        changesPane = new ChangesPane();
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("1.3", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        changesPane.clickPreviousFromVersion();
+        changesPane = new ChangesPane();
+        assertEquals("1.1", changesPane.getFromVersion());
+        assertEquals("1.3", changesPane.getToVersion());
+        assertFalse(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertFalse(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        changesPane.clickNextFromVersion();
+        changesPane = new ChangesPane();
+        changesPane.clickNextFromVersion();
+        changesPane = new ChangesPane();
+        assertEquals("1.3", changesPane.getFromVersion());
+        assertEquals("1.3", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        changesPane.clickNextFromVersion();
+        changesPane = new ChangesPane();
+        assertEquals("1.4", changesPane.getFromVersion());
+        assertEquals("1.3", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        changesPane.clickPreviousChange();
+        changesPane = new ChangesPane();
+        assertEquals("1.3", changesPane.getFromVersion());
+        assertEquals("1.2", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        queryString = "viewer=changes&rev1=1.9&rev2=2.1";
+        testUtils.gotoPage(testReference, "view", queryString);
+        changesPane = new ChangesPane();
+        assertEquals("1.9", changesPane.getFromVersion());
+        assertEquals("2.1", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        changesPane.clickNextChange();
+        changesPane = new ChangesPane();
+        assertEquals("2.1", changesPane.getFromVersion());
+        assertEquals("3.1", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        queryString = "viewer=changes&rev1=1.2&rev2=5.4";
+        testUtils.gotoPage(testReference, "view", queryString);
+        changesPane.clickNextToVersion();
+        changesPane = new ChangesPane();
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("5.5", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertFalse(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertFalse(changesPane.hasNextToVersion());
+
+        changesPane.clickPreviousToVersion();
+        changesPane = new ChangesPane();
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("5.4", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        // Tests that the unified diff (for multi-line text) shows the inline changes.
+        viewPage = testUtils.gotoPage(testReference);
+        changesPane = viewPage.openHistoryDocExtraPane().showMinorEdits().compare("1.4", "1.5").getChangesPane();
+        jsxDiff = changesPane.getRawChanges().getEntityDiff("XWiki.JavaScriptExtension[0]");
+        assertDiff(jsxDiff.getDiff("Code"), "@@ -1,3 +1,3 @@", " var tmp = alice;", "-alice = bob;",
+            "+alice = <ins>2 * </ins>bob;", " bob = tmp;");
+
+        // Tests that a message is displayed when there are no changes.
+        viewPage = testUtils.gotoPage(testReference);
+        historyTab = viewPage.openHistoryDocExtraPane();
+        currentVersion = historyTab.getCurrentVersion();
+        assertTrue(historyTab.compare(currentVersion, currentVersion).getChangesPane().getRawChanges().hasNoChanges());
+
+        // Check that the source of a specific version is correct
+        viewPage = testUtils.gotoPage(testReference);
+        historyTab = viewPage.openHistoryDocExtraPane();
+        historyTab = historyTab.showMinorEdits();
+        viewPage = historyTab.viewVersion("1.1");
+        assertTrue(viewPage.getLastModifiedText().startsWith("Version 1.1 by superadmin on " + today), "Version "
+            + "information incorrect: " + viewPage.getLastModifiedText());
+        testUtils.getDriver().addPageNotYetReloadedMarker();
+        viewPage.clickMoreActionsSubMenuEntry("tmViewSource");
+        testUtils.getDriver().waitUntilPageIsReloaded();
+        SourceViewer sourceViewer = new SourceViewer();
+        assertEquals(3, sourceViewer.getLineNumber());
+        assertEquals("one\ntwo\nthree", sourceViewer.getEntireSource());
+
+        // Test delete versions
+        viewPage = testUtils.gotoPage(testReference);
+        historyTab = viewPage.openHistoryDocExtraPane().showMinorEdits();
+        historyTab.deleteRangeVersions("1.3", "5.4");
+        queryString = "viewer=changes&rev1=1.1&rev2=1.2";
+        testUtils.gotoPage(testReference, "view", queryString);
+        changesPane = new ChangesPane();
+        assertEquals("1.1", changesPane.getFromVersion());
+        assertEquals("1.2", changesPane.getToVersion());
+        assertFalse(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertFalse(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+        changesPane.clickNextChange();
+
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("5.5", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertFalse(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertFalse(changesPane.hasNextToVersion());
     }
 }

@@ -32,6 +32,7 @@ import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -68,6 +69,7 @@ import static org.mockito.Mockito.when;
     StoreConfiguration.class
 })
 @UserReferenceComponentList
+@SecurityScriptServiceComponentList
 class GetdeleteddocumentsPageTest extends PageTest
 {
     private static final String GETDELETEDDOCUMENTS = "getdeleteddocuments.vm";

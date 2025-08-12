@@ -61,7 +61,7 @@
     <tika.version>2.9.4</tika.version>
     <pdfbox.version>2.0.34</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.23</jetty.server.version>
+    <jetty.server.version>12.0.24</jetty.server.version>
     <jetty.client.version>10.0.25</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <netty.version>4.2.2.Final</netty.version>
@@ -113,7 +113,7 @@
     <mysql.version>9.4.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.4</mariadb.version>
+    <mariadb.version>3.5.5</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>

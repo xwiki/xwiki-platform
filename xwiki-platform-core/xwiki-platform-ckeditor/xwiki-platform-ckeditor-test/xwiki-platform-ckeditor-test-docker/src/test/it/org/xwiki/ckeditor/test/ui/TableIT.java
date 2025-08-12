@@ -65,7 +65,7 @@ class TableIT extends AbstractCKEditorIT
         edit(setup, testReference);
 
         // Insert a table.
-        editor.getToolBar().insertTable().submit();
+        editor.getToolBar().insertTable().setHeader("None").submit();
 
         // The caret should be in the first table cell. Insert two paragraphs. It's important to have two paragraphs,
         // otherwise the bug doesn't reproduce.
@@ -84,8 +84,6 @@ class TableIT extends AbstractCKEditorIT
         textArea.sendKeys("three", Keys.BACK_SPACE);
 
         // Check the result.
-        // The second row is headers too since we created it from the first one.
-        assertSourceEquals("|=(((\none\n\ntwo\n)))|= \n|=(% scope=\"col\" %) |= \n"
-            + "| | \n|thre| \n\n ");
+        assertSourceEquals("|(((\none\n\ntwo\n)))| \n|thre| \n| | \n| | \n\n ");
     }
 }

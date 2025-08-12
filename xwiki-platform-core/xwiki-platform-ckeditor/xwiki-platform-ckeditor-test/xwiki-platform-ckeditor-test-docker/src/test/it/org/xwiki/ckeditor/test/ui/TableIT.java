@@ -84,6 +84,7 @@ class TableIT extends AbstractCKEditorIT
         textArea.sendKeys("three", Keys.BACK_SPACE);
 
         // Check the result.
+        // The second row is headers too since we created it from the first one.
         assertSourceEquals("|=(((\none\n\ntwo\n)))|= \n|=(% scope=\"col\" %) |= \n"
             + "| | \n|thre| \n\n ");
     }

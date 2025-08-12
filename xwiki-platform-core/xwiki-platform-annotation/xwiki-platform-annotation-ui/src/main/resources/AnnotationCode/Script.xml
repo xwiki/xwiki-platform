@@ -1381,7 +1381,7 @@ XWiki.Annotation = Class.create({
       bubble.style.left = horizontalCoordinate + 'px';
     } else {
       // There isn't enough space on the right of the window to fit the modal, and there is enough on the left.
-      bubble.style.right = (window.innerWidth - horizontalCoordinate) + 'px';
+      bubble.style.left = (horizontalCoordinate - bubbleWidth) + 'px';
       bubble.toggleClassName('annotation-bubble-position-left');
     }
     bubble.style.top = verticalCoordinate + 'px';

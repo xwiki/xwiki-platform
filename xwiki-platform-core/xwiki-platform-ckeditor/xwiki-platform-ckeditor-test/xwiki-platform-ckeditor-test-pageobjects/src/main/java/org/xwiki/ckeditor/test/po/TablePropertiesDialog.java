@@ -32,6 +32,9 @@ import org.openqa.selenium.support.ui.Select;
  */
 public class TablePropertiesDialog extends CKEditorDialog
 {
+    /**
+     * Update the table header setting. Values can be `None`, `First Row` (default), `First column` or `Both`.
+     */
     public TablePropertiesDialog setHeader(String value)
     {
         // The CKEditor table dialog does not have much semantics in its form, we use the label text to find the 

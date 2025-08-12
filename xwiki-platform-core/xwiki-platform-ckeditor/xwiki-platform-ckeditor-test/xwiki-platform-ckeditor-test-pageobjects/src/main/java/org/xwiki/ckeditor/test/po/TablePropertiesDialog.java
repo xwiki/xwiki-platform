@@ -39,7 +39,7 @@ public class TablePropertiesDialog extends CKEditorDialog
     {
         // The CKEditor table dialog does not have much semantics in its form, we use the label text to find the 
         // select we're looking for.
-        WebElement headerLabel = getDriver().findElement(
+        WebElement headerLabel = getContainer().findElement(
             By.xpath("//label[contains(text(), 'Headers')]"));
         WebElement headerSelect = getDriver().findElement(By.id(headerLabel.getAttribute("for")));
         Select select = new Select(headerSelect);

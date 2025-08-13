@@ -103,7 +103,7 @@
         <form class="xform third" action="" method="post" autocomplete="off">
         ## Async validation feedback
         #if ($request.xwikipassword && !$isValidPassword)
-            #error($stringtool.join($errorMessage, "<br/>"))
+            #error($stringtool.join($errorMessage, '<br/>'))
         #end
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>

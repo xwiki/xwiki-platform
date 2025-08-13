@@ -45,7 +45,6 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
-import org.xwiki.livedata.internal.JSONMerge;
 import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
@@ -77,9 +76,6 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     @Inject
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
-
-
-    private final JSONMerge jsonMerge = new JSONMerge();
 
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException

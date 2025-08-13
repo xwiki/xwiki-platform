@@ -143,10 +143,7 @@
 
 #macro (getSearchSuggestResults $results)
   #createSearchSuggestQuery($request.query $request.input $query)
-  #set ($limit = $numbertool.toNumber($request.nb).intValue())
-  #if (!$limit)
-    #set ($limit = 3)
-  #end
+  #getAndValidateQueryLimitFromRequest('nb', 3, $limit)
   #set ($discard = $query.setLimit($limit))
   #set ($macro.results = $query.execute()[0].results)
   #foreach ($result in $macro.results)

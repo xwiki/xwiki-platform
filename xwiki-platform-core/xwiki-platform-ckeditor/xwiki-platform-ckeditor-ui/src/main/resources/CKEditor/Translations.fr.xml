@@ -60,9 +60,6 @@ ckeditor.plugin.link.defaultLabel=Saisir le label du lien
 ckeditor.plugin.link.openInNewTab=Ouvrir le lien dans un nouvel onglet
 ckeditor.plugin.link.upload=Ajouter une pièce jointe
 ckeditor.plugin.link.uploadHint=Lien vers la pièce jointe récemment ajoutée.
-ckeditor.plugin.link.uploadProgress=Envoi en cours {0}...
-ckeditor.plugin.link.uploadSuccess=Envoyé avec succès {0}
-ckeditor.plugin.link.uploadError=Erreur lors de l''envoi {0}
 ckeditor.plugin.list.listType.none=Aucun
 ckeditor.plugin.macro.placeholder=macro : {0}
 ckeditor.plugin.macro.buttonHint=Macro XWiki
@@ -92,6 +89,7 @@ ckeditor.plugin.save.leaveConfirmationMessage=Il y a des modifications non sauve
 ckeditor.plugin.save.failed=Impossible d’enregistrer le contenu en raison d’une erreur interne de CKEditor. Vous devriez essayer de copier vos modifications importantes avant d'actualiser l'éditeur.
 ckeditor.plugin.source.conversionFailed=La conversion a échoué.
 ckeditor.plugin.selection.restoring=Restauration de la sélection en cours...
+ckeditor.plugin.table.header.accessibilityWarning=Définir des en-têtes facilitera la lecture du tableau.
 ckeditor.plugin.toolbar.basicStyles=Styles de base
 ckeditor.plugin.toolbar.lists=Listes
 ckeditor.plugin.toolbar.bulletedlist=Liste à puces
@@ -153,9 +151,6 @@ ckeditor.plugin.image.slash.currentPageBadge=Cette page
 ckeditor.plugin.image.slash.externalBadge=Externe
 ckeditor.plugin.image.slash.loading=Chargement en cours…
 ckeditor.plugin.image.slash.upload=Ajouter une image
-### Missing: ckeditor.plugin.image.slash.uploadProgress=Uploading {0}...
-### Missing: ckeditor.plugin.image.slash.uploadSuccess=Successfully uploaded {0}
-### Missing: ckeditor.plugin.image.slash.uploadError=Failed to upload {0}
 ckeditor.plugin.slash.group.Layout=Disposition
 ckeditor.plugin.slash.group.Content=Contenu
 ### Missing: ckeditor.plugin.slash.group.Formatting=Formatting
@@ -339,6 +334,12 @@ imageSelector.modal.initialization.fail=Impossible d'afficher le formulaire de s
 ## Deprecated since 14.10
 imageEditor.modal.backToEditor.button=Retour
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=Arbre de document
+ckeditor.plugin.link.uploadProgress=Envoi en cours {0}...
+ckeditor.plugin.link.uploadSuccess=Envoyé avec succès {0}
+ckeditor.plugin.link.uploadError=Erreur lors de l''envoi {0}
+### Missing: ckeditor.plugin.image.slash.uploadProgress=Uploading {0}...
+### Missing: ckeditor.plugin.image.slash.uploadSuccess=Successfully uploaded {0}
+### Missing: ckeditor.plugin.image.slash.uploadError=Failed to upload {0}
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

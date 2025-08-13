@@ -26,12 +26,12 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.text.StringUtils;
 
 /**
  * Helper to get user preferences for the {@link EventUserFilter}.
@@ -56,7 +56,7 @@ public class EventUserFilterPreferencesGetter
             NotificationFormat format)
     {
         return getPreferences(filterPreferences, format, NotificationFilterType.EXCLUSIVE).anyMatch(
-            pref -> StringUtils.equals(pref.getUser(), testUser)
+            pref -> Strings.CS.equals(pref.getUser(), testUser)
         );
     }
 
@@ -72,7 +72,7 @@ public class EventUserFilterPreferencesGetter
                                   NotificationFormat format)
     {
         return getPreferences(filterPreferences, format, NotificationFilterType.INCLUSIVE).anyMatch(
-            pref -> StringUtils.equals(pref.getUser(), testUser)
+            pref -> Strings.CS.equals(pref.getUser(), testUser)
         );
     }
 

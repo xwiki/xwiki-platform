@@ -22,7 +22,7 @@ package org.xwiki.index.tree.internal;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -111,7 +111,7 @@ public abstract class AbstractDocumentRelatedTreeNode extends AbstractEntityTree
     protected EntityReference resolve(String nodeId)
     {
         String prefix = getType() + ':';
-        if (StringUtils.startsWith(nodeId, prefix)) {
+        if (Strings.CS.startsWith(nodeId, prefix)) {
             return super.resolve("document:" + nodeId.substring(prefix.length()));
         }
         return null;

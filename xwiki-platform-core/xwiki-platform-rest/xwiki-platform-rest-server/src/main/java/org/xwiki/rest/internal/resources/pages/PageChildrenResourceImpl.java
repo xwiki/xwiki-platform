@@ -57,15 +57,16 @@ public class PageChildrenResourceImpl extends AbstractPagesResource implements P
     public Pages getPageChildren(String wikiName, String spaceName, String pageName, Integer start, Integer number,
         Boolean withPrettyNames, String hierarchy, String search) throws XWikiRestException
     {
+        int limit = validateAndGetLimit(number);
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
             if ("nestedpages".equals(hierarchy)) {
                 return getPages(this.nestedPageHierarchy.getChildren(documentInfo.getDocument().getDocumentReference())
-                    .withOffset(start).withLimit(number).matching(search).getDocumentReferences(), withPrettyNames);
+                    .withOffset(start).withLimit(limit).matching(search).getDocumentReferences(), withPrettyNames);
             } else {
                 // We fall-back (default) to the parent-child hierarchy for backwards compatibility.
-                return getPages(getPageChildrenForParentChildHierarchy(documentInfo, start, number), withPrettyNames);
+                return getPages(getPageChildrenForParentChildHierarchy(documentInfo, start, limit), withPrettyNames);
             }
         } catch (XWikiException | QueryException e) {
             throw new XWikiRestException(e);

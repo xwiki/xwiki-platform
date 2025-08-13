@@ -76,15 +76,15 @@ $xwiki.jsx.use($attachmentPickerDocName)
  * @param $targetAttachDocument the document to list/save attachments to
  * @param $options generic picker options
  *#
-#macro (attachmentPicker_displayAttachmentGallery $targetDocument, $targetAttachDocument, $options)
+#macro (_attachmentPicker_displayAttachmentGallery $targetDocument, $targetAttachDocument, $options)
   #set ($currentValue = $targetDocument.getValue($options.property))
   #if ("$!{targetAttachDocument.getAttachment($currentValue)}" == '')
     #set ($currentValue = "$!{options.defaultValue}")
   #end
   (% class="gallery" %)(((
   ## Only display the upload form if they have edit permission on targetAttachDocument
-  #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
-  #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
+  #_attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
+  #_attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
   #if ("$!services.temporaryAttachments" != '')
     #set ($unsortedAttachments = $services.temporaryAttachments.listAllAttachments($targetAttachDocument))
     #set ($sortedAttachments = $collectiontool.sort($unsortedAttachments, "${options.sortAttachmentsBy}"))
@@ -95,7 +95,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #set ($extension = $attachment.getFilename())
     #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
     #if ($options.filter.size() == 0 || $options.filter.contains($extension))
-      #attachmentPicker_displayAttachmentBox($attachment $targetDocument $targetAttachDocument, $options $currentValue)
+      #_attachmentPicker_displayAttachmentBox($attachment $targetDocument $targetAttachDocument, $options $currentValue)
     #end
   #end
   )))
@@ -109,7 +109,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
  * @param $options generic picker options
  * @param $currentValue the currently selected file, used for determining if the box should be highlighted as the current value
  *#
-#macro (attachmentPicker_displayAttachmentBox $attachment $targetDocument $targetAttachDocument, $options $currentValue)
+#macro (_attachmentPicker_displayAttachmentBox $attachment $targetDocument $targetAttachDocument, $options $currentValue)
   #set ($hasTemporaryAttachment = "$!services.temporaryAttachments" != '')
   #set ($canEdit = $xwiki.hasAccessLevel('edit', $xcontext.user, ${targetAttachDocument.fullName}))
   #set ($isTemporaryAttachment = false)
@@ -127,8 +127,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #if ($isTemporaryAttachment)
     #set ($discard = $cssClasses.add('temporary_attachment'))
   #end
-  #attachmentPicker_displayStartFrame({'value' : $attachment.filename, 'text' : $attachment.filename, 'cssClass' : "${stringtool.join($cssClasses, ' ')}"} $currentValue)
-  #attachmentPicker_displayAttachmentDetails($attachment $options)
+  #_attachmentPicker_displayStartFrame({'value' : $attachment.filename, 'text' : $attachment.filename, 'cssClass' : "${stringtool.join($cssClasses, ' ')}"} $currentValue)
+  #_attachmentPicker_displayAttachmentDetails($attachment $options)
   #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
   #set ($deleteURL = $targetAttachDocument.getAttachmentURL($attachment.filename, 'delattachment', "xredirect=${returnURL}&amp;form_token=$!{services.csrf.getToken()}") )
   #set ($viewURL = $targetAttachDocument.getAttachmentURL($attachment.filename) )##{'name' : 'download', 'url' : $viewURL, 'rel' : '__blank'}
@@ -138,9 +138,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
   })))
   ## Delete action is only proposed for users with the edit right on the document.
   ## If the temporary attachment is available, the delete action is only allowed for non-temporary attachments.  
-  #set ($attachmentActions = [{'name' : 'select', 'url' : $selectURL}])
+  #set ($attachmentActions = [{'name' : 'select', 'url' : $selectURL, 'icon' : 'check', 'extraCssClass' : 'btn btn-xs btn-success'}])
   #if($canDeleteAttachment)
-    #set ($discard = $attachmentActions.add({'name' : 'delete', 'url' : $deleteURL}))
+    #set ($discard = $attachmentActions.add({'name' : 'delete', 'url' : $deleteURL, 'icon' : 'cross', 'extraCssClass' : 'btn btn-xs btn-danger'}))
   #end
   #define($additionalContent)
     #if ($isTemporaryAttachment)
@@ -149,7 +149,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       (% title="$titleMessage" %)$services.icon.render('clock')(%%)
     #end
   #end
-  #attachmentPicker_displayEndFrame ($attachmentActions $additionalContent)
+  #_attachmentPicker_displayEndFrame ($attachmentActions $additionalContent)
 #end
 
 #**
@@ -159,9 +159,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *        the title to display (boxOptions.text), optional extra CSS classnames to put on the box (boxOptions.cssClass)
  * @param $currentValue the currently selected file, used for determining if this attachment should be highlighted as the current value
  *#
-#macro (attachmentPicker_displayStartFrame $boxOptions $currentValue)
+#macro (_attachmentPicker_displayStartFrame $boxOptions $currentValue)
   (% class="gallery_attachmentbox $!{boxOptions.cssClass} #if ("$!{boxOptions.value}" == $currentValue) current#{end}" %)(((
     (% class="gallery_attachmenttitle" title="$services.rendering.escape($!{boxOptions.value}, 'xwiki/2.1')" %)(((
+      #if($!{boxOptions.cssClass} == 'gallery_upload')$services.icon.render('add') #end##
       $services.rendering.escape($boxOptions.text, 'xwiki/2.1')
     )))
     (% class="gallery_attachmentframe" %)(((
@@ -174,7 +175,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
  * @param $attachment the target attachment to display
  * @param $options generic picker options
  *#
-#macro (attachmentPicker_displayAttachmentDetails $attachment $options)
+#macro (_attachmentPicker_displayAttachmentDetails $attachment $options)
   #if ($attachment)
     ## Compute the attachment reference because there's no getter.
     #set ($attachmentReference = $services.model.createAttachmentReference($attachment.document.documentReference,
@@ -207,12 +208,14 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *        &lt;/dl&gt;
  * @param $additionalContent optional additional content that does not follow the structure of the actions 
  *#
-#macro (attachmentPicker_displayEndFrame $actions $additionalContent)
+#macro (_attachmentPicker_displayEndFrame $actions $additionalContent)
     )))## attachmentframe
     (% class="gallery_actions" %)(((
       #foreach ($action in $actions)
         #set( $actionname = $services.localization.render("${translationPrefix}.actions.${action.name}") )
-        [[${actionname}&gt;&gt;path:${action.url}||class="tool ${action.name}" title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
+        [[${services.icon.render($action.icon)}(% class="sr-only"%)${actionname}(%%)&gt;&gt;##
+          path:${action.url}||class="tool ${action.name} $!{action.extraCssClass}"##
+          title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
       #end
       $!additionalContent
     )))## actions
@@ -226,8 +229,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
  * @param $targetAttachDocument the document to upload the attachment to
  * @param $options generic picker options
  *#
-#macro (attachmentPicker_displayUploadForm $targetDocument, $targetAttachDocument, $options)
-#attachmentPicker_displayStartFrame({
+#macro (_attachmentPicker_displayUploadForm $targetDocument, $targetAttachDocument, $options)
+#_attachmentPicker_displayStartFrame({
    'value' : $services.localization.render("${translationPrefix}.upload.title"),
    'text' : $services.localization.render("${translationPrefix}.upload.title"),
    'cssClass' : 'gallery_upload'
@@ -274,7 +277,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
-#attachmentPicker_displayEndFrame ([])
+#_attachmentPicker_displayEndFrame ([])
 #end
 
 #**
@@ -285,7 +288,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
  * @param $options generic picker options
  * @param $currentValue the currently selected file, used for determining if the empty box should be highlighted as the current value
  *#
-#macro (attachmentPicker_displayAttachmentGalleryEmptyValue $targetDocument, $targetAttachDocument, $options, $currentValue)
+#macro (_attachmentPicker_displayAttachmentGalleryEmptyValue $targetDocument, $targetAttachDocument, $options, $currentValue)
   #if ("$!{options.get('defaultValue')}" != '')
     #set ($reference = ${options.get('defaultValue')})
     #set ($docNameLimit = $reference.indexOf('@'))
@@ -300,11 +303,11 @@ $xwiki.jsx.use($attachmentPickerDocName)
       #set($dcssClass = 'gallery_image')
     #end
   #end
-  #attachmentPicker_displayStartFrame({'cssClass' : "gallery_emptyChoice $!{dcssClass}", 'text' : $services.localization.render("${translationPrefix}.default"), 'value' : "${options.defaultValue}"} $currentValue)
-  #attachmentPicker_displayAttachmentDetails($defaultAttachment $options)
+  #_attachmentPicker_displayStartFrame({'cssClass' : "gallery_emptyChoice $!{dcssClass}", 'text' : $services.localization.render("${translationPrefix}.default"), 'value' : "${options.defaultValue}"} $currentValue)
+  #_attachmentPicker_displayAttachmentDetails($defaultAttachment $options)
   #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
   #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=&amp;form_token=$!{services.csrf.getToken()}"))
-  #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}])
+  #_attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL, 'icon' : 'check', 'extraCssClass' : 'btn btn-xs btn-success'}])
 #end
 {{/velocity}}
 
@@ -369,7 +372,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     'versionSummary': $request.versionSummary.equals('true')
   })
   $!targetDocument.use($targetDocument.getObject($options.classname, $options.object))##
-  #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
+  #_attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
 
   #set ($cancelLinkName = $services.rendering.escape($services.rendering.escape($services.localization.render("${translationPrefix}.cancel"), 'xwiki/2.1'), 'xwiki/2.1'))
   #set ($cancelLinkTarget = $services.rendering.escape($services.model.serialize($targetDocument), 'xwiki/2.1'))
@@ -1099,9 +1102,12 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
   margin: 0;
 }
 .gallery_attachmentbox {
+  display: grid;
+  gap: .2rem;
   background: $theme.pageContentBackgroundColor;
+  padding: .2rem;
   border: 1px solid $theme.borderColor;
-  border-radius: 8px;
+  border-radius: var(--border-radius-base);
   float: left;
   margin: ${boxMargin}px;
   overflow: hidden;
@@ -1110,8 +1116,6 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 }
 .gallery .current {
   background-color: $theme.highlightColor;
-  border-width: 3px;
-  margin: 3px;
 }
 .gallery .current .gallery_attachmenttitle {
   font-weight: bold;
@@ -1121,9 +1125,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 }
 
 .gallery_attachmenttitle {
-  background: $theme.backgroundSecondaryColor;
-  border-bottom: 1px dotted $theme.borderColor;
-  border-radius: 8px 8px 0px 0px;
+  grid-area: 1 / 1 / 2 / 2;
   font-size: 85%;
   padding: 3px ${boxPadding}px;
   overflow: hidden;
@@ -1136,7 +1138,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 }
 
 .gallery_attachmentframe {
-  padding: ${boxPadding}px;
+  grid-area: 2 / 1 / 3 / 3;
   height: ${imgSize}px;
   overflow: hidden;
   position: relative;
@@ -1175,38 +1177,15 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 }
 
 /* Actions */
-.gallery_actions {
-  width: auto;
-  position: absolute;
-  bottom: 0px;
-  right: ${boxPadding}px;
+.gallery_actions p {
+  grid-area: 1 / 2 / 2 / 3;
+  display: flex;
+  justify-content: flex-end;
+  gap: .2rem;
 }
 .gallery_actions .tool {
-  background: none no-repeat 50% transparent;
   cursor: pointer;
   display: block;
-  float: left;
-  height: ${actionsHeight}px;
-  padding: 0 !important;
-  overflow: hidden;
-  text-indent: -1000em;
-  opacity: 0.6;
-  width: ${actionsWidth}px;
-}
-.gallery_actions .tool:hover {
-  opacity: 1;
-}
-.gallery_actions .select {
-  background-image: url("$xwiki.getSkinFile('icons/silk/tick.png')");
-}
-.gallery_actions .delete {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
-}
-.gallery_actions .view {
-  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
-}
-.gallery_actions .download {
-  background-image: url("$xwiki.getSkinFile('icons/silk/arrow_down.png')");
 }
 /*--------------------------------------------------*/
 /* Upload form                                      */
@@ -1218,12 +1197,6 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
   background-color: $theme.backgroundSecondaryColor;
 }
 
-.gallery_upload .gallery_attachmenttitle {
-  background-position: 1px center;
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_add.png')");
-  background-repeat: no-repeat;
-  padding-left: 16px;
-}
 .gallery_upload .gallery_attachmentframe {
   height: auto;
 }
@@ -1589,7 +1562,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 #set ($propValue = "$!{targetdoc.getObject($classname, $object).getProperty($property).value}")
 ##
 
-#macro (attachmentPicker_displayAttachment $name $displayImage $withLink $forceElement)
+#macro (_attachmentPicker_displayAttachment $name $displayImage $withLink $forceElement)
   #set ($attachment = $targetdoc.getAttachment("$!{name}"))
   #if ("$!{name}" != '' &amp;&amp; "$!{attachment}" != '')
     #set ($attachmentRef = $services.model.createAttachmentReference(${targetdoc.documentReference}, ${name}))
@@ -1622,7 +1595,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 ## Display the "Choose an attachment" button if they can:
 ##  1. Edit the current page
 ##  2. View the target attachment page. (can be the same page)
-#macro (attachmentPicker_displayButton)
+#macro (_attachmentPicker_displayButton)
   #if ($targetPermView)
     #set ($queryString = {
       'docname': $doc.fullName,
@@ -1647,14 +1620,14 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 
 {{velocity}}
 #if ("${savemode}" == 'direct')
-  (% class="attachment-picker" %)(((#attachmentPicker_displayAttachment($propValue $displayImage $link true) #attachmentPicker_displayButton())))
+  (% class="attachment-picker" %)(((#_attachmentPicker_displayAttachment($propValue $displayImage $link true) #_attachmentPicker_displayButton())))
 #elseif ($xcontext.action == 'inline' || $xcontext.action == 'edit')
   (% class="attachment-picker" %)(((##
-    #attachmentPicker_displayAttachment($propValue $displayImage false true) #attachmentPicker_displayButton()##
+    #_attachmentPicker_displayAttachment($propValue $displayImage false true) #_attachmentPicker_displayButton()##
     {{html}}&lt;input type="hidden" name="$escapetool.xml("${classname}_${object}_${property}")" value="$escapetool.xml("${propValue}")" class="property-reference"/&gt;{{/html}}##
   )))
 #else
-  #attachmentPicker_displayAttachment($propValue $displayImage $link false)
+  #_attachmentPicker_displayAttachment($propValue $displayImage $link false)
 #end
 {{/velocity}}</code>
     </property>

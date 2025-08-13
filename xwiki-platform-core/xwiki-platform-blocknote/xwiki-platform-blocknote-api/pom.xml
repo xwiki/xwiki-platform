@@ -29,11 +29,12 @@
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-blocknote-api</artifactId>
-  <name>XWiki Platform - BlockNote - API</name>
+  <name>XWiki Platform - BlockNote Integration - API</name>
+  <description>Integrates BlockNote as a WYSIWYG editor in XWiki. The integration is in early stages of development so please use with care.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>BlockNote API</xwiki.extension.name>
+    <xwiki.extension.name>BlockNote Integration (Experimental)</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

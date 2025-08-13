@@ -27,6 +27,7 @@ import { createI18n } from "vue-i18n";
 import { jsonMerge } from "@/services/jsonMerge.js";
 import { i18nResolver } from "@/services/i18nResolver.js";
 import Vue3TouchEvents from "vue3-touch-events";
+import { componentStore } from "@/components/store.js";
 
 export class Logic {
   constructor(element, $) {
@@ -411,7 +412,21 @@ export class Logic {
     return this.fetchEntries()
       .then(data => {
         this.data.data = data;
-        this.vueInstance.$nextTick(() => this.triggerEvent("entriesUpdated", {}));
+        // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated first.
+        // It turns out this is not enough when components are resolved asynchronously.
+        // Therefore, we preemptively resolve the components that are going to be displayed here. Since they are cached,
+        // the rendering of the displayers will not be delayed later on, and listeners of entriesUpdated have access to
+        // a fully rendered DOM.
+        // Note that this approach is not optimal, and we should aim for a mechanism that does not rely on direct DOM
+        // access. Instead, we should provide way to alter the data externally before starting the rendering. (see
+        // https://jira.xwiki.org/browse/XWIKI-23423)
+        const preloadDisplayer = this.getPropertyDescriptors()
+            .filter(it => this.isPropertyVisible(it.id))
+            .map(it => componentStore.load('displayer', this.getDisplayerDescriptor(it.id).id));
+        Promise.all(preloadDisplayer)
+            .then(() => {
+              this.vueInstance.$nextTick(() => this.triggerEvent("entriesUpdated", {}));
+            })
         // Remove the outdated footnotes, they will be recomputed by the new entries.
         this.footnotes.reset();
       })

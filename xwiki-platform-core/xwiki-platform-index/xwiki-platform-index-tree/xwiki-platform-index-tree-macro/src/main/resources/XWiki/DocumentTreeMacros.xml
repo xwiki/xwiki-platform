@@ -190,6 +190,8 @@
   #set ($limit = $mathtool.max($numbertool.toNumber($request.limit).intValue(), 1))
   #if ("$!limit" == '')
     #set ($limit = 15)
+  #else
+    #validateQueryLimit($limit)
   #end
   #if ($nodeId == '#' &amp;&amp; $docTreeConfig.showRoot)
     #maybeAddNode($actualNodeId $children)
@@ -324,7 +326,7 @@
 
 #macro (addSpaceNode $spaceReference $siblings)
   #set ($spaceId = $services.model.serialize($spaceReference, 'default'))
-  #set ($nodeId = "space:$spaceId")
+  #set ($spaceNodeId = "space:$spaceId")
   #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spaceReference))
   #set ($canViewSpace = $services.security.authorization.hasAccess('view', $spaceReference))
   #if ($docTreeConfig.showTerminalDocuments)
@@ -332,7 +334,7 @@
     #set ($hasChildren = true)
   #else
     ## We display only the nested spaces. This space might contain only documents.
-    #set ($hasChildren = $tree.getChildCount($nodeId) &gt; 0)
+    #set ($hasChildren = $tree.getChildCount($spaceNodeId) &gt; 0)
   #end
   #set ($isOpened = false)
   #if ("$!docTreeConfig.expandToLevel" != '')
@@ -342,11 +344,11 @@
     #else
       #set ($rootNode = $docTreeConfig.root)
     #end
-    #set ($rootDistance = $tree.getPath($nodeId).size())
+    #set ($rootDistance = $tree.getPath($spaceNodeId).size())
     #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
   #end
   #set ($discard = $siblings.add({
-    'id': $nodeId,
+    'id': $spaceNodeId,
     'text': $spaceReference.name,
     'icon': 'fa fa-folder-o',
     'iconOpened': 'fa fa-folder-open-o',
@@ -392,7 +394,7 @@
 
 #macro (addDocumentNode $documentReference $siblings)
   #set ($documentId = $services.model.serialize($documentReference, 'default'))
-  #set ($nodeId = "document:$documentId")
+  #set ($docNodeId = "document:$documentId")
   #set ($label = $documentReference.name)
   #if (!$docTreeConfig.showSpaces &amp;&amp;
       $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
@@ -409,7 +411,7 @@
       #set ($label = $plainTitle)
     #end
   #end
-  #set ($hasChildren = $tree.getChildCount($nodeId) &gt; 0)
+  #set ($hasChildren = $tree.getChildCount($docNodeId) &gt; 0)
   #set ($isOpened = false)
   #if ("$!docTreeConfig.expandToLevel" != '')
     #set ($rootNode = "wiki:$services.wiki.currentWikiId")
@@ -418,11 +420,11 @@
     #else
       #set ($rootNode = $docTreeConfig.root)
     #end
-    #set ($rootDistance = $tree.getPath($nodeId).size())
+    #set ($rootDistance = $tree.getPath($docNodeId).size())
     #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
   #end
   #set ($discard = $siblings.add({
-    'id': $nodeId,
+    'id': $docNodeId,
     'text': $label,
     'icon': 'fa fa-file-o',
     'children': $hasChildren,

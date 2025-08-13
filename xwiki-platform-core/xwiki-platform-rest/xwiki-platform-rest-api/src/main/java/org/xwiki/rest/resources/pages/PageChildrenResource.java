@@ -57,7 +57,7 @@ public interface PageChildrenResource
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
             @QueryParam("hierarchy") @DefaultValue("parentchild") String hierarchy,
             @QueryParam("search") @DefaultValue("") String search

@@ -147,8 +147,10 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * the editor is destroyed.
      *
      * @param {Function} callback the function to call before the editor is destroyed
+     * @param {boolean} isAsync {@code true} if the callback needs to perform asynchronous operations, {@code false}
+     *   otherwise
      */
-    onBeforeDestroy(callback) {
+    onBeforeDestroy(callback, isAsync) {
       throw new Error('Not implemented!');
     }
 

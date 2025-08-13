@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.http.NameValuePair;
@@ -144,7 +145,7 @@ public class ExtendedURL implements Cloneable
         }
 
         // Remove leading "/" if any
-        rawPath = StringUtils.removeStart(rawPath, URL_SEPARATOR);
+        rawPath = Strings.CS.removeStart(rawPath, URL_SEPARATOR);
 
         this.segments = extractPathSegments(rawPath);
         this.parameters = extractParameters(internalURI);

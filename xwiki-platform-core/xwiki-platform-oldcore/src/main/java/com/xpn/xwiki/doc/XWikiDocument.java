@@ -64,6 +64,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
@@ -2591,7 +2592,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private boolean isRedirectAbsolute(XWikiContext context)
     {
-        return StringUtils.equals("1", context.getWiki().Param("xwiki.redirect.absoluteurl"));
+        return Strings.CS.equals("1", context.getWiki().Param("xwiki.redirect.absoluteurl"));
     }
 
     public String getURL(String action, boolean redirect, XWikiContext context)
@@ -4335,7 +4336,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         // Read the minor edit checkbox from the form
-        setMinorEdit(eform.isMinorEdit());
+        boolean minorEdit = context.getWiki().hasMinorEdit(context) && eform.isMinorEdit();
+        setMinorEdit(minorEdit);
 
         String tags = eform.getTags();
         if (!StringUtils.isEmpty(tags)) {
@@ -7515,7 +7517,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         // If the copied document has a title set to the original page name then set the new title to be the new page
         // name.
-        if (StringUtils.equals(newdoc.getTitle(), getPrettyName(this.getDocumentReference()))) {
+        if (Strings.CS.equals(newdoc.getTitle(), getPrettyName(this.getDocumentReference()))) {
             newdoc.setTitle(getPrettyName(newDocumentReference));
         }
 
@@ -9537,7 +9539,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // /////////////////////////////////
         // Document
 
-        if (!StringUtils.equals(getContent(), document.getContent())) {
+        if (!Strings.CS.equals(getContent(), document.getContent())) {
             setContent(document.getContent());
             modified = true;
         }
@@ -9551,12 +9553,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             modified = true;
         }
 
-        if (!StringUtils.equals(getTitle(), document.getTitle())) {
+        if (!Strings.CS.equals(getTitle(), document.getTitle())) {
             setTitle(document.getTitle());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultTemplate(), document.getDefaultTemplate())) {
+        if (!Strings.CS.equals(getDefaultTemplate(), document.getDefaultTemplate())) {
             setDefaultTemplate(document.getDefaultTemplate());
             modified = true;
         }
@@ -9565,12 +9567,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             modified = true;
         }
 
-        if (!StringUtils.equals(getCustomClass(), document.getCustomClass())) {
+        if (!Strings.CS.equals(getCustomClass(), document.getCustomClass())) {
             setCustomClass(document.getCustomClass());
             modified = true;
         }
 
-        if (!StringUtils.equals(getValidationScript(), document.getValidationScript())) {
+        if (!Strings.CS.equals(getValidationScript(), document.getValidationScript())) {
             setValidationScript(document.getValidationScript());
             modified = true;
         }

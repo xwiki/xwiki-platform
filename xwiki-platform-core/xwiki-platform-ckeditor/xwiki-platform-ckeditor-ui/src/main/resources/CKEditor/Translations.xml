@@ -97,6 +97,8 @@ ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor in
 ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
 ckeditor.plugin.selection.restoring=Restoring selection...
 
+ckeditor.plugin.table.header.accessibilityWarning=Using headers will make your table easier to understand.
+
 ckeditor.plugin.toolbar.basicStyles=Basic Styles
 ckeditor.plugin.toolbar.lists=Lists
 ckeditor.plugin.toolbar.bulletedlist=Bulleted List

@@ -60,6 +60,7 @@
 #if ("$!xcontext.userReference" != '')
   #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
 #end
+#addMetaAttribute($metaAttributes, 'action', "$xcontext.action")
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()" $stringtool.join($metaAttributes, ' ')>
   <head>

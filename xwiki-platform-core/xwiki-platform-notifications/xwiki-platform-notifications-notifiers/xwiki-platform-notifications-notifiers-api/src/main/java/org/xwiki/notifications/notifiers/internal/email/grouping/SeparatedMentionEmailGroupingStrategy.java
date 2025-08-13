@@ -19,16 +19,17 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.grouping;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This component offers a strategy where the notifications related to mentions are sent in a separated email than all
@@ -52,7 +53,7 @@ public class SeparatedMentionEmailGroupingStrategy implements NotificationEmailG
         List<List<CompositeEvent>> result = new ArrayList<>();
 
         for (CompositeEvent compositeEvent : compositeEvents) {
-            if (StringUtils.equals("mention", compositeEvent.getType())) {
+            if (Strings.CS.equals("mention", compositeEvent.getType())) {
                 mention.add(compositeEvent);
             } else {
                 otherEvents.add(compositeEvent);

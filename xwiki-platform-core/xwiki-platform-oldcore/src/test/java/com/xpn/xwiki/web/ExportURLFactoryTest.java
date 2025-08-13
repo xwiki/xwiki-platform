@@ -26,23 +26,22 @@ import java.util.Arrays;
 
 import javax.inject.Provider;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.MockitoOldcore;
-import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
-import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -52,34 +51,36 @@ import static org.mockito.Mockito.mock;
  *
  * @version $Id$
  */
-@OldcoreTest
 @AllComponents
-class ExportURLFactoryTest
+public class ExportURLFactoryTest
 {
-    @InjectMockitoOldcore
-    private MockitoOldcore oldcore;
+    @Rule
+    public MockitoOldcoreRule oldcoreRule = new MockitoOldcoreRule();
 
-    @XWikiTempDir
-    private File tmpDir;
+    @Rule
+    public TemporaryFolder tmpDirRule = new TemporaryFolder();
 
     private ExportURLFactory urlFactory;
 
+    private File tmpDir;
+
     private FilesystemExportContext exportContext;
 
-    @BeforeEach
-    void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         this.urlFactory = new ExportURLFactory();
 
+        this.tmpDir = this.tmpDirRule.newFolder("xwikitests");
         new File(this.tmpDir, "attachment").mkdir();
 
-        Provider<FilesystemExportContext> exportContextProvider = this.oldcore.getMocker().getInstance(
+        Provider<FilesystemExportContext> exportContextProvider = this.oldcoreRule.getMocker().getInstance(
             new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
         this.exportContext = exportContextProvider.get();
 
-        doReturn("/xwiki").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
+        doReturn("/xwiki").when(this.oldcoreRule.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
-        XWikiContext context = this.oldcore.getXWikiContext();
+        XWikiContext context = this.oldcoreRule.getXWikiContext();
         XWikiRequest request = mock(XWikiRequest.class);
         context.setRequest(request);
         context.setURL(new URL("http://www.xwiki.org/"));
@@ -88,7 +89,7 @@ class ExportURLFactoryTest
     }
 
     @Test
-    void createAttachmentURLWithWhitespacesInSpaceAndPageNames() throws Exception
+    public void createAttachmentURLWithWhitespacesInSpaceAndPageNames() throws Exception
     {
         // Prepare the exported document and attachment.
         XWikiDocument doc = new XWikiDocument(
@@ -101,10 +102,10 @@ class ExportURLFactoryTest
         XWikiAttachment attachment = new XWikiAttachment(doc, "img .jpg");
         attachment.setContent(new ByteArrayInputStream("test".getBytes()));
         doc.getAttachmentList().add(attachment);
-        this.oldcore.getSpyXWiki().saveDocument(doc, this.oldcore.getXWikiContext());
+        this.oldcoreRule.getSpyXWiki().saveDocument(doc, this.oldcoreRule.getXWikiContext());
 
         URL url = this.urlFactory.createAttachmentURL("img .jpg", " Space1 .Space2", "Pa ge", "view", "", "Wiki",
-            this.oldcore.getXWikiContext());
+            this.oldcoreRule.getXWikiContext());
 
         // Verify generated URL
         assertEquals(new URL("file://../../../../attachment/Wiki/+Space1+/Space2/Pa+ge/img+.jpg"), url);

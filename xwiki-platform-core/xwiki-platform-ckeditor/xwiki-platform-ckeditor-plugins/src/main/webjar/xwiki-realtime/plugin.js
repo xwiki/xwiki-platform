@@ -52,12 +52,30 @@
       preserveSpaceCharAtTheEndOfLine(editor);
 
       editor.delayInstanceReady(new Promise((resolve, reject) => {
+        const rejectWithNotification = (reason, ...args) => {
+          if (reason) {
+            const message = reason.message || reason;
+            new XWiki.widgets.Notification(message, 'error');
+          }
+          reject(reason, ...args);
+        };
         require([
           'xwiki-realtime-loader',
           'xwiki-ckeditor-realtime-adapter',
-          'xwiki-realtime-interface'
-        ], asyncRequireCallback(async (Loader, Adapter, Interface) => {
-          await enableRealtimeEditing(editor, Loader, Adapter);
+          'xwiki-realtime-interface',
+          'xwiki-l10n!xwiki-realtime-messages'
+        ], asyncRequireCallback(async (Loader, Adapter, Interface, Messages) => {
+          try {
+            const realtimeSupported = await enableRealtimeEditing(editor, Loader, Adapter);
+            if (!realtimeSupported) {
+              // "Fail" silently if realtime collaboration is not supported in this context.
+              return;
+            }
+          } catch (error) {
+            // The caught error may be too technical for the end user, so we wrap it in a more user-friendly message,
+            // making sure we don't lose the original error that will be logged in the console for debugging.
+            throw new Error(Messages['join.error'], {cause: error});
+          }
 
           // The edited (HTML) content is normalized when the realtime editing is enabled (e.g. by adding some BR
           // elements to ensure the HTML is the same across different browsers) which makes the editor dirty, although
@@ -80,7 +98,7 @@
           editor.on('beforeModeUnload', this.onBeforeModeUnload.bind(this));
           CKEDITOR.plugins.xwikiSource?.addModeChangeHandler(editor, this.onModeChanged.bind(this), 10);
           editor.on('modeReady', this.onModeReady.bind(this));
-        }, resolve, reject), reject);
+        }, resolve, rejectWithNotification), rejectWithNotification);
       }));
     },
 
@@ -273,11 +291,14 @@
     };
 
     const realtimeContext = await Loader.bootstrap(info);
-    await new Promise((resolve, reject) => {
-      require(['xwiki-realtime-wysiwyg'], asyncRequireCallback(RealtimeWysiwygEditor => {
-        editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), realtimeContext);
-      }, resolve, reject), reject);
-    });
+    if (realtimeContext) {
+      return await new Promise((resolve, reject) => {
+        require(['xwiki-realtime-wysiwyg'], asyncRequireCallback(RealtimeWysiwygEditor => {
+          editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), realtimeContext);
+          return editor._realtime;
+        }, resolve, reject), reject);
+      });
+    }
   }
 
   /**

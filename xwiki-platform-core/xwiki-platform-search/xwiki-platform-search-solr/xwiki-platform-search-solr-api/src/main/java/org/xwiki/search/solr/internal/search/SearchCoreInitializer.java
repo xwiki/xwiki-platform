@@ -17,47 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.search.solr.internal.search;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.search.solr.Solr;
+import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
-import org.xwiki.search.solr.internal.search.SearchCoreInitializer;
+import org.xwiki.search.solr.XWikiSolrCore;
 
 /**
- * A wrapper around the new {@link Solr} API for the search core.
+ * Take care of the initialization of the search core which can be done through the SolrJ API.
  * 
  * @version $Id$
- * @since 12.2
+ * @since 17.8.0RC1
  */
 @Component
+@Named(SearchCoreInitializer.CORE_NAME)
 @Singleton
-public class SolrClientInstance extends AbstractSolrInstance
+public class SearchCoreInitializer implements SolrCoreInitializer
 {
     /**
      * The name of the core containing the XWiki search index.
      */
-    public static final String CORE_NAME = SearchCoreInitializer.CORE_NAME;
+    public static final String CORE_NAME = "search";
 
     @Inject
-    private Solr solr;
+    private SearchCoreMigrationManager migrations;
 
     @Override
-    public void initialize() throws InitializationException
+    public String getCoreName()
     {
-        try {
-            this.server = this.solr.getCore(SearchCoreInitializer.CORE_NAME);
-        } catch (SolrException e) {
-            throw new InitializationException("Failed to create the solr client for core [search]", e);
-        }
+        return CORE_NAME;
+    }
 
-        if (this.server == null) {
-            throw new InitializationException(
-                "No core with name [" + SearchCoreInitializer.CORE_NAME + "] could be found");
-        }
+    @Override
+    public void initialize(XWikiSolrCore core) throws SolrException
+    {
+        this.migrations.update(core);
     }
 }

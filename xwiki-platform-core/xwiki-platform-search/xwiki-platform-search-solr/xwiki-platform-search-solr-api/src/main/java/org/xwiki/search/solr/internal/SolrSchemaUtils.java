@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
@@ -215,16 +216,31 @@ public class SolrSchemaUtils
      * 
      * @param core the core to update
      * @param definition the definition of the field to add
-     * @param add true if the field type should be added, false for replace
      * @throws SolrException when failing to add the field
      * @since 16.2.0RC1
      */
-    public void setFieldType(XWikiSolrCore core, FieldTypeDefinition definition, boolean add) throws SolrException
+    public void setFieldType(XWikiSolrCore core, FieldTypeDefinition definition) throws SolrException
     {
-        SolrCoreSchema schema = getSchema(core);
+        setFieldType(core, definition, null);
+    }
+
+    /**
+     * Add a field type in the Solr schema.
+     * 
+     * @param core the core to update
+     * @param definition the definition of the field to add
+     * @param add true or false to explicitly indicate if it's a new field, null to find automatically
+     * @throws SolrException when failing to add the field
+     * @since 17.8.0RC1
+     */
+    public void setFieldType(XWikiSolrCore core, FieldTypeDefinition definition, Boolean add) throws SolrException
+    {
+        String filedName = (String) definition.getAttributes().get(FieldType.TYPE_NAME);
+
+        Map<String, FieldTypeRepresentation> filedTypes = getFieldTypes(core, false);
 
         try {
-            if (add) {
+            if ((add == null && filedTypes.get(filedName) == null) || (add != null && add.equals(Boolean.TRUE))) {
                 new SchemaRequest.AddFieldType(definition).process(core.getClient());
             } else {
                 new SchemaRequest.ReplaceFieldType(definition).process(core.getClient());
@@ -242,7 +258,7 @@ public class SolrSchemaUtils
         representation.setQueryAnalyzer(definition.getQueryAnalyzer());
         representation.setSimilarity(definition.getSimilarity());
 
-        getFieldTypes(core, false).put((String) definition.getAttributes().get(FieldType.TYPE_NAME), representation);
+        filedTypes.put(filedName, representation);
     }
 
     /**
@@ -350,6 +366,189 @@ public class SolrSchemaUtils
     }
 
     /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * String (UTF-8 encoded string or Unicode). Strings are intended for small fields and are not tokenized or analyzed
+     * in any way. They have a hard limit of slightly less than 32K.
+     * 
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 17.8.0RC1
+     */
+    public void setStringField(XWikiSolrCore core, String name, boolean multiValued, boolean dynamic,
+        Object... attributes) throws SolrException
+    {
+        setField(core, name, multiValued ? DefaultSolrUtils.SOLR_TYPE_STRINGS : DefaultSolrUtils.SOLR_TYPE_STRING,
+            dynamic, attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * A general text field that has reasonable, generic cross-language defaults: it tokenizes with StandardTokenizer,
+     * removes stop words from case-insensitive "stopwords.txt" (empty by default), and down cases. At query time only,
+     * it also applies synonyms.
+     * 
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 17.8.0RC1
+     */
+    public void setTextGeneralField(XWikiSolrCore core, String name, boolean multiValued, boolean dynamic,
+        Object... attributes) throws SolrException
+    {
+        setField(core, name,
+            multiValued ? DefaultSolrUtils.SOLR_TYPE_TEXT_GENERALS : DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, dynamic,
+            attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Contains either true or false. Values of "1", "t", or "T" in the first character are interpreted as true. Any
+     * other values in the first character are interpreted as false.
+     * 
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 17.8.0RC1
+     */
+    public void setBooleanField(XWikiSolrCore core, String name, boolean multiValued, boolean dynamic,
+        Object... attributes) throws SolrException
+    {
+        setField(core, name, multiValued ? DefaultSolrUtils.SOLR_TYPE_BOOLEANS : DefaultSolrUtils.SOLR_TYPE_BOOLEAN,
+            dynamic, attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Integer field (32-bit signed integer).
+     * 
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 17.8.0RC1
+     */
+    public void setPIntField(XWikiSolrCore core, String name, boolean multiValued, boolean dynamic,
+        Object... attributes) throws SolrException
+    {
+        setField(core, name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PINTS : DefaultSolrUtils.SOLR_TYPE_PINT, dynamic,
+            attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Floating point field (32-bit IEEE floating point).
+     * 
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 17.8.0RC1
+     */
+    public void setPFloatField(XWikiSolrCore core, String name, boolean multiValued, boolean dynamic,
+        Object... attributes) throws SolrException
+    {
+        setField(core, name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PFLOATS : DefaultSolrUtils.SOLR_TYPE_PFLOAT,
+            dynamic, attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Long field (64-bit signed integer).
+     * 
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 17.8.0RC1
+     */
+    public void setPLongField(XWikiSolrCore core, String name, boolean multiValued, boolean dynamic,
+        Object... attributes) throws SolrException
+    {
+        setField(core, name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PLONGS : DefaultSolrUtils.SOLR_TYPE_PLONG,
+            dynamic, attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Double field (64-bit IEEE floating point).
+     * 
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 17.8.0RC1
+     */
+    public void setPDoubleField(XWikiSolrCore core, String name, boolean multiValued, boolean dynamic,
+        Object... attributes) throws SolrException
+    {
+        setField(core, name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PDOUBLES : DefaultSolrUtils.SOLR_TYPE_PDOUBLE,
+            dynamic, attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Date field. Represents a point in time with millisecond precision.
+     * 
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param multiValued true if the field can contain several values
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 17.8.0RC1
+     */
+    public void setPDateField(XWikiSolrCore core, String name, boolean multiValued, boolean dynamic,
+        Object... attributes) throws SolrException
+    {
+        setField(core, name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PDATES : DefaultSolrUtils.SOLR_TYPE_PDATE,
+            dynamic, attributes);
+    }
+
+    /**
+     * Add or replace a field in the Solr schema.
+     * <p>
+     * Binary data.
+     * 
+     * @param core the core to update
+     * @param name the name of the field to set
+     * @param dynamic true to create a dynamic field
+     * @param attributes attributed to add to the field definition
+     * @throws SolrException when failing to set the field
+     * @since 17.8.0RC1
+     */
+    public void setBinaryField(XWikiSolrCore core, String name, boolean dynamic, Object... attributes)
+        throws SolrException
+    {
+        setField(core, name, DefaultSolrUtils.SOLR_TYPE_BINARY, dynamic, attributes);
+    }
+
+    /**
      * @param core the core to update
      * @param name the name of the field to delete
      * @param dynamic true to delete a dynamic field
@@ -423,5 +622,127 @@ public class SolrSchemaUtils
 
         // Reset the cache
         getSchema(core).reset();
+    }
+
+    private FieldTypeRepresentation getFieldType(XWikiSolrCore core, String name) throws SolrException
+    {
+        return getFieldTypes(core, false).get(name);
+    }
+
+    /**
+     * @param core the core
+     * @param name the name of the version
+     * @return the version, or null if no value could be found for the provided version name
+     * @throws SolrException when failing to get the version
+     * @since 17.8.0RC1
+     */
+    public Long getVersion(XWikiSolrCore core, String name) throws SolrException
+    {
+        FieldTypeRepresentation fieldType = getFieldType(core, name);
+
+        if (fieldType == null) {
+            return null;
+        }
+
+        String value = (String) fieldType.getAttributes().get(SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE);
+
+        return NumberUtils.createLong(value);
+    }
+
+    /**
+     * Add a field type in the Solr schema.
+     * 
+     * @param core the core
+     * @param attributes the attributes of the field to add
+     * @throws SolrException when failing to add the field
+     * @since 17.8.0RC1
+     */
+    public void setFieldType(XWikiSolrCore core, Map<String, Object> attributes) throws SolrException
+    {
+        setFieldType(core, attributes, null);
+    }
+
+    /**
+     * Add a field type in the Solr schema.
+     * 
+     * @param core the core
+     * @param attributes the attributes of the field to add
+     * @param add true or false to explicitly indicate if it's a new field, null to find automatically
+     * @throws SolrException when failing to add the field
+     * @since 17.8.0RC1
+     */
+    public void setFieldType(XWikiSolrCore core, Map<String, Object> attributes, Boolean add) throws SolrException
+    {
+        FieldTypeDefinition definition = new FieldTypeDefinition();
+        definition.setAttributes(attributes);
+
+        setFieldType(core, definition, add);
+    }
+
+    /**
+     * Add a field type in the Solr schema.
+     * 
+     * @param core the core
+     * @param name the name of the field type
+     * @param solrClass the class of the field type
+     * @param attributes the other attributes of the field type
+     * @throws SolrException when failing to add the field
+     * @since 17.8.0RC1
+     */
+    public void setFieldType(XWikiSolrCore core, String name, String solrClass, Object... attributes)
+        throws SolrException
+    {
+        setFieldType(core, name, solrClass, null, attributes);
+    }
+
+    /**
+     * Add a field type in the Solr schema.
+     * 
+     * @param core the core
+     * @param name the name of the field type
+     * @param solrClass the class of the field type
+     * @param add true or false to explicitly indicate if it's a new field, null to find automatically
+     * @param attributes the other attributes of the field type
+     * @throws SolrException when failing to add the field
+     * @since 17.8.0RC1
+     */
+    public void setFieldType(XWikiSolrCore core, String name, String solrClass, Boolean add, Object... attributes)
+        throws SolrException
+    {
+        Map<String, Object> attributesMap = new HashMap<>(2 + (attributes.length > 0 ? attributes.length / 2 : 0));
+
+        attributesMap.put(FieldType.TYPE_NAME, name);
+        attributesMap.put(FieldType.CLASS_NAME, solrClass);
+
+        MapUtils.putAll(attributesMap, attributes);
+
+        setFieldType(core, attributesMap);
+    }
+
+    /**
+     * @param core the core
+     * @param name the name of the version
+     * @param version the version value
+     * @throws SolrException when failing to set the version
+     * @since 17.8.0RC1
+     */
+    public void setVersion(XWikiSolrCore core, String name, long version) throws SolrException
+    {
+        setFieldType(core, name, "solr.ExternalFileField", SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE,
+            String.valueOf(version));
+    }
+
+    /**
+     * @param core the core
+     * @param name the name of the version
+     * @param version the version value
+     * @param add true or false to explicitly indicate if it's a new field, null to find automatically
+     * @throws SolrException when failing to set the version
+     * @since 17.8.0RC1
+     */
+    public void setVersion(XWikiSolrCore core, String name, long version, Boolean add) throws SolrException
+    {
+        setFieldType(core, name, "solr.ExternalFileField", SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE,
+            String.valueOf(version), add);
     }
 }

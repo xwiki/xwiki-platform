@@ -36,6 +36,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
+import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -86,6 +87,9 @@ class IndexerJobTest
 
     @MockComponent
     private DocumentAccessBridge mockDocumentAccessBridge;
+
+    @MockComponent
+    private SolrInstance mockSolrInstance;
 
     @InjectMockComponents
     private IndexerJob indexerJob;

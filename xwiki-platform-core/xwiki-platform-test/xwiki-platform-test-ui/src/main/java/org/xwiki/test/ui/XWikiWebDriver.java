@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
@@ -436,7 +437,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         waitUntilCondition(driver -> {
             try {
                 WebElement element = driver.findElement(locator);
-                return !element.getAttribute(attributeName).isEmpty();
+                return StringUtils.isNotEmpty(element.getAttribute(attributeName));
             } catch (NotFoundException e) {
                 return false;
             } catch (StaleElementReferenceException e) {

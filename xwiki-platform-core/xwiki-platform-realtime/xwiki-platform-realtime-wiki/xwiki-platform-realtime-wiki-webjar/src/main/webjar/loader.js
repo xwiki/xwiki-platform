@@ -19,8 +19,9 @@
  */
 define('xwiki-realtime-wikiEditor-loader', [
   'jquery',
-  'xwiki-realtime-loader'
-], function($, Loader) {
+  'xwiki-realtime-loader',
+  'xwiki-l10n!xwiki-realtime-messages'
+], function($, Loader, Messages) {
   'use strict';
 
   const editorId = 'wiki', info = {
@@ -34,9 +35,24 @@ define('xwiki-realtime-wikiEditor-loader', [
   };
 
   Loader.bootstrap(info).then(realtimeContext => {
-    require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
-      realtimeContext.rtURL = Loader.getEditorURL(window.location.href, info);
-      new RealtimeWikiEditor(realtimeContext);
-    });
+    // "Fail" silently if realtime collaboration is not supported in this context.
+    if (realtimeContext) {
+      return new Promise((resolve, reject) => {
+        require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
+          try {
+            realtimeContext.rtURL = Loader.getEditorURL(window.location.href, info);
+            // TODO: The editor initialization is asynchronous so the resolved value should be a Promise in order to
+            // notify the user in case of errors.
+            resolve(new RealtimeWikiEditor(realtimeContext));
+          } catch (error) {
+            reject(error);
+          }
+        }, reject);
+      });
+    }
+  }).catch(error => {
+    new XWiki.widgets.Notification(Messages['join.error'], 'error');
+    // Provide more details in the console for debugging.
+    console.error(Messages['join.error'], error);
   });
 });

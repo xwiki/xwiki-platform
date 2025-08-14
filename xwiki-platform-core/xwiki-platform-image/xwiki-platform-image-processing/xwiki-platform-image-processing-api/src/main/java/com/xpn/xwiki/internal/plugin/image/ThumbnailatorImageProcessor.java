@@ -58,7 +58,13 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
             // Ensure that nothing is actually resized and there is thus no quality loss.
             .resizer(Resizers.NULL)
             .asBufferedImage();
+
+        // We're computing a second time the image but this time we specify the image type so that we can fallback
+        // on proper type for PNG images.
         return Thumbnails.of(bufferedImage)
+            .scale(1)
+            // Ensure that nothing is actually resized and there is thus no quality loss.
+            .resizer(Resizers.NULL)
             .imageType(getBestImageTypeFor(bufferedImage))
             .asBufferedImage();
     }

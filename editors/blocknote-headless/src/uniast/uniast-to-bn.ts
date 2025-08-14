@@ -190,8 +190,8 @@ export class UniAstToBlockNoteConverter {
           // @ts-expect-error: macros are dynamically added to the AST
           type: `${MACRO_NAME_PREFIX}${block.name}`,
           id: genId(),
-          // @ts-expect-error: macros are dynamically added to the AST so the properties are not typed properly
-          props: block.params,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          props: block.params as any,
         };
 
       default:

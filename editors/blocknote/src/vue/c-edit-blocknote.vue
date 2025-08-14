@@ -130,7 +130,12 @@ async function loadEditor(currentPage: PageData | undefined): Promise<void> {
     // TODO: make this customizable
     // https://jira.xwiki.org/browse/CRISTAL-457
     lang: "en",
-    macros: Object.values(DEFAULT_MACROS),
+    macros: {
+      buildable: Object.values(DEFAULT_MACROS),
+      openMacroParamsEditor(/*macro, params, update*/) {
+        alert("TODO: params editor for macros in Cristal");
+      },
+    },
   };
 
   editorContent.value = markdownToUniAst.parseMarkdown(currentPage.source);

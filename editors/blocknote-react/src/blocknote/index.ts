@@ -115,15 +115,22 @@ function querySuggestionsMenuItems(
       getDefaultReactSlashMenuItems(editor),
 
       // Custom blocks
-      [Heading4, Heading5, Heading6].map((custom) =>
-        custom.slashMenuEntry(editor),
+      filterMap([Heading4, Heading5, Heading6], (custom) =>
+        custom.slashMenuEntry ? custom.slashMenuEntry(editor) : null,
       ),
 
-      // Macros
-      // TODO: decide how to show inline macros as the menu is only shown for block suggestions
+      // Block macros
       filterMap(macros, (macro) =>
-        !macro.hidden && macro.blockNote.type === "block"
+        macro.blockNote.type === "block" && macro.blockNote.block.slashMenuEntry
           ? macro.blockNote.block.slashMenuEntry(editor)
+          : null,
+      ),
+
+      // Inline macros
+      filterMap(macros, (macro) =>
+        macro.blockNote.type === "inline" &&
+        macro.blockNote.inlineContent.slashMenuEntry
+          ? macro.blockNote.inlineContent.slashMenuEntry(editor)
           : null,
       ),
     ),

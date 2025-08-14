@@ -41,11 +41,11 @@ function createCustomHeading(level: 4 | 5 | 6) {
       group: "Headings",
       icon: <>H</>,
       aliases: [],
-      default: {
+      default: () => ({
         type: `Heading${level}`,
-      },
+      }),
     },
-    toolbar: () => null,
+    customToolbar: null,
   });
 }
 

@@ -22,7 +22,7 @@
 
 /* Matches the style of the new object editor */
 #xwikiobjects .fullScreenEditLinkContainer, #xwikiclassproperties .fullScreenEditLinkContainer {
-  margin-right: 10%;
+  margin-right: 0;
 }
 
 .fullScreenWrapper .fullScreenEditLinkContainer {

@@ -43,7 +43,7 @@ widgets.ModalPopup = Class.create({
     this.shortcuts = {
       "show" : { method : this.showDialog, keys : ['Ctrl+G', 'Meta+G']},
       "close" : { method : this.closeDialog, keys : ['Esc']}
-    },
+    };
 
     this.content = content || "Hello world!";
     // Add the new shortcuts
@@ -54,33 +54,41 @@ widgets.ModalPopup = Class.create({
     this.registerShortcuts("show");
   },
   /** Create the dialog, if it is not already loaded. Otherwise, just make it visible again. */
-  createDialog : function(event) {
-    this.dialog = new Element('div', {'class': 'xdialog-modal-container'});
+  createDialog : function() {
+    // The dialog
+    this.dialog = new Element('dialog', {'class': 'xdialog-box'});
     // A full-screen semi-transparent screen covering the main document
-    var screen = new Element('div', {'class': 'xdialog-screen'}).setStyle({
-      opacity : this.options.screenOpacity,
-      backgroundColor : this.options.screenColor
-    });
-    this.dialog.update(screen);
-    // The dialog chrome
-    this.dialogBox = new Element('div', {'class': 'xdialog-box'});
+    if (this.options.screenOpacity > 0) {
+      /* We cannot just change the pseudo element color like that. We need to use a CSS property here. */
+      this.dialog.style.setProperty('--xdialog-backdrop-opacity', this.options.screenColor);
+    }
+    if (this.options.screenColor) {
+      /* We cannot just change the pseudo element color like that. We need to use a CSS property here. */
+      this.dialog.style.setProperty('--xdialog-backdrop-color', this.options.screenColor);
+    }
+    
     if (this.options.extraClassName) {
-      this.dialogBox.addClassName(this.options.extraClassName);
+      this.dialog.addClassName(this.options.extraClassName);
     }
     // Insert the content
-    this.dialogBox._x_contentPlug = new Element('div', {'class' : 'xdialog-content'});
-    this.dialogBox.update(this.dialogBox._x_contentPlug);
-    this.dialogBox._x_contentPlug.update(this.content);
+    this.dialog._x_contentPlug = new Element('div', {'class' : 'xdialog-content'});
+    this.dialog.update(this.dialog._x_contentPlug);
+    this.dialog._x_contentPlug.update(this.content);
     // Add the dialog title
     if (this.options.title) {
       var title = new Element('div', {'class': 'xdialog-title'}).update(this.options.title);
       title.setStyle({"color" : this.options.titleColor});
-      this.dialogBox.insertBefore(title, this.dialogBox.firstChild);
+      this.dialog.insertBefore(title, this.dialog.firstChild);
     }
     // Add the close button
     if (this.options.displayCloseButton) {
-      var closeButton = new Element('button', {'class': 'close xdialog-close', 'title': 'Close'})
+      let closeButtonHint = "$!escapetool.javascript($services.localization.render('core.xdialog.close.hint'))";
+      var closeButton = new Element('button', {'class': 'close xdialog-close', 'title': closeButtonHint})
         .update("$!escapetool.javascript($services.icon.renderHTML('cross'))");
+      let textAlternative = new Element("div", {
+        "class" : "sr-only"
+      }).update(closeButtonHint);
+      closeButton.appendChild(textAlternative);
       closeButton.observe("click", this.closeDialog.bindAsEventListener(this));
       if (this.options.title) {
         title.insert({bottom: closeButton});
@@ -88,38 +96,33 @@ widgets.ModalPopup = Class.create({
           closeButton.setStyle({"color": this.options.titleColor});
         }
       } else {
-        this.dialogBox.insertBefore(closeButton, this.dialogBox.firstChild);
+        this.dialog.insertBefore(closeButton, this.dialog.firstChild);
       }
     }
-    this.dialog.appendChild(this.dialogBox);
-    this.dialogBox.setStyle({
-      "textAlign": "left",
+    this.dialog.setStyle({
       "borderColor": this.options.borderColor,
       "backgroundColor" : this.options.backgroundColor
     });
     switch(this.options.verticalPosition) {
       case "top":
-        this.dialogBox.setStyle({"top": "30px"});
+        this.dialog.setStyle({"margin-top": "30px"});
         break;
       case "bottom":
-        this.dialogBox.setStyle({"bottom": "30px"});
+        this.dialog.setStyle({"margin-bottom": "30px"});
         break;
       default:
-        // TODO: smart alignment according to the actual height
-        this.dialogBox.setStyle({"top": "35%"});
         break;
     }
     switch(this.options.horizontalPosition) {
       case "left":
-        this.dialog.setStyle({"textAlign": "left"});
+        this.dialog.setStyle({"margin-left": "10%", "margin-right": "auto"});
         break;
       case "right":
-        this.dialog.setStyle({"textAlign": "right"});
+        this.dialog.setStyle({"margin-right": "10%", "margin-left": "auto"});
         break;
       default:
-        this.dialog.setStyle({"textAlign": "center"});
-        this.dialogBox.setStyle({"margin": "auto"});
-      break;
+        this.dialog.setStyle({"margin-right": "auto", "margin-left": "auto"});
+        break;
     }
     // Append to the end of the document body.
     $('body').appendChild(this.dialog);
@@ -127,16 +130,16 @@ widgets.ModalPopup = Class.create({
   },
   /** Set a class name to the dialog box */
   setClass : function(className) {
-    this.dialogBox.addClassName('xdialog-box-' + className);
+    this.dialog.addClassName('xdialog-box-' + className);
   },
   /** Remove a class name from the dialog box */
   removeClass : function(className) {
-    this.dialogBox.removeClassName('xdialog-box-' + className);
+    this.dialog.removeClassName('xdialog-box-' + className);
   },
   /** Set the content of the dialog box */
   setContent : function(content) {
      this.content = content;
-     this.dialogBox._x_contentPlug.update(this.content);
+     this.dialog._x_contentPlug.update(this.content);
   },
   /** Called when the dialog is displayed. Enables the key listeners and gives focus to the (cleared) input. */
   showDialog : function(event) {
@@ -164,7 +167,10 @@ widgets.ModalPopup = Class.create({
     // Start listening to keyboard events
     this.attachKeyListeners();
     // Display the dialog
-    this.dialog.show();
+    // We cannot rely on prototype .show() to remove the unwanted style since there's a collision with the 
+    // native HTML dialog method .show()
+    this.dialog.style.removeProperty('display');
+    this.dialog.showModal();
   },
   /** Called when the dialog is closed. Disables the key listeners, hides the UI and re-enables the 'Show' behavior. */
   closeDialog : function(event) {
@@ -236,6 +242,10 @@ widgets.ModalPopup = Class.create({
       "title" : title,
       "id" : id
     });
+    let textAlternative = new Element("div", {
+      "class" : "sr-only"
+    }).update(title);
+    button.appendChild(textAlternative);
     if (extraClass) {
       button.addClassName(extraClass);
     }

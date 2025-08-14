@@ -33,9 +33,24 @@ function init(event, data) {
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 require(["jquery", "xwiki-events-bridge"], ($) => {
-  $(document).on("xwiki:actions:beforePreview xwiki:actions:beforeSave", () => {
+  $(document).on("xwiki:actions:beforePreview xwiki:actions:beforeSave", async (event) => {
     // Make sure that all BlockNote instances update their data before the form is submitted.
-    factory.getAll().forEach((blockNote) => blockNote.data);
+    const dataAsynchronousSerializationKey = 'xwiki-blocknote-asynchronous-serialization';
+    const target = $(event.target);
+    const firstEvent = target.data(dataAsynchronousSerializationKey) !== 'true';
+    // On the first click, prevent the event, let the editors serialize their content asynchronously, then resubmit.
+    // The second programmatically triggered click will just remove the data marker and pass through to let the content
+    // be saved.
+    if (firstEvent) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      target.data(dataAsynchronousSerializationKey, 'true')
+      await Promise.all(factory.getAll().map((blockNote) => blockNote.data()));
+      event.target.click();
+    } else {
+      // Clear the data to let the user click again on save?
+      target.removeData(dataAsynchronousSerializationKey)
+    }
   });
 
   $(document).on("xwiki:dom:updated", init);

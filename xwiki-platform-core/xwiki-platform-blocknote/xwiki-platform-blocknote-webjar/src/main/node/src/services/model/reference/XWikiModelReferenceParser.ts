@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
-import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
+import { ModelReferenceParser, ModelReferenceParserOptions } from "@xwiki/cristal-model-reference-api";
 import { Container, injectable } from "inversify";
 import { toCristalEntityReference } from "./XWikiEntityReference";
 
@@ -51,8 +51,8 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
     container.bind("ModelReferenceParser").to(XWikiModelReferenceParser).inSingletonScope().whenNamed("XWiki");
   }
 
-  public parse(reference: string, type?: EntityType): EntityReference {
-    const defaultType = type === EntityType.ATTACHMENT ? "attach" : "doc";
+  public parse(reference: string, options?: ModelReferenceParserOptions): EntityReference {
+    const defaultType = options?.type === EntityType.ATTACHMENT ? "attach" : "doc";
     const resourceReference = this.parseResourceReference(reference, defaultType);
     const entityType = this.getEntityType(resourceReference);
     if (entityType) {
@@ -61,6 +61,13 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
       throw new Error(`[${reference}] is not an entity reference.`);
     }
   }
+
+    public async parseAsync(
+        reference: string,
+        options?: ModelReferenceParserOptions,
+    ): Promise<EntityReference> {
+      return this.parse(reference, options)
+    }
 
   private parseResourceReference(reference: string, defaultType: string): ResourceReference {
     const parts = reference.split(":");

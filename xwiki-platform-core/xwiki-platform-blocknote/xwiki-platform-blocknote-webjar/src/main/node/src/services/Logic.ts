@@ -96,8 +96,8 @@ export class Logic {
   /**
    * @returns {Data} the data managed by this BlockNote instance
    */
-  get data(): Data {
-    this._data.value = this._root.updateValue();
+  async data(): Promise<Data> {
+    this._data.value = await this._root.updateValue();
     return this._data;
   }
 

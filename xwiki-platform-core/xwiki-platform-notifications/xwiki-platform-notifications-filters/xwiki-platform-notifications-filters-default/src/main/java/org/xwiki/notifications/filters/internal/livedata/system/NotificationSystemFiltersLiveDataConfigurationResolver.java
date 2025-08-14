@@ -25,10 +25,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.AbstractLiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfigurationResolver;
-import org.xwiki.livedata.LiveDataException;
-import org.xwiki.livedata.internal.JSONMerge;
 
 /**
  * Needed component for the live data configuration.
@@ -39,16 +37,15 @@ import org.xwiki.livedata.internal.JSONMerge;
 @Component
 @Singleton
 @Named(NotificationSystemFiltersLiveDataSource.NAME)
-public class NotificationSystemFiltersLiveDataConfigurationResolver implements
-    LiveDataConfigurationResolver<LiveDataConfiguration>
+public class NotificationSystemFiltersLiveDataConfigurationResolver extends AbstractLiveDataConfigurationResolver
 {
     @Inject
     @Named(NotificationSystemFiltersLiveDataSource.NAME)
     private Provider<LiveDataConfiguration> notificationFiltersLiveDataConfigurationProvider;
 
     @Override
-    public LiveDataConfiguration resolve(LiveDataConfiguration input) throws LiveDataException
+    protected LiveDataConfiguration getDefaultConfiguration(LiveDataConfiguration input)
     {
-        return new JSONMerge().merge(input, this.notificationFiltersLiveDataConfigurationProvider.get());
+        return this.notificationFiltersLiveDataConfigurationProvider.get();
     }
 }

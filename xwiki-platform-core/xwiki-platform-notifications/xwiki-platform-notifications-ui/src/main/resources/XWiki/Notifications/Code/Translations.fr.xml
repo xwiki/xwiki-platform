@@ -89,7 +89,7 @@ notifications.filters.preferences.allEvents=Tous les événements (y compris les
 
 ## System Filter preferences settings
 notifications.settings.filters.preferences.system.title=Filtres système
-notifications.settings.filters.preferences.system.hint=Les filtres du système que vous pouvez activer pour avoir un contrôle plus précis des notifications que vous souhaitez recevoir.
+notifications.settings.filters.preferences.system.hint=Filtres systèmes que vous pouvez activer pour avoir un contrôle plus précis des notifications que vous souhaitez recevoir.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=Nom
 notifications.settings.filters.preferences.system.table.filterDescription=Description

@@ -103,6 +103,7 @@
     <xwiki.enforcer.banneddependencytype-xar.skip>${xwiki.enforcer.skip}</xwiki.enforcer.banneddependencytype-xar.skip>
     <xwiki.enforcer.mysql-connector-id.skip>${xwiki.enforcer.skip}</xwiki.enforcer.mysql-connector-id.skip>
     <xwiki.enforcer.enforce-no-old-xwiki-platform.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-no-old-xwiki-platform.skip>
+    <xwiki.enforcer.enforce-commons-httpclient.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-commons-httpclient.skip>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
@@ -1817,6 +1818,27 @@
                     <exclude>org.xwiki.enterprise:xwiki-enterprise-ui-tour</exclude>
                     <exclude>org.xwiki.enterprise:xwiki-enterprise-ui-wiki</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-distribution-flavor</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure we don't use the old commons-httpclient -->
+          <execution>
+            <id>enforce-commons-httpclient</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.enforce-commons-httpclient.skip}</skip>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Best practice is to use org.apache.httpcomponents:httpclient instead of commons-httpclient
+                  </message>
+                  <excludes>
+                    <exclude>commons-httpclient:commons-httpclient</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

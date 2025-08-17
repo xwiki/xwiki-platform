@@ -28,12 +28,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -131,18 +134,25 @@ public class InstallMojo extends AbstractMojo
             Unmarshaller unmarshaller = context.createUnmarshaller();
             Marshaller marshaller = context.createMarshaller();
 
-            HttpClient httpClient = new HttpClient();
-            httpClient.getState().setCredentials(AuthScope.ANY,
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY,
                 new UsernamePasswordCredentials(this.username, this.password));
-            httpClient.getParams().setAuthenticationPreemptive(true);
+            
+            CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultCredentialsProvider(credentialsProvider)
+                .build();
 
-            installExtensions(marshaller, unmarshaller, httpClient);
+            try {
+                installExtensions(marshaller, unmarshaller, httpClient);
+            } finally {
+                httpClient.close();
+            }
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to install Extension(s) into XWiki", e);
         }
     }
 
-    private void installExtensions(Marshaller marshaller, Unmarshaller unmarshaller, HttpClient httpClient)
+    private void installExtensions(Marshaller marshaller, Unmarshaller unmarshaller, CloseableHttpClient httpClient)
         throws Exception
     {
         InstallRequest installRequest = new InstallRequest();
@@ -177,44 +187,38 @@ public class InstallMojo extends AbstractMojo
         JobRequest request = getModelFactory().toRestJobRequest(installRequest);
 
         String uri = String.format("%s/jobs?jobType=install&async=false", this.xwikiRESTURL);
-        PutMethod putMethod = executePutXml(uri, request, marshaller, httpClient);
+        HttpResponse response = executePutXml(uri, request, marshaller, httpClient);
 
         // Verify results
         // Verify that we got a 200 response
-        int statusCode = putMethod.getStatusCode();
+        int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode < 200 || statusCode >= 300) {
             throw new MojoExecutionException(
-                String.format("Job execution failed. Response status code [%s], reason [%s]", statusCode,
-                    putMethod.getResponseBodyAsString()));
+                String.format("Job execution failed. Response status code [%s]", statusCode));
         }
 
         // Get the job status
-        JobStatus jobStatus = (JobStatus) unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
+        JobStatus jobStatus = (JobStatus) unmarshaller.unmarshal(response.getEntity().getContent());
         if (jobStatus.getErrorMessage() != null && jobStatus.getErrorMessage().length() > 0) {
             throw new MojoExecutionException(
                 String.format("Job execution failed. Reason [%s]", jobStatus.getErrorMessage()));
         }
-
-        // Release connection
-        putMethod.releaseConnection();
     }
 
-    private PutMethod executePutXml(String uri, Object object, Marshaller marshaller, HttpClient httpClient)
+    private HttpResponse executePutXml(String uri, Object object, Marshaller marshaller, CloseableHttpClient httpClient)
         throws Exception
     {
-        PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
+        HttpPut httpPut = new HttpPut(uri);
+        httpPut.addHeader("Accept", MediaType.APPLICATION_XML);
 
         StringWriter writer = new StringWriter();
         marshaller.marshal(object, writer);
 
-        RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
-        putMethod.setRequestEntity(entity);
+        StringEntity entity = new StringEntity(writer.toString(), "UTF-8");
+        entity.setContentType(MediaType.APPLICATION_XML);
+        httpPut.setEntity(entity);
 
-        httpClient.executeMethod(putMethod);
-
-        return putMethod;
+        return httpClient.execute(httpPut);
     }
 
     private ModelFactory getModelFactory() throws Exception

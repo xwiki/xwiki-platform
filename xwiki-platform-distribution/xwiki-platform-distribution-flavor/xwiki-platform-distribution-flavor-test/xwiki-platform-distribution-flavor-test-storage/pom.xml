@@ -37,8 +37,9 @@ safely under all foreseeable conditions.
   <dependencies>
 
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.14</version>
       <scope>test</scope>
     </dependency>
 

@@ -70,6 +70,7 @@ const { t } = useI18n({
 function updateCurrentPage() {
   namePlaceholder.value = cristal.getWikiConfig().getNewPageDefaultName();
   name.value = "";
+  existingPage.value = undefined;
 }
 
 // eslint-disable-next-line max-statements

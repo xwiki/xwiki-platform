@@ -45,7 +45,7 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
       linkEditionCtx={linkEditionCtx}
       macros={{
         buildable: Object.values(DEFAULT_MACROS),
-        openMacroParamsEditor(macro, id, params) {
+        openMacroParamsEditor() {
           throw new Error("Macros params editor is not supported");
         },
       }}

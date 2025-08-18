@@ -1,5 +1,16 @@
 # @xwiki/cristal-configuration-web
 
+## 0.21.0
+
+### Minor Changes
+
+- Cristal 0.21 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-configuration-api@0.21.0
+
 ## 0.20.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # @xwiki/cristal-dsfr
 
+## 0.21.0
+
+### Minor Changes
+
+- Cristal 0.21 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.21.0
+  - @xwiki/cristal-dsapi@0.21.0
+
 ## 0.20.0
 
 ### Minor Changes

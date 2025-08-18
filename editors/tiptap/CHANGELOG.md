@@ -1,5 +1,31 @@
 # @xwiki/cristal-editors-tiptap
 
+## 0.21.0
+
+### Minor Changes
+
+- Cristal 0.21 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.21.0
+  - @xwiki/cristal-alerts-api@0.21.0
+  - @xwiki/cristal-authentication-api@0.21.0
+  - @xwiki/cristal-backend-api@0.21.0
+  - @xwiki/cristal-browser-api@0.21.0
+  - @xwiki/cristal-document-api@0.21.0
+  - @xwiki/cristal-icons@0.21.0
+  - @xwiki/cristal-link-suggest-api@0.21.0
+  - @xwiki/cristal-markdown-default@0.21.0
+  - @xwiki/cristal-model-api@0.21.0
+  - @xwiki/cristal-model-reference-api@0.21.0
+  - @xwiki/cristal-model-remote-url-api@0.21.0
+  - @xwiki/cristal-tiptap-extension-image@0.21.0
+  - @xwiki/cristal-tiptap-link-suggest-ui@0.21.0
+  - @xwiki/cristal-dsapi@0.21.0
+  - @xwiki/cristal-skin@0.21.0
+
 ## 0.20.0
 
 ### Minor Changes

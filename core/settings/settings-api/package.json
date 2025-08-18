@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/cristal-settings-api",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
@@ -22,7 +22,6 @@
     "build": "rimraf dist && tsc --project tsconfig.json",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
-
   },
   "types": "./src/index.ts",
   "devDependencies": {

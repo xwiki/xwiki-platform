@@ -1,5 +1,18 @@
 # @xwiki/cristal-rename-filesystem
 
+## 0.21.0
+
+### Minor Changes
+
+- Cristal 0.21 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.21.0
+  - @xwiki/cristal-backend-api@0.21.0
+  - @xwiki/cristal-rename-api@0.21.0
+
 ## 0.20.0
 
 ### Minor Changes

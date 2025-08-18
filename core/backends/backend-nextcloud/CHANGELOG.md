@@ -1,5 +1,21 @@
 # @xwiki/cristal-backend-nextcloud
 
+## 0.21.0
+
+### Minor Changes
+
+- Cristal 0.21 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.21.0
+  - @xwiki/cristal-alerts-api@0.21.0
+  - @xwiki/cristal-authentication-api@0.21.0
+  - @xwiki/cristal-backend-api@0.21.0
+  - @xwiki/cristal-page-default@0.21.0
+  - @xwiki/cristal-utils-inversify@0.21.0
+
 ## 0.20.0
 
 ### Minor Changes

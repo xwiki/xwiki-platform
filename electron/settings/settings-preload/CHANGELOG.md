@@ -1,5 +1,11 @@
 # @xwiki/cristal-electron-settings-preload
 
+## 0.21.0
+
+### Minor Changes
+
+- Cristal 0.21 Release
+
 ## 0.20.0
 
 ### Minor Changes

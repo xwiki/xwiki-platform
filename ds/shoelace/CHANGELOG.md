@@ -1,5 +1,22 @@
 # @xwiki/cristal-dsshoelace
 
+## 0.21.0
+
+### Minor Changes
+
+- Cristal 0.21 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.21.0
+  - @xwiki/cristal-document-api@0.21.0
+  - @xwiki/cristal-hierarchy-api@0.21.0
+  - @xwiki/cristal-icons@0.21.0
+  - @xwiki/cristal-model-api@0.21.0
+  - @xwiki/cristal-model-reference-api@0.21.0
+  - @xwiki/cristal-navigation-tree-api@0.21.0
+
 ## 0.20.0
 
 ### Minor Changes

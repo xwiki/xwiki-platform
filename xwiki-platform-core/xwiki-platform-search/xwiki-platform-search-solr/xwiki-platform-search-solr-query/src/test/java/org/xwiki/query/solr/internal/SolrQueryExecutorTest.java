@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.query.solr;
+package org.xwiki.query.solr.internal;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
@@ -44,7 +44,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.query.internal.DefaultQueryExecutorManager;
 import org.xwiki.query.internal.DefaultQueryManager;
-import org.xwiki.query.solr.internal.SolrQueryExecutor;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;

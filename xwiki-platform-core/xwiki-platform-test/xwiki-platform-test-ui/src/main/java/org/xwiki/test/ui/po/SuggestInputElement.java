@@ -216,9 +216,8 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement waitForSuggestionsClearance()
     {
-        getDriver().waitUntilCondition(driver ->
-            getDriver().findElementsWithoutWaiting(this.container, By.xpath("//*[contains(@class, 'selectize-input') "
-                + "and contains(@class, 'dropdown-active')]")).size() == 0);
+        getDriver().waitUntilCondition(driver -> getDriver()
+            .findElementsWithoutWaiting(this.container, By.cssSelector(".selectize-input.dropdown-active")).isEmpty());
         return this;
     }
 
@@ -318,8 +317,19 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement hideSuggestions()
     {
-        getTextInput().sendKeys(Keys.ESCAPE);
-        waitForSuggestionsClearance();
+        if (isDropDownOpened()) {
+            getTextInput().sendKeys(Keys.ESCAPE);
+            waitForSuggestionsClearance();
+        }
         return this;
+    }
+
+    /**
+     * @return {@code true} if the suggestions dropdown is opened, {@code false} otherwise
+     */
+    public boolean isDropDownOpened()
+    {
+        return !getDriver()
+            .findElementsWithoutWaiting(this.container, By.cssSelector(".selectize-input.dropdown-active")).isEmpty();
     }
 }

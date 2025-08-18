@@ -262,6 +262,19 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Extracted code from HqlQueryExecutor to an abstract base class to facilitate reuse. HqlQueryExecutor is a component implementation so it should be treated as internal, even if it's not inside an internal package.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</old>
+                  <new>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</new>
+                  <superClass>org.xwiki.query.internal.AbstractQueryExecutor</superClass>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

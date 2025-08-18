@@ -23,41 +23,56 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.administration.test.po.AdministrationSectionPage;
 import org.xwiki.test.ui.po.Select;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
- * Represents the actions possible on the Search Suggest administration section.
+ * Represents the actions possible on the search administration section.
  *
  * @version $Id$
+ * @since 17.8.0RC1
  */
-public class SearchSuggestAdministrationPage extends AdministrationSectionPage
+public class SearchAdministrationPage extends AdministrationSectionPage
 {
-    private static final String SECTION_ID = "searchSuggest";
+    private static final String SECTION_ID = "Search";
 
-    @FindBy(id = "XWiki.SearchSuggestConfig_0_activated")
-    private WebElement searchSuggestActivationSelect;
+    @FindBy(id = "XWiki.SearchConfigClass_0_engine")
+    private WebElement searchEngineField;
+
+    @FindBy(id = "XWiki.SearchConfigClass_0_exclusions")
+    private WebElement searchExclusionsField;
 
     /**
-     * Open the Search Suggest administration section.
+     * Open the search administration section.
      *
-     * @return the Search Suggest administration section
+     * @return the search administration section
      */
-    public static SearchSuggestAdministrationPage gotoPage()
+    public static SearchAdministrationPage gotoPage()
     {
         AdministrationSectionPage.gotoPage(SECTION_ID);
-        return new SearchSuggestAdministrationPage();
+        return new SearchAdministrationPage();
     }
 
     /**
      * Default constructor.
      */
-    public SearchSuggestAdministrationPage()
+    public SearchAdministrationPage()
     {
         super(SECTION_ID, true);
     }
 
-    public void setActivated(boolean activated)
+    /**
+     * @return the field used to select the search engine
+     */
+    public Select getSearchEngineField()
     {
-        Select select = new Select(this.searchSuggestActivationSelect);
-        select.selectByValue(activated ? "1" : "0");
+        return new Select(this.searchEngineField);
+    }
+
+    /**
+     * @return the field used to configure search exclusions
+     */
+    public SuggestInputElement getSearchExclusionsField()
+    {
+        return new SuggestInputElement(this.searchExclusionsField);
     }
 }

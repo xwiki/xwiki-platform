@@ -53,21 +53,39 @@ export class NextcloudBasicAuthenticationManager
   async start(): Promise<void> {
     const config = this.cristalApp.getWikiConfig();
 
-    this.authenticationState.callback.value = () => {
-      Cookies.set(
-        this.getAccessTokenCookieKey(config.name),
-        btoa(
-          `${this.authenticationState.username.value}:${this.authenticationState.password.value}`,
-        ),
-        this.cookiesOptions,
+    this.authenticationState.callback = async (): Promise<{
+      success: boolean;
+      status?: number;
+    }> => {
+      const token = btoa(
+        `${this.authenticationState.username.value}:${this.authenticationState.password.value}`,
       );
-      Cookies.set(
-        this.getUserIdCookieKey(config.name),
-        this.authenticationState.username.value,
-        this.cookiesOptions,
-      );
-      // We reload the content on successful login.
-      window.location.reload();
+
+      // We try to access the root folder to check if the login was succesful.
+      const testLoginResponse = await fetch(config.baseRestURL, {
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${token}`,
+        },
+      });
+
+      if (testLoginResponse.ok) {
+        Cookies.set(
+          this.getAccessTokenCookieKey(config.name),
+          token,
+          this.cookiesOptions,
+        );
+        Cookies.set(
+          this.getUserIdCookieKey(config.name),
+          this.authenticationState.username.value,
+          this.cookiesOptions,
+        );
+        // We reload the content on successful login.
+        window.location.reload();
+        return { success: true };
+      } else {
+        return { success: false, status: testLoginResponse.status };
+      }
     };
     this.authenticationState.modalOpened.value = true;
   }

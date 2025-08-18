@@ -22,7 +22,7 @@
 import messages from "../translations";
 import { CristalApp } from "@xwiki/cristal-api";
 import { NextcloudAuthenticationState } from "@xwiki/cristal-authentication-nextcloud-state";
-import { inject, watch } from "vue";
+import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { Ref } from "vue";
 
@@ -38,7 +38,14 @@ const authenticationState = cristal
 const modalOpened: Ref<boolean> = authenticationState.modalOpened;
 const username: Ref<string> = authenticationState.username;
 const password: Ref<string> = authenticationState.password;
-const callback: Ref<() => void> = authenticationState.callback;
+const errorStatus: Ref<number | undefined> = ref(undefined);
+
+async function callback() {
+  const response = await authenticationState.callback();
+  if (!response.success) {
+    errorStatus.value = response.status;
+  }
+}
 
 watch(
   authenticationState.modalOpened,
@@ -46,6 +53,7 @@ watch(
     if (newValue && !oldValue) {
       authenticationState.username.value = "";
       authenticationState.password.value = "";
+      errorStatus.value = undefined;
     }
   },
 );
@@ -58,6 +66,23 @@ watch(
     :title="t('authentication.nextcloud.modal.title')"
   >
     <template #default>
+      <!-- We need 2 different divs to implement the following behavior:
+             - Use max available width from the parent
+             - Do not resize the parent if the content is larger -->
+      <div class="alerts-wrapper">
+        <div class="alerts">
+          <x-alert v-if="errorStatus === 401" type="error">
+            {{ t("authentication.nextcloud.modal.error.invalid") }}
+          </x-alert>
+          <x-alert v-else-if="errorStatus !== undefined" type="error">
+            {{
+              t("authentication.nextcloud.modal.error.generic", {
+                status: errorStatus,
+              })
+            }}
+          </x-alert>
+        </div>
+      </div>
       <x-form id="nextcloud-login-form" @submit="callback">
         <x-text-field
           v-model="username"
@@ -81,3 +106,13 @@ watch(
     </template>
   </x-dialog>
 </template>
+
+<style scoped>
+.alerts-wrapper {
+  display: flex;
+}
+.alerts {
+  flex-grow: 1;
+  width: 0;
+}
+</style>

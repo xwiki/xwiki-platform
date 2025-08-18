@@ -4,5 +4,7 @@
   "authentication.nextcloud.modal.username.help": "Saisissez votre nom d'utilisateur.",
   "authentication.nextcloud.modal.password.label": "Mot de passe",
   "authentication.nextcloud.modal.password.help": "Il n'est pas recommandé de saisir votre mot de passe personnel, vous devriez saisir un mot de passe d'application à la place.",
-  "authentication.nextcloud.modal.submit.label": "Se connecter"
+  "authentication.nextcloud.modal.submit.label": "Se connecter",
+  "authentication.nextcloud.modal.error.invalid": "Nom d'utilisateur ou mot de passe invalide.",
+  "authentication.nextcloud.modal.error.generic": "Échec de la vérification de connexion. Status de la réponse: {status}."
 }

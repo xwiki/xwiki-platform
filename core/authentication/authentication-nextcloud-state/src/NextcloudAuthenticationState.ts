@@ -36,5 +36,8 @@ export class NextcloudAuthenticationState {
   readonly modalOpened: Ref<boolean> = ref(false);
   readonly username: Ref<string> = ref("");
   readonly password: Ref<string> = ref("");
-  readonly callback: Ref<() => void> = ref(() => {});
+  callback: () => Promise<{ success: boolean; status?: number }> =
+    async () => ({
+      success: true,
+    });
 }

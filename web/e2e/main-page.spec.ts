@@ -261,6 +261,17 @@ configs.forEach(
       await expect(newConfiguration.locator(".ds-name")).toContainText(
         "Design System: shoelace",
       );
+
+      // Check exact stored values in local storage.
+      const storedConfiguration = JSON.parse(
+        (await page.evaluate(() => localStorage.getItem("settings"))) ?? "",
+      )["configuration"]["Test Configuration"];
+
+      expect(storedConfiguration).toStrictEqual({
+        configType: "XWiki",
+        name: "Test Configuration",
+        designSystem: "shoelace",
+      });
     });
 
     if (offlineDefaultPage) {

@@ -77,41 +77,57 @@ const { t } = useI18n({
 watch(
   () => props.configurationName,
   () => {
-    if (props.configurationName) {
-      configuration.value = props.configurations.get(props.configurationName);
-      baseUrl.value = (configuration.value!.baseURL ?? "") as string;
-      baseRestUrl.value = (configuration.value!.baseRestURL ?? "") as string;
-      homePage.value = (configuration.value!.homePage ?? "") as string;
-      designSystem.value = (configuration.value!.designSystem ?? "") as string;
-      storageRoot.value = (configuration.value!.storageRoot ?? "") as string;
-      realtimeUrl.value = (configuration.value!.realtimeURL ?? "") as string;
-      authenticationBaseUrl.value = (configuration.value!
+    if (
+      props.configurationName &&
+      props.configurations.has(props.configurationName)
+    ) {
+      configuration.value = props.configurations.get(props.configurationName)!;
+      baseUrl.value = (configuration.value.baseURL ?? "") as string;
+      baseRestUrl.value = (configuration.value.baseRestURL ?? "") as string;
+      homePage.value = (configuration.value.homePage ?? "") as string;
+      designSystem.value = (configuration.value.designSystem ?? "") as string;
+      storageRoot.value = (configuration.value.storageRoot ?? "") as string;
+      realtimeUrl.value = (configuration.value.realtimeURL ?? "") as string;
+      authenticationBaseUrl.value = (configuration.value
         .authenticationBaseURL ?? "") as string;
-      editor.value = (configuration.value!.editor ?? "") as string;
+      editor.value = (configuration.value.editor ?? "") as string;
     }
   },
 );
 
 async function submit() {
-  Object.assign(configuration.value!, {
-    baseURL: baseUrl.value,
-    baseRestURL: baseRestUrl.value,
-    homePage: homePage.value,
-    designSystem: designSystem.value,
-    storageRoot: storageRoot.value,
-    realtimeURL: realtimeUrl.value,
-    authenticationBaseURL: authenticationBaseUrl.value,
-    editor: editor.value ? editor.value : undefined,
-  });
-  settingsManager
-    .get(ConfigurationsSettings)!
-    .content.set(props.configurationName, configuration.value!);
-  await settingsStorage.save(settingsManager);
-  await settingsStorage.load(settingsManager);
-  wikiConfigProxy.setAvailableConfigurations({
-    [props.configurationName]: configuration.value!,
-  });
-  open.value = false;
+  if (configuration.value) {
+    // We want to only reassign the values managed by the current form.
+    Object.assign(configuration.value, {
+      baseURL: baseUrl.value,
+      baseRestURL: baseRestUrl.value,
+      homePage: homePage.value,
+      designSystem: designSystem.value,
+      storageRoot: storageRoot.value,
+      realtimeURL: realtimeUrl.value,
+      authenticationBaseURL: authenticationBaseUrl.value,
+      editor: editor.value,
+    });
+
+    // Clean up all empty and null properties.
+    Object.keys(configuration.value).forEach(
+      (k) =>
+        (configuration.value![k] =
+          configuration.value![k] || configuration.value![k] === false
+            ? configuration.value![k]
+            : undefined),
+    );
+
+    settingsManager
+      .get(ConfigurationsSettings)!
+      .content.set(props.configurationName, configuration.value);
+    await settingsStorage.save(settingsManager);
+    await settingsStorage.load(settingsManager);
+    wikiConfigProxy.setAvailableConfigurations({
+      [props.configurationName]: configuration.value,
+    });
+    open.value = false;
+  }
 }
 </script>
 

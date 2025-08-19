@@ -123,12 +123,7 @@ define('xwiki-realtime-wysiwyg', [
       this._realtimeContext.setRealtimeEnabled(true);
 
       // Listen to local changes and propagate them to the other users.
-      this._editor.onChange(() => {
-        if (this._connection.status === ConnectionStatus.CONNECTED) {
-          this._onLocal();
-          this._saver.contentModifiedLocally();
-        }
-      });
+      this._editor.onChange(this._onLocalContentChange.bind(this));
 
       this._editor.onLock(this._pauseRealtimeSync.bind(this));
       this._editor.onUnlock(() => {
@@ -181,6 +176,16 @@ define('xwiki-realtime-wysiwyg', [
       // Call like `test = easyTest()`
       // Terminate the test like `test.cancel()`
       window.easyTest = this._easyTest.bind(this);
+    }
+
+    _onLocalContentChange() {
+      clearTimeout(this._localContentChangeTimeout);
+      this._localContentChangeTimeout = setTimeout(() => {
+        if (this._connection.status === ConnectionStatus.CONNECTED) {
+          this._onLocal();
+          this._saver.contentModifiedLocally();
+        }
+      }, 100);
     }
 
     _createToolbar() {

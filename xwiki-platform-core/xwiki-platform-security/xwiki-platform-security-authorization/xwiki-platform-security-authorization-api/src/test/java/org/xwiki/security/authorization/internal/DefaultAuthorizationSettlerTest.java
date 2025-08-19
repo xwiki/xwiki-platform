@@ -48,6 +48,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
@@ -153,12 +154,12 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     {
         assertThat(message + " - user", actual.getUserReference(), equalTo(user));
         assertThat(message + " - entity", actual.getReference(), equalTo(entity));
-        for (Right right : Right.values()) {
+        assertAll(Right.values().stream().map(right -> () -> {
             if (access.get(right) != UNDETERMINED) {
                 assertThat(message + " - Right(" + right.getName() + ")",
                     actual.getAccess().get(right), equalTo(access.get(right)));
             }
-        }
+        }));
     }
 
     @Test
@@ -718,5 +719,140 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
                 getMockedSecurityRuleEntries("allrights",
                     xattachmentRef,
                     Collections.singletonList(Collections.singletonList(allowAllTestRightsRulesToXuser)))));
+    }
+
+    @Test
+    void testDenyViewImpliesDenyEditDeleteComment() throws Exception
+    {
+        XWikiSecurityAccess viewDenied = this.defaultAccess.clone();
+        viewDenied.deny(Right.EDIT);
+        viewDenied.deny(Right.DELETE);
+        viewDenied.deny(Right.VIEW);
+        viewDenied.deny(Right.COMMENT);
+
+        assertAccess("When view is denied, deny edit, delete and comment",
+            this.userRef, this.docRef, viewDenied,
+            this.authorizationSettler.settle(this.userRef, List.of(this.groupRef),
+                getMockedSecurityRuleEntries("viewDenied",
+                    this.docRef,
+                    List.of(List.of(getMockedSecurityRule(
+                        "denyView",
+                        List.of(this.userRef),
+                        List.of(),
+                        List.of(Right.VIEW),
+                        DENY))))));
+    }
+
+    @Test
+    void testImplicitDenyViewImpliesDenyEditDeleteComment() throws Exception
+    {
+        XWikiSecurityAccess viewDenied = this.defaultAccess.clone();
+        viewDenied.deny(Right.EDIT);
+        viewDenied.deny(Right.VIEW);
+        viewDenied.deny(Right.COMMENT);
+
+        assertAccess("When view is implicitly denied, deny edit, delete and comment",
+            this.userRef, this.docRef, viewDenied,
+            this.authorizationSettler.settle(this.userRef, List.of(this.groupRef),
+                getMockedSecurityRuleEntries("viewAnotherUser",
+                    this.docRef,
+                    List.of(List.of(getMockedSecurityRule(
+                        "implicitDenyView",
+                        List.of(this.anotherUserRef),
+                        List.of(),
+                        List.of(Right.VIEW),
+                        ALLOW))))));
+    }
+
+    @Test
+    void testSpaceAdminPreventsDenyDocumentView() throws Exception
+    {
+        XWikiSecurityAccess adminAllowed = this.defaultAccess.clone();
+        adminAllowed.allow(Right.ADMIN);
+        adminAllowed.allow(Right.SCRIPT);
+        adminAllowed.allow(Right.DELETE);
+
+        assertAccess("When space admin right is allowed, allow view regardless of deny view on document",
+            this.userRef, this.docRef, adminAllowed,
+            this.authorizationSettler.settle(this.userRef, List.of(this.groupRef),
+                getMockedSecurityRuleEntries("adminAllowed",
+                    this.docRef,
+                    List.of(List.of(
+                        getMockedSecurityRule(
+                            "denyDocumentView",
+                            List.of(this.userRef),
+                            List.of(),
+                            List.of(Right.VIEW),
+                            DENY)
+                    ), List.of(
+                        getMockedSecurityRule(
+                            "allowSpaceAdmin",
+                            List.of(this.userRef),
+                            List.of(),
+                            List.of(Right.ADMIN),
+                            ALLOW)
+                    )))));
+    }
+
+    @Test
+    void testSpaceAdminPreventsDenySpaceView() throws Exception
+    {
+        XWikiSecurityAccess adminAllowed = this.defaultAccess.clone();
+        adminAllowed.allow(Right.ADMIN);
+        adminAllowed.allow(Right.SCRIPT);
+        adminAllowed.allow(Right.DELETE);
+
+        assertAccess("When space admin right is allowed, allow view regardless of deny view on space",
+            this.userRef, this.spaceRef, adminAllowed,
+            this.authorizationSettler.settle(this.userRef, List.of(this.groupRef),
+                getMockedSecurityRuleEntries("allowSpaceAdmin",
+                    this.docRef,
+                    List.of(
+                        List.of(),
+                        List.of(
+                            getMockedSecurityRule(
+                                "denySpaceView",
+                                List.of(this.userRef),
+                                List.of(),
+                                List.of(Right.VIEW),
+                                DENY),
+                            getMockedSecurityRule(
+                                "allowSpaceAdmin",
+                                List.of(this.userRef),
+                                List.of(),
+                                List.of(Right.ADMIN),
+                                ALLOW)
+                        )
+                    ))));
+    }
+
+    @Test
+    void testCreatorIsDeniedDeleteViewWhenViewIsDenied() throws Exception
+    {
+        XWikiSecurityAccess viewDenied = this.defaultAccess.clone();
+        viewDenied.deny(Right.EDIT);
+        viewDenied.deny(Right.VIEW);
+        viewDenied.deny(Right.COMMENT);
+        viewDenied.allow(Right.CREATOR);
+
+        assertAccess("When creator right is allowed, allow view regardless of deny view",
+            this.userRef, this.docRef, viewDenied,
+            this.authorizationSettler.settle(this.userRef, List.of(this.groupRef),
+                getMockedSecurityRuleEntries("creatorAllowed",
+                    this.docRef,
+                    List.of(List.of(
+                        getMockedSecurityRule(
+                            "allowCreator",
+                            List.of(this.userRef),
+                            List.of(),
+                            List.of(Right.CREATOR),
+                            ALLOW),
+                        getMockedSecurityRule(
+                            "denyView",
+                            List.of(this.userRef),
+                            List.of(),
+                            List.of(Right.VIEW),
+                            DENY)
+                    )))));
     }
 }

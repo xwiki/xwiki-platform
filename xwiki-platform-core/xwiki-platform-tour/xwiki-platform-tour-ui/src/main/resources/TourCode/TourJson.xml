@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>{{include reference="TourCode.Macros"/}}
 
-{{velocity}}
+    {{velocity wiki="false"}}
 #if ($xcontext.action == 'get')
   ##--------------------------------------------------------
   ## Get the tour steps corresponding to the target page

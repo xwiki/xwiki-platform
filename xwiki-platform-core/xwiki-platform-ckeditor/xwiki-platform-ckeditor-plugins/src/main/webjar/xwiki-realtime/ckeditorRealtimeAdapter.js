@@ -101,7 +101,7 @@ define('xwiki-ckeditor-realtime-adapter', [
 
       let updatedNodes = [];
       try {
-        this._protectWidgets(this._ckeditor.widgets.instances);
+        this._protectWidgets(this._ckeditor.widgets.instances, this.getContentWrapper());
         updatedNodes = updater(this.getContentWrapper());
       } finally {
         await this._updateWidgets(updatedNodes);
@@ -151,7 +151,7 @@ define('xwiki-ckeditor-realtime-adapter', [
       const fixedHTML = this._ckeditor.dataProcessor.toHtml(html);
       const doc = new DOMParser().parseFromString(fixedHTML, 'text/html');
       const widgets = this._initializeWidgets(doc.body);
-      this._protectWidgets(widgets);
+      this._protectWidgets(widgets, doc.body);
       return this._ensureSameContentWrapper(doc.body);
     }
 
@@ -197,6 +197,9 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     _initializeWidgets(contentWrapper) {
       const widgets = this._ckeditor.widgets.instances;
+      const restoreTasks = [() => {
+        this._ckeditor.widgets.instances = widgets;
+      }];
       try {
         this._ckeditor.widgets.instances = {};
 
@@ -204,6 +207,19 @@ define('xwiki-ckeditor-realtime-adapter', [
         // doesn't have to be fully initialized (enhanced) by dedicated JavaScript code.
         contentWrapper.querySelectorAll('.macro[data-macro]').forEach(macroElement => {
           macroElement.dataset.xwikiDomUpdated = 'true';
+        });
+        Object.values(this._ckeditor.widgets.registered).forEach(widgetDef => {
+          if (widgetDef.hasOwnProperty('draggable')) {
+            const wasDraggable = widgetDef.draggable;
+            restoreTasks.push(() => {
+              widgetDef.draggable = wasDraggable;
+            });
+          } else {
+            restoreTasks.push(() => {
+              delete widgetDef.draggable;
+            });
+          }
+          widgetDef.draggable = false;
         });
 
         this._ckeditor.widgets.initOnAll(new this._CKEDITOR.dom.element(contentWrapper));
@@ -223,11 +239,40 @@ define('xwiki-ckeditor-realtime-adapter', [
 
         return this._ckeditor.widgets.instances;
       } finally {
-        this._ckeditor.widgets.instances = widgets;
+        restoreTasks.forEach(task => task());
       }
     }
 
-    _protectWidgets(widgets) {
+    _updateDetached(element, updater) {
+      let attachElement = () => {};
+      if (element?.parentNode) {
+        if (element.nextSibling) {
+          const nextSibling = element.nextSibling;
+          attachElement = () => {
+            nextSibling.before(element);
+          };
+        } else {
+          const parentNode = element.parentNode;
+          attachElement = () => {
+            parentNode.append(element);
+          };
+        }
+        element.remove();
+      }
+      try {
+        updater();
+      } finally {
+        attachElement();
+      }
+    }
+
+    _protectWidgets(widgets, root) {
+      this._updateDetached(root, () => {
+        this._protectWidgetsDetached(widgets);
+      });
+    }
+
+    _protectWidgetsDetached(widgets) {
       // Cache the widgets so that we can restore them after the content is updated.
       Object.assign(this._widgetCache, widgets);
       Object.values(widgets).forEach(widget => {
@@ -254,50 +299,14 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     _restoreWidgets() {
-      this.getContentWrapper().querySelectorAll('.xwiki-widget').forEach(widgetPlaceholder => {
-        const widget = this._widgetCache[widgetPlaceholder.dataset.widgetId];
-        if (widget) {
-          // Restore the widget wrapper.
-          widgetPlaceholder.replaceWith(widget.wrapper.$);
-          // Update the widget data (which may have been modified as a result of a remote change). Note that this may
-          // add or remove widget editables (e.g. when the image widget data is modified to enable the image caption the
-          // caption editable is added).
-          let widgetData = widgetPlaceholder.getAttribute('value');
-          // Widget#setData() checks if the data has changed before firing the data event, but unfortunately the code
-          // expects the data values to be primitives, which is not the case for macro widget data where the parameters
-          // data is an object and this makes the check always return false. The problem with this is that when the data
-          // event is fired the scroll postion is updated, making it hard to scroll the content while remote changes are
-          // applied (the scroll bar jumps). So we have to check ourselves if the data has changed.
-          if (widgetData !== this._serializeWidgetData(widget)) {
-            widgetData = JSON.parse(widgetData);
-            widget.setData(widgetData);
+      const contentWrapper = this.getContentWrapper();
+      this._updateDetached(contentWrapper, () => {
+        contentWrapper.querySelectorAll('.xwiki-widget').forEach(widgetPlaceholder => {
+          const widget = this._widgetCache[widgetPlaceholder.dataset.widgetId];
+          if (widget) {
+            this._restoreWidget(widget, widgetPlaceholder);
           }
-
-          // Restore the content of the widget editables.
-          widgetPlaceholder.querySelectorAll(':scope > xwiki-editable').forEach(editablePlaceholder => {
-            const editableName = editablePlaceholder.getAttribute('name');
-            let editable = widget.editables[editableName]?.$;
-            if (!editable && widget.name === 'xwiki-macro') {
-              // Macro widgets are rendered server-side so setting the widget data above doesn't create the editables.
-              // We need create the editables ourselves under the widget element so that they get submitted to the
-              // server when the content is refreshed (in order to be taken into account when rendering the macros).
-              editable = widgetPlaceholder.ownerDocument.createElement('div');
-              editable.classList.add('xwiki-metadata-container');
-              editable.dataset.xwikiNonGeneratedContent = editablePlaceholder.dataset.contentType;
-              editable.dataset.xwikiParameterName = editableName;
-              widget.element.$.append(editable);
-              widget.initEditable(editableName, {
-                selector: `[data-xwiki-parameter-name="${CSS.escape(editableName)}"]`
-              });
-            }
-            if (editable) {
-              // The editable should be empty, unless it was just initialized above in which case it may contain an
-              // empty paragraph that we want to get rid of (we want only the content from the editable placeholder).
-              editable.innerHTML = '';
-              editable.append(...editablePlaceholder.childNodes);
-            }
-          });
-        }
+        });
       });
 
       // Update the widget instances to include the restored widgets, and destroy the detached widgets.
@@ -314,6 +323,49 @@ define('xwiki-ckeditor-realtime-adapter', [
 
       // We only need to cache the widgets until they are restored.
       this._widgetCache = {};
+    }
+
+    _restoreWidget(widget, widgetPlaceholder) {
+      // Restore the widget wrapper.
+      widgetPlaceholder.replaceWith(widget.wrapper.$);
+      // Update the widget data (which may have been modified as a result of a remote change). Note that this may add or
+      // remove widget editables (e.g. when the image widget data is modified to enable the image caption the caption
+      // editable is added).
+      let widgetData = widgetPlaceholder.getAttribute('value');
+      // Widget#setData() checks if the data has changed before firing the data event, but unfortunately the code
+      // expects the data values to be primitives, which is not the case for macro widget data where the parameters data
+      // is an object and this makes the check always return false. The problem with this is that when the data event is
+      // fired the scroll postion is updated, making it hard to scroll the content while remote changes are applied (the
+      // scroll bar jumps). So we have to check ourselves if the data has changed.
+      if (widgetData !== this._serializeWidgetData(widget)) {
+        widgetData = JSON.parse(widgetData);
+        widget.setData(widgetData);
+      }
+
+      // Restore the content of the widget editables.
+      widgetPlaceholder.querySelectorAll(':scope > xwiki-editable').forEach(editablePlaceholder => {
+        const editableName = editablePlaceholder.getAttribute('name');
+        let editable = widget.editables[editableName]?.$;
+        if (!editable && widget.name === 'xwiki-macro') {
+          // Macro widgets are rendered server-side so setting the widget data above doesn't create the editables. We
+          // need create the editables ourselves under the widget element so that they get submitted to the server when
+          // the content is refreshed (in order to be taken into account when rendering the macros).
+          editable = widgetPlaceholder.ownerDocument.createElement('div');
+          editable.classList.add('xwiki-metadata-container');
+          editable.dataset.xwikiNonGeneratedContent = editablePlaceholder.dataset.contentType;
+          editable.dataset.xwikiParameterName = editableName;
+          widget.element.$.append(editable);
+          widget.initEditable(editableName, {
+            selector: `[data-xwiki-parameter-name="${CSS.escape(editableName)}"]`
+          });
+        }
+        if (editable) {
+          // The editable should be empty, unless it was just initialized above in which case it may contain an empty
+          // paragraph that we want to get rid of (we want only the content from the editable placeholder).
+          editable.innerHTML = '';
+          editable.append(...editablePlaceholder.childNodes);
+        }
+      });
     }
 
     _serializeWidgetData(widget) {

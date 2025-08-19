@@ -20,6 +20,9 @@
 package org.xwiki.officeimporter.server;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
+
+import java.util.Optional;
 
 /**
  * Configuration properties for the {@link OfficeServer}. They are defined in XWiki's global configuration file using
@@ -47,6 +50,14 @@ public interface OfficeServerConfiguration
     int SERVER_TYPE_EXTERNAL_REMOTE = 2;
 
     /**
+     * Default host name of the office server instance.
+     * Coming from org.jodconverter.local.office.ExternalOfficeManager.DEFAULT_HOSTNAME
+     * @since 16.10.0RC1
+     * @since 16.4.5
+     */
+    String DEFAULT_SERVER_HOST = "127.0.0.1";
+
+    /**
      * Returns the type of the office server instance consumed by office importer module:
      * <ul>
      * <li>0 - Internally managed server instance</li>
@@ -57,6 +68,20 @@ public interface OfficeServerConfiguration
      * @return type of the office server used by the office importer module
      */
     int getServerType();
+
+    /**
+     * Returns the hostname of the office server instance, used only when the office server is externally managed and
+     * remotely deployed.
+     * @return the hostname of the office server instance
+     * @since 16.10.0RC1
+     * @since 16.4.6
+     */
+    @Unstable
+    default String getServerHost()
+    {
+        // Coming from org.jodconverter.local.office.ExternalOfficeManager.DEFAULT_HOSTNAME
+        return DEFAULT_SERVER_HOST;
+    }
 
     /**
      * @return the port number used for connecting to the office server instance
@@ -90,6 +115,18 @@ public interface OfficeServerConfiguration
      * @return the path to office server execution profile, {@code null} by default
      */
     String getProfilePath();
+
+    /**
+     * @return the path where the files are exchanged between XWiki and the office server (if absent or blank: use the
+     * default environment temporary directory)
+     * @since 16.10.0RC1
+     * @since 16.4.6
+     */
+    @Unstable
+    default Optional<String> getWorkDir()
+    {
+        return Optional.empty();
+    }
 
     /**
      * @return the maximum number of simultaneous conversion tasks to be handled by a single office process instance

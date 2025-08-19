@@ -21,6 +21,7 @@ package org.xwiki.officeimporter.internal.server;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -90,6 +91,12 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     }
 
     @Override
+    public String getServerHost()
+    {
+        return this.configuration.getProperty(PREFIX + "host", DEFAULT_SERVER_HOST);
+    }
+
+    @Override
     public int getServerPort()
     {
         return this.configuration.getProperty(PREFIX + "serverPort", DEFAULT_SERVER_PORT);
@@ -132,6 +139,12 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
         }
         
         return homePath;
+    }
+
+    @Override
+    public Optional<String> getWorkDir()
+    {
+        return Optional.ofNullable(this.configuration.getProperty(PREFIX + "workDir"));
     }
 
     @Override

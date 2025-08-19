@@ -172,7 +172,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         textArea.sendKeys("zero");
 
         // Wait for auto-save.
-        assertEquals(SaveStatus.UNSAVED, inplaceEditablePage.getToolbar().getSaveStatus());
+        inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
         inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
 
         inplaceEditablePage.done();

@@ -31,6 +31,9 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.securityfilter.filter.SecurityRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
@@ -55,6 +58,8 @@ import com.xpn.xwiki.user.api.XWikiUser;
  */
 public class XWikiContextInitializationFilter implements Filter
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiContextInitializationFilter.class);
+
     /**
      * XWiki context mode.
      */
@@ -146,6 +151,10 @@ public class XWikiContextInitializationFilter implements Filter
 
             // Initialize the current user.
             XWikiUser user = context.getWiki().checkAuth(context);
+            LOGGER.warn("Obtained user principal from XWikiRequest after check auth: [{}] User in session [{}]",
+                xwikiRequest.getUserPrincipal(),
+                xwikiRequest.getSession().getAttribute(SecurityRequestWrapper.PRINCIPAL_SESSION_KEY));
+            LOGGER.warn("XWiki user {} is authenticated", user);
             if (user != null) {
                 DocumentReference userReference = user.getUserReference();
                 context.setUserReference(

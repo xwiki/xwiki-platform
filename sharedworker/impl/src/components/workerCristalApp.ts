@@ -21,7 +21,7 @@
 import { DefaultLogger } from "@xwiki/cristal-api";
 import { injectable } from "inversify";
 import type {
-  CristalApp as CristalApp,
+  CristalApp,
   Logger,
   LoggerConfig,
   PageData,
@@ -152,10 +152,6 @@ export class WorkerCristalApp implements CristalApp {
   }
 
   getLoggerConfig(): LoggerConfig {
-    throw new Error("Method not implemented.");
-  }
-
-  renderContent(): Promise<string> {
     throw new Error("Method not implemented.");
   }
 }

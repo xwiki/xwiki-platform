@@ -24,6 +24,8 @@ import fs from "fs";
 
 const app = express();
 
+const __dirname = import.meta.dirname;
+
 app.use("/", express.static(path.resolve(__dirname, "../dist")));
 
 app.get(/.*/, function (req, res) {

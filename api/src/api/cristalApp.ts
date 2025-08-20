@@ -117,11 +117,4 @@ export interface CristalApp {
   getLogger(module: string): Logger;
 
   getLoggerConfig(): LoggerConfig;
-
-  renderContent(
-    source: string,
-    sourceSyntax: string,
-    targetSyntax: string,
-    wikiConfig: WikiConfig,
-  ): Promise<string>;
 }

@@ -38,7 +38,6 @@ import { ComponentInit as DefaultPageHistoryComponentInit } from "@xwiki/cristal
 import { ComponentInit as HistoryUIComponentInit } from "@xwiki/cristal-history-ui";
 import { ComponentInit as InfoActionsComponentInit } from "@xwiki/cristal-info-actions-default";
 import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-api";
-import { ComponentInit as MacrosComponentInit } from "@xwiki/cristal-macros";
 import { ComponentInit as MarkdownDefaultComponentInit } from "@xwiki/cristal-markdown-default";
 import { ComponentInit as ClickListenerComponentInit } from "@xwiki/cristal-model-click-listener";
 import { ComponentInit as ModelReferenceAPIComponentInit } from "@xwiki/cristal-model-reference-api";
@@ -47,7 +46,6 @@ import { ComponentInit as DefaultNavigationTreeComponentInit } from "@xwiki/cris
 import { ComponentInit as ActionsPagesComponentInit } from "@xwiki/cristal-page-actions-default";
 import { ComponentInit as ActionsPagesUIComponentInit } from "@xwiki/cristal-page-actions-ui";
 import { ComponentInit as RenameComponentInit } from "@xwiki/cristal-rename-default";
-import { ComponentInit as RenderingComponentInit } from "@xwiki/cristal-rendering";
 import { ComponentInit as SettingsConfigurationsComponentInit } from "@xwiki/cristal-settings-configurations";
 import { ComponentInit as SettingsConfigurationsUIComponentInit } from "@xwiki/cristal-settings-configurations-ui";
 import { ComponentInit as SettingsComponentInit } from "@xwiki/cristal-settings-default";
@@ -66,10 +64,8 @@ import type { Container } from "inversify";
 // eslint-disable-next-line max-statements
 async function defaultComponentsList(container: Container): Promise<void> {
   new SkinComponentInit(container);
-  new MacrosComponentInit(container);
   new XWikiBackendComponentInit(container);
   new NextcloudBackendComponentInit(container);
-  new RenderingComponentInit(container);
   new MenuButtonsComponentInit(container);
   new ExtraTabsComponentInit(container);
   new InfoActionsComponentInit(container);

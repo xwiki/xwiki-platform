@@ -19,13 +19,10 @@
  */
 
 import "reflect-metadata";
-import Blog from "../vue/c-blog.vue";
 import Config from "../vue/c-config.vue";
 import Content from "../vue/c-content.vue";
 import Edit from "../vue/c-edit.vue";
 import Main from "../vue/c-main.vue";
-import Movie from "../vue/c-movie.vue";
-import Panel from "../vue/c-panel.vue";
 import Sidebar from "../vue/c-sidebar.vue";
 import View from "../vue/c-view.vue";
 import { injectable } from "inversify";
@@ -49,11 +46,8 @@ export class DefaultSkinManager implements SkinManager {
     this.templates.set("config", Config);
     this.templates.set("sidebar", Sidebar);
     this.templates.set("content", Content);
-    this.templates.set("panel", Panel);
     this.templates.set("main", Main);
     this.templates.set("edit", Edit);
-    this.templates.set("blog", Blog);
-    this.templates.set("movie", Movie);
   }
 
   public setDesignSystem(designSystem: string): void {

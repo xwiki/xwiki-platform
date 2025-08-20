@@ -21,7 +21,6 @@ package org.xwiki.query.solr.internal;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -42,8 +41,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.SecureQuery;
+import org.xwiki.query.internal.AbstractQueryExecutor;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -62,7 +61,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named(SolrQueryExecutor.SOLR)
 @Singleton
-public class SolrQueryExecutor implements QueryExecutor
+public class SolrQueryExecutor extends AbstractQueryExecutor
 {
     /**
      * Query language ID.
@@ -106,6 +105,7 @@ public class SolrQueryExecutor implements QueryExecutor
     private JobProgressManager progress;
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> List<T> execute(Query query) throws QueryException
     {
         this.progress.startStep(query, "query.solr.progress.execute", "Execute Solr query [{}]", query);
@@ -114,7 +114,7 @@ public class SolrQueryExecutor implements QueryExecutor
         try {
             this.progress.startStep(query, "query.solr.progress.execute.prepare", "Prepare");
 
-            SolrQuery solrQuery = createSolrQuery(query);
+            SolrQuery solrQuery = createSolrQuery(filterQuery(query, SOLR));
 
             this.progress.startStep(query, "query.solr.progress.execute.execute", "Execute");
 
@@ -128,7 +128,6 @@ public class SolrQueryExecutor implements QueryExecutor
             // information (facets, highlighting, maxScore, etc.) is still relevant.
             // A better way would be using a PostFilter as described in this article:
             // http://java.dzone.com/articles/custom-security-filtering-solr
-            // Basically, we would be asking
             List<DocumentReference> usersToCheck = new ArrayList<>(2);
             if (query instanceof SecureQuery) {
                 if (((SecureQuery) query).isCurrentUserChecked()) {
@@ -145,7 +144,7 @@ public class SolrQueryExecutor implements QueryExecutor
                 filterResponse(response, usersToCheck);
             }
 
-            return (List<T>) Arrays.asList(response);
+            return filterResults(query, (List<T>) List.of(response));
         } catch (Exception e) {
             throw new QueryException("Exception while executing query", query, e);
         } finally {

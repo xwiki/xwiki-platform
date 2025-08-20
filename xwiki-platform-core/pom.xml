@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -259,6 +259,19 @@
                   <old>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.spaces.SpaceSearchResource::search(java.lang.String, java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;, ===java.lang.Integer===, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
                   <new>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.spaces.SpaceSearchResource::search(java.lang.String, java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;, ===java.lang.Integer===, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
                   <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Extracted code from HqlQueryExecutor to an abstract base class to facilitate reuse. HqlQueryExecutor is a component implementation so it should be treated as internal, even if it's not inside an internal package.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</old>
+                  <new>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</new>
+                  <superClass>org.xwiki.query.internal.AbstractQueryExecutor</superClass>
                 </item>
               </differences>
             </revapi.differences>

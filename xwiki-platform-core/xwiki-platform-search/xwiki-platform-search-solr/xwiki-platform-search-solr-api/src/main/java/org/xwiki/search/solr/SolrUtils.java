@@ -200,8 +200,6 @@ public interface SolrUtils
      */
     void set(String fieldName, Collection<?> fieldValue, SolrInputDocument document);
 
-
-
     /**
      * Store in the document the value associated with the passed field name.
      * <p>
@@ -291,7 +289,6 @@ public interface SolrUtils
     {
         return toFilterQueryString(fieldValue, valueType);
     }
-
 
     /**
      * Extract from the document the value associated with the passed field name.

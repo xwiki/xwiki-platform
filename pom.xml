@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>17.7.0-SNAPSHOT</version>
+  <version>17.8.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -61,12 +61,12 @@
     <tika.version>2.9.4</tika.version>
     <pdfbox.version>2.0.34</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.24</jetty.server.version>
-    <jetty.client.version>10.0.25</jetty.client.version>
+    <jetty.server.version>12.0.25</jetty.server.version>
+    <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.2.Final</netty.version>
+    <netty.version>4.2.4.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.5.3</dockerJava.version>
+    <dockerJava.version>3.6.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>

@@ -58,6 +58,15 @@ class ThumbnailatorImageProcessorTest
     }
 
     @Test
+    void readImageWithPNG() throws IOException
+    {
+        try (InputStream imageInput = getClass().getResourceAsStream("/test.png")) {
+            Image image = this.imageProcessor.readImage(imageInput);
+            assertEquals(BufferedImage.TYPE_4BYTE_ABGR, ((BufferedImage) image).getType(), "Improper image type");
+        }
+    }
+
+    @Test
     void changeAspectRatio()
     {
         Image image = createImage(20, 20, new Color(37, 220, 182));

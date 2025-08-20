@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Main.SolrSearchMacros" locale="">
+<xwikidoc version="1.6" reference="Main.SolrSearchMacros" locale="">
   <web>Main</web>
   <name>SolrSearchMacros</name>
   <language/>
@@ -632,9 +632,10 @@ $services.localization.render('core.users.unknownUser')##
   ## Set query parameters.
   #set ($discard = $query.setLimit($rows))
   #set ($discard = $query.setOffset($start))
+  #set ($discard = $query.addFilter('searchExclusions/solr'))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
   #set ($discard = $query.bindValue('tie', $solrConfig.tieBreaker))
-  #set ($discard = $query.bindValue('mm', $solrConfig.minShouldMatch))  
+  #set ($discard = $query.bindValue('mm', $solrConfig.minShouldMatch))
   #setQueryFields($query)
   #setPhraseFields($query)
   #setFacetFields($query)

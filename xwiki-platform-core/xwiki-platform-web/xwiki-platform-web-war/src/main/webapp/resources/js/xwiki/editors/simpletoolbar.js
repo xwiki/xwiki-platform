@@ -19,77 +19,89 @@
  */
 require(['jquery'], function ($) {
   class SimpleToolbar {
-      constructor()
-      {
-          $('textarea').each(this.initTextarea);
-      };
+    constructor()
+    {
+      let self = this;
+      self._insertTagFunction = self._defaultInsertTag;
+      $('textarea').each(function() {
+          self._initTextarea($(this), self);
+      });
+      $(document).on('xwiki:dom:updated', function (event, data) {
+        $(data.elements).find('textarea').each(function() {
+          self._initTextarea($(this), self);
+        });
+      })
+    }
 
-      insertTag = function(textarea, tagOpen, tagClose, sampleText) {
-          let startPos = textarea.selectionStart;
-          let endPos = textarea.selectionEnd;
-          let scrollTop = textarea.scrollTop;
-          let textareaVal = $(textarea).val();
-          let subst, myText = (textareaVal).substring(startPos, endPos);
-          if (!myText) {
-              myText = sampleText;
-          }
-          if (myText.charAt(myText.length - 1) === " ") {
-              // exclude ending space char, if any
-              subst = tagOpen + myText.substring(0, (myText.length - 1)) + tagClose + " ";
-          } else {
-              subst = tagOpen + myText + tagClose;
-          }
-          let textBegin = textareaVal.substring(0, startPos);
-          let textEnd = textareaVal.substring(endPos, textareaVal.length);
-          $(textarea).val(textBegin + subst + textEnd);
-          $(textarea).focus();
+    setInsertTagFunction(insertTagFunction) {
+      this._insertTagFunction = insertTagFunction;
+    }
 
-          let cPos = startPos + (tagOpen.length + myText.length + tagClose.length);
-          textarea.selectionStart = cPos;
-          textarea.selectionEnd = cPos;
-          textarea.scrollTop = scrollTop;
-
-          // reposition cursor if possible
-          // FIXME: double check this
-          if (textarea.createTextRange) {
-              textarea.caretPos = document.selection.createRange().duplicate();
-          }
+    _defaultInsertTag(textarea, tagOpen, tagClose, sampleText) {
+      let startPos = textarea.selectionStart;
+      let endPos = textarea.selectionEnd;
+      let scrollTop = textarea.scrollTop;
+      let textareaVal = $(textarea).val();
+      let subst, myText = (textareaVal).substring(startPos, endPos);
+      if (!myText) {
+        myText = sampleText;
       }
-
-      initTextarea = function () {
-          let textarea = $(this);
-          let buttonMenu = $('<div class="leftmenu2"></div>');
-          let self = this;
-          let buttonConfig = JSON.parse($('#simpletoolbar-configuration').text());
-          for (let item of buttonConfig.toolbarElements) {
-              let link = $('<button type="button" class="wikitoolbar-button"></button>');
-              let image = $('<img />');
-              image.attr({
-                  src: item.image,
-                  alt: item.speedTip,
-                  title: item.speedTip
-              });
-              link.on('click', function () {
-                  self.insertTag(textarea[0],
-                      self.unescapeLineBreaks(item.tagOpen),
-                      self.unescapeLineBreaks(item.tagClose),
-                      item.sampleText);
-              });
-              link.append(image);
-              buttonMenu.append(link);
-          }
-          textarea.before(buttonMenu);
+      if (myText.charAt(myText.length - 1) === " ") {
+        // exclude ending space char, if any
+        subst = tagOpen + myText.substring(0, (myText.length - 1)) + tagClose + " ";
+      } else {
+        subst = tagOpen + myText + tagClose;
       }
+      let textBegin = textareaVal.substring(0, startPos);
+      let textEnd = textareaVal.substring(endPos, textareaVal.length);
+      $(textarea).val(textBegin + subst + textEnd);
+      $(textarea).focus();
 
-      unescapeLineBreaks = function (text) {
-          return text.replace(/\\n/g, '\n');
+      let cPos = startPos + (tagOpen.length + myText.length + tagClose.length);
+      textarea.selectionStart = cPos;
+      textarea.selectionEnd = cPos;
+      textarea.scrollTop = scrollTop;
+
+      // reposition cursor if possible
+      // FIXME: double check this
+      if (textarea.createTextRange) {
+        textarea.caretPos = document.selection.createRange().duplicate();
       }
+    }
+
+    _unescapeLineBreaks(text) {
+      return text.replace(/\\n/g, '\n');
+    }
+
+    _initTextarea(textarea, self) {
+      let buttonMenu = $('<div class="leftmenu2"></div>');
+      let buttonConfig = JSON.parse($('#simpletoolbar-configuration').text());
+      for (let item of buttonConfig.toolbarElements) {
+        let link = $('<button type="button" class="wikitoolbar-button"></button>');
+        let image = $('<img />');
+        image.attr({
+          src: item.image,
+          alt: item.speedTip,
+          title: item.speedTip
+        });
+        link.on('click', function () {
+          self._insertTagFunction(textarea[0],
+            self._unescapeLineBreaks(item.tagOpen),
+            self._unescapeLineBreaks(item.tagClose),
+            item.sampleText);
+        });
+        link.append(image);
+        buttonMenu.append(link);
+      }
+      textarea.before(buttonMenu);
+      //FIXME: trigger a dom updated event and improve fullscreen code to react on it.
+    }
   }
 
   let init = function () {
-      XWiki = window.XWiki || {};
-      XWiki.editors = XWiki.editors || {};
-      XWiki.editors.SimpleToolbar = new SimpleToolbar();
+    XWiki = window.XWiki || {};
+    XWiki.editors = XWiki.editors || {};
+    XWiki.editors.SimpleToolbar = new SimpleToolbar();
   };
-  (XWiki && XWiki.isInitialized && init()) || document.observe('xwiki:dom:loaded', init);
+  (XWiki && XWiki.isInitialized && init()) || document.observe('xwiki:dom:loading', init);
 });

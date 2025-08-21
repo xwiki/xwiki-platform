@@ -502,37 +502,160 @@
 #set($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
 #set($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
 #set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($doc))
-## If the watched status informs that the filter is about children it means it's a filter for the space,
-## so we should look for ancestor of the space.
-#set ($refForAncestorFirstFilter = $doc.getDocumentReference())
-#if ($watchedStatus == 'WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS' || $watchedStatus == 'BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
-  #set ($refForAncestorFirstFilter = $doc.getDocumentReference().parent)
+#_notificationsWatchStatusIcon($watchedStatus)
+#set ($buttonTitle = $services.localization.render('notifications.watch.button.title', [$watchText]))
+{{html clean='false'}}
+&lt;div class="btn-group" id="watchButton">
+  &lt;a href="#" role="button" title="$escapetool.xml($buttonTitle)" class="btn btn-default" data-toggle="modal" data-target="#watchModal">
+    &lt;span class="fa $watchIcon">&lt;/span> $watchText
+  &lt;/a>
+&lt;/div>
+{{/html}}
 #end
-#set ($ancestorFirstFilter = $services.notification.watch.getFirstFilteredAncestor($refForAncestorFirstFilter))
-#if ($ancestorFirstFilter)
-  #set ($ancestorRef = $ancestorFirstFilter.left)
-  #set ($ancestorWatchStatus = $ancestorFirstFilter.right)
-#end
-## FIXME: the different icons should use the icon service
-#set ($iconWhenWatched = 'fa-bell')
-#set ($iconWhenNotSet = 'fa-bell-o')
-#set ($iconWhenBlocked = 'fa-bell-slash')
-#set ($iconWhenCustom = 'fa-bullhorn')
-#if ($watchedStatus == 'NOT_SET')
-  #set ($watchIcon = $iconWhenNotSet)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.notset', 'html/5.0', []))
-#elseif ($watchedStatus.isWatched())
-  #set ($watchIcon = $iconWhenWatched)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.followed', 'html/5.0', []))
-#elseif ($watchedStatus.isBlocked())
-  #set ($watchIcon = $iconWhenBlocked)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.blocked', 'html/5.0', []))
-#else
-  #set ($watchIcon = $iconWhenCustom)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.custom', 'html/5.0', []))
-#end
-## TODO: better way for that?
-#set ($isTerminal = ($doc.getDocumentReference().name != 'WebHome'))
+{{/velocity}}
+</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.menu.content</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.notification.watch</name>
+    </property>
+    <property>
+      <parameters>order=39000</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsWatchUIX</name>
+    <number>1</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>ad3c491c-2532-48c7-8559-286a36a90cfb</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+#if (!$isGuest)
 #macro (_displayOption $attributeName $optionValue $translationSuffix $iconName $panelClass)
   &lt;div class="panel panel-default $panelClass"&gt;
     &lt;div class="panel-radio"&gt;
@@ -554,6 +677,24 @@
     &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
   &lt;/div&gt;&lt;!-- end panel --&gt;
 #end
+
+#set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($doc))
+#_notificationsWatchStatusIcon($watchedStatus)
+## If the watched status informs that the filter is about children it means it's a filter for the space,
+## so we should look for ancestor of the space.
+#set ($refForAncestorFirstFilter = $doc.getDocumentReference())
+#if ($watchedStatus == 'WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS' || $watchedStatus == 'BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($refForAncestorFirstFilter = $doc.getDocumentReference().parent)
+#end
+#set ($ancestorFirstFilter = $services.notification.watch.getFirstFilteredAncestor($refForAncestorFirstFilter))
+#if ($ancestorFirstFilter)
+  #set ($ancestorRef = $ancestorFirstFilter.left)
+  #set ($ancestorWatchStatus = $ancestorFirstFilter.right)
+#end
+
+## TODO: better way for that?
+#set ($isTerminal = ($doc.getDocumentReference().name != 'WebHome'))
+
 #set ($watchPageOption = "#_displayOption('watch-page','watchPage','watchpage','page','')")
 #set ($watchSpaceOption = "#_displayOption('watch-space','watchSpace','watchspace','chart-organisation','')")
 #set ($unwatchPageAndWatchSpaceOption = "#_displayOption('unwatch-page-watch-space','unwatchPageWatchSpace','watchspace','chart-organisation','')")
@@ -567,15 +708,8 @@
 #set ($unblockPageOption = "#_displayOption('unblock-page','unblockPage','unblockpage','page','')")
 #set ($unblockSpaceOption = "#_displayOption('unblock-space','unblockSpace','unblockspace','chart-organisation','')")
 #set ($unblockWikiOption = "#_displayOption('unblock-wiki','unblockWiki','unblockwiki','world','wiki-option')")
-
-#set ($buttonTitle = $services.localization.render('notifications.watch.button.title', [$watchText]))
 {{html clean='false'}}
-&lt;div class="btn-group" id="watchButton"&gt;
-  &lt;a href="#" role="button" title="$escapetool.xml($buttonTitle)" class="btn btn-default" data-toggle="modal" data-target="#watchModal"&gt;
-    &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $watchText
-  &lt;/a&gt;
-&lt;/div&gt;
-&lt;div class="modal fade" tabindex="-1" role="dialog" id="watchModal"&gt;
+&lt;dialog class="modal fade" id="watchModal"&gt;
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
@@ -682,19 +816,19 @@
       &lt;/div&gt;
     &lt;/div&gt;&lt;!-- /.modal-content --&gt;
   &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
-&lt;/div&gt;&lt;!-- /.modal --&gt;
+&lt;/dialog&gt;&lt;!-- /.modal --&gt;
 {{/html}}
 #end
 {{/velocity}}</content>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.menu.content</extensionPointId>
+      <extensionPointId>org.xwiki.platform.template.body.end</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.notification.watch</name>
+      <name>org.xwiki.platform.notification.watchModal</name>
     </property>
     <property>
-      <parameters>order=39000</parameters>
+      <parameters></parameters>
     </property>
     <property>
       <scope>wiki</scope>

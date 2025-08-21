@@ -23,7 +23,7 @@
  *#
 #macro(exportModal)
   #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
-  <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
+  <dialog class="modal fade text-left" id="exportModal" aria-labelledby="exportModalLabel"
       aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -46,7 +46,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </dialog>
   #if ($doc.documentReference.name == 'WebHome' && $xwiki.exists('XWiki.ExportDocumentTree'))
     #exportTreeModal()
   #end
@@ -203,7 +203,7 @@
 #end
 ##
 #macro(exportTreeModal)
-  <div class="modal fade text-left" id="exportTreeModal" tabindex="-1" role="dialog"
+  <dialog class="modal fade text-left" id="exportTreeModal"
       aria-labelledby="exportTreeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -237,5 +237,5 @@
         </div>
       </div>
     </div>
-  </div>
+  </dialog>
 #end

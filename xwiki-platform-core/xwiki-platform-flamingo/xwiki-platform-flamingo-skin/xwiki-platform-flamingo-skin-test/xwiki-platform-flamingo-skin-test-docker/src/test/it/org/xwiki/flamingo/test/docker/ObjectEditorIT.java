@@ -114,6 +114,21 @@ class ObjectEditorIT
         // we should be able to leave the editor without any warning
         viewPage = testUtils.gotoPage(testReference);
 
+        // come back to the editor and try to edit the value
+        objectEditPage = viewPage.editObjects();
+        xobjects = objectEditPage.getObjectsOfClass(NUMBER_CLASS);
+        objectEditPane = xobjects.get(0);
+        // edit a field: we should be prevented to leave without saving
+        objectEditPane.setPropertyValue("number", "48");
+
+        testUtils.gotoPageWithoutWaiting(testReference);
+        testUtils.getDriver().switchTo().alert().dismiss();
+
+        objectEditPage.clickSaveAndContinue();
+
+        // we should be able to leave the editor without any warning now
+        viewPage = testUtils.gotoPage(testReference);
+
         // come back to the editor and create a new object
         objectEditPage = viewPage.editObjects();
         objectEditPane = objectEditPage.addObject(NUMBER_CLASS);
@@ -576,6 +591,7 @@ class ObjectEditorIT
         ClassEditPage classEditor = ClassEditPage.gotoPage(testReference);
         classEditor.addProperty("date", "Date");
         classEditor.addProperty("author", "Users");
+        classEditor.clickSaveAndView();
 
         // Add an object of this class and set its properties.
         ObjectEditPage objectEditor = ObjectEditPage.gotoPage(testReference);

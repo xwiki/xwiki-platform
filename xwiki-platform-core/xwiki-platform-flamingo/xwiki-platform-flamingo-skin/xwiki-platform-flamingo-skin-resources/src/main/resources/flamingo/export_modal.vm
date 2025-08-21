@@ -21,7 +21,7 @@
 #**
  * Export modal
  *#
-#define($exportModal)
+#macro(exportModal)
   #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
   <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
       aria-hidden="true">
@@ -51,6 +51,7 @@
     #exportTreeModal()
   #end
 #end
+#set($_exportModal = "#exportModal()")
 ##
 #macro (getExportFormats)
   ## Hide by default the output produced by rendering each export format UIX.

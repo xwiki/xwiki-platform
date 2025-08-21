@@ -19,8 +19,10 @@
  */
 package org.xwiki.index.test.ui.docker;
 
+import java.util.Objects;
 import java.util.Properties;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
@@ -38,13 +40,14 @@ public class DynamicTestConfigurationExtension implements BeforeAllCallback
     @Override
     public void beforeAll(ExtensionContext extensionContext)
     {
+
         // Get the already loaded configuration to get the used database engine.
         TestConfiguration loadedConfiguration = DockerTestUtils.getTestConfiguration(extensionContext);
 
         // Collations to test. They were chosen such that they offer sorting for German umlauts that differs from the
         // default "binary" sorting.
         String collation = switch (loadedConfiguration.getDatabase()) {
-            case MYSQL, MARIADB -> "utf8mb4_german2_ci";
+            case MYSQL, MARIADB -> computeMysqlCollation(loadedConfiguration);
             case HSQLDB_EMBEDDED -> "de_DE";
             case POSTGRESQL -> "unicode";
             case ORACLE -> "GENERIC_M_CI";
@@ -58,5 +61,18 @@ public class DynamicTestConfigurationExtension implements BeforeAllCallback
             String.format("index.sortCollation=%s", collation));
         configuration.setProperties(properties);
         globalStore.put(TestConfiguration.class, configuration);
+    }
+
+    private static String computeMysqlCollation(TestConfiguration loadedConfiguration)
+    {
+        String mysqlCollation;
+        // Replace the collation with utf8mb3 when the collation is explicitly set to utf8. This is for instance the
+        // case when running the docker-all configuration on the CI.
+        if (Objects.equals(loadedConfiguration.getDatabaseCommands().getProperty("collation-server"), "utf8_bin")) {
+            mysqlCollation = "utf8mb3_german2_ci";
+        } else{
+            mysqlCollation = "utf8mb4_german2_ci";
+        }
+        return mysqlCollation;
     }
 }

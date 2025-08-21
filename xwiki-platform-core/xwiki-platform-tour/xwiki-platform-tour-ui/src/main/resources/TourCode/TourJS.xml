@@ -609,7 +609,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
 
 #contentcontainer:has(.popover[class*="tour-"])::before {
   background: transparent;
-  z-index: 1;
+  z-index: 1101;
   position: fixed;
   top: 0;
   right: 0;

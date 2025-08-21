@@ -77,24 +77,29 @@ require(['jquery'], function ($) {
       let buttonMenu = $('<div class="leftmenu2"></div>');
       let buttonConfig = JSON.parse($('#simpletoolbar-configuration').text());
       for (let item of buttonConfig.toolbarElements) {
-        let link = $('<button type="button" class="wikitoolbar-button"></button>');
+        let button = $('<button></button>');
+        button.attr({
+            type: 'button',
+            class: 'wikitoolbar-button',
+            title: item.speedTip
+        });
         let image = $('<img />');
         image.attr({
           src: item.image,
           alt: item.speedTip,
           title: item.speedTip
         });
-        link.on('click', function () {
+        button.on('click', function () {
           self._insertTagFunction(textarea[0],
             self._unescapeLineBreaks(item.tagOpen),
             self._unescapeLineBreaks(item.tagClose),
             item.sampleText);
         });
-        link.append(image);
-        buttonMenu.append(link);
+        button.append(image);
+        buttonMenu.append(button);
       }
       textarea.before(buttonMenu);
-      //FIXME: trigger a dom updated event and improve fullscreen code to react on it.
+      $(document).trigger('xwiki:dom:updated', {'elements': [textarea]});
     }
   }
 

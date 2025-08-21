@@ -84,7 +84,11 @@ public class PageHistoryResourceImpl extends XWikiResource implements PageHistor
 
             List<Object> queryResult = null;
             queryResult = this.queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceId)
-                .bindValue("name", pageName).setLimit(number).setOffset(start).setWiki(wikiName).execute();
+                .bindValue("name", pageName)
+                .setLimit(validateAndGetLimit(number))
+                .setOffset(start)
+                .setWiki(wikiName)
+                .execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;

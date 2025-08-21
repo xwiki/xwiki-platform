@@ -23,6 +23,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Pages;
@@ -66,5 +67,54 @@ public class PagesResourceIT extends AbstractHttpIT
         Assert.assertTrue(pages.getPageSummaries().size() > 0);
 
         checkLinks(pages);
+    }
+
+    @Test
+    public void testPagesResourcePaginationAndErrors() throws Exception
+    {
+        // Setup: Ensure at least 2 pages exist in a space
+        String spaceName = getTestClassName();
+        String page1 = getTestMethodName() + "A";
+        String page2 = getTestMethodName() + "B";
+        DocumentReference ref1 = new DocumentReference(getWiki(), spaceName, page1);
+        DocumentReference ref2 = new DocumentReference(getWiki(), spaceName, page2);
+        try {
+            this.testUtils.rest().delete(ref1);
+            this.testUtils.rest().delete(ref2);
+            this.testUtils.rest().savePage(ref1, "content1", "title1");
+            this.testUtils.rest().savePage(ref2, "content2", "title2");
+
+            // Test: number=-1 should return error
+            GetMethod getMethod = executeGet(
+                "%s?number=-1".formatted(buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), spaceName)));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+
+            // Test: number=1001 should return error
+            getMethod = executeGet(
+                "%s?number=1001".formatted(buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), spaceName)));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+
+            // Test: pagination with number=1
+            getMethod = executeGet(
+                "%s?number=1".formatted(buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), spaceName)));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, pages.getPageSummaries().size());
+
+            String firstName = pages.getPageSummaries().get(0).getName();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(
+                "%s?number=1&start=1".formatted(buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), spaceName)));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, pages.getPageSummaries().size());
+            Assert.assertNotEquals(firstName, pages.getPageSummaries().get(0).getName());
+        } finally {
+            this.testUtils.rest().delete(ref1);
+            this.testUtils.rest().delete(ref2);
+        }
     }
 }

@@ -18,12 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
+#set ($paths = {
+  'jquery-ui': $services.webjars.url('jquery-ui', "jquery-ui#if ($services.debug.minify).min#{end}.js")
+})
 #set ($icons = {'reposition': $services.icon.renderHTML('reposition')})
 #[[*/
 // Start JavaScript-only code.
 
-(function(icons) {
+(function(icons, paths) {
   "use strict";
+  require.config({
+    paths
+  });
   define('dataeditors-translations', {
     prefix: 'core.editors.',
     keys: [
@@ -110,15 +116,17 @@
         });
 
         // We want to the user to be prevented if he tries to leave the editor before saving.
-        $(document).on("beforeunload", function(event) {
-          if (Object.keys(this.editorStatus.addedXObjects).length > 0
-            || Object.keys(this.editorStatus.deletedXObjects).length > 0) {
+        // We cannot use jQuery style to listen on event for this one as apparently it's not working
+        // See: https://stackoverflow.com/questions/4376596/jquery-unload-or-beforeunload
+        window.onbeforeunload = function(event) {
+          if (Object.keys(self.editorStatus.addedXObjects).length > 0
+            || Object.keys(self.editorStatus.deletedXObjects).length > 0) {
             event.preventDefault();
             event.returnValue = "";
           } else {
             return;
           }
-        });
+        };
       }
 
       /**
@@ -506,7 +514,7 @@
               let notification = new XWiki.widgets.Notification(l10n['class.addProperty.inProgress'], "inprogress");
               $.post(ref).done(function(data) {
                 $('#xclassContent').append(data);
-                let insertedPropertyElt = $('#xclassContent :last-child');
+                let insertedPropertyElt = $('#xclassContent > div.xproperty:last-child');
                 // Expand the newly inserted property, since the user will probably want to edit it once it was added
                 self.expandCollapseMetaProperty(insertedPropertyElt);
                 // Make teh newly added property sortable
@@ -779,4 +787,4 @@
   });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$icons]));
+}).apply(']]#', $jsontool.serialize([$icons, $paths]));

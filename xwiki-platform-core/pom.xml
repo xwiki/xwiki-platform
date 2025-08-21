@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -150,7 +150,131 @@
             </revapi.differences>
             -->
 
-            
+            <revapi.differences>
+              <justification>Removed default values as they're now handled by the implementation to allow
+                dynamically setting the default values based on the configuration.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentHistoryResource::getAttachmentHistory(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentHistoryResource::getAttachmentHistory(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentsResource::getAttachments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.Boolean, java.lang.String, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentsResource::getAttachments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.Boolean, java.lang.String, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Classes org.xwiki.rest.resources.classes.ClassesResource::getClasses(java.lang.String, java.lang.Integer, ===java.lang.Integer===) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Classes org.xwiki.rest.resources.classes.ClassesResource::getClasses(java.lang.String, java.lang.Integer, ===java.lang.Integer===) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Objects org.xwiki.rest.resources.objects.AllObjectsForClassNameResource::getObjects(java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Objects org.xwiki.rest.resources.objects.AllObjectsForClassNameResource::getObjects(java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PageChildrenResource::getPageChildren(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.Boolean, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PageChildrenResource::getPageChildren(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.Boolean, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.History org.xwiki.rest.resources.pages.PageHistoryResource::getPageHistory(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.History org.xwiki.rest.resources.pages.PageHistoryResource::getPageHistory(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.History org.xwiki.rest.resources.pages.PageTranslationHistoryResource::getPageTranslationHistory(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.History org.xwiki.rest.resources.pages.PageTranslationHistoryResource::getPageTranslationHistory(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PagesResource::getPages(java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PagesResource::getPages(java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Spaces org.xwiki.rest.resources.spaces.SpacesResource::getSpaces(java.lang.String, java.lang.Integer, ===java.lang.Integer===) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Spaces org.xwiki.rest.resources.spaces.SpacesResource::getSpaces(java.lang.String, java.lang.Integer, ===java.lang.Integer===) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.tags.PagesForTagsResource::getTags(java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.tags.PagesForTagsResource::getTags(java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.wikis.WikiChildrenResource::getChildren(java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.wikis.WikiChildrenResource::getChildren(java.lang.String, java.lang.Integer, ===java.lang.Integer===, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.wikis.WikiSearchQueryResource::search(java.lang.String, java.lang.String, java.lang.String, ===java.lang.Integer===, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.String) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.wikis.WikiSearchQueryResource::search(java.lang.String, java.lang.String, java.lang.String, ===java.lang.Integer===, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.wikis.WikiSearchResource::search(java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;, ===java.lang.Integer===, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.wikis.WikiSearchResource::search(java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;, ===java.lang.Integer===, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.wikis.WikisSearchQueryResource::search(java.lang.String, ===java.lang.Integer===, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.String) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.wikis.WikisSearchQueryResource::search(java.lang.String, ===java.lang.Integer===, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.removed</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.spaces.SpaceSearchResource::search(java.lang.String, java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;, ===java.lang.Integer===, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.SearchResults org.xwiki.rest.resources.spaces.SpaceSearchResource::search(java.lang.String, java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;, ===java.lang.Integer===, java.lang.Integer, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                  <annotation>@javax.ws.rs.DefaultValue("-1")</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Extracted code from HqlQueryExecutor to an abstract base class to facilitate reuse. HqlQueryExecutor is a component implementation so it should be treated as internal, even if it's not inside an internal package.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</old>
+                  <new>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</new>
+                  <superClass>org.xwiki.query.internal.AbstractQueryExecutor</superClass>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

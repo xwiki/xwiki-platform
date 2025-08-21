@@ -58,11 +58,13 @@ public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSe
 
         List<KeywordSearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
+        int limit = validateAndGetLimit(number);
+
         KeywordSearchOptions searchOptions = KeywordSearchOptions.builder()
             .searchScopes(searchScopes)
             .wikiName(wikiName)
             .space(Utils.getLocalSpaceId(spaces))
-            .number(number)
+            .number(limit)
             .start(start)
             .orderField(orderField)
             .order(order)

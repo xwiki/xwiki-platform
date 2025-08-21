@@ -28,6 +28,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -86,13 +87,13 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     public String getWikiIdFromDocumentReference(DocumentReference descriptorDocumentReference)
     {
         String docName = descriptorDocumentReference.getName();
-        return StringUtils.removeStart(docName, "XWikiServer").toLowerCase();
+        return Strings.CS.removeStart(docName, "XWikiServer").toLowerCase();
     }
 
     @Override
     public String getWikiIdFromDocumentFullname(String descriptorDocumentFullname)
     {
-        return StringUtils.removeStart(descriptorDocumentFullname, "XWiki.XWikiServer").toLowerCase();
+        return Strings.CS.removeStart(descriptorDocumentFullname, "XWiki.XWikiServer").toLowerCase();
     }
 
     @Override

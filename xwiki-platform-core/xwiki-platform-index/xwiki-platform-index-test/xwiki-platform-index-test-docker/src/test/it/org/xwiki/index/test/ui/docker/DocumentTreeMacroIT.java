@@ -104,55 +104,56 @@ class DocumentTreeMacroIT
         setup.rest().savePage(eve, "updated", "3. Eve");
 
         // Documents are sorted by title by default (when document titles are displayed).
-        TreeElement tree = getDocumentTree(setup, testReference, Map.of("showTerminalDocuments", false));
+        TreeElement tree = getDocumentTree(setup, testReference, true, Map.of("showTerminalDocuments", false));
         assertNodeLabels(tree.getTopLevelNodes(), "1. Bob", "2. George", "3. Alice", "Carol");
 
         // Documents are sorted by name when document titles are not displayed.
         tree =
-            getDocumentTree(setup, testReference, Map.of("showTerminalDocuments", false, "showDocumentTitle", false));
+            getDocumentTree(setup, testReference, true,
+                Map.of("showTerminalDocuments", false, "showDocumentTitle", false));
         assertNodeLabels(tree.getTopLevelNodes(), "Alice", "Bob", "Carol", "George");
 
         // Sort by title descending.
-        tree = getDocumentTree(setup, testReference,
+        tree = getDocumentTree(setup, testReference, true,
             Map.of("showTerminalDocuments", false, "sortDocumentsBy", "title:desc"));
         assertNodeLabels(tree.getTopLevelNodes(), "Carol", "3. Alice", "2. George", "1. Bob");
 
         // Sort by name descending.
-        tree = getDocumentTree(setup, testReference,
+        tree = getDocumentTree(setup, testReference, true,
             Map.of("showTerminalDocuments", false, "sortDocumentsBy", "name:desc"));
         assertNodeLabels(tree.getTopLevelNodes(), "2. George", "Carol", "1. Bob", "3. Alice");
 
         // Sort by last modification date descending (null values last).
-        tree = getDocumentTree(setup, testReference,
+        tree = getDocumentTree(setup, testReference, true,
             Map.of("showTerminalDocuments", false, "sortDocumentsBy", "date:desc"));
         assertNodeLabels(tree.getTopLevelNodes(), "3. Alice", "1. Bob", "2. George", "Carol");
 
         // Sort by creation date ascending (null values last).
-        tree = getDocumentTree(setup, testReference,
+        tree = getDocumentTree(setup, testReference, true,
             Map.of("showTerminalDocuments", false, "sortDocumentsBy", "creationDate"));
         assertNodeLabels(tree.getTopLevelNodes(), "2. George", "3. Alice", "1. Bob", "Carol");
 
         // Let's check also the order of descendant pages (where we mix terminal and non-terminal pages).
 
         // Documents are sorted by title by default (when document titles are displayed).
-        tree = getDocumentTree(setup, testReference, Map.of("openTo", getNodeId(alice)));
+        tree = getDocumentTree(setup, testReference, true, Map.of("openTo", getNodeId(alice)));
         assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "1. Henry", "2. Denis", "3. Eve", "Fiona");
 
         // Sort by name (even if document titles are displayed).
-        tree = getDocumentTree(setup, testReference, Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "name"));
+        tree = getDocumentTree(setup, testReference, true, Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "name"));
         assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "2. Denis", "3. Eve", "Fiona", "1. Henry");
 
         // Sort by title descending.
         tree =
-            getDocumentTree(setup, testReference, Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "title:desc"));
+            getDocumentTree(setup, testReference, true, Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "title:desc"));
         assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "Fiona", "3. Eve", "2. Denis", "1. Henry");
 
         // Sort by last modification date ascending (null values last).
-        tree = getDocumentTree(setup, testReference, Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "date:asc"));
+        tree = getDocumentTree(setup, testReference, true, Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "date:asc"));
         assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "1. Henry", "2. Denis", "3. Eve", "Fiona");
 
         // Sort by creation date descending (null values last).
-        tree = getDocumentTree(setup, testReference,
+        tree = getDocumentTree(setup, testReference, true,
             Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "creationDate:desc"));
         assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "2. Denis", "1. Henry", "3. Eve", "Fiona");
 
@@ -232,17 +233,19 @@ class DocumentTreeMacroIT
         createPage(setup, fionaTerminal, "", "");
 
         // By default only top nodes are displayed
-        TreeElement tree = getDocumentTree(setup, testReference, Map.of("root", getNodeId(testReference)));
+        TreeElement tree = getDocumentTree(setup, testReference, true, Map.of("root", getNodeId(testReference)));
         assertNodeLabels(tree.getTopLevelNodes(), "Alice", "Bob", "Carol", "Eve", "Fiona");
         tree.getTopLevelNodes().forEach(node -> assertFalse(node.isOpen()));
 
         // Specifying expandToLevel 0 should be exactly the same
-        tree = getDocumentTree(setup, testReference, Map.of("root", getNodeId(testReference), "expandToLevel", "0"));
+        tree = getDocumentTree(setup, testReference, true,
+            Map.of("root", getNodeId(testReference), "expandToLevel", "0"));
         assertNodeLabels(tree.getTopLevelNodes(), "Alice", "Bob", "Carol", "Eve", "Fiona");
         tree.getTopLevelNodes().forEach(node -> assertFalse(node.isOpen()));
 
         // Now all top nodes are opened
-        tree = getDocumentTree(setup, testReference, Map.of("root", getNodeId(testReference), "expandToLevel", "1"));
+        tree = getDocumentTree(setup, testReference, true,
+            Map.of("root", getNodeId(testReference), "expandToLevel", "1"));
         List<TreeNodeElement> topLevelNodes = tree.getTopLevelNodes();
         assertNodeLabels(topLevelNodes, "Alice", "Bob", "Carol", "Eve", "Fiona");
 
@@ -265,7 +268,8 @@ class DocumentTreeMacroIT
         assertNodeLabels(topLevelNodes.get(4).getChildren(), "FionaTerminal");
 
         // Check that expandToLevel=2 also open sublevel
-        tree = getDocumentTree(setup, testReference, Map.of("root", getNodeId(testReference), "expandToLevel", "2"));
+        tree = getDocumentTree(setup, testReference, true,
+            Map.of("root", getNodeId(testReference), "expandToLevel", "2"));
         topLevelNodes = tree.getTopLevelNodes();
         assertNodeLabels(topLevelNodes, "Alice", "Bob", "Carol", "Eve", "Fiona");
 
@@ -359,7 +363,7 @@ class DocumentTreeMacroIT
             createPage(setup, george, "Zeit", "");
 
             // Sort by title with collation
-            TreeElement tree = getDocumentTree(setup, testReference, Map.of());
+            TreeElement tree = getDocumentTree(setup, testReference, true, Map.of());
             assertNodeLabels(tree.getTopLevelNodes(), "A Öl", "Ö Alice", "Zeit");
 
             // Sort by name with collation (even if document titles are displayed).
@@ -371,6 +375,108 @@ class DocumentTreeMacroIT
         }
     }
 
+    @Test
+    @Order(5)
+    void testLimit(TestUtils setup, TestReference testReference)
+    {
+        DocumentReference alice =
+            new DocumentReference("WebHome", new SpaceReference("Alice", testReference.getLastSpaceReference()));
+        DocumentReference bob =
+            new DocumentReference("WebHome", new SpaceReference("Bob", testReference.getLastSpaceReference()));
+        DocumentReference carol =
+            new DocumentReference("WebHome", new SpaceReference("Carol", testReference.getLastSpaceReference()));
+        DocumentReference denis =
+            new DocumentReference("WebHome", new SpaceReference("Denis", testReference.getLastSpaceReference()));
+
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference, true);
+
+        createPage(setup, alice, "Alice", "");
+        createPage(setup, bob, "Bob", "");
+        createPage(setup, carol, "Carol", "");
+        createPage(setup, denis, "Denis", "");
+
+        // Limit to 2 nodes. We need at least 4 pages for this, as we show up to one more page than the limit.
+        TreeElement tree = getDocumentTree(setup, testReference, true, Map.of("limit", "2"));
+        assertNodeLabels(tree.getTopLevelNodes(), "Alice", "Bob", "2 more ...");
+
+        // Limit to 2000 nodes
+        tree = getDocumentTree(setup, testReference, true, Map.of("limit", "2000"));
+        // FIXME: the tree is simply empty when the limit is too high, the error that is returned is simply ignored.
+        assertNodeLabels(tree.getTopLevelNodes());
+    }
+
+    /*
+    Regression test for XWIKI-23390
+     */
+    @Test
+    @Order(6)
+    void documentTreeRootOpenTo(TestUtils setup, TestReference testReference)
+    {
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+
+        // Create the following hierarchy:
+        // TestReference:
+        //    - Alice:
+        //        - SubAlice
+        //    - Eve:
+        //        - SubEve
+        //          - ChildrenSubEve
+        //            - SubChildrenSubEve
+        //          - Children2SubEve
+        //        - SubEve2
+        //           - ChildrenSubEve2
+
+        DocumentReference alice =
+            new DocumentReference("WebHome", new SpaceReference("Alice", testSpaceReference));
+        DocumentReference subAlice =
+            new DocumentReference("WebHome", new SpaceReference("SubAlice", alice.getLastSpaceReference()));
+
+        DocumentReference eve =
+            new DocumentReference("WebHome", new SpaceReference("Eve", testSpaceReference));
+        DocumentReference subEve =
+            new DocumentReference("WebHome", new SpaceReference("SubEve", eve.getLastSpaceReference()));
+        DocumentReference childrenSubEve =
+            new DocumentReference("WebHome", new SpaceReference("ChildrenSubEve", subEve.getLastSpaceReference()));
+        DocumentReference subChildrenSubEve =
+            new DocumentReference("WebHome", new SpaceReference("SubChildrenSubEve",
+                childrenSubEve.getLastSpaceReference()));
+        DocumentReference children2SubEve =
+            new DocumentReference("WebHome", new SpaceReference("Children2SubEve", subEve.getLastSpaceReference()));
+        DocumentReference subEve2 =
+            new DocumentReference("WebHome", new SpaceReference("SubEve2", eve.getLastSpaceReference()));
+        DocumentReference childrenSubEve2 =
+            new DocumentReference("WebHome", new SpaceReference("ChildrenSubEve2", subEve2.getLastSpaceReference()));
+
+        setup.loginAsSuperAdmin();
+        // Clean up.
+        setup.deletePage(testReference, true);
+        createPage(setup, alice, "", "");
+        createPage(setup, subAlice, "", "");
+        createPage(setup, eve, "", "");
+        createPage(setup, subEve, "", "");
+        createPage(setup, childrenSubEve, "", "");
+        createPage(setup, children2SubEve, "", "");
+        createPage(setup, subChildrenSubEve, "", "");
+        createPage(setup, subEve2, "", "");
+        createPage(setup, childrenSubEve2, "", "");
+
+        TreeElement tree = getDocumentTree(setup, testReference, false, Map.of(
+            "showRoot", true,
+            "root", getNodeId(eve),
+            "openTo", getNodeId(childrenSubEve)
+        ));
+        assertNodeLabels(tree.getTopLevelNodes(), "Eve");
+        assertTrue(tree.hasNode(getNodeId(subEve)));
+        assertTrue(tree.hasNode(getNodeId(childrenSubEve)));
+        assertTrue(tree.hasNode(getNodeId(children2SubEve)));
+        assertTrue(tree.hasNode(getNodeId(subEve2)));
+        assertTrue(tree.hasNode(getNodeId(subChildrenSubEve)));
+        assertFalse(tree.hasNode(getNodeId(childrenSubEve2)));
+        assertFalse(tree.hasNode(getNodeId(alice)));
+        assertFalse(tree.hasNode(getNodeId(subAlice)));
+    }
+
     private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title, String content)
     {
         // We don't care what parent page is used, we just want to avoid creating orphan pages in order to not interfere
@@ -378,13 +484,16 @@ class DocumentTreeMacroIT
         return setup.createPage(documentReference, content, title, "xwiki/2.1", "Main.WebHome");
     }
 
-    private TreeElement getDocumentTree(TestUtils setup, TestReference testReference, Map<String, Object> parameters)
+    private TreeElement getDocumentTree(TestUtils setup, TestReference testReference,
+        boolean rootIsTestReference, Map<String, Object> parameters)
     {
         parameters = new HashMap<>(parameters);
         String id = testReference.getLastSpaceReference().getName();
         parameters.put("id", id);
-        parameters.put("root", getNodeId(testReference));
-        parameters.put("showRoot", false);
+        if (rootIsTestReference) {
+            parameters.put("root", getNodeId(testReference));
+            parameters.put("showRoot", false);
+        }
         StringBuilder content = new StringBuilder("{{documentTree");
         parameters.forEach((key, value) ->
             content.append(" ").append(key).append("='").append(value).append("'"));

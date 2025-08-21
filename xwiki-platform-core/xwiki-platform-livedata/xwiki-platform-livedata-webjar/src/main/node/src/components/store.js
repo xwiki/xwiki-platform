@@ -19,7 +19,7 @@
  */
 import { reactive } from "vue";
 
-const store = reactive({});
+const store = {};
 
 const componentStore = {
 
@@ -35,7 +35,14 @@ const componentStore = {
       return undefined;
     }
 
-    return store[kind][key]();
+    // On the first access, we resolve the component provider and save its result instead.
+    // On the next access, the cached result is returned without a lookup.
+    // This is fine since the result of the componentProvider function is expected to be stable.
+    if(typeof store[kind][key] === "function") {
+      store[kind][key] = await store[kind][key]()
+    }
+
+    return store[kind][key];
   },
 };
 

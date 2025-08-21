@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
@@ -1591,37 +1592,37 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
         BaseClass newBaseClass = (BaseClass) newElement;
 
-        if (!StringUtils.equals(getCustomClass(), newBaseClass.getCustomClass())) {
+        if (!Strings.CS.equals(getCustomClass(), newBaseClass.getCustomClass())) {
             setCustomClass(newBaseClass.getCustomClass());
             modified = true;
         }
 
-        if (!StringUtils.equals(getCustomMapping(), newBaseClass.getCustomMapping())) {
+        if (!Strings.CS.equals(getCustomMapping(), newBaseClass.getCustomMapping())) {
             setCustomMapping(newBaseClass.getCustomMapping());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultWeb(), newBaseClass.getDefaultWeb())) {
+        if (!Strings.CS.equals(getDefaultWeb(), newBaseClass.getDefaultWeb())) {
             setDefaultWeb(newBaseClass.getDefaultWeb());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultViewSheet(), newBaseClass.getDefaultViewSheet())) {
+        if (!Strings.CS.equals(getDefaultViewSheet(), newBaseClass.getDefaultViewSheet())) {
             setDefaultViewSheet(newBaseClass.getDefaultViewSheet());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultEditSheet(), newBaseClass.getDefaultEditSheet())) {
+        if (!Strings.CS.equals(getDefaultEditSheet(), newBaseClass.getDefaultEditSheet())) {
             setDefaultEditSheet(newBaseClass.getDefaultEditSheet());
             modified = true;
         }
 
-        if (!StringUtils.equals(getValidationScript(), newBaseClass.getValidationScript())) {
+        if (!Strings.CS.equals(getValidationScript(), newBaseClass.getValidationScript())) {
             setValidationScript(newBaseClass.getValidationScript());
             modified = true;
         }
 
-        if (!StringUtils.equals(getNameField(), newBaseClass.getNameField())) {
+        if (!Strings.CS.equals(getNameField(), newBaseClass.getNameField())) {
             setNameField(newBaseClass.getNameField());
             modified = true;
         }

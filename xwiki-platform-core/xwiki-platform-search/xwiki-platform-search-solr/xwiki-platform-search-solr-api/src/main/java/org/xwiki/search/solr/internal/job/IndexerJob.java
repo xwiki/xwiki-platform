@@ -19,12 +19,14 @@
  */
 package org.xwiki.search.solr.internal.job;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -36,8 +38,12 @@ import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
+import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
+import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 /**
  * Provide progress information and store logging of an advanced indexing.
@@ -79,6 +85,12 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private SolrInstance solrInstance;
+
+    @Inject
+    private SolrReferenceResolver solrReferenceResolver;
 
     @Override
     public String getType()
@@ -175,8 +187,54 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
             this.logger.info(
                 "{} documents added, {} deleted and {} updated during the synchronization of the Solr index.",
                 counter[Action.ADD.ordinal()], counter[Action.DELETE.ordinal()], counter[Action.UPDATE.ordinal()]);
+
+            if (getRequest().isCleanInvalid()) {
+                // Wait for the indexing to be fully applied
+                this.indexer.waitReady().get();
+
+                // Remove invalid entries
+                cleanInvalid();
+            }
         } finally {
             this.progressManager.popLevelProgress(this);
         }
+    }
+
+    private void cleanInvalid() throws SolrServerException, IOException, SolrIndexerException
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append('(');
+
+        // All entries which don't have a docId set
+        builder.append(notSet(FieldUtils.DOC_ID));
+
+        builder.append(" OR ");
+
+        // All entries which don't have a fullName set
+        builder.append(notSet(FieldUtils.FULLNAME));
+
+        // TODO: Remove from the core all entries for which no corresponding DOCUMENT type entry exist (see
+        // https://jira.xwiki.org/browse/XWIKI-22949)
+
+        builder.append(')');
+
+        builder.append(" AND ");
+
+        // Filter documents based on the indicated root reference
+        builder.append('(');
+        builder.append(this.solrReferenceResolver.getQuery(getRequest().getRootReference()));
+        builder.append(')');
+
+        // Execute the delete
+        this.solrInstance.deleteByQuery(builder.toString());
+
+        // Commit
+        this.solrInstance.commit();
+    }
+
+    private String notSet(String field)
+    {
+        return "-" + field + ":*";
     }
 }

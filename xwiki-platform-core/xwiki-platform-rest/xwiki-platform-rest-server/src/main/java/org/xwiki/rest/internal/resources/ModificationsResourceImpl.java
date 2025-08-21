@@ -62,6 +62,8 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
     public History getModifications(String wikiName, Integer start, Integer number, String order, Long ts,
             Boolean withPrettyNames) throws XWikiRestException
     {
+        int limit = validateAndGetLimit(number);
+
         try {
             String validOrder = HqlQueryUtils.getValidQueryOrder(order, "desc");
 
@@ -74,7 +76,7 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
 
             List<Object> queryResult = null;
             queryResult = this.queryManager.createQuery(query, Query.XWQL).bindValue("date", new Date(ts))
-                .setLimit(number).setOffset(start).setWiki(wikiName).execute();
+                .setLimit(limit).setOffset(start).setWiki(wikiName).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;

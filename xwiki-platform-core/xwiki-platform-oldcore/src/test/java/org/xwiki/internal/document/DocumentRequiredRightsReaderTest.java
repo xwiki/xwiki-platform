@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -38,7 +39,6 @@ import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -97,7 +97,7 @@ class DocumentRequiredRightsReaderTest
 
         assertEquals(expected, actual);
 
-        List<String> invalidValues = values.stream().filter(v -> StringUtils.startsWith(v, "foo")).toList();
+        List<String> invalidValues = values.stream().filter(v -> Strings.CS.startsWith(v, "foo")).toList();
         for (int i = 0; i < invalidValues.size(); i++) {
             assertEquals("Illegal required right value [%s] in object [%s]".formatted(invalidValues.get(i),
                 objectReferenceName), this.logCapture.getMessage(i));

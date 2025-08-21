@@ -66,7 +66,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DatabaseDocumentIteratorTest
 {
-    private static final String ORDER_CLAUSE = " order by doc.space, doc.name, doc.language nulls first";
+    private static final String ORDER_CLAUSE = " order by doc.id asc";
 
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
@@ -157,9 +157,9 @@ class DatabaseDocumentIteratorTest
         when(countQuery.setWiki("chess")).thenReturn(chessCountQuery);
         when(countQuery.setWiki("tennis")).thenReturn(tennisCountQuery);
 
-        when(
-            this.queryManager.createQuery("select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc"
-                                          + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
+        when(this.queryManager.createQuery(
+            "select doc.space, doc.name, doc.language, doc.version, doc.id from XWikiDocument doc" + ORDER_CLAUSE,
+            Query.HQL)).thenReturn(query);
         when(this.queryManager.createQuery("", Query.HQL)).thenReturn(countQuery);
 
         DocumentIterator<String> iterator = this.databaseIterator;
@@ -207,9 +207,9 @@ class DatabaseDocumentIteratorTest
         when(countQuery.addFilter(this.countQueryFilter)).thenReturn(countQuery);
 
         String whereClause = " where doc.space = :space and doc.name = :name";
-        when(
-            this.queryManager.createQuery("select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc"
-                                          + whereClause + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
+        when(this.queryManager
+            .createQuery("select doc.space, doc.name, doc.language, doc.version, doc.id from XWikiDocument doc"
+                + whereClause + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
         when(this.queryManager.createQuery(whereClause, Query.HQL)).thenReturn(countQuery);
 
         DocumentIterator<String> iterator = this.databaseIterator;

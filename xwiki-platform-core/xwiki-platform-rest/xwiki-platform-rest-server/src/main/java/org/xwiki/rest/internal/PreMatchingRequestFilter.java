@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -229,8 +230,8 @@ public class PreMatchingRequestFilter implements ContainerRequestFilter, XWikiRe
         // Check for a prefix match to make sure it matches regardless of the supplied parameters (like charset).
         if (HttpMethod.POST.equals(requestContext.getMethod())) {
             if (SIMPLE_CONTENT_TYPES.stream()
-                .anyMatch(expectedType -> requestContext.getMediaType() != null && StringUtils
-                    .startsWith(StringUtils.lowerCase(requestContext.getMediaType().toString()), expectedType))) {
+                .anyMatch(expectedType -> requestContext.getMediaType() != null && Strings.CI
+                    .startsWith(requestContext.getMediaType().toString(), expectedType))) {
                 String formToken = requestContext.getHeaders().getFirst(FORM_TOKEN_HEADER);
 
                 // Skip the main request handler but allow cleanup if either the CSRF validator failed or the token is

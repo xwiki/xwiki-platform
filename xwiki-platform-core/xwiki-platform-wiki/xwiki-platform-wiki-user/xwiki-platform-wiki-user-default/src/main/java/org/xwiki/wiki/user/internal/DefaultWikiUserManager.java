@@ -28,7 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -400,7 +400,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         if (invitations != null) {
             String userId = documentReferenceSerializer.serialize(user);
             for (MemberCandidacy invitation : invitations) {
-                if (StringUtils.equals(invitation.getUserId(), userId)
+                if (Strings.CS.equals(invitation.getUserId(), userId)
                     && invitation.getStatus() == MemberCandidacy.Status.PENDING) {
                     return true;
                 }
@@ -417,7 +417,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         if (requests != null) {
             String userId = documentReferenceSerializer.serialize(user);
             for (MemberCandidacy request : requests) {
-                if (StringUtils.equals(request.getUserId(), userId)
+                if (Strings.CS.equals(request.getUserId(), userId)
                     && request.getStatus() == MemberCandidacy.Status.PENDING) {
                     return true;
                 }

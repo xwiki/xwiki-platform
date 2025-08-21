@@ -21,11 +21,6 @@ define('xwiki-realtime-messages', {
   prefix: 'realtime.',
   keys: [
     'allowRealtime',
-    'sessionInProgress',
-    'redirectDialog.pluralPrompt',
-    'redirectDialog.create',
-    'redirectDialog.join',
-    'requestASession',
     'requestDialog.prompt',
     'requestDialog.create',
     'requestDialog.reject',

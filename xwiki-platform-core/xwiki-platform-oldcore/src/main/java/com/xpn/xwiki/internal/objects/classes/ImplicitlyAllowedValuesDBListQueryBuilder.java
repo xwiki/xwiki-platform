@@ -30,6 +30,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.DocumentReference;
@@ -214,7 +215,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         if (!StringUtils.isAlphanumeric(
             // Remove whitespace at both ends and a document or object prefix. We don't care about having both
             // prefixes after each other, this is not about catching all invalid names.
-            StringUtils.removeStart(StringUtils.removeStart(StringUtils.strip(fieldName), DOC_PREFIX), OBJ_PREFIX)))
+            Strings.CS.removeStart(Strings.CS.removeStart(StringUtils.strip(fieldName), DOC_PREFIX), OBJ_PREFIX)))
         {
             throw new QueryException("Invalid field name [%s]".formatted(fieldName), null);
         }

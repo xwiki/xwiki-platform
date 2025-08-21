@@ -2061,6 +2061,48 @@ $displayName##
 ##
 ##
 #**
+ * Validate the given query limit. Send an error and stop parsing when the limit is invalid
+ *
+ * @param limit the limit to validate
+ * @param parameterName the name of the parameter that shall be mentioned in the error message
+ * @since 17.7.0RC1
+ * @since 17.4.4
+ * @since 16.10.11
+ *#
+#macro(validateQueryLimit $limit $parameterName)
+  #set ($configuredLimit = $services.security.getQueryItemsLimit())
+  #if ($configuredLimit > 0 && ($limit < 0 || $limit > $configuredLimit))
+    #set($discard =
+      $response.sendError(400,
+        "Invalid parameter value $limit for $parameterName: Must be a positive integer and less than or equal to $configuredLimit"))
+    #stop
+  #end
+#end
+##
+##
+#**
+ * Get and validate the limit of a query from a request parameter.
+ *
+ * @param parameterName the name of the request parameter
+ * @param defaultValue the default limit to use when the request parameter isn't set
+ * @param _limit the limit variable to set
+ * @since 17.7.0RC1
+ * @since 17.4.4
+ * @since 16.10.11
+ *#
+#macro(getAndValidateQueryLimitFromRequest $parameterName $defaultValue $_limit)
+  #set ($return = $numbertool.toNumber("$!{request.get($parameterName)}").intValue())
+  #if (!$return)
+    #set ($return = $defaultValue)
+  #else
+    #validateQueryLimit($return $parameterName)
+  #end
+  #set ($_limit = $NULL)
+  #setVariable("$_limit" $return)
+#end
+##
+##
+#**
  * Pagination 2.0
  *
  * Displays a generic pagination widget for browsing a collection of items.
@@ -2143,11 +2185,14 @@ $displayName##
   #if (!$parameters.defaultItemsPerPage || $numbertool.toNumber($parameters.defaultItemsPerPage).intValue() <= 0)
     #set ($parameters.defaultItemsPerPage = 20)
   #end
+  ## We don't use #getAndValidateQueryLimitFromRequest here because of the different handling of negative parameter
+  ## values (using the default vs. sending an error).
   #set ($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
   #set ($parameters.itemsPerPage = $numbertool.toNumber($parameters.itemsPerPage).intValue())
   #if (!$parameters.itemsPerPage || $parameters.itemsPerPage <= 0)
     #set ($parameters.itemsPerPage = $parameters.defaultItemsPerPage)
   #end
+  #validateQueryLimit($parameters.itemsPerPage, $parameters.itemsPerPageParamName)
 #end
 #**
  * Pagination : display the pagination widget after all parameters have been computed

@@ -146,10 +146,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
   #if (!$offset || $offset &lt; 0)
     #set ($offset = 0)
   #end
-  #set ($limit = $numbertool.toNumber($request.get('limit')).intValue())
-  #if (!$limit)
-    #set ($limit = 15)
-  #end
+  #getAndValidateQueryLimitFromRequest('limit', 15, $limit)
   #set ($filenameFilter = $request.get('datt.filename'))
   #set ($docNameFilter = $request.get('datt.docName'))
   #set ($dateFilter = $request.get('datt.date'))

@@ -65,7 +65,7 @@ class TableIT extends AbstractCKEditorIT
         edit(setup, testReference);
 
         // Insert a table.
-        editor.getToolBar().insertTable().submit();
+        editor.getToolBar().insertTable().setHeader("None").submit();
 
         // The caret should be in the first table cell. Insert two paragraphs. It's important to have two paragraphs,
         // otherwise the bug doesn't reproduce.

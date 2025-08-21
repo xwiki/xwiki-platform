@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.stability.Unstable;
 
@@ -168,9 +169,9 @@ public interface NotificationFilterPreference
     {
         String wikiIdWithPrefix = wikiId + DB_SPACE_SEP;
         return Objects.equals(getWiki(), wikiId)
-            || StringUtils.startsWith(getPage(), wikiIdWithPrefix)
-            || StringUtils.startsWith(getPageOnly(), wikiIdWithPrefix)
-            || StringUtils.startsWith(getUser(), wikiIdWithPrefix);
+            || Strings.CS.startsWith(getPage(), wikiIdWithPrefix)
+            || Strings.CS.startsWith(getPageOnly(), wikiIdWithPrefix)
+            || Strings.CS.startsWith(getUser(), wikiIdWithPrefix);
     }
 
     /**

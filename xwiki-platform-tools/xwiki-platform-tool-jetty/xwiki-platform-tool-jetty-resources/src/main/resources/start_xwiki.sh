@@ -194,12 +194,13 @@ mkdir -p $XWIKI_DATA_DIR 2>/dev/null
 mkdir -p $XWIKI_DATA_DIR/logs 2>/dev/null
 
 # Set up the Jetty Base directory (used for custom Jetty configuration) to be the current directory where this file is.
+# Jetty does not work well with a relative directory, so we use the absolute one
+JETTY_BASE=$PRGDIR
 # Also make sure the log directory exists since Jetty won't create it.
-JETTY_BASE=.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
 
-# Specify Jetty's home directory to be the directory named jetty inside the jetty base directory.
-JETTY_HOME=jetty
+# Specify Jetty's home directory to be the directory named "jetty" inside the Jetty base directory.
+JETTY_HOME="$JETTY_BASE/jetty"
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 
 # Specify the encoding to use

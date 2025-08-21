@@ -55,6 +55,8 @@ import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 @Named("solr")
 public class SolrDocumentIterator extends AbstractDocumentIterator<String>
 {
+    private static final String SOLR_ANYVALUE = "[* TO *]";
+
     /**
      * The current index in the list of {@link #results}.
      */
@@ -144,19 +146,12 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
             query.setFields(FieldUtils.WIKI, FieldUtils.SPACES, FieldUtils.NAME, FieldUtils.DOCUMENT_LOCALE,
                 FieldUtils.VERSION);
             query.addFilterQuery(FieldUtils.TYPE + ':' + EntityType.DOCUMENT.name());
+            // Make sure to skip invalid documents, they will be re-indexed
+            query.addFilterQuery(FieldUtils.WIKI + ':' + SOLR_ANYVALUE);
+            query.addFilterQuery(FieldUtils.DOC_ID + ':' + SOLR_ANYVALUE);
             // This iterator must have the same order as the database iterator, otherwise the synchronization fails.
-            // Note that we had two options:
-            // (A) Sort the Solr index only by id and enable docValues on the id field to improve the speed. But then we
-            // need to sort the database on a computed field (fullName_locale) which is very slow (due to the missing
-            // database index for the computed column).
-            // (B) Sort the Solr index by multiple fields, each having a corresponding column in the database. This
-            // slows down a bit the Solr query but allows us to sort the database on stored columns that have indexes,
-            // thus improving the speed of the database query.
-            // We chose solution B because it offers a good tradeoff between Solr and database performance.
             query.addSort(FieldUtils.WIKI, ORDER.asc);
-            query.addSort(FieldUtils.SPACE_EXACT, ORDER.asc);
-            query.addSort(FieldUtils.NAME_EXACT, ORDER.asc);
-            query.addSort(FieldUtils.DOCUMENT_LOCALE, ORDER.asc);
+            query.addSort(FieldUtils.DOC_ID, ORDER.asc);
             // Cursor-based deep-paging requires the unique key to be included in the sort fields as a tie-breaker.
             // See https://issues.apache.org/jira/browse/SOLR-6277 .
             query.addSort(FieldUtils.ID, ORDER.asc);

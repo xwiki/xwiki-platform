@@ -332,6 +332,101 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         Assert.assertEquals(content, getMethod.getResponseBodyAsString());
     }
 
+    @Test
+    public void testAttachmentsResourcePaginationAndErrors() throws Exception
+    {
+        // Setup: Add two attachments
+        String attachmentName1 = "att1.txt";
+        String attachmentName2 = "att2.txt";
+        try {
+            putAttachmentFilename(attachmentName1);
+            putAttachmentFilename(attachmentName2);
+
+            String attachmentsUri = buildURIForThisPage(AttachmentsResource.class);
+
+            // Test: number=-1 should return error
+            GetMethod getMethod = executeGet(attachmentsUri + "?number=-1");
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+
+            // Test: number=1001 should return error
+            getMethod = executeGet(attachmentsUri + "?number=1001");
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+
+            // Test: pagination with number=1
+            getMethod = executeGet(attachmentsUri + "?number=1");
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, attachments.getAttachments().size());
+
+            String firstName = attachments.getAttachments().get(0).getName();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(attachmentsUri + "?number=1&start=1");
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, attachments.getAttachments().size());
+            Assert.assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
+        } finally {
+            // Clean up
+            this.testUtils.deletePage(this.reference);
+        }
+    }
+
+    @Test
+    public void testAttachmentHistoryResourcePaginationAndErrors() throws Exception
+    {
+        try {
+            // Setup: Create an attachment with multiple versions
+            String attachmentName = "history.txt";
+            int versionCount = 3;
+            for (int i = 0; i < versionCount; i++) {
+                String content = "Content version " + i;
+                PutMethod putMethod =
+                    executePut(buildURIForThisPage(AttachmentResource.class, attachmentName), content,
+                        MediaType.TEXT_PLAIN,
+                        TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+                        TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+                if (i == 0) {
+                    Assert.assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode());
+                } else {
+                    Assert.assertEquals(HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+                }
+            }
+
+            String historyUri = buildURIForThisPage(AttachmentHistoryResource.class, attachmentName);
+
+            // Test: number=-1 should return error
+            GetMethod getMethod = executeGet(historyUri + "?number=-1");
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+
+            // Test: number=1001 should return error
+            getMethod = executeGet(historyUri + "?number=1001");
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+
+            // Test: pagination with number=1
+            getMethod = executeGet(historyUri + "?number=1");
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, attachments.getAttachments().size());
+
+            String firstVersion = attachments.getAttachments().get(0).getVersion();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(historyUri + "?number=1&start=1");
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, attachments.getAttachments().size());
+            Assert.assertNotEquals(firstVersion, attachments.getAttachments().get(0).getVersion());
+        } finally {
+            // Clean up
+            this.testUtils.deletePage(this.reference);
+        }
+    }
+
     /**
      * Creates a URI to access the specified resource with the given path elements. The wiki, space and page path
      * elements are added by this method so you can skip them.

@@ -32,7 +32,7 @@ public interface WikisSearchQueryResource
 {
     @GET SearchResults search(
             @QueryParam("q") String query,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("distinct") @DefaultValue("true") Boolean distinct,
             @QueryParam("wikis") String searchWikis,

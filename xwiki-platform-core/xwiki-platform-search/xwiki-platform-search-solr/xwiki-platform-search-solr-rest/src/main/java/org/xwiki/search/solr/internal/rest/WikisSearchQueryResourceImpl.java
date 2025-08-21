@@ -52,6 +52,8 @@ public class WikisSearchQueryResourceImpl extends BaseSearchResult implements Wi
     public SearchResults search(String query, Integer number, Integer start, Boolean distinct, String searchWikis,
         String orderField, String order, Boolean withPrettyNames, String className) throws XWikiRestException
     {
+        int limit = validateAndGetLimit(number);
+
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
             searchResults.setTemplate(String.format("%s?%s", uriInfo.getBaseUri().toString(),
@@ -63,7 +65,7 @@ public class WikisSearchQueryResourceImpl extends BaseSearchResult implements Wi
                     getXWikiContext().getWikiId(),
                     searchWikis,
                     Utils.getXWiki(componentManager).getRightService().hasProgrammingRights(
-                        Utils.getXWikiContext(componentManager)), orderField, order, distinct, number, start,
+                        Utils.getXWikiContext(componentManager)), orderField, order, distinct, limit, start,
                         withPrettyNames, className, uriInfo));
 
             return searchResults;

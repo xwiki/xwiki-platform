@@ -15,11 +15,15 @@
   },
   "type": "module",
   "exports": {
-    "./vitest.config": "./src/vitest.config.ts",
-    "./vitest-vue.config": "./src/vitest-vue.config.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
   },
   "devDependencies": {
-    "typescript": "5.9.2",
-    "vite": "7.0.6"
+    "typescript": "5.9.2"
   }
 }

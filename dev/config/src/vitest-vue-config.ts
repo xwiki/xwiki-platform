@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import defaultConfig from "./vitest.config";
+import defaultConfig from "./vitest-config.js";
 import { defineConfig, mergeConfig } from "vitest/config";
 import type { UserConfig } from "vite";
 

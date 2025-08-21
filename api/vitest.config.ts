@@ -19,7 +19,7 @@
  */
 
 import localConfig from "./vite.config";
+import { vitest as defaultConfig } from "@xwiki/cristal-dev-config";
 import { mergeConfig } from "vitest/config";
-import defaultConfig from "@xwiki/cristal-dev-config/vitest.config";
 
 export default mergeConfig(defaultConfig, localConfig);

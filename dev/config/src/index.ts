@@ -17,21 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import localConfig from "./vite.config";
-import { vitestVue as defaultConfig } from "@xwiki/cristal-dev-config";
-import { defineConfig, mergeConfig } from "vitest/config";
-
-export default mergeConfig(
-  mergeConfig(defaultConfig, localConfig),
-  defineConfig({
-    test: {
-      server: {
-        deps: {
-          // see https://github.com/vitest-dev/vitest/discussions/2677#discussioncomment-7035566
-          inline: ["vuetify"],
-        },
-      },
-    },
-  }),
-);
+import vitest from "./vitest-config.js";
+import vitestVue from "./vitest-vue-config.js";
+export { vitest, vitestVue };

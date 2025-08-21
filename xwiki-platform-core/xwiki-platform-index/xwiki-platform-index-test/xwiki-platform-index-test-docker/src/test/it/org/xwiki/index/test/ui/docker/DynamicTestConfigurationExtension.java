@@ -22,7 +22,6 @@ package org.xwiki.index.test.ui.docker;
 import java.util.Objects;
 import java.util.Properties;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
@@ -40,7 +39,6 @@ public class DynamicTestConfigurationExtension implements BeforeAllCallback
     @Override
     public void beforeAll(ExtensionContext extensionContext)
     {
-
         // Get the already loaded configuration to get the used database engine.
         TestConfiguration loadedConfiguration = DockerTestUtils.getTestConfiguration(extensionContext);
 

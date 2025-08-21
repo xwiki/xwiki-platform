@@ -19,6 +19,7 @@
  */
 package org.xwiki.index.test.ui.docker;
 
+import java.util.Objects;
 import java.util.Properties;
 
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -44,7 +45,7 @@ public class DynamicTestConfigurationExtension implements BeforeAllCallback
         // Collations to test. They were chosen such that they offer sorting for German umlauts that differs from the
         // default "binary" sorting.
         String collation = switch (loadedConfiguration.getDatabase()) {
-            case MYSQL, MARIADB -> "utf8mb4_german2_ci";
+            case MYSQL, MARIADB -> computeMysqlCollation(loadedConfiguration);
             case HSQLDB_EMBEDDED -> "de_DE";
             case POSTGRESQL -> "unicode";
             case ORACLE -> "GENERIC_M_CI";
@@ -58,5 +59,18 @@ public class DynamicTestConfigurationExtension implements BeforeAllCallback
             String.format("index.sortCollation=%s", collation));
         configuration.setProperties(properties);
         globalStore.put(TestConfiguration.class, configuration);
+    }
+
+    private static String computeMysqlCollation(TestConfiguration loadedConfiguration)
+    {
+        String mysqlCollation;
+        // Replace the collation with utf8mb3 when the collation is explicitly set to utf8. This is for instance the
+        // case when running the docker-all configuration on the CI.
+        if (Objects.equals(loadedConfiguration.getDatabaseCommands().getProperty("collation-server"), "utf8_bin")) {
+            mysqlCollation = "utf8mb3_german2_ci";
+        } else{
+            mysqlCollation = "utf8mb4_german2_ci";
+        }
+        return mysqlCollation;
     }
 }

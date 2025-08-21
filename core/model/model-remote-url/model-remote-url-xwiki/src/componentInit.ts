@@ -20,11 +20,11 @@
 
 import { XWikiRemoteURLParser } from "./xWikiRemoteURLParser";
 import { XWikiRemoteURLSerializer } from "./xWikiRemoteURLSerializer";
-import {
+import { Container } from "inversify";
+import type {
   RemoteURLParser,
   RemoteURLSerializer,
 } from "@xwiki/cristal-model-remote-url-api";
-import { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

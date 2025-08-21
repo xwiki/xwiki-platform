@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
-
-import { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
+import { EntityType } from "@xwiki/cristal-model-api";
 import { injectable } from "inversify";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
 
 @injectable()
 export class GitHubModelReferenceSerializer

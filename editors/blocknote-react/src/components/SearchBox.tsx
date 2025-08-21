@@ -17,12 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { LinkSuggestion } from "../misc/linkSuggest";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
 import { t } from "i18next";
 import { debounce } from "lodash-es";
-import { ReactElement, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { RiLink } from "react-icons/ri";
+import type { LinkSuggestion } from "../misc/linkSuggest";
+import type { ReactElement } from "react";
 
 export type SearchBoxProps = {
   /**

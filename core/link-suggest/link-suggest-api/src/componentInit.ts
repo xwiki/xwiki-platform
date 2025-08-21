@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DefaultLinkSuggestServiceProvider } from "./DefaultLinkSuggestServiceProvider";
-import { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
 import { Container } from "inversify";
+import type { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
 
 /**
  * @since 0.11

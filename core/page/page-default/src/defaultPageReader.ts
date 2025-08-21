@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { PageReader } from "@xwiki/cristal-page-api";
 import { parse } from "yaml";
+import type { PageReader } from "@xwiki/cristal-page-api";
 
 /**
  * @since 0.20

@@ -18,8 +18,9 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { FileInputModel } from "@xwiki/cristal-dsapi";
-import { Ref, ref } from "vue";
+import { ref } from "vue";
+import type { FileInputModel } from "@xwiki/cristal-dsapi";
+import type { Ref } from "vue";
 
 defineProps<{ isUploading: boolean }>();
 const fileInputValue: Ref<FileInputModel> = ref();

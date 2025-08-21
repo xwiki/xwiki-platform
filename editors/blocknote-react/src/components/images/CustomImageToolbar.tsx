@@ -18,12 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageFilePanel } from "./ImageFilePanel";
-import { BlockOfType } from "../../blocknote";
-import { LinkEditionContext } from "../../misc/linkSuggest";
 import { useComponentsContext } from "@blocknote/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
+import type { BlockOfType } from "../../blocknote";
+import type { LinkEditionContext } from "../../misc/linkSuggest";
 
 export type CustomImageToolbarProps = {
   currentBlock: BlockOfType<"image">;

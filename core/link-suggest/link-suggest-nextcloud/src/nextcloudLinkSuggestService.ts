@@ -18,16 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
-  Link,
-  LinkSuggestService,
-  LinkType,
-} from "@xwiki/cristal-link-suggest-api";
+import { LinkType } from "@xwiki/cristal-link-suggest-api";
 import { EntityType } from "@xwiki/cristal-model-api";
 import { inject, injectable } from "inversify";
 import xmlescape from "xml-escape";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
+import type { Link, LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
 import type { ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";
 import type { RemoteURLParserProvider } from "@xwiki/cristal-model-remote-url-api";
 

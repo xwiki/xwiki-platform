@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { TabPanelProps } from "@xwiki/cristal-dsapi";
+import type { TabPanelProps } from "@xwiki/cristal-dsapi";
 
 defineProps<TabPanelProps>();
 </script>

@@ -20,11 +20,11 @@
 
 import { NextcloudRemoteURLParser } from "./nextcloudRemoteURLParser";
 import { NextcloudRemoteURLSerializer } from "./nextcloudRemoteURLSerializer";
-import {
+import { Container } from "inversify";
+import type {
   RemoteURLParser,
   RemoteURLSerializer,
 } from "@xwiki/cristal-model-remote-url-api";
-import { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

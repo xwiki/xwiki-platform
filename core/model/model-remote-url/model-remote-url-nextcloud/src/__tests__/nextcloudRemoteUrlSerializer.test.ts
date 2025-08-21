@@ -19,10 +19,6 @@
  */
 import { NextcloudRemoteURLSerializer } from "../nextcloudRemoteURLSerializer";
 import {
-  AuthenticationManager,
-  AuthenticationManagerProvider,
-} from "@xwiki/cristal-authentication-api";
-import {
   AttachmentReference,
   DocumentReference,
   SpaceReference,
@@ -31,6 +27,10 @@ import {
 import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 import type { CristalApp, WikiConfig } from "@xwiki/cristal-api";
+import type {
+  AuthenticationManager,
+  AuthenticationManagerProvider,
+} from "@xwiki/cristal-authentication-api";
 
 describe("NextcloudRemoteURLSerializer", () => {
   const mockAuthenticationManagerProvider =

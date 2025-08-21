@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { PageAttachment } from "./pageAttachment";
+import type { PageAttachment } from "./pageAttachment";
 
 /**
  * Return the list of attachments and an optional count if the results are

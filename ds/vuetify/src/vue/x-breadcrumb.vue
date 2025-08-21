@@ -18,8 +18,8 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { BreadcrumbProps } from "@xwiki/cristal-dsapi";
 import { computed } from "vue";
+import type { BreadcrumbProps } from "@xwiki/cristal-dsapi";
 
 const props = defineProps<BreadcrumbProps>();
 // Converts props items to the format expected by v-breadcrumbs

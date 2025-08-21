@@ -19,6 +19,6 @@
  */
 
 import { ComponentInit } from "./componentInit";
-import { DateService } from "./dateService";
+import type { DateService } from "./dateService";
 
 export { ComponentInit, type DateService };

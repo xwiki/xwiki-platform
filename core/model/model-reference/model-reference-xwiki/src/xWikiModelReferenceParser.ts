@@ -21,15 +21,14 @@
 import {
   AttachmentReference,
   DocumentReference,
-  EntityReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
-import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import { inject, injectable } from "inversify";
-
 import { isEqual } from "lodash-es";
 import type { DocumentService } from "@xwiki/cristal-document-api";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 
 @injectable()
 export class XWikiModelReferenceParser implements ModelReferenceParser {

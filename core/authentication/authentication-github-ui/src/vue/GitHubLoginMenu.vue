@@ -20,10 +20,10 @@
 
 <script lang="ts" setup>
 import messages from "../translations";
-import { CristalApp } from "@xwiki/cristal-api";
 import { GitHubAuthenticationState } from "@xwiki/cristal-authentication-github-state";
 import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { Ref } from "vue";
 

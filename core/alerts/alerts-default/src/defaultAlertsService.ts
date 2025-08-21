@@ -19,14 +19,15 @@
  */
 
 import { injectable } from "inversify";
-import { Store, StoreDefinition, defineStore, storeToRefs } from "pinia";
-import { Ref } from "vue";
+import { defineStore, storeToRefs } from "pinia";
 import type {
   Action,
   Alert,
   AlertsService,
   Type as AlertType,
 } from "@xwiki/cristal-alerts-api";
+import type { Store, StoreDefinition } from "pinia";
+import type { Ref } from "vue";
 
 type Id = "alerts";
 type State = {

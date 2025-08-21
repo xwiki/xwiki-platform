@@ -19,7 +19,7 @@
 -->
 <script setup lang="ts">
 import "@shoelace-style/shoelace/dist/components/tab/tab";
-import { TabProps } from "@xwiki/cristal-dsapi";
+import type { TabProps } from "@xwiki/cristal-dsapi";
 
 defineProps<TabProps>();
 </script>

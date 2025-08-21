@@ -19,8 +19,8 @@
  */
 
 import { EditorState, SelectionRange } from "@tiptap/pm/state";
-import { Primitive } from "@tiptap/vue-3";
 import type { Editor } from "@tiptap/core";
+import type { Primitive } from "@tiptap/vue-3";
 import type { Component } from "vue";
 
 /**

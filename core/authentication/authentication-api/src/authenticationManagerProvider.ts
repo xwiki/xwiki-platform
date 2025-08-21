@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AuthenticationManager } from "./authenticationManager";
+import type { AuthenticationManager } from "./authenticationManager";
 
 /**
  * Help to resolve the right Authentication Manager based on the backend

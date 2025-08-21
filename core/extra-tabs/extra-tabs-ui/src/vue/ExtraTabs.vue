@@ -18,10 +18,10 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { ExtraTab, ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
-import { Ref, ShallowRef, inject, onBeforeMount, ref, shallowRef } from "vue";
+import { inject, onBeforeMount, ref, shallowRef } from "vue";
 import type { CristalApp } from "@xwiki/cristal-api";
-import type { Component } from "vue";
+import type { ExtraTab, ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
+import type { Component, Ref, ShallowRef } from "vue";
 
 const cristal = inject<CristalApp>("cristal")!;
 

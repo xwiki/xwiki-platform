@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { LocalURLSerializer } from "./localURLSerializer";
+import type { LocalURLSerializer } from "./localURLSerializer";
 
 export class DefaultLocalURLSerializer implements LocalURLSerializer {
   serialize(): string | undefined {

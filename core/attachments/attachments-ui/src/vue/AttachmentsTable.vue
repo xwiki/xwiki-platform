@@ -19,16 +19,16 @@
 -->
 <script setup lang="ts">
 import messages from "../translations";
-import { Attachment } from "@xwiki/cristal-attachments-api";
 import { Date } from "@xwiki/cristal-date-ui";
 import { FileSize } from "@xwiki/cristal-file-preview-ui";
 import { AttachmentReference, EntityType } from "@xwiki/cristal-model-api";
-import { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
 import { User } from "@xwiki/cristal-user-ui";
 import { computed, inject } from "vue";
 import { useI18n } from "vue-i18n";
 import type { CristalApp } from "@xwiki/cristal-api";
+import type { Attachment } from "@xwiki/cristal-attachments-api";
 import type { ClickListener } from "@xwiki/cristal-model-click-listener";
+import type { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
 
 const { t } = useI18n({
   messages,

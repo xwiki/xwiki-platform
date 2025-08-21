@@ -19,25 +19,22 @@
  */
 
 import { Heading4, Heading5, Heading6 } from "./blocks/Headings";
-import { MACRO_NAME_PREFIX, Macro } from "./utils";
+import { MACRO_NAME_PREFIX } from "./utils";
 import translations from "../translations";
 import {
-  Block,
   BlockNoteEditor,
   BlockNoteSchema,
-  Link,
-  StyledText,
   combineByGroup,
   defaultBlockSpecs,
   defaultInlineContentSpecs,
   filterSuggestionItems,
 } from "@blocknote/core";
 import * as locales from "@blocknote/core/locales";
-import {
-  DefaultReactSuggestionItem,
-  getDefaultReactSlashMenuItems,
-} from "@blocknote/react";
+import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/cristal-fn-utils";
+import type { Macro } from "./utils";
+import type { Block, Link, StyledText } from "@blocknote/core";
+import type { DefaultReactSuggestionItem } from "@blocknote/react";
 
 /**
  * Create the BlockNote editor's schema

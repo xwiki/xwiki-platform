@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { User } from "./user";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import EventEmitter from "eventemitter3";
+import type { User } from "./user";
 
 interface AutoSaverAwarenessState {
   // The number of local changes made so far.

@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { Status } from "./status";
-import { User } from "./user";
 import type { CollaborationInitializer } from "./collaborationInitializer";
+import type { User } from "./user";
 import type { Ref } from "vue";
 
 /**

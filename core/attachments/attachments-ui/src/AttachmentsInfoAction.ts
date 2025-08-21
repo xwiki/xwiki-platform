@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { InfoAction } from "@xwiki/cristal-info-actions-api";
 import { inject, injectable } from "inversify";
-import { Ref } from "vue";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { AttachmentsService } from "@xwiki/cristal-attachments-api";
+import type { InfoAction } from "@xwiki/cristal-info-actions-api";
+import type { Ref } from "vue";
 
 /**
  * Display the total attachments count of the current page.

@@ -28,7 +28,6 @@ import { Slash } from "../components/extensions/slash";
 import { CollaborationKit } from "../extensions/collaborationKit";
 import initLinkExtension from "../extensions/link";
 import initMarkdown from "../extensions/markdown";
-import { User } from "../extensions/user";
 import messages from "../translations";
 import Placeholder from "@tiptap/extension-placeholder";
 import Table from "@tiptap/extension-table";
@@ -37,21 +36,7 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
-import { CristalApp, PageData } from "@xwiki/cristal-api";
-import { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
-import { BrowserApi } from "@xwiki/cristal-browser-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
-import {
-  ModelReferenceHandlerProvider,
-  ModelReferenceParserProvider,
-  ModelReferenceSerializer,
-  ModelReferenceSerializerProvider,
-} from "@xwiki/cristal-model-reference-api";
-import {
-  RemoteURLParser,
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/cristal-model-remote-url-api";
 import { CArticle } from "@xwiki/cristal-skin";
 import {
   ImageInsertNode,
@@ -62,14 +47,29 @@ import { debounce } from "lodash-es";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import type { User } from "../extensions/user";
 import type { AlertsService } from "@xwiki/cristal-alerts-api";
+import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
+import type { BrowserApi } from "@xwiki/cristal-browser-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/cristal-link-suggest-api";
 import type { DocumentReference } from "@xwiki/cristal-model-api";
+import type {
+  ModelReferenceHandlerProvider,
+  ModelReferenceParserProvider,
+  ModelReferenceSerializer,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/cristal-model-reference-api";
+import type {
+  RemoteURLParser,
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/cristal-model-remote-url-api";
 import type { Markdown } from "tiptap-markdown";
 import type { Ref } from "vue";
 

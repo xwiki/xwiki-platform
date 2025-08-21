@@ -19,7 +19,8 @@
  */
 
 import { BrowserApiDefault } from "./browser-api-default";
-import { BrowserApi, name } from "@xwiki/cristal-browser-api";
+import { name } from "@xwiki/cristal-browser-api";
+import type { BrowserApi } from "@xwiki/cristal-browser-api";
 import type { Container } from "inversify";
 
 export class ComponentInit {

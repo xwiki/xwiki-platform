@@ -20,7 +20,7 @@
 
 import { AlertMacro } from "./alertMacro";
 import Error from "../vue/c-error.vue";
-import { Component } from "vue";
+import type { Component } from "vue";
 
 export class ErrorMacro extends AlertMacro {
   public static override cname = "cristal.macro.error";

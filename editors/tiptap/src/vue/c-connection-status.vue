@@ -18,17 +18,14 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { User } from "../extensions/user";
-import {
-  HocuspocusProvider,
-  WebSocketStatus,
-  // eslint-disable-next-line import/named
-  onAwarenessChangeParameters,
-  // eslint-disable-next-line import/named
-  onStatusParameters,
-} from "@hocuspocus/provider";
+import { HocuspocusProvider, WebSocketStatus } from "@hocuspocus/provider";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { ref } from "vue";
+import type { User } from "../extensions/user";
+import type {
+  onAwarenessChangeParameters,
+  onStatusParameters,
+} from "@hocuspocus/provider";
 import type { Ref } from "vue";
 
 const { provider } = defineProps<{ provider: HocuspocusProvider }>();

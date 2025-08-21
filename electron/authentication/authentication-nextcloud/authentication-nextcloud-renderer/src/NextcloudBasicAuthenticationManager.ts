@@ -18,11 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { UserDetails } from "@xwiki/cristal-authentication-api";
 import { NextcloudAuthenticationState } from "@xwiki/cristal-authentication-nextcloud-state";
 import { inject, injectable } from "inversify";
 import type { CristalApp } from "@xwiki/cristal-api";
-import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
+import type {
+  AuthenticationManager,
+  UserDetails,
+} from "@xwiki/cristal-authentication-api";
 
 interface AuthenticationWindow extends Window {
   authenticationNextcloud: {

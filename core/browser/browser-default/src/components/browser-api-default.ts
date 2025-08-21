@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { WikiConfig } from "@xwiki/cristal-api";
-import { BrowserApi } from "@xwiki/cristal-browser-api";
 import { injectable } from "inversify";
 import { onBeforeMount, onBeforeUnmount } from "vue";
+import type { WikiConfig } from "@xwiki/cristal-api";
+import type { BrowserApi } from "@xwiki/cristal-browser-api";
 
 /**
  * Default implementation for the browser. Set the window location, and the

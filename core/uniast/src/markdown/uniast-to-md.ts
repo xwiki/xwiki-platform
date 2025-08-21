@@ -18,7 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
+import { tryFallibleOrError } from "@xwiki/cristal-fn-utils";
+import type {
   Block,
   Image,
   InlineContent,
@@ -27,7 +28,6 @@ import {
   Text,
   UniAst,
 } from "../ast";
-import { tryFallibleOrError } from "@xwiki/cristal-fn-utils";
 
 /**
  * Converts Universal AST trees to markdown.

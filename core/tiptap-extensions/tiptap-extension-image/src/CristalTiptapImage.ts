@@ -20,10 +20,10 @@
 import ImageView from "./vue/ImageView.vue";
 import { default as Image } from "@tiptap/extension-image";
 import { VueNodeViewRenderer } from "@tiptap/vue-3";
-import { EntityReference } from "@xwiki/cristal-model-api";
-import { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
-import { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 import type { Node } from "@tiptap/pm/model";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
+import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 import type { MarkdownSerializerState } from "prosemirror-markdown";
 
 function serializeExternal(node: Node, state: MarkdownSerializerState) {

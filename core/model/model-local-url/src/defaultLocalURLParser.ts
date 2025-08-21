@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { LocalURLParser } from "./localURLParser";
+import type { LocalURLParser } from "./localURLParser";
 import type { EntityReference } from "@xwiki/cristal-model-api";
 
 export class DefaultLocalURLParser implements LocalURLParser {

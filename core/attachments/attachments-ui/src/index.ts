@@ -21,10 +21,10 @@
 import { AttachmentExtraTab } from "./AttachmentExtraTab";
 import { AttachmentPreviewContentAfterUIExtension } from "./AttachmentPreviewContentAfterUIExtension";
 import { AttachmentsInfoAction } from "./AttachmentsInfoAction";
-import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
-import { InfoAction } from "@xwiki/cristal-info-actions-api";
-import { UIExtension } from "@xwiki/cristal-uiextension-api";
 import { Container } from "inversify";
+import type { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
+import type { InfoAction } from "@xwiki/cristal-info-actions-api";
+import type { UIExtension } from "@xwiki/cristal-uiextension-api";
 
 export class ComponentInit {
   constructor(container: Container) {

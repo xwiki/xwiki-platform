@@ -19,10 +19,8 @@
  */
 
 import { HocuspocusCollaborationProvider } from "./hocuspocusCollaborationProvider";
-import {
-  CollaborationManager,
-  collaborationManagerName,
-} from "@xwiki/cristal-collaboration-api";
+import { collaborationManagerName } from "@xwiki/cristal-collaboration-api";
+import type { CollaborationManager } from "@xwiki/cristal-collaboration-api";
 import type { Container } from "inversify";
 
 /**

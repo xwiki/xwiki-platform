@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { RemoteURLParser } from "./remoteURLParser";
-import { RemoteURLParserProvider } from "./remoteURLParserProvider";
 import { inject, injectable } from "inversify";
+import type { RemoteURLParser } from "./remoteURLParser";
+import type { RemoteURLParserProvider } from "./remoteURLParserProvider";
 import type { CristalApp } from "@xwiki/cristal-api";
 
 /**

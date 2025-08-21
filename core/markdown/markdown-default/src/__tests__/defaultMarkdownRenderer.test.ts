@@ -23,16 +23,17 @@ import {
   DocumentReference,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
-import {
+import { describe, expect, it } from "vitest";
+import { mock } from "vitest-mock-extended";
+import type {
   ModelReferenceParser,
   ModelReferenceParserProvider,
 } from "@xwiki/cristal-model-reference-api";
-import {
+import type {
   RemoteURLSerializer,
   RemoteURLSerializerProvider,
 } from "@xwiki/cristal-model-remote-url-api";
-import { describe, expect, it } from "vitest";
-import { MockProxy, mock } from "vitest-mock-extended";
+import type { MockProxy } from "vitest-mock-extended";
 
 function addReferenceMocks(
   modelReferenceParser: MockProxy<ModelReferenceParser> & ModelReferenceParser,

@@ -19,8 +19,9 @@
  */
 
 import { injectable, unmanaged } from "inversify";
-import { Component } from "vue";
-import { ComposerTranslation, useI18n } from "vue-i18n";
+import { useI18n } from "vue-i18n";
+import type { Component } from "vue";
+import type { ComposerTranslation } from "vue-i18n";
 
 /**
  * Defines the structure of a tab. Including its content.

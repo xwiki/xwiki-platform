@@ -22,20 +22,10 @@ import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
 import { ImageFilePanel } from "./images/ImageFilePanel";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import {
-  BlockType,
-  EditorBlockSchema,
-  EditorInlineContentSchema,
-  EditorLanguage,
-  EditorSchema,
-  EditorStyleSchema,
-  EditorType,
   createBlockNoteSchema,
   createDictionary,
   querySuggestionsMenuItems,
 } from "../blocknote";
-import { BuildableMacro, ContextForMacros } from "../blocknote/utils";
-import { LinkEditionContext } from "../misc/linkSuggest";
-import { BlockNoteEditorOptions } from "@blocknote/core";
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -49,6 +39,18 @@ import {
 } from "@blocknote/react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type {
+  BlockType,
+  EditorBlockSchema,
+  EditorInlineContentSchema,
+  EditorLanguage,
+  EditorSchema,
+  EditorStyleSchema,
+  EditorType,
+} from "../blocknote";
+import type { BuildableMacro, ContextForMacros } from "../blocknote/utils";
+import type { LinkEditionContext } from "../misc/linkSuggest";
+import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationInitializer } from "@xwiki/cristal-collaboration-api";
 
 type DefaultEditorOptionsType = BlockNoteEditorOptions<

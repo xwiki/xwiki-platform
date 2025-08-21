@@ -22,7 +22,6 @@
 import UIX from "./c-uix.vue";
 import messages from "../translations";
 import { AlertsToasts } from "@xwiki/cristal-alerts-ui";
-import { PageData } from "@xwiki/cristal-api";
 import { Date } from "@xwiki/cristal-date-ui";
 import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
 import { InfoActions } from "@xwiki/cristal-info-actions-ui";
@@ -30,7 +29,7 @@ import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
 import { User } from "@xwiki/cristal-user-ui";
 import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import type { CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolverProvider,

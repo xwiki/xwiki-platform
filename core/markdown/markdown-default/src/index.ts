@@ -20,8 +20,8 @@
 import { DefaultMarkdownRenderer } from "./defaultMarkdownRenderer";
 import { parseInternalImages } from "./parseInternalImages";
 import { parseInternalLinks } from "./parseInternalLinks";
-import { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 import { Container } from "inversify";
+import type { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 
 class ComponentInit {
   constructor(container: Container) {

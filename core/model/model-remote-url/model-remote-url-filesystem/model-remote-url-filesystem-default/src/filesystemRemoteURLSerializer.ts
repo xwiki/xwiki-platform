@@ -21,12 +21,12 @@
 import {
   AttachmentReference,
   DocumentReference,
-  EntityReference,
   EntityType,
 } from "@xwiki/cristal-model-api";
-import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import { protocol } from "@xwiki/cristal-model-remote-url-filesystem-api";
 import { injectable } from "inversify";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 
 @injectable()
 class FileSystemRemoteURLSerializer implements RemoteURLSerializer {

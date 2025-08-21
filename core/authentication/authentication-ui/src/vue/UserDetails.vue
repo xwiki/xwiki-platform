@@ -20,11 +20,12 @@
 <script setup lang="ts">
 import { getUserProfile } from "./utils/getUserProfile";
 import messages from "../translations";
-import { CristalApp } from "@xwiki/cristal-api";
-import { BrowserApi, name as browserApiName } from "@xwiki/cristal-browser-api";
+import { name as browserApiName } from "@xwiki/cristal-browser-api";
 import { inject } from "vue";
 import { I18nT, useI18n } from "vue-i18n";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
+import type { BrowserApi } from "@xwiki/cristal-browser-api";
 
 const { t } = useI18n({
   messages,

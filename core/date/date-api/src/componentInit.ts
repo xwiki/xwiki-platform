@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DateService } from "./dateService";
 import { DefaultDateService } from "./defaultDateService";
 import { Container } from "inversify";
+import type { DateService } from "./dateService";
 
 export class ComponentInit {
   constructor(container: Container) {

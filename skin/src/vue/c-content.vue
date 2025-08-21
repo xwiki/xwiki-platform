@@ -21,13 +21,12 @@
 import CArticle from "./c-article.vue";
 import { ContentTools } from "./contentTools";
 import messages from "../translations";
-import { PageData } from "@xwiki/cristal-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { PageActions } from "@xwiki/cristal-page-actions-ui";
 import { computed, inject, onUpdated, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import type { CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 import type { ComputedRef, Ref } from "vue";

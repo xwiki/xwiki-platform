@@ -20,4 +20,4 @@
 
 import type { MarkdownRenderer } from "./markdownRenderer";
 
-export { MarkdownRenderer };
+export { type MarkdownRenderer };

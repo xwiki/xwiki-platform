@@ -19,7 +19,6 @@
  */
 
 import { DefaultLogger } from "@xwiki/cristal-api";
-import { Configurations } from "@xwiki/cristal-configuration-api";
 import { injectable } from "inversify";
 import type {
   CristalApp as CristalApp,
@@ -29,6 +28,7 @@ import type {
   SkinManager,
   WikiConfig,
 } from "@xwiki/cristal-api";
+import type { Configurations } from "@xwiki/cristal-configuration-api";
 import type { Container } from "inversify";
 import type { App, Component } from "vue";
 import type { Router } from "vue-router";

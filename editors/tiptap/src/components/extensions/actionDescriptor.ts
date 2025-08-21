@@ -17,7 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Editor, Range } from "@tiptap/core";
+import { Editor } from "@tiptap/core";
+import type { Range } from "@tiptap/core";
 
 /**
  * Defines the structure of a slash action descriptor.

@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DateService } from "./dateService";
 import dayjs from "dayjs";
 import LocalizedFormat from "dayjs/plugin/localizedFormat";
 import { injectable } from "inversify";
+import type { DateService } from "./dateService";
 
 /**
  * Use dayjs to format dates to a localized form.

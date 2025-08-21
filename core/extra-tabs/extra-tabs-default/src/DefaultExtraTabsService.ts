@@ -18,10 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ExtraTab, ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
-
 import { injectable, multiInject } from "inversify";
 import { sortBy } from "lodash-es";
+import type { ExtraTab, ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
 
 /**
  * @since 0.9

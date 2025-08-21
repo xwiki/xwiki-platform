@@ -18,15 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
+import { injectable, unmanaged } from "inversify";
+import type {
   AttachmentsData,
+  Logger,
   PageAttachment,
   PageData,
   Storage,
   WikiConfig,
 } from "@xwiki/cristal-api";
-import { injectable, unmanaged } from "inversify";
-import type { Logger } from "@xwiki/cristal-api";
 
 @injectable()
 export abstract class AbstractStorage implements Storage {

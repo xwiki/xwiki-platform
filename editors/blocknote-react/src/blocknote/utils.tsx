@@ -18,8 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { BlockNoteEditor, insertOrUpdateBlock } from "@blocknote/core";
 import {
-  BlockNoteEditor,
+  createReactBlockSpec,
+  createReactInlineContentSpec,
+} from "@blocknote/react";
+import { assertUnreachable } from "@xwiki/cristal-fn-utils";
+import type {
   CustomBlockConfig,
   CustomInlineContentConfig,
   InlineContentSchema,
@@ -29,16 +34,12 @@ import {
   PropSpec,
   Props,
   StyleSchema,
-  insertOrUpdateBlock,
 } from "@blocknote/core";
-import {
+import type {
   ReactCustomBlockImplementation,
   ReactInlineContentImplementation,
-  createReactBlockSpec,
-  createReactInlineContentSpec,
 } from "@blocknote/react";
-import { assertUnreachable } from "@xwiki/cristal-fn-utils";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 /**
  * Create a custom block to use in the BlockNote editor

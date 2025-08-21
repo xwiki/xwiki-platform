@@ -19,7 +19,7 @@
 -->
 <script lang="ts" setup>
 import "@shoelace-style/shoelace/dist/components/card/card";
-import { CardProps } from "@xwiki/cristal-dsapi";
+import type { CardProps } from "@xwiki/cristal-dsapi";
 defineProps<CardProps>();
 </script>
 <template>

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ActionCategoryDescriptor } from "../components/extensions/actionCategoryDescriptor";
+import type { ActionCategoryDescriptor } from "../components/extensions/actionCategoryDescriptor";
 
 type Props = { items: ActionCategoryDescriptor[] };
 export { type Props };

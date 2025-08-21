@@ -29,7 +29,6 @@ import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-b
 import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
 import { ComponentInit as CollaborationAPIComponentInit } from "@xwiki/cristal-collaboration-api";
 import { ComponentInit as CollaborationHocusPocusComponentInit } from "@xwiki/cristal-collaboration-hocuspocus";
-import { Configuration } from "@xwiki/cristal-configuration-api";
 import { ComponentInit as DateAPIComponentInit } from "@xwiki/cristal-date-api";
 import { ComponentInit as DocumentComponentInit } from "@xwiki/cristal-document-default";
 import { ComponentInit as MenuButtonsComponentInit } from "@xwiki/cristal-extension-menubuttons";
@@ -55,6 +54,7 @@ import { ComponentInit as SettingsComponentInit } from "@xwiki/cristal-settings-
 import { ComponentInit as SkinComponentInit } from "@xwiki/cristal-skin";
 import { ComponentInit as UIExtensionDefaultComponentInit } from "@xwiki/cristal-uiextension-default";
 import { ComponentInit as WikiConfigComponentInit } from "@xwiki/cristal-wiki-config-default";
+import type { Configuration } from "@xwiki/cristal-configuration-api";
 import type { Container } from "inversify";
 
 /**

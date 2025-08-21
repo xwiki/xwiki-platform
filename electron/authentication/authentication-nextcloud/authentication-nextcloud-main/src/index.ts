@@ -35,9 +35,9 @@ import {
   setTokenType,
   setUserId,
 } from "./storage.js";
-import { UserDetails } from "@xwiki/cristal-authentication-api";
 import axios from "axios";
 import { BrowserWindow, ipcMain, shell } from "electron";
+import type { UserDetails } from "@xwiki/cristal-authentication-api";
 
 const callbackUrl = "http://callback/";
 

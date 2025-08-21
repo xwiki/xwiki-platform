@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
-import { LinkSuggestService } from "./linkSuggestService";
 import { inject, injectable } from "inversify";
+import type { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
+import type { LinkSuggestService } from "./linkSuggestService";
 import type { CristalApp } from "@xwiki/cristal-api";
 
 /**

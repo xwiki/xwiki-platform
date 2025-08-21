@@ -18,7 +18,8 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { Ref, ref } from "vue";
+import { ref } from "vue";
+import type { Ref } from "vue";
 const tab: Ref<unknown> = ref();
 
 const emits = defineEmits(["tab-change"]);

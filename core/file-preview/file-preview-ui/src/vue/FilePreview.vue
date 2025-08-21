@@ -21,7 +21,7 @@
 import NoPreview from "./NoPreview.vue";
 import ImageFilePreview from "./preview/ImageFilePreview.vue";
 import VideoFilePreview from "./preview/VideoFilePreview.vue";
-import { Attachment } from "@xwiki/cristal-attachments-api";
+import type { Attachment } from "@xwiki/cristal-attachments-api";
 import type { Component } from "vue";
 
 defineProps<{ attachment: Attachment }>();

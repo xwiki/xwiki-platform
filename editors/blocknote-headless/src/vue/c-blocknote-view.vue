@@ -23,12 +23,8 @@ import { createLinkEditionContext } from "../components/linkEditionContext";
 import messages from "../translations";
 import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
-import {
-  BlockNoteViewWrapperProps,
-  EditorType,
-  mountBlockNote,
-} from "@xwiki/cristal-editors-blocknote-react";
-import { UniAst, createConverterContext } from "@xwiki/cristal-uniast";
+import { mountBlockNote } from "@xwiki/cristal-editors-blocknote-react";
+import { createConverterContext } from "@xwiki/cristal-uniast";
 import { Container } from "inversify";
 
 import { debounce } from "lodash-es";
@@ -42,6 +38,11 @@ import {
 import { useI18n } from "vue-i18n";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { CollaborationInitializer } from "@xwiki/cristal-collaboration-api";
+import type {
+  BlockNoteViewWrapperProps,
+  EditorType,
+} from "@xwiki/cristal-editors-blocknote-react";
+import type { UniAst } from "@xwiki/cristal-uniast";
 
 const {
   editorProps,

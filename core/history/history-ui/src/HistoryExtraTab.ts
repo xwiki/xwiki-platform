@@ -22,8 +22,8 @@ import messages from "./translations";
 import HistoryTab from "./vue/HistoryTab.vue";
 import { AbstractExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import { inject, injectable } from "inversify";
-import { Component } from "vue";
 import type { PageRevisionManagerProvider } from "@xwiki/cristal-history-api";
+import type { Component } from "vue";
 
 @injectable()
 export class HistoryExtraTab extends AbstractExtraTab {

@@ -18,7 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Ref, onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
+import type { Ref } from "vue";
 
 enum ViewportType {
   Mobile,

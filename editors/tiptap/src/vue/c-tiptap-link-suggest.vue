@@ -19,13 +19,14 @@
 -->
 <script setup lang="ts">
 import { listNavigation } from "./list-navigation-helper";
-import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggestion-action-descriptor";
 import linkSuggestStore from "../stores/link-suggest-store";
-import { SuggestionProps } from "@tiptap/suggestion";
 import { LinkSuggestItem } from "@xwiki/cristal-tiptap-link-suggest-ui";
 import { storeToRefs } from "pinia";
-import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
+import tippy from "tippy.js";
 import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from "vue";
+import type { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggestion-action-descriptor";
+import type { SuggestionProps } from "@tiptap/suggestion";
+import type { GetReferenceClientRect, Instance, Props } from "tippy.js";
 
 const container = ref();
 

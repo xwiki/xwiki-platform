@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Component } from "vue";
+import type { Component } from "vue";
 
 /**
  * Define the information held by a UI Extension (UIX).

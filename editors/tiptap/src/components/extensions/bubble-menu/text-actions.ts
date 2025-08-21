@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import CTiptapLinkEdit from "../../../vue/c-tiptap-link-edit.vue";
-import { Level } from "@tiptap/extension-heading";
 import type { BubbleMenuAction } from "./BubbleMenuAction";
 import type { Editor } from "@tiptap/core";
+import type { Level } from "@tiptap/extension-heading";
 
 function getBoldAction(editor: Editor): BubbleMenuAction {
   return {

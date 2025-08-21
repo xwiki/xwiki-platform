@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { LinkEditionContext, LinkSuggestion } from "../../misc/linkSuggest";
 import { SearchBox } from "../SearchBox";
 import {
   Box,
@@ -38,6 +37,10 @@ import {
 import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
+import type {
+  LinkEditionContext,
+  LinkSuggestion,
+} from "../../misc/linkSuggest";
 
 export type ImageSelectorProps = {
   linkEditionCtx: LinkEditionContext;

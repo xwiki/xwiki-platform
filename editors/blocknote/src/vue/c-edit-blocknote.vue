@@ -21,24 +21,18 @@
 import cRealtimeUsers from "./c-realtime-users.vue";
 import cSaveStatus, { SaveStatus } from "./c-save-status.vue";
 import messages from "../translations";
-import { CristalApp, PageData } from "@xwiki/cristal-api";
 import {
   Status,
   collaborationManagerProviderName,
 } from "@xwiki/cristal-collaboration-api";
-import {
-  DocumentService,
-  name as documentServiceName,
-} from "@xwiki/cristal-document-api";
+import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import {
   BlocknoteEditor as CBlockNoteView,
   DEFAULT_MACROS,
 } from "@xwiki/cristal-editors-blocknote-headless";
-import { ModelReferenceHandlerProvider } from "@xwiki/cristal-model-reference-api";
 import { CArticle } from "@xwiki/cristal-skin";
 import {
   MarkdownToUniAstConverter,
-  UniAst,
   UniAstToMarkdownConverter,
   createConverterContext,
 } from "@xwiki/cristal-uniast";
@@ -46,12 +40,16 @@ import { debounce } from "lodash-es";
 import { inject, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { AlertsService } from "@xwiki/cristal-alerts-api";
+import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type {
   CollaborationInitializer,
   CollaborationManagerProvider,
   User,
 } from "@xwiki/cristal-collaboration-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
+import type { ModelReferenceHandlerProvider } from "@xwiki/cristal-model-reference-api";
+import type { UniAst } from "@xwiki/cristal-uniast";
 import type { Ref } from "vue";
 
 const { t } = useI18n({

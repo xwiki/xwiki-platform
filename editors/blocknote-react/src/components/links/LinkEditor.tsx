@@ -17,10 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  LinkEditionContext,
-  createLinkSuggestor,
-} from "../../misc/linkSuggest";
+import { createLinkSuggestor } from "../../misc/linkSuggest";
 import { SearchBox } from "../SearchBox";
 import { Button, Input, Stack, Text, useCombobox } from "@mantine/core";
 import { tryFallible } from "@xwiki/cristal-fn-utils";
@@ -28,6 +25,7 @@ import { LinkType } from "@xwiki/cristal-link-suggest-api";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiText } from "react-icons/ri";
+import type { LinkEditionContext } from "../../misc/linkSuggest";
 
 type LinkData = {
   title: string;

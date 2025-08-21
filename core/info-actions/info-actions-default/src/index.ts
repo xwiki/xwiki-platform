@@ -19,7 +19,7 @@
  */
 
 import { DefaultInfoActionsService } from "./DefaultInfoActionsService";
-import { InfoActionsService } from "@xwiki/cristal-info-actions-api";
+import type { InfoActionsService } from "@xwiki/cristal-info-actions-api";
 import type { Container } from "inversify";
 
 export class ComponentInit {

@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CristalApp } from "@xwiki/cristal-api";
 import { DefaultVueTemplateProvider } from "@xwiki/cristal-skin";
 import { injectable } from "inversify";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type { Component } from "vue";
 
 @injectable()

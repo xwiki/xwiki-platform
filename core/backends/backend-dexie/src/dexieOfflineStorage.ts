@@ -19,9 +19,9 @@
  */
 
 import DexiePageStorage from "./dexiePageStorage";
-import { DefaultPageData, PageData } from "@xwiki/cristal-api";
+import { DefaultPageData } from "@xwiki/cristal-api";
 import { inject, injectable } from "inversify";
-import type { Logger } from "@xwiki/cristal-api";
+import type { Logger, PageData } from "@xwiki/cristal-api";
 import type { OfflineStorage } from "@xwiki/cristal-backend-api";
 
 @injectable()

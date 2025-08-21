@@ -18,8 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Editor, Range } from "@tiptap/core";
-import { SuggestionProps } from "@tiptap/suggestion";
+import { Editor } from "@tiptap/core";
+import type { Range } from "@tiptap/core";
+import type { SuggestionProps } from "@tiptap/suggestion";
 
 export interface CommandParams {
   editor: Editor;

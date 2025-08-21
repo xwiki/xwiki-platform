@@ -18,11 +18,11 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { CristalApp } from "@xwiki/cristal-api";
-import { DocumentService } from "@xwiki/cristal-document-api";
 import { DocumentReference } from "@xwiki/cristal-model-api";
-import { ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";
 import { inject, onMounted, shallowRef } from "vue";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
+import type { ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";
 
 defineSlots<{
   default: [];

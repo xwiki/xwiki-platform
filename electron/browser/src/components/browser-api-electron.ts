@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { APITypes } from "../electron/preload/apiTypes";
-import { WikiConfig } from "@xwiki/cristal-api";
-import { BrowserApi } from "@xwiki/cristal-browser-api";
 import { injectable } from "inversify";
+import type { APITypes } from "../electron/preload/apiTypes";
+import type { WikiConfig } from "@xwiki/cristal-api";
+import type { BrowserApi } from "@xwiki/cristal-browser-api";
 
 declare const browserElectron: APITypes;
 

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ActionDescriptor } from "./actionDescriptor";
+import type { ActionDescriptor } from "./actionDescriptor";
 
 /**
  * Define the descriptor for action categories.

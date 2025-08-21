@@ -19,13 +19,15 @@
 -->
 <script setup lang="ts">
 import { listNavigation } from "./list-navigation-helper";
-import { ActionDescriptor } from "../components/extensions/actionDescriptor";
 import slashStore from "../stores/slash-store";
-import { SuggestionProps } from "@tiptap/suggestion";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { storeToRefs } from "pinia";
-import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
-import { ComputedRef, computed, onMounted, onUnmounted, ref } from "vue";
+import tippy from "tippy.js";
+import { computed, onMounted, onUnmounted, ref } from "vue";
+import type { ActionDescriptor } from "../components/extensions/actionDescriptor";
+import type { SuggestionProps } from "@tiptap/suggestion";
+import type { GetReferenceClientRect, Instance, Props } from "tippy.js";
+import type { ComputedRef } from "vue";
 
 const container = ref();
 

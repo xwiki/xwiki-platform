@@ -19,8 +19,8 @@
 -->
 <script setup lang="ts">
 import messages from "../../translations";
-import { Attachment } from "@xwiki/cristal-attachments-api";
 import { useI18n } from "vue-i18n";
+import type { Attachment } from "@xwiki/cristal-attachments-api";
 
 defineProps<{ attachment: Attachment }>();
 

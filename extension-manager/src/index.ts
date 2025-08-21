@@ -20,12 +20,12 @@
 
 import ComponentInit from "./components/componentsInit";
 import { CristalLoader } from "./components/cristalLoader";
+import { DefaultComponent } from "./components/defaultComponent";
 import { DefaultExtensionConfig } from "./components/defaultExtensionConfig";
 import { DefaultExtensionManager } from "./components/defaultExtensionManager";
 import type { CristalComponent } from "./api/cristalComponent";
 import type { ExtensionConfig } from "./api/extensionConfig";
 import type { ExtensionManager } from "./api/extensionManager";
-import type { DefaultComponent } from "./components/defaultComponent";
 
 export type { CristalComponent, ExtensionConfig, ExtensionManager };
 export {

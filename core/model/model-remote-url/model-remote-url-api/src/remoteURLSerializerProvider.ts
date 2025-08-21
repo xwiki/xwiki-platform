@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { RemoteURLSerializer } from "./remoteURLSerializer";
+import type { RemoteURLSerializer } from "./remoteURLSerializer";
 
 /**
  * @since 0.12

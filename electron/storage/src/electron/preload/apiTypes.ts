@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { PageAttachment, PageData } from "@xwiki/cristal-api";
 import { LinkType } from "@xwiki/cristal-link-suggest-api";
 import { EntityType } from "@xwiki/cristal-model-api";
+import type { PageAttachment, PageData } from "@xwiki/cristal-api";
 
 export interface APITypes {
   initRootDirectory(): void;

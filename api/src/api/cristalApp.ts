@@ -18,12 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { PageData } from "./PageData";
-import { Configurations } from "@xwiki/cristal-configuration-api";
+import type { PageData } from "./PageData";
 import type { WikiConfig } from "./WikiConfig";
 import type { Logger } from "./logger";
 import type { LoggerConfig } from "./loggerConfig";
 import type { SkinManager } from "./skinManager";
+import type { Configurations } from "@xwiki/cristal-configuration-api";
 import type { Container } from "inversify";
 import type { App, Component, Ref } from "vue";
 import type { Router } from "vue-router";

@@ -18,8 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggestion-action-descriptor";
-import { Store, StoreDefinition, defineStore } from "pinia";
+import { defineStore } from "pinia";
+import type { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggestion-action-descriptor";
+import type { Store, StoreDefinition } from "pinia";
 
 type State = {
   links: LinkSuggestionActionDescriptor[];

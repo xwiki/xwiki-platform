@@ -19,15 +19,13 @@
 -->
 <script setup lang="ts">
 import messages from "../translations";
-import { StorageProvider } from "@xwiki/cristal-backend-api";
-import {
-  DocumentService,
-  name as documentServiceName,
-} from "@xwiki/cristal-document-api";
+import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import { CIcon } from "@xwiki/cristal-icons";
 import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { StorageProvider } from "@xwiki/cristal-backend-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
 import type {
   DocumentReference,
   SpaceReference,

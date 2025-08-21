@@ -23,18 +23,12 @@
 import "reflect-metadata";
 import Index from "../c-index.vue";
 import { DefaultLogger, DefaultPageData } from "@xwiki/cristal-api";
-import { Configurations } from "@xwiki/cristal-configuration-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import { inject, injectable, multiInject } from "inversify";
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 import { createI18n } from "vue-i18n";
-import {
-  RouteRecordRaw,
-  Router,
-  createRouter,
-  createWebHashHistory,
-} from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import type {
   CristalApp,
   Logger,
@@ -44,6 +38,7 @@ import type {
   WikiConfig,
 } from "@xwiki/cristal-api";
 import type { BrowserApi } from "@xwiki/cristal-browser-api";
+import type { Configurations } from "@xwiki/cristal-configuration-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { ExtensionManager } from "@xwiki/cristal-extension-manager";
 import type { MenuEntry } from "@xwiki/cristal-extension-menubuttons";
@@ -54,6 +49,7 @@ import type {
 } from "@xwiki/cristal-skin";
 import type { Container } from "inversify";
 import type { App, Component, Ref } from "vue";
+import type { RouteRecordRaw, Router } from "vue-router";
 
 @injectable()
 export class DefaultCristalApp implements CristalApp {

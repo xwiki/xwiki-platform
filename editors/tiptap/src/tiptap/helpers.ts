@@ -21,7 +21,7 @@
 import { MarkType, NodeType } from "@tiptap/pm/model";
 import { EditorState } from "@tiptap/pm/state";
 import { findParentNode } from "@tiptap/vue-3";
-import { Primitive } from "utility-types";
+import type { Primitive } from "utility-types";
 
 function isNodeActive(
   type: NodeType,

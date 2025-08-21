@@ -12,7 +12,7 @@
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build": "vite build",
     "clean": "rimraf dist",

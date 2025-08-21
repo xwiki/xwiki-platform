@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
+import { defineAsyncComponent } from "vue";
+import type {
+  App,
   AsyncComponentLoader,
   AsyncComponentOptions,
   Component,
   ComponentPublicInstance,
-  defineAsyncComponent,
 } from "vue";
-import type { App } from "vue";
 
 export interface DesignSystemLoader {
   loadDesignSystem(app: App): void;

@@ -20,9 +20,9 @@
 
 import { parseInternalImages } from "./parseInternalImages";
 import { parseInternalLinks } from "./parseInternalLinks";
-import { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 import { inject, injectable } from "inversify";
 import markdownit from "markdown-it";
+import type { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 import type { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
 import type MarkdownIt from "markdown-it";

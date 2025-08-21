@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Attachment } from "./attachment";
-import { Ref } from "vue";
+import type { Attachment } from "./attachment";
+import type { Ref } from "vue";
 
 /**
  * @since 0.9

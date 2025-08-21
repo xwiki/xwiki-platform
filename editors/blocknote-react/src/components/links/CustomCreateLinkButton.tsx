@@ -19,11 +19,11 @@
  */
 import { LinkEditor } from "./LinkEditor";
 import { useEditor } from "../../hooks";
-import { LinkEditionContext } from "../../misc/linkSuggest";
 import { formatKeyboardShortcut } from "@blocknote/core";
 import { useComponentsContext, useDictionary } from "@blocknote/react";
 import { useCallback, useState } from "react";
 import { RiLink } from "react-icons/ri";
+import type { LinkEditionContext } from "../../misc/linkSuggest";
 
 export type CustomCreateLinkButtonProps = {
   linkEditionCtx: LinkEditionContext;

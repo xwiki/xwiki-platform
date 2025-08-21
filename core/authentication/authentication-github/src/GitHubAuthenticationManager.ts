@@ -18,13 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 import { GitHubAuthenticationState } from "@xwiki/cristal-authentication-github-state";
 import axios from "axios";
 import { inject, injectable } from "inversify";
 import Cookies from "js-cookie";
 import type { CristalApp, WikiConfig } from "@xwiki/cristal-api";
-import type { UserDetails } from "@xwiki/cristal-authentication-api";
+import type {
+  AuthenticationManager,
+  UserDetails,
+} from "@xwiki/cristal-authentication-api";
 
 /**
  * {@link AuthenticationManager} for the GitHub backend.

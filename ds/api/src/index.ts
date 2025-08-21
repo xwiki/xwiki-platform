@@ -20,14 +20,6 @@
 
 import { navigationTreePropsDefaults } from "./XNavigationTree";
 import { navigationTreeSelectPropsDefaults } from "./XNavigationTreeSelect";
-import {
-  ButtonHTMLAttributes,
-  DefineComponent,
-  FormHTMLAttributes,
-  HTMLAttributes,
-  ImgHTMLAttributes,
-  InputHTMLAttributes,
-} from "vue";
 import type { AlertActions, AlertProps, AlterAction } from "./XAlert";
 import type { AvatarProps } from "./XAvatar";
 import type {
@@ -54,6 +46,14 @@ import type { TabProps } from "./XTab";
 import type { TabGroupProps } from "./XTabGroup";
 import type { TabPanelProps } from "./XTabPanel";
 import type { TextFieldProps } from "./XTextField";
+import type {
+  ButtonHTMLAttributes,
+  DefineComponent,
+  FormHTMLAttributes,
+  HTMLAttributes,
+  ImgHTMLAttributes,
+  InputHTMLAttributes,
+} from "vue";
 
 /**
  * {@link HTMLAttributes} must be a type for all components. Possibly a sub-type of the abstract component is expected

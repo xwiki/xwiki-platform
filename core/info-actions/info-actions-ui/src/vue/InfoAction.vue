@@ -20,9 +20,9 @@
 
 <script lang="ts" setup>
 import { CIcon } from "@xwiki/cristal-icons";
-import { InfoAction } from "@xwiki/cristal-info-actions-api";
 import { watch } from "vue";
 import { useRoute } from "vue-router";
+import type { InfoAction } from "@xwiki/cristal-info-actions-api";
 
 const route = useRoute();
 const props = defineProps<{ infoAction: InfoAction }>();

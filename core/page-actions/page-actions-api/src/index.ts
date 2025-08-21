@@ -19,8 +19,9 @@
  */
 
 import { injectable, unmanaged } from "inversify";
-import { ComposerTranslation, useI18n } from "vue-i18n";
+import { useI18n } from "vue-i18n";
 import type { Component } from "vue";
+import type { ComposerTranslation } from "vue-i18n";
 
 /**
  * Defines a category for page actions.

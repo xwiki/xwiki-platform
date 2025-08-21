@@ -18,7 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
+import { EntityType } from "@xwiki/cristal-model-api";
+import type { EntityReference } from "@xwiki/cristal-model-api";
 
 /**
  * @since 0.12

@@ -19,8 +19,8 @@
  */
 
 import { DefaultClickListener } from "./DefaultClickListener";
-import { ClickListener } from "./clickListener";
 import { Container } from "inversify";
+import type { ClickListener } from "./clickListener";
 
 export class ComponentInit {
   constructor(container: Container) {

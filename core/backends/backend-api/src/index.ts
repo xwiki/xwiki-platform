@@ -23,4 +23,9 @@ import { ComponentInit } from "./componentInit";
 import type OfflineStorage from "./offlineStorage";
 import type { StorageProvider } from "./storageProvider";
 
-export { AbstractStorage, ComponentInit, OfflineStorage, StorageProvider };
+export {
+  AbstractStorage,
+  ComponentInit,
+  type OfflineStorage,
+  type StorageProvider,
+};

@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { RemoteURLSerializer } from "./remoteURLSerializer";
-import { RemoteURLSerializerProvider } from "./remoteURLSerializerProvider";
 import { inject, injectable } from "inversify";
+import type { RemoteURLSerializer } from "./remoteURLSerializer";
+import type { RemoteURLSerializerProvider } from "./remoteURLSerializerProvider";
 import type { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()

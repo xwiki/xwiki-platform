@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ModelReferenceHandler } from "./modelReferenceHandler";
-import { ModelReferenceHandlerProvider } from "./modelReferenceHandlerProvider";
 import { inject, injectable } from "inversify";
+import type { ModelReferenceHandler } from "./modelReferenceHandler";
+import type { ModelReferenceHandlerProvider } from "./modelReferenceHandlerProvider";
 import type { CristalApp } from "@xwiki/cristal-api";
 
 /**

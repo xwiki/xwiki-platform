@@ -20,12 +20,12 @@
 <script setup lang="ts">
 import AttachmentUploadForm from "./AttachmentUploadForm.vue";
 import AttachmentsTable from "./AttachmentsTable.vue";
-import { CristalApp } from "@xwiki/cristal-api";
-import { AttachmentsService } from "@xwiki/cristal-attachments-api";
-import { DocumentService } from "@xwiki/cristal-document-api";
 import { inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import type { AlertsService } from "@xwiki/cristal-alerts-api";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { AttachmentsService } from "@xwiki/cristal-attachments-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
 
 const cristal = inject<CristalApp>("cristal")!;
 const attachmentsService = cristal

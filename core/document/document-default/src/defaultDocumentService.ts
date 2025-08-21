@@ -20,8 +20,7 @@
 
 import { EntityType } from "@xwiki/cristal-model-api";
 import { inject, injectable } from "inversify";
-import { Store, StoreDefinition, defineStore, storeToRefs } from "pinia";
-import { Ref } from "vue";
+import { defineStore, storeToRefs } from "pinia";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   DocumentChange,
@@ -33,6 +32,8 @@ import type {
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/cristal-model-reference-api";
+import type { Store, StoreDefinition } from "pinia";
+import type { Ref } from "vue";
 
 type Id = "document";
 type State = {

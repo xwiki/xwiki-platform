@@ -21,12 +21,12 @@
 import {
   AttachmentReference,
   DocumentReference,
-  EntityReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
-import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import { injectable } from "inversify";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 
 @injectable()
 export class GitHubModelReferenceParser implements ModelReferenceParser {

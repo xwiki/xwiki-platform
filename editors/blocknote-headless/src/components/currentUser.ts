@@ -19,7 +19,7 @@
  */
 
 import { stringToColor } from "../utils";
-import { AuthenticationManager } from "@xwiki/cristal-authentication-api";
+import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 
 /**
  * Realtime user

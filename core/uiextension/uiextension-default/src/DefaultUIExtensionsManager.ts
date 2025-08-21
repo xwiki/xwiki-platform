@@ -18,12 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
+import { injectable, multiInject } from "inversify";
+import { sortBy } from "lodash-es";
+import type {
   UIExtension,
   UIExtensionsManager,
 } from "@xwiki/cristal-uiextension-api";
-import { injectable, multiInject } from "inversify";
-import { sortBy } from "lodash-es";
 
 @injectable()
 export class DefaultUIExtensionsManager implements UIExtensionsManager {

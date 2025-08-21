@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ImageSelector } from "./ImageSelector";
-import { BlockOfType } from "../../blocknote";
 import { useEditor } from "../../hooks";
-import { LinkEditionContext } from "../../misc/linkSuggest";
 import { Paper } from "@mantine/core";
 import { useCallback } from "react";
+import type { BlockOfType } from "../../blocknote";
+import type { LinkEditionContext } from "../../misc/linkSuggest";
 
 export type ImageFilePanelProps = {
   currentBlock: BlockOfType<"image">;

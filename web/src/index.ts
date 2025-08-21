@@ -29,8 +29,8 @@ import { ComponentInit as AuthenticationXWikiComponentInit } from "@xwiki/crista
 import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-default";
 import { ComponentInit as BrowserSettingsComponentInit } from "@xwiki/cristal-settings-browser";
 import { loadConfig } from "@xwiki/cristal-configuration-web";
-import { type Container } from "inversify";
-import { type Configuration } from "@xwiki/cristal-configuration-api";
+import type { Container } from "inversify";
+import type { Configuration } from "@xwiki/cristal-configuration-api";
 
 CristalAppLoader.init(
   [

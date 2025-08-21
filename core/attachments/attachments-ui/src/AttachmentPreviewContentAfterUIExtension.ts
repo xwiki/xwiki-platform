@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { UIExtension } from "@xwiki/cristal-uiextension-api";
 import { injectable } from "inversify";
-import { Component } from "vue";
+import type { UIExtension } from "@xwiki/cristal-uiextension-api";
+import type { Component } from "vue";
 
 /**
  * @since 0.12

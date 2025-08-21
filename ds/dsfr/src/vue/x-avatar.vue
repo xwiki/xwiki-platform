@@ -19,7 +19,7 @@
 -->
 <script lang="ts" setup>
 import { DsfrPicture } from "@gouvminint/vue-dsfr";
-import { AvatarProps } from "@xwiki/cristal-dsapi";
+import type { AvatarProps } from "@xwiki/cristal-dsapi";
 
 defineProps<AvatarProps>();
 </script>

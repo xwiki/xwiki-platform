@@ -20,10 +20,9 @@
 
 import { XWikiWikiConfig } from "./XWikiWikiConfig";
 import { XWikiStorage } from "./xwikiStorage";
-import { Storage } from "@xwiki/cristal-api";
 import { whenNamedOrDefault } from "@xwiki/cristal-utils-inversify";
 import { Container } from "inversify";
-import type { WikiConfig } from "@xwiki/cristal-api";
+import type { Storage, WikiConfig } from "@xwiki/cristal-api";
 
 export class ComponentInit {
   constructor(container: Container) {

@@ -27,12 +27,12 @@ import { TemplateComponent } from "./templateTemplateProvider";
 import { UIXLoginTemplateProvider } from "./uixLoginTemplateProvider";
 import { UIXSearchTemplateProvider } from "./uixSearchTemplateProvider";
 import { UIXVueTemplateProvider } from "./uixVueTemplateProvider";
-import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
-import { InfoAction } from "@xwiki/cristal-info-actions-api";
-import { UIExtension } from "@xwiki/cristal-uiextension-api";
 import type { UIXTemplateProvider } from "../api/uixTemplateProvider";
 import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import type { Logger, SkinManager } from "@xwiki/cristal-api";
+import type { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
+import type { InfoAction } from "@xwiki/cristal-info-actions-api";
+import type { UIExtension } from "@xwiki/cristal-uiextension-api";
 import type { Container } from "inversify";
 
 export default class ComponentInit {

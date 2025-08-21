@@ -21,13 +21,11 @@
 import { CustomImageToolbar } from "./images/CustomImageToolbar";
 import { CustomCreateLinkButton } from "./links/CustomCreateLinkButton";
 import { useEditor } from "../hooks";
-import { LinkEditionContext } from "../misc/linkSuggest";
 import {
   AddCommentButton,
   AddTiptapCommentButton,
   BasicTextStyleButton,
   BlockTypeSelect,
-  BlockTypeSelectItem,
   ColorStyleButton,
   FileCaptionButton,
   FileDeleteButton,
@@ -35,14 +33,18 @@ import {
   FilePreviewButton,
   FileRenameButton,
   FileReplaceButton,
-  FormattingToolbarProps,
   NestBlockButton,
   TableCellMergeButton,
   TextAlignButton,
   UnnestBlockButton,
   useComponentsContext,
 } from "@blocknote/react";
-import { JSX } from "react";
+import type { LinkEditionContext } from "../misc/linkSuggest";
+import type {
+  BlockTypeSelectItem,
+  FormattingToolbarProps,
+} from "@blocknote/react";
+import type { JSX } from "react";
 
 export type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;

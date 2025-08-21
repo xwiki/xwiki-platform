@@ -21,13 +21,13 @@
 import {
   AttachmentReference,
   DocumentReference,
-  EntityReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
-import { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 import { inject, injectable } from "inversify";
 import type { CristalApp } from "@xwiki/cristal-api";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 
 @injectable()
 class GitHubRemoteURLParser implements RemoteURLParser {

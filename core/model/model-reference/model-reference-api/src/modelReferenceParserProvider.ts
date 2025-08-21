@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ModelReferenceParser } from "./modelReferenceParser";
+import type { ModelReferenceParser } from "./modelReferenceParser";
 
 /**
  * @since 0.12

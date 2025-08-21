@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { Attachment } from "@xwiki/cristal-attachments-api";
+import type { Attachment } from "@xwiki/cristal-attachments-api";
 
 defineProps<{ attachment: Attachment }>();
 </script>

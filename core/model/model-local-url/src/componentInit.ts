@@ -20,9 +20,9 @@
 
 import { DefaultLocalURLParser } from "./defaultLocalURLParser";
 import { DefaultLocalURLSerializer } from "./defaultLocalURLSerializer";
-import { LocalURLParser } from "./localURLParser";
-import { LocalURLSerializer } from "./localURLSerializer";
 import { Container } from "inversify";
+import type { LocalURLParser } from "./localURLParser";
+import type { LocalURLSerializer } from "./localURLSerializer";
 
 class ComponentInit {
   constructor(container: Container) {

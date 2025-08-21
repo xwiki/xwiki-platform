@@ -22,10 +22,10 @@ import {
   parseInternalImages,
   parseInternalLinks,
 } from "@xwiki/cristal-markdown-default";
-import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
-import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import MarkdownIt from "markdown-it";
 import { Markdown } from "tiptap-markdown";
+import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
+import type { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 
 export default function (
   modelReferenceParser: ModelReferenceParser,

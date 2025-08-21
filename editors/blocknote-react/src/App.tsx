@@ -17,14 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  BlockNoteViewWrapper,
-  BlockNoteViewWrapperProps,
-} from "./components/BlockNoteViewWrapper";
+import { BlockNoteViewWrapper } from "./components/BlockNoteViewWrapper";
 import i18n from "./i18n";
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.layer.css";
 import { useEffect } from "react";
+import type { BlockNoteViewWrapperProps } from "./components/BlockNoteViewWrapper";
 
 export const App: React.FC<BlockNoteViewWrapperProps> = (props) => {
   useEffect(() => {

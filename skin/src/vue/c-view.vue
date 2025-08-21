@@ -22,7 +22,8 @@ import CMain from "./c-main.vue";
 import CTemplate from "./c-template.vue";
 import UIX from "./c-uix.vue";
 import { ViewportType, useViewportType } from "../composables/viewport";
-import { Ref, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
+import type { Ref } from "vue";
 import "../css/main.css";
 
 const viewportType: Ref<ViewportType> = useViewportType();

@@ -18,18 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ActionCategoryDescriptor } from "./actionCategoryDescriptor";
-import { ActionDescriptor } from "./actionDescriptor";
 import { queryEqualityOperator } from "./filter-helper";
-import { CommandParams } from "./menu-helpers";
-import { Props } from "../../stores/props";
-import slashStore, { SlashStore } from "../../stores/slash-store";
+import slashStore from "../../stores/slash-store";
 import Selector from "../../vue/c-tiptap-selector.vue";
 import { Extension } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
 import { default as Suggestion } from "@tiptap/suggestion";
 import { createPinia } from "pinia";
-import { App, createApp } from "vue";
+import { createApp } from "vue";
+import type { ActionCategoryDescriptor } from "./actionCategoryDescriptor";
+import type { ActionDescriptor } from "./actionDescriptor";
+import type { CommandParams } from "./menu-helpers";
+import type { Props } from "../../stores/props";
+import type { SlashStore } from "../../stores/slash-store";
+import type { App } from "vue";
 
 const Slash = Extension.create({
   name: "slash",

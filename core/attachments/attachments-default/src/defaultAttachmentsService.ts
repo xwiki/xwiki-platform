@@ -19,13 +19,14 @@
  */
 
 import { inject, injectable } from "inversify";
-import { Store, StoreDefinition, defineStore, storeToRefs } from "pinia";
-import { Ref } from "vue";
+import { defineStore, storeToRefs } from "pinia";
 import type {
   Attachment,
   AttachmentsService,
 } from "@xwiki/cristal-attachments-api";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
+import type { Store, StoreDefinition } from "pinia";
+import type { Ref } from "vue";
 
 type Id = "attachments";
 type State = {

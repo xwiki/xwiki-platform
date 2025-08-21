@@ -18,10 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { StorageProvider } from "./storageProvider";
-import { Storage } from "@xwiki/cristal-api";
 import { inject, injectable } from "inversify";
-import type { CristalApp } from "@xwiki/cristal-api";
+import type { StorageProvider } from "./storageProvider";
+import type { CristalApp, Storage } from "@xwiki/cristal-api";
 
 /**
  * Provide the current storage.

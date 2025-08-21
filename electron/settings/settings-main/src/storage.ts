@@ -19,8 +19,8 @@
  */
 
 import defaultSettings from "./defaultSettings.json";
-import { Configurations } from "@xwiki/cristal-configuration-api";
 import Store from "electron-store";
+import type { Configurations } from "@xwiki/cristal-configuration-api";
 
 const configurationKey = "configuration";
 const settingsKey = "_raw";

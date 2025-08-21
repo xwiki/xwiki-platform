@@ -19,10 +19,10 @@
  */
 
 import { default as Link } from "@tiptap/extension-link";
-import { EntityReference } from "@xwiki/cristal-model-api";
-import { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
-import { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 import type { Mark } from "@tiptap/pm/model";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
+import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 
 /**
  * Extends the default tiptap extension link with custom Markdown serialization

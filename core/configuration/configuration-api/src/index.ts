@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Primitive } from "utility-types";
+import type { Primitive } from "utility-types";
 
 /**
  * A single configuration entry.

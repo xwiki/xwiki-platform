@@ -20,8 +20,8 @@
 
 import { DefaultRemoteURLParserProvider } from "./defaultRemoteURLParserProvider";
 import { DefaultRemoteURLSerializerProvider } from "./defaultRemoteURLSerializerProvider";
-import { RemoteURLParserProvider } from "./remoteURLParserProvider";
-import { RemoteURLSerializerProvider } from "./remoteURLSerializerProvider";
+import type { RemoteURLParserProvider } from "./remoteURLParserProvider";
+import type { RemoteURLSerializerProvider } from "./remoteURLSerializerProvider";
 import type { Container } from "inversify";
 
 class ComponentInit {

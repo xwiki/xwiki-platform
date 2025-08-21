@@ -22,4 +22,8 @@ import type { AuthenticationManager } from "./authenticationManager";
 import type { AuthenticationManagerProvider } from "./authenticationManagerProvider";
 import type { UserDetails } from "./userDetails";
 
-export { AuthenticationManager, AuthenticationManagerProvider, UserDetails };
+export type {
+  AuthenticationManager,
+  AuthenticationManagerProvider,
+  UserDetails,
+};

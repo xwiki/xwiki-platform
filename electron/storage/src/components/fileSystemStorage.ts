@@ -18,16 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { APITypes } from "../electron/preload/apiTypes";
-import {
+import { DefaultPageData } from "@xwiki/cristal-api";
+import { AbstractStorage } from "@xwiki/cristal-backend-api";
+import { inject, injectable } from "inversify";
+import type { APITypes } from "../electron/preload/apiTypes";
+import type {
   AttachmentsData,
-  DefaultPageData,
+  Logger,
   PageAttachment,
   PageData,
 } from "@xwiki/cristal-api";
-import { AbstractStorage } from "@xwiki/cristal-backend-api";
-import { inject, injectable } from "inversify";
-import type { Logger } from "@xwiki/cristal-api";
 
 declare const fileSystemStorage: APITypes;
 

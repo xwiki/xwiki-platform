@@ -20,20 +20,15 @@
 <script setup lang="ts">
 import CTiptapLinkSuggest from "./c-tiptap-link-suggest.vue";
 import { initSuggestionsService } from "../components/extensions/link-suggest";
-import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggestion-action-descriptor";
-import linkSuggestStore, {
-  LinkSuggestStore,
-} from "../stores/link-suggest-store";
+import linkSuggestStore from "../stores/link-suggest-store";
 import { SelectionRange } from "@tiptap/pm/state";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import {
-  ModelReferenceParserProvider,
-  ModelReferenceSerializerProvider,
-} from "@xwiki/cristal-model-reference-api";
 import { ContentTools } from "@xwiki/cristal-skin";
 import { debounce } from "lodash-es";
-import { Ref, inject, onMounted, onUpdated, ref, toRefs, watch } from "vue";
+import { inject, onMounted, onUpdated, ref, toRefs, watch } from "vue";
 import type { BubbleMenuAction } from "../components/extensions/bubble-menu/BubbleMenuAction";
+import type { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggestion-action-descriptor";
+import type { LinkSuggestStore } from "../stores/link-suggest-store";
 import type { Editor } from "@tiptap/core";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type {
@@ -42,9 +37,14 @@ import type {
 } from "@xwiki/cristal-link-suggest-api";
 import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/cristal-model-reference-api";
+import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
 } from "@xwiki/cristal-model-remote-url-api";
+import type { Ref } from "vue";
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 

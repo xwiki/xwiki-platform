@@ -20,26 +20,27 @@
 <script setup lang="ts">
 import messages from "../translations";
 import { NodeViewWrapper } from "@tiptap/vue-3";
-import { CristalApp } from "@xwiki/cristal-api";
-import { AttachmentsService } from "@xwiki/cristal-attachments-api";
-import { DocumentService } from "@xwiki/cristal-document-api";
-import {
-  Link,
-  LinkSuggestServiceProvider,
-  LinkType,
-} from "@xwiki/cristal-link-suggest-api";
+import { LinkType } from "@xwiki/cristal-link-suggest-api";
 import {
   AttachmentReference,
   DocumentReference,
 } from "@xwiki/cristal-model-api";
-import { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
-import { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
 import { LinkSuggestItem } from "@xwiki/cristal-tiptap-link-suggest-ui";
 import { debounce } from "lodash-es";
-import { Ref, inject, ref, useTemplateRef, watch } from "vue";
+import { inject, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Tippy } from "vue-tippy";
 import type { NodeViewProps } from "@tiptap/vue-3";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { AttachmentsService } from "@xwiki/cristal-attachments-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
+import type {
+  Link,
+  LinkSuggestServiceProvider,
+} from "@xwiki/cristal-link-suggest-api";
+import type { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
+import type { Ref } from "vue";
 import "@tiptap/extension-image";
 
 const { t } = useI18n({

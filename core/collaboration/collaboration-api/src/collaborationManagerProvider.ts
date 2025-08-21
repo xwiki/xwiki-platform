@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CollaborationManager } from "./collaborationManager";
+import type { CollaborationManager } from "./collaborationManager";
 
 /**
  * Dynamically resolves a CollaborationManager based on the configuration.

@@ -18,9 +18,9 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import { CristalApp } from "@xwiki/cristal-api";
-import { DateService } from "@xwiki/cristal-date-api";
 import { inject } from "vue";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { DateService } from "@xwiki/cristal-date-api";
 
 defineProps<{ date: Date }>();
 const cristal = inject<CristalApp>("cristal")!;

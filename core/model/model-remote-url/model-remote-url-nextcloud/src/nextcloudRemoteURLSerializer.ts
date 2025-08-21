@@ -21,14 +21,14 @@
 import {
   AttachmentReference,
   DocumentReference,
-  EntityReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
-import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import { inject, injectable } from "inversify";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 
 @injectable()
 class NextcloudRemoteURLSerializer implements RemoteURLSerializer {

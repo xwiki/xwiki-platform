@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ClickListener } from "./clickListener";
 import { AttachmentReference, EntityType } from "@xwiki/cristal-model-api";
 import { inject, injectable } from "inversify";
+import type { ClickListener } from "./clickListener";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { AttachmentPreview } from "@xwiki/cristal-attachments-api";
 import type { ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";

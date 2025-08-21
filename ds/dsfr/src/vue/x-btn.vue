@@ -19,7 +19,7 @@
 -->
 <script lang="ts" setup>
 import { DsfrButton } from "@gouvminint/vue-dsfr";
-import { BtnProps } from "@xwiki/cristal-dsapi";
+import type { BtnProps } from "@xwiki/cristal-dsapi";
 
 defineProps<BtnProps>();
 </script>

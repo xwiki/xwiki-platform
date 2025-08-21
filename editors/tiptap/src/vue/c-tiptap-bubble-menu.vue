@@ -34,10 +34,10 @@ import {
 import { EditorView } from "@tiptap/pm/view";
 import { BubbleMenu } from "@tiptap/vue-3";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import { ComputedRef, Ref, computed, ref, shallowRef } from "vue";
+import { computed, ref, shallowRef } from "vue";
 import type { BubbleMenuAction } from "../components/extensions/bubble-menu/BubbleMenuAction";
 import type { Editor } from "@tiptap/core";
-import type { Component } from "vue";
+import type { Component, ComputedRef, Ref } from "vue";
 
 const props = defineProps<{
   editor: Editor;

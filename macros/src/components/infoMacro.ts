@@ -20,7 +20,7 @@
 
 import { AlertMacro } from "./alertMacro";
 import Info from "../vue/c-info.vue";
-import { Component } from "vue";
+import type { Component } from "vue";
 
 export class InfoMacro extends AlertMacro {
   public static override cname = "cristal.macro.info";

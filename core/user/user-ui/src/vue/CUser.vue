@@ -20,7 +20,7 @@
 <script lang="ts" setup>
 // For now this component is mostly useful to centralize user display use. Several ways to display user or users must be
 // provided over time, and more adapted to the design systems.
-import { UserDetails } from "@xwiki/cristal-authentication-api";
+import type { UserDetails } from "@xwiki/cristal-authentication-api";
 
 defineProps<{ user: UserDetails }>();
 </script>

@@ -19,8 +19,8 @@
  */
 
 import { UixBlocknoteEditorProvider } from "./uixBlocknoteEditorProvider";
-import { UIXTemplateProvider } from "@xwiki/cristal-skin";
 import { Container } from "inversify";
+import type { UIXTemplateProvider } from "@xwiki/cristal-skin";
 
 export default class ComponentInit {
   constructor(container: Container) {

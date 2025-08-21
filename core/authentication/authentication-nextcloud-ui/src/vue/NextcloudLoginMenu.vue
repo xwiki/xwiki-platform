@@ -20,10 +20,10 @@
 
 <script lang="ts" setup>
 import messages from "../translations";
-import { CristalApp } from "@xwiki/cristal-api";
 import { NextcloudAuthenticationState } from "@xwiki/cristal-authentication-nextcloud-state";
 import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type { Ref } from "vue";
 
 const { t } = useI18n({

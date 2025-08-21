@@ -22,19 +22,22 @@ import "reflect-metadata";
 import { WorkerCristalApp } from "./workerCristalApp";
 import WorkerQueueWorker from "./workerQueueWorker";
 import { ComponentInit as AlertsDefaultComponentInit } from "@xwiki/cristal-alerts-default";
-import { CristalApp, WrappingStorage } from "@xwiki/cristal-api";
 import { ComponentInit as AuthenticationDefaultComponentInit } from "@xwiki/cristal-authentication-default";
 import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backend-dexie";
 import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
 import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
-import {
+import { CristalLoader } from "@xwiki/cristal-extension-manager";
+import * as Comlink from "comlink";
+import type {
+  CristalApp,
+  WikiConfig,
+  WrappingStorage,
+} from "@xwiki/cristal-api";
+import type {
   ConfigurationLoader,
   Configurations,
 } from "@xwiki/cristal-configuration-api";
-import { CristalLoader } from "@xwiki/cristal-extension-manager";
-import * as Comlink from "comlink";
-import type { WikiConfig } from "@xwiki/cristal-api";
 import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
 import type { Container } from "inversify";
 

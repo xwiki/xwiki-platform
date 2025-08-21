@@ -18,12 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
-  AttachmentsData,
-  DefaultPageData,
-  PageAttachment,
-  PageData,
-} from "@xwiki/cristal-api";
+import { DefaultPageData } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 import {
   DefaultPageReader,
@@ -32,7 +27,12 @@ import {
 import { inject, injectable } from "inversify";
 import mime from "mime";
 import type { AlertsServiceProvider } from "@xwiki/cristal-alerts-api";
-import type { Logger } from "@xwiki/cristal-api";
+import type {
+  AttachmentsData,
+  Logger,
+  PageAttachment,
+  PageData,
+} from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 
 @injectable()

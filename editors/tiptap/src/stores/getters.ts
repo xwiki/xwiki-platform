@@ -17,9 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { State } from "./state";
-
-import { ActionCategoryDescriptor } from "../components/extensions/actionCategoryDescriptor";
+import type { State } from "./state";
+import type { ActionCategoryDescriptor } from "../components/extensions/actionCategoryDescriptor";
 
 export type Getters = {
   items: (state: State) => ActionCategoryDescriptor[];

@@ -18,12 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
+import { injectable, multiInject } from "inversify";
+import { sortBy } from "lodash-es";
+import type {
   InfoAction,
   InfoActionsService,
 } from "@xwiki/cristal-info-actions-api";
-import { injectable, multiInject } from "inversify";
-import { sortBy } from "lodash-es";
 
 /**
  * Default implementation of InfoActionsService. Returns the list of enabled

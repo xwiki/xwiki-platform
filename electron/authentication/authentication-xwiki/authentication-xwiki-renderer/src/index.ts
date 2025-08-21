@@ -19,7 +19,7 @@
  */
 
 import { XWikiAuthenticationManager } from "./xWikiAuthenticationManager";
-import { AuthenticationManager } from "@xwiki/cristal-authentication-api";
+import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 import type { Container } from "inversify";
 
 export class ComponentInit {

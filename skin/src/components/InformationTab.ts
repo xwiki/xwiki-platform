@@ -22,7 +22,7 @@ import messages from "../translations";
 import InformationTab from "../vue/extra-tabs/InformationTab.vue";
 import { AbstractExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import { injectable } from "inversify";
-import { Component } from "vue";
+import type { Component } from "vue";
 
 @injectable()
 class InformationExtraTab extends AbstractExtraTab {

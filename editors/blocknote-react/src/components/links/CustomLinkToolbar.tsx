@@ -18,8 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { LinkEditor } from "./LinkEditor";
-import { LinkEditionContext } from "../../misc/linkSuggest";
-import { LinkToolbarProps, useComponentsContext } from "@blocknote/react";
+import { useComponentsContext } from "@blocknote/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -27,6 +26,8 @@ import {
   RiExternalLinkLine,
   RiPencilLine,
 } from "react-icons/ri";
+import type { LinkEditionContext } from "../../misc/linkSuggest";
+import type { LinkToolbarProps } from "@blocknote/react";
 
 export type CustomLinkToolbarProps = {
   linkToolbarProps: LinkToolbarProps;

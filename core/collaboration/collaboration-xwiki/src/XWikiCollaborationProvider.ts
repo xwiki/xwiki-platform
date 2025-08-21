@@ -17,17 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  CollaborationInitializer,
-  Status,
-  User,
-} from "@xwiki/cristal-collaboration-api";
+import { Status } from "@xwiki/cristal-collaboration-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import { inject, injectable } from "inversify";
-import { Ref, ref } from "vue";
+import { ref } from "vue";
 import type { CristalApp } from "@xwiki/cristal-api";
-import type { CollaborationManager } from "@xwiki/cristal-collaboration-api";
+import type {
+  CollaborationInitializer,
+  CollaborationManager,
+  User,
+} from "@xwiki/cristal-collaboration-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
+import type { Ref } from "vue";
 
 /**
  * A collaboration provider for the websocket endpoint provided by xwiki for realtime editing with yjs based editors.

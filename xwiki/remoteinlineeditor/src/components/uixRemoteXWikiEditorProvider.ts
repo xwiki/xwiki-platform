@@ -19,9 +19,9 @@
  */
 
 import TextEditor from "../vue/c-edit-xwikiremote.vue";
-import { CristalApp } from "@xwiki/cristal-api";
 import { DefaultVueTemplateProvider } from "@xwiki/cristal-skin";
 import { injectable } from "inversify";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type { Component } from "vue";
 
 @injectable()

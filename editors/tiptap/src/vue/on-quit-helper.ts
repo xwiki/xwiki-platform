@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import messages from "../translations";
-import { BrowserApi } from "@xwiki/cristal-browser-api";
 import { useI18n } from "vue-i18n";
-import { Router } from "vue-router";
+import type { BrowserApi } from "@xwiki/cristal-browser-api";
+import type { Router } from "vue-router";
 
 function hasUnsavedContent(currentContent: string, lastSavedContent: string) {
   return currentContent !== lastSavedContent;

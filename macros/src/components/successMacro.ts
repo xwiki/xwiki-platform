@@ -20,7 +20,7 @@
 
 import { AlertMacro } from "./alertMacro";
 import Success from "../vue/c-success.vue";
-import { Component } from "vue";
+import type { Component } from "vue";
 
 export class SuccessMacro extends AlertMacro {
   public static override cname = "cristal.macro.success";

@@ -18,21 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Link, TableCell as BlockNoteTableCell } from "@blocknote/core";
-import {
-  BlockType,
-  EditorInlineContentSchema,
-  EditorLink,
-  EditorStyleSchema,
-  EditorStyledText,
-  MACRO_NAME_PREFIX,
-} from "@xwiki/cristal-editors-blocknote-react";
+import { MACRO_NAME_PREFIX } from "@xwiki/cristal-editors-blocknote-react";
 import {
   assertUnreachable,
   provideTypeInference,
   tryFallibleOrError,
 } from "@xwiki/cristal-fn-utils";
-import {
+import type { Link, TableCell as BlockNoteTableCell } from "@blocknote/core";
+import type {
+  BlockType,
+  EditorInlineContentSchema,
+  EditorLink,
+  EditorStyleSchema,
+  EditorStyledText,
+} from "@xwiki/cristal-editors-blocknote-react";
+import type {
   Block,
   BlockStyles,
   ConverterContext,

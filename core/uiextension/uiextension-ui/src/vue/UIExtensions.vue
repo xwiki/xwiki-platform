@@ -19,9 +19,9 @@
 -->
 
 <script lang="ts" setup>
-import { CristalApp } from "@xwiki/cristal-api";
-import { UIExtensionsManager } from "@xwiki/cristal-uiextension-api";
 import { inject } from "vue";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { UIExtensionsManager } from "@xwiki/cristal-uiextension-api";
 import type { Component } from "vue";
 //
 const { uixName } = defineProps<{

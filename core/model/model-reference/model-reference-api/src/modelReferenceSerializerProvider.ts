@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ModelReferenceSerializer } from "./modelReferenceSerializer";
+import type { ModelReferenceSerializer } from "./modelReferenceSerializer";
 
 /**
  * @since 0.12

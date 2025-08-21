@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ClickListener } from "@xwiki/cristal-model-click-listener";
 import { createVNode, render } from "vue";
 import type { MacroProvider } from "../api/macroProvider";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
+import type { ClickListener } from "@xwiki/cristal-model-click-listener";
 import type { App, Component, VNode } from "vue";
 
 export class ContentTools {

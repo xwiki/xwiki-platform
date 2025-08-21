@@ -20,8 +20,8 @@
 
 import { LoggedInMenuUIExtension } from "./LoggedInMenuUIExtension";
 import { LoginMenuUIExtension } from "./LoginMenuUIExtension";
-import { UIExtension } from "@xwiki/cristal-uiextension-api";
 import { Container } from "inversify";
+import type { UIExtension } from "@xwiki/cristal-uiextension-api";
 
 export class ComponentInit {
   constructor(container: Container) {

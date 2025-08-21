@@ -20,17 +20,16 @@
 import { App } from "./App";
 import { XWikiMacroHTMLBlockMacro } from "./blocknote/macros/XWikiMacroHtmlBlock";
 import { XWikiMacroInlineHTMLMacro } from "./blocknote/macros/XWikiMacroInlineHtml";
-import {
+import { MACRO_NAME_PREFIX, createMacro } from "./blocknote/utils";
+import { createRoot } from "react-dom/client";
+import type {
   BuildableMacro,
   ContextForMacros,
-  MACRO_NAME_PREFIX,
   Macro,
   MacroCreationArgs,
-  createMacro,
 } from "./blocknote/utils";
-import { BlockNoteViewWrapperProps } from "./components/BlockNoteViewWrapper";
-import { LinkEditionContext } from "./misc/linkSuggest";
-import { createRoot } from "react-dom/client";
+import type { BlockNoteViewWrapperProps } from "./components/BlockNoteViewWrapper";
+import type { LinkEditionContext } from "./misc/linkSuggest";
 
 /**
  * Mount a BlockNote editor inside a DOM container

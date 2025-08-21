@@ -19,9 +19,10 @@
 -->
 <script setup lang="ts">
 import { NodeViewWrapper } from "@tiptap/vue-3";
-import { Ref, computed, ref } from "vue";
+import { computed, ref } from "vue";
 import Vue3DraggableResizable from "vue3-draggable-resizable";
 import type { NodeViewProps } from "@tiptap/vue-3";
+import type { Ref } from "vue";
 
 const { node, updateAttributes } = defineProps<NodeViewProps>();
 

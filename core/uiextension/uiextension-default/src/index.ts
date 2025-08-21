@@ -19,7 +19,7 @@
  */
 
 import { DefaultUIExtensionsManager } from "./DefaultUIExtensionsManager";
-import { UIExtensionsManager } from "@xwiki/cristal-uiextension-api";
+import type { UIExtensionsManager } from "@xwiki/cristal-uiextension-api";
 import type { Container } from "inversify";
 
 export class ComponentInit {

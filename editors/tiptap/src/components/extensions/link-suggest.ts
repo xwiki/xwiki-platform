@@ -19,27 +19,27 @@
  */
 
 import { queryEqualityOperator } from "./filter-helper";
-import { LinkSuggestionActionDescriptor } from "./link-suggestion-action-descriptor";
 import { LinkType } from "./link-type";
-import linkSuggestStore, {
-  LinkSuggestStore,
-} from "../../stores/link-suggest-store";
+import linkSuggestStore from "../../stores/link-suggest-store";
 import LinkSuggestVue from "../../vue/c-tiptap-link-suggest.vue";
 import { PluginKey } from "@tiptap/pm/state";
 import { default as Suggestion } from "@tiptap/suggestion";
-import { Editor, Extension, Range } from "@tiptap/vue-3";
-import { SkinManager } from "@xwiki/cristal-api";
-import { Link } from "@xwiki/cristal-link-suggest-api";
+import { Editor, Extension } from "@tiptap/vue-3";
 import {
   AttachmentReference,
   DocumentReference,
   EntityType,
 } from "@xwiki/cristal-model-api";
-import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import { Container } from "inversify";
 import { createPinia } from "pinia";
-import { App, createApp } from "vue";
-import type { LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
+import { createApp } from "vue";
+import type { LinkSuggestionActionDescriptor } from "./link-suggestion-action-descriptor";
+import type { LinkSuggestStore } from "../../stores/link-suggest-store";
+import type { Range } from "@tiptap/vue-3";
+import type { SkinManager } from "@xwiki/cristal-api";
+import type { Link, LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
+import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
+import type { App } from "vue";
 
 /**
  * Initialize a link suggest tiptap extension with the provided components.

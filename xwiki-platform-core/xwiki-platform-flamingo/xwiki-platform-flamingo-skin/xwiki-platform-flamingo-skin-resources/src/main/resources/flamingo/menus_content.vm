@@ -132,7 +132,7 @@
 ## Display the submenu modals next to the list. Note that those could be pretty much anywhere but in the ul for HTML
 ## correctness sake.
 #if ("$!notificationsWatchModal" != "")$notificationsWatchModal#end
-#if ("$!_exportModal" != "")$_exportModal#end
+#exportModal()
 #end
 
 #**

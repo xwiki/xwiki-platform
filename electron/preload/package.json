@@ -26,7 +26,7 @@
     "@xwiki/cristal-electron-settings-preload": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "22.17.0",
+    "@types/node": "22.17.2",
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "typescript": "5.9.2",

@@ -21,10 +21,10 @@
 import InfoAction from "../InfoAction.vue";
 import { flushPromises, mount } from "@vue/test-utils";
 import { wrapInSuspense } from "@xwiki/cristal-dev-test-utils";
-import { InfoAction as InfoActionAPI } from "@xwiki/cristal-info-actions-api";
 import { describe, expect, it, vi } from "vitest";
 import { Ref, ref } from "vue";
 import { useRoute } from "vue-router";
+import type { InfoAction as InfoActionAPI } from "@xwiki/cristal-info-actions-api";
 
 describe("info-action", () => {
   it("Takes into account the info action values", async () => {

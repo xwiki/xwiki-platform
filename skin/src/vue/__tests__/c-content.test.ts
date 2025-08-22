@@ -31,7 +31,6 @@ import {
   PageHierarchyResolver,
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
-import { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 import { DocumentReference, SpaceReference } from "@xwiki/cristal-model-api";
 import { ClickListener } from "@xwiki/cristal-model-click-listener";
 import { Container } from "inversify";
@@ -39,6 +38,7 @@ import { DeepPartial } from "ts-essentials";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
+import type { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements

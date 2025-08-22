@@ -20,7 +20,6 @@
 import AttachmentsTable from "../AttachmentsTable.vue";
 import { shallowMount } from "@vue/test-utils";
 import { CristalApp } from "@xwiki/cristal-api";
-import { Attachment } from "@xwiki/cristal-attachments-api";
 import { mockI18n } from "@xwiki/cristal-dev-test-utils";
 import {
   AttachmentReference,
@@ -35,6 +34,7 @@ import {
 import { Container } from "inversify";
 import { describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
+import type { Attachment } from "@xwiki/cristal-attachments-api";
 
 function initializeMocks() {
   const cristalMock = mock<CristalApp>();

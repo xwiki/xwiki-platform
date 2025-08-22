@@ -81,8 +81,8 @@ importers:
         version: 11.1.11(vue@3.5.20(typescript@5.9.2))
     devDependencies:
       '@eslint/js':
-        specifier: 9.32.0
-        version: 9.32.0
+        specifier: 9.34.0
+        version: 9.34.0
       '@tsconfig/node22':
         specifier: 22.0.2
         version: 22.0.2

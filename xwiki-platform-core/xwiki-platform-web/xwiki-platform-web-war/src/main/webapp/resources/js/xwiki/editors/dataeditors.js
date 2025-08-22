@@ -117,11 +117,17 @@
           self.editorStatus.deletedXObjects = {};
           self.unsavedChanges = false;
         });
-        $('input').on('change', function(e) {
+        // We don't want to listen on inputs related to an xclass or an xobject, but not the actual inputs allowing
+        // to create a property or an object.
+        let filterInputs = function () {
+            return $(this).parents('#add_xproperty,#add_xobject').length === 0
+                && $(this).parents('.xclass').length > 0;
+        };
+        $('input').filter(filterInputs).on('change', function(e) {
           self.unsavedChanges = true;
         });
         $(document).on('xwiki:dom:updated', function (event, data) {
-          $(data.elements).find('input').on('change', function () {
+          $(data.elements).find('input').filter(filterInputs).on('change', function (e) {
             self.unsavedChanges = true;
           });
         });

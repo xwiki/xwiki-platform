@@ -41,7 +41,7 @@
     "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
-    "vite": "7.0.6"
+    "vite": "7.1.3"
   },
   "publishConfig": {
     "exports": {

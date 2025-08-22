@@ -105,12 +105,27 @@
       <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed for the PresentationBuilder -->
     <dependency>
-      <!-- Used to detect the encoding of the HTML byte array produced by the office server. -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tika-parsers</artifactId>
-      <version>${project.version}</version>
-      <type>pom</type>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>pdfbox</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>pdfbox-tools</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
+    <!-- Needed by the ImageFilter -->
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
     </dependency>
     <!-- Used to parse the images embedded through the Data URI scheme. -->
     <dependency>

@@ -457,6 +457,12 @@
       <artifactId>xwiki-platform-edit-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed by FileUploadPlugin -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>5.4.1</version>
+    </dependency>
 
     <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>

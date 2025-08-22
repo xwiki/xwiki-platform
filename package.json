@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.29.6",
-    "@eslint/config-helpers": "0.3.0",
+    "@eslint/config-helpers": "0.3.1",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.32.0",
     "@microsoft/tsdoc": "0.15.1",

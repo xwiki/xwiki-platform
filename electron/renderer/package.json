@@ -33,7 +33,7 @@
     "@xwiki/cristal-model-remote-url-filesystem-default": "workspace:*",
     "@xwiki/cristal-navigation-tree-filesystem": "workspace:*",
     "@xwiki/cristal-rename-filesystem": "workspace:*",
-    "inversify": "7.7.0",
+    "inversify": "7.9.0",
     "reflect-metadata": "0.2.2",
     "vue": "3.5.19"
   },

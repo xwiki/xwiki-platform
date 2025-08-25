@@ -129,8 +129,8 @@ importers:
         specifier: workspace:*
         version: link:../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -204,8 +204,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -238,8 +238,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -309,8 +309,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -391,8 +391,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -440,8 +440,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -477,8 +477,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -501,8 +501,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -556,8 +556,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -608,8 +608,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -629,8 +629,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -675,8 +675,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -730,8 +730,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -773,8 +773,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -795,8 +795,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -826,8 +826,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -866,8 +866,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -906,8 +906,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -943,8 +943,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -987,8 +987,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1015,8 +1015,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1049,8 +1049,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1089,8 +1089,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1143,8 +1143,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1233,8 +1233,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1261,8 +1261,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1292,8 +1292,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1413,8 +1413,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1444,8 +1444,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1475,8 +1475,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1506,8 +1506,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1549,8 +1549,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1593,8 +1593,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1624,8 +1624,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1667,8 +1667,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1707,8 +1707,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1779,8 +1779,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1841,8 +1841,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1884,8 +1884,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1918,8 +1918,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1968,8 +1968,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2017,8 +2017,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2039,8 +2039,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2067,8 +2067,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2092,8 +2092,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2117,8 +2117,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2142,8 +2142,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2173,8 +2173,8 @@ importers:
         specifier: 4.17.12
         version: 4.17.12
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2207,8 +2207,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2247,8 +2247,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2275,8 +2275,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2309,8 +2309,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2340,8 +2340,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2387,8 +2387,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2421,8 +2421,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2461,8 +2461,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2495,8 +2495,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2532,8 +2532,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2554,8 +2554,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2585,8 +2585,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2643,8 +2643,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2667,8 +2667,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2724,8 +2724,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2752,8 +2752,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2792,8 +2792,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -2817,8 +2817,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -2872,8 +2872,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2915,8 +2915,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -3060,8 +3060,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3146,8 +3146,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -3224,8 +3224,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -3264,8 +3264,8 @@ importers:
         version: 11.1.11(vue@3.5.19(typescript@5.9.2))
     devDependencies:
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3329,8 +3329,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3387,8 +3387,8 @@ importers:
         specifier: workspace:*
         version: link:../api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3442,8 +3442,8 @@ importers:
         specifier: workspace:*
         version: link:../api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3515,8 +3515,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3594,8 +3594,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3848,8 +3848,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3951,8 +3951,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4032,8 +4032,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4104,8 +4104,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4135,8 +4135,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4169,8 +4169,8 @@ importers:
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4291,8 +4291,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/rename/rename-filesystem
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4370,8 +4370,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -4431,8 +4431,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -4459,8 +4459,8 @@ importers:
         specifier: workspace:*
         version: link:../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -4484,8 +4484,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -4719,8 +4719,8 @@ importers:
         specifier: workspace:*
         version: link:../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -4836,8 +4836,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -4951,8 +4951,8 @@ importers:
         specifier: workspace:*
         version: link:../dev/test-utils
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       ts-essentials:
         specifier: 10.1.1
         version: 10.1.1(typescript@5.9.2)
@@ -5009,8 +5009,8 @@ importers:
         specifier: workspace:*
         version: link:../../ds/api
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -5048,8 +5048,8 @@ importers:
         specifier: 5.1.0
         version: 5.1.0
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.19
         version: 3.5.19(typescript@5.9.2)
@@ -5095,8 +5095,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
-        specifier: 7.7.0
-        version: 7.7.0(reflect-metadata@0.2.2)
+        specifier: 7.9.0
+        version: 7.9.0(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -5683,13 +5683,13 @@ packages:
   '@inversifyjs/common@1.5.2':
     resolution: {integrity: sha512-WlzR9xGadABS9gtgZQ+luoZ8V6qm4Ii6RQfcfC9Ho2SOlE6ZuemFo7PKJvKI0ikm8cmKbU8hw5UK6E4qovH21w==}
 
-  '@inversifyjs/container@1.12.1':
-    resolution: {integrity: sha512-E64SnmsJhbKA6idh/8zJNsBhMX52tjBrlFGfDfrNf63YLjF3hfOXqobWY/6Xln1jGxX79F7Z+WHrn4xNF12lzA==}
+  '@inversifyjs/container@1.12.6':
+    resolution: {integrity: sha512-P0RWN5tkLPZG6HMa4zQCpiMfyzjI5JHJc/ZlHPcyXLO9FIrmB0sXi6Oa4ic3+GEO/L/mz+a5k8RRCsa7mQ94eg==}
     peerDependencies:
       reflect-metadata: ~0.2.2
 
-  '@inversifyjs/core@6.0.1':
-    resolution: {integrity: sha512-i0T9eSdYSZCx9b3izzlC3NIuHV03RQ1vwEa3vXgvk2vPIgW11DqMQefEVmxVx1pQZoS1EOK3ENZfHqZ/omWlzg==}
+  '@inversifyjs/core@7.2.0':
+    resolution: {integrity: sha512-rOmtf31TGTeO5BNZhobV0hoV5F0yGwVJFm8mWyoLJbemOH1ugZRMYlVyKXvSDZfMCi/MSU4EEasSi/NFaq4qeA==}
 
   '@inversifyjs/plugin@0.2.0':
     resolution: {integrity: sha512-R/JAdkTSD819pV1zi0HP54mWHyX+H2m8SxldXRgPQarS3ySV4KPyRdosWcfB8Se0JJZWZLHYiUNiS6JvMWSPjw==}
@@ -8320,8 +8320,8 @@ packages:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
 
-  inversify@7.7.0:
-    resolution: {integrity: sha512-CLw7WbwULppLMNp6jPliwLbapnf996Bdju3VvtW0wrfI0LTuxv0h9uqrFh1RE3QO23+r4JK0hCarETJjDN4LFw==}
+  inversify@7.9.0:
+    resolution: {integrity: sha512-bq5om1H9i5wXUoWfoubnNnSpD8Aw+uci6sH751M4RZHPKdccuniRNFO6pQf5AsPdO/Tcy4WPFx8FxaETsaQlhw==}
     peerDependencies:
       reflect-metadata: ~0.2.2
 
@@ -11632,15 +11632,15 @@ snapshots:
 
   '@inversifyjs/common@1.5.2': {}
 
-  '@inversifyjs/container@1.12.1(reflect-metadata@0.2.2)':
+  '@inversifyjs/container@1.12.6(reflect-metadata@0.2.2)':
     dependencies:
       '@inversifyjs/common': 1.5.2
-      '@inversifyjs/core': 6.0.1(reflect-metadata@0.2.2)
+      '@inversifyjs/core': 7.2.0(reflect-metadata@0.2.2)
       '@inversifyjs/plugin': 0.2.0
       '@inversifyjs/reflect-metadata-utils': 1.3.0(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
 
-  '@inversifyjs/core@6.0.1(reflect-metadata@0.2.2)':
+  '@inversifyjs/core@7.2.0(reflect-metadata@0.2.2)':
     dependencies:
       '@inversifyjs/common': 1.5.2
       '@inversifyjs/prototype-utils': 0.1.2
@@ -14801,11 +14801,11 @@ snapshots:
       hasown: 2.0.2
       side-channel: 1.1.0
 
-  inversify@7.7.0(reflect-metadata@0.2.2):
+  inversify@7.9.0(reflect-metadata@0.2.2):
     dependencies:
       '@inversifyjs/common': 1.5.2
-      '@inversifyjs/container': 1.12.1(reflect-metadata@0.2.2)
-      '@inversifyjs/core': 6.0.1(reflect-metadata@0.2.2)
+      '@inversifyjs/container': 1.12.6(reflect-metadata@0.2.2)
+      '@inversifyjs/core': 7.2.0(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
 
   ip-address@9.0.5:

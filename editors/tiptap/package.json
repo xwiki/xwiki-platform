@@ -82,7 +82,7 @@
     "@types/markdown-it": "14.1.2",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "inversify": "7.7.0",
+    "inversify": "7.9.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.1.3",

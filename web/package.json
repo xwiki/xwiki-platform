@@ -36,7 +36,7 @@
     "@xwiki/cristal-settings-browser": "workspace:*",
     "express": "5.1.0",
     "inversify": "7.7.0",
-    "vue": "3.5.18"
+    "vue": "3.5.19"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.1",

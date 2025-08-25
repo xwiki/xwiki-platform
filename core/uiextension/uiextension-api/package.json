@@ -31,7 +31,7 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.9.2",
-    "vue": "3.5.18"
+    "vue": "3.5.19"
   },
   "publishConfig": {
     "exports": {

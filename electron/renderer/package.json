@@ -35,7 +35,7 @@
     "@xwiki/cristal-rename-filesystem": "workspace:*",
     "inversify": "7.7.0",
     "reflect-metadata": "0.2.2",
-    "vue": "3.5.18"
+    "vue": "3.5.19"
   },
   "devDependencies": {
     "@types/node": "22.17.2",

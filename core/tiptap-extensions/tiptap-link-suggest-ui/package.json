@@ -40,7 +40,7 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "vue": "3.5.19",
+    "vue": "3.5.20",
     "vue-tsc": "2.2.12"
   },
   "publishConfig": {

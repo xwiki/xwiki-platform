@@ -890,6 +890,11 @@ $value##
 
     #end
     #displaySearchForm()
+    #foreach ($extension in $services.uix.getExtensions("org.xwiki.platform.search.widget"))
+      {{html clean=false}}
+      $services.rendering.render($extension.execute(), 'xhtml/1.0')
+      {{/html}}
+    #end
     #if ($text != '')
       #getSearchResults()
       #if ($debug)

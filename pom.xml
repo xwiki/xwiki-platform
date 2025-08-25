@@ -216,7 +216,7 @@
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>${tika.version}</version>
+        <version>2.9.4-xwiki</version>
       </dependency>
       <!-- Tika Parsers modules -->
       <dependency>

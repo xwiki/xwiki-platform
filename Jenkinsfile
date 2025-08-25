@@ -60,22 +60,19 @@ pipeline {
     }
     post {
         always {
-            junit testResults: 'api/**/unit-tests.xml', skipPublishingChecks: true
+            junit testResults: 'api/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'core/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'ds/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'editors/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'electron/**/unit-tests.xml', skipPublishingChecks: true
-            junit testResults: 'extension-manager/**/unit-tests.xml', skipPublishingChecks: true
+            junit testResults: 'extension-manager/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'extensions/**/unit-tests.xml', skipPublishingChecks: true
-            junit testResults: 'lib/**/unit-tests.xml', skipPublishingChecks: true
-            junit testResults: 'macros/unit-tests.xml', skipPublishingChecks: true
-            junit testResults: 'rendering/**/unit-tests.xml', skipPublishingChecks: true
+            junit testResults: 'lib/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'sharedworker/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'skin/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'utils/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'xwiki/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'web/e2e-tests.xml', skipPublishingChecks: true
-
         }
         failure {
           archiveArtifacts artifacts: 'web/test-results'

@@ -68,10 +68,10 @@ pipeline {
             junit testResults: 'extension-manager/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'extensions/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'lib/**/unit-tests.xml', skipPublishingChecks: true
-            junit testResults: 'macros/**/unit-tests.xml', skipPublishingChecks: true
+            junit testResults: 'macros/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'rendering/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'sharedworker/**/unit-tests.xml', skipPublishingChecks: true
-            junit testResults: 'skin/**/unit-tests.xml', skipPublishingChecks: true
+            junit testResults: 'skin/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'utils/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'xwiki/**/unit-tests.xml', skipPublishingChecks: true
             junit testResults: 'web/e2e-tests.xml', skipPublishingChecks: true

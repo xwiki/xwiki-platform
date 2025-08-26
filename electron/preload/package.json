@@ -23,7 +23,8 @@
     "@xwiki/cristal-electron-authentication-github-preload": "workspace:*",
     "@xwiki/cristal-electron-authentication-nextcloud-preload": "workspace:*",
     "@xwiki/cristal-electron-authentication-xwiki-preload": "workspace:*",
-    "@xwiki/cristal-electron-settings-preload": "workspace:*"
+    "@xwiki/cristal-electron-settings-preload": "workspace:*",
+    "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
     "@types/node": "22.17.2",

@@ -4232,6 +4232,9 @@ importers:
       '@xwiki/cristal-electron-settings-preload':
         specifier: workspace:*
         version: link:../settings/settings-preload
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
     devDependencies:
       '@types/node':
         specifier: 22.17.2

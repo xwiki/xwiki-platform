@@ -90,12 +90,14 @@
                     <!-- We don't need demo packages -->
                     **/*demo*,
                     **/*demo*/,
-                    <!-- Remove any ee8 or ee9 libraries since we want to focus on the latest standard compatible 
-                         with the same minimum Java version XWiki supports -->
+                    <!-- Remove any ee8, ee9 or ee10 libraries since we want to focus
+                         on the latest standard supported by Jetty which is compatible with XWiki -->
                     **/*ee8*,
                     **/*ee8*/,
                     **/*ee9*,
                     **/*ee9*/,
+                    **/*ee10*,
+                    **/*ee10*/,
                     <!-- We don't need http2 support -->
                     **/*http2*,
                     **/*http2*/,

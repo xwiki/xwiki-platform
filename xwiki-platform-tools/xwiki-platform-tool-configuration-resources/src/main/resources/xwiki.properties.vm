@@ -464,35 +464,40 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# groovy.customizer.timedInterrupt.timeout = 60
 
 #-------------------------------------------------------------------------------------
-# Events distribution
+# Clustering and events distribution
 #-------------------------------------------------------------------------------------
 
 #-# [Since 17.5.0]
 #-# Indicate the unique identifier of the instance among the members of a cluster.
 #-# By default it is automatically generated from a UUID and stored in the permanent directory.
+#-# 
 # observation.remote.id = node1
 
 #-# [Since 2.0M3]
 #-# Indicate if the network distribution module is enabled or not.
 #-# By default remote events are disabled.
+#-# 
+#-# The default is:
 # observation.remote.enabled = false
 
 #-# [Since 2.0M3]
 #-# The list of events communication channels to start when the application starts.
 #-# By default no channel is configured.
-#-#
+#-# 
 #-# The default remote event distribution implementation is using JGroups and you'll need to either use embedded
 #-# JGroups configuration files or drop your custom configuration in the WEB-INF/observation/remote/jgroups/ directory.
 #-# There's a README file in that directory with more information.
-#-# Example: observation.remote.channels = public, cluster
+#-# 
+# observation.remote.channels = public, cluster
 
 #-# [Since 2.0M4]
 #-# The implementation of network adapter to use.
-#-# The default is jgroups.
 #-#
-#-# By default only jgroups is provided. To add one implements NetworkAdaptor component interface. The identifier
+#-# By default only jgroups is provided. To add one, implements NetworkAdaptor component interface. The identifier
 #-# provided in the configuration is matched with the component role hint.
-#-# Example: observation.remote.networkadapter = jgroups
+#-# 
+#-# The default is:
+#-# observation.remote.networkadapter = jgroups
 
 #-------------------------------------------------------------------------------------
 # CSRF token component

@@ -19,6 +19,9 @@
  */
 package org.xwiki.observation.remote;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
 
 /**
@@ -65,4 +68,13 @@ public interface RemoteObservationManager
      * @throws RemoteEventException error when trying to start a channel
      */
     void startChannel(String channelId) throws RemoteEventException;
+
+    /**
+     * @return the channels used to communicate with other XWiki instances
+     * @since 17.9.0RC1
+     */
+    default Collection<NetworkChannel> getChannels()
+    {
+        return List.of();
+    }
 }

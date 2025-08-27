@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -206,6 +207,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         maybeEnableRemoteDebugging(javaOpts);
         this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
+        List<String> commands = new ArrayList<>();
+
         // Jetty has a protection for URLs that don't respect the Servlet specification and that are considered
         // ambiguous.See https://github.com/jetty/jetty.project/issues/12162#issuecomment-2286747043 for an explanation.
         // Since XWiki uses them, we need to configure Jetty to allow for it. See also
@@ -215,15 +218,18 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         //   Remove AMBIGUOUS_EMPTY_SEGMENT when https://jira.xwiki.org/browse/XWIKI-22428 is fixed.
         //   Remove AMBIGUOUS_PATH_SEPARATOR when https://jira.xwiki.org/browse/XWIKI-22435 is fixed.
         // Note: It's important that this command comes before the one below that specifies the module.
-        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance="
-            + "RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
+        String violations = "RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR,FRAGMENT";
+        commands.add("jetty.httpConfig.uriCompliance=" + violations);
+        commands.add("jetty.httpConfig.redirectUriCompliance=" + violations);
 
         // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
         // (ee8 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
         if (extractJettyVersionFromDockerTag(this.testConfiguration.getServletEngineTag()) >= 12) {
-            this.servletContainer.setCommand(this.servletContainer.getCommandParts()[0],
-                "--module=ee8-webapp,ee8-deploy,ee8-jstl,ee8-websocket-javax,ee8-websocket-jetty");
+            commands.add("--module=ee8-webapp,ee8-deploy,ee8-jstl,ee8-websocket-javax,ee8-websocket-jetty");
         }
+
+        // Add commands
+        this.servletContainer.setCommandParts(commands.toArray(ArrayUtils.EMPTY_STRING_ARRAY));
 
         // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker
         // socket (otherwise we can't manage the Docker containers from within XWiki, which is a use case for the PDF

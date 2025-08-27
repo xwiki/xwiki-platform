@@ -8,7 +8,7 @@ overrides:
   '@xwiki/cristal-fn-utils': 0.19.0
   '@xwiki/cristal-model-api': 0.19.0
   '@xwiki/cristal-model-reference-api': 0.19.0
-  '@xwiki/cristal-model-remote-url-api': 0.19.0
+  '@xwiki/cristal-model-remote-url-api': 0.21.1
   inversify: 7.5.2
   vue: 3.5.20
 
@@ -48,7 +48,7 @@ importers:
         version: 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.2)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
       '@xwiki/cristal-editors-blocknote-react':
         specifier: 0.19.0
-        version: 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.2)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
+        version: 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.2)(vue@3.5.20(typescript@5.9.2))(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
       '@xwiki/cristal-link-suggest-api':
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
@@ -59,11 +59,11 @@ importers:
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
       '@xwiki/cristal-model-remote-url-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        specifier: 0.21.1
+        version: 0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))
       '@xwiki/cristal-uniast':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)(vue@3.5.20(typescript@5.9.2))
       inversify:
         specifier: 7.5.2
         version: 7.5.2(reflect-metadata@0.2.2)
@@ -1137,6 +1137,13 @@ packages:
   '@xwiki/cristal-api@0.19.0':
     resolution: {integrity: sha512-W2v6R9o+oB5dARFEkY1OUmcJ7vsO++a3xxcEJMwcJBL2rrd+HLQm8aPVuc793ReM6wMYEnw2KEjzrYBwyRMBRw==}
 
+  '@xwiki/cristal-api@0.21.1':
+    resolution: {integrity: sha512-SfCiBB9FTgyCp7442Iur9eIDI/rVIQ5Wz3hvMYBCIRiK5dWlgc76jvuqn1JlRMVQhFwF76NVuF4BuUthdDMlzA==}
+    peerDependencies:
+      inversify: 7.5.2
+      reflect-metadata: 0.x
+      vue: 3.5.20
+
   '@xwiki/cristal-attachments-api@0.19.0':
     resolution: {integrity: sha512-RPTdA65TDB/qenOBkZbWntm26tGnjZA8p8Ev5jFO1DX1TWkuKPmylbSI/TI2Cx1JS6fi+GUT8+vkqyYjNicRQw==}
 
@@ -1150,6 +1157,11 @@ packages:
     peerDependencies:
       reflect-metadata: 0.2.2
 
+  '@xwiki/cristal-authentication-api@0.21.1':
+    resolution: {integrity: sha512-ElPVopCXU7slRozLRLntyXw667rLtwSAm2TUaKyvTWL1JJYx3PSGRLtTPm7dxjTbSnLCmozHCSoxxTkSrGjxDQ==}
+    peerDependencies:
+      reflect-metadata: 0.x
+
   '@xwiki/cristal-backend-api@0.19.0':
     resolution: {integrity: sha512-/ThyYGWPCJ7GH9aMNDULx3IwBRP4oB3GSt9QFki1l2OGclozXufyNZ1EkwvC+iHzhDBwSetYu67HiSLZZTcvfw==}
     peerDependencies:
@@ -1157,6 +1169,9 @@ packages:
 
   '@xwiki/cristal-configuration-api@0.19.0':
     resolution: {integrity: sha512-Mq2t83gydM3ioG3zjzjHvTD2fc+gnFdbgqjes56Dx33wu9NOTF5adFwKfVSfaDF6twW/o9h7wO6wXEdCLZnCxQ==}
+
+  '@xwiki/cristal-configuration-api@0.21.1':
+    resolution: {integrity: sha512-nBpOqkGpJKVOfcs+AfIpdVH09T2b6BEL3n5gqUycVQfn5gB+eVn2cISJUGmFGYYxIYM0wrZjbNqxHb3RJwHsFw==}
 
   '@xwiki/cristal-document-api@0.19.0':
     resolution: {integrity: sha512-6b3V/EVTEfrGmhF75UQBcKOYp9q3/9Aqs/x0L0wZ57b1P7Wdj7bGkBnP1iEX+IGfAuKMDxns99HwpkKF0yyrkg==}
@@ -1191,10 +1206,11 @@ packages:
     peerDependencies:
       reflect-metadata: 0.2.2
 
-  '@xwiki/cristal-model-remote-url-api@0.19.0':
-    resolution: {integrity: sha512-gJcNfGWruoLFosl3H+841TJd2N5B1xk6mAM7lCFFDXZ+wcTrW1m3vDMisqkZCI/kadbdWlyRsSPDcjCxqLqVQg==}
+  '@xwiki/cristal-model-remote-url-api@0.21.1':
+    resolution: {integrity: sha512-2uYM4+0D5eQP7EHlRDW4UO1OqWyMrkSrqnfg0WM8YDDEE/b8q3Ae0jNlvfKughRx/OQmoZd36l+QTfzLlAxwQw==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      inversify: 7.5.2
+      reflect-metadata: 0.x
 
   '@xwiki/cristal-navigation-tree-api@0.19.0':
     resolution: {integrity: sha512-hd9K0G/4fZSwn8kSwH2RcR0ztHlhMSKxssgz/cYh9nb+hCGIHpuK5YAsyIIqWV9MwRXGOHn3Sx3cH6DY4+YQBw==}
@@ -4030,6 +4046,15 @@ snapshots:
       - reflect-metadata
       - typescript
 
+  '@xwiki/cristal-api@0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))':
+    dependencies:
+      '@xwiki/cristal-authentication-api': 0.21.1(reflect-metadata@0.2.2)
+      '@xwiki/cristal-configuration-api': 0.21.1
+      inversify: 7.5.2(reflect-metadata@0.2.2)
+      reflect-metadata: 0.2.2
+      vue: 3.5.20(typescript@5.9.2)
+      vue-router: 4.5.1(vue@3.5.20(typescript@5.9.2))
+
   '@xwiki/cristal-attachments-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
     dependencies:
       '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
@@ -4046,7 +4071,7 @@ snapshots:
       '@xwiki/cristal-backend-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
       '@xwiki/cristal-model-api': 0.19.0
       '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-model-remote-url-api': 0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))
       inversify: 7.5.2(reflect-metadata@0.2.2)
       pinia: 3.0.2(typescript@5.9.2)(vue@3.5.20(typescript@5.9.2))
       reflect-metadata: 0.2.2
@@ -4055,6 +4080,10 @@ snapshots:
       - typescript
 
   '@xwiki/cristal-authentication-api@0.19.0(reflect-metadata@0.2.2)':
+    dependencies:
+      reflect-metadata: 0.2.2
+
+  '@xwiki/cristal-authentication-api@0.21.1(reflect-metadata@0.2.2)':
     dependencies:
       reflect-metadata: 0.2.2
 
@@ -4067,6 +4096,10 @@ snapshots:
       - typescript
 
   '@xwiki/cristal-configuration-api@0.19.0':
+    dependencies:
+      utility-types: 3.11.0
+
+  '@xwiki/cristal-configuration-api@0.21.1':
     dependencies:
       utility-types: 3.11.0
 
@@ -4097,14 +4130,14 @@ snapshots:
       '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
       '@xwiki/cristal-document-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
       '@xwiki/cristal-dsapi': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-editors-blocknote-react': 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.2)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
+      '@xwiki/cristal-editors-blocknote-react': 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.2)(vue@3.5.20(typescript@5.9.2))(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
       '@xwiki/cristal-fn-utils': 0.19.0
       '@xwiki/cristal-icons': 0.19.0(typescript@5.9.2)
       '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
       '@xwiki/cristal-model-api': 0.19.0
       '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-model-remote-url-api': 0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))
+      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)(vue@3.5.20(typescript@5.9.2))
       eventemitter3: 5.0.1
       inversify: 7.5.2(reflect-metadata@0.2.2)
       lodash-es: 4.17.21
@@ -4127,7 +4160,7 @@ snapshots:
       - y-protocols
       - yjs
 
-  '@xwiki/cristal-editors-blocknote-react@0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.2)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
+  '@xwiki/cristal-editors-blocknote-react@0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.2)(vue@3.5.20(typescript@5.9.2))(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
     dependencies:
       '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
       '@blocknote/mantine': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -4143,8 +4176,8 @@ snapshots:
       '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
       '@xwiki/cristal-model-api': 0.19.0
       '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-model-remote-url-api': 0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))
+      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)(vue@3.5.20(typescript@5.9.2))
       i18next: 25.2.1(typescript@5.9.2)
       lodash-es: 4.17.21
       react: 19.1.0
@@ -4157,6 +4190,7 @@ snapshots:
       - '@types/react'
       - bufferutil
       - highlight.js
+      - inversify
       - lowlight
       - react-native
       - reflect-metadata
@@ -4165,6 +4199,7 @@ snapshots:
       - supports-color
       - typescript
       - utf-8-validate
+      - vue
       - y-protocols
       - yjs
 
@@ -4196,14 +4231,14 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@xwiki/cristal-model-remote-url-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-model-remote-url-api@0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-api': 0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))
       '@xwiki/cristal-model-api': 0.19.0
       inversify: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
     transitivePeerDependencies:
-      - typescript
+      - vue
 
   '@xwiki/cristal-navigation-tree-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
     dependencies:
@@ -4213,12 +4248,12 @@ snapshots:
       - reflect-metadata
       - typescript
 
-  '@xwiki/cristal-uniast@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-uniast@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)(vue@3.5.20(typescript@5.9.2))':
     dependencies:
       '@xwiki/cristal-fn-utils': 0.19.0
       '@xwiki/cristal-model-api': 0.19.0
       '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-model-remote-url-api': 0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))
       inversify: 7.5.2(reflect-metadata@0.2.2)
       mdast-util-gfm-strikethrough: 2.0.0
       mdast-util-gfm-table: 2.0.0
@@ -4232,6 +4267,7 @@ snapshots:
       - reflect-metadata
       - supports-color
       - typescript
+      - vue
 
   abbrev@2.0.0: {}
 

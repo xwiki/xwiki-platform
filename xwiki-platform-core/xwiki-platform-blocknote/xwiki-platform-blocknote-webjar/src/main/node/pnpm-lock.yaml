@@ -38,8 +38,8 @@ importers:
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
       '@xwiki/cristal-document-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        specifier: 0.21.1
+        version: 0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))
       '@xwiki/cristal-dsapi':
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
@@ -1137,6 +1137,13 @@ packages:
   '@xwiki/cristal-api@0.19.0':
     resolution: {integrity: sha512-W2v6R9o+oB5dARFEkY1OUmcJ7vsO++a3xxcEJMwcJBL2rrd+HLQm8aPVuc793ReM6wMYEnw2KEjzrYBwyRMBRw==}
 
+  '@xwiki/cristal-api@0.21.1':
+    resolution: {integrity: sha512-SfCiBB9FTgyCp7442Iur9eIDI/rVIQ5Wz3hvMYBCIRiK5dWlgc76jvuqn1JlRMVQhFwF76NVuF4BuUthdDMlzA==}
+    peerDependencies:
+      inversify: 7.5.2
+      reflect-metadata: 0.x
+      vue: 3.5.20
+
   '@xwiki/cristal-attachments-api@0.19.0':
     resolution: {integrity: sha512-RPTdA65TDB/qenOBkZbWntm26tGnjZA8p8Ev5jFO1DX1TWkuKPmylbSI/TI2Cx1JS6fi+GUT8+vkqyYjNicRQw==}
 
@@ -1150,6 +1157,11 @@ packages:
     peerDependencies:
       reflect-metadata: 0.2.2
 
+  '@xwiki/cristal-authentication-api@0.21.1':
+    resolution: {integrity: sha512-ElPVopCXU7slRozLRLntyXw667rLtwSAm2TUaKyvTWL1JJYx3PSGRLtTPm7dxjTbSnLCmozHCSoxxTkSrGjxDQ==}
+    peerDependencies:
+      reflect-metadata: 0.x
+
   '@xwiki/cristal-backend-api@0.19.0':
     resolution: {integrity: sha512-/ThyYGWPCJ7GH9aMNDULx3IwBRP4oB3GSt9QFki1l2OGclozXufyNZ1EkwvC+iHzhDBwSetYu67HiSLZZTcvfw==}
     peerDependencies:
@@ -1158,8 +1170,17 @@ packages:
   '@xwiki/cristal-configuration-api@0.19.0':
     resolution: {integrity: sha512-Mq2t83gydM3ioG3zjzjHvTD2fc+gnFdbgqjes56Dx33wu9NOTF5adFwKfVSfaDF6twW/o9h7wO6wXEdCLZnCxQ==}
 
+  '@xwiki/cristal-configuration-api@0.21.1':
+    resolution: {integrity: sha512-nBpOqkGpJKVOfcs+AfIpdVH09T2b6BEL3n5gqUycVQfn5gB+eVn2cISJUGmFGYYxIYM0wrZjbNqxHb3RJwHsFw==}
+
   '@xwiki/cristal-document-api@0.19.0':
     resolution: {integrity: sha512-6b3V/EVTEfrGmhF75UQBcKOYp9q3/9Aqs/x0L0wZ57b1P7Wdj7bGkBnP1iEX+IGfAuKMDxns99HwpkKF0yyrkg==}
+
+  '@xwiki/cristal-document-api@0.21.1':
+    resolution: {integrity: sha512-iJ+sG2Yo6bI+TCChtJWml+AR6pJRZYRnyVSb3vXWAzIysTJy7gSCkT5rMVgp5QbztUVNolzbZBl8rYLxlFAq0A==}
+    peerDependencies:
+      reflect-metadata: 0.x
+      vue: 3.5.20
 
   '@xwiki/cristal-dsapi@0.19.0':
     resolution: {integrity: sha512-DyqMJKa1tKeNQO5QqZSjlr5szvyF4PVYQbT7Y3zPsGtCrVGcIb1YlHlqbSQRpb4soEohbkLDC5jU2aoOB/iMUw==}
@@ -4030,6 +4051,15 @@ snapshots:
       - reflect-metadata
       - typescript
 
+  '@xwiki/cristal-api@0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))':
+    dependencies:
+      '@xwiki/cristal-authentication-api': 0.21.1(reflect-metadata@0.2.2)
+      '@xwiki/cristal-configuration-api': 0.21.1
+      inversify: 7.5.2(reflect-metadata@0.2.2)
+      reflect-metadata: 0.2.2
+      vue: 3.5.20(typescript@5.9.2)
+      vue-router: 4.5.1(vue@3.5.20(typescript@5.9.2))
+
   '@xwiki/cristal-attachments-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
     dependencies:
       '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
@@ -4058,6 +4088,10 @@ snapshots:
     dependencies:
       reflect-metadata: 0.2.2
 
+  '@xwiki/cristal-authentication-api@0.21.1(reflect-metadata@0.2.2)':
+    dependencies:
+      reflect-metadata: 0.2.2
+
   '@xwiki/cristal-backend-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
     dependencies:
       '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
@@ -4070,6 +4104,10 @@ snapshots:
     dependencies:
       utility-types: 3.11.0
 
+  '@xwiki/cristal-configuration-api@0.21.1':
+    dependencies:
+      utility-types: 3.11.0
+
   '@xwiki/cristal-document-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
     dependencies:
       '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
@@ -4078,6 +4116,15 @@ snapshots:
     transitivePeerDependencies:
       - reflect-metadata
       - typescript
+
+  '@xwiki/cristal-document-api@0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))':
+    dependencies:
+      '@xwiki/cristal-api': 0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.20(typescript@5.9.2))
+      '@xwiki/cristal-model-api': 0.19.0
+      reflect-metadata: 0.2.2
+      vue: 3.5.20(typescript@5.9.2)
+    transitivePeerDependencies:
+      - inversify
 
   '@xwiki/cristal-dsapi@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
     dependencies:

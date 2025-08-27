@@ -55,7 +55,7 @@
     "vite": "6.3.5",
     "vitest": "3.2.4",
     "vue": "3.5.20",
-    "vue-tsc": "2.2.10"
+    "vue-tsc": "3.0.6"
   },
   "pnpm": {
     "overrides": {

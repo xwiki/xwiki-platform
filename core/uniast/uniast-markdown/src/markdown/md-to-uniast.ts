@@ -34,6 +34,7 @@ import remarkParse from "remark-parse";
 import { unified } from "unified";
 import type {
   Block,
+  ConverterContext,
   Image,
   InlineContent,
   LinkTarget,
@@ -42,8 +43,7 @@ import type {
   TableColumn,
   TextStyles,
   UniAst,
-} from "../ast";
-import type { ConverterContext } from "../interface";
+} from "@xwiki/cristal-uniast-api";
 import type { Image as MdImage, PhrasingContent, RootContent } from "mdast";
 import type { Processor } from "unified";
 
@@ -148,10 +148,11 @@ export class MarkdownToUniAstConverter {
           language: block.lang ?? undefined,
         };
 
-      case "table":
+      case "table": {
+        const [headers, ...rows] = block.children;
         return {
           type: "table",
-          columns: block.children[0]?.children.map(
+          columns: headers?.children.map(
             (cell): TableColumn => ({
               headerCell: {
                 content: cell.children.flatMap((item) =>
@@ -161,7 +162,7 @@ export class MarkdownToUniAstConverter {
               },
             }),
           ),
-          rows: block.children.map((row) =>
+          rows: rows.map((row) =>
             row.children.map(
               (cell): TableCell => ({
                 content: cell.children.flatMap((item) =>
@@ -173,6 +174,7 @@ export class MarkdownToUniAstConverter {
           ),
           styles: {},
         };
+      }
 
       case "image":
         return {

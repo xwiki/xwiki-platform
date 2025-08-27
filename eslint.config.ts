@@ -102,7 +102,7 @@ const eslintConfig: Config[] = defineConfig([
       },
     },
     languageOptions: {
-      ecmaVersion: "latest",
+      ecmaVersion: 2022,
       sourceType: "module",
     },
     rules: {

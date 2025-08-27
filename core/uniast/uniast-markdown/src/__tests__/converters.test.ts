@@ -18,22 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { UniAst } from "../ast";
-import { ConverterContext, createConverterContext } from "../interface";
 import { MarkdownToUniAstConverter } from "../markdown/md-to-uniast";
 import { UniAstToMarkdownConverter } from "../markdown/uniast-to-md";
-import {
+import { createConverterContext } from "@xwiki/cristal-uniast-utils";
+import { Container } from "inversify";
+import { describe, expect, test } from "vitest";
+import { mock } from "vitest-mock-extended";
+import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/cristal-model-reference-api";
-import {
+import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
 } from "@xwiki/cristal-model-remote-url-api";
-import { Container } from "inversify";
-import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
+import type { ConverterContext, UniAst } from "@xwiki/cristal-uniast-api";
 
 // eslint-disable-next-line max-statements
 function getConverterContext(): ConverterContext {
@@ -199,6 +199,193 @@ describe("MarkdownToUniAstConverter", () => {
     });
   });
 
+  test("parse tables", () => {
+    testTwoWayConversion({
+      startingFrom: `| Heading 1| Heading 2| Heading **3**|
+| ---------|--------- |-------------|
+| Row 1 cell 1 | Row 1 cell 2 | Row 1 cell **3** 
+| Row 2 cell 1 | Row 2 cell 2 | Row 2 cell **3** |
+|Row 3 cell 1 | Row 3 cell 2| Row 3 cell __3__|`,
+      convertsBackTo: `| Heading 1 | Heading 2 | Heading **3** |
+|  -  |  -  |  -  |
+| Row 1 cell 1 | Row 1 cell 2 | Row 1 cell **3** |
+| Row 2 cell 1 | Row 2 cell 2 | Row 2 cell **3** |
+| Row 3 cell 1 | Row 3 cell 2 | Row 3 cell **3** |`,
+      withUniAst: {
+        blocks: [
+          {
+            columns: [
+              {
+                headerCell: {
+                  content: [
+                    {
+                      content: "Heading 1",
+                      styles: {},
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+              },
+              {
+                headerCell: {
+                  content: [
+                    {
+                      content: "Heading 2",
+                      styles: {},
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+              },
+              {
+                headerCell: {
+                  content: [
+                    {
+                      content: "Heading ",
+                      styles: {},
+                      type: "text",
+                    },
+                    {
+                      content: "3",
+                      styles: {
+                        bold: true,
+                      },
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+              },
+            ],
+            rows: [
+              [
+                {
+                  content: [
+                    {
+                      content: "Row 1 cell 1",
+                      styles: {},
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+                {
+                  content: [
+                    {
+                      content: "Row 1 cell 2",
+                      styles: {},
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+                {
+                  content: [
+                    {
+                      content: "Row 1 cell ",
+                      styles: {},
+                      type: "text",
+                    },
+                    {
+                      content: "3",
+                      styles: {
+                        bold: true,
+                      },
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+              ],
+              [
+                {
+                  content: [
+                    {
+                      content: "Row 2 cell 1",
+                      styles: {},
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+                {
+                  content: [
+                    {
+                      content: "Row 2 cell 2",
+                      styles: {},
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+                {
+                  content: [
+                    {
+                      content: "Row 2 cell ",
+                      styles: {},
+                      type: "text",
+                    },
+                    {
+                      content: "3",
+                      styles: {
+                        bold: true,
+                      },
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+              ],
+              [
+                {
+                  content: [
+                    {
+                      content: "Row 3 cell 1",
+                      styles: {},
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+                {
+                  content: [
+                    {
+                      content: "Row 3 cell 2",
+                      styles: {},
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+                {
+                  content: [
+                    {
+                      content: "Row 3 cell ",
+                      styles: {},
+                      type: "text",
+                    },
+                    {
+                      content: "3",
+                      styles: {
+                        bold: true,
+                      },
+                      type: "text",
+                    },
+                  ],
+                  styles: {},
+                },
+              ],
+            ],
+            styles: {},
+            type: "table",
+          },
+        ],
+      },
+    });
+  });
+
   test("parse some simple blocks", () => {
     testTwoWayConversion({
       startingFrom: [
@@ -241,12 +428,6 @@ describe("MarkdownToUniAstConverter", () => {
         "```javascript",
         "Code block 2 (js)",
         "```",
-        "",
-        "| Heading 1| Heading 2| Heading **3**|",
-        "| ---------|--------- |-------------|",
-        "| Row 1 cell 1 | Row 1 cell 2 | Row 1 cell **3** ",
-        "| Row 2 cell 1 | Row 2 cell 2 | Row 2 cell **3** |",
-        "|Row 3 cell 1 | Row 3 cell 2| Row 3 cell __3__|",
         "",
         "![Image alt](http://somewhere.somewhere)",
         "",
@@ -302,13 +483,6 @@ describe("MarkdownToUniAstConverter", () => {
         "```javascript",
         "Code block 2 (js)",
         "```",
-        "",
-        "| Heading 1 | Heading 2 | Heading **3** |",
-        "|  -  |  -  |  -  |",
-        "| Heading 1 | Heading 2 | Heading **3** |",
-        "| Row 1 cell 1 | Row 1 cell 2 | Row 1 cell **3** |",
-        "| Row 2 cell 1 | Row 2 cell 2 | Row 2 cell **3** |",
-        "| Row 3 cell 1 | Row 3 cell 2 | Row 3 cell **3** |",
         "",
         "![Image alt](http://somewhere.somewhere)",
         "",
@@ -698,213 +872,6 @@ describe("MarkdownToUniAstConverter", () => {
             content: "Code block 2 (js)",
             language: "javascript",
             type: "code",
-          },
-          {
-            columns: [
-              {
-                headerCell: {
-                  content: [
-                    {
-                      content: "Heading 1",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-              },
-              {
-                headerCell: {
-                  content: [
-                    {
-                      content: "Heading 2",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-              },
-              {
-                headerCell: {
-                  content: [
-                    {
-                      content: "Heading ",
-                      styles: {},
-                      type: "text",
-                    },
-                    {
-                      content: "3",
-                      styles: {
-                        bold: true,
-                      },
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-              },
-            ],
-            rows: [
-              [
-                {
-                  content: [
-                    {
-                      content: "Heading 1",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-                {
-                  content: [
-                    {
-                      content: "Heading 2",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-                {
-                  content: [
-                    {
-                      content: "Heading ",
-                      styles: {},
-                      type: "text",
-                    },
-                    {
-                      content: "3",
-                      styles: {
-                        bold: true,
-                      },
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-              ],
-              [
-                {
-                  content: [
-                    {
-                      content: "Row 1 cell 1",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-                {
-                  content: [
-                    {
-                      content: "Row 1 cell 2",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-                {
-                  content: [
-                    {
-                      content: "Row 1 cell ",
-                      styles: {},
-                      type: "text",
-                    },
-                    {
-                      content: "3",
-                      styles: {
-                        bold: true,
-                      },
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-              ],
-              [
-                {
-                  content: [
-                    {
-                      content: "Row 2 cell 1",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-                {
-                  content: [
-                    {
-                      content: "Row 2 cell 2",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-                {
-                  content: [
-                    {
-                      content: "Row 2 cell ",
-                      styles: {},
-                      type: "text",
-                    },
-                    {
-                      content: "3",
-                      styles: {
-                        bold: true,
-                      },
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-              ],
-              [
-                {
-                  content: [
-                    {
-                      content: "Row 3 cell 1",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-                {
-                  content: [
-                    {
-                      content: "Row 3 cell 2",
-                      styles: {},
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-                {
-                  content: [
-                    {
-                      content: "Row 3 cell ",
-                      styles: {},
-                      type: "text",
-                    },
-                    {
-                      content: "3",
-                      styles: {
-                        bold: true,
-                      },
-                      type: "text",
-                    },
-                  ],
-                  styles: {},
-                },
-              ],
-            ],
-            styles: {},
-            type: "table",
           },
           {
             content: [

@@ -27,7 +27,7 @@ import type {
   TableCell,
   Text,
   UniAst,
-} from "../ast";
+} from "@xwiki/cristal-uniast-api";
 
 /**
  * Converts Universal AST trees to markdown.
@@ -202,6 +202,6 @@ export class UniAstToMarkdownConverter {
       surroundings.push("**");
     }
 
-    return `${surroundings.join("")}${content}${surroundings.toReversed().join("")}`;
+    return `${surroundings.join("")}${content}${surroundings.reverse().join("")}`;
   }
 }

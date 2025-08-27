@@ -18,8 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-// TODO: don't do barrel files!
-export * from "./ast";
-export * from "./interface";
-export * from "./markdown/md-to-uniast";
-export * from "./markdown/uniast-to-md";
+import { generateConfig } from "../../../vite.config";
+
+export default generateConfig(import.meta.url);

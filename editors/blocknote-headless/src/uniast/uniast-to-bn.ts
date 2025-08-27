@@ -34,8 +34,9 @@ import type {
   ConverterContext,
   Image,
   InlineContent,
+  TableCell as TableCellUniast,
   UniAst,
-} from "@xwiki/cristal-uniast";
+} from "@xwiki/cristal-uniast-api";
 
 /**
  * Converts the Universal AS to the internal format of Blocknote.
@@ -150,34 +151,36 @@ export class UniAstToBlockNoteConverter {
       case "list":
         return this.convertList(block);
 
-      case "table":
+      case "table": {
+        const headerRow: {
+          cells: TableCell<EditorInlineContentSchema, EditorStyleSchema>[];
+        }[] = block.columns.some((c) => c.headerCell === undefined)
+          ? []
+          : [
+              {
+                cells: block.columns.map((c) =>
+                  this.convertCell(c.headerCell!),
+                ),
+              },
+            ];
+        const contentRows: {
+          cells: TableCell<EditorInlineContentSchema, EditorStyleSchema>[];
+        }[] = block.rows.map((cells) => ({
+          cells: cells.map((c) => this.convertCell(c)),
+        }));
         return {
           type: "table",
           id: genId(),
           content: {
             type: "tableContent",
+            headerRows: 1,
             columnWidths: block.columns.map((col) => col.widthPx),
-            rows: block.rows.map((cells) => ({
-              cells: cells.map(
-                (
-                  cell,
-                ): TableCell<EditorInlineContentSchema, EditorStyleSchema> => ({
-                  type: "tableCell",
-                  content: cell.content.map((item) =>
-                    this.convertInlineContent(item),
-                  ),
-                  props: {
-                    ...this.convertBlockStyles(cell.styles),
-                    colspan: cell.colSpan,
-                    rowspan: cell.rowSpan,
-                  },
-                }),
-              ),
-            })),
+            rows: [...headerRow, ...contentRows],
           },
           children: [],
           props: this.convertBlockStyles(block.styles),
         };
+      }
 
       case "image":
         return this.convertImage(block);
@@ -197,6 +200,20 @@ export class UniAstToBlockNoteConverter {
       default:
         assertUnreachable(block);
     }
+  }
+
+  private convertCell(
+    cell: TableCellUniast,
+  ): TableCell<EditorInlineContentSchema, EditorStyleSchema> {
+    return {
+      type: "tableCell",
+      content: cell.content.map((item) => this.convertInlineContent(item)),
+      props: {
+        ...this.convertBlockStyles(cell.styles),
+        colspan: cell.colSpan,
+        rowspan: cell.rowSpan,
+      },
+    };
   }
 
   private convertCustomBlockContent(

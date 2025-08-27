@@ -24,7 +24,7 @@ import messages from "../translations";
 import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
 import { mountBlockNote } from "@xwiki/cristal-editors-blocknote-react";
-import { createConverterContext } from "@xwiki/cristal-uniast";
+import { createConverterContext } from "@xwiki/cristal-uniast-utils";
 import { Container } from "inversify";
 
 import { debounce } from "lodash-es";
@@ -42,7 +42,7 @@ import type {
   BlockNoteViewWrapperProps,
   EditorType,
 } from "@xwiki/cristal-editors-blocknote-react";
-import type { UniAst } from "@xwiki/cristal-uniast";
+import type { UniAst } from "@xwiki/cristal-uniast-api";
 
 const {
   editorProps,

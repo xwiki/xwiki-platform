@@ -50,7 +50,7 @@ packages:
   - "core/settings/*"
   - "core/tiptap-extensions/*"
   - "core/uiextension/*"
-  - "core/uniast"
+  - "core/uniast/*"
   - "core/user/*"
   - "core/xwiki/*"
   - "core/wiki-config/*"

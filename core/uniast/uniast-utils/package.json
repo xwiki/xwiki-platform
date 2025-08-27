@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-editors-blocknote-headless",
+  "name": "@xwiki/cristal-uniast-utils",
   "version": "0.21.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "editors/blocknote-headless",
+    "directory": "core/uniast/uniast-utils",
     "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
@@ -15,8 +15,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./src/index.ts"
+      "import": "./src/index.ts",
+      "types": "./dist/index.d.ts"
     }
   },
   "main": "./src/index.ts",
@@ -25,42 +25,23 @@
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test": "vitest --run",
-    "typecheck": "vue-tsc"
+    "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@blocknote/core": "0.35.0",
-    "@xwiki/cristal-attachments-api": "workspace:*",
-    "@xwiki/cristal-authentication-api": "workspace:*",
-    "@xwiki/cristal-collaboration-api": "workspace:*",
-    "@xwiki/cristal-document-api": "workspace:*",
-    "@xwiki/cristal-dsapi": "workspace:*",
-    "@xwiki/cristal-editors-blocknote-react": "workspace:*",
     "@xwiki/cristal-fn-utils": "workspace:*",
-    "@xwiki/cristal-icons": "workspace:*",
-    "@xwiki/cristal-link-suggest-api": "workspace:*",
-    "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
-    "@xwiki/cristal-uniast-api": "workspace:*",
-    "@xwiki/cristal-uniast-utils": "workspace:*",
-    "eventemitter3": "5.0.1",
-    "lodash-es": "4.17.21",
-    "vue-i18n": "11.1.11"
+    "@xwiki/cristal-uniast-api": "workspace:*"
   },
   "peerDependencies": {
-    "inversify": "7.x",
-    "reflect-metadata": "0.x",
-    "vue": "3.x"
+    "inversify": "7.x"
   },
   "devDependencies": {
-    "@types/lodash-es": "4.17.12",
     "@xwiki/cristal-dev-config": "workspace:*",
     "inversify": "7.9.0",
-    "reflect-metadata": "0.2.2",
-    "vite": "7.1.3",
-    "vue": "3.5.20",
-    "vue-tsc": "2.2.12"
+    "typescript": "5.9.2",
+    "vite": "7.1.3"
   },
   "publishConfig": {
     "exports": {

@@ -19,7 +19,6 @@
  */
 
 import { createVNode, render } from "vue";
-import type { MacroProvider } from "../api/macroProvider";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type { ClickListener } from "@xwiki/cristal-model-click-listener";
@@ -265,58 +264,5 @@ export class ContentTools {
       vNode = null;
     };
     return destroy;
-  }
-
-  /**
-   * Method to look for Macros in client side rendering
-   * Macros are inserted by the WikiModel parser using the following syntax
-   *   \<pre class="wikimodel-macro" macroname="MACRONAME" param1="PARAMVALUE1" param2="PARAMVALUE2"\>
-   *     \<!--[CDATA[CONTENT]]--\>
-   *   \</pre\>
-   *
-   * Example with warning macro:
-   *   \<pre class="wikimodel-macro" macroname="warning" title="WARNING"\>
-   *     \<!--[CDATA[This is a warning message]]--\>
-   *   \</pre\>
-   */
-  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
-  // eslint-disable-next-line max-statements
-  public static async transformMacros(
-    element: HTMLElement,
-    cristal: CristalApp,
-  ): Promise<void> {
-    const macroTagList = element.getElementsByTagName("pre");
-    for (let i = 0; i < macroTagList.length; i++) {
-      const macroTag = macroTagList[i];
-      if (macroTag.className == "wikimodel-macro") {
-        const macroName = macroTag.getAttribute("macroname");
-        if (macroName != null && macroName != "") {
-          ContentTools.logger?.debug("Found macro", macroName);
-          try {
-            const macroProvider = cristal
-              ?.getContainer()
-              .get<MacroProvider>("MacroProvider", { name: macroName });
-            const vueComponent = await macroProvider?.getVueComponent();
-            if (vueComponent && cristal?.getApp()) {
-              macroTag.id = "wikimodel-macro-" + macroName + "-1";
-              const macroData = macroProvider.parseParameters(macroTag);
-              this.mount(
-                vueComponent,
-                { macroData: macroData },
-                null,
-                macroTag,
-                cristal.getApp(),
-              );
-            }
-          } catch (e) {
-            ContentTools.logger?.debug(
-              "Could not find macro implementation for",
-              macroName,
-              e,
-            );
-          }
-        }
-      }
-    }
   }
 }

@@ -17,28 +17,4 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import { defineConfig } from "vite";
-import Vue from "@vitejs/plugin-vue";
-import { resolve } from "path";
-
-export default defineConfig({
-  build: {
-    sourcemap: true,
-    input: {
-      main: resolve(__dirname, "index.html"),
-    },
-  },
-  plugins: [
-    Vue({
-      template: {
-        compilerOptions: {
-          isCustomElement: (tag) => tag.startsWith("sl-"),
-        },
-      },
-    }),
-  ],
-  worker: {
-    format: "es",
-  },
-});
+export { UniAstToHTMLConverter } from "./html/uniast-to-html";

@@ -41,7 +41,7 @@ import type {
   ListItem,
   TableCell,
   UniAst,
-} from "@xwiki/cristal-uniast";
+} from "@xwiki/cristal-uniast-api";
 
 // TODO: escape characters that need it (e.g. '`', '\', '*', '_', etc.)
 

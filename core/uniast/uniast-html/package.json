@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-uniast",
+  "name": "@xwiki/cristal-uniast-html",
   "version": "0.21.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "core/uniast",
+    "directory": "core/uniast/uniast-html",
     "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
@@ -15,8 +15,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./src/index.ts"
+      "import": "./src/index.ts",
+      "types": "./dist/index.d.ts"
     }
   },
   "main": "./src/index.ts",
@@ -29,25 +29,19 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/cristal-fn-utils": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
-    "@xwiki/cristal-model-reference-api": "workspace:*",
-    "@xwiki/cristal-model-remote-url-api": "workspace:*",
-    "mdast-util-gfm-strikethrough": "2.0.0",
-    "mdast-util-gfm-table": "2.0.0",
-    "mdast-util-gfm-task-list-item": "2.0.0",
-    "micromark-extension-gfm-strikethrough": "2.1.0",
-    "micromark-extension-gfm-table": "2.1.1",
-    "micromark-extension-gfm-task-list-item": "2.1.0",
-    "remark-parse": "11.0.0",
-    "unified": "11.0.5"
+    "@xwiki/cristal-uniast-api": "workspace:*",
+    "lodash-es": "4.17.21"
   },
   "peerDependencies": {
     "inversify": "7.x"
   },
   "devDependencies": {
-    "@types/mdast": "4.0.4",
+    "@types/lodash-es": "4.17.12",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/cristal-model-reference-api": "workspace:*",
+    "@xwiki/cristal-model-remote-url-api": "workspace:*",
+    "@xwiki/cristal-uniast-utils": "workspace:*",
     "inversify": "7.9.0",
     "typescript": "5.9.2",
     "vite": "7.1.3",

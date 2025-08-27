@@ -1374,9 +1374,10 @@ XWiki.Annotation = Class.create({
     // position the bubble
     // By default, we position it to the right and under the coordinates
     // Position it horizontally.
+    let bubbleStyles = getComputedStyle(bubble);
     let bubbleWidth = bubble.offsetWidth 
-      + parseInt(getComputedStyle(bubble).marginLeft) 
-      + parseInt(getComputedStyle(bubble).marginRight);
+      + parseInt(bubbleStyles.marginLeft)
+      + parseInt(bubbleStyles.marginRight);
     if (horizontalCoordinate &lt; bubbleWidth || horizontalCoordinate + bubbleWidth &lt; window.innerWidth) {
       bubble.style.left = horizontalCoordinate + 'px';
     } else {

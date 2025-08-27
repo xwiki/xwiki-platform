@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.jgroups.BytesMessage;
 import org.jgroups.Message;
+import org.jgroups.View;
 import org.jgroups.blocks.cs.ReceiverAdapter;
 import org.slf4j.Logger;
 import org.xwiki.classloader.ClassLoaderManager;
@@ -65,6 +66,9 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
     @Inject
     private Logger logger;
 
+    @Inject
+    private JGroupsNetworkChannels channels;
+
     /**
      * @return the RemoteObservationManager
      */
@@ -81,6 +85,7 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
         return this.remoteObservationManager;
     }
 
+    @SuppressWarnings("resource")
     @Override
     public void receive(Message msg)
     {
@@ -91,6 +96,17 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
             this.logger.debug("Received JGroups remote event [{}]", remoteEvent);
 
             getRemoteObservationManager().notify(remoteEvent);
+        }
+    }
+
+    @SuppressWarnings("resource")
+    @Override
+    public void viewAccepted(View view)
+    {
+        for (JGroupsNetworkChannel channel : this.channels.getChannels().values()) {
+            if (channel.getJChannel().getView() == view) {
+                channel.onViewChanged();
+            }
         }
     }
 }

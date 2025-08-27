@@ -7,3 +7,5 @@ org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkAdapter
 org.xwiki.observation.remote.internal.converter.DefaultEventConverterManager
 org.xwiki.observation.remote.internal.converter.LogEventConverter
 org.xwiki.observation.remote.internal.converter.SerializableEventConverter
+org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkChannel
+org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkChannels

@@ -54,6 +54,11 @@
       <artifactId>xwiki-rendering-transformation-macro</artifactId>
       <version>${rendering.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-to-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

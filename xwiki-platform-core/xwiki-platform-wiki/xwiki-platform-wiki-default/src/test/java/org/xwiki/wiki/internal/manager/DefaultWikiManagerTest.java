@@ -137,7 +137,8 @@ class DefaultWikiManagerTest
         Throwable exception = assertThrows(WikiManagerException.class, () -> {
             this.wikiManager.create("wikiid1", "wikialias1", true);
         });
-        assertEquals("wiki id [wikiid1] is already used and is thus not available", exception.getMessage());
+        assertEquals("The wiki id [wikiid1] is already used or is a reserved id, and thus is not available.",
+            exception.getMessage());
     }
 
     @Test
@@ -152,7 +153,8 @@ class DefaultWikiManagerTest
         Throwable exception = assertThrows(WikiManagerException.class, () -> {
             this.wikiManager.create("wikiid1", "wikialias1", true);
         });
-        assertEquals("wiki id [wikiid1] is already used and is thus not available", exception.getMessage());
+        assertEquals("The wiki id [wikiid1] is already used or is a reserved id, and thus is not available.",
+            exception.getMessage());
     }
 
     @Test

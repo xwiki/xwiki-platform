@@ -109,8 +109,8 @@
   #set ($discard = $xwiki.jsfx.use('js/xwiki/editors/simpletoolbar.js', true))
   #set ($discard = $xwiki.ssfx.use('js/xwiki/editors/simpletoolbar.css', true))
 <script type="application/json" id="simpletoolbar-configuration">
-$jsontool.serialize({
-  toolbarElements: $toolbarJson
-})
+{
+  "toolbarElements": $jsontool.serialize($toolbarJson)
+}
 </script>
 #end

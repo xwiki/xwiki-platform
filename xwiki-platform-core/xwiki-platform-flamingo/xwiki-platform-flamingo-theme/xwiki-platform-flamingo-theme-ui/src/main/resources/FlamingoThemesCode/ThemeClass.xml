@@ -650,7 +650,7 @@
       <name>logo-description</name>
       <number>64</number>
       <picker>0</picker>
-      <prettyName>logo description</prettyName>
+      <prettyName>logo-description</prettyName>
       <size>100</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>

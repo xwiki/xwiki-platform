@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
@@ -105,11 +105,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-authorization-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -128,6 +123,10 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
 
     <dependency>
@@ -212,7 +211,6 @@
                 org/xwiki/rest/internal/Utils.java,
                 org/xwiki/rest/internal/XWikiAuthentication.java,
                 org/xwiki/rest/internal/resources/BaseAttachmentsResource.java,
-                org/xwiki/rest/internal/resources/BaseSearchResult.java,
                 org/xwiki/rest/internal/resources/BrowserAuthenticationResource.java,
                 org/xwiki/rest/internal/resources/pages/PagesResourceImpl.java,
                 org/xwiki/rest/internal/resources/search/AbstractDatabaseSearchSource.java,

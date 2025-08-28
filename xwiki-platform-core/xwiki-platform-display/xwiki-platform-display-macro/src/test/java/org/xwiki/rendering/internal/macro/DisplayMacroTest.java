@@ -67,6 +67,7 @@ import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.DefaultAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -106,6 +107,10 @@ class DisplayMacroTest
     // Make sure to not load the standard AuthorizationManager which trigger too many things
     @MockComponent
     private AuthorizationManager authorizationManager;
+
+    // Mock DocumentAuthorizationManager as otherwise the document display cannot be loaded
+    @MockComponent
+    private DocumentAuthorizationManager documentAuthorizationManager;
 
     @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;

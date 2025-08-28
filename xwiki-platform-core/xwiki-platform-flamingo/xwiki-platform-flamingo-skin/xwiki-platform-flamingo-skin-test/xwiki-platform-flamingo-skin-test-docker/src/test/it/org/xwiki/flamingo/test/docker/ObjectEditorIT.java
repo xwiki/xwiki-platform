@@ -22,14 +22,12 @@ package org.xwiki.flamingo.test.docker;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.bidi.browsingcontext.BrowsingContext;
-import org.openqa.selenium.bidi.module.BrowsingContextInspector;
-import org.openqa.selenium.remote.Augmenter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -63,7 +61,7 @@ class ObjectEditorIT
     private static final String STRING_CLASS = "ObjectEditorIT.NestedSpace.StringClass";
 
     @BeforeAll
-    public void setup(TestUtils setup)
+    void beforeAll(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
 
@@ -78,15 +76,27 @@ class ObjectEditorIT
         setup.createPage(stringClassReference, "", "StringClass");
         setup.addClassProperty(stringClassReference, "string", "String");
     }
-    
+
+    @BeforeEach
+    void beforeEach(TestUtils testUtils, TestReference testReference)
+    {
+        testUtils.deletePage(testReference, true);
+    }
+
+    @AfterEach
+    void afterEach(TestUtils testUtils)
+    {
+        testUtils.maybeLeaveEditMode();
+    }
+
     @Test
-    @IgnoreBrowser(value = "chrome", reason = "Alert handling in Chrome currently isn't working, see also "
-        + "https://jira.xwiki.org/browse/XWIKI-22533")
     @Order(1)
+    @IgnoreBrowser(value = "chrome", reason = "Chrome has recently started to ignore the unhandledPromptBehavior "
+        + "capability which allows us to handle alerts shown before page unload. "
+        + "See https://issues.chromium.org/issues/351858989#comment30 .")
     void preventUsersToLeaveTheEditorWithoutSaving(TestUtils testUtils, TestReference testReference)
     {
         // fixture
-        testUtils.deletePage(testReference);
         testUtils.createPage(testReference, "Some content");
         testUtils.addObject(testReference, NUMBER_CLASS, "number", 42);
 
@@ -104,6 +114,21 @@ class ObjectEditorIT
         // we should be able to leave the editor without any warning
         viewPage = testUtils.gotoPage(testReference);
 
+        // come back to the editor and try to edit the value
+        objectEditPage = viewPage.editObjects();
+        xobjects = objectEditPage.getObjectsOfClass(NUMBER_CLASS);
+        objectEditPane = xobjects.get(0);
+        // edit a field: we should be prevented to leave without saving
+        objectEditPane.setPropertyValue("number", "48");
+
+        testUtils.gotoPageWithoutWaiting(testReference);
+        testUtils.getDriver().switchTo().alert().dismiss();
+
+        objectEditPage.clickSaveAndContinue();
+
+        // we should be able to leave the editor without any warning now
+        viewPage = testUtils.gotoPage(testReference);
+
         // come back to the editor and create a new object
         objectEditPage = viewPage.editObjects();
         objectEditPane = objectEditPage.addObject(NUMBER_CLASS);
@@ -111,15 +136,8 @@ class ObjectEditorIT
         assertTrue(objectEditPane.isDeleteLinkDisplayed());
         assertFalse(objectEditPane.isEditLinkDisplayed());
 
-        WebDriver driver = new Augmenter().augment(testUtils.getDriver().getWrappedDriver());
-        try (BrowsingContextInspector inspector = new BrowsingContextInspector(driver)) {
-            BrowsingContext context = new BrowsingContext(driver, driver.getWindowHandle());
-            inspector.onUserPromptOpened(userPromptOpened -> {
-                assertEquals(context.getId(), userPromptOpened.getBrowsingContextId());
-                context.handleUserPrompt(false);
-            });
-            testUtils.gotoPage(testReference);
-        }
+        testUtils.gotoPageWithoutWaiting(testReference);
+        testUtils.getDriver().switchTo().alert().dismiss();
         objectEditPage.deleteObject(NUMBER_CLASS, 1);
 
         // State should be same as before adding
@@ -140,14 +158,8 @@ class ObjectEditorIT
 
         // Delete the saved object
         objectEditPage.deleteObject(NUMBER_CLASS, 0);
-        try (BrowsingContextInspector inspector = new BrowsingContextInspector(driver)) {
-            BrowsingContext context = new BrowsingContext(driver, driver.getWindowHandle());
-            inspector.onUserPromptOpened(userPromptOpened -> {
-                assertEquals(context.getId(), userPromptOpened.getBrowsingContextId());
-                context.handleUserPrompt(false);
-            });
-            testUtils.gotoPage(testReference);
-        }
+        testUtils.gotoPageWithoutWaiting(testReference);
+        testUtils.getDriver().switchTo().alert().dismiss();
 
         objectEditPage.clickSaveAndContinue();
 
@@ -325,39 +337,38 @@ class ObjectEditorIT
     @Order(4)
     void changeMultiselectProperty(TestUtils testUtils, TestReference testReference)
     {
-        String dedicatedSpace = testReference.getLastSpaceReference().getName();
-        String testClassPage = "TestClass";
-        String testClassFullName = String.format("%s.%s", dedicatedSpace, testClassPage);
-        ViewPage page = testUtils.createPage(dedicatedSpace, testClassPage, "", "");
+        DocumentReference testClassReference =
+            new DocumentReference("TestClass", testReference.getLastSpaceReference());
+        String testClass = testUtils.serializeLocalReference(testClassReference);
+
+        ViewPage page = testUtils.createPage(testClassReference, "", "");
         // Create a class with a database list property set to return all documents
         ClassEditPage cep = page.editClass();
         cep.addProperty("prop", "DBList");
-        cep.getDatabaseListClassEditElement("prop").setHibernateQuery(
-            String.format("select doc.fullName from XWikiDocument doc where doc.space = '%s'", dedicatedSpace));
+        cep.getDatabaseListClassEditElement("prop")
+            .setHibernateQuery(String.format("select doc.fullName from XWikiDocument doc where doc.space = '%s'",
+                testUtils.serializeLocalReference(testReference.getLastSpaceReference())));
         cep.clickSaveAndView();
 
-        // Create a second page to hold the Object and set its content
-        String testObjectPage = "TestObject";
-        ViewPage vp = testUtils.createPage(dedicatedSpace, testObjectPage, "this is the content", "");
+        ViewPage vp = testUtils.createPage(testReference, "this is the content", "");
 
         // Add an object of the class created and set the value to be the test page
         ObjectEditPage oep = vp.editObjects();
-        FormContainerElement objectForm = oep.addObject(testClassFullName);
-        objectForm.setFieldValue(By.id(String.format("%s_0_prop", testClassFullName)), testClassFullName);
+        FormContainerElement objectForm = oep.addObject(testClass);
+        objectForm.setFieldValue(By.id(String.format("%s_0_prop", testClass)), testClass);
         oep.clickSaveAndView();
 
         // Set multiselect to true
-        cep = ClassEditPage.gotoPage(dedicatedSpace, testClassPage);
+        cep = ClassEditPage.gotoPage(testClassReference);
         cep.getDatabaseListClassEditElement("prop").setMultiSelect(true);
         cep.clickSaveAndView();
 
         // Select a second document in the DB list select field.
-        oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        oep = ObjectEditPage.gotoPage(testReference);
+        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClass).get(0);
         objectEditPane.displayObject();
-        objectEditPane.setFieldValue(
-            By.id(String.format("%s_0_prop", testClassFullName)),
-            String.format("%s.%s", dedicatedSpace, testObjectPage));
+        objectEditPane.setFieldValue(By.id(String.format("%s_0_prop", testClass)),
+            testUtils.serializeLocalReference(testReference));
         vp = oep.clickSaveAndView();
 
         assertEquals("this is the content", vp.getContent());
@@ -367,13 +378,12 @@ class ObjectEditorIT
     @Order(5)
     void changeNumberType(TestUtils testUtils, TestReference testReference)
     {
-        String dedicatedSpace = testReference.getLastSpaceReference().getName();
-        String testClassPage = "TestClass";
-        String testClassFullName = String.format("%s.%s", dedicatedSpace, testClassPage);
-        String testObjectPage = "TestObject";
-        String propertyClassId = String.format("%s_0_prop", testClassFullName);
+        DocumentReference testClassReference =
+            new DocumentReference("TestClass", testReference.getLastSpaceReference());
+        String testClass = testUtils.serializeLocalReference(testClassReference);
+        String propertyClassId = String.format("%s_0_prop", testClass);
         // Create class page
-        ViewPage vp = testUtils.createPage(dedicatedSpace, testClassPage, "this is the content", "");
+        ViewPage vp = testUtils.createPage(testClassReference, "this is the content", "");
 
         // Add class
         ClassEditPage cep = vp.editClass();
@@ -383,38 +393,38 @@ class ObjectEditorIT
         assertEquals("this is the content", vp.getContent());
 
         // Create object page
-        vp = testUtils.createPage(dedicatedSpace, testObjectPage,
-            "this is the content: {{velocity}}$doc.display('prop'){{/velocity}}", "");
+        vp = testUtils.createPage(testReference, "this is the content: {{velocity}}$doc.display('prop'){{/velocity}}",
+            "");
 
         // Add object
         ObjectEditPage oep = vp.editObjects();
-        FormContainerElement objectForm = oep.addObject(testClassFullName);
+        FormContainerElement objectForm = oep.addObject(testClass);
         objectForm.setFieldValue(By.id(propertyClassId), "3");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: 3", vp.getContent());
 
         // Change number to double type
-        cep = ClassEditPage.gotoPage(dedicatedSpace, testClassPage);
+        cep = ClassEditPage.gotoPage(testClassReference);
         cep.getNumberClassEditElement("prop").setNumberType("double");
         vp = cep.clickSaveAndView();
         assertEquals("this is the content", vp.getContent());
 
         // Verify conversion
-        oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        oep = ObjectEditPage.gotoPage(testReference);
+        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClass).get(0);
         objectEditPane.displayObject();
         objectEditPane.setFieldValue(By.id(propertyClassId), "2.5");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: 2.5", vp.getContent());
 
         // Change number to long type
-        cep = ClassEditPage.gotoPage(dedicatedSpace, testClassPage);
+        cep = ClassEditPage.gotoPage(testClassReference);
         cep.getNumberClassEditElement("prop").setNumberType("long");
         vp = cep.clickSaveAndView();
         assertEquals("this is the content", vp.getContent());
 
         // Verify conversion
-        oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
+        oep = ObjectEditPage.gotoPage(testReference);
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: 2", vp.getContent());
     }
@@ -423,14 +433,13 @@ class ObjectEditorIT
     @Order(6)
     void changeListMultipleSelect(TestUtils testUtils, TestReference testReference)
     {
-        String dedicatedSpace = testReference.getLastSpaceReference().getName();
-        String testClassPage = "TestClass";
-        String testClassFullName = String.format("%s.%s", dedicatedSpace, testClassPage);
-        String testObjectPage = "TestObject";
-        String propertyClassId = String.format("%s_0_prop", testClassFullName);
+        DocumentReference testClassReference =
+            new DocumentReference("TestClass", testReference.getLastSpaceReference());
+        String testClass = testUtils.serializeLocalReference(testClassReference);
+        String propertyClassId = String.format("%s_0_prop", testClass);
 
         // Create class page
-        ViewPage vp = testUtils.createPage(dedicatedSpace, testClassPage, "this is the content", "");
+        ViewPage vp = testUtils.createPage(testClassReference, "this is the content", "");
 
         // Add class
         ClassEditPage cep = vp.editClass();
@@ -442,25 +451,25 @@ class ObjectEditorIT
         assertEquals("this is the content", vp.getContent());
 
         // Create object page
-        vp = testUtils.createPage(dedicatedSpace, testObjectPage,
-            "this is the content: {{velocity}}$doc.display('prop'){{/velocity}}", "");
+        vp = testUtils.createPage(testReference, "this is the content: {{velocity}}$doc.display('prop'){{/velocity}}",
+            "");
 
         // Add object
         ObjectEditPage oep = vp.editObjects();
-        FormContainerElement objectForm = oep.addObject(testClassFullName);
+        FormContainerElement objectForm = oep.addObject(testClass);
         objectForm.setFieldValue(By.id(propertyClassId), "choice 3");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: choice 3", vp.getContent());
 
         // Change list to a multiple select.
-        cep = ClassEditPage.gotoPage(dedicatedSpace, testClassPage);
+        cep = ClassEditPage.gotoPage(testClassReference);
         cep.getStaticListClassEditElement("prop").setMultiSelect(true);
         vp = cep.clickSaveAndView();
         assertEquals("this is the content", vp.getContent());
 
         // Verify conversion
-        oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        oep = ObjectEditPage.gotoPage(testReference);
+        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClass).get(0);
         objectEditPane.displayObject();
         objectEditPane.setFieldValue(By.id(propertyClassId), "choice 3");
         objectEditPane.setFieldValue(By.id(propertyClassId), "choice 4");
@@ -472,14 +481,13 @@ class ObjectEditorIT
     @Order(7)
     void changeListTypeRelationalStorage(TestUtils testUtils, TestReference testReference)
     {
-        String dedicatedSpace = testReference.getLastSpaceReference().getName();
-        String testClassPage = "TestClass";
-        String testClassFullName = String.format("%s.%s", dedicatedSpace, testClassPage);
-        String testObjectPage = "TestObject";
-        String propertyClassId = String.format("%s_0_prop", testClassFullName);
+        DocumentReference testClassReference =
+            new DocumentReference("TestClass", testReference.getLastSpaceReference());
+        String testClass = testUtils.serializeLocalReference(testClassReference);
+        String propertyClassId = String.format("%s_0_prop", testClass);
 
         // Create class page
-        ViewPage vp = testUtils.createPage(dedicatedSpace, testClassPage, "this is the content", "");
+        ViewPage vp = testUtils.createPage(testClassReference, "this is the content", "");
 
         // Add class
         ClassEditPage cep = vp.editClass();
@@ -491,43 +499,41 @@ class ObjectEditorIT
         assertEquals("this is the content", vp.getContent());
 
         // Create object page
-        vp = testUtils.createPage(dedicatedSpace, testObjectPage,
-            "this is the content: {{velocity}}$doc.display('prop'){{/velocity}}", "");
+        vp = testUtils.createPage(testReference, "this is the content: {{velocity}}$doc.display('prop'){{/velocity}}",
+            "");
 
         // Add object
         ObjectEditPage oep = vp.editObjects();
-        FormContainerElement objectForm = oep.addObject(testClassFullName);
+        FormContainerElement objectForm = oep.addObject(testClass);
         objectForm.setFieldValue(By.id(propertyClassId), "this|that|other");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: this that other", vp.getContent());
 
         // Change list to relational storage.
-        cep = ClassEditPage.gotoPage(dedicatedSpace, testClassPage);
+        cep = ClassEditPage.gotoPage(testClassReference);
         cep.getStaticListClassEditElement("prop").setRelationalStorage(true);
         vp = cep.clickSaveAndView();
         assertEquals("this is the content", vp.getContent());
 
         // Make sure we can still edit the object.
-        oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        oep = ObjectEditPage.gotoPage(testReference);
+        ObjectEditPane objectEditPane = oep.getObjectsOfClass(testClass).get(0);
         objectEditPane.displayObject();
-        objectEditPane.setFieldValue(
-            By.id(propertyClassId), "this|other");
+        objectEditPane.setFieldValue(By.id(propertyClassId), "this|other");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: this other", vp.getContent());
 
         // Change list to non-relational storage.
-        cep = ClassEditPage.gotoPage(dedicatedSpace, testClassPage);
+        cep = ClassEditPage.gotoPage(testClassReference);
         cep.getStaticListClassEditElement("prop").setRelationalStorage(false);
         vp = cep.clickSaveAndView();
         assertEquals("this is the content", vp.getContent());
 
         // Make sure we can still edit the object.
-        oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
-        objectEditPane = oep.getObjectsOfClass(testClassFullName).get(0);
+        oep = ObjectEditPage.gotoPage(testReference);
+        objectEditPane = oep.getObjectsOfClass(testClass).get(0);
         objectEditPane.displayObject();
-        objectEditPane.setFieldValue(
-            By.id(propertyClassId), "that|other");
+        objectEditPane.setFieldValue(By.id(propertyClassId), "that|other");
         vp = oep.clickSaveAndView();
         assertEquals("this is the content: that other", vp.getContent());
     }
@@ -536,11 +542,9 @@ class ObjectEditorIT
     @Order(8)
     void objectAddAndRemove(TestReference testReference)
     {
-        String dedicatedSpace = testReference.getLastSpaceReference().getName();
-        String testObjectPage = "TestObject";
         String property = String.format("%s_%%s_string", STRING_CLASS);
 
-        ObjectEditPage oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
+        ObjectEditPage oep = ObjectEditPage.gotoPage(testReference);
         FormContainerElement object = oep.addObject(STRING_CLASS);
         object.setFieldValue(By.id(String.format(property, 0)), "John");
 
@@ -568,41 +572,35 @@ class ObjectEditorIT
     @Order(9)
     void inlineObjectAddButton(TestReference testReference)
     {
-        String dedicatedSpace = testReference.getLastSpaceReference().getName();
-        String testObjectPage = "TestObject";
-        ObjectEditPage oep = ObjectEditPage.gotoPage(dedicatedSpace, testObjectPage);
+        ObjectEditPage oep = ObjectEditPage.gotoPage(testReference);
         oep.addObject(STRING_CLASS);
         oep.addObjectFromInlineLink(STRING_CLASS);
         assertEquals(2, oep.getObjectsOfClass(STRING_CLASS).size());
-
-        // Save & view to avoid getting an alert when moving to next test.
-        oep.clickSaveAndView();
     }
 
     @Test
     @Order(10)
-    void propertyDisplayersForNewObjects(TestUtils testUtils, TestReference testReference) throws Exception
+    void propertyDisplayersForNewObjects(TestUtils testUtils, TestReference testReference)
     {
-        String dedicatedSpace = testReference.getLastSpaceReference().getName();
-        String testClassPage = "TestClass";
-        String testClassFullName = String.format("%s.%s", dedicatedSpace, testClassPage);
-        testUtils.rest().deletePage(dedicatedSpace, testClassPage);
+        String testClass = testUtils.serializeLocalReference(testReference);
+
         testUtils.createAdminUser();
         testUtils.loginAsSuperAdmin();
 
         // Create a class with two properties: a date and a list of users.
-        ClassEditPage classEditor = ClassEditPage.gotoPage(dedicatedSpace, testClassPage);
+        ClassEditPage classEditor = ClassEditPage.gotoPage(testReference);
         classEditor.addProperty("date", "Date");
         classEditor.addProperty("author", "Users");
+        classEditor.clickSaveAndView();
 
         // Add an object of this class and set its properties.
-        ObjectEditPage objectEditor = ObjectEditPage.gotoPage(dedicatedSpace, testClassPage);
-        ObjectEditPane object = objectEditor.addObject(testClassFullName);
+        ObjectEditPage objectEditor = ObjectEditPage.gotoPage(testReference);
+        ObjectEditPane object = objectEditor.addObject(testClass);
         object.openDatePicker("date").selectDay("15").close();
         object.getSuggestInput("author").sendKeys("ad").waitForSuggestions().selectByVisibleText("Admin");
 
         // Save, edit again and check the values.
-        object = objectEditor.clickSaveAndView().editObjects().getObjectsOfClass(testClassFullName).get(0);
+        object = objectEditor.clickSaveAndView().editObjects().getObjectsOfClass(testClass).get(0);
         object.displayObject();
         BootstrapDateTimePicker datePicker = object.openDatePicker("date");
         assertEquals("15", datePicker.getSelectedDay());

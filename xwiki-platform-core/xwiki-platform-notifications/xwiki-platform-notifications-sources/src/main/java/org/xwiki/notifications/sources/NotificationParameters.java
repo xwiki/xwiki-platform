@@ -30,7 +30,6 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -104,7 +103,6 @@ public class NotificationParameters
      * {@link org.xwiki.notifications.GroupingEventManager}.
      * @since 15.5RC1
      */
-    @Unstable
     public String groupingEventTarget = "alert";
 
     @Override

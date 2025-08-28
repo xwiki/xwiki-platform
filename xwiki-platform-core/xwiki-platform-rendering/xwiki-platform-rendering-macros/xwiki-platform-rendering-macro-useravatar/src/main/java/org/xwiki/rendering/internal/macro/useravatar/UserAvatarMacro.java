@@ -39,7 +39,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
@@ -98,13 +97,6 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
-
-    /**
-     * Used to find out the current Wiki name.
-     */
-    @Inject
-    @Named("current")
-    private EntityReferenceValueProvider currentEntityReferenceValueProvider;
 
     /**
      * Logging framework.

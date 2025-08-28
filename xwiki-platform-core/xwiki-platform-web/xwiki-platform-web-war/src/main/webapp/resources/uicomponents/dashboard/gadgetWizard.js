@@ -29,7 +29,8 @@
   'dashboard.gadgetEditor.title',
   'dashboard.gadgetEditor.changeGadget.label',
   'dashboard.gadgetEditor.gadgetTitle.label',
-  'dashboard.gadgetEditor.gadgetTitle.hint'
+  'dashboard.gadgetEditor.gadgetTitle.hint',
+  'macroEditor.required'
 ])
 #set ($l10n = {})
 #foreach ($key in $l10nKeys)
@@ -42,14 +43,20 @@
 
 define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   var gadgetTitleTemplate = $(
-    '<li class="macro-parameter" data-id="$gadgetTitle">' +
-      '<div class="macro-parameter-name"></div>' +
-      '<div class="macro-parameter-description"></div>' +
-      '<input type="text" class="macro-parameter-field" name="$gadgetTitle"/>' +
-    '</li>'
+    `<div class="macro-parameter" data-id="$gadgetTitle" data-type="java.lang.String">
+       <div class="macro-parameter-name-container">
+         <label class="macro-parameter-name" for="parameter-$gadgetTitle"></label>
+         <span class="mandatory"></span>
+       </div>
+       <div class="macro-parameter-description"></div>
+       <div class="macro-parameter-field">
+         <input type="text" class="macro-parameter-field" name="$gadgetTitle"/>
+       </div>
+    </div>`
   );
   gadgetTitleTemplate.find('.macro-parameter-name').text(l10n['dashboard.gadgetEditor.gadgetTitle.label']);
   gadgetTitleTemplate.find('.macro-parameter-description').text(l10n['dashboard.gadgetEditor.gadgetTitle.hint']);
+  gadgetTitleTemplate.find('.mandatory').text('(' + l10n['macroEditor.required'] + ')');
 
   $('head').append($('<link type="text/css" rel="stylesheet"/>').attr('href', paths.css.macroWizard));
 

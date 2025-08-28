@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activeinstalls2-test</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activeinstalls2-test-docker</artifactId>
   <name>XWiki Platform - Active Installs 2 - Tests - Functional Docker Tests</name>
@@ -87,6 +87,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <!--
+              Disable tracing during test startup to avoid conflicts between opentelemetry versions.
+              The conflict comes from transitive dependencies of Selenium and Elasticsearch.
+              Disabling tracing is the easiest option, but if tracing becomes necessary, we can resolve the version
+              conflict by specifying the opentelemetry version.
+            -->
+            <webdriver.remote.enableTracing>false</webdriver.remote.enableTracing>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -19,6 +19,7 @@
  */
 package org.xwiki.security.authorization.cache.internal;
 
+import java.lang.invoke.VarHandle;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +29,11 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
@@ -83,14 +87,24 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     @Inject
     private Logger logger;
 
-    /** Fair read-write lock used for fair scheduling of cache access. */
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
+    /**
+     * Count how many cache invalidations have been completed. This counter is incremented at the end of every
+     * invalidation while the write lock is still held. Any operation that wants to load something into the security
+     * cache needs to get this counter before loading any data. By comparing the obtained value of the counter to the
+     * current value under the write lock, we can be sure that between the start of the loading and the insertion into
+     * the security cache, no cache invalidation has happened. This ensures that the obtained data isn't outdated.
+     */
+    private final AtomicLong invalidationCounter = new AtomicLong();
 
-    /** Fair read lock. */
-    private final Lock readLock = readWriteLock.readLock();
+    /**
+     * Boolean indicator if a cache invalidation is currently in progress. This is used to directly cancel adding
+     * data into the cache when an invalidation is currently running as the invalidation counter would be higher
+     * afterward, anyway. This can avoid long waits on locks in case of slow invalidation operations.
+     */
+    private final AtomicBoolean invalidationInProgress = new AtomicBoolean();
 
     /** Fair write lock. */
-    private final Lock writeLock = readWriteLock.writeLock();
+    private final Lock writeLock = new ReentrantLock();
 
     private final ReadWriteLock invalidationReadWriteLock = new ReentrantReadWriteLock(true);
 
@@ -377,7 +391,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         }
 
         /**
-         * Update an existing cached security rule entry with parents groups if it does not have any already.
+         * Update an existing cached security rule entry with parents groups if it doesn’t have any already.
          *
          * @param groups the groups to be added to this entry, if null or empty nothing will be done.
          * @throws ParentEntryEvictedException if one of the groups has been evicted from the cache.
@@ -635,7 +649,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getEntry(SecurityReference reference)
     {
-        return getInternal(getEntryKey(reference));
+        return getInternal(getEntryKey(reference), true);
     }
 
     /**
@@ -646,7 +660,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getEntry(UserSecurityReference userReference, SecurityReference reference)
     {
-        return getInternal(getEntryKey(userReference, reference));
+        // Access entries aren't in the internal entries, so no reason to check them.
+        return getInternal(getEntryKey(userReference, reference), false);
     }
 
     /**
@@ -657,46 +672,47 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getShadowEntry(SecurityReference userReference, SecurityReference wiki)
     {
-        return getInternal(getShadowEntryKey(userReference, wiki));
+        return getInternal(getShadowEntryKey(userReference, wiki), true);
     }
 
     /**
      * Get a security cache entry from the cache or the internal map. In the latter case, the entry is re-inserted
-     * into the cache. This method can be called without locking, it uses the read lock internally.
+     * into the cache. This method can be called without locking.
      *
      * @param key the key of the entry to retrieve
+     * @param checkInternalEntries if the method should try finding the item in the internal entries and re-insert it
+     * into the cache if found. This acquires the write lock of the cache.
      * @throws IllegalStateException if the entry has been disposed (this should never happen)
      * @return the entry corresponding to the given key, null if none is available in the cache
      */
-    private SecurityCacheEntry getInternal(String key)
+    private SecurityCacheEntry getInternal(String key, boolean checkInternalEntries)
     {
-        readLock.lock();
-        try {
-            SecurityCacheEntry result = cache.get(key);
-            if (result == null) {
+        // It is okay to get the entry without locking as the cache itself is thread-safe. We never modify the part of
+        // the entry that is returned directly, and we fully initialize the cache entry before inserting it into the
+        // cache. The only case where we modify entries is when we're upgrading a page entry to a user entry. In
+        // this case, we are careful to first set group information and then mark the entry as a user entry. So when
+        // trying to get group information, we can be sure that group information has been set and isn't modified
+        // anymore when the entry is a user entry.
+        SecurityCacheEntry result = cache.get(key);
+        if (result == null && checkInternalEntries) {
+            try {
+                this.writeLock.lock();
                 // Try to get the entry from the internal map which may have, e.g., parents that are no longer in the
                 // cache but still referenced by entries in the cache.
-                // Synchronize to avoid concurrent modification of the map as get() may trigger the eviction of
-                // garbage collected entries. All other operations are done under the write lock.
-                synchronized (this.internalEntries) {
-                    result = this.internalEntries.get(key);
-                }
+                // Synchronize under the write lock to avoid concurrent modification of the map as get() may trigger
+                // the eviction of garbage collected entries, so all operations are performed under this lock.
+                result = this.internalEntries.get(key);
 
                 if (result != null) {
                     // Try re-inserting the entry into the cache to give it another chance of being stored directly.
                     this.cache.set(key, result);
                 }
+            } finally {
+                this.writeLock.unlock();
             }
-
-            if (result != null && result.disposed) {
-                throw new IllegalCacheStateException(
-                    String.format("Entry [%s] has been disposed without being removed from the cache.", result));
-            }
-
-            return result;
-        } finally {
-            readLock.unlock();
         }
+
+        return result;
     }
 
     /**
@@ -718,7 +734,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     private boolean isAlreadyInserted(String key, SecurityEntry entry, Collection<GroupSecurityReference> groups)
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
-        SecurityCacheEntry oldEntry = getInternal(key);
+        // Always check in the internal entries as this method is called under the write lock and thus the overhead
+        // is low.
+        SecurityCacheEntry oldEntry = getInternal(key, true);
         if (oldEntry != null) {
             if (!oldEntry.getEntry().equals(entry)) {
                 // Another thread has inserted an entry which is different from this entry!
@@ -730,7 +748,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             }
             // If the user/group has been completed
             if (oldEntry.updateParentGroups(groups)) {
-                // Upgrade it to a user/group entry
+                // Upgrade it to a user/group entry. Ensure that all writes up until now (that set the actual group
+                // information) become visible to other threads before marking this security cache entry as a user
+                // entry.
+                VarHandle.fullFence();
                 oldEntry.entry = entry;
             }
 
@@ -768,23 +789,24 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     }
 
     @Override
-    public void add(SecurityRuleEntry entry) throws ParentEntryEvictedException, ConflictingInsertionException
+    public void add(SecurityRuleEntry entry, long invalidationCounter) throws ParentEntryEvictedException,
+        ConflictingInsertionException
     {
-        add(entry, null);
+        add(entry, null, invalidationCounter);
     }
 
     @Override
-    public void add(SecurityRuleEntry entry, Collection<GroupSecurityReference> groups)
+    public void add(SecurityRuleEntry entry, Collection<GroupSecurityReference> groups, long invalidationCounter)
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
-        add((SecurityEntry) entry, groups);
+        add((SecurityEntry) entry, groups, invalidationCounter);
     }
 
     @Override
-    public void add(SecurityShadowEntry entry, Collection<GroupSecurityReference> groups)
+    public void add(SecurityShadowEntry entry, Collection<GroupSecurityReference> groups, long invalidationCounter)
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
-        add((SecurityEntry) entry, groups);
+        add((SecurityEntry) entry, groups, invalidationCounter);
     }
 
     /**
@@ -792,26 +814,57 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      * 
      * @param entry the rule or shadow entry
      * @param groups Local groups references that this user/group is a member.
+     * @param invalidationCounter the invalidation counter from before starting the loading of the entry to add
      * @exception ParentEntryEvictedException when the parent entry of this entry was evicted before this insertion.
      *                Since all entries, except wiki-entries, must have a parent cached, the
      *                {@link org.xwiki.security.authorization.cache.SecurityCacheLoader} must restart its load attempt.
      * @throws ConflictingInsertionException when another thread have inserted this entry, but with a different content.
      */
-    private void add(SecurityEntry entry, Collection<GroupSecurityReference> groups)
+    private void add(SecurityEntry entry, Collection<GroupSecurityReference> groups, long invalidationCounter)
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
         String key = getEntryKey(entry);
 
-        writeLock.lock();
-        try {
+        withWriteLockAndInvalidationCheck(invalidationCounter, key, () -> {
             if (isAlreadyInserted(key, entry, groups)) {
                 return;
             }
             addEntry(key, newSecurityCacheEntry(entry, groups));
 
             logger.debug("Added rule/shadow entry [{}] into the cache.", key);
+        });
+    }
+
+    @FunctionalInterface
+    private interface SecurityCacheRunnable
+    {
+        void run() throws ConflictingInsertionException, ParentEntryEvictedException;
+    }
+
+    private void withWriteLockAndInvalidationCheck(long invalidationCounter, String key, SecurityCacheRunnable runnable)
+        throws ConflictingInsertionException, ParentEntryEvictedException
+    {
+        // Early check of the invalidation counter to avoid waiting for the lock if there is no possibility to insert
+        // the entry, anyway. Further, check if currently an invalidation is in progress as it also means that the
+        // invalidation counter will be different when the lock has been obtained. This can avoid waiting for a possibly
+        // slow invalidation (that affects a lot of entries).
+        if (getInvalidationCounter() != invalidationCounter || this.invalidationInProgress.get()) {
+            this.logger.debug("Cancelling the addition of entry [{}] early because the invalidation counter doesn't "
+                + "match or an invalidation is in progress.", key);
+            return;
+        }
+
+        this.writeLock.lock();
+        try {
+            // Check the invalidation counter again after acquiring the write lock to ensure that it didn't change.
+            if (getInvalidationCounter() != invalidationCounter) {
+                this.logger.debug("Not adding the entry [{}] because the invalidation counter doesn't match", key);
+                return;
+            }
+
+            runnable.run();
         } finally {
-            writeLock.unlock();
+            this.writeLock.unlock();
         }
     }
 
@@ -838,16 +891,17 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     }
 
     @Override
-    public void add(SecurityAccessEntry entry) throws ParentEntryEvictedException, ConflictingInsertionException
+    public void add(SecurityAccessEntry entry, long invalidationCounter) throws ParentEntryEvictedException,
+        ConflictingInsertionException
     {
-        internalAdd(entry, null);
+        internalAdd(entry, null, invalidationCounter);
     }
 
     @Override
-    public void add(SecurityAccessEntry entry, SecurityReference wiki)
+    public void add(SecurityAccessEntry entry, SecurityReference wiki, long invalidationCounter)
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
-        internalAdd(entry, wiki);
+        internalAdd(entry, wiki, invalidationCounter);
     }
 
     /**
@@ -860,22 +914,25 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      *             {@link org.xwiki.security.authorization.cache.SecurityCacheLoader} must restart its load attempt.
      * @throws ConflictingInsertionException when another thread have inserted this entry, but with a different content.
      */
-    private void internalAdd(SecurityAccessEntry entry, SecurityReference wiki)
+    private void internalAdd(SecurityAccessEntry entry, SecurityReference wiki, long invalidationCounter)
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
         String key = getEntryKey(entry);
 
-        writeLock.lock();
-        try {
+        withWriteLockAndInvalidationCheck(invalidationCounter, key, () -> {
             if (isAlreadyInserted(key, entry)) {
                 return;
             }
             addEntry(key, new SecurityCacheEntry(entry, wiki));
 
             logger.debug("Added access entry [{}] into the cache.", key);
-        } finally {
-            writeLock.unlock();
-        }
+        });
+    }
+
+    @Override
+    public long getInvalidationCounter()
+    {
+        return this.invalidationCounter.get();
     }
 
     /**
@@ -886,7 +943,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     SecurityEntry get(String entryKey)
     {
-        SecurityCacheEntry entry = getInternal(entryKey);
+        SecurityCacheEntry entry = getInternal(entryKey, true);
         return (entry != null) ? entry.getEntry() : null;
     }
 
@@ -925,43 +982,47 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     @Override
     public void remove(UserSecurityReference user, SecurityReference entity)
     {
-        this.invalidationWriteLock.lock();
-
-        try {
-            writeLock.lock();
-            try {
-                SecurityCacheEntry entry = getEntry(user, entity);
-                if (entry != null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Remove outdated access entry for [{}].", getEntryKey(user, entity));
-                    }
-                    entry.dispose();
+        withInvalidationAndWriteLocking(() -> {
+            SecurityCacheEntry entry = getEntry(user, entity);
+            if (entry != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Remove outdated access entry for [{}].", getEntryKey(user, entity));
                 }
-            } finally {
-                writeLock.unlock();
+                entry.dispose();
             }
-        } finally {
-            this.invalidationWriteLock.unlock();
-        }
+        });
     }
 
     @Override
     public void remove(SecurityReference entity)
     {
+        withInvalidationAndWriteLocking(() -> {
+            SecurityCacheEntry entry = getEntry(entity);
+            if (entry != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Remove outdated rule entry for [{}].", getEntryKey(entity));
+                }
+                entry.dispose();
+            }
+        });
+    }
+
+    private void withInvalidationAndWriteLocking(Runnable r)
+    {
+        // Lock the invalidation write lock to not break the public SecurityCacheRulesInvalidator API which promises
+        // to allow the suspension of cache invalidations.
+        // In XWiki itself, this API isn't used anymore and thus the corresponding read lock should never be locked.
         this.invalidationWriteLock.lock();
 
         try {
-            writeLock.lock();
+            this.writeLock.lock();
+            this.invalidationInProgress.set(true);
             try {
-                SecurityCacheEntry entry = getEntry(entity);
-                if (entry != null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Remove outdated rule entry for [{}].", getEntryKey(entity));
-                    }
-                    entry.dispose();
-                }
+                r.run();
             } finally {
-                writeLock.unlock();
+                this.invalidationInProgress.set(false);
+                this.invalidationCounter.incrementAndGet();
+                this.writeLock.unlock();
             }
         } finally {
             this.invalidationWriteLock.unlock();

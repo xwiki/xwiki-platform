@@ -305,6 +305,14 @@ public class DefaultMergeManager implements MergeManager
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.HIDDEN, hiddenPropertyMergeResult);
             mergedDocument.setHidden(hiddenPropertyMergeResult.getMergeResult());
 
+            // Enforce required rights
+            MergeManagerResult<Boolean, Boolean> enforceRequiredRightsMergeResult =
+                this.mergeObject(previousDoc.isEnforceRequiredRights(), newDoc.isEnforceRequiredRights(),
+                    currentDoc.isEnforceRequiredRights(), configuration);
+            mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.ENFORCE_REQUIRED_RIGHTS,
+                enforceRequiredRightsMergeResult);
+            mergedDocument.setEnforceRequiredRights(enforceRequiredRightsMergeResult.getMergeResult());
+
             // CustomClass
             MergeManagerResult<String, String> customClassMergeResult = this.mergeLines(previousDoc.getCustomClass(),
                 newDoc.getCustomClass(), currentDoc.getCustomClass(), configuration);
@@ -477,7 +485,7 @@ public class DefaultMergeManager implements MergeManager
                                 } else {
                                     // collision between DB and new: property to modify but does not exist in DB
                                     // Lets assume it's a mistake to fix
-                                    objectMergeResult.getLog().warn("Object [{}] does not exist",
+                                    objectMergeResult.getLog().warn("Property [{}] does not exist",
                                         newProperty.getReference());
 
                                     objectResult.safeput(diff.getPropName(), newProperty);
@@ -485,8 +493,14 @@ public class DefaultMergeManager implements MergeManager
                                 }
                             }
                         } else {
-                            // Object explitely removed from the DB, lets assume we don't care about the changes
-                            objectMergeResult.getLog().warn(WARNING_OBJECT_REMOVED, previousObject.getReference());
+                            // Object explicitely removed from the DB, it's a conflict
+                            objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT, previousObject.getReference());
+
+                            // We put the new object only if the fallback is to take new version.
+                            if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT) {
+                                mergedDocument.setXObject(newObject.getNumber(), newObject.clone());
+                                objectMergeResult.setModified(true);
+                            }
                         }
                     }
                 }
@@ -566,6 +580,10 @@ public class DefaultMergeManager implements MergeManager
                             // TODO: manage conflict properly
                             attachmentMergeResult.getLog().error(ERROR_COLLISION_ATTACHMENT,
                                 previousAttachment.getReference());
+                            if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT) {
+                                mergedDocument.addAttachment(nextAttachment);
+                                attachmentMergeResult.setModified(true);
+                            }
                         }
                         break;
                     default:

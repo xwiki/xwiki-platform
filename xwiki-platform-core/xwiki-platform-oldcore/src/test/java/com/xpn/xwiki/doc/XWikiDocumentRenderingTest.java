@@ -133,6 +133,7 @@ public class XWikiDocumentRenderingTest
         this.oldcore.getXWikiContext().put("isInRenderingEngine", true);
 
         when(this.oldcore.getMockAuthorizationManager().hasAccess(any(), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(any(), any(), any(), any())).thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(any())).thenAnswer(invocationOnMock -> {
             if (List.of(Right.SCRIPT, Right.PROGRAM).contains(invocationOnMock.getArgument(0))) {
                 RenderingContext renderingContext = this.oldcore.getMocker().getInstance(RenderingContext.class);

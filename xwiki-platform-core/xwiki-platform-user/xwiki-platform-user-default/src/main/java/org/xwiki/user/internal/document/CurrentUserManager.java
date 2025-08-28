@@ -87,5 +87,4 @@ public class CurrentUserManager implements UserManager
     {
         return this.contextProvider.get();
     }
-
 }

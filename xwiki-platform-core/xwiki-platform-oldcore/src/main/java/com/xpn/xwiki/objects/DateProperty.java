@@ -84,8 +84,8 @@ public class DateProperty extends BaseProperty implements Cloneable
             return false;
         }
 
-        if (getValue() == null && ((DateProperty) obj).getValue() == null) {
-            return true;
+        if (getValue() == null) {
+            return ((DateProperty) obj).getValue() == null;
         }
 
         return getValue().equals(((DateProperty) obj).getValue());
@@ -97,6 +97,12 @@ public class DateProperty extends BaseProperty implements Cloneable
         return (DateProperty) super.clone();
     }
 
+    @Override
+    public DateProperty clone(boolean detach)
+    {
+        return (DateProperty) super.clone(detach);
+    }
+    
     @Override
     protected void cloneInternal(BaseProperty clone)
     {

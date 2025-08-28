@@ -19,14 +19,24 @@
  */
 package org.xwiki.user.internal.document;
 
+import java.util.List;
+
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.internal.MapCache;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -45,7 +55,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,10 +66,14 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList(UserCache.class)
 class DocumentUserManagerTest
 {
     @InjectMockComponents
     private DocumentUserManager userManager;
+
+    @InjectMockComponents
+    private UserCache userCache;
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
@@ -65,8 +81,22 @@ class DocumentUserManagerTest
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
+    private CacheManager cacheManager;
+
+    @MockComponent
+    private QueryManager queryManager;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    private MapCache<Boolean> cache = new MapCache<>();
+
+    @BeforeComponent
+    public void beforeComponent() throws Exception
+    {
+        when(this.cacheManager.<Boolean>createNewCache(any())).thenReturn(this.cache);
+    }
 
     @Test
     void exists() throws Exception
@@ -80,8 +110,9 @@ class DocumentUserManagerTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
         when(document.isNew()).thenReturn(false);
-        when(document.getXObject(new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
-            EntityType.SPACE)))).thenReturn(mock(BaseObject.class));
+        when(document.getXObject(
+            new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+                .thenReturn(mock(BaseObject.class));
 
         assertTrue(this.userManager.exists(new DocumentUserReference(reference, true)));
     }
@@ -97,8 +128,9 @@ class DocumentUserManagerTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.isNew()).thenReturn(false);
         when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
-        when(document.getXObject(new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki",
-            EntityType.SPACE)))).thenReturn(null);
+        when(document.getXObject(
+            new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+                .thenReturn(null);
 
         assertFalse(this.userManager.exists(new DocumentUserReference(reference, true)));
     }
@@ -161,5 +193,33 @@ class DocumentUserManagerTest
         UserException userException = assertThrows(UserException.class, () -> this.userManager.exists(userReference));
         assertEquals("Failed to determine if wiki [wiki] exists.", userException.getMessage());
         assertEquals(WikiManagerException.class, userException.getCause().getClass());
+    }
+
+    @Test
+    void hasUser() throws UserException, QueryException
+    {
+        Query query = mock(Query.class);
+        when(this.queryManager.createQuery("select doc.id from Document doc, doc.object(XWiki.XWikiUsers) as user",
+            Query.XWQL)).thenReturn(query);
+        WikiReference wikiReference = new WikiReference("wiki");
+
+        assertFalse(this.userManager.hasUsers(wikiReference));
+        assertFalse(this.cache.get(wikiReference.getName()));
+
+        verify(query).setWiki(wikiReference.getName());
+        verify(this.queryManager).createQuery(any(), any());
+
+        assertFalse(this.userManager.hasUsers(wikiReference));
+
+        verify(query).setWiki(wikiReference.getName());
+        verify(this.queryManager).createQuery(any(), any());
+
+        when(query.execute()).thenReturn(List.of(0));
+
+        assertFalse(this.userManager.hasUsers(wikiReference));
+
+        this.userCache.invalidate(wikiReference);
+
+        assertTrue(this.userManager.hasUsers(wikiReference));
     }
 }

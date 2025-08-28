@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.objects;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -45,7 +43,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
-public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Serializable, Cloneable
+public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Cloneable
 {
     private static final long serialVersionUID = 1L;
 
@@ -197,12 +195,25 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     @Override
     public BaseObject clone()
     {
-        BaseObject object = (BaseObject) super.clone();
+        return (BaseObject) super.clone();
+    }
+
+    @Override
+    public BaseObject clone(boolean detach)
+    {
+        return (BaseObject) super.clone(detach);
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<BaseObjectReference> element)
+    {
+        super.cloneContent(element);
+
+        BaseObject object = (BaseObject) element;
+
         // We don't use #getGuid() because we actually want the same value and not generate a new guid when null (which
         // is expensive)
         object.setGuid(this.guid);
-
-        return object;
     }
 
     /**
@@ -449,7 +460,6 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * @since 15.5.5
      * @since 15.10.2
      */
-    @Unstable
     public Map<String, String> evaluate() throws ObjectEvaluatorException
     {
         ObjectEvaluator objectEvaluator = Utils.getComponent(ObjectEvaluator.class);

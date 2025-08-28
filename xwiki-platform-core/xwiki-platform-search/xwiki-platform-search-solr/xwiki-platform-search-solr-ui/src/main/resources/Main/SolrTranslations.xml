@@ -75,7 +75,7 @@ solr.sortOrder.desc=Descending
 
 solr.options=Show:
 solr.options.highlight=Highlighting
-solr.options.highlight.title=Display en extract of what was matched in each result
+solr.options.highlight.title=Display an extract of what was matched in each result
 solr.options.facet=Facets
 solr.options.facet.title=Allow extra filtering of the result
 

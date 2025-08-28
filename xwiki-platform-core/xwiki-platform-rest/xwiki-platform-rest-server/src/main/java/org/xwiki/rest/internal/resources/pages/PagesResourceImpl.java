@@ -53,6 +53,7 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
         String spaceId = Utils.getLocalSpaceId(spaces);
 
         Pages pages = objectFactory.createPages();
+        int limit = validateAndGetLimit(number);
 
         try {
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
@@ -63,8 +64,11 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
 
             /* Use an explicit query to improve performance */
             List<String> pageNames =
-                    query.addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden"))
-                        .bindValue("space", spaceId).setOffset(start).setLimit(number).execute();
+                query.addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden"))
+                    .bindValue("space", spaceId)
+                    .setOffset(start)
+                    .setLimit(limit)
+                    .execute();
 
             Pattern parentFilter = null;
             if (parentFilterExpression != null) {

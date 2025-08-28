@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-wikimacro</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - Store</name>
   <description>Defines the ability to store macros into wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wiki Macro Store</xwiki.extension.name>
   </properties>
@@ -162,14 +162,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-el</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- Used to mock XWiki class -->
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

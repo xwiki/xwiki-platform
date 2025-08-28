@@ -52,9 +52,9 @@ public class InstalledExtensionDocumentTree
 {
     private static final class InstalledExtensionDocumentTreeNode
     {
-        public Set<Locale> customizedLocales;
+        private Set<Locale> customizedLocales;
 
-        public Set<DocumentReference> children = Collections.newSetFromMap(new ConcurrentHashMap<>());
+        private Set<DocumentReference> children = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
 
     private final Map<EntityReference, InstalledExtensionDocumentTreeNode> nodes = new ConcurrentHashMap<>();

@@ -23,11 +23,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.image.lightbox.test.po.ImagePopover;
 import org.xwiki.image.lightbox.test.po.Lightbox;
@@ -73,6 +75,15 @@ class LightboxIT
         testUtils.setGlobalRights("", "XWiki." + USER_NAME, "script", true);
         testUtils.createUserAndLogin(USER_NAME, "pa$$word");
 
+    }
+
+    @BeforeEach
+    void setUp(TestUtils testUtils)
+    {
+        // Move back the curso to a fixed location to make sure moving the cursor again during tests triggers a cursor
+        // "motion". We have failures because the cursor was already at the expected location when performing a move.
+        // Consequently, expected Javascript events were not triggered.
+        new Actions(testUtils.getDriver().getWrappedDriver()).moveToLocation(0, 0).perform();
     }
 
     @Test

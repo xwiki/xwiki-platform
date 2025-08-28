@@ -146,24 +146,25 @@ public class DocumentMergeImporterTest
         this.previousDocument = mock(XWikiDocument.class, "previous");
         when(this.previousDocument.isNew()).thenReturn(false);
         when(this.previousDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
+        when(this.previousDocument.clone()).thenReturn(this.previousDocument);
 
         this.currentDocument = mock(XWikiDocument.class, "current");
-
         when(this.currentDocument.isNew()).thenReturn(false);
         when(this.currentDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
+        when(this.currentDocument.clone()).thenReturn(this.currentDocument);
         when(this.xwiki.getDocument(same(this.documentReference), same(xcontext))).thenReturn(this.currentDocument);
 
         this.nextDocument = mock(XWikiDocument.class, "next");
         when(this.nextDocument.getAuthors()).thenReturn(new DefaultDocumentAuthors(this.currentDocument));
         when(this.nextDocument.isNew()).thenReturn(false);
         when(this.nextDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
+        when(this.nextDocument.clone()).thenReturn(this.nextDocument);
 
         this.mergedDocument = mock(XWikiDocument.class, "merged");
         when(this.mergedDocument.getAuthors()).thenReturn(new DefaultDocumentAuthors(this.mergedDocument));
         when(this.mergedDocument.isNew()).thenReturn(false);
         when(this.mergedDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
-
-        when(this.currentDocument.clone()).thenReturn(this.mergedDocument);
+        when(this.mergedDocument.clone()).thenReturn(this.mergedDocument);
 
         // merge
 

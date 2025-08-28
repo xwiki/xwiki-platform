@@ -107,16 +107,7 @@ $response.setContentType("application/json")
 #if (!$offset || $offset < 0)
   #set($offset = 0)
 #end
-#set ($limit = $numbertool.toNumber($request.get('limit')).intValue())
-#if (!$limit)
-  #set ($limit = 15)
-#else
-  ## Security protection for guest users: limit the number of items returned to avoid DOS attacks.
-  #if (!$xcontext.userReference)
-    #set ($maxLimit = $services.security.getQueryItemsLimit())
-    #set ($limit = $mathtool.min($limit, $maxLimit))
-  #end
-#end
+#getAndValidateQueryLimitFromRequest('limit', 15, $limit)
 ##
 ## Build the query
 ##

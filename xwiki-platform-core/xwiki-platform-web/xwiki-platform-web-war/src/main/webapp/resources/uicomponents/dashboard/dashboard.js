@@ -80,12 +80,18 @@ XWiki.Dashboard = Class.create( {
     // find out all the gadget-containers in element and add them ids
     this.containers = element.select(".gadget-container");
     this.createDragAndDrops();
-    this.addGadgetsHandlers();``
+    this.addGadgetsHandlers();
     // Create the section to contain add buttons
     var sectionAddButtons = new Element('section', {
       'class': 'containeradd'
-    })
-    this.element.insert({'top' : sectionAddButtons});
+    });
+    // check if the warning is there, if it is, put the button under it
+    var warning = this.element.down('.differentsource');
+    if (warning) {
+      warning.insert({'after' : sectionAddButtons});
+    } else {
+      this.element.insert({'top' : sectionAddButtons});
+    }
     this.addNewGadgetHandler();
     this.addNewContainerHandler();
 
@@ -295,13 +301,7 @@ XWiki.Dashboard = Class.create( {
     });
     addButton.update(icons.add + l10n['dashboard.actions.add.button']);
     addButton.observe('click', this.onAddGadgetClick.bindAsEventListener(this));
-    // check if the warning is there, if it is, put the button under it
-    var warning = this.element.down('.differentsource');
-    if (warning) {
-      warning.insert({'after' : addButton});
-    } else {
-      this.element.down('.containeradd').insert(addButton);
-    }
+    this.element.down('.containeradd').insert(addButton);
   },
 
   /**

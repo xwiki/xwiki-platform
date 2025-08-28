@@ -33,9 +33,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
- * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
-@Deprecated
 public class ImagePluginAPI extends PluginApi<ImagePlugin>
 {
     /** Logging helper object. */

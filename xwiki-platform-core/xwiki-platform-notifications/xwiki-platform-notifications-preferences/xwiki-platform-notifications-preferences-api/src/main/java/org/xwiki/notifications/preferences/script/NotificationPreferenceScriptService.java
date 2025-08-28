@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Strings;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -388,7 +389,7 @@ public class NotificationPreferenceScriptService implements ScriptService
     {
         for (NotificationPreference preference : allPreferences) {
             Object prefEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
-            if (prefEventType != null && StringUtils.equals((String) prefEventType, eventType)
+            if (prefEventType != null && Strings.CS.equals((String) prefEventType, eventType)
                 && preference.getFormat() == format) {
                 return preference.isNotificationEnabled();
             }

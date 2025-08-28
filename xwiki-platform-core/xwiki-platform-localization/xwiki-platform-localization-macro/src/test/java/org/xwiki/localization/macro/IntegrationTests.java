@@ -22,18 +22,19 @@ package org.xwiki.localization.macro;
 import java.util.Arrays;
 import java.util.Locale;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.runner.RunWith;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
-import org.xwiki.test.jmock.MockingComponentManager;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -42,110 +43,97 @@ import org.xwiki.test.jmock.MockingComponentManager;
  * @version $Id$
  * @since 3.4M2
  */
-@RunWith(RenderingTestSuite.class)
-public class IntegrationTests
+@AllComponents
+@Scope(pattern = "macrotranslation.*")
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager componentManager) throws Exception
+    @Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
     {
-        Mockery mockery = new JUnit4Mockery();
+        LocalizationManager localizationManager = componentManager.registerMockComponent(LocalizationManager.class);
+        LocalizationContext localizationContext = componentManager.registerMockComponent(LocalizationContext.class);
 
-        final LocalizationManager localizationManager =
-            componentManager.registerMockComponent(mockery, LocalizationManager.class);
-        final LocalizationContext localizationContext =
-            componentManager.registerMockComponent(mockery, LocalizationContext.class);
-
-        mockery.checking(new Expectations()
+        when(localizationManager.getTranslation("some.translation", Locale.ENGLISH)).thenReturn(new Translation()
         {
+            @Override
+            public Block render(Locale locale, Object... parameters)
             {
-                allowing(localizationManager).getTranslation("some.translation", Locale.ENGLISH);
-                will(returnValue(new Translation()
-                {
-                    @Override
-                    public Block render(Locale locale, Object... parameters)
-                    {
-                        return parameters.length > 0 ? new WordBlock("entranslationmessage"
-                            + Arrays.toString(parameters)) : new WordBlock("entranslationmessage");
-                    }
+                return parameters.length > 0 ? new WordBlock("entranslationmessage"
+                    + Arrays.toString(parameters)) : new WordBlock("entranslationmessage");
+            }
 
-                    @Override
-                    public Block render(Object... parameters)
-                    {
-                        return render(null, parameters);
-                    }
+            @Override
+            public Block render(Object... parameters)
+            {
+                return render(null, parameters);
+            }
 
-                    @Override
-                    public String getRawSource()
-                    {
-                        return "entranslationmessagesource";
-                    }
+            @Override
+            public String getRawSource()
+            {
+                return "entranslationmessagesource";
+            }
 
-                    @Override
-                    public Locale getLocale()
-                    {
-                        return Locale.ENGLISH;
-                    }
+            @Override
+            public Locale getLocale()
+            {
+                return Locale.ENGLISH;
+            }
 
-                    @Override
-                    public String getKey()
-                    {
-                        return "some.translation";
-                    }
+            @Override
+            public String getKey()
+            {
+                return "some.translation";
+            }
 
-                    @Override
-                    public TranslationBundle getBundle()
-                    {
-                        return null;
-                    }
-                }));
-
-                allowing(localizationManager).getTranslation("some.translation", Locale.FRENCH);
-                will(returnValue(new Translation()
-                {
-                    @Override
-                    public Block render(Locale locale, Object... parameters)
-                    {
-                        return parameters.length > 0 ? new WordBlock("frtranslationmessage"
-                            + Arrays.toString(parameters)) : new WordBlock("frtranslationmessage");
-                    }
-
-                    @Override
-                    public Block render(Object... parameters)
-                    {
-                        return render(null, parameters);
-                    }
-
-                    @Override
-                    public String getRawSource()
-                    {
-                        return "frtranslationmessagesource";
-                    }
-
-                    @Override
-                    public Locale getLocale()
-                    {
-                        return Locale.FRENCH;
-                    }
-
-                    @Override
-                    public String getKey()
-                    {
-                        return "some.translation";
-                    }
-
-                    @Override
-                    public TranslationBundle getBundle()
-                    {
-                        return null;
-                    }
-                }));
-
-                allowing(localizationManager).getTranslation("unexisting.translation", Locale.ENGLISH);
-                will(returnValue(null));
-
-                allowing(localizationContext).getCurrentLocale();
-                will(returnValue(Locale.ENGLISH));
+            @Override
+            public TranslationBundle getBundle()
+            {
+                return null;
             }
         });
+
+        when(localizationManager.getTranslation("some.translation", Locale.FRENCH)).thenReturn(new Translation()
+        {
+            @Override
+            public Block render(Locale locale, Object... parameters)
+            {
+                return parameters.length > 0 ? new WordBlock("frtranslationmessage"
+                    + Arrays.toString(parameters)) : new WordBlock("frtranslationmessage");
+            }
+
+            @Override
+            public Block render(Object... parameters)
+            {
+                return render(null, parameters);
+            }
+
+            @Override
+            public String getRawSource()
+            {
+                return "frtranslationmessagesource";
+            }
+
+            @Override
+            public Locale getLocale()
+            {
+                return Locale.FRENCH;
+            }
+
+            @Override
+            public String getKey()
+            {
+                return "some.translation";
+            }
+
+            @Override
+            public TranslationBundle getBundle()
+            {
+                return null;
+            }
+        });
+
+        when(localizationManager.getTranslation("unexisting.translation", Locale.ENGLISH)).thenReturn(null);
+        when(localizationContext.getCurrentLocale()).thenReturn(Locale.ENGLISH);
     }
 }

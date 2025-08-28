@@ -42,6 +42,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -65,7 +66,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DatabaseDocumentIteratorTest
 {
-    private static final String ORDER_CLAUSE = " order by doc.space, doc.name, doc.language nulls first";
+    private static final String ORDER_CLAUSE = " order by doc.id asc";
 
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
@@ -84,6 +85,9 @@ class DatabaseDocumentIteratorTest
     @MockComponent
     @Named("count")
     private QueryFilter countQueryFilter;
+
+    @MockComponent
+    private SolrConfiguration configuration;
 
     @InjectMockComponents
     private DatabaseDocumentIterator databaseIterator;
@@ -107,12 +111,14 @@ class DatabaseDocumentIteratorTest
     @Test
     void iterateAllWikis() throws Exception
     {
+        int batchSize = 83;
+        when(this.configuration.getSynchronizationBatchSize()).thenReturn(batchSize);
         Query emptyQuery = mock(Query.class);
         when(emptyQuery.execute()).thenReturn(Collections.emptyList());
 
         Query chessQuery = mock(Query.class);
         when(chessQuery.setOffset(0)).thenReturn(chessQuery);
-        when(chessQuery.setOffset(100)).thenReturn(emptyQuery);
+        when(chessQuery.setOffset(batchSize)).thenReturn(emptyQuery);
         when(chessQuery.execute()).thenReturn(Arrays.asList(new Object[] { "Blog.Code", "WebHome", "", "3.2" },
             new Object[] { "Main", "Welcome", "en", "1.1" }, new Object[] { "XWiki.Syntax", "Links", "fr", "2.5" }));
 
@@ -125,7 +131,7 @@ class DatabaseDocumentIteratorTest
 
         Query tennisQuery = mock(Query.class);
         when(tennisQuery.setOffset(0)).thenReturn(tennisQuery);
-        when(tennisQuery.setOffset(100)).thenReturn(emptyQuery);
+        when(tennisQuery.setOffset(batchSize)).thenReturn(emptyQuery);
         when(tennisQuery.execute()).thenReturn(Arrays.asList(new Object[] { "Main", "Welcome", "en", "2.1" },
             new Object[] { "XWiki.Syntax", "Links", "fr", "1.3" }));
 
@@ -151,9 +157,9 @@ class DatabaseDocumentIteratorTest
         when(countQuery.setWiki("chess")).thenReturn(chessCountQuery);
         when(countQuery.setWiki("tennis")).thenReturn(tennisCountQuery);
 
-        when(
-            this.queryManager.createQuery("select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc"
-                                          + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
+        when(this.queryManager.createQuery(
+            "select doc.space, doc.name, doc.language, doc.version, doc.id from XWikiDocument doc" + ORDER_CLAUSE,
+            Query.HQL)).thenReturn(query);
         when(this.queryManager.createQuery("", Query.HQL)).thenReturn(countQuery);
 
         DocumentIterator<String> iterator = this.databaseIterator;
@@ -178,6 +184,8 @@ class DatabaseDocumentIteratorTest
     @Test
     void iterateOneWiki() throws Exception
     {
+        int batchSize = 23;
+        when(this.configuration.getSynchronizationBatchSize()).thenReturn(batchSize);
         DocumentReference rootReference = createDocumentReference("gang", Arrays.asList("A", "B"), "C", null);
 
         Query emptyQuery = mock(Query.class);
@@ -187,7 +195,7 @@ class DatabaseDocumentIteratorTest
         when(query.setLimit(anyInt())).thenReturn(query);
         when(query.setWiki(rootReference.getWikiReference().getName())).thenReturn(query);
         when(query.setOffset(0)).thenReturn(query);
-        when(query.setOffset(100)).thenReturn(emptyQuery);
+        when(query.setOffset(batchSize)).thenReturn(emptyQuery);
         when(query.execute()).thenReturn(Collections.singletonList(new Object[] { "A.B", "C", "de", "3.1" }));
 
         Map<String, Object> namedParameters = new HashMap();
@@ -199,9 +207,9 @@ class DatabaseDocumentIteratorTest
         when(countQuery.addFilter(this.countQueryFilter)).thenReturn(countQuery);
 
         String whereClause = " where doc.space = :space and doc.name = :name";
-        when(
-            this.queryManager.createQuery("select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc"
-                                          + whereClause + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
+        when(this.queryManager
+            .createQuery("select doc.space, doc.name, doc.language, doc.version, doc.id from XWikiDocument doc"
+                + whereClause + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
         when(this.queryManager.createQuery(whereClause, Query.HQL)).thenReturn(countQuery);
 
         DocumentIterator<String> iterator = this.databaseIterator;

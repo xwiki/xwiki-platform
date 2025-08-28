@@ -21,10 +21,13 @@ package org.xwiki.rendering.internal.macro;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.platform.security.requiredrights.MacroRequiredRight;
 import org.xwiki.platform.security.requiredrights.MacroRequiredRightReporter;
@@ -129,5 +132,67 @@ class HTMLMacroRequiredRightsAnalyzerTest
             verify(reporter).report(eq(macroBlock), eq(List.of(MacroRequiredRight.SCRIPT)), anyString());
         }
         verifyNoMoreInteractions(reporter);
+    }
+
+    /**
+     * Test the behavior when a parameter occurs several times but with different case. Ensure that the "most
+     * dangerous" value wins.
+     */
+    @ParameterizedTest
+    @MethodSource("analyzeWithDuplicateParametersDataProvider")
+    void analyzeWithDuplicateParameters(Map<String, String> arguments, boolean wiki, boolean clean)
+    {
+        String content = "content";
+        MacroBlock macroBlock = new MacroBlock(HTML_MACRO_ID, arguments, content, false);
+
+        MacroRequiredRightReporter reporter = mock();
+        this.htmlMacroRequiredRightsAnalyzer.analyze(macroBlock, reporter);
+
+        if (wiki) {
+            verify(reporter).analyzeContent(macroBlock, content);
+        }
+
+        if (!clean || wiki) {
+            ArgumentCaptor<List<MacroRequiredRight>> argumentCaptor = ArgumentCaptor.captor();
+            verify(reporter).report(eq(macroBlock), argumentCaptor.capture(), anyString());
+            List<MacroRequiredRight> requiredRights = argumentCaptor.getValue();
+            if (wiki && clean) {
+                assertEquals(List.of(MacroRequiredRight.MAYBE_SCRIPT), requiredRights);
+            } else {
+                assertEquals(List.of(MacroRequiredRight.SCRIPT), requiredRights);
+            }
+        } else {
+            verifyNoMoreInteractions(reporter);
+        }
+    }
+
+    private static Stream<Arguments> analyzeWithDuplicateParametersDataProvider()
+    {
+        return Stream.of(
+            Arguments.of(Map.of(
+                "wiki", Boolean.TRUE.toString(),
+                "WIKI", Boolean.FALSE.toString(),
+                "clean", Boolean.TRUE.toString(),
+                "CLEAN", Boolean.FALSE.toString()
+            ), true, false),
+            Arguments.of(Map.of(
+                "wiki", Boolean.FALSE.toString(),
+                "WIKI", Boolean.TRUE.toString(),
+                "clean", Boolean.FALSE.toString(),
+                "CLEAN", Boolean.TRUE.toString()
+            ), true, false),
+            Arguments.of(Map.of(
+                "wiKi", Boolean.TRUE.toString(),
+                "clEan", Boolean.FALSE.toString()
+            ), true, false),
+            Arguments.of(Map.of(
+                "wikI", Boolean.FALSE.toString(),
+                "Wiki", Boolean.FALSE.toString(),
+                "clean", Boolean.TRUE.toString()
+            ), false, true),
+            Arguments.of(Map.of(
+                "cleaN", Boolean.FALSE.toString()
+            ), false, false)
+        );
     }
 }

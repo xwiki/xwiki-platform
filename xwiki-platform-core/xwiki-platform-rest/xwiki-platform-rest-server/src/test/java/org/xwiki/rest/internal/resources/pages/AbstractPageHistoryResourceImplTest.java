@@ -20,7 +20,6 @@
 package org.xwiki.rest.internal.resources.pages;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collections;
@@ -35,7 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
@@ -45,6 +43,7 @@ import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.HistorySummary;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -96,6 +95,9 @@ public abstract class AbstractPageHistoryResourceImplTest
     private QueryManager queryManager;
 
     @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
+    @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @MockComponent
@@ -109,7 +111,7 @@ public abstract class AbstractPageHistoryResourceImplTest
 
     @BeforeEach
     void setUp(MockitoComponentManager componentManager)
-        throws ComponentLookupException, URISyntaxException, IllegalAccessException
+        throws Exception
     {
         Utils.setComponentManager(componentManager);
 
@@ -120,6 +122,8 @@ public abstract class AbstractPageHistoryResourceImplTest
         when(this.contextComponentManager.getInstance(any(), any()))
             .thenAnswer(
                 invocation -> componentManager.getInstance(invocation.getArgument(0), invocation.getArgument(1)));
+
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
 
         when(this.uriInfo.getBaseUri()).thenReturn(new URI("https://test/"));
 

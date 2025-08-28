@@ -20,7 +20,6 @@
 package org.xwiki.image.style;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Give access to the image style configuration.
@@ -52,7 +51,6 @@ public interface ImageStyleConfiguration
      * @since 15.5.2
      * @since 15.8RC1
      */
-    @Unstable
     default boolean getForceDefaultStyle(String wikiName, String documentReference) throws ImageStyleException
     {
         return false;

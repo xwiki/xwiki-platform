@@ -18,6 +18,7 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template('display_macros.vm')
+#initRequiredSkinExtensions()
 #macro(docTranslationLink $locale $action $fragment)
   #set ($localeName = $locale.getDisplayName($xcontext.locale))
   #if ("$!localeName" == '')
@@ -267,3 +268,5 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
     <div class="clearfloats">&nbsp;</div>
   </div>## _information
 </div>## informationcontent
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))

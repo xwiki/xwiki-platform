@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -79,7 +81,7 @@ public class BaseObjects extends AbstractList<BaseObject>
         for (Map.Entry<Integer, BaseObject> entry : otherObjects.map.entrySet()) {
             BaseObject otherObject = entry.getValue();
             BaseObject clonedObject =
-                keepsIdentity ? otherObject.clone() : otherObject.duplicate(document.getDocumentReference());
+                keepsIdentity ? otherObject.clone(true) : otherObject.duplicate(document.getDocumentReference());
 
             // Make sure the cloned object has the right document (in case was is cloned in the document)
             clonedObject.setOwnerDocument(document);
@@ -208,5 +210,19 @@ public class BaseObjects extends AbstractList<BaseObject>
     private String outOfBoundsMsg(int index)
     {
         return "Index: " + index + ", Size: " + size;
+    }
+
+    /**
+     * @param dirty true the value of the dirty flag(s)
+     * @param deep true if the dirty flag should be set to all children
+     * @since 17.2.1
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public void setDirty(boolean dirty, boolean deep)
+    {
+        if (deep) {
+            this.map.values().forEach(object -> object.setDirty(dirty, deep));
+        }
     }
 }

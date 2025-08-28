@@ -61,12 +61,19 @@ class RenameJobTest extends AbstractMoveJobTest
         DocumentReference whiteReference = new DocumentReference("wiki", "Color", "White");
         DocumentReference orangeReference = new DocumentReference("wiki", "Color", "Orange");
 
+        when(this.modelBridge.exists(blackReference)).thenReturn(true);
+        when(this.modelBridge.exists(whiteReference)).thenReturn(true);
+
         MoveRequest request = new MoveRequest();
         request.setEntityReferences(List.of(blackReference, whiteReference));
         request.setDestination(orangeReference);
+        request.setCheckAuthorRights(false);
+        request.setCheckRights(false);
         run(request);
 
         verifyNoMove();
+        assertEquals(1, getLogCapture().size());
+        assertEquals("Cannot rename multiple entities.", getLogCapture().getMessage(0));
     }
 
     @Test
@@ -118,10 +125,17 @@ class RenameJobTest extends AbstractMoveJobTest
         SpaceReference aliceReference = new SpaceReference("wiki", "Alice");
         SpaceReference bobReference = new SpaceReference("wiki", "Bob");
 
-        run(createRequest(aliceReference, bobReference));
+        DocumentReference aliceWebHomeReference = new DocumentReference("wiki", "Alice", "WebHome");
+        DocumentReference bobWebHomeReference = new DocumentReference("wiki", "Bob", "WebHome");
+        when(this.modelBridge.getDocumentReferences(aliceReference)).thenReturn(List.of(aliceWebHomeReference));
+        when(this.modelBridge.exists(aliceWebHomeReference)).thenReturn(true);
+        MoveRequest request = createRequest(aliceReference, bobReference);
+        request.setCheckRights(false);
+        run(request);
 
         // We verify that job fetches the space children.
         verify(this.modelBridge, times(2)).getDocumentReferences(aliceReference);
+        verify(this.modelBridge).rename(aliceWebHomeReference, bobWebHomeReference);
     }
 
     @Test

@@ -26,7 +26,7 @@ define('xwiki-realtime-saver', [
   'xwiki-realtime-document'
 ], function(
   /* jshint maxparams:false */
-  $, ChainPad, ChainPadNetflux, jsonSortify, Crypto, doc
+  $, ChainPad, ChainPadNetflux, jsonSortify, Crypto, xwikiDocument
 ) {
   'use strict';
 
@@ -110,10 +110,22 @@ define('xwiki-realtime-saver', [
         this._state.updateCount > 0 &&
         // Check if there is a client that has saved all our local changes.
         !this._someState(state => state.savedUpdateCount[this._getClientId()] >= this._state.updateCount);
-      if (!wasDirty && this._state.dirty) {
-        // Remember the last time when the content became dirty in order to be able to save immediately when the save
-        // interval is reached (even if the use is still making changes).
-        this._dirtyTimestamp = now();
+      if (wasDirty !== this._state.dirty) {
+        // Dirty state changed.
+        if (wasDirty) {
+          // Notify immediately that the content is clean, otherwise, if the user saving the content is not the one that
+          // made the changes, the save status will remain dirty after the save success notification.
+          push = immediate = true;
+        } else {
+          // Remember the last time when the content became dirty in order to be able to save immediately when the save
+          // interval is reached (even if the user is still making changes).
+          this._dirtyTimestamp = now();
+        }
+      } else if (this._isSomeoneSaving()) {
+        // Avoid auto-saving more often than the SAVE_INTERVAL. It's possible that the SAVE_INTERVAL is reached for
+        // multiple users that are editing at the same time. In this case the auto-save should be triggered for only one
+        // of them. For the others the auto-save should be delayed until the SAVE_INTERVAL is reached again.
+        delete this._dirtyTimestamp;
       }
       if (push) {
         // Push the state of this saver to the other clients.
@@ -137,11 +149,11 @@ define('xwiki-realtime-saver', [
     }
 
     _isSomeoneSaving() {
-      return this._someState(state => state.saving);
+      return this._someState(state => state.saving && this._isConnected(state));
     }
 
     _isSomeoneDirty() {
-      return this._someState(state => state.dirty);
+      return this._someState(state => state.dirty && this._isConnected(state));
     }
 
     _someState(predicate) {
@@ -151,6 +163,17 @@ define('xwiki-realtime-saver', [
     _getStates() {
       // Must be implemented by subclasses.
       return {};
+    }
+
+    _getConnectedStates() {
+      return Object.fromEntries(Object.entries(this._getStates())
+        .filter(([clientId, state]) => this._isConnected(state)));
+    }
+
+    _isConnected(state) {
+      // Must be overridden by subclasses to indicate if the user associated with the given state is connected to the
+      // realtime editing session.
+      return true;
     }
 
     async _save(options) {
@@ -198,7 +221,7 @@ define('xwiki-realtime-saver', [
         setTimeout(() => {
           // Initialize with minimum save priority.
           let savePriority = 1, savingClientId;
-          for (const [clientId, state] of Object.entries(this._getStates())) {
+          for (const [clientId, state] of Object.entries(this._getConnectedStates())) {
             if (state.saving > savePriority || (state.saving === savePriority &&
                 (!savingClientId || savingClientId > clientId))) {
               savePriority = state.saving;
@@ -230,10 +253,6 @@ define('xwiki-realtime-saver', [
     constructor(config) {
       super();
 
-      // The cached states of all the clients, grouped by editor type (because we use the same Netflux channel for all
-      // editor types).
-      this._states = {};
-
       this._revertList = [];
 
       this._initializing = new Promise(resolve => {
@@ -245,8 +264,9 @@ define('xwiki-realtime-saver', [
         };
       });
 
-      this._config = $.extend({}, config);
-      this._states[this._config.editorType] = {
+      this._config = {...config};
+      // The cached states of all the clients.
+      this._states = {
         [this._getClientId()]: this._state
       };
 
@@ -262,15 +282,20 @@ define('xwiki-realtime-saver', [
     }
 
     _getStates() {
-      return this._states[this._config.editorType];
+      return this._states;
     }
 
     _pushState(immediate) {
+      this._state.id = this._myId;
       this._getStates()[this._getClientId()] = this._state;
       this._onLocal();
       if (immediate) {
         this._chainpad.sync();
       }
+    }
+
+    _isConnected(state) {
+      return this._userList.users.includes(state.id);
     }
 
     async toBeReady() {
@@ -298,7 +323,9 @@ define('xwiki-realtime-saver', [
     }
 
     _onReady(info) {
+      this._myId = info.myId;
       this._chainpad = info.realtime;
+      this._userList = info.userList;
       this._notifyReady();
       this._onLocal();
     }
@@ -339,9 +366,20 @@ define('xwiki-realtime-saver', [
     /**
      * Stop the autosave when the user disallows realtime or when the WebSocket is disconnected.
      */
-    stop() {
+    async stop() {
       // Cancel the scheduled save.
       clearTimeout(this._saveTimer);
+
+      if (this._chainpad) {
+        // Push uncommitted changes to the server before disconnecting.
+        await new Promise(resolve => {
+          this._chainpad.sync();
+          this._chainpad.onSettle(() => {
+            delete this._chainpad;
+            resolve();
+          });
+        });
+      }
 
       // Disconnect from the realtime channel and revert the changes made by this saver (i.e. remove event listeners,
       // restore action buttons behaviour).
@@ -354,21 +392,27 @@ define('xwiki-realtime-saver', [
    */
   class XWikiSaver extends ChainPadSaver {
     constructor(config) {
-      super($.extend({
-        formId: 'edit'
-      }, config));
+      super({
+        formId: 'edit',
+        onStatusChange: () => {},
+        onCreateVersion: () => {},
+        ...config
+      });
     }
 
     _onReady(info) {
       super._onReady(info);
 
       // There's a very small chance that the preview button might cause problems, so let's just get rid of it.
-      $('[name="action_preview"]').hide();
-      this._revertList.push(() => {
-        $('[name="action_preview"]').show();
-      });
-
       const form = document.getElementById(this._config.formId);
+      const $previewButton = $(form).find('input[name="action_preview"]');
+      if ($previewButton.is(':visible')) {
+        $previewButton.hide();
+        this._revertList.push(() => {
+          $previewButton.show();
+        });
+      }
+
       this._overwriteAjaxSaveAndContinue(form);
 
       const beforeSaveHandler = event => {
@@ -380,7 +424,7 @@ define('xwiki-realtime-saver', [
       };
       $(form).on('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
       this._revertList.push(() => {
-        $(document).off('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
+        $(form).off('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
       });
     }
 
@@ -392,11 +436,7 @@ define('xwiki-realtime-saver', [
         // FIXME: The in-place editor is also overriding reloadEditor, before this code is executed, so here we're
         // actually overwritting in-place editor's behavior.
         reloadEditor: () => {
-          doc.reload();
-          // TODO: Handle the page title.
-          this._config.getTextAtCurrentRevision().then(data => {
-            this._config.setTextValue(data);
-          });
+          xwikiDocument.reload();
           // HACK: Replicate the behavior from the in-place editor.
           setTimeout(() => {
             $(form).trigger('xwiki:actions:reload');
@@ -428,6 +468,8 @@ define('xwiki-realtime-saver', [
     _updateState(push, immediate) {
       super._updateState(push, immediate);
 
+      this._notifyStatusChange();
+
       let latestVersion = '0.0';
       let savedBy;
       for (const [clientId, state] of Object.entries(this._getStates())) {
@@ -436,32 +478,61 @@ define('xwiki-realtime-saver', [
           savedBy = clientId;
         }
       }
-      if (this._compareVersions(latestVersion, doc.version) > 0) {
-        doc.update({
+      if (this._compareVersions(latestVersion, xwikiDocument.version) > 0) {
+        xwikiDocument.update({
           version: latestVersion,
           modified: now(),
           isNew: false
         });
         if (savedBy !== this._getClientId()) {
-          this._config.showNotification('savedRemote', [latestVersion, this._getUserName(savedBy)]);
+          this._config.onCreateVersion({
+            number: latestVersion,
+            date: xwikiDocument.modified,
+            author: savedBy
+          });
         }
       }
+    }
+
+    _notifyStatusChange() {
+      const status = (this._isSomeoneSaving() && 1) || (this._isSomeoneDirty() ? 0 : 2);
+      if (this._previousStatus !== status) {
+        this._previousStatus = status;
+        this._config.onStatusChange(status);
+      }
+    }
+
+    async toBeReady() {
+      const result = await super.toBeReady();
+      this._notifyStatusChange();
+      if (!xwikiDocument.isNew) {
+        // Retrieve information about the initial version, when joining the editing session, but without blocking the
+        // saver ready state.
+        xwikiDocument.getRevision(xwikiDocument.version).then(revision => {
+          this._config.onCreateVersion({
+            number: revision.version,
+            date: new Date(revision.modified).getTime(),
+            author: {
+              reference: this._getAbsoluteUserReference(revision.modifier),
+              name: revision.modifierName
+            }
+          });
+        }).catch(error => {
+          console.debug('Failed to retrieve information about the initial version.', error);
+        });
+      }
+      return result;
+    }
+
+    _getAbsoluteUserReference(userReference) {
+      const usersSpaceReference = XWiki.Model.resolve('XWiki', XWiki.EntityType.SPACE, xwikiDocument.documentReference);
+      return XWiki.Model.serialize(XWiki.Model.resolve(userReference, XWiki.EntityType.DOCUMENT, usersSpaceReference));
     }
 
     _compareVersions(a, b) {
       const [aMajor, aMinor] = (a + '').split('.').map(Number);
       const [bMajor, bMinor] = (b + '').split('.').map(Number);
       return aMajor - bMajor || aMinor - bMinor;
-    }
-
-    _getUserName(clientId) {
-      if (this._config.userList) {
-        return clientId.replace(/^.*-([^-]*)%2d\d*$/, function(all, one) {
-          return decodeURIComponent(one);
-        });
-      } else {
-        return clientId;
-      }
     }
 
     _getSavePriority({button}) {
@@ -484,21 +555,38 @@ define('xwiki-realtime-saver', [
         throw new Error('Merge conflict prevents save.');
       }
 
-      const form = document.getElementById(this._config.formId);
-      button = button || form.querySelector('[name="action_saveandcontinue"]');
+      button = button || this._getSaveButton(true);
       if (!$(button).is(':enabled')) {
         throw new Error('The save button is disabled or missing.');
       }
 
-      const submitResultPromise = this._getSubmitResult(form);
+      const form = document.getElementById(this._config.formId);
+      const removeListeners = [];
+      const submitResultPromise = this._getSubmitResult(form, removeListeners);
 
+      let savePrevented = true;
+      $(button).on('xwiki:actions:save.realtime-saver', event => {
+        savePrevented = event.isDefaultPrevented();
+      });
       $(button).click();
+      $(button).off('xwiki:actions:save.realtime-saver');
+      if (savePrevented) {
+        // The save is prevented if the form has invalid data (e.g. missing mandatory title). In this case the
+        // xwiki:document:saved and xwiki:document:saveFailed events are not triggered, so we need to remove the
+        // corresponding event listeners and reject the save.
+        removeListeners.forEach(removeListener => removeListener());
+        throw new Error('Save prevented. Verify that the form has valid data.');
+      }
 
       this._afterSave(await submitResultPromise);
     }
 
+    _getSaveButton(continueEditing) {
+      const form = document.getElementById(this._config.formId);
+      return form.querySelector('input[name="action_save' + (continueEditing ? 'andcontinue' : '') + '"]');
+    }
+
     _getSubmitResult(form, removeListeners) {
-      removeListeners = removeListeners || [];
       return new Promise((resolve, reject) => {
         this._once(form, removeListeners, 'xwiki:document:saved.realtime-saver', (event, data) => {
           resolve(data);
@@ -569,10 +657,18 @@ define('xwiki-realtime-saver', [
       if (newVersion === '1.1') {
         debug('Created document version 1.1');
       } else {
-        debug(`Version bumped from ${doc.version} to ${newVersion}.`);
+        debug(`Version bumped from ${xwikiDocument.version} to ${newVersion}.`);
       }
       this._state.version = newVersion;
-      this._config.showNotification('saved', [newVersion]);
+      this._config.onCreateVersion({
+        number: newVersion,
+        date: now(),
+        author: this._getClientId()
+      });
+    }
+
+    save(continueEditing) {
+      return this._save({button: this._getSaveButton(continueEditing)});
     }
   }
 

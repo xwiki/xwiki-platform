@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.diff.Conflict;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -75,7 +74,6 @@ public class MergeDocumentResultScript
      * @since 15.5RC1
      * @since 14.10.12
      */
-    @Unstable
     public MergeDocumentResultScript(MergeDocumentResult mergeDocumentResult, XWikiContext context,
         boolean hasProgramming)
     {
@@ -142,7 +140,6 @@ public class MergeDocumentResultScript
      * @since 15.5RC1
      * @since 14.10.12
      */
-    @Unstable
     @Programming
     public MergeDocumentResult getMergeDocumentResult()
     {
@@ -159,7 +156,6 @@ public class MergeDocumentResultScript
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     public boolean hasOnlyContentConflicts()
     {
         return !getContentConflicts().isEmpty()

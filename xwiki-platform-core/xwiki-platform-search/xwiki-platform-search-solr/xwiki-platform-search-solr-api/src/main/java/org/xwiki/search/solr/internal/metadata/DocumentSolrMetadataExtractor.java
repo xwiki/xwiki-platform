@@ -97,7 +97,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     private SolrFieldNameEncoder fieldNameEncoder;
 
     @Override
-    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public boolean setFieldsInternal(XWikiSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         DocumentReference documentReference = new DocumentReference(entityReference);
@@ -109,22 +109,20 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             return false;
         }
 
-        Locale locale = getLocale(documentReference);
-
-        solrDocument.setField(FieldUtils.FULLNAME, localSerializer.serialize(documentReference));
+        Locale realLocale = getRealLocale(documentReference);
 
         // Rendered title.
         String plainTitle = translatedDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext);
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, locale), plainTitle);
+        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.TITLE, realLocale), plainTitle);
 
         // Raw Content
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RAW_CONTENT, locale),
+        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RAW_CONTENT, realLocale),
             translatedDocument.getContent());
 
         // Rendered content
         WikiPrinter plainContentPrinter = new DefaultWikiPrinter();
         this.renderer.render(translatedDocument.getXDOM(), plainContentPrinter);
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, locale),
+        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.DOCUMENT_RENDERED_CONTENT, realLocale),
             plainContentPrinter.toString());
 
         solrDocument.setField(FieldUtils.VERSION, translatedDocument.getVersion());
@@ -149,7 +147,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         setLinks(solrDocument, translatedDocument, xcontext);
 
         // Add any extra fields (about objects, etc.) that can improve the findability of the document.
-        setExtras(documentReference, solrDocument, locale);
+        setExtras(documentReference, solrDocument, realLocale);
 
         // Extract more metadata
         this.extractorUtils.extract(documentReference, translatedDocument, solrDocument);
@@ -218,7 +216,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param locale the locale of which to index the extra data.
      * @throws XWikiException if problems occur.
      */
-    protected void setExtras(DocumentReference documentReference, SolrInputDocument solrDocument, Locale locale)
+    protected void setExtras(DocumentReference documentReference, XWikiSolrInputDocument solrDocument, Locale locale)
         throws XWikiException
     {
         // We need to support the following types of queries:
@@ -244,7 +242,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param locale the locale for which to index the objects.
      * @param originalDocument the original document where the objects come from.
      */
-    protected void setObjects(SolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
+    protected void setObjects(XWikiSolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> objects : originalDocument.getXObjects().entrySet()) {
             boolean hasObjectsOfThisType = false;
@@ -260,7 +258,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     }
 
     @Override
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    protected void setPropertyValue(XWikiSolrInputDocument solrDocument, BaseProperty<?> property,
         TypedValue typedValue, Locale locale)
     {
         Object value = typedValue.getValue();

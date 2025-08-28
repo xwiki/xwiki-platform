@@ -33,7 +33,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageAttachmentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -497,7 +496,7 @@ public interface DocumentAccessBridge
      * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
      *         not exist.
      * @throws Exception If the document cannot be accessed.
-     * @deprecated use {@link #getAttachmentContent(org.xwiki.model.reference.AttachmentReference)} instead
+     * @deprecated use {@link #getAttachmentContent(EntityReference)} instead
      */
     @Deprecated
     byte[] getAttachmentContent(String documentReference, String attachmentName) throws Exception;
@@ -509,9 +508,7 @@ public interface DocumentAccessBridge
      * @return The content of the attachment as an input stream or null if the attachment doesn't exist
      * @throws Exception If the document cannot be accessed.
      * @since 2.2M1
-     * @deprecated use {@link #getAttachmentContent(EntityReference)} instead
      */
-    @Deprecated(since = "14.7RC1")
     InputStream getAttachmentContent(AttachmentReference attachmentReference) throws Exception;
 
     /**
@@ -549,7 +546,6 @@ public interface DocumentAccessBridge
      * @since 14.10.8
      * @since 15.3RC1
      */
-    @Unstable
     default void setAttachmentContent(AttachmentReference attachmentReference, InputStream attachmentData)
         throws Exception
     {

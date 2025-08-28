@@ -20,18 +20,21 @@
 package org.xwiki.rest.internal.resources.classes;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.icon.IconManager;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -42,6 +45,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -69,8 +73,18 @@ public abstract class AbstractListClassPropertyValuesProviderTest
     @Named("usedValues")
     protected QueryBuilder<ListClass> usedValuesQueryBuilder;
 
+    @MockComponent
+    protected ContextualAuthorizationManager authorizationManager;
+
     @InjectComponentManager
     protected ComponentManager componentManager;
+
+    @MockComponent
+    protected IconManager iconManager;
+
+    @MockComponent
+    @Named("readonly")
+    protected Provider<XWikiContext> readonlyXWikiContextProvider;
 
     public void configure() throws Exception
     {
@@ -79,6 +93,7 @@ public abstract class AbstractListClassPropertyValuesProviderTest
         DocumentReference authorReference = new DocumentReference("wiki", "Users", "Alice");
 
         when(xcontextProvider.get()).thenReturn(this.xcontext);
+        when(this.readonlyXWikiContextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
         when(this.classDocument.getXClass()).thenReturn(xclass);
         when(this.classDocument.getDocumentReference()).thenReturn(this.classReference);
@@ -89,6 +104,8 @@ public abstract class AbstractListClassPropertyValuesProviderTest
         when(this.usedValuesQuery.bindValue("text")).thenReturn(queryParameter);
         when(queryParameter.anyChars()).thenReturn(queryParameter);
         when(queryParameter.literal("foo")).thenReturn(queryParameter);
+
+        when(this.iconManager.getMetaData(anyString())).thenAnswer(i -> mock(Map.class, i.<String>getArgument(0)));
     }
 
     protected void addProperty(String name, PropertyClass definition, boolean withQueryBuilders) throws Exception

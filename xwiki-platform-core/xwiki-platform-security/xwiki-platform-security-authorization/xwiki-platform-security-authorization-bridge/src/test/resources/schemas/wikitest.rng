@@ -78,6 +78,11 @@
       <attribute name="name">
         <data type="Name" />
       </attribute>
+      <optional>
+        <attribute name="enforceRequiredRights">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
       <group>
         <optional>
           <element name="creator">
@@ -87,7 +92,35 @@
         <zeroOrMore>
           <ref name="right.element" />
         </zeroOrMore>
+        <zeroOrMore>
+          <ref name="requiredRight.element" />
+        </zeroOrMore>
       </group>
+    </element>
+  </define>
+  <define name="requiredRight.element">
+    <element name="requiredRight">
+      <attribute name="type">
+        <choice>
+          <value>login</value>
+          <value>register</value>
+          <value>view</value>
+          <value>edit</value>
+          <value>delete</value>
+          <value>admin</value>
+          <value>programming</value>
+        </choice>
+      </attribute>
+      <optional>
+        <attribute name="scope">
+          <choice>
+            <value>document</value>
+            <value>space</value>
+            <value>wiki</value>
+            <value>farm</value>
+          </choice>
+        </attribute>
+      </optional>
     </element>
   </define>
   <define name="right.element">

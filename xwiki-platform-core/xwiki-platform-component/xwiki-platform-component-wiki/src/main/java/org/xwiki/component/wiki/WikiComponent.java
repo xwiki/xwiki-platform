@@ -24,7 +24,6 @@ import java.lang.reflect.Type;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents the definition of a wiki component implementation. A java component can extend this interface if it needs
@@ -79,7 +78,6 @@ public interface WikiComponent
      * @return the role type priority of the component.
      * @since 15.4RC1
      */
-    @Unstable
     default int getRoleTypePriority()
     {
         return ComponentDescriptor.DEFAULT_PRIORITY;
@@ -93,7 +91,6 @@ public interface WikiComponent
      * @return the role hint priority of the component.
      * @since 15.4RC1
      */
-    @Unstable
     default int getRoleHintPriority()
     {
         return ComponentDescriptor.DEFAULT_PRIORITY;

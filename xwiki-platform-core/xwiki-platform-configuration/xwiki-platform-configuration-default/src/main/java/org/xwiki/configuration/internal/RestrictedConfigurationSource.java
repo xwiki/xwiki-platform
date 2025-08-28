@@ -34,7 +34,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * <li>xwiki properties file (xwiki.properties)</li>
  * </ul>
  * If you need to use a Configuration source that can find its configuration in the wiki you should consider using
- * either {@link DefaultConfigurationSource} or {@link AllConfigurationSource}.
+ * either {@link SystemConfigurationSource} or {@link AllConfigurationSource}.
  *
  * @version $Id$
  * @since 4.1M2

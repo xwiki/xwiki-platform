@@ -22,10 +22,8 @@ package com.xpn.xwiki.web;
 import java.net.URL;
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,25 +32,31 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.model.LegacySpaceResolver;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ExportURLFactory}.
  *
  * @version $Id$
  */
-public class ExportURLFactoryMockitoTest
+@ComponentTest
+class ExportURLFactoryMockitoTest
 {
-    @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private ExportURLFactory factory;
 
@@ -68,8 +72,8 @@ public class ExportURLFactoryMockitoTest
 
     private EntityReferenceResolver<String> relativeEntityReferenceResolver;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
         this.context = new XWikiContext();
         this.context.setURL(new URL("http://localhost:8080/xwiki/bin/export/Main/WebHome?format=html"));
@@ -77,14 +81,9 @@ public class ExportURLFactoryMockitoTest
         when(request.getHeader("x-forwarded-host")).thenReturn(null);
         this.context.setRequest(request);
         XWikiResponse response = mock(XWikiResponse.class);
-        when(response.encodeURL(anyString())).thenAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                Object[] args = invocationOnMock.getArguments();
-                return args[0];
-            }
+        when(response.encodeURL(anyString())).thenAnswer((Answer) invocationOnMock -> {
+            Object[] args = invocationOnMock.getArguments();
+            return args[0];
         });
         this.context.setResponse(response);
 
@@ -115,7 +114,7 @@ public class ExportURLFactoryMockitoTest
     }
 
     @Test
-    public void createURLWhenNotInExportedPages() throws Exception
+    void createURLWhenNotInExportedPages() throws Exception
     {
         DocumentReference pageReference = new DocumentReference("xwiki", "Main", "WebHome");
         when(this.currentDocumentReferenceResolver.resolve("Main.WebHome")).thenReturn(pageReference);
@@ -135,7 +134,7 @@ public class ExportURLFactoryMockitoTest
     }
 
     @Test
-    public void createURLWhenInExportedPages() throws Exception
+    void createURLWhenInExportedPages() throws Exception
     {
         DocumentReference pageReference = new DocumentReference("xwiki", "Main", "WebHome");
         when(this.currentDocumentReferenceResolver.resolve("Main.WebHome")).thenReturn(pageReference);

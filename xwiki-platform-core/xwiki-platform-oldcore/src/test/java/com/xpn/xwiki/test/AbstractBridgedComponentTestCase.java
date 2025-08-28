@@ -103,7 +103,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
             will(returnValue(null));
             allowing(mockServletContext).getResourceAsStream("/WEB-INF/xwiki.cfg");
             will(returnValue(null));
-            allowing(mockServletContext).getAttribute("javax.servlet.context.tempdir");
+            allowing(mockServletContext).getAttribute("jakarta.servlet.context.tempdir");
                 will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
         }});
 

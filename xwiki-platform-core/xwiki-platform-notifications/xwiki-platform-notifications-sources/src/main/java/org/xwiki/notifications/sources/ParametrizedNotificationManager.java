@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.stability.Unstable;
 
 /**
  * A notification manager that work only with the parameters given to it (it will not look at the current user
@@ -54,7 +53,6 @@ public interface ParametrizedNotificationManager
      * @throws NotificationException if an error occurs
      * @since 15.5RC1
      */
-    @Unstable
     default List<Event> getRawEvents(NotificationParameters parameters) throws NotificationException
     {
         return Collections.emptyList();

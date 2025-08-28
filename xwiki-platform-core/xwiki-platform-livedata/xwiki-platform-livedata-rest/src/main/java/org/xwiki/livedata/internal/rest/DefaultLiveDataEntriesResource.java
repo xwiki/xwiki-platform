@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -55,13 +54,12 @@ import org.xwiki.rest.model.jaxb.Link;
 
 /**
  * Default implementation of {@link LiveDataEntriesResource}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntriesResource")
-@Singleton
 public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource implements LiveDataEntriesResource
 {
     private static final String FILTERS_PREFIX = "filters.";
@@ -75,8 +73,11 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     {
         this.contextInitializer.initialize(namespace);
 
-        LiveDataConfiguration config = initConfig(sourceId, properties, matchAll, sort, descending, offset, limit);
-        return getEntries(namespace, offset, limit, config);
+        int validatedLimit = validateAndGetLimit(limit);
+
+        LiveDataConfiguration config =
+            initConfig(sourceId, properties, matchAll, sort, descending, offset, validatedLimit);
+        return getEntries(namespace, offset, validatedLimit, config);
     }
 
     @Override
@@ -181,7 +182,7 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     private LiveDataConfiguration initConfig(String sourceId, List<String> properties, List<String> matchAll,
         List<String> sort, List<Boolean> descending, long offset, int limit) throws LiveDataException
     {
-        // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue 
+        // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue
         // query-params gives list with null element).
         List<String> actualProperties = properties.stream().filter(Objects::nonNull).collect(Collectors.toList());
         List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).collect(Collectors.toList());

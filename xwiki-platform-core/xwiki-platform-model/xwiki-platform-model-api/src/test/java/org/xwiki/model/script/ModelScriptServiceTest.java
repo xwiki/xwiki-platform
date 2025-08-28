@@ -34,7 +34,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageReference;
@@ -68,8 +67,6 @@ public class ModelScriptServiceTest
 
     private EntityReferenceResolver<String> stringEntityReferenceResolver;
 
-    private EntityReferenceValueProvider valueProvider;
-
     private Logger logger;
 
     @SuppressWarnings("unchecked")
@@ -96,8 +93,6 @@ public class ModelScriptServiceTest
         this.stringEntityReferenceResolver = mock(EntityReferenceResolver.class);
         when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "current"))
             .thenReturn(this.stringEntityReferenceResolver);
-
-        this.valueProvider = mock(EntityReferenceValueProvider.class);
     }
 
     @Test
@@ -232,31 +227,6 @@ public class ModelScriptServiceTest
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         assertEquals(documentReference, this.service.createDocumentReference(documentReference.getName(),
             documentReference.getLastSpaceReference()));
-    }
-
-    @Test
-    public void getEntityReferenceValue() throws Exception
-    {
-        when(this.componentManager.getInstance(EntityReferenceValueProvider.class, "current"))
-            .thenReturn(this.valueProvider);
-        when(this.valueProvider.getDefaultValue(EntityType.WIKI)).thenReturn("somewiki");
-
-        assertEquals("somewiki", this.service.getEntityReferenceValue(EntityType.WIKI));
-    }
-
-    @Test
-    public void getEntityReferenceValueWithInvalidHint() throws Exception
-    {
-        when(this.componentManager.getInstance(EntityReferenceValueProvider.class, "invalid"))
-            .thenThrow(new ComponentLookupException("error"));
-
-        assertNull(this.service.getEntityReferenceValue(EntityType.WIKI, "invalid"));
-    }
-
-    @Test
-    public void getEntityReferenceValueWithNullType() throws Exception
-    {
-        assertNull(this.service.getEntityReferenceValue(null));
     }
 
     @Test

@@ -19,7 +19,6 @@
  */
 package org.xwiki.user.test.po;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -35,7 +34,7 @@ import org.xwiki.test.ui.po.BasePage;
  */
 public class ChangePasswordPage extends BasePage
 {
-    private static final String ERROR_MESSAGE_SELECTOR = "span.box.errormessage";
+    private static final String ERROR_MESSAGE_SELECTOR = "div.box.errormessage";
 
     private static final String VALIDATION_ERROR_MESSAGE_SELECTOR = "span.LV_validation_message.LV_invalid";
 
@@ -82,6 +81,7 @@ public class ChangePasswordPage extends BasePage
         this.password1.sendKeys(password);
         this.password2.clear();
         this.password2.sendKeys(password2);
+        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.xpath("//input[@id='xwikipassword2']"),"class");
     }
 
     /**
@@ -97,6 +97,7 @@ public class ChangePasswordPage extends BasePage
         this.password1.sendKeys(password);
         this.password2.clear();
         this.password2.sendKeys(password2);
+        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.xpath("//input[@id='xwikipassword2']"),"class");
     }
 
     /**
@@ -138,7 +139,7 @@ public class ChangePasswordPage extends BasePage
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
-            public Boolean apply(@Nullable WebDriver webDriver)
+            public Boolean apply(WebDriver webDriver)
             {
                 return isDisplayed(By.cssSelector(VALIDATION_ERROR_MESSAGE_SELECTOR))
                     || isDisplayed(By.cssSelector(ERROR_MESSAGE_SELECTOR))
@@ -180,7 +181,12 @@ public class ChangePasswordPage extends BasePage
      */
     public void assertValidationErrorMessage(String expectedText)
     {
-        getDriver().waitUntilElementHasTextContent(By.cssSelector(VALIDATION_ERROR_MESSAGE_SELECTOR), expectedText);
+        try {
+            getDriver().waitUntilElementHasTextContent(By.cssSelector(VALIDATION_ERROR_MESSAGE_SELECTOR), expectedText);
+        } catch (TimeoutException e) {
+            throw new AssertionError(
+                String.format("Expected [%s] and obtained [%s]", expectedText, getValidationErrorMessage()), e);
+        }
     }
 
     /**
@@ -193,7 +199,12 @@ public class ChangePasswordPage extends BasePage
      */
     public void assertSuccessMessage(String expectedText)
     {
-        getDriver().waitUntilElementHasTextContent(By.cssSelector(SUCCESS_MESSAGE_SELECTOR), expectedText);
+        try {
+            getDriver().waitUntilElementHasTextContent(By.cssSelector(SUCCESS_MESSAGE_SELECTOR), expectedText);
+        } catch (TimeoutException e) {
+            throw new AssertionError(
+                String.format("Expected [%s] and obtained [%s]", expectedText, getSuccessMessage()), e);
+        }
     }
 
     /**
@@ -206,6 +217,11 @@ public class ChangePasswordPage extends BasePage
      */
     public void assertErrorMessage(String expectedText)
     {
-        getDriver().waitUntilElementHasTextContent(By.cssSelector(ERROR_MESSAGE_SELECTOR), expectedText);
+        try {
+            getDriver().waitUntilElementHasTextContent(By.cssSelector(ERROR_MESSAGE_SELECTOR), expectedText);
+        } catch (TimeoutException e) {
+            throw new AssertionError(
+                String.format("Expected [%s] and obtained [%s]", expectedText, getErrorMessage()), e);
+        }
     }
 }

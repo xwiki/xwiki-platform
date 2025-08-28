@@ -19,14 +19,14 @@
  */
 package org.xwiki.netflux.internal;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -79,7 +79,7 @@ public class EffectiveAuthorSetterListener extends AbstractLocalEventListener
         Request request = this.container.getRequest();
         getEffectiveAuthor(request).ifPresent(effectiveAuthor -> {
             this.logger.debug("Setting the effective author of the request to [{}].", effectiveAuthor);
-            request.setProperty("com.xpn.xwiki.web.XWikiRequest#effectiveAuthor", effectiveAuthor);
+            request.setAttribute(Request.ATTRIBUTE_EFFECTIVE_AUTHOR, effectiveAuthor);
         });
     }
 
@@ -113,8 +113,9 @@ public class EffectiveAuthorSetterListener extends AbstractLocalEventListener
      */
     private List<String> getChannelsFromRequest(Request request)
     {
-        List<String> channels = request.getProperties("netfluxChannel").stream()
-            .map(value -> Objects.toString(value, null)).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+        String[] values = request.getParameterValues("netfluxChannel");
+        Stream<String> valuesStream = (values == null) ? Stream.empty() : Arrays.stream(values);
+        List<String> channels = valuesStream.filter(StringUtils::isNotBlank).toList();
         this.logger.debug("Channels from request: [{}].", channels);
         return channels;
     }

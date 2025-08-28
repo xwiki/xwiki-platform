@@ -1,3 +1,6 @@
+org.xwiki.index.tree.IndexTreeScriptService
+org.xwiki.index.tree.internal.macro.DocumentSortConverter
+
 org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesClassInitializer
 org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesListener
 org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesManager

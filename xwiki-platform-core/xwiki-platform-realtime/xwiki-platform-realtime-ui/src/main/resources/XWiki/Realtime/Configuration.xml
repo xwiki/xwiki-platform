@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.Realtime.Configuration" locale="">
+<xwikidoc version="1.6" reference="XWiki.Realtime.Configuration" locale="">
   <web>XWiki.Realtime</web>
   <name>Configuration</name>
   <language/>
@@ -40,269 +40,10 @@
   <object>
     <name>XWiki.Realtime.Configuration</name>
     <number>0</number>
-    <className>XWiki.ConfigurableClass</className>
-    <guid>4f91fc16-bb42-49c2-9471-5056226e9351</guid>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>84becc8f-41b3-4339-a1a6-f6295ec72daf</guid>
     <class>
-      <name>XWiki.ConfigurableClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <categoryIcon>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>categoryIcon</name>
-        <number>11</number>
-        <picker>0</picker>
-        <prettyName>categoryIcon</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </categoryIcon>
-      <codeToExecute>
-        <contenttype>VelocityWiki</contenttype>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <editor>---</editor>
-        <hint/>
-        <name>codeToExecute</name>
-        <number>7</number>
-        <picker>0</picker>
-        <prettyName>codeToExecute</prettyName>
-        <rows>5</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </codeToExecute>
-      <configurationClass>
-        <cache>0</cache>
-        <classname/>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <freeText/>
-        <hint/>
-        <idField/>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>configurationClass</name>
-        <number>3</number>
-        <picker>1</picker>
-        <prettyName>configurationClass</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators/>
-        <size>30</size>
-        <sort>none</sort>
-        <sql/>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <valueField/>
-        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
-      </configurationClass>
-      <displayBeforeCategory>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>displayBeforeCategory</name>
-        <number>10</number>
-        <picker>0</picker>
-        <prettyName>displayBeforeCategory</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </displayBeforeCategory>
-      <displayInCategory>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>displayInCategory</name>
-        <number>9</number>
-        <picker>0</picker>
-        <prettyName>displayInCategory</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </displayInCategory>
-      <displayInSection>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>displayInSection</name>
-        <number>1</number>
-        <picker>0</picker>
-        <prettyName>displayInSection</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </displayInSection>
-      <heading>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>heading</name>
-        <number>2</number>
-        <picker>0</picker>
-        <prettyName>heading</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </heading>
-      <iconAttachment>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>iconAttachment</name>
-        <number>8</number>
-        <picker>0</picker>
-        <prettyName>iconAttachment</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </iconAttachment>
-      <linkPrefix>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>linkPrefix</name>
-        <number>5</number>
-        <picker>0</picker>
-        <prettyName>linkPrefix</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </linkPrefix>
-      <propertiesToShow>
-        <cache>0</cache>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <freeText/>
-        <hint/>
-        <largeStorage>0</largeStorage>
-        <multiSelect>1</multiSelect>
-        <name>propertiesToShow</name>
-        <number>6</number>
-        <picker>0</picker>
-        <prettyName>propertiesToShow</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>20</size>
-        <sort>none</sort>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values/>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </propertiesToShow>
-      <scope>
-        <cache>0</cache>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText/>
-        <hint/>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>12</number>
-        <picker>1</picker>
-        <prettyName>scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <sort/>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>WIKI|SPACE|ALL_SPACES|WIKI+ALL_SPACES</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-      <sectionOrder>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>sectionOrder</name>
-        <number>12</number>
-        <numberType>integer</numberType>
-        <prettyName>sectionOrder</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-      </sectionOrder>
-    </class>
-    <property>
-      <categoryIcon/>
-    </property>
-    <property>
-      <codeToExecute>#set ($discard = $xwiki.jsx.use('XWiki.Realtime.Configuration'))</codeToExecute>
-    </property>
-    <property>
-      <configurationClass>XWiki.Realtime.ConfigurationClass</configurationClass>
-    </property>
-    <property>
-      <displayBeforeCategory/>
-    </property>
-    <property>
-      <displayInCategory>edit</displayInCategory>
-    </property>
-    <property>
-      <displayInSection>edit.realtime</displayInSection>
-    </property>
-    <property>
-      <heading/>
-    </property>
-    <property>
-      <iconAttachment/>
-    </property>
-    <property>
-      <linkPrefix/>
-    </property>
-    <property>
-      <propertiesToShow/>
-    </property>
-    <property>
-      <scope>WIKI</scope>
-    </property>
-    <property>
-      <sectionOrder/>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Realtime.Configuration</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>13645d2f-aa7f-4eaf-b41f-18997b3793b9</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
+      <name>XWiki.StyleSheetExtension</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -342,6 +83,24 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -384,20 +143,241 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function ($) {
-  var form = $('#edit\\.realtime_XWiki\\.Realtime\\.Configuration');
-  if (XWiki.mainWiki === XWiki.currentWiki) {
-    form.find('dt').first().hide();
-    return;
+      <code>.realtime-edit-toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.realtime-edit-toolbar-left,
+.realtime-edit-toolbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.btn-group &gt; .btn-primary:not(:first-child) {
+  // Fix the border that separates the primary button from the dropdown toggle.
+  border-left-color: @btn-primary-border;
+}
+
+#realtime-changeSummaryModal .modal-body &gt; .nav-tabs {
+  margin-bottom: 1em;
+}
+
+#realtime-changeSummaryModal dl {
+  margin-bottom: 0;
+}
+
+#realtime-changeSummaryModal[data-continue="false"] [data-continue="true"],
+#realtime-changeSummaryModal[data-continue="true"] [data-continue="false"] {
+  display: none;
+}
+
+#realtime-changeSummaryModal-changesTab {
+  &amp; &gt; realtime-spinner,
+  &amp; &gt; .diff-group,
+  &amp; &gt; .infomessage,
+  &amp; &gt; .errormessage {
+    display: none;
   }
-  var onChange = function () {
-    var useGlobal = $(this).prop('checked');
-    form.find('input:visible, textarea:visible, select:visible').prop('disabled', useGlobal);
-    $(this).prop('disabled', false);
-  };
-  $('#XWiki\\.Realtime\\.Configuration_XWiki\\.Realtime\\.ConfigurationClass_0_useGlobalConfig').on('change', onChange)
-    .trigger('change');
-});</code>
+  &amp;[data-state="loading"] &gt; realtime-spinner,
+  &amp;[data-state="loaded"] &gt; .diff-group,
+  &amp;[data-state="empty"] &gt; .infomessage.noChange,
+  &amp;[data-state="isNew"] &gt; .infomessage.isNew,
+  &amp;[data-state="error"] &gt; .errormessage {
+    display: block;
+  }
+}
+
+realtime-status {
+  color: @text-muted;
+  margin: 0 .5em;
+}
+
+/* Hide the user list and user dropdown when we are disconnected and while the connection is being established. */
+.realtime-connection-status[value="dirty"] + .realtime-users,
+.realtime-connection-status[value="dirty"] ~ .realtime-users-dropdown,
+.realtime-connection-status[value="cleaning"] + .realtime-users,
+.realtime-connection-status[value="cleaning"] ~ .realtime-users-dropdown,
+.realtime-connection-status[value="clean"],
+.realtime-users-dropdown[hidden] {
+  display: none;
+}
+
+ul.realtime-users {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.realtime-connection-status + .realtime-users {
+  margin-left: .5em;
+}
+
+.realtime-user {
+  display: inline-block;
+}
+
+.realtime-user-avatar {
+  max-width: 24px;
+  max-height: 24px;
+  border-radius: @border-radius-base;
+  margin: 4px;
+}
+
+.realtime-user-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+
+  &amp;::after {
+    content: attr(data-abbr);
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 2px;
+    line-height: 12px;
+    border-radius: @border-radius-small;
+    font-size: 10px;
+    font-weight: bold;
+    font-family: monospace;
+    background-color: @btn-primary-bg;
+    color: @btn-primary-color;
+  }
+}
+
+/* Hide the user name in compact mode. */
+.realtime-user-compact .realtime-user-name {
+  display: none;
+}
+
+.realtime-user-name {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.realtime-users + .realtime-users-dropdown {
+  margin: 4px;
+}
+
+.realtime-users-dropdown &gt; .dropdown-toggle {
+  padding: 4px 3px;
+  font-size: 10px;
+  font-family: monospace;
+
+  &amp;:hover,
+  &amp;:focus {
+    color: @badge-color;
+    background-color: darken(@badge-bg, 30%);
+  }
+
+  &amp;:focus {
+    outline-offset: 3px;
+    outline-style: auto;
+    outline-width: thin;
+    outline-color: darken(@badge-bg, 30%);
+  }
+
+  &amp;::after {
+    content: "+" attr(data-more);
+  }
+}
+
+.dropdown-menu &gt; li &gt; a.realtime-version {
+  display: flex;
+  align-items: center;
+}
+
+.realtime-version &gt; :first-child {
+  flex-basis: 32px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.realtime-version-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0 20px 0 10px;
+}
+
+.realtime-version {
+  .realtime-version-number {
+    font-weight: bolder;
+  }
+
+  .realtime-version-date {
+    font-size: 85%;
+    color: @text-muted;
+  }
+}
+
+.realtime-version-author .realtime-user-name {
+  vertical-align: inherit;
+}
+
+#realtime-version-modal .modal-body {
+  /* We want to see the modal buttons from the start (without scrolling) even when the displayed content is large. */
+  max-height: ~"calc(100vh - 200px)";
+  overflow: auto;
+}
+
+/**
+ * Spinner
+ */
+:host(realtime-spinner), :host(realtime-spinner)::before {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid;
+  width: 8px;
+  height: 8px;
+}
+
+:host(realtime-spinner) {
+  position: relative;
+  border-color: transparent;
+  animation: realtime-spinner-rotate 3s linear infinite;
+}
+
+:host(realtime-spinner)::before {
+  content: "";
+  box-sizing: content-box !important;
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  clip-path: rect(6px 12px 12px 0);
+  animation: realtime-spinner-rotate 1.5s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+}
+
+@keyframes realtime-spinner-rotate {
+  0% {transform: rotate(0deg);}
+  100% {transform: rotate(360deg);}
+}
+
+/**
+ * Status
+ */
+:host(realtime-status) realtime-spinner {
+  display: none;
+}
+
+:host(realtime-status[value="cleaning"]) realtime-spinner {
+  display: inline-block;
+}
+
+:host(realtime-status[value="dirty"])::after {
+  content: attr(data-status-dirty);
+}
+
+:host(realtime-status[value="cleaning"])::after {
+  content: attr(data-status-cleaning);
+}
+
+:host(realtime-status[value="clean"])::after {
+  content: attr(data-status-clean);
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>
@@ -407,104 +387,6 @@
     </property>
     <property>
       <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Realtime.Configuration</name>
-    <number>0</number>
-    <className>XWiki.Realtime.ConfigurationClass</className>
-    <guid>bb069db7-4aca-420c-877b-59bcdfa9a6f3</guid>
-    <class>
-      <name>XWiki.Realtime.ConfigurationClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <enableMerge>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <hint>Try to merge the content when saving a document (disable only if it causes issues)</hint>
-        <name>enableMerge</name>
-        <number>4</number>
-        <prettyName>Merge on save</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </enableMerge>
-      <marginAvatar>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <hint>Show on the side of the editing area the avatars of the users that are currently typing</hint>
-        <name>marginAvatar</name>
-        <number>3</number>
-        <prettyName>Show editing users</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </marginAvatar>
-      <toolbarUserlist>
-        <cache>0</cache>
-        <customDisplay/>
-        <defaultValue>both</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText/>
-        <hint>Show the list of connected users at the top of the editing area</hint>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>toolbarUserlist</name>
-        <number>2</number>
-        <picker>0</picker>
-        <prettyName>Show connected users</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <sort>none</sort>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>name=Display only user names|avatar=Display only user avatars|both=Display both user names and avatars</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </toolbarUserlist>
-      <useGlobalConfig>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <hint>Use the main wiki configuration</hint>
-        <name>useGlobalConfig</name>
-        <number>1</number>
-        <prettyName>Global configuration</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </useGlobalConfig>
-    </class>
-    <property>
-      <enableMerge>1</enableMerge>
-    </property>
-    <property>
-      <marginAvatar>1</marginAvatar>
-    </property>
-    <property>
-      <toolbarUserlist>both</toolbarUserlist>
-    </property>
-    <property>
-      <useGlobalConfig>1</useGlobalConfig>
     </property>
   </object>
   <object>
@@ -633,17 +515,10 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity}}
+      <content>{{template name="display_macros.vm" output="false" /}}
+
+{{velocity}}
 {{html clean="false"}}
-#set ($configClassRef = 'XWiki.Realtime.ConfigurationClass')
-#set ($configLocalRef = 'XWiki.Realtime.Configuration')
-#set ($configRef = $services.model.resolveDocument($configLocalRef))
-#set ($configObj = $xwiki.getDocument($configRef).getObject($configClassRef))
-#if ("$!configObj.getValue('useGlobalConfig')" != '0' &amp;&amp; !$xcontext.isMainWiki())
-    #set ($configRef = $services.model.resolveDocument($configLocalRef,
-      $services.model.createWikiReference($xcontext.mainWikiName)))
-    #set ($configObj = $xwiki.getDocument($configRef).getObject($configClassRef))
-#end
 #getUserAvatarURL($xcontext.userReference $avatarURL 120)
 ## Note that we have to pass some document information that is missing from the meta:
 ## * meta includes only the raw document locale value which is the same for documents with translations (e.g. having
@@ -654,19 +529,357 @@
   'webSocketURL': $services.websocket.url('netflux'),
   'user': {
     'name': $xwiki.getUserName($xcontext.user, false),
-    'avatarURL': $avatarURL.url,
-    'advanced': $isAdvancedUser
+    'avatarURL': $avatarURL.url
   },
   'document': {
     'language': $tdoc.realLocale,
     'modified': $tdoc.date.time
   },
-  'toolbarUserlist': $configObj.getValue('toolbarUserlist'),
-  'marginAvatar': $configObj.getValue('marginAvatar'),
-  'enableMerge': $configObj.getValue('enableMerge')
+  'dateFormat': $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm')
 })
 &lt;script id="realtime-config" type="application/json"&gt;$jsontool.serialize($config).replace(
   '&lt;', '\u003C')&lt;/script&gt;
+
+#initRequiredSkinExtensions()
+#set ($discard = $xwiki.ssx.use('XWiki.Realtime.Configuration'))
+#getRequiredSkinExtensions($realtimeToolbarStylesheet)
+&lt;template id="realtime-edit-toolbar"&gt;
+  &lt;div class="realtime-edit-toolbar" data-user-id=""&gt;
+    &lt;div class="realtime-edit-toolbar-left"&gt;
+      &lt;div class="btn-group dropup"&gt;
+        &lt;button
+          type="button"
+          class="btn btn-primary realtime-action-done"
+          title="$escapetool.xml($services.localization.render('realtime.done.hint'))"
+        &gt;
+          $services.icon.renderHTML('check')
+          $escapetool.xml($services.localization.render('realtime.done'))
+        &lt;/button&gt;
+        &lt;button
+          type="button"
+          class="btn btn-primary dropdown-toggle"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        &gt;
+          &lt;span class="caret"&gt;&lt;/span&gt;
+          &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('core.menu.toggleDropdown'))&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;ul class="dropdown-menu"&gt;
+          &lt;li&gt;
+            &lt;a
+              href="#"
+              class="realtime-action-summarize"
+              title="$escapetool.xml($services.localization.render('realtime.summarizeAndDone.hint'))"
+              data-continue="false"
+              data-toggle="modal"
+              data-target="#realtime-changeSummaryModal"
+            &gt;$escapetool.xml($services.localization.render('realtime.summarizeAndDone'))&lt;/a&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;a
+              href="#"
+              class="realtime-action-leave"
+              title="$escapetool.xml($services.localization.render('realtime.leave.hint'))"
+              data-toggle="modal"
+              data-target="#realtime-leave-modal"
+            &gt;$escapetool.xml($services.localization.render('realtime.leave'))&lt;/a&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;realtime-status
+        class="realtime-connection-status"
+        data-status-dirty="$escapetool.xml($services.localization.render('realtime.disconnected'))"
+        data-status-cleaning="$escapetool.xml($services.localization.render('realtime.connecting'))"
+      &gt;&lt;/realtime-status&gt;
+      &lt;ul
+        class="realtime-users"
+        data-limit="4"
+      &gt;
+        &lt;li&gt;&lt;!-- User --&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;div class="btn-group dropup realtime-users-dropdown"&gt;
+        &lt;button
+          type="button"
+          class="btn dropdown-toggle realtime-action-users badge"
+          title="$escapetool.xml($services.localization.render('realtime.users.hint'))"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          data-more=""
+        &gt;
+          &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('realtime.users'))&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;ul class="dropdown-menu"&gt;
+          &lt;li&gt;&lt;!-- User --&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="realtime-edit-toolbar-right"&gt;
+      &lt;realtime-status
+        class="realtime-save-status"
+        data-status-dirty="$escapetool.xml($services.localization.render('realtime.saveStatus.unsaved'))"
+        data-status-cleaning="$escapetool.xml($services.localization.render('realtime.saveStatus.saving'))"
+        data-status-clean="$escapetool.xml($services.localization.render('realtime.saveStatus.saved'))"
+      &gt;&lt;/realtime-status&gt;
+      &lt;div class="btn-group dropup"&gt;
+        &lt;button
+          type="button"
+          class="btn btn-default dropdown-toggle realtime-action-history"
+          title="$escapetool.xml($services.localization.render('realtime.history.hint'))"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        &gt;
+          $services.icon.renderHTML('clock')
+          &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('realtime.history'))&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;ul
+          class="dropdown-menu realtime-versions"
+          data-limit="5"
+        &gt;
+          &lt;li class="dropdown-header"&gt;
+            $escapetool.xml($services.localization.render('realtime.history.hint'))
+          &lt;/li&gt;
+          &lt;li role="separator" class="divider"&gt;&lt;/li&gt;
+          &lt;li&gt;
+            &lt;a
+              href="#"
+              class="realtime-action-summarize"
+              title="$escapetool.xml($services.localization.render('realtime.summarize.hint'))"
+              data-continue="true"
+              data-toggle="modal"
+              data-target="#realtime-changeSummaryModal"
+            &gt;$escapetool.xml($services.localization.render('realtime.summarize'))&lt;/a&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-user"&gt;
+  &lt;a
+    href="#"
+    class="realtime-user"
+    data-id=""
+    data-reference=""
+  &gt;
+    &lt;span class="realtime-user-avatar-wrapper" data-abbr=""&gt;
+      &lt;img
+        class="realtime-user-avatar"
+        src="$xwiki.getSkinFile('icons/xwiki/noavatar.png', true)"
+        alt="$escapetool.xml($services.localization.render('username'))"
+        title=""
+      /&gt;
+    &lt;/span&gt;
+    &lt;span class="realtime-user-name" data-count=""&gt;&lt;/span&gt;
+  &lt;/a&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-spinner"&gt;
+  $realtimeToolbarStylesheet
+&lt;/template&gt;
+
+&lt;template id="realtime-status"&gt;
+  $realtimeToolbarStylesheet
+  &lt;realtime-spinner&gt;&lt;/realtime-spinner&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-version"&gt;
+  &lt;a
+    href=""
+    class="realtime-version"
+    data-toggle="modal"
+    data-target="#realtime-version-modal"
+    data-remote="false"
+  &gt;
+    &lt;span class="realtime-version-icon"&gt;
+      $services.icon.renderHTML('clock')
+    &lt;/span&gt;
+    &lt;span class="realtime-version-info"&gt;
+      &lt;span class="realtime-version-number"&gt;&lt;/span&gt;
+      &lt;span class="realtime-version-date"&gt;&lt;/span&gt;
+    &lt;/span&gt;
+  &lt;/a&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-changeSummaryModal-template"&gt;
+  &lt;div id="realtime-changeSummaryModal" class="modal fade" tabindex="-1" role="dialog"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('realtime.close'))"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title"&gt;
+            $escapetool.xml($services.localization.render('realtime.summarize'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body xform"&gt;
+          &lt;ul class="nav nav-tabs" role="tablist"&gt;
+            &lt;li role="presentation" class="active"&gt;
+              &lt;a
+                href="#realtime-changeSummaryModal-summaryTab"
+                aria-controls="realtime-changeSummaryModal-summaryTab"
+                role="tab"
+                data-toggle="tab"
+              &gt;
+                $escapetool.xml($services.localization.render('realtime.summary'))
+              &lt;/a&gt;
+            &lt;/li&gt;
+            &lt;li role="presentation"&gt;
+              &lt;a
+                href="#realtime-changeSummaryModal-changesTab"
+                aria-controls="realtime-changeSummaryModal-changesTab"
+                role="tab"
+                data-toggle="tab"
+              &gt;
+                $escapetool.xml($services.localization.render('realtime.changes'))
+              &lt;/a&gt;
+            &lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;div class="tab-content"&gt;
+            &lt;div
+              role="tabpanel"
+              class="tab-pane active"
+              id="realtime-changeSummaryModal-summaryTab"
+            &gt;
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  ## The label is redundant with the tab name.
+                  &lt;label for="realtime-changeSummaryModal-summary" hidden&gt;
+                    $escapetool.xml($services.localization.render('realtime.summary'))
+                  &lt;/label&gt;
+                  &lt;span class="xHint"&gt;
+                    $escapetool.xml($services.localization.render('core.comment.tooltip'))
+                  &lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  &lt;textarea
+                    id="realtime-changeSummaryModal-summary"
+                    name="summary"
+                    maxlength="1023"
+                    rows="10"
+                    title="$escapetool.xml($services.localization.render('realtime.summary'))"
+                  &gt;&lt;/textarea&gt;
+                &lt;/dd&gt;
+                ## Save &amp; Continue always creates a minor change so we show the minor change checkbox only when the
+                ## action is Save &amp; View
+                &lt;dt id="realtime-changeSummaryModal-minorChange" data-continue="false"&gt;
+                  &lt;label&gt;
+                    &lt;input type="checkbox" name="minorChange" /&gt;
+                    $escapetool.xml($services.localization.render('realtime.minorChange'))
+                  &lt;/label&gt;
+                  &lt;span class="xHint"&gt;
+                    $escapetool.xml($services.localization.render('realtime.minorChange.hint'))
+                  &lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;&lt;/dd&gt;
+              &lt;/dl&gt;
+            &lt;/div&gt;
+            &lt;div
+              role="tabpanel"
+              class="tab-pane"
+              id="realtime-changeSummaryModal-changesTab"
+            &gt;
+              &lt;realtime-spinner&gt;&lt;/realtime-spinner&gt;
+              &lt;div class="diff-group"&gt;&lt;/div&gt;
+              &lt;div class="box infomessage noChange"&gt;
+                $escapetool.xml($services.localization.render('realtime.changes.empty'))
+              &lt;/div&gt;
+              &lt;div class="box infomessage isNew"&gt;
+                $escapetool.xml($services.localization.render('realtime.changes.isnew'))
+              &lt;/div&gt;
+              &lt;div class="box errormessage"&gt;
+                $escapetool.xml($services.localization.render('realtime.changes.error'))
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-primary"&gt;
+            &lt;span data-continue="true"&gt;$escapetool.xml($services.localization.render('save'))&lt;/span&gt;
+            &lt;span data-continue="false"&gt;$escapetool.xml($services.localization.render('realtime.done'))&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-version-modal-template"&gt;
+  &lt;div id="realtime-version-modal" class="modal fade" tabindex="-1" role="dialog"&gt;
+    &lt;div class="modal-dialog modal-lg" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('realtime.close'))"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title"&gt;
+            #set ($title = $escapetool.xml($services.localization.render('core.document.modificationWithVersion', [
+              '__version__', '__author__', '__date__'
+            ])))
+            $title.replace(
+              '__version__', '&lt;span class="realtime-version-number"&gt;&lt;/span&gt;'
+            ).replace(
+              '__author__', '&lt;span class="realtime-version-author"&gt;&lt;/span&gt;'
+            ).replace(
+              '__date__', '&lt;span class="realtime-version-date"&gt;&lt;/span&gt;'
+            )
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          &lt;realtime-document-viewer
+            reference="$escapetool.xml($services.model.serialize($doc.documentReference, 'default'))"
+            locale="$escapetool.xml($tdoc.realLocale)"
+            version=""
+            alt="$escapetool.xml($services.localization.render('realtime.failedToLoadVersion'))"
+          &gt;&lt;/realtime-document-viewer&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('realtime.close'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-leave-modal-template"&gt;
+  &lt;div id="realtime-leave-modal" class="modal fade" tabindex="-1" role="dialog"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('realtime.close'))"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title"&gt;
+            $escapetool.xml($services.localization.render('realtime.leave'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          $escapetool.xml($services.localization.render('realtime.leave.confirmation'))
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-primary" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('realtime.leave.accept'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
 {{/html}}
 {{/velocity}}</content>
     </property>
@@ -1247,148 +1460,6 @@ path=$services.webjars.url('org.xwiki.contrib:netflux-websocket-webjar', 'netflu
       <parameters>id=xwiki-realtime
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-webjar', 'webjar.bundle.min.js')
 bundles=xwiki-realtime-config,xwiki-realtime-crypto,xwiki-realtime-document,xwiki-realtime-interface,xwiki-realtime-loader,xwiki-realtime-messages,xwiki-realtime-saver,xwiki-realtime-toolbar,xwiki-realtime-typingTests,xwiki-realtime-userData</parameters>
-    </property>
-    <property>
-      <scope>wiki</scope>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Realtime.Configuration</name>
-    <number>9</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>10c2b58f-8d93-47a7-9d7e-5d89f9241edf</guid>
-    <class>
-      <name>XWiki.UIExtensionClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <async_cached>
-        <defaultValue>0</defaultValue>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType/>
-        <name>async_cached</name>
-        <number>3</number>
-        <prettyName>Cached</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </async_cached>
-      <async_context>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>1</multiSelect>
-        <name>async_context</name>
-        <number>4</number>
-        <prettyName>Context elements</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator>, </separator>
-        <separators>|, </separators>
-        <size>5</size>
-        <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </async_context>
-      <async_enabled>
-        <defaultValue>0</defaultValue>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType/>
-        <name>async_enabled</name>
-        <number>2</number>
-        <prettyName>Asynchronous rendering</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </async_enabled>
-      <content>
-        <disabled>0</disabled>
-        <editor>Text</editor>
-        <name>content</name>
-        <number>1</number>
-        <prettyName>Executed Content</prettyName>
-        <restricted>0</restricted>
-        <rows>25</rows>
-        <size>120</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </content>
-      <extensionPointId>
-        <disabled>0</disabled>
-        <name>extensionPointId</name>
-        <number>5</number>
-        <prettyName>Extension Point ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </extensionPointId>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>6</number>
-        <prettyName>Extension ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parameters>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>parameters</name>
-        <number>7</number>
-        <prettyName>Extension Parameters</prettyName>
-        <restricted>0</restricted>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </parameters>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>8</number>
-        <prettyName>Extension Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>wiki=Current Wiki|user=Current User|global=Global</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <property>
-      <async_cached>0</async_cached>
-    </property>
-    <property>
-      <async_context/>
-    </property>
-    <property>
-      <async_enabled>0</async_enabled>
-    </property>
-    <property>
-      <content/>
-    </property>
-    <property>
-      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
-    </property>
-    <property>
-      <name>org.xwiki.platform.requirejs.module.realtime.errorBox</name>
-    </property>
-    <property>
-      <parameters>id=xwiki-realtime-errorBox
-path=$xwiki.getURL('RTFrontend.ErrorBox', 'jsx', $escapetool.url({'v': $services.extension.installed.getInstalledExtension('org.xwiki.platform:xwiki-platform-realtime-ui', "wiki:$xcontext.database").version.value}))</parameters>
     </property>
     <property>
       <scope>wiki</scope>

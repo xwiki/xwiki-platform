@@ -85,7 +85,7 @@
       maximizedSelector.val('');
 
       // Move the form action buttons back to their original position. Doesn't apply to the in-line editor.
-      bottom.next().appendTo(bottomButtons);
+      bottom.nextAll('.buttons').appendTo(bottomButtons);
 
       // Remove the full-screen marker from the body element.
       body.removeAttr('data-maximized');
@@ -202,17 +202,23 @@
     };
 
     var updateEditingArea = function(editor, reset) {
-      var $editable = $(editor.editable().$);
+      let editable = editor.editable().$;
+      // In some cases it's not enough to maximize only the editable area because there are other elements around the
+      // editable area that need to be visible in full-screen mode (e.g. when editing in realtime the user caret
+      // indicators are injected after the editable area and they must be visible in full-screen mode so we need to
+      // maximize the parent of the editable area). We look for an ancestor of the editable area that was marked as the
+      // element that needs to be maximized.
+      editable = editable.closest('.cke_editable_fullscreen') || editable;
       if (reset !== true && isMaximized(editor)) {
         var toolBarHeight = $('.cke_toolBar_active').outerHeight();
         var actionBarHeight = $('.cke_actionBar_active').outerHeight();
-        $editable.addClass('cke_editable_active').css({
+        $(editable).addClass('cke_editable_active').css({
           top: toolBarHeight,
           height: $(window).height() - toolBarHeight - actionBarHeight
         });
       } else {
         // Remove the full-screen styles.
-        $editable.removeClass('cke_editable_active').css({
+        $(editable).removeClass('cke_editable_active').css({
           top: '',
           height: ''
         });

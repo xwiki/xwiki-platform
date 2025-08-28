@@ -25,7 +25,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -35,7 +34,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 15.9RC1
  */
-@Unstable
 public class EditConfirmationCheckerResult
 {
     private final Block message;
@@ -73,7 +71,6 @@ public class EditConfirmationCheckerResult
      * @see #EditConfirmationCheckerResult(Block, boolean, Serializable)
      * @since 15.10RC1
      */
-    @Unstable
     public EditConfirmationCheckerResult(Block message, boolean isError, Serializable skipValue)
     {
         this.message = message;

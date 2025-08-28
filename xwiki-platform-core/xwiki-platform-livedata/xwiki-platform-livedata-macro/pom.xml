@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-livedata-macro</artifactId>
   <name>XWiki Platform - Live Data - Macro</name>
   <description>Display dynamic lists of data.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data Macro</xwiki.extension.name>
   </properties>
@@ -57,6 +57,22 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-template-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

@@ -87,6 +87,7 @@ public class CompositeWikiConfigurationSource extends CompositeConfigurationSour
             }
         }
         this.sources = newSources;
+        this.wikiInitialized = true;
 
         return this.sources;
 

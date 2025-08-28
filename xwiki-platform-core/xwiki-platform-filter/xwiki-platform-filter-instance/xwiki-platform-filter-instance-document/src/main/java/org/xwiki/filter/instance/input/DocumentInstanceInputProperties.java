@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
@@ -80,6 +81,11 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
      * @see #isWithWikiDocumentContentHTML()
      */
     private boolean withWikiDocumentContentHTML;
+
+    /**
+     * @see #getExcludedPropertyTypes()
+     */
+    private Set<String> excludedPropertyTypes;
 
     /**
      * @return Indicates if events should be generated for history
@@ -269,5 +275,34 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     public void setWithWikiDocumentContentHTML(boolean withWikiDocumentContentHTML)
     {
         this.withWikiDocumentContentHTML = withWikiDocumentContentHTML;
+    }
+
+    /**
+     * @return the class property types (like "Email" or "Password") for whose values no events shall be created
+     *        when generating events for objects
+     * @since 16.4.7
+     * @since 16.10.5
+     * @since 17.2.0RC1
+     */
+    @PropertyName("Excluded property types")
+    @PropertyDescription("The class property types (like \"Email\" or \"Password\") for whose values no "
+        + "events shall be created when generating events for objects")
+    @Unstable
+    public Set<String> getExcludedPropertyTypes()
+    {
+        return this.excludedPropertyTypes != null ? this.excludedPropertyTypes : Set.of();
+    }
+
+    /**
+     * @param excludedPropertyTypes the class property types (like "Email" or "Password") for whose values no events
+     *     shall be created when generating events for objects
+     * @since 16.4.7
+     * @since 16.10.5
+     * @since 17.2.0RC1
+     */
+    @Unstable
+    public void setExcludedPropertyTypes(Set<String> excludedPropertyTypes)
+    {
+        this.excludedPropertyTypes = excludedPropertyTypes;
     }
 }

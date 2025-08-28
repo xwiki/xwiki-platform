@@ -85,7 +85,7 @@
                #set($reflex      = $step.getValue('reflex'))
                #set($stepID      = $step.getNumber())
                &lt;tr&gt;
-                  &lt;td&gt;$!mathtool.add($order, 1)&lt;/td&gt;
+                  &lt;td&gt;$!order&lt;/td&gt;
                   &lt;td&gt;$!element&lt;/td&gt;
                   &lt;td&gt;$services.localization.render($!title)&lt;/td&gt;
                   &lt;td&gt;

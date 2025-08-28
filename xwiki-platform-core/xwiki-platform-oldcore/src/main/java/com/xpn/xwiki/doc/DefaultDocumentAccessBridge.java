@@ -32,6 +32,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -271,6 +272,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
+
         doc.setContent(content);
         saveDocument(doc, editComment, isMinorEdit);
     }
@@ -282,6 +287,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
+
         doc.setContent(content);
         saveDocument(doc, editComment, isMinorEdit);
     }
@@ -301,6 +310,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
+
         doc.setSyntaxId(syntaxId);
         saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", doc.getSyntax(), syntaxId), true);
     }
@@ -311,6 +324,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
+
         String oldSyntaxId = doc.getSyntaxId();
         doc.setSyntaxId(syntaxId);
         saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", oldSyntaxId, syntaxId), true);
@@ -322,6 +339,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
+
         doc.setParent(this.compactWikiEntityReferenceSerializer.serialize(parentReference, doc.getDocumentReference()));
         saveDocument(doc, String.format("Changed document parent to [%s].",
             this.defaultEntityReferenceSerializer.serialize(parentReference)), true);
@@ -332,6 +353,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
+
         doc.setTitle(title);
         saveDocument(doc, String.format("Changed document title to [%s].", title), true);
     }
@@ -567,6 +592,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
+
         BaseObject obj = doc.getObject(className, true, xcontext);
         if (obj != null) {
             obj.set(propertyName, propertyValue, xcontext);
@@ -580,6 +609,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
+
         BaseObject obj = doc.getXObject(classReference, true, xcontext);
         if (obj != null) {
             obj.set(propertyName, propertyValue, xcontext);
@@ -620,6 +653,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
 
+        // Avoid modifying the cached document
+        doc = doc.clone();
+
         setAttachmentContent(doc, attachmentReference.getName(), attachmentData, xcontext);
     }
 
@@ -629,6 +665,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
 
         setAttachmentContent(doc, attachmentReference.getName(), attachmentData, xcontext);
     }
@@ -641,6 +680,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+        // Avoid modifying the cached document
+        doc = doc.clone();
 
         setAttachmentContent(doc, attachmentFilename, attachmentData, xcontext);
     }
@@ -889,7 +931,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 try {
                     XWikiDocument userDocument = xcontext.getWiki().getDocument(userReference, xcontext);
                     advanced =
-                        StringUtils.equals(userDocument.getStringValue(USERCLASS_REFERENCE, "usertype"), "Advanced");
+                        Strings.CS.equals(userDocument.getStringValue(USERCLASS_REFERENCE, "usertype"), "Advanced");
                 } catch (XWikiException e) {
                     this.logger.error("Failed to get document", e);
                 }

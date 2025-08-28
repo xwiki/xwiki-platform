@@ -35,7 +35,7 @@ public interface WikiSearchQueryResource
             @PathParam("wikiName") String wikiName,
             @QueryParam("q") String query,
             @QueryParam("type") String queryTypeString,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("distinct") @DefaultValue("true") Boolean distinct,
             @QueryParam("orderField") @DefaultValue("") String orderField,

@@ -30,8 +30,8 @@ import org.hsqldb.Server;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.extension.test.ExtensionTestUtils;
 import org.xwiki.cluster.test.AllIT;
+import org.xwiki.extension.test.ExtensionTestUtils;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.AbstractTest;
 
@@ -70,6 +70,7 @@ public abstract class AbstractClusterHttpIT extends AbstractTest
 
             List<XWikiExecutor> executors = new ArrayList<>(2);
 
+            AllIT.setupRepository();
             executors.add(createExecutor(0));
             executors.add(createExecutor(1));
 

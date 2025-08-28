@@ -24,6 +24,8 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -56,6 +58,9 @@ import com.github.kklisura.cdt.services.utils.ProxyUtils;
 public class ChromeServiceFactory implements Initializable
 {
     private WebSocketServiceFactory webSocketServiceFactory;
+
+    @Inject
+    private Provider<ChromeDevToolsServiceConfiguration> configurationProvider;
 
     @Override
     public void initialize() throws InitializationException
@@ -106,7 +111,7 @@ public class ChromeServiceFactory implements Initializable
             ChromeDevToolsService browserDevToolsService =
                 ProxyUtils.createProxyFromAbstract(ChromeDevToolsServiceImpl.class,
                     new Class[] {WebSocketService.class, ChromeDevToolsServiceConfiguration.class},
-                    new Object[] {webSocketService, new ChromeDevToolsServiceConfiguration()},
+                    new Object[] {webSocketService, this.configurationProvider.get()},
                     (unused, method, args) -> commandsCache.computeIfAbsent(method, key -> {
                         Class<?> returnType = method.getReturnType();
                         return ProxyUtils.createProxy(returnType, commandInvocationHandler);

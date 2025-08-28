@@ -28,9 +28,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
@@ -52,7 +53,7 @@ import com.xpn.xwiki.internal.template.InternalTemplateManager.DefaultTemplateCo
 public class VelocityTemplateEvaluator
 {
     @Inject
-    private AuthorizationManager authorization;
+    private DocumentAuthorizationManager authorization;
 
     @Inject
     private RenderingContext renderingContext;
@@ -73,7 +74,8 @@ public class VelocityTemplateEvaluator
     {
         // Make sure the author of the template has script right (required to execute Velocity)
         if (content.isAuthorProvided()) {
-            this.authorization.checkAccess(Right.SCRIPT, content.getAuthorReference(), content.getDocumentReference());
+            this.authorization.checkAccess(Right.SCRIPT, EntityType.DOCUMENT, content.getAuthorReference(),
+                content.getDocumentReference());
         }
 
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally

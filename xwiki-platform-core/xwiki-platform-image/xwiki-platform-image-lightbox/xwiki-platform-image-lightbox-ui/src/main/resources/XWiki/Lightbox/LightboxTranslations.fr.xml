@@ -58,5 +58,6 @@ image.lightbox.gallery.title=Gallerie d'images
 image.lightbox.nextSlide.title=Image suivante
 image.lightbox.prevSlide.title=Image précédente
 image.lightbox.publisher.label=Publier l'image
+image.lightbox.toggler.label=Ouvrir les actions de l'image
 </content>
 </xwikidoc>

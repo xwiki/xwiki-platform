@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,16 +67,17 @@ class DefaultIconRendererTest
     private SkinExtension jsExtension;
 
     @MockComponent
-    private VelocityRenderer velocityRenderer;
+    private IconTemplateRendererManager rendererManager;
 
     @Test
     void render() throws Exception
     {
         IconSet iconSet = new IconSet("default");
-        iconSet.setRenderWiki("image:$icon.png");
+        String template = "image:$icon.png";
+        iconSet.setRenderWiki(template);
         iconSet.addIcon("test", new Icon("blabla"));
-        when(this.velocityRenderer.render("#set($icon = \"blabla\")\nimage:$icon.png", null))
-            .thenReturn("image:blabla.png");
+
+        setupSimpleTemplate(template);
 
         // Test
         String result = this.iconRenderer.render("test", iconSet);
@@ -87,14 +89,27 @@ class DefaultIconRendererTest
         verify(this.jsExtension, never()).use(any());
     }
 
+    private void setupSimpleTemplate(String template) throws IconException
+    {
+        when(this.rendererManager.getRenderer(template)).thenReturn(
+            (icon, documentReference) -> template.replace("$icon", icon));
+    }
+
     @Test
     void renderWithCSS() throws Exception
     {
         IconSet iconSet = new IconSet("default");
-        iconSet.setRenderWiki("image:$icon.png");
+        String template = "image:$icon.png";
+        iconSet.setRenderWiki(template);
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
-        when(this.velocityRenderer.render("css", null)).thenReturn("velocityParsedCSS");
+
+        IconTemplateRenderer mockRenderer = mock();
+        when(this.rendererManager.getRenderer("css")).thenReturn(mockRenderer);
+        String parsedCSS = "velocityParsedCSS";
+        when(mockRenderer.render(null, null)).thenReturn(parsedCSS);
+
+        setupSimpleTemplate(template);
 
         // Test
         this.iconRenderer.render("test", iconSet);
@@ -102,7 +117,7 @@ class DefaultIconRendererTest
         // Verify
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("rel", "stylesheet");
-        verify(this.linkExtension).use("velocityParsedCSS", parameters);
+        verify(this.linkExtension).use(parsedCSS, parameters);
         verify(this.skinExtension, never()).use(any());
         verify(this.jsExtension, never()).use(any());
     }
@@ -111,9 +126,12 @@ class DefaultIconRendererTest
     void renderWithSSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
-        iconSet.setRenderWiki("image:$icon.png");
+        String template = "image:$icon.png";
+        iconSet.setRenderWiki(template);
         iconSet.setSsx("ssx");
         iconSet.addIcon("test", new Icon("blabla"));
+
+        setupSimpleTemplate(template);
 
         // Test
         this.iconRenderer.render("test", iconSet);
@@ -128,9 +146,11 @@ class DefaultIconRendererTest
     void renderWithJSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
-        iconSet.setRenderWiki("image:$icon.png");
+        String template = "image:$icon.png";
+        iconSet.setRenderWiki(template);
         iconSet.setJsx("jsx");
         iconSet.addIcon("test", new Icon("blabla"));
+        setupSimpleTemplate(template);
 
         // Test
         this.iconRenderer.render("test", iconSet);
@@ -145,11 +165,11 @@ class DefaultIconRendererTest
     void renderHTML() throws Exception
     {
         IconSet iconSet = new IconSet("default");
-        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
+        String template = "<img src=\"$icon.png\" />";
+        iconSet.setRenderHTML(template);
         iconSet.addIcon("test", new Icon("blabla"));
 
-        when(this.velocityRenderer.render("#set($icon = \"blabla\")\n<img src=\"$icon.png\" />", null))
-            .thenReturn("<img src=\"blabla.png\" />");
+        setupSimpleTemplate(template);
 
         // Test
         String result = this.iconRenderer.renderHTML("test", iconSet);
@@ -162,10 +182,17 @@ class DefaultIconRendererTest
     void renderHTMLWithCSS() throws Exception
     {
         IconSet iconSet = new IconSet("default");
-        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
+        String template = "<img src=\"$icon.png\" />";
+        iconSet.setRenderHTML(template);
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
-        when(this.velocityRenderer.render("css", null)).thenReturn("velocityParsedCSS");
+
+        IconTemplateRenderer mockRenderer = mock();
+        when(this.rendererManager.getRenderer("css")).thenReturn(mockRenderer);
+        String parsedCSS = "velocityParsedCSS";
+        when(mockRenderer.render(null, null)).thenReturn(parsedCSS);
+
+        setupSimpleTemplate(template);
 
         // Test
         this.iconRenderer.renderHTML("test", iconSet);
@@ -173,7 +200,7 @@ class DefaultIconRendererTest
         // Verify
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("rel", "stylesheet");
-        verify(this.linkExtension).use("velocityParsedCSS", parameters);
+        verify(this.linkExtension).use(parsedCSS, parameters);
         verify(this.skinExtension, never()).use(any());
         verify(this.jsExtension, never()).use(any());
     }
@@ -182,9 +209,12 @@ class DefaultIconRendererTest
     void renderHTMLWithSSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
-        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
+        String template = "<img src=\"$icon.png\" />";
+        iconSet.setRenderHTML(template);
         iconSet.setSsx("ssx");
         iconSet.addIcon("test", new Icon("blabla"));
+
+        setupSimpleTemplate(template);
 
         // Test
         this.iconRenderer.renderHTML("test", iconSet);
@@ -199,9 +229,12 @@ class DefaultIconRendererTest
     void renderHTMLWithJSX() throws Exception
     {
         IconSet iconSet = new IconSet("default");
-        iconSet.setRenderHTML("<img src=\"$icon.png\" />");
+        String template = "<img src=\"$icon.png\" />";
+        iconSet.setRenderHTML(template);
         iconSet.setJsx("jsx");
         iconSet.addIcon("test", new Icon("blabla"));
+
+        setupSimpleTemplate(template);
 
         // Test
         this.iconRenderer.renderHTML("test", iconSet);
@@ -231,7 +264,9 @@ class DefaultIconRendererTest
         iconSet.setRenderWiki("image:$icon.png");
         iconSet.addIcon("test", new Icon("blabla"));
         IconException exception = new IconException("exception");
-        when(this.velocityRenderer.render(any(), any())).thenThrow(exception);
+        IconTemplateRenderer mockRenderer = mock();
+        when(this.rendererManager.getRenderer(any())).thenReturn(mockRenderer);
+        when(mockRenderer.render(any(), any())).thenThrow(exception);
 
         // Test
         IconException caughtException = null;
@@ -251,12 +286,13 @@ class DefaultIconRendererTest
     {
         IconSet iconSet = new IconSet("iconSet");
         iconSet.addIcon("test", new Icon("hello"));
-        when(this.velocityRenderer.render("#set($icon = \"hello\")\nfa fa-$icon", null)).thenReturn("fa fa-hello");
+        String template = "fa fa-$icon";
+        setupSimpleTemplate(template);
 
         // Test
-        String renderedIcon1 = this.iconRenderer.render("test", iconSet, "fa fa-$icon");
-        String renderedIcon2 = this.iconRenderer.render("none", iconSet, "fa fa-$icon");
-        String renderedIcon3 = this.iconRenderer.render("none", null, "fa fa-$icon");
+        String renderedIcon1 = this.iconRenderer.render("test", iconSet, template);
+        String renderedIcon2 = this.iconRenderer.render("none", iconSet, template);
+        String renderedIcon3 = this.iconRenderer.render("none", null, template);
         String renderedIcon4 = this.iconRenderer.render("none", iconSet, null);
 
         // Verify

@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
@@ -257,7 +256,6 @@ public class UserScriptService implements ScriptService
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     public UserConfiguration getConfiguration()
     {
         return this.userConfiguration;

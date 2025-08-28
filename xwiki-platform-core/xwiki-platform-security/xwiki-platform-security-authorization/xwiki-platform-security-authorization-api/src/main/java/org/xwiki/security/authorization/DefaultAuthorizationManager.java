@@ -27,9 +27,9 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -38,6 +38,7 @@ import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
+import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;
 import org.xwiki.security.internal.XWikiBridge;
 
 /**
@@ -48,6 +49,8 @@ import org.xwiki.security.internal.XWikiBridge;
  */
 @Component
 @Singleton
+// The fan-out is of 21 instead of 20 after introducing the ModelContext, not an easy one to refactor.
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultAuthorizationManager implements AuthorizationManager
 {
     /**
@@ -79,21 +82,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     @Inject
     private XWikiBridge xwikiBridge;
 
-    /**
-     * Check if the user is the super admin.
-     *
-     * NOTE: We rely on that the authentication service especially
-     * authenticates user names matching superadmin's in a case
-     * insensitive match, and will ignore any user profile's that may
-     * be matching the superadmin's user name.
-     *
-     * @param user A document reference representing a user identity.
-     * @return {@code true} if and only if the user is determined to be the super user.
-     */
-    private boolean isSuperAdmin(DocumentReference user)
-    {
-        return user != null && StringUtils.equalsIgnoreCase(user.getName(), AuthorizationManager.SUPERADMIN_USER);
-    }
+    @Inject
+    private DocumentRequiredRightsChecker documentRequiredRightsChecker;
+
+    @Inject
+    private ModelContext modelContext;
 
     @Override
     public void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
@@ -148,18 +141,50 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         }
 
         if (right == null || right == Right.ILLEGAL) {
-            if (check) {
-                logDeny(userReference, entityReference, right, "no such right");
-            }
+            logDenyIfCheck(right, userReference, entityReference, check, "no such right");
             return false;
         }
 
-        if ((!right.isReadOnly() && xwikiBridge.isWikiReadOnly())
-            || (userReference == null && xwikiBridge.needsAuthentication(right))) {
+        if (checkWikiPreferencesDiscardAccess(right, userReference, entityReference)) {
+            return false;
+        }
+
+        // For edit right, check if the user has all required rights.
+        if (right == Right.EDIT && !this.documentRequiredRightsChecker.hasRequiredRights(userReference,
+            entityReference))
+        {
+            logDenyIfCheck(right, userReference, entityReference, check, "misses required right");
             return false;
         }
 
         return evaluateSecurityAccess(right, userReference, entityReference, check);
+    }
+
+    private boolean checkWikiPreferencesDiscardAccess(Right right, DocumentReference userReference,
+        EntityReference entityReference)
+    {
+        if (entityReference != null) {
+            EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
+            this.modelContext.setCurrentEntityReference(entityReference);
+
+            try {
+                if ((!right.isReadOnly() && xwikiBridge.isWikiReadOnly())
+                    || (userReference == null && xwikiBridge.needsAuthentication(right))) {
+                    return true;
+                }
+            } finally {
+                this.modelContext.setCurrentEntityReference(currentEntityReference);
+            }
+        }
+        return false;
+    }
+
+    private void logDenyIfCheck(Right right, DocumentReference userReference, EntityReference entityReference,
+        boolean check, String info)
+    {
+        if (check) {
+            logDeny(userReference, entityReference, right, info);
+        }
     }
 
     private boolean evaluateSecurityAccess(Right right, DocumentReference userReference,

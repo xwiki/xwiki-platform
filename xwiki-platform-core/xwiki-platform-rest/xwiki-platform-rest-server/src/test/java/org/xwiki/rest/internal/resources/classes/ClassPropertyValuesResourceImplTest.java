@@ -41,6 +41,7 @@ import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -90,6 +91,9 @@ class ClassPropertyValuesResourceImplTest
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
     private ClassPropertyReference propertyReference =
         new ClassPropertyReference("status", new DocumentReference("wiki", Arrays.asList("Path", "To"), "Class"));
 
@@ -121,6 +125,8 @@ class ClassPropertyValuesResourceImplTest
         UriInfo uriInfo = mock(UriInfo.class);
         when(uriInfo.getBaseUri()).thenReturn(new URI("/xwiki/rest"));
         ReflectionUtils.setFieldValue(resource, "uriInfo", uriInfo);
+
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
 
     @Test

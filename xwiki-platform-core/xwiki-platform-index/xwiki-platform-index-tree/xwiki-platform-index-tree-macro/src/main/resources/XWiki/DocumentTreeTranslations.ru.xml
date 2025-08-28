@@ -82,11 +82,24 @@ rendering.macro.documentTree.parameter.limit.name=Максимальное ко�
 rendering.macro.documentTree.parameter.limit.description=Максимальное количество дочерних узлов, отображаемых при первом раскрытии родительского узла. Остальные дочерние узлы доступны через ссылку «подробнее ...». Этот параметр в основном используется для разбиения на страницы дочерних узлов и, таким образом, помогает масштабировать дерево, когда число дочерних узлов велико.
 rendering.macro.documentTree.parameter.exclusions.name=Исключения
 rendering.macro.documentTree.parameter.exclusions.description=Список узлов для исключения из дерева. Узлы указываются по их идентификатору и разделяются запятой.
+rendering.macro.documentTree.parameter.sortDocumentsBy.name=Сортировка страниц по
+rendering.macro.documentTree.parameter.sortDocumentsBy.description=Поле страницы, используемое для сортировки дочерних страниц и порядок сортировки.
 rendering.macro.children.name=Дочерние
 rendering.macro.children.description=Отображает дерево дочерних страниц текущей страницы
+rendering.macro.children.parameter.sort.name=Сортировка по
+rendering.macro.children.parameter.sort.description=Поле страницы, используемое для сортировки дочерних страниц и порядок сортировки.
 index.documentTree.empty=Страницы не найдены
 index.documentTree.more={0} подробнее ...
 index.documentTree.addDocument=Новая страница...
+index.documentTree.documentSortDisplayer.field=Поле сортировки
+index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.title=Название
+index.documentTree.documentSortDisplayer.field.date=Дата последнего изменения
+index.documentTree.documentSortDisplayer.field.creationDate=Дата создания
+index.documentTree.documentSortDisplayer.order=Порядок сортировки
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=По возрастанию
+index.documentTree.documentSortDisplayer.order.desc=По убыванию
 
 ## Deprecated translation keys
 

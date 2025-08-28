@@ -82,13 +82,33 @@ rendering.macro.documentTree.parameter.limit.name=Limite
 rendering.macro.documentTree.parameter.limit.description=Le nombre maximum de nœuds fils à afficher lorsqu'un nœud père est déplié pour la première fois. Les autres nœuds sont accessibles grâce au lien "Plus...". Ce paramètre sert essentiellement à définir la pagination afin d'améliorer les performances lorsque les nœuds fils sont nombreux.
 rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 rendering.macro.documentTree.parameter.exclusions.description=Liste de noeuds à exclure de l'arbre. Les noeuds sont indiqués par leur ID et séparés par des virgules (,).
-
+rendering.macro.documentTree.parameter.sortDocumentsBy.name=Trier les pages par
+rendering.macro.documentTree.parameter.sortDocumentsBy.description=Le champ appartenant à la page utilisé pour filtrer les pages enfants, suivi de l'ordre de tri.
+rendering.macro.documentTree.parameter.expandToLevel.name=Déplier jusqu'au niveau
+rendering.macro.documentTree.parameter.expandToLevel.description=Définit la profondeur de l'arbre jusqu'où déplier automatiquement. La valeur par défaut 0 signifie que seules les pages de premier niveau sont affichées. Un niveau 1 les déplie, un niveau 2 déplie aussi les enfants sous les éléments nouvellement affichés, etc. Veuillez noter qu'une valeur élevée peut rendre l'affichage par le navigateur coûteux en ressources.
+rendering.macro.children.name=Enfants
+rendering.macro.children.description=Affiche un arbre des pages enfants de la page courante
+rendering.macro.children.parameter.sort.name=Trier par
+rendering.macro.children.parameter.sort.description=Le champ de page utilisé pour trier les pages enfants, suivi de l'ordre de tri.
+rendering.macro.children.parameter.root.name=Racine
+### Missing: rendering.macro.children.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified. The format of a node identifier is entityType:entityReference, where the entity type can be for instance wiki, space, document. E.g.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
 index.documentTree.empty=Aucune page trouvée
 index.documentTree.more={0} autres...
+index.documentTree.addDocument=Nouvelle page...
+index.documentTree.documentSortDisplayer.field=Champ de tri
+index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.title=Titre
+index.documentTree.documentSortDisplayer.field.date=Date de dernière modification
+index.documentTree.documentSortDisplayer.field.creationDate=Date de création
+index.documentTree.documentSortDisplayer.order=Ordre de tri
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=Croissant
+index.documentTree.documentSortDisplayer.order.desc=Décroissant
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Montrer les documents enfants
-rendering.macro.documentTree.parameter.showChildDocuments.description=Montrer les documents enfant basé sur le champ parent du document.</content>
+rendering.macro.documentTree.parameter.showChildDocuments.description=Montrer les documents enfant basé sur le champ parent du document.
+</content>
 </xwikidoc>

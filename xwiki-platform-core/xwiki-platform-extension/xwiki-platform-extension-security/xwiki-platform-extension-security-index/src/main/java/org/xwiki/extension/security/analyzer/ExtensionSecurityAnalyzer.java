@@ -23,7 +23,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
 import org.xwiki.extension.security.internal.ExtensionSecurityException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Generic interface to call for the security analysis of an extension.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.5RC1
  */
 @Role
-@Unstable
 public interface ExtensionSecurityAnalyzer
 {
     /**

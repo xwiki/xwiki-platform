@@ -113,13 +113,27 @@ define('xwiki-realtime-document', [
         timestamp: new Date().getTime()
       }, params);
       return $.getJSON(url, $.param(params, true)).then(function(data) {
-        if (!Array.isArray(data)) {
-          console.error('Failed to retrieve the list of document channels.');
-          return Promise.reject(data);
-        } else {
+        if (Array.isArray(data)) {
           return $.extend(data, channelListAPI);
+        } else {
+          return Promise.reject(new Error(
+            'Invalid response from the server when requesting the list of document channels.',
+            {cause: data}
+          ));
         }
+      }, function(jqXHR) {
+        return Promise.reject(new Error('Failed to retrieve the list of document channels.', {cause: jqXHR}));
       });
+    }
+
+    getURL(...args) {
+      return new XWiki.Document(this.documentReference).getURL(...args);
+    }
+
+    getRevision(version) {
+      return $.getJSON(meta.restURL + '/history/' + encodeURIComponent(version), $.param({
+        prettyNames: true
+      }, true));
     }
   }
 

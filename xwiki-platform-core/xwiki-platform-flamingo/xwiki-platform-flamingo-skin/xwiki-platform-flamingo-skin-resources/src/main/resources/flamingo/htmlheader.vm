@@ -60,6 +60,7 @@
 #if ("$!xcontext.userReference" != '')
   #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
 #end
+#addMetaAttribute($metaAttributes, 'action', "$xcontext.action")
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()" $stringtool.join($metaAttributes, ' ')>
   <head>
@@ -104,13 +105,20 @@
     #end
     ## ---------------------------------------------------------------------------------------------------------------
     ## Make sure search engine spiders give the plain page instead of ?viewer=comments, ?viewer=code etc.
-    ## ---------------------------------------------------------------------------------------------------------------    
+    ## ---------------------------------------------------------------------------------------------------------------
     <link rel="canonical" href="$doc.getURL('view')" />
     ## ---------------------------------------------------------------------------------------------------------------
     ## Add user-defined Meta directives.
     ## ---------------------------------------------------------------------------------------------------------------
     ## Note: Velocity code, so it needs to be evaluated.
-    #evaluate($!xwiki.getSpacePreference("meta"))
+    ## Check for the presence of a meta preference in the current space.
+    ## If not found, falls back to the default meta.vm template.
+    #set ($spacePreferenceMeta = $!xwiki.getSpacePreference("meta"))
+    #if ($spacePreferenceMeta != '')
+      #evaluate($spacePreferenceMeta )
+    #else
+      #template("meta.vm")
+    #end
     ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     ## ---------------------------------------------------------------------------------------------------------------

@@ -107,6 +107,21 @@ public class Object extends Collection
      */
     public java.lang.Object display(String name, String mode, boolean isolated)
     {
+        return display(name, mode, isolated, true);
+    }
+
+    /**
+     * Display the property with the passed name in the context of the current document or its own document.
+     * 
+     * @param name the name of the property
+     * @param mode the edit mode in which the property should be displayed ("view", "edit", etc.)
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param number true if the number you be part of the input name, false otherwise
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public java.lang.Object display(String name, String mode, boolean isolated, boolean number)
+    {
         try {
             XWikiDocument doc = getBaseObject().getOwnerDocument();
             if (doc == null) {
@@ -114,7 +129,7 @@ public class Object extends Collection
                     getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
             }
 
-            return doc.display(name, mode, getBaseObject(), isolated, getXWikiContext());
+            return doc.display(name, mode, getBaseObject(), isolated, number, getXWikiContext());
         } catch (XWikiException e) {
             return null;
         }
@@ -137,7 +152,7 @@ public class Object extends Collection
         getBaseObject().set(fieldname, value, xcontext);
 
         // Temporary set as author of the document the current script author (until the document is saved)
-        getBaseObject().getOwnerDocument().setAuthorReference(xcontext.getAuthorReference());
+        Document.updateAuthor(getBaseObject().getOwnerDocument(), xcontext);
     }
 
     @Override
@@ -173,7 +188,6 @@ public class Object extends Collection
      * @since 15.5.5
      * @since 15.10.2
      */
-    @Unstable
     public Map<String, String> evaluate() throws ObjectEvaluatorException
     {
         return getBaseObject().evaluate();

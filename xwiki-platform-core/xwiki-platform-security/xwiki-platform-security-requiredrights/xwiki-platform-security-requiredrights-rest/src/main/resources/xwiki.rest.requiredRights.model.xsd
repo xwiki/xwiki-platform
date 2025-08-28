@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xwiki.org"
+  xmlns:xwiki="http://www.xwiki.org"
+  elementFormDefault="qualified">
+
+  <complexType name="RequiredRight">
+    <annotation>
+      <documentation>Represents a required right for an entity, composed of a right, an entity type, and a boolean
+        indicating if manual review is needed.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element name="right" type="string"/>
+      <element name="entityType" type="string" minOccurs="0"/>
+      <element name="manualReviewNeeded" type="boolean"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="RequiredRightAnalysisResult">
+    <annotation>
+      <documentation>Represents the result of a required right analysis, including the entity reference with locale
+        as extra field, summary and detailed messages, and the list of required rights.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element name="entityReference" type="string"/>
+      <element name="locale" type="string"/>
+      <element name="summaryMessageHTML" type="string"/>
+      <element name="detailedMessageHTML" type="string"/>
+      <element name="requiredRights" type="xwiki:RequiredRight" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="DocumentRequiredRight">
+    <annotation>
+      <documentation>A required right set on a document, including the right and its scope.</documentation>
+    </annotation>
+    <sequence>
+      <element name="right" type="string"/>
+      <element name="scope" type="string"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="DocumentRequiredRights">
+    <annotation>
+      <documentation>Represents the required rights that are configured on a document, including enforcement and the set
+        of rights.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element name="enforce" type="boolean"/>
+      <element name="rights" type="xwiki:DocumentRequiredRight" minOccurs="0" maxOccurs="unbounded" />
+    </sequence>
+  </complexType>
+
+  <complexType name="AvailableRight">
+    <annotation>
+      <documentation>Represents a right that could be configured on a document.</documentation>
+    </annotation>
+    <sequence>
+      <element name="right" type="string"/>
+      <element name="scope" type="string"/>
+      <element name="displayName" type="string"/>
+      <element name="hasRight" type="boolean"/>
+      <element name="definitelyRequiredRight" type="boolean"/>
+      <element name="maybeRequiredRight" type="boolean"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="DocumentRightsAnalysisResult">
+    <annotation>
+      <documentation>Represents the analysis and suggested changes for document required rights.</documentation>
+    </annotation>
+    <sequence>
+      <element name="analysisResults" type="xwiki:RequiredRightAnalysisResult" minOccurs="0" maxOccurs="unbounded"/>
+      <element name="currentRights" type="xwiki:DocumentRequiredRights"/>
+      <element name="availableRights" type="xwiki:AvailableRight" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+</schema>

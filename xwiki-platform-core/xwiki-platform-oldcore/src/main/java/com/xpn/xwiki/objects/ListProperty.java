@@ -20,16 +20,13 @@
 package com.xpn.xwiki.objects;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.collection.internal.PersistentList;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
-import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 public class ListProperty extends BaseProperty implements Cloneable
@@ -52,8 +49,12 @@ public class ListProperty extends BaseProperty implements Cloneable
     /**
      * This is the actual list. It will be used during serialization/deserialization.
      */
-    private List<String> actualList = new ArrayList<String>();
+    private List<String> actualList = new ArrayList<>();
 
+    /**
+     * Wrap the actual list into a {@link NotifyList}.
+     */
+    public ListProperty()
     {
         this.list = new NotifyList(this.actualList, this);
     }
@@ -89,7 +90,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public void setValue(Object value)
     {
-        this.setList((List<String>) value);
+        setList((List<String>) value);
     }
 
     /**
@@ -168,6 +169,12 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     @Override
+    public ListProperty clone(boolean detach)
+    {
+        return (ListProperty) super.clone(detach);
+    }
+
+    @Override
     protected void cloneInternal(BaseProperty clone)
     {
         ListProperty property = (ListProperty) clone;
@@ -180,22 +187,19 @@ public class ListProperty extends BaseProperty implements Cloneable
 
     public List<String> getList()
     {
-        // Hibernate will not set the owner of the notify list, so we must make sure this has been done before returning
-        // the list.
-        if (this.list instanceof NotifyList) {
-            ((NotifyList) this.list).setOwner(this);
-        } else if (this.list instanceof ListPropertyPersistentList) {
-            ((ListPropertyPersistentList) this.list).setOwner(this);
+        // Wrap the list if it was (wrongly) changed by a child class
+        if (!(this.list instanceof NotifyList)) {
+            return new NotifyList(this.list, this);
         }
 
         return this.list;
     }
 
     /**
-     * Starting from 4.3M2, this method will copy the list passed as parameter. Due to XWIKI-8398 we must be able to
-     * detect when the values in the list changes, so we cannot store the values in any type of list.
+     * Set the value and also make sure that the exposed list will always be a {@link NotifyList} so that any direct
+     * modification to the list will impact its owners dirty flags.
      *
-     * @param list The list to copy.
+     * @param list the list to copy.
      */
     public void setList(List<String> list)
     {
@@ -204,40 +208,22 @@ public class ListProperty extends BaseProperty implements Cloneable
             return;
         }
 
-        if (this.list instanceof PersistentList) {
-            PersistentList persistentList = (PersistentList) this.list;
-            if (persistentList.isWrapper(list)) {
-                // Accept a caller that sets the already existing list instance.
-                return;
-            }
-        }
-
-        if (list instanceof PersistentList) {
-            // This is the list wrapper we are using for hibernate.
-            PersistentList persistentList = (PersistentList) list;
-            this.list = persistentList;
-            persistentList.setOwner(this);
-            return;
-        }
-
         if (list == null) {
-            this.actualList = new ArrayList<>();
-            this.list = new NotifyList(this.actualList, this);
+            if (!this.actualList.isEmpty()) {
+                this.actualList.clear();
 
-            setValueDirty(true);
-        } else if (!this.list.equals(list)) {
-            this.list.clear();
-            this.list.addAll(list);
-
-            setValueDirty(true);
-        }
-
-        // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
-        // safe to assume that a retrieved NULL value should actually be an empty string.
-        for (Iterator<String> it = this.list.iterator(); it.hasNext();) {
-            if (it.next() == null) {
-                it.remove();
+                setDirty(true);
             }
+        } else if (!this.list.equals(list)) {
+            // Clear the current list
+            this.actualList.clear();
+
+            // In Oracle, empty strings are converted to NULL. Since an undefined property is not found at all, it is
+            // safe to assume that a retrieved NULL value should actually be an empty string.
+            list.stream().map(e -> e == null ? "" : e).forEach(this.actualList::add);
+
+            // Update the dirty flag
+            setDirty(true);
         }
     }
 
@@ -279,14 +265,17 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     public static class NotifyList extends AbstractNotifyOnUpdateList<String>
     {
-
-        /** The owner list property. */
+        /**
+         * The owner list property.
+         */
         private ListProperty owner;
 
-        /** The dirty flag. */
+        /**
+         * The dirty flag.
+         */
         private boolean dirty;
 
-        private List<String> actualList;
+        private final List<String> actualList;
 
         /**
          * @param list {@link AbstractNotifyOnUpdateList}.
@@ -294,6 +283,7 @@ public class ListProperty extends BaseProperty implements Cloneable
         public NotifyList(List<String> list)
         {
             super(list);
+
             this.actualList = list;
         }
 
@@ -317,7 +307,7 @@ public class ListProperty extends BaseProperty implements Cloneable
         {
             if (this.owner != owner) {
                 if (this.dirty) {
-                    owner.setValueDirty(true);
+                    owner.setDirty(true);
                 }
                 this.owner = owner;
                 owner.actualList = this.actualList;

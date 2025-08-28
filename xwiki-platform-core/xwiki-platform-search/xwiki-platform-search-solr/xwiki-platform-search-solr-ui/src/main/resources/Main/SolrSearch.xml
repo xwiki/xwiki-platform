@@ -722,19 +722,6 @@ a.search-result-highlightAll:after {
   position: relative;
 }
 
-.search-facet-header:after {
-  border-bottom: 1px dotted $theme.pageContentBackgroundColor;
-  border-top: 1px dotted $theme.borderColor;
-  clear: both;
-  content: "";
-  display: block;
-  height: 0;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-}
-
 .search-facet:last-of-type .search-facet-header:after {
   border: medium none;
 }
@@ -770,19 +757,19 @@ a.search-result-highlightAll:after {
   box-shadow: unset;
 }
 
-.search-facet .search-facet-header .facet-toggler > span, button.facet-value-toggler > span,
-.search-facet .search-facet-header .facet-toggler > img, button.facet-value-toggler > img {
+.search-facet .search-facet-header .facet-toggler &gt; span, button.facet-value-toggler &gt; span,
+.search-facet .search-facet-header .facet-toggler &gt; img, button.facet-value-toggler &gt; img {
   transform: rotate(90deg);
 }
 
-.search-facet.expanded .search-facet-header .facet-toggler > span, .expanded > button.facet-value-toggler > span,
-.search-facet.expanded .search-facet-header .facet-toggler > img, .expanded > button.facet-value-toggler > img {
+.search-facet.expanded .search-facet-header .facet-toggler &gt; span, .expanded &gt; button.facet-value-toggler &gt; span,
+.search-facet.expanded .search-facet-header .facet-toggler &gt; img, .expanded &gt; button.facet-value-toggler &gt; img {
   transform: rotate(0deg);
 }
 
 @media not (prefers-reduced-motion) {
-  .search-facet .search-facet-header .facet-toggler > span, button.facet-value-toggler > span,
-  .search-facet .search-facet-header .facet-toggler > img, button.facet-value-toggler > img {
+  .search-facet .search-facet-header .facet-toggler &gt; span, button.facet-value-toggler &gt; span,
+  .search-facet .search-facet-header .facet-toggler &gt; img, button.facet-value-toggler &gt; img {
     transition: transform 0.2s ease;
   }
 }

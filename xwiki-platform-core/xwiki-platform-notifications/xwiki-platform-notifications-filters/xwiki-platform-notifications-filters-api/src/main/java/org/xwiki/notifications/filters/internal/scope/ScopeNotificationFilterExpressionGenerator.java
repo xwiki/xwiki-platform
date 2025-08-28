@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -194,6 +195,14 @@ public class ScopeNotificationFilterExpressionGenerator
         return topNode;
     }
 
+    /*
+    This method should be removed in the future as it doesn't really make sense anymore in XWiki Standard, and it's
+    not great for performance of notification macro.
+    Basically right now this method ensures we don't add pageOnly criteria coming from user profile preferences (see
+    its usage to understand how we skip adding expressions when this returns true): we do that to avoid possible
+    StackOverflow when performing HQL queries. But all that doesn't make much sense anymore in XS now we use
+    prefiltering and all that is only used now for notification macro only, and possibly for custom queries in HQL DB.
+     */
     private boolean isPageOnly(ScopeNotificationFilterPreference pref)
     {
         // We make sure we only handle preferences that come from "userProfile" that are actually saved in the database
@@ -203,6 +212,7 @@ public class ScopeNotificationFilterExpressionGenerator
         // filterExpression(Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format,
         //    NotificationFilterType type, DocumentReference user).
         return StringUtils.isNotBlank(pref.getPageOnly())
+            && Strings.CS.startsWith(pref.getId(), NotificationFilterPreference.DB_ID_FILTER_PREFIX)
             && pref.getEventTypes().isEmpty();
     }
 
@@ -248,7 +258,13 @@ public class ScopeNotificationFilterExpressionGenerator
      *
      * @since 10.8RC1
      * @since 9.11.8
+     * @deprecated This method is not used anymore in XWiki standard: we don't use that class for standard
+     * notification because prefiltering is used; and when using the notification macro the ScopeNotificationFilter
+     * are not coming from the database but only from the parameters of the macro, so the first condition is not met
+     * and we entirely skip the content of this method. Finally, it's deprecated because it creates an HQL query that
+     * we don't support anymore since we only target Solr storage.
      */
+    @Deprecated(since = "16.10.6,17.2.0RC1")
     public AbstractOperatorNode filterExpression(Collection<NotificationFilterPreference> filterPreferences,
             NotificationFormat format, NotificationFilterType type, DocumentReference user)
     {
@@ -295,7 +311,7 @@ public class ScopeNotificationFilterExpressionGenerator
     {
         // This optimization can only works on preferences stored by the user, that's why we add the final condition
         return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName())
-            && StringUtils.startsWith(nfp.getId(), NotificationFilterPreference.DB_ID_FILTER_PREFIX);
+            && Strings.CS.startsWith(nfp.getId(), NotificationFilterPreference.DB_ID_FILTER_PREFIX);
     }
 
     private boolean doesFilterTypeAndFormatMatch(NotificationFilterPreference nfp, NotificationFormat format,

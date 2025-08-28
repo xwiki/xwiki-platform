@@ -23,7 +23,6 @@ import java.util.Locale;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * Internationalization service based on key/property values. The key is the id of the message being looked for, and the
@@ -92,7 +91,6 @@ public interface LocalizationManager
      * @since 15.5RC1
      * @since 14.10.12
      */
-    @Unstable
     default String getTranslation(String key, Locale locale, Syntax targetSyntax, Object... parameters)
         throws LocalizationException
     {

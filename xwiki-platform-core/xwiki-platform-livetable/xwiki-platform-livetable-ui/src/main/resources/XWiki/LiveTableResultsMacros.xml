@@ -343,10 +343,7 @@
   #if(!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
-  #set($limit = $numbertool.toNumber($request.get('limit')).intValue())
-  #if(!$limit)
-    #set ($limit = 15)
-  #end
+  #getAndValidateQueryLimitFromRequest('limit', 15, $limit)
   #set($query = $services.query.hql($sql))
   ## Apply query filters if defined. Otherwise use default.
   #foreach ($queryFilter in $stringtool.split($!request.queryFilters, ', '))
@@ -544,7 +541,9 @@
     #set($discard = $map.put('params', $sqlParams))
   #end
   #set($discard = $map.put('reqNo', $numbertool.toNumber($request.reqNo).intValue()))
-  #gridresult_buildTagCloudJSON($map)
+  #if("$!request.tagcloud" == 'true')
+    #gridresult_buildTagCloudJSON($map)
+  #end
   #gridresult_buildRowsJSON($map)
 #end
 

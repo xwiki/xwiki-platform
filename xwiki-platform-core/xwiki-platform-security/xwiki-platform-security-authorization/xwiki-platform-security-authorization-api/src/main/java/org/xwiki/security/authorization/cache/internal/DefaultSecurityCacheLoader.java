@@ -48,7 +48,6 @@ import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
-import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
 import org.xwiki.security.internal.GroupSecurityEntry;
 import org.xwiki.security.internal.UserBridge;
@@ -72,10 +71,6 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     /** The right cache. */
     @Inject
     private org.xwiki.security.authorization.cache.SecurityCache securityCache;
-
-    /** Event listener responsible for invalidating cache entries. */
-    @Inject
-    private SecurityCacheRulesInvalidator rulesInvalidator;
 
     /** Factory object for producing SecurityRule instances from the corresponding xwiki rights objects. */
     @Inject
@@ -144,34 +139,6 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     @Override
     public SecurityAccessEntry load(UserSecurityReference user, SecurityReference entity) throws AuthorizationException
     {
-        // This lock is important to prevent that any cache invalidation is applied while we are creating new
-        // cache entries. Otherwise, this code might create new cache entries based on outdated information that
-        // won't be invalidated. Imagine, for example, that thread 1 is starting to load user groups for user A, then
-        // thread 2 removes a group of A and invalidates the cache of A and then thread 1 saves a new cache entry for
-        // user A with the outdated information. This lock prevents this by delaying the invalidation of the cache of A
-        // (that uses a write-lock that corresponds to the read lock we use here) after the store of the cache entry A
-        // such that the new cache entry is correctly invalidated.
-        this.rulesInvalidator.suspend();
-
-        try {
-            return loadRequiredEntries(user, entity);
-        } finally {
-            this.rulesInvalidator.resume();
-        }
-    }
-
-    /**
-     * Load entity entries, group entries, and user entries required to settle the access, settle it, add this decision
-     * into the cache and return the access.
-     * 
-     * @param user The user to check access for.
-     * @param entity The entity to check access to.
-     * @return The resulting access for the user on the entity.
-     * @throws org.xwiki.security.authorization.AuthorizationException On error.
-     */
-    private SecurityAccessEntry loadRequiredEntries(UserSecurityReference user, SecurityReference entity)
-        throws AuthorizationException
-    {
         // No entity, return default rights for user in its wiki
         if (entity == null) {
             return authorizationSettlerProvider.get()
@@ -179,11 +146,13 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
                     null);
         }
 
+        long invalidationCounter = getSecurityCache().getInvalidationCounter();
+
         // Retrieve rules for the entity from the cache
         Deque<SecurityRuleEntry> ruleEntries = getRules(entity);
 
         // Evaluate, store and return the access right
-        return loadAccessEntries(user, entity, ruleEntries);
+        return loadAccessEntries(user, entity, ruleEntries, invalidationCounter);
     }
 
     /**
@@ -197,7 +166,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * @throws org.xwiki.security.authorization.AuthorizationException On error.
      */
     private SecurityAccessEntry loadAccessEntries(UserSecurityReference user, SecurityReference entity,
-        Deque<SecurityRuleEntry> ruleEntries)
+        Deque<SecurityRuleEntry> ruleEntries, long invalidationCounter)
         throws AuthorizationException
     {
         // userWiki is the wiki of the user
@@ -223,7 +192,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
 
         // Store the result into the cache
         try {
-            getSecurityCache().add(accessEntry, entityWiki);
+            getSecurityCache().add(accessEntry, entityWiki, invalidationCounter);
         } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
             logFailedInsertion(e);
         }
@@ -251,6 +220,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         SecurityReference userWiki, SecurityReference entityWiki, Deque<GroupSecurityReference> branchGroups)
         throws AuthorizationException
     {
+        long invalidationCounter = getSecurityCache().getInvalidationCounter();
+
         // First, we try to get the groups of the user from the cache
         Collection<GroupSecurityReference> groups = getSecurityCache().getGroupsFor(user, entityWiki);
         if (groups != null) {
@@ -298,14 +269,15 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         allImmediateGroups.removeAll(groupsToIgnore);
 
         // Load the user entry for its own wiki.
-        loadUserEntry(user, globalGroups);
+        loadUserEntry(user, globalGroups, invalidationCounter);
 
         if (entityWiki != null) {
             // Store a shadow entry for a global user/group involved in a local wiki with both local and global
             // groups as parents to ensure that the entry is properly invalidated also when just the shadow parent is
             // invalidated due to a local parent being invalidated.
             try {
-                getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), allImmediateGroups);
+                getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), allImmediateGroups,
+                    invalidationCounter);
             } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
                 logFailedInsertion(e);
             }
@@ -374,7 +346,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         if (entityWiki != null) {
             // Ensure there is a Public shadow in the subwiki of the checked entity
             try {
-                getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), null);
+                getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), null,
+                    getSecurityCache().getInvalidationCounter());
             } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
                 logFailedInsertion(e);
             }
@@ -388,9 +361,11 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      *
      * @param user The user/group to load.
      * @param groups The collection of groups associated with the user/group
+     * @param invalidationCounter the invalidation counter from before reading the group information
      * @throws org.xwiki.security.authorization.AuthorizationException on error.
      */
-    private void loadUserEntry(UserSecurityReference user, Collection<GroupSecurityReference> groups)
+    private void loadUserEntry(UserSecurityReference user, Collection<GroupSecurityReference> groups,
+        long invalidationCounter)
         throws AuthorizationException
     {
         // Make sure the parent of the user document is loaded.
@@ -400,13 +375,13 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             SecurityRuleEntry entry = getSecurityCache().get(ref);
             if (entry == null) {
                 entry = securityEntryReader.read(ref);
-                addToCache(entry);
+                addToCache(entry, invalidationCounter);
             }
         }
 
         SecurityRuleEntry entry = securityEntryReader.read(user);
         try {
-            getSecurityCache().add(entry, groups);
+            getSecurityCache().add(entry, groups, invalidationCounter);
         } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
             logFailedInsertion(e);
         }
@@ -425,6 +400,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     {
         Deque<SecurityRuleEntry> rules = new LinkedList<SecurityRuleEntry>();
         List<SecurityRuleEntry> emptyRuleEntryTail = new ArrayList<SecurityRuleEntry>();
+        long invalidationCounter = getSecurityCache().getInvalidationCounter();
+
         for (SecurityReference ref : entity.getReversedSecurityReferenceChain()) {
             SecurityRuleEntry entry = getSecurityCache().get(ref);
             if (entry == null) {
@@ -436,10 +413,10 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
                     entry = securityEntryReader.read(ref);
                     // Add intermediate empty rules sets to the cache to hold this significant one
                     for (SecurityRuleEntry emptyRuleEntry : emptyRuleEntryTail) {
-                        addToCache(emptyRuleEntry);
+                        addToCache(emptyRuleEntry, invalidationCounter);
                     }
                     emptyRuleEntryTail.clear();
-                    addToCache(entry);
+                    addToCache(entry, invalidationCounter);
                 }
             }
             rules.push(entry);
@@ -447,10 +424,10 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         return rules;
     }
 
-    private void addToCache(SecurityRuleEntry entry)
+    private void addToCache(SecurityRuleEntry entry, long invalidationCounter)
     {
         try {
-            getSecurityCache().add(entry);
+            getSecurityCache().add(entry, invalidationCounter);
         } catch (ParentEntryEvictedException | ConflictingInsertionException e) {
             logFailedInsertion(e);
         }

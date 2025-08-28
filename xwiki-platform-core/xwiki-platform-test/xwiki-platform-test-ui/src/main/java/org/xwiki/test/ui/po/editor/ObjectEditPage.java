@@ -29,6 +29,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
@@ -51,6 +52,20 @@ public class ObjectEditPage extends EditPage
     public static ObjectEditPage gotoPage(String space, String page)
     {
         getUtil().gotoPage(space, page, "edit", "editor=object");
+        return new ObjectEditPage();
+    }
+
+    /**
+     * Edit the specified page in object edit mode.
+     *
+     * @param pageReference the reference of the page to edit
+     * @return the object edit page
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public static ObjectEditPage gotoPage(EntityReference pageReference)
+    {
+        getUtil().gotoPage(pageReference, "edit", "editor=object");
         return new ObjectEditPage();
     }
 

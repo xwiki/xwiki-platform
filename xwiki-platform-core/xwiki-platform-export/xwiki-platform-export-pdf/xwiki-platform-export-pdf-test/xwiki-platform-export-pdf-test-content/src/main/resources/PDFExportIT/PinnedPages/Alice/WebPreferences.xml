@@ -1,0 +1,1089 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.6" reference="PDFExportIT.PinnedPages.Alice.WebPreferences" locale="">
+  <web>PDFExportIT.PinnedPages.Alice</web>
+  <name>WebPreferences</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>PDFExportIT.PinnedPages.Alice.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>$services.localization.render('admin.preferences.title')</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>PDFExportIT.PinnedPages.Alice.WebPreferences</name>
+    <number>0</number>
+    <className>XWiki.PinnedChildPagesClass</className>
+    <guid>6e197480-536e-4e87-95c3-65950849d82c</guid>
+    <class>
+      <name>XWiki.PinnedChildPagesClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <pinnedChildPages>
+        <cache>0</cache>
+        <customDisplay>{{template name="pinnedChildPagesDisplayer.vm"/}}</customDisplay>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>pinnedChildPages</name>
+        <number>1</number>
+        <prettyName>Static List</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </pinnedChildPages>
+    </class>
+    <property>
+      <pinnedChildPages>
+        <value>Profile</value>
+      </pinnedChildPages>
+    </property>
+  </object>
+  <object>
+    <name>PDFExportIT.PinnedPages.Alice.WebPreferences</name>
+    <number>0</number>
+    <className>XWiki.XWikiPreferences</className>
+    <guid>77ef5f30-13bc-4be9-b870-7897f0763896</guid>
+    <class>
+      <name>XWiki.XWikiPreferences</name>
+      <customClass/>
+      <customMapping>internal</customMapping>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <accessibility>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>accessibility</name>
+        <number>11</number>
+        <prettyName>Enable extra accessibility features</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </accessibility>
+      <admin_email>
+        <disabled>0</disabled>
+        <name>admin_email</name>
+        <number>19</number>
+        <prettyName>Admin eMail</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </admin_email>
+      <authenticate_edit>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>authenticate_edit</name>
+        <number>4</number>
+        <prettyName>Authenticated Edit</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </authenticate_edit>
+      <authenticate_view>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>authenticate_view</name>
+        <number>5</number>
+        <prettyName>Authenticated View</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </authenticate_view>
+      <backlinks>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>backlinks</name>
+        <number>40</number>
+        <prettyName>Activate the backlinks</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </backlinks>
+      <colorTheme>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>colorTheme</name>
+        <number>7</number>
+        <prettyName>Color theme</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>1</size>
+        <sql>select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' or theme.className='FlamingoThemesCode.ThemeClass') and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' and doc.fullName&lt;&gt;'FlamingoThemesCode.ThemeTemplate'</sql>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </colorTheme>
+      <comment_anonymous>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>comment_anonymous</name>
+        <number>33</number>
+        <prettyName>Anonymous</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Image|Text</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </comment_anonymous>
+      <comment_registered>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>comment_registered</name>
+        <number>34</number>
+        <prettyName>Registered</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Image|Text</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </comment_registered>
+      <confirmation_email_content>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>confirmation_email_content</name>
+        <number>26</number>
+        <prettyName>Confirmation eMail Content</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>72</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </confirmation_email_content>
+      <core.defaultDocumentSyntax>
+        <disabled>0</disabled>
+        <name>core.defaultDocumentSyntax</name>
+        <number>37</number>
+        <prettyName>Default document syntax</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </core.defaultDocumentSyntax>
+      <dateformat>
+        <disabled>0</disabled>
+        <name>dateformat</name>
+        <number>17</number>
+        <prettyName>Date Format</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dateformat>
+      <default_language>
+        <disabled>0</disabled>
+        <name>default_language</name>
+        <number>3</number>
+        <prettyName>Default Language</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </default_language>
+      <documentBundles>
+        <cache>0</cache>
+        <classname/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>discouraged</freeText>
+        <multiSelect>0</multiSelect>
+        <name>documentBundles</name>
+        <number>48</number>
+        <picker>1</picker>
+        <prettyName>Internationalization Document Bundles</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>60</size>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </documentBundles>
+      <edit_anonymous>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>edit_anonymous</name>
+        <number>31</number>
+        <prettyName>Anonymous</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Image|Text</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </edit_anonymous>
+      <edit_registered>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>edit_registered</name>
+        <number>32</number>
+        <prettyName>Registered</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Image|Text</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </edit_registered>
+      <editcomment>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>editcomment</name>
+        <number>74</number>
+        <prettyName>Enable version summary</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </editcomment>
+      <editcomment_mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>editcomment_mandatory</name>
+        <number>75</number>
+        <prettyName>Make version summary mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </editcomment_mandatory>
+      <editor>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>editor</name>
+        <number>12</number>
+        <prettyName>Default Editor</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Text|Wysiwyg</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </editor>
+      <guest_comment_requires_captcha>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>select</displayType>
+        <name>guest_comment_requires_captcha</name>
+        <number>36</number>
+        <prettyName>Enable CAPTCHA in comments for unregistered users</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </guest_comment_requires_captcha>
+      <iconTheme>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>iconTheme</name>
+        <number>8</number>
+        <prettyName>Icon theme</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>1</size>
+        <sql>select doc.fullName, propName.value from XWikiDocument as doc, BaseObject as theme, StringProperty propName where doc.fullName=theme.name and theme.className='IconThemesCode.IconThemeClass' and doc.fullName&lt;&gt;'IconThemesCode.IconThemeTemplate' and theme.id = propName.id and propName.name = 'name'</sql>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </iconTheme>
+      <invitation_email_content>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>invitation_email_content</name>
+        <number>27</number>
+        <prettyName>Invitation eMail Content</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>72</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </invitation_email_content>
+      <javamail_extra_props>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>javamail_extra_props</name>
+        <number>24</number>
+        <prettyName>Additional JavaMail properties</prettyName>
+        <restricted>0</restricted>
+        <rows>6</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </javamail_extra_props>
+      <languages>
+        <disabled>0</disabled>
+        <name>languages</name>
+        <number>47</number>
+        <prettyName>Supported languages</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </languages>
+      <ldap>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>ldap</name>
+        <number>50</number>
+        <prettyName>Ldap</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </ldap>
+      <ldap_UID_attr>
+        <disabled>0</disabled>
+        <name>ldap_UID_attr</name>
+        <number>59</number>
+        <prettyName>Ldap UID attribute name</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_UID_attr>
+      <ldap_base_DN>
+        <disabled>0</disabled>
+        <name>ldap_base_DN</name>
+        <number>58</number>
+        <prettyName>Ldap base DN</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_base_DN>
+      <ldap_bind_DN>
+        <disabled>0</disabled>
+        <name>ldap_bind_DN</name>
+        <number>53</number>
+        <prettyName>Ldap login matching</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_bind_DN>
+      <ldap_bind_pass>
+        <disabled>0</disabled>
+        <name>ldap_bind_pass</name>
+        <number>54</number>
+        <prettyName>Ldap password matching</prettyName>
+        <size>60</size>
+        <storageType>Clear</storageType>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
+      </ldap_bind_pass>
+      <ldap_exclude_group>
+        <disabled>0</disabled>
+        <name>ldap_exclude_group</name>
+        <number>57</number>
+        <prettyName>Ldap group to exclude</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_exclude_group>
+      <ldap_fields_mapping>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>ldap_fields_mapping</name>
+        <number>60</number>
+        <prettyName>Ldap user fields mapping</prettyName>
+        <restricted>0</restricted>
+        <rows>1</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </ldap_fields_mapping>
+      <ldap_group_mapping>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>ldap_group_mapping</name>
+        <number>65</number>
+        <prettyName>Ldap groups mapping</prettyName>
+        <restricted>0</restricted>
+        <rows>5</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </ldap_group_mapping>
+      <ldap_groupcache_expiration>
+        <disabled>0</disabled>
+        <name>ldap_groupcache_expiration</name>
+        <number>66</number>
+        <prettyName>LDAP groups members cache</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_groupcache_expiration>
+      <ldap_mode_group_sync>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>ldap_mode_group_sync</name>
+        <number>67</number>
+        <prettyName>LDAP groups sync mode</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>always|create</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </ldap_mode_group_sync>
+      <ldap_photo_attachment_name>
+        <disabled>0</disabled>
+        <name>ldap_photo_attachment_name</name>
+        <number>63</number>
+        <prettyName>Attachment name to save LDAP photo</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_photo_attachment_name>
+      <ldap_photo_attribute>
+        <disabled>0</disabled>
+        <name>ldap_photo_attribute</name>
+        <number>64</number>
+        <prettyName>Ldap photo attribute name</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_photo_attribute>
+      <ldap_port>
+        <disabled>0</disabled>
+        <name>ldap_port</name>
+        <number>52</number>
+        <prettyName>Ldap server port</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_port>
+      <ldap_server>
+        <disabled>0</disabled>
+        <name>ldap_server</name>
+        <number>51</number>
+        <prettyName>Ldap server adress</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_server>
+      <ldap_trylocal>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>ldap_trylocal</name>
+        <number>68</number>
+        <prettyName>Try local login</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </ldap_trylocal>
+      <ldap_update_photo>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>ldap_update_photo</name>
+        <number>62</number>
+        <prettyName>Update user photo from LDAP</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </ldap_update_photo>
+      <ldap_update_user>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>ldap_update_user</name>
+        <number>61</number>
+        <prettyName>Update user from LDAP</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </ldap_update_user>
+      <ldap_user_group>
+        <disabled>0</disabled>
+        <name>ldap_user_group</name>
+        <number>56</number>
+        <prettyName>Ldap group filter</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </ldap_user_group>
+      <ldap_validate_password>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>ldap_validate_password</name>
+        <number>55</number>
+        <prettyName>Validate Ldap user/password</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </ldap_validate_password>
+      <leftPanels>
+        <disabled>0</disabled>
+        <name>leftPanels</name>
+        <number>41</number>
+        <prettyName>Panels displayed on the left</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </leftPanels>
+      <leftPanelsWidth>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>leftPanelsWidth</name>
+        <number>45</number>
+        <prettyName>Width of the left panel column</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Small|Medium|Large</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </leftPanelsWidth>
+      <meta>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>meta</name>
+        <number>16</number>
+        <prettyName>HTTP Meta Info</prettyName>
+        <restricted>0</restricted>
+        <rows>8</rows>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </meta>
+      <minoredit>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>minoredit</name>
+        <number>76</number>
+        <prettyName>Enable minor edits</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </minoredit>
+      <multilingual>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>multilingual</name>
+        <number>2</number>
+        <prettyName>Multi-Lingual</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </multilingual>
+      <obfuscateEmailAddresses>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>obfuscateEmailAddresses</name>
+        <number>28</number>
+        <prettyName>Obfuscate Email Addresses</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </obfuscateEmailAddresses>
+      <parent>
+        <disabled>0</disabled>
+        <name>parent</name>
+        <number>1</number>
+        <prettyName>Parent Space</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </parent>
+      <registration_anonymous>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>registration_anonymous</name>
+        <number>29</number>
+        <prettyName>Anonymous</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Image|Text</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </registration_anonymous>
+      <registration_registered>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>registration_registered</name>
+        <number>30</number>
+        <prettyName>Registered</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Image|Text</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </registration_registered>
+      <rightPanels>
+        <disabled>0</disabled>
+        <name>rightPanels</name>
+        <number>42</number>
+        <prettyName>Panels displayed on the right</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </rightPanels>
+      <rightPanelsWidth>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>rightPanelsWidth</name>
+        <number>46</number>
+        <prettyName>Width of the right panel column</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Small|Medium|Large</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </rightPanelsWidth>
+      <showLeftPanels>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>showLeftPanels</name>
+        <number>43</number>
+        <prettyName>Display the left panel column</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </showLeftPanels>
+      <showRightPanels>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>showRightPanels</name>
+        <number>44</number>
+        <prettyName>Display the right panel column</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </showRightPanels>
+      <showannotations>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>showannotations</name>
+        <number>69</number>
+        <prettyName>Show document annotations</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </showannotations>
+      <showattachments>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>showattachments</name>
+        <number>71</number>
+        <prettyName>Show document attachments</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </showattachments>
+      <showcomments>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>showcomments</name>
+        <number>70</number>
+        <prettyName>Show document comments</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </showcomments>
+      <showhistory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>showhistory</name>
+        <number>72</number>
+        <prettyName>Show document history</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </showhistory>
+      <showinformation>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>showinformation</name>
+        <number>73</number>
+        <prettyName>Show document information</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </showinformation>
+      <skin>
+        <cache>0</cache>
+        <classname/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <multiSelect>0</multiSelect>
+        <name>skin</name>
+        <number>6</number>
+        <picker>1</picker>
+        <prettyName>Skin</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>30</size>
+        <sql>, BaseObject obj where doc.fullName = obj.name and obj.className = 'XWiki.XWikiSkins'</sql>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </skin>
+      <smtp_port>
+        <disabled>0</disabled>
+        <name>smtp_port</name>
+        <number>21</number>
+        <prettyName>SMTP Port</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </smtp_port>
+      <smtp_server>
+        <disabled>0</disabled>
+        <name>smtp_server</name>
+        <number>20</number>
+        <prettyName>SMTP Server</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </smtp_server>
+      <smtp_server_password>
+        <disabled>0</disabled>
+        <name>smtp_server_password</name>
+        <number>23</number>
+        <prettyName>Server password (optional)</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </smtp_server_password>
+      <smtp_server_username>
+        <disabled>0</disabled>
+        <name>smtp_server_username</name>
+        <number>22</number>
+        <prettyName>Server username (optional)</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </smtp_server_username>
+      <stylesheet>
+        <disabled>0</disabled>
+        <name>stylesheet</name>
+        <number>9</number>
+        <prettyName>Default Stylesheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </stylesheet>
+      <stylesheets>
+        <disabled>0</disabled>
+        <name>stylesheets</name>
+        <number>10</number>
+        <prettyName>Alternative Stylesheet</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </stylesheets>
+      <tags>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>tags</name>
+        <number>39</number>
+        <prettyName>Activate the tagging</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </tags>
+      <timezone>
+        <disabled>0</disabled>
+        <name>timezone</name>
+        <number>49</number>
+        <prettyName>Time Zone</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TimezoneClass</classType>
+      </timezone>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>14</number>
+        <prettyName>Title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+      <upload_maxsize>
+        <disabled>0</disabled>
+        <name>upload_maxsize</name>
+        <number>35</number>
+        <numberType>long</numberType>
+        <prettyName>Maximum Upload Size</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </upload_maxsize>
+      <use_email_verification>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>use_email_verification</name>
+        <number>18</number>
+        <prettyName>Use eMail Verification</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </use_email_verification>
+      <validation_email_content>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>validation_email_content</name>
+        <number>25</number>
+        <prettyName>Validation eMail Content</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>72</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </validation_email_content>
+      <version>
+        <disabled>0</disabled>
+        <name>version</name>
+        <number>15</number>
+        <prettyName>Version</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </version>
+      <webcopyright>
+        <disabled>0</disabled>
+        <name>webcopyright</name>
+        <number>13</number>
+        <prettyName>Copyright</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </webcopyright>
+      <xwiki.title.mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>xwiki.title.mandatory</name>
+        <number>38</number>
+        <prettyName>Make document title field mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </xwiki.title.mandatory>
+    </class>
+    <property>
+      <accessibility/>
+    </property>
+    <property>
+      <colorTheme/>
+    </property>
+    <property>
+      <core.defaultDocumentSyntax/>
+    </property>
+    <property>
+      <dateformat/>
+    </property>
+    <property>
+      <editcomment/>
+    </property>
+    <property>
+      <editcomment_mandatory/>
+    </property>
+    <property>
+      <guest_comment_requires_captcha/>
+    </property>
+    <property>
+      <iconTheme/>
+    </property>
+    <property>
+      <javamail_extra_props/>
+    </property>
+    <property>
+      <ldap/>
+    </property>
+    <property>
+      <ldap_UID_attr/>
+    </property>
+    <property>
+      <ldap_base_DN/>
+    </property>
+    <property>
+      <ldap_bind_DN/>
+    </property>
+    <property>
+      <ldap_bind_pass/>
+    </property>
+    <property>
+      <ldap_exclude_group/>
+    </property>
+    <property>
+      <ldap_fields_mapping/>
+    </property>
+    <property>
+      <ldap_group_mapping/>
+    </property>
+    <property>
+      <ldap_groupcache_expiration/>
+    </property>
+    <property>
+      <ldap_mode_group_sync/>
+    </property>
+    <property>
+      <ldap_photo_attachment_name/>
+    </property>
+    <property>
+      <ldap_photo_attribute/>
+    </property>
+    <property>
+      <ldap_port/>
+    </property>
+    <property>
+      <ldap_server/>
+    </property>
+    <property>
+      <ldap_trylocal/>
+    </property>
+    <property>
+      <ldap_update_photo/>
+    </property>
+    <property>
+      <ldap_update_user/>
+    </property>
+    <property>
+      <ldap_user_group/>
+    </property>
+    <property>
+      <ldap_validate_password/>
+    </property>
+    <property>
+      <leftPanelsWidth/>
+    </property>
+    <property>
+      <minoredit/>
+    </property>
+    <property>
+      <obfuscateEmailAddresses/>
+    </property>
+    <property>
+      <parent/>
+    </property>
+    <property>
+      <rightPanelsWidth/>
+    </property>
+    <property>
+      <showannotations/>
+    </property>
+    <property>
+      <showattachments/>
+    </property>
+    <property>
+      <showcomments/>
+    </property>
+    <property>
+      <showhistory/>
+    </property>
+    <property>
+      <showinformation/>
+    </property>
+    <property>
+      <smtp_port/>
+    </property>
+    <property>
+      <smtp_server_password/>
+    </property>
+    <property>
+      <smtp_server_username/>
+    </property>
+    <property>
+      <tags/>
+    </property>
+    <property>
+      <timezone/>
+    </property>
+    <property>
+      <upload_maxsize/>
+    </property>
+    <property>
+      <xwiki.title.mandatory/>
+    </property>
+  </object>
+</xwikidoc>

@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A collection of icons, with some properties to display them.
@@ -280,7 +279,6 @@ public class IconSet
      * @since 14.10.6
      * @since 15.2RC1
      */
-    @Unstable
     public DocumentReference getSourceDocumentReference()
     {
         return this.sourceDocumentReference;
@@ -291,7 +289,6 @@ public class IconSet
      * @since 14.10.6
      * @since 15.2RC1
      */
-    @Unstable
     public void setSourceDocumentReference(DocumentReference sourceDocumentReference)
     {
         this.sourceDocumentReference = sourceDocumentReference;

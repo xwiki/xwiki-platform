@@ -39,6 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.logging.LoggerManager;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.hibernate.HibernateAdapter;
+import org.xwiki.store.hibernate.HibernateStoreException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -124,6 +127,16 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     public String getHint()
     {
         return HINT;
+    }
+
+    /**
+     * @return the {@link HibernateAdapter}
+     * @since 17.1.0RC1
+     */
+    @Unstable
+    public HibernateAdapter getHibernateAdapater()
+    {
+        return this.store.getAdapter();
     }
 
     /**
@@ -262,6 +275,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
 
         try {
             this.store.updateDatabase(context.getWikiId(), force);
+        } catch (HibernateStoreException e) {
+            throw new HibernateException(e);
         } finally {
             restoreExecutionXContext();
         }
@@ -274,12 +289,14 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param databaseProduct the database engine type.
      * @param inputxcontext the XWiki context.
      * @return the database/schema name.
+     * @deprecated use {@link HibernateAdapter#getDatabaseFromWikiName(String)} instead
      * @since 1.1.2
      * @since 1.2M2
      */
+    @Deprecated(since = "17.1.0RC1")
     protected String getSchemaFromWikiName(String wikiName, DatabaseProduct databaseProduct, XWikiContext inputxcontext)
     {
-        return this.store.getDatabaseFromWikiName(wikiName, databaseProduct);
+        return this.store.getAdapter().getDatabaseFromWikiName(wikiName);
     }
 
     /**
@@ -290,12 +307,14 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param wikiId the wiki name to convert.
      * @param inputxcontext the XWiki context.
      * @return the database/schema name.
+     * @deprecated use {@link HibernateAdapter#getDatabaseFromWikiName(String)} instead
      * @since 1.1.2
      * @since 1.2M2
      */
+    @Deprecated(since = "17.1.0RC1")
     protected String getSchemaFromWikiName(String wikiId, XWikiContext inputxcontext)
     {
-        return this.store.getDatabaseFromWikiName(wikiId);
+        return this.store.getAdapter().getDatabaseFromWikiName(wikiId);
     }
 
     /**
@@ -305,12 +324,14 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      *
      * @param context the XWiki context.
      * @return the database/schema name.
+     * @deprecated use {@link HibernateAdapter#getDatabaseFromWikiName()} instead
      * @since 1.1.2
      * @since 1.2M2
      */
+    @Deprecated(since = "17.1.0RC1")
     public String getSchemaFromWikiName(XWikiContext context)
     {
-        return this.store.getDatabaseFromWikiName();
+        return this.store.getAdapter().getDatabaseFromWikiName();
     }
 
     /**
@@ -454,7 +475,9 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
             }
 
             Metadata metadata = this.store.getMetadata(bclass.getName(), custommapping, context.getWikiId());
-            this.store.updateDatabase(metadata);
+            this.store.getAdapter().updateDatabase(metadata);
+        } catch (Exception e) {
+            throw new XWikiException("Failed to update the schema for class [" + bclass.getName() + "]", e);
         } finally {
             restoreExecutionXContext();
         }
@@ -513,10 +536,12 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param schema the schema name to escape
      * @param context the XWiki context to get database engine identifier
      * @return the escaped version
+     * @deprecated use {@link HibernateAdapter#escapeDatabaseName(String)} instead
      */
+    @Deprecated(since = "17.1.0RC1")
     protected String escapeSchema(String schema, XWikiContext context)
     {
-        return this.store.escapeDatabaseName(schema);
+        return this.store.getAdapter().escapeDatabaseName(schema);
     }
 
     /**
@@ -951,10 +976,12 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     /**
      * @return true if the user has configured Hibernate to use XWiki in schema mode (vs database mode)
      * @since 4.5M1
+     * @deprecated use {@link HibernateAdapter#isConfiguredInSchemaMode()} instead
      */
+    @Deprecated(since = "17.1.0RC1")
     protected boolean isInSchemaMode()
     {
-        return this.store.isConfiguredInSchemaMode();
+        return this.store.getAdapter().isConfiguredInSchemaMode();
     }
 
     /**

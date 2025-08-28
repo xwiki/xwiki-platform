@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.LinkSuggestions" locale="">
+<xwikidoc version="1.6" reference="CKEditor.LinkSuggestions" locale="">
   <web>CKEditor</web>
   <name>LinkSuggestions</name>
   <language/>
@@ -133,7 +133,7 @@
   #set ($results = [])
   #searchDocumentsSolr($input $limit $results)
   #searchAttachmentsSolr($input $limit $results)
-  #set ($results = $resolvedSortTool.sort($results, 'score:desc'))
+  #set ($results = $collectiontool.sort($results, 'score:desc'))
   #foreach ($result in $results.subList(0, $mathtool.min($results.size(), $limit)))
     #set ($discard = $entityReferences.add($services.solr.resolve($result)))
   #end

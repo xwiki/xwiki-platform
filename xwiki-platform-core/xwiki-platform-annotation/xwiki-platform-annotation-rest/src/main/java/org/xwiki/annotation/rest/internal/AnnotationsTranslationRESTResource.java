@@ -22,7 +22,6 @@ package org.xwiki.annotation.rest.internal;
 import java.util.Locale;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -45,7 +44,6 @@ import org.xwiki.rest.XWikiRestException;
 @Component
 @Named("org.xwiki.annotation.rest.internal.AnnotationsTranslationRESTResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/translations/{language}/annotations")
-@Singleton
 public class AnnotationsTranslationRESTResource extends AbstractAnnotationsRESTResource
 {
     /**

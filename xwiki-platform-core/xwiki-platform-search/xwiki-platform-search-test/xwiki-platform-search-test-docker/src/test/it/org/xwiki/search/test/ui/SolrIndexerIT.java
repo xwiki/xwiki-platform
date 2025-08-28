@@ -48,11 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     // Exclude the Groovy script below from the PR checker.
-    // Increase the indexer batch size to speed up indexing.
-    """
-        xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*Test\\.Execute\\..*
-        solr.indexer.batch.maxLength=10000000
-        solr.indexer.batch.size=200"""
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*Test\\.Execute\\..*"
+}, extraJARs = {
+    // Solr initialization isn't reliable when it's not part of the WAR.
+    "org.xwiki.platform:xwiki-platform-search-solr-query"
 })
 class SolrIndexerIT
 {

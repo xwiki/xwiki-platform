@@ -76,6 +76,7 @@ class UserDirectoryIT
 
         // Go back to the user directory page since the user creation navigated to another page
         page = UserDirectoryPage.gotoPage();
+        liveTableElement = page.getUserDirectoryLiveTable();
         assertEquals(1, liveTableElement.getRowCount());
         assertTrue(liveTableElement.hasRow("User ID", "test"));
         assertTrue(liveTableElement.hasRow("First Name", "John"));
@@ -83,6 +84,9 @@ class UserDirectoryIT
 
         // Log out to verify the livetable works in guest view too
         setup.forceGuestUser();
+        // Create a new instance of the page to ensure that we wait for it to be fully loaded.
+        page = new UserDirectoryPage();
+        liveTableElement = page.getUserDirectoryLiveTable();
         assertEquals(1, liveTableElement.getRowCount());
         assertTrue(liveTableElement.hasRow("User ID", "test"));
         assertTrue(liveTableElement.hasRow("First Name", "John"));

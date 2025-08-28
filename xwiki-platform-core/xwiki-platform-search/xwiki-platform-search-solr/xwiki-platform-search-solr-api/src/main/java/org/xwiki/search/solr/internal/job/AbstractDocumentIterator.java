@@ -19,7 +19,10 @@
  */
 package org.xwiki.search.solr.internal.job;
 
+import javax.inject.Inject;
+
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
  * Base class for {@link DocumentIterator}s.
@@ -31,14 +34,24 @@ import org.xwiki.model.reference.EntityReference;
 public abstract class AbstractDocumentIterator<T> implements DocumentIterator<T>
 {
     /**
-     * The maximum number of documents to query at once.
-     */
-    protected static final int LIMIT = 100;
-
-    /**
      * Specifies the root entity whose documents are iterated. If {@code null} then all the documents are iterated.
      */
     protected EntityReference rootReference;
+
+    @Inject
+    protected SolrConfiguration solrConfiguration;
+
+    private int limit;
+
+    protected int getLimit()
+    {
+        // Cache the limit value to avoid possibly changing values during iteration.
+        if (this.limit == 0) {
+            this.limit = this.solrConfiguration.getSynchronizationBatchSize();
+        }
+
+        return this.limit;
+    }
 
     @Override
     public void remove()

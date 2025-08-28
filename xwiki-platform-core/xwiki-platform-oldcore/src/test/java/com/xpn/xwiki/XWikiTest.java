@@ -123,7 +123,7 @@ class XWikiTest
     private XWiki xwiki;
 
     @AfterComponent
-    public void afterComponent() throws Exception
+    void afterComponent() throws Exception
     {
         MockitoComponentManager componentManager = this.oldcore.getMocker();
 
@@ -143,7 +143,7 @@ class XWikiTest
     }
 
     @BeforeEach
-    protected void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.document = new XWikiDocument(new DocumentReference("Wiki", "MilkyWay", "Fidis"));
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequestStub());
@@ -155,7 +155,7 @@ class XWikiTest
         this.xwiki = this.oldcore.getSpyXWiki();
 
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
-        // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
+        // the Velocity init would fail (since, by default, the macros.vm templates wouldn't be found as we're
         // not providing it in our unit test resources).
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.render.velocity.macrolist", "");
 
@@ -1093,13 +1093,14 @@ class XWikiTest
             new DocumentReference(targetReference, Locale.GERMAN), xWikiContext);
 
         // Test links
-        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference);
+        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference,
+            Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
-            targetReference, false);
+            targetReference, false, Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
-            targetReference, false);
+            targetReference, false, Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc3.getXDOM(), reference3, sourceReference,
-            targetReference, false);
+            targetReference, false, Map.of(sourceReference, targetReference));
 
         assertTrue(this.xwiki
             .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), this.oldcore.getXWikiContext()).isNew());

@@ -19,26 +19,25 @@
  */
 package org.xwiki.icon.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.icon.IconSet;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,140 +48,131 @@ import static org.mockito.Mockito.when;
  * @since 6.2M1
  * @version $Id$
  */
-public class DefaultIconSetCacheTest
+@ComponentTest
+class DefaultIconSetCacheTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultIconSetCache> mocker =
-            new MockitoComponentMockingRule<>(DefaultIconSetCache.class);
+    @InjectMockComponents
+    private DefaultIconSetCache iconSetCache;
 
+    @MockComponent
     private CacheManager cacheManager;
 
+    @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     private Cache<IconSet> cache;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeComponent
+    void setUp() throws Exception
     {
-        cacheManager = mocker.getInstance(CacheManager.class);
-        entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
-                EntityReferenceSerializer.class, String.class));
-        cache = mock(Cache.class);
         CacheFactory cacheFactory = mock(CacheFactory.class);
-        when(cacheManager.getCacheFactory()).thenReturn(cacheFactory);
+        when(this.cacheManager.getCacheFactory()).thenReturn(cacheFactory);
         CacheConfiguration configuration = new CacheConfiguration("iconset");
-        when(cacheFactory.<IconSet>newCache(eq(configuration))).thenReturn(cache);
+        this.cache = mock();
+        when(cacheFactory.<IconSet>newCache(configuration)).thenReturn(this.cache);
     }
 
     @Test
-    public void getByName() throws Exception
+    void getByName()
     {
         IconSet iconSet = new IconSet("key");
-        when(cache.get("NAMED:key")).thenReturn(iconSet);
+        when(this.cache.get("NAMED:key")).thenReturn(iconSet);
 
-        IconSet result = mocker.getComponentUnderTest().get("key");
-        assertTrue(iconSet == result);
+        IconSet result = this.iconSetCache.get("key");
+        assertSame(result, iconSet);
     }
 
     @Test
-    public void getByNameAndWiki() throws Exception
+    void getByNameAndWiki()
     {
         IconSet iconSet = new IconSet("key");
         when(cache.get("NAMED:6wikiId_key")).thenReturn(iconSet);
 
-        IconSet result = mocker.getComponentUnderTest().get("key", "wikiId");
-        assertTrue(iconSet == result);
+        IconSet result = this.iconSetCache.get("key", "wikiId");
+        assertSame(result, iconSet);
     }
 
     @Test
-    public void getByDocRef() throws Exception
+    void getByDocRef()
     {
         IconSet iconSet = new IconSet("key");
         DocumentReference docRef = new DocumentReference("a","b","c");
-        when(entityReferenceSerializer.serialize(docRef)).thenReturn("a:b.c");
-        when(cache.get("DOC:a:b.c")).thenReturn(iconSet);
+        when(this.entityReferenceSerializer.serialize(docRef)).thenReturn("a:b.c");
+        when(this.cache.get("DOC:a:b.c")).thenReturn(iconSet);
 
-        IconSet result = mocker.getComponentUnderTest().get(docRef);
-        assertTrue(iconSet == result);
+        IconSet result = this.iconSetCache.get(docRef);
+        assertSame(result, iconSet);
     }
 
     @Test
-    public void putByName() throws Exception
+    void putByName()
     {
         IconSet iconSet = new IconSet("key");
-        mocker.getComponentUnderTest().put("key", iconSet);
-        verify(cache).set("NAMED:key", iconSet);
+        this.iconSetCache.put("key", iconSet);
+        verify(this.cache).set("NAMED:key", iconSet);
     }
 
     @Test
-    public void putByNameAndWiki() throws Exception
+    void putByNameAndWiki()
     {
         IconSet iconSet = new IconSet("key");
-        mocker.getComponentUnderTest().put("key", "wikiId", iconSet);
-        verify(cache).set("NAMED:6wikiId_key", iconSet);
+        this.iconSetCache.put("key", "wikiId", iconSet);
+        verify(this.cache).set("NAMED:6wikiId_key", iconSet);
     }
 
     @Test
-    public void putByDocRef() throws Exception
+    void putByDocRef()
     {
         IconSet iconSet = new IconSet("key");
         DocumentReference docRef = new DocumentReference("a","b","c");
-        when(entityReferenceSerializer.serialize(docRef)).thenReturn("a:b.c");
-        mocker.getComponentUnderTest().put(docRef, iconSet);
-        verify(cache).set("DOC:a:b.c", iconSet);
+        when(this.entityReferenceSerializer.serialize(docRef)).thenReturn("a:b.c");
+        this.iconSetCache.put(docRef, iconSet);
+        verify(this.cache).set("DOC:a:b.c", iconSet);
     }
 
     @Test
-    public void clear() throws Exception
+    void clear()
     {
-        mocker.getComponentUnderTest().clear();
-        verify(cache).removeAll();
+        this.iconSetCache.clear();
+        verify(this.cache).removeAll();
     }
 
     @Test
-    public void clearByName() throws Exception
+    void clearByName()
     {
-        mocker.getComponentUnderTest().clear("key");
-        verify(cache).remove("NAMED:key");
+        this.iconSetCache.clear("key");
+        verify(this.cache).remove("NAMED:key");
     }
 
     @Test
-    public void clearByNameAndWiki() throws Exception
+    void clearByNameAndWiki()
     {
-        mocker.getComponentUnderTest().clear("key", "wikiId");
-        verify(cache).remove("NAMED:6wikiId_key");
+        this.iconSetCache.clear("key", "wikiId");
+        verify(this.cache).remove("NAMED:6wikiId_key");
     }
 
     @Test
-    public void clearByDocRef() throws Exception
+    void clearByDocRef()
     {
         DocumentReference docRef = new DocumentReference("a","b","c");
-        when(entityReferenceSerializer.serialize(docRef)).thenReturn("a:b.c");
-        mocker.getComponentUnderTest().clear(docRef);
-        verify(cache).remove("DOC:a:b.c");
+        when(this.entityReferenceSerializer.serialize(docRef)).thenReturn("a:b.c");
+        this.iconSetCache.clear(docRef);
+        verify(this.cache).remove("DOC:a:b.c");
     }
 
     @Test
-    public void initializeWhenError() throws Exception
+    void initializeWhenError() throws Exception
     {
-        DefaultIconSetCache cache = mocker.getComponentUnderTest();
         CacheFactory cacheFactory = mock(CacheFactory.class);
-        when(cacheManager.getCacheFactory()).thenReturn(cacheFactory);
+        when(this.cacheManager.getCacheFactory()).thenReturn(cacheFactory);
 
         Exception exception = new CacheException("ERROR");
         when(cacheFactory.newCache(any(CacheConfiguration.class))).thenThrow(exception);
 
-        Exception exceptionCaught = null;
-        try {
-            cache.initialize();
-        } catch(InitializationException e){
-            exceptionCaught = e;
-        }
-
-        assertNotNull(exceptionCaught);
-        assertEquals("Failed to initialize the IconSet Cache.", exceptionCaught.getMessage());
-        assertEquals(exception, exceptionCaught.getCause());
+        Throwable expected = assertThrows(InitializationException.class, () -> {
+            this.iconSetCache.initialize();
+        });
+        assertEquals("Failed to initialize the IconSet Cache.", expected.getMessage());
+        assertEquals(exception, expected.getCause());
     }
-
-
 }

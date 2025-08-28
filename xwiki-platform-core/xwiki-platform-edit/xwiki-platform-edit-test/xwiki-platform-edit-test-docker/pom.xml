@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-edit-test</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-edit-test-docker</artifactId>
   <name>XWiki Platform - Edit - Tests - Functional Docker Tests</name>
@@ -74,6 +74,21 @@
       <artifactId>xwiki-platform-annotation-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <!-- Used to test the integration between required rights and the editor. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-requiredrights-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Provide an implementation for the HTMLDisplayer (needed by MacroDescriptorUIFactory to get the edit template for
+      macro parameters). -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-html</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- ================================
          Test only dependencies

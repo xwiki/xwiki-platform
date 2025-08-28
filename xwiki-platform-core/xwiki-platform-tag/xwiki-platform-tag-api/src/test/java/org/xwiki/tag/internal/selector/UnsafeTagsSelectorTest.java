@@ -217,7 +217,7 @@ class UnsafeTagsSelectorTest
     {
         when(this.query.<String>execute()).thenReturn(results);
 
-        assertEquals(expected, this.tagsSelector.getDocumentsWithTag("Tag0", false));
+        assertEquals(expected, this.tagsSelector.getDocumentsWithTag("Tag0", false, false));
         verifyNoInteractions(this.stringDocumentReferenceResolver);
         verifyNoInteractions(this.contextualAuthorizationManager);
     }

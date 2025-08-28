@@ -102,7 +102,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     /**
      * The default size of the batch.
      */
-    public static final int SOLR_INDEXER_BATCH_SIZE_DEFAULT = 50;
+    public static final int SOLR_INDEXER_BATCH_SIZE_DEFAULT = 1000;
 
     /**
      * The name of the configuration property containing the batch maximum length.
@@ -112,7 +112,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     /**
      * The default length of the data above which the batch is sent without waiting.
      */
-    public static final int SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT = 10000;
+    public static final int SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT = 10000000;
 
     /**
      * The name of the configuration property containing the batch size.
@@ -138,6 +138,16 @@ public class DefaultSolrConfiguration implements SolrConfiguration
      * The name of the configuration property indicating which synchronization mode should be used at startup.
      */
     public static final String SOLR_SYNCHRONIZE_AT_STARTUP_MODE = "solr.synchronizeAtStartupMode";
+
+    /**
+     * The default synchronization batch size.
+     */
+    public static final int SOLR_SYNCHRONIZE_BATCH_SIZE_DEFAULT = 1000;
+
+    /**
+     * The name of the configuration property containing the batch size for the synchronization.
+     */
+    public static final String SOLR_SYNCHRONIZE_BATCH_SIZE = "solr.synchronizeBatchSize";
 
     /**
      * Indicate which mode to use for synchronize at startup by default.
@@ -237,5 +247,11 @@ public class DefaultSolrConfiguration implements SolrConfiguration
             result = SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT;
         }
         return result;
+    }
+
+    @Override
+    public int getSynchronizationBatchSize()
+    {
+        return this.configuration.getProperty(SOLR_SYNCHRONIZE_BATCH_SIZE, SOLR_SYNCHRONIZE_BATCH_SIZE_DEFAULT);
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macros</artifactId>
   <name>XWiki Platform - Rendering - Macros - Parent POM</name>
@@ -64,8 +64,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-el</artifactId>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

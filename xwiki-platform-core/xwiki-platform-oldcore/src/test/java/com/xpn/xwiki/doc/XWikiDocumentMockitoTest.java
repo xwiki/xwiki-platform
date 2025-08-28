@@ -20,6 +20,7 @@
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +37,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.dom4j.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +53,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
@@ -66,8 +69,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
@@ -81,6 +86,7 @@ import com.xpn.xwiki.web.EditForm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -129,6 +135,9 @@ public class XWikiDocumentMockitoTest
     @MockComponent
     @Named("compactwiki/document")
     private UserReferenceSerializer<String> compactWikiUserReferenceSerializer;
+
+    @MockComponent
+    private ContentParser parser;
 
     @MockComponent
     private LinkStore linkStore;
@@ -206,6 +215,8 @@ public class XWikiDocumentMockitoTest
         QueryFilter hiddenFilter = this.oldcore.getMocker().registerMockComponent(QueryFilter.class, "hidden");
 
         when(query.setLimit(7)).thenReturn(query);
+        when(query.setOffset(3)).thenReturn(query);
+        when(query.setWiki(DOCWIKI)).thenReturn(query);
 
         List<String> result = Arrays.asList("X.y", "A.b");
         when(query.<String>execute()).thenReturn(result);
@@ -216,6 +227,7 @@ public class XWikiDocumentMockitoTest
         verify(query).addFilter(hiddenFilter);
         verify(query).setLimit(7);
         verify(query).setOffset(3);
+        verify(query).setWiki(DOCWIKI);
 
         assertEquals(2, childrenReferences.size());
         assertEquals(new DocumentReference("wiki", "X", "y"), childrenReferences.get(0));
@@ -565,6 +577,117 @@ public class XWikiDocumentMockitoTest
 
         assertEquals("2.2", this.document.getVersion());
         assertNull(this.document.getPreviousVersion());
+    }
+
+    @Test
+    void testCloneIdentical() throws IllegalAccessException
+    {
+        XWikiDocument initialDocument = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
+
+        initialDocument.setContent("content");
+        initialDocument.setChangeTracked(true);
+
+        XWikiDocument clonedDocument = initialDocument.clone();
+
+        assertTrue(clonedDocument.isChangeTracked());
+        assertSame(initialDocument.getContent(), clonedDocument.getContent());
+        assertSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+
+        initialDocument.setContent("new content");
+
+        assertNotEquals(initialDocument.getContent(), clonedDocument.getContent());
+        assertEquals(initialDocument.getSyntax(), clonedDocument.getSyntax());
+        assertNotSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+
+        clonedDocument = initialDocument.clone();
+
+        assertTrue(clonedDocument.isChangeTracked());
+        assertSame(initialDocument.getContent(), clonedDocument.getContent());
+        assertSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+
+        initialDocument.setSyntax(Syntax.XWIKI_2_0);
+
+        assertEquals(initialDocument.getContent(), clonedDocument.getContent());
+        assertNotEquals(initialDocument.getSyntax(), clonedDocument.getSyntax());
+        assertNotSame(FieldUtils.readField(initialDocument, "content", true),
+            FieldUtils.readField(clonedDocument, "content", true));
+    }
+
+    @Test
+    void cloneCleanAndCached() throws IOException, XWikiException
+    {
+        XWikiDocument cleanDocument = new XWikiDocument(DOCUMENT_REFERENCE);
+        cleanDocument.setAttachment("filename.ext", new ByteArrayInputStream("attachment".getBytes()),
+            this.oldcore.getXWikiContext());
+        BaseClass dirtyClass = cleanDocument.getXClass();
+        dirtyClass.addTextField("string", "String", 30);
+        BaseObject dirtyObject = cleanDocument.newXObject(CLASS_REFERENCE, this.oldcore.getXWikiContext());
+        dirtyObject.setStringValue("string", "string");
+
+        // Make sure the document is not considered dirty
+        cleanDocument.setDirty(false, true);
+        // Indicate the document is cached and trusted
+        cleanDocument.setCached(true);
+        cleanDocument.setChangeTracked(true);
+
+        assertTrue(cleanDocument.isCached());
+        assertTrue(cleanDocument.isChangeTracked());
+        assertFalse(cleanDocument.isContentDirty());
+        assertFalse(cleanDocument.isMetaDataDirty());
+        assertFalse(cleanDocument.getAttachment("filename.ext").isMetaDataDirty());
+        assertFalse(cleanDocument.getXClass().isDirty());
+        assertSame(cleanDocument, cleanDocument.getXClass().getOwnerDocument());
+        assertEquals(cleanDocument.getDocumentReference(), cleanDocument.getXClass().getDocumentReference());
+        assertFalse(((PropertyClass) cleanDocument.getXClass().getField("string")).isDirty());
+        assertSame(cleanDocument, ((PropertyClass) cleanDocument.getXClass().getField("string")).getOwnerDocument());
+        assertFalse(cleanDocument.getXObject(CLASS_REFERENCE).isDirty());
+        assertSame(cleanDocument, cleanDocument.getXObject(CLASS_REFERENCE).getOwnerDocument());
+        assertEquals(cleanDocument.getDocumentReference(),
+            cleanDocument.getXObject(CLASS_REFERENCE).getDocumentReference());
+        assertFalse(((BaseProperty) cleanDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+        assertSame(cleanDocument,
+            ((BaseProperty) cleanDocument.getXObject(CLASS_REFERENCE).getField("string")).getOwnerDocument());
+
+        XWikiDocument clonedDocument = cleanDocument.clone();
+
+        assertTrue(cleanDocument.isCached());
+        assertTrue(cleanDocument.isChangeTracked());
+        assertFalse(cleanDocument.isContentDirty());
+        assertFalse(cleanDocument.isMetaDataDirty());
+        assertFalse(cleanDocument.getAttachment("filename.ext").isMetaDataDirty());
+        assertFalse(cleanDocument.getXClass().isDirty());
+        assertSame(cleanDocument, cleanDocument.getXClass().getOwnerDocument());
+        assertEquals(cleanDocument.getDocumentReference(), cleanDocument.getXClass().getDocumentReference());
+        assertFalse(((PropertyClass) cleanDocument.getXClass().getField("string")).isDirty());
+        assertSame(cleanDocument, ((PropertyClass) cleanDocument.getXClass().getField("string")).getOwnerDocument());
+        assertFalse(cleanDocument.getXObject(CLASS_REFERENCE).isDirty());
+        assertSame(cleanDocument, cleanDocument.getXObject(CLASS_REFERENCE).getOwnerDocument());
+        assertEquals(cleanDocument.getDocumentReference(),
+            cleanDocument.getXObject(CLASS_REFERENCE).getDocumentReference());
+        assertFalse(((BaseProperty) cleanDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+        assertSame(cleanDocument,
+            ((BaseProperty) cleanDocument.getXObject(CLASS_REFERENCE).getField("string")).getOwnerDocument());
+
+        assertFalse(clonedDocument.isCached());
+        assertTrue(clonedDocument.isChangeTracked());
+        assertFalse(clonedDocument.isContentDirty());
+        assertFalse(clonedDocument.isMetaDataDirty());
+        assertFalse(clonedDocument.getAttachment("filename.ext").isMetaDataDirty());
+        assertFalse(clonedDocument.getXClass().isDirty());
+        assertSame(clonedDocument, clonedDocument.getXClass().getOwnerDocument());
+        assertEquals(clonedDocument.getDocumentReference(), clonedDocument.getXClass().getDocumentReference());
+        assertFalse(((PropertyClass) clonedDocument.getXClass().getField("string")).isDirty());
+        assertSame(clonedDocument, ((PropertyClass) clonedDocument.getXClass().getField("string")).getOwnerDocument());
+        assertFalse(clonedDocument.getXObject(CLASS_REFERENCE).isDirty());
+        assertSame(clonedDocument, clonedDocument.getXObject(CLASS_REFERENCE).getOwnerDocument());
+        assertEquals(clonedDocument.getDocumentReference(),
+            clonedDocument.getXObject(CLASS_REFERENCE).getDocumentReference());
+        assertFalse(((BaseProperty) clonedDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+        assertSame(clonedDocument,
+            ((BaseProperty) clonedDocument.getXObject(CLASS_REFERENCE).getField("string")).getOwnerDocument());
     }
 
     @Test
@@ -1105,6 +1228,61 @@ public class XWikiDocumentMockitoTest
         document.setMetaDataDirty(false);
         attachments.remove(0);
         assertTrue(document.isMetaDataDirty());
+    }
+
+    @Test
+    void setDirty() throws IOException, XWikiException
+    {
+        XWikiDocument dirtyDocument = new XWikiDocument(DOCUMENT_REFERENCE);
+        dirtyDocument.setAttachment("filename.ext", new ByteArrayInputStream("attachment".getBytes()),
+            this.oldcore.getXWikiContext());
+        BaseClass dirtyClass = dirtyDocument.getXClass();
+        dirtyClass.addTextField("string", "String", 30);
+        BaseObject dirtyObject = dirtyDocument.newXObject(CLASS_REFERENCE, this.oldcore.getXWikiContext());
+        dirtyObject.setStringValue("string", "string");
+
+        assertTrue(dirtyDocument.isMetaDataDirty());
+        assertTrue(dirtyDocument.getAttachment("filename.ext").isMetaDataDirty());
+        assertTrue(dirtyDocument.getXClass().isDirty());
+        assertTrue(((PropertyClass) dirtyDocument.getXClass().getField("string")).isDirty());
+        assertTrue(dirtyDocument.getXObject(CLASS_REFERENCE).isDirty());
+        assertTrue(((BaseProperty) dirtyDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+
+        dirtyDocument.setMetaDataDirty(false);
+
+        assertFalse(dirtyDocument.isMetaDataDirty());
+        assertTrue(dirtyDocument.getAttachment("filename.ext").isMetaDataDirty());
+        assertTrue(dirtyDocument.getXClass().isDirty());
+        assertTrue(((PropertyClass) dirtyDocument.getXClass().getField("string")).isDirty());
+        assertTrue(dirtyDocument.getXObject(CLASS_REFERENCE).isDirty());
+        assertTrue(((BaseProperty) dirtyDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+
+        dirtyDocument.setMetaDataDirty(true);
+
+        assertTrue(dirtyDocument.isMetaDataDirty());
+        assertTrue(dirtyDocument.getAttachment("filename.ext").isMetaDataDirty());
+        assertTrue(dirtyDocument.getXClass().isDirty());
+        assertTrue(((PropertyClass) dirtyDocument.getXClass().getField("string")).isDirty());
+        assertTrue(dirtyDocument.getXObject(CLASS_REFERENCE).isDirty());
+        assertTrue(((BaseProperty) dirtyDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+
+        dirtyDocument.setDirty(false, true);
+
+        assertFalse(dirtyDocument.isMetaDataDirty());
+        assertFalse(dirtyDocument.getAttachment("filename.ext").isMetaDataDirty());
+        assertFalse(dirtyDocument.getXClass().isDirty());
+        assertFalse(((PropertyClass) dirtyDocument.getXClass().getField("string")).isDirty());
+        assertFalse(dirtyDocument.getXObject(CLASS_REFERENCE).isDirty());
+        assertFalse(((BaseProperty) dirtyDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
+
+        dirtyDocument.setDirty(true, true);
+
+        assertTrue(dirtyDocument.isMetaDataDirty());
+        assertTrue(dirtyDocument.getAttachment("filename.ext").isMetaDataDirty());
+        assertTrue(dirtyDocument.getXClass().isDirty());
+        assertTrue(((PropertyClass) dirtyDocument.getXClass().getField("string")).isDirty());
+        assertTrue(dirtyDocument.getXObject(CLASS_REFERENCE).isDirty());
+        assertTrue(((BaseProperty) dirtyDocument.getXObject(CLASS_REFERENCE).getField("string")).isDirty());
     }
 
     /**
@@ -1804,5 +1982,44 @@ public class XWikiDocumentMockitoTest
 
         assertEquals(Set.of(backlink1, backlink21.withoutLocale()),
             new HashSet<>(doc.getBackLinkedReferences(this.oldcore.getXWikiContext())));
+    }
+
+    @Test
+    void getXClassDoesNotChangeDirtyFlagWhenEmpty()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+
+        document.setMetaDataDirty(false);
+        document.setContentDirty(false);
+
+        BaseClass xClass = document.getXClass();
+
+        assertNotNull(xClass);
+
+        assertFalse(xClass.isDirty());
+        assertFalse(document.isMetaDataDirty());
+        assertFalse(document.isContentDirty());
+    }
+
+    @Test
+    void hidden()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+
+        document.setHidden(false);
+        document.setMetaDataDirty(false);
+
+        assertFalse(document.isHidden());
+        assertFalse(document.isMetaDataDirty());
+
+        document.setHidden(true);
+
+        assertTrue(document.isMetaDataDirty());
+
+        document.setMetaDataDirty(false);
+
+        document.setHidden(true);
+
+        assertFalse(document.isMetaDataDirty());
     }
 }

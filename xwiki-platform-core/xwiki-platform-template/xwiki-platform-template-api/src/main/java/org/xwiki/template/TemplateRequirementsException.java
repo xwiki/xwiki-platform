@@ -22,7 +22,6 @@ package org.xwiki.template;
 import java.util.List;
 
 import org.xwiki.logging.AbstractMessageException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Any exception raised in the XWiki Extension Manager must raise an exception of this type.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.0RC1
  * @since 14.10.1
  */
-@Unstable
 public class TemplateRequirementsException extends AbstractMessageException
 {
     /**

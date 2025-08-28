@@ -38,11 +38,13 @@ import org.w3c.dom.Node;
 import org.w3c.tidy.Tidy;
 import org.xwiki.xml.XMLUtils;
 
-import com.sun.syndication.feed.synd.SyndCategory;
-import com.sun.syndication.feed.synd.SyndCategoryImpl;
-import com.sun.syndication.feed.synd.SyndContent;
-import com.sun.syndication.feed.synd.SyndContentImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndCategory;
+import com.rometools.rome.feed.synd.SyndCategoryImpl;
+import com.rometools.rome.feed.synd.SyndContent;
+import com.rometools.rome.feed.synd.SyndContentImpl;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndPerson;
+import com.rometools.rome.feed.synd.SyndPersonImpl;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -282,7 +284,13 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         entry.setPublishedDate(getPublishedDate(doc, params, context));
         entry.setUpdatedDate(getUpdateDate(doc, params, context));
         entry.setAuthor(getAuthor(doc, params, context));
-        entry.setContributors(getContributors(doc, params, context));
+        entry.setContributors(getContributors(doc, params, context).stream()
+            .map(name -> {
+                SyndPerson person = new SyndPersonImpl();
+                person.setName(name);
+                return person;
+            })
+            .toList());
     }
 
     protected String getDefaultURI(Document doc, Map<String, Object> params, XWikiContext context)

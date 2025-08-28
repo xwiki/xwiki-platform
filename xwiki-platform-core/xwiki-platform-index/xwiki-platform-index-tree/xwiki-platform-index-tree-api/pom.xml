@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-index-tree</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-index-tree-api</artifactId>
   <name>XWiki Platform - Index - Tree - API</name>
   <description>Defines multiple document hierarchies (nested pages, nested spaces, parent-child, etc.) that can be displayed using the document tree macro.</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.44</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.49</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Document Tree API</xwiki.extension.name>
   </properties>
@@ -88,9 +88,42 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-to-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.vdubus</groupId>
+        <artifactId>velocity-maven-plugin</artifactId>
+        <version>1.1.3</version>
+        <executions>
+          <execution>
+            <id>generate-named-queries</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <configuration>
+              <removeExtension>.vm</removeExtension>
+              <templateFiles>
+                <directory>src/main/resources</directory>
+                <includes>
+                  <include>**/queries.hbm.xml.vm</include>
+                </includes>
+              </templateFiles>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

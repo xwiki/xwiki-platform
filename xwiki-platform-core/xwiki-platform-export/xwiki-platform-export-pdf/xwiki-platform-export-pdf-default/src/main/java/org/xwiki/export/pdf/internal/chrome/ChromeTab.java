@@ -22,33 +22,32 @@ package org.xwiki.export.pdf.internal.chrome;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.browser.BrowserTab;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
 import com.github.kklisura.cdt.protocol.commands.Network;
 import com.github.kklisura.cdt.protocol.commands.Page;
-import com.github.kklisura.cdt.protocol.commands.Runtime;
 import com.github.kklisura.cdt.protocol.types.network.CookieParam;
 import com.github.kklisura.cdt.protocol.types.page.Frame;
 import com.github.kklisura.cdt.protocol.types.page.Navigate;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDF;
 import com.github.kklisura.cdt.protocol.types.page.PrintToPDFTransferMode;
-import com.github.kklisura.cdt.protocol.types.runtime.Evaluate;
-import com.github.kklisura.cdt.protocol.types.runtime.RemoteObject;
 import com.github.kklisura.cdt.protocol.types.target.TargetInfo;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
+import com.github.kklisura.cdt.services.config.ChromeDevToolsServiceConfiguration;
 
 /**
  * Represents a Chrome web browser tab.
@@ -58,36 +57,21 @@ import com.github.kklisura.cdt.services.ChromeDevToolsService;
  */
 public class ChromeTab implements BrowserTab
 {
-    /**
-     * The JavaScript code used to wait for the page to be fully ready before printing it to PDF.
-     */
-    static final String PAGE_READY_PROMISE;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ChromeTab.class);
-
-    static {
-        // Read the JavaScript code for page ready promise once and cache it.
-        String filePath = "/pageReadyPromise.js";
-        try {
-            PAGE_READY_PROMISE =
-                IOUtils.toString(ChromeTab.class.getResourceAsStream(filePath), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(String.format("Failed to read the [%s] file.", filePath), e);
-        }
-    }
 
     private final ChromeDevToolsService tabDevToolsService;
 
     private final ChromeDevToolsService browserDevToolsService;
 
-    private final PDFExportConfiguration configuration;
+    private final PageReadyPromise pageReadyPromise;
 
     ChromeTab(ChromeDevToolsService tabDevToolsService, ChromeDevToolsService browserDevToolsService,
-        PDFExportConfiguration configuration)
+        ChromeDevToolsServiceConfiguration configuration)
     {
         this.tabDevToolsService = tabDevToolsService;
         this.browserDevToolsService = browserDevToolsService;
-        this.configuration = configuration;
+        this.pageReadyPromise =
+            new PageReadyPromise(tabDevToolsService, configuration.getReadTimeout());
     }
 
     @Override
@@ -102,12 +86,27 @@ public class ChromeTab implements BrowserTab
     }
 
     @Override
+    public boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait, int timeout) throws IOException
+    {
+        return navigate(url, JakartaServletBridge.toJakarta(cookies), wait, timeout);
+    }
+
+    @Override
     public boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout) throws IOException
+    {
+        return navigate(url, cookies, wait, timeout, () -> false);
+    }
+
+    @Override
+    public boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout, BooleanSupplier isCanceled)
+        throws IOException
     {
         LOGGER.debug("Navigating to [{}].", url);
 
         if (cookies != null) {
             setCookies(cookies, url);
+
+            continueIfNotCanceled(isCanceled);
         }
 
         Page page = this.tabDevToolsService.getPage();
@@ -115,13 +114,18 @@ public class ChromeTab implements BrowserTab
         Navigate navigate = page.navigate(url.toString());
         boolean success = navigate.getErrorText() == null;
 
-        if (success && wait) {
-            Runtime runtime = this.tabDevToolsService.getRuntime();
-            runtime.enable();
-            waitForPageReady(runtime, timeout);
+        if (success && wait && !isCanceled.getAsBoolean()) {
+            this.pageReadyPromise.wait(timeout, isCanceled);
         }
 
         return success;
+    }
+
+    private void continueIfNotCanceled(BooleanSupplier isCanceled)
+    {
+        if (isCanceled.getAsBoolean()) {
+            throw new CancellationException();
+        }
     }
 
     @Override
@@ -162,46 +166,6 @@ public class ChromeTab implements BrowserTab
     }
 
     /**
-     * Wait for a page to be ready.
-     * 
-     * @param runtime the page runtime
-     * @param timeout the number of seconds to wait for the web page to be ready before timing out
-     */
-    private void waitForPageReady(Runtime runtime, int timeout) throws IOException
-    {
-        LOGGER.debug("Waiting for page to be ready.");
-        String pageReadyPromise = PAGE_READY_PROMISE.replace("__pageReadyTimeout__", String.valueOf(timeout * 1000));
-        Evaluate evaluate = runtime.evaluate(/* expression */ pageReadyPromise, /* objectGroup */ null,
-            /* includeCommandLineAPI */ false, /* silent */ false, /* contextId */ null, /* returnByValue */ true,
-            /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
-            /* throwOnSideEffect */ false, /* timeout */ this.configuration.getChromeRemoteDebuggingTimeout() * 1000.0,
-            /* disableBreaks */ true, /* replMode */ false, /* allowUnsafeEvalBlockedByCSP */ false,
-            /* uniqueContextId */ null);
-        checkEvaluation(evaluate, "Page ready.", "Failed to wait for page to be ready.",
-            "Timeout waiting for page to be ready.");
-    }
-
-    private void checkEvaluation(Evaluate evaluate, Object expectedValue, String evaluationException,
-        String unexpectedValueException) throws IOException
-    {
-        String messageTemplae = "%s Root cause: %s";
-        if (evaluate.getExceptionDetails() != null) {
-            RemoteObject exception = evaluate.getExceptionDetails().getException();
-            Object cause = exception.getDescription();
-            if (cause == null) {
-                // When the exception was thrown as a string or when a promise was rejected.
-                cause = exception.getValue();
-            }
-            throw new IOException(String.format(messageTemplae, evaluationException, cause));
-        } else {
-            RemoteObject result = evaluate.getResult();
-            if (!Objects.equals(expectedValue, result.getValue())) {
-                throw new IOException(String.format(messageTemplae, unexpectedValueException, result.getValue()));
-            }
-        }
-    }
-
-    /**
      * Converts servlet cookies to browser cookies.
      *
      * @param cookies the servlet cookies to convert to browser cookies
@@ -210,10 +174,10 @@ public class ChromeTab implements BrowserTab
     private List<CookieParam> toCookieParams(Cookie[] cookies, URL targetURL)
     {
         if (cookies == null) {
-            return Collections.emptyList();
+            return List.of();
         } else {
             return Stream.of(cookies).filter(Objects::nonNull)
-                .map(servletCookie -> toCookieParam(servletCookie, targetURL)).collect(Collectors.toList());
+                .map(servletCookie -> toCookieParam(servletCookie, targetURL)).toList();
         }
     }
 
@@ -250,10 +214,24 @@ public class ChromeTab implements BrowserTab
     {
         List<CookieParam> browserCookies = toCookieParams(servletCookies, targetURL);
         LOGGER.debug("Setting cookies [{}].", browserCookies.stream()
-            .map(cookie -> String.format("%s: %s", cookie.getName(), cookie.getValue())).collect(Collectors.toList()));
+            .map(cookie -> String.format("%s: %s", cookie.getName(), cookie.getValue())).toList());
         Network network = this.tabDevToolsService.getNetwork();
         network.enable();
         network.clearBrowserCookies();
         network.setCookies(browserCookies);
+    }
+
+    @Override
+    public void setExtraHTTPHeaders(Map<String, List<String>> headers)
+    {
+        LOGGER.debug("Setting extra HTTP headers [{}].", headers);
+        Network network = this.tabDevToolsService.getNetwork();
+        network.enable();
+        // The documentation of setExtraHTTPHeaders is not clear about the type of value we can pass for a header (key).
+        // We tried passing a List<String> and a String[] but in both cases we got an exception: "Invalid header value,
+        // string expected". So we concatenate the values of a header with a comma.
+        Map<String, Object> extraHeaders = headers.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> StringUtils.join(entry.getValue(), ",")));
+        network.setExtraHTTPHeaders(extraHeaders);
     }
 }

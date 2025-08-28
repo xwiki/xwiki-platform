@@ -40,20 +40,19 @@ div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
   border-left: 4px solid;
   box-shadow: none;
   
-  & > img {
-    // Improve alignment for silk icons
-    align-self: flex-start;
+  & > .icon-block > img {
+    max-width: unset;
   }
 
-  & > div > .box-title,
-  & > div > .xwiki-metadata-container[data-xwiki-parameter-name="title"] {
-    font-weight: bold;
-  }
-
-  // Main message content
-  & > div > p,
-  & > div > [data-cke-display-name="$content"] {
+  // Main message block
+  & > div {
     margin: 0;
+    flex-grow: 1;
+    
+    // By default the title is bold.
+    & > .box-title {
+      font-weight: bold;
+    }
   }
 }
 
@@ -64,9 +63,11 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
 }
 
 // Remove space added by last elements inside box, like paragraphs.
-.box > *:last-child,
+.box > div > *:last-child,
 // Do the same when the box macro is edited in-line.
-.box > .xwiki-metadata-container > *:last-child {
+.box > div > .xwiki-metadata-container > *:last-child,
+// Keep the previous selector for backwards compatibility with hard coded boxes that didn't get updated
+.box > *:last-child, .box > .xwiki-metadata-container > *:last-child {
   margin-bottom: 0;
 }
 

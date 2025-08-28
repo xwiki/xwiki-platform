@@ -39,7 +39,7 @@
   <content>{{velocity output="false"}}
 #set ($discard = $xwiki.ssx.use('Help.Code.VelocityMacros'))
 #set ($discard = $xwiki.jsx.use('Help.Code.VelocityMacros'))
-#set ($docextras = [])
+#set ($displayDocExtra = false)
 
 #macro (helpActionCard $data)
   &lt;div class="well"&gt;
@@ -400,6 +400,52 @@
     font-size: 300%;
     margin-bottom: 10px;
   }
+}
+
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  row-gap: 1em;
+  column-gap: 1%;
+  padding-left: 0;
+}
+
+li.card {
+  list-style: none;
+  flex-shrink: 1;
+  width: 24%;
+}
+
+.three-cols > li.card {
+  width: 32%;
+}
+
+.two-cols > li.card {
+  width: 49%;
+}
+
+@media (max-width: @screen-lg-min) {
+  li.card {
+    width: 32%;
+  }
+}
+
+@media (max-width: @screen-md-min) {
+  .card-list > li.card {
+    width: 49%;
+  }
+}
+
+@media (max-width: @screen-sm-min) {
+  .card-list > li.card {
+    width: 100%;
+  }
+}
+
+li.card > .well {
+  height: 100%;
+  margin-bottom: 0px;
 }
 
 .video-modal .modal-body {

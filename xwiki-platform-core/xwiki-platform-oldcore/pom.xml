@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -35,7 +35,7 @@
     <xwiki.extension.features>${xwiki.platform.oldcore.extension.features}</xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.38</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
@@ -130,6 +130,10 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+    </dependency>
 
     <!-- Used by parse groovy from page -->
     <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
@@ -143,6 +147,11 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
+    </dependency>
+    <!-- Hibernate 5 seems to require (but don't declare) javax validation-->
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
     </dependency>
     <!-- Replace the one from Hibernate -->
     <dependency>
@@ -164,6 +173,10 @@
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
@@ -216,6 +229,12 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-svgrasterizer</artifactId>
+    </dependency>
+
+    <!-- Guava, currently only used in SimpleDocumentCache -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
 
     <!-- Misc -->
@@ -274,7 +293,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-configuration-api</artifactId>
+      <artifactId>xwiki-commons-configuration-default</artifactId>
       <version>${commons.version}</version>
     </dependency>
 
@@ -438,6 +457,12 @@
       <artifactId>xwiki-platform-edit-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed by FileUploadPlugin -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>5.4.1</version>
+    </dependency>
 
     <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
@@ -574,6 +599,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- The Login and Register links are injected as UI extensions. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Test dependencies -->
 
     <!-- XWiki syntax parsers -->
@@ -633,12 +665,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- To be removed if we stop declaring hibernate validator as oldcore runtime dependency -->
-    <dependency>
-      <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-el</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-index-api</artifactId>
@@ -792,8 +818,6 @@
                 **/objects/StringListProperty.java,
                 **/pdf/impl/PdfExportImpl.java,
                 **/pdf/impl/PdfURLFactory.java,
-                **/plugin/mail/MailPluginApi.java,
-                **/plugin/mail/MailPlugin.java,
                 **/plugin/packaging/DocumentFilter.java,
                 **/plugin/packaging/DocumentInfoAPI.java,
                 **/plugin/packaging/DocumentInfo.java,
@@ -874,7 +898,6 @@
                 **/web/ExportAction.java,
                 **/web/ExportURLFactory.java,
                 **/web/HomePageRedirectServlet.java,
-                **/web/ImportAction.java,
                 **/web/includeservletasstring/BufferedResponse.java,
                 **/web/includeservletasstring/BufferOutputStream.java,
                 **/web/includeservletasstring/IncludeServletAsString.java,

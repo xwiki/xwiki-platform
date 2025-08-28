@@ -19,14 +19,22 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.NotFoundException;
+import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.CommentElement;
 import org.xwiki.test.ui.po.CommentForm;
 import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,6 +63,8 @@ class CommentsIT
     private static final String USER_PASSWORD = "commentUserPassword";
 
     private static final String COMMENT_REPLACED_CONTENT = "Some replaced content";
+
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     @Test
     @Order(1)
@@ -121,7 +131,10 @@ class CommentsIT
         commentsTab.openCommentForm();
         assertTrue(commentsTab.isCommentFormShown());
         commentIndex = commentsTab.postComment(COMMENT_CONTENT, true);
-        commentsTab.editCommentByID(commentIndex, COMMENT_REPLACED_CONTENT);
+        CommentForm editCommentForm = commentsTab.editCommentByID(commentIndex);
+        assertEquals(COMMENT_CONTENT, editCommentForm.getContentField().getText());
+        editCommentForm.clearAndSetContentField(COMMENT_REPLACED_CONTENT);
+        editCommentForm.clickSubmit();
         assertEquals(COMMENT_REPLACED_CONTENT, commentsTab.getCommentContentByID(commentIndex));
         
         // Open then cancel the edit comment forms
@@ -158,5 +171,118 @@ class CommentsIT
         addCommentForm = commentsTab.getAddCommentForm();
         addCommentForm.addToContentField("xyz");
         assertEquals("xyz", addCommentForm.clickPreview().getText());
+    }
+
+    private String getDateString(int seconds)
+    {
+        return DEFAULT_DATE_FORMAT.format(new Date(seconds * 1000L));
+    }
+
+    @Test
+    @Order(4)
+    void commentsAreOrderedByDate(TestUtils setup, TestReference reference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        // ensure that all dates are using GMT-0 to be displayed.
+        setup.setPropertyInXWikiPreferences("timezone", "String", "UTC");
+        setup.rest().savePage(reference, "Test comment order", "Test comment order");
+        Property authorProperty = TestUtils.RestTestUtils.property("author", "XWiki.superadmin");
+
+        // Object 0 date 100 (order: 5)
+        Object commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        Property dateProperty = TestUtils.RestTestUtils.property("date", getDateString(100));
+        Property contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 0 at date 100");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
+        setup.rest().add(commentObject);
+
+        // object 1 date 42 (order: 2)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(42));
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 1 at date 42");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
+        setup.rest().add(commentObject);
+
+        // object 2 date 100 (order: 6)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(100));
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 2 at date 100");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
+        setup.rest().add(commentObject);
+
+        // object 3 date 24 (order: 1)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(24));
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 3 at date 24");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
+        setup.rest().add(commentObject);
+
+        // object 4 date 154 reply to 1 (order: 4 - thread 1)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(154));
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 4 at date 154 reply to 1");
+        Property replyToProperty = TestUtils.RestTestUtils.property("replyto", 1);
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty, replyToProperty));
+        setup.rest().add(commentObject);
+
+        // object 5 date 122 (order: 7)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(122));
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 5 at date 122");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
+        setup.rest().add(commentObject);
+
+        // object 6 date 66 reply to 1 (order: 3 - thread 1)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(66));
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 6 at date 66 reply to 1");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty, replyToProperty));
+        setup.rest().add(commentObject);
+
+        ViewPage viewPage = setup.gotoPage(reference);
+        CommentsTab commentsTab = viewPage.openCommentsDocExtraPane();
+        List<CommentElement> comments = commentsTab.getComments();
+        assertEquals(7, comments.size());
+
+        CommentElement commentElement = comments.get(0);
+        assertEquals("1970/01/01 00:00", commentElement.getDate());
+        assertEquals("Comment object 3 at date 24", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertFalse(commentElement.isReply());
+
+        commentElement = comments.get(1);
+        assertEquals("Comment object 1 at date 42", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertEquals("1970/01/01 00:00", commentElement.getDate());
+        assertFalse(commentElement.isReply());
+
+        commentElement = comments.get(2);
+        assertEquals("Comment object 6 at date 66 reply to 1", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertEquals("1970/01/01 00:01", commentElement.getDate());
+        assertTrue(commentElement.isReply());
+
+        commentElement = comments.get(3);
+        assertEquals("Comment object 4 at date 154 reply to 1", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertEquals("1970/01/01 00:02", commentElement.getDate());
+        assertTrue(commentElement.isReply());
+
+        commentElement = comments.get(4);
+        assertEquals("Comment object 0 at date 100", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertEquals("1970/01/01 00:01", commentElement.getDate());
+        assertFalse(commentElement.isReply());
+
+        commentElement = comments.get(5);
+        assertEquals("Comment object 2 at date 100", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertEquals("1970/01/01 00:01", commentElement.getDate());
+        assertFalse(commentElement.isReply());
+
+        commentElement = comments.get(6);
+        assertEquals("Comment object 5 at date 122", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertEquals("1970/01/01 00:02", commentElement.getDate());
+        assertFalse(commentElement.isReply());
     }
 }

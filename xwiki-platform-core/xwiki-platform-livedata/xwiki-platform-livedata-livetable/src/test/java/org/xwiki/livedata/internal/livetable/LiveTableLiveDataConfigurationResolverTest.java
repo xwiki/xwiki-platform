@@ -88,7 +88,7 @@ class LiveTableLiveDataConfigurationResolverTest
         ObjectMapper objectMapper = new ObjectMapper();
         LiveTableConfiguration liveTableConfig = objectMapper.readerFor(LiveTableConfiguration.class).readValue(input);
         LiveDataConfiguration liveDataConfig = this.liveTableLiveDataConfigResolver.resolve(liveTableConfig);
-        assertEquals(output, objectMapper.writeValueAsString(liveDataConfig));
+        assertEquals(objectMapper.readValue(output, LiveDataConfiguration.class), liveDataConfig);
     }
 
     static Stream<String[]> testData()

@@ -22,8 +22,6 @@ package com.xpn.xwiki.internal.store.hibernate.query;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link HqlQueryUtils}.
@@ -32,39 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class HqlQueryUtilsTest
 {
-    @Test
-    public void isSafe()
-    {
-        // allowed
-
-        assertTrue(HqlQueryUtils.isSafe("select name from XWikiDocument"));
-        assertTrue(HqlQueryUtils.isSafe("select doc.name, space.name from XWikiDocument doc, XWikiSpace space"));
-        assertTrue(HqlQueryUtils
-            .isSafe("select doc.name, space.name from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
-        assertTrue(HqlQueryUtils.isSafe("select count(name) from XWikiDocument"));
-        assertTrue(HqlQueryUtils.isSafe("select count(doc.name) from XWikiDocument doc"));
-        assertTrue(HqlQueryUtils
-            .isSafe("select doc.fullName from XWikiDocument as doc, com.xpn.xwiki.objects.StringProperty as str"));
-
-        assertTrue(HqlQueryUtils.isSafe("select count(*) from XWikiSpace"));
-        assertTrue(HqlQueryUtils.isSafe("select count(space.*) from XWikiSpace space"));
-
-        assertTrue(HqlQueryUtils.isSafe("select attachment.filename from XWikiAttachment attachment"));
-        assertTrue(HqlQueryUtils.isSafe("select count(*) from XWikiAttachment"));
-
-        // not allowed
-
-        assertFalse(HqlQueryUtils.isSafe("select name from OtherTable"));
-        assertFalse(HqlQueryUtils.isSafe("select doc.* from XWikiDocument doc, XWikiSpace space"));
-        assertFalse(HqlQueryUtils.isSafe("select * from XWikiDocument doc"));
-        assertFalse(HqlQueryUtils.isSafe("select * from XWikiAttachment"));
-        assertFalse(HqlQueryUtils.isSafe("select attachment.mimeType from XWikiAttachment attachment"));
-        assertFalse(HqlQueryUtils
-            .isSafe("select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
-        assertFalse(HqlQueryUtils.isSafe("select count(*) from OtherTable"));
-        assertFalse(HqlQueryUtils.isSafe("select count(other.*) from OtherTable other"));
-    }
-
     @Test
     public void replaceLegacyQueryParameters()
     {
@@ -86,5 +51,32 @@ public class HqlQueryUtilsTest
             HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column >?"));
         assertEquals("select column from table where table.column <?1",
             HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column <?"));
+    }
+
+    @Test
+    public void toCompleteStatement()
+    {
+        assertEquals("from table", HqlQueryUtils.toCompleteStatement("from table"));
+        assertEquals("select * from table", HqlQueryUtils.toCompleteStatement("select * from table"));
+
+        assertEquals("select doc.fullName from XWikiDocument doc where doc.name = 'name'",
+            HqlQueryUtils.toCompleteStatement("where doc.name = 'name'"));
+        assertEquals("select doc.fullName from XWikiDocument doc order by doc.name",
+            HqlQueryUtils.toCompleteStatement("order by doc.name"));
+        assertEquals("select doc.fullName from XWikiDocument doc , XWikiSpace space",
+            HqlQueryUtils.toCompleteStatement(", XWikiSpace space"));
+    }
+
+    @Test
+    public void getValidQueryOrder()
+    {
+        assertEquals("asc", HqlQueryUtils.getValidQueryOrder("asc", "desc"));
+        assertEquals("desc", HqlQueryUtils.getValidQueryOrder("desc", "asc"));
+        assertEquals("ASC", HqlQueryUtils.getValidQueryOrder("ASC", "desc"));
+        assertEquals("DESC", HqlQueryUtils.getValidQueryOrder("DESC", "asc"));
+
+        assertEquals("desc", HqlQueryUtils.getValidQueryOrder(null, "desc"));
+        assertEquals("desc", HqlQueryUtils.getValidQueryOrder("wrong", "desc"));
+        assertEquals("asc", HqlQueryUtils.getValidQueryOrder("wrong", "asc"));
     }
 }

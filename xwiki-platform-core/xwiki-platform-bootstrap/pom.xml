@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-bootstrap</artifactId>
@@ -169,7 +169,7 @@
             <configuration>
               <arguments>run lint</arguments>
             </configuration>
-            <phase>test</phase>
+            <phase>verify</phase>
           </execution>
         </executions>
         <configuration>

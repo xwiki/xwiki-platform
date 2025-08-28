@@ -20,7 +20,6 @@
 package org.xwiki.annotation.rest.internal;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -41,7 +40,6 @@ import org.xwiki.rest.XWikiRestException;
 @Component
 @Named("org.xwiki.annotation.rest.internal.AnnotationsRESTResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/annotations")
-@Singleton
 public class AnnotationsRESTResource extends AbstractAnnotationsRESTResource
 {
     /**

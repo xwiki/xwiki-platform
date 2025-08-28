@@ -19,10 +19,8 @@
  */
 package org.xwiki.realtime.wysiwyg.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -38,17 +36,26 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
+import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.CKEditorToolBar;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
+import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.realtime.test.RealtimeTestUtils;
+import org.xwiki.realtime.test.po.Coeditor;
+import org.xwiki.realtime.test.po.RealtimeEditToolbar;
+import org.xwiki.realtime.test.po.RealtimeInplaceEditablePage;
+import org.xwiki.realtime.test.po.SaveStatus;
+import org.xwiki.realtime.test.po.SummaryModal;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
-import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar;
-import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement.CoeditorPosition;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeWYSIWYGEditPage;
@@ -56,8 +63,16 @@ import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import com.mchange.io.FileUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the real-time WYSIWYG editor.
@@ -104,8 +119,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor editor = editPage.getContenEditor();
 
-        // Verify that the Allow Realtime Collaboration checkbox is checked.
-        assertTrue(editPage.isRealtimeEditing());
+        // Verify that we're connected to the realtime editing session.
+        assertTrue(editPage.getToolbar().isCollaborating());
 
         // Verify that the Preview button is hidden.
         assertFalse(editPage.hasPreviewButton());
@@ -115,7 +130,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertFalse(editPage.getAutoSaveCheckbox().isDisplayed());
 
         // Verify that we're editing alone.
-        assertTrue(editor.getToolBar().isEditingAlone());
+        assertTrue(editPage.getToolbar().isEditingAlone());
 
         // The Source button is now available.
         assertTrue(editor.getToolBar().canToggleSourceMode());
@@ -124,45 +139,81 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         textArea.sendKeys("one");
 
         // Verify the cursor indicator on the left of the editing area.
-        CoeditorPosition selfPosition = textArea.getCoeditorPosition(editor.getToolBar().getUserId());
+        CoeditorPosition selfPosition = textArea.getCoeditorPosition(editPage.getToolbar().getUserId());
         assertEquals("John", selfPosition.getAvatarHint());
         assertTrue(selfPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + selfPosition.getAvatarURL());
-        selfPosition.waitForLocation(new Point(4, 18));
+        selfPosition.waitForLocation(new Point(4, 17));
 
         assertEquals(1, textArea.getCoeditorPositions().size());
 
         // Verify that the cursor indicator is updated when typing.
         textArea.sendKeys(Keys.ENTER, "two");
-        selfPosition.waitForLocation(new Point(4, 48));
+        selfPosition.waitForLocation(new Point(4, 47));
 
-        // Verify the action buttons (Save and Cancel).
-        editPage.clickSaveAndContinue();
+        // Verify save and cancel.
+        editPage.getToolbar().sendSaveShortcutKey();
         textArea.sendKeys(Keys.ENTER, "three");
-        ViewPage viewPage = editPage.clickCancel();
-        assertEquals("one\ntwo", viewPage.getContent());
+        setup.leaveEditMode();
+        RealtimeInplaceEditablePage inplaceEditablePage = new RealtimeInplaceEditablePage();
+        assertEquals("one\ntwo", inplaceEditablePage.getContent());
 
         // Edit again and verify the Save and View button.
-        viewPage.edit();
-        InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+        inplaceEditablePage.editInplace();
         new RealtimeCKEditor().getRichTextArea().sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "three");
-        viewPage = inplaceEditablePage.saveAndView();
-        assertEquals("one\ntwo\nthree", viewPage.getContent());
+        inplaceEditablePage.done();
+        assertEquals("one\ntwo\nthree", inplaceEditablePage.getContent());
 
         // Edit again to verify the autosave.
-        viewPage.edit();
-        inplaceEditablePage = new InplaceEditablePage();
+        inplaceEditablePage.editInplace();
         editor = new RealtimeCKEditor();
         textArea = editor.getRichTextArea();
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
         textArea.sendKeys("zero");
 
         // Wait for auto-save.
-        String saveStatus = editor.getToolBar().waitForAutoSave();
-        assertTrue(saveStatus.startsWith("Saved:"), "Unexpected save status: " + saveStatus);
+        inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
+        inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
 
-        viewPage = inplaceEditablePage.cancel();
-        assertEquals("zero\ntwo\nthree", viewPage.getContent());
+        inplaceEditablePage.done();
+        assertEquals("zero\ntwo\nthree", inplaceEditablePage.getContent());
+
+        // edit again and test the summarize & done
+        inplaceEditablePage.editInplace();
+        new RealtimeCKEditor().getRichTextArea().sendKeys(
+            Keys.ARROW_DOWN,
+            Keys.ARROW_DOWN,
+            Keys.END,
+            Keys.ENTER,
+            "four");
+        SummaryModal summaryModal = inplaceEditablePage.getToolbar().clickSummarizeAndDone();
+        summaryModal.setSummary("Summarize changes");
+        summaryModal.clickSave(true);
+        inplaceEditablePage.waitForView();
+        assertEquals("zero\ntwo\nthree\nfour", inplaceEditablePage.getContent());
+        HistoryPane historyPane = inplaceEditablePage.openHistoryDocExtraPane();
+        assertEquals(4, historyPane.getNumberOfVersions());
+        assertEquals("Summarize changes", historyPane.getCurrentVersionComment());
+
+        // delete the page to test creation with summarize & done (regression test for XWIKI-23136)
+        setup.deletePage(testReference);
+        editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        editor = editPage.getContenEditor();
+        textArea = editor.getRichTextArea();
+        textArea.sendKeys("New content");
+        new WikiEditPage().setTitle("Dummy title");
+        summaryModal = editPage.getToolbar().clickSummarizeAndDone();
+        summaryModal.setSummary("Summarize changes 2");
+
+        // Since it's a page creation, we're not in inplace editable page and so we'll have a reload.
+        setup.getDriver().addPageNotYetReloadedMarker();
+        summaryModal.clickSave(false);
+        setup.getDriver().waitUntilPageIsReloaded();
+        ViewPage viewPage = new ViewPage();
+        assertEquals("New content", viewPage.getContent());
+        assertEquals("Dummy title", viewPage.getDocumentTitle());
+        historyPane = inplaceEditablePage.openHistoryDocExtraPane();
+        assertEquals("Summarize changes 2", historyPane.getCurrentVersionComment());
     }
 
     @Test
@@ -180,7 +231,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        String firstCoeditorId = firstEditor.getToolBar().getUserId();
+        String firstCoeditorId = firstEditPage.getToolbar().getUserId();
 
         //
         // Second Tab
@@ -192,17 +243,19 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
-        String secondCoeditorId = secondEditor.getToolBar().getUserId();
+        String secondCoeditorId = secondEditPage.getToolbar().getUserId();
 
         // Verify the list of coeditors.
-        List<Coeditor> coeditors = secondEditor.getToolBar().waitForCoeditor(firstCoeditorId).getCoeditors();
-        assertEquals(1, coeditors.size());
-        Coeditor self = coeditors.get(0);
-        assertEquals("John", self.getName());
+        Coeditor self = secondEditPage.getToolbar().waitForCoeditor(firstCoeditorId);
+        assertTrue(self.isDisplayed());
+        // The name is not visible when the user is displayed directly on the toolbar.
+        assertEquals("", self.getName());
         assertEquals("xwiki:XWiki.John", self.getReference());
         assertTrue(setup.getURL(new DocumentReference("xwiki", "XWiki", "John")).endsWith(self.getURL()));
         assertTrue(self.getAvatarURL().contains("noavatar.png"), "Unexpected avatar URL: " + self.getAvatarURL());
         assertEquals("John", self.getAvatarHint());
+        assertEquals("Jo", self.getAbbreviation());
+        assertEquals(2, secondEditPage.getToolbar().getVisibleCoeditors().size());
 
         // Verify the placeholder text is present, because the content is empty.
         secondTextArea.waitForPlaceholder("Start typing here...");
@@ -213,14 +266,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Switch back to the first tab and verify the list of coeditors.
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        coeditors = firstEditor.getToolBar().waitForCoeditor(secondCoeditorId).getCoeditors();
-        assertEquals(1, coeditors.size());
-        self = coeditors.get(0);
-        assertEquals("John", self.getName());
+        self = firstEditPage.getToolbar().waitForCoeditor(secondCoeditorId);
+        assertTrue(self.isDisplayed());
+        // The name is not visible when the user is displayed directly on the toolbar.
+        assertEquals("", self.getName());
         assertEquals("xwiki:XWiki.John", self.getReference());
         assertTrue(setup.getURL(new DocumentReference("xwiki", "XWiki", "John")).endsWith(self.getURL()));
         assertTrue(self.getAvatarURL().contains("noavatar.png"), "Unexpected avatar URL: " + self.getAvatarURL());
         assertEquals("John", self.getAvatarHint());
+        assertEquals("Jo", self.getAbbreviation());
+        assertEquals(2, firstEditPage.getToolbar().getVisibleCoeditors().size());
 
         // Type in the first tab to see that it gets propagated to the second tab.
         firstTextArea.sendKeys("one", Keys.ENTER, "two", Keys.ENTER, "three");
@@ -244,14 +299,14 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The first user is on the third line (paragraph).
         CoeditorPosition firstPosition =
-            secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 78));
+            secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 77));
         assertEquals("John", firstPosition.getAvatarHint());
         assertTrue(firstPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + firstPosition.getAvatarURL());
 
         // The second user is on the first line (paragraph).
         CoeditorPosition secondPosition =
-            secondTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 18));
+            secondTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 17));
         assertEquals("John", secondPosition.getAvatarHint());
         assertTrue(secondPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + secondPosition.getAvatarURL());
@@ -266,7 +321,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 48));
+        firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 47));
 
         // Verify that clicking on the coeditor indicator scrolls the editing area to the coeditor position.
         // But first we need to add enough paragraphs to make the editing area scrollable.
@@ -282,9 +337,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Switch to the second tab and click on the coeditor indicator.
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.waitUntilTextContains("end");
-        firstPosition = secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 18 + 22 * 30));
+        firstPosition = secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 17 + 22 * 30));
         assertFalse(firstPosition.isVisible(), "The coeditor position is visible before scrolling.");
-        secondEditor.getToolBar().getCoeditor(firstCoeditorId).click();
+        secondEditPage.getToolbar().waitForCoeditor(firstCoeditorId).click();
         assertTrue(firstPosition.isVisible(), "The coeditor position is not visible after scrolling.");
     }
 
@@ -370,7 +425,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilTextContains("three");
 
         // Save and check the result.
-        ViewPage viewPage = secondEditPage.clickSaveAndView();
+        ViewPage viewPage = secondEditPage.clickDone();
         assertEquals("Information\nmy info message\none two three", viewPage.getContent());
     }
 
@@ -431,7 +486,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Wait to receive all the content typed by the first user.
         secondTextArea.waitUntilTextContains("First");
 
-        ViewPage viewPage = secondEditPage.clickSaveAndView();
+        ViewPage viewPage = secondEditPage.clickDone();
         assertEquals("Start. " + firstUserText + "\n" + secondUserText + " End.", viewPage.getContent());
     }
 
@@ -495,7 +550,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Wait to receive all the content typed by the first user.
         secondTextArea.waitUntilTextContains("First.");
 
-        ViewPage viewPage = secondEditPage.clickSaveAndView();
+        ViewPage viewPage = secondEditPage.clickDone();
         assertEquals(text + " First. Separator. " + text, viewPage.getContent());
     }
 
@@ -626,6 +681,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
         imageDialogEditModal.clickInsert();
 
+        // Verify the image is uploaded properly
+        File file = setup.getResourceFile("/image.gif");
+        byte[] uploadedAttachmentContent = setup.rest()
+            .getAttachmentAsByteArray(new EntityReference("image.gif", EntityType.ATTACHMENT, testReference));
+        assertTrue(Arrays.equals(FileUtils.getBytes(file), uploadedAttachmentContent));
+
         // Focus the caption and edit it.
         secondTextArea.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP);
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -662,7 +723,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.sendKeys(Keys.ARROW_LEFT, "est");
         firstTextArea.waitUntilContentContains("<strong>Tree</strong>");
-        firstEditPage.clickSaveAndView();
+        firstEditPage.clickDone();
         assertEquals("before\n\n[[Smallest **Tree**>>image:image.gif]]\n\n ",
             WikiEditPage.gotoPage(testReference).getContent());
     }
@@ -724,6 +785,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Wait for the content to be synchronized before applying the macro parameter changes, otherwise we might
         // overwrite the text typed in the second tab.
         firstTextArea.waitUntilTextContains("two");
+        firstMacroEditModal.setMacroContent("one two");
         firstMacroEditModal.clickSubmit();
         firstTextArea.waitForContentRefresh();
 
@@ -739,6 +801,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilTextContains("Some title");
         // Verify that the remote change (which included a macro parameter update) didn't steal the focus.
         secondMacroEditModal.getMacroParameterInput("cssClass").sendKeys("a");
+        secondMacroEditModal.setMacroParameter("title", "Some title");
         secondMacroEditModal.clickSubmit();
         secondTextArea.waitForContentRefresh();
 
@@ -760,7 +823,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("bar", firstMacroEditModal.getMacroParameter("cssClass"));
         firstMacroEditModal.clickCancel();
 
-        firstEditPage.clickSaveAndView();
+        firstEditPage.clickDone();
         assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}",
             WikiEditPage.gotoPage(testReference).getContent());
     }
@@ -788,7 +851,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // conflict. We have to save now to prevent the autosave from triggering (it doesn't trigger if there are no
         // local changes), because we want to control when the merge conflict modal is shown (moreover, we're going to
         // handle the merge conflict in a second browser tab).
-        firstEditPage.clickSaveAndContinue();
+        firstEditPage.getToolbar().sendSaveShortcutKey();
 
         //
         // Second Tab
@@ -816,7 +879,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Make some changes outside the realtime session and save in order to trigger a merge conflict in the realtime
         // session.
-        thirdEditPage.leaveRealtimeEditing();
+        thirdEditPage.getToolbar().leaveCollaboration();
         thirdTextArea.sendKeys(Keys.END, " third");
         thirdEditPage.clickSaveAndContinue();
 
@@ -826,7 +889,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.sendKeys(Keys.END, " second");
-        secondEditPage.clickSaveAndContinue(false);
+        secondEditPage.getToolbar().sendSaveShortcutKey(false);
 
         EditConflictModal editConflictModal = new EditConflictModal();
         editConflictModal.makeChoiceAndSubmit(ConflictChoice.RELOAD, false);
@@ -836,7 +899,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.verifyContent(content -> {
             WebElement image = content.getImages().get(0);
             AttachmentReference attachmentReference = new AttachmentReference("image.gif", testReference);
-            assertEquals(setup.getURL(attachmentReference, "download", "width=50&rev=1.1"), image.getAttribute("src"));
+            assertEquals(setup.getURL(attachmentReference, "download", "width=50&rev=1.1"),
+                image.getDomProperty("src"));
             Dimension imageSize = image.getSize();
 
             if (imageSize.width != 50 && "20".equals(image.getDomProperty("naturalWidth"))) {
@@ -891,7 +955,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
         firstTextArea.sendKeys("First");
-        firstEditPage.clickSaveAndContinue();
+        firstEditPage.getToolbar().sendSaveShortcutKey();
 
         //
         // Second Tab
@@ -915,7 +979,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement thirdTextArea = thirdEditor.getRichTextArea();
         thirdTextArea.waitUntilTextContains("First");
 
-        thirdEditPage.leaveRealtimeEditing();
+        thirdEditPage.getToolbar().leaveCollaboration();
 
         thirdTextArea.sendKeys(Keys.END, Keys.ENTER, "Third");
         thirdEditPage.clickSaveAndContinue();
@@ -925,7 +989,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(secondTabHandle);
-        secondEditPage.clickSaveAndContinue();
+        // Save to get the auto-merged content.
+        secondEditPage.getToolbar().sendSaveShortcutKey(false);
         secondTextArea.waitUntilTextContains("Third");
 
         //
@@ -1054,7 +1119,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstEditPage.getContenEditor();
 
         // Leaving the realtime session should not release the lock.
-        firstEditPage.leaveRealtimeEditing();
+        firstEditPage.getToolbar().leaveCollaboration();
 
         //
         // Second Tab
@@ -1120,22 +1185,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
-        // Insert an empty Velocity macro.
+        // Insert a Velocity macro.
         secondTextArea.sendKeys("before", Keys.RETURN);
         secondTextArea.sendKeys("/velo");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/velo", "Velocity");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitForContentRefresh();
-        String text = secondTextArea.getText();
-        assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
-
-        // Edit the inserted Velocity macro.
-        secondTextArea.sendKeys(Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
         secondTextArea.waitForContentRefresh();
-        text = secondTextArea.getText();
+        String text = secondTextArea.getText();
         assertTrue(text.contains("superadmin"));
         assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
         String secondRefreshCounter = secondTextArea.getRefreshCounter();
@@ -1198,10 +1257,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitForContentRefresh();
-
-        // Edit the inserted Velocity macro to add some script.
-        firstTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("injected").clickSubmit();
         firstTextArea.waitForContentRefresh();
         text = firstTextArea.getText();
@@ -1209,7 +1264,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         String firstRefreshCounter = firstTextArea.getRefreshCounter();
 
         // Leave the edit mode to see that the script level associated with the realtime session remains the same.
-        firstEditPage.clickCancel();
+        setup.leaveEditMode();
 
         //
         // Second Tab
@@ -1253,7 +1308,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.sendKeys("default content");
 
         // Save the page so that we can translate it.
-        firstTextArea.sendSaveShortcutKey();
+        firstEditPage.getToolbar().sendSaveShortcutKey();
 
         //
         // Second Tab
@@ -1285,10 +1340,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitForContentRefresh();
-
-        // Edit the inserted Velocity macro.
-        secondTextArea.sendKeys(Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
         secondTextArea.waitUntilTextContains("superadmin");
 
@@ -1304,10 +1355,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
+        new MacroDialogEditModal().waitUntilReady().setMacroContent(" ").clickSubmit();
         firstTextArea.waitUntilTextContains("default content\nFailed to execute the [velocity] macro.");
 
         // Verify that we're editing alone.
-        assertTrue(firstEditor.getToolBar().isEditingAlone());
+        assertTrue(firstEditPage.getToolbar().isEditingAlone());
 
         //
         // Second Tab
@@ -1322,9 +1374,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilTextContains("User: superadmin");
 
         // Verify that we're editing alone.
-        assertTrue(secondEditor.getToolBar().isEditingAlone());
+        assertTrue(secondEditPage.getToolbar().isEditingAlone());
 
-        assertEquals("French content\nUser: superadmin", secondEditPage.clickSaveAndView().getContent());
+        assertEquals("French content\nUser: superadmin", secondEditPage.clickDone().getContent());
 
         //
         // First Tab
@@ -1336,13 +1388,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.ARROW_RIGHT));
         firstTextArea.sendKeys("English");
 
-        String content = firstEditPage.clickSaveAndView().getContent();
+        String content = firstEditPage.clickDone().getContent();
         assertTrue(content.startsWith("English content\nFailed to execute the [velocity] macro."),
             "Unexpected content: " + content);
 
         // Now edit the same (German) translation.
         setup.gotoPage(testReference, "view", "language=de");
-        new InplaceEditablePage().translateInplace();
+        new RealtimeInplaceEditablePage().translateInplace();
 
         firstEditPage = new RealtimeWYSIWYGEditPage();
         firstEditor = firstEditPage.getContenEditor();
@@ -1376,13 +1428,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilTextContains("Deutsch");
         assertEquals("Deutsch content", firstTextArea.getText());
 
-        assertEquals("superadmin", firstEditor.getToolBar().getCoeditors().stream().map(Coeditor::getName)
-            .reduce((a, b) -> a + ", " + b).get());
-
-        // cancel all editions
-        firstEditPage.clickCancel();
-        multiUserSetup.switchToBrowserTab(secondTabHandle);
-        secondEditPage.clickCancel();
+        assertEquals("John, superadmin", firstEditPage.getToolbar().getVisibleCoeditors().stream()
+            .map(Coeditor::getAvatarHint).reduce((a, b) -> a + ", " + b).get());
     }
 
     @Test
@@ -1399,7 +1446,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Edit the page in the first browser tab.
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
-        RealtimeCKEditorToolBar firstEditorToolbar = firstEditor.getToolBar();
+        CKEditorToolBar firstEditorToolbar = firstEditor.getToolBar();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
 
         // Check that the source button is available.
@@ -1414,7 +1461,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Edit the page in the second browser tab.
         RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
-        RealtimeCKEditorToolBar secondEditorToolbar = secondEditor.getToolBar();
+        CKEditorToolBar secondEditorToolbar = secondEditor.getToolBar();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         // Check that the source button is available.
@@ -1441,18 +1488,18 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("one\ntwo\nthree", secondTextArea.getText());
 
         // Save to make sure the editor is not marked as dirty.
-        secondEditPage.clickSaveAndContinue();
+        secondEditPage.getToolbar().sendSaveShortcutKey();
 
         // Switch to source mode and check that we are not in the realtime session anymore.
         secondEditorToolbar.toggleSourceMode();
-        assertFalse(secondEditPage.isRealtimeEditing());
-        assertFalse(secondEditPage.canToggleRealtimeEditing());
+        assertFalse(secondEditPage.getToolbar().isCollaborating());
+        assertFalse(secondEditPage.getToolbar().canJoinCollaboration());
 
         // Check that we can still switch back to wysiwyg mode.
         assertTrue(secondEditorToolbar.canToggleSourceMode());
 
         // Check the contents of the source mode.
-        assertEquals("one\n\ntwo\n\nthree", secondEditor.getSourceTextArea().getAttribute("value"));
+        assertEquals("one\n\ntwo\n\nthree", secondEditor.getSourceTextArea().getDomProperty("value"));
 
         //
         // First Tab
@@ -1475,8 +1522,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea = secondEditor.getRichTextArea();
 
         // Check that the second user re-joined the realtime editing session.
-        assertTrue(secondEditPage.isRealtimeEditing());
-        assertTrue(secondEditPage.canToggleRealtimeEditing());
+        assertTrue(secondEditPage.getToolbar().isCollaborating());
         assertTrue(secondEditorToolbar.canToggleSourceMode());
         secondTextArea.waitUntilContentContains("four");
         assertEquals("one\ntwo\nthree\nfour", secondTextArea.getText());
@@ -1485,15 +1531,15 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(secondEditorToolbar.canToggleSourceMode());
 
         // Save again to make the editor not dirty.
-        secondEditPage.clickSaveAndContinue();
+        secondEditPage.getToolbar().sendSaveShortcutKey();
 
         // Switch to source mode.
         secondEditorToolbar.toggleSourceMode();
 
-        assertFalse(secondEditPage.isRealtimeEditing());
-        assertFalse(secondEditPage.canToggleRealtimeEditing());
+        assertFalse(secondEditPage.getToolbar().isCollaborating());
+        assertFalse(secondEditPage.getToolbar().canJoinCollaboration());
         // Check the contents of the source mode.
-        assertEquals("one\n\ntwo\n\nthree\n\nfour", secondEditor.getSourceTextArea().getAttribute("value"));
+        assertEquals("one\n\ntwo\n\nthree\n\nfour", secondEditor.getSourceTextArea().getDomProperty("value"));
 
         // Add some content.
         secondEditor.getSourceTextArea().sendKeys(Keys.ENTER, Keys.ENTER, "five");
@@ -1511,21 +1557,21 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Second Tab
         //
 
-        // Switch to the second tab and switch back to view mode.
+        // Switch to the second tab and switch back to WYSIWYG mode.
         setup.getDriver().switchTo().window(secondTabHandle);
         secondEditorToolbar.toggleSourceMode();
 
-        // After switching back to view mode, we need to recreate the textArea.
+        // After switching back to WYSIWYG mode, we need to recreate the textArea.
         secondTextArea = secondEditor.getRichTextArea();
 
         // Check that the second user did not re-join the realtime editing session.
-        assertFalse(secondEditPage.isRealtimeEditing());
+        assertFalse(secondEditPage.getToolbar().isCollaborating());
         assertTrue(secondEditorToolbar.canToggleSourceMode());
-        assertTrue(secondEditPage.canToggleRealtimeEditing());
+        assertTrue(secondEditPage.getToolbar().canJoinCollaboration());
         assertEquals("one\ntwo\nthree\nfour\nfive", secondTextArea.getText());
 
         // Join the realtime session again and wait to be in sync.
-        secondEditPage.joinRealtimeEditing();
+        secondEditPage.getToolbar().joinCollaboration();
         secondTextArea.waitUntilContentContains("six");
         assertEquals("one\ntwo\nthree\nfour\nsix", secondTextArea.getText());
 
@@ -1537,28 +1583,28 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Switch to source mode and back to wysiwyg edit mode.
         secondEditorToolbar.toggleSourceMode();
-        assertFalse(secondEditPage.isRealtimeEditing());
-        assertFalse(secondEditPage.canToggleRealtimeEditing());
+        assertFalse(secondEditPage.getToolbar().isCollaborating());
+        assertFalse(secondEditPage.getToolbar().canJoinCollaboration());
         assertEquals("one\n\ntwo\n\nthree\n\nfour\n\nsix\n\nseven",
-            secondEditor.getSourceTextArea().getAttribute("value"));
+            secondEditor.getSourceTextArea().getDomProperty("value"));
         secondEditorToolbar.toggleSourceMode();
-        assertTrue(secondEditPage.canToggleRealtimeEditing());
+        assertTrue(secondEditPage.getToolbar().canJoinCollaboration());
 
         // Check that the second user did not re-join the realtime editing session.
-        assertFalse(secondEditPage.isRealtimeEditing());
+        assertFalse(secondEditPage.getToolbar().isCollaborating());
         
         // Switch to source mode and back to wysiwyg again.
         // We should stay out of the realtime editing session.
         secondEditorToolbar.toggleSourceMode();
-        assertFalse(secondEditPage.isRealtimeEditing());
-        assertFalse(secondEditPage.canToggleRealtimeEditing());
+        assertFalse(secondEditPage.getToolbar().isCollaborating());
+        assertFalse(secondEditPage.getToolbar().canJoinCollaboration());
         
         assertEquals("one\n\ntwo\n\nthree\n\nfour\n\nsix\n\nseven",
-            secondEditor.getSourceTextArea().getAttribute("value"));
+            secondEditor.getSourceTextArea().getDomProperty("value"));
         
         secondEditorToolbar.toggleSourceMode();
-        assertFalse(secondEditPage.isRealtimeEditing());
-        assertTrue(secondEditPage.canToggleRealtimeEditing());
+        assertFalse(secondEditPage.getToolbar().isCollaborating());
+        assertTrue(secondEditPage.getToolbar().canJoinCollaboration());
 
         // We keep the second user out of the realtime editing session now
         // and we do more tests with the first user.
@@ -1574,30 +1620,31 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(firstEditorToolbar.canToggleSourceMode());
 
         // Saving might merge silently. Here is some bulletproofing cleanup.
-        firstEditPage.clickSaveAndContinue();
+        firstEditPage.getToolbar().sendSaveShortcutKey();
         firstTextArea.clear();
 
-        // Make the editor not dirty by saving.
-        firstEditPage.clickSaveAndContinue();
+        // Make the editor is not dirty by saving.
+        firstEditPage.getToolbar().sendSaveShortcutKey();
 
         // Switch to source mode and back to wysiwyg.
         firstEditorToolbar.toggleSourceMode();
-        assertFalse(firstEditPage.isRealtimeEditing());
+        assertFalse(firstEditPage.getToolbar().isCollaborating());
         firstEditorToolbar.toggleSourceMode();
-        assertTrue(firstEditPage.isRealtimeEditing());
+        firstEditPage.getToolbar().waitUntilConnected();
 
         // Bulletproofing: Save to make sure the editor is not dirty.
-        firstEditPage.clickSaveAndContinue();
+        firstEditPage.getToolbar().sendSaveShortcutKey();
 
         // Switch to source mode, make a change, and switch back to wysiwyg.
         firstEditorToolbar.toggleSourceMode();
-        assertFalse(firstEditPage.isRealtimeEditing());
+        assertFalse(firstEditPage.getToolbar().isCollaborating());
         firstEditor.getSourceTextArea().sendKeys(Keys.ENTER, Keys.ENTER, "eight");
         firstEditorToolbar.toggleSourceMode();
+        // We are editing alone, so we should have joined the realtime session after switching back to wysiwyg.
+        firstEditPage.getToolbar().waitUntilConnected();
+        assertTrue(firstEditPage.getToolbar().isEditingAlone());
 
         firstTextArea = firstEditor.getRichTextArea();
-        // We are editing alone, so we should have joined the realtime session after switching back to wysiwyg.
-        assertTrue(firstEditPage.isRealtimeEditing());
         assertEquals("eight", firstTextArea.getText());
     }
 
@@ -1609,25 +1656,25 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.createPage(testReference, "one\n\n{{info}}two{{/info}}");
 
         // The default edit mode is inplace.
-        InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
-        inplaceEditablePage.edit();
+        RealtimeInplaceEditablePage inplaceEditablePage = new RealtimeInplaceEditablePage();
+        inplaceEditablePage.editInplace();
 
         RealtimeCKEditor editor = new RealtimeCKEditor();
-        RealtimeCKEditorToolBar toolbar = editor.getToolBar();
+        CKEditorToolBar toolbar = editor.getToolBar();
         RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
 
         // Move the focus from the main editable to the nested editable.
         textArea.sendKeys("1", Keys.ARROW_DOWN, Keys.HOME, "2");
 
         // Save and continue (using the shortcut so that the editor doesn't lose the focus).
-        textArea.sendSaveShortcutKey();
+        inplaceEditablePage.getToolbar().sendSaveShortcutKey();
 
         // Verify that the toolbar is still visible.
         assertTrue(toolbar.canToggleSourceMode());
 
-        // Verify that Save & View doesn't ask for leave confirmation.
+        // Verify that Done doesn't ask for leave confirmation.
         textArea.sendKeys("3");
-        inplaceEditablePage = inplaceEditablePage.saveAndView();
+        inplaceEditablePage.done();
         assertEquals("1one\nInformation\n23two", inplaceEditablePage.getContent());
     }
 
@@ -1659,7 +1706,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         secondTextArea.sendKeys("second");
-        secondEditPage.clickSaveAndView();
+        secondEditPage.clickDone();
 
         //
         // First Tab
@@ -1669,7 +1716,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilTextContains("second");
         firstTextArea.sendKeys("first ");
         // Use the shortcut key so that we don't lose the caret position.
-        firstTextArea.sendSaveShortcutKey();
+        firstEditPage.getToolbar().sendSaveShortcutKey();
 
         //
         // Second Tab
@@ -1678,7 +1725,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().switchTo().window(secondTabHandle);
 
         // Edit again, this time inplace.
-        InplaceEditablePage secondInplaceEditPage = new InplaceEditablePage().editInplace();
+        RealtimeInplaceEditablePage secondInplaceEditPage = new RealtimeInplaceEditablePage().editInplace();
         secondEditPage = new RealtimeWYSIWYGEditPage();
         secondEditor = secondEditPage.getContenEditor();
         secondTextArea = secondEditor.getRichTextArea();
@@ -1690,7 +1737,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.sendKeys("then ");
-        firstEditPage.clickSaveAndView();
+        firstEditPage.clickDone();
 
         //
         // Second Tab
@@ -1700,7 +1747,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilTextContains("first then second");
         secondTextArea.sendKeys(Keys.END, " and");
         // Use the shortcut key so that we don't lose the caret position.
-        secondTextArea.sendSaveShortcutKey();
+        secondEditPage.getToolbar().sendSaveShortcutKey();
 
         //
         // First Tab
@@ -1709,14 +1756,14 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
 
         // Edit again, this time inplace.
-        InplaceEditablePage firstInplaceEditPage = new InplaceEditablePage().editInplace();
+        RealtimeInplaceEditablePage firstInplaceEditPage = new RealtimeInplaceEditablePage().editInplace();
         firstEditPage = new RealtimeWYSIWYGEditPage();
         firstEditor = firstEditPage.getContenEditor();
         firstTextArea = firstEditor.getRichTextArea();
 
         firstTextArea.waitUntilTextContains("first then second and");
         firstTextArea.sendKeys(Keys.END, " done");
-        firstInplaceEditPage.saveAndView();
+        firstInplaceEditPage.done();
 
         //
         // Second Tab
@@ -1725,7 +1772,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.waitUntilTextContains("first then second and done");
         secondTextArea.sendKeys(" almost");
-        secondInplaceEditPage.saveAndView();
+        secondInplaceEditPage.done();
 
         assertEquals("first then second and almost done", secondInplaceEditPage.getContent());
     }
@@ -1815,12 +1862,54 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Verify the result.
         secondEditor.getToolBar().toggleSourceMode();
-        assertEquals(
-            "first [[attach:realtimeWysiwygEditor.webm||target=\"_blank\"]]"
-                + " red [[image:ckeditor-source.png]] yellow end\n\n"
-                + "second\u00A0[[attach:source-button.mp4||target=\"_blank\"]]"
-                + " blue\u00A0[[image:realtimeWysiwygEditor.png]] green",
-            secondEditor.getSourceTextArea().getAttribute("value"));
+        assertEquals("""
+            first [[attach:realtimeWysiwygEditor.webm||target="_blank"]] red [[image:ckeditor-source.png]] yellow end
+
+            second\u00A0[[attach:source-button.mp4||target="_blank"]] blue\u00A0[[image:realtimeWysiwygEditor.png]] green""",
+            secondEditor.getSourceTextArea().getDomProperty("value"));
+    }
+
+    @Test
+    @Order(21)
+    void failGracefullyIfWeCannotConnect(TestUtils setup, TestReference testReference) throws Exception
+    {
+        RealtimeTestUtils.simulateFailedWebSocketConnection(setup, () -> {
+            // Start fresh.
+            setup.deletePage(testReference);
+
+            loginAsJohn(setup);
+
+            // Verify the standalone editor.
+            WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
+            editPage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
+
+            RealtimeEditToolbar realtimeToolbar = new RealtimeEditToolbar();
+            assertFalse(realtimeToolbar.isCollaborating());
+            assertFalse(realtimeToolbar.canJoinCollaboration());
+
+            CKEditor editor = new CKEditor("content").waitToLoad();
+            RichTextAreaElement textArea = editor.getRichTextArea();
+            textArea.sendKeys("alone");
+            editor.getToolBar().toggleSourceMode();
+            assertEquals("alone", editor.getSourceTextArea().getDomProperty("value"));
+            editPage.clickSaveAndView();
+
+            // Verify the in-place editor.
+            InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+            assertEquals("alone", inplaceEditablePage.getContent());
+
+            inplaceEditablePage.editInplace();
+            inplaceEditablePage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
+
+            assertFalse(realtimeToolbar.isCollaborating());
+            assertFalse(realtimeToolbar.canJoinCollaboration());
+
+            new CKEditor("content").waitToLoad().getRichTextArea().sendKeys("edited ");
+            inplaceEditablePage.save();
+            assertEquals("edited alone", inplaceEditablePage.getContent());
+
+            return null;
+        });
     }
 
     private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)

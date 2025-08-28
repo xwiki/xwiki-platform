@@ -27,7 +27,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for the {@link AttachmentGalleryPickerMacro} Macro.
@@ -104,7 +103,6 @@ public class AttachmentGalleryPickerMacroParameters
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     public String getTarget()
     {
         return this.targetDocumentReference;
@@ -117,7 +115,6 @@ public class AttachmentGalleryPickerMacroParameters
      */
     @PropertyDescription("The reference to the document serving as the current document")
     @PropertyDisplayType(DocumentReference.class)
-    @Unstable
     public void setTarget(String targetDocumentReference)
     {
         this.targetDocumentReference = targetDocumentReference;

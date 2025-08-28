@@ -49,15 +49,16 @@ tour.homepageTour.pageContent.title=页面内容
 tour.homepageTour.pageContent.contentA=这是将显示当前页面内容。
 tour.homepageTour.pageContent.contentB=编辑这个页面可以向这个页面增加表格、列表、宏和文章结构来整理你的知识。
 tour.homepageTour.pageMenu.title=页面菜单
-tour.homepageTour.pageMenu.contentA=此菜单包含与页面相关的操作。拥有适当的权限，您可以编辑，创建，管理或删除页面。
-tour.homepageTour.pageMenu.contentB=这个{0}按钮可以显示更多的行为，比如导出、打印、分享。
+tour.homepageTour.pageMenu.contentA=此菜单包含与页面相关的操作。拥有适当的权限，您可以编辑，创建，关注或者实现更多功能。
+tour.homepageTour.pageMenu.contentB=这个{0}按钮可以显示更多的行为，比如管理，复制/移动/重命名/删除，导出，打印，批注和共享。
 tour.homepageTour.pageTabs.title=页面标签
 tour.homepageTour.pageTabs.contentA=你可以和其他用户一起对页面的内容进行评论。
 tour.homepageTour.pageTabs.contentB=你也可以添加附件，查看页面版本和页面信息。
 tour.homepageTour.header.title=标题
-tour.homepageTour.header.contentA=你可以查找相关内容，查看页面改动，进入个人信息页面。
+tour.homepageTour.header.contentA=你可以查找相关内容，查看信息提醒或者进入个人信息页面。
 tour.homepageTour.header.contentB={0} 按钮可以打开抽屉菜单，菜单里有更多与本wiki相关的行为，比如索引和管理。
 tour.homepageTour.tourComplete.title=导游完成
 tour.homepageTour.tourComplete.contentA=XWiki的基本外观和功能探索完毕。
-tour.homepageTour.tourComplete.contentB=每个特色更详细的介绍可以在{0}documentation{1}中查看。</content>
+tour.homepageTour.tourComplete.contentB=每个特色更详细的介绍可以在{0}documentation{1}中查看。
+</content>
 </xwikidoc>

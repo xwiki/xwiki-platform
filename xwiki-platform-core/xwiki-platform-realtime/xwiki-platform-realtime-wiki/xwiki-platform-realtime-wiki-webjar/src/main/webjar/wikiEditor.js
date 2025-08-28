@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-wikiEditor', [
-  'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
   'xwiki-realtime-userData',
@@ -30,88 +29,108 @@ define('xwiki-realtime-wikiEditor', [
   'jquery'
 ], function(
   /* jshint maxparams:false */
-  ErrorBox, Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $
+  Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $
 ) {
   'use strict';
 
-  var canonicalize = function(text) {
-    return text.replace(/\r\n/g, '\n');
-  };
+  class RealtimeWikiEditor {
+    constructor(editorConfig) {
+      this.editorId = 'wiki';
+      this.editorConfig = editorConfig;
+      this.channel = editorConfig.channels[this.editorId];
+      this.saverChannel = editorConfig.channels.saver;
+      this.userDataChannel = editorConfig.channels.userData;
 
-  var module = {}, editorId = 'wiki';
+      this.createAllowRealtimeCheckbox();
+      this.createEditor();
 
-  module.main = function(editorConfig) {
-    var channel = editorConfig.channels[editorId],
-    eventsChannel = editorConfig.channels.events,
-    userdataChannel = editorConfig.channels.userdata;
+      // Don't let the user edit until the editor is ready.
+      this.setEditable(false);
+
+      this.initializing = true;
+
+      // List of pretty name of all users (mapped with their session ID).
+      this.userData = {};
+
+      // The real-time toolbar, showing the list of connected users.
+      this.toolbar = new Toolbar({
+        save: (...args) => this.saver?.save(...args),
+        leave: () => Interface.getAllowRealtimeCheckbox().click()
+      });
+
+      this.realtimeInput = ChainPadNetflux.start(this.getRealtimeOptions());
+
+      // Notify the others that we're editing in realtime.
+      editorConfig.setRealtimeEnabled(true);
+    }
+
+    canonicalize(text) {
+      return text.replace(/\r\n/g, '\n');
+    }
 
     /**
      * Update the channel keys for reconnecting WebSocket.
      */
-    var updateKeys = function() {
-      return editorConfig.updateChannels().then(keys => {
-        if (keys[editorId] && keys[editorId] !== channel) {
-          channel = keys[editorId];
-        }
-        if (keys.events && keys.events !== eventsChannel) {
-          eventsChannel = keys.events;
-        }
-        if (keys.userdata && keys.userdata !== userdataChannel) {
-          userdataChannel = keys.userdata;
-        }
+    updateKeys() {
+      return this.editorConfig.updateChannels().then(keys => {
+        this.channel = keys[this.editorId] || channel;
+        this.saverChannel = keys.saver || saverChannel;
+        this.userDataChannel = keys.userData || userDataChannel;
         return keys;
       });
-    };
+    }
 
-    Interface.realtimeAllowed(true);
-    var allowRealtimeCheckbox = $('.buttons input[type=checkbox].realtime-allow');
-    if (!allowRealtimeCheckbox.length) {
-      allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(true);
-      allowRealtimeCheckbox.on('change', function() {
-        if (allowRealtimeCheckbox.prop('checked')) {
-          // TODO: Allow for enabling realtime without reloading the entire page.
-          window.location.href = editorConfig.rtURL;
-        } else {
-          Interface.realtimeAllowed(false);
-          module.onAbort();
-        }
+    createAllowRealtimeCheckbox() {
+      Interface.createAllowRealtimeCheckbox({
+        checked: this.editorConfig.realtimeEnabled,
+        join: () => {
+          return new Promise(() => {
+            // TODO: Join the realtime editing session without reloading the entire page.
+            window.location.href = this.editorConfig.rtURL;
+          });
+        },
+        leave: this.onAbort.bind(this)
       });
     }
-    // Disable while real-time framework is loading.
-    allowRealtimeCheckbox.prop('disabled', true);
 
-    console.log("Creating realtime toggle");
-
-    var whenReady = function() {
-      var cursorToPos = function(cursor, oldText) {
-        var cLine = cursor.line;
-        var cCh = cursor.ch;
-        var pos = 0;
-        var textLines = oldText.split('\n');
-        for (var line = 0; line <= cLine; line++) {
-          if (line < cLine) {
-            pos += textLines[line].length + 1;
-          } else if (line === cLine) {
-            pos += cCh;
-          }
+    cursorToPos(cursor, oldText) {
+      const cLine = cursor.line;
+      const cCh = cursor.ch;
+      let pos = 0;
+      const textLines = oldText.split('\n');
+      for (let line = 0; line <= cLine; line++) {
+        if (line < cLine) {
+          pos += textLines[line].length + 1;
+        } else if (line === cLine) {
+          pos += cCh;
         }
-        return pos;
-      };
+      }
+      return pos;
+    }
 
-      var posToCursor = function(position, newText) {
-        var cursor = {
-          line: 0,
-          ch: 0
-        };
-        var textLines = newText.substr(0, position).split('\n');
-        cursor.line = textLines.length - 1;
-        cursor.ch = textLines[cursor.line].length;
-        return cursor;
+    posToCursor(position, newText) {
+      const cursor = {
+        line: 0,
+        ch: 0
       };
+      const textLines = newText.substr(0, position).split('\n');
+      cursor.line = textLines.length - 1;
+      cursor.ch = textLines[cursor.line].length;
+      return cursor;
+    }
 
-      // Default wiki behaviour.
-      var $textArea = $('#content');
-      var editor = {
+    createEditor() {
+      this.editor = this.createPlainEditor();
+      this.editor.onChange(this.onChange.bind(this));
+      this.getCodeMirrorInstance().then(codeMirrorInstance => {
+        this.editor = this.createCodeMirrorEditor(codeMirrorInstance);
+        this.editor.onChange(this.onChange.bind(this));
+      });
+    }
+
+    createPlainEditor() {
+      const $textArea = $('#content');
+      return {
         getValue: function() {
           return $textArea.val();
         },
@@ -122,8 +141,10 @@ define('xwiki-realtime-wikiEditor', [
           $textArea.prop('disabled', bool);
         },
         getCursor: function() {
-          // Should return an object with selectionStart and selectionEnd fields.
-          return $textArea[0];
+          return {
+            selectionStart: $textArea[0].selectionStart,
+            selectionEnd: $textArea[0].selectionEnd
+          };
         },
         setCursor: function(start, end) {
           $textArea[0].selectionStart = start;
@@ -134,231 +155,228 @@ define('xwiki-realtime-wikiEditor', [
         },
         _: $textArea
       };
+    }
 
-      // Wiki
-      var useCodeMirror = function(codeMirrorInstance) {
-        editor._ = codeMirrorInstance;
-        editor.getValue = function() {
-          return editor._.getValue();
-        };
-        editor.setValue = function (text) {
-          editor._.setValue(text);
-          editor._.save();
-        };
-        editor.setReadOnly = function(bool) {
-          editor._.setOption('readOnly', bool);
-        };
-        editor.onChange = function(handler) {
-          editor._.off('change');
-          editor._.on('change', handler);
-        };
-        editor.getCursor = function() {
-          var doc = canonicalize(editor.getValue());
+    createCodeMirrorEditor(codeMirrorInstance) {
+      return {
+        getValue: () => {
+          return codeMirrorInstance.getValue();
+        },
+        setValue: text => {
+          codeMirrorInstance.setValue(text);
+          codeMirrorInstance.save();
+        },
+        setReadOnly: bool => {
+          codeMirrorInstance.setOption('readOnly', bool);
+        },
+        onChange: handler => {
+          codeMirrorInstance.off('change');
+          codeMirrorInstance.on('change', handler);
+        },
+        getCursor: () => {
+          const doc = this.canonicalize(codeMirrorInstance.getValue());
           return {
-            selectionStart : cursorToPos(editor._.getCursor('from'), doc),
-            selectionEnd : cursorToPos(editor._.getCursor('to'), doc)
+            selectionStart: this.cursorToPos(codeMirrorInstance.getCursor('from'), doc),
+            selectionEnd: this.cursorToPos(codeMirrorInstance.getCursor('to'), doc)
           };
-        };
-        editor.setCursor = function(start, end) {
-          var doc = canonicalize(editor.getValue());
+        },
+        setCursor: (start, end) => {
+          const doc = this.canonicalize(codeMirrorInstance.getValue());
           if (start === end) {
-            editor._.setCursor(posToCursor(start, doc));
+            codeMirrorInstance.setCursor(this.posToCursor(start, doc));
           } else {
-            editor._.setSelection(posToCursor(start, doc), posToCursor(end, doc));
+            codeMirrorInstance.setSelection(this.posToCursor(start, doc), this.posToCursor(end, doc));
           }
-        };
-        editor.onChange(onChangeHandler);
+        },
+        _: codeMirrorInstance
       };
+    }
 
-      if ($('#content ~ .CodeMirror').prop('CodeMirror')) {
+    async getCodeMirrorInstance() {
+      const codeMirrorInstance = $('#content ~ .CodeMirror').prop('CodeMirror');
+      if (codeMirrorInstance) {
         // The content text area has a CodeMirror instance attached. Use it for real-time editing.
-        useCodeMirror($('#content ~ .CodeMirror').prop('CodeMirror'));
+        return codeMirrorInstance;
       } else {
-        // Detect when a CodeMirror instance is attached to the content text area and update the real-time editor.
-        require(['deferred!SyntaxHighlighting_cm/lib/codemirror'], async function(codeMirrorPromise) {
-          CodeMirror = await codeMirrorPromise;
-          CodeMirror.defineInitHook(instance => {
-            if ($(instance.getTextArea?.()).attr('id') === 'content') {
-              useCodeMirror(instance);
-            }
+        return await new Promise(resolve => {
+          // Detect when a CodeMirror instance is attached to the content text area and update the real-time editor.
+          require(['deferred!SyntaxHighlighting_cm/lib/codemirror'], async function(codeMirrorPromise) {
+            const CodeMirror = await codeMirrorPromise;
+            CodeMirror.defineInitHook(instance => {
+              if ($(instance.getTextArea?.()).attr('id') === 'content') {
+                resolve(instance);
+              }
+            });
           });
         });
       }
+    }
 
-      module.setEditable = function(bool) {
-        editor.setReadOnly(!bool);
-      };
+    setEditable(bool) {
+      this.editor.setReadOnly(!bool);
+    }
 
-      // Don't let the user edit until the editor is ready.
-      module.setEditable(false);
+    setValueWithCursor(newValue) {
+      const oldValue = this.canonicalize(this.editor.getValue());
+      const ops = ChainPad.Diff.diff(oldValue, newValue);
+      const oldCursor = this.editor.getCursor();
+      this.editor.setValue(newValue);
+      this.editor.setCursor(
+        TextCursor.transformCursor(oldCursor.selectionStart, ops),
+        TextCursor.transformCursor(oldCursor.selectionEnd, ops)
+      );
+    }
 
-      var initializing = true,
+    async createSaver(info) {
+      $('#edit').on('xwiki:actions:reload', this.resetContent.bind(this));
 
-      // List of pretty name of all users (mapped with their server ID).
-      userData,
+      return await new Saver({
+        userName: this.editorConfig.user.sessionId,
+        network: info.network,
+        channel: this.saverChannel,
+        onStatusChange: this.toolbar.onSaveStatusChange.bind(this.toolbar),
+        onCreateVersion: version => {
+          version.author = Object.values(this.userData).find(
+            user => (user?.sessionId && user.sessionId === version.author) ||
+              (user?.reference && user.reference === version.author?.reference)
+          ) || version.author;
+          this.toolbar.onCreateVersion(version);
+        }
+      }).toBeReady();
+    }
 
-      // The real-time toolbar, showing the list of connected users, the merge message, the spinner and the lag.
-      toolbar;
+    async resetContent() {
+      const data = await $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'})));
+      this.hideChangesFromSaver(this.setValueWithCursor.bind(this, data.content));
+      this.onLocal();
+    }
 
-      var setValueWithCursor = function(newValue) {
-        var oldValue = canonicalize(editor.getValue());
-        var ops = ChainPad.Diff.diff(oldValue, newValue);
-        var oldCursor = editor.getCursor();
-        var selects = ['selectionStart', 'selectionEnd'].map(function (attr) {
-          return TextCursor.transformCursor(oldCursor[attr], ops);
-        });
-
-        editor.setValue(newValue);
-        editor.setCursor(selects[0], selects[1]);
-      };
-
-      function createSaver(info) {
-        return new Saver({
-          editorType: editorId,
-          editorName: 'Wiki',
-          userList: info.userList,
-          userName: editorConfig.user.name,
-          network: info.network,
-          channel: eventsChannel,
-          // This function displays a message notifying users that there was a merge.
-          showNotification: Interface.createMergeMessageElement(toolbar.toolbar.find('.rt-toolbar-rightside')),
-          setTextValue: function(newText, toConvert, callback) {
-            setValueWithCursor(newText);
-            callback();
-            realtimeOptions.onLocal();
-          },
-          getTextValue: function() {
-            return editor.getValue();
-          },
-          getTextAtCurrentRevision: function() {
-            return $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'}))).then(data => {
-              return data.content;
-            });
-          }
-        });
+    hideChangesFromSaver(task) {
+      const contentModifiedLocally = this.saver.contentModifiedLocally;
+      this.saver.contentModifiedLocally = () => {};
+      try {
+        task();
+      } finally {
+        this.saver.contentModifiedLocally = contentModifiedLocally;
       }
+    }
 
-      var realtimeOptions = {
+    onUserListChange(userList, newUserData) {
+      // If no new data (someone has just joined or left the channel), get the latest known values.
+      this.userData = newUserData || this.userData;
+      const users = userList.users.filter(id => this.userData[id]).map(id => ({id, ...this.userData[id]}));
+      this.toolbar.onUserListChange(users);
+    }
+
+    getRealtimeOptions() {
+      return {
         // Provide initial state...
-        initialState: editor.getValue() || '',
-        websocketURL: editorConfig.webSocketURL,
-        userName: editorConfig.user.name,
+        initialState: this.editor.getValue() || '',
+        websocketURL: this.editorConfig.webSocketURL,
+        userName: this.editorConfig.user.sessionId,
         // The channel we will communicate over.
-        channel,
+        channel: this.channel,
         // The object responsible for encrypting the messages.
         crypto: Crypto,
-        network: editorConfig.network,
+        network: this.editorConfig.network,
 
-        onInit: function(info) {
-          // Create the toolbar.
-          toolbar = Toolbar.create({
-            // Prepend the real-time toolbar to the existing Wiki Editor toolbar.
-            '$container': $('.leftmenu2'),
-            myUserName: info.myID,
-            realtime: info.realtime,
-            getLag: info.getLag,
-            userList: info.userList,
-            config: {userData}
-          });
-        },
-
-        onReady: async function(info) {
-          module.chainpad = info.realtime;
-          module.leaveChannel = info.leave;
-
-          // Update the user list to link the wiki name to the user id.
-          userData = await UserData.start(info.network, userdataChannel, {
-            myId: info.myId,
-            userName: editorConfig.user.name,
-            userAvatar: editorConfig.user.avatarURL,
-            onChange: info.userList.onChange,
-            crypto: Crypto,
-            editor: editorId
-          });
-
-          editor.setValue(module.chainpad.getUserDoc());
-
-          console.log('Unlocking editor');
-          initializing = false;
-          module.setEditable(true);
-          // Renable the allow real-time checkbox now that the framework is ready.
-          allowRealtimeCheckbox.prop('disabled', false);
-
-          this.onLocal();
-          module.saver = createSaver(info);
-        },
-
-        onRemote: function(info) {
-          if (!initializing) {
-            setValueWithCursor(info.realtime.getUserDoc());
-          }
-        },
-
-        onLocal: function() {
-          if (initializing) {
-            return;
-          }
-
-          // Serialize your DOM into an object.
-          var serializedHyperJSON = canonicalize(editor.getValue());
-
-          module.chainpad.contentUpdate(serializedHyperJSON);
-
-          if (module.chainpad.getUserDoc() !== serializedHyperJSON) {
-            console.error('chainpad.getUserDoc() !== serializedHyperJSON');
-            module.chainpad.contentUpdate(serializedHyperJSON, true);
-          }
-        },
-
-        onAbort: function(info, reason, debug) {
-          console.log('Aborting the session!');
-          module.chainpad.abort();
-          module.leaveChannel();
-          module.aborted = true;
-          module.saver.stop();
-          toolbar.failed();
-          toolbar.toolbar.remove();
-          userData.stop?.();
-          if (reason || debug) {
-            ErrorBox.show(reason || 'disconnected', debug);
-          }
-        },
-
-        beforeReconnecting: function (callback) {
-          updateKeys().then(() => {
-            callback(channel, editor.getValue());
-          });
-        },
-
-        onConnectionChange: function(info) {
-          console.log('Connection status: ' + info.state);
-          toolbar.failed();
-          if (info.state) {
-            ErrorBox.hide();
-            initializing = true;
-            toolbar.reconnecting(info.myId);
-          } else {
-            module.setEditable(false);
-            ErrorBox.show('disconnected');
-          }
-        }
+        onInit: this.onInit.bind(this),
+        onReady: this.onReady.bind(this),
+        onRemote: this.onRemote.bind(this),
+        onLocal: this.onLocal.bind(this),
+        onAbort: this.onAbort.bind(this),
+        beforeReconnecting: this.beforeReconnecting.bind(this),
+        onConnectionChange: this.onConnectionChange.bind(this)
       };
+    }
 
-      module.onAbort = realtimeOptions.onAbort;
-      module.realtimeInput = ChainPadNetflux.start(realtimeOptions);
+    onInit(info) {
+      this.toolbar.onConnectionStatusChange(1 /* connecting */, info.myID);
+    }
 
-      // Notify the others that we're editing in realtime.
-      editorConfig.setRealtimeEnabled(true);
+    async onReady(info) {
+      this.chainpad = info.realtime;
+      this.leaveChannel = info.leave;
 
-      function onChangeHandler() {
-        realtimeOptions.onLocal();
-        module.saver.contentModifiedLocally();
+      // Update the user list to link the wiki name to the user id.
+      this.userData = await UserData.start(info.network, this.userDataChannel, {
+        myId: info.myId,
+        user: this.editorConfig.user,
+        onChange: info.userList.onChange,
+        crypto: Crypto,
+        editor: this.editorId
+      });
+      this.onUserListChange(info.userList, this.userData);
+      info.userList.change.push(this.onUserListChange.bind(this, info.userList));
+
+      this.saver = await this.createSaver(info);
+      this.initializing = false;
+      // Initialize the edited content with the content from the realtime session.
+      this.onRemote(info);
+
+      console.log('Unlocking editor');
+      this.setEditable(true);
+      this.toolbar.onConnectionStatusChange(2 /* connected */, info.myId);
+
+      // Renable the allow real-time checkbox now that the framework is ready.
+      Interface.getAllowRealtimeCheckbox().prop('disabled', false);
+    }
+
+    onRemote(info) {
+      if (!this.initializing) {
+        this.setValueWithCursor(info.realtime.getUserDoc());
       }
-      editor.onChange(onChangeHandler);
-    };
+    }
 
-    whenReady();
-  };
+    onLocal() {
+      if (this.initializing) {
+        return;
+      }
 
-  return module;
+      // Serialize your DOM into an object.
+      const serializedHyperJSON = this.canonicalize(this.editor.getValue());
+
+      this.chainpad.contentUpdate(serializedHyperJSON);
+
+      if (this.chainpad.getUserDoc() !== serializedHyperJSON) {
+        console.error('chainpad.getUserDoc() !== serializedHyperJSON');
+        this.chainpad.contentUpdate(serializedHyperJSON, true);
+      }
+    }
+
+    onAbort() {
+      console.log('Aborting the session!');
+      this.chainpad.abort();
+      this.leaveChannel();
+      this.aborted = true;
+      this.saver.stop();
+      this.toolbar.destroy();
+      this.userData.stop?.();
+    }
+
+    async beforeReconnecting(callback) {
+      await this.updateKeys();
+      callback(this.channel, this.editor.getValue());
+    }
+
+    onConnectionChange(info) {
+      console.log('Connection status: ' + info.state);
+      this.initializing = true;
+      if (info.state) {
+        // Reconnecting.
+        this.toolbar.onConnectionStatusChange(1 /* connecting */, info.myId);
+      } else {
+        // Disconnected.
+        this.toolbar.onConnectionStatusChange(0 /* disconnected */);
+        this.setEditable(false);
+      }
+    }
+
+    onChange() {
+      this.onLocal();
+      this.saver.contentModifiedLocally();
+    }
+  }
+
+  return RealtimeWikiEditor;
 });

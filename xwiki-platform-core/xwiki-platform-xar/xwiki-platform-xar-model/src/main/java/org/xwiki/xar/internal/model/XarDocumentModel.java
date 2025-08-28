@@ -19,6 +19,8 @@
  */
 package org.xwiki.xar.internal.model;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * @version $Id$
  * @since 5.4M1
@@ -62,11 +64,19 @@ public class XarDocumentModel
     public static final String VERSION_15 = "1.5";
 
     /**
+     * Introduce the concept of required right enforcement.
+     *
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public static final String VERSION_16 = "1.6";
+
+    /**
      * The current version.
      * 
      * @since 9.0RC1
      */
-    public static final String VERSION_CURRENT = VERSION_15;
+    public static final String VERSION_CURRENT = VERSION_16;
 
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
 
@@ -162,6 +172,12 @@ public class XarDocumentModel
      * @since 14.0RC1
      */
     public static final String ELEMENT_REVISION_ORIGINALMEDATAAUTHOR = "originalMetadataAuthor";
+
+    /**
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public static final String ELEMENT_ENFORCE_REQUIRED_RIGHTS = "enforceRequiredRights";
 
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 

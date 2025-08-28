@@ -24,11 +24,30 @@
      * metadata-complete="true" is used to disable scanning the web application and its libraries for classes that use
        annotations to define components of a web application (Servlets etc.). Thus leading to a faster startup.
 -->
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-  version="3.1"
-  metadata-complete="true">
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0" metadata-complete="true">
+  <!-- In order to avoid getting a "java.lang.IllegalStateException: Form too large" error when editing large page in
+       XWiki we need to tell Jetty to allow for large content since by default it only allows for 20K. We do this by
+       passing the "org.eclipse.jetty.server.Request.maxFormContentSize" attribute.
+       Note 1: Setting this value too high can leave your server vulnerable to denial of service attacks.
+       Note 2: We're setting it here instead of in Jetty's XML configuration files so that the XWiki WAR can be used
+       in any Jetty config and work out of the box.
+  -->
+  <context-param>
+    <param-name>org.eclipse.jetty.server.Request.maxFormContentSize</param-name>
+    <param-value>1000000</param-value>
+  </context-param>
+  <!-- Increasing the maxFormKeys in order to be able to import correctly a full wiki (more than 1000 pages in 11.10).
+       The import should be fixed at a point to allow importing everything without creating a form with a field by 
+       page. Once done this configuration can be removed. See https://jira.xwiki.org/browse/XWIKI-11597 for a follow 
+       up. 
+  -->
+  <context-param>
+    <param-name>org.eclipse.jetty.server.Request.maxFormKeys</param-name>
+    <param-value>2000</param-value>
+  </context-param>
 
   <!-- "absolute-ordering" specifies which web fragment JARs (according to the names in their WEB-INF/web-fragment.xml
        files) have to be scanned for SCIs (javax.servlet.ServletContainerInitializer), fragments and annotations.
@@ -48,6 +67,25 @@
   <filter>
     <filter-name>RoutingFilter</filter-name>
     <filter-class>org.xwiki.resource.servlet.RoutingFilter</filter-class>
+  </filter>
+
+  <!-- Filter which inject a response wrapper in charge of resolving the relative URL on XWiki side instead of application
+       server side, to reduce setup requirements. -->
+  <filter>
+    <filter-name>ResolveRelativeRedirectFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.ResolveRelativeRedirectFilter</filter-class>
+  </filter>
+
+  <!-- Filter in charge of fixing the request base URL base on proxy headers. -->
+  <filter>
+    <filter-name>SourceURLResolverFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SourceURLResolverFilter</filter-class>
+  </filter>
+
+  <!-- Filter which inject a response wrapper in charge of converting the redirect location into a safe URL. -->
+  <filter>
+    <filter-name>SafeRedirectFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SafeRedirectFilter</filter-class>
   </filter>
 
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
@@ -153,6 +191,21 @@
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
     <dispatcher>ERROR</dispatcher>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>SourceURLResolverFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>ResolveRelativeRedirectFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>SafeRedirectFilter</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <filter-mapping>
@@ -380,11 +433,6 @@
   <welcome-file-list>
     <welcome-file>redirect</welcome-file>
   </welcome-file-list>
-
-  <error-page>
-    <error-code>404</error-code>
-    <location>/bin/view/Main/DocumentDoesNotExist</location>
-  </error-page>
 
   <!-- Uncomment if you wish to use a DataSource to define the Database connection
   <resource-ref>

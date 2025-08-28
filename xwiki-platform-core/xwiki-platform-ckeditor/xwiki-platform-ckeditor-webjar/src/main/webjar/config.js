@@ -115,6 +115,16 @@ CKEDITOR.editorConfig = function(config) {
           height: true,
           src: true,
           width: true
+        },
+        match: function(image) {
+          if (image.parent?.name?.toLowerCase() === 'figure' ||
+              (image.parent?.name?.toLowerCase() === 'a' && image.parent?.parent?.name?.toLowerCase() === 'figure')) {
+            const figure = image.getAscendant('figure');
+            // This is needed in order for this figure to be upcasted as a captioned image widget.
+            // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_config.html#cfg-image2_captionedClass
+            figure.addClass('image');
+          }
+          return true;
         }
       },
       // Allowed table header and table cell attributes.
@@ -133,10 +143,10 @@ CKEDITOR.editorConfig = function(config) {
         // * lone paragraphs, when inside a list item, table cell, definition list or block quote (in order to simplify
         //   the generated wiki syntax; they will be replaced by their child nodes)
         match: function(element) {
-          var loneParagraphParents = ['li', 'td', 'th', 'dd', 'blockquote'];
-          var name = element.name.toLowerCase();
-          var allowed = name !== 'div' && name !== 'span' && (
-            name !== 'p' || !element.parent || !element.parent.name ||
+          const loneParagraphParents = ['li', 'td', 'th', 'dd', 'blockquote'];
+          const name = element.name.toLowerCase();
+          const allowed = name !== 'div' && name !== 'span' && (
+            name !== 'p' || !element.parent?.name ||
             element.parent.children.length > 1 || loneParagraphParents.indexOf(element.parent.name.toLowerCase()) < 0
           );
           if (!allowed && name === 'p') {
@@ -164,6 +174,7 @@ CKEDITOR.editorConfig = function(config) {
       'xwiki-maximize',
       'xwiki-office',
       'xwiki-realtime',
+      'xwiki-rights',
       'xwiki-save',
       'xwiki-selection',
       'xwiki-slash',
@@ -314,7 +325,9 @@ CKEDITOR.editorConfig = function(config) {
       nestedEditableTypes: {
         // The type used when the macro content / parameter supports any wiki syntax (no restrictions).
         'java.util.List<org.xwiki.rendering.block.Block>': {}
-      }
+      },
+      // You can decide here to not see the inline editable parameters in the macro config UI.
+      showInlineEditableParameters: true
     },
     'xwiki-save': {
       leaveConfirmation: true

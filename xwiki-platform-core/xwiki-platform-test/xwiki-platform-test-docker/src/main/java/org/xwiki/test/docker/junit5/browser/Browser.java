@@ -100,6 +100,8 @@ public enum Browser
         }
         options.enableBiDi();
         options.addPreference("dom.disable_beforeunload", false);
+        // Workaround for https://github.com/mozilla/geckodriver/issues/2212
+        options.addPreference("remote.events.async.enabled", false);
         return options;
     }
 

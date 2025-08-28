@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.extension.version.Version;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -34,7 +33,6 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 15.1RC1
  */
-@Unstable
 public interface NewsSource
 {
     /**

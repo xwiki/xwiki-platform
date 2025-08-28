@@ -113,7 +113,6 @@ public class NotificationWatchScriptService implements ScriptService
      * @throws NotificationException in case of errors
      * @since 15.5RC1
      */
-    @Unstable
     public WatchedEntityReference.WatchedStatus getLocationWatchedStatus(EntityReference location)
             throws NotificationException
     {

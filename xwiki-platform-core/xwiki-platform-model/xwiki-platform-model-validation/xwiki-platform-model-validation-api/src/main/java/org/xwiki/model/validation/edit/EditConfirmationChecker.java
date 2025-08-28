@@ -22,7 +22,6 @@ package org.xwiki.model.validation.edit;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides the operation that a pre-edit checker must provide. The checks are called by the
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.9RC1
  */
 @Role
-@Unstable
 public interface EditConfirmationChecker
 {
     /**

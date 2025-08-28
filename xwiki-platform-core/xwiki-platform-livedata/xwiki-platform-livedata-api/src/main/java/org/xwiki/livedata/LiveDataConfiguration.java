@@ -19,6 +19,9 @@
  */
 package org.xwiki.livedata;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -128,5 +131,43 @@ public class LiveDataConfiguration implements InitializableLiveDataElement
             this.meta = new LiveDataMeta();
         }
         this.meta.initialize();
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        LiveDataConfiguration that = (LiveDataConfiguration) o;
+
+        return new EqualsBuilder()
+            .append(this.id, that.id)
+            .append(this.query, that.query)
+            .append(this.data, that.data)
+            .append(this.meta, that.meta)
+            .isEquals();
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.id)
+            .append(this.query)
+            .append(this.data)
+            .append(this.meta)
+            .toHashCode();
     }
 }

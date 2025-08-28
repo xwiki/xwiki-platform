@@ -39,29 +39,26 @@
   <content>{{velocity}}
 #if ($type == 'edit')
   #set ($className = $object.getxWikiClass().name)
+  #set ($id = "${prefix}${name}")
   #if ($doc.fullName == $className)
     ## We are editing the class so the content must be read from / written to the template document.
     #set ($name = 'templateContent')
     #set ($editedDocument = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template"))
-    ## Don't load the WYSIWYG editor when editing the class, because it's too heavy.
-    #set ($useWysiwygEditor = false)
   #else
     ## We are editing an application entry so the content must be read from / written to the current document.
     #set ($name = 'content')
     #set ($editedDocument = $tdoc)
-    ## Use the preferred content editor.
-    #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
   #end
+  ## Use the preferred content editor.
+  #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
   {{html clean="false"}}
-  ## The "content" id is expected by some JavaScript and CSS code.
-  #set ($id = 'content')
   #if (!$useWysiwygEditor)
     &lt;div id="xwikieditcontentinner"&gt;
       ## The tool bar may have an entry to insert an HTML macro. Make sure it doesn't break the HTML macro we are currently in.
       #set ($toolBar = "#template('simpleedittoolbar.vm')")
       $!toolBar.replace('{{', '&amp;#123;&amp;#123;')
       ## Display a simple textarea.
-      &lt;textarea id="$id" cols="80" rows="25" name="$name"&gt;$escapetool.xml($editedDocument.content)&lt;/textarea&gt;
+      &lt;textarea id="$escapetool.xml($id)" cols="80" rows="25" name="$name"&gt;$escapetool.xml($editedDocument.content)&lt;/textarea&gt;
   #end
   #if ($useWysiwygEditor)
     $!services.edit.syntaxContent.wysiwyg($editedDocument.content, $editedDocument.syntax, {

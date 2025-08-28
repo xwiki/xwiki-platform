@@ -22,17 +22,18 @@ package org.xwiki.platform.security.requiredrights.internal.analyzer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
+import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Required rights analyzer for {@code XWiki.ConfigurableClass}.
@@ -45,25 +46,22 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Singleton
 @Named("XWiki.ConfigurableClass")
-public class ConfigurableClassRequiredRightsAnalyzer extends DefaultObjectRequiredRightAnalyzer
+public class ConfigurableClassRequiredRightsAnalyzer implements RequiredRightAnalyzer<BaseObject>
 {
+    @Inject
+    private ObjectPropertyRequiredRightAnalyzer objectPropertyRequiredRightAnalyzer;
+
     @Override
     public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException
     {
-
-        BaseClass xClass = object.getXClass(this.contextProvider.get());
         List<RequiredRightAnalysisResult> result =
-            new ArrayList<>(analyzeProperty(object, "codeToExecute", xClass));
+            new ArrayList<>(this.objectPropertyRequiredRightAnalyzer.analyzeAllProperties(object));
         String headingFieldName = "heading";
         String heading = object.getStringValue(headingFieldName);
-        if (this.velocityDetector.containsVelocityScript(heading)) {
-            PropertyInterface field = object.getField(headingFieldName);
-            result.add(new RequiredRightAnalysisResult(
-                field.getReference(),
-                this.translationMessageSupplierProvider.get("security.requiredrights.object.configurableClassHeading"),
-                this.stringCodeBlockSupplierProvider.get(heading),
-                RequiredRight.SCRIPT_AND_MAYBE_PROGRAM)
-            );
+        PropertyInterface field = object.getField(headingFieldName);
+        if (StringUtils.isNotBlank(heading)) {
+            result.addAll(this.objectPropertyRequiredRightAnalyzer.analyzeVelocityScriptValue(heading,
+                field.getReference(), "security.requiredrights.object.configurableClassHeading"));
         }
 
         return result;

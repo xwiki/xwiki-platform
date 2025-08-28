@@ -51,14 +51,24 @@ public class RawMacroRequiredRightsAnalyzer implements MacroRequiredRightsAnalyz
     @Override
     public void analyze(MacroBlock macroBlock, MacroRequiredRightReporter reporter)
     {
+        // Check if any parameter that is equal to "syntax" ignoring case is an HTML syntax.
+        boolean isHTML = macroBlock.getParameters().entrySet().stream()
+            .filter(entry -> "syntax".equalsIgnoreCase(entry.getKey()))
+            .anyMatch(entry -> isHTMLSyntax(entry.getValue()));
+
+        if (isHTML) {
+            reporter.report(macroBlock, List.of(MacroRequiredRight.SCRIPT), "rendering.macro.rawMacroRequiredRights");
+        }
+    }
+
+    private boolean isHTMLSyntax(String syntaxValue)
+    {
         try {
-            SyntaxType syntax = this.syntaxRegistry.resolveSyntax(macroBlock.getParameter("syntax")).getType();
-            if (SyntaxType.HTML_FAMILY_TYPES.contains(syntax)) {
-                reporter.report(macroBlock, List.of(MacroRequiredRight.SCRIPT),
-                    "rendering.macro.rawMacroRequiredRights");
-            }
+            SyntaxType syntax = this.syntaxRegistry.resolveSyntax(syntaxValue).getType();
+            return SyntaxType.HTML_FAMILY_TYPES.contains(syntax);
         } catch (ParseException e) {
-            // Ignore, this should fail the macro or at least won't produce HTML output.
+            // Values that can't be parsed also won't be considered as HTML by the macro itself.
+            return false;
         }
     }
 }

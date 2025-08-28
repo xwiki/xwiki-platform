@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.Translations" locale="zh">
+<xwikidoc version="1.6" reference="CKEditor.Translations" locale="zh">
   <web>CKEditor</web>
   <name>Translations</name>
   <language>zh</language>
@@ -87,9 +87,11 @@ ckeditor.plugin.office.importer.fail=Office 导入失败。
 ckeditor.plugin.office.importer.noUploadURL=未配置文件上传 URL。
 ckeditor.plugin.office.importer.failedToLoadForm=加载表单失败。
 ### Missing: ckeditor.plugin.resource.notSpecified=The {0} is not specified.
+ckeditor.plugin.resource.selectValue=请为链接位置选择一个值。
 ckeditor.plugin.save.leaveConfirmationMessage=有未保存的更改。你想丢弃它们吗？
 ckeditor.plugin.save.failed=由于 CKEditor 内部错误，无法保存内容。您应该尝试复制重要的更改并重新加载编辑器。
 ### Missing: ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
+ckeditor.plugin.selection.restoring=正在恢复选择内容...
 ### Missing: ckeditor.plugin.toolbar.basicStyles=Basic Styles
 ### Missing: ckeditor.plugin.toolbar.lists=Lists
 ### Missing: ckeditor.plugin.toolbar.bulletedlist=Bulleted List
@@ -146,7 +148,7 @@ ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=接受
 ckeditor.plugin.image.imageSelector.urlTab.title=网址
 ckeditor.plugin.image.imageSelector.urlTab.url.title=网址
 ckeditor.plugin.image.imageSelector.urlTab.url.hint=要显示的图像的网址。
-### Missing: ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
 ckeditor.plugin.image.slash.currentPageBadge=此页面
 ckeditor.plugin.image.slash.externalBadge=外部
 ckeditor.plugin.image.slash.loading=载入中...
@@ -251,6 +253,11 @@ ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=暂时�
 ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=未进行任何更改。重新加入实时会话。
 ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=有未保存的更改，但没有其他人在实时会话中。重新加入。
 ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=无法重新加入实时会话，因为有未保存的更改。
+ckeditor.plugin.upload.downloadingPastedImages=正在下载粘贴的图片：{0} / {1}
+ckeditor.plugin.upload.imageDownloadFailed=未能下载 {0} 张中的 {1} 张粘贴的图片
+ckeditor.plugin.upload.starting=将在 {0} 秒后开始上传
+ckeditor.plugin.upload.uploadingPastedImages=正在上传粘贴的图片：{0} / {1}
+ckeditor.plugin.upload.imageUploadFailed=未能上传 {0} 张中的 {1} 张粘贴的图片
 ckeditor.inline.failedToInit=初始化CKEditor失败。
 ckeditor.upload.error.csrf=缺少 CSRF 令牌。
 ckeditor.upload.error.emptyReturn=上传文件时出错：它可能超过配置的最大上传大小。
@@ -276,6 +283,7 @@ resource.attach.label=附件
 ### Missing: resource.user.placeholder=alias
 ### Missing: resourcePicker.attach.hint=Select an attachment
 ### Missing: resourcePicker.doc.hint=Select a page
+resourcePicker.dropdown.toggle.title=切换资源类型的显示。
 ### Missing: entityResourceSuggester.doc.placeholder=Find a page...
 ### Missing: entityResourceSuggester.attach.placeholder=Find an attachment...
 entityResourceSuggester.create.resolvedInSpace=创建新页面…
@@ -297,12 +305,15 @@ macroSelector.install.notAllowed=不允许您安装这个扩展
 macroSelector.filter.category.placeholder=选择一个类别…
 ### Missing: macroEditor.title=Edit Macro
 ### Missing: macroEditor.more=More
+macroEditor.required=要求
 ### Missing: macroEditor.changeMacro=Change Macro
 ### Missing: macroEditor.submit=Submit
 ### Missing: macroEditor.content=Content
 ### Missing: macroEditor.noParameters=This macro has no parameters.
 ### Missing: macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+macroEditor.parametersRequestFailed=未能检索到{0}的参数。
 macroEditor.installRequestFailed=安装宏 {0} 失败。
+macroEditor.selectFeature=选择参数{0}
 
 
 imageEditor.modal.changeImage.button=改变图片

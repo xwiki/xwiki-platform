@@ -173,7 +173,7 @@
   #set ($isCurrentTheme = ($currentThemeDoc.documentReference == $themeReference))
   #set ($themeDoc = $xwiki.getDocument($themeReference))
   #set ($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
-  (% class="theme #if($isCurrentTheme) current-theme#end" %)
+  * (% class="theme #if($isCurrentTheme) current-theme#end" %)
   (((
     ## Display the mockup
     #themeMockup($themeObj)
@@ -262,23 +262,16 @@
 ####################################
 #macro(creationForm)
   #if($xwiki.hasAccessLevel('edit', $xcontext.user, 'FlamingoThemes.AnyPage____________'))
-    (% class="clearfix" %)
-    (((
-  
     {{html}}
-      &lt;div class="theme-creation-form" &gt;
-        &lt;form action="$doc.getURL()" method="post" class="form-inline"&gt;
-          $services.icon.renderHTML('add')
-          &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
-          &lt;input type="hidden" name="action" value="create"/&gt;
-          &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('platform.flamingo.themes.home.newThemeName')&lt;/label&gt;
-          &lt;input type="text" name="newThemeName" id="newThemeName" value="$services.localization.render('platform.flamingo.themes.home.newThemeName')" class="withTip" size="30"/&gt;
-          &lt;input type="submit" value="$services.localization.render('platform.flamingo.themes.home.create')" class="button"/&gt;
-        &lt;/form&gt;
-      &lt;/div&gt;
+      &lt;form class="theme-creation-form form-inline" action="$doc.getURL()" method="post"&gt;
+        $services.icon.renderHTML('add')
+        &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
+        &lt;input type="hidden" name="action" value="create"/&gt;
+        &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('platform.flamingo.themes.home.newThemeName')&lt;/label&gt;
+        &lt;input type="text" name="newThemeName" id="newThemeName" value="$services.localization.render('platform.flamingo.themes.home.newThemeName')" class="withTip" size="30"/&gt;
+        &lt;input type="submit" value="$services.localization.render('platform.flamingo.themes.home.create')" class="button"/&gt;
+      &lt;/form&gt;
     {{/html}}
-    
-    )))
   #end
 #end
 ####################################
@@ -434,11 +427,14 @@
     <property>
       <code>#template('colorThemeInit.vm')
 .theme {
-  border: 1px dotted $theme.borderColor;
-  float: left;
-  margin: 0 1em 1em 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid $theme.borderColor;
   padding: 2px 4px;
   width: 300px;
+  /* Even when the content changes, takes all the space given to it in the grid of themes. */
+  height: 100%;
 }
 
 .current-theme {
@@ -446,19 +442,29 @@
 }
 
 .theme-info {
-  margin-left: 60px;
   color: $theme.textSecondaryColor;
   font-size: .9em;
 }
 
 .theme-info h3{
   margin-top: 0;
-  border-bottom: 1px solid $theme.borderColor;
 }
 
-/* Clear the floatting strategy after the display of all themes */
+/* Clear the floating strategy after the display of all themes */
 .theme-viewer h2, .theme-creation-form {
-  clear: both;
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.theme-viewer ul {
+  /* We remove the default UL styles since we want to use a flex display to make a grid of items.*/
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .mockup-page {
@@ -619,13 +625,6 @@
   border-width: 1px;
   left: 12px;
 }
-
-.theme-creation-form form {
-  display: inline-block;
-  padding: .5em;
-  margin-bottom: 1em;
-}
-
 </code>
     </property>
     <property>

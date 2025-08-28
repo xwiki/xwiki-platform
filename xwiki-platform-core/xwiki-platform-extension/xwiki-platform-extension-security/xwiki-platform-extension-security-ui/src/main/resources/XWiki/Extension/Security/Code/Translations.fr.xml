@@ -42,12 +42,16 @@ extension.security.indexed.on=Indexée à {0}. Toute extension installée après
 extension.security.indexed.nojob=Aucune indexation antérieure n'a pu être trouvée.
 extension.security.admin.generalWarning=Veuillez noter que cette analyse de sécurité n'inclut pas toutes les extensions installées. Les extensions qui ne peuvent pas être mises à jour via le gestionnaire d'extensions ne sont actuellement pas incluses.
 extension.security.admin.configuration.title=Configuration
+extension.security.admin.environment.explanation=Les extensions listées dans la section ci-dessous ont des vulnérabilités connues, mais ne peuvent pas être mises à jour depuis le Gestionnaire d'Extensions. Cela signifie qu'elles ne peuvent être mises à jour qu'en mettant à jour XWiki lui-même, ou son environnement d'installation (par exemple le conteneur de servlet, ou le container docker).
 extension.security.notification.message=Nous avons identifié {0} extensions présentant des vulnérabilités connues, voir les détails dans le rapport {1}
+extension.security.experimental.warning=Gardez à l'esprit que cette extension a un statut expérimental et peut conduire à l'affichage d'une analyse imprécise. Aussi, les résultats présentés sont à lire avec attention avant d'envisager toute action. 
 XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Scan activé
 XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=Si la case n'est pas cochée, l'analyse de sécurité ne sera plus exécutée
 XWiki.Extension.Security.Code.ConfigClass_scanDelay=Délai d'analyse
 XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=Nombre d'heures d'attente entre deux analyses de sécurité (par défaut : 24h)
 XWiki.Extension.Security.Code.ConfigClass_scanURL=URL du scan
 XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=L'URL à utiliser comme source distante pour l'analyse de sécurité (valeur par défaut : https://api.osv.dev/v1/query)
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=URL des revues de sécurité
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=L'URL à utiliser comme source distante des scans de sécurité commentés (valeur par défaut : https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)
 </content>
 </xwikidoc>

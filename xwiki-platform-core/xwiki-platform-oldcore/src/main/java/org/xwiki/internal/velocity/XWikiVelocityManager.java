@@ -39,10 +39,11 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
+import org.xwiki.model.EntityType;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -100,7 +101,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
     private Environment environment;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Inject
     private Logger logger;
@@ -256,7 +257,8 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
 
         // Inject skin macros if their author has at least Script rights.
         if (skinMacrosTemplate != null
-            && this.authorizationManager.hasAccess(Right.SCRIPT, skinMacrosTemplate.getContent().getAuthorReference(),
+            && this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            skinMacrosTemplate.getContent().getAuthorReference(),
             skinMacrosTemplate.getContent().getDocumentReference()))
         {
             VelocityTemplate skinMacros =

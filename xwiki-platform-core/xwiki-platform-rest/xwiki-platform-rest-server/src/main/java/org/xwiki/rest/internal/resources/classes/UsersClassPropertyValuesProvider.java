@@ -35,6 +35,7 @@ import org.xwiki.icon.IconType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.rest.model.jaxb.PropertyValues;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserConfiguration;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
@@ -106,21 +107,25 @@ public class UsersClassPropertyValuesProvider extends AbstractUsersAndGroupsClas
     protected Map<String, Object> getIcon(DocumentReference userReference)
     {
         Map<String, Object> icon = new HashMap<>();
-        XWikiContext xcontext = this.xcontextProvider.get();
-        try {
-            XWikiDocument userProfileDocument = xcontext.getWiki().getDocument(userReference, xcontext);
-            String avatar = userProfileDocument.getStringValue("avatar");
-            XWikiAttachment avatarAttachment = userProfileDocument.getAttachment(avatar);
-            if (avatarAttachment != null && avatarAttachment.isImage(xcontext)) {
-                icon.put(IconManager.META_DATA_URL, xcontext.getWiki().getURL(avatarAttachment.getReference(),
-                    "download", "width=30&height=30&keepAspectRatio=true", null, xcontext));
-                icon.put(IconManager.META_DATA_ICON_SET_TYPE, IconType.IMAGE.name());
+
+        if (this.contextualAuthorizationManager.hasAccess(Right.VIEW, userReference)) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            try {
+                XWikiDocument userProfileDocument = xcontext.getWiki().getDocument(userReference, xcontext);
+                String avatar = userProfileDocument.getStringValue("avatar");
+                XWikiAttachment avatarAttachment = userProfileDocument.getAttachment(avatar);
+                if (avatarAttachment != null && avatarAttachment.isImage(xcontext)) {
+                    icon.put(IconManager.META_DATA_URL, xcontext.getWiki().getURL(avatarAttachment.getReference(),
+                        "download", "width=30&height=30&keepAspectRatio=true", null, xcontext));
+                    icon.put(IconManager.META_DATA_ICON_SET_TYPE, IconType.IMAGE.name());
+                }
+            } catch (XWikiException e) {
+                this.logger.warn(
+                    "Failed to read the avatar of user [{}]. Root cause is [{}]. Using the default avatar instead.",
+                    userReference.getName(), ExceptionUtils.getRootCauseMessage(e));
             }
-        } catch (XWikiException e) {
-            this.logger.warn(
-                "Failed to read the avatar of user [{}]. Root cause is [{}]. Using the default avatar instead.",
-                userReference.getName(), ExceptionUtils.getRootCauseMessage(e));
         }
+
         if (!icon.containsKey(IconManager.META_DATA_URL)) {
             try {
                 icon = this.iconManager.getMetaData(DEFAULT_ICON_NAME);

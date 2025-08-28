@@ -88,7 +88,7 @@ class WikiMacrosTest
     @Test
     void saveWikiMacro() throws Exception
     {
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(any(), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(any(), any(), any(), any())).thenReturn(true);
 
         this.macroObject.setStringValue("visibility", "Current Wiki");
 

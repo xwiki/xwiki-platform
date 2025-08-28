@@ -128,6 +128,9 @@ public class ModelBridge
             throw new LiveDataException(NEW_DOCUMENT_UPDATE_ERROR);
         }
 
+        // Avoid modifying the cache document
+        document = document.clone();
+
         Object changedValue = updateProperty(property, value, classReference, objectNumber, document);
 
         saveDocument(document);
@@ -178,6 +181,9 @@ public class ModelBridge
         if (document.isNew()) {
             throw new LiveDataException(NEW_DOCUMENT_UPDATE_ERROR);
         }
+
+        // Avoid modifying the cache document
+        document = document.clone();
 
         convertPropertiesFromHtml(properties, this.localSerializer.serialize(classReference), objectNumber);
 

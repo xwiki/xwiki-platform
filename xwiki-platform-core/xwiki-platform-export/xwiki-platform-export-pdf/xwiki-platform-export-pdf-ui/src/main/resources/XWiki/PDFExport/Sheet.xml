@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.PDFExport.Sheet" locale="">
+<xwikidoc version="1.6" reference="XWiki.PDFExport.Sheet" locale="">
   <web>XWiki.PDFExport</web>
   <name>Sheet</name>
   <language/>
@@ -73,7 +73,7 @@
   ## which is probably lower than ECMAScript 2020 (ES11) when support for dynamic imports was introduced.
   ## See also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import
   ## and https://caniuse.com/?search=import()
-  #set ($discard = $xwiki.jsx.use($sheetReference, {'minify': false}))
+  #set ($discard = $xwiki.jsx.use($sheetReference, {'minify': false, 'defer': false}))
   #set ($discard = $xwiki.ssx.use($pdfExportConfig.template))
   #set ($discard = $xwiki.jsx.use($pdfExportConfig.template))
   ## Use the specified PDF file name as the title of the HTML page in order to have it suggested as file name when
@@ -549,6 +549,35 @@ define('paged-polyfill-patched', [
   return PagedPolyfill;
 });
 
+// Collect the MutationObserver instances in order to be able to disconnect them before generating the print preview
+// with paged.js (a process which generates a lot of DOM mutations because the content is split into print pages).
+(function() {
+  const mutationObservers = new Set();
+
+  const originalObserve = MutationObserver.prototype.observe;
+  MutationObserver.prototype.observe = function(...args) {
+    mutationObservers.add(this);
+    return originalObserve.apply(this, args);
+  };
+
+  const originalDisconnect = MutationObserver.prototype.disconnect;
+  MutationObserver.prototype.disconnect = function(...args) {
+    mutationObservers.delete(this);
+    return originalDisconnect.apply(this, args);
+  };
+
+  function disconnectAll() {
+    console.debug(`Disconnecting ${mutationObservers.size} mutation observers.`);
+    mutationObservers.forEach(mutationObserver =&gt; mutationObserver.disconnect());
+  }
+
+  define('xwiki-export-pdf-mutationObserverManager', function() {
+    return {
+      disconnectAll
+    };
+  });
+})();
+
 define('xwiki-export-pdf-config', ['jquery'], function($) {
   const pdfExportConfig = {
     documents: [],
@@ -565,8 +594,63 @@ define('xwiki-export-pdf-config', ['jquery'], function($) {
 require([
   'jquery',
   'xwiki-page-ready',
-  'xwiki-export-pdf-config'
-], function($, pageReady, pdfExportConfig) {
+  'xwiki-export-pdf-config',
+  'xwiki-export-pdf-mutationObserverManager'
+], function($, pageReady, pdfExportConfig, mutationObserverManager) {
+  // Workaround for a paged.js bug (#267: Missing CSS stylesheets can break the page rendering).
+  // See https://github.com/pagedjs/pagedjs/issues/267
+  const protectAgainstMissingStyleSheets = function() {
+    const missingStyleSheets = [...document.styleSheets].flatMap(getMissingStyleSheets);
+    console.debug('Missing stylesheets: ', missingStyleSheets);
+    const originalOpen = window.XMLHttpRequest.prototype.open;
+    window.XMLHttpRequest.prototype.open = function(...args) {
+      if (missingStyleSheets.includes(args[1])) {
+        // Paged.js needs to reload the stylesheets but unfortunately it doesn't check the response status so it treats
+        // the returned 404 Not Found HTML page as CSS which breaks the page rendering. We avoid this by replacing the
+        // request for the missing stylesheet with a request that gets an empty response.
+        args[1] = new XWiki.Document('MissingStyleSheet', 'XWiki.PDFExport').getURL('get', 'xpage=get');
+      }
+      return originalOpen.call(this, ...args);
+    };
+  };
+
+  function getMissingStyleSheets(styleSheet) {
+    // If a stylesheet has an URL (i.e. it's not inline in the HTML page) but no CSS rules, this usually means the
+    // stylesheet failed to be loaded.
+    const cssRules = getCSSRules(styleSheet);
+    if (cssRules?.length) {
+      return getMissingStyleSheetsFromCSSRules(cssRules);
+    } else if (styleSheet.href) {
+      // We consider stylesheets loaded from a different domain as missing because paged.js fails to load them and
+      // doesn't recover so this breaks the PDF export. This problem is going to be fixed by #267: Missing CSS
+      // stylesheets can break the page rendering.
+      return [styleSheet.href];
+    } else {
+      return [];
+    }
+  }
+
+  function getMissingStyleSheetsFromCSSRules(cssRules) {
+    let missingStyleSheets = [];
+    [...cssRules].forEach(cssRule =&gt; {
+      if (cssRule.href &amp;&amp; cssRule.styleSheet) {
+        missingStyleSheets = missingStyleSheets.concat(getMissingStyleSheets(cssRule.styleSheet));
+      } else if (cssRule.cssRules?.length) {
+        missingStyleSheets = missingStyleSheets.concat(getMissingStyleSheetsFromCSSRules(cssRule.cssRules));
+      }
+    });
+    return missingStyleSheets;
+  }
+
+  function getCSSRules(styleSheet) {
+    try {
+      return styleSheet.cssRules;
+    } catch (e) {
+      // We can't access the CSS rules if the stylesheet is loaded from a different domain.
+      return null;
+    }
+  }
+
   const refactorAnchors = function() {
     // Fix anchors that use relative URLs to point to the right document (that generated that anchor).
     fixRelativeAnchors($('#xwikicontent'));
@@ -823,6 +907,18 @@ require([
   };
 
   /**
+   * Lazy image loading (when the image is scrolled into view port) doesn't make sense for PDF export (printing).
+   * Paged.js needs to wait for all images to be loaded (even if they are not in the view port) in order to know how to
+   * split the content into print pages (e.g. to know if an image fits on the current print page or has to be moved to
+   * the next one).
+   */
+  function preventLazyImageLoading() {
+    document.querySelectorAll('#xwikicontent img[loading="lazy"]').forEach(image =&gt; {
+      image.removeAttribute('loading');
+    });
+  }
+
+  /**
    * Removes the image size (width and height) from the image URL query string in order to prevent the server-side
    * resize of the image, thus allowing the full size image to be included in the generated PDF.
    */
@@ -856,12 +952,14 @@ require([
 
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
+    protectAgainstMissingStyleSheets();
     refactorAnchors();
     removeEmptyTableOfContents();
     validateTableOfContentsAnchors();
     storeFormFieldValues();
     makeTableCellWidthRelative();
     preserveWhiteSpaceInCodeBlocks();
+    preventLazyImageLoading();
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
@@ -873,12 +971,25 @@ require([
     const usePagedPolyfill = $('body').children('.pdf-toc, .pdf-header, .pdf-footer').length;
     if (usePagedPolyfill) {
       return new Promise((resolve, reject) =&gt; {
-        window.PagedConfig = {after: resolve};
+        let start;
+        window.PagedConfig = {after: (...args) =&gt; {
+          const duration = (new Date().getTime() - start) / 1000;
+          console.debug(`Print preview ready in ${duration}s`);
+          resolve(...args);
+        }};
         // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become
         // blank when they are moved around within the DOM tree.
         replaceCanvasesWithImages($('#xwikicontent')).catch((cause) =&gt; {
           console.log('Failed to replace canvases with images. Cause: ' + cause);
         }).finally(() =&gt; {
+          // Splitting the content into print pages triggers a lot of DOM mutations. We disconnect all the mutation
+          // observers in order to speed up the print preview generation and also because we consider the current state
+          // of the content as final (i.e. that's how the content should end up in the PDF) so the DOM mutations
+          // triggered by paged.js should not lead to any new content changes.
+          mutationObserverManager.disconnectAll();
+
+          console.debug('Generating print preview...');
+          start = new Date().getTime();
           require(['paged-polyfill'], function(PagedPolyfill) {});
         })
       });
@@ -1276,7 +1387,7 @@ require([
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

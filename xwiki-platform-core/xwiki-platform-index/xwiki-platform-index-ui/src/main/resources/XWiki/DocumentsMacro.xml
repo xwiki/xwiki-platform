@@ -282,7 +282,7 @@ Generates:
 #set ($propertyDescriptors = [])
 #if ("$!services.like" != "")
   ## We can't make it sortable or filterable right now since it's not stored in DB.
-  #set ($discard = $propertyDescriptors.add({ 'id': '_likes', 'sortable': false, 'filterable': false }))
+  #set ($discard = $propertyDescriptors.add({ 'id': '_likes', 'sortable': false, 'filterable': false, 'editable': false }))
   #set ($discard = $properties.add('_likes'))
 #end
 #if(!$isGuest &amp;&amp; $xcontext.macro.params.actions == "true")
@@ -307,11 +307,16 @@ Generates:
   #set ($limit = $services.rendering.escape($xcontext.macro.params.count, 'xwiki/2.1'))
 #end
 #set ($propertiesStr = $services.rendering.escape($stringtool.join($properties, ','), 'xwiki/2.1'))
+#set ($filtersDeclared = $xcontext.macro.params.parameterNames.contains('filters'))
+#if ($filtersDeclared)
+  #set ($filters = $services.rendering.escape($xcontext.macro.params.filters, 'xwiki/2.1'))
+#end
 {{liveData
   id="$livedataId"
   properties="$propertiesStr"
   source="liveTable"
   sourceParameters="$escapetool.url($sourceParameters)"
+  #if ($filtersDeclared) filters="$filters"#end
   #if ($description != '')description="$description"#end
   #if ($properties.contains('doc.location'))sort="doc.location"#end
   #if ($limit != '')limit="$limit"#end
@@ -1069,6 +1074,182 @@ Generates:
     </property>
     <property>
       <type/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DocumentsMacro</name>
+    <number>8</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>ef5dfd9f-aeb1-495b-8621-4acbeaf73637</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>type</name>
+        <number>5</number>
+        <picker>1</picker>
+        <prettyName>Parameter type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </type>
+    </class>
+    <property>
+      <advanced>1</advanced>
+    </property>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <deprecated/>
+    </property>
+    <property>
+      <description>Provide a default filter to apply in the documents Live Data</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group/>
+    </property>
+    <property>
+      <hidden/>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>filters</name>
+    </property>
+    <property>
+      <type>Unknown</type>
     </property>
   </object>
 </xwikidoc>

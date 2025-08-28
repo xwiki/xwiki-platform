@@ -27,7 +27,6 @@ import java.net.URL;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -77,7 +76,6 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Named("org.xwiki.repository.internal.resources.ExtensionVersionFileRESTResource")
 @Path(Resources.EXTENSION_VERSION_FILE)
-@Singleton
 public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResource
 {
     @Inject

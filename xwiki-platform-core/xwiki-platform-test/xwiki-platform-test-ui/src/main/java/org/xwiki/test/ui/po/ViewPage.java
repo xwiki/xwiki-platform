@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
@@ -40,6 +41,12 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  */
 public class ViewPage extends BasePage
 {
+    private static final String COMMENTS_TAB_ID = "Commentslink";
+
+    private static final String HISTORY_TAB_ID = "Historylink";
+
+    private static final String INFORMATION_TAB_ID = "Informationlink";
+
     @FindBy(id = "xwikicontent")
     private WebElement content;
 
@@ -49,27 +56,60 @@ public class ViewPage extends BasePage
     private BreadcrumbElement breadcrumb;
 
     /**
+     * @return if the comments extra pane is available on this page
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean hasCommentsDocExtraPane()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(COMMENTS_TAB_ID));
+    }
+
+    /**
      * Opens the comments tab.
      * 
      * @return element for controlling the comments tab
      */
     public CommentsTab openCommentsDocExtraPane()
     {
-        getDriver().findElement(By.id("Commentslink")).click();
+        getDriver().findElement(By.id(COMMENTS_TAB_ID)).click();
         waitForDocExtraPaneActive("comments");
         return new CommentsTab();
     }
 
+    /**
+     * @return if the history extra pane is available on this page
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean hasHistoryDocExtraPane()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(HISTORY_TAB_ID));
+    }
+
     public HistoryPane openHistoryDocExtraPane()
     {
-        getDriver().findElement(By.id("Historylink")).click();
+        getDriver().findElement(By.id(HISTORY_TAB_ID)).click();
         waitForDocExtraPaneActive("history");
         return new HistoryPane();
     }
 
+    /**
+     * @return if the information extra pane is available on this page
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean hasInformationDocExtraPane()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(INFORMATION_TAB_ID));
+    }
+
     public InformationPane openInformationDocExtraPane()
     {
-        getDriver().findElement(By.id("Informationlink")).click();
+        getDriver().findElement(By.id(INFORMATION_TAB_ID)).click();
         waitForDocExtraPaneActive("information");
         return new InformationPane();
     }
@@ -135,12 +175,17 @@ public class ViewPage extends BasePage
         clickWantedLink(new DocumentReference("xwiki", spaceName, pageName), waitForTemplateDisplay);
     }
 
+    public CreatePagePage clickWantedLink(EntityReference reference)
+    {
+        return clickWantedLink(reference, true).get();
+    }
+
     /**
      * Clicks on a wanted link in the page.
      *
      * @since 7.2M2
      */
-    public void clickWantedLink(EntityReference reference, boolean waitForTemplateDisplay)
+    public Optional<CreatePagePage> clickWantedLink(EntityReference reference, boolean waitForTemplateDisplay)
     {
         WebElement brokenLink = getDriver().findElement(
             By.xpath("//span[@class='wikicreatelink']/a[contains(@href,'/create/" + getUtil().getURLFragment(reference)
@@ -152,7 +197,9 @@ public class ViewPage extends BasePage
             // will all have been displayed.
             getDriver().waitUntilElementIsVisible(
                 By.xpath("//div[@class='modal-dialog']//form[@id='create']//button[@type='submit']"));
+            return Optional.of(new CreatePagePage());
         }
+        return Optional.empty();
     }
 
     public BreadcrumbElement getBreadcrumb()
@@ -309,5 +356,37 @@ public class ViewPage extends BasePage
     public String getLastModifiedText()
     {
         return getDriver().findElement(By.className("xdocLastModification")).getText();
+    }
+
+    /**
+     * @param wait if {@code true} waits (with the standard timeout) until the required rights warning is present,
+     *     otherwise returns immediately
+     * @return {@code true} if the page has a required rights warning, {@code false} otherwise
+     * @since 17.4.0RC1
+     */
+    public boolean hasRequiredRightsWarning(boolean wait)
+    {
+        By requiredRightsWarningSelector = By.cssSelector("#missing-required-rights-warning .requiredrights-warning");
+        if (wait) {
+            return getDriver().hasElementWithoutWaiting(requiredRightsWarningSelector);
+        } else {
+            return getDriver().hasElement(requiredRightsWarningSelector);
+        }
+    }
+
+    /**
+     * Opens the required rights modal by clicking on the button in the required rights warning.
+     *
+     * @return the opened required rights modal
+     * @since 17.4.0RC1
+     */
+    public RequiredRightsModal openRequiredRightsModal()
+    {
+        WebElement reviewButton = getDriver().findElement(By.cssSelector("#missing-required-rights-warning button"));
+        // Wait until the button isn't disabled anymore to avoid clicking the button before the event handler has been
+        // initialized.
+        getDriver().waitUntilCondition(driver -> reviewButton.isEnabled());
+        reviewButton.click();
+        return new RequiredRightsModal();
     }
 }

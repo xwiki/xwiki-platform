@@ -174,12 +174,12 @@ public class AutocompleteDropdown extends BaseElement
     {
         if (this.selectedItem != null) {
             // Wait for the previously selected item to be hidden, unselected or detached from the DOM.
-            getDriver().waitUntilCondition((driver) -> {
+            getDriver().waitUntilCondition(driver -> {
                 try {
                     // Either hidden (e.g. when the drop down is closed)
                     return !this.selectedItem.isDisplayed()
                         // or not selected,
-                        || !this.selectedItem.getAttribute("class").contains("cke_autocomplete_selected");
+                        || !this.selectedItem.getDomAttribute("class").contains("cke_autocomplete_selected");
                 } catch (StaleElementReferenceException e) {
                     // or detached from the DOM (e.g. when the items have been updated).
                     return true;

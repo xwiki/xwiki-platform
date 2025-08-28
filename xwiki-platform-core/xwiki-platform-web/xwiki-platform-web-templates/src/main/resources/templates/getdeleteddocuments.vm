@@ -58,6 +58,7 @@ $response.setContentType("application/json")
     ## So we filter on the document full name instead, which is the expected behavior.
     #set ($order = 'ddoc.fullName')
   #end
+  #set($discard = $services.query.hql.checkOrderBySafe(['ddoc.'], $order))
   ## Weird things happen if we use "ORDER BY" (upper case), at least on HSQLDB. Other DBs may behave differently
   #set ($orderQueryPart = "order by ${order} ${orderDirection}")
 #end
@@ -70,10 +71,7 @@ $response.setContentType("application/json")
 #if (!$offset || $offset < 0)
   #set($offset = 0)
 #end
-#set ($limit = $numbertool.toNumber($request.get('limit')).intValue())
-#if (!$limit)
-  #set ($limit = 15)
-#end
+#getAndValidateQueryLimitFromRequest('limit', 15, $limit)
 ##
 ## Build the query
 ##

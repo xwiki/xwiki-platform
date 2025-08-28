@@ -27,7 +27,8 @@
     'name': $id,
     'value': $value,
     'disabled': $disabled,
-    'data-format': $format
+    'data-format': $format,
+    'aria-label': $aria-label
   })
   #set ($picker = $field.getProperty('picker').value == 1)
   #if ($picker)

@@ -132,13 +132,8 @@ public class DefaultNewsConfiguration implements NewsConfiguration
     {
         List<NewsSourceDescriptor> descriptors = new ArrayList<>();
         // Only keep the keys related to configuring news sources, for performance.
-        List<String> keys = new ArrayList<>();
         String sourceKeyNamePrefix = String.format("%s.", getFullKeyName(SOURCE_CONFIG_NAME));
-        for (String key : this.configurationSource.getKeys()) {
-            if (key.startsWith(sourceKeyNamePrefix)) {
-                keys.add(key);
-            }
-        }
+        List<String> keys = this.configurationSource.getKeys(sourceKeyNamePrefix);
         for (Map.Entry<Object, Object> entry : sources.entrySet()) {
             // Find all parameter properties for the defined source
             Map<String, String> parameters = new HashMap<>();

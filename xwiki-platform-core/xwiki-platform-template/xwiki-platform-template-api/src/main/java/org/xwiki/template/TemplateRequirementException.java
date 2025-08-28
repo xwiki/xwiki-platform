@@ -22,7 +22,6 @@ package org.xwiki.template;
 import org.slf4j.Marker;
 import org.xwiki.logging.AbstractMessageException;
 import org.xwiki.logging.Message;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exception thrown when a template requirement is not met.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.0RC1
  * @since 14.10.1
  */
-@Unstable
 public class TemplateRequirementException extends AbstractMessageException
 {
     private static final long serialVersionUID = 1L;

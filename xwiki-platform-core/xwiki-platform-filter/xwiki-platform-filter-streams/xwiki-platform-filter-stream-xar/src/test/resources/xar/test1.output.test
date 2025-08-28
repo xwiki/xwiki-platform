@@ -87,6 +87,10 @@
                 <boolean>false</boolean>
               </entry>
               <entry>
+                <string>enforce_required_rights</string>
+                <boolean>true</boolean>
+              </entry>
+              <entry>
                 <string>content</string>
                 <string>content</string>
               </entry>

@@ -39,6 +39,7 @@ import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.messagetool.internal.MessageToolTranslationMessageParser;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.internal.DefaultObservationManager;
@@ -176,8 +177,8 @@ class ComponentDocumentTranslationBundleTest
         this.oldcore.getSpyXWiki().saveDocument(this.translationFrDocument, this.oldcore.getXWikiContext());
 
         doThrow(new AccessDeniedException(Right.SCRIPT, null, translationRootDocument.getDocumentReference()))
-            .when(this.oldcore.getMockAuthorizationManager()).checkAccess(Right.ADMIN, null,
-                TRANSLATION_ROOT_REFERENCE.getWikiReference());
+            .when(this.oldcore.getMockDocumentAuthorizationManager()).checkAccess(Right.ADMIN, EntityType.WIKI, null,
+                TRANSLATION_ROOT_REFERENCE);
     }
 
     @Test
@@ -189,8 +190,8 @@ class ComponentDocumentTranslationBundleTest
         Translation frTranslation = this.localization.getTranslation("xwiki.translation", Locale.FRENCH);
         assertEquals("fr", frTranslation.getRawSource());
         // Authorizations are checked twice because the mocked behavior is not actual locale bundle registration.
-        verify(this.oldcore.getMockAuthorizationManager(), times(4)).checkAccess(Right.ADMIN, ADMIN_USER_REFERENCE,
-            TRANSLATION_ROOT_REFERENCE.getWikiReference());
+        verify(this.oldcore.getMockDocumentAuthorizationManager(), times(4))
+            .checkAccess(Right.ADMIN, EntityType.WIKI, ADMIN_USER_REFERENCE, TRANSLATION_ROOT_REFERENCE);
     }
 
     @Test
@@ -202,7 +203,7 @@ class ComponentDocumentTranslationBundleTest
                 + "Falling back to default locale.",
             this.logCapture.getMessage(0));
         assertEquals("root", frTranslation.getRawSource());
-        verify(this.oldcore.getMockAuthorizationManager()).checkAccess(Right.ADMIN, null,
-            TRANSLATION_ROOT_REFERENCE.getWikiReference());
+        verify(this.oldcore.getMockDocumentAuthorizationManager())
+            .checkAccess(Right.ADMIN, EntityType.WIKI, null, TRANSLATION_ROOT_REFERENCE);
     }
 }

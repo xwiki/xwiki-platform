@@ -82,11 +82,28 @@ rendering.macro.documentTree.parameter.limit.name=Limit
 rendering.macro.documentTree.parameter.limit.description=Die maximale Anzahl der Kindknoten, die beim ersten Aufklappen eines übergeordneten Knotens angezeigt werden sollen. Der Rest der Kindknoten ist über einen "mehr ..."-Link zugänglich. Dieser Parameter dient im Wesentlichen dazu, die Kindknoten zu paginieren und hilft so bei der Skalierung des Baums, wenn die Anzahl der Kindknoten groß ist.
 rendering.macro.documentTree.parameter.exclusions.name=Ausschlüsse
 rendering.macro.documentTree.parameter.exclusions.description=Die Liste der Knoten, die aus dem Baum ausgeschlossen werden sollen. Die Knoten werden durch ihre ID angegeben und durch Komma getrennt.
+rendering.macro.documentTree.parameter.sortDocumentsBy.name=Seiten sortieren nach
+rendering.macro.documentTree.parameter.sortDocumentsBy.description=Das Seitenfeld, das zum Sortieren der untergeordneten Seiten verwendet wird, gefolgt von der Sortierreihenfolge.
+rendering.macro.documentTree.parameter.expandToLevel.name=Auf Ebene erweitern
+rendering.macro.documentTree.parameter.expandToLevel.description=Lege fest, wie tief der Baum automatisch erweitert werden soll. Standardmäßig ist der Wert 0, was bedeutet, dass nur die obersten Knoten angezeigt werden. Mit dem Wert 1 werden diese geöffnet, mit dem Wert 2 werden zusätzlich die untergeordneten Knoten der neu angezeigten Knoten geöffnet usw. Beachte, dass ein hoher Wert dazu führen kann, dass die Makroerweiterung für den Browser sehr umfangreich wird.
 rendering.macro.children.name=Unterseiten
 rendering.macro.children.description=Zeigt einen Baum von Unterseiten der aktuellen Seite an
+rendering.macro.children.parameter.sort.name=Sortieren nach
+rendering.macro.children.parameter.sort.description=Das Seitenfeld, das zum Sortieren der untergeordneten Seiten verwendet wird, gefolgt von der Sortierreihenfolge.
+rendering.macro.children.parameter.root.name=Wurzel
+rendering.macro.children.parameter.root.description=Die ID des Wurzelknotens. Das ist praktisch, wenn Du nur die Unterseiten eines bestimmten Knotens (der als Wurzel angegeben ist) anzeigen willst. Der Baum zeigt die Kinder des Wurzelknotens auf der ersten Ebene an, sodass der Wurzelknoten selbst nicht angezeigt wird. Wenn kein Wurzelknoten angegeben ist, wird der gesamte Baum angezeigt. Das Format einer Knotenbezeichnung ist entityType:entityReference, wobei der Entitätstyp zum Beispiel wiki, space oder document sein kann. Beispiel: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
 index.documentTree.empty=Keine Seiten gefunden
 index.documentTree.more={0} mehr ...
 index.documentTree.addDocument=Neue Seite...
+index.documentTree.documentSortDisplayer.field=Feld sortieren
+index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.title=Titel
+index.documentTree.documentSortDisplayer.field.date=Datum der letzten Änderung
+index.documentTree.documentSortDisplayer.field.creationDate=Erstellungsdatum
+index.documentTree.documentSortDisplayer.order=Sortierreihenfolge
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=Aufsteigend
+index.documentTree.documentSortDisplayer.order.desc=Absteigend
 
 ## Deprecated translation keys
 

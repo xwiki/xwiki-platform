@@ -37,7 +37,9 @@ import org.xwiki.display.internal.DefaultDocumentDisplayer;
 import org.xwiki.display.internal.DocumentContentAsyncExecutor;
 import org.xwiki.display.internal.DocumentContentAsyncRenderer;
 import org.xwiki.display.internal.DocumentContentDisplayer;
+import org.xwiki.display.internal.DocumentReferenceDequeContext;
 import org.xwiki.display.internal.DocumentTitleDisplayer;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.internal.script.XWikiScriptContextInitializer;
 import org.xwiki.internal.velocity.XWikiVelocityManager;
 import org.xwiki.localization.internal.DefaultContextualLocalizationManager;
@@ -77,6 +79,7 @@ import org.xwiki.rendering.internal.transformation.DefaultTransformationManager;
 import org.xwiki.rendering.internal.transformation.XWikiRenderingContext;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
+import org.xwiki.rendering.internal.transformation.macro.IsolatedExecutionConfiguration;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.internal.transformation.macro.RawBlockFilterUtils;
 import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
@@ -89,6 +92,7 @@ import org.xwiki.script.internal.service.DefaultScriptServiceManager;
 import org.xwiki.script.internal.service.ServicesScriptContextInitializer;
 import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
+import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 import org.xwiki.velocity.internal.InternalVelocityEngine;
@@ -185,6 +189,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultMacroManager.class,
     DefaultMacroIdFactory.class,
     DefaultErrorBlockGenerator.class,
+    IsolatedExecutionConfiguration.class,
 
     // Properties
     DefaultBeanManager.class,
@@ -208,6 +213,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     BaseAsyncRendererExecutor.class,
     DefaultAsyncContext.class,
     SheetDocumentDisplayer.class,
+    DocumentReferenceDequeContext.class,
 
     // Sheet
     DefaultSheetManager.class,
@@ -304,10 +310,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     // Template Manager
     DefaultTemplateManager.class,
     InternalTemplateManager.class,
+    TemplateScriptService.class,
     TemplateContext.class,
     VelocityTemplateEvaluator.class,
     TemplateAsyncRenderer.class,
-    DefaultCacheControl.class
+    DefaultCacheControl.class,
+
+    // Required rights (needed for Document/Object API)
+    DocumentRequiredRightsReader.class
 })
 @Inherited
 @XWikiDocumentFilterUtilsComponentList

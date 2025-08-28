@@ -5,207 +5,136 @@
   .container-fluid();
 }
 
-#menuview, #headerglobal, #contentcontainer, #xwikieditor, #footerglobal {
+#menuview, #headerglobal, #xwikieditor, #footerglobal {
   .make-row();
 }
-
 @main-padding: @grid-gutter-width * 2;
 
+@property ~"--panel-column-left-width" {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 16vw;
+}
+@property ~"--panel-column-right-width" {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 16vw;
+}
 #body {
-  // Both left and right panels are displayed
-  &.content {
-    // Left panels are small
-    &.panel-left-width-Small {
-      .main {
-        .make-md-column-push(1);
-      }
-      // Left panels are small and right panels are small
-      &.panel-right-width-Small {
-        .main {
-          .make-md-column(10, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(10);
-        }
-      }
-      // Left panels are small and right panels are medium
-      &.panel-right-width-Medium {
-        .main {
-          .make-md-column(9, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(9);
-        }
-      }
-      // Left panels are small and right panels are large
-      &.panel-right-width-Large {
-        .main {
-          .make-md-column(8, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(8);
-        }
-      }
-    }
-    // Left panels are medium
-    &.panel-left-width-Medium {
-      .main {
-        .make-md-column-push(2);
-      }
-      // Left panels are medium and right panels are small
-      &.panel-right-width-Small {
-        .main {
-          .make-md-column(9, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(9);
-        }
-      }
-      // Left panels are medium and right panels are medium
-      &.panel-right-width-Medium {
-        .main {
-          .make-md-column(8, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(8);
-        }
-      }
-      // Left panels are medium and right panels are large
-      &.panel-right-width-Large {
-        .main {
-          .make-md-column(7, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(7);
-        }
-      }
-    }
-    // Left panels are large
-    &.panel-left-width-Large {
-      .main {
-        .make-md-column-push(3);
-      }
-      // Left panels are large and right panels are small
-      &.panel-right-width-Small {
-        .main {
-          .make-md-column(8, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(8);
-        }
-      }
-      // Left panels are large and right panels are medium
-      &.panel-right-width-Medium {
-        .main {
-          .make-md-column(7, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(7);
-        }
-      }
-      // Left panels are large and right panels are large
-      &.panel-right-width-Large {
-        .main {
-          .make-md-column(6, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(6);
-        }
-      }
-    }
+  /* We reorganize the DOM order so that it makes sense visually. */
+  & #contentcolumn , & #editcolumn {
+    order: 2;
+    width: ~"calc(100vw - var(--panel-column-left-width) - var(--panel-column-right-width))";
+    /* Whatever the user preference/actions, we make sure that the content is still at least somewhat visible. */
+    min-width: 10vw;
   }
 
-  // Only right panels
-  &.hideleft {
-    &.panel-right-width-Small {
-      .main {
-        .make-md-column(11, @main-padding);
-      }
-    }
-    &.panel-right-width-Medium {
-      .main {
-        .make-md-column(10, @main-padding);
-      }
-    }
-    &.panel-right-width-Large {
-      .main {
-        .make-md-column(9, @main-padding);
-      }
-    }
+  & #editcolumn main {
+    padding: 0 @grid-gutter-width;
   }
 
-  // Only left panels
-  &.hideright {
-    &.panel-left-width-Small {
-      .main {
-        .make-md-column(11, @main-padding);
-        .make-md-column-push(1);
-      }
-      #leftPanels {
-        .make-md-column-pull(11);
-      }
-    }
-    &.panel-left-width-Medium {
-      .main {
-        .make-md-column(10, @main-padding);
-        .make-md-column-push(2);
-      }
-      #leftPanels {
-        .make-md-column-pull(10);
-      }
-    }
-    &.panel-left-width-Large {
-      .main {
-        .make-md-column(9, @main-padding);
-        .make-md-column-push(3);
-      }
-      #leftPanels {
-        .make-md-column-pull(9);
-      }
-    }
+  & #leftPanels {
+    order: 1;
+    width: ~"var(--panel-column-left-width)";
   }
 
-  // No Panels
-  &.hidelefthideright {
-    .main {
-      .make-md-column(12, @main-padding);
-    }
+  & #rightPanels {
+    order: 3;
+    width: ~"var(--panel-column-right-width)";
   }
+  
+  /* Depending on the admin parameters, we want to change the default size. */
+  /* In order to set CSS property values in this LESS file, we need to make sure the LESS lexer
+     doesn't interpret the double dash as the start of a HTML comment close.
+     We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
+     Once this file is migrated to native CSS, this hack can be removed. */
 
   &.panel-left-width-Small {
-    #leftPanels {
-      .make-md-column(1);
-    }
+    -/**/-panel-column-left-width: 8vw;
   }
-  &.panel-left-width-Medium {
-    #leftPanels {
-      .make-md-column(2);
-    }
-  }
-  &.panel-left-width-Large {
-    #leftPanels {
-      .make-md-column(3);
-    }
-  }
-  &.panel-right-width-Small {
-    #rightPanels, #editPanels {
-      .make-md-column(1);
-    }
-  }
-  &.panel-right-width-Medium {
-    #rightPanels, #editPanels {
-      .make-md-column(2);
-    }
-  }
-  &.panel-right-width-Large {
-    #rightPanels, #editPanels {
-      .make-md-column(3);
-    }
-  }
-}
 
-#leftPanels, #rightPanels {
-  .make-xs-column(12);
+  &.panel-left-width-Large {
+    -/**/-panel-column-left-width: 24vw;
+  }
+
+  /* The functionality to hide the panel takes precedence over the panel size defaults. 
+    This ruleset should come after the rules for .panel-left-width-<WIDTH> */
+  &.hideleft {
+    /* When the screen is small enough, we keep panels shown.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
+      ie. this media query does not short-circuit the admin preference. */
+    @media (min-width: @screen-md-min) {
+      -/**/-panel-column-left-width: 0;
+
+      & #leftPanels {
+        display: none;
+      }
+    }
+  }
+
+  &.panel-right-width-Small {
+    -/**/-panel-column-right-width: 8vw;
+  }
+
+  &.panel-right-width-Large {
+    -/**/-panel-column-right-width: 24vw;
+  }
+
+  /* The functionality to hide the panel takes precedence over the panel size defaults. 
+    This ruleset should come after the rules for .panel-right-width-<WIDTH> */
+  &.hideright {
+    /* When the screen is small enough, we keep panels shown.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
+      ie. this media query does not short-circuit the admin preference. */
+    @media (min-width: @screen-md-min) {
+      -/**/-panel-column-right-width: 0;
+
+      & #rightPanels {
+        display: none;
+      }
+    }
+  }
+
+  &.hidelefthideright {
+    /* When the screen is small enough, we keep panels shown.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
+      ie. this media query does not short-circuit the admin preference. */
+    @media (min-width: @screen-md-min) {
+      -/**/-panel-column-left-width: 0;
+      -/**/-panel-column-right-width: 0;
+  
+      & #leftPanels, & #rightPanels {
+        display: none;
+      }
+    }
+  }
+
+  /* We use CSS flex to display the default column sizes.
+   The size "unit" is 8vw which is approximately equal to 1/12th of the viewport. */
+  & #contentcontainer, & #xwikieditorinner {
+    display: flex;
+
+    /* The bootstrap grid system had a breakpoint at this width to send the panel columns down. */
+    @media (max-width: @screen-md-min) {
+      flex-wrap: wrap;
+
+      & > * {
+        width: 100vw;
+        order: initial;
+        
+        /* We disable the resize handles totally when 
+         the view is too small to display panels next to the content anyways.
+         Jquery UI adds the inline display:block if the handle is hidden at the start. We need to be extra secure when
+         hiding those handles. */
+        & > .ui-resizable-handle {
+          display: none;
+          width: 0;
+          height: 0;
+          border-color: transparent;
+        }
+      }
+    }
+  }
 }
 
 .rightmenu {
@@ -231,7 +160,7 @@
   padding-bottom: 0;
 }
 
-#xwikieditor .main {
+#xwikieditor #editcolumn {
   background-color: @xwiki-page-content-bg;
 }
 
@@ -246,11 +175,143 @@
   resize: vertical;
 }
 
-.main,
-#leftPanels, #rightPanels, #editPanels,
-#docextrapanes {
+.main, #editcolumn, #leftPanels, #rightPanels {
+  position: relative;
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
+}
+
+/* Styles for the panel column handles.. */
+/* Toggle handles */
+#leftPanelsToggle, #rightPanelsToggle {
+  /* We make sure it doesn't get over the content. */
+  max-width: @grid-gutter-width - 4px;
+  background-color: @breadcrumb-bg;
+  border: 0;
+  box-shadow: none;
+  .text-muted;
+  /* By default, those buttons are hidden visually but never hidden in the DOM. */
+  opacity: 0;
+  /* Smoothen out the apparition and disparition of the togglers in the UI. */
+  transition: visibility .2s ease-in-out, opacity .2s ease-in-out;
+  /* They are fixed on the page, always at the very top of their parent #contentcontainer.
+    We use the same top-margin as #leftPanels and #rightPanels so that the carets are aligned with
+    the first panel title at first. */
+  position: fixed;
+  margin-top: 15px;
+  /* Make sure the toggles are displayed above the panel content. */
+  z-index: 1;
+  /* Smoothen out the state transition when expanding and collapsing the panel. */
+  & > * {
+    transition: transform .2s;
+  }
+}
+
+/* We only allow the panel column toggles when the screen is large enough to support the columns next to the content.
+It would not make sense on mobile. 
+A niche weird interaction that would make this style behave unexpectedly is: hide one column, reduce the screen width 
+(e.g. rotate the phone) and the panels are not here and cannot be displayed again until the screen width is increased 
+again or the page is reloaded (because the toggler is hidden until then). */
+@media (min-width: @screen-md-min) {
+  /* The panel toggle is quite small. Since it's hidden by default, we need to give it proper conditions for showing up.
+  We show the toggles when either of the panel columns are hovered.  */
+  #leftPanelsToggle[aria-expanded="false"],
+  #contentcontainer:hover #contentcolumn:not(:hover) ~ #leftPanelsToggle,
+  #leftPanelsToggle:has(+ #leftPanels:focus-within),
+  #leftPanelsToggle:hover, #leftPanelsToggle:focus,
+  #rightPanelsToggle[aria-expanded="false"],
+  #contentcontainer:hover #contentcolumn:not(:hover) ~ #rightPanelsToggle,
+  #rightPanelsToggle:has(+ #rightPanels:focus-within),
+  #rightPanelsToggle:hover, #rightPanelsToggle:focus {
+    opacity: 1;
+  }
+  
+  /* When the display is large enough, we add padding on the outer sides of the panel columns. */
+  #leftPanels {
+    padding-right: ~"calc(var(--grid-gutter-width) / 2)";
+  }
+  
+  #rightPanels {
+    padding-left: ~"calc(var(--grid-gutter-width) / 2)";
+  }
+}
+
+body#body #rightPanelsToggle {
+  /* Merge the button with the side of the screen. */
+  right: 0;
+  border-radius: @border-radius-small 0 0 @border-radius-small;
+  
+  /* Default state has the caret pointing right. */
+  & > * {
+    transform: rotate(0);
+  }
+  
+  /* When the panel is closed, we want the caret pointing left. ie 'right-caret' rotated 180deg */
+  &[aria-expanded="false"] > * {
+    transform: rotate(180deg);
+  }
+}
+
+body#body #leftPanelsToggle {
+  /* Merge the button with the side of the screen. */
+  left: 0;
+  border-radius: 0 @border-radius-small @border-radius-small 0;
+  
+  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
+  & > * {
+    transform: rotate(180deg);
+  }
+  
+  /* When the panel is closed, we want the caret pointing right. */
+  &[aria-expanded="false"] > * {
+    transform: rotate(0);
+  }
+}
+
+/* Resize handles */
+#rightPanels > .ui-resizable-w,
+#leftPanels > .ui-resizable-e {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  opacity: 0;
+  padding: 0;
+  cursor: col-resize;
+  min-width: 0;
+  /* With this width, there should be just enough space to fit the handle on the side of the panel 
+    without it going over panel content. */
+  width: ~"var(--grid-gutter-width)";
+  border: 0;
+  border-radius: 0;
+  /* We want those handles to display above any regular content. The style should be discreete. */
+  z-index: 1;
+  /* We already provide a visible indicator when those handles are focused. There's no need for an outline. */
+  outline: 0;
+}
+
+#leftPanels > .ui-resizable-e {
+  right: 0;
+  /* We want the click zone to be large, but the display to be discreete. 
+    90% of the button is transparent and the 10% on the right are highlighted on hover. */
+  background-image: linear-gradient( 90deg, transparent 0%, transparent 90%, @navbar-default-bg 90%, @navbar-default-bg 90%);
+}
+
+#rightPanels > .ui-resizable-w {
+  left: 0;
+  /* We want the click zone to be large, but the display to be discreete. 
+    90% of the button is transparent and the 10% on the left are highlighted on hover. */
+  background-image: linear-gradient( -90deg, transparent 0%, transparent 90%, @navbar-default-bg 90%, @navbar-default-bg 90%);
+}
+
+#rightPanels > .ui-resizable-w:focus,
+#rightPanels > .ui-resizable-w:hover,
+#rightPanels > .ui-resizable-w:active,
+#rightPanels.ui-resizable-resizing > .ui-resizable-w,
+#leftPanels > .ui-resizable-e:focus,
+#leftPanels > .ui-resizable-e:hover,
+#leftPanels > .ui-resizable-e:active,
+#leftPanels.ui-resizable-resizing > .ui-resizable-e {
+  opacity: 1
 }
 
 #xwikicontent {
@@ -299,8 +360,13 @@
 #xdocFooter,
 #docextrapanes {
   background-color: @xwiki-page-content-bg;
-  margin: 0 -@grid-gutter-width;
   padding: @line-height-computed @grid-gutter-width;
+}
+
+/* We don't want to apply a extra padding when the #hierarchy_breadcrumb is nested inside the #mainContentArea,
+ which happens on some pages (like the AdminSheet). On most pages, these elements are next to each other. */
+#mainContentArea #hierarchy_breadcrumb {
+  padding: @line-height-computed 0;
 }
 
 #hierarchy_breadcrumb {
@@ -354,7 +420,7 @@ already take care of padding and shadow. */
 }
 
 #docExtrasTabsUl {
-  margin-left: -(floor((@grid-gutter-width / 2)));
+  margin: 0 floor((@grid-gutter-width / 2));
 }
 
 .xwikitabbar > li.active > a {

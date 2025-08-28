@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -41,7 +42,7 @@ import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -76,7 +77,7 @@ class DefaultGadgetSourceTest
     private AuthorExecutor authorExecutor;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Mock
     private DocumentReference documentReference;
@@ -164,7 +165,8 @@ class DefaultGadgetSourceTest
         when(gadgetObject1.getLargeStringValue("content")).thenReturn("Some content");
         when(gadgetObject1.getStringValue("position")).thenReturn("0");
         when(gadgetObject1.getNumber()).thenReturn(42);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, ownerAuthorReference, ownerSourceReference)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, ownerAuthorReference,
+            ownerSourceReference)).thenReturn(true);
         when(this.velocityEngine.evaluate(any(), any(), any(), eq("Gadget 1"))).then((Answer<Void>) invocation -> {
             Object[] args = invocation.getArguments();
             StringWriter stringWriter = (StringWriter) args[1];
@@ -197,7 +199,8 @@ class DefaultGadgetSourceTest
         when(gadgetObject1.getLargeStringValue("content")).thenReturn("Some other content");
         when(gadgetObject1.getStringValue("position")).thenReturn("2");
         when(gadgetObject1.getNumber()).thenReturn(12);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, ownerAuthorReference, ownerSourceReference)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, ownerAuthorReference,
+            ownerSourceReference)).thenReturn(false);
 
         List<Gadget> gadgets = this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext);
         assertEquals(1, gadgets.size());

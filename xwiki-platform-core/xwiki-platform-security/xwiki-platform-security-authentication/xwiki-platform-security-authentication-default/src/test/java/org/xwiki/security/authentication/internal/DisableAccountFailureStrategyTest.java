@@ -19,6 +19,12 @@
  */
 package org.xwiki.security.authentication.internal;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,15 +38,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DisableAccountFailureStrategy}.
@@ -49,7 +48,7 @@ import static org.mockito.Mockito.when;
  * @since 11.8RC1
  */
 @ComponentTest
-public class DisableAccountFailureStrategyTest
+class DisableAccountFailureStrategyTest
 {
     @InjectMockComponents(role = AuthenticationFailureStrategy.class)
     private DisableAccountFailureStrategy disableStrategy;
@@ -61,7 +60,7 @@ public class DisableAccountFailureStrategyTest
     private XWikiDocument updatedDocument;
 
     @BeforeEach
-    public void configure() throws XWikiException
+    public void configure()
     {
         DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
 
@@ -81,7 +80,7 @@ public class DisableAccountFailureStrategyTest
     }
 
     @Test
-    public void resetAuthenticationFailureCounterWhenAccountIsActivated()
+    void resetAuthenticationFailureCounterWhenAccountIsActivated()
     {
         when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
             .getIntValue("active")).thenReturn(0);
@@ -95,7 +94,7 @@ public class DisableAccountFailureStrategyTest
     }
 
     @Test
-    public void dontResetAuthenticationFailureCounterWhenAccountRemainsInactive()
+    void dontResetAuthenticationFailureCounterWhenAccountRemainsInactive()
     {
         when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
             .getIntValue("active")).thenReturn(0);
@@ -109,7 +108,7 @@ public class DisableAccountFailureStrategyTest
     }
 
     @Test
-    public void dontResetAuthenticationFailureCounterWhenAccountRemainsActive()
+    void dontResetAuthenticationFailureCounterWhenAccountRemainsActive()
     {
         when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
             .getIntValue("active")).thenReturn(1);
@@ -123,7 +122,7 @@ public class DisableAccountFailureStrategyTest
     }
 
     @Test
-    public void dontResetAuthenticationFailureCounterWhenAccountIsDeactivated()
+    void dontResetAuthenticationFailureCounterWhenAccountIsDeactivated()
     {
         when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
             .getIntValue("active")).thenReturn(1);
@@ -137,7 +136,7 @@ public class DisableAccountFailureStrategyTest
     }
 
     @Test
-    public void onDocumentUpdatedNoUserAccount()
+    void onDocumentUpdatedNoUserAccount()
     {
         when(this.updatedDocument.getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)).thenReturn(null);
 
@@ -147,7 +146,7 @@ public class DisableAccountFailureStrategyTest
     }
 
     @Test
-    public void onDocumentUpdatedNoUserAccountStateChange()
+    void onDocumentUpdatedNoUserAccountStateChange()
     {
         disableStrategy.onEvent(new DocumentUpdatedEvent(), updatedDocument, null);
 
@@ -155,8 +154,8 @@ public class DisableAccountFailureStrategyTest
     }
 
     @Test
-    public void validateFormReturnsFalseWhenUserNotFound()
+    void validateFormReturnsFalseWhenUserNotFound()
     {
-        assertFalse(this.disableStrategy.validateForm("Foo", null));
+        assertFalse(this.disableStrategy.validateForm("Foo", (javax.servlet.http.HttpServletRequest) null));
     }
 }

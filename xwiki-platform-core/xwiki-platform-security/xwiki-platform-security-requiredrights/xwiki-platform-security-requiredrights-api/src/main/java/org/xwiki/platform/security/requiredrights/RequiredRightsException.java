@@ -19,15 +19,12 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception raised by the required rights operations.
  *
  * @version $Id$
  * @since 15.9RC1
  */
-@Unstable
 public class RequiredRightsException extends Exception
 {
     /**

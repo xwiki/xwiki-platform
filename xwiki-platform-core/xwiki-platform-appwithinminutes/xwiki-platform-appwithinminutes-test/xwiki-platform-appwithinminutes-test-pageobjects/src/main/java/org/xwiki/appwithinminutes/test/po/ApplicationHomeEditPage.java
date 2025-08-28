@@ -237,7 +237,10 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     public void removeAllDeprecatedLiveTableColumns(boolean yes)
     {
         WebElement warningMessage = getDriver().findElementWithoutWaiting(getForm(), By.className("warningmessage"));
-        getDriver().findElementWithoutWaiting(warningMessage, By.linkText(yes ? "Yes" : "No")).click();
+        WebElement linkElement =
+            getDriver().findElementWithoutWaiting(warningMessage, By.linkText(yes ? "Yes" : "No"));
+        getDriver().scrollTo(linkElement);
+        linkElement.click();
     }
 
     /**

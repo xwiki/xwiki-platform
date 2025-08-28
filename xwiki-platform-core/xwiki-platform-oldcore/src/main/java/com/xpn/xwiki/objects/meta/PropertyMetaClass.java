@@ -161,6 +161,12 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
         return (PropertyMetaClass) super.clone();
     }
 
+    @Override
+    public PropertyMetaClass clone(boolean detach)
+    {
+        return (PropertyMetaClass) super.clone(detach);
+    }
+
     /**
      * {@inheritDoc}
      * <p>

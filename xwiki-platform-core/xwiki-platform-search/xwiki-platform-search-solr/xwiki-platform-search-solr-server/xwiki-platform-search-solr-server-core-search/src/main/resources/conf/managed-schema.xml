@@ -65,13 +65,40 @@
        1.6: useDocValuesAsStored defaults to true.
     -->
 
-    <!-- XWIKI: the version of the schema from XWiki point of view.
-         The version should be updated when the configuration need to be updated for the core to work as expected.
-         It cause the whole schema to be re-created with embedded Solr setup.
+    <!-- XWiki changelog
 
-         160600000: added support for Ukrainian locale, this also requires a special JAR in the lib/ folder
+         14.8 (no schema version change):
+           * added field "reference"
+           * added field "links"
+           * added field "links_extended"
+
+         16.6.0 (160600000) (major):
+           * added support for Ukrainian locale, this also requires a special JAR in the lib/ folder
+
+         17.3.0 (no schema version change):
+           * "string" type moved to docValues="true"
+           * "lowercase" type implementation changed, and moved to docValues="true"
+
+         17.7.0 (170700000) (migration):
+           * a docid plong field has been added to store the XWiki document long local identifier (XWikiDocument#getId)
+           * a dynamic *_string_lowercase and a corresponding copy field have been added to automatically provide a lower case version of all exact string properties
+           * the fullname field is not set for all entities, not just DOCUMENT
+    -->
+    <!-- XWIKI: the versions of the schema from XWiki point of view.
+    
+         There are two possibilities:
+           * increment both "__cversion" and "__cmversion": the "search" core configuration and data will be deleted and re-created
+                (only in the case of the embedded setup, the standalone setup will require a manual intervention in this case)
+           * increment only "__cmversion": it won't recreate the "search" core, instead it will execute all SearchCoreMigration components
+                with versions greater than the current one
+
+         It's recommended to use migrations when possible (so only when the required changes can be fully done using SolrJ API):
+           * it avoid starting from scratch re-indexing sometimes huge instances
+           * it makes the upgrade of Solr standalone setups much easier
+           * it better support customizations of the Solr configuration (i.e. they are not reseted)
     -->
     <fieldType name="__cversion" class="solr.ExternalFileField" defVal="160600000"/>
+    <fieldType name="__cmversion" class="solr.ExternalFileField" defVal="170600000"/>
 
     <!-- Valid attributes for fields:
      name: mandatory - the name for the field
@@ -152,6 +179,8 @@
     <!-- The entity type: DOCUMENT, ATTACHMENT, OBJECT, OBJECT_PROPERTY -->
     <field name="type" type="string" indexed="true" stored="true" />
     <field name="wiki" type="string" indexed="true" stored="true" />
+    <!-- The unique identifier of the document in the wiki (see XWikiDocument#getId()) -->
+    <field name="docid" type="plong" indexed="true" stored="true" />
     <!-- The local space reference. For a document {@code A.B.C.Page} the value of this field is {@code A.B.C}.
       This field is analyzed and thus used for free text search.
       @deprecated since 7.2, use the "spaces" multiValued field instead -->
@@ -288,6 +317,10 @@
     <dynamicField name="*_string" type="string" indexed="true" stored="true" multiValued="true" />
     <dynamicField name="*_date" type="pdates" indexed="true" stored="true" />
 
+    <!-- Also automatically index a lowercase version of all string properties -->
+    <dynamicField name="*_string_lowercase" type="lowercase" indexed="true" stored="true" multiValued="true" />
+    <copyField source="*_string" dest="*_string_lowercase"/>
+
     <!-- Used to index the currency code sub-type (check the currency type definition) -->
     <dynamicField name="*_string_ns" type="string" indexed="true" stored="false" />
 
@@ -367,7 +400,7 @@
     -->
 
     <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
-    <fieldType name="string" class="solr.StrField" sortMissingLast="true" />
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true" />
     <fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true" docValues="true" />
 
     <!-- boolean type: "true" or "false" -->
@@ -499,6 +532,9 @@
         <filter name="lowercase"/>
       </analyzer>
     </fieldType>
+
+    <!-- XWiki: lower cased text -->
+    <dynamicField name="*_lowercase" type="lowercase"  indexed="true"  stored="true" multiValued="true"/>
 
     <!-- A text field with defaults appropriate for English: it tokenizes with StandardTokenizer,
          removes English stop words (lang/stopwords_en.txt), down cases, protects words from protwords.txt, and
@@ -633,13 +669,11 @@
       </analyzer>
     </fieldType>
 
-    <!-- lowercases the entire field value, keeping it as a single token.  -->
-    <fieldType name="lowercase" class="solr.TextField" positionIncrementGap="100">
-      <analyzer>
-        <tokenizer name="keyword"/>
-        <filter name="lowercase" />
-      </analyzer>
-    </fieldType>
+    <!--
+    Custom lowercase field that is like a String field but lowercases the value before indexing, querying, and storing.
+    -->
+    <fieldType name="lowercase" class="org.xwiki.search.solr.LowerCaseStrField" docValues="true"
+      sortMissingLast="true"/>
 
     <!--
       Example of using PathHierarchyTokenizerFactory at index time, so

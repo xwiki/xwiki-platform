@@ -52,13 +52,6 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * @returns {Element} the DOM element that represents the toolbar of the editor
-     */
-    getToolBar() {
-      throw new Error('Not implemented!');
-    }
-
-    /**
      * Update the edited content as a result of a remote change.
      *
      * @param {Function} updater a function that takes the current content of the editor, modifies it and returns the
@@ -106,7 +99,7 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * @param {Range[]} ranges the DOM selection ranges to restore; if not specified, the last saved text selection is
      *   restored
      */
-    restoreSelection(ranges) {
+    async restoreSelection(ranges) {
       throw new Error('Not implemented!');
     }
 
@@ -154,8 +147,10 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * the editor is destroyed.
      *
      * @param {Function} callback the function to call before the editor is destroyed
+     * @param {boolean} isAsync {@code true} if the callback needs to perform asynchronous operations, {@code false}
+     *   otherwise
      */
-    onBeforeDestroy(callback) {
+    onBeforeDestroy(callback, isAsync) {
       throw new Error('Not implemented!');
     }
 
@@ -182,6 +177,17 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      */
     setReadOnly(readOnly) {
       throw new Error('Not implemented!');
+    }
+
+    /**
+     * This method is used to inform the underlying editor that the realtime connection status has changed. The
+     * underlying editor can use this information to enable or disable some features that don't support realtime
+     * collaboration.
+     *
+     * @param {number} status the new connection status
+     */
+    setConnectionStatus(status) {
+      // Do nothing by default.
     }
   }
 

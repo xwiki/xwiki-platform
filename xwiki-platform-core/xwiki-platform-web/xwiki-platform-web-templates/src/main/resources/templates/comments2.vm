@@ -21,10 +21,31 @@
 #set($showcomments = $xwiki.getSpacePreference('showcomments'))
 #end
 #if($showcomments!="no")
-#if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 0)
 #set($comments = $doc.getComments())
+#set($commentMap = $collectiontool.getSortedMap())
+#set($keysWithMultipleComments = $collectiontool.getSet())
+#foreach ($comment in $comments)
+#set($key = $comment.date)
+#if($commentMap.containsKey($key))
+#set($discard = $commentMap.get($key).add($comment))
+#set($discard = $keysWithMultipleComments.add($key))
 #else
-#set($comments = $doc.getComments(false))
+#set($discard = $commentMap.put($key, [$comment]))
+#end
+#end
+#if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 1)
+#set($orderSuffix = ':asc')
+#else
+#set($orderSuffix = ':desc')
+#set($commentMap = $commentMap.descendingMap())
+#end
+#foreach($keyMultipleComment in $keysWithMultipleComments)
+#set($reorderedList = $collectiontool.sort($commentMap.get($keyMultipleComment), "number$orderSuffix"))
+#set($discard = $commentMap.put($keyMultipleComment, $reorderedList))
+#end
+#set($comments = $collectiontool.getLinkedList())
+#foreach($commentList in $commentMap.values())
+#set($discard = $comments.addAll($commentList))
 #end
 #if($comments.size()>0)
 <div id="xwikicomments" class="xwikidata">

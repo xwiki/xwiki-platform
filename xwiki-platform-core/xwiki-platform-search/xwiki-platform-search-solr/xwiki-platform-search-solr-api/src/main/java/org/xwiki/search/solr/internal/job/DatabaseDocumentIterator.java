@@ -199,7 +199,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
             // the synchronization takes place. Also, the database is used as the reference store, meaning that we
             // update the Solr index to match the database, not the other way around.
             results = getQuery().setWiki(wiki).setOffset(offset).execute();
-            offset += LIMIT;
+            offset += getLimit();
         } catch (QueryException e) {
             throw new IllegalStateException("Failed to query the database.", e);
         }
@@ -212,9 +212,9 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
     private Query getQuery() throws QueryException
     {
         if (query == null) {
+            String select = "select doc.space, doc.name, doc.language, doc.version, doc.id from XWikiDocument doc";
             // This iterator must have the same order as the SolrDocumentIterator, otherwise the synchronization fails.
-            String select = "select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc";
-            String orderBy = " order by doc.space, doc.name, doc.language nulls first";
+            String orderBy = " order by doc.id asc";
 
             EntityReference spaceReference = null;
             EntityReference documentReference = null;
@@ -231,7 +231,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
                 }
             }
 
-            query = queryManager.createQuery(select + whereClause + orderBy, Query.HQL).setLimit(LIMIT);
+            query = queryManager.createQuery(select + whereClause + orderBy, Query.HQL).setLimit(getLimit());
             countQuery = queryManager.createQuery(whereClause, Query.HQL).addFilter(countFilter);
 
             if (spaceReference != null) {

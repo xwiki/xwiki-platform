@@ -117,38 +117,24 @@
 
 {{velocity}}
 {{html clean="false"}}
-&lt;div class="row"&gt;
+&lt;ul class="card-list two-cols"&gt;
   #foreach ($card in $actionCards)
-    ## See http://getbootstrap.com/css/#grid-responsive-resets .
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 2 == 0)
-      &lt;div class="clearfix visible-sm-block visible-md-block visible-lg-block"&gt;&lt;/div&gt;
-    #end
-    &lt;div class="col-xs-12 col-sm-6"&gt;
+    &lt;li class="card"&gt;
       #helpActionCard($card)
-    &lt;/div&gt;
+    &lt;/li&gt;
   #end
-&lt;/div&gt;
+&lt;/ul&gt;
 &lt;h3 id="HExamples"&gt;$services.localization.render('help.templates.examples.title')&lt;/h3&gt;
 &lt;p&gt;$services.localization.render('help.templates.examples.description')&lt;/p&gt;
-&lt;div class="row"&gt;
+&lt;ul class="card-list"&gt;
   #foreach ($card in $exampleCards)
-    ## See http://getbootstrap.com/css/#grid-responsive-resets .
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 2 == 0)
-      &lt;div class="clearfix visible-sm-block "&gt;&lt;/div&gt;
-    #end
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 3 == 0)
-      &lt;div class="clearfix visible-md-block"&gt;&lt;/div&gt;
-    #end
-    #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 4 == 0)
-      &lt;div class="clearfix visible-lg-block"&gt;&lt;/div&gt;
-    #end
-    &lt;div class="col-xs-12 col-sm-6 col-md-4 col-lg-3"&gt;
+    &lt;li class="card"&gt;
       #set ($outputCard = {})
       #getTemplateExample($card $outputCard)
       #helpExampleCard($outputCard)
-    &lt;/div&gt;
+    &lt;/li&gt;
   #end
-&lt;/div&gt;
+&lt;/ul&gt;
 &lt;p&gt;&lt;a href="$exoPrefix/Templates+Application/" class="wikiexternallink"&gt;$services.localization.render('help.templates.more')&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>

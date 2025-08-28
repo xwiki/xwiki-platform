@@ -463,15 +463,8 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
       <code>require([
   'jquery',
   'xwiki-meta',
-  'vue',
-  'xwiki-platform-notifications-webjar',
   'xwiki-l10n!notifications-custom-filters-preferences-macro-translation-keys',
-  'xwiki-events-bridge'
-], function ($, xm, Vue, notifications, l10n) {
-  Vue.component('DisplayerToggle', notifications.DisplayerToggle);
-  Vue.component('DisplayerScope', notifications.DisplayerScope);
-  Vue.component('DisplayerStaticList', notifications.DisplayerStaticList);
-
+        'xwiki-events-bridge', 'xwiki-platform-notifications-webjar'], function($, xm, l10n) {
   // Globals
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
     XWiki.EntityType.DOCUMENT);
@@ -785,7 +778,9 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro'))
 ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
-#set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webjar', 'style.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+      #set($discard = $xwiki.linkx.use(
+        $services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webjar',
+          'xwiki-platform-notifications-webjar.css'), { 'type': 'text/css', 'rel': 'stylesheet' }))
 ######################################################
 ### MACRO CONTENT
 ######################################################

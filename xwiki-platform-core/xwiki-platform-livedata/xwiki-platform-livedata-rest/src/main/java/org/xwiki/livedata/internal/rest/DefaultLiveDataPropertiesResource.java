@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -45,13 +44,12 @@ import org.xwiki.rest.model.jaxb.Link;
 
 /**
  * Default implementation of {@link LiveDataPropertiesResource}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataPropertiesResource")
-@Singleton
 public class DefaultLiveDataPropertiesResource extends AbstractLiveDataResource implements LiveDataPropertiesResource
 {
     @Override

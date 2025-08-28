@@ -25,7 +25,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component responsible for splitting office imports.
@@ -87,7 +86,6 @@ public interface XDOMOfficeDocumentSplitter
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
         OfficeDocumentSplitterParameters parameters) throws OfficeImporterException;
 }

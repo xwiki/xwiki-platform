@@ -43,6 +43,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -329,7 +330,7 @@ public class RepositoryManager implements Initializable, Disposable
         // Update last version field
 
         String lastVersion = StringUtils.defaultString(findLastVersion(document));
-        if (!StringUtils.equals(lastVersion, this.extensionStore.getValue(extensionObject,
+        if (!Strings.CS.equals(lastVersion, this.extensionStore.getValue(extensionObject,
             XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null))) {
             extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, xcontext);
 
@@ -668,7 +669,7 @@ public class RepositoryManager implements Initializable, Disposable
             needSave = true;
         }
 
-        if (!StringUtils.equals(extensionId,
+        if (!Strings.CS.equals(extensionId,
             this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID, (String) null))) {
             extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_ID, extensionId, xcontext);
             needSave = true;
@@ -885,7 +886,7 @@ public class RepositoryManager implements Initializable, Disposable
 
         // License
         if (!extension.getLicenses().isEmpty()
-            && !StringUtils.equals(extension.getLicenses().iterator().next().getName(), this.extensionStore
+            && !Strings.CS.equals(extension.getLicenses().iterator().next().getName(), this.extensionStore
                 .getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME, (String) null))) {
             extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME,
                 extension.getLicenses().iterator().next().getName(), xcontext);

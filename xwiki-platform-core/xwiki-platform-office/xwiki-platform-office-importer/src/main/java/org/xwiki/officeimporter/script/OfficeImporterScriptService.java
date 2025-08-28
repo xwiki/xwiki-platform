@@ -48,7 +48,6 @@ import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the office importer APIs to server-side scripts.
@@ -241,7 +240,6 @@ public class OfficeImporterScriptService implements ScriptService
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
         String[] headingLevels, String namingCriterionHint, boolean useTerminalPages,
         DocumentReference rootDocumentReference)
@@ -275,7 +273,6 @@ public class OfficeImporterScriptService implements ScriptService
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     public boolean save(XDOMOfficeDocument doc, DocumentReference documentReference, boolean append)
     {
         return save(doc, documentReference, null, null, append);

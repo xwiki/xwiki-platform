@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -100,6 +100,7 @@ import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.XWikiSpace;
 import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
+import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseElement;
@@ -205,6 +206,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     private final Map<Long, ReentrantLock> spaceSavingLockMap = Collections.synchronizedMap(new ReferenceMap<>());
 
+    private Optional<Set<EntityReference>> optimizedObjectClasses;
+
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
@@ -255,6 +258,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public void initialize() throws InitializationException
     {
         this.registerLogoutListener();
+
+        this.optimizedObjectClasses = this.hibernateConfiguration.getOptimizedXObjectClasses();
+
+        this.logger.debug("optimizedObjectClasses: {}", this.optimizedObjectClasses);
     }
 
     /**
@@ -531,6 +538,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         });
     }
 
+    private boolean isClassOptimized(DocumentReference classReference)
+    {
+        return this.optimizedObjectClasses.isEmpty()
+            || this.optimizedObjectClasses.get().contains(classReference.getLocalDocumentReference());
+    }
+
     @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
@@ -710,15 +723,41 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                     if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
                         // TODO: Delete all objects for which we don't have a name in the Map
-                        for (List<BaseObject> objects : doc.getXObjects().values()) {
-                            for (BaseObject obj : objects) {
-                                if (obj != null) {
-                                    obj.setDocumentReference(doc.getDocumentReference());
-                                    /* If the object doesn't have a GUID, create it before saving */
-                                    if (StringUtils.isEmpty(obj.getGuid())) {
-                                        obj.setGuid(null);
+                        for (Map.Entry<DocumentReference, List<BaseObject>> entry : doc.getXObjects().entrySet()) {
+                            List<BaseObject> objects = entry.getValue();
+                            if (!objects.isEmpty()) {
+                                boolean optimizedObjects =
+                                    // If the document is new, it does not make any sense to skip an object
+                                    !doc.isNew()
+                                    // Apply optimizations only if dirty flags can be trusted (generally when the
+                                    // XWikiDocument can be sourced from the store, cloned or not)
+                                    && doc.isChangeTracked()
+                                    // Get from the configuration the xobject classes on which to apply save
+                                    // optimization
+                                    && isClassOptimized(entry.getKey());
+
+                                int count = 0;
+                                for (BaseObject obj : objects) {
+                                    // Only save modified (or new) objects
+                                    if (obj != null && (!optimizedObjects || obj.isDirty())) {
+                                        count++;
+                                        obj.setDocumentReference(doc.getDocumentReference());
+                                        /* If the object doesn't have a GUID, create it before saving */
+                                        if (StringUtils.isEmpty(obj.getGuid())) {
+                                            obj.setGuid(null);
+                                        }
+                                        saveXWikiCollection(obj, context, false);
                                     }
-                                    saveXWikiCollection(obj, context, false);
+                                }
+
+                                if (this.logger.isDebugEnabled()) {
+                                    this.logger.debug("saveXWikiDoc:");
+                                    this.logger.debug("    - document: [{}]", doc.getDocumentReferenceWithLocale());
+                                    this.logger.debug(
+                                        "    - optimizedObjects: {} (doc.isNew: {} doc.isChangeTracked: {}, isClassOptimized: {})",
+                                        optimizedObjects, doc.isNew(), doc.isChangeTracked(),
+                                        isClassOptimized(entry.getKey()));
+                                    this.logger.debug("    - saved xobjects: [{}]", count);
                                 }
                             }
                         }
@@ -735,6 +774,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                     // Make sure that properly saved documents aren't restricted.
                     doc.setRestricted(false);
+
+                    // We can track modifications now
+                    doc.setChangeTracked(true);
 
                     // We need to ensure that the saved document becomes the original document
                     doc.setOriginalDocument(doc.clone());
@@ -1132,6 +1174,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 loadXWikiCollectionInternal(object, doc, context, false, true);
                             }
                             doc.setXObject(object.getNumber(), object);
+                            // The object just been loaded so make sure it's considered clean
+                            object.setDirty(false);
                         }
 
                         // AFAICT this was added as an emergency patch because loading of objects has proven
@@ -1157,13 +1201,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 obj.setXClassReference(localGroupEntityReference);
                                 obj.setNumber(number.intValue());
                                 obj.setStringValue("member", member);
+                                // Mark the property that has just been loaded as clean.
+                                ((BaseProperty<?>) obj.getField("member")).setDirty(false);
                                 doc.setXObject(obj.getNumber(), obj);
+                                // The object just been loaded so make sure it's considered clean
+                                obj.setDirty(false);
                             }
                         }
                     }
 
                     doc.setContentDirty(false);
                     doc.setMetaDataDirty(false);
+                    doc.setChangeTracked(true);
 
                     // We need to ensure that the loaded document becomes the original document
                     doc.setOriginalDocument(doc.clone());
@@ -1465,6 +1514,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
 
+                object.setDirty(false);
+
                 if (bTransaction) {
                     endTransaction(context, true);
                 }
@@ -1628,6 +1679,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
 
                         object.addField(name, property);
+                        // The property just been loaded so make sure it's considered clean
+                        property.setDirty(false);
                     }
                 }
 
@@ -1695,9 +1748,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             if (evict) {
                                 session.evict(property);
                             }
-                            if (session.get(property.getClass(), property) != null) {
-                                session.delete(property);
-                            }
+                            session.delete(property);
                         }
                     }
                 }
@@ -1752,15 +1803,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 try {
                     session.load(property, (Serializable) property);
                     // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all,
-                    // it is
-                    // safe to assume that a retrieved NULL value should actually be an empty string.
+                    // it is safe to assume that a retrieved NULL value should actually be an empty string.
                     if (property instanceof BaseStringProperty) {
                         BaseStringProperty stringProperty = (BaseStringProperty) property;
                         if (stringProperty.getValue() == null) {
                             stringProperty.setValue("");
                         }
                     }
-                    ((BaseProperty) property).setValueDirty(false);
+                    ((BaseProperty) property).setDirty(false);
                 } catch (ObjectNotFoundException e) {
                     // Let's accept that there is no data in property tables but log it
                     this.logger.error("No data for property [{}] of object id [{}]", property.getName(),
@@ -1831,7 +1881,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     session.save(property);
                 }
 
-                ((BaseProperty) property).setValueDirty(false);
+                ((BaseProperty) property).setDirty(false);
 
                 if (bTransaction) {
                     endTransaction(context, true);
@@ -2864,28 +2914,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     protected String createSQLQuery(String queryPrefix, String whereSQL)
     {
-        StringBuilder sql = new StringBuilder(queryPrefix);
-
-        String normalizedWhereSQL;
-        if (StringUtils.isBlank(whereSQL)) {
-            normalizedWhereSQL = "";
-        } else {
-            normalizedWhereSQL = whereSQL.trim();
-        }
-
-        sql.append(getColumnsForSelectStatement(normalizedWhereSQL));
-        sql.append(" from XWikiDocument as doc");
-
-        if (!normalizedWhereSQL.equals("")) {
-            if ((!normalizedWhereSQL.startsWith("where")) && (!normalizedWhereSQL.startsWith(","))) {
-                sql.append(" where ");
-            } else {
-                sql.append(" ");
-            }
-            sql.append(normalizedWhereSQL);
-        }
-
-        return sql.toString();
+        return HqlQueryUtils.createLegacySQLQuery(queryPrefix, whereSQL);
     }
 
     /**
@@ -2897,22 +2926,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     protected String getColumnsForSelectStatement(String whereSQL)
     {
-        StringBuilder columns = new StringBuilder();
-
-        int orderByPos = whereSQL.toLowerCase().indexOf("order by");
-        if (orderByPos >= 0) {
-            String orderByStatement = whereSQL.substring(orderByPos + "order by".length() + 1);
-            StringTokenizer tokenizer = new StringTokenizer(orderByStatement, ",");
-            while (tokenizer.hasMoreTokens()) {
-                String column = tokenizer.nextToken().trim();
-                // Remove "desc" or "asc" from the column found
-                column = StringUtils.removeEndIgnoreCase(column, " desc");
-                column = StringUtils.removeEndIgnoreCase(column, " asc");
-                columns.append(", ").append(column.trim());
-            }
-        }
-
-        return columns.toString();
+        return HqlQueryUtils.getColumnsForSelectStatement(whereSQL);
     }
 
     @Override

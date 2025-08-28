@@ -19,8 +19,6 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a required right for a macro. To avoid dependencies on the authorization API, this class provides
  * constants for common cases.
@@ -28,7 +26,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.10RC1
  */
-@Unstable
 public enum MacroRequiredRight
 {
     /**

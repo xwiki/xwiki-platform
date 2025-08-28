@@ -21,7 +21,6 @@ package org.xwiki.platform.security.requiredrights;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.stability.Unstable;
 
 /**
  * Analyzes a macro to determine if it requires specific rights.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.10RC1
  */
-@Unstable
 @Role
 public interface MacroRequiredRightsAnalyzer
 {

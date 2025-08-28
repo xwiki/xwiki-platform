@@ -25,11 +25,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -42,6 +44,8 @@ import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikiResource;
 import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
@@ -73,12 +77,19 @@ public class DefaultWikiManagerREST extends XWikiResource implements WikiManager
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private AuthorizationManager authorizationManager;
+
     @Override
     @POST
     public Response createWiki(@QueryParam("template") String template, Wiki wiki) throws XWikiRestException
     {
         XWikiContext xcontext = getXWikiContext();
         WikiDescriptor descriptor = null;
+        WikiReference mainWikiReference = new WikiReference(wikiDescriptorManager.getMainWikiId());
+        if (!this.authorizationManager.hasAccess(Right.CREATE_WIKI, xcontext.getUserReference(), mainWikiReference)) {
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
 
         try {
             // Find the wiki owner
@@ -132,7 +143,7 @@ public class DefaultWikiManagerREST extends XWikiResource implements WikiManager
      * @param description the wiki description.
      * @return the wiki model object.
      */
-    public static Wiki createWiki(ObjectFactory objectFactory, URI baseUri, String wikiName, String owner,
+    private static Wiki createWiki(ObjectFactory objectFactory, URI baseUri, String wikiName, String owner,
             String description)
     {
         Wiki wiki = objectFactory.createWiki().withId(wikiName).withName(wikiName).withOwner(owner)

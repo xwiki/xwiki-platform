@@ -37,6 +37,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -46,7 +47,9 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +70,9 @@ class SolrDocumentIteratorTest
 
     @MockComponent
     private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+
+    @MockComponent
+    private SolrConfiguration configuration;
 
     @InjectMockComponents
     private SolrDocumentIterator solrIterator;
@@ -101,6 +107,9 @@ class SolrDocumentIteratorTest
     @Test
     void iterate() throws Exception
     {
+        int limit = 42;
+        when(this.configuration.getSynchronizationBatchSize()).thenReturn(limit);
+
         SolrDocumentList firstResults = new SolrDocumentList();
         firstResults.add(createSolrDocument("chess", Arrays.asList("A", "B"), "C", "", "1.3"));
         firstResults.add(createSolrDocument("chess", Arrays.asList("M"), "N", "en", "2.4"));
@@ -139,6 +148,9 @@ class SolrDocumentIteratorTest
         expectedResult.add(new ImmutablePair<>(documentReference, "1.1"));
 
         assertEquals(expectedResult, actualResult);
+
+        verify(this.solrInstance, times(3)).query(argThat(query ->
+            query instanceof SolrQuery solrQuery && solrQuery.getRows() == limit));
     }
 
     private SolrDocument createSolrDocument(String wiki, List<String> spaces, String name, String locale,

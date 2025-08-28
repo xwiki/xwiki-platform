@@ -30,11 +30,11 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
@@ -73,10 +73,7 @@ import org.hibernate.mapping.Column;
 import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
-import org.hibernate.mapping.Table;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-import org.hibernate.tool.schema.TargetType;
 import org.hibernate.tool.schema.extract.spi.ExtractionContext;
 import org.hibernate.tool.schema.extract.spi.SequenceInformation;
 import org.slf4j.Logger;
@@ -90,6 +87,9 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
 import org.xwiki.logging.LoggerConfiguration;
+import org.xwiki.store.hibernate.HibernateAdapter;
+import org.xwiki.store.hibernate.HibernateAdapterFactory;
+import org.xwiki.store.hibernate.HibernateStoreException;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -111,11 +111,6 @@ import com.xpn.xwiki.store.migration.DataMigrationManager;
 @DisposePriority(10000)
 public class HibernateStore implements Disposable, Initializable
 {
-    /**
-     * @see #isConfiguredInSchemaMode()
-     */
-    private static final String VIRTUAL_MODE_SCHEMA = "schema";
-
     private static final String CONTEXT_SESSION = "hibsession";
 
     private static final String CONTEXT_TRANSACTION = "hibtransaction";
@@ -144,9 +139,6 @@ public class HibernateStore implements Disposable, Initializable
     private Execution execution;
 
     @Inject
-    private WikiDescriptorManager wikis;
-
-    @Inject
     private HibernateConfiguration hibernateConfiguration;
 
     @Inject
@@ -154,6 +146,15 @@ public class HibernateStore implements Disposable, Initializable
 
     @Inject
     private LoggerConfiguration loggerConfiguration;
+
+    @Inject
+    private List<HibernateAdapterFactory> adapterFactories;
+
+    @Inject
+    private WikiDescriptorManager wikis;
+
+    @Inject
+    private Provider<HibernateAdapter> defaultHibernateAdapterProvider;
 
     private DataMigrationManager dataMigrationManager;
 
@@ -168,6 +169,8 @@ public class HibernateStore implements Disposable, Initializable
     private Dialect dialect;
 
     private DatabaseProduct databaseProductCache = DatabaseProduct.UNKNOWN;
+
+    private HibernateAdapter adapter;
 
     private SessionFactory sessionFactory;
 
@@ -249,6 +252,8 @@ public class HibernateStore implements Disposable, Initializable
         if (this.bootstrapServiceRegistry != null) {
             this.bootstrapServiceRegistry.close();
         }
+
+        this.adapter = null;
     }
 
     private void createSessionFactory()
@@ -381,95 +386,6 @@ public class HibernateStore implements Disposable, Initializable
     }
 
     /**
-     * @return true if the user has configured Hibernate to use XWiki in schema mode (vs database mode)
-     * @since 11.6RC1
-     */
-    public boolean isConfiguredInSchemaMode()
-    {
-        String virtualModePropertyValue = getConfiguration().getProperty("xwiki.virtual_mode");
-        if (virtualModePropertyValue == null) {
-            virtualModePropertyValue = VIRTUAL_MODE_SCHEMA;
-        }
-        return StringUtils.equals(virtualModePropertyValue, VIRTUAL_MODE_SCHEMA);
-    }
-
-    /**
-     * Convert wiki name in database/schema name.
-     *
-     * @param wikiId the wiki name to convert.
-     * @param product the database engine type.
-     * @return the database/schema name.
-     */
-    public String getDatabaseFromWikiName(String wikiId, DatabaseProduct product)
-    {
-        if (wikiId == null) {
-            return null;
-        }
-
-        String database = wikiId;
-
-        // Some databases have special database for main wiki
-        // It's also possible to configure the name of the main wiki database
-        String mainWikiId = this.wikis.getMainWikiId();
-        if (StringUtils.equalsIgnoreCase(wikiId, mainWikiId)) {
-            database = this.hibernateConfiguration.getDB();
-            if (database == null) {
-                if (product == DatabaseProduct.DERBY) {
-                    database = "APP";
-                } else if (product == DatabaseProduct.HSQLDB || product == DatabaseProduct.H2) {
-                    database = "PUBLIC";
-                } else if (product == DatabaseProduct.POSTGRESQL && isConfiguredInSchemaMode()) {
-                    database = "public";
-                } else {
-                    database = wikiId;
-                }
-            }
-        }
-
-        // Minus (-) is not supported by many databases
-        database = database.replace('-', '_');
-
-        // In various places we need the canonical database name (which is upper case for HSQLDB, Oracle and H2) because
-        // the translation is not properly done by the Dialect
-        if (DatabaseProduct.HSQLDB == product || DatabaseProduct.ORACLE == product || DatabaseProduct.H2 == product) {
-            database = StringUtils.upperCase(database);
-        }
-
-        // Apply prefix
-        String prefix = this.hibernateConfiguration.getDBPrefix();
-        database = prefix + database;
-
-        return database;
-    }
-
-    /**
-     * Convert wiki name in database name.
-     * <p>
-     * Need Hibernate to be initialized.
-     *
-     * @param wikiId the wiki name to convert.
-     * @return the database name.
-     * @since 11.6RC1
-     */
-    public String getDatabaseFromWikiName(String wikiId)
-    {
-        return getDatabaseFromWikiName(wikiId, getDatabaseProductName());
-    }
-
-    /**
-     * Convert wiki name in database name.
-     * <p>
-     * Need hibernate to be initialized.
-     *
-     * @return the database name.
-     * @since 11.6RC1
-     */
-    public String getDatabaseFromWikiName()
-    {
-        return getDatabaseFromWikiName(this.wikis.getCurrentWikiId());
-    }
-
-    /**
      * Retrieve the current database product name.
      * <p>
      * Note that the database product name is cached for improved performances.
@@ -504,6 +420,38 @@ public class HibernateStore implements Disposable, Initializable
         }
 
         return this.databaseProductCache;
+    }
+
+    /**
+     * @return the Hibernate adapter
+     * @throws HibernateException when failing to get the adapter
+     */
+    public HibernateAdapter getAdapter() throws HibernateException
+    {
+        if (this.adapter == null) {
+            this.adapter = createHibernateAdapter();
+        }
+
+        return this.adapter;
+    }
+
+    private synchronized HibernateAdapter createHibernateAdapter()
+    {
+        // Gather metadata about the database
+        DatabaseMetaData metadata = getDatabaseMetaData();
+
+        // Ask the various factories for adapters matching the metadata and configuration
+        for (HibernateAdapterFactory factory : this.adapterFactories) {
+            Optional<HibernateAdapter> newAdapter = factory.createHibernateAdapter(metadata, getConfiguration());
+
+            // If a matching adapter was found, stop searching
+            if (newAdapter.isPresent()) {
+                return newAdapter.get();
+            }
+        }
+
+        // Fallback on the default adapter if no specific one could be found
+        return this.defaultHibernateAdapterProvider.get();
     }
 
     private String extractJDBCConnectionURLScheme(String fullConnectionURL)
@@ -547,29 +495,13 @@ public class HibernateStore implements Disposable, Initializable
     }
 
     /**
-     * @return true if the current database product is catalog based, false for a schema based databases
-     * @since 11.6RC1
-     */
-    public boolean isCatalog()
-    {
-        DatabaseProduct product = getDatabaseProductName();
-        if (DatabaseProduct.ORACLE == product
-            || (DatabaseProduct.POSTGRESQL == product && isConfiguredInSchemaMode())) {
-            return false;
-        } else {
-            return getDialect().canCreateCatalog();
-        }
-
-    }
-
-    /**
      * @since 11.5RC1
      */
     public void setWiki(MetadataBuilder builder, String wikiId)
     {
-        String databaseName = getDatabaseFromWikiName(wikiId);
+        String databaseName = getAdapter().getDatabaseFromWikiName(wikiId);
 
-        if (isCatalog()) {
+        if (getAdapter().isCatalog()) {
             builder.applyImplicitCatalogName(databaseName);
         } else {
             builder.applyImplicitSchemaName(databaseName);
@@ -633,35 +565,6 @@ public class HibernateStore implements Disposable, Initializable
     }
 
     /**
-     * Escape database name depending of the database engine.
-     *
-     * @param databaseName the schema name to escape
-     * @return the escaped version
-     * @since 11.6RC1
-     */
-    public String escapeDatabaseName(String databaseName)
-    {
-        String escapedDatabaseName;
-
-        // - Oracle converts user names in uppercase when no quotes is used.
-        // For example: "create user xwiki identified by xwiki;" creates a user named XWIKI (uppercase)
-        // - In Hibernate.cfg.xml we just specify: <property name="hibernate.connection.username">xwiki</property> and
-        // Hibernate
-        // seems to be passing this username as is to Oracle which converts it to uppercase.
-        //
-        // Thus for Oracle we don't escape the schema.
-        if (DatabaseProduct.ORACLE == getDatabaseProductName()) {
-            escapedDatabaseName = databaseName;
-        } else {
-            String closeQuote = String.valueOf(getDialect().closeQuote());
-            escapedDatabaseName =
-                getDialect().openQuote() + databaseName.replace(closeQuote, closeQuote + closeQuote) + closeQuote;
-        }
-
-        return escapedDatabaseName;
-    }
-
-    /**
      * @return a singleton instance of the configured {@link Dialect}
      */
     public Dialect getDialect()
@@ -699,8 +602,8 @@ public class HibernateStore implements Disposable, Initializable
 
             // Switch the database only if we did not switched on it last time
             if (wikiId != null) {
-                String databaseName = getDatabaseFromWikiName(wikiId);
-                String escapedDatabaseName = escapeDatabaseName(databaseName);
+                String databaseName = getAdapter().getDatabaseFromWikiName(wikiId);
+                String escapedDatabaseName = getAdapter().escapeDatabaseName(databaseName);
 
                 DatabaseProduct product = getDatabaseProductName();
                 if (DatabaseProduct.ORACLE == product) {
@@ -708,7 +611,7 @@ public class HibernateStore implements Disposable, Initializable
                 } else if (DatabaseProduct.DERBY == product || DatabaseProduct.HSQLDB == product
                     || DatabaseProduct.DB2 == product || DatabaseProduct.H2 == product) {
                     executeStatement("SET SCHEMA " + escapedDatabaseName, session);
-                } else if (DatabaseProduct.POSTGRESQL == product && isConfiguredInSchemaMode()) {
+                } else if (DatabaseProduct.POSTGRESQL == product && getAdapter().isConfiguredInSchemaMode()) {
                     executeStatement("SET search_path TO " + escapedDatabaseName, session);
                 } else {
                     session.doWork(connection -> {
@@ -832,7 +735,7 @@ public class HibernateStore implements Disposable, Initializable
 
         if (session != null) {
             String sessionDatabase = (String) session.getProperties().get("xwiki.database");
-            String contextDatabase = getDatabaseFromWikiName(contextWikiId);
+            String contextDatabase = getAdapter().getDatabaseFromWikiName(contextWikiId);
 
             // The current context is trying to manipulate a database different from the one in the current session
             if (!Objects.equals(sessionDatabase, contextDatabase)) {
@@ -1026,16 +929,17 @@ public class HibernateStore implements Disposable, Initializable
     /**
      * Automatically update the current database schema to contains what's defined in standard metadata.
      * 
+     * @throws HibernateStoreException when failing to update the database
      * @since 11.6RC1
      */
-    public void updateDatabase(String wikiId)
+    public void updateDatabase(String wikiId) throws HibernateStoreException
     {
         MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder();
 
         // Associate the metadata with a specific wiki
         setWiki(metadataBuilder, wikiId);
 
-        updateDatabase(metadataBuilder.build());
+        getAdapter().updateDatabase(metadataBuilder.build());
 
         // Workaround Hibernate bug which does not create the required sequence in some databases
         createSequenceIfMissing(wikiId);
@@ -1105,8 +1009,8 @@ public class HibernateStore implements Disposable, Initializable
     private void createSequenceIfMissing(String wikiId)
     {
         // There's no issue with catalog based databases, only with schemas.
-        if (!isCatalog() && getDialect().getNativeIdentifierGeneratorStrategy().equals("sequence")) {
-            String schemaName = getDatabaseFromWikiName(wikiId);
+        if (!getAdapter().isCatalog() && getDialect().getNativeIdentifierGeneratorStrategy().equals("sequence")) {
+            String schemaName = getAdapter().getDatabaseFromWikiName(wikiId);
 
             boolean ignoreError = false;
 
@@ -1160,38 +1064,14 @@ public class HibernateStore implements Disposable, Initializable
     }
 
     /**
-     * Automatically update the current database schema to contains what's defined in standard metadata.
-     * 
-     * @param metadata the metadata we want the current database to follow
-     * @since 11.6RC1
-     */
-    public void updateDatabase(Metadata metadata)
-    {
-        SchemaUpdate updater = new SchemaUpdate();
-        updater.execute(EnumSet.of(TargetType.DATABASE), metadata);
-
-        List<Exception> exceptions = updater.getExceptions();
-
-        if (exceptions.isEmpty()) {
-            return;
-        }
-
-        // Print the errors
-        for (Exception exception : exceptions) {
-            this.logger.error(exception.getMessage(), exception);
-        }
-
-        throw new HibernateException("Failed to update the database. See the log for all errors", exceptions.get(0));
-    }
-
-    /**
      * Allows to update the schema to match the Hibernate mapping
      *
      * @param wikiId the identifier of the wiki to update
      * @param force defines whether or not to force the update despite the xwiki.cfg settings
+     * @throws HibernateStoreException when failing to update the database
      * @since 11.6RC1
      */
-    public synchronized void updateDatabase(String wikiId, boolean force)
+    public synchronized void updateDatabase(String wikiId, boolean force) throws HibernateStoreException
     {
         // We don't update the database if the XWiki hibernate config parameter says not to update
         if (!force && !this.hibernateConfiguration.isUpdateSchema()) {
@@ -1263,28 +1143,6 @@ public class HibernateStore implements Disposable, Initializable
     }
 
     /**
-     * @since 11.6RC1
-     */
-    public String getConfiguredTableName(PersistentClass persistentClass)
-    {
-        return getConfiguredTableName(persistentClass.getTable());
-    }
-
-    /**
-     * @since 13.2
-     */
-    public String getConfiguredTableName(Table table)
-    {
-        String tableName = table.getName();
-        // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
-        if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
-            tableName = tableName.toUpperCase();
-        }
-
-        return tableName;
-    }
-
-    /**
      * Execute the passed function with the {@link DatabaseMetaData} {@link ResultSet} corresponding to the passed
      * entity and property.
      * 
@@ -1299,11 +1157,11 @@ public class HibernateStore implements Disposable, Initializable
     public <R> R metadataTableOrColumn(Class<?> entityType, String propertyName, R def, ResultSetFunction<R> function)
     {
         // retrieve the database name from the context
-        final String databaseName = getDatabaseFromWikiName();
+        final String databaseName = getAdapter().getDatabaseFromWikiName();
 
         PersistentClass persistentClass = getConfigurationMetadata().getEntityBinding(entityType.getName());
 
-        final String tableName = getConfiguredTableName(persistentClass);
+        final String tableName = getAdapter().getTableName(persistentClass);
 
         final String columnName = getConfiguredColumnName(persistentClass, propertyName);
 
@@ -1313,13 +1171,13 @@ public class HibernateStore implements Disposable, Initializable
             String name = databaseName;
 
             if (columnName != null) {
-                if (isCatalog()) {
+                if (getAdapter().isCatalog()) {
                     resultSet = databaseMetaData.getColumns(name, null, tableName, columnName);
                 } else {
                     resultSet = databaseMetaData.getColumns(null, name, tableName, columnName);
                 }
             } else {
-                if (isCatalog()) {
+                if (getAdapter().isCatalog()) {
                     resultSet = databaseMetaData.getTables(name, null, tableName, null);
                 } else {
                     resultSet = databaseMetaData.getTables(null, name, tableName, null);
@@ -1397,9 +1255,9 @@ public class HibernateStore implements Disposable, Initializable
      */
     public boolean isWikiDatabaseExist(String wikiName)
     {
-        final String databaseName = getDatabaseFromWikiName(wikiName);
+        final String databaseName = getAdapter().getDatabaseFromWikiName(wikiName);
 
-        if (isCatalog()) {
+        if (getAdapter().isCatalog()) {
             return isCatalogExist(databaseName);
         } else {
             return isSchemaExist(databaseName);

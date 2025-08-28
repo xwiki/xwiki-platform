@@ -13,6 +13,13 @@
         <denyUser name="AllanSvensson" type="edit" />
         <allowUser name="AllanSvensson" type="view" />
       </document>
+      <document name="ScriptDocument" enforceRequiredRights="true">
+        <requiredRight type="script"/>
+      </document>
+      <document name="EditableScriptDocument" enforceRequiredRights="true">
+        <requiredRight type="script"/>
+        <allowUser name="AllanSvensson" type="script"/>
+      </document>
     </space>
   </wiki>
 </wikis>

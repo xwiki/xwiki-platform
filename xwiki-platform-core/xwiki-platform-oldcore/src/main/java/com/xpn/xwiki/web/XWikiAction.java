@@ -33,10 +33,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.script.ScriptContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -56,6 +58,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.internal.web.DocExistValidator;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -67,7 +70,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
@@ -87,7 +89,6 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -252,7 +253,6 @@ public abstract class XWikiAction implements LegacyAction
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     protected String localizeOrReturnKey(String key, Syntax syntax, Object... parameters)
     {
         String result;
@@ -271,7 +271,6 @@ public abstract class XWikiAction implements LegacyAction
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     protected String localizePlainOrReturnKey(String key, Object... parameters)
     {
         return localizeOrReturnKey(key, Syntax.PLAIN_1_0, parameters);
@@ -333,7 +332,8 @@ public abstract class XWikiAction implements LegacyAction
             // Initialize the XWiki Context which is the main object used to pass information across
             // classes/methods. It's also wrapping the request, response, and all container objects
             // in general.
-            context = initializeXWikiContext(servletRequest, servletResponse);
+            context =
+                initializeXWikiContext(JakartaServletBridge.toJavax(servletRequest), JakartaServletBridge.toJavax(servletResponse));
 
             // From this line forward all information can be found in the XWiki Context.
             execute(context);
@@ -397,7 +397,7 @@ public abstract class XWikiAction implements LegacyAction
         DefaultJobProgress actionProgress = null;
         String docName = "";
 
-        boolean debug = StringUtils.equals(context.getRequest().get("debug"), "true");
+        boolean debug = Strings.CS.equals(context.getRequest().get("debug"), "true");
 
         String sasync = context.getRequest().get("async");
 
@@ -426,7 +426,7 @@ public abstract class XWikiAction implements LegacyAction
             // Verify that the requested wiki exists
             try {
                 // Don't show init screen if async is forced to false
-                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization || StringUtils.equals(sasync, "false"), context);
+                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization || Strings.CS.equals(sasync, "false"), context);
 
                 // If XWiki is still initializing display initialization template
                 if (xwiki == null) {
@@ -467,11 +467,11 @@ public abstract class XWikiAction implements LegacyAction
 
                             // Set the main home page in the main space of the main wiki as the current requested entity
                             // since we cannot set the non existing one as it would generate errors obviously...
-                            EntityReferenceValueProvider valueProvider =
-                                Utils.getComponent(EntityReferenceValueProvider.class);
-                            xwiki.setPhonyDocument(new DocumentReference(valueProvider.getDefaultValue(EntityType.WIKI),
-                                valueProvider.getDefaultValue(EntityType.SPACE),
-                                valueProvider.getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
+                            EntityReferenceProvider entityReferenceProvider =
+                                Utils.getComponent(EntityReferenceProvider.class);
+                            DocumentReference phonyDoc =
+                                (DocumentReference) entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT);
+                            xwiki.setPhonyDocument(phonyDoc, context);
 
                             // Parse the error template
                             Utils.parseTemplate(context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"),
@@ -831,8 +831,9 @@ public abstract class XWikiAction implements LegacyAction
         xcontext.setFinished(true);
     }
 
-    protected XWikiContext initializeXWikiContext(HttpServletRequest servletRequest,
-        HttpServletResponse servletResponse)
+    @Deprecated(since = "17.0.0RC1")
+    protected XWikiContext initializeXWikiContext(javax.servlet.http.HttpServletRequest servletRequest,
+        javax.servlet.http.HttpServletResponse servletResponse)
         throws XWikiException, ServletException, InstantiationException, IllegalAccessException
     {
         XWikiForm form;
@@ -854,8 +855,9 @@ public abstract class XWikiAction implements LegacyAction
         return this.componentDescriptor.getRoleHint();
     }
 
-    protected XWikiContext initializeXWikiContext(HttpServletRequest servletRequest,
-        HttpServletResponse servletResponse, XWikiForm form) throws XWikiException, ServletException
+    @Deprecated(since = "17.0.0RC1")
+    protected XWikiContext initializeXWikiContext(javax.servlet.http.HttpServletRequest servletRequest,
+        javax.servlet.http.HttpServletResponse servletResponse, XWikiForm form) throws XWikiException, ServletException
     {
         String action = getName();
 
@@ -910,8 +912,8 @@ public abstract class XWikiAction implements LegacyAction
     {
         Request request = this.container.getRequest();
 
-        if (request instanceof ServletRequest) {
-            return ((ServletRequest) request).getHttpServletRequest().getServletContext().getRealPath(path);
+        if (request instanceof ServletRequest servletRequest) {
+            return servletRequest.getRequest().getServletContext().getRealPath(path);
         }
 
         return null;

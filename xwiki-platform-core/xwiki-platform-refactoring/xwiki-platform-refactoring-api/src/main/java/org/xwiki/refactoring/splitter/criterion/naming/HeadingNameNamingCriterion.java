@@ -44,7 +44,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.stability.Unstable;
 
 /**
  * A {@link NamingCriterion} based on the opening heading (if present) of the document.
@@ -107,7 +106,6 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     public HeadingNameNamingCriterion()
     {
     }

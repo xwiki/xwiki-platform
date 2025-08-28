@@ -19,26 +19,29 @@
  */
 package org.xwiki.eventstream.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.wiki.WikiComponent;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -47,54 +50,45 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.6RC1
  */
-public class UntypedRecordableEventDescriptorComponentBuilderTest
+@ComponentTest
+class UntypedRecordableEventDescriptorComponentBuilderTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<UntypedRecordableEventDescriptorComponentBuilder> mocker =
-            new MockitoComponentMockingRule<>(UntypedRecordableEventDescriptorComponentBuilder.class);
+    @InjectMockComponents
+    private UntypedRecordableEventDescriptorComponentBuilder componentBuilder;
 
+    @MockComponent
     private ModelBridge modelBridge;
 
+    @MockComponent
     private QueryManager queryManager;
 
+    @MockComponent
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
-    private AuthorizationManager authorizationManager;
+    @MockComponent
+    private DocumentAuthorizationManager authorizationManager;
 
-    private DocumentReference event1;
-    private DocumentReference event2;
-    private DocumentReference event3;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        queryManager = mocker.registerMockComponent(QueryManager.class);
-        modelBridge = mocker.registerMockComponent(ModelBridge.class);
-        documentReferenceResolver = mocker.registerMockComponent(DocumentReferenceResolver.class);
-        authorizationManager = mocker.registerMockComponent(AuthorizationManager.class);
-
         Query query = mock(Query.class);
-        when(queryManager.createQuery(any(), any())).thenReturn(query);
-        when(query.execute()).thenReturn(Arrays.asList("e1", "e2", "e3"));
+        when(this.queryManager.createQuery(any(), any())).thenReturn(query);
+        when(query.execute()).thenReturn(List.of("e1", "e2", "e3"));
 
-        event1 = mock(DocumentReference.class);
-        event2 = mock(DocumentReference.class);
-        event3 = mock(DocumentReference.class);
-
-        when(this.documentReferenceResolver.resolve("e1")).thenReturn(event1);
-        when(this.documentReferenceResolver.resolve("e2")).thenReturn(event2);
-        when(this.documentReferenceResolver.resolve("e3")).thenReturn(event3);
+        when(this.documentReferenceResolver.resolve("e1")).thenReturn(mock(DocumentReference.class));
+        when(this.documentReferenceResolver.resolve("e2")).thenReturn(mock(DocumentReference.class));
+        when(this.documentReferenceResolver.resolve("e3")).thenReturn(mock(DocumentReference.class));
     }
 
     @Test
-    public void testClassReference() throws Exception
+    void classReference()
     {
         assertEquals("EventClass",
-                this.mocker.getComponentUnderTest().getClassReference().getName());
+            this.componentBuilder.getClassReference().getName());
     }
 
     @Test
-    public void testBuildComponent() throws Exception
+    void buildComponent() throws Exception
     {
         BaseObject baseObject = mock(BaseObject.class);
         XWikiDocument parentDocument = mock(XWikiDocument.class);
@@ -104,10 +98,12 @@ public class UntypedRecordableEventDescriptorComponentBuilderTest
         when(parentDocument.getDocumentReference()).thenReturn(documentReference);
 
         // Ensure that the user rights are correctly checked
-        when(this.authorizationManager.hasAccess(any(), any(), any())).thenReturn(true);
+        when(this.authorizationManager.hasAccess(any(), any(), any(), any())).thenReturn(true);
 
-        List<WikiComponent> result = this.mocker.getComponentUnderTest().buildComponents(baseObject);
+        List<WikiComponent> result = this.componentBuilder.buildComponents(baseObject);
 
         assertEquals(1, result.size());
+
+        verify(this.authorizationManager).hasAccess(Right.ADMIN, EntityType.WIKI, null, documentReference);
     }
 }

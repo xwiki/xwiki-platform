@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-authorization</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-authorization-api</artifactId>
   <name>XWiki Platform - Security - Authorization - API</name>
   <description>Controls permissions to all the wiki elements</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>

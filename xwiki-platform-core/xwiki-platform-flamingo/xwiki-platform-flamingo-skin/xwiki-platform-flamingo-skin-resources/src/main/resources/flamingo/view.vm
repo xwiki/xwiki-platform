@@ -46,7 +46,6 @@
       #template("${viewer}.vm")
     </main>
   #end
-  <div class="clearfloats"></div>
   #if($viewer == 'content')
     #if ($displayContentFooter)
       ## This is an aside element because it is related to the main

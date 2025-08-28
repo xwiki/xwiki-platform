@@ -86,7 +86,9 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
      */
     public void saveConfig()
     {
+        getDriver().addPageNotYetReloadedMarker();
         getDriver().findElement(By.cssSelector("form input.button")).click();
+        getDriver().waitUntilPageIsReloaded();
     }
 
     /**

@@ -28,6 +28,7 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,9 +39,12 @@ import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
@@ -120,10 +124,16 @@ class LiveDataIT
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
      * and two XObjects, then edit the XObjects properties from the live data.
      */
-    @Test
+    @ParameterizedTest
+    @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-livetable-ui")
     @Order(1)
-    void livedataLivetableTableLayout(TestUtils testUtils, TestReference testReference) throws Exception
+    void livedataLivetableTableLayout(WikiReference wikiReference, TestUtils testUtils,
+        TestLocalReference testLocalReference) throws Exception
     {
+        testUtils.setCurrentWiki(wikiReference.getName());
+
+        DocumentReference testReference = new DocumentReference(testLocalReference, wikiReference);
+
         // Make sure an icon theme is configured.
         testUtils.setWikiPreference("iconTheme", "IconThemes.Silk");
 
@@ -191,10 +201,11 @@ class LiveDataIT
         tableLayout
             .assertRow(BIRTHDAY_COLUMN, not(hasItem(tableLayout.getWebElementTextMatcher(CANCELED_BIRTHDAY_DATETIME))));
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_D);
+        SpaceReference xWikiSpace = new SpaceReference("XWiki", wikiReference);
         tableLayout
-            .assertCellWithLink(USER_COLUMN, "U1", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U1")));
+            .assertCellWithLink(USER_COLUMN, "U1", testUtils.getURL(new DocumentReference("U1", xWikiSpace)));
         tableLayout
-            .assertCellWithLink(USER_COLUMN, "U2", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U2")));
+            .assertCellWithLink(USER_COLUMN, "U2", testUtils.getURL(new DocumentReference("U2", xWikiSpace)));
         tableLayout.assertRow(USER_COLUMN, "");
         assertEquals(1, liveDataElement.countFootnotes());
         assertEquals(FOOTNOTE_COMPUTED_TITLE, liveDataElement.getFootnotesText().get(0));
@@ -203,7 +214,7 @@ class LiveDataIT
         // The footnotes are supposed to disappear after the filter because the related entries are not displayed.
         assertEquals(0, liveDataElement.countFootnotes());
         tableLayout
-            .assertCellWithLink(USER_COLUMN, "U1", testUtils.getURL(new DocumentReference("xwiki", "XWiki", "U1")));
+            .assertCellWithLink(USER_COLUMN, "U1", testUtils.getURL(new DocumentReference("U1", xWikiSpace)));
 
         // Reload the page to verify that the persisted filters are taken into account after reload.
         testUtils.getDriver().navigate().refresh();
@@ -296,9 +307,21 @@ class LiveDataIT
         liveDataElement.waitUntilReady();
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
+
+        // Switch to another language to assert that the text is still correctly translated.
+        try {
+            testUtils.setWikiPreference("default_language", "fr");
+            testUtils.getDriver().navigate().refresh();
+            liveDataElement.waitUntilReady();
+            assertEquals(List.of(
+                    "(1) Le titre de certaines pages est calculé. Filtrer et trier sur ces titres ne fonctionnera pas normalement pour ces pages."),
+                liveDataElement.getFootnotesText());
+        } finally {
+            testUtils.setWikiPreference("default_language", "en");
+        }
     }
 
-    private void createXObjects(TestUtils testUtils, TestReference testReference)
+    private void createXObjects(TestUtils testUtils, DocumentReference testReference)
     {
         String className = testUtils.serializeReference(testReference);
         DocumentReference o1 = new DocumentReference("O1", (SpaceReference) testReference.getParent());
@@ -382,7 +405,7 @@ class LiveDataIT
         assertEquals(2, tableLayout.countRows());
     }
 
-    private void initLocalization(TestUtils testUtils, TestReference testReference) throws Exception
+    private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception
     {
         DocumentReference translationDocumentReference =
             new DocumentReference("Translation", testReference.getLastSpaceReference());
@@ -419,7 +442,7 @@ class LiveDataIT
         testUtils.addObject(documentReference, className, properties);
     }
 
-    private void createXClass(TestUtils testUtils, TestReference testReference)
+    private void createXClass(TestUtils testUtils, DocumentReference testReference)
     {
         testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
         testUtils.addClassProperty(testReference, CHOICE_COLUMN, "StaticList");
@@ -441,7 +464,7 @@ class LiveDataIT
         testUtils.addClassProperty(testReference, IS_ACTIVE_COLUMN, "Boolean");
     }
 
-    private static void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference,
+    private static void createClassNameLiveDataPage(TestUtils testUtils, DocumentReference testReference,
         List<String> properties, String body) throws Exception
     {
         TestUtils.RestTestUtils rest = testUtils.rest();
@@ -459,7 +482,7 @@ class LiveDataIT
         rest.save(page);
     }
 
-    private void createResultPageLiveDataPage(TestUtils testUtils, TestReference testReference, String resultPage)
+    private void createResultPageLiveDataPage(TestUtils testUtils, DocumentReference testReference, String resultPage)
         throws Exception
     {
         TestUtils.RestTestUtils rest = testUtils.rest();

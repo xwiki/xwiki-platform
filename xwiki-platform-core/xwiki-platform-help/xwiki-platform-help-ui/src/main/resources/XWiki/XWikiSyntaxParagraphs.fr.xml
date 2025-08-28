@@ -66,10 +66,6 @@ Paragraphe centré et bleu
 
 Les paragraphes sont des éléments de texte séparés par 2 ou plusieurs nouvelles lignes.
 
-{{info}}
-La syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}} tient compte des sauts de ligne, ce qui n'est pas le cas des syntaxes XWiki 1.0 et Creole.
-{{/info}}
-
 |=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
 |Paragraphe simple|Ceci est un paragraphe|Ceci est un paragraphe
 |Paragraphe sur plusieurs lignes |Paragraphe sur

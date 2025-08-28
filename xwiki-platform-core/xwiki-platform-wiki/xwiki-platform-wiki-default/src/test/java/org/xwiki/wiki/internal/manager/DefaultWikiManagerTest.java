@@ -236,8 +236,9 @@ class DefaultWikiManagerTest
         Throwable exception = assertThrows(WikiManagerException.class, () -> {
             this.wikiManager.copy("wikiid", "existingid", "newwikialias", true, true, true);
         });
+        assertEquals("Failed to create the new wiki [existingid] when copying [wikiid].", exception.getMessage());
         assertEquals("The wiki id [existingid] is already used or is a reserved id, and thus is not available.",
-            exception.getMessage());
+            exception.getCause().getMessage());
     }
 
     @Test

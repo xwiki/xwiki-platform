@@ -117,7 +117,14 @@ public class DefaultWikiManager implements WikiManager
     public WikiDescriptor copy(String fromWikiId, String newWikiId, String newWikiAlias, boolean copyHistory,
         boolean copyRecycleBin, boolean failOnExist) throws WikiManagerException
     {
-        WikiDescriptor newWiki = create(newWikiId, newWikiAlias, failOnExist);
+        WikiDescriptor newWiki;
+        try {
+             newWiki = create(newWikiId, newWikiAlias, failOnExist);
+        } catch (WikiManagerException e) {
+            throw new WikiManagerException(String.format("Failed to create the new wiki [%s] when copying [%s].",
+                newWikiId, fromWikiId), e);
+        }
+
         this.wikiCopier.copyDocuments(fromWikiId, newWikiId, copyHistory);
         if (copyRecycleBin) {
             this.wikiCopier.copyDeletedDocuments(fromWikiId, newWikiId);

@@ -33,6 +33,13 @@ require(['jquery'], function ($) {
       })
     }
 
+   /**
+    * Allows to override the default function to insert a tag syntax.
+    * This method should be used when a specific editor implementation is used on top of the default textarea (e.g.
+    * CodeMirror for syntax highlighting).
+    * @param insertTagFunction the function used for overriding, which needs to take 4 parameters (see
+    * _defaultInsertTag) for the example.
+    */
     setInsertTagFunction(insertTagFunction) {
       this._insertTagFunction = insertTagFunction;
     }
@@ -61,12 +68,6 @@ require(['jquery'], function ($) {
       textarea.selectionStart = cPos;
       textarea.selectionEnd = cPos;
       textarea.scrollTop = scrollTop;
-
-      // reposition cursor if possible
-      // FIXME: double check this
-      if (textarea.createTextRange) {
-        textarea.caretPos = document.selection.createRange().duplicate();
-      }
     }
 
     _unescapeLineBreaks(text) {

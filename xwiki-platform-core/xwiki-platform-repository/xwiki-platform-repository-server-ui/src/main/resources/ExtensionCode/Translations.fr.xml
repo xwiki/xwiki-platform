@@ -61,11 +61,11 @@ repository.supporter.sheet.createplan=Ajouter
 ### Missing: repository.supporter.sheet.plans=Plans
 ### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
 ExtensionCode.ExtensionSupporterClass_doc.title=Nom
-### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
+ExtensionCode.ExtensionSupporterClass_summary=Résumé
 ExtensionCode.ExtensionSupporterClass_url=URL
 ExtensionCode.ExtensionSupporterClass_email=Email
 ExtensionCode.ExtensionSupporterClass_content=Détails
-### Missing: ExtensionCode.ExtensionSupporterClass_active=Active
+ExtensionCode.ExtensionSupporterClass_active=Actif
 
 ## Support plans
 ### Missing: repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
@@ -73,10 +73,10 @@ ExtensionCode.ExtensionSupporterClass_content=Détails
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Nom
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
-### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
+ExtensionCode.ExtensionSupportPlanClass_summary=Résumé
 ExtensionCode.ExtensionSupportPlanClass_url=URL
 ExtensionCode.ExtensionSupportPlanClass_content=Détails
-### Missing: ExtensionCode.ExtensionSupportPlanClass_active=Active
+ExtensionCode.ExtensionSupportPlanClass_active=Actif
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
 </content>
 </xwikidoc>

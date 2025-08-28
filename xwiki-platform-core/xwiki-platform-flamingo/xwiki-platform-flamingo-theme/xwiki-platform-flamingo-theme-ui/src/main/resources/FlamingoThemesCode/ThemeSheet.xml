@@ -52,7 +52,8 @@
 ############################
 #set($variables = {
   "logos": {
-    "logo": "image"
+    "logo": "image",
+    "logo-description": "text"
   },
   "base-colors": {
     "text-color": "color",

@@ -72,11 +72,11 @@ ExtensionCode.ExtensionSupporterClass_active=Actif
 ### Missing: repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Nom
-### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
+ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
 ExtensionCode.ExtensionSupportPlanClass_summary=Résumé
 ExtensionCode.ExtensionSupportPlanClass_url=URL
 ExtensionCode.ExtensionSupportPlanClass_content=Détails
 ExtensionCode.ExtensionSupportPlanClass_active=Actif
-### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+ExtensionCode.ExtensionSupportPlanClass_paying=Paiement
 </content>
 </xwikidoc>

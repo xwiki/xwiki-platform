@@ -48,5 +48,13 @@ authentication.admin.isAuthenticationSecurityEnabled.label=Activer ou désactive
 authentication.admin.isAuthenticationSecurityEnabled.hint=Désactiver le mécanisme d'authentification sécurisée supprimera du même coup le journal des échecs d'authentification.
 authentication.admin.isAuthenticationSecurityEnabled.disabled=Désactivé
 authentication.admin.isAuthenticationSecurityEnabled.enabled=Activé
-authentication.admin.heading=Sécurité d'authentification</content>
+authentication.admin.heading=Sécurité d'authentification
+### Missing: security.authservice.admin.title=Authentication service
+### Missing: security.authservice.admin.currentAuthService=Current Authentication service
+security.authservice.admin.component.label=Définir le service d'authentification :
+### Missing: security.authservice.admin.component.save=Save
+security.authservice.admin.component.noService=Aucun service d'authentification alternatif n'a été trouvé.
+### Missing: security.authservice.admin.other.warning=The current authentication service cannot be modified because it's injected by a custom system.
+security.authservice.admin.class.warning=Le service d'authentification ne peut pas être modifié car il est contrôlé par le fichier de configuration 'xwiki.cfg'.
+</content>
 </xwikidoc>

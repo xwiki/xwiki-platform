@@ -39,8 +39,19 @@
   <content>office.createForm.type.name=Page provenant d'Office
 office.createForm.type.description=Importer des documents Office dans des pages wiki
 office.form.error.noDocument=Vous devez utiliser l''action {0}"créer une page"{1} pour importer un document Office.
-office.form.append.hint=Ce document existe déjà ! Ajouter à la page existante
-
+office.import.document.hint=Sélectionnez le document Office à importer.
+office.import.target.hint=La page dans laquelle le contenu du document Office sera importé.
+### Missing: office.import.overwriteContent=Overwrite existing content
+office.import.overwriteContent.hint=La page cible existe déjà. Vous pouvez soit écraser son contenu soit ajouter le nouveau contenu en fin du contenu existant.
+### Missing: office.import.overwriteContent.confirmationMessage=Are you sure you want to overwrite the content of the target page?
+### Missing: office.import.overwriteContent.confirmationAction=Overwrite
+### Missing: office.import.headingLevelsToSplit.hint=Import the selected heading levels and their corresponding sections in separate child pages, linked from the parent page.
+office.import.childPagesNaming.hint=Définissez comment nommer les pages enfants créées lorsque le contenu importé sera divisé.
+office.import.terminalChildPages=Pages enfants terminales
+office.import.terminalChildPages.hint=Avancé : créer les pages enfants en tant que pages terminales. Les pages terminales ne peuvent pas avoir d'enfants. Ces pages sont généralement utilisées dans les applications, pour du développement ou dans les anciennes versions de XWiki.
+### Missing: office.import.inProgress=Importing office document...
+### Missing: office.import.done=Office document imported
+### Missing: office.import.failed=Office import failed
 office.config.serverType.hint=Type de serveur Office. Il peut être interne (local) ou externe (distant).
 office.config.serverPort.hint=Numéro de port pour se connecter au serveur Office
 office.config.autoStart.hint=Indique si le serveur Office doit être démarré / connecté automatiquement au démarrage de XWiki
@@ -48,5 +59,14 @@ office.config.serverPath.hint=Chemin vers l'installation d'Office
 office.config.serverState.connected=Connecté
 office.config.serverState.notConnected=Non connecté
 office.config.serverState.confError=Configuration non valide
-office.config.serverState.error=Erreur</content>
+office.config.serverState.error=Erreur
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+office.form.append.hint=Ce document existe déjà ! Ajouter à la page existante
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

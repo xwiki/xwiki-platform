@@ -94,24 +94,10 @@
     },
 
     afterInit: function(editor) {
-      // The source command is not registered if the editor is loaded in-line.
-      var sourceCommand = editor.getCommand('source');
-      if (sourceCommand) {
-        editor.on('beforeSetMode', this.onBeforeSetMode.bind(this));
-        editor.on('beforeModeUnload', this.onBeforeModeUnload.bind(this));
-        editor.on('mode', this.onMode.bind(this));
-        CKEDITOR.plugins.xwikiSource.addModeChangeHandler(editor, this.onModeChanged.bind(this), 5);
-
-        // The default source command is not asynchronous so it becomes (re)enabled right after the editing mode is
-        // changed. In our case switching between WYSIWYG and Source mode is asynchronous because we need to convert the
-        // edited content on the server side. Thus we need to prevent the source command from being enabled while the
-        // conversion takes place.
-        // CKEDITOR-66: Switch to source corrupt page when connection lost or when connection is very slow
-        var oldCheckAllowed = sourceCommand.checkAllowed;
-        sourceCommand.checkAllowed = function() {
-          return !this.running && oldCheckAllowed.apply(this, arguments);
-        };
-      }
+      editor.on('beforeSetMode', this.onBeforeSetMode.bind(this));
+      editor.on('beforeModeUnload', this.onBeforeModeUnload.bind(this));
+      editor.on('mode', this.onMode.bind(this));
+      CKEDITOR.plugins.xwikiSource.addModeChangeHandler(editor, this.onModeChanged.bind(this), 5);
     },
 
     onBeforeSetMode: function(event) {
@@ -218,11 +204,6 @@
     startLoading: function(editor) {
       CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
       editor.setLoading(true);
-      // Prevent the source command from being enabled while the conversion takes place.
-      var sourceCommand = editor.getCommand('source');
-      // We have to set the flag before setting the command state in order to be taken into account.
-      sourceCommand.running = true;
-      sourceCommand.setState(CKEDITOR.TRISTATE_DISABLED);
       if (editor.mode === 'source') {
         // When switching from Source mode to WYSIWYG mode the wiki syntax is converted to HTML on the server side.
         // Before we receive the result the Source plugin sets the source (wiki syntax) as the data for the WYSIWYG
@@ -258,10 +239,6 @@
         // Unlock the undo history after the conversion is done and the WYSIWYG mode data is set.
         editor.fire('unlockSnapshot');
       }
-      var sourceCommand = editor.getCommand('source');
-      // We have to set the flag before setting the command state in order to be taken into account.
-      sourceCommand.running = false;
-      sourceCommand.setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
       await CKEDITOR.plugins.xwikiSelection.restoreSelection(editor, {
         beforeApply: () => editor.setLoading(false)
       });

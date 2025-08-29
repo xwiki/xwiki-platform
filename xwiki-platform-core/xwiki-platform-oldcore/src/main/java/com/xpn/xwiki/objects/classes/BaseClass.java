@@ -405,7 +405,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return fromMap(map, object);
     }
 
-    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object)
+    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object) throws XWikiException
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
@@ -415,7 +415,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 if (formvalues instanceof String[]) {
                     objprop = property.fromStringArray(((String[]) formvalues));
                 } else if (formvalues instanceof String) {
-                    objprop = property.fromString(formvalues.toString());
+                    objprop = property.parseString(formvalues.toString());
                 } else {
                     objprop = property.fromValue(formvalues);
                 }

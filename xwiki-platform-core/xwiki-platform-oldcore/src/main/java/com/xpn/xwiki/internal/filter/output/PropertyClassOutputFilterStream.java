@@ -151,7 +151,14 @@ public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterS
                 return;
             }
 
-            BaseProperty<?> field = propertyClass.fromString(value);
+            BaseProperty<?> field = null;
+            try {
+                field = propertyClass.parseString(value);
+            } catch (XWikiException e) {
+                throw new FilterException(
+                    String.format("Failed to parse value [%s] for field [%s] in class reference [%s]",
+                    value, name, classReference), e);
+            }
 
             this.entity.safeput(name, field);
         }

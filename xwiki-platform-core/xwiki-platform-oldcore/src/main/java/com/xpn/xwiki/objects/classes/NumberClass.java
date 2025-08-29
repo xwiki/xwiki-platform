@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -121,7 +122,7 @@ public class NumberClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty parseString(String value) throws XWikiException
     {
         BaseProperty property = newProperty();
         String ntype = getNumberType();
@@ -146,10 +147,7 @@ public class NumberClass extends PropertyClass
                 }
             }
         } catch (NumberFormatException e) {
-            LOG.warn("Invalid number entered for property " + getName() + " of class " + getObject().getName() + ": "
-                + value);
-            // Returning null makes sure that the old value (if one exists) will not be discarded/replaced
-            return null;
+            throw new XWikiException(String.format("Error when parsing [%s] to type [%s]", value, ntype), e);
         }
 
         property.setValue(nvalue);

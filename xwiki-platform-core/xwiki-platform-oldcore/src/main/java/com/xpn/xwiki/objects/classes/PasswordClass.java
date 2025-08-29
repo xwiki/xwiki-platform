@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -69,7 +70,7 @@ public class PasswordClass extends StringClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty parseString(String value) throws XWikiException
     {
         if (value.equals(FORM_PASSWORD_PLACEHODLER)) {
             return null;

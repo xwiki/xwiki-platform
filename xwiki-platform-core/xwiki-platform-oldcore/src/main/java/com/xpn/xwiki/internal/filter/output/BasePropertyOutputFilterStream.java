@@ -25,6 +25,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClassInterface;
@@ -69,7 +70,14 @@ public class BasePropertyOutputFilterStream extends AbstractElementOutputFilterS
                 // Bulletproofing using PropertyClassInterface#fromString when a String is passed (in case it's not
                 // really a String property)
                 BaseProperty property =
-                    value instanceof String ? propertyclass.fromString((String) value) : propertyclass.fromValue(value);
+                    null;
+                try {
+                    property = value instanceof String
+                        ? propertyclass.parseString((String) value) : propertyclass.fromValue(value);
+                } catch (XWikiException e) {
+                    throw new FilterException(String.format("Error when handling object [%s] with value [%s]", name,
+                        value), e);
+                }
 
                 if (this.entity == null) {
                     this.entity = property;

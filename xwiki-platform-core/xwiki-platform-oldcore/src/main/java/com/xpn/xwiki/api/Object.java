@@ -145,7 +145,7 @@ public class Object extends Collection
         return o.getXWikiContext().equals(getXWikiContext()) && this.element.equals(o.element);
     }
 
-    public void set(String fieldname, java.lang.Object value)
+    public void set(String fieldname, java.lang.Object value) throws XWikiException
     {
         XWikiContext xcontext = getXWikiContext();
 

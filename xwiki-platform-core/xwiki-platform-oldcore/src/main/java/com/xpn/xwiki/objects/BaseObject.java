@@ -360,13 +360,13 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         return new com.xpn.xwiki.api.Object(obj, context);
     }
 
-    public void set(String fieldname, java.lang.Object value, XWikiContext context)
+    public void set(String fieldname, java.lang.Object value, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = getXClass(context);
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         BaseProperty prop = (BaseProperty) safeget(fieldname);
         if ((value instanceof String) && (pclass != null)) {
-            prop = pclass.fromString((String) value);
+            prop = pclass.parseString((String) value);
         } else {
             if ((prop == null) && (pclass != null)) {
                 prop = pclass.newProperty();

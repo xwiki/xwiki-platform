@@ -271,7 +271,7 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
      * @param resetPassword {@code true} if the password should be just reset, or {@code false} if the hash of the
      *                      defined password should be computed.
      */
-    private boolean fixPasswordHash(XWikiDocument userDoc, boolean isMain, boolean resetPassword)
+    private boolean fixPasswordHash(XWikiDocument userDoc, boolean isMain, boolean resetPassword) throws XWikiException
     {
         boolean result = false;
         XWikiContext context = getXWikiContext();

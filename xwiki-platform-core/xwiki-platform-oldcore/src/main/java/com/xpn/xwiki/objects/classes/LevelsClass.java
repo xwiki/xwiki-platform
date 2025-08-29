@@ -106,7 +106,7 @@ public class LevelsClass extends ListClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty parseString(String value) throws XWikiException
     {
         BaseProperty prop = newProperty();
         prop.setValue(value);

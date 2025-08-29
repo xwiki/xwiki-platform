@@ -30,7 +30,9 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.HistoryPane;
+import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
@@ -97,6 +99,8 @@ class UserProfileIT
 
     private static final String TEXT_EDITOR = "Text";
 
+    private static final String NEW_SHORTCUT_VALUE = "B";
+
     private static final String DEFAULT_EDITOR = "Text (Default)";
 
     private static final String SIMPLE_USER = "Simple";
@@ -116,6 +120,7 @@ class UserProfileIT
         this.userName = testReference.getLastSpaceReference().getName();
         setup.loginAsSuperAdmin();
         setup.rest().deletePage("XWiki", this.userName);
+        // We make sure the user is in advanced mode so that they can use view mode shortcuts
         setup.createUserAndLogin(this.userName, DEFAULT_PASSWORD);
 
         // At first edition the Dashboard is saving the doc to insert a new object, so we need to be sure
@@ -251,12 +256,54 @@ class UserProfileIT
         assertEquals(DEFAULT_EDITOR, preferencesPage.getDefaultEditor());
     }
 
+    /** Functionality check: changing the shortcut for the default edit mode. */
+    @Test
+    @Order(5)
+    void changeShortcutViewEdit(TestUtils setup)
+    {
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
+
+
+        // Setting to Advanced user, so that the view shortcuts are enabled
+        PreferencesEditPage preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.setAdvancedUserType();
+        preferencesEditPage.clickSaveAndView();
+
+        // Overriding the default shortcut value (E)
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.setShortcutViewEdit(NEW_SHORTCUT_VALUE);
+        preferencesEditPage.clickSaveAndView();
+
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        assertEquals(NEW_SHORTCUT_VALUE, preferencesPage.getViewEditShortcut());
+
+        // Testing that the updated shortcut preference works as intended
+        setup.getDriver().addPageNotYetReloadedMarker();
+        setup.getDriver().createActions().sendKeys(NEW_SHORTCUT_VALUE).perform();
+        setup.getDriver().waitUntilPageIsReloaded();
+        // The edit shortcut sends us to the profile section, whatever the section we were in was.
+        ProfileEditPage profileEditPage = new ProfileEditPage();
+        // We make sure we can find a field on this page (aka we didn't cast this erroneously)
+        assertEquals("", profileEditPage.getUserFirstName());
+
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        preferencesEditPage = preferencesPage.editPreferences();
+        // Reset the preference
+        preferencesEditPage.setShortcutViewEdit("");
+        preferencesEditPage.clickSaveAndView();
+    }
+
     /**
      * Check that the content of the first comment isn't used as the "About" information in the user profile. See
      * XAADMINISTRATION-157.
      */
     @Test
-    @Order(5)
+    @Order(6)
     void commentDoesntOverrideAboutInformation(TestUtils setup)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
@@ -273,7 +320,7 @@ class UserProfileIT
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     void ensureDashboardUIAddAnObjectAtFirstEdit()
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
@@ -283,7 +330,7 @@ class UserProfileIT
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     void verifyGroupTab(TestUtils setup)
     {
         GroupsUserProfilePage preferencesPage = GroupsUserProfilePage.gotoPage(this.userName);
@@ -297,7 +344,7 @@ class UserProfileIT
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     void toggleEnableDisable(TestUtils setup)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
@@ -332,7 +379,7 @@ class UserProfileIT
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     void disabledUserTest(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
@@ -352,5 +399,51 @@ class UserProfileIT
         ViewPage viewPage = setup.gotoPage(testReference);
         assertFalse(viewPage.exists());
         assertTrue(gotException);
+    }
+
+    @Test
+    @Order(11)
+    void changeShortcutInformation(TestUtils setup, TestReference testReference)
+    {
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
+
+        // Setting to Advanced user, so that the view shortcuts are enabled
+        PreferencesEditPage preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.setAdvancedUserType();
+        preferencesEditPage.clickSaveAndView();
+
+        // Overriding the default shortcut value (I)
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.setShortcutInformation(NEW_SHORTCUT_VALUE);
+        preferencesEditPage.clickSaveAndView();
+
+        ViewPage viewPage = setup.createPage(testReference, "one **two** three", "");
+        InformationPane infoPane = viewPage.openInformationDocExtraPane();
+        CommentsTab commentsPane = viewPage.openCommentsDocExtraPane();
+        assertTrue(commentsPane.isOpened());
+        assertFalse(infoPane.isOpened());
+        // We try using the default shortcut. We expect it to not work, that is, to still have the commentsTab opened.
+        setup.getDriver().createActions().sendKeys("i").perform();
+        assertTrue(commentsPane.isOpened());
+        assertFalse(infoPane.isOpened());
+        // We now use the user preference defined shortcut to open it instead.
+        setup.getDriver().createActions().sendKeys(NEW_SHORTCUT_VALUE).perform();
+        viewPage.waitForDocExtraPaneActive("information");
+        assertFalse(commentsPane.isOpened());
+        assertTrue(infoPane.isOpened());
+        // We try using the default shortcut to get back to the comments tab. We expect this one to work without change.
+        viewPage.useShortcutKeyForCommentPane();
+        assertTrue(commentsPane.isOpened());
+        assertFalse(infoPane.isOpened());
+
+        // Reset the preference
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.setShortcutInformation("");
+        preferencesEditPage.clickSaveAndView();
     }
 }

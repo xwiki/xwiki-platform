@@ -57,6 +57,13 @@ public class DefaultMentionsConfiguration implements MentionsConfiguration
     }
 
     @Override
+    public String getSelfMentionsForeground()
+    {
+        // default color is rgba, not hexa to allow setting opacity and keep working on IE11
+        return this.configuration.getProperty("selfMentionsForeground", "rgba(255, 255, 255, 1)");
+    }
+
+    @Override
     public boolean isQuoteActivated()
     {
         return this.configuration.getProperty("quoteActivated", false);

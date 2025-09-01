@@ -214,6 +214,8 @@ public class DefaultOfficeServer implements OfficeServer
             }
             setState(ServerState.CONNECTED);
             this.logger.info("Open Office instance started.");
+        } catch (ThreadDeath e) {
+            throw e;
         } catch (Exception e) {
             setState(ServerState.ERROR);
             throw new OfficeServerException("Error while connecting / starting the office server.", e);

@@ -238,8 +238,8 @@
 
   var searchRequest = null;
 
-  // ChangeTargetId is the id of the facet anchor that initiated this reload. We expect the focus to go back to this 
-  // place once the UI is reloaded.
+  // changeTargetSelector is the CSS selector of the facet anchor that initiated this reload. '
+  // We expect the focus to go back to this place once the UI is reloaded.
   var pushSearchUIState = function(viewURL, changeTargetSelector) {
     // If there is a request in progress, abort it to prevent its callback from being called.
     searchRequest &amp;&amp; searchRequest.abort();

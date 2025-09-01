@@ -62,21 +62,21 @@ solr.admin.indexing.query.language.label=Language of the custom query
 
 solr.admin.info.affectedDocuments=Affected documents in the index:
 
-solr.sortBy.hint=Sort order rule
-solr.sortBy.sort_by_score=Sort by relevance
-solr.sortBy.sort_by_title_sort=Sort by title
-solr.sortBy.sort_by_date=Sort by last edit date
-solr.sortBy.sort_by_author_display_sort=Sort by last author name
-solr.sortBy.sort_by_filename_sort=Sort by file name
-solr.sortBy.sort_by_attsize_sort=Sort by file size
-solr.sortBy.sort_by_attdate_sort=Sort by upload date
-solr.sortBy.sort_by_attauthor_display_sort=Sort by uploader name
-solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
-solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
-    
-solr.options.show_highlight=Display highlights of matches
+search.solr.sortBy.hint=Sort order rule
+search.solr.sortBy.field.score=Sort by relevance
+search.solr.sortBy.field.title_sort=Sort by title
+search.solr.sortBy.field.date=Sort by last edit date
+search.solr.sortBy.field.author_display_sort=Sort by last author name
+search.solr.sortBy.field.filename_sort=Sort by file name
+search.solr.sortBy.field.attsize_sort=Sort by file size
+search.solr.sortBy.field.attdate_sort=Sort by upload date
+search.solr.sortBy.field.attauthor_display_sort=Sort by uploader name
+search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+
+search.solr.options.show_highlight=Display highlights of matches
 solr.options.highlight.title=Display an extract of what was matched in each result
-solr.options.show_facet=Show filters
+search.solr.options.show_facet=Show filters
 solr.options.facet.title=Allow extra filtering of the result
 
 solr.result.language=Language
@@ -186,7 +186,7 @@ solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
 ## until 7.2RC1
 solr.field.space=Location
 
-## until 17.5.0RC1
+## until 17.7.0RC1
 ## Those translations were composed together, they have been replaced with new keys that follow translation guidelines.
 solr.sortBy=Sort by:
 solr.sortBy.score=Relevance

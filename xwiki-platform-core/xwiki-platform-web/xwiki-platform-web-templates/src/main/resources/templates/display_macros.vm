@@ -73,13 +73,15 @@
   #foreach ($translationLocale in $doc.translationLocales)
     #set ($discard = $macro.disabledLocales.add("$translationLocale"))
   #end
+  ## Allow selecting no locale if there are no document translations or there is already no locale selected.
+  #set ($macro.allowEmpty = $doc.translationLocales.isEmpty() || "$!tdoc.defaultLocale" == '')
   #set ($macro.parameters = {
     'id': 'xwikidoclanguageinput2',
     'name': 'defaultLanguage',
     'value': $tdoc.defaultLocale,
     'mode': $displayMode,
     'settings': {
-      'allowEmpty': $doc.translationLocales.isEmpty(),
+      'allowEmpty': $macro.allowEmpty,
       'supportedLocales': $macro.supportedLocales,
       'disabledLocales':$macro.disabledLocales,
       'disabledLocalesHint': $services.localization.render('web.templates.documentLocalePicker.existingTranslation')

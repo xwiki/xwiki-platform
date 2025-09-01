@@ -62,11 +62,28 @@
 #end
 
 #macro (displayDocumentProperty_defaultLocale $displayMode)
+  ## The default document locale should be chosen from the list of supported locales.
+  #set ($macro.supportedLocales = [])
+  #foreach ($supportedLocale in $xwiki.availableLocales)
+    #set ($discard = $macro.supportedLocales.add("$supportedLocale"))
+  #end
+  ## Prevent the user from selecting the locale of an existing document translation as the locale of the default
+  ## translation, because it would hide that translation.
+  #set ($macro.disabledLocales = [])
+  #foreach ($translationLocale in $doc.translationLocales)
+    #set ($discard = $macro.disabledLocales.add("$translationLocale"))
+  #end
   #set ($macro.parameters = {
     'id': 'xwikidoclanguageinput2',
     'name': 'defaultLanguage',
     'value': $tdoc.defaultLocale,
-    'mode': $displayMode
+    'mode': $displayMode,
+    'settings': {
+      'allowEmpty': $doc.translationLocales.isEmpty(),
+      'supportedLocales': $macro.supportedLocales,
+      'disabledLocales':$macro.disabledLocales,
+      'disabledLocalesHint': $services.localization.render('web.templates.documentLocalePicker.existingTranslation')
+    }
   })
   #displayProperty_locale($macro.parameters)
 #end
@@ -130,7 +147,8 @@
   #if ($parameters.mode == 'edit')
     #set ($discard = $xwiki.jsfx.use('localePicker.js', true))
     <input type="text" data-type="locale" id="$!escapetool.xml($parameters.id)"
-      name="$!escapetool.xml($parameters.name)" value="$!escapetool.xml($parameters.value)"/>
+      name="$!escapetool.xml($parameters.name)" value="$!escapetool.xml($parameters.value)"
+      #if ($parameters.settings)data-settings="$escapetool.xml($jsontool.serialize($parameters.settings))"#end/>
   #else
     #set ($localeName = $parameters.value.getDisplayName($xcontext.locale))
     #set ($styleName = '')

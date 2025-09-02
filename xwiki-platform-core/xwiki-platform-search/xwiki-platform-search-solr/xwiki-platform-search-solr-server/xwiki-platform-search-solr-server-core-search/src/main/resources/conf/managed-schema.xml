@@ -82,7 +82,7 @@
          17.7.0 (170700000) (migration):
            * a docid plong field has been added to store the XWiki document long local identifier (XWikiDocument#getId)
            * a dynamic *_string_lowercase and a corresponding copy field have been added to automatically provide a lower case version of all exact string properties
-           * the fullname field is not set for all entities, not just DOCUMENT
+           * the fullname field is now set for all entities, not just DOCUMENT
     -->
     <!-- XWIKI: the versions of the schema from XWiki point of view.
     

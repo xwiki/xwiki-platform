@@ -60,15 +60,20 @@ class SolrIndexEventListenerTest
     @Test
     void onDocumentDeleted()
     {
-        DocumentReference documentReference = new DocumentReference("aWiki", "aSpace", "aPage");
+        DocumentReference documentReference = new DocumentReference("aWiki", "aSpace", "aPage", Locale.ROOT);
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getOriginalDocument()).thenReturn(document);
-        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getDocumentReferenceWithLocale()).thenReturn(documentReference);
         when(document.getRealLocale()).thenReturn(Locale.FRENCH);
 
         this.listener.onEvent(new DocumentDeletedEvent(), document, null);
 
-        verify(this.indexer).delete(new DocumentReference(documentReference, Locale.FRENCH), false);
+        verify(this.indexer).delete(documentReference, false);
+
+        documentReference = new DocumentReference("aWiki", "aSpace", "aPage", Locale.GERMAN);
+        when(document.getDocumentReferenceWithLocale()).thenReturn(documentReference);
+
+        this.listener.onEvent(new DocumentDeletedEvent(), document, null);
     }
 
     @Test

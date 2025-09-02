@@ -28,7 +28,10 @@ require(['jquery'], function ($) {
       });
       $(document).on('xwiki:dom:updated', function (event, data) {
         $(data.elements).find('textarea').each(function() {
-          self._initTextarea($(this), self);
+          let syntax = $(this).data('syntax');
+          if (typeof syntax === 'string' && syntax.startsWith('xwiki')) {
+            self._initTextarea($(this), self);
+          }
         });
       })
     }
@@ -100,7 +103,7 @@ require(['jquery'], function ($) {
         buttonMenu.append(button);
       }
       textarea.before(buttonMenu);
-      $(document).trigger('xwiki:dom:updated', {'elements': [textarea]});
+      $(document).trigger('xwiki:dom:updated', {'elements': [buttonMenu.parent()[0]]});
     }
   }
 

@@ -29,7 +29,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "dayjs": "1.11.13"
+    "dayjs": "1.11.18"
   },
   "peerDependencies": {
     "inversify": "7.x",

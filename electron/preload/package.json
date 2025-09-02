@@ -27,7 +27,7 @@
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
-    "@types/node": "22.17.2",
+    "@types/node": "22.18.0",
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "typescript": "5.9.2",

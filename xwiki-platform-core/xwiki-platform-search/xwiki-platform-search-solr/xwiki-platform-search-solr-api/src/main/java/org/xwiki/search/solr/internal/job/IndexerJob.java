@@ -42,6 +42,7 @@ import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
@@ -74,11 +75,11 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
 
     @Inject
     @Named("database")
-    private transient DocumentIterator<String> databaseIterator;
+    private transient DocumentIterator<DocumentIteratorEntry> databaseIterator;
 
     @Inject
     @Named("solr")
-    private transient DocumentIterator<String> solrIterator;
+    private transient DocumentIterator<DocumentIteratorEntry> solrIterator;
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -125,7 +126,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
      */
     private void updateSolrIndex() throws Exception
     {
-        DiffDocumentIterator<String> iterator = new DiffDocumentIterator<>(this.solrIterator, this.databaseIterator);
+        DiffDocumentIterator iterator = new DiffDocumentIterator(this.solrIterator, this.databaseIterator);
         iterator.setRootReference(getRequest().getRootReference());
 
         this.progressManager.pushLevelProgress(2, this);
@@ -147,7 +148,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         }
     }
 
-    private void updateSolrIndex(int progressSize, DiffDocumentIterator<String> iterator) throws Exception
+    private void updateSolrIndex(int progressSize, DiffDocumentIterator iterator) throws Exception
     {
         this.progressManager.pushLevelProgress(progressSize, this);
 

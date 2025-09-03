@@ -45,15 +45,15 @@ public abstract class AbstractDocumentIterator<T> implements DocumentIterator<T>
      */
     public static class DocumentIteratorEntry
     {
-        private final WikiReference reference;
+        private final WikiReference wiki;
 
         private final long docId;
 
         private final String version;
 
-        protected DocumentIteratorEntry(WikiReference reference, long docId, String version)
+        protected DocumentIteratorEntry(WikiReference wiki, long docId, String version)
         {
-            this.reference = reference;
+            this.wiki = wiki;
             this.docId = docId;
             this.version = version;
         }
@@ -63,7 +63,7 @@ public abstract class AbstractDocumentIterator<T> implements DocumentIterator<T>
          */
         public WikiReference getWiki()
         {
-            return reference;
+            return wiki;
         }
 
         /**

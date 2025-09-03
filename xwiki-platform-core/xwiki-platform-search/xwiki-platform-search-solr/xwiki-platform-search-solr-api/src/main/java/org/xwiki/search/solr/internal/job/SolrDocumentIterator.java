@@ -149,7 +149,7 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<DocumentItera
         if (query == null) {
             query = new SolrQuery(solrReferenceResolver.getQuery(rootReference));
             query.setFields(FieldUtils.WIKI, FieldUtils.SPACES, FieldUtils.NAME, FieldUtils.DOCUMENT_LOCALE,
-                FieldUtils.VERSION);
+                FieldUtils.VERSION, FieldUtils.DOC_ID);
             query.addFilterQuery(FieldUtils.TYPE + ':' + EntityType.DOCUMENT.name());
             // Make sure to skip invalid documents, they will be re-indexed
             query.addFilterQuery(FieldUtils.WIKI + ':' + SOLR_ANYVALUE);

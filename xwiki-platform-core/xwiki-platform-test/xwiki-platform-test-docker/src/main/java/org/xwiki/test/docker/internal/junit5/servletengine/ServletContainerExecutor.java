@@ -40,6 +40,8 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
@@ -79,7 +81,11 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String ROOT_USER = "root";
 
-    private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
+    private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+\\.?)+");
+
+    private static final Version V12 = new DefaultVersion("12");
+
+    private static final Version V12_1 = new DefaultVersion("12.1");
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -207,6 +213,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         maybeEnableRemoteDebugging(javaOpts);
         this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
+        Version jettyVersion = extractJettyVersionFromDockerTag(this.testConfiguration.getServletEngineTag());
+
         List<String> commands = new ArrayList<>();
 
         // Jetty has a protection for URLs that don't respect the Servlet specification and that are considered
@@ -217,16 +225,17 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         //   Remove AMBIGUOUS_PATH_ENCODING when https://jira.xwiki.org/browse/XWIKI-22422 is fixed.
         //   Remove AMBIGUOUS_EMPTY_SEGMENT when https://jira.xwiki.org/browse/XWIKI-22428 is fixed.
         //   Remove AMBIGUOUS_PATH_SEPARATOR when https://jira.xwiki.org/browse/XWIKI-22435 is fixed.
-        // Note: It's important that this command comes before the one below that specifies the module.
-        String violations = "RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR,FRAGMENT";
+        StringBuilder violations = new StringBuilder("RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
+        if (jettyVersion.compareTo(V12_1) >= 0) {
+            // Jetty 12.1+ forbids the use of fragments in URIs by default
+            violations.append(",FRAGMENT");
+        }
+        // Note: It's important that those commands comes before the one below that specifies the module.
         commands.add("jetty.httpConfig.uriCompliance=" + violations);
         commands.add("jetty.httpConfig.redirectUriCompliance=" + violations);
 
-        // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
-        // (ee8 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
-        if (extractJettyVersionFromDockerTag(this.testConfiguration.getServletEngineTag()) >= 12) {
-            commands.add("--module=ee8-webapp,ee8-deploy,ee8-jstl,ee8-websocket-javax,ee8-websocket-jetty");
-        }
+        // Use Jakarta EE 8 modules since XWiki 16.10.x run on javax environment
+        commands.add("--module=ee8-webapp,ee8-deploy,ee8-jstl,ee8-websocket-javax,ee8-websocket-jetty");
 
         // Add commands
         this.servletContainer.setCommandParts(commands.toArray(ArrayUtils.EMPTY_STRING_ARRAY));
@@ -237,20 +246,16 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         this.servletContainer.withCreateContainerCmdModifier(cmd -> cmd.withUser(ROOT_USER));
     }
 
-    private int extractJettyVersionFromDockerTag(String tag)
+    private Version extractJettyVersionFromDockerTag(String tag)
     {
-        int result = 12;
         if (tag != null) {
-            Matcher matcher = MAJOR_VERSION.matcher(tag);
+            Matcher matcher = VERSION_PATTERN.matcher(tag);
             if (matcher.find()) {
-                try {
-                    result = Integer.valueOf(matcher.group());
-                } catch (NumberFormatException e) {
-                    // On error consider we're on Jetty 12
-                }
+                return new DefaultVersion(matcher.group());
             }
         }
-        return result;
+
+        return V12;
     }
 
     private void configureTomcat(File sourceWARDirectory) throws Exception

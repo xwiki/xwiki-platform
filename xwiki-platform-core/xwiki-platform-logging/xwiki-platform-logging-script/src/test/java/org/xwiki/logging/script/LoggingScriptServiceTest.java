@@ -144,6 +144,17 @@ class LoggingScriptServiceTest
         when(logEvent.getArgumentArray()).thenReturn(new Object[0]);
         LogEvent expectedLogEvent = new LogEvent(null, LogLevel.TRACE, "The full translation", new Object[0], null);
         assertEquals(expectedLogEvent, this.loggingScriptService.translate(logEvent));
+
+        when(translation.getRawSource()).thenReturn("The full '{0} translation {0}");
+        when(logEvent.getArgumentArray()).thenReturn(new Object[] {"param"});
+        expectedLogEvent =
+            new LogEvent(null, LogLevel.TRACE, "The full {0} translation {}", new Object[] {"param"}, null);
+        assertEquals(expectedLogEvent, this.loggingScriptService.translate(logEvent));
+
+        when(translation.getRawSource()).thenReturn("The full ''{0} translation {0}");
+        expectedLogEvent =
+            new LogEvent(null, LogLevel.TRACE, "The full '{} translation {}", new Object[] {"param", "param"}, null);
+        assertEquals(expectedLogEvent, this.loggingScriptService.translate(logEvent));
     }
 
     @Test

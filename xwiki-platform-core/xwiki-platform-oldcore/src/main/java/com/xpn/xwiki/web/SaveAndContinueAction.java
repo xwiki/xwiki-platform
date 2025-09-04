@@ -145,37 +145,6 @@ public class SaveAndContinueAction extends XWikiAction
         return failure;
     }
 
-    /**
-     * @param isAjaxRequest Indicate if this is an ajax request.
-     * @param exception The exception to handle.
-     * @param context The XWiki context.
-     * @throws XWikiException unless it is an ajax request.
-     */
-    private void handleException(boolean isAjaxRequest, Exception exception, XWikiContext context)
-        throws XWikiException
-    {
-        if (isAjaxRequest) {
-            String errorMessage =
-                localizePlainOrKey("core.editors.saveandcontinue.exceptionWhileSaving", exception.getMessage());
-
-            writeAjaxErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
-
-            String logMessage = "Caught exception during save and continue";
-            if (exception instanceof XWikiException) {
-                LOGGER.info(logMessage, exception);
-            } else {
-                LOGGER.error(logMessage, exception);
-            }
-        } else {
-            if (exception instanceof XWikiException) {
-                throw (XWikiException) exception;
-            } else {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Uncaught exception", exception);
-            }
-        }
-    }
-
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -200,7 +169,7 @@ public class SaveAndContinueAction extends XWikiAction
                 return !isAjaxRequest;
             }
         } catch (Exception e) {
-            handleException(isAjaxRequest, e, context);
+            handleSaveException(isAjaxRequest, e, context);
             return !isAjaxRequest;
         }
 

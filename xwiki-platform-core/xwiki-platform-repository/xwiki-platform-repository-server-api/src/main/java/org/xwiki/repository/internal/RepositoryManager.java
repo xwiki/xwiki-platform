@@ -851,6 +851,7 @@ public class RepositoryManager implements Initializable, Disposable
     }
 
     private boolean updateExtension(Extension extension, BaseObject extensionObject, XWikiContext xcontext)
+        throws XWikiException
     {
         boolean needSave = false;
 
@@ -1014,7 +1015,7 @@ public class RepositoryManager implements Initializable, Disposable
         return description;
     }
 
-    private boolean updateAuthors(BaseObject extensionObject, Collection<ExtensionAuthor> authors)
+    private boolean updateAuthors(BaseObject extensionObject, Collection<ExtensionAuthor> authors) throws XWikiException
     {
         List<String> authorIds = new ArrayList<>(authors.size());
 
@@ -1026,6 +1027,7 @@ public class RepositoryManager implements Initializable, Disposable
     }
 
     private boolean updateFeatures(String fieldName, BaseObject extensionObject, Collection<ExtensionId> features)
+        throws XWikiException
     {
         List<String> featureStrings = new ArrayList<>(features.size());
 
@@ -1288,7 +1290,7 @@ public class RepositoryManager implements Initializable, Disposable
         return this.resourceReferenceSerializer.serialize(resource);
     }
 
-    protected boolean updateProperties(BaseObject object, Extension extension)
+    protected boolean updateProperties(BaseObject object, Extension extension) throws XWikiException
     {
         Map<String, Object> map = extension.getProperties();
 
@@ -1321,7 +1323,7 @@ public class RepositoryManager implements Initializable, Disposable
         return false;
     }
 
-    protected boolean update(BaseObject object, String fieldName, Object value)
+    protected boolean update(BaseObject object, String fieldName, Object value) throws XWikiException
     {
         // Make sure collection are lists
         if (value instanceof Collection) {
@@ -1340,7 +1342,7 @@ public class RepositoryManager implements Initializable, Disposable
     }
 
     private boolean updateCollection(BaseObject extensionObject, String fieldName, Collection<String> values,
-        XWikiContext xcontext)
+        XWikiContext xcontext) throws XWikiException
     {
         boolean needSave = update(extensionObject, fieldName, values != null ? values : Collections.emptyList());
 

@@ -40,6 +40,7 @@ import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -589,7 +590,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty prop = newProperty();
         if (isMultiSelect()) {
@@ -601,7 +602,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromStringArray(String[] strings)
+    public BaseProperty fromStringArray(String[] strings) throws XWikiException
     {
         if (!isMultiSelect()) {
             return fromString(strings[0]);
@@ -637,7 +638,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty newPropertyfromXML(Element ppcel)
+    public BaseProperty newPropertyfromXML(Element ppcel) throws XWikiException
     {
         if (!isMultiSelect()) {
             return super.newPropertyfromXML(ppcel);

@@ -76,7 +76,7 @@ public class PropertyConverter
                     // Looks like the conversion didn't succeed. Let's try to compute the value from string.
                     // This should return null if the new value cannot be parsed from string.
                     try {
-                        newProperty = modifiedPropertyClass.parseString(storedProperty.toText());
+                        newProperty = modifiedPropertyClass.fromString(storedProperty.toText());
                     } catch (XWikiException ex) {
                         this.logger.warn(errorLog,
                             modifiedPropertyClass.getName(), modifiedPropertyClass.getClassName(), ex);

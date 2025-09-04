@@ -153,7 +153,7 @@ public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterS
 
             BaseProperty<?> field = null;
             try {
-                field = propertyClass.parseString(value);
+                field = propertyClass.fromString(value);
             } catch (XWikiException e) {
                 throw new FilterException(
                     String.format("Failed to parse value [%s] for field [%s] in class reference [%s]",

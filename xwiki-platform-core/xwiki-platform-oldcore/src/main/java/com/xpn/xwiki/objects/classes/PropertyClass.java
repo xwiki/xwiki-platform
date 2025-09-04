@@ -191,23 +191,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     @Override
-    public BaseProperty fromString(String value)
-    {
-        try {
-            return parseString(value);
-        } catch (XWikiException e) {
-            LOGGER.error("Error when parsing [{}]", value, e);
-            return null;
-        }
-    }
-
-    @Override
-    public BaseProperty parseString(String value) throws XWikiException
+    public BaseProperty fromString(String value) throws XWikiException
     {
         return null;
     }
 
-    public BaseProperty newPropertyfromXML(Element ppcel)
+    public BaseProperty newPropertyfromXML(Element ppcel) throws XWikiException
     {
         String value = ppcel.getText();
         return fromString(value);
@@ -709,7 +698,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
     public BaseProperty fromStringArray(String[] strings) throws XWikiException
     {
-        return parseString(strings[0]);
+        return fromString(strings[0]);
     }
 
     public boolean isValidColumnTypes(Property hibprop)

@@ -73,7 +73,7 @@ public class BasePropertyOutputFilterStream extends AbstractElementOutputFilterS
                     null;
                 try {
                     property = value instanceof String
-                        ? propertyclass.parseString((String) value) : propertyclass.fromValue(value);
+                        ? propertyclass.fromString((String) value) : propertyclass.fromValue(value);
                 } catch (XWikiException e) {
                     throw new FilterException(String.format("Error when handling object [%s] with value [%s]", name,
                         value), e);

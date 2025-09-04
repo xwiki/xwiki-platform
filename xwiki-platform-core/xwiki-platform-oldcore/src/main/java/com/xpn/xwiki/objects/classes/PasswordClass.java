@@ -70,7 +70,7 @@ public class PasswordClass extends StringClass
     }
 
     @Override
-    public BaseProperty parseString(String value) throws XWikiException
+    public BaseProperty fromString(String value) throws XWikiException
     {
         if (value.equals(FORM_PASSWORD_PLACEHODLER)) {
             return null;

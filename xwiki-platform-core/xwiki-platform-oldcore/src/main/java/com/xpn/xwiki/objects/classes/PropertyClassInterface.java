@@ -39,13 +39,7 @@ public interface PropertyClassInterface extends ObjectInterface, PropertyInterfa
 {
     String toString(BaseProperty property);
 
-    @Deprecated
-    BaseProperty fromString(String value);
-
-    default BaseProperty parseString(String value) throws XWikiException
-    {
-        return fromString(value);
-    }
+    BaseProperty fromString(String value) throws XWikiException;
 
     BaseProperty fromValue(Object value);
 

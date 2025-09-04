@@ -590,7 +590,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty parseString(String value) throws XWikiException
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty prop = newProperty();
         if (isMultiSelect()) {
@@ -602,7 +602,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromStringArray(String[] strings)
+    public BaseProperty fromStringArray(String[] strings) throws XWikiException
     {
         if (!isMultiSelect()) {
             return fromString(strings[0]);
@@ -638,7 +638,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty newPropertyfromXML(Element ppcel)
+    public BaseProperty newPropertyfromXML(Element ppcel) throws XWikiException
     {
         if (!isMultiSelect()) {
             return super.newPropertyfromXML(ppcel);

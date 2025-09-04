@@ -81,7 +81,7 @@ public class StringClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty parseString(String value) throws XWikiException
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty property = newProperty();
         property.setValue(value);

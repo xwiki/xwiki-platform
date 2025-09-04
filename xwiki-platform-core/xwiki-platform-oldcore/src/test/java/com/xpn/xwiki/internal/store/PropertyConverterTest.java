@@ -144,7 +144,7 @@ public class PropertyConverterTest
         StringClass stringClass = mock(StringClass.class);
         when(stringClass.newProperty()).thenReturn(new StringProperty());
         StringProperty stringProperty = new StringProperty();
-        when(stringClass.parseString(longProperty.toText())).thenReturn(stringProperty);
+        when(stringClass.fromString(longProperty.toText())).thenReturn(stringProperty);
 
         assertEquals(stringProperty, this.mocker.getComponentUnderTest().convertProperty(longProperty, stringClass));
     }

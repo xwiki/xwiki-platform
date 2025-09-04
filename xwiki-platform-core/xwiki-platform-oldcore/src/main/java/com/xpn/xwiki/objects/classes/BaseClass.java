@@ -415,7 +415,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 if (formvalues instanceof String[]) {
                     objprop = property.fromStringArray(((String[]) formvalues));
                 } else if (formvalues instanceof String) {
-                    objprop = property.parseString(formvalues.toString());
+                    objprop = property.fromString(formvalues.toString());
                 } else {
                     objprop = property.fromValue(formvalues);
                 }

@@ -4385,7 +4385,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         BaseObject tags = getObject(XWikiConstant.TAG_CLASS, true, context);
 
-        tags.safeput(XWikiConstant.TAG_CLASS_PROP_TAGS, tagProp.parseString(tagsStr));
+        tags.safeput(XWikiConstant.TAG_CLASS_PROP_TAGS, tagProp.fromString(tagsStr));
 
         setMetaDataDirty(true);
     }

@@ -121,7 +121,7 @@ public class ComputedFieldClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty parseString(String value) throws XWikiException
+    public BaseProperty fromString(String value) throws XWikiException
     {
         // There is no content in a computed field
         return null;

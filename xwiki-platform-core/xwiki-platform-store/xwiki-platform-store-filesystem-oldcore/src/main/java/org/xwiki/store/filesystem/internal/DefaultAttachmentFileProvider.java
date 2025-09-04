@@ -19,7 +19,10 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.File;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.BlobStoreException;
 
 /**
  * A means of getting files for storing information about a given attachment.
@@ -37,9 +40,14 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
     private static final String ATTACH_ARCHIVE_META_FILENAME = "~METADATA.xml";
 
     /**
+     * The blob store where the attachment information is stored.
+     */
+    protected final BlobStore store;
+
+    /**
      * The directory where all information about this attachment resides.
      */
-    private final File attachmentDir;
+    private final BlobPath attachmentDir;
 
     /**
      * The name of the attached file.
@@ -49,11 +57,13 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
     /**
      * The Constructor.
      *
+     * @param store the blob store where the attachment information is stored.
      * @param attachmentDir a directory where all information about this attachment is stored.
      * @param fileName the name of the attachment file.
      */
-    public DefaultAttachmentFileProvider(final File attachmentDir, final String fileName)
+    public DefaultAttachmentFileProvider(BlobStore store, final BlobPath attachmentDir, final String fileName)
     {
+        this.store = store;
         this.attachmentDir = attachmentDir;
         this.attachmentFileName = fileName;
     }
@@ -61,7 +71,7 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
     /**
      * @return the directory where information about this attachment is stored.
      */
-    protected File getAttachmentDir()
+    protected BlobPath getAttachmentDir()
     {
         return this.attachmentDir;
     }
@@ -75,20 +85,22 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
     }
 
     @Override
-    public File getAttachmentContentFile()
+    public Blob getAttachmentContentFile() throws BlobStoreException
     {
-        return new File(this.attachmentDir, StoreFileUtils.getStoredFilename(this.attachmentFileName, null));
+        return this.store.getBlob(
+            this.attachmentDir.resolve(StoreFileUtils.getStoredFilename(this.attachmentFileName, null)));
     }
 
     @Override
-    public File getAttachmentVersioningMetaFile()
+    public Blob getAttachmentVersioningMetaFile() throws BlobStoreException
     {
-        return new File(this.attachmentDir, ATTACH_ARCHIVE_META_FILENAME);
+        return this.store.getBlob(this.attachmentDir.resolve(ATTACH_ARCHIVE_META_FILENAME));
     }
 
     @Override
-    public File getAttachmentVersionContentFile(final String versionName)
+    public Blob getAttachmentVersionContentFile(final String versionName) throws BlobStoreException
     {
-        return new File(this.attachmentDir, StoreFileUtils.getStoredFilename(this.attachmentFileName, versionName));
+        return this.store.getBlob(
+            this.attachmentDir.resolve(StoreFileUtils.getStoredFilename(this.attachmentFileName, versionName)));
     }
 }

@@ -38,6 +38,7 @@ import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StreamProvider;
 import org.xwiki.store.StringStreamProvider;
 import org.xwiki.store.TransactionRunnable;
+import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.internal.FileSystemStoreUtils;
@@ -435,7 +436,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * @throws XWikiException if unable to load the archive for the attachment to delete.
          */
         AttachmentDeleteTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
-            final XWikiContext context, final File attachFile) throws XWikiException
+            final XWikiContext context, final File attachFile) throws XWikiException, BlobStoreException
         {
             // Delete both the standard and link location
             File linkAtachFile = StoreFileUtils.getLinkFile(attachFile);

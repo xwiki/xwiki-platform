@@ -19,7 +19,8 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.File;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
 
 /**
  * A means of getting files for storing information about a given attachment.
@@ -30,7 +31,7 @@ import java.io.File;
 public interface DeletedAttachmentFileProvider extends AttachmentFileProvider
 {
     /**
-     * @return the File for storing the information about the deleted attachment such as who deleted it.
+     * @return the Blob for storing the information about the deleted attachment such as who deleted it.
      */
-    File getDeletedAttachmentMetaFile();
+    Blob getDeletedAttachmentMetaFile() throws BlobStoreException;
 }

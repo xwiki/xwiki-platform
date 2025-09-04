@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.store.StartableTransactionRunnable;
+import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
@@ -231,6 +232,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      * @return a StartableTransactionRunnable for deleting the attachment archive.
      */
     public StartableTransactionRunnable getArchiveDeleteRunnable(final XWikiAttachmentArchive archive)
+        throws BlobStoreException
     {
         if (archive == null) {
             throw new NullPointerException("The archive to delete cannot be null.");

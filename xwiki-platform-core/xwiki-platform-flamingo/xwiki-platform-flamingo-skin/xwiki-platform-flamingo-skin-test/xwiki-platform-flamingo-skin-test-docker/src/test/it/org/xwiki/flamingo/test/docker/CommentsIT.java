@@ -23,8 +23,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.NotFoundException;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Property;
@@ -65,6 +68,13 @@ class CommentsIT
     private static final String COMMENT_REPLACED_CONTENT = "Some replaced content";
 
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+    @BeforeEach
+    void beforeEach(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setPropertyInXWikiPreferences("dateformat", "String", "");
+    }
 
     @Test
     @Order(1)
@@ -178,13 +188,19 @@ class CommentsIT
         return DEFAULT_DATE_FORMAT.format(new Date(seconds * 1000L));
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
     @Order(4)
-    void commentsAreOrderedByDate(TestUtils setup, TestReference reference) throws Exception
+    void commentsAreOrderedByDate(boolean isFrenchDateFormat, TestUtils setup, TestReference reference) throws Exception
     {
         setup.loginAsSuperAdmin();
+        // ensure the page doesn't exist before the test starts
+        setup.rest().delete(reference);
         // ensure that all dates are using GMT-0 to be displayed.
         setup.setPropertyInXWikiPreferences("timezone", "String", "UTC");
+        if (isFrenchDateFormat) {
+            setup.setPropertyInXWikiPreferences("dateformat", "String", "dd-MM-yyyy HH:mm");
+        }
         setup.rest().savePage(reference, "Test comment order", "Test comment order");
         Property authorProperty = TestUtils.RestTestUtils.property("author", "XWiki.superadmin");
 
@@ -231,20 +247,49 @@ class CommentsIT
         commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
         setup.rest().add(commentObject);
 
-        // object 6 date 66 reply to 1 (order: 3 - thread 1)
+        // object 6 date 3600*24*46 (1 month and 15 days after) (order: 10)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(3600*24*46));
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 6 at date 1 month 15 days after");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
+        setup.rest().add(commentObject);
+
+        // object 7 date 66 reply to 1 (order: 3 - thread 1)
         commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
         dateProperty = TestUtils.RestTestUtils.property("date", getDateString(66));
-        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 6 at date 66 reply to 1");
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 7 at date 66 reply to 1");
         commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty, replyToProperty));
+        setup.rest().add(commentObject);
+
+        // object 8 date 3600*24*10 (11 days after) (order: 8)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(3600*24*11));
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 8 at date 11 days after");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
+        setup.rest().add(commentObject);
+
+        // object 9 date 3600*24*36 (1 month 5 days after) (order: 9)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(3600*24*36));
+        contentProperty = TestUtils.RestTestUtils.property("comment", "Comment object 9 at date 1 month 5 days after");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
+        setup.rest().add(commentObject);
+
+        // object 1 date 3600*24*(365 + 31) (1 year 1 month 1 day after) (order: 10)
+        commentObject = setup.rest().object(reference, "XWiki.XWikiComments");
+        dateProperty = TestUtils.RestTestUtils.property("date", getDateString(3600*24*396));
+        contentProperty = TestUtils.RestTestUtils.property("comment",
+            "Comment object 10 at date 1 year 1 month 1 day after");
+        commentObject.getProperties().addAll(List.of(dateProperty, authorProperty, contentProperty));
         setup.rest().add(commentObject);
 
         ViewPage viewPage = setup.gotoPage(reference);
         CommentsTab commentsTab = viewPage.openCommentsDocExtraPane();
         List<CommentElement> comments = commentsTab.getComments();
-        assertEquals(7, comments.size());
+        assertEquals(11, comments.size());
 
         CommentElement commentElement = comments.get(0);
-        assertEquals("1970/01/01 00:00", commentElement.getDate());
+        assertDate("1970", "01", "01", "00", commentElement.getDate(), isFrenchDateFormat);
         assertEquals("Comment object 3 at date 24", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
         assertFalse(commentElement.isReply());
@@ -252,37 +297,76 @@ class CommentsIT
         commentElement = comments.get(1);
         assertEquals("Comment object 1 at date 42", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
-        assertEquals("1970/01/01 00:00", commentElement.getDate());
+        assertDate("1970", "01", "01", "00", commentElement.getDate(), isFrenchDateFormat);
         assertFalse(commentElement.isReply());
 
         commentElement = comments.get(2);
-        assertEquals("Comment object 6 at date 66 reply to 1", commentElement.getContent());
+        assertEquals("Comment object 7 at date 66 reply to 1", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
-        assertEquals("1970/01/01 00:01", commentElement.getDate());
+        assertDate("1970", "01", "01", "01", commentElement.getDate(), isFrenchDateFormat);
         assertTrue(commentElement.isReply());
 
         commentElement = comments.get(3);
         assertEquals("Comment object 4 at date 154 reply to 1", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
-        assertEquals("1970/01/01 00:02", commentElement.getDate());
+        assertDate("1970", "01", "01", "02", commentElement.getDate(), isFrenchDateFormat);
         assertTrue(commentElement.isReply());
 
         commentElement = comments.get(4);
         assertEquals("Comment object 0 at date 100", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
-        assertEquals("1970/01/01 00:01", commentElement.getDate());
+        assertDate("1970", "01", "01", "01", commentElement.getDate(), isFrenchDateFormat);
         assertFalse(commentElement.isReply());
 
         commentElement = comments.get(5);
         assertEquals("Comment object 2 at date 100", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
-        assertEquals("1970/01/01 00:01", commentElement.getDate());
+        assertDate("1970", "01", "01", "01", commentElement.getDate(), isFrenchDateFormat);
         assertFalse(commentElement.isReply());
 
         commentElement = comments.get(6);
         assertEquals("Comment object 5 at date 122", commentElement.getContent());
         assertEquals("superadmin", commentElement.getAuthor());
-        assertEquals("1970/01/01 00:02", commentElement.getDate());
+        assertDate("1970", "01", "01", "02", commentElement.getDate(), isFrenchDateFormat);
         assertFalse(commentElement.isReply());
+
+        commentElement = comments.get(7);
+        assertEquals("Comment object 8 at date 11 days after", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertDate("1970", "01", "12", "00", commentElement.getDate(), isFrenchDateFormat);
+        assertFalse(commentElement.isReply());
+
+        commentElement = comments.get(8);
+        assertEquals("Comment object 9 at date 1 month 5 days after", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertDate("1970", "02", "06", "00", commentElement.getDate(), isFrenchDateFormat);
+        assertFalse(commentElement.isReply());
+
+        commentElement = comments.get(9);
+        assertEquals("Comment object 6 at date 1 month 15 days after", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertDate("1970", "02", "16", "00", commentElement.getDate(), isFrenchDateFormat);
+        assertFalse(commentElement.isReply());
+
+        commentElement = comments.get(10);
+        assertEquals("Comment object 10 at date 1 year 1 month 1 day after", commentElement.getContent());
+        assertEquals("superadmin", commentElement.getAuthor());
+        assertDate("1971", "02", "01", "00", commentElement.getDate(), isFrenchDateFormat);
+        assertFalse(commentElement.isReply());
+    }
+
+    private void assertDate(String expectedYear, String expectedMonth, String expectedDay, String expectedMinute,
+        String obtainedDate, boolean isFrenchFormat)
+    {
+        String englishFormat = "%1$s/%2$s/%3$s 00:%4$s";
+        String frenchFormat = "%3$s-%2$s-%1$s 00:%4$s";
+
+        if (isFrenchFormat) {
+            assertEquals(String.format(frenchFormat, expectedYear, expectedMonth, expectedDay, expectedMinute),
+                obtainedDate);
+        } else {
+            assertEquals(String.format(englishFormat, expectedYear,  expectedMonth, expectedDay, expectedMinute),
+                obtainedDate);
+        }
     }
 }

@@ -20,7 +20,7 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -30,15 +30,17 @@ import javax.inject.Singleton;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.environment.Environment;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.store.internal.FileSystemStoreUtils;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.blob.BlobStoreManager;
 import org.xwiki.store.locks.LockProvider;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -96,9 +98,6 @@ public class FilesystemStoreTools implements Initializable
      */
     private static final String TEMP_FILE_SUFFIX = "~tmp";
 
-    @Inject
-    private FilesystemAttachmentsConfiguration config;
-
     /**
      * A means of acquiring locks for attachments. Because the attachments temp files are randomly named and rename is
      * atomic, locks are not needed. DummyLockProvider provides fake locks.
@@ -108,93 +107,27 @@ public class FilesystemStoreTools implements Initializable
     private LockProvider lockProvider;
 
     @Inject
-    private Logger logger;
+    private BlobStoreManager blobStoreManager;
 
-    /**
-     * Used to get store directory.
-     */
-    @Inject
-    private Environment environment;
-
-    /**
-     * This is the root directory of the stored data.
-     */
-    private File storeRootDirectory;
-
-    /**
-     * Testing Constructor.
-     *
-     * @param storageDir the directory to store the content in.
-     * @param lockProvider a means of getting locks for making sure only one thread accesses an attachment at a time.
-     */
-    public FilesystemStoreTools(final File storageDir, final LockProvider lockProvider)
-    {
-        this.storeRootDirectory = storageDir;
-        this.lockProvider = lockProvider;
-    }
-
-    /**
-     * Constructor for component manager.
-     */
-    public FilesystemStoreTools()
-    {
-    }
+    private BlobStore store;
 
     @Override
     public void initialize() throws InitializationException
     {
-        File fileStorageDirectory = this.config.getDirectory();
-
-        if (fileStorageDirectory == null) {
-            // General location when filesystem based stored put data
-            File storeDirectory = new File(this.environment.getPermanentDirectory(), "store");
-            // Specific location for file component
-            fileStorageDirectory = new File(storeDirectory, FileSystemStoreUtils.HINT);
-        }
-
         try {
-            this.storeRootDirectory = fileStorageDirectory.getCanonicalFile();
-        } catch (IOException e) {
-            throw new InitializationException("Invalid permanent directory", e);
-        }
-
-        this.logger.info("Using filesystem store directory [{}]", this.storeRootDirectory);
-
-        // TODO: make this useless (by cleaning empty directories as soon as they appear)
-        if (this.config.cleanOnStartup()) {
-            final File dir = this.storeRootDirectory;
-
-            new Thread(() -> deleteEmptyDirs(dir, 0)).start();
+            this.store = this.blobStoreManager.getBlobStore(XWikiFileSystemBlobStoreManager.NAME);
+        } catch (BlobStoreException e) {
+            throw new InitializationException("Failed to initialize attachments blob store.", e);
         }
     }
 
     /**
-     * Delete all empty directories under the given directory. A directory which contains only empty directories is also
-     * considered an empty ditectory. This function will not delete *location* unless depth is non-zero.
-     *
-     * @param location a directory to delete.
-     * @param depth used for recursion, should always be zero.
-     * @return true if the directory existed, was empty and was deleted.
+     * @return the store for file system attachment blobs
+     * @since 17.8.0RC1
      */
-    private static boolean deleteEmptyDirs(final File location, int depth)
+    public BlobStore getStore()
     {
-        if (location != null && location.exists() && location.isDirectory()) {
-            final File[] dirs = location.listFiles();
-            boolean empty = true;
-            for (int i = 0; i < dirs.length; i++) {
-                if (!deleteEmptyDirs(dirs[i], depth + 1)) {
-                    empty = false;
-                }
-            }
-
-            if (empty && depth != 0) {
-                location.delete();
-
-                return true;
-            }
-        }
-
-        return false;
+        return this.store;
     }
 
     /**
@@ -204,13 +137,12 @@ public class FilesystemStoreTools implements Initializable
      * @param storageFile the file to get a backup file for.
      * @return a backup file with a name based on the name of the given file.
      */
-    public File getBackupFile(final File storageFile)
+    public BlobPath getBackupFile(final BlobPath storageFile)
     {
         // We pad our file names with random alphanumeric characters so that multiple operations on the same
         // file in the same transaction do not collide, the set of all capital and lower case letters
         // and numbers has 62 possibilities and 62^8 = 218340105584896 between 2^47 and 2^48.
-        return new File(storageFile.getAbsolutePath() + BACKUP_FILE_SUFFIX
-            + RandomStringUtils.secure().nextAlphanumeric(8));
+        return storageFile.appendSuffix(BACKUP_FILE_SUFFIX + RandomStringUtils.secure().nextAlphanumeric(8));
     }
 
     /**
@@ -220,10 +152,9 @@ public class FilesystemStoreTools implements Initializable
      * @param storageFile the file to get a temporary file for.
      * @return a temporary file with a name based on the name of the given file.
      */
-    public File getTempFile(final File storageFile)
+    public BlobPath getTempFile(final BlobPath storageFile)
     {
-        return new File(storageFile.getAbsolutePath() + TEMP_FILE_SUFFIX
-            + RandomStringUtils.secure().nextAlphanumeric(8));
+        return storageFile.appendSuffix(TEMP_FILE_SUFFIX + RandomStringUtils.secure().nextAlphanumeric(8));
     }
 
     /**
@@ -238,7 +169,7 @@ public class FilesystemStoreTools implements Initializable
     public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final AttachmentReference attachment,
         final long index)
     {
-        return new DefaultDeletedAttachmentFileProvider(getDeletedAttachmentDir(attachment, index),
+        return new DefaultDeletedAttachmentFileProvider(getStore(), getDeletedAttachmentDir(attachment, index),
             attachment.getName());
     }
 
@@ -254,16 +185,8 @@ public class FilesystemStoreTools implements Initializable
     public DeletedDocumentContentFileProvider getDeletedDocumentFileProvider(DocumentReference documentReference,
         long index)
     {
-        return new DefaultDeletedDocumentContentFileProvider(getDeletedDocumentContentDir(documentReference, index));
-    }
-
-    /**
-     * @return the absolute path to the directory where the files are stored.
-     * @since 11.0
-     */
-    public File getStoreRootDirectory()
-    {
-        return this.storeRootDirectory;
+        return new DefaultDeletedDocumentContentFileProvider(getStore(), getDeletedDocumentContentDir(documentReference,
+            index));
     }
 
     /**
@@ -276,7 +199,8 @@ public class FilesystemStoreTools implements Initializable
      */
     public AttachmentFileProvider getAttachmentFileProvider(final AttachmentReference attachmentReference)
     {
-        return new DefaultAttachmentFileProvider(getAttachmentDir(attachmentReference), attachmentReference.getName());
+        return new DefaultAttachmentFileProvider(getStore(), getAttachmentDir(attachmentReference),
+            attachmentReference.getName());
     }
 
     /**
@@ -284,13 +208,16 @@ public class FilesystemStoreTools implements Initializable
      * @return the content of the link file
      * @since 16.4.0
      */
-    public String getLinkContent(XWikiAttachment attachment)
+    public String getLinkContent(XWikiAttachment attachment) throws BlobStoreException
     {
         AttachmentFileProvider provider = getAttachmentFileProvider(attachment.getReference());
-        File defaultFile = provider.getAttachmentContentFile();
-        File versionFile = provider.getAttachmentVersionContentFile(attachment.getVersion());
+        Blob defaultFile = provider.getAttachmentContentFile();
+        Blob versionFile = provider.getAttachmentVersionContentFile(attachment.getVersion());
 
-        return StoreFileUtils.getLinkContent(defaultFile.getParentFile(), versionFile);
+        // TODO: implement this in a cleaner way. We shouldn't rely on both files being in the same directory.
+        assert defaultFile.getPath().getParent().equals(versionFile.getPath().getParent());
+        List<String> segments = versionFile.getPath().getSegments();
+        return segments.get(segments.size() - 1);
     }
 
     /**
@@ -298,12 +225,12 @@ public class FilesystemStoreTools implements Initializable
      * @return the attachment directory
      * @since 11.0
      */
-    public File getAttachmentDir(final AttachmentReference attachmentReference)
+    public BlobPath getAttachmentDir(final AttachmentReference attachmentReference)
     {
-        final File docDir = getDocumentContentDir(attachmentReference.getDocumentReference());
-        final File attachmentsDir = new File(docDir, ATTACHMENTS_DIR_NAME);
+        final BlobPath docDir = getDocumentContentDir(attachmentReference.getDocumentReference());
+        BlobPath attachmentsPath = docDir.resolve(ATTACHMENTS_DIR_NAME);
 
-        return hashDirectory(attachmentsDir, attachmentReference.getName());
+        return hashDirectory(attachmentsPath, attachmentReference.getName());
     }
 
     /**
@@ -316,14 +243,14 @@ public class FilesystemStoreTools implements Initializable
      * @return a directory which will be repeatable only with the same inputs.
      * @since 11.0
      */
-    public File getDeletedAttachmentDir(final AttachmentReference attachment, final long index)
+    public BlobPath getDeletedAttachmentDir(final AttachmentReference attachment, final long index)
     {
         final DocumentReference doc = attachment.getDocumentReference();
-        final File docDir = getDocumentContentDir(doc);
-        final File deletedAttachmentsDir = new File(docDir, DELETED_ATTACHMENTS_DIR_NAME);
-        final File deletedAttachmentDir = hashDirectory(deletedAttachmentsDir, attachment.getName());
+        final BlobPath docDir = getDocumentContentDir(doc);
+        final BlobPath deletedAttachmentsDir = docDir.resolve(DELETED_ATTACHMENTS_DIR_NAME);
+        final BlobPath deletedAttachmentDir = hashDirectory(deletedAttachmentsDir, attachment.getName());
 
-        return new File(deletedAttachmentDir, String.valueOf(index));
+        return deletedAttachmentDir.resolve(String.valueOf(index));
     }
 
     /**
@@ -335,12 +262,9 @@ public class FilesystemStoreTools implements Initializable
      * @return a directory which will be repeatable only with the same inputs.
      * @since 11.0
      */
-    public File getDeletedDocumentContentDir(final DocumentReference documentReference, final long index)
+    public BlobPath getDeletedDocumentContentDir(final DocumentReference documentReference, final long index)
     {
-        final File docDir = getDocumentContentDir(documentReference);
-        final File deletedDocumentContentsDir = new File(docDir, DELETED_DOCUMENTS_DIR_NAME);
-
-        return new File(deletedDocumentContentsDir, String.valueOf(index));
+        return getDocumentContentDir(documentReference).resolve(DELETED_DOCUMENTS_DIR_NAME, String.valueOf(index));
     }
 
     /**
@@ -348,21 +272,19 @@ public class FilesystemStoreTools implements Initializable
      * @return the {@link File} corresponding to the passed wiki identifier
      * @since 10.1RC1
      */
-    public File getWikiDir(String wikiId)
+    public BlobPath getWikiDir(String wikiId)
     {
-        return new File(this.storeRootDirectory, wikiId);
+        return BlobPath.of(List.of(wikiId));
     }
 
-    private File hashDirectory(File parent, String name)
+    private BlobPath hashDirectory(BlobPath parent, String name)
     {
         String md5 = DigestUtils.md5Hex(name);
 
         // Avoid having too many files in one folder because some filesystems don't perform well with large numbers of
         // files in one folder
-        File documentDir1 = new File(parent, String.valueOf(md5.charAt(0)));
-        File documentDir2 = new File(documentDir1, String.valueOf(md5.charAt(1)));
-
-        return new File(documentDir2, String.valueOf(md5.substring(2)));
+        return parent.resolve(String.valueOf(md5.charAt(0)), String.valueOf(md5.charAt(1)),
+            md5.substring(2));
     }
 
     /**
@@ -373,9 +295,9 @@ public class FilesystemStoreTools implements Initializable
      *         be safe.
      * @since 11.0
      */
-    public File getDocumentContentDir(final DocumentReference documentReference)
+    public BlobPath getDocumentContentDir(final DocumentReference documentReference)
     {
-        File wikiDir = getWikiDir(documentReference.getWikiReference().getName());
+        BlobPath wikiDir = getWikiDir(documentReference.getWikiReference().getName());
 
         String localKey =
             LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(documentReference.getLocale() != null
@@ -384,18 +306,16 @@ public class FilesystemStoreTools implements Initializable
 
         // Avoid having too many files in one folder because some filesystems don't perform well with large numbers of
         // files in one folder
-        File documentDir1 = new File(wikiDir, String.valueOf(md5.charAt(0)));
-        File documentDir2 = new File(documentDir1, String.valueOf(md5.charAt(1)));
-        File documentDirFinal = new File(documentDir2, String.valueOf(md5.substring(2)));
+        BlobPath documentDirPath = wikiDir.resolve(String.valueOf(md5.charAt(0)),
+            String.valueOf(md5.charAt(1)), md5.substring(2));
 
         // Add the locale (if any)
         Locale documentLocale = documentReference.getLocale();
         if (documentLocale != null && !documentLocale.equals(Locale.ROOT)) {
-            File documentLocalesDir = new File(documentDirFinal, DOCUMENT_LOCALES_DIR_NAME);
-            documentDirFinal = new File(documentLocalesDir, documentLocale.toString());
+            documentDirPath = documentDirPath.resolve(DOCUMENT_LOCALES_DIR_NAME, documentLocale.toString());
         }
 
-        return documentDirFinal;
+        return documentDirPath;
     }
 
     /**
@@ -405,7 +325,7 @@ public class FilesystemStoreTools implements Initializable
      * @param toLock the file to get a lock for.
      * @return a lock for the given file.
      */
-    public ReadWriteLock getLockForFile(final File toLock)
+    public ReadWriteLock getLockForFile(final BlobPath toLock)
     {
         return this.lockProvider.getLock(toLock);
     }

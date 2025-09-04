@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,11 +36,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
+import org.xwiki.store.TransactionRunnable;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
+import org.xwiki.store.internal.BlobDeleteTransactionRunnable;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 import org.xwiki.store.serialization.Serializer;
@@ -116,9 +120,8 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     {
         DeletedAttachmentFileProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, index);
 
-        StartableTransactionRunnable tr = getDeletedAttachmentPurgeRunnable(provider);
-
         try {
+            StartableTransactionRunnable tr = getDeletedAttachmentPurgeRunnable(provider);
             tr.start();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
@@ -133,18 +136,23 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
      * @return a StartableTransactionRunnable for removing the attachment.
      */
     private StartableTransactionRunnable getDeletedAttachmentPurgeRunnable(final DeletedAttachmentFileProvider provider)
+        throws BlobStoreException
     {
-        final StartableTransactionRunnable out = new StartableTransactionRunnable();
-        final File deletedAttachDir = provider.getDeletedAttachmentMetaFile().getParentFile();
-        if (!deletedAttachDir.exists()) {
-            // No such dir, return a do-nothing runnable.
-            return out;
-        }
+        final StartableTransactionRunnable<TransactionRunnable<?>> out = new StartableTransactionRunnable<>();
 
-        // Easy thing to do is just delete everything in the deleted-attachment directory.
-        for (File toDelete : deletedAttachDir.listFiles()) {
-            new FileDeleteTransactionRunnable(toDelete, this.fileTools.getBackupFile(toDelete),
-                this.fileTools.getLockForFile(toDelete)).runIn(out);
+        Blob attachmentMetaBlob = provider.getDeletedAttachmentMetaFile();
+        try (Stream<Blob> blobStream =
+                 attachmentMetaBlob.getStore().listBlobs(attachmentMetaBlob.getPath().getParent())) {
+            blobStream.forEach(blob -> {
+                try {
+                    new BlobDeleteTransactionRunnable(blob,
+                        blob.getStore().getBlob(this.fileTools.getBackupFile(blob.getPath())),
+                        this.fileTools.getLockForFile(blob.getPath()))
+                        .runIn(out);
+                } catch (BlobStoreException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
 
         return out;

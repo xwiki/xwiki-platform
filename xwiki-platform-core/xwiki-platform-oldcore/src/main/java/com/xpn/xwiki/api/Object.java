@@ -22,6 +22,8 @@ package com.xpn.xwiki.api;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.evaluation.ObjectEvaluator;
 import org.xwiki.evaluation.ObjectEvaluatorException;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -40,6 +42,8 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  */
 public class Object extends Collection
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Object.class);
+
     /**
      * Default constructor.
      * @param obj the wrapped object
@@ -107,6 +111,7 @@ public class Object extends Collection
 
             return doc.display(name, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
+            LOGGER.debug("Error while displaying [{}]", name, e);
             return null;
         }
     }
@@ -148,7 +153,7 @@ public class Object extends Collection
      * @since 17.3.0RC1
      */
     @Unstable
-    public java.lang.Object display(String name, String mode, boolean isolated, boolean number)
+    public String display(String name, String mode, boolean isolated, boolean number)
     {
         try {
             XWikiDocument doc = getBaseObject().getOwnerDocument();
@@ -159,6 +164,8 @@ public class Object extends Collection
 
             return doc.display(name, mode, getBaseObject(), isolated, number, getXWikiContext());
         } catch (XWikiException e) {
+            LOGGER.debug("Error while displaying [{}] number [{}] with mode [{}] and isolation set to [{}]",
+                name, number, mode, isolated, e);
             return null;
         }
     }

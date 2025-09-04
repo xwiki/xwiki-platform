@@ -30,6 +30,7 @@ import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 
@@ -124,7 +125,7 @@ public privileged aspect BooleanClassCompatibiityAspect
 
 
     @Deprecated
-    public void BooleanClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map)
+    public void BooleanClass.fromSearchMap(XWikiQuery query, Map<String, String[]> map) throws XWikiException
     {
         String[] data = map.get("");
         if (data != null) {

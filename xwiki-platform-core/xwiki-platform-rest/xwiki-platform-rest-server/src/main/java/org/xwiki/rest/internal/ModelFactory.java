@@ -326,6 +326,7 @@ public class ModelFactory
     }
 
     public void toObject(com.xpn.xwiki.api.Object xwikiObject, org.xwiki.rest.model.jaxb.Object restObject)
+        throws XWikiException
     {
         for (Property restProperty : restObject.getProperties()) {
             xwikiObject.set(restProperty.getName(), restProperty.getValue());

@@ -44,6 +44,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * Java abstraction of an XObject.
+ *
+ * @version $Id$
+ */
+@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
 public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Cloneable
 {
     private static final long serialVersionUID = 1L;
@@ -139,55 +145,130 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         this.referenceCache = null;
     }
 
+    /**
+     * Display a hidden input for the given property in the given buffer.
+     * @param buffer where to write the output
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayHidden(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
         ((PropertyClass) getXClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
     }
 
+    /**
+     * Display the value of the given property in the given buffer.
+     * @param buffer where to write the output
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayView(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public void displayView(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
         ((PropertyClass) getXClass(context).get(name)).displayView(buffer, name, prefix, this, context);
     }
 
+    /**
+     * Display an edit input of the given property in the given buffer.
+     * @param buffer where to write the output
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayEdit(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public void displayEdit(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
         ((PropertyClass) getXClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
     }
 
+    /**
+     * Display a hidden input for the given property.
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayHidden(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayHidden(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getXClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
-
+        displayHidden(buffer, name, prefix, context);
         return buffer.toString();
     }
 
+    /**
+     * Display the value of the given property.
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayView(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayView(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getXClass(context).get(name)).displayView(buffer, name, prefix, this, context);
-
+        displayView(buffer, name, prefix, context);
         return buffer.toString();
     }
 
+    /**
+     * Display an edit input of the given property in the given buffer.
+     * @param name the name of the property to display
+     * @param prefix the prefix to use for the name of the field
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayEdit(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayEdit(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getXClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
-
+        displayEdit(buffer, name, prefix, context);
         return buffer.toString();
     }
 
+    /**
+     * Display a hidden input for the given property.
+     * @param name the name of the property to display
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayHidden(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayHidden(String name, XWikiContext context)
     {
         return displayHidden(name, "", context);
     }
 
+    /**
+     * Display the value of the given property.
+     * @param name the name of the property to display
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayView(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayView(String name, XWikiContext context)
     {
         return displayView(name, "", context);
     }
 
+    /**
+     * Display an edit input of the given property in the given buffer.
+     * @param name the name of the property to display
+     * @param context the wiki context to use for computing the values
+     * @return the string containing the display output
+     * @see com.xpn.xwiki.objects.classes.PropertyClassInterface#displayEdit(StringBuffer, String, String,
+     * BaseCollection, XWikiContext)
+     */
     public String displayEdit(String name, XWikiContext context)
     {
         return displayEdit(name, "", context);
@@ -209,6 +290,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     /**
      * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the same
      * data but with a different identity.
+     * @return a duplicate of current instance
      *
      * @since 2.2.3
      */
@@ -222,6 +304,10 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     }
 
     /**
+     * Duplicate the current instance but set the given reference as document reference.
+     * @param documentReference the new reference to use
+     * @return a duplicate of current instance
+     * @see #duplicate()
      * @since 2.2.3
      */
     public BaseObject duplicate(DocumentReference documentReference)
@@ -345,12 +431,27 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         return difflist;
     }
 
+    /**
+     * Wrap the given object in an {@link com.xpn.xwiki.api.Object}.
+     * @param obj the object to wrap
+     * @param context the context to use for wrapping
+     * @return a new instance of the object to be used in scripts
+     */
     public com.xpn.xwiki.api.Object newObjectApi(BaseObject obj, XWikiContext context)
     {
         return new com.xpn.xwiki.api.Object(obj, context);
     }
 
-    public void set(String fieldname, java.lang.Object value, XWikiContext context)
+    /**
+     * Set the defined property with the given value in the current object.
+     * The given value might be a {@link String} or a type supported by the property. If a {@link String} is given
+     * then {@link com.xpn.xwiki.objects.classes.PropertyClassInterface#parseString(String)} will be used.
+     * @param fieldname the name of the property to set
+     * @param value the value to set
+     * @param context the context to use for setting the value
+     * @throws XWikiException in case of problem when parsing the value
+     */
+    public void set(String fieldname, java.lang.Object value, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = getXClass(context);
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);

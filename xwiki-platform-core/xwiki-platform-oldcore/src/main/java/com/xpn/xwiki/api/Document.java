@@ -2497,7 +2497,7 @@ public class Document extends Api
         return this.doc.isCreator(username);
     }
 
-    public void set(String fieldname, java.lang.Object value)
+    public void set(String fieldname, java.lang.Object value) throws XWikiException
     {
         Object obj;
         if (this.currentObj != null) {
@@ -2508,7 +2508,7 @@ public class Document extends Api
         set(fieldname, value, obj);
     }
 
-    public void set(String fieldname, java.lang.Object value, Object obj)
+    public void set(String fieldname, java.lang.Object value, Object obj) throws XWikiException
     {
         if (obj == null) {
             return;

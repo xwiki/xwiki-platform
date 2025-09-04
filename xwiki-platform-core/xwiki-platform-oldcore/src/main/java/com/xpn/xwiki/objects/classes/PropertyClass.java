@@ -181,12 +181,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         return null;
     }
 
-    public BaseProperty newPropertyfromXML(Element ppcel)
+    public BaseProperty newPropertyfromXML(Element ppcel) throws XWikiException
     {
         String value = ppcel.getText();
         return fromString(value);
@@ -665,7 +665,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         }
     }
 
-    public BaseProperty fromStringArray(String[] strings)
+    public BaseProperty fromStringArray(String[] strings) throws XWikiException
     {
         return fromString(strings[0]);
     }

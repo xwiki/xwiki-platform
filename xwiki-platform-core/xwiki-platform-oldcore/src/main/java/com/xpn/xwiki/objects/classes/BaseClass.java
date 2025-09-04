@@ -404,7 +404,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return fromMap(map, object);
     }
 
-    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object)
+    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object) throws XWikiException
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();

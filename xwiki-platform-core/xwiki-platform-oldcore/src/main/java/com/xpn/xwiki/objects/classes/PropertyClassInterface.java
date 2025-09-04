@@ -21,6 +21,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectInterface;
@@ -38,7 +39,7 @@ public interface PropertyClassInterface extends ObjectInterface, PropertyInterfa
 {
     String toString(BaseProperty property);
 
-    BaseProperty fromString(String value);
+    BaseProperty fromString(String value) throws XWikiException;
 
     BaseProperty fromValue(Object value);
 

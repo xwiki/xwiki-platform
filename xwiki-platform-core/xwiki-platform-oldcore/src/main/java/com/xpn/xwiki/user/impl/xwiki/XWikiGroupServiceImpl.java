@@ -270,7 +270,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     }
 
     private boolean replaceMemberFromGroup(XWikiDocument groupDocument, DocumentReference memberSourceReference,
-        DocumentReference memberTargetReference, XWikiContext context)
+        DocumentReference memberTargetReference, XWikiContext context) throws XWikiException
     {
         boolean needUpdate = false;
 

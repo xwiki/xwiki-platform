@@ -795,7 +795,6 @@
                 **/objects/classes/ListItem.java,
                 **/objects/classes/NumberClass.java,
                 **/objects/classes/PasswordClass.java,
-                **/objects/classes/PropertyClassInterface.java,
                 **/objects/classes/PropertyClass.java,
                 **/objects/classes/StaticListClass.java,
                 **/objects/classes/StringClass.java,

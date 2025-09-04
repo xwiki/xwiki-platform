@@ -455,7 +455,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     /**
      * Set the defined property with the given value in the current object.
      * The given value might be a {@link String} or a type supported by the property. If a {@link String} is given
-     * then {@link com.xpn.xwiki.objects.classes.PropertyClassInterface#parseString(String)} will be used.
+     * then {@link com.xpn.xwiki.objects.classes.PropertyClassInterface#fromString(String)} will be used.
      * @param fieldname the name of the property to set
      * @param value the value to set
      * @param context the context to use for setting the value

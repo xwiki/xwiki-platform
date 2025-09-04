@@ -137,8 +137,9 @@ public class NotificationsWatchModal extends BaseModal
     public void selectOptionAndSave(WatchOptions option)
     {
         getDriver().addPageNotYetReloadedMarker();
-        this.container.findElement(By.cssSelector("input[type='radio'][value='" + option.getOptionValue() + "']"))
-            .click();
+        By selector = By.cssSelector("input[type='radio'][value='%s']".formatted(option.getOptionValue()));
+        getDriver().waitUntilElementIsVisible(selector);
+        this.container.findElement(selector).click();
         this.container.findElement(By.className("btn-primary")).click();
         getDriver().waitUntilPageIsReloaded();
     }

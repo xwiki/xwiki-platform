@@ -39,6 +39,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -77,6 +78,13 @@ class SolrDocumentIteratorTest
     @InjectMockComponents
     private SolrDocumentIterator solrIterator;
 
+    private ImmutablePair<DocumentReference, DocumentIteratorEntry> entry(DocumentReference reference, long docId,
+        String version)
+    {
+        return new ImmutablePair<DocumentReference, DocumentIteratorEntry>(reference,
+            new DocumentIteratorEntry(reference.getWikiReference(), docId, version));
+    }
+
     @Test
     void size() throws Exception
     {
@@ -88,7 +96,7 @@ class SolrDocumentIteratorTest
 
         when(this.solrInstance.query(any(SolrQuery.class))).thenReturn(response);
 
-        DocumentIterator<String> iterator = this.solrIterator;
+        DocumentIterator<DocumentIteratorEntry> iterator = this.solrIterator;
 
         WikiReference rootReference = new WikiReference("wiki");
         iterator.setRootReference(rootReference);
@@ -111,15 +119,15 @@ class SolrDocumentIteratorTest
         when(this.configuration.getSynchronizationBatchSize()).thenReturn(limit);
 
         SolrDocumentList firstResults = new SolrDocumentList();
-        firstResults.add(createSolrDocument("chess", Arrays.asList("A", "B"), "C", "", "1.3"));
-        firstResults.add(createSolrDocument("chess", Arrays.asList("M"), "N", "en", "2.4"));
+        firstResults.add(createSolrDocument("chess", Arrays.asList("A", "B"), "C", "", 1, "1.3"));
+        firstResults.add(createSolrDocument("chess", Arrays.asList("M"), "N", "en", 2, "2.4"));
 
         QueryResponse firstResponse = mock(QueryResponse.class);
         when(firstResponse.getNextCursorMark()).thenReturn("foo");
         when(firstResponse.getResults()).thenReturn(firstResults);
 
         SolrDocumentList secondResults = new SolrDocumentList();
-        secondResults.add(createSolrDocument("tennis", Arrays.asList("X", "Y", "Z"), "V", "fr", "1.1"));
+        secondResults.add(createSolrDocument("tennis", Arrays.asList("X", "Y", "Z"), "V", "fr", 3, "1.1"));
 
         QueryResponse secondResponse = mock(QueryResponse.class);
         when(secondResponse.getNextCursorMark()).thenReturn("bar");
@@ -127,25 +135,25 @@ class SolrDocumentIteratorTest
 
         when(this.solrInstance.query(any(SolrQuery.class))).thenReturn(firstResponse, secondResponse, secondResponse);
 
-        DocumentIterator<String> iterator = this.solrIterator;
+        DocumentIterator<DocumentIteratorEntry> iterator = this.solrIterator;
 
         WikiReference rootReference = new WikiReference("wiki");
         iterator.setRootReference(rootReference);
 
-        List<Pair<DocumentReference, String>> actualResult = new ArrayList<>();
+        List<Pair<DocumentReference, DocumentIteratorEntry>> actualResult = new ArrayList<>();
         while (iterator.hasNext()) {
             actualResult.add(iterator.next());
         }
 
         verify(this.resolver).getQuery(rootReference);
 
-        List<Pair<DocumentReference, String>> expectedResult = new ArrayList<>();
+        List<Pair<DocumentReference, DocumentIteratorEntry>> expectedResult = new ArrayList<>();
         DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("A", "B"), "C");
-        expectedResult.add(new ImmutablePair<>(documentReference, "1.3"));
+        expectedResult.add(entry(documentReference, 1, "1.3"));
         documentReference = new DocumentReference("chess", Arrays.asList("M"), "N", Locale.ENGLISH);
-        expectedResult.add(new ImmutablePair<>(documentReference, "2.4"));
+        expectedResult.add(entry(documentReference, 2, "2.4"));
         documentReference = new DocumentReference("tennis", Arrays.asList("X", "Y", "Z"), "V", Locale.FRENCH);
-        expectedResult.add(new ImmutablePair<>(documentReference, "1.1"));
+        expectedResult.add(entry(documentReference, 3, "1.1"));
 
         assertEquals(expectedResult, actualResult);
 
@@ -153,7 +161,7 @@ class SolrDocumentIteratorTest
             query instanceof SolrQuery solrQuery && solrQuery.getRows() == limit));
     }
 
-    private SolrDocument createSolrDocument(String wiki, List<String> spaces, String name, String locale,
+    private SolrDocument createSolrDocument(String wiki, List<String> spaces, String name, String locale, long docId,
         String version)
     {
         SolrDocument doc = new SolrDocument();
@@ -162,6 +170,7 @@ class SolrDocumentIteratorTest
             docRef = new DocumentReference(docRef, LocaleUtils.toLocale(locale));
         }
         when(this.solrDocumentReferenceResolver.resolve(doc)).thenReturn(docRef);
+        doc.setField(FieldUtils.DOC_ID, docId);
         doc.setField(FieldUtils.VERSION, version);
         return doc;
     }

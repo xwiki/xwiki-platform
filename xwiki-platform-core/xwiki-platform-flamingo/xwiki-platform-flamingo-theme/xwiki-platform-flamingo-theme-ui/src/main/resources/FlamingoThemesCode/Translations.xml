@@ -108,6 +108,7 @@ platform.flamingo.themes.defaultvalue=Default
 platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
 platform.flamingo.themes.local=Local
 platform.flamingo.themes.global=Global
+FlamingoThemesCode.ThemeClass_logo-description.hint=Alternative text to the logo. It should describe the logo's meaning. Default: "Logo of the wiki"
 
 ###############################################################################
 ## Deprecated

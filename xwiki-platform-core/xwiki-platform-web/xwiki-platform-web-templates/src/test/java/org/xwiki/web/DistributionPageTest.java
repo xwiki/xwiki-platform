@@ -93,11 +93,11 @@ class DistributionPageTest extends PageTest
     void nonExistingExtensionRequestWithJobStatus() throws Exception
     {
         String testValue = "<test>";
-        this.stubRequest.put("extensionId", testValue);
-        this.stubRequest.put("extensionVersion", testValue);
-        this.stubRequest.put("extensionSection", "progress");
+        this.request.put("extensionId", testValue);
+        this.request.put("extensionVersion", testValue);
+        this.request.put("extensionSection", "progress");
         String namespace = "wiki:xwiki";
-        this.stubRequest.put("extensionNamespace", namespace);
+        this.request.put("extensionNamespace", namespace);
         ExtensionId extensionId = new ExtensionId(testValue, testValue);
 
         // Mock an extension job status for an installation request with the necessary properties to trigger the

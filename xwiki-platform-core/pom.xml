@@ -164,7 +164,7 @@
             </revapi.differences>
             <revapi.differences>
               <justification>Unstable API: the signature changes here but the API always returned a String so there's no breaking behaviour for scripts.</justification>
-              <criticality>allowed</criticality>
+              <criticality>documented</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>

@@ -33,6 +33,7 @@ import type {
  * Default implementation for NavigationTreeSource.
  *
  * @since 0.10
+ * @beta
  **/
 @injectable()
 class DefaultNavigationTreeSource implements NavigationTreeSource {
@@ -63,6 +64,7 @@ class DefaultNavigationTreeSource implements NavigationTreeSource {
  * Default implementation for NavigationTreeSourceProvider.
  *
  * @since 0.10
+ * @beta
  **/
 @injectable()
 class DefaultNavigationTreeSourceProvider
@@ -95,6 +97,9 @@ class DefaultNavigationTreeSourceProvider
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

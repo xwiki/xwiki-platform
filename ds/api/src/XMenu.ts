@@ -20,6 +20,7 @@
 
 /**
  * @since 0.14
+ * @beta
  */
 type MenuProps = {
   disabled?: boolean;

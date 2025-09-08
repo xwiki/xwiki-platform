@@ -20,6 +20,7 @@
 
 /**
  * @since 0.12
+ * @beta
  */
 interface ClickListener {
   /**

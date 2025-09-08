@@ -30,6 +30,7 @@ import type { Component } from "vue";
  * Login {@link UIExtension} for the GitHub backend.
  *
  * @since 0.15
+ * @beta
  */
 @injectable()
 export class GitHubLoginMenuUIExtension implements UIExtension {

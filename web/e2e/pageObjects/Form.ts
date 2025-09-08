@@ -25,6 +25,7 @@ import { DesignSystem } from "../DesignSystem";
 /**
  * The page object interface for a form element.
  * @since 0.19
+ * @beta
  */
 export interface FormElement {
   /**
@@ -43,6 +44,7 @@ export interface FormElement {
 /**
  * Page object to interact with a form and its elements.
  * @since 0.19
+ * @beta
  */
 export class FormPageObject {
   constructor(
@@ -78,28 +80,36 @@ export class FormPageObject {
   private findInputFromLabelShoelace(label: string): FormElement {
     const inputs = this.formLocator.locator("sl-input");
     return this.wrapInputShoelace(
-      inputs.filter({has: this.page.locator("label").getByText(label, {exact: true})}),
+      inputs.filter({
+        has: this.page.locator("label").getByText(label, { exact: true }),
+      }),
     );
   }
 
   private findInputFromLabelVuetify(label: string): FormElement {
     const inputs = this.formLocator.locator(".v-input");
     return this.wrapInputVuetify(
-      inputs.filter({has: this.page.locator(".v-label").getByText(label, {exact: true})}),
+      inputs.filter({
+        has: this.page.locator(".v-label").getByText(label, { exact: true }),
+      }),
     );
   }
 
   private findSelectFromLabelShoelace(label: string): FormElement {
     const selects = this.formLocator.locator("sl-select");
     return this.wrapSelectShoelace(
-      selects.filter({has: this.page.locator("label").getByText(label, {exact: true})}),
+      selects.filter({
+        has: this.page.locator("label").getByText(label, { exact: true }),
+      }),
     );
   }
 
   private findSelectFromLabelVuetify(label: string): FormElement {
     const selects = this.formLocator.locator(".v-select");
     return this.wrapSelectVuetify(
-      selects.filter({has: this.page.locator(".v-label").getByText(label, {exact: true})}),
+      selects.filter({
+        has: this.page.locator(".v-label").getByText(label, { exact: true }),
+      }),
     );
   }
 
@@ -119,7 +129,7 @@ export class FormPageObject {
     const inputValue = input.locator("input");
     return {
       async getValue() {
-        return await inputValue.getAttribute("value") ?? "";
+        return (await inputValue.getAttribute("value")) ?? "";
       },
       async setValue(value: string) {
         await inputValue.fill(value);
@@ -135,7 +145,9 @@ export class FormPageObject {
       },
       async setValue(value: string) {
         await select.locator("sl-popup").click();
-        const option = select.locator("sl-option").getByText(value, {exact: true});
+        const option = select
+          .locator("sl-option")
+          .getByText(value, { exact: true });
         await expect(option).toBeVisible();
         await option.click();
         await expect(option).toBeHidden();
@@ -152,9 +164,12 @@ export class FormPageObject {
       },
       async setValue(value: string) {
         await select.click();
-        const option = page.locator(".v-overlay .v-list [role=option].v-list-item").filter({
-          visible: true
-        }).getByText(value, {exact: true});
+        const option = page
+          .locator(".v-overlay .v-list [role=option].v-list-item")
+          .filter({
+            visible: true,
+          })
+          .getByText(value, { exact: true });
         await option.click();
         await expect(option).toBeHidden();
       },

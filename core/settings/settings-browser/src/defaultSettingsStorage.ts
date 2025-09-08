@@ -28,6 +28,7 @@ import type {
  * Default implementation for {@link SettingsStorage}.
  * It stores and retrieves settings as JSON from the browser's local storage.
  * @since 0.18
+ * @beta
  */
 @injectable()
 export class DefaultSettingsStorage implements SettingsStorage {

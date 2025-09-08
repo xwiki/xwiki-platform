@@ -24,6 +24,9 @@ import type { RemoteURLParserProvider } from "./remoteURLParserProvider";
 import type { RemoteURLSerializerProvider } from "./remoteURLSerializerProvider";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 class ComponentInit {
   constructor(container: Container) {
     container

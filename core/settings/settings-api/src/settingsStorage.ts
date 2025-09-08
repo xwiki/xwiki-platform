@@ -24,6 +24,7 @@ import type { SettingsManager } from "./settingsManager";
  * A SettingsStorage can persistently store and retrieve settings, from and to
  * a {@link SettingsManager} instance.
  * @since 0.18
+ * @beta
  */
 export interface SettingsStorage {
   /**

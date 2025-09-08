@@ -265,6 +265,7 @@ async function isWithin(root: string, path: string) {
  * @param content - the content of the page
  * @param title - the title of the page
  * @since 0.8
+ * @beta
  */
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
@@ -343,6 +344,7 @@ async function listSingleChild(folderPath: string, children: Set<string>) {
  * @param page - the id of the page
  * @returns a list of page ids
  * @since 0.10
+ * @beta
  */
 async function listChildren(page: string): Promise<Array<string>> {
   const folderPath = resolvePath(page);
@@ -360,6 +362,7 @@ async function listChildren(page: string): Promise<Array<string>> {
  *
  * @param reference - the reference of the page to delete
  * @since 0.19
+ * @beta
  */
 async function deletePage(reference: string): Promise<void> {
   // Remove the page and its attachments
@@ -435,6 +438,7 @@ async function search(
  * Initialize the wiki with a minimal content.
  *
  * @since 0.14
+ * @beta
  */
 async function createMinimalContent() {
   await savePage(

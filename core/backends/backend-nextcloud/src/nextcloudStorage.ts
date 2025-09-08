@@ -45,6 +45,7 @@ import type {
  * another directory.
  *
  * @since 0.9
+ * @beta
  */
 @injectable()
 export class NextcloudStorage extends AbstractStorage {

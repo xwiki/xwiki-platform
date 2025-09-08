@@ -30,6 +30,7 @@ import type {
  * Default implementation for {@link PageRenameManagerProvider}.
  *
  * @since 0.14
+ * @beta
  **/
 @injectable()
 class DefaultPageRenameManagerProvider implements PageRenameManagerProvider {

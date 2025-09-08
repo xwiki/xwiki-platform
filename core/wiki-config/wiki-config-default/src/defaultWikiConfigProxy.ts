@@ -28,6 +28,7 @@ import type { Ref } from "vue";
 /**
  * Default implementation for {@link WikiConfigProxy}.
  * @since 0.18
+ * @beta
  */
 @injectable()
 export class DefaultWikiConfigProxy implements WikiConfigProxy {

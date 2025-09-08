@@ -22,6 +22,7 @@
  * Mandatory information for a user connected to a realtime session.
  *
  * @since 0.20
+ * @beta
  */
 export type User = {
   user: {

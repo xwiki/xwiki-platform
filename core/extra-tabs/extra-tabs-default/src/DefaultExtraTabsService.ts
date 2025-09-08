@@ -24,6 +24,7 @@ import type { ExtraTab, ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
 
 /**
  * @since 0.9
+ * @beta
  */
 @injectable()
 class DefaultExtraTabsService implements ExtraTabsService {

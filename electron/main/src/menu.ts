@@ -28,6 +28,7 @@ import type { MenuItem } from "electron";
  * @param actions - the action we are interested to keep
  * @param newMenu - the new menu built from interesting actions
  * @since 0.13
+ * @beta
  */
 function scan(items: MenuItem[], actions: string[], newMenu: Menu): void {
   for (const item of items) {
@@ -46,6 +47,7 @@ function scan(items: MenuItem[], actions: string[], newMenu: Menu): void {
  * keyboard shortcuts.
  * @param browserWindow - the provided browser window.
  * @since 0.13
+ * @beta
  */
 function initializeMenu(browserWindow: BrowserWindow) {
   const menu = Menu.getApplicationMenu();

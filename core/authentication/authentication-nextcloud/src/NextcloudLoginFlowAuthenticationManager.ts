@@ -30,6 +30,7 @@ import type {
  * {@link AuthenticationManager} for the Nextcloud backend, using login flow v2.
  *
  * @since 0.20
+ * @beta
  */
 @injectable()
 export class NextcloudLoginFlowAuthenticationManager

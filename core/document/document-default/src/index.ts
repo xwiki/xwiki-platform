@@ -25,6 +25,7 @@ import type { DocumentService } from "@xwiki/cristal-document-api";
 
 /**
  * @since 0.11
+ * @beta
  */
 export class ComponentInit {
   constructor(container: Container) {

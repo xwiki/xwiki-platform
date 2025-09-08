@@ -28,6 +28,10 @@ import type {
   WikiConfig,
 } from "@xwiki/cristal-api";
 
+/**
+ * @since 1.0
+ * @beta
+ */
 @injectable()
 export abstract class AbstractStorage implements Storage {
   protected logger: Logger;
@@ -66,11 +70,13 @@ export abstract class AbstractStorage implements Storage {
    * Returns the list of attachments of a given page.
    * TODO: this API is missing pagination.
    * @since 0.9
+   * @beta
    */
   abstract getAttachments(page: string): Promise<AttachmentsData | undefined>;
 
   /**
    * @since 0.12
+   * @beta
    */
   abstract getAttachment(
     page: string,
@@ -102,6 +108,7 @@ export abstract class AbstractStorage implements Storage {
    * @param syntax - the syntax of the content
    *
    * @since 0.8
+   * @beta
    */
   abstract save(
     page: string,
@@ -117,6 +124,7 @@ export abstract class AbstractStorage implements Storage {
    *   is useful in the case where the url cannot be resolved from the name of the file and its document reference
    *   alone.
    * @since 0.9
+   * @beta
    */
   abstract saveAttachments(
     page: string,
@@ -130,6 +138,7 @@ export abstract class AbstractStorage implements Storage {
    * @returns true if the delete was successful, false with the reason otherwise
    *
    * @since 0.11
+   * @beta
    */
   abstract delete(page: string): Promise<{ success: boolean; error?: string }>;
 
@@ -142,6 +151,7 @@ export abstract class AbstractStorage implements Storage {
    * @returns true if the move was successful, false with the reason otherwise
    *
    * @since 0.14
+   * @beta
    */
   abstract move(
     page: string,

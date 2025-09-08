@@ -24,6 +24,7 @@
  * @param value - the error value printed when this method is reached
  *
  * @since 0.17
+ * @beta
  */
 function assertUnreachable(value: never): never {
   console.error({ unreachable: value });
@@ -34,6 +35,7 @@ function assertUnreachable(value: never): never {
  * Assert that a value is in an array, and fix its type
  *
  * @since 0.17
+ * @beta
  *
  * @param array - the array to check
  * @param value - the value expected in the array
@@ -57,6 +59,7 @@ function assertInArray<T, U extends T>(
  * Get a function's output or `null` if thrown an error
  *
  * @since 0.17
+ * @beta
  *
  * @param func - The function to try
  *
@@ -76,6 +79,7 @@ function tryFallible<T>(func: () => T): T | null {
  * Will construct a new Error object if the thrown value is not an instance of the Error class
  *
  * @since 0.17
+ * @beta
  *
  * @param func - The function to try
  *
@@ -117,6 +121,7 @@ function tryFallibleOrError<T>(func: () => T): T | Error {
  * This is actually an identity function - the provided value is returned as is, with no other operation.
  *
  * @since 0.20
+ * @beta
  *
  * @param value - The value to return
  * @returns - The provided value
@@ -134,6 +139,7 @@ function provideTypeInference<T>(value: T): T {
  * Combines both `.filter` and `.map` with the additional benefit of conditional type predicates
  *
  * @since 0.20
+ * @beta
  *
  * @example `filterMap([1, 2, 3], value => value >= 2 ? value.toString() : null) // ['2', '3']`
  *

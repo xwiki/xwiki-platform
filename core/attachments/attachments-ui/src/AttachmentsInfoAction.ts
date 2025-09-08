@@ -27,6 +27,7 @@ import type { Ref } from "vue";
 /**
  * Display the total attachments count of the current page.
  * @since 0.9
+ * @beta
  */
 @injectable()
 export class AttachmentsInfoAction implements InfoAction {

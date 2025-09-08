@@ -23,6 +23,9 @@ import { name } from "@xwiki/cristal-link-suggest-api";
 import { Container } from "inversify";
 import type { LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

@@ -24,6 +24,7 @@ import type { Range } from "@tiptap/core";
  * Defines the structure of a slash action descriptor.
  *
  * @since 0.8
+ * @beta
  */
 export interface ActionDescriptor {
   title: string;

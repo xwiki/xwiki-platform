@@ -23,6 +23,9 @@ import type { PageData } from "../api/PageData";
 import type { Document } from "../api/document";
 import type { UserDetails } from "@xwiki/cristal-authentication-api";
 
+/**
+ * @beta
+ */
 export class DefaultPageData implements PageData {
   id: string;
   name: string;

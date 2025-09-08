@@ -23,6 +23,9 @@ import { GitHubAuthenticationState } from "@xwiki/cristal-authentication-github-
 import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

@@ -35,6 +35,7 @@ import type { AuthenticationManagerProvider } from "@xwiki/cristal-authenticatio
 /**
  * The type of individual attachments.
  * @since 0.21
+ * @beta
  */
 type Attachment = {
   id: string;
@@ -56,6 +57,7 @@ type Attachment = {
 /**
  * The attachments rest response type
  * @since 0.9
+ * @beta
  */
 type AttachmentsRest = {
   attachments: Attachment[];

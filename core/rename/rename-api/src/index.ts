@@ -24,6 +24,7 @@ import type { PageData } from "@xwiki/cristal-api";
  * A PageRenameManager can handle page rename operations.
  *
  * @since 0.14
+ * @beta
  **/
 interface PageRenameManager {
   /**
@@ -49,6 +50,7 @@ interface PageRenameManager {
  * matching the current wiki configuration.
  *
  * @since 0.14
+ * @beta
  **/
 interface PageRenameManagerProvider {
   /**
@@ -71,6 +73,7 @@ interface PageRenameManagerProvider {
 /**
  * The component id of PageRenameManager.
  * @since 0.14
+ * @beta
  */
 const name = "PageRenameManager";
 

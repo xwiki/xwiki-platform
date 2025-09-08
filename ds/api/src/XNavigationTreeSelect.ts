@@ -25,6 +25,7 @@ import type {
 
 /**
  * @since 0.15
+ * @beta
  */
 type NavigationTreeSelectProps = {
   label: string;
@@ -34,6 +35,7 @@ type NavigationTreeSelectProps = {
   /**
    * Whether to include terminal pages as select options (default: false).
    * @since 0.16
+   * @beta
    */
   includeTerminals?: boolean;
 };
@@ -41,6 +43,7 @@ type NavigationTreeSelectProps = {
 /**
  * Default props values for NavigationTreeSelect implementations.
  * @since 0.16
+ * @beta
  */
 const navigationTreeSelectPropsDefaults = {
   includeTerminals: false,

@@ -34,6 +34,7 @@ interface MouseState {
  *  * y: y position of mouse cursor or touch event
  *
  * @since 0.8
+ * @beta
  **/
 export function useMouseCoordinates(): MouseState {
   const x: Ref<number> = ref(0);

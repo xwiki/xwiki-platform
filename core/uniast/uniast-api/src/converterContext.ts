@@ -24,6 +24,7 @@ import type { EntityReference } from "@xwiki/cristal-model-api";
  * Set of tools used by converters
  *
  * @since 0.16
+ * @beta
  */
 export type ConverterContext = {
   /**
@@ -45,6 +46,7 @@ export type ConverterContext = {
    * This function must **NOT** throw
    *
    * @since 0.17
+   * @beta
    *
    * @param reference - The reference to serialize
    *
@@ -57,6 +59,7 @@ export type ConverterContext = {
    * This function must **NOT** throw
    *
    * @since 0.17
+   * @beta
    *
    * @param url - The reference URL to parse
    *
@@ -69,6 +72,7 @@ export type ConverterContext = {
    * This function must **NOT** throw
    *
    * @since 0.17
+   * @beta
    *
    * @param reference - The reference to get an URL from
    *
@@ -81,6 +85,7 @@ export type ConverterContext = {
    * This function must **NOT** throw
    *
    * @since 0.17
+   * @beta
    *
    * @param reference - The reference to get the name of
    *

@@ -21,4 +21,10 @@
 import { Size } from "./size";
 import CIcon from "./vue/c-icon.vue";
 
-export { CIcon, Size };
+/**
+ * @since 0.7
+ * @beta
+ */
+const CIconAnnotated = CIcon;
+
+export { CIconAnnotated as CIcon, Size };

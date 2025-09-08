@@ -19,4 +19,10 @@
  */
 import LinkSuggestItem from "./vue/LinkSuggestItem.vue";
 
-export { LinkSuggestItem };
+/**
+ * @since 0.13
+ * @beta
+ */
+const LinkSuggestItemAnnotated = LinkSuggestItem;
+
+export { LinkSuggestItemAnnotated as LinkSuggestItem };

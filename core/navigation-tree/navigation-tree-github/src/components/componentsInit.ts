@@ -36,6 +36,7 @@ import type {
  * Implementation of NavigationTreeSource for the GitHub backend.
  *
  * @since 0.10
+ * @beta
  **/
 @injectable()
 class GitHubNavigationTreeSource implements NavigationTreeSource {
@@ -165,6 +166,9 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

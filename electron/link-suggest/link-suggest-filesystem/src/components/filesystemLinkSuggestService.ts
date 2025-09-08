@@ -40,6 +40,7 @@ declare const fileSystemStorage: {
  * Default implementation of the link suggestion service, for the file system backend.
  * The current implementation is based on full scan and does not scale
  * @since 0.13
+ * @beta
  */
 @injectable()
 export class FilesystemLinkSuggestService implements LinkSuggestService {

@@ -25,6 +25,9 @@ import { NextcloudAuthenticationState } from "@xwiki/cristal-authentication-next
 import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 class ComponentInit {
   constructor(container: Container) {
     container

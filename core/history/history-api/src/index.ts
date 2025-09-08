@@ -24,6 +24,7 @@ import type { UserDetails } from "@xwiki/cristal-authentication-api";
 /**
  * Description of a revision for a given page.
  * @since 0.12
+ * @beta
  */
 type PageRevision = {
   version: string;
@@ -37,6 +38,7 @@ type PageRevision = {
  * A PageRevisionManager returns the existing revisions for a given page.
  *
  * @since 0.12
+ * @beta
  **/
 interface PageRevisionManager {
   /**
@@ -59,6 +61,7 @@ interface PageRevisionManager {
  * matching the current wiki configuration.
  *
  * @since 0.12
+ * @beta
  **/
 interface PageRevisionManagerProvider {
   /**
@@ -81,6 +84,7 @@ interface PageRevisionManagerProvider {
 /**
  * The component id of PageRevisionManager.
  * @since 0.12
+ * @beta
  */
 const name = "PageRevisionManager";
 

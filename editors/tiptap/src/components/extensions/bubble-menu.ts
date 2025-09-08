@@ -27,6 +27,7 @@ import type { Editor } from "@tiptap/core";
 
 /**
  * @since 0.13
+ * @beta
  */
 enum ElementType {
   TEXT,

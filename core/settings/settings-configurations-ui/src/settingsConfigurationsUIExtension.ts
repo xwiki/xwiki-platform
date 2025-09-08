@@ -26,6 +26,7 @@ import type { Component } from "vue";
  * Settings category {@link UIExtension} for Configurations management.
  *
  * @since 0.18
+ * @beta
  */
 @injectable()
 export class SettingsConfigurationsUIExtension implements UIExtension {

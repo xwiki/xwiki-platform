@@ -22,6 +22,9 @@ import { HistoryExtraTab } from "./HistoryExtraTab";
 import type { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container.bind<ExtraTab>("ExtraTab").to(HistoryExtraTab).inSingletonScope();

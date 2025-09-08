@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { node } from "../.electron-vendors.cache.json";
 import { injectAppVersion } from "../version/inject-app-version-plugin.mjs";
 import { join } from "node:path";
 
@@ -40,8 +39,7 @@ const config = {
   },
   build: {
     ssr: true,
-    sourcemap: "inline",
-    target: `node${node}`,
+    target: `node22`,
     outDir: "dist",
     assetsDir: ".",
     minify: process.env.MODE !== "development",

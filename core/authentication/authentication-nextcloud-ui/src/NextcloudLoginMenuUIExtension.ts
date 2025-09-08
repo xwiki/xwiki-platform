@@ -30,6 +30,7 @@ import type { Component } from "vue";
  * Login {@link UIExtension} for the Nextcloud backend.
  *
  * @since 0.16
+ * @beta
  */
 @injectable()
 export class NextcloudLoginMenuUIExtension implements UIExtension {

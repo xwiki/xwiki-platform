@@ -18,6 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import "@xwiki/cristal-editors-blocknote-react/dist/cristal-editors-blocknote-react.css";
 import { computeCurrentUser } from "../components/currentUser";
 import { createLinkEditionContext } from "../components/linkEditionContext";
 import messages from "../translations";

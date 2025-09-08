@@ -23,6 +23,9 @@ import { name as pageRenameManagerName } from "@xwiki/cristal-rename-api";
 import type { PageRenameManager } from "@xwiki/cristal-rename-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

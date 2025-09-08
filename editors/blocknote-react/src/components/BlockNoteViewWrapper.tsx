@@ -60,7 +60,9 @@ type DefaultEditorOptionsType = BlockNoteEditorOptions<
 >;
 
 /**
- * Properties for the {@link BlockNoteEditor} component
+ * Properties for the {@link BlockNoteEditor} component.
+ * @since 0.16
+ * @beta
  */
 type BlockNoteViewWrapperProps = {
   /**
@@ -90,6 +92,7 @@ type BlockNoteViewWrapperProps = {
    * Macros to show in the editor
    *
    * @since 0.21
+   * @beta
    */
   macros: null | {
     /**

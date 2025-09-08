@@ -23,6 +23,7 @@ import type { BindingConstraints, MetadataName } from "inversify";
 /**
  * Condition to bind a component both on a named scope and the default scope.
  * @since 0.18
+ * @beta
  */
 function whenNamedOrDefault(
   name: MetadataName,

@@ -35,6 +35,7 @@ import type {
  * Default implementation for {@link ModelReferenceHandler}.
  *
  * @since 0.13
+ * @beta
  */
 @injectable()
 class DefaultModelReferenceHandler implements ModelReferenceHandler {

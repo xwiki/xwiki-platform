@@ -22,6 +22,9 @@ import { DefaultDateService } from "./defaultDateService";
 import { Container } from "inversify";
 import type { DateService } from "./dateService";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

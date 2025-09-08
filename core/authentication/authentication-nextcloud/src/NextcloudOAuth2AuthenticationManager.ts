@@ -32,6 +32,7 @@ import type {
  * {@link AuthenticationManager} for the Nextcloud backend, using OAuth2.
  *
  * @since 0.16
+ * @beta
  */
 @injectable()
 export class NextcloudOAuth2AuthenticationManager

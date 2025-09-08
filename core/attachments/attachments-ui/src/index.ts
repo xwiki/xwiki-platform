@@ -26,6 +26,9 @@ import type { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import type { InfoAction } from "@xwiki/cristal-info-actions-api";
 import type { UIExtension } from "@xwiki/cristal-uiextension-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

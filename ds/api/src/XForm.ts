@@ -22,6 +22,7 @@
  * Props for the btn component.
  *
  * @since 0.11
+ * @beta
  */
 type FormProps = {
   onFormSubmit?: () => void;

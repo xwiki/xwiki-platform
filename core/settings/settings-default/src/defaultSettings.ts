@@ -24,6 +24,7 @@ import type { Settings } from "@xwiki/cristal-settings-api";
  * Default imlementation of {@link Settings}.
  * Mostly useful to have a default implementation for toJSON().
  * @since 0.18
+ * @beta
  */
 export class DefaultSettings implements Settings {
   key: string;

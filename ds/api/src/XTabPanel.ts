@@ -22,6 +22,7 @@
  * Props of the x-tab-panel component.
  *
  * @since 0.9
+ * @beta
  */
 type TabPanelProps = {
   tabId: string;

@@ -15,17 +15,18 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
     }
   },
   "main": "./src/index.ts",
   "scripts": {
+    "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test": "vitest --run",
-    "typecheck": "vue-tsc"
+    "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
@@ -51,13 +52,12 @@
     "vue": "3.x"
   },
   "devDependencies": {
+    "@types/sharedworker": "0.0.180",
     "@xwiki/cristal-dev-config": "workspace:*",
     "inversify": "7.9.0",
     "typescript": "5.9.2",
     "vite": "7.1.4",
-    "vite-plugin-comlink": "5.3.0",
-    "vue": "3.5.20",
-    "vue-tsc": "2.2.12"
+    "vue": "3.5.20"
   },
   "publishConfig": {
     "exports": {

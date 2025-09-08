@@ -14,10 +14,18 @@
   },
   "type": "module",
   "exports": {
-    ".": "./src/index.tsx"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.tsx"
+    },
+    "./dist/*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
   },
   "main": "./src/index.tsx",
   "scripts": {
+    "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
@@ -71,6 +79,10 @@
           "types": "./dist/index.d.cts",
           "default": "./dist/index.umd.js"
         }
+      },
+      "./dist/*.css": {
+        "import": "./dist/*.css",
+        "require": "./dist/*.css"
       }
     },
     "main": "./dist/index.es.js",

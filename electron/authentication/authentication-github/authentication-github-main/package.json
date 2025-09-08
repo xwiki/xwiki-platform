@@ -21,6 +21,7 @@
   },
   "main": "./src/index.ts",
   "scripts": {
+    "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",

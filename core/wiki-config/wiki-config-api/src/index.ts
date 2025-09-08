@@ -27,6 +27,7 @@ import type { Ref } from "vue";
  * WikiConfigs.
  *
  * @since 0.18
+ * @beta
  */
 interface WikiConfigProxy {
   /**

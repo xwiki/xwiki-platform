@@ -25,6 +25,7 @@ import type { ModelReferenceHandler } from "./modelReferenceHandler";
  * {@link ModelReferenceHandler}.
  *
  * @since 0.13
+ * @beta
  */
 interface ModelReferenceHandlerProvider {
   /**

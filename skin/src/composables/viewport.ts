@@ -33,6 +33,7 @@ enum ViewportType {
  *  * ViewportType.Desktop (&gt; 600px)
  *
  * @since 0.8
+ * @beta
  **/
 function useViewportType(): Ref<ViewportType> {
   const viewportType: Ref<ViewportType> = ref(getNewViewportType());

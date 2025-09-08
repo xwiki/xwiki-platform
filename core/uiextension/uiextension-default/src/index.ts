@@ -22,6 +22,9 @@ import { DefaultUIExtensionsManager } from "./DefaultUIExtensionsManager";
 import type { UIExtensionsManager } from "@xwiki/cristal-uiextension-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

@@ -24,6 +24,7 @@ import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 /**
  * Realtime user
  * @since 0.16
+ * @beta
  */
 export type User = {
   name: string;
@@ -34,6 +35,7 @@ export type User = {
  *
  * @param authentication - an authentication manager components
  * @since 0.16
+ * @beta
  */
 export async function computeCurrentUser(
   authentication?: AuthenticationManager,

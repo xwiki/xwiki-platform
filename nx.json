@@ -8,7 +8,8 @@
           "typecheck",
           "test",
           "lint",
-          "start"
+          "start",
+          "api-extractor:local"
         ]
       }
     }
@@ -82,6 +83,15 @@
       ],
       "dependsOn": [
         "^compile"
+      ]
+    },
+    "api-extractor:local": {
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "dependsOn": [
+        "compile"
       ]
     },
     "start": {

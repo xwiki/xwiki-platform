@@ -30,6 +30,7 @@ import type MarkdownIt from "markdown-it";
 /**
  * Default implementation based on markdown-it.
  * @since 0.13
+ * @beta
  */
 @injectable()
 export class DefaultMarkdownRenderer implements MarkdownRenderer {

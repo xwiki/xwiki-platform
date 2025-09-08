@@ -14,6 +14,7 @@
   },
   "type": "module",
   "scripts": {
+    "api-extractor:local": "nx run-many -t api-extractor:local",
     "build": "nx run-many -t build --nxBail=true",
     "clean": "nx run-many -t clean",
     "dev": "nx build @xwiki/cristal-web && concurrently --kill-others 'pnpm run dev:cristal-web' 'pnpm run dev:cristal-realtime' 'pnpm run dev:cristal-authentication-server'",
@@ -33,6 +34,7 @@
     "@eslint/config-helpers": "0.3.1",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.34.0",
+    "@microsoft/api-extractor": "7.52.11",
     "@microsoft/tsdoc": "0.15.1",
     "@microsoft/tsdoc-config": "0.17.1",
     "@typescript-eslint/eslint-plugin": "8.41.0",

@@ -24,6 +24,9 @@ import { Container } from "inversify";
 import type { WrappingStorage } from "@xwiki/cristal-api";
 import type { OfflineStorage } from "@xwiki/cristal-backend-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

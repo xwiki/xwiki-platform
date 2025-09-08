@@ -23,6 +23,7 @@ import type { Ref } from "vue";
 
 /**
  * @since 0.9
+ * @beta
  */
 interface AttachmentsService {
   list(): Ref<Attachment[]>;

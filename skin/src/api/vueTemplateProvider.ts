@@ -20,6 +20,10 @@
 
 import type { App, Component } from "vue";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export interface VueTemplateProvider {
   getVueComponent(): Promise<Component>;
 

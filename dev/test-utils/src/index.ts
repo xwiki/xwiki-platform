@@ -46,6 +46,7 @@ function wrapInSuspense(
 /**
  * @param clazz - the class to decorate with an injectable
  * @since 0.11
+ * @beta
  */
 function makeInjectable(clazz: object): object {
   decorate(injectable(), clazz);

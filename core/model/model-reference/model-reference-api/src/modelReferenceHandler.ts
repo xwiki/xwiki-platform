@@ -29,6 +29,7 @@ import type {
  * {@link @xwiki/cristal-model-api#EntityReference | EntityReferences}.
  *
  * @since 0.13
+ * @beta
  */
 interface ModelReferenceHandler {
   /**

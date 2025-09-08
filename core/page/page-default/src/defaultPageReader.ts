@@ -22,6 +22,7 @@ import type { PageReader } from "@xwiki/cristal-page-api";
 
 /**
  * @since 0.20
+ * @beta
  */
 class DefaultPageReader implements PageReader {
   readPage(pageContent: string): { content: string; [key: string]: unknown } {

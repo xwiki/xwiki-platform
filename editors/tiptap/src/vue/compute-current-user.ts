@@ -26,6 +26,7 @@ import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
  *
  * @param authentication - an authentication manager components
  * @since 0.14
+ * @beta
  */
 export async function computeCurrentUser(
   authentication?: AuthenticationManager,

@@ -49,6 +49,7 @@ import type { ReactNode } from "react";
  * @returns A block definition
  *
  * @since 0.18
+ * @beta
  */
 function createCustomBlockSpec<
   const B extends CustomBlockConfig,
@@ -101,6 +102,7 @@ function createCustomBlockSpec<
  * @returns An inline content definition
  *
  * @since 0.20
+ * @beta
  */
 
 function createCustomInlineContentSpec<
@@ -152,6 +154,7 @@ function createCustomInlineContentSpec<
  * Function building a macro using the required context
  *
  * @since 0.20
+ * @beta
  */
 type BuildableMacro = (ctx: ContextForMacros) => Macro;
 
@@ -159,6 +162,7 @@ type BuildableMacro = (ctx: ContextForMacros) => Macro;
  * Internal context required for macros execution
  *
  * @since 0.20
+ * @beta
  */
 type ContextForMacros = {
   /**
@@ -179,6 +183,7 @@ type ContextForMacros = {
  * Description of a macro
  *
  * @since 0.20
+ * @beta
  */
 type Macro = {
   /** Name of the macro */
@@ -203,6 +208,7 @@ type Macro = {
  * Description of a macro's inner content
  *
  * @since 0.20
+ * @beta
  */
 type MacroForBlockNote =
   // Block macro
@@ -220,6 +226,7 @@ type MacroForBlockNote =
  * Description of a macro type
  *
  * @since 0.20
+ * @beta
  */
 type MacroParameterType = (
   | { type: "boolean" }
@@ -279,6 +286,7 @@ type FilterUndefined<T> = {
  * Arguments for creating a macro
  *
  * @since 0.20
+ * @beta
  */
 type MacroCreationArgs<Parameters extends Record<string, MacroParameterType>> =
   {
@@ -295,6 +303,7 @@ type MacroCreationArgs<Parameters extends Record<string, MacroParameterType>> =
      * Show an entry in the slash menu
      *
      * @since 0.21
+     * @beta
      */
     slashMenu:
       | {
@@ -332,6 +341,7 @@ type MacroCreationArgs<Parameters extends Record<string, MacroParameterType>> =
  * The prefix used for macro names in BlockNote
  *
  * @since 0.20
+ * @beta
  */
 const MACRO_NAME_PREFIX = "Macro_";
 
@@ -345,6 +355,7 @@ const MACRO_NAME_PREFIX = "Macro_";
  * @returns The macro
  *
  * @since 0.20
+ * @beta
  */
 function createMacro<Parameters extends Record<string, MacroParameterType>>({
   name,

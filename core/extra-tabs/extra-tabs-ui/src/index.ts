@@ -20,4 +20,10 @@
 
 import ExtraTabs from "./vue/ExtraTabs.vue";
 
-export { ExtraTabs };
+/**
+ * @since 0.9
+ * @beta
+ */
+const ExtraTabsAnnotated = ExtraTabs;
+
+export { ExtraTabsAnnotated as ExtraTabs };

@@ -29,6 +29,10 @@ function loadSettings(): string {
   return getSettings();
 }
 
+/**
+ * @since 0.18
+ * @beta
+ */
 function load(): void {
   ipcMain.handle(
     "settings:save",

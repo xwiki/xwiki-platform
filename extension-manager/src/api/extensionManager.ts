@@ -21,6 +21,10 @@
 import type { CristalComponent } from "./cristalComponent";
 import type { Container } from "inversify";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export interface ExtensionManager extends CristalComponent {
   addRemoteExtension(
     name: string,

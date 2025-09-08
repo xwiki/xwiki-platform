@@ -34,6 +34,7 @@ import type {
  * Implementation of NavigationTreeSource for the XWiki backend.
  *
  * @since 0.10
+ * @beta
  **/
 @injectable()
 class XWikiNavigationTreeSource implements NavigationTreeSource {
@@ -171,6 +172,9 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

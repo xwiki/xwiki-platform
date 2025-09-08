@@ -27,6 +27,10 @@ import type {
   ComponentPublicInstance,
 } from "vue";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export interface DesignSystemLoader {
   loadDesignSystem(app: App): void;
 }
@@ -40,6 +44,7 @@ export interface DesignSystemLoader {
  * in the package where the component is as otherwise the import is made
  * relative to this package and the dependency is not found
  * @since 0.7
+ * @beta
  */
 export function registerAsyncComponent<
   T extends Component = {

@@ -50,6 +50,10 @@ import type { Container } from "inversify";
 import type { App, Component, Ref } from "vue";
 import type { RouteRecordRaw, Router } from "vue-router";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 @injectable()
 export class DefaultCristalApp implements CristalApp {
   public skinManager: SkinManager;
@@ -196,6 +200,7 @@ export class DefaultCristalApp implements CristalApp {
    * provided, it is used to determine if an asynchronous update of the page
    * content is allowed. When undefinied, default to true.
    * @since 0.8
+   * @beta
    */
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
   // eslint-disable-next-line max-statements

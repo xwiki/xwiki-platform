@@ -30,6 +30,7 @@ import type { Ref } from "vue";
  * and "callback" will be executed on submit.
  *
  * @since 0.16
+ * @beta
  */
 @injectable()
 export class NextcloudAuthenticationState {

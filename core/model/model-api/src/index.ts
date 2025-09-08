@@ -20,6 +20,7 @@
 
 /**
  * @since 0.12
+ * @beta
  */
 enum EntityType {
   WIKI,
@@ -30,6 +31,7 @@ enum EntityType {
 
 /**
  * @since 0.12
+ * @beta
  */
 interface BaseEntityReference {
   type: EntityType;
@@ -37,6 +39,7 @@ interface BaseEntityReference {
 
 /**
  * @since 0.12
+ * @beta
  */
 class WikiReference implements BaseEntityReference {
   type: EntityType.WIKI = EntityType.WIKI;
@@ -50,6 +53,7 @@ class WikiReference implements BaseEntityReference {
 
 /**
  * @since 0.12
+ * @beta
  */
 class SpaceReference implements BaseEntityReference {
   type: EntityType.SPACE = EntityType.SPACE;
@@ -64,6 +68,7 @@ class SpaceReference implements BaseEntityReference {
 
 /**
  * @since 0.12
+ * @beta
  */
 class DocumentReference implements BaseEntityReference {
   type: EntityType.DOCUMENT = EntityType.DOCUMENT;
@@ -72,6 +77,7 @@ class DocumentReference implements BaseEntityReference {
   /**
    * Indicates whether the current document reference is terminal.
    * @since 0.13
+   * @beta
    */
   terminal: boolean;
 
@@ -84,6 +90,7 @@ class DocumentReference implements BaseEntityReference {
 
 /**
  * @since 0.12
+ * @beta
  */
 class AttachmentReference implements BaseEntityReference {
   type: EntityType.ATTACHMENT = EntityType.ATTACHMENT;
@@ -98,6 +105,7 @@ class AttachmentReference implements BaseEntityReference {
 
 /**
  * @since 0.16
+ * @beta
  */
 type EntityReference =
   | AttachmentReference
@@ -107,6 +115,7 @@ type EntityReference =
 
 export {
   AttachmentReference,
+  type BaseEntityReference,
   DocumentReference,
   type EntityReference,
   EntityType,

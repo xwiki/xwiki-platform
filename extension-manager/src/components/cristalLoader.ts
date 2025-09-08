@@ -24,6 +24,10 @@ import { Container } from "inversify";
 import type { ExtensionManager } from "../api/extensionManager";
 import type { Logger, LoggerConfig } from "@xwiki/cristal-api";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export class CristalLoader {
   // @ts-expect-error logger can be temporarily undefined during class
   // initialization

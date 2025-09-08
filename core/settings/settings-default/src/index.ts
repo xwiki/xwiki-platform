@@ -30,6 +30,9 @@ import type {
   SettingsParserProvider,
 } from "@xwiki/cristal-settings-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

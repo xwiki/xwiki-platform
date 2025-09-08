@@ -21,6 +21,10 @@ import ImageInsertView from "./vue/ImageInsertView.vue";
 import { Node, mergeAttributes } from "@tiptap/core";
 import { VueNodeViewRenderer } from "@tiptap/vue-3";
 
+/**
+ * @since 0.13
+ * @beta
+ */
 const ImageInsertNode = Node.create({
   name: "imageInsert",
   group: "block",

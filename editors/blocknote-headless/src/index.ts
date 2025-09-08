@@ -20,6 +20,12 @@
 import BlocknoteEditor from "./vue/c-blocknote-view.vue";
 import type { EditorType } from "@xwiki/cristal-editors-blocknote-react";
 
-export { BlocknoteEditor };
+/**
+ * @since 0.16
+ * @beta
+ */
+const BlocknoteEditorAnnotated = BlocknoteEditor;
+
+export { BlocknoteEditorAnnotated as BlocknoteEditor };
 export type { EditorType };
 export { DEFAULT_MACROS } from "@xwiki/cristal-editors-blocknote-react";

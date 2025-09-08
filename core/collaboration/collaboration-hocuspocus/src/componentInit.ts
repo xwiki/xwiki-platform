@@ -25,6 +25,7 @@ import type { Container } from "inversify";
 
 /**
  * @since 0.20
+ * @beta
  */
 class ComponentInit {
   constructor(container: Container) {

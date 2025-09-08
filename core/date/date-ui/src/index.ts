@@ -20,4 +20,10 @@
 
 import Date from "./vue/CDate.vue";
 
-export { Date };
+/**
+ * @since 0.12
+ * @beta
+ */
+const DateAnnotated = Date;
+
+export { DateAnnotated as Date };

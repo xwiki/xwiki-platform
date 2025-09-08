@@ -18,13 +18,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+/**
+ * @since 0.14
+ * @beta
+ */
 type AlterAction = { name: string; callback: () => void };
+
+/**
+ * @since 0.14
+ * @beta
+ */
 type AlertActions = AlterAction[];
 
 /**
  * Props for the alert component.
  *
  * @since 0.11
+ * @beta
  */
 type AlertProps = {
   title?: string;
@@ -35,6 +45,7 @@ type AlertProps = {
   /**
    * Other (less important) data to show in the alert.
    * @since 0.13
+   * @beta
    */
   details?: string;
 };

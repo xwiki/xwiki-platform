@@ -34,6 +34,7 @@ import type { Ref } from "vue";
  * A collaboration provider for the websocket endpoint provided by xwiki for realtime editing with yjs based editors.
  * Technically, this is a wrapper on top of y-websocket.
  * @since 0.20
+ * @beta
  */
 @injectable()
 export class XWikiCollaborationProvider implements CollaborationManager {

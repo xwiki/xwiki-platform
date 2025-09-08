@@ -21,11 +21,21 @@
 import type { AlertActions } from "@xwiki/cristal-dsapi";
 import type { Ref } from "vue";
 
+/**
+ * @since 0.11
+ * @beta
+ */
 type Action = { name: string; callback: () => void };
+
+/**
+ * @since 0.11
+ * @beta
+ */
 type Type = "info" | "success" | "warning" | "error";
 
 /**
  * @since 0.11
+ * @beta
  */
 interface Alert {
   id: number;
@@ -35,6 +45,7 @@ interface Alert {
   /**
    * Number of times this specific alert has already been created.
    * @since 0.13
+   * @beta
    */
   duplicatesCount: number;
 }
@@ -43,6 +54,7 @@ interface Alert {
  * Service to create and manage alert messages in Cristal.
  *
  * @since 0.11
+ * @beta
  */
 interface AlertsService {
   /**
@@ -90,6 +102,7 @@ interface AlertsService {
  * Helper to resolve an instance of {@link AlertsService} lazily.
  *
  * @since 0.13
+ * @beta
  */
 interface AlertsServiceProvider {
   /**

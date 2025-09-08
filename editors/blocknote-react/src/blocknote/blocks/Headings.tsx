@@ -55,6 +55,7 @@ function createCustomHeading(level: 4 | 5 | 6) {
  * Required as BlockNote does not implement heading levels greater than 3
  *
  * @since 0.16
+ * @beta
  */
 const Heading4 = createCustomHeading(4);
 
@@ -64,6 +65,7 @@ const Heading4 = createCustomHeading(4);
  * Required as BlockNote does not implement heading levels greater than 3
  *
  * @since 0.16
+ * @beta
  */
 const Heading5 = createCustomHeading(5);
 
@@ -73,6 +75,7 @@ const Heading5 = createCustomHeading(5);
  * Required as BlockNote does not implement heading levels greater than 3
  *
  * @since 0.16
+ * @beta
  */
 
 const Heading6 = createCustomHeading(6);

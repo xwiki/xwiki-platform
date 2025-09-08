@@ -22,6 +22,10 @@ import "reflect-metadata";
 import { injectable } from "inversify";
 import type { CristalComponent } from "../api/cristalComponent";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 @injectable()
 export class DefaultComponent implements CristalComponent {
   public name: string;

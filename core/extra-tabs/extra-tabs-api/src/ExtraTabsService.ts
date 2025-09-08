@@ -27,6 +27,7 @@ import type { ComposerTranslation } from "vue-i18n";
  * Defines the structure of a tab. Including its content.
  *
  * @since 0.9
+ * @beta
  */
 interface ExtraTab {
   /**
@@ -54,6 +55,7 @@ interface ExtraTab {
   /**
    * Compute whether the ExtraTab should be displayed or not.
    * @since 0.12
+   * @beta
    */
   enabled(): Promise<boolean>;
 }
@@ -62,6 +64,7 @@ interface ExtraTab {
  * Operations to access the available extra tabs.
  *
  * @since 0.9
+ * @beta
  */
 interface ExtraTabsService {
   /**
@@ -74,6 +77,7 @@ interface ExtraTabsService {
  * Abstract class helping with localization of extra tabs.
  *
  * @since 0.9
+ * @beta
  */
 @injectable()
 abstract class AbstractExtraTab implements ExtraTab {

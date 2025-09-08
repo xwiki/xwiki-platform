@@ -20,6 +20,10 @@
 
 import type { Storage } from "./storage";
 
+/**
+ * @since 0.18
+ * @beta
+ */
 interface WikiConfig {
   name: string;
   // The base url of the backend endpoint
@@ -30,22 +34,26 @@ interface WikiConfig {
    * Realtime endpoint URL.
    * Defaults to http://localhost:15681/collaboration when undefined.
    * @since 0.11
+   * @beta
    */
   realtimeURL?: string;
   /**
    * Realtime provider hint. When undefined, the default hocuspocus provider is used.
    * @since 0.20
+   * @beta
    */
   realtimeHint?: string;
   /**
    * Authentication server base URL.
    * @since 0.15
+   * @beta
    */
   authenticationBaseURL?: string;
   /**
    * Authentication Manager component to use.
    * By default, resolves to configuration type.
    * @since 0.16
+   * @beta
    */
   authenticationManager?: string;
   homePage: string;
@@ -56,12 +64,14 @@ interface WikiConfig {
   /**
    * Root location to store pages.
    * @since 0.16
+   * @beta
    */
   storageRoot?: string;
   /**
    * The (optional) type of the editor. The default is "tiptap".
    *
    * @since 0.16
+   * @beta
    */
   editor?: string;
 
@@ -95,6 +105,7 @@ interface WikiConfig {
    *
    * @returns the type of the implementation
    * @since 0.9
+   * @beta
    */
   getType(): string;
 
@@ -103,6 +114,7 @@ interface WikiConfig {
    *
    * @returns the default name
    * @since 0.10
+   * @beta
    */
   getNewPageDefaultName(): string;
 }

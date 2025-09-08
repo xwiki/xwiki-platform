@@ -25,6 +25,7 @@ import type { AuthenticationManager } from "./authenticationManager";
  * type.
  *
  * @since 0.11
+ * @beta
  */
 interface AuthenticationManagerProvider {
   /**

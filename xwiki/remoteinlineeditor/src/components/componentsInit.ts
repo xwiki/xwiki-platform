@@ -20,6 +20,9 @@
 
 import { Container } from "inversify";
 
+/**
+ * @beta
+ */
 export default class ComponentInit {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(container: Container) {

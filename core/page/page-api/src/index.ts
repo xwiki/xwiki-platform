@@ -17,9 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 /**
  * Provide the operations to read a page content
  * @since 0.20
+ * @beta
  */
 interface PageReader {
   /**
@@ -33,6 +35,7 @@ interface PageReader {
 
 /**
  * @since 0.20
+ * @beta
  */
 interface PageWriter {
   writePage(pageContent: { [key: string]: unknown }): string;

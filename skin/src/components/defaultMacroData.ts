@@ -20,6 +20,10 @@
 
 import type { MacroData } from "../api/macroData";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export class DefaultMacroData implements MacroData {
   protected macroContent: string = "";
   protected macroParameters: Map<string, string> = new Map<string, string>();

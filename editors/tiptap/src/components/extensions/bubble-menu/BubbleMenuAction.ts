@@ -27,6 +27,7 @@ import type { Component } from "vue";
  * Bubble menu action descriptor.
  *
  * @since 0.8
+ * @beta
  */
 export interface BubbleMenuAction {
   title: string;

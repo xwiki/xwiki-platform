@@ -22,6 +22,9 @@ import { DefaultSettingsStorage } from "./defaultSettingsStorage";
 import { Container } from "inversify";
 import type { SettingsStorage } from "@xwiki/cristal-settings-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

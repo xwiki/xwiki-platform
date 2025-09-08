@@ -26,6 +26,7 @@ import type {
 /**
  * Description of a navigation tree node.
  * @since 0.10
+ * @beta
  */
 type NavigationTreeNode = {
   /** the id of a node, used by the NavigationTreeSource to access children */
@@ -38,6 +39,7 @@ type NavigationTreeNode = {
   /**
    * Whether this node corresponds to a terminal page.
    * @since 0.16
+   * @beta
    */
   is_terminal: boolean;
 };
@@ -46,6 +48,7 @@ type NavigationTreeNode = {
  * A NavigationTreeSource computes and returns a wiki's navigation tree.
  *
  * @since 0.10
+ * @beta
  **/
 interface NavigationTreeSource {
   /**
@@ -65,6 +68,7 @@ interface NavigationTreeSource {
    * @param includeRootNode - whether to include a root node with empty id (default: false)
    * @returns the parents nodes ids
    * @since 0.20
+   * @beta
    **/
   getParentNodesId(
     page: DocumentReference,
@@ -78,6 +82,7 @@ interface NavigationTreeSource {
  * matching the current wiki configuration.
  *
  * @since 0.10
+ * @beta
  **/
 interface NavigationTreeSourceProvider {
   /**
@@ -92,6 +97,7 @@ interface NavigationTreeSourceProvider {
 /**
  * The component id of NavigationTreeSource.
  * @since 0.10
+ * @beta
  */
 const name = "NavigationTreeSource";
 

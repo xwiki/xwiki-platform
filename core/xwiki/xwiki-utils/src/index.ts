@@ -27,6 +27,7 @@ import type { WikiConfig } from "@xwiki/cristal-api";
  * @param documentId - the id of the document
  * @returns the crafted URL
  * @since 0.9
+ * @beta
  */
 export function getRestSpacesApiUrl(
   wikiConfig: WikiConfig,

@@ -19,12 +19,13 @@
  */
 
 import vue from "@vitejs/plugin-vue";
-import { UserConfig, defineConfig, mergeConfig } from "vite";
+import { defineConfig, mergeConfig } from "vite";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 import dts from "vite-plugin-dts";
 import { copyFileSync, existsSync, readFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { UserConfig } from "vite";
 
 function pathsComputation(path: string) {
   const dir = dirname(fileURLToPath(path));
@@ -39,8 +40,13 @@ function pathsComputation(path: string) {
  *
  * @param path - the path of the build module
  * @param distPath - an optional parameter in case the target directory is not the default dist
+ * @param entryRoot - an optional parameter in case the entry point is not the default src/index.ts
  */
-function generateConfig(path: string, distPath: string = "dist"): UserConfig {
+function generateConfig(
+  path: string,
+  distPath: string = "dist",
+  entryRoot: string = "./src/",
+): UserConfig {
   const { packageDirName, pkg } = pathsComputation(path);
 
   const libFileName = (format: string) => `index.${format}.js`;
@@ -49,7 +55,7 @@ function generateConfig(path: string, distPath: string = "dist"): UserConfig {
     build: {
       sourcemap: true,
       lib: {
-        entry: "./src/index.ts",
+        entry: `${entryRoot}/index.ts`,
         name: `cristal_${packageDirName}`,
         fileName: libFileName,
       },
@@ -63,6 +69,7 @@ function generateConfig(path: string, distPath: string = "dist"): UserConfig {
     plugins: [
       dts({
         insertTypesEntry: true,
+        entryRoot,
         afterBuild: () => {
           // publint suggests having a specific extensions for the exported types for each kind of module system
           // (esm/cjs). The goal is to make sure packages are supported by all consumers.

@@ -34,6 +34,7 @@ import type {
  * @param cristalApp - the current app
  * @returns the page hierarchy
  * @since 0.15
+ * @beta
  **/
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements

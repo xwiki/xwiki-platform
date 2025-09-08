@@ -40,6 +40,10 @@ import type {
   RemoteURLSerializer,
 } from "@xwiki/cristal-model-remote-url-api";
 
+/**
+ * @since 0.19
+ * @beta
+ */
 type LinkEditionContext = {
   linkSuggestService: LinkSuggestService;
   modelReferenceParser: ModelReferenceParser;
@@ -55,6 +59,7 @@ type LinkEditionContext = {
  * Describe a link suggestion action (i.e., a search result entry).
  *
  * @since 0.16
+ * @beta
  */
 type LinkSuggestion = {
   title: string;
@@ -68,6 +73,7 @@ type LinkSuggestion = {
  * Shape of a function providing a list of link suggestions for a given query
  *
  * @since 0.16
+ * @beta
  */
 type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
 
@@ -75,6 +81,7 @@ type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
  * Build a function returning an array of link suggestions from a string.
  *
  * @since 0.16
+ * @beta
  */
 function createLinkSuggestor({
   linkSuggestService,

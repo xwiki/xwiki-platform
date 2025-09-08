@@ -22,6 +22,9 @@ import { DefaultExtraTabsService } from "./DefaultExtraTabsService";
 import type { ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

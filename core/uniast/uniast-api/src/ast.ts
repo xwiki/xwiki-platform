@@ -22,11 +22,13 @@ import type { EntityReference } from "@xwiki/cristal-model-api";
 
 /**
  * @since 0.16
+ * @beta
  */
 type UniAst = { blocks: Block[] };
 
 /**
  * @since 0.16
+ * @beta
  */
 type Block =
   | { type: "paragraph"; styles: BlockStyles; content: InlineContent[] }
@@ -54,7 +56,10 @@ type Block =
     } & Image)
   | { type: "break" }
   | {
-      /** @since 0.20 */
+      /**
+       * @since 0.20
+       * @beta
+       */
       type: "macroBlock";
       name: string;
       params: Record<string, boolean | number | string>;
@@ -62,6 +67,7 @@ type Block =
 
 /**
  * @since 0.16
+ * @beta
  */
 type BlockStyles = {
   textColor?: string;
@@ -71,11 +77,13 @@ type BlockStyles = {
 
 /**
  * @since 0.16
+ * @beta
  */
 type Alignment = "left" | "center" | "right" | "justify";
 
 /**
  * @since 0.17
+ * @beta
  */
 type ListItem = {
   number?: number;
@@ -86,6 +94,7 @@ type ListItem = {
 
 /**
  * @since 0.17
+ * @beta
  */
 type Image = {
   target: LinkTarget;
@@ -98,11 +107,13 @@ type Image = {
 
 /**
  * @since 0.16
+ * @beta
  */
 type TableColumn = { headerCell?: TableCell; widthPx?: number };
 
 /**
  * @since 0.16
+ * @beta
  */
 type TableCell = {
   content: InlineContent[];
@@ -113,6 +124,7 @@ type TableCell = {
 
 /**
  * @since 0.16
+ * @beta
  */
 type InlineContent =
   | ({ type: "text" } & Text)
@@ -123,7 +135,10 @@ type InlineContent =
       content: Exclude<InlineContent, { type: "link" }>[];
     }
   | {
-      /** @since 0.20 */
+      /**
+       * @since 0.20
+       * @beta
+       */
       type: "inlineMacro";
       name: string;
       params: Record<string, boolean | number | string>;
@@ -131,6 +146,7 @@ type InlineContent =
 
 /**
  * @since 0.16
+ * @beta
  */
 type Text = {
   content: string;
@@ -139,6 +155,7 @@ type Text = {
 
 /**
  * @since 0.16
+ * @beta
  */
 type TextStyles = {
   bold?: boolean;
@@ -152,18 +169,24 @@ type TextStyles = {
 
 /**
  * @since 0.16
+ * @beta
  */
 type LinkTarget =
   | {
       type: "internal";
 
-      /** @since 0.20 */
+      /**
+       * @since 0.20
+       * @beta
+       */
+
       rawReference: string;
 
       /**
        * Will be `null` if the raw reference is invalid and can't be parsed
        *
        * @since 0.20
+       * @beta
        */
       parsedReference: EntityReference | null;
     }

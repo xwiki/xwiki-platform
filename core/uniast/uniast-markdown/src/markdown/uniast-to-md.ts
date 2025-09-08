@@ -33,6 +33,7 @@ import type {
  * Converts Universal AST trees to markdown.
  *
  * @since 0.16
+ * @beta
  */
 export class UniAstToMarkdownConverter {
   toMarkdown(uniAst: UniAst): string | Error {

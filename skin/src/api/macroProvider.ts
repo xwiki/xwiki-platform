@@ -21,6 +21,10 @@
 import type { MacroData } from "./macroData";
 import type { VueTemplateProvider } from "./vueTemplateProvider";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export interface MacroProvider extends VueTemplateProvider {
   getMacroName(): string;
 

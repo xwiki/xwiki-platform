@@ -26,6 +26,7 @@ import type { CristalApp, Logger, Storage } from "@xwiki/cristal-api";
  * Configuration instance for the Nextcloud backend.
  *
  * @since 0.9
+ * @beta
  */
 @injectable()
 export class NextcloudWikiConfig extends DefaultWikiConfig {

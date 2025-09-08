@@ -27,6 +27,7 @@
  * @returns a lamba taking a string and returning a true when the value matches
  * the query filter, and false otherwise
  * @since 0.8
+ * @beta
  */
 function queryEqualityOperator(query: string) {
   const queryNoCase = query.toLowerCase();

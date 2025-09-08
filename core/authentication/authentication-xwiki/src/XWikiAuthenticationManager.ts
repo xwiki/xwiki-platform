@@ -29,6 +29,7 @@ import type {
 
 /**
  * @since 0.11
+ * @beta
  */
 @injectable()
 export class XWikiAuthenticationManager implements AuthenticationManager {

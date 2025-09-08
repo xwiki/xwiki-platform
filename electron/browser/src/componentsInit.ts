@@ -23,6 +23,9 @@ import { name } from "@xwiki/cristal-browser-api";
 import type { BrowserApi } from "@xwiki/cristal-browser-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container.bind<BrowserApi>(name).to(BrowserApiElectron).inSingletonScope();

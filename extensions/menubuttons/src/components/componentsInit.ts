@@ -23,6 +23,10 @@ import type { MenuEntry } from "../api/menuEntry";
 import type { Logger } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export class ComponentInit {
   logger: Logger;
 

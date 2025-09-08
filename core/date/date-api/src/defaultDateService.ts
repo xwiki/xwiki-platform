@@ -27,6 +27,7 @@ import type { DateService } from "./dateService";
  * Use dayjs to format dates to a localized form.
  *
  * @since 0.12
+ * @beta
  */
 @injectable()
 class DefaultDateService implements DateService {

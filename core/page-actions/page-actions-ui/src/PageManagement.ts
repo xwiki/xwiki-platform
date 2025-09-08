@@ -41,6 +41,7 @@ class PageManagementActionCategory extends AbstractPageActionCategory {
 /**
  * {@link PageAction} to change the parent of a page.
  * @since 0.14
+ * @beta
  */
 @injectable()
 class PageMoveAction implements PageAction {
@@ -65,6 +66,7 @@ class PageMoveAction implements PageAction {
 /**
  * {@link PageAction} to change the name part of a page reference.
  * @since 0.14
+ * @beta
  */
 @injectable()
 class PageRenameAction implements PageAction {

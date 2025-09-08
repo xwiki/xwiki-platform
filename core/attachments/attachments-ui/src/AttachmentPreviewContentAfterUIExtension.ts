@@ -24,6 +24,7 @@ import type { Component } from "vue";
 
 /**
  * @since 0.12
+ * @beta
  */
 @injectable()
 class AttachmentPreviewContentAfterUIExtension implements UIExtension {

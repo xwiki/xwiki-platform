@@ -23,6 +23,9 @@ import { name as PageRevisionManagerName } from "@xwiki/cristal-history-api";
 import type { PageRevisionManager } from "@xwiki/cristal-history-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 class ComponentInit {
   constructor(container: Container) {
     container

@@ -22,6 +22,7 @@
  * Identifier of the custom protocol used to reference resources stored in the filesystem.
  *
  * @since 0.13
+ * @beta
  */
 const protocol: string = "cristalfs";
 

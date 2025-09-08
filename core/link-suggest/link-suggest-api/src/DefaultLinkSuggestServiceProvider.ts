@@ -25,6 +25,7 @@ import type { CristalApp } from "@xwiki/cristal-api";
 
 /**
  * @since 0.11
+ * @beta
  */
 @injectable()
 class DefaultLinkSuggestServiceProvider implements LinkSuggestServiceProvider {

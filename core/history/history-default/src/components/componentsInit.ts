@@ -30,6 +30,7 @@ import type {
  * Default implementation for PageRevisionManagerProvider.
  *
  * @since 0.12
+ * @beta
  **/
 @injectable()
 class DefaultPageRevisionManagerProvider

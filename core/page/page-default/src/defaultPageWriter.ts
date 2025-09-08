@@ -22,6 +22,7 @@ import type { PageWriter } from "@xwiki/cristal-page-api";
 
 /**
  * @since 0.20
+ * @beta
  */
 class DefaultPageWriter implements PageWriter {
   writePage(page: { content: string; [key: string]: unknown }): string {

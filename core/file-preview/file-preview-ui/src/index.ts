@@ -21,4 +21,15 @@
 import FilePreview from "./vue/FilePreview.vue";
 import FileSize from "./vue/FileSize.vue";
 
-export { FilePreview, FileSize };
+/**
+ * @since 0.12
+ * @beta
+ */
+const FilePreviewAnnotated = FilePreview;
+/**
+ * @since 0.12
+ * @beta
+ */
+const FileSizeAnnotated = FileSize;
+
+export { FilePreviewAnnotated as FilePreview, FileSizeAnnotated as FileSize };

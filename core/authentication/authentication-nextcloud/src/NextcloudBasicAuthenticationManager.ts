@@ -31,6 +31,7 @@ import type {
  * {@link AuthenticationManager} for the Nextcloud backend, using Basic auth.
  *
  * @since 0.16
+ * @beta
  */
 @injectable()
 export class NextcloudBasicAuthenticationManager

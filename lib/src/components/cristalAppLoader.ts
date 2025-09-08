@@ -46,6 +46,10 @@ async function handleCallback(container: Container): Promise<void> {
   }
 }
 
+/**
+ * @since 0.1
+ * @beta
+ */
 class CristalAppLoader extends CristalLoader {
   // @ts-expect-error cristal is temporarily undefined during class
   // initialization

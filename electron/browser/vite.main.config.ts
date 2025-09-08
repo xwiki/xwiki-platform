@@ -22,10 +22,14 @@ import { generateConfig } from "../../vite.config";
 import { defineConfig, mergeConfig } from "vite";
 
 export default mergeConfig(
-  generateConfig(import.meta.url, "dist/main"),
+  generateConfig(import.meta.url, "dist/main", "./src/electron/main/"),
   defineConfig({
     build: {
+      target: `node22`,
       outDir: "dist/main",
+      rollupOptions: {
+        external: ["node:path"],
+      },
     },
   }),
 );

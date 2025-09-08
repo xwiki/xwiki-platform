@@ -30,6 +30,7 @@ import type { RemoteURLParserProvider } from "@xwiki/cristal-model-remote-url-ap
 
 /**
  * @since 0.11
+ * @beta
  */
 @injectable()
 export class NextcloudLinkSuggestService implements LinkSuggestService {

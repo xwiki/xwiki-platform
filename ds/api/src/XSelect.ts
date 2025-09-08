@@ -21,6 +21,7 @@
 /**
  * Props of the select component.
  * @since 0.18
+ * @beta
  */
 type SelectProps = {
   /**

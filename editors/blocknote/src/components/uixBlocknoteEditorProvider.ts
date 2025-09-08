@@ -26,6 +26,7 @@ import type { Component } from "vue";
  * Editor provider for Blocknote editor.
  *
  * @since 0.16
+ * @beta
  */
 @injectable()
 export class UixBlocknoteEditorProvider extends DefaultVueTemplateProvider {

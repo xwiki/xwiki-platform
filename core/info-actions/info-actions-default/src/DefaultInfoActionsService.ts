@@ -30,6 +30,7 @@ import type {
  * info action components sorted by ascending order.
  *
  * @since 0.9
+ * @beta
  */
 @injectable()
 export class DefaultInfoActionsService implements InfoActionsService {

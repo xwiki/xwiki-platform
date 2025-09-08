@@ -24,6 +24,7 @@ import type { Ref } from "vue";
  * The information to provide for an info action element.
  *
  * @since 0.9
+ * @beta
  */
 interface InfoAction {
   id: string;
@@ -36,12 +37,14 @@ interface InfoAction {
    * is enough.
    * @param page - an option page reference, otherwise the current page is used
    * @since 0.10
+   * @beta
    */
   refresh?(page?: string): Promise<void>;
 
   /**
    * Compute whether the InfoAction should be displayed or not.
    * @since 0.13
+   * @beta
    */
   enabled(): Promise<boolean>;
 }
@@ -51,6 +54,7 @@ interface InfoAction {
  * the full list of available info actions.
  *
  * @since 0.9
+ * @beta
  */
 interface InfoActionsService {
   list(): Promise<InfoAction[]>;

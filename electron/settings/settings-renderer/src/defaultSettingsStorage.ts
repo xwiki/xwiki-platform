@@ -37,6 +37,7 @@ declare const window: SettingsWindow;
  * Default implementation for {@link SettingsStorage} on Electron.
  * It stores and retrieves settings as JSON from Electron storage.
  * @since 0.18
+ * @beta
  */
 @injectable()
 export class DefaultSettingsStorage implements SettingsStorage {

@@ -18,6 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+/**
+ * @since 0.12
+ * @beta
+ */
 interface DateService {
   format(date: Date): string;
 }

@@ -34,6 +34,7 @@ import type {
  * Converts Universal AST trees to HTML.
  *
  * @since 0.22
+ * @beta
  */
 export class UniAstToHTMLConverter {
   constructor(private readonly context: ConverterContext) {}

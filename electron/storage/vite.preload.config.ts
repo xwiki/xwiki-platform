@@ -22,7 +22,7 @@ import { generateConfig } from "../../vite.config";
 import { defineConfig, mergeConfig } from "vite";
 
 export default mergeConfig(
-  generateConfig(import.meta.url, "dist/preload"),
+  generateConfig(import.meta.url, "dist/preload", "./src/electron/preload/"),
   defineConfig({
     build: {
       outDir: "dist/preload",

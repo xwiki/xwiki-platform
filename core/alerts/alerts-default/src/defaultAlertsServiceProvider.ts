@@ -28,6 +28,7 @@ import type { CristalApp } from "@xwiki/cristal-api";
 /**
  * Provider for {@link DefaultAlertsService}.
  * @since 0.13
+ * @beta
  */
 @injectable()
 export class DefaultAlertsServiceProvider implements AlertsServiceProvider {

@@ -48,6 +48,7 @@ import type {
 /**
  * Convert the internal format of Blocknote to the Universal AST.
  * @since 0.16
+ * @beta
  */
 export class BlockNoteToUniAstConverter {
   constructor(public context: ConverterContext) {}

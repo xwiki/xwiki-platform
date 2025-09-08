@@ -34,6 +34,7 @@ import type {
  * Implementation of NavigationTreeSource for the Nextcloud backend.
  *
  * @since 0.10
+ * @beta
  **/
 @injectable()
 class NextcloudNavigationTreeSource implements NavigationTreeSource {
@@ -166,6 +167,9 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

@@ -23,6 +23,7 @@
  * This should be extended with a properly typed "content" attribute for
  * specific settings.
  * @since 0.18
+ * @beta
  */
 export interface Settings {
   key: string;

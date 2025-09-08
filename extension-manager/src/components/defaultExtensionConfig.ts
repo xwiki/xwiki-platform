@@ -20,6 +20,10 @@
 
 import type { ExtensionConfig } from "../api/extensionConfig";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export class DefaultExtensionConfig implements ExtensionConfig {
   name: string;
   entryFile: string | null;

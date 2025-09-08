@@ -28,6 +28,7 @@ import type { RemoteURLParserProvider } from "@xwiki/cristal-model-remote-url-ap
 
 /**
  * @since 0.12
+ * @beta
  */
 @injectable()
 class DefaultClickListener implements ClickListener {

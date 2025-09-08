@@ -32,6 +32,7 @@ import type { ModelReferenceHandler } from "@xwiki/cristal-model-reference-api";
  * Implementation of {@link ModelReferenceHandler} for the XWiki backend.
  *
  * @since 0.13
+ * @beta
  */
 @injectable()
 export class XWikiModelReferenceHandler implements ModelReferenceHandler {

@@ -38,6 +38,7 @@ import type { Ref } from "vue";
  * Collaboration provider for Hocus Pocus.
  * This is the default provider.
  * @since 0.20
+ * @beta
  */
 @injectable()
 export class HocuspocusCollaborationProvider implements CollaborationManager {

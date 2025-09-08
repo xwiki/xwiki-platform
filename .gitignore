@@ -92,3 +92,6 @@ e2e-tests.xml
 
 ## Vite specifics
 vite.*.timestamp-*
+
+## api-extractor
+temp/

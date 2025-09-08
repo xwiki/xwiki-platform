@@ -20,6 +20,7 @@
 
 /**
  * @since 0.9
+ * @beta
  */
 export interface PageAttachment {
   id: string;

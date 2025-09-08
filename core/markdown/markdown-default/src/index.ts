@@ -23,6 +23,9 @@ import { parseInternalLinks } from "./parseInternalLinks";
 import { Container } from "inversify";
 import type { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 
+/**
+ * @beta
+ */
 class ComponentInit {
   constructor(container: Container) {
     container

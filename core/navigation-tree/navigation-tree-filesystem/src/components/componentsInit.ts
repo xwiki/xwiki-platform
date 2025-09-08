@@ -33,6 +33,7 @@ import type {
  * Implementation of NavigationTreeSource for the FileSystem backend.
  *
  * @since 0.10
+ * @beta
  **/
 @injectable()
 class FileSystemNavigationTreeSource implements NavigationTreeSource {
@@ -98,6 +99,9 @@ class FileSystemNavigationTreeSource implements NavigationTreeSource {
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

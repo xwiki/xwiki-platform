@@ -35,6 +35,7 @@ import type {
  * Implementation of PageRevisionManager for the XWiki backend.
  *
  * @since 0.12
+ * @beta
  **/
 @injectable()
 class XWikiPageRevisionManager implements PageRevisionManager {

@@ -23,6 +23,10 @@ import DefaultVueTemplateProvider from "./defaultVueTemplateProvider";
 import { injectable } from "inversify";
 import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 @injectable()
 export default class DefaultUIXTemplateProvider
   extends DefaultVueTemplateProvider

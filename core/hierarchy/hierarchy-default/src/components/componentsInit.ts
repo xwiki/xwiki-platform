@@ -37,6 +37,7 @@ import type {
  * This can be used as a fallback, and only returns the homepage and the current page.
  *
  * @since 0.9
+ * @beta
  **/
 @injectable()
 class DefaultPageHierarchyResolver implements PageHierarchyResolver {
@@ -83,6 +84,7 @@ class DefaultPageHierarchyResolver implements PageHierarchyResolver {
  * Default implementation for PageHierarchyResolverProvider.
  *
  * @since 0.9
+ * @beta
  **/
 @injectable()
 class DefaultPageHierarchyResolverProvider
@@ -117,6 +119,9 @@ class DefaultPageHierarchyResolverProvider
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

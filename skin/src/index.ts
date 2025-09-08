@@ -31,6 +31,18 @@ import type { MacroProvider } from "./api/macroProvider";
 import type { UIXTemplateProvider } from "./api/uixTemplateProvider";
 import type { VueTemplateProvider } from "./api/vueTemplateProvider";
 
+/**
+ * @since 0.13
+ * @beta
+ */
+const CArticleAnnotated = CArticle;
+
+/**
+ * @since 0.1
+ * @beta
+ */
+const CTemplateAnnotated = CTemplate;
+
 export type {
   MacroData,
   MacroProvider,
@@ -38,8 +50,8 @@ export type {
   VueTemplateProvider,
 };
 export {
-  CArticle,
-  CTemplate,
+  CArticleAnnotated as CArticle,
+  CTemplateAnnotated as CTemplate,
   ComponentInit,
   ContentTools,
   DefaultMacroData,

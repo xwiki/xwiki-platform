@@ -26,6 +26,7 @@ import type { Settings } from "./settings";
  * a named component, with the name being the "key" attribute of the Settings'
  * concrete type.
  * @since 0.18
+ * @beta
  */
 interface SettingsParser {
   /**
@@ -40,6 +41,7 @@ interface SettingsParser {
  * A SettingsParserProvider retrieves the best instance of SettingsParser for
  * a given Settings key.
  * @since 0.18
+ * @beta
  */
 interface SettingsParserProvider {
   /**

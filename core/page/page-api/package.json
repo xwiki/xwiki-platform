@@ -19,6 +19,7 @@
     }
   },
   "scripts": {
+    "api-extractor:local": "api-extractor run --local",
     "build": "rimraf dist && tsc",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
@@ -33,12 +34,5 @@
     "inversify": "7.9.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2"
-  },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts"
-      }
-    }
   }
 }

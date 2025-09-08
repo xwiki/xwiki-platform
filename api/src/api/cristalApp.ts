@@ -28,6 +28,10 @@ import type { Container } from "inversify";
 import type { App, Component, Ref } from "vue";
 import type { Router } from "vue-router";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export interface CristalApp {
   getApp(): App;
 
@@ -54,6 +58,7 @@ export interface CristalApp {
    *
    * @param configName - the name of the configuration to delete
    * @since 0.18
+   * @beta
    */
   deleteAvailableConfiguration(configName: string): void;
 
@@ -67,6 +72,7 @@ export interface CristalApp {
    *
    * @param extensionPoint - id of the extension point to resolve
    * @since 0.15
+   * @beta
    */
   getUIXTemplates(extensionPoint: string): Promise<Array<Component>>;
 
@@ -81,10 +87,13 @@ export interface CristalApp {
   /**
    * Return the syntax of the current page.
    * @since 0.7
+   * @beta
    */
   getCurrentSyntax(): string;
 
-  /** @since 0.18 */
+  /** @since 0.18
+   * @beta
+   */
   setCurrentPage(page: string, mode?: string): Promise<void>;
 
   /**
@@ -108,6 +117,7 @@ export interface CristalApp {
    * @returns the page data, or undefined if the page is not found
    *
    * @since 0.7
+   * @beta
    */
   getPage(
     page: string,

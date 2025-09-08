@@ -49,6 +49,7 @@ import type { App } from "vue";
  * @param container - a container manager instance
  * @param linkSuggest - a link suggest service instance
  * @since 0.8
+ * @beta
  */
 function loadLinkSuggest(
   skinManager: SkinManager,

@@ -27,6 +27,7 @@ import type { ComposerTranslation } from "vue-i18n";
  * Defines a category for page actions.
  *
  * @since 0.11
+ * @beta
  */
 interface PageActionCategory {
   /**
@@ -49,6 +50,7 @@ interface PageActionCategory {
  * Operations to access the available categories.
  *
  * @since 0.11
+ * @beta
  */
 interface PageActionCategoryService {
   /**
@@ -61,6 +63,7 @@ interface PageActionCategoryService {
  * Defines a page action.
  *
  * @since 0.11
+ * @beta
  */
 interface PageAction {
   /**
@@ -97,6 +100,7 @@ interface PageAction {
  * Operations to access the available actions.
  *
  * @since 0.11
+ * @beta
  */
 interface PageActionService {
   /**
@@ -111,6 +115,7 @@ interface PageActionService {
  * Abstract class helping with localization of action categories.
  *
  * @since 0.11
+ * @beta
  */
 @injectable()
 abstract class AbstractPageActionCategory implements PageActionCategory {

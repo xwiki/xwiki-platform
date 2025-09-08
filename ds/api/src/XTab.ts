@@ -21,6 +21,7 @@
 /**
  * Props of the x-tab component.
  * @since 0.9
+ * @beta
  */
 type TabProps = {
   tabId: string;

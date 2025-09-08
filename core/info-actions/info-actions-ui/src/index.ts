@@ -20,4 +20,10 @@
 
 import InfoActions from "./vue/InfoActions.vue";
 
-export { InfoActions };
+/**
+ * @since 0.9
+ * @beta
+ */
+const InfoActionsAnnotated = InfoActions;
+
+export { InfoActionsAnnotated as InfoActions };

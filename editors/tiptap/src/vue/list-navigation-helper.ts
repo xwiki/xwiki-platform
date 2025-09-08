@@ -35,6 +35,7 @@ import type { Ref } from "vue";
  *      value
  *
  * @since 0.8
+ * @beta
  */
 export function listNavigation(
   apply: (index: number) => void,

@@ -24,6 +24,10 @@ import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type { ClickListener } from "@xwiki/cristal-model-click-listener";
 import type { App, Component, VNode } from "vue";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export class ContentTools {
   static logger: Logger;
 

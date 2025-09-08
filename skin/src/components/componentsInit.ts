@@ -35,6 +35,10 @@ import type { InfoAction } from "@xwiki/cristal-info-actions-api";
 import type { UIExtension } from "@xwiki/cristal-uiextension-api";
 import type { Container } from "inversify";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export default class ComponentInit {
   logger: Logger;
 

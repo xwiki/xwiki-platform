@@ -42,6 +42,8 @@ import type { DefaultReactSuggestionItem } from "@blocknote/react";
  * Contains all the blocks usable inside the editor
  *
  * @returns The created schema
+ * @since 0.20
+ * @beta
  */
 function createBlockNoteSchema(macros: Macro[]) {
   // Get rid of some block types
@@ -94,14 +96,29 @@ function createBlockNoteSchema(macros: Macro[]) {
  * @param lang - The dictionary's language
  *
  * @returns The dictionary in the requested language
+ * @since 0.19
+ * @beta
  */
 function createDictionary(lang: EditorLanguage) {
   // eslint-disable-next-line import/namespace
   return locales[lang];
 }
 
+/**
+ * @since 0.20
+ * @beta
+ */
 type EditorLanguage = keyof typeof locales & keyof typeof translations;
 
+/**
+ * Suggests a set of suggestion from the menu items.
+ *
+ * @param editor - the editor type
+ * @param query - the query to filter the suggestions by
+ * @param macros - the available macros
+ * @since 0.16
+ * @beta
+ */
 function querySuggestionsMenuItems(
   editor: EditorType,
   query: string,
@@ -135,8 +152,16 @@ function querySuggestionsMenuItems(
   );
 }
 
+/**
+ * @since 0.16
+ * @beta
+ */
 type EditorSchema = ReturnType<typeof createBlockNoteSchema>;
 
+/**
+ * @since 0.16
+ * @beta
+ */
 type EditorBlockSchema =
   EditorSchema extends BlockNoteSchema<
     infer BlockSchema,
@@ -148,6 +173,10 @@ type EditorBlockSchema =
     ? BlockSchema
     : never;
 
+/**
+ * @since 0.16
+ * @beta
+ */
 type EditorInlineContentSchema =
   EditorSchema extends BlockNoteSchema<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -159,6 +188,10 @@ type EditorInlineContentSchema =
     ? InlineContentSchema
     : never;
 
+/**
+ * @since 0.16
+ * @beta
+ */
 type EditorStyleSchema =
   EditorSchema extends BlockNoteSchema<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -170,21 +203,42 @@ type EditorStyleSchema =
     ? StyleSchema
     : never;
 
+/**
+ * @since 0.16
+ * @beta
+ */
 type EditorType = BlockNoteEditor<
   EditorBlockSchema,
   EditorInlineContentSchema,
   EditorStyleSchema
 >;
 
+/**
+ * @since 0.16
+ * @beta
+ */
 type EditorStyledText = StyledText<EditorStyleSchema>;
+
+/**
+ * @since 0.16
+ * @beta
+ */
 type EditorLink = Link<EditorStyleSchema>;
 
+/**
+ * @since 0.16
+ * @beta
+ */
 type BlockType = Block<
   EditorBlockSchema,
   EditorInlineContentSchema,
   EditorStyleSchema
 >;
 
+/**
+ * @since 0.16
+ * @beta
+ */
 type BlockOfType<B extends BlockType["type"]> = Extract<BlockType, { type: B }>;
 
 export type {

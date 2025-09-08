@@ -30,6 +30,7 @@ import type {
  * It will try to find the best {@link SettingsParser} instance for the
  * settings it handles.
  * @since 0.18
+ * @beta
  */
 @injectable()
 export class DefaultSettingsManager implements SettingsManager {

@@ -24,6 +24,9 @@ import { Container } from "inversify";
 import type { LocalURLParser } from "./localURLParser";
 import type { LocalURLSerializer } from "./localURLSerializer";
 
+/**
+ * @beta
+ */
 class ComponentInit {
   constructor(container: Container) {
     container

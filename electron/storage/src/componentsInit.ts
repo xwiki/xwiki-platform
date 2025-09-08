@@ -24,6 +24,9 @@ import { whenNamedOrDefault } from "@xwiki/cristal-utils-inversify";
 import type { Logger, Storage, WikiConfig } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 export default class ComponentInit {
   logger: Logger;
 

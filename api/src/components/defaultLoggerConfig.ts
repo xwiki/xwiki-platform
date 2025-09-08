@@ -21,6 +21,10 @@
 import { injectable } from "inversify";
 import type { LoggerConfig } from "../api/loggerConfig";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 @injectable()
 export class DefaultLoggerConfig implements LoggerConfig {
   protected config: Map<string, string>;

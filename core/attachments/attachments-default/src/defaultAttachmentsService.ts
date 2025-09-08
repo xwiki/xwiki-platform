@@ -112,6 +112,7 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore<
 
 /**
  * @since 0.9
+ * @beta
  */
 @injectable()
 export class DefaultAttachmentsService implements AttachmentsService {

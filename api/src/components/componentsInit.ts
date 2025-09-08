@@ -18,6 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+/**
+ * @beta
+ */
 export default class ComponentInit {
   constructor() {
     // empty

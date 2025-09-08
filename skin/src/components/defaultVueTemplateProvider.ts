@@ -23,6 +23,10 @@ import { injectable } from "inversify";
 import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import type { Component } from "vue";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 @injectable()
 export default class DefaultVueTemplateProvider implements VueTemplateProvider {
   public static cname = "cristal.vuejs.component";

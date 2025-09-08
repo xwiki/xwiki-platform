@@ -22,6 +22,9 @@ import { DSFRDesignSystemLoader } from "./dsfrDesignSystemLoader";
 import type { DesignSystemLoader } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 export default class ComponentInit {
   constructor(container: Container) {
     container

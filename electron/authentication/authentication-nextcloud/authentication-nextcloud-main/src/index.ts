@@ -107,6 +107,13 @@ async function createWindow(url: string) {
 let authWin: BrowserWindow;
 let mainWin: BrowserWindow;
 
+/**
+ * @param browserWindow - the browser window to use for the authentication process
+ * @param reload - the reload function
+ *
+ * @since 0.16
+ * @beta
+ */
 export function load(
   browserWindow: BrowserWindow,
   reload: (win: BrowserWindow) => void,

@@ -91,6 +91,7 @@ const alertsStore: AlertsStoreDefinition = defineStore<
 
 /**
  * @since 0.11
+ * @beta
  */
 @injectable()
 export class DefaultAlertsService implements AlertsService {

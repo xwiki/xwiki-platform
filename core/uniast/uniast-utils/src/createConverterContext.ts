@@ -35,6 +35,7 @@ import type { ConverterContext } from "@xwiki/cristal-uniast-api";
  * This works by extracting the required providers from the container
  *
  * @since 0.16
+ * @beta
  *
  * @param container - Cristal application's Inversify container
  *

@@ -37,9 +37,11 @@ import type { PageAttachment } from "./api/pageAttachment";
 import type { SkinManager } from "./api/skinManager.js";
 import type { Storage } from "./api/storage.js";
 import type { WrappingStorage } from "./api/wrappingStorage.js";
+import type { ConfigObjectType } from "./components/defaultWikiConfig.js";
 
 export type {
   AttachmentsData,
+  ConfigObjectType,
   CristalApp,
   DesignSystemLoader,
   Document,

@@ -23,6 +23,7 @@ import type { Settings } from "./settings";
 /**
  * A SettingsManager handles operations on Cristal's settings.
  * @since 0.18
+ * @beta
  */
 export interface SettingsManager {
   /**

@@ -22,6 +22,7 @@
  * Set of allowed provider states.
  *
  * @since 0.20
+ * @beta
  */
 export enum Status {
   Disconnected,

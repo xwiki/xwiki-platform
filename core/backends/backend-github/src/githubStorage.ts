@@ -145,6 +145,7 @@ export class GitHubStorage extends AbstractStorage {
 
   /**
    * @since 0.9
+   * @beta
    */
   async getAttachments(page: string): Promise<AttachmentsData | undefined> {
     const url = `${this.getPageRestMetaURL(page, "")}/${this.ATTACHMENTS}`;

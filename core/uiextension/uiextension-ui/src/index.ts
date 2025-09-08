@@ -20,4 +20,10 @@
 
 import UIExtensions from "./vue/UIExtensions.vue";
 
-export { UIExtensions };
+/**
+ * @since 0.11
+ * @beta
+ */
+const UIExtensionsAnnotated = UIExtensions;
+
+export { UIExtensionsAnnotated as UIExtensions };

@@ -24,11 +24,13 @@ import type { UserDetails } from "./userDetails";
  * Interface to implement for a given backend to allow users to authenticate.
  *
  * @since 0.11
+ * @beta
  */
 interface AuthenticationManager {
   /**
    * Starts the authentication process.
    * @since 0.15
+   * @beta
    */
   start(): Promise<void>;
 
@@ -62,6 +64,7 @@ interface AuthenticationManager {
    *
    * @returns the id of the currently connected user, or undefined if not authenticated
    * @since 0.20
+   * @beta
    */
   getUserId?(): string | undefined;
 }

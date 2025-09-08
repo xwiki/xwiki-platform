@@ -22,6 +22,9 @@ import { DefaultAuthenticationManagerProvider } from "./defaultAuthenticationMan
 import { Container } from "inversify";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

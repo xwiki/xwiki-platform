@@ -19,6 +19,7 @@
     }
   },
   "scripts": {
+    "api-extractor:local": "api-extractor run --local",
     "build": "rimraf dist && tsc",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
@@ -32,12 +33,5 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.9.2",
     "vue": "3.5.20"
-  },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts"
-      }
-    }
   }
 }

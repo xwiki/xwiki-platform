@@ -23,6 +23,10 @@ import type { WikiConfig } from "./WikiConfig";
 import type { AttachmentsData } from "./attachmentsData";
 import type { PageAttachment } from "./pageAttachment";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export interface Storage {
   setWikiConfig(config: WikiConfig): void;
 
@@ -58,6 +62,7 @@ export interface Storage {
    *  requested page is not found
    *
    * @since 0.9
+   * @beta
    */
   getAttachments(page: string): Promise<AttachmentsData | undefined>;
 
@@ -66,6 +71,7 @@ export interface Storage {
    * @param name - the attachment name
    * @returns a promise wrapping the attachment data, or undefined if the requested attachment is not found
    * @since 0.12
+   * @beta
    */
   getAttachment(
     page: string,
@@ -92,6 +98,7 @@ export interface Storage {
    * @returns a promise when the save is done
    *
    * @since 0.8
+   * @beta
    */
   save(
     page: string,
@@ -107,6 +114,7 @@ export interface Storage {
    *   is useful in the case where the url cannot be resolved from the name of the file and its document reference
    *   alone.
    * @since 0.9
+   * @beta
    */
   saveAttachments(
     page: string,
@@ -120,6 +128,7 @@ export interface Storage {
    * @returns true if the delete was successful, false with the reason otherwise
    *
    * @since 0.11
+   * @beta
    */
   delete(page: string): Promise<{ success: boolean; error?: string }>;
 
@@ -132,6 +141,7 @@ export interface Storage {
    * @returns true if the move was successful, false with the reason otherwise
    *
    * @since 0.14
+   * @beta
    */
   move(
     page: string,

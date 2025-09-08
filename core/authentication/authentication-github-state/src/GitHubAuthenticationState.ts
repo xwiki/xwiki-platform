@@ -26,6 +26,7 @@ import type { Ref } from "vue";
  * Authentication State for the GitHub backend.
  *
  * @since 0.15
+ * @beta
  */
 @injectable()
 export class GitHubAuthenticationState {

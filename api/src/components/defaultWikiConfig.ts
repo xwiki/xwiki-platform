@@ -25,7 +25,11 @@ import type { Logger } from "../api/logger";
 import type { Storage } from "../api/storage";
 import type { WrappingStorage } from "../api/wrappingStorage";
 
-type ConfigObjectType = {
+/**
+ * @since 0.16
+ * @beta
+ */
+export type ConfigObjectType = {
   name: string;
   baseURL: string;
   baseRestURL: string;
@@ -40,6 +44,10 @@ type ConfigObjectType = {
   editor?: string;
 };
 
+/**
+ * @since 0.1
+ * @beta
+ */
 @injectable()
 export class DefaultWikiConfig implements WikiConfig {
   // @ts-expect-error name is temporarily undefined during class
@@ -55,12 +63,14 @@ export class DefaultWikiConfig implements WikiConfig {
   /**
    * Realtime endpoint URL.
    * @since 0.11
+   * @beta
    */
   public realtimeURL?: string;
 
   /**
    * Authentication server base URL.
    * @since 0.15
+   * @beta
    */
   authenticationBaseURL?: string;
 
@@ -68,6 +78,7 @@ export class DefaultWikiConfig implements WikiConfig {
    * Authentication Manager component to use.
    * By default, resolves to configuration type.
    * @since 0.16
+   * @beta
    */
   authenticationManager?: string;
 
@@ -94,6 +105,7 @@ export class DefaultWikiConfig implements WikiConfig {
   /**
    * Root location to store pages.
    * @since 0.16
+   * @beta
    */
   storageRoot?: string;
 

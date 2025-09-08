@@ -31,6 +31,9 @@ import type {
 } from "@xwiki/cristal-page-actions-api";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 class ComponentInit {
   constructor(container: Container) {
     container
@@ -43,4 +46,10 @@ class ComponentInit {
   }
 }
 
-export { ComponentInit, PageActions };
+/**
+ * @since 0.11
+ * @beta
+ */
+const PageActionsAnnotated = PageActions;
+
+export { ComponentInit, PageActionsAnnotated as PageActions };

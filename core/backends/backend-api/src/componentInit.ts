@@ -22,6 +22,9 @@ import { DefaultStorageProvider } from "./defaultStorageProvider";
 import { Container } from "inversify";
 import type { StorageProvider } from "./storageProvider";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

@@ -25,6 +25,7 @@ import type { CristalApp, Storage } from "@xwiki/cristal-api";
 /**
  * Provide the current storage.
  * @since 0.13
+ * @beta
  */
 @injectable()
 class DefaultStorageProvider implements StorageProvider {

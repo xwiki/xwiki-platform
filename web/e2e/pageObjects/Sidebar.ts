@@ -24,6 +24,7 @@ import type { Locator, Page } from "@playwright/test";
 /**
  * Page object to interact with the sidebar.
  * @since 0.13
+ * @beta
  */
 export class SidebarPageObject {
   private sidebarLocator: Locator;

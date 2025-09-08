@@ -20,4 +20,10 @@
 
 import User from "./vue/CUser.vue";
 
-export { User };
+/**
+ * @since 0.12
+ * @beta
+ */
+const UserAnnotated = User;
+
+export { UserAnnotated as User };

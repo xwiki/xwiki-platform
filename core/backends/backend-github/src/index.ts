@@ -24,6 +24,9 @@ import { whenNamedOrDefault } from "@xwiki/cristal-utils-inversify";
 import { Container } from "inversify";
 import type { Storage, WikiConfig } from "@xwiki/cristal-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

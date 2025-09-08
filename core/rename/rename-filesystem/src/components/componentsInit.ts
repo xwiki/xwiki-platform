@@ -27,6 +27,7 @@ import type { PageRenameManager } from "@xwiki/cristal-rename-api";
  * Implementation of {@link PageRenameManager} for FileSystem backend.
  *
  * @since 0.14
+ * @beta
  **/
 @injectable()
 class FileSystemPageRenameManager implements PageRenameManager {

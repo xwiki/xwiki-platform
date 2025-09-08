@@ -25,6 +25,7 @@ import type { WikiConfig } from "@xwiki/cristal-api";
  * because interacting with the browser is not equivalent when Cristal is
  * running directly on a browser, or in an Electron app managing a browser.
  * @since 0.8
+ * @beta
  */
 export interface BrowserApi {
   /**
@@ -37,6 +38,7 @@ export interface BrowserApi {
    * Fully reload the current window.
    *
    * @since 0.11
+   * @beta
    */
   reload(): void;
 
@@ -44,6 +46,7 @@ export interface BrowserApi {
    * Calls a callback when the current "window" is close, can either be a browser tab, or an electron windows.
    * @param callback - the lamda called before the window is closed
    * @since 0.14
+   * @beta
    */
 
   onClose(callback: () => boolean): void;
@@ -52,8 +55,12 @@ export interface BrowserApi {
    * Set the wiki configuration of the Cristal instance
    * @param wikiConfig - the wiki config to use
    * @since 0.16
+   * @beta
    */
   setLocation(wikiConfig: WikiConfig): void;
 }
 
+/**
+ * @beta
+ */
 export const name = "BrowserApi";

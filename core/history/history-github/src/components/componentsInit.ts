@@ -31,6 +31,7 @@ import type {
  * Implementation of PageRevisionManager for the GitHub backend.
  *
  * @since 0.12
+ * @beta
  **/
 @injectable()
 class GitHubPageRevisionManager implements PageRevisionManager {

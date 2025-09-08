@@ -27,6 +27,7 @@ import type {
 
 /**
  * @since 0.11
+ * @beta
  */
 @injectable()
 class DefaultPageActionCategoryService implements PageActionCategoryService {

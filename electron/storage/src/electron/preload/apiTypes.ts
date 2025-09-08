@@ -51,6 +51,7 @@ export interface APITypes {
    * @param type - the type of attach
    * @param mimetype - the expected mimetype, only applied for attachments
    * @since 0.13
+   * @beta
    */
   search(
     query: string,
@@ -71,6 +72,7 @@ export interface APITypes {
    * @param preserveChildren - whether to move children
    *
    * @since 0.20
+   * @beta
    */
   movePage(
     reference: string,

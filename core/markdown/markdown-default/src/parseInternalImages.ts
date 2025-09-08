@@ -54,6 +54,12 @@ function parseInternalImageLabel(state: StateInline, start: number) {
   return labelEnd;
 }
 
+/**
+ * @param modelReferenceParser - the model reference parser
+ * @param remoteURLSerializer - the remote URL serializer
+ * @since 0.20
+ * @beta
+ */
 export function parseInternalImages(
   modelReferenceParser: ModelReferenceParser,
   remoteURLSerializer: RemoteURLSerializer,

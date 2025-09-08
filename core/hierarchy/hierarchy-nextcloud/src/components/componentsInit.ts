@@ -35,6 +35,7 @@ import type {
  * Implementation of PageHierarchyResolver for Nextcloud backend.
  *
  * @since 0.10
+ * @beta
  **/
 @injectable()
 class NextcloudPageHierarchyResolver implements PageHierarchyResolver {
@@ -75,6 +76,9 @@ class NextcloudPageHierarchyResolver implements PageHierarchyResolver {
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

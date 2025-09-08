@@ -22,6 +22,7 @@ import type { LinkSuggestService } from "./linkSuggestService";
 
 /**
  * @since 0.11
+ * @beta
  */
 interface LinkSuggestServiceProvider {
   /**

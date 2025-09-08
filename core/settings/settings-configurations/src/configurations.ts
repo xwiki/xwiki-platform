@@ -24,6 +24,7 @@ import type { Settings } from "@xwiki/cristal-settings-api";
 /**
  * Imlementation of {@link Settings} to handle {@link Configuration} instances.
  * @since 0.18
+ * @beta
  */
 export class ConfigurationsSettings implements Settings {
   static SETTINGS_KEY: string = "configuration";

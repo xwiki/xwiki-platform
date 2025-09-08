@@ -35,6 +35,7 @@ import type {
  * Implementation of PageHierarchyResolver for the GitHub backend.
  *
  * @since 0.9
+ * @beta
  **/
 @injectable()
 class GitHubPageHierarchyResolver implements PageHierarchyResolver {
@@ -75,6 +76,9 @@ class GitHubPageHierarchyResolver implements PageHierarchyResolver {
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

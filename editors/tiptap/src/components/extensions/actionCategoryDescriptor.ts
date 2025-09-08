@@ -25,6 +25,7 @@ import type { ActionDescriptor } from "./actionDescriptor";
  * A category is composed of the action title and a set of actions linked to
  * that category.
  * @since 0.8
+ * @beta
  */
 interface ActionCategoryDescriptor {
   actions: ActionDescriptor[];

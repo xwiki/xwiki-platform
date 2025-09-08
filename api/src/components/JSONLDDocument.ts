@@ -20,6 +20,10 @@
 
 import type { Document } from "../api/document";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export class JSONLDDocument implements Document {
   // TODO get rid of any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

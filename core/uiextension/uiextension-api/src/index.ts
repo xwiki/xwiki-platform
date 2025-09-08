@@ -24,6 +24,7 @@ import type { Component } from "vue";
  * Define the information held by a UI Extension (UIX).
  *
  * @since 0.11
+ * @beta
  */
 interface UIExtension {
   /**
@@ -60,6 +61,7 @@ interface UIExtension {
 
 /**
  * @since 0.11
+ * @beta
  */
 interface UIExtensionsManager {
   /**

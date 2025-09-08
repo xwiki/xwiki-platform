@@ -267,10 +267,7 @@ export class Worker implements MyWorker {
 const worker = new Worker();
 worker.start();
 
-// @ts-expect-error ignore
-// TODO remove use of any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-onconnect = (e: any) => {
+onconnect = (e) => {
   Comlink.expose(worker, e.ports[0]);
 };
 console.log("Worker code loaded");

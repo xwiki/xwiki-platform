@@ -24,6 +24,7 @@ import type { Configurations } from "@xwiki/cristal-configuration-api";
  * @param input - the input string
  *
  * @since 0.8
+ * @beta
  */
 function loadConfig(input: string) {
   return async (): Promise<Configurations> => {

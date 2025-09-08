@@ -60,6 +60,7 @@ import type {
  * to mick an existing HTML element (e.g., {@link ButtonHTMLAttributes} from {@link AbstractElements.XBtn}).
  *
  * @since 0.14
+ * @beta
  */
 type AbstractElements = {
   XAlert: DefineComponent<AlertProps & HTMLAttributes>;

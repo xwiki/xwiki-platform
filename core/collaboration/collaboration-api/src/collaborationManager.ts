@@ -25,6 +25,7 @@ import type { Ref } from "vue";
 /**
  * The manager for a given collaboration provider (e.g., hocuspocus, or y-websocket).
  * @since 0.20
+ * @beta
  */
 interface CollaborationManager {
   /**

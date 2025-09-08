@@ -65,6 +65,10 @@ function deleteSettings(): void {
   storeInstance.delete(settingsKey);
 }
 
+/**
+ * @since 0.18
+ * @beta
+ */
 function getConfigurations(): Configurations {
   return storeInstance.get(configurationKey) as Configurations;
 }

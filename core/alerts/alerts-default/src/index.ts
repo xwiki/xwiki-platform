@@ -26,6 +26,9 @@ import type {
   AlertsServiceProvider,
 } from "@xwiki/cristal-alerts-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

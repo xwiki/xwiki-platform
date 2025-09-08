@@ -27,6 +27,7 @@ import type { SettingsParser } from "@xwiki/cristal-settings-api";
  * Implementation of {@link SettingsParser} for {@link ConfigurationSettings}.
  * In particular, it will handle parsing Map instances used as content.
  * @since 0.18
+ * @beta
  */
 @injectable()
 export class ConfigurationsSettingsParser implements SettingsParser {

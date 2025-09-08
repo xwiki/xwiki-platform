@@ -26,6 +26,7 @@ import type { CristalApp } from "@xwiki/cristal-api";
 
 /**
  * @since 0.20
+ * @beta
  */
 @injectable()
 export class DefaultCollaborationManagerProvider

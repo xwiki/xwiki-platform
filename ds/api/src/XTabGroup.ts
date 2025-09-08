@@ -20,6 +20,7 @@
 
 /**
  * @since 0.14
+ * @beta
  */
 type TabGroupProps = {
   onTabChange: (tabId: string) => void;

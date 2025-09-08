@@ -29,6 +29,7 @@ import { Container } from "inversify";
  * @param container - the inversify container
  *
  * @since 0.22
+ * @beta
  */
 export function renderMarkdown(source: string, container: Container): string {
   // Mardown to uniast to html

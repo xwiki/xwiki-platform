@@ -24,6 +24,7 @@ import type { Primitive } from "utility-types";
  * A single configuration entry.
  *
  * @since 0.14
+ * @beta
  */
 type Configuration = {
   configType: string;
@@ -34,6 +35,7 @@ type Configuration = {
  * The set of available configurations.
  *
  * @since 0.14
+ * @beta
  */
 type Configurations = { [key: string]: Configuration };
 
@@ -41,6 +43,7 @@ type Configurations = { [key: string]: Configuration };
  * Signature of the configuration loader.
  *
  * @since 0.14
+ * @beta
  */
 type ConfigurationLoader = () => Promise<Configurations>;
 

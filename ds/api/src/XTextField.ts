@@ -21,6 +21,7 @@
 /**
  * Props of the text-field component.
  * @since 0.9
+ * @beta
  */
 type TextFieldProps = {
   name?: string;
@@ -29,22 +30,26 @@ type TextFieldProps = {
   /**
    * Whether the field should be focused on load or not (default: false).
    * @since 0.13
+   * @beta
    */
   autofocus?: boolean;
   modelValue?: string;
   /**
    * Help message.
    * @since 0.15
+   * @beta
    */
   help?: string;
   /**
    * Whether the field should be readonly (default: false).
    * @since 0.15
+   * @beta
    */
   readonly?: boolean;
   /**
    * Type of content.
    * @since 0.16
+   * @beta
    */
   type?:
     | "date"

@@ -24,6 +24,7 @@ import type { Ref } from "vue";
 
 /**
  * @since 0.12
+ * @beta
  */
 interface AttachmentPreview {
   preview(attachment: AttachmentReference): Promise<void>;

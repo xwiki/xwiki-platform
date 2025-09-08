@@ -22,6 +22,7 @@ import type { UserDetails } from "@xwiki/cristal-authentication-api";
 
 /**
  * @since 0.9
+ * @beta
  */
 interface Attachment {
   id: string;

@@ -35,6 +35,7 @@ import type {
  * Implementation of PageHierarchyResolver for the FileSystem backend.
  *
  * @since 0.9
+ * @beta
  **/
 @injectable()
 class FileSystemPageHierarchyResolver implements PageHierarchyResolver {
@@ -77,6 +78,9 @@ class FileSystemPageHierarchyResolver implements PageHierarchyResolver {
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

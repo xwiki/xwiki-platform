@@ -23,6 +23,10 @@ import type { ExtensionManager } from "../api/extensionManager";
 import type { Logger } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 export default class ComponentInit {
   logger: Logger;
 

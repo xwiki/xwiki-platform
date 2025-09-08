@@ -25,6 +25,7 @@ import type { CristalApp } from "@xwiki/cristal-api";
 
 /**
  * @since 0.12
+ * @beta
  */
 @injectable()
 class DefaultRemoteURLParserProvider implements RemoteURLParserProvider {

@@ -30,6 +30,10 @@ import type { DesignSystemLoader, SkinManager } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
 import type { App, Component } from "vue";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 @injectable()
 export class DefaultSkinManager implements SkinManager {
   public static DEFAULT_DESIGN_SYSTEM = "";

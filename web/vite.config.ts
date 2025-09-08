@@ -26,19 +26,19 @@ export default defineConfig({
   build: {
     sourcemap: true,
     input: {
-      main: resolve(__dirname, "index.html"),
-    },
+      main: resolve(__dirname, "index.html")
+    }
   },
   plugins: [
     Vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => tag.startsWith("sl-"),
-        },
-      },
-    }),
+          isCustomElement: (tag) => tag.startsWith("sl-")
+        }
+      }
+    })
   ],
   worker: {
-    format: "es",
+    format: "es"
   },
 });

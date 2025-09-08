@@ -28,6 +28,9 @@ import type { ModelReferenceParserProvider } from "./modelReferenceParserProvide
 import type { ModelReferenceSerializerProvider } from "./modelReferenceSerializerProvider";
 import type { Container } from "inversify";
 
+/**
+ * @beta
+ */
 class ComponentInit {
   constructor(container: Container) {
     container

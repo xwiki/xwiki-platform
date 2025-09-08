@@ -26,6 +26,9 @@ import type {
   RemoteURLSerializer,
 } from "@xwiki/cristal-model-remote-url-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

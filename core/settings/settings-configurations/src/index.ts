@@ -23,6 +23,9 @@ import { ConfigurationsSettingsParser } from "./configurationsSettingsParser";
 import { Container } from "inversify";
 import type { SettingsParser } from "@xwiki/cristal-settings-api";
 
+/**
+ * @beta
+ */
 class ComponentInit {
   constructor(container: Container) {
     container

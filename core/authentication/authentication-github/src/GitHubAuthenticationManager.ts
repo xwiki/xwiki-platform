@@ -32,6 +32,7 @@ import type {
  * {@link AuthenticationManager} for the GitHub backend.
  *
  * @since 0.15
+ * @beta
  */
 @injectable()
 export class GitHubAuthenticationManager implements AuthenticationManager {

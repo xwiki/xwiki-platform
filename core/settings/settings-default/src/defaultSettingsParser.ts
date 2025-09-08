@@ -32,6 +32,7 @@ import type {
  * It will try to parse given settings through JSON.parse(). It should be
  * extended for settings whose content is not compatible with this method.
  * @since 0.18
+ * @beta
  */
 @injectable()
 class DefaultSettingsParser implements SettingsParser {
@@ -43,6 +44,7 @@ class DefaultSettingsParser implements SettingsParser {
 /**
  * Default implementation for {@link SettingsParserProvider}.
  * @since 0.18
+ * @beta
  */
 @injectable()
 class DefaultSettingsParserProvider implements SettingsParserProvider {

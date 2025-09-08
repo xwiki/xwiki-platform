@@ -22,6 +22,9 @@ import { DefaultWikiConfigProxy } from "./defaultWikiConfigProxy";
 import { Container } from "inversify";
 import type { WikiConfigProxy } from "@xwiki/cristal-wiki-config-api";
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

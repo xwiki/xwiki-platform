@@ -20,4 +20,10 @@
 
 import AlertsToasts from "./vue/AlertsToasts.vue";
 
-export { AlertsToasts };
+/**
+ * @since 0.11
+ * @beta
+ */
+const AlertsToastsAnnotated = AlertsToasts;
+
+export { AlertsToastsAnnotated as AlertsToasts };

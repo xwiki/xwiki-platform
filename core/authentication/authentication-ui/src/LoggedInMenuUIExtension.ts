@@ -25,6 +25,7 @@ import type { Component } from "vue";
 
 /**
  * @since 0.11
+ * @beta
  */
 @injectable()
 export class LoggedInMenuUIExtension implements UIExtension {

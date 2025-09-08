@@ -37,19 +37,34 @@ pipeline {
                  sh 'pnpm build'
             }
         }
-        stage('Lint') {
-            steps {
-                sh 'pnpm lint'
-            }
-        }
-        stage('PubLint') {
-            steps {
-                sh 'pnpm -r exec publint --pack pnpm --strict'
-            }
-        }
-        stage('Unit Tests') {
-            steps {
-                sh 'pnpm test'
+        stage('checks') {
+            parallel {
+                stage('Lint') {
+                    steps {
+                        sh 'pnpm lint'
+                    }
+                }
+                stage('API Extractor') {
+                    steps {
+                        sh 'pnpm run api-extractor:local'
+                        script {
+                            def gitStatus = sh(script: 'git status --porcelain', returnStdout: true).trim()
+                            if (gitStatus) {
+                                error("Git working directory is not clean after command execution. Changes detected:\n${gitStatus}")
+                            }
+                        }
+                    }
+                }
+                stage('PubLint') {
+                    steps {
+                        sh 'pnpm -r exec publint --pack pnpm --strict'
+                    }
+                }
+                stage('Unit Tests') {
+                    steps {
+                        sh 'pnpm test'
+                    }
+                }
             }
         }
         stage('E2E Tests') {

@@ -24,6 +24,7 @@ import type { Ref } from "vue";
 
 /**
  * @since 0.12
+ * @beta
  */
 type DocumentChange = "update" | "delete";
 
@@ -31,6 +32,7 @@ type DocumentChange = "update" | "delete";
  * Provide the operation to access a document.
  *
  * @since 0.11
+ * @beta
  */
 interface DocumentService {
   /**
@@ -42,6 +44,7 @@ interface DocumentService {
    * Returns a reference the document reference for the current document.
    *
    * @since 0.13
+   * @beta
    */
   getCurrentDocumentReference(): Ref<DocumentReference | undefined>;
 
@@ -49,12 +52,14 @@ interface DocumentService {
    * Returns a serialized string of {@link getCurrentDocumentReference}.
    *
    * @since 0.13
+   * @beta
    */
   getCurrentDocumentReferenceString(): Ref<string | undefined>;
 
   /**
    * @returns the revision of the current document, or undefined if it's the last one
    * @since 0.12
+   * @beta
    */
   getCurrentDocumentRevision(): Ref<string | undefined>;
 
@@ -63,6 +68,7 @@ interface DocumentService {
    * document reference.
    *
    * @since 0.14
+   * @beta
    */
   getDisplayTitle(): Ref<string>;
 
@@ -71,6 +77,7 @@ interface DocumentService {
    * see {@link getDisplayTitle}.
    *
    * @since 0.14
+   * @beta
    */
   getTitle(): Ref<string | undefined>;
 
@@ -90,6 +97,7 @@ interface DocumentService {
    * @param revision - the revision of the document, undefined for latest
    *
    * @since 0.18
+   * @beta
    */
   setCurrentDocument(
     documentReference: string,
@@ -100,6 +108,7 @@ interface DocumentService {
    * Force reloading the content of the document without changing the current document reference
    *
    * @since 0.18
+   * @beta
    */
   refreshCurrentDocument(): Promise<void>;
 
@@ -109,6 +118,7 @@ interface DocumentService {
    * @param change - the kind of change
    * @param listener - the listener to register
    * @since 0.15
+   * @beta
    */
   registerDocumentChangeListener(
     change: DocumentChange,
@@ -121,6 +131,7 @@ interface DocumentService {
    * @param change - the kind of change
    * @param page - the reference to the changed document
    * @since 0.15
+   * @beta
    */
   notifyDocumentChange(
     change: DocumentChange,
@@ -128,6 +139,9 @@ interface DocumentService {
   ): Promise<void>;
 }
 
+/**
+ * @beta
+ */
 const name: string = "DocumentService";
 
 export { type DocumentChange, type DocumentService, name };

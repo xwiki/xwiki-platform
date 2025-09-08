@@ -34,6 +34,13 @@ function getAuthorizationValue() {
   return `${getTokenType()} ${getAccessToken()}`;
 }
 
+/**
+ * @param browserWindow - the browser window to use for the authentication process
+ * @param reload - the reload function
+ *
+ * @since 0.15
+ * @beta
+ */
 export function load(
   browserWindow: BrowserWindow,
   reload: (win: BrowserWindow) => void,

@@ -22,6 +22,7 @@
  * Provides operation to render Markdown to HTML.
  *
  * @since 0.13
+ * @beta
  */
 export interface MarkdownRenderer {
   /**

@@ -18,12 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+/**
+ * @since 0.8
+ * @beta
+ */
 type BreadcrumbItem = { label: string; url?: string };
+
+/**
+ * @since 0.8
+ * @beta
+ */
 type BreadcrumbItems = BreadcrumbItem[];
 
 /**
  * Shared types for the x-breadcrumb component implementations.
  * @since 0.8
+ * @beta
  */
 type BreadcrumbProps = {
   items: BreadcrumbItems;

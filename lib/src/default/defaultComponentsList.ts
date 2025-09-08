@@ -60,6 +60,7 @@ import type { Container } from "inversify";
  *
  * @param container - the container the load the components in
  * @since 0.18
+ * @beta
  */
 // eslint-disable-next-line max-statements
 async function defaultComponentsList(container: Container): Promise<void> {
@@ -105,6 +106,7 @@ async function defaultComponentsList(container: Container): Promise<void> {
  * @param container - the container to load the components in
  * @param configuration - the current configuration
  * @since 0.18
+ * @beta
  */
 // eslint-disable-next-line max-statements
 async function conditionalComponentsList(

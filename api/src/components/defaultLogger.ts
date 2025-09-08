@@ -22,6 +22,10 @@ import { inject, injectable, optional } from "inversify";
 import type { Logger } from "../api/logger";
 import type { LoggerConfig } from "../api/loggerConfig";
 
+/**
+ * @since 0.1
+ * @beta
+ */
 @injectable()
 export class DefaultLogger implements Logger {
   // @ts-expect-error module is temporarily undefined during class

@@ -40,6 +40,7 @@ import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
  * Implementation of PageHierarchyResolver for the XWiki backend.
  *
  * @since 0.9
+ * @beta
  **/
 @injectable()
 class XWikiPageHierarchyResolver implements PageHierarchyResolver {
@@ -134,6 +135,9 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -72,8 +73,13 @@ class CommentsIT
     @BeforeEach
     void beforeEach(TestUtils setup)
     {
-        setup.loginAsSuperAdmin();
-        setup.setPropertyInXWikiPreferences("dateformat", "String", "");
+        resetDateFormatProperty(setup);
+    }
+
+    @AfterAll
+    static void afterAll(TestUtils setup)
+    {
+        resetDateFormatProperty(setup);
     }
 
     @Test
@@ -368,5 +374,11 @@ class CommentsIT
             assertEquals(String.format(englishFormat, expectedYear,  expectedMonth, expectedDay, expectedMinute),
                 obtainedDate);
         }
+    }
+
+    private static void resetDateFormatProperty(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setPropertyInXWikiPreferences("dateformat", "String", "");
     }
 }

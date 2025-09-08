@@ -26,7 +26,6 @@ import java.lang.annotation.Target;
 
 import org.xwiki.bridge.internal.DefaultDocumentContextExecutor;
 import org.xwiki.icon.internal.context.IconSetContext;
-import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.skinx.internal.CssDocumentSkinExtension;
 import org.xwiki.skinx.internal.JsDocumentSkinExtension;
 import org.xwiki.skinx.internal.JsFileSkinExtension;
@@ -61,7 +60,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     JsDocumentSkinExtension.class,
     VelocityRenderer.class,
     DefaultDocumentContextExecutor.class,
-    AuthorExecutor.class,
 })
 @Inherited
 public @interface DefaultIconManagerComponentList

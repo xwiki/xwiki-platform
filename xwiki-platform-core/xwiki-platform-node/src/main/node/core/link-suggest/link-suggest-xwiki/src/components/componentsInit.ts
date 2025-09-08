@@ -31,6 +31,7 @@ import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-ur
  * Currently limited to guests, and to XWiki instances that have explicitly
  * allowed CORS, see https://cristal.xwiki.org/xwiki/bin/view/Backends/XWiki/
  * @since 0.8
+ * @beta
  */
 @injectable()
 class XWikiLinkSuggestService implements LinkSuggestService {
@@ -177,6 +178,9 @@ class XWikiLinkSuggestService implements LinkSuggestService {
   }
 }
 
+/**
+ * @beta
+ */
 export class ComponentInit {
   constructor(container: Container) {
     container

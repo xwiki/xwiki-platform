@@ -26,6 +26,7 @@ import type {
 /**
  * Description of a hierarchy item for a given page.
  * @since 0.9
+ * @beta
  */
 type PageHierarchyItem = {
   label: string;
@@ -37,6 +38,7 @@ type PageHierarchyItem = {
  * A PageHierarchyResolver computes and returns the hierarchy for a given page.
  *
  * @since 0.9
+ * @beta
  **/
 interface PageHierarchyResolver {
   /**
@@ -46,6 +48,7 @@ interface PageHierarchyResolver {
    * @param includeHomePage - whether to include a segment for the home page (default: true)
    * @returns the page hierarchy
    * @since 0.20
+   * @beta
    */
   getPageHierarchy(
     page: DocumentReference | SpaceReference,
@@ -58,6 +61,7 @@ interface PageHierarchyResolver {
  * matching the current wiki configuration.
  *
  * @since 0.9
+ * @beta
  **/
 interface PageHierarchyResolverProvider {
   /**
@@ -72,6 +76,7 @@ interface PageHierarchyResolverProvider {
 /**
  * The component id of PageHierarchyResolver.
  * @since 0.9
+ * @beta
  */
 const name = "PageHierarchyResolver";
 

@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -127,13 +128,21 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<DocumentI
     @Override
     public boolean hasNext()
     {
-        return getResults().size() > index;
+        return getResults().size() > this.index;
     }
 
     @Override
     public Pair<DocumentReference, DocumentIteratorEntry> next()
     {
-        Object[] result = getResults().get(index++);
+        List<Object[]> currentResults = getResults();
+
+        // Make sure there is indeed a next element
+        if (currentResults.size() <= this.index) {
+            throw new NoSuchElementException("No more element");
+        }
+
+        // Get current element
+        Object[] result = currentResults.get(index++);
 
         String localSpaceReference = (String) result[0];
         String name = (String) result[1];

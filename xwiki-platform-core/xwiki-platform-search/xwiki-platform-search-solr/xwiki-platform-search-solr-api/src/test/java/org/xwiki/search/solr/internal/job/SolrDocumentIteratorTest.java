@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -145,6 +146,8 @@ class SolrDocumentIteratorTest
             actualResult.add(iterator.next());
         }
 
+        assertThrows(NoSuchElementException.class, iterator::next);
+
         verify(this.resolver).getQuery(rootReference);
 
         List<Pair<DocumentReference, DocumentIteratorEntry>> expectedResult = new ArrayList<>();
@@ -157,7 +160,7 @@ class SolrDocumentIteratorTest
 
         assertEquals(expectedResult, actualResult);
 
-        verify(this.solrInstance, times(3)).query(argThat(query ->
+        verify(this.solrInstance, times(4)).query(argThat(query ->
             query instanceof SolrQuery solrQuery && solrQuery.getRows() == limit));
     }
 

@@ -21,6 +21,7 @@ package org.xwiki.search.solr.internal.job;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -97,7 +98,15 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<DocumentItera
     @Override
     public Pair<DocumentReference, DocumentIteratorEntry> next()
     {
-        SolrDocument result = getResults().get(this.index++);
+        List<SolrDocument> currentResults = getResults();
+
+        // Make sure there is indeed a next element
+        if (currentResults.size() <= this.index) {
+            throw new NoSuchElementException("No more element");
+        }
+
+        // Get current element
+        SolrDocument result = currentResults.get(this.index++);
 
         DocumentReference documentReference = this.solrDocumentReferenceResolver.resolve(result);
         long docId = (long) result.getFieldValue(FieldUtils.DOC_ID);

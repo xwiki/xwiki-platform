@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.inject.Named;
 
@@ -171,6 +172,8 @@ class DatabaseDocumentIteratorTest
             actualResults.add(iterator.next());
         }
 
+        assertThrows(NoSuchElementException.class, () -> iterator.next());
+
         List<Pair<DocumentReference, String>> expectedResults = new ArrayList<>();
         expectedResults.add(new ImmutablePair<>(chessBlogCodeWebHome, "3.2"));
         expectedResults.add(new ImmutablePair<>(chessMainWelcome, "1.1"));
@@ -219,6 +222,8 @@ class DatabaseDocumentIteratorTest
         while (iterator.hasNext()) {
             actualResults.add(iterator.next());
         }
+
+        assertThrows(NoSuchElementException.class, () -> iterator.next());
 
         List<Pair<DocumentReference, String>> expectedResults = new ArrayList<>();
         expectedResults.add(new ImmutablePair<>(new DocumentReference(rootReference, Locale.GERMAN), "3.1"));

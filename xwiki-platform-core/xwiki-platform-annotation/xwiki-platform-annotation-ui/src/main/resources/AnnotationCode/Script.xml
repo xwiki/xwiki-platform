@@ -1361,22 +1361,32 @@ XWiki.Annotation = Class.create({
     }.bind(this));
   },
 
-  displayLoadingBubble : function(top, left) {
-    // create an element with the form
+  displayLoadingBubble : function(verticalCoordinate, horizontalCoordinate) {
+    // create a bubble element wrapping the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
-    // and a nice loading panel inside
+    // Add a nice loading panel inside
     bubble.insert({top : new Element('div', {'class' : 'loading'})});
-    // and put it in the content
+    // Position it off-screen at first, before we measure it and compute its final position
+    bubble.style.top = verticalCoordinate + 'px';
+    bubble.style.left = '-100%';
+    // and insert the bubble in the content
     document.body.insert({bottom : bubble});
-    // make it hidden for the moment
-    bubble.toggleClassName('hidden');
-    // position it
-    bubble.style.left = left + 'px';
-    bubble.style.top = top + 'px';
-    // make it visible
-    bubble.toggleClassName('hidden');
     // put this bubble in the bubbles stack
     this.bubbles.push(bubble);
+    // position the bubble
+    // By default, we position it to the right and under the coordinates
+    // Position it horizontally.
+    let bubbleStyles = getComputedStyle(bubble);
+    let bubbleWidth = bubble.offsetWidth 
+      + parseInt(bubbleStyles.marginLeft)
+      + parseInt(bubbleStyles.marginRight);
+    if (horizontalCoordinate &lt; bubbleWidth || horizontalCoordinate + bubbleWidth &lt; window.innerWidth) {
+      bubble.style.left = horizontalCoordinate + 'px';
+    } else {
+      // There isn't enough space on the right of the window to fit the modal, and there is enough on the left.
+      bubble.style.left = (horizontalCoordinate - bubbleWidth) + 'px';
+      bubble.toggleClassName('annotation-bubble-position-left');
+    }
 
     return bubble;
   },

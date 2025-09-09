@@ -756,6 +756,8 @@ require(['jquery', 'xwiki-l10n!xwiki-flamingo-theme-messages', 'bootstrap'], fun
   height: 400px;
 }
 
+/* When reworking the DOM of this form, use the standard vertical form structure to avoid hard-coding styles like 
+this. */
 .xHint {
   color: $theme.textSecondaryColor;
   font-size: smaller;

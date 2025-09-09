@@ -79,8 +79,9 @@ require(['jquery'], function ($) {
 
     _initTextarea(textarea, self) {
       let buttonMenu = $('<div class="leftmenu2"></div>');
-      let buttonConfig = JSON.parse($('#simpletoolbar-configuration').text());
-      for (let item of buttonConfig.toolbarElements) {
+      let buttonConfig = this._parseConfiguration();
+      const toolbarElement = buttonConfig.toolbarElements || [];
+      for (let item of toolbarElement) {
         let button = $('<button></button>');
         button.attr({
             type: 'button',
@@ -104,6 +105,19 @@ require(['jquery'], function ($) {
       }
       textarea.before(buttonMenu);
       $(document).trigger('xwiki:dom:updated', {'elements': [buttonMenu.parent()[0]]});
+    }
+
+    /**
+     * @returns {Object} the resolved configuration as an unstructured object, or the empty object in case of error.
+     */
+    _parseConfiguration()
+    {
+      try {
+        return $('#simpletoolbar-configuration').data('xwiki-simpletoolbar-configuration');
+      } catch (e) {
+        console.error('Error parsing simpletoolbar configuration: ', e);
+        return {};
+      }
     }
   }
 

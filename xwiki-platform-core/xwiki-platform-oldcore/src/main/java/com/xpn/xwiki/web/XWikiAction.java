@@ -1297,4 +1297,35 @@ public abstract class XWikiAction implements LegacyAction
         }
         return false;
     }
+
+    /**
+     * @param isAjaxRequest Indicate if this is an ajax request.
+     * @param exception The exception to handle.
+     * @param context The XWiki context.
+     * @throws XWikiException unless it is an ajax request.
+     */
+    protected void handleSaveException(boolean isAjaxRequest, Exception exception, XWikiContext context)
+        throws XWikiException
+    {
+        if (isAjaxRequest) {
+            String errorMessage =
+                localizePlainOrKey("core.editors.saveandcontinue.exceptionWhileSaving", exception.getMessage());
+
+            writeAjaxErrorResponse(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
+
+            String logMessage = "Caught exception during save and continue";
+            if (exception instanceof XWikiException) {
+                LOGGER.info(logMessage, exception);
+            } else {
+                LOGGER.error(logMessage, exception);
+            }
+        } else {
+            if (exception instanceof XWikiException) {
+                throw (XWikiException) exception;
+            } else {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Uncaught exception", exception);
+            }
+        }
+    }
 }

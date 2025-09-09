@@ -36,17 +36,22 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
+import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.CKEditorToolBar;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
+import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
+import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.realtime.test.RealtimeTestUtils;
 import org.xwiki.realtime.test.po.Coeditor;
+import org.xwiki.realtime.test.po.RealtimeEditToolbar;
 import org.xwiki.realtime.test.po.RealtimeInplaceEditablePage;
 import org.xwiki.realtime.test.po.SaveStatus;
 import org.xwiki.realtime.test.po.SummaryModal;
@@ -60,6 +65,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import com.mchange.io.FileUtils;
@@ -166,7 +172,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         textArea.sendKeys("zero");
 
         // Wait for auto-save.
-        assertEquals(SaveStatus.UNSAVED, inplaceEditablePage.getToolbar().getSaveStatus());
+        inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
         inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
 
         inplaceEditablePage.done();
@@ -1861,6 +1867,49 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
             second\u00A0[[attach:source-button.mp4||target="_blank"]] blue\u00A0[[image:realtimeWysiwygEditor.png]] green""",
             secondEditor.getSourceTextArea().getDomProperty("value"));
+    }
+
+    @Test
+    @Order(21)
+    void failGracefullyIfWeCannotConnect(TestUtils setup, TestReference testReference) throws Exception
+    {
+        RealtimeTestUtils.simulateFailedWebSocketConnection(setup, () -> {
+            // Start fresh.
+            setup.deletePage(testReference);
+
+            loginAsJohn(setup);
+
+            // Verify the standalone editor.
+            WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
+            editPage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
+
+            RealtimeEditToolbar realtimeToolbar = new RealtimeEditToolbar();
+            assertFalse(realtimeToolbar.isCollaborating());
+            assertFalse(realtimeToolbar.canJoinCollaboration());
+
+            CKEditor editor = new CKEditor("content").waitToLoad();
+            RichTextAreaElement textArea = editor.getRichTextArea();
+            textArea.sendKeys("alone");
+            editor.getToolBar().toggleSourceMode();
+            assertEquals("alone", editor.getSourceTextArea().getDomProperty("value"));
+            editPage.clickSaveAndView();
+
+            // Verify the in-place editor.
+            InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+            assertEquals("alone", inplaceEditablePage.getContent());
+
+            inplaceEditablePage.editInplace();
+            inplaceEditablePage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
+
+            assertFalse(realtimeToolbar.isCollaborating());
+            assertFalse(realtimeToolbar.canJoinCollaboration());
+
+            new CKEditor("content").waitToLoad().getRichTextArea().sendKeys("edited ");
+            inplaceEditablePage.save();
+            assertEquals("edited alone", inplaceEditablePage.getContent());
+
+            return null;
+        });
     }
 
     private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)

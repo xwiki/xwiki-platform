@@ -19,19 +19,24 @@
  */
 package org.xwiki.realtime.wiki.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WindowType;
+import org.xwiki.realtime.test.RealtimeTestUtils;
+import org.xwiki.realtime.test.po.RealtimeEditToolbar;
 import org.xwiki.realtime.wiki.test.po.RealtimeWikiEditPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Functional tests for the real-time Wiki editor.
@@ -143,5 +148,35 @@ class RealtimeWikiEditorIT
         firstRtWikiEditor.waitUntilContentContains("finish");
 
         assertEquals("end\nfinish", firstRtWikiEditor.getExactContent());
+    }
+
+    @Test
+    @Order(2)
+    void failGracefullyIfWeCannotConnect(TestUtils setup, TestReference testReference) throws Exception
+    {
+        RealtimeTestUtils.simulateFailedWebSocketConnection(setup, () -> {
+            // Start fresh.
+            setup.deletePage(testReference);
+
+            loginAsAlice(setup);
+
+            WikiEditPage editPage = WikiEditPage.gotoPage(testReference);
+            editPage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
+
+            RealtimeEditToolbar realtimeToolbar = new RealtimeEditToolbar();
+            assertFalse(realtimeToolbar.isCollaborating());
+            assertFalse(realtimeToolbar.canJoinCollaboration());
+
+            editPage.setContent("edited alone");
+            ViewPage viewPage = editPage.clickSaveAndView();
+            assertEquals("edited alone", viewPage.getContent());
+
+            return null;
+        });
+    }
+
+    private void loginAsAlice(TestUtils setup)
+    {
+        setup.login("alice", "pa$$word");
     }
 }

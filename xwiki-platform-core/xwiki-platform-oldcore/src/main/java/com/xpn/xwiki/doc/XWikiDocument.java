@@ -1693,7 +1693,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
-     * @param isolated true of the content should be executed in this document's context
+     * @param isolated true if the content should be executed in this document's context
      * @param context the XWiki context
      * @return the given text rendered in the context of this document using the passed Syntax
      * @since 14.10

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>17.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -457,6 +457,12 @@
       <artifactId>xwiki-platform-edit-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed by FileUploadPlugin -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>5.4.1</version>
+    </dependency>
 
     <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
@@ -708,7 +714,6 @@
                 **/api/CriteriaService.java,
                 **/api/Document.java,
                 **/api/DocumentSection.java,
-                **/api/Object.java,
                 **/api/XWiki.java,
                 **/content/parsers/RenamePageReplaceLinkHandler.java,
                 **/criteria/api/XWikiCriteriaService.java,
@@ -778,7 +783,6 @@
                 **/monitor/api/MonitorTimerSummary.java,
                 **/objects/BaseCollection.java,
                 **/objects/BaseElement.java,
-                **/objects/BaseObject.java,
                 **/objects/BaseProperty.java,
                 **/objects/BaseStringProperty.java,
                 **/objects/classes/BaseClass.java,
@@ -791,7 +795,6 @@
                 **/objects/classes/ListItem.java,
                 **/objects/classes/NumberClass.java,
                 **/objects/classes/PasswordClass.java,
-                **/objects/classes/PropertyClassInterface.java,
                 **/objects/classes/PropertyClass.java,
                 **/objects/classes/StaticListClass.java,
                 **/objects/classes/StringClass.java,

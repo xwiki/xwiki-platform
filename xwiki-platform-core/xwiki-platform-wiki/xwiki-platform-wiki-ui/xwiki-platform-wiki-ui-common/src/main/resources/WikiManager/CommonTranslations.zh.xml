@@ -40,7 +40,7 @@
 admin.wikis.descriptor=描述符号
 admin.wikis.descriptor.description=配置Wiki描述符号
 admin.wiki.description=描述您的Wiki（好听的名称和描述）并设置其所有者和主页。
-platform.wiki.admin.wiki.ownerProblemConfirmation=新所有者的用户不存在，或者它可能来自其他 wiki。\\n您确定要使用它并继续保存操作吗？
+platform.wiki.admin.wiki.ownerProblemConfirmation=新所有者的用户不存在，或者它可能来自其他 wiki。\n您确定要使用它并继续保存操作吗？
 platform.wiki.admin.wiki.csrfInvalidError=安全 （CSRF） 令牌无效。请刷新页面并重试。
 platform.wiki.admin.wiki.requiredFieldsError='主页' 字段不能为空。
 platform.wiki.admin.wiki.ownerWarning=警告： 更改此设置后，以前的所有者将失去其所有者权限。如果那是你，请确保你不要把自己锁在 wiki 之外。如果这是错误的，您将需要联系主 wiki 的管理员或使用超级管理员帐户。

@@ -70,7 +70,6 @@
         #else
           #set ($passwordLength = $passwordOptions.passwordLength)
         #end
-        $services.localization.render('platform.core.profile.passwd.instructionsPasswordLength', $passwordLength)
         ## We won't ask for the original password if the user is admin and not updating his own profile.
         ## In all other cases, we ask for it.
         #if (!$hasAdmin || $isCurrentUsersProfile)
@@ -102,12 +101,13 @@
         ## This key fits better.
         #set ($fields[$index].label = $services.localization.render('xe.admin.passwordReset.step2.newPasswordVerification.label'))
         <form class="xform third" action="" method="post" autocomplete="off">
+        ## Async validation feedback
+        #if ($request.xwikipassword && !$isValidPassword)
+            #error($stringtool.join($errorMessage, '<br/>'))
+        #end
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
         #generateHtml($fields, $NULL)
-        #if ($request.xwikipassword && !$isValidPassword)
-          <span class='box errormessage'>$stringtool.join($errorMessage, "<br/>")</span>
-        #end
         <div class="padded buttons">
           <span class="buttonwrapper"><input type="submit" value="$services.localization.render('platform.core.profile.passwd.submit')" class="button"/></span>
           <span class="buttonwrapper"><a href="$doc.getURL("view")" class="secondary button">$services.localization.render('platform.core.profile.passwd.cancel')</a></span>

@@ -23,6 +23,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.management.MBeanServer;
@@ -33,6 +34,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
@@ -258,7 +260,9 @@ public class XWikiServletContextListener implements ServletContextListener
                 uriCompliance = getUriCompliance(httpConfiguration);
             }
 
+            // Disable various violations applied by default by Jetty to URIs and redirect URIs
             MethodUtils.invokeMethod(httpConfiguration, "setUriCompliance", uriCompliance);
+            MethodUtils.invokeMethod(httpConfiguration, "setRedirectUriCompliance", uriCompliance);
         } catch (Exception e) {
             LOGGER.debug("Failed to set the URI compliance", e);
         }
@@ -274,11 +278,18 @@ public class XWikiServletContextListener implements ServletContextListener
 
         Class<?> uriComplianceClass = MethodUtils.invokeMethod(httpConfiguration, "getUriCompliance").getClass();
         Class violationsClass = getViolationClass(uriComplianceClass);
-        Set<?> violations = Set.of(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEGMENT"),
-            Enum.valueOf(violationsClass, "AMBIGUOUS_EMPTY_SEGMENT"),
-            Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEPARATOR"),
-            Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_PARAMETER"),
-            Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_ENCODING"));
+        Set<Object> violations = new HashSet<>();
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEGMENT"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_EMPTY_SEGMENT"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEPARATOR"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_PARAMETER"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_ENCODING"));
+
+        // Allow fragments in redirects (violation introduced in Jetty 12.1.0)
+        Object fragmentViolation = EnumUtils.getEnum(violationsClass, "FRAGMENT");
+        if (fragmentViolation != null) {
+            violations.add(fragmentViolation);
+        }
 
         return ConstructorUtils.invokeConstructor(uriComplianceClass, "XWiki", violations);
     }

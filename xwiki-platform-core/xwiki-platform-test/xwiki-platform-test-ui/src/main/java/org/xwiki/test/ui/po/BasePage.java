@@ -56,7 +56,7 @@ public class BasePage extends BaseElement
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
 
-    private static final By EDIT_BUTTON_LOCATOR = By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]");
+    private static final By EDIT_BUTTON_LOCATOR = By.xpath("//li[@id='tmEdit']/a[contains(@class, 'btn')]");
 
     /**
      * Used for sending keyboard shortcuts to.
@@ -70,10 +70,10 @@ public class BasePage extends BaseElement
     @FindBy(id = "contentmenu")
     private WebElement contentMenuBar;
 
-    @FindBy(xpath = "//div[@id='tmCreate']/a[contains(@class, 'btn')]")
+    @FindBy(xpath = "//li[@id='tmCreate']/a[contains(@class, 'btn')]")
     private WebElement tmCreate;
 
-    @FindBy(xpath = "//div[@id='tmMoreActions']/button")
+    @FindBy(xpath = "//li[@id='tmMoreActions']/button")
     private WebElement moreActionsMenu;
 
     @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
@@ -194,7 +194,7 @@ public class BasePage extends BaseElement
      */
     protected void clickEditSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmEdit']/*[contains(@class, 'dropdown-toggle')]"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//li[@id='tmEdit']/*[contains(@class, 'dropdown-toggle')]"), id);
     }
 
     /**
@@ -329,7 +329,7 @@ public class BasePage extends BaseElement
      */
     public void clickMoreActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/button"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//li[@id='tmMoreActions']/button"), id);
     }
 
     /**

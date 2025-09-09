@@ -25,9 +25,9 @@
 ext
 console-capture
 requestlog
-ee10-apache-jsp
-ee10-deploy
-ee10-websocket-jakarta
+ee11-apache-jsp
+ee11-deploy
+ee11-websocket-jakarta
 http
 forwarded
 work

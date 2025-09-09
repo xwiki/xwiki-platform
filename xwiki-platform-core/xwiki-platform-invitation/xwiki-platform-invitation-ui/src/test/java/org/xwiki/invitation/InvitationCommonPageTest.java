@@ -42,6 +42,7 @@ import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.user.UserReferenceComponentList;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -226,7 +227,13 @@ class InvitationCommonPageTest extends PageTest
             hopefullyNonExistantSpaceDoc.newXObject(configDocumentReference, this.context);
         invitationConfigXObject.set("from_address", "no-reply@localhost.localdomain", this.context);
         IntStream.range(0, 8)
-            .forEach(value -> invitationConfigXObject.set("field" + value, "value " + value, this.context));
+            .forEach(value -> {
+                try {
+                    invitationConfigXObject.set("field" + value, "value " + value, this.context);
+                } catch (XWikiException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         this.xwiki.saveDocument(hopefullyNonExistantSpaceDoc, this.context);
 
         this.request.put("test", "1");

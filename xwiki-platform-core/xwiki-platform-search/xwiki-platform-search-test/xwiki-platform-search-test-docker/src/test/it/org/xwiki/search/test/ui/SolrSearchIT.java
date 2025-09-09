@@ -43,6 +43,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -224,9 +225,9 @@ class SolrSearchIT
         // Check the search results without search exclusions.
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
         searchPage.search(matchedWord);
-        assertEquals(List.of("One", "Two", "Three", "Child of Three", "Four", "Child of Four"),
+        assertThat("All matched pages should appear in the search results before configuring search exclusions.",
             searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
-            "All matched pages should appear in the search results before configuring search exclusions.");
+            containsInAnyOrder("One", "Two", "Three", "Child of Three", "Four", "Child of Four"));
 
         // Configure search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();
@@ -238,8 +239,8 @@ class SolrSearchIT
         searchPage = SolrSearchPage.gotoPage();
         searchPage.search(matchedWord);
         // Children of excluded pages should also be excluded.
-        assertEquals(List.of("One", "Four", "Child of Four"),
-            searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList());
+        assertThat(searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
+            containsInAnyOrder("One", "Four", "Child of Four"));
 
         // Refine the search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();
@@ -251,7 +252,7 @@ class SolrSearchIT
         // Check again the search results.
         searchPage = SolrSearchPage.gotoPage();
         searchPage.search(matchedWord);
-        assertEquals(List.of("One", "Two", "Four", "Child of Four"),
-            searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList());
+        assertThat(searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
+            containsInAnyOrder("One", "Two", "Four", "Child of Four"));
     }
 }

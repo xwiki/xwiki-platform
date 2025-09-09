@@ -59,15 +59,18 @@
     ## * multilingual is on
     ## * the user can edit the current document
     ## * the user is viewing the original document version
-    ## * the document is translatable (either has a default locale specified or it has existing translations)
-    ## * the current UI locale doesn't match the original document locale
+    ## * the document is translatable (either has a default locale specified or it has existing translations for the
+    ##   supported locales)
+    ## * the current UI locale doesn't match the original document locale, and there's no existing translation for it
+    #set ($supportedTranslationLocales = $doc.translationLocales)
+    #set ($discard = $supportedTranslationLocales.retainAll($xwiki.availableLocales))
     #if (
       $displayTranslateMenu &&
       $xwiki.isMultiLingual() &&
       $hasEdit && !$isReadOnly &&
       $xcontext.action == 'view' && $tdoc.realLocale == $doc.realLocale &&
-      ("$!doc.realLocale" != '' || !$doc.translationLocales.isEmpty()) &&
-      $doc.realLocale != $xcontext.locale
+      ("$!doc.realLocale" != '' || !$supportedTranslationLocales.isEmpty()) &&
+      $doc.realLocale != $xcontext.locale && !$supportedTranslationLocales.contains($xcontext.locale)
     )
       #displayTranslateMenu()
     #end

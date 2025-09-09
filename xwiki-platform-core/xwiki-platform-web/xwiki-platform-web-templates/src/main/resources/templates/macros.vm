@@ -2070,13 +2070,14 @@ $displayName##
  * @since 16.10.11
  *#
 #macro(validateQueryLimit $limit $parameterName)
-  #set ($configuredLimit = $services.security.getQueryItemsLimit())
-  #if ($configuredLimit > 0 && ($limit < 0 || $limit > $configuredLimit))
-    #set($discard =
-      $response.sendError(400,
-        "Invalid parameter value $limit for $parameterName: Must be a positive integer and less than or equal to $configuredLimit"))
-    #stop
-  #end
+## This macro is used in places that are sensitive to whitespace - don't indent.
+#set ($configuredLimit = $services.security.getQueryItemsLimit())
+#if ($configuredLimit > 0 && ($limit < 0 || $limit > $configuredLimit))
+#set($discard =
+  $response.sendError(400,
+    "Invalid parameter value $limit for $parameterName: Must be a positive integer and less than or equal to $configuredLimit"))
+#stop
+#end
 #end
 ##
 ##
@@ -2091,14 +2092,15 @@ $displayName##
  * @since 16.10.11
  *#
 #macro(getAndValidateQueryLimitFromRequest $parameterName $defaultValue $_limit)
-  #set ($return = $numbertool.toNumber("$!{request.get($parameterName)}").intValue())
-  #if (!$return)
-    #set ($return = $defaultValue)
-  #else
-    #validateQueryLimit($return $parameterName)
-  #end
-  #set ($_limit = $NULL)
-  #setVariable("$_limit" $return)
+## This macro is used in places that are sensitive to whitespace - don't indent.
+#set ($return = $numbertool.toNumber("$!{request.get($parameterName)}").intValue())
+#if (!$return)
+#set ($return = $defaultValue)
+#else
+#validateQueryLimit($return $parameterName)
+#end
+#set ($_limit = $NULL)
+#setVariable("$_limit" $return)
 #end
 ##
 ##

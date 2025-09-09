@@ -411,6 +411,7 @@ public class DefaultIOService implements IOService
      * @return {@code true} if any modification was done on this object, {@code false} otherwise
      */
     protected boolean updateObject(BaseObject object, Annotation annotation, XWikiContext deprecatedContext)
+        throws XWikiException
     {
         boolean updated = false;
         // TODO: there's an issue here to solve with (custom) types which need to be serialized before saved. Some do,
@@ -447,6 +448,7 @@ public class DefaultIOService implements IOService
      * @return {@code true} if the field was set to newValue, {@code false} otherwise
      */
     protected boolean setIfNotNull(BaseObject object, String fieldName, Object newValue, XWikiContext deprecatedContext)
+        throws XWikiException
     {
         if (newValue != null) {
             object.set(fieldName, newValue, deprecatedContext);

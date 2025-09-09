@@ -182,7 +182,10 @@ public class LoggingScriptService implements ScriptService
                 Translation translation = this.localization.getTranslation(message.getTranslationKey());
 
                 if (translation != null) {
-                    return LogUtils.translate(message, (String) translation.getRawSource());
+                    // FIXME: it might not actually be a MessageFormat based translation, introduce a more accurate
+                    // extension point
+                    return LogUtils.translate(message, (String) translation.getRawSource(),
+                        LogUtils.MESSAGE_FORMAT_SYNTAX);
                 }
             }
         }

@@ -28,7 +28,10 @@ require(['jquery'], function ($) {
       });
       $(document).on('xwiki:dom:updated', function (event, data) {
         $(data.elements).find('textarea').each(function() {
-          self._initTextarea($(this), self);
+          let syntax = $(this).data('syntax');
+          if (typeof syntax === 'string' && syntax.startsWith('xwiki')) {
+            self._initTextarea($(this), self);
+          }
         });
       })
     }
@@ -76,8 +79,9 @@ require(['jquery'], function ($) {
 
     _initTextarea(textarea, self) {
       let buttonMenu = $('<div class="leftmenu2"></div>');
-      let buttonConfig = JSON.parse($('#simpletoolbar-configuration').text());
-      for (let item of buttonConfig.toolbarElements) {
+      let buttonConfig = this._parseConfiguration();
+      const toolbarElement = buttonConfig.toolbarElements || [];
+      for (let item of toolbarElement) {
         let button = $('<button></button>');
         button.attr({
             type: 'button',
@@ -100,7 +104,20 @@ require(['jquery'], function ($) {
         buttonMenu.append(button);
       }
       textarea.before(buttonMenu);
-      $(document).trigger('xwiki:dom:updated', {'elements': [textarea]});
+      $(document).trigger('xwiki:dom:updated', {'elements': [buttonMenu.parent()[0]]});
+    }
+
+    /**
+     * @returns {Object} the resolved configuration as an unstructured object, or the empty object in case of error.
+     */
+    _parseConfiguration()
+    {
+      try {
+        return $('#simpletoolbar-configuration').data('xwiki-simpletoolbar-configuration');
+      } catch (e) {
+        console.error('Error parsing simpletoolbar configuration: ', e);
+        return {};
+      }
     }
   }
 

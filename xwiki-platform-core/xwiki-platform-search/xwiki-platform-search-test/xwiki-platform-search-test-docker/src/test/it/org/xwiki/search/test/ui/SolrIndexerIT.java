@@ -66,12 +66,13 @@ class SolrIndexerIT
         import org.xwiki.search.solr.internal.job.DiffDocumentIterator
         import org.xwiki.search.solr.internal.job.DocumentIterator
         import org.xwiki.velocity.tools.JSONTool
-        
+        import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
+
         if (xcontext.action == "get") {
             ParameterizedType documentIterator =
-                new DefaultParameterizedType(null, DocumentIterator.class, String.class)
-            DocumentIterator<String> databaseIterator = services.component.getInstance(documentIterator, "database")
-            DocumentIterator<String> solrIterator = services.component.getInstance(documentIterator, "solr")
+                new DefaultParameterizedType(null, DocumentIterator.class, DocumentIteratorEntry.class)
+            DocumentIterator<DocumentIteratorEntry> databaseIterator = services.component.getInstance(documentIterator, "database")
+            DocumentIterator<DocumentIteratorEntry> solrIterator = services.component.getInstance(documentIterator, "solr")
         
             // Store both iterators converted to list for the output.
             def outputData = [
@@ -106,8 +107,8 @@ class SolrIndexerIT
             while (iterator.hasNext()) {
                 def pair = iterator.next()
                 int comparison = -1
-                if (previous != null) {
-                    comparison = comparator.compare(previous.getLeft(), pair.getLeft())
+                if (previous != null && previous.getRight() instanceof DocumentIteratorEntry) {
+                    comparison = comparator.compare(previous.getRight(), pair.getRight())
                 }
                 previous = pair
                 list.add([pair.getLeft().toString(), pair.getRight().toString(), String.valueOf(comparison)])

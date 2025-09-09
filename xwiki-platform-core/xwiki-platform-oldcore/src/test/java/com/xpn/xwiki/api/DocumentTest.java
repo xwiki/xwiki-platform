@@ -174,7 +174,7 @@ class DocumentTest
     }
 
     @Test
-    void getObject()
+    void getObject() throws XWikiException
     {
         XWikiContext context = new XWikiContext();
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));

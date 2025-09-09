@@ -210,17 +210,22 @@ Object.extend(XWiki, {
         }
         $("docextrapanes").className="loading";
 
-        // Determine if JS minification is disabled in the URL. Needed to pass it to the AJAX call to get the right resources on the reply.
-        var maybeMinifyRequestParameter = '';
-        var requestMinify = window.location.search.toQueryParams().minify;
-        if (requestMinify && requestMinify == 'false') {
-          maybeMinifyRequestParameter = '&minify=false';
+        const parameters = {
+          'xpage': 'xpart',
+          'vm': extraTemplate,
+          'language': document.documentElement.dataset.xwikiLocale
+        };
+        // Determine if JavaScript minification is disabled from the URL. We need to pass it to the AJAX call in order
+        // to get the right resources on the response.
+        if (new URLSearchParams(window.location.search).get('minify') === 'false') {
+          parameters.minify = 'false';
         }
 
         new Ajax.Request(
-          window.docgeturl + '?xpage=xpart&vm=' + extraTemplate + maybeMinifyRequestParameter,
+          window.docgeturl,
                 {
                     method: 'get',
+                    parameters,
                     onSuccess: function(response) {
                       // Do the work that Ajax.Updater is supposed to do, but we can't use it because it strips the <script>s
                       // from the output and we need to inject the external scripts from the reply (in the DOM's dead), to execute them.

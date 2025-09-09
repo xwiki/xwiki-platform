@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
@@ -170,7 +171,7 @@ public class DateClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty property = newProperty();
 
@@ -186,7 +187,11 @@ public class DateClass extends PropertyClass
             property.setValue(sdf.parse(value));
             return property;
         } catch (ParseException e) {
-            return null;
+            throw new XWikiException(String.format("Error when parsing [%s] with format [%s] and locale [%s]",
+                value,
+                getDateFormat(),
+                getCurrentLocale()),
+                e);
         }
     }
 

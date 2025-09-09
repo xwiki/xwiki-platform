@@ -517,12 +517,18 @@ public class SaveAction extends EditAction
             return false;
         }
 
-        if (save(context)) {
-            return true;
+        Boolean isAjaxRequest = Utils.isAjaxRequest(context);
+        try {
+            if (save(context)) {
+                return true;
+            }
+        } catch (XWikiException e) {
+            handleSaveException(isAjaxRequest, e, context);
+            return !isAjaxRequest;
         }
 
         // forward to view
-        if (Utils.isAjaxRequest(context)) {
+        if (isAjaxRequest) {
             Map<String, String> jsonAnswer = new LinkedHashMap<>();
             Version newVersion = (Version) context.get(SAVED_OBJECT_VERSION_KEY);
             jsonAnswer.put("newVersion", newVersion.toString());

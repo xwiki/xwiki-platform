@@ -758,7 +758,7 @@ require(['jquery', 'xwiki-l10n!xwiki-flamingo-theme-messages', 'bootstrap'], fun
 
 /* When reworking the DOM of this form, use the standard vertical form structure to avoid hard-coding styles like 
 this. */
-.xHint {
+#panel-theme-variables .xHint {
   color: $theme.textSecondaryColor;
   font-size: smaller;
   margin: 0.3em 0;

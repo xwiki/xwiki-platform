@@ -34,13 +34,16 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.store.FileDeleteTransactionRunnable;
-import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StreamProvider;
 import org.xwiki.store.StringStreamProvider;
 import org.xwiki.store.TransactionRunnable;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
+import org.xwiki.store.internal.BlobDeleteTransactionRunnable;
+import org.xwiki.store.internal.BlobSaveTransactionRunnable;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 
@@ -152,7 +155,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         }
 
         // This is the permanent location where the attachment content will go.
-        final File attachFile =
+        final Blob attachFile =
             this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
 
         return new AttachmentSaveTransactionRunnable(attachment, updateDocument, context, attachFile);
@@ -307,16 +310,13 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * @param attachment the XWikiAttachment whose content should be saved.
          * @param updateDocument whether or not to update the document at the same time.
          * @param context the XWikiContext for the request.
-         * @param attachFile the File to store the attachment in.
-         * @param tempFile the File to put the attachment content in until the transaction is complete.
-         * @param backupFile the File to backup the content of the existing attachment in.
-         * @param lock this Lock will be locked while the attachment file is being written to.
+         * @param attachFile the Blob to store the attachment in.
          * @throws XWikiException if thrown by {@link XWikiAttachment#updateContentArchive(XWikiContext)} or
          *             {@link FilesystemAttachmentVersioningStore# getArchiveSaveRunnable(XWikiAttachmentArchive,
          *             XWikiContext)}
          */
         AttachmentSaveTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
-            final XWikiContext context, final File attachFile) throws XWikiException
+            final XWikiContext context, final Blob attachFile) throws XWikiException, BlobStoreException
         {
             boolean link = false;
 
@@ -361,10 +361,10 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             //////////////////
             // CURRENT
 
-            File linkAttachFile = StoreFileUtils.getLinkFile(attachFile);
+            Blob linkAttachFile = StoreFileUtils.getLinkFile(attachFile);
 
-            File finalAttachFile;
-            File otherAttachFile;
+            Blob finalAttachFile;
+            Blob otherAttachFile;
             StreamProvider streamProvider;
             if (link) {
                 // Create a link to the current version
@@ -379,13 +379,17 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             }
 
             // Save the attachment file
-            new FileSaveTransactionRunnable(finalAttachFile, fileTools.getTempFile(finalAttachFile),
-                fileTools.getBackupFile(finalAttachFile), fileTools.getLockForFile(finalAttachFile), streamProvider)
-                    .runIn(this);
+            new BlobSaveTransactionRunnable(finalAttachFile,
+                FilesystemAttachmentStore.this.fileTools.getTempFile(finalAttachFile),
+                FilesystemAttachmentStore.this.fileTools.getBackupFile(finalAttachFile),
+                FilesystemAttachmentStore.this.fileTools.getLockForFile(finalAttachFile.getPath()),
+                streamProvider)
+                .runIn(this);
 
             // Also delete any file remaining at the other location
-            new FileDeleteTransactionRunnable(otherAttachFile, fileTools.getTempFile(otherAttachFile),
-                fileTools.getLockForFile(otherAttachFile)).runIn(this);
+            new BlobDeleteTransactionRunnable(otherAttachFile,
+                FilesystemAttachmentStore.this.fileTools.getTempFile(otherAttachFile),
+                FilesystemAttachmentStore.this.fileTools.getLockForFile(otherAttachFile.getPath())).runIn(this);
 
             //////////////////
             // DOCUMENT
@@ -432,18 +436,18 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * @param attachment the XWikiAttachment to delete
          * @param updateDocument whether or not to update the document at the same time.
          * @param context the XWikiContext for the request.
-         * @param attachFile the file to where the attachment content is stored.
+         * @param attachFile the blob to where the attachment content is stored.
          * @throws XWikiException if unable to load the archive for the attachment to delete.
          */
         AttachmentDeleteTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
-            final XWikiContext context, final File attachFile) throws XWikiException, BlobStoreException
+            final XWikiContext context, final Blob attachFile) throws XWikiException, BlobStoreException
         {
             // Delete both the standard and link location
-            File linkAtachFile = StoreFileUtils.getLinkFile(attachFile);
-            new FileDeleteTransactionRunnable(attachFile, fileTools.getBackupFile(attachFile),
-                fileTools.getLockForFile(attachFile)).runIn(this);
-            new FileDeleteTransactionRunnable(linkAtachFile, fileTools.getBackupFile(linkAtachFile),
-                fileTools.getLockForFile(linkAtachFile)).runIn(this);
+            Blob linkAtachFile = StoreFileUtils.getLinkFile(attachFile);
+            new BlobDeleteTransactionRunnable(attachFile, fileTools.getBackupFile(attachFile),
+                fileTools.getLockForFile(attachFile.getPath())).runIn(this);
+            new BlobDeleteTransactionRunnable(linkAtachFile, fileTools.getBackupFile(linkAtachFile),
+                fileTools.getLockForFile(linkAtachFile.getPath())).runIn(this);
 
             // If the store supports deleting in the same transaction then do it.
             final AttachmentVersioningStore avs = context.getWiki().getDefaultAttachmentArchiveStore();

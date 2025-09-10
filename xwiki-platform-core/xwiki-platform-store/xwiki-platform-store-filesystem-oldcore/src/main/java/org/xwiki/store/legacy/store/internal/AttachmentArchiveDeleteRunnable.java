@@ -58,7 +58,7 @@ public class AttachmentArchiveDeleteRunnable extends StartableTransactionRunnabl
         }
 
         for (Blob file : toDelete) {
-            new BlobDeleteTransactionRunnable(file, file.getStore().getBlob(fileTools.getBackupFile(file.getPath())),
+            new BlobDeleteTransactionRunnable(file, fileTools.getBackupFile(file),
                 fileTools.getLockForFile(file.getPath()))
                 .runIn(this);
         }

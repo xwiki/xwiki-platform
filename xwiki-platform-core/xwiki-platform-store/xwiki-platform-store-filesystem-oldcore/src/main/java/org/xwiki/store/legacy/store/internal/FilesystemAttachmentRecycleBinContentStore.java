@@ -19,8 +19,6 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -146,7 +144,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
             blobStream.forEach(blob -> {
                 try {
                     new BlobDeleteTransactionRunnable(blob,
-                        blob.getStore().getBlob(this.fileTools.getBackupFile(blob.getPath())),
+                        this.fileTools.getBackupFile(blob),
                         this.fileTools.getLockForFile(blob.getPath()))
                         .runIn(out);
                 } catch (BlobStoreException e) {
@@ -166,7 +164,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
 
         try {
             return deletedAttachmentContentFromProvider(provider);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
                 "Failed to get deleted attachment [" + reference + "] at index [" + index + "] and date  [" + deleteDate
                     + "]",
@@ -184,9 +182,9 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
      * @throws IOException if deserialization fails or there is a problem loading the archive.
      */
     private DeletedAttachmentContent deletedAttachmentContentFromProvider(final DeletedAttachmentFileProvider provider)
-        throws IOException
+        throws Exception
     {
-        final File deletedMeta = provider.getDeletedAttachmentMetaFile();
+        final Blob deletedMeta = provider.getDeletedAttachmentMetaFile();
 
         // No metadata, no deleted attachment.
         if (!deletedMeta.exists()) {
@@ -194,15 +192,15 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
         }
 
         final XWikiAttachment attachment;
-        ReadWriteLock lock = this.fileTools.getLockForFile(deletedMeta);
+        ReadWriteLock lock = this.fileTools.getLockForFile(deletedMeta.getPath());
         lock.readLock().lock();
         try {
-            attachment = this.metaSerializer.parse(new FileInputStream(deletedMeta));
+            attachment = this.metaSerializer.parse(deletedMeta.getStream());
         } finally {
             lock.readLock().unlock();
         }
 
-        File contentFile = provider.getAttachmentContentFile();
+        Blob contentFile = provider.getAttachmentContentFile();
 
         // Support links
         contentFile = StoreFileUtils.resolve(contentFile, true);
@@ -223,11 +221,11 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        final StartableTransactionRunnable tr = getSaveTrashAttachmentRunnable(attachment, index, xcontext);
-
-        new StartableTransactionRunnable().runIn(tr);
-
         try {
+            final StartableTransactionRunnable tr = getSaveTrashAttachmentRunnable(attachment, index, xcontext);
+
+            new StartableTransactionRunnable().runIn(tr);
+
             tr.start();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
@@ -247,7 +245,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
      *             in order to save it in the deleted section.
      */
     private StartableTransactionRunnable getSaveTrashAttachmentRunnable(final XWikiAttachment deleted, long index,
-        final XWikiContext context) throws XWikiException
+        final XWikiContext context) throws XWikiException, BlobStoreException
     {
         final DeletedAttachmentFileProvider provider =
             this.fileTools.getDeletedAttachmentFileProvider(deleted.getReference(), index);

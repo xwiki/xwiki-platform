@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +38,8 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.internal.FileSystemStoreUtils;
@@ -104,34 +107,34 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
     private void migrateWiki(String wikiId) throws DataMigrationException
     {
         // Previous wiki store location
-        File oldDirectory = this.getPre11WikiDir(wikiId);
+        BlobPath oldDirectory = this.getPre11WikiDir(wikiId);
 
         // New wiki store location
-        File newDirectory = this.fstools.getWikiDir(wikiId);
+        BlobPath newDirectory = this.fstools.getWikiDir(wikiId);
 
-        if (oldDirectory.exists()) {
-            // Move the wiki store
-            try {
+        try (Stream<Blob> stream = this.pre11BlobStore.listBlobs(oldDirectory)) {
+            if (stream.findAny().isPresent()) {
+                // Move the wiki store
                 this.logger.info("Moving wiki folder [{}] to new location [{}]", oldDirectory, newDirectory);
 
                 moveDirectory(oldDirectory, newDirectory);
-            } catch (IOException e) {
-                throw new DataMigrationException("Failed to move wiki store to the new location", e);
             }
+        } catch (Exception e) {
+            throw new DataMigrationException("Failed to move wiki store to the new location", e);
         }
 
         // Set right root directory
-        setStoreRootDirectory(this.fstools.getStoreRootDirectory());
+        setBlobStore(this.fstools.getStore());
 
-        if (newDirectory.exists()) {
-            // Rewrite store paths based on reference hash instead of URL encoding for the current wiki
-            try {
+        try (Stream<Blob> stream = this.blobStore.listBlobs(newDirectory)) {
+            if (stream.findAny().isPresent()) {
+                // Rewrite store paths based on reference hash instead of URL encoding for the current wiki
                 migrate(newDirectory, true);
-            } catch (IOException e) {
-                throw new DataMigrationException("Failed to refactor filesystem store paths", e);
+            } else {
+                this.logger.info("The wiki [{}] does not have any filesystem store", wikiId);
             }
-        } else {
-            this.logger.info("The wiki [{}] does not have any filesystem store", wikiId);
+        } catch (Exception e) {
+            throw new DataMigrationException("Failed to refactor filesystem store paths", e);
         }
     }
 

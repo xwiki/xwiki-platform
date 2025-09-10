@@ -19,24 +19,25 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.VoidAttachmentVersioningStore;
-
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.StreamProvider;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.internal.BlobSaveTransactionRunnable;
 import org.xwiki.store.serialization.SerializationStreamProvider;
 import org.xwiki.store.serialization.Serializer;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.store.VoidAttachmentVersioningStore;
 
 /**
  * A TransactionRunnable for saving attachment archives.
@@ -67,7 +68,7 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
         final Serializer<List<XWikiAttachment>,
             List<XWikiAttachment>> serializer,
         final XWikiContext context)
-        throws XWikiException
+        throws XWikiException, BlobStoreException
     {
         if (archive instanceof VoidAttachmentVersioningStore.VoidAttachmentArchive) {
             return;
@@ -112,12 +113,10 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
      */
     private void addSaver(final StreamProvider provider,
         final FilesystemStoreTools fileTools,
-        final File saveHere)
+        final Blob saveHere) throws BlobStoreException
     {
-        new FileSaveTransactionRunnable(saveHere,
-            fileTools.getTempFile(saveHere),
-            fileTools.getBackupFile(saveHere),
-            fileTools.getLockForFile(saveHere),
+        new BlobSaveTransactionRunnable(saveHere, fileTools.getTempFile(saveHere), fileTools.getBackupFile(saveHere),
+            fileTools.getLockForFile(saveHere.getPath()),
             provider).runIn(this);
     }
 }

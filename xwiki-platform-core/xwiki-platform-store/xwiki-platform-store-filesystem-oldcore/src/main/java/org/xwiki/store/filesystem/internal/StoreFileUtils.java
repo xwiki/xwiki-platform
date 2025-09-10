@@ -20,10 +20,12 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStoreException;
 
 /**
  * Internal class for providing static utilities used by multiple classes in this package.
@@ -76,22 +78,23 @@ public final class StoreFileUtils
      * @param targetFile the target file
      * @param followLinks true if links should be followed
      * @return the resolved file
-     * @throws IOException when failing to resolve the link
+     * @throws Exception when failing to resolve the link
      * @since 16.4.0RC1
      */
-    public static File resolve(File targetFile, boolean followLinks) throws IOException
+    public static Blob resolve(Blob targetFile, boolean followLinks) throws Exception
     {
         // Return the target file by default
-        File file = targetFile;
+        Blob file = targetFile;
 
         while (!file.exists()) {
             // If the file does not exist, check if there is a link instead
-            File linkFile = getLinkFile(file);
+            Blob linkFile = getLinkFile(file);
 
             if (linkFile.exists()) {
                 if (followLinks) {
                     // Move the target file to the link's target file
-                    file = new File(linkFile.getParent(), FileUtils.readFileToString(linkFile, StandardCharsets.UTF_8));
+                    String linkContent = IOUtils.toString(linkFile.getStream(), StandardCharsets.UTF_8).trim();
+                    file = linkFile.getStore().getBlob(linkFile.getPath().getParent().resolve(linkContent));
                 } else {
                     // Stop at the link file if we don't follow it
                     file = linkFile;
@@ -110,9 +113,10 @@ public final class StoreFileUtils
      * @return the File representing the link for the passed location
      * @since 16.4.0RC1
      */
-    public static File getLinkFile(File originalfile)
+    public static Blob getLinkFile(Blob originalfile) throws BlobStoreException
     {
-        return new File(originalfile.getParent(), originalfile.getName() + ".lnk");
+        BlobPath linkPath = originalfile.getPath().appendSuffix(".lnk");
+        return originalfile.getStore().getBlob(linkPath);
     }
 
     /**

@@ -27,9 +27,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
-import org.xwiki.filter.output.DefaultFileOutputTarget;
+import org.xwiki.filter.output.DefaultBlobOutputTarget;
 import org.xwiki.filter.xar.output.XAROutputProperties;
-import org.xwiki.store.FileSerializer;
+import org.xwiki.store.BlobSerializer;
+import org.xwiki.store.blob.Blob;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -43,7 +44,7 @@ import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
  */
 @Component(roles = DeletedDocumentContentFileSerializer.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DeletedDocumentContentFileSerializer implements FileSerializer
+public class DeletedDocumentContentFileSerializer implements BlobSerializer
 {
     @Inject
     private XWikiDocumentFilterUtils serializer;
@@ -63,7 +64,7 @@ public class DeletedDocumentContentFileSerializer implements FileSerializer
     }
 
     @Override
-    public void serialize(File file) throws Exception
+    public void serialize(Blob blob) throws Exception
     {
         // Input
         DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
@@ -82,7 +83,7 @@ public class DeletedDocumentContentFileSerializer implements FileSerializer
         xarProperties.setFormat(true);
 
         try {
-            this.serializer.exportEntity(this.document, new DefaultFileOutputTarget(file), xarProperties,
+            this.serializer.exportEntity(this.document, new DefaultBlobOutputTarget(blob), xarProperties,
                 documentProperties);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,

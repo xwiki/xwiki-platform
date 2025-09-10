@@ -22,6 +22,7 @@ package org.xwiki.store.filesystem.internal.migration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -35,6 +36,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
@@ -69,64 +73,67 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
     @Inject
     protected Logger logger;
 
-    protected File pre11StoreRootDirectory;
+    protected FileSystemBlobStore pre11BlobStore;
 
-    protected File storeRootDirectory;
+    protected BlobStore blobStore;
 
     @Override
     public void initialize() throws InitializationException
     {
-        this.pre11StoreRootDirectory = new File(this.environment.getPermanentDirectory(), "storage");
+        String pre11StoreName = "storage";
+        File pre11StoreDirectory = new File(this.environment.getPermanentDirectory(), pre11StoreName);
+
+        this.pre11BlobStore = new FileSystemBlobStore(pre11StoreName, pre11StoreDirectory.toPath());
 
         if (getVersion().getVersion() < R1100000XWIKI15620DataMigration.VERSION) {
-            this.storeRootDirectory = this.pre11StoreRootDirectory;
+            this.blobStore = this.pre11BlobStore;
         } else {
-            this.storeRootDirectory = this.fstools.getStoreRootDirectory();
+            this.blobStore = this.fstools.getStore();
         }
     }
 
-    protected File getPre11StoreRootDirectory()
+    protected BlobStore getPre11BlobStore()
     {
-        return this.pre11StoreRootDirectory;
+        return this.pre11BlobStore;
     }
 
-    protected File getStoreRootDirectory()
+    protected BlobStore getBlobStore()
     {
-        return this.storeRootDirectory;
+        return this.blobStore;
     }
 
-    protected void setStoreRootDirectory(File storeRootDirectory)
+    protected void setBlobStore(BlobStore blobStore)
     {
-        this.storeRootDirectory = storeRootDirectory;
+        this.blobStore = blobStore;
     }
 
-    protected File getPre11WikiDir(String wikiId)
+    protected BlobPath getPre11WikiDir(String wikiId)
     {
-        return new File(getPre11StoreRootDirectory(), wikiId);
+        return BlobPath.of(List.of(wikiId));
     }
 
-    private EntityReference getPre11EntityReference(File directory) throws IOException
+    private EntityReference getPre11EntityReference(BlobPath directory) throws IOException
     {
         String name = FileSystemStoreUtils.decode(directory.getName());
 
-        File parent = directory.getParentFile();
+        BlobPath parent = directory.getParent();
 
-        if (parent.getCanonicalPath().equals(getStoreRootDirectory().getCanonicalPath())) {
+        if (parent.getSegments().isEmpty()) {
             return new WikiReference(name);
         } else {
             return new SpaceReference(name, getPre11EntityReference(parent));
         }
     }
 
-    protected DocumentReference getPre11DocumentReference(File directory) throws DataMigrationException
+    protected DocumentReference getPre11DocumentReference(BlobPath directory) throws DataMigrationException
     {
         try {
             String name = FileSystemStoreUtils.decode(directory.getName());
 
-            return new DocumentReference(name, (SpaceReference) getPre11EntityReference(directory.getParentFile()));
+            return new DocumentReference(name, (SpaceReference) getPre11EntityReference(directory.getParent()));
         } catch (Exception e) {
             throw new DataMigrationException("Failed to get document reference for filesystem path [" + directory
-                + "] (root=" + getStoreRootDirectory() + ")", e);
+                + "]", e);
         }
     }
 

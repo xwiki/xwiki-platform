@@ -1,22 +1,46 @@
+#template('colorThemeInit.vm')
+.xdialog-modal-container {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 1005;
+}
+/* Semi-transparent overlay screen that covers the entire page. */
+.xdialog-screen {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+}
 .xdialog-box {
-  width: auto;
+  text-align: left;
   padding: 0;
-  /* By default the dialog box will be centered on the page using margins*/
   margin: auto;
-  color: var(--panel-default-text);
-  border: 1px solid var(--xwiki-border-color);
-  background-color: var(--panel-bg);
-  border-radius: var(--border-radius-large);
-
-  /* Semi-transparent overlay screen that covers the entire page. */
-  &::backdrop {
-    --xdialog-backdrop-color: #000;
-    background-color: var(--xdialog-backdrop-color);
-    --xdialog-backdrop-opacity: .5;
-    opacity: var(--xdialog-backdrop-opacity);
+  position: relative;
+  color: $theme.panelTextColor;
+  border: 1px solid $theme.borderColor;
+  background-color: $theme.panelBackgroundColor;
+  border-radius: 10px;
+}
+.xdialog-box {
+  max-height: 100%; /* Needed because of position: fixed */
+  overflow: auto; 
+  width: auto;
+}
+@media (min-width: 768px) { /* Should be: @screen-sm-min */
+  .xdialog-box {
+    width: 400px; /* Should be: @modal-md */
   }
 }
-
 .xdialog-box .xdialog-content,
 .xdialog-box > .xdialog-close {
   margin: .8em;
@@ -26,12 +50,12 @@
 }
 .xdialog-title .xdialog-close {
   font-size: 1.25em;
-  color: var(--panel-header-text);
+  color: $theme.panelHeaderTextColor;
 }
 .xdialog-title {
   font-size: 142%;
   padding: 15px;
-  border-bottom: 1px solid var(--xwiki-border-color);
+  border-bottom: 1px solid $theme.borderColor;
 }
 .xdialog-box .xform {
   width: 100%;

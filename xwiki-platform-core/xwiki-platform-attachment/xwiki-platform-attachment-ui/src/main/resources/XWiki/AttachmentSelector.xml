@@ -539,7 +539,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     initialize : function(property, dialog) {
       this.property = property;
       this.dialog = dialog;
-      this.gallery = dialog;
+      this.gallery = dialog.dialogBox;
       if (!this.property.down('input')) {
         this.directSave = true;
       }
@@ -800,7 +800,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
       );
       dialog.shortcuts.close.keys = [];
       dialog.showDialog();
-      dialog.dialog.setStyle({width: "80%", "margin-left": "10%", "margin-right": "10%"});
+      dialog.dialog.down().setStyle({position: "fixed"});
+      dialog.dialog.setStyle({top: document.viewport.getScrollOffsets().top + "px", position: "absolute"});
+      dialog.dialogBox.setStyle({overflow: "hidden", width: "80%", margin: "0 10%"});
       new Ajax.Updater(loading.up(), url, {
         onComplete : function() {
           // Play nice with the Lightbox widget
@@ -934,10 +936,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     // Start listening to keyboard events
     this.attachKeyListeners();
     // Display the dialog
-    // We cannot rely on prototype .show() to remove the unwanted style since there's a collision with the 
-    // native HTML dialog method .show()
-    this.dialog.style.removeProperty('display');
-    this.dialog.showModal();
+    this.dialog.show();
   }
 };
 XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {

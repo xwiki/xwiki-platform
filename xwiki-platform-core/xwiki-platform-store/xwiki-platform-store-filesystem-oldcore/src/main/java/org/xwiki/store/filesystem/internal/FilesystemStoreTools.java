@@ -137,12 +137,14 @@ public class FilesystemStoreTools implements Initializable
      * @param storageFile the file to get a backup file for.
      * @return a backup file with a name based on the name of the given file.
      */
-    public BlobPath getBackupFile(final BlobPath storageFile)
+    public Blob getBackupFile(final Blob storageFile) throws BlobStoreException
     {
         // We pad our file names with random alphanumeric characters so that multiple operations on the same
         // file in the same transaction do not collide, the set of all capital and lower case letters
         // and numbers has 62 possibilities and 62^8 = 218340105584896 between 2^47 and 2^48.
-        return storageFile.appendSuffix(BACKUP_FILE_SUFFIX + RandomStringUtils.secure().nextAlphanumeric(8));
+        BlobPath path =
+            storageFile.getPath().appendSuffix(BACKUP_FILE_SUFFIX + RandomStringUtils.secure().nextAlphanumeric(8));
+        return storageFile.getStore().getBlob(path);
     }
 
     /**
@@ -152,9 +154,11 @@ public class FilesystemStoreTools implements Initializable
      * @param storageFile the file to get a temporary file for.
      * @return a temporary file with a name based on the name of the given file.
      */
-    public BlobPath getTempFile(final BlobPath storageFile)
+    public Blob getTempFile(final Blob storageFile) throws BlobStoreException
     {
-        return storageFile.appendSuffix(TEMP_FILE_SUFFIX + RandomStringUtils.secure().nextAlphanumeric(8));
+        BlobPath path =
+            storageFile.getPath().appendSuffix(TEMP_FILE_SUFFIX + RandomStringUtils.secure().nextAlphanumeric(8));
+        return storageFile.getStore().getBlob(path);
     }
 
     /**

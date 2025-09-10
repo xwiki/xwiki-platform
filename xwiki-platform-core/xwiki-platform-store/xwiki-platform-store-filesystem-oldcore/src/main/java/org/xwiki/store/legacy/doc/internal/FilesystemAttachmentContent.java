@@ -19,14 +19,13 @@
  */
 package org.xwiki.store.legacy.doc.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.xwiki.store.UnexpectedException;
+import org.xwiki.store.blob.Blob;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
@@ -43,18 +42,18 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     /**
      * The underlying storage mechanism.
      */
-    private final File storageFile;
+    private final Blob storageBlob;
 
     /**
      * The Constructor.
      *
-     * @param storage the file where the data is stored.
+     * @param storage the blob where the data is stored.
      * @param attachment the attachment to associate this content with.
      */
-    public FilesystemAttachmentContent(final File storage, final XWikiAttachment attachment)
+    public FilesystemAttachmentContent(final Blob storage, final XWikiAttachment attachment)
     {
         super(attachment, null);
-        this.storageFile = storage;
+        this.storageBlob = storage;
     }
 
     /**
@@ -64,10 +63,10 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
      * @param storage the file where the data is stored.
      * @since 4.4RC1
      */
-    public FilesystemAttachmentContent(final File storage)
+    public FilesystemAttachmentContent(final Blob storage)
     {
         super(null, null);
-        this.storageFile = storage;
+        this.storageBlob = storage;
     }
 
     /**
@@ -81,7 +80,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     {
         super(filesystemAttachmentContent);
 
-        this.storageFile = filesystemAttachmentContent.storageFile;
+        this.storageBlob = filesystemAttachmentContent.storageBlob;
     }
 
     @Override
@@ -93,7 +92,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     @Override
     public boolean exists()
     {
-        return this.storageFile.exists();
+        return this.storageBlob.exists();
     }
 
     @Override
@@ -122,8 +121,8 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         }
 
         try {
-            return new AutoCloseInputStream(new FileInputStream(this.storageFile));
-        } catch (IOException e) {
+            return AutoCloseInputStream.builder().setInputStream(this.storageBlob.getStream()).get();
+        } catch (Exception e) {
             throw new UnexpectedException("Failed to get InputStream", e);
         }
     }
@@ -135,6 +134,10 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
             return super.getLongSize();
         }
 
-        return this.storageFile.length();
+        try {
+            return this.storageBlob.getSize();
+        } catch (Exception e) {
+            throw new UnexpectedException("Failed to get size", e);
+        }
     }
 }

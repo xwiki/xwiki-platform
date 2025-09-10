@@ -465,7 +465,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       <cache>long</cache>
     </property>
     <property>
-      <code>var XWiki = (function(XWiki) {
+      <code>require(['jquery','bootstrap'], function($) {
   function uploadTemporaryAttachment() {
     // Require jquery locally until we are able to fully migrate this code away from prototype.
     const form = this.property.up('form');
@@ -529,17 +529,17 @@ $xwiki.jsx.use($attachmentPickerDocName)
   }
 
   /** Handles the gallery buttons directly in the current page without reloading the window. */
-  XWiki.AttachmentPicker = Class.create({
+  class AttachmentPicker {
     /**
      * Constructor.
      *
      * @param property the property being edited, as the containing div with class="attachment-picker"
      * @param dialog the modal dialog where the gallery was loaded
      */
-    initialize : function(property, dialog) {
+    initialize : function(property, modal) {
       this.property = property;
-      this.dialog = dialog;
-      this.gallery = dialog;
+      this.modal = modal;
+      this.gallery = modal;
       if (!this.property.down('input')) {
         this.directSave = true;
       }
@@ -563,7 +563,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
         img.observe('load', function() {img.up('div').removeClassName('hidden');});
         img.observe('error', function() {img.up('div').addClassName('hidden');});
       }
-    },
+    }
     /**
      * Catches the upload form submission and stops it if the selected file is not of the accepted types (or not selected at all),
      * and saves the underlying form (if any) so that any unsaved changes won't be lost.
@@ -609,7 +609,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
           }
         }
       }.bindAsEventListener(this));
-    },
+    }
     getFileExtension : function(filename) {
       var fpath = filename.replace('\\', '/');
       var pieces = fpath.split('/');
@@ -619,17 +619,17 @@ $xwiki.jsx.use($attachmentPickerDocName)
       var basename = pieces[pieces.length-1];
       pieces = basename.split('.');
       return pieces[pieces.length-1].toLowerCase();
-    },
+    }
 
     /** Catch attachment delete requests. */
     addDeleteListeners : function() {
       this.gallery.select('.gallery_actions .tool.delete').invoke('observe', 'click', this.onDelete.bindAsEventListener(this));
-    },
+    }
 
     /** Catch attachment selection requests. */
     addSelectListeners : function() {
       this.gallery.select('.gallery_actions .tool.select').invoke('observe', 'click', this.onSelect.bindAsEventListener(this));
-    },
+    }
 
     /** AJAX deletion of attachments. */
     onDelete : function(event) {
@@ -672,7 +672,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
           }
         );
       }
-    },
+    }
 
     /** Update the property with the selected value without reloading the page. */
     onSelect : function(event) {
@@ -724,7 +724,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
         this.property.down('input').value = attachmentName;
         this.dialog.closeDialog();
       }
-    },
+    }
 
     /** Update the property display. */
     updateAttachment : function(attachmentName, imageSource) {
@@ -745,7 +745,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
           }
         }
       }
-    },
+    }
 
     /** Update the gallery to reflect the currently selected value. */
     updateCurrentSelection : function() {
@@ -766,7 +766,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
       } else {
         this.gallery.down('.current .tool.select').addClassName('hidden');
       }
-    },
+    }
+    
     addCloseListener : function () {
       var closeButton = $('attachment-picker-close');
       if (closeButton) {
@@ -776,7 +777,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
         }.bindAsEventListener(this));
       }
     }
-  });
+  };
 
   var loading = new Element('div', {'class' : 'imgcenter'}).update("&lt;img src=\"$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')\"/&gt;");
   var dialog;
@@ -785,184 +786,32 @@ $xwiki.jsx.use($attachmentPickerDocName)
   document.observe('xwiki:dom:loaded', function() {
     $$('.attachment-picker-start').invoke('observe', 'click', function(event) {
       event.stop();
+      let modal = $$('.attachment-selector-modal').modal();
       var targetElement = event.element();
       var url = targetElement.href;
       if (url.indexOf('?') &lt; 0) {
         url += '?';
       }
       url += "&amp;xpage=plain";
-      dialog = new XWiki.widgets.ModalPopup(
-        loading, {}, {
-          'verticalPosition' : 'top',
-          'removeOnClose' : true,
-          'title' : "$services.localization.render('xe.attachmentSelector.gallery.title')"
-        }
-      );
-      dialog.shortcuts.close.keys = [];
-      dialog.showDialog();
-      dialog.dialog.setStyle({width: "80%", "margin-left": "10%", "margin-right": "10%"});
+      modal.modal('show');
       new Ajax.Updater(loading.up(), url, {
         onComplete : function() {
           // Play nice with the Lightbox widget
           if (window.gallery_lb) {
             window.gallery_lb.updateImageList();
           }
-          // Manually convert the special rel values into target attributes for the newly inserted content (rel="_something" =&gt; target="something")
-          if (typeof (XWiki.fixLinksTargetAttribute) == 'function') {
-            // Trick the function into updating link targets in edit mode; normally the conversion only takes place in view mode
-            var __tmp = XWiki.contextaction;
-            XWiki.contextaction = 'view';
-            XWiki.fixLinksTargetAttribute(dialog.dialog);
-            XWiki.contextaction = __tmp;
-          }
-          new XWiki.AttachmentPicker(targetElement.up('.attachment-picker'), dialog);
+          new AttachmentPicker(targetElement.up('.attachment-picker'), modal);
         }
       });
     });
   });
-  return XWiki;
-}(XWiki || {}));</code>
+});</code>
     </property>
     <property>
       <name>Loads the image picker in a modal dialog</name>
     </property>
     <property>
       <parse>1</parse>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.AttachmentSelector</name>
-    <number>1</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>2aa565e6-b9bd-4095-a7a9-bbf47d75d079</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>XWiki.widgets.ModalPopup.prototype.showDialog = function(event) {
-  if (event) {
-    Event.stop(event);
-  }
-  // Only do this if the dialog is not already active.
-  if (!this.active) {
-    this.active = true;
-    if (!this.dialog) {
-      // The dialog wasn't loaded, create it.
-      this.createDialog();
-    }
-    // Start listening to keyboard events
-    this.attachKeyListeners();
-    // Display the dialog
-    // We cannot rely on prototype .show() to remove the unwanted style since there's a collision with the 
-    // native HTML dialog method .show()
-    this.dialog.style.removeProperty('display');
-    this.dialog.showModal();
-  }
-};
-XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
-  if (event) {
-    Event.stop(event);
-  }
-  // Call optional callback
-  this.options.onClose.call(this);
-  // Hide the dialog, without removing it from the DOM.
-  this.dialog.hide();
-  if (this.options.removeOnClose) {
-    this.dialog.remove();
-  }
-  // Stop the UI shortcuts (except the initial Show Dialog one).
-  this.detachKeyListeners();
-  // Re-enable the 'show' behavior.
-  this.active = false;
-}
-</code>
-    </property>
-    <property>
-      <name>Patch for modalPopup.js, allowing to display several widgets on the same screen and removing position:fixed in IE</name>
-    </property>
-    <property>
-      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -1640,18 +1489,43 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
       #set ($queryString.targetdocname = $targetdoc.fullName)
     #end
     #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
-    (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
-      class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
+    (% class="buttonwrapper"%)##
+     [[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)" class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')" data-target=".attachment-selector-modal" data-toggle="modal"]](%%)##
   #end
+#end
+
+## Include the attachment modal
+#macro (attachmentPicker_displayModal)
+#if ($targetPermView)
+
+{{html}}
+&lt;div class="modal fade attachment-selector-modal" tabindex="-1" role="dialog"&gt;
+  &lt;div class="modal-dialog" role="document"&gt;
+    &lt;div class="modal-content"&gt;
+      &lt;div class="modal-header"&gt;
+      &lt;button type="button" class="close" data-dismiss="modal"&gt;
+      &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+      &lt;/button&gt;
+      &lt;h4 class="modal-title"&gt;&lt;/h4&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-body"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+
+#end
 #end
 {{/velocity}}
 
 {{velocity}}
 #if ("${savemode}" == 'direct')
-  (% class="attachment-picker" %)(((#attachmentPicker_displayAttachment($propValue $displayImage $link true) #attachmentPicker_displayButton())))
+  (% class="attachment-picker" %)(((#attachmentPicker_displayAttachment($propValue $displayImage $link true)##
+  #attachmentPicker_displayModal() #attachmentPicker_displayButton())))
 #elseif ($xcontext.action == 'inline' || $xcontext.action == 'edit')
   (% class="attachment-picker" %)(((##
     #attachmentPicker_displayAttachment($propValue $displayImage false true) #attachmentPicker_displayButton()##
+    #attachmentPicker_displayModal()##
     {{html}}&lt;input type="hidden" name="$escapetool.xml("${classname}_${object}_${property}")" value="$escapetool.xml("${propValue}")" class="property-reference"/&gt;{{/html}}##
   )))
 #else

@@ -2305,8 +2305,7 @@ $baseURL&amp;$queryString$!hash
   #if($pageNumber == $parameters.crtPage)
     <span class="currentPage btn btn-primary btn-xs">$displayedPageNumber</span>
   #else
-    <a href="#_paginationURL($parameters.url)${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if
-    ($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}"
+    <a href="#_paginationURL($parameters.url)${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if ($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}"
       class="btn btn-default btn-xs"
       title="$escapetool.xml($services.localization.render('platform.livetable.paginationPageTitle', [$displayedPageNumber]))">$displayedPageNumber</a>
   #end

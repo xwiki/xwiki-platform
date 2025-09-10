@@ -501,7 +501,16 @@
 #if (!$isGuest)
 #set($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
 #set($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
+#try()
 #set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($doc))
+#end
+#if ("$!exception" != '')
+{{html clean='false'}}
+&lt;li&gt;
+  #displayException('Could not get the watched status', $exception)
+&lt;/li&gt;
+{{/html}}
+#else
 ## If the watched status informs that the filter is about children it means it's a filter for the space,
 ## so we should look for ancestor of the space.
 #set ($refForAncestorFirstFilter = $doc.getDocumentReference())
@@ -686,6 +695,7 @@
     &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
   &lt;/div&gt;&lt;!-- /.modal --&gt;
   #end
+#end
 #end
 {{/velocity}}</content>
     </property>

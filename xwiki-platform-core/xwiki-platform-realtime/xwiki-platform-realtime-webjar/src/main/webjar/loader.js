@@ -594,7 +594,7 @@ define('xwiki-realtime-loader', [
         channel.bcast(JSON.stringify(response));
       });
       setTimeout(function() {
-        $('.xdialog-box').css('z-index', '99999');
+        $('.xdialog-modal-container').css('z-index', '99999');
       });
       displayCustomModal(content);
     }

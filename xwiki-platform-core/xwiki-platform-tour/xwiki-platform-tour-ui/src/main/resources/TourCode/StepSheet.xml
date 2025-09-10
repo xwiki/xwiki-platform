@@ -207,7 +207,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   // Initialize add new step button
   $('#addStep').on('click', function() {
     var tourName = $('#tourName').val();
-    $('.xdialog-box').remove();
+    $('.xdialog-modal-container').remove();
     new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;tourName=' + tourName});
   });
 
@@ -263,10 +263,10 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
 
   // Initialize step edit btns
   $('body').on('click', '.editStep', function() {
-    $('.xdialog-box').remove();
+    $('.xdialog-modal-container').remove();
     var tourName = $('#tourName').val();
     var stepID = $(this).attr('data-step-id');
-    $('.xdialog-box').remove();
+    $('.xdialog-modal-container').remove();
     new XWiki.widgets.StepPopup({
       pageURL: bstStepURL + '&amp;tourName=' + encodeURIComponent(tourName) + '&amp;stepID=' + encodeURIComponent(stepID)
     });
@@ -274,7 +274,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
    
   // Initialize step delete btns
   $('body').on('click', '.deleteStep', function() {
-    $('.xdialog-box').remove();
+    $('.xdialog-modal-container').remove();
     var tourName = $('#tourName').val();
     var stepID = $(this).attr('data-step-id');
     new XWiki.widgets.ConfirmationBox({

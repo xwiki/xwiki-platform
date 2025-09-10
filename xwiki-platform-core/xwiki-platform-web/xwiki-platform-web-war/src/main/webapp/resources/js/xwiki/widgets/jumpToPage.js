@@ -133,7 +133,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     Event.observe(this.editButton, 'click', this.openDocument.bindAsEventListener(this, "edit"));
     $super(event);
     // Add a CSS class to the container in order to better control the styles for the Jump to Page modal.
-    this.input.up('.xdialog-box').addClassName('jump-dialog-container');
+    this.input.up('.xdialog-modal-container').addClassName('jump-dialog-container');
     // Initialize the page picker.
     var self = this;
     require(['jquery', 'xwiki-suggestPages'], function($) {

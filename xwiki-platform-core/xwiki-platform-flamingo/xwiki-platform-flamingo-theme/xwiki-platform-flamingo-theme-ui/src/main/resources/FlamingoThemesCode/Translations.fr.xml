@@ -70,6 +70,7 @@ platform.flamingo.themes.defaultvalue=Par défaut
 platform.flamingo.themes.lessCode.description=Dans ce champ vous pouvez ajouter du code LESS qui sera ajouté à la skin.
 platform.flamingo.themes.local=Local
 platform.flamingo.themes.global=Global
+FlamingoThemesCode.ThemeClass_logo-description.hint=Texte alternatif au logo qui précise le sens du logo. Par défaut, la valeur est définie dans clé localisée « core.document.header.logo.image.text ».
 
 ###############################################################################
 ## Deprecated

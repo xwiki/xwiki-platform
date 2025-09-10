@@ -236,7 +236,7 @@
       #foreach($var in $catVar.keySet())
         #set($varName = $var)
         #set($varType = $catVar.get($varName))
-        #set($hintKey = "${obj.xWikiClass.name}_${varName}.hint")
+        #set($hintKey = "${obj.xWikiClass.name}_${varName}_hint")
         #set($hint = $services.localization.render($hintKey))
         #if($hint == $hintKey)
           #set($hint = $NULL)

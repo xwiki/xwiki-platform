@@ -248,7 +248,7 @@ class LiveDataIT
 
         // Test filtering by label
         suggestInputElement.sendKeys(CHOICE_L_LABEL);
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         List<SuggestInputElement.SuggestionElement> suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         assertEquals(CHOICE_L, suggestionElements.get(0).getValue());
@@ -257,7 +257,7 @@ class LiveDataIT
         // Test filtering by translation
         suggestInputElement.clear();
         suggestInputElement.sendKeys(CHOICE_T_TRANSLATION);
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         assertEquals(CHOICE_T, suggestionElements.get(0).getValue());
@@ -272,7 +272,7 @@ class LiveDataIT
         // Take the focus on the is active filter.
         suggestInputElement = new SuggestInputElement(tableLayout.getFilter(IS_ACTIVE_COLUMN));
         suggestInputElement.sendKeys(Boolean.TRUE.toString());
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
@@ -294,7 +294,7 @@ class LiveDataIT
         suggestInputElement = new SuggestInputElement(isActiveFilter);
         suggestInputElement.clear();
         suggestInputElement.sendKeys(Boolean.FALSE.toString());
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();

@@ -1333,10 +1333,10 @@
       <rightPanelsWidth>---</rightPanelsWidth>
     </property>
     <property>
-      <showLeftPanels>0</showLeftPanels>
+      <showLeftPanels/>
     </property>
     <property>
-      <showRightPanels>0</showRightPanels>
+      <showRightPanels/>
     </property>
     <property>
       <showannotations/>

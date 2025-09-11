@@ -373,7 +373,7 @@ class LiveDataIT
                       "loadingMessage": "Loading",
                       "successMessage": "Delete Success",
                       "failureMessage": "Failed",
-                      "body": "newBacklinkTarget=&updateLinks=false&autoRedirect=false&form_token=${services.csrf.token}&confirm=1&async=true",
+                      "body": "newBacklinkTarget=&updateLinks=false&autoRedirect=false&form_token=${services.csrf.token}&confirm=1&async=false",
                       "headers": {
                         "Content-Type": "application/x-www-form-urlencoded"
                       }

@@ -343,6 +343,9 @@ class InplaceEditIT
         qa.waitForItemSubmitted();
         richTextArea.waitForContentRefresh();
 
+        // Wait until the children macro has loaded the tree content.
+        richTextArea.waitUntilTextContains("No pages found");
+
         assertEquals("a first line\nNo pages found\nmacro:id", richTextArea.getText());
         viewPage.cancel();
     }

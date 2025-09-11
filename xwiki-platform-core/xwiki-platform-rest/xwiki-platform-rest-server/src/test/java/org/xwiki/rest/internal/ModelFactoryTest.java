@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.xwiki.mail.EmailAddressObfuscator;
@@ -55,6 +56,7 @@ import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Hierarchy;
 import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Translations;
@@ -87,9 +89,13 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @OldcoreTest
@@ -513,5 +519,29 @@ class ModelFactoryTest
 
         assertEquals(this.testDocument.getDisplayTitle(), pageSummary.getTitle());
         assertEquals(this.testDocument.getTitle(), pageSummary.getRawTitle());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "true, true",
+        "true, false",
+        "false, true",
+        "false, false"
+    })
+    void toDocumentWithJustHidden(boolean pageHidden, boolean restHidden) throws Exception
+    {
+        when(this.testDocument.isHidden()).thenReturn(pageHidden);
+
+        Page restPage = new Page();
+        restPage.setHidden(restHidden);
+
+        boolean modified = this.modelFactory.toDocument(this.testDocument, restPage);
+        if (pageHidden != restHidden) {
+            assertTrue(modified);
+            verify(this.testDocument).setHidden(restHidden);
+        } else {
+            assertFalse(modified);
+            verify(this.testDocument, never()).setHidden(anyBoolean());
+        }
     }
 }

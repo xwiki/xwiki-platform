@@ -58,7 +58,7 @@ solr.admin.indexing.wiki.hint=The wiki for which all its documents will be affec
 solr.admin.indexing.wiki.select_farm=Entire farm
 solr.admin.indexing.query.label=Custom query
 solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
-solr.admin.indexing.query.language.label=Language used for the optional query
+solr.admin.indexing.query.language.label=Language of the custom query
 
 solr.admin.info.affectedDocuments=Affected documents in the index:
 

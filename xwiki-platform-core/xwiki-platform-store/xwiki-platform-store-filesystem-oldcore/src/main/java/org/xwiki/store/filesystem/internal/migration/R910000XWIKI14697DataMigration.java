@@ -20,9 +20,8 @@
 
 package org.xwiki.store.filesystem.internal.migration;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,6 +29,8 @@ import javax.inject.Singleton;
 import org.hibernate.HibernateException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStoreException;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -67,12 +68,14 @@ public class R910000XWIKI14697DataMigration extends AbstractXWIKI14697DataMigrat
     @Override
     protected boolean isFile(AttachmentReference attachmentReference)
     {
-        File attachmentFolder = getAttachmentDir(attachmentReference);
+        BlobPath attachmentFolder = getAttachmentDir(attachmentReference);
 
         try {
-            return new File(attachmentFolder, URLEncoder.encode(attachmentReference.getName(), "UTF8")).exists();
-        } catch (UnsupportedEncodingException e) {
-            throw new HibernateException("UTF8 is unknown", e);
+            String urlEncodedName = URLEncoder.encode(attachmentReference.getName(), StandardCharsets.UTF_8);
+            BlobPath attachmentBlobPath = attachmentFolder.resolve(urlEncodedName);
+            return this.pre11BlobStore.getBlob(attachmentBlobPath).exists();
+        } catch (BlobStoreException e) {
+            throw new HibernateException("Error checking if the attachment exists.", e);
         }
     }
 }

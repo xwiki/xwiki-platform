@@ -19,8 +19,6 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -33,12 +31,10 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.StreamProvider;
 import org.xwiki.store.StringStreamProvider;
 import org.xwiki.store.TransactionRunnable;
 import org.xwiki.store.blob.Blob;
-import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
@@ -154,11 +150,17 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             return new TransactionRunnable<>();
         }
 
-        // This is the permanent location where the attachment content will go.
-        final Blob attachFile =
-            this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
+        try {
+            // This is the permanent location where the attachment content will go.
+            final Blob attachFile =
+                this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
 
-        return new AttachmentSaveTransactionRunnable(attachment, updateDocument, context, attachFile);
+            return new AttachmentSaveTransactionRunnable(attachment, updateDocument, context, attachFile);
+        } catch (BlobStoreException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
+                "Exception while saving attachment.", e);
+        }
     }
 
     /**
@@ -211,22 +213,30 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     public void loadAttachmentContent(final XWikiAttachment attachment, final XWikiContext context,
         final boolean bTransaction) throws XWikiException
     {
-        File attachFile =
-            this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
-
-        // Support links
+        Blob attachFile;
         try {
+            attachFile = this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
+
+            // Support links
             attachFile = StoreFileUtils.resolve(attachFile, true);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
-                "Failed to resolve the attachment file link for file [{0}]", e, new Object[] {attachFile});
+                "Failed to resolve the attachment file link for attachment [{0}]", e,
+                new Object[] { attachment.getReference() });
         }
 
-        // Check if the final file exist
-        if (!attachFile.exists()) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
-                String.format("The attachment [%s] (file %s) could not be found in the filesystem attachment store.",
-                    attachment.getReference(), attachFile));
+        // Check if the final file exists
+        try {
+            if (!attachFile.exists()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
+                    String.format(
+                        "The attachment [%s] (file %s) could not be found in the filesystem attachment store.",
+                        attachment.getReference(), attachFile.getPath()));
+            }
+        } catch (BlobStoreException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
+                "Failed to check existence of attachment file [" + attachFile.getPath() + "]", e);
         }
 
         FilesystemAttachmentContent content = new FilesystemAttachmentContent(attachFile);
@@ -239,16 +249,15 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     public boolean attachmentContentExists(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
-        File attachFile;
+        Blob attachFile;
         try {
             attachFile = StoreFileUtils.resolve(
                 this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile(), false);
-        } catch (IOException e) {
+            return attachFile.exists();
+        } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
                 "Failed to resolve the attachment file link", e);
         }
-
-        return attachFile.exists();
     }
 
     @Override
@@ -285,10 +294,15 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     private TransactionRunnable<XWikiHibernateTransaction> getAttachmentDeleteRunnable(final XWikiAttachment attachment,
         final boolean updateDocument, final XWikiContext context) throws XWikiException
     {
-        final File attachFile =
-            this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
+        try {
+            final Blob attachFile =
+                this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
 
-        return new AttachmentDeleteTransactionRunnable(attachment, updateDocument, context, attachFile);
+            return new AttachmentDeleteTransactionRunnable(attachment, updateDocument, context, attachFile);
+        } catch (BlobStoreException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Exception while resolving attachment to delete.", e);
+        }
     }
 
     @Override

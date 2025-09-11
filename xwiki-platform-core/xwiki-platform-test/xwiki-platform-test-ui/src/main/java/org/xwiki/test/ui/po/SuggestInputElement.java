@@ -238,7 +238,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByIndex(int index)
     {
-        getDriver().findElementWithoutWaiting(
+        getDriver().findElement(
             By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
                 + "//*[contains(@class, 'xwiki-selectize-option')][" + (index + 1) + "]"))
             .click();
@@ -253,7 +253,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByValue(String value)
     {
-        getDriver().findElementWithoutWaiting(
+        getDriver().findElement(
             By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
                 + "//*[contains(@class, 'xwiki-selectize-option') and @data-value = '" + value + "']"))
             .click();
@@ -268,7 +268,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByVisibleText(String text)
     {
-        getDriver().findElementWithoutWaiting(
+        getDriver().findElement(
             By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
                 + "//*[contains(@class, 'xwiki-selectize-option-label') and . = '" + text + "']"))
             .click();
@@ -283,7 +283,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectTypedText()
     {
-        getDriver().findElementWithoutWaiting(By.cssSelector(".selectize-dropdown.active .create")).click();
+        getDriver().findElement(By.cssSelector(".selectize-dropdown.active .create")).click();
 
         return this;
     }

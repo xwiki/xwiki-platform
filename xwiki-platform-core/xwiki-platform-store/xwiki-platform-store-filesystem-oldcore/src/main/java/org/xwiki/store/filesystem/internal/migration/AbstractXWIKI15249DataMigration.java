@@ -20,7 +20,6 @@
 
 package org.xwiki.store.filesystem.internal.migration;
 
-import java.io.File;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -29,6 +28,7 @@ import javax.inject.Named;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
@@ -68,30 +68,29 @@ public abstract class AbstractXWIKI15249DataMigration extends AbstractStoreTypeD
         }
     }
 
-    protected File getDocumentContentDir(final DocumentReference documentReference)
+    protected BlobPath getDocumentContentDir(final DocumentReference documentReference)
     {
-        File documentDir =
-            new File(getPre11StoreRootDirectory(), this.fileEntitySerializer.serialize(documentReference, true));
-        File documentContentDir = new File(documentDir, THIS_DIR_NAME);
+        BlobPath basePath = BlobPath.from(this.fileEntitySerializer.serialize(documentReference, true));
+        BlobPath documentContentDir = basePath.resolve(THIS_DIR_NAME);
 
         // Add the locale
         Locale documentLocale = documentReference.getLocale();
         if (documentLocale != null) {
-            final File documentLocalesDir =
-                new File(documentContentDir, FilesystemStoreTools.DOCUMENT_LOCALES_DIR_NAME);
-            final File documentLocaleDir = new File(documentLocalesDir,
+            final BlobPath documentLocalesDir =
+                documentContentDir.resolve(FilesystemStoreTools.DOCUMENT_LOCALES_DIR_NAME);
+            final BlobPath documentLocaleDir = documentLocalesDir.resolve(
                 documentLocale.equals(Locale.ROOT) ? DOCUMENT_LOCALE_ROOT_NAME : documentLocale.toString());
-            documentContentDir = new File(documentLocaleDir, THIS_DIR_NAME);
+            documentContentDir = documentLocaleDir.resolve(THIS_DIR_NAME);
         }
 
         return documentContentDir;
     }
 
-    protected File getAttachmentDir(final AttachmentReference attachmentReference)
+    protected BlobPath getAttachmentDir(final AttachmentReference attachmentReference)
     {
-        File docDir = getDocumentContentDir(attachmentReference.getDocumentReference());
-        File attachmentsDir = new File(docDir, FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
+        BlobPath docDir = getDocumentContentDir(attachmentReference.getDocumentReference());
+        BlobPath attachmentsDir = docDir.resolve(FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
 
-        return new File(attachmentsDir, FileSystemStoreUtils.encode(attachmentReference.getName(), true));
+        return attachmentsDir.resolve(FileSystemStoreUtils.encode(attachmentReference.getName(), true));
     }
 }

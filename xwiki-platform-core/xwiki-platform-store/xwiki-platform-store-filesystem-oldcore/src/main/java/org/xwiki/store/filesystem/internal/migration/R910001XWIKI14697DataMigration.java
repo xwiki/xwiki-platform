@@ -23,8 +23,10 @@ package org.xwiki.store.filesystem.internal.migration;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.hibernate.HibernateException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.filesystem.internal.DefaultAttachmentFileProvider;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
@@ -63,7 +65,11 @@ public class R910001XWIKI14697DataMigration extends AbstractXWIKI14697DataMigrat
     @Override
     protected boolean isFile(AttachmentReference attachmentReference)
     {
-        return new DefaultAttachmentFileProvider(getAttachmentDir(attachmentReference), attachmentReference.getName())
-            .getAttachmentVersioningMetaFile().exists();
+        try {
+            return new DefaultAttachmentFileProvider(this.pre11BlobStore, getAttachmentDir(attachmentReference),
+                attachmentReference.getName()).getAttachmentVersioningMetaFile().exists();
+        } catch (BlobStoreException e) {
+            throw new HibernateException("Error checking if attachment versioning meta file exists.", e);
+        }
     }
 }

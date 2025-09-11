@@ -33,7 +33,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.9.2",
-    "vite": "7.1.4"
+    "vite": "7.1.5"
   },
   "publishConfig": {
     "exports": {

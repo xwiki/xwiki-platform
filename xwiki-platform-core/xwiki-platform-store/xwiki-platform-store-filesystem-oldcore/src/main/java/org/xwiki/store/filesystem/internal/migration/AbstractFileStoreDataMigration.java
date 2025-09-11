@@ -75,15 +75,17 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
 
     protected FileSystemBlobStore pre11BlobStore;
 
+    protected File pre11StoreDirectory;
+
     protected BlobStore blobStore;
 
     @Override
     public void initialize() throws InitializationException
     {
         String pre11StoreName = "storage";
-        File pre11StoreDirectory = new File(this.environment.getPermanentDirectory(), pre11StoreName);
+        this.pre11StoreDirectory = new File(this.environment.getPermanentDirectory(), pre11StoreName);
 
-        this.pre11BlobStore = new FileSystemBlobStore(pre11StoreName, pre11StoreDirectory.toPath());
+        this.pre11BlobStore = new FileSystemBlobStore(pre11StoreName, this.pre11StoreDirectory.toPath());
 
         if (getVersion().getVersion() < R1100000XWIKI15620DataMigration.VERSION) {
             this.blobStore = this.pre11BlobStore;
@@ -92,7 +94,7 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
         }
     }
 
-    protected BlobStore getPre11BlobStore()
+    protected FileSystemBlobStore getPre11BlobStore()
     {
         return this.pre11BlobStore;
     }

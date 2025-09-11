@@ -536,10 +536,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
      * @param property the property being edited, as the containing div with class="attachment-picker"
      * @param dialog the modal dialog where the gallery was loaded
      */
-    initialize : function(property, modal) {
+    initialize(property, modal) {
       this.property = property;
       this.modal = modal;
-      this.gallery = modal;
+      this.gallery = modal.find('.modal-body');
       if (!this.property.down('input')) {
         this.directSave = true;
       }
@@ -557,7 +557,6 @@ $xwiki.jsx.use($attachmentPickerDocName)
       this.addDeleteListeners();
       this.addSelectListeners();
       this.updateCurrentSelection();
-      this.addCloseListener();
       var img = this.property.down('img');
       if (img) {
         img.observe('load', function() {img.up('div').removeClassName('hidden');});
@@ -568,7 +567,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
      * Catches the upload form submission and stops it if the selected file is not of the accepted types (or not selected at all),
      * and saves the underlying form (if any) so that any unsaved changes won't be lost.
      */
-    filterFormUpload : function() {
+    filterFormUpload() {
       this.gallery.select('.uploadAttachment input[type="file"]').each(function(fileInput) {
         fileInput.__allowedExtensions = fileInput.title.toLowerCase().replace(/\s*[,|; ]\s*/g, " ").strip();
         if (fileInput.__allowedExtensions != '') {
@@ -610,7 +609,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
         }
       }.bindAsEventListener(this));
     }
-    getFileExtension : function(filename) {
+    getFileExtension(filename) {
       var fpath = filename.replace('\\', '/');
       var pieces = fpath.split('/');
       if (pieces.length == 0) {
@@ -622,19 +621,19 @@ $xwiki.jsx.use($attachmentPickerDocName)
     }
 
     /** Catch attachment delete requests. */
-    addDeleteListeners : function() {
+    addDeleteListeners() {
       this.gallery.select('.gallery_actions .tool.delete').invoke('observe', 'click', this.onDelete.bindAsEventListener(this));
     }
 
     /** Catch attachment selection requests. */
-    addSelectListeners : function() {
+    addSelectListeners() {
       this.gallery.select('.gallery_actions .tool.select').invoke('observe', 'click', this.onSelect.bindAsEventListener(this));
     }
 
     /** AJAX deletion of attachments. */
-    onDelete : function(event) {
+    onDelete(event) {
       event.stop();
-      deleteTool = event.element();
+      let deleteTool = event.element();
       if (!deleteTool.disabled) {
         new XWiki.widgets.ConfirmedAjaxRequest(
           deleteTool.readAttribute('href'),
@@ -675,7 +674,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     }
 
     /** Update the property with the selected value without reloading the page. */
-    onSelect : function(event) {
+    onSelect(event) {
       event.stop();
       var targetElement = event.element();
       var attachmentName = targetElement.up('.gallery_attachmentbox').down('.gallery_attachmenttitle').title;
@@ -727,7 +726,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     }
 
     /** Update the property display. */
-    updateAttachment : function(attachmentName, imageSource) {
+    updateAttachment(attachmentName, imageSource) {
       var img = this.property.down('img');
       if (img) {
         img.src = img.src.replace(/^[^\?]+($|\?)/, imageSource + "$1");
@@ -748,7 +747,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     }
 
     /** Update the gallery to reflect the currently selected value. */
-    updateCurrentSelection : function() {
+    updateCurrentSelection() {
       if (!this.directSave) {
         var selectedName =  this.property.down('input').value;
         var selectedElement = this.gallery.down('.gallery_attachmenttitle[title="' + selectedName.replace('"', '\\22 ') + '"]');
@@ -768,15 +767,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       }
     }
     
-    addCloseListener : function () {
-      var closeButton = $('attachment-picker-close');
-      if (closeButton) {
-        closeButton.observe('click', function(event) {
-          event.stop();
-          this.dialog.closeDialog();
-        }.bindAsEventListener(this));
-      }
-    }
+    
   };
 
   var loading = new Element('div', {'class' : 'imgcenter'}).update("&lt;img src=\"$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')\"/&gt;");

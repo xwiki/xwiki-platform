@@ -84,7 +84,7 @@
         &lt;/dt&gt;
         &lt;dd&gt;
           &lt;label class="sr-only" for="customQueryLanguage"&gt;##
-            $services.localization.render('solr.admin.indexing.query.language.label')##
+            $escapetool.xml($services.localization.render('solr.admin.indexing.query.language.label'))##
           &lt;/label&gt;##
           &lt;select id="customQueryLanguage" name="customQueryLanguage"&gt;
             &lt;option value="xwql"&gt;XWiki Query Language (XWQL)&lt;/option&gt;

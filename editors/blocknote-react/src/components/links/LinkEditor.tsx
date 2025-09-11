@@ -19,12 +19,19 @@
  */
 import { createLinkSuggestor } from "../../misc/linkSuggest";
 import { SearchBox } from "../SearchBox";
-import { Button, Input, Stack, Text, useCombobox } from "@mantine/core";
+import {
+  Breadcrumbs,
+  Button,
+  Input,
+  Stack,
+  Text,
+  useCombobox,
+} from "@mantine/core";
 import { tryFallible } from "@xwiki/cristal-fn-utils";
 import { LinkType } from "@xwiki/cristal-link-suggest-api";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { RiText } from "react-icons/ri";
+import { RiFileLine, RiText } from "react-icons/ri";
 import type { LinkEditionContext } from "../../misc/linkSuggest";
 
 type LinkData = {
@@ -94,7 +101,20 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
             ),
           )
         }
-        renderSuggestion={(label) => <Text>{label.title}</Text>}
+        renderSuggestion={(link) => (
+          <Stack justify="center">
+            <Text>
+              <RiFileLine /> {link.title}
+              <Breadcrumbs c="gray">
+                {link.segments.map((segment, i) => (
+                  <Text key={`${i}${segment}`} fz="md">
+                    {segment}
+                  </Text>
+                ))}
+              </Breadcrumbs>
+            </Text>
+          </Stack>
+        )}
         onSelect={(url) => (creationMode ? submit({ url }) : setUrl(url))}
         onSubmit={(url) => submit({ url })}
       />

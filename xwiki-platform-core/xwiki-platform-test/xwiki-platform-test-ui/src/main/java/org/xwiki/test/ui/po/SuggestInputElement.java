@@ -210,6 +210,21 @@ public class SuggestInputElement extends BaseElement
     }
 
     /**
+     * Waits until suggestions beyond the option to choose the typed text are displayed.
+     *
+     * @return the current suggest input element
+     * @since 17.8.0RC1
+     * @since 17.4.5
+     * @since 16.10.12
+     */
+    public SuggestInputElement waitForNonTypedSuggestions()
+    {
+        getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading")
+            && !driver.findElements(By.cssSelector(".selectize-dropdown.active .xwiki-selectize-option")).isEmpty());
+        return this;
+    }
+
+    /**
      * Waits until the suggestions have disappeared.
      *
      * @return the current suggest input element

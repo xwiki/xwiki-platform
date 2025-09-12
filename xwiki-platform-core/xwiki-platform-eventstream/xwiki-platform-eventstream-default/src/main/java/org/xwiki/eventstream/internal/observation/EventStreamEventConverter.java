@@ -30,14 +30,12 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
-import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 /**
  * Convert all event status events to remote events and back to local events.
@@ -49,13 +47,10 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
 @Component
 @Singleton
 @Named("eventstreamevent")
-public class EventStreamEventConverter extends AbstractEventConverter
+public class EventStreamEventConverter extends AbstractStreamEventConverter
 {
     private static final Set<Class<? extends Event>> EVENTS =
         new HashSet<>(Arrays.asList(EventStreamAddedEvent.class, EventStreamDeletedEvent.class));
-
-    @Inject
-    private EventStore store;
 
     @Inject
     private Logger logger;
@@ -101,8 +96,8 @@ public class EventStreamEventConverter extends AbstractEventConverter
 
     private org.xwiki.eventstream.Event unserializeEvent(Serializable remote) throws EventStreamException
     {
-        if (remote instanceof String) {
-            return this.store.getEvent((String) remote).orElse(null);
+        if (remote instanceof String eventId) {
+            return getEvent(eventId).orElse(null);
         }
 
         return null;

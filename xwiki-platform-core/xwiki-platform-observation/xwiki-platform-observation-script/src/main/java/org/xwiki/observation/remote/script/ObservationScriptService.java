@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.stability.Unstable;
 
 /**
  * Entry point of observation from scripts.
@@ -36,6 +37,7 @@ import org.xwiki.script.service.ScriptServiceManager;
 @Component
 @Named(ObservationScriptService.ROLEHINT)
 @Singleton
+@Unstable
 public class ObservationScriptService implements ScriptService
 {
     /**

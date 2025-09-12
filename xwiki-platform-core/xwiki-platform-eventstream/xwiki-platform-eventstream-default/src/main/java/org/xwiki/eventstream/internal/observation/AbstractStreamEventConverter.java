@@ -25,6 +25,7 @@ import javax.inject.Inject;
 
 import jakarta.inject.Provider;
 
+import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
@@ -38,11 +39,11 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
 public abstract class AbstractStreamEventConverter extends AbstractEventConverter
 {
     @Inject
-    // Load the event store lazily because it can trigger a lot of things while the event converter is used loaded very
-    // early (but the change of it actually doing anything is very low during init)
+    // Load the event store lazily because it can trigger a lot of things while the event converter is loaded very early
+    // (but the change of it actually doing anything is very low during init)
     private Provider<EventStore> storeProvider;
 
-    protected Optional<org.xwiki.eventstream.Event> getEvent(String eventId) throws EventStreamException
+    protected Optional<Event> getEvent(String eventId) throws EventStreamException
     {
         return this.storeProvider.get().getEvent(eventId);
     }

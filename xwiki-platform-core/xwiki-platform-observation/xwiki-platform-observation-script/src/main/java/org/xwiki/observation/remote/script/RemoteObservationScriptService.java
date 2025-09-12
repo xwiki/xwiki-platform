@@ -34,6 +34,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 /**
  * Various script APIs related remote observation and clustering.
@@ -44,6 +45,7 @@ import org.xwiki.security.authorization.Right;
 @Component
 @Named(ObservationScriptService.ROLEHINT + '.' + RemoteObservationScriptService.ID)
 @Singleton
+@Unstable
 public class RemoteObservationScriptService implements ScriptService
 {
     /**
@@ -86,7 +88,7 @@ public class RemoteObservationScriptService implements ScriptService
 
     /**
      * @return the channels used to communicate with other XWiki instances
-     * @throws AccessDeniedException when the context author is not allowed to use this API
+     * @throws AccessDeniedException when the context author is not allowed to use this API (require programming right)
      */
     public Collection<NetworkChannel> getChannels() throws AccessDeniedException
     {

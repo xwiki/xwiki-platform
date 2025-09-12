@@ -20,6 +20,7 @@
 package org.xwiki.observation.remote;
 
 import org.xwiki.observation.event.Event;
+import org.xwiki.stability.Unstable;
 
 /**
  * This event is triggered when a member left a {@link NetworkChannel}.
@@ -32,8 +33,9 @@ import org.xwiki.observation.event.Event;
  * </ul>
  * 
  * @version $Id$
- * @since 17.8.0RC1
+ * @since 17.9.0RC1
  */
+@Unstable
 public class NetworkMemberLeftEvent implements Event
 {
     private final String channel;

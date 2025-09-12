@@ -79,11 +79,7 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
     @Override
     public void receive(Message msg)
     {
-        Object obj = msg.getObject();
-
-        if (obj instanceof RemoteEventData) {
-            RemoteEventData remoteEvent = (RemoteEventData) msg.getObject();
-
+        if (msg.getObject() instanceof RemoteEventData remoteEvent) {
             this.logger.debug("Received JGroups remote event [{}]", remoteEvent);
 
             getRemoteObservationManager().notify(remoteEvent);

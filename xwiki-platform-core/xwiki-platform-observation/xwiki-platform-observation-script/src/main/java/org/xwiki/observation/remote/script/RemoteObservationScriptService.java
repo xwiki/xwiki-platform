@@ -31,6 +31,9 @@ import org.xwiki.observation.remote.NetworkChannel;
 import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Various script APIs related remote observation and clustering.
@@ -53,6 +56,9 @@ public class RemoteObservationScriptService implements ScriptService
 
     @Inject
     private RemoteObservationManager manager;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     /**
      * @return the unique identifier of the instance in the cluster
@@ -80,9 +86,12 @@ public class RemoteObservationScriptService implements ScriptService
 
     /**
      * @return the channels used to communicate with other XWiki instances
+     * @throws AccessDeniedException when the context author is not allowed to use this API
      */
-    public Collection<NetworkChannel> getChannels()
+    public Collection<NetworkChannel> getChannels() throws AccessDeniedException
     {
+        this.authorization.checkAccess(Right.PROGRAM);
+
         return this.manager.getChannels();
     }
 }

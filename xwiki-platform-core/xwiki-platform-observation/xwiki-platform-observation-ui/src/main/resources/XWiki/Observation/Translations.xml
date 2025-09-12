@@ -27,13 +27,14 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>observation.remote.admin.intro=It's possible to setup a cluster of XWiki instances. In such a setup, XWiki instances are sharing the same database and communicate via the Remote Observation network (which default implementation is based on JGroups).
 observation.remote.admin.id=Observation identifier

@@ -272,7 +272,7 @@ $member.id#if ($member.id == $remoteObservation.id) //({{translation key="observ
 #end
 #set($remoteObservation = $services.observation.remote)
 ; {{translation key="observation.remote.admin.id"/}}
-: $remoteObservation.id
+: $services.rendering.escape($remoteObservation.id, 'xwiki/2.1')
 ; {{translation key="observation.remote.admin.networkAdapter"/}}
 : {{translation key="observation.remote.admin.networkAdapter.${remoteObservation.adapterId}.name"/}}
 
@@ -283,7 +283,7 @@ $member.id#if ($member.id == $remoteObservation.id) //({{translation key="observ
   #foreach ($channel in $channels)
     {{box}}
     ; {{translation key="observation.remote.admin.channel.id"/}}
-    : $channel.id
+    : $services.rendering.escape($channel.id, 'xwiki/2.1')
     ; {{translation key="observation.remote.admin.channel.leader"/}}
     : #displayMember($channel.leader)
 

@@ -506,23 +506,24 @@
 
 /* This checkbox input should be styled as a switch between ascending and descending states. */
 .search-results-sort #sort-order-input {
-  /* Hide the default checkbox. We rely on the style of the label itself to make it work. */
+  /* Hide the default checkbox. We rely on the style of the icon in its label to make it work. */
   appearance: none;
   margin: 0;
 }
 
-.search-results-sort #sort-order-input + label {
+.search-results-sort label:has(&amp;&gt;#sort-order-input) {
   /* We want most of the styles from "form-control", but not the shadow that comes from bootstrap. */
   box-shadow: none;
 }
 
-.search-results-sort #sort-order-input + label *:first-child {
+/* We assume the icon is next to the hidden checkbox in the DOM */
+.search-results-sort label #sort-order-input + * {
   transform: none;
   transition: transform .2s ease-out;
 }
 
 /* When the box is checked, we want to rotate the icon. */
-.search-results-sort #sort-order-input:checked + label *:first-child {
+.search-results-sort label #sort-order-input:checked + * {
   transform: rotate(180deg);
 }
 

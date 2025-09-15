@@ -35,7 +35,7 @@
       if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
         // When editing in-place we need to maximize the parent of the editable area in order to have the user caret
         // indicators visible (they are injected after the editable area).
-        editor.element.getParent().addClass('cke_editable_fullscreen');
+        this.fixFullScreenMode(editor);
       }
 
       // CKEditor's HTML parser doesn't preserve the space character typed at the end of a line of text. For instance,
@@ -65,8 +65,15 @@
           'xwiki-realtime-interface',
           'xwiki-l10n!xwiki-realtime-messages'
         ], asyncRequireCallback(async (Loader, Adapter, Interface, Messages) => {
+          editor._realtime = {
+            adapter: new Adapter(editor, CKEDITOR),
+            interface: Interface,
+            // Rejoin the realtime collaboration when switching back to WYSIWYG mode.
+            rejoin: true,
+          };
+
           try {
-            const realtimeSupported = await enableRealtimeEditing(editor, Loader, Adapter);
+            const realtimeSupported = await enableRealtimeEditing(editor, Loader);
             if (!realtimeSupported) {
               // "Fail" silently if realtime collaboration is not supported in this context.
               return;
@@ -84,136 +91,79 @@
           // loaded.
           editor.resetDirty();
 
-          editor._realtimeInterface = Interface;
-          editor._realtimeSource = {
-            // True if the editor was in the realtime session before switching to source.
-            realtime: false,
-
-            // The value of editor.checkDirty() before switching to source.
-            dirty: false,
-
-            // The result of editor.getSnapshot() right after switching to source.
-            previousValue: null
-          };
-          editor.on('beforeModeUnload', this.onBeforeModeUnload.bind(this));
+          // Leave / rejoin the realtime session when switching between WYSIWYG and Source modes.
+          // We flush uncommitted work before leaving the WYSIWYG mode, in order to avoid losing local changes. We do
+          // this very early, before the new mode is set, hopefully before the editor is locked (loading).
+          editor.on('beforeSetMode', this.onBeforeSetMode.bind(this), null, null, 0);
           CKEDITOR.plugins.xwikiSource?.addModeChangeHandler(editor, this.onModeChanged.bind(this), 10);
           editor.on('modeReady', this.onModeReady.bind(this));
         }, resolve, rejectWithNotification), rejectWithNotification);
       }));
     },
 
-    onBeforeModeUnload: function(event) {
+    fixFullScreenMode: function(editor) {
+      const prepareForFullScreenMode = (realtimeSupported) => {
+        if (realtimeSupported === undefined) {
+          realtimeSupported = editor.mode === 'wysiwyg';
+        }
+        // Maximize the parent of the editable area in order to include the user caret indicators. We do this only for
+        // the WYSIWYG mode because it's the only mode that supports realtime editing.
+        $(editor.element.getParent().$).toggleClass('cke_editable_fullscreen', realtimeSupported);
+      };
+      // Update the area that is maximized whenever the editing mode changes.
+      CKEDITOR.plugins.xwikiSource?.addModeChangeHandler(editor, () => prepareForFullScreenMode());
+      // Clean up when the editor is destroyed, but only after the full-screen mode is exited.
+      editor.on('beforeDestroy', () => prepareForFullScreenMode(false), null, null, 100);
+      // The mode change handler we added above is not called when the editor is initialized, so we need to trigger it.
+      prepareForFullScreenMode();
+    },
+
+    onBeforeSetMode: function(event) {
       const editor = event.editor;
       if (editor.mode === 'wysiwyg') {
-        // Store the dirty state before leaving the WYSIWYG mode.
-        editor._realtimeSource.dirty = editor.checkDirty();
-      } else if (editor.mode === 'source') {
-        // Update the dirty state before leaving the Source mode because we can join the realtime session when switching
-        // to WYSIWYG mode only if the content is not dirty (or there is no one else in the editing session). The
-        // content is dirty if there are unsaved changes made before switching to Source mode or while in Source mode.
-        editor._realtimeSource.dirty = editor._realtimeSource.dirty ||
-          (editor._realtimeSource.previousValue !== editor.getSnapshot());
+        // Flushing uncommitted work has no effect if we're disconnected from the realtime session or if the connection
+        // is paused, which is why we do it here, very early, before the new mode is set, so before the editor is locked
+        // (put into loading mode, which pauses the connection).
+        //
+        // Note that this operation is asynchronous but we can't block the event processing until it completes (because 
+        // CKEditor doesn't support async event listeners). This is fine in practice because switching from WYSIWYG to
+        // Source mode is asynchronous as well, so there is time for the uncommitted work to arrive to the server.
+        editor._realtime.editor?._flushUncommittedWork();
       }
     },
 
     onModeChanged: async function(editor, {previousMode}) {
-      const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
-
-      // This handles the switching between wysiwyg and source mode. The switch between wysiwyg and source modes marks
-      // the editor as dirty. But we would like to rely on the dirty state of the editor to decide wether or not to
-      // re-join the realtime session after editing the source. To determine wether or not the editor is dirty, CKEditor
-      // compares the current snapshot of the content to a snapshot saved during a editor.resetDirty() call. We need to
-      // keep track of the dirty state ourselves by saving a snapshot.
-
-      // When switching back to wysiwyg, even without editing the source, the content can be marked as dirty, making
-      // switching back and forth between wysiwyg and source leave the realtime session permanently even when no changes
-      // were made. To prevent that, we reset the dirty state when the realtime-tracked dirty state is clean.
-
-      // We use a mode change handler to capture the dirty state prior to the mode change, and abort the realtime
-      // session before the iframe (when in framed wysiwyg) is destroyed. We use the modeReady event to restore the
-      // dirty state once the mode change is done. and re-join the realtime session if suitable.
-
-      // We keep track of the realtime status before switching to source mode in the editor._realtimeSource attribute.
-
       if (previousMode === 'wysiwyg' && editor.mode === 'source') {
         // Switching from WYSIWYG to Source mode.
 
         // Store the realtime state before switching to Source mode in order to restore the state when switching back to
         // WYSIWYG mode.
-        editor._realtimeSource.realtime = realtimeCheckbox.prop('checked');
+        editor._realtime.rejoin = editor._realtime.context?.realtimeEnabled;
 
         // When using the iframed editor, switching to source destroys the iframe, preventing the realtime framework
         // from applying new patches. We need to leave the realtime session when switching to source mode in order to
         // avoid unexpected behaviour.
-        if (editor._realtimeSource.realtime) {
-          await this.onSourceFromWYSIWYG(editor, realtimeCheckbox);
+        if (editor._realtime.rejoin) {
+          // Notify the user that we're leaving the realtime collaboration.
+          editor.showNotification(editor.localization.get('xwiki-realtime.leavingCollaboration'));
+
+          // Abort the realtime session. This operation is asynchronous because we want to push uncommitted work before
+          // disconnecting.
+          await editor._realtime.disconnect();
         }
-      } else if (previousMode === 'source' && editor.mode === 'wysiwyg' && editor._realtimeSource.realtime) {
+      } else if (previousMode === 'source' && editor.mode === 'wysiwyg' && editor._realtime.rejoin) {
         // Swithing from Source back to WYSIWYG mode, which had realtime enabled before the switch.
-        await this.onWYSIWYGFromSource(editor, realtimeCheckbox);
-      }
-    },
-
-    onSourceFromWYSIWYG: async function(editor, realtimeCheckbox) {
-      // Abort the realtime session. This operation is asynchronous because we want to push uncommitted work before
-      // disconnecting.
-      await editor._realtime._onAbort();
-
-      // Show the user that we left the realtime session.
-      realtimeCheckbox.prop('checked', false);
-
-      // Show a notification explaining that we temporarily left the realtime session.
-      editor.showNotification(editor.localization.get(
-        'xwiki-realtime.notification.sourcearea.temporarilyLeftSession'));
-    },
-
-    onWYSIWYGFromSource: async function(editor, realtimeCheckbox) {
-      // Update the realtime channels to prepare joining the realtime session, as well as knowing if there are users
-      // in the session.
-      await editor._realtime._updateChannels();
-
-      let translationKey = 'xwiki-realtime.notification.sourcearea.rejoiningSession.noChanges';
-      let rejoin = true;
-
-      // When the editor is dirty, we can join only if we are alone.
-      if (editor._realtimeSource.dirty) {
-        /*jshint -W106 */
-        if (editor._realtime._realtimeContext.channels.wysiwyg_users > 0) {
-          /*jshint +W106 */
-
-          translationKey = 'xwiki-realtime.notification.sourcearea.notRejoiningSession';
-          rejoin = false;
-        } else {
-          translationKey = 'xwiki-realtime.notification.sourcearea.rejoiningSession.alone';
-        }
-      }
-
-      editor.showNotification(
-        editor.localization.get(translationKey),
-        rejoin ? 'success' : 'warning',
-        rejoin ? undefined : 5000
-      );
-      if (rejoin) {
-        realtimeCheckbox.prop('checked', true);
-        editor._realtime._startRealtimeSync();
+        editor.showNotification(editor.localization.get('xwiki-realtime.joiningCollaboration'));
+        editor._realtime.context.realtimeEnabled = true;
+        await editor._realtime.connect();
       }
     },
 
     onModeReady: function(event) {
-      const editor = event.editor;
-
-      if (editor.mode === 'source') {
-        // Once the mode switch is done, we store a snapshot of the source allowing to check if changes were made when
-        // switching back to WYSIWYG.
-        editor._realtimeSource.previousValue = editor.getSnapshot();
-      } else if (editor.mode === 'wysiwyg' && !editor._realtimeSource.dirty) {
-        // There are no unsaved changes. But the editor might consider itself dirty because of the mode change.
-        editor.resetDirty();
-      }
-
       // The user should not be able to join the realtime editing session while in source mode. We disable the allow
       // realtime checkbox while in source mode, and enable it when we go back to wysiwyg.
-      const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
+      const editor = event.editor;
+      const realtimeCheckbox = editor._realtime.interface.getAllowRealtimeCheckbox();
       realtimeCheckbox.prop('disabled', editor.mode !== 'wysiwyg');
     }
   });
@@ -279,7 +229,7 @@
     textNode.$.replaceData(textNode.getLength() - whitespaceLength, whitespaceLength, whitespaceSuffix);
   }
 
-  async function enableRealtimeEditing(editor, Loader, Adapter) {
+  async function enableRealtimeEditing(editor, Loader) {
     const info = {
       type: 'wysiwyg',
       field: editor.name,
@@ -290,12 +240,23 @@
       compatible: ['wysiwyg', 'wiki']
     };
 
-    const realtimeContext = await Loader.bootstrap(info);
-    if (realtimeContext) {
+    editor._realtime.context = await Loader.bootstrap(info);
+    if (editor._realtime.context) {
       return await new Promise((resolve, reject) => {
         require(['xwiki-realtime-wysiwyg'], asyncRequireCallback(RealtimeWysiwygEditor => {
-          editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), realtimeContext);
-          return editor._realtime;
+          editor._realtime.connect = async () => {
+            if (!editor._realtime.editor) {
+              editor._realtime.editor = new RealtimeWysiwygEditor(editor._realtime.adapter, editor._realtime.context);
+              return await editor._realtime.editor.toBeConnected();
+            } else {
+              await editor._realtime.editor._updateChannels();
+              await editor._realtime.editor._startRealtimeSync();
+            }
+          };
+          editor._realtime.disconnect = async () => {
+            await editor._realtime.editor?._onAbort();
+          };
+          return editor._realtime.connect();
         }, resolve, reject), reject);
       });
     }

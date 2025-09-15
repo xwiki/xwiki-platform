@@ -68,7 +68,7 @@ public class RichTextAreaElement extends BaseElement
     /**
      * The CKEditor instance that owns this rich text area.
      */
-    private CKEditor editor;
+    protected CKEditor editor;
 
     /**
      * The element that defines the rich text area.
@@ -179,9 +179,31 @@ public class RichTextAreaElement extends BaseElement
         if (keysToSend.length > 0) {
             try {
                 getActiveElement().sendKeys(keysToSend);
+                maybeForceSelectionChange();
             } finally {
                 maybeSwitchToDefaultContent();
             }
+        }
+    }
+
+    private void maybeForceSelectionChange()
+    {
+        String browserName = getDriver().getCapabilities().getBrowserName().toLowerCase();
+        if (!this.isFrame && browserName.contains("firefox")) {
+            // When editing in-place in Firefox, the selection (caret position) is not updated if the editor is losing
+            // focus immediately after some text has been typed. This happens for instance if you type and then quickly
+            // switch to a different browser tab. When you get back the caret is before the newly typed text instead of
+            // after it. Same happens if you type and then quickly focus another element on the same page (e.g. another
+            // form field). This is a CKEditor bug, which you can reproduce using the CKEditor 4 demo, after selecting
+            // the "Inline" mode. The workaround we found is to force CKEditor to acknowledge the selection change right
+            // after typing, before the editor loses focus. Note that we could have waited for the "selectionChange"
+            // event to be fired after typing, but its documentation says: "this event is fired only when selection's
+            // start element (container of a selecion start) changes, not on every possible selection change", which
+            // means this event is not triggered when we type.
+            getDriver().executeScript("""
+                const name = arguments[0];
+                const editor = CKEDITOR.instances[name];
+                editor.selectionChange(true);""", this.editor.getName());
         }
     }
 

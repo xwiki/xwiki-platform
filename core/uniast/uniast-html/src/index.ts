@@ -17,4 +17,5 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export { UniAstToHTMLConverter } from "./html/uniast-to-html";
+export { ComponentInit, uniAstToHTMLConverterName } from "./component-init";
+export { type UniAstToHTMLConverter } from "./html/uni-ast-to-html-converter";

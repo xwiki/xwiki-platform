@@ -30,6 +30,7 @@ export interface ModelReferenceHandlerProvider {
 export interface ModelReferenceParser {
     // (undocumented)
     parse(reference: string, type?: EntityType): EntityReference;
+    parseAsync(reference: string, type?: EntityType): Promise<EntityReference>;
 }
 
 // @beta (undocumented)

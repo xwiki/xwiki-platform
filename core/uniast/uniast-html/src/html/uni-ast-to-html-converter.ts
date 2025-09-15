@@ -17,7 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { UniAst } from "@xwiki/cristal-uniast-api";
 
-import { generateConfig } from "../../../vite.config";
-
-export default generateConfig(import.meta.url);
+/**
+ * Converts Universal AST trees to HTML.
+ *
+ * @since 0.22
+ * @beta
+ */
+export interface UniAstToHTMLConverter {
+  toHtml(uniAst: UniAst): string | Error;
+}

@@ -18,10 +18,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-export {
-  ComponentInit,
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "./component-init";
-export { type MarkdownToUniAstConverter } from "./markdown/markdown-to-uni-ast-converter";
-export { type UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-converter";
+export type MatchResult<K extends string> = {
+  name: K;
+  match: string;
+  offset: number;
+};
+
+export function findFirstMatchIn<K extends string>(
+  subject: string,
+  candidates: Array<{ name: K; match: string }>,
+): MatchResult<K> | null {
+  let first: MatchResult<K> | null = null;
+
+  for (const { name, match } of candidates) {
+    const offset = subject.indexOf(match);
+
+    if (offset !== -1 && (first === null || first.offset > offset)) {
+      first = { name, match, offset };
+    }
+  }
+
+  return first;
+}

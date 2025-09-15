@@ -23,41 +23,85 @@ import {
   DocumentReference,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
+import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { EntityReference } from "@xwiki/cristal-model-api";
 import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 
 @injectable()
 export class FileSystemModelReferenceParser implements ModelReferenceParser {
+  constructor(
+    @inject("DocumentService")
+    private readonly documentService: DocumentService,
+  ) {}
+
+  // eslint-disable-next-line max-statements
   parse(reference: string): EntityReference {
     if (/^https?:\/\//.test(reference)) {
       throw new Error(`[${reference}] is not a valid entity reference`);
     }
     const segments = reference.split(/(?<!\\)\//);
-    if (segments[segments.length - 2] == "attachments") {
+    if (
+      segments[segments.length - 2] == "attachments" &&
+      segments[segments.length - 3].startsWith(".")
+    ) {
+      const currentDocumentSegments = this.documentService
+        .getCurrentDocument()
+        .value?.id.split("/");
+
+      const references = reference
+        .split(/(?<!\\)\//)
+        .map((s) => this.unescape(s));
+      const spaces = references.slice(0, references.length - 3);
+
+      const currentSegments =
+        currentDocumentSegments?.slice(
+          0,
+          currentDocumentSegments?.length - 1,
+        ) ?? [];
+
+      while (spaces[0] == "..") {
+        currentSegments.pop();
+        spaces.pop();
+      }
+
       return new AttachmentReference(
         this.unescape(segments[segments.length - 1]),
         new DocumentReference(
-          this.unescape(segments[segments.length - 3]),
-          new SpaceReference(
-            undefined,
-            ...segments
-              .slice(0, segments.length - 3)
-              .map((s) => this.unescape(s)),
-          ),
+          this.unescape(segments[segments.length - 3]).replace(/^\./, ""),
+          new SpaceReference(undefined, ...[...currentSegments, ...spaces]),
         ),
       );
     } else {
+      const currentDocumentSegments = this.documentService
+        .getCurrentDocument()
+        .value?.id.split("/");
+
+      const references = reference
+        .split(/(?<!\\)\//)
+        .map((s) => this.unescape(s));
+      const spaces = references.slice(0, references.length - 1);
+
+      const currentSegments =
+        currentDocumentSegments?.slice(
+          0,
+          currentDocumentSegments?.length - 1,
+        ) ?? [];
+
+      while (spaces[0] == "..") {
+        currentSegments.pop();
+        spaces.pop();
+      }
+
       return new DocumentReference(
         this.unescape(segments[segments.length - 1]),
-        new SpaceReference(
-          undefined,
-          ...segments
-            .slice(0, segments.length - 1)
-            .map((s) => this.unescape(s)),
-        ),
+        new SpaceReference(undefined, ...[...currentSegments, ...spaces]),
       );
     }
+  }
+
+  async parseAsync(reference: string): Promise<EntityReference> {
+    return this.parse(reference);
   }
 
   private unescape(string: string) {

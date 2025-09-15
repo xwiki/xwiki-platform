@@ -17,11 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-export {
-  ComponentInit,
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "./component-init";
-export { type MarkdownToUniAstConverter } from "./markdown/markdown-to-uni-ast-converter";
-export { type UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-converter";
+/**
+ * Variation points used by the markdown parser.
+ *
+ * @since 0.22
+ */
+export type MarkdownParserConfiguration = {
+  /**
+   * When true, the parser must consider that all standard links (e.g., []()) are externals, and internal links have
+   * the double square brackets ([[]]) form.
+   */
+  supportFlexmarkInternalLinks: boolean;
+};

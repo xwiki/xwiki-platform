@@ -23,6 +23,7 @@ export type {
   BlockStyles,
   Image,
   InlineContent,
+  Link,
   LinkTarget,
   ListItem,
   TableCell,
@@ -31,4 +32,3 @@ export type {
   TextStyles,
   UniAst,
 } from "./ast";
-export { type ConverterContext } from "./converterContext";

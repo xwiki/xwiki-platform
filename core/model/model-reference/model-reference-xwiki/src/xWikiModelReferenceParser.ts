@@ -44,6 +44,13 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
     return this.innerParse(reference, type);
   }
 
+  async parseAsync(
+    reference: string,
+    type?: EntityType,
+  ): Promise<EntityReference> {
+    return this.parse(reference, type);
+  }
+
   private innerParse(reference: string, type: EntityType | undefined) {
     const splits = reference.split(":");
     const noWiki = splits[splits.length - 1];

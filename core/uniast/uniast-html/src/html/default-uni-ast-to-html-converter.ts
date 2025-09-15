@@ -18,10 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { EntityType } from "@xwiki/cristal-model-api";
+import { inject, injectable } from "inversify";
 import { escape } from "lodash-es";
+import type { UniAstToHTMLConverter } from "./uni-ast-to-html-converter";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
 import type {
   Block,
-  ConverterContext,
   Image,
   InlineContent,
   ListItem,
@@ -30,14 +34,15 @@ import type {
   UniAst,
 } from "@xwiki/cristal-uniast-api";
 
-/**
- * Converts Universal AST trees to HTML.
- *
- * @since 0.22
- * @beta
- */
-export class UniAstToHTMLConverter {
-  constructor(private readonly context: ConverterContext) {}
+@injectable()
+export class DefaultUniAstToHTMLConverter implements UniAstToHTMLConverter {
+  constructor(
+    @inject("RemoteURLSerializerProvider")
+    private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
+    @inject("ModelReferenceParserProvider")
+    private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
+  ) {}
+
   toHtml(uniAst: UniAst): string | Error {
     const { blocks } = uniAst;
 
@@ -101,13 +106,20 @@ export class UniAstToHTMLConverter {
 
   private convertImage(image: Image): string {
     const target = image.target;
-    const srcValue: string = escape(
-      target.type === "external"
-        ? target.url
-        : target.parsedReference !== null
-          ? this.context.getUrlFromReference(target.parsedReference)
-          : this.convertReference(target.rawReference, EntityType.ATTACHMENT),
-    );
+    let srcValue: string;
+    if (target.type === "external") {
+      srcValue = escape(target.url);
+    } else if (target.parsedReference !== null) {
+      srcValue = escape(
+        this.remoteURLSerializerProvider
+          .get()!
+          .serialize(target.parsedReference),
+      );
+    } else {
+      srcValue = escape(
+        this.convertReference(target.rawReference, EntityType.ATTACHMENT),
+      );
+    }
     const altValue: string = escape(image.alt) ?? "";
     return `<img src="${srcValue}" alt="${altValue}">`;
   }
@@ -156,9 +168,17 @@ export class UniAstToHTMLConverter {
           case "external":
             return `<a href="${escape(inlineContent.target.url)}" class="wikiexternallink">${linkContent}</a>`;
 
-          case "internal":
+          case "internal": {
             // TODO: convert reference
-            return `<a href="${escape(this.convertReference(inlineContent.target.rawReference, EntityType.DOCUMENT))}">${linkContent}</a>`;
+
+            const href = inlineContent.target.parsedReference
+              ? this.serializeReference(inlineContent.target.parsedReference)
+              : this.convertReference(
+                  inlineContent.target.rawReference,
+                  EntityType.DOCUMENT,
+                );
+            return `<a href="${escape(href)}">${linkContent}</a>`;
+          }
         }
         break;
       }
@@ -219,7 +239,13 @@ export class UniAstToHTMLConverter {
   }
 
   private convertReference(rawReference: string, type: EntityType) {
-    const parseReference = this.context.parseReference(rawReference, type);
-    return this.context.getUrlFromReference(parseReference!);
+    const parseReference = this.modelReferenceParserProvider
+      .get()!
+      .parse(rawReference, type);
+    return this.serializeReference(parseReference);
+  }
+
+  private serializeReference(parseReference: EntityReference) {
+    return this.remoteURLSerializerProvider.get()!.serialize(parseReference);
   }
 }

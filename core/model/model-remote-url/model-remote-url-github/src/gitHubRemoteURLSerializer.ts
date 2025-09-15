@@ -37,11 +37,11 @@ class GitHubRemoteURLSerializer implements RemoteURLSerializer {
         throw new Error("Not implemented");
       case EntityType.SPACE: {
         const spaces = reference.names.join("/");
-        return `${this.getBaseRestURL()}/${spaces}`;
+        return `${this.getBaseRestURL()}/contents${spaces}`;
       }
       case EntityType.DOCUMENT: {
         const spaces = reference.space?.names.join("/");
-        return `${this.getBaseRestURL()}/${spaces}/${reference.name}`;
+        return `${this.getBaseRestURL()}/contents${spaces}/${reference.name}`;
       }
       case EntityType.ATTACHMENT: {
         return this.serializeAttachmentReference(reference);

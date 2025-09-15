@@ -5,7 +5,6 @@
 ```ts
 
 import type { EntityReference } from '@xwiki/cristal-model-api';
-import { EntityType } from '@xwiki/cristal-model-api';
 
 // @beta (undocumented)
 export type Alignment = "left" | "center" | "right" | "justify";
@@ -54,15 +53,6 @@ export type BlockStyles = {
     textAlignment?: Alignment;
 };
 
-// @beta
-export type ConverterContext = {
-    parseReference(reference: string, type: EntityType | null): EntityReference | null;
-    serializeReference(reference: EntityReference): string;
-    parseReferenceFromUrl(url: string): EntityReference | null;
-    getUrlFromReference(reference: EntityReference): string;
-    getDisplayName(reference: EntityReference): string;
-};
-
 // @beta (undocumented)
 type Image_2 = {
     target: LinkTarget;
@@ -81,16 +71,20 @@ export type InlineContent = ({
     type: "text";
 } & Text_2) | ({
     type: "image";
-} & Image_2) | {
+} & Image_2) | ({
     type: "link";
+} & Link) | {
+    type: "inlineMacro";
+    name: string;
+    params: Record<string, boolean | number | string>;
+};
+
+// @beta (undocumented)
+export type Link = {
     target: LinkTarget;
     content: Exclude<InlineContent, {
         type: "link";
     }>[];
-} | {
-    type: "inlineMacro";
-    name: string;
-    params: Record<string, boolean | number | string>;
 };
 
 // @beta (undocumented)

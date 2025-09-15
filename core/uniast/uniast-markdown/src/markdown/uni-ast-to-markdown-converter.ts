@@ -17,11 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { InlineContent, UniAst } from "@xwiki/cristal-uniast-api";
 
-export {
-  ComponentInit,
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "./component-init";
-export { type MarkdownToUniAstConverter } from "./markdown/markdown-to-uni-ast-converter";
-export { type UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-converter";
+/**
+ * Converts Universal AST trees to markdown.
+ *
+ * @since 0.16
+ * @beta
+ */
+export interface UniAstToMarkdownConverter {
+  /**
+   * Converts the provided AST to Markdown.
+   *
+   * @param uniAst - the AST to convert to markdown
+   *
+   * understand the impacts
+   */
+  toMarkdown(uniAst: UniAst): Promise<string | Error>;
+
+  /**
+   * @since 0.22
+   * @internal
+   * @param inlineContents - the inline contents to convert to markdown
+   * @returns the markdown representation of the inline content
+   */
+  convertInlineContents(inlineContents: InlineContent[]): Promise<string>;
+}

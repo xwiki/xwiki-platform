@@ -25,11 +25,11 @@ import messages from "../translations";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { PageActions } from "@xwiki/cristal-page-actions-ui";
-import { computed, inject, onUpdated, ref } from "vue";
+import { computed, inject, onUpdated, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
-import type { ComputedRef, Ref } from "vue";
+import type { Ref } from "vue";
 
 const { t } = useI18n({
   messages,
@@ -51,20 +51,36 @@ const displayTitle = documentService.getDisplayTitle();
 
 const contentRoot = ref(undefined);
 
-const content: ComputedRef<string | undefined> = computed(() => {
-  if (currentPage.value) {
-    const cpn: PageData = currentPage.value;
-    if (cpn.html && cpn.html.trim() !== "" && cpn.syntax != "markdown/1.2") {
-      return cpn.html as string;
-    } else if (cpn.source) {
-      return renderMarkdown(cpn.source, container);
+const content: Ref<string | undefined> = ref();
+const contentRendering = ref(true);
+
+watch(
+  currentPage,
+  // eslint-disable-next-line max-statements
+  async (currentPage) => {
+    if (currentPage) {
+      if (
+        currentPage.html &&
+        currentPage.html.trim() !== "" &&
+        currentPage.syntax != "markdown/1.2"
+      ) {
+        content.value = currentPage.html as string;
+        contentRendering.value = false;
+      } else if (currentPage.source) {
+        contentRendering.value = true;
+        content.value = await renderMarkdown(currentPage.source, container);
+        contentRendering.value = false;
+      } else {
+        content.value = "";
+        contentRendering.value = false;
+      }
     } else {
-      return "";
+      content.value = undefined;
+      contentRendering.value = false;
     }
-  } else {
-    return undefined;
-  }
-});
+  },
+  { immediate: true },
+);
 
 const pageExist = computed(() => {
   return content.value !== undefined;
@@ -128,12 +144,13 @@ onUpdated(() => {
     <template #default>
       <!-- eslint-disable vue/no-v-html -->
       <div
-        v-if="pageExist"
+        v-if="pageExist && !contentRendering"
         id="xwikicontent"
         ref="contentRoot"
         class="doc-content"
         v-html="content"
       ></div>
+      <div v-else-if="pageExist && contentRendering">Rendering the page...</div>
       <div v-else class="doc-content unknown-page">
         <p>
           The requested page could not be found. You can edit the page to create

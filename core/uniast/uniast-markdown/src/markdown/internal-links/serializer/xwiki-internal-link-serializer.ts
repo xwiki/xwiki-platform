@@ -17,11 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { injectable } from "inversify";
+import type { InternalLinksSerializer } from "./internal-links-serializer";
+import type { UniAstToMarkdownConverter } from "../../uni-ast-to-markdown-converter";
+import type { Link, LinkTarget } from "@xwiki/cristal-uniast-api";
 
-export {
-  ComponentInit,
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "./component-init";
-export { type MarkdownToUniAstConverter } from "./markdown/markdown-to-uni-ast-converter";
-export { type UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-converter";
+/**
+ * @since 0.22
+ */
+@injectable()
+export class XWikiInternalLinkSerializer implements InternalLinksSerializer {
+  async serialize(
+    content: Link["content"],
+    target: Extract<LinkTarget, { type: "internal" }>,
+    uniAstToMarkdownConverter: UniAstToMarkdownConverter,
+  ): Promise<string> {
+    return `[[${await uniAstToMarkdownConverter.convertInlineContents(
+      content,
+    )}|${target.rawReference}]]`;
+  }
+
+  async serializeImage(
+    target: Extract<LinkTarget, { type: "internal" }>,
+    alt?: string,
+  ): Promise<string> {
+    return `![[${alt ?? ""}${alt ? "|" : ""}${target.rawReference}]]`;
+  }
+}

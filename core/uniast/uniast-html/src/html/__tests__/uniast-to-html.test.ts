@@ -18,14 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { UniAstToHTMLConverter } from "../uniast-to-html";
+import { DefaultUniAstToHTMLConverter } from "../default-uni-ast-to-html-converter";
 import {
   AttachmentReference,
   DocumentReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
-import { createConverterContext } from "@xwiki/cristal-uniast-utils";
 import { Container } from "inversify";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -40,10 +39,9 @@ import type {
   RemoteURLSerializer,
   RemoteURLSerializerProvider,
 } from "@xwiki/cristal-model-remote-url-api";
-import type { ConverterContext } from "@xwiki/cristal-uniast-api";
 
 // eslint-disable-next-line max-statements
-function getConverterContext(): ConverterContext {
+function init() {
   const modelReferenceParserProvider = mock<ModelReferenceParserProvider>();
   const remoteURLSerializerProvider = mock<RemoteURLSerializerProvider>();
   const modelReferenceParser = mock<ModelReferenceParser>();
@@ -85,14 +83,16 @@ function getConverterContext(): ConverterContext {
     .calledWith(attachmentReference)
     .mockReturnValue("https://my.site/A/B/image.png");
 
-  return createConverterContext(containerMock);
+  return { remoteURLSerializerProvider, modelReferenceParserProvider };
 }
 
 // eslint-disable-next-line max-statements
 describe("UniAstToHTMLConverter", () => {
-  const converterContext = getConverterContext();
-
-  const uniAstToHTMLConverter = new UniAstToHTMLConverter(converterContext);
+  const { remoteURLSerializerProvider, modelReferenceParserProvider } = init();
+  const uniAstToHTMLConverter = new DefaultUniAstToHTMLConverter(
+    remoteURLSerializerProvider,
+    modelReferenceParserProvider,
+  );
 
   test("empty ast", () => {
     const res = uniAstToHTMLConverter.toHtml({ blocks: [] });

@@ -17,11 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { UniAst } from "@xwiki/cristal-uniast-api";
 
-export {
-  ComponentInit,
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "./component-init";
-export { type MarkdownToUniAstConverter } from "./markdown/markdown-to-uni-ast-converter";
-export { type UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-converter";
+/**
+ * Convert Markdown string to a Universal AST.
+ *
+ * @since 0.16
+ * @beta
+ */
+export interface MarkdownToUniAstConverter {
+  /**
+   * Parse a markdown document to a universal AST
+   *
+   * @param markdown - The markdown content to parse
+   *
+   * @returns The Universal Ast
+   */
+  parseMarkdown(markdown: string): Promise<UniAst | Error>;
+}

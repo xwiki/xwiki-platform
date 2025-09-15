@@ -43,7 +43,6 @@
     "@xwiki/cristal-skin": "workspace:*",
     "@xwiki/cristal-uniast-api": "workspace:*",
     "@xwiki/cristal-uniast-markdown": "workspace:*",
-    "@xwiki/cristal-uniast-utils": "workspace:*",
     "lodash-es": "4.17.21",
     "vue-i18n": "11.1.11"
   },

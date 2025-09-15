@@ -25,7 +25,6 @@ import messages from "../translations";
 import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
 import { mountBlockNote } from "@xwiki/cristal-editors-blocknote-react";
-import { createConverterContext } from "@xwiki/cristal-uniast-utils";
 import { Container } from "inversify";
 
 import { debounce } from "lodash-es";
@@ -43,6 +42,11 @@ import type {
   BlockNoteViewWrapperProps,
   EditorType,
 } from "@xwiki/cristal-editors-blocknote-react";
+import type { ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/cristal-model-remote-url-api";
 import type { UniAst } from "@xwiki/cristal-uniast-api";
 
 const {
@@ -140,11 +144,21 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
 };
 
-const converterContext = createConverterContext(container);
+const remoteURLSerializer = container
+  .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+  .get()!;
+const remoteURLParser = container
+  .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+  .get()!;
+const modelReferenceSerializer = container
+  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+  .get()!;
 
-const blockNoteToUniAst = new BlockNoteToUniAstConverter(converterContext);
-
-const uniAstToBlockNote = new UniAstToBlockNoteConverter(converterContext);
+const blockNoteToUniAst = new BlockNoteToUniAstConverter(
+  remoteURLParser,
+  modelReferenceSerializer,
+);
+const uniAstToBlockNote = new UniAstToBlockNoteConverter(remoteURLSerializer);
 
 const content =
   uniAst instanceof Error

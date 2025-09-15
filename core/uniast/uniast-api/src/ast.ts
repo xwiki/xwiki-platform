@@ -106,6 +106,19 @@ type Image = {
 };
 
 /**
+ * @since 0.22
+ * @beta
+ */
+type Link = {
+  target: LinkTarget;
+  /**
+   * @since 0.23
+   * @beta
+   */
+  content: Exclude<InlineContent, { type: "link" }>[];
+};
+
+/**
  * @since 0.16
  * @beta
  */
@@ -129,11 +142,7 @@ type TableCell = {
 type InlineContent =
   | ({ type: "text" } & Text)
   | ({ type: "image" } & Image)
-  | {
-      type: "link";
-      target: LinkTarget;
-      content: Exclude<InlineContent, { type: "link" }>[];
-    }
+  | ({ type: "link" } & Link)
   | {
       /**
        * @since 0.20
@@ -198,6 +207,7 @@ export type {
   BlockStyles,
   Image,
   InlineContent,
+  Link,
   LinkTarget,
   ListItem,
   TableCell,

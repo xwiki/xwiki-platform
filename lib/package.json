@@ -94,6 +94,8 @@
     "@xwiki/cristal-sharedworker-impl": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",
     "@xwiki/cristal-uiextension-default": "workspace:*",
+    "@xwiki/cristal-uniast-html": "workspace:*",
+    "@xwiki/cristal-uniast-markdown": "workspace:*",
     "@xwiki/cristal-wiki-config-default": "workspace:*",
     "pinia": "3.0.2",
     "reflect-metadata": "0.2.2",

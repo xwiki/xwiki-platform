@@ -55,7 +55,6 @@
     "@xwiki/cristal-uiextension-ui": "workspace:*",
     "@xwiki/cristal-uniast-html": "workspace:*",
     "@xwiki/cristal-uniast-markdown": "workspace:*",
-    "@xwiki/cristal-uniast-utils": "workspace:*",
     "@xwiki/cristal-user-ui": "workspace:*",
     "@xwiki/cristal-wiki-config-api": "workspace:*",
     "reflect-metadata": "0.2.2",

@@ -28,10 +28,10 @@ import type {
   EditorStyleSchema,
   EditorStyledText,
 } from "@xwiki/cristal-editors-blocknote-react";
+import type { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
 import type {
   Block,
   BlockStyles,
-  ConverterContext,
   Image,
   InlineContent,
   TableCell as TableCellUniast,
@@ -44,8 +44,9 @@ import type {
  * @since 0.16
  * @beta
  */
+// TODO: convert to an actual inversify component
 export class UniAstToBlockNoteConverter {
-  constructor(public context: ConverterContext) {}
+  constructor(private readonly remoteURLSerializer: RemoteURLSerializer) {}
 
   uniAstToBlockNote(uniAst: UniAst): BlockType[] | Error {
     return tryFallibleOrError(() =>
@@ -306,7 +307,7 @@ export class UniAstToBlockNoteConverter {
       image.target.type === "external"
         ? image.target.url
         : image.target.parsedReference
-          ? this.context.getUrlFromReference(image.target.parsedReference)
+          ? this.remoteURLSerializer.serialize(image.target.parsedReference)!
           : // TODO: think about what to do in case of invalid reference - let it as it is, show an error, replace by a fallback, ...?
             image.target.rawReference;
 
@@ -364,9 +365,9 @@ export class UniAstToBlockNoteConverter {
           inlineContent.target.type === "external"
             ? inlineContent.target.url
             : inlineContent.target.parsedReference
-              ? this.context.getUrlFromReference(
+              ? this.remoteURLSerializer.serialize(
                   inlineContent.target.parsedReference,
-                )
+                )!
               : // TODO: think about what to do in case of invalid reference - let it as it is, show an error, replace by a fallback, ...?
                 inlineContent.target.rawReference;
 

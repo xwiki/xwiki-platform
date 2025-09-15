@@ -44,7 +44,6 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "@xwiki/cristal-uniast-api": "workspace:*",
-    "@xwiki/cristal-uniast-utils": "workspace:*",
     "eventemitter3": "5.0.1",
     "lodash-es": "4.17.21",
     "vue-i18n": "11.1.11"

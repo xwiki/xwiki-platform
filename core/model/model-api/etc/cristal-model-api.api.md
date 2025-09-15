@@ -6,9 +6,11 @@
 
 // @beta (undocumented)
 export class AttachmentReference implements BaseEntityReference {
-    constructor(name: string, document: DocumentReference);
+    constructor(name: string, document: DocumentReference, metadata?: Record<string, string>);
     // (undocumented)
     document: DocumentReference;
+    // (undocumented)
+    get metadata(): Record<string, string>;
     // (undocumented)
     name: string;
     // (undocumented)

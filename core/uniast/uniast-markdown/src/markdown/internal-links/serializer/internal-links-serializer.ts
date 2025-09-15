@@ -17,9 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { UniAstToMarkdownConverter } from "../../uni-ast-to-markdown-converter";
+import type { Link, LinkTarget } from "@xwiki/cristal-uniast-api";
 
-import localConfig from "./vite.config";
-import { vitestVue as defaultConfig } from "@xwiki/cristal-dev-config";
-import { mergeConfig } from "vitest/config";
+/**
+ * Serialize internal link and image for a specific backend.
+ *
+ * @since 0.22
+ */
+export interface InternalLinksSerializer {
+  serialize(
+    content: Link["content"],
+    target: Extract<LinkTarget, { type: "internal" }>,
+    uniAstToMarkdownConverter: UniAstToMarkdownConverter,
+  ): Promise<string>;
 
-export default mergeConfig(defaultConfig, localConfig);
+  serializeImage(
+    target: Extract<LinkTarget, { type: "internal" }>,
+    alt?: string,
+  ): Promise<string>;
+}

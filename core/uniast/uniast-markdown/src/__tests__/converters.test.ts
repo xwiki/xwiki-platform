@@ -18,14 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { MarkdownToUniAstConverter } from "../markdown/md-to-uniast";
-import { UniAstToMarkdownConverter } from "../markdown/uniast-to-md";
-import { createConverterContext } from "@xwiki/cristal-uniast-utils";
+import { DefaultMarkdownToUniAstConverter } from "../markdown/default-markdown-to-uni-ast-converter";
+import { DefaultUniAstToMarkdownConverter } from "../markdown/default-uni-ast-to-markdown-converter";
+import { EntityType } from "@xwiki/cristal-model-api";
 import { Container } from "inversify";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
+import type { MarkdownParserConfiguration } from "../markdown/internal-links/parser/markdown-parser-configuration";
+import type { ParserConfigurationResolver } from "../markdown/internal-links/parser/parser-configuration-resolver";
+import type { InternalLinksSerializer } from "../markdown/internal-links/serializer/internal-links-serializer";
+import type { InternalLinksSerializerResolver } from "../markdown/internal-links/serializer/internal-links-serializer-resolver";
 import type {
   ModelReferenceHandlerProvider,
+  ModelReferenceParser,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/cristal-model-reference-api";
@@ -33,11 +38,35 @@ import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
 } from "@xwiki/cristal-model-remote-url-api";
-import type { ConverterContext, UniAst } from "@xwiki/cristal-uniast-api";
+import type { UniAst } from "@xwiki/cristal-uniast-api";
 
 // eslint-disable-next-line max-statements
-function getConverterContext(): ConverterContext {
+function init() {
   const modelReferenceParserProvider = mock<ModelReferenceParserProvider>();
+
+  const modelReferenceParser = mock<ModelReferenceParser>();
+  // modelReferenceParser.parseAsync.mockReturnValue(
+  //   Promise.resolve(new DocumentReference("A")),
+  // );
+  modelReferenceParser.parseAsync
+    .calledWith("http://somewhere.somewhere", EntityType.ATTACHMENT)
+    .mockImplementation(() => {
+      throw new Error("Not internal");
+    });
+
+  modelReferenceParser.parse
+    .calledWith("documentReference", EntityType.DOCUMENT)
+    .mockImplementation(() => {
+      throw new Error("Not internal");
+    });
+
+  modelReferenceParser.parse
+    .calledWith("imageReference", EntityType.ATTACHMENT)
+    .mockImplementation(() => {
+      throw new Error("Not internal");
+    });
+
+  modelReferenceParserProvider.get.mockReturnValue(modelReferenceParser);
 
   const modelReferenceSerializerProvider =
     mock<ModelReferenceSerializerProvider>();
@@ -49,6 +78,34 @@ function getConverterContext(): ConverterContext {
   const modelReferenceHandlerProvider = mock<ModelReferenceHandlerProvider>();
 
   const containerMock = mock<Container>();
+
+  const parserConfigurationResolver = mock<ParserConfigurationResolver>();
+  const markdownParserConfiguration = mock<MarkdownParserConfiguration>();
+  markdownParserConfiguration.supportFlexmarkInternalLinks.mockReturnValue(
+    false,
+  );
+  parserConfigurationResolver.get.mockReturnValue(markdownParserConfiguration);
+
+  const internalLinksSerializerResolver =
+    mock<InternalLinksSerializerResolver>();
+
+  const internalLinksSerializer = mock<InternalLinksSerializer>();
+
+  internalLinksSerializer.serialize.mockImplementation(
+    async (content, target, uniAstToMarkdownConverter) => {
+      return `[[${await uniAstToMarkdownConverter.convertInlineContents(content)}|${target.rawReference}]]`;
+    },
+  );
+
+  internalLinksSerializer.serializeImage.mockImplementation(
+    async (target, alt) => {
+      return `![[${alt}|${target.rawReference}]]`;
+    },
+  );
+
+  internalLinksSerializerResolver.get.mockReturnValue(
+    Promise.resolve(internalLinksSerializer),
+  );
 
   containerMock.get
     .calledWith("ModelReferenceParserProvider")
@@ -70,21 +127,37 @@ function getConverterContext(): ConverterContext {
     .calledWith("ModelReferenceHandlerProvider")
     .mockReturnValue(modelReferenceHandlerProvider);
 
-  return createConverterContext(containerMock);
+  return {
+    modelReferenceParserProvider,
+    modelReferenceHandlerProvider,
+    remoteURLSerializerProvider,
+    parserConfigurationResolver,
+    internalLinksSerializerResolver,
+  };
 }
 
 describe("MarkdownToUniAstConverter", () => {
-  const converterContext = getConverterContext();
+  const {
+    modelReferenceParserProvider,
+    modelReferenceHandlerProvider,
+    parserConfigurationResolver,
+    internalLinksSerializerResolver,
+  } = init();
+  const mdToUniAst = new DefaultMarkdownToUniAstConverter(
+    modelReferenceParserProvider,
+    modelReferenceHandlerProvider,
+    parserConfigurationResolver,
+  );
+  const uniAstToMd = new DefaultUniAstToMarkdownConverter(
+    internalLinksSerializerResolver,
+  );
 
-  const mdToUniAst = new MarkdownToUniAstConverter(converterContext);
-  const uniAstToMd = new UniAstToMarkdownConverter();
-
-  function testTwoWayConversion(expected: {
+  async function testTwoWayConversion(expected: {
     startingFrom: string;
     convertsBackTo: string;
     withUniAst: UniAst;
-  }): void {
-    const uniAst = mdToUniAst.parseMarkdown(expected.startingFrom);
+  }) {
+    const uniAst = await mdToUniAst.parseMarkdown(expected.startingFrom);
 
     expect(uniAst).toStrictEqual(expected.withUniAst);
 
@@ -92,12 +165,14 @@ describe("MarkdownToUniAstConverter", () => {
       throw new Error("Unreachable");
     }
 
-    expect(uniAstToMd.toMarkdown(uniAst)).toEqual(expected.convertsBackTo);
+    expect(await uniAstToMd.toMarkdown(uniAst)).toEqual(
+      expected.convertsBackTo,
+    );
   }
 
   // TODO: test inline images + links
-  test("parse some text styling", () => {
-    testTwoWayConversion({
+  test("parse some text styling", async () => {
+    await testTwoWayConversion({
       startingFrom:
         "Normal **Bold** *Italic1* _Italic2_ ~~Strikethrough~~ __Underline__ `Code` **_~~wow!~~_**",
       convertsBackTo:
@@ -199,8 +274,8 @@ describe("MarkdownToUniAstConverter", () => {
     });
   });
 
-  test("parse tables", () => {
-    testTwoWayConversion({
+  test("parse tables", async () => {
+    await testTwoWayConversion({
       startingFrom: `| Heading 1| Heading 2| Heading **3**|
 | ---------|--------- |-------------|
 | Row 1 cell 1 | Row 1 cell 2 | Row 1 cell **3** 
@@ -386,8 +461,8 @@ describe("MarkdownToUniAstConverter", () => {
     });
   });
 
-  test("parse some simple blocks", () => {
-    testTwoWayConversion({
+  test("parse some simple blocks", async () => {
+    await testTwoWayConversion({
       startingFrom: [
         "Paragraph line 1",
         "Paragraph line 2",
@@ -900,8 +975,8 @@ describe("MarkdownToUniAstConverter", () => {
     });
   });
 
-  test("parse XWiki-specific syntax elements", () => {
-    testTwoWayConversion({
+  test("parse XWiki-specific syntax elements", async () => {
+    await testTwoWayConversion({
       startingFrom: [
         "A [[title|documentReference]] B",
         "C ![[title|imageReference]] D",
@@ -977,8 +1052,8 @@ describe("MarkdownToUniAstConverter", () => {
     });
   });
 
-  test("parse various macros syntaxes", () => {
-    testTwoWayConversion({
+  test("parse various macros syntaxes", async () => {
+    await testTwoWayConversion({
       startingFrom: [
         "{{macro/}}",
         "{{ macro/}}",

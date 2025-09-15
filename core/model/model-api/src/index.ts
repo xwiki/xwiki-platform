@@ -96,10 +96,30 @@ class AttachmentReference implements BaseEntityReference {
   type: EntityType.ATTACHMENT = EntityType.ATTACHMENT;
   name: string;
   document: DocumentReference;
+  /**
+   * @since 0.22
+   */
+  private readonly _metadata: Record<string, string>;
 
-  constructor(name: string, document: DocumentReference) {
+  /**
+   *
+   * @param name - the name of the attachment
+   * @param document - the document reference of the attachment
+   * @param metadata - (since 0.22) the metadata of the attachment, can be used to store additional information
+   *  about the attachment (e.g., additional information for a given backend)
+   */
+  constructor(
+    name: string,
+    document: DocumentReference,
+    metadata?: Record<string, string>,
+  ) {
     this.name = name;
     this.document = document;
+    this._metadata = metadata ?? {};
+  }
+
+  get metadata(): Record<string, string> {
+    return this._metadata;
   }
 }
 

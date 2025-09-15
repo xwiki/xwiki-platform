@@ -17,11 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { inject, injectable } from "inversify";
+import type { MarkdownParserConfiguration } from "./markdown-parser-configuration";
+import type { CristalApp } from "@xwiki/cristal-api";
 
-export {
-  ComponentInit,
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "./component-init";
-export { type MarkdownToUniAstConverter } from "./markdown/markdown-to-uni-ast-converter";
-export { type UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-converter";
+/**
+ * @since 0.22
+ */
+@injectable()
+export class ParserConfigurationResolver {
+  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  get(): MarkdownParserConfiguration {
+    const type = this.cristalApp.getWikiConfig().getType();
+    try {
+      const factory: () => MarkdownParserConfiguration = this.cristalApp
+        .getContainer()
+        .get("Factory<MarkdownParserConfiguration>", { name: type });
+      return factory();
+    } catch {
+      // Return the default value if no specific factory is found.
+      return {
+        supportFlexmarkInternalLinks: false,
+      };
+    }
+  }
+}

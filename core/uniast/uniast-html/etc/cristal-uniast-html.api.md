@@ -4,15 +4,22 @@
 
 ```ts
 
-import { ConverterContext } from '@xwiki/cristal-uniast-api';
+import { Container } from 'inversify';
 import { UniAst } from '@xwiki/cristal-uniast-api';
 
+// @beta (undocumented)
+export class ComponentInit {
+    constructor(container: Container);
+}
+
 // @beta
-export class UniAstToHTMLConverter {
-    constructor(context: ConverterContext);
+export interface UniAstToHTMLConverter {
     // (undocumented)
     toHtml(uniAst: UniAst): string | Error;
 }
+
+// @beta (undocumented)
+export const uniAstToHTMLConverterName = "UniAstToHTMLConverter";
 
 // (No @packageDocumentation comment for this package)
 

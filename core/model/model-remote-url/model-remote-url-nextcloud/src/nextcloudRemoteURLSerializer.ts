@@ -55,9 +55,12 @@ class NextcloudRemoteURLSerializer implements RemoteURLSerializer {
   }
 
   private serializeSpace(spaceReference: SpaceReference) {
-    const spaces = spaceReference.names.join("/");
+    const spaces =
+      spaceReference.names.length > 0
+        ? "/" + spaceReference.names.join("/")
+        : "";
     const userId = this.authenticationManagerProvider.get()?.getUserId?.();
-    return `${this.getRootURL(spaceReference.wiki?.name ?? userId ?? "")}/${spaces}`;
+    return `${this.getRootURL(spaceReference.wiki?.name ?? userId ?? "")}${spaces}`;
   }
 
   private serializeDocument(documentReference: DocumentReference) {
@@ -69,7 +72,14 @@ class NextcloudRemoteURLSerializer implements RemoteURLSerializer {
   }
 
   private serializeAttachment(attachmentReference: AttachmentReference) {
-    return `${this.serializeMeta(attachmentReference.document)}/attachments/${attachmentReference.name}`;
+    if (attachmentReference.metadata["nextcloud-specific"] === "true") {
+      const spaceSegments = attachmentReference.document.space!
+        ? this.serializeSpace(attachmentReference.document.space) + "/"
+        : "";
+      return `${spaceSegments}${attachmentReference.document.name}/${attachmentReference.name}`;
+    } else {
+      return `${this.serializeMeta(attachmentReference.document)}/attachments/${attachmentReference.name}`;
+    }
   }
 
   private getRootURL(username: string) {

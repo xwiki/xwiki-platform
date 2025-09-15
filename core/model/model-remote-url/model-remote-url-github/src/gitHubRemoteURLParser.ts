@@ -54,7 +54,7 @@ class GitHubRemoteURLParser implements RemoteURLParser {
       segments[segments.length - 2] == "attachments"
     ) {
       return new AttachmentReference(
-        segments[segments.length - 1].split("?")[0],
+        decodeURIComponent(segments[segments.length - 1].split("?")[0]),
         this.buildDocumentReference(
           segments[segments.length - 3].slice(1), // remove the starting dot
           segments.splice(0, segments.length - 3),
@@ -79,7 +79,7 @@ class GitHubRemoteURLParser implements RemoteURLParser {
       urlStr.replace(`${baseRestURL}/contents/`, "").replace(/\?.*/, ""),
     );
 
-    if (type === EntityType.DOCUMENT) {
+    if (type === EntityType.DOCUMENT || type === undefined) {
       return this.buildDocumentReference(
         segments[segments.length - 1],
         segments.splice(0, segments.length - 1),
@@ -108,8 +108,10 @@ class GitHubRemoteURLParser implements RemoteURLParser {
     spaces: string[],
   ) {
     return new DocumentReference(
-      this.removeExtension(documentReferenceName),
-      spaces.length > 0 ? new SpaceReference(undefined, ...spaces) : undefined,
+      decodeURIComponent(this.removeExtension(documentReferenceName)),
+      spaces.length > 0
+        ? new SpaceReference(undefined, ...spaces.map(decodeURIComponent))
+        : undefined,
     );
   }
 

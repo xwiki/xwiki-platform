@@ -32,10 +32,9 @@ import {
 } from "@xwiki/cristal-editors-blocknote-headless";
 import { CArticle } from "@xwiki/cristal-skin";
 import {
-  MarkdownToUniAstConverter,
-  UniAstToMarkdownConverter,
+  markdownToUniAstConverterName,
+  uniAstToMarkdownConverterName,
 } from "@xwiki/cristal-uniast-markdown";
-import { createConverterContext } from "@xwiki/cristal-uniast-utils";
 import { debounce } from "lodash-es";
 import { inject, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -50,6 +49,10 @@ import type {
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { ModelReferenceHandlerProvider } from "@xwiki/cristal-model-reference-api";
 import type { UniAst } from "@xwiki/cristal-uniast-api";
+import type {
+  MarkdownToUniAstConverter,
+  UniAstToMarkdownConverter,
+} from "@xwiki/cristal-uniast-markdown";
 import type { Ref } from "vue";
 
 const { t } = useI18n({
@@ -99,9 +102,12 @@ const editorInstance =
   useTemplateRef<InstanceType<typeof CBlockNoteView>>("editorInstance");
 
 // Tools for UniAst handling
-const converterContext = createConverterContext(container);
-const markdownToUniAst = new MarkdownToUniAstConverter(converterContext);
-const uniAstToMarkdown = new UniAstToMarkdownConverter();
+const markdownToUniAst = container.get<MarkdownToUniAstConverter>(
+  markdownToUniAstConverterName,
+);
+const uniAstToMarkdown = container.get<UniAstToMarkdownConverter>(
+  uniAstToMarkdownConverterName,
+);
 
 // Saving status
 const saveStatus = ref<SaveStatus>(SaveStatus.SAVED);
@@ -136,7 +142,9 @@ async function loadEditor(currentPage: PageData | undefined): Promise<void> {
     },
   };
 
-  editorContent.value = markdownToUniAst.parseMarkdown(currentPage.source);
+  editorContent.value = await markdownToUniAst.parseMarkdown(
+    currentPage.source,
+  );
 
   title.value = documentService.getTitle().value ?? "";
 }
@@ -163,7 +171,7 @@ async function save(content: UniAst) {
   saveStatus.value = SaveStatus.SAVING;
 
   try {
-    const markdown = uniAstToMarkdown.toMarkdown(content);
+    const markdown = await uniAstToMarkdown.toMarkdown(content);
 
     if (markdown instanceof Error) {
       throw error;

@@ -17,5 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { DefaultUniAstToHTMLConverter } from "./html/default-uni-ast-to-html-converter";
+import type { UniAstToHTMLConverter } from "./html/uni-ast-to-html-converter";
+import type { Container } from "inversify";
 
-export { createConverterContext } from "./createConverterContext";
+/**
+ * @since 0.22
+ * @beta
+ */
+const uniAstToHTMLConverterName = "UniAstToHTMLConverter";
+
+/**
+ * @since 0.22
+ * @beta
+ */
+class ComponentInit {
+  constructor(container: Container) {
+    container
+      .bind<UniAstToHTMLConverter>(uniAstToHTMLConverterName)
+      .to(DefaultUniAstToHTMLConverter)
+      .whenDefault();
+  }
+}
+
+export { ComponentInit, uniAstToHTMLConverterName };

@@ -31,5 +31,14 @@ interface ModelReferenceParser {
    * @param type - (since 0.13) an optional type, helping to remove ambiguity when parsing the reference
    */
   parse(reference: string, type?: EntityType): EntityReference;
+
+  /**
+   * Parse a reference with additional analysis that can only be performed asynchronously
+   * @param reference - an entity reference
+   * @param type - an optional type, helping to remove ambiguity when parsing the reference
+   * @since 0.22
+   * @beta
+   */
+  parseAsync(reference: string, type?: EntityType): Promise<EntityReference>;
 }
 export type { ModelReferenceParser };

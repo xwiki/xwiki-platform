@@ -42,7 +42,6 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
-    "@xwiki/cristal-uniast-utils": "workspace:*",
     "inversify": "7.9.0",
     "typescript": "5.9.2",
     "vite": "7.1.5",

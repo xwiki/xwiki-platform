@@ -24,9 +24,23 @@ import {
   SpaceReference,
 } from "@xwiki/cristal-model-api";
 import { describe, expect, it } from "vitest";
+import { mock } from "vitest-mock-extended";
+import { ref } from "vue";
+import type { PageData } from "@xwiki/cristal-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
 
 describe("FileSystemModelReferenceParser", () => {
-  const fileSystemModelReferenceParser = new FileSystemModelReferenceParser();
+  const documentService = mock<DocumentService>();
+  const fileSystemModelReferenceParser = new FileSystemModelReferenceParser(
+    documentService,
+  );
+
+  documentService.getCurrentDocument.mockReturnValue(
+    ref({
+      id: "Page",
+    } as PageData),
+  );
+
   it("parse single segment reference", () => {
     const entityReference = fileSystemModelReferenceParser.parse("a");
     expect(entityReference).toEqual(
@@ -50,7 +64,7 @@ describe("FileSystemModelReferenceParser", () => {
 
   it("parse attachments", () => {
     const entityReference = fileSystemModelReferenceParser.parse(
-      "a.x/attachments/c.png",
+      ".a.x/attachments/c.png",
     );
     expect(entityReference).toEqual(
       new AttachmentReference(

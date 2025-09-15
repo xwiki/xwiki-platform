@@ -121,14 +121,14 @@ public class SolrIndexEventListener implements EventListener
             } else if (event instanceof DocumentCreatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
-                if (!Locale.ROOT.equals(document.getLocale())) {
-                    // If a new translation is added to a document reindex the whole document (could be optimized a bit
-                    // by reindexing only the parent locales but that would always include objects and attachments
-                    // anyway)
-                    indexTranslations(document, (XWikiContext) data);
-                } else {
-                    this.solrIndexer.get().index(document.getDocumentReferenceWithLocale(), false);
-                }
+                // Always re-index all the translations of a document when a document is created.
+                // If a new translation is added to a document, we need to re-index the parent locales. This could be
+                // optimized a bit by reindexing only the parent locales, but that would always include objects and
+                // attachments anyway.
+                // When the default translation is created, then there could also be existing translations that need
+                // to be re-indexed as indexing operations before that failed due to the missing default translation.
+                // This second case can happen during extension installations.
+                indexTranslations(document, (XWikiContext) data);
             } else if (event instanceof DocumentDeletedEvent) {
                 XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
 

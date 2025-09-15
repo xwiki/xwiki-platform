@@ -38,8 +38,6 @@ define('xwiki-realtime-toolbar', [
       // Create the toolbar.
       const toolbarTemplate = document.querySelector('template#realtime-edit-toolbar');
       this._toolbar = toolbarTemplate.content.querySelector('.realtime-edit-toolbar').cloneNode(true);
-      // Inherit some styles from the old toolbar.
-      this._toolbar.classList.add('buttons');
 
       this._dateFormat = moment().toMomentFormatString(realtimeConfig.dateFormat || 'yyyy/MM/dd HH:mm');
 
@@ -48,6 +46,8 @@ define('xwiki-realtime-toolbar', [
         // The old toolbar is moved when editing fullscreen with the standalone editor.
         ' .cke_maximized > .buttons,' +
         ' .inplace-editing-buttons.sticky-buttons > .buttons');
+      // Inherit some styles from the old toolbar.
+      this._toolbar.classList.add(...this._oldToolbar.classList);
       this._oldToolbar.before(this._toolbar);
       this._oldToolbar.hidden = true;
 
@@ -92,7 +92,12 @@ define('xwiki-realtime-toolbar', [
         document.body.appendChild(leaveModal);
       }
 
-      $(leaveModal).find('.modal-footer .btn-primary').off('click.realtime').on('click.realtime', () => {
+      const leaveButton = $(leaveModal).find('.modal-footer .btn-primary');
+      // The autofocus HTML attribute has no effect in Bootstrap modals.
+      $(leaveModal).off('shown.bs.modal.realtime').on('shown.bs.modal.realtime', () => {
+        leaveButton.trigger('focus');
+      });
+      leaveButton.off('click.realtime').on('click.realtime', () => {
         this._config.leave();
       });
     }

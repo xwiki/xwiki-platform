@@ -194,7 +194,7 @@
     updateExpandCollapseAllFacetsState(facetsContainer);
 
     // Expand/Collapse toggle for each facet.
-    facetsContainer.find('.facet-toggler').on('click', function(event) {
+    facetsContainer.find('.facet-toggle').on('click', function(event) {
       $(event.target).parents('.search-facet').toggleClass('expanded');
       updateExpandCollapseAllFacetsState(facetsContainer);
     });

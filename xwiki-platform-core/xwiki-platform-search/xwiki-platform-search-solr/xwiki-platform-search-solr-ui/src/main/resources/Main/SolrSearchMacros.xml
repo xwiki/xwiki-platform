@@ -66,14 +66,16 @@
     &lt;div class="search-bar"&gt;
       &lt;div class="input-group"&gt;
         &lt;input id='search-page-bar-input' type='search' name='text' class='form-control withTip useTitleAsTip'
-          title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;
+          title="$escapetool.xml($services.localization.render('search.page.bar.query.title'))"
+          placeholder="$escapetool.xml($services.localization.render('search.page.bar.query.title'))"
+          value="$escapetool.xml($text)"/&gt;
         &lt;label class='sr-only' for='search-page-bar-input'&gt;
-        $services.localization.render('search.page.bar.query.title')
+        $escapetool.xml($services.localization.render('search.page.bar.query.title'))
         &lt;/label&gt;
         &lt;span class="input-group-btn"&gt;
           &lt;button type="submit" class="btn btn-primary"&gt;
             $services.icon.renderHTML('search')
-            &lt;span&gt;$services.localization.render('search.page.bar.submit')&lt;/span&gt;
+            &lt;span&gt;$escapetool.xml($services.localization.render('search.page.bar.submit'))&lt;/span&gt;
           &lt;/button&gt;
         &lt;/span&gt;
       &lt;/div&gt;
@@ -383,9 +385,10 @@
       aria-describedby="option-highlight-description" 
       title="$services.localization.render('solr.options.highlight.title')"
       #if($highlightEnabled)checked#end/&gt;##
-      &lt;label for="option-highlight-input"&gt;$services.localization.render('solr.options.show_highlight')&lt;/label&gt;##
+      &lt;label 
+      for="option-highlight-input"&gt;$services.localization.render('search.solr.options.show_highlight')&lt;/label&gt;##
       &lt;span id="option-highlight-description" class="sr-only"&gt;
-      $escapetool.xml($services.localization.render('solr.options.highlight.title'))
+      $escapetool.xml($services.localization.render('search.solr.options.highlight.title'))
       &lt;/span&gt;##
       &lt;/li&gt;##
       &lt;li&gt;##
@@ -393,7 +396,8 @@
         aria-describedby="option-facet-description"
         title="$services.localization.render('solr.options.facet.title')" 
         #if($facetEnabled)checked#end/&gt;##
-        &lt;label for="option-facet-input"&gt;$services.localization.render('solr.options.show_facet')&lt;/label&gt;
+        &lt;label 
+        for="option-facet-input"&gt;$services.localization.render('search.solr.options.show_facet')&lt;/label&gt;
         &lt;span id="option-facet-description" class="sr-only"&gt;
         $services.localization.render('solr.options.facet.title')
         &lt;/span&gt;##

@@ -35,6 +35,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.store.migration.DataMigrationException;
@@ -107,6 +110,16 @@ public class R1130040XWIKI16682DataMigration extends AbstractStoreTypeDataMigrat
         }
     }
 
+    private File newPathToFile(BlobPath path)
+    {
+        BlobStore store = this.fstools.getStore();
+        if (store instanceof FileSystemBlobStore fileSystemStore) {
+            return fileSystemStore.getBlobFilePath(path).toFile();
+        } else {
+            throw new HibernateException("Cannot migrate from pre-11.3 filesystem store to non filesystem store");
+        }
+    }
+
     private void setStore(List<Object[]> attachments, Session session) throws IOException
     {
         WikiReference wikiReference = getXWikiContext().getWikiReference();
@@ -131,7 +144,7 @@ public class R1130040XWIKI16682DataMigration extends AbstractStoreTypeDataMigrat
 
             AttachmentReference attachmentReference = new AttachmentReference(filename, documentReference);
 
-            File attachmentDirectory = this.fstools.getAttachmentDir(attachmentReference);
+            File attachmentDirectory = newPathToFile(this.fstools.getAttachmentDir(attachmentReference));
 
             if (attachmentDirectory.exists() && R1100000XWIKI15620DataMigration
                 .migrateAttachmentFiles(attachmentDirectory, attachmentReference.getName(), this.logger)) {

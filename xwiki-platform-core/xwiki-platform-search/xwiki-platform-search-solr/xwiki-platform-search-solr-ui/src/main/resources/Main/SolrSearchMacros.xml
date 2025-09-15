@@ -366,14 +366,13 @@
       &lt;label for="sort-by-input" class="sr-only"&gt;$escapetool.xml($services.localization.render('solr.sortBy.hint'))&lt;/label&gt;##
       &lt;select id="sort-by-input" name="sort"&gt;
         #foreach ($entry in $defaultSortOrder.entrySet())
-          #set ($targetSortOrder = $entry.value)
           &lt;option class="sort-item" value="$entry.key" #if($sort == $entry.key)selected='selected'#end&gt;
-            $services.localization.render("search.solr.sortBy.field.$entry.key")
+            $escapetool.xml($services.localization.render("search.solr.sortBy.field.$entry.key"))
           &lt;/option&gt;
         #end
       &lt;/select&gt;##
-      &lt;input id="sort-order-input" type="checkbox" name="sortOrder" value="asc" #if ("$!sortOrder" == 'asc')checked="checked"#end/&gt;##
-      &lt;label for="sort-order-input" class="form-control" title="$escapetool.xml($services.localization.render("solr.sortOrder.$sortOrder"))"&gt;##
+      &lt;label class="form-control" title="$escapetool.xml($services.localization.render("solr.sortOrder.$sortOrder"))"&gt;##
+        &lt;input id="sort-order-input" type="checkbox" name="sortOrder" value="asc" #if ("$!sortOrder" == 'asc')checked="checked"#end/&gt;##
         $services.icon.renderHTML('down')##
         &lt;span class="sr-only"&gt;$services.localization.render("solr.sortOrder.$sortOrder")&lt;/span&gt;##
       &lt;/label&gt;##
@@ -385,8 +384,7 @@
       aria-describedby="option-highlight-description" 
       title="$services.localization.render('solr.options.highlight.title')"
       #if($highlightEnabled)checked#end/&gt;##
-      &lt;label 
-      for="option-highlight-input"&gt;$services.localization.render('search.solr.options.show_highlight')&lt;/label&gt;##
+      &lt;label for="option-highlight-input"&gt;$services.localization.render('search.solr.options.show_highlight')&lt;/label&gt;##
       &lt;span id="option-highlight-description" class="sr-only"&gt;
       $escapetool.xml($services.localization.render('search.solr.options.highlight.title'))
       &lt;/span&gt;##

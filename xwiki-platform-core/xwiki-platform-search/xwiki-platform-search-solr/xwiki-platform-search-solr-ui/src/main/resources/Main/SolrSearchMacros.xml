@@ -361,9 +361,9 @@
   (% class='search-results-controls' %)
   (((
 
-    {{html}}
+    {{html clean="false"}}
     &lt;div class="search-results-sort"&gt;
-      &lt;label for="sort-by-input" class="sr-only"&gt;$escapetool.xml($services.localization.render('solr.sortBy.hint'))&lt;/label&gt;##
+      &lt;label for="sort-by-input" class="sr-only"&gt;$escapetool.xml($services.localization.render('search.solr.sortBy.hint'))&lt;/label&gt;##
       &lt;select id="sort-by-input" name="sort"&gt;
         #foreach ($entry in $defaultSortOrder.entrySet())
           &lt;option class="sort-item" value="$entry.key" #if($sort == $entry.key)selected='selected'#end&gt;
@@ -371,33 +371,37 @@
           &lt;/option&gt;
         #end
       &lt;/select&gt;##
-      &lt;label class="form-control" title="$escapetool.xml($services.localization.render("solr.sortOrder.$sortOrder"))"&gt;##
+      &lt;label class="form-control" title="$escapetool.xml($services.localization.render("search.solr.sortOrder.$sortOrder"))"&gt;##
         &lt;input id="sort-order-input" type="checkbox" name="sortOrder" value="asc" #if ("$!sortOrder" == 'asc')checked="checked"#end/&gt;##
         $services.icon.renderHTML('down')##
-        &lt;span class="sr-only"&gt;$services.localization.render("solr.sortOrder.$sortOrder")&lt;/span&gt;##
+        &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render("search.solr.sortOrder.$sortOrder"))&lt;/span&gt;##
       &lt;/label&gt;##
     &lt;/div&gt;
     &lt;div class="search-options"&gt;
     &lt;ul&gt;##
       &lt;li&gt;##
-      &lt;input id="option-highlight-input" type="checkbox" class="options-item" value="true" data-query-name="highlight"
-      aria-describedby="option-highlight-description" 
-      title="$services.localization.render('solr.options.highlight.title')"
-      #if($highlightEnabled)checked#end/&gt;##
-      &lt;label for="option-highlight-input"&gt;$services.localization.render('search.solr.options.show_highlight')&lt;/label&gt;##
+      &lt;label&gt;##
+        &lt;input id="option-highlight-input" type="checkbox" class="options-item" value="true" 
+        data-query-name="highlight"
+        aria-describedby="option-highlight-description"
+        title="$escapetool.xml($services.localization.render('solr.options.highlight.title'))"
+        #if($highlightEnabled)checked#end/&gt;##
+        $escapetool.xml($services.localization.render('search.solr.options.show_highlight'))##
+      &lt;/label&gt;##
       &lt;span id="option-highlight-description" class="sr-only"&gt;
-      $escapetool.xml($services.localization.render('search.solr.options.highlight.title'))
+      $escapetool.xml($services.localization.render('solr.options.highlight.title'))
       &lt;/span&gt;##
       &lt;/li&gt;##
       &lt;li&gt;##
-        &lt;input id="option-facet-input" type="checkbox" class="options-item" value="true" data-query-name="facet"
-        aria-describedby="option-facet-description"
-        title="$services.localization.render('solr.options.facet.title')" 
-        #if($facetEnabled)checked#end/&gt;##
-        &lt;label 
-        for="option-facet-input"&gt;$services.localization.render('search.solr.options.show_facet')&lt;/label&gt;
+        &lt;label&gt;##
+          &lt;input id="option-facet-input" type="checkbox" class="options-item" value="true" data-query-name="facet"
+          aria-describedby="option-facet-description"
+          title="$escapetool.xml($services.localization.render('solr.options.facet.title'))"
+          #if($facetEnabled)checked#end/&gt;##
+          $escapetool.xml($services.localization.render('search.solr.options.show_facet'))
+        &lt;/label&gt;##
         &lt;span id="option-facet-description" class="sr-only"&gt;
-        $services.localization.render('solr.options.facet.title')
+          $escapetool.xml($services.localization.render('solr.options.facet.title'))
         &lt;/span&gt;##
       &lt;/li&gt;##
     &lt;/ul&gt;##

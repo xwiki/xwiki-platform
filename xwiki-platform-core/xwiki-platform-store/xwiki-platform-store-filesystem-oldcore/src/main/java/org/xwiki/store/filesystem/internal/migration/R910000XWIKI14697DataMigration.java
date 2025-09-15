@@ -22,15 +22,15 @@ package org.xwiki.store.filesystem.internal.migration;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.hibernate.HibernateException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.store.blob.BlobPath;
-import org.xwiki.store.blob.BlobStoreException;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -70,12 +70,9 @@ public class R910000XWIKI14697DataMigration extends AbstractXWIKI14697DataMigrat
     {
         BlobPath attachmentFolder = getAttachmentDir(attachmentReference);
 
-        try {
-            String urlEncodedName = URLEncoder.encode(attachmentReference.getName(), StandardCharsets.UTF_8);
-            BlobPath attachmentBlobPath = attachmentFolder.resolve(urlEncodedName);
-            return this.pre11BlobStore.getBlob(attachmentBlobPath).exists();
-        } catch (BlobStoreException e) {
-            throw new HibernateException("Error checking if the attachment exists.", e);
-        }
+        Path attachmentFolderPath = this.pre11BlobStore.getBlobFilePath(attachmentFolder);
+
+        return Files.exists(attachmentFolderPath.resolve(URLEncoder.encode(attachmentReference.getName(),
+            StandardCharsets.UTF_8)));
     }
 }

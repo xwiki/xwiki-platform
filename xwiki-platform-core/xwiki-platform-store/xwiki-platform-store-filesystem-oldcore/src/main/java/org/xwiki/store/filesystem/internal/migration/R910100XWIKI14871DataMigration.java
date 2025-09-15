@@ -21,14 +21,12 @@
 package org.xwiki.store.filesystem.internal.migration;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,10 +52,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.store.blob.Blob;
-import org.xwiki.store.blob.BlobPath;
-import org.xwiki.store.blob.BlobStoreException;
-import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.XWikiException;
@@ -121,102 +115,79 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
     private void migrateMetadatas(Session session) throws IOException, XMLStreamException, FactoryConfigurationError,
         ParserConfigurationException, SAXException, DataMigrationException
     {
-        FileSystemBlobStore pre11BlobStore = getPre11BlobStore();
+        File storageLocationFile = getPre11StoreRootDirectory();
 
-        this.logger.info("Migrating filesystem attachment metadatas stored in [{}]", pre11BlobStore.getName());
+        this.logger.info("Migrating filesystem attachment metadatas stored in [{}]", storageLocationFile);
 
-        try {
-            Blob pathByIdStoreBlob =
-                pre11BlobStore.getBlob(BlobPath.of(List.of("~GLOBAL_DELETED_ATTACHMENT_ID_MAPPINGS.xml")));
-            if (pathByIdStoreBlob.exists()) {
-                try (InputStream stream = pathByIdStoreBlob.getStream()) {
-                    // No need to protect against XXE attacks since the XML file is controlled.
-                    // Note that if a user were able to change that XML file content, and modify the <path> element then
-                    // it would be possible to access any local file content since the path is displayed in the logs below.
-                    // That would still need server access though.
-                    XMLStreamReader xmlReader = XMLInputFactory.newInstance().createXMLStreamReader(stream);
+        File pathByIdStore = new File(storageLocationFile, "~GLOBAL_DELETED_ATTACHMENT_ID_MAPPINGS.xml");
+        if (pathByIdStore.exists()) {
+            try (FileInputStream stream = new FileInputStream(pathByIdStore)) {
+                // No need to protect against XXE attacks since the XML file is controlled.
+                // Note that if a user were able to change that XML file content, and modify the <path> element then
+                // it would be possible to access any local file content since the path is displayed in the logs below.
+                // That would still need server access though.
+                XMLStreamReader xmlReader = XMLInputFactory.newInstance().createXMLStreamReader(stream);
 
-                    // <deletedattachmentids>
+                // <deletedattachmentids>
+                xmlReader.nextTag();
+
+                for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
+                    // <entry>
                     xmlReader.nextTag();
 
-                    for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
-                        // <entry>
-                        xmlReader.nextTag();
+                    String value1 = xmlReader.getElementText();
+                    xmlReader.nextTag();
+                    String value2 = xmlReader.getElementText();
 
-                        String value1 = xmlReader.getElementText();
-                        xmlReader.nextTag();
-                        String value2 = xmlReader.getElementText();
+                    String path;
+                    if (xmlReader.getLocalName().equals("path")) {
+                        path = value2;
+                    } else {
+                        path = value1;
+                    }
 
-                        String path;
-                        if (xmlReader.getLocalName().equals("path")) {
-                            path = value2;
-                        } else {
-                            path = value1;
+                    // </entry>
+                    xmlReader.nextTag();
+
+                    if (!this.migratedDeletedAttachment.contains(path)) {
+                        File directory = new File(path);
+                        if (!directory.getCanonicalPath().startsWith(storageLocationFile.getCanonicalPath())) {
+                            this.logger.warn("[{}] is the wrong path, trying to find the new location", directory);
+
+                            directory = findNewPath(path);
+
+                            if (directory == null) {
+                                this.logger.warn("Could not find the deleted attachment in any other location");
+
+                                // Remember that this attachment could not be migrated
+                                this.migratedDeletedAttachment.add(path);
+
+                                continue;
+                            } else {
+                                this.logger.info("Found deleted attachment on [{}]", directory);
+                            }
                         }
 
-                        // </entry>
-                        xmlReader.nextTag();
+                        if (!directory.isDirectory()) {
+                            this.logger.warn("[{}] is not a directory", directory);
 
-                        handlePath(session, path);
+                            continue;
+                        }
+
+                        // Find document reference
+                        File documentDirectory = directory.getParentFile().getParentFile().getParentFile();
+                        DocumentReference documentReference = getPre11DocumentReference(documentDirectory);
+
+                        if (getXWikiContext().getWikiReference().equals(documentReference.getWikiReference())) {
+                            storeDeletedAttachment(directory, documentReference, session);
+
+                            // Remember which path we already migrated
+                            this.migratedDeletedAttachment.add(path);
+                        }
                     }
                 }
             }
-        } catch (BlobStoreException e) {
-            throw new DataMigrationException("Failed to access the deleted attachment id mappings file", e);
         }
-    }
-
-    private void handlePath(Session session, String path)
-        throws IOException, DataMigrationException, ParserConfigurationException, SAXException
-    {
-        if (!this.migratedDeletedAttachment.contains(path)) {
-            File directory = new File(path);
-            if (!directory.getCanonicalPath().startsWith(this.pre11StoreDirectory.getCanonicalPath())) {
-                this.logger.warn("[{}] is the wrong path, trying to find the new location", directory);
-
-                directory = findNewPath(path);
-
-                if (directory == null) {
-                    this.logger.warn("Could not find the deleted attachment in any other location");
-
-                    // Remember that this attachment could not be migrated
-                    this.migratedDeletedAttachment.add(path);
-
-                    return;
-                } else {
-                    this.logger.info("Found deleted attachment on [{}]", directory);
-                }
-            }
-
-            if (!directory.isDirectory()) {
-                this.logger.warn("[{}] is not a directory", directory);
-
-                return;
-            }
-
-            // Find document reference
-            BlobPath documentBlobPath = getDocumentBlobPath(directory);
-            DocumentReference documentReference = getPre11DocumentReference(documentBlobPath);
-
-            if (getXWikiContext().getWikiReference().equals(documentReference.getWikiReference())) {
-                storeDeletedAttachment(directory, documentReference, session);
-
-                // Remember which path we already migrated
-                this.migratedDeletedAttachment.add(path);
-            }
-        }
-    }
-
-    private BlobPath getDocumentBlobPath(File attachmentDirectory)
-    {
-        File documentDirectory = attachmentDirectory.getParentFile().getParentFile().getParentFile();
-        // Get the relative path from the store directory and construct a BlobPath based on that.
-        Path relativePath = this.pre11StoreDirectory.toPath().relativize(documentDirectory.toPath());
-        List<String> pathParts = new java.util.ArrayList<>();
-        for (Path p : relativePath) {
-            pathParts.add(p.toString());
-        }
-        return BlobPath.of(pathParts);
     }
 
     private File findNewPath(String path)
@@ -226,7 +197,7 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
         if (matcher.find()) {
             String relative = path.substring(matcher.end());
 
-            File newPath = new File(this.pre11StoreDirectory, relative);
+            File newPath = new File(getStoreRootDirectory(), relative);
             if (newPath.exists()) {
                 return newPath;
             }

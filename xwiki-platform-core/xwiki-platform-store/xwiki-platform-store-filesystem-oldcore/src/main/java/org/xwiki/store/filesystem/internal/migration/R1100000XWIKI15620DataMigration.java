@@ -23,9 +23,7 @@ package org.xwiki.store.filesystem.internal.migration;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.Locale;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,9 +37,9 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobPath;
-import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.internal.FileSystemStoreUtils;
@@ -106,107 +104,107 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         }
     }
 
+    private File newPathToFile(BlobPath path) throws DataMigrationException
+    {
+        BlobStore store = this.fstools.getStore();
+        if (store instanceof FileSystemBlobStore fileSystemStore) {
+            return fileSystemStore.getBlobFilePath(path).toFile();
+        } else {
+            throw new DataMigrationException("Cannot migrate from pre-11 filesystem store to non filesystem store");
+        }
+    }
+
     private void migrateWiki(String wikiId) throws DataMigrationException
     {
         // Previous wiki store location
-        BlobPath oldDirectory = this.getPre11WikiDir(wikiId);
+        File oldDirectory = this.getPre11WikiDir(wikiId);
 
         // New wiki store location
-        BlobPath newDirectory = this.fstools.getWikiDir(wikiId);
+        BlobStore newBlobStore = this.fstools.getStore();
+        File newDirectory = newPathToFile(this.fstools.getWikiDir(wikiId));
 
-        try (Stream<Blob> stream = this.pre11BlobStore.listBlobs(oldDirectory)) {
-            if (stream.findAny().isPresent()) {
-                // Move the wiki store
+        if (oldDirectory.exists()) {
+            // Move the wiki store
+            try {
                 this.logger.info("Moving wiki folder [{}] to new location [{}]", oldDirectory, newDirectory);
 
-                this.fstools.getStore().moveDirectory(this.pre11BlobStore, oldDirectory, newDirectory);
+                moveDirectory(oldDirectory, newDirectory);
+            } catch (IOException e) {
+                throw new DataMigrationException("Failed to move wiki store to the new location", e);
             }
-        } catch (Exception e) {
-            throw new DataMigrationException("Failed to move wiki store to the new location", e);
         }
 
         // Set right root directory
-        setBlobStore(this.fstools.getStore());
+        setBlobStore(newBlobStore);
 
-        try (Stream<Blob> stream = this.blobStore.listBlobs(newDirectory)) {
-            if (stream.findAny().isPresent()) {
-                // Rewrite store paths based on reference hash instead of URL encoding for the current wiki
-                migrate(newDirectory);
-            } else {
-                this.logger.info("The wiki [{}] does not have any filesystem store", wikiId);
+        if (newDirectory.exists()) {
+            // Rewrite store paths based on reference hash instead of URL encoding for the current wiki
+            try {
+                migrate(newDirectory, true);
+            } catch (IOException e) {
+                throw new DataMigrationException("Failed to refactor filesystem store paths", e);
             }
-        } catch (Exception e) {
-            throw new DataMigrationException("Failed to refactor filesystem store paths", e);
+        } else {
+            this.logger.info("The wiki [{}] does not have any filesystem store", wikiId);
         }
     }
 
-    private void migrate(BlobPath directory) throws IOException, DataMigrationException
+    private void migrate(File directory, boolean wiki) throws IOException, DataMigrationException
     {
-        try (Stream<Blob> stream = this.blobStore.listBlobs(directory)) {
-            BlobPath currentDirectory = null;
-            for (Blob blob : (Iterable<Blob>) stream::iterator) {
-                List<String> segments = blob.getPath().getSegments();
-                int index = segments.indexOf(THIS_DIR_NAME);
-                if (index > 0) {
-                    // We found a document directory
-                    BlobPath nextDirectory = BlobPath.of(segments.subList(0, index + 1));
-                    if (!nextDirectory.equals(currentDirectory)) {
-                        currentDirectory = nextDirectory;
-                        migrateDocumentContent(currentDirectory);
-                    }
+        if (!directory.exists() || !directory.isDirectory()) {
+            return;
+        }
+
+        // Migrate directory content
+        for (File child : directory.listFiles()) {
+            if (child.isDirectory()) {
+                if (!wiki && child.getName().equals(THIS_DIR_NAME)) {
+                    migrateDocumentContent(child);
+                } else {
+                    migrate(child, false);
                 }
             }
-        } catch (BlobStoreException e) {
-            throw new DataMigrationException("Failed to list blobs in directory [" + directory + "]", e);
+        }
+
+        if (!wiki) {
+            // Cleanup
+            cleanEmptyfolder(directory);
         }
     }
 
-    private void migrateDocumentContent(BlobPath oldDocumentContentDirectory) throws IOException,
-        DataMigrationException, BlobStoreException
+    private void migrateDocumentContent(File oldDocumentContentDirectory) throws IOException, DataMigrationException
     {
-        DocumentReference documentReference = getPre11DocumentReference(oldDocumentContentDirectory.getParent());
+        DocumentReference documentReference = getPre11DocumentReference(oldDocumentContentDirectory.getParentFile());
 
-        BlobPath newDocumentContentDirectory = this.fstools.getDocumentContentDir(documentReference);
+        File newDocumentContentDirectory = newPathToFile(this.fstools.getDocumentContentDir(documentReference));
 
         this.logger.info("Moving document folder [{}] to new location [{}]", oldDocumentContentDirectory,
             newDocumentContentDirectory);
 
-        this.blobStore.moveDirectory(oldDocumentContentDirectory, newDocumentContentDirectory);
+        moveDirectory(oldDocumentContentDirectory, newDocumentContentDirectory);
 
         migrateAttachments(newDocumentContentDirectory, documentReference);
         migrateDeletedAttachments(newDocumentContentDirectory, documentReference);
         migrateDocumentLocales(newDocumentContentDirectory);
     }
 
-    private void migrateAttachments(BlobPath documentContentDirectory, DocumentReference documentReference)
-        throws IOException, BlobStoreException
+    private void migrateAttachments(File documentContentDirectory, DocumentReference documentReference)
+        throws IOException, DataMigrationException
     {
-        BlobPath attachmentsDirectory = documentContentDirectory.resolve(FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
+        File attachmentsDirectory = new File(documentContentDirectory, FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
 
-        try (Stream<Blob> stream = this.blobStore.listBlobs(attachmentsDirectory)) {
-            BlobPath currentDirectory = null;
-            for (Blob blob : (Iterable<Blob>) stream::iterator) {
-                // We get all blobs, but we actually just want the directories immediately below attachmentsDirectory.
-                List<String> segments = blob.getPath().getSegments();
-                if (segments.size() == attachmentsDirectory.getSegments().size() + 1) {
-                    // File in the root, skip
-                    continue;
-                }
-
-                BlobPath nextDirectory = BlobPath.of(segments.subList(0,
-                    attachmentsDirectory.getSegments().size() + 2));
-                if (!nextDirectory.equals(currentDirectory)) {
-                    currentDirectory = nextDirectory;
-
+        if (attachmentsDirectory.isDirectory()) {
+            for (File oldAttachmentDirectory : attachmentsDirectory.listFiles()) {
+                if (oldAttachmentDirectory.isDirectory()) {
                     AttachmentReference attachmentReference = new AttachmentReference(
-                        FileSystemStoreUtils.decode(currentDirectory.getName()), documentReference);
+                        FileSystemStoreUtils.decode(oldAttachmentDirectory.getName()), documentReference);
 
-                    BlobPath newAttachmentDirectory = this.fstools.getAttachmentDir(attachmentReference);
+                    File newAttachmentDirectory = newPathToFile(this.fstools.getAttachmentDir(attachmentReference));
 
-                    this.logger.info("Moving attachment folder [{}] to new location [{}]", currentDirectory,
+                    this.logger.info("Moving attachment folder [{}] to new location [{}]", oldAttachmentDirectory,
                         newAttachmentDirectory);
 
-                    this.blobStore.moveDirectory(currentDirectory, newAttachmentDirectory);
+                    moveDirectory(oldAttachmentDirectory, newAttachmentDirectory);
 
                     migrateAttachmentFiles(newAttachmentDirectory, attachmentReference.getName(), this.logger);
                 }
@@ -223,7 +221,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
      * @return true if a sub file was found
      * @throws IOException when failing to migrate one of the files
      */
-    public static boolean migrateAttachmentFiles(BlobPath attachmentDirectory, String attachmentName, Logger logger)
+    public static boolean migrateAttachmentFiles(File attachmentDirectory, String attachmentName, Logger logger)
         throws IOException
     {
         boolean foundFile = false;
@@ -257,8 +255,8 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         return foundFile;
     }
 
-    private void migrateDeletedAttachments(BlobPath documentContentDirectory, DocumentReference documentReference)
-        throws IOException
+    private void migrateDeletedAttachments(File documentContentDirectory, DocumentReference documentReference)
+        throws IOException, DataMigrationException
     {
         File deletedAttachmentsDirectory =
             new File(documentContentDirectory, FilesystemStoreTools.DELETED_ATTACHMENTS_DIR_NAME);
@@ -276,7 +274,8 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
                     AttachmentReference attachmentReference =
                         new AttachmentReference(attachmentName, documentReference);
 
-                    File newDeletedAttachmentDirectory = this.fstools.getDeletedAttachmentDir(attachmentReference, id);
+                    File newDeletedAttachmentDirectory =
+                        newPathToFile(this.fstools.getDeletedAttachmentDir(attachmentReference, id));
 
                     this.logger.info("Moving deleted attachment folder [{}] to new location [{}]",
                         oldDeletedAttachmentDirectory, newDeletedAttachmentDirectory);
@@ -289,7 +288,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         }
     }
 
-    private void migrateDocumentLocales(BlobPath documentContentDirectory) throws DataMigrationException
+    private void migrateDocumentLocales(File documentContentDirectory) throws DataMigrationException
     {
         File localesDirectory = new File(documentContentDirectory, FilesystemStoreTools.DOCUMENT_LOCALES_DIR_NAME);
 
@@ -311,7 +310,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         return LocaleUtils.toLocale(localeString);
     }
 
-    private void migrateDocumentLocale(BlobPath documentContentDirectory, File localeDirectory)
+    private void migrateDocumentLocale(File documentContentDirectory, File localeDirectory)
         throws DataMigrationException
     {
         File localeThisDirectory = new File(localeDirectory, THIS_DIR_NAME);

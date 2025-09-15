@@ -75,7 +75,7 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
 
     protected FileSystemBlobStore pre11BlobStore;
 
-    protected File pre11StoreDirectory;
+    protected File pre11StoreRootDirectory;
 
     protected BlobStore blobStore;
 
@@ -83,9 +83,9 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
     public void initialize() throws InitializationException
     {
         String pre11StoreName = "storage";
-        this.pre11StoreDirectory = new File(this.environment.getPermanentDirectory(), pre11StoreName);
+        this.pre11StoreRootDirectory = new File(this.environment.getPermanentDirectory(), pre11StoreName);
 
-        this.pre11BlobStore = new FileSystemBlobStore(pre11StoreName, this.pre11StoreDirectory.toPath());
+        this.pre11BlobStore = new FileSystemBlobStore(pre11StoreName, this.pre11StoreRootDirectory.toPath());
 
         if (getVersion().getVersion() < R1100000XWIKI15620DataMigration.VERSION) {
             this.blobStore = this.pre11BlobStore;
@@ -99,6 +99,20 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
         return this.pre11BlobStore;
     }
 
+    protected File getPre11StoreRootDirectory()
+    {
+        return this.pre11StoreRootDirectory;
+    }
+
+    protected File getStoreRootDirectory()
+    {
+        if (this.blobStore instanceof FileSystemBlobStore fileSystemBlobStore) {
+            return fileSystemBlobStore.getBlobFilePath(BlobPath.of(List.of())).toFile();
+        } else {
+            throw new IllegalStateException("The current blob store is not a file system blob store");
+        }
+    }
+
     protected BlobStore getBlobStore()
     {
         return this.blobStore;
@@ -109,33 +123,33 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
         this.blobStore = blobStore;
     }
 
-    protected BlobPath getPre11WikiDir(String wikiId)
+    protected File getPre11WikiDir(String wikiId)
     {
-        return BlobPath.of(List.of(wikiId));
+        return new File(getPre11StoreRootDirectory(), wikiId);
     }
 
-    private EntityReference getPre11EntityReference(BlobPath directory) throws IOException
+    private EntityReference getPre11EntityReference(File directory) throws IOException
     {
         String name = FileSystemStoreUtils.decode(directory.getName());
 
-        BlobPath parent = directory.getParent();
+        File parent = directory.getParentFile();
 
-        if (parent.getSegments().isEmpty()) {
+        if (parent.getCanonicalPath().equals(getStoreRootDirectory().getCanonicalPath())) {
             return new WikiReference(name);
         } else {
             return new SpaceReference(name, getPre11EntityReference(parent));
         }
     }
 
-    protected DocumentReference getPre11DocumentReference(BlobPath directory) throws DataMigrationException
+    protected DocumentReference getPre11DocumentReference(File directory) throws DataMigrationException
     {
         try {
             String name = FileSystemStoreUtils.decode(directory.getName());
 
-            return new DocumentReference(name, (SpaceReference) getPre11EntityReference(directory.getParent()));
+            return new DocumentReference(name, (SpaceReference) getPre11EntityReference(directory.getParentFile()));
         } catch (Exception e) {
             throw new DataMigrationException("Failed to get document reference for filesystem path [" + directory
-                + "]", e);
+                + "] (root=" + getStoreRootDirectory() + ")", e);
         }
     }
 

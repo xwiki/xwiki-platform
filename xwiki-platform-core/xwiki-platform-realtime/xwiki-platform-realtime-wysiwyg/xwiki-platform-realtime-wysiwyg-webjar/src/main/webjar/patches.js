@@ -257,6 +257,11 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @returns {Array[Object]} an array of objects (relative ranges) that could be used to restore the selection
      */
     _saveSelection() {
+      if (this._editor.isReadOnly()) {
+        // Let the code that put the editor in read-only mode handle the selection restore.
+        return [];
+      }
+
       // Save the selection as a text selection.
       this._editor.saveSelection();
       // Save the selection as an array of relative ranges.
@@ -370,7 +375,7 @@ define('xwiki-realtime-wysiwyg-patches', [
         // Some of the selected nodes were removed from the DOM or the selection was in a text node that was modified.
         // Restore the text selection.
         await this._editor.restoreSelection();
-      } else {
+      } else if (selection.length) {
         // The selected nodes are still in the DOM so we can restore the selection using the relative ranges.
         await this._editor.restoreSelection(selection.map(savedRange => {
           const range = this._editor.getContentWrapper().ownerDocument.createRange();

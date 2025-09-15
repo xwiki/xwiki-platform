@@ -968,26 +968,15 @@ ul.cke_autocomplete_panel {
 }
 
 .cke_contents &gt; textarea.cke_source.cke_editable_inline {
-  border: 1px solid transparent;
-  border-radius: 0;
   box-shadow: none;
-  margin-top: -1px;
-  margin-left: -1px;
-
-  .form-control-focus();
-}
-
-.cke_contents.fake {
-  /* We need this to have the box shadow visible when the source area is focused. */
-  overflow: visible;
 }
 
 #xwikicontent + .cke_contents &gt; textarea.cke_source.cke_editable_inline {
   /* Don't take the padding and the margin into account when computing the 100% width. */
   box-sizing: content-box;
   /* Make sure the Source area has the same width as the WYSIWYG area. */
-  margin-left: -@grid-gutter-width / 2 - 1px;
-  margin-right: -@grid-gutter-width / 2 - 1px;
+  margin-left: -@grid-gutter-width / 2;
+  margin-right: -@grid-gutter-width / 2;
 }
 
 /**

@@ -59,7 +59,7 @@
     "publint": "0.3.12",
     "rimraf": "6.0.1",
     "typescript": "5.9.2",
-    "typescript-eslint": "8.41.0",
+    "typescript-eslint": "8.43.0",
     "vite": "7.1.5",
     "vite-plugin-css-injected-by-js": "3.5.2",
     "vite-plugin-dts": "4.5.4",

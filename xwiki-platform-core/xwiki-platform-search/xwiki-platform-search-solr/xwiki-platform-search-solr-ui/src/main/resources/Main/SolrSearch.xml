@@ -489,7 +489,8 @@
 }
 
 .search-results-sort,
-.search-options, .search-options &gt; ul, .search-options &gt; ul &gt; li {
+.search-options, .search-options &gt; ul, .search-options &gt; ul &gt; li,
+.search-options &gt; ul &gt; li &gt; label {
   display: flex;
   gap: .4em;
   align-items: center;

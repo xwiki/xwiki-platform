@@ -374,6 +374,20 @@ ul.realtime-users {
 
 :host(realtime-status[value="clean"])::after {
   content: attr(data-status-clean);
+}
+
+/**
+ * Concurrent editing warning
+ */
+
+.realtime-warning {
+  padding: 6px;
+  border: 0;
+  margin: 0 0 0 .5em;
+}
+
+.buttons:not(.realtime-edit-toolbar) &gt; .realtime-warning &gt; * {
+  vertical-align: baseline;
 }</code>
     </property>
     <property>
@@ -879,6 +893,29 @@ ul.realtime-users {
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-warning"&gt;
+  &lt;button
+    type="button"
+    class="btn btn-link realtime-warning realtime-warning-connected"
+    data-toggle="popover"
+    data-placement="top"
+    title="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning'))"
+    data-content="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning.connected'))"
+  &gt;
+    $services.icon.renderHTML('warning')
+  &lt;/button&gt;
+  &lt;button
+    type="button"
+    class="btn btn-link realtime-warning realtime-warning-disconnected"
+    data-toggle="popover"
+    data-placement="top"
+    title="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning'))"
+    data-content="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning.disconnected'))"
+  &gt;
+    $services.icon.renderHTML('warning')
+  &lt;/button&gt;
 &lt;/template&gt;
 {{/html}}
 {{/velocity}}</content>

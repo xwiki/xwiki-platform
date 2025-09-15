@@ -262,10 +262,8 @@ ckeditor.plugin.focusedplaceholder.placeholder.caption=Title
 ckeditor.plugin.focusedplaceholder.placeholder.th=Header
 ckeditor.plugin.focusedplaceholder.placeholder.td=Cell
 
-ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=Temporarily leaving the realtime session.
-ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=No changes were made. Re-joining the realtime session.
-ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=There are unsaved changes, but no one else is in the realtime session. Re-joining.
-ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=Could not rejoin the realtime session because there are unsaved changes.
+ckeditor.plugin.realtime.leavingCollaboration=Leaving realtime collaboration
+ckeditor.plugin.realtime.joiningCollaboration=Joining realtime collaboration
 
 ckeditor.plugin.upload.downloadingPastedImages=Downloading pasted images: {0} / {1}
 ckeditor.plugin.upload.imageDownloadFailed=Failed to download {0} out of {1} pasted images
@@ -365,6 +363,12 @@ ckeditor.plugin.link.uploadError=Failed to upload {0}
 ckeditor.plugin.image.slash.uploadProgress=Uploading {0}...
 ckeditor.plugin.image.slash.uploadSuccess=Successfully uploaded {0}
 ckeditor.plugin.image.slash.uploadError=Failed to upload {0}
+
+## Deprecated since 16.10.12, 17.4.5, 17.8.0
+ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=Temporarily leaving the realtime session.
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=No changes were made. Re-joining the realtime session.
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=There are unsaved changes, but no one else is in the realtime session. Re-joining.
+ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=Could not rejoin the realtime session because there are unsaved changes.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

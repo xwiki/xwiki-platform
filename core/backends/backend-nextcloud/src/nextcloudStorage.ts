@@ -491,8 +491,6 @@ export class NextcloudStorage extends AbstractStorage {
               "\n" +
               "You can use it to take your *own* notes.\n" +
               "\n" +
-              "You can also create new [[pages|home/newpage]].\n" +
-              "\n" +
               "Enjoy!",
           );
         }

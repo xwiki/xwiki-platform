@@ -172,7 +172,7 @@ export class NextcloudModelReferenceParser implements ModelReferenceParser {
 
       const references = reference.split("/");
       const spaces = references.slice(0, references.length - 3);
-      const currentSegments = currentDocument.space?.names ?? [];
+      const currentSegments = [...(currentDocument.space?.names ?? [])];
 
       while (spaces[0] == "..") {
         currentSegments.pop();

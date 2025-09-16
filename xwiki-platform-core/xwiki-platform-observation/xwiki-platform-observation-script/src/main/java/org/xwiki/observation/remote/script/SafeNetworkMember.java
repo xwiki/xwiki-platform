@@ -20,6 +20,7 @@
 package org.xwiki.observation.remote.script;
 
 import org.xwiki.observation.remote.NetworkMember;
+import org.xwiki.stability.Unstable;
 
 /**
  * A script safe version of {@link NetworkMember} exposing only what authors with just script right are allowed to do.
@@ -27,6 +28,7 @@ import org.xwiki.observation.remote.NetworkMember;
  * @version $Id$
  * @since 17.9.0RC1
  */
+@Unstable
 public class SafeNetworkMember implements NetworkMember
 {
     private final NetworkMember wrapped;

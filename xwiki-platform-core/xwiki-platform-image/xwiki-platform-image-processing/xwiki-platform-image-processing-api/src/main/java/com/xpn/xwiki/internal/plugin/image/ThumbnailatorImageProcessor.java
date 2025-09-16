@@ -34,6 +34,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
+import net.coobird.thumbnailator.ThumbnailParameter;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.resizers.Resizers;
 
@@ -53,19 +54,14 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
     public Image readImage(InputStream inputStream) throws IOException
     {
         // Use Thumbnailator to read the image to correctly interpret the orientation that is set in Exif metadata.
-        BufferedImage bufferedImage = Thumbnails.of(inputStream)
+        return Thumbnails.of(inputStream)
             .scale(1)
             // Ensure that nothing is actually resized and there is thus no quality loss.
             .resizer(Resizers.NULL)
-            .asBufferedImage();
-
-        // We're computing a second time the image but this time we specify the image type so that we can fallback
-        // on proper type for PNG images.
-        return Thumbnails.of(bufferedImage)
-            .scale(1)
-            // Ensure that nothing is actually resized and there is thus no quality loss.
-            .resizer(Resizers.NULL)
-            .imageType(getBestImageTypeFor(bufferedImage))
+            // Set the image type to the default one (ARGB) as Thumbnailator doesn't properly handle indexed PNG
+            // images, see https://github.com/coobird/thumbnailator/issues/41. This cannot be done later after
+            // analyzing the read image, as otherwise the colors would already be wrong.
+            .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE)
             .asBufferedImage();
     }
 

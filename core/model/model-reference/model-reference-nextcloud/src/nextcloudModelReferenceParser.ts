@@ -173,7 +173,7 @@ export class NextcloudModelReferenceParser implements ModelReferenceParser {
 
       while (spaces[0] == "..") {
         currentSegments.pop();
-        spaces.pop();
+        spaces.shift();
       }
 
       return new AttachmentReference(

@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { AttachmentReference, EntityType } from "@xwiki/cristal-model-api";
 import { inject, injectable } from "inversify";
 import type { InternalLinksSerializer } from "./internal-links-serializer";
 import type { UniAstToMarkdownConverter } from "../../uni-ast-to-markdown-converter";
+import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { EntityReference } from "@xwiki/cristal-model-api";
-import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
 import type { Link, LinkTarget } from "@xwiki/cristal-uniast-api";
 
 /**
@@ -32,8 +33,8 @@ export class FilesystemInternalLinkSerializer
   implements InternalLinksSerializer
 {
   constructor(
-    @inject("RemoteURLSerializerProvider")
-    private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
+    @inject("DocumentService")
+    private readonly documentService: DocumentService,
   ) {}
 
   async serialize(
@@ -54,6 +55,7 @@ export class FilesystemInternalLinkSerializer
     return `![${alt ?? ""}](${this.serializeTarget(target)})`;
   }
 
+  // eslint-disable-next-line max-statements
   private serializeTarget(
     target: Extract<
       {
@@ -64,13 +66,40 @@ export class FilesystemInternalLinkSerializer
       { type: "internal" }
     >,
   ) {
-    return (
-      (target.parsedReference
-        ? this.remoteURLSerializerProvider
-            .get()!
-            .serialize(target.parsedReference)
-            ?.replace(/cristalfs:\/\/\/?/, "")
-        : target.rawReference) ?? target.rawReference
-    );
+    if (target.parsedReference) {
+      const currentDocumentReference =
+        this.documentService.getCurrentDocumentReference().value!;
+      let parsedReference = target.parsedReference;
+      const isAttachment = parsedReference.type === EntityType.ATTACHMENT;
+      if (isAttachment) {
+        parsedReference = (parsedReference as AttachmentReference).document;
+      } else if (parsedReference.type !== EntityType.DOCUMENT) {
+        throw new Error(
+          `Unexpected type ${parsedReference.type} for link serialization`,
+        );
+      }
+
+      const down = [
+        ...(currentDocumentReference.space &&
+        currentDocumentReference.space.names.length > 0
+          ? currentDocumentReference.space.names.map(() => "..")
+          : ["."]),
+      ].join("/");
+
+      const name = (isAttachment ? "." : "") + parsedReference.name;
+      const up = [...(parsedReference.space?.names ?? []), name]
+        .map(encodeURI)
+        .join("/");
+      if (!isAttachment) {
+        return `${down}/${up}.md`.replace(/^\.\//, "");
+      } else {
+        return `${down}/${up}/attachments/${encodeURI((target.parsedReference as AttachmentReference).name)}`.replace(
+          /^\.\//,
+          "",
+        );
+      }
+    } else {
+      return target.rawReference;
+    }
   }
 }

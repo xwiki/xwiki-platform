@@ -47,7 +47,11 @@ export const ImageFilePanel: React.FC<ImageFilePanelProps> = ({
     // By default file panels don't have any styling and just "float", unstyled, above the editor
     // So we put some container to make it stand out from the editor's content
     <Paper shadow="md" p="sm">
-      <ImageSelector linkEditionCtx={linkEditionCtx} onSelected={updateImage} />
+      <ImageSelector
+        linkEditionCtx={linkEditionCtx}
+        currentSelection={image.props.url}
+        onSelected={updateImage}
+      />
     </Paper>
   );
 };

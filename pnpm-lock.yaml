@@ -3590,6 +3590,9 @@ importers:
       vue-i18n:
         specifier: 11.1.11
         version: 11.1.11(vue@3.5.20(typescript@5.9.2))
+      vue-router:
+        specifier: 4.5.1
+        version: 4.5.1(vue@3.5.20(typescript@5.9.2))
     devDependencies:
       '@types/lodash-es':
         specifier: 4.17.12

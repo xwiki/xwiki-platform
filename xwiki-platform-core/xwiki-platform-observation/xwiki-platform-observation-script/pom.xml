@@ -24,24 +24,26 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-observation</artifactId>
     <version>17.9.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-observation</artifactId>
-  <name>XWiki Platform - Observation - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Observation - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-observation-remote</module>
-    <module>xwiki-platform-observation-script</module>
-    <module>xwiki-platform-observation-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-observation-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-observation-script</artifactId>
+  <name>XWiki Platform - Observation - Script</name>
+  <packaging>jar</packaging>
+  <description>Script API for to manipulate observation concepts</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-observation-remote</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-job-script</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -24,64 +24,48 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-distribution-flavor</artifactId>
+    <artifactId>xwiki-platform-observation</artifactId>
     <version>17.9.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
-  <name>XWiki Platform - Distribution - Flavor - Main Wiki</name>
+  <artifactId>xwiki-platform-observation-ui</artifactId>
+  <name>XWiki Platform - Observation - UI</name>
   <packaging>xar</packaging>
-  <description>${xwiki.extension.distribution.ui.summary}</description>
+  <description>Observation and clustering related admi administration</description>
   <properties>
-    <xwiki.extension.category>flavor</xwiki.extension.category>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>${xwiki.extension.distribution.ui.name}</xwiki.extension.name>
-    <!-- Should only be installed on main wiki -->
-    <xwiki.extension.namespaces>wiki:xwiki</xwiki.extension.namespaces>
-    <xwiki.extension.features>
-        <!-- Make sure to replace the old XE flavor -->
-        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
-        <!-- Replace old XEM flavor -->
-        com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator,
-        org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator,
-        org.xwiki.manager:xwiki-manager-wiki-administrator,
-        org.xwiki.manager:xwiki-manager-ui
-    </xwiki.extension.features>
+    <xwiki.extension.name>Observation Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-flavor-common</artifactId>
+      <artifactId>xwiki-platform-observation-script</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- Used to display the administration section -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
-      <optional>true</optional>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-message</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-menu-ui</artifactId>
+      <artifactId>xwiki-platform-localization-macro</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
-      <optional>true</optional>
-    </dependency>
-    <!-- Add the Mail Resending UI. It's only added in the main wiki XS flavor so that it's not installed
-         in subwikis (as we want a single mail resender located in the main wiki) -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-resender-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <!-- What is current exposed in the Observation UI does not make much sense at sub-wiki level -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

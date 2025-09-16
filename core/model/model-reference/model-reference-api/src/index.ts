@@ -22,15 +22,16 @@ import { ComponentInit } from "./componentInit";
 import type { ModelReferenceHandler } from "./modelReferenceHandler";
 import type { ModelReferenceHandlerProvider } from "./modelReferenceHandlerProvider";
 import type { ModelReferenceParser } from "./modelReferenceParser";
+import type { ModelReferenceParserOptions } from "./modelReferenceParserOptions";
 import type { ModelReferenceParserProvider } from "./modelReferenceParserProvider";
 import type { ModelReferenceSerializer } from "./modelReferenceSerializer";
 import type { ModelReferenceSerializerProvider } from "./modelReferenceSerializerProvider";
-
 export {
   ComponentInit,
   type ModelReferenceHandler,
   type ModelReferenceHandlerProvider,
   type ModelReferenceParser,
+  type ModelReferenceParserOptions,
   type ModelReferenceParserProvider,
   type ModelReferenceSerializer,
   type ModelReferenceSerializerProvider,

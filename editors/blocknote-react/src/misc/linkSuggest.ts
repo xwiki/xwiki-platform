@@ -110,7 +110,9 @@ function createLinkSuggestor({
       .map((link) => {
         // FIXME: relate to link management is reference management, here too we
         // need to think me precisely of the architecture we want for this.
-        const entityReference = modelReferenceParser?.parse(link.reference);
+        const entityReference = modelReferenceParser?.parse(link.reference, {
+          relative: false,
+        });
 
         const documentReference =
           entityReference?.type == EntityType.ATTACHMENT
@@ -125,7 +127,7 @@ function createLinkSuggestor({
         }
 
         return {
-          title: link.label,
+          title: documentReference.name,
           segments,
           reference: link.reference,
           url: link.url,

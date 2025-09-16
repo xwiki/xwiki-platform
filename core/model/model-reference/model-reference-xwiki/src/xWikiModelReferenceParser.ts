@@ -28,7 +28,10 @@ import { inject, injectable } from "inversify";
 import { isEqual } from "lodash-es";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { EntityReference } from "@xwiki/cristal-model-api";
-import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
+import type {
+  ModelReferenceParser,
+  ModelReferenceParserOptions,
+} from "@xwiki/cristal-model-reference-api";
 
 @injectable()
 export class XWikiModelReferenceParser implements ModelReferenceParser {
@@ -37,18 +40,21 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
     private readonly documentService: DocumentService,
   ) {}
 
-  parse(reference: string, type?: EntityType): EntityReference {
+  parse(
+    reference: string,
+    options?: ModelReferenceParserOptions,
+  ): EntityReference {
     if (/^https?:\/\//.test(reference)) {
       throw new Error(`[${reference}] is not a valid entity reference`);
     }
-    return this.innerParse(reference, type);
+    return this.innerParse(reference, options?.type);
   }
 
   async parseAsync(
     reference: string,
-    type?: EntityType,
+    options?: ModelReferenceParserOptions,
   ): Promise<EntityReference> {
-    return this.parse(reference, type);
+    return this.parse(reference, options);
   }
 
   private innerParse(reference: string, type: EntityType | undefined) {

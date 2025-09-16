@@ -24,7 +24,6 @@ import { mockI18n } from "@xwiki/cristal-dev-test-utils";
 import {
   AttachmentReference,
   DocumentReference,
-  EntityType,
 } from "@xwiki/cristal-model-api";
 import { ClickListener } from "@xwiki/cristal-model-click-listener";
 import {
@@ -33,7 +32,7 @@ import {
 } from "@xwiki/cristal-model-reference-api";
 import { Container } from "inversify";
 import { describe, expect, it, vi } from "vitest";
-import { mock } from "vitest-mock-extended";
+import { any, mock } from "vitest-mock-extended";
 import type { Attachment } from "@xwiki/cristal-attachments-api";
 
 function initializeMocks() {
@@ -45,7 +44,7 @@ function initializeMocks() {
   const modelReferenceParserProviderMock = mock<ModelReferenceParserProvider>();
   const modelReferenceParserMock = mock<ModelReferenceParser>();
   modelReferenceParserMock.parse
-    .calledWith("test.jpg", EntityType.ATTACHMENT)
+    .calledWith("test.jpg", any())
     .mockReturnValue(
       new AttachmentReference("test.jpg", new DocumentReference("A")),
     );

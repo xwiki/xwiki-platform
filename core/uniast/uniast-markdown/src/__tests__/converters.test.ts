@@ -23,7 +23,7 @@ import { DefaultUniAstToMarkdownConverter } from "../markdown/default-uni-ast-to
 import { EntityType } from "@xwiki/cristal-model-api";
 import { Container } from "inversify";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
+import { matches, mock } from "vitest-mock-extended";
 import type { MarkdownParserConfiguration } from "../markdown/internal-links/parser/markdown-parser-configuration";
 import type { ParserConfigurationResolver } from "../markdown/internal-links/parser/parser-configuration-resolver";
 import type { InternalLinksSerializer } from "../markdown/internal-links/serializer/internal-links-serializer";
@@ -31,6 +31,7 @@ import type { InternalLinksSerializerResolver } from "../markdown/internal-links
 import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParser,
+  ModelReferenceParserOptions,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/cristal-model-reference-api";
@@ -45,23 +46,35 @@ function init() {
   const modelReferenceParserProvider = mock<ModelReferenceParserProvider>();
 
   const modelReferenceParser = mock<ModelReferenceParser>();
-  // modelReferenceParser.parseAsync.mockReturnValue(
-  //   Promise.resolve(new DocumentReference("A")),
-  // );
   modelReferenceParser.parseAsync
-    .calledWith("http://somewhere.somewhere", EntityType.ATTACHMENT)
+    .calledWith(
+      "http://somewhere.somewhere",
+      matches((value: ModelReferenceParserOptions) => {
+        return value.type === EntityType.ATTACHMENT;
+      }),
+    )
     .mockImplementation(() => {
       throw new Error("Not internal");
     });
 
   modelReferenceParser.parse
-    .calledWith("documentReference", EntityType.DOCUMENT)
+    .calledWith(
+      "documentReference",
+      matches((value: ModelReferenceParserOptions) => {
+        return value.type === EntityType.DOCUMENT;
+      }),
+    )
     .mockImplementation(() => {
       throw new Error("Not internal");
     });
 
   modelReferenceParser.parse
-    .calledWith("imageReference", EntityType.ATTACHMENT)
+    .calledWith(
+      "imageReference",
+      matches((value: ModelReferenceParserOptions) => {
+        return value.type === EntityType.ATTACHMENT;
+      }),
+    )
     .mockImplementation(() => {
       throw new Error("Not internal");
     });

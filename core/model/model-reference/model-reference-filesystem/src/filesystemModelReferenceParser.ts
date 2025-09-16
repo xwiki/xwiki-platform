@@ -26,7 +26,10 @@ import {
 import { inject, injectable } from "inversify";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { EntityReference } from "@xwiki/cristal-model-api";
-import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
+import type {
+  ModelReferenceParser,
+  ModelReferenceParserOptions,
+} from "@xwiki/cristal-model-reference-api";
 
 @injectable()
 export class FileSystemModelReferenceParser implements ModelReferenceParser {
@@ -35,14 +38,15 @@ export class FileSystemModelReferenceParser implements ModelReferenceParser {
     private readonly documentService: DocumentService,
   ) {}
 
-  parse(reference: string): EntityReference {
+  parse(
+    reference: string,
+    options?: ModelReferenceParserOptions,
+  ): EntityReference {
     if (/^https?:\/\//.test(reference)) {
       throw new Error(`[${reference}] is not a valid entity reference`);
     }
-    const isAbsolute = reference.startsWith("/");
-    const segments = (isAbsolute ? reference.substring(1) : reference)
-      .split(/(?<!\\)\//)
-      .map((s) => this.unescape(s));
+    const isAbsolute = options?.relative === false;
+    const segments = reference.split(/(?<!\\)\//).map((s) => this.unescape(s));
     const isAttachment = this.isAttachmentReference(segments);
     if (isAttachment && isAbsolute) {
       return this.parseAttachmentAbsolute(segments);

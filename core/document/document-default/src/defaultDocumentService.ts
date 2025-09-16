@@ -114,8 +114,8 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
         return modelReferenceParserProvider
           .get()
           ?.parse(
-            this.lastDocumentReference ? "/" + this.lastDocumentReference : "",
-            EntityType.DOCUMENT,
+            this.lastDocumentReference ? this.lastDocumentReference : "",
+            { type: EntityType.DOCUMENT, relative: false },
           ) as DocumentReference;
       },
       documentReferenceString(): string | undefined {

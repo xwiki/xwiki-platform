@@ -64,10 +64,9 @@ const hasAuthor = computed(() => {
 function attachmentName(name: string) {
   try {
     return (
-      modelReferenceParser.parse(
-        name,
-        EntityType.ATTACHMENT,
-      ) as AttachmentReference
+      modelReferenceParser.parse(name, {
+        type: EntityType.ATTACHMENT,
+      }) as AttachmentReference
     ).name;
   } catch {
     return "";

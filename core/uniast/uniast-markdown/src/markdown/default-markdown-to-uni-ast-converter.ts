@@ -323,7 +323,7 @@ export class DefaultMarkdownToUniAstConverter
     try {
       const parsed = await this.modelReferenceParserProvider
         .get()!
-        .parseAsync(url, EntityType.ATTACHMENT);
+        .parseAsync(url, { type: EntityType.ATTACHMENT });
       target = {
         type: "internal",
         parsedReference: parsed,
@@ -495,12 +495,9 @@ export class DefaultMarkdownToUniAstConverter
 
     let reference: EntityReference | null;
     try {
-      reference = this.modelReferenceParserProvider
-        .get()!
-        .parse(
-          targetStr,
-          isImage ? EntityType.ATTACHMENT : EntityType.DOCUMENT,
-        );
+      reference = this.modelReferenceParserProvider.get()!.parse(targetStr, {
+        type: isImage ? EntityType.ATTACHMENT : EntityType.DOCUMENT,
+      });
     } catch {
       reference = null;
     }

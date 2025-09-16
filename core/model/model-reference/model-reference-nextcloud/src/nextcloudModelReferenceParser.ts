@@ -29,7 +29,10 @@ import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { EntityReference } from "@xwiki/cristal-model-api";
-import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
+import type {
+  ModelReferenceParser,
+  ModelReferenceParserOptions,
+} from "@xwiki/cristal-model-reference-api";
 
 @injectable()
 export class NextcloudModelReferenceParser implements ModelReferenceParser {
@@ -52,7 +55,7 @@ export class NextcloudModelReferenceParser implements ModelReferenceParser {
 
   async parseAsync(
     reference: string,
-    type?: EntityType,
+    options?: ModelReferenceParserOptions,
   ): Promise<EntityReference> {
     if (/^https?:\/\//.test(reference)) {
       const baseURL = this.cristalApp.getWikiConfig().baseURL;
@@ -67,7 +70,7 @@ export class NextcloudModelReferenceParser implements ModelReferenceParser {
         throw new Error(`[${reference}] is not a valid entity reference`);
       }
     } else {
-      return this.legacyParsing(reference, type);
+      return this.legacyParsing(reference, options?.type);
     }
   }
 

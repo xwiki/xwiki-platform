@@ -98,6 +98,6 @@ describe("xWikiModelReferenceParser", () => {
       ),
     ],
   ])("%s -> %s", (reference, type, expected) => {
-    expect(parser.parse(reference, type)).toEqual(expected);
+    expect(parser.parse(reference, { type })).toEqual(expected);
   });
 });

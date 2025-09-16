@@ -17,34 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import type { ModelReferenceParserOptions } from "./modelReferenceParserOptions";
-import type { EntityReference } from "@xwiki/cristal-model-api";
+import { EntityType } from "@xwiki/cristal-model-api";
 
 /**
- * @since 0.12
+ * @since 0.22
  * @beta
  */
-interface ModelReferenceParser {
+export type ModelReferenceParserOptions = {
   /**
-   * @param reference - an entity reference
-   * @param options - (since 0.22) an optional configuration object
+   * an optional type, helping to remove ambiguity when parsing the reference
    */
-  parse(
-    reference: string,
-    options?: ModelReferenceParserOptions,
-  ): EntityReference;
-
+  type?: EntityType;
   /**
-   * Parse a reference with additional analysis that can only be performed asynchronously
-   * @param reference - an entity reference
-   * @param options - an optional configuration object
-   * @since 0.22
-   * @beta
+   * When false, the model reference is parsed as an absolute reference.
+   * When true, the model reference is parsed relatively to the current document.
+   * The default value is true.
    */
-  parseAsync(
-    reference: string,
-    options?: ModelReferenceParserOptions,
-  ): Promise<EntityReference>;
-}
-export type { ModelReferenceParser };
+  relative?: boolean;
+};

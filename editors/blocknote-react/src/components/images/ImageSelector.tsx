@@ -106,8 +106,10 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
       if (uploadedFilesUrls && uploadedFilesUrls[0]) {
         url = uploadedFilesUrls[0];
       } else {
-        const parser =
-          linkEditionCtx.modelReferenceParser?.parse(currentPageName);
+        const parser = linkEditionCtx.modelReferenceParser?.parse(
+          currentPageName,
+          { relative: false },
+        );
 
         url = linkEditionCtx.remoteURLSerializer?.serialize(
           new AttachmentReference(file.name, parser as DocumentReference),
@@ -129,9 +131,10 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
         "image/*",
       );
 
-      const suggestions = results.map((link): LinkSuggestion => {
+      return results.map((link): LinkSuggestion => {
         const attachmentReference = linkEditionCtx.modelReferenceParser?.parse(
           link.reference,
+          { relative: false },
         ) as AttachmentReference;
 
         const documentReference = attachmentReference.document;
@@ -149,8 +152,6 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
           segments,
         };
       });
-
-      return suggestions;
     },
     [linkEditionCtx],
   );

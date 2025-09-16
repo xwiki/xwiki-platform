@@ -73,4 +73,13 @@ describe("FileSystemModelReferenceParser", () => {
       ),
     );
   });
+
+  it("parse index", () => {
+    const entityReference = fileSystemModelReferenceParser.parse("index", {
+      relative: false,
+    });
+    expect(entityReference).toEqual(
+      new DocumentReference("index", new SpaceReference(undefined)),
+    );
+  });
 });

@@ -241,7 +241,7 @@ export class DefaultUniAstToHTMLConverter implements UniAstToHTMLConverter {
   private convertReference(rawReference: string, type: EntityType) {
     const parseReference = this.modelReferenceParserProvider
       .get()!
-      .parse(rawReference, type);
+      .parse(rawReference, { type });
     return this.serializeReference(parseReference);
   }
 

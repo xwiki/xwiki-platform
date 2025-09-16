@@ -22,12 +22,11 @@ import { DefaultUniAstToHTMLConverter } from "../default-uni-ast-to-html-convert
 import {
   AttachmentReference,
   DocumentReference,
-  EntityType,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
 import { Container } from "inversify";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
+import { any, mock } from "vitest-mock-extended";
 import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParser,
@@ -76,7 +75,7 @@ function init() {
     new DocumentReference("B", new SpaceReference(undefined, "A")),
   );
   modelReferenceParser.parse
-    .calledWith("A.B@image.png", EntityType.ATTACHMENT)
+    .calledWith("A.B@image.png", any())
     .mockReturnValue(attachmentReference);
 
   remoteURLSerializer.serialize

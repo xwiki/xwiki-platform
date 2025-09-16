@@ -92,8 +92,13 @@ public class RemoteObservationScriptService implements ScriptService
      */
     public Collection<NetworkChannel> getChannels() throws AccessDeniedException
     {
-        this.authorization.checkAccess(Right.PROGRAM);
+        Collection<NetworkChannel> channels = this.manager.getChannels();
 
-        return this.manager.getChannels();
+        if (this.authorization.hasAccess(Right.PROGRAM)) {
+            return channels;
+        }
+
+        // Return a version which expose only what authors with script right is allowed to use
+        return channels.stream().<NetworkChannel>map(SafeNetworkChannel::new).toList();
     }
 }

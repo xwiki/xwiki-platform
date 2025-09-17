@@ -43,6 +43,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.SecureQuery;
 import org.xwiki.rest.XWikiRestException;
@@ -128,6 +129,10 @@ public class SolrKeywordSearchSource implements KeywordSearchSource
     @Inject
     private SearchResultConverter searchResultConverter;
 
+    @Inject
+    @Named("searchExclusions/solr")
+    private QueryFilter searchExclusionsFilter;
+
     @Override
     public List<SearchResult> search(String keywords, KeywordSearchOptions options, URI baseURI)
         throws XWikiRestException
@@ -182,6 +187,7 @@ public class SolrKeywordSearchSource implements KeywordSearchSource
         ((SecureQuery) query).checkCurrentUser(true);
         query.setLimit(options.number());
         query.setOffset(options.start());
+        query.addFilter(this.searchExclusionsFilter);
         query.bindValue("fq", filterQueries);
         addSortValue(options.orderField(), options.order(), query);
         return this.searchResultConverter.getSolrSearchResults(options.withPrettyNames(), query, baseURI, true);

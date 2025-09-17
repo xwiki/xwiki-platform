@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -637,6 +638,12 @@ public abstract class XWikiAction implements LegacyAction
                     renderResult = render(context);
                 }
 
+                LOGGER.warn("Response session ID is [{}]", context.getResponse().getHttpServletResponse().)
+                LOGGER.warn("Response headers is [{}]",
+                    context.getResponse().getHttpServletResponse().getHeaderNames()
+                        .stream()
+                        .map(headerName -> headerName + " : "+ context.getResponse().getHeader(headerName))
+                        .collect(Collectors.joining()));
                 if (renderResult != null) {
                     // check for doc existence
                     if (shouldReturnDocDoesNotExist(doc, context)) {

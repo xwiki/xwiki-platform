@@ -156,14 +156,14 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             }
         }
 
+        // We skip the executor on purpose to ensure there's no bug related to Threads of the executor.
         if (result == null) {
-            // 2. Generate the cache key
-            String cacheKey = this.cacheManager.createCacheKey(notificationParameters);
-
-            // 3. Search events
-            result = this.executor.submit(cacheKey,
-                () -> getCompositeEvents(notificationParameters),
-                Boolean.parseBoolean(async), count, true);
+            List<CompositeEvent> compositeEvents = getCompositeEvents(notificationParameters);
+            if (count) {
+                result = compositeEvents.size();
+            } else {
+                result = compositeEvents;
+            }
         }
 
         return result;

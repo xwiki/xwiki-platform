@@ -1,5 +1,11 @@
 # @xwiki/cristal-icons
 
+## 0.22.0
+
+### Minor Changes
+
+- Cristal 0.22 Release
+
 ## 0.21.0
 
 ### Minor Changes

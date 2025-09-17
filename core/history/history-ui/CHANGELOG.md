@@ -1,5 +1,20 @@
 # @xwiki/cristal-history-ui
 
+## 0.22.0
+
+### Minor Changes
+
+- Cristal 0.22 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.22.0
+  - @xwiki/cristal-document-api@0.22.0
+  - @xwiki/cristal-extra-tabs-api@0.22.0
+  - @xwiki/cristal-history-api@0.22.0
+  - @xwiki/cristal-user-ui@0.22.0
+
 ## 0.21.0
 
 ### Minor Changes

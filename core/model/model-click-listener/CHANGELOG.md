@@ -1,5 +1,20 @@
 # @xwiki/cristal-model-click-listener
 
+## 0.22.0
+
+### Minor Changes
+
+- Cristal 0.22 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.22.0
+  - @xwiki/cristal-attachments-api@0.22.0
+  - @xwiki/cristal-model-api@0.22.0
+  - @xwiki/cristal-model-reference-api@0.22.0
+  - @xwiki/cristal-model-remote-url-api@0.22.0
+
 ## 0.21.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @xwiki/cristal-backend-api
 
+## 0.22.0
+
+### Minor Changes
+
+- Cristal 0.22 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.22.0
+
 ## 0.21.0
 
 ### Minor Changes

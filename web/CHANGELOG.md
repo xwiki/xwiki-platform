@@ -1,5 +1,23 @@
 # @xwiki/cristal-web
 
+## 0.22.0
+
+### Minor Changes
+
+- Cristal 0.22 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-authentication-github@0.22.0
+  - @xwiki/cristal-authentication-nextcloud@0.22.0
+  - @xwiki/cristal-authentication-xwiki@0.22.0
+  - @xwiki/cristal-browser-default@0.22.0
+  - @xwiki/cristal-configuration-api@0.22.0
+  - @xwiki/cristal-configuration-web@0.22.0
+  - @xwiki/cristal-settings-browser@0.22.0
+  - @xwiki/cristal-lib@0.22.0
+
 ## 0.21.0
 
 ### Minor Changes

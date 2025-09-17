@@ -1794,7 +1794,7 @@ public class Document extends Api
 
     /**
      * Displays the given field of the given object The display mode will be decided depending on page context (edit or
-     * inline context will display in edit, view context in view) This function can return html inside an html macro
+     * inline context will display in edit, view context in view). This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @param obj object from which to take the field

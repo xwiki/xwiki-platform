@@ -695,14 +695,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       if (this.directSave) {
         // save via ajax
         if (!targetElement.disabled) {
-          let url = null;
-          if (targetElement.tagName === "a") {
-            url = targetElement.href;
-          }
-          else {
-            url = targetElement.dataset.modalUrl;
-          }
-          new Ajax.Request(url, {
+          new Ajax.Request(targetElement.href, {
             onCreate : function() {
               targetElement.disabled = true;
               targetElement._x_notif = new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.inProgress')", 'inprogress');

@@ -1,3 +1,4 @@
 {
-    "blocknote.editor.save.error": "Die Seite konnte nicht gespeichert werden."
+    "blocknote.editor.save.error": "Die Seite konnte nicht gespeichert werden.",
+    "blocknote.editor.save.unsavedChanges": "Die Änderungen sind noch nicht gespeichert. Wirklich abbrechen?"
 }

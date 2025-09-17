@@ -158,7 +158,7 @@
     }
   };
 
-  var addFacetValueCheckbox = function(index) {
+  var addFacetValueCheckbox = function() {
     // Create an id unique to the facet value.
     let facetContainer = $(this).parents('.search-facet').first();
     // We use the JQuery index, so that id indexes are reset across facetContainers.
@@ -311,8 +311,9 @@
         let queryFieldName = this.getAttribute('data-query-name');
         let queryField = document.querySelector('input[name="' + queryFieldName + '"]');
         queryField.value = this.checked ? 'true' : 'false';
-        pushSearchUIState(this.form.getAttribute('action') + "?" +
-          new URLSearchParams(new FormData(this.form)).toString(),
+        let baseURL = getQueryString(getURL);
+        let params = new URLSearchParams(new FormData(this.form));
+        pushSearchUIState(baseURL + params.toString(),
           'input[data-query-name="' + queryFieldName + '"]');
       });
     });

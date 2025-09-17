@@ -637,7 +637,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     /** AJAX deletion of attachments. */
     onDelete : function(event) {
       event.stop();
-      deleteTool = event.element();
+      deleteTool = event.element().up('a.delete') || event.element();
       if (!deleteTool.disabled) {
         new XWiki.widgets.ConfirmedAjaxRequest(
           deleteTool.readAttribute('href'),
@@ -680,7 +680,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     /** Update the property with the selected value without reloading the page. */
     onSelect : function(event) {
       event.stop();
-      var targetElement = event.element();
+      var targetElement = event.element().up('a.select') || event.element();
       var attachmentName = targetElement.up('.gallery_attachmentbox').down('.gallery_attachmenttitle').title;
       var imageSource = targetElement.up('.gallery_attachmentbox.gallery_image');
       if (imageSource) {
@@ -695,7 +695,14 @@ $xwiki.jsx.use($attachmentPickerDocName)
       if (this.directSave) {
         // save via ajax
         if (!targetElement.disabled) {
-          new Ajax.Request(event.element().href, {
+          let url = null;
+          if (targetElement.tagName === "a") {
+            url = targetElement.href;
+          }
+          else {
+            url = targetElement.dataset.modalUrl;
+          }
+          new Ajax.Request(url, {
             onCreate : function() {
               targetElement.disabled = true;
               targetElement._x_notif = new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.inProgress')", 'inprogress');
@@ -789,7 +796,13 @@ $xwiki.jsx.use($attachmentPickerDocName)
     $$('.attachment-picker-start').invoke('observe', 'click', function(event) {
       event.stop();
       var targetElement = event.element();
-      var url = targetElement.href;
+      let url = null;
+      if (targetElement.tagName === "a") {
+        url = targetElement.href;
+      }
+      else {
+        url = targetElement.dataset.modalUrl;
+      }
       if (url.indexOf('?') &lt; 0) {
         url += '?';
       }
@@ -1611,9 +1624,15 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #if ($hasTargetDoc)
       #set ($queryString.targetdocname = $targetdoc.fullName)
     #end
-    #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
-    (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
-      class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
+    #set ($linkLabel = $escapetool.xml($buttontext))
+    #set ($modalUrl = $escapetool.xml("$xcontext.macro.doc.URL?$escapetool.url($queryString)"))
+    (% class="buttonwrapper" %)##
+      {{html clean="false"}}
+        &lt;button class="attachment-picker-start button" 
+        title="$!{linkLabel}" 
+        data-modal-url="${modalUrl}"&gt;$!linkLabel
+        &lt;/button&gt;
+      {{/html}}(%%)##
   #end
 #end
 {{/velocity}}

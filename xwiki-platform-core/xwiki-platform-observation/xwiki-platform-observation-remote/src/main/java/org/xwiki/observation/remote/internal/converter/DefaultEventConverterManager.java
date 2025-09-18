@@ -90,7 +90,7 @@ public class DefaultEventConverterManager implements EventConverterManager
     @Override
     public List<RemoteEventConverter> getRemoteEventConverters()
     {
-        if (this.localEventConverters == null) {
+        if (this.remoteEventConverters == null) {
             this.remoteEventConverters =
                 loadConverters(RemoteEventConverter.class, (c1, c2) -> c1.getPriority() - c2.getPriority());
         }

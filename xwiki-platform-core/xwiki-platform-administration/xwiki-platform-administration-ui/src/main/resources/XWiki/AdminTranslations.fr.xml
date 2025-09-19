@@ -155,6 +155,10 @@ administration.section.analytics.status.hint=Définit si le suivi Google Analyti
 admin.social=Social
 admin.social.description=Paramétrage des fonctionnalités sociales.
 
+# Network category
+admin.network=Réseau
+admin.network.description=Fonctionnalités liées au réseau.
+
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=Afficher dans la section
 XWiki.ConfigurableClass_heading=Niveau de titre

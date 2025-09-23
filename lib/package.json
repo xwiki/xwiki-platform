@@ -99,7 +99,7 @@
     "@xwiki/cristal-wiki-config-default": "workspace:*",
     "pinia": "3.0.2",
     "reflect-metadata": "0.2.2",
-    "vue-i18n": "11.1.11",
+    "vue-i18n": "11.1.12",
     "vue-router": "4.5.1"
   },
   "peerDependencies": {

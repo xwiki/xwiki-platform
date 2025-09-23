@@ -34,7 +34,7 @@
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-authentication-nextcloud-state": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
-    "vue-i18n": "11.1.11"
+    "vue-i18n": "11.1.12"
   },
   "peerDependencies": {
     "inversify": "7.x",

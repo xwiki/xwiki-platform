@@ -41,7 +41,7 @@
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "@xwiki/cristal-page-actions-api": "workspace:*",
     "@xwiki/cristal-rename-api": "workspace:*",
-    "vue-i18n": "11.1.11"
+    "vue-i18n": "11.1.12"
   },
   "peerDependencies": {
     "inversify": "7.x",

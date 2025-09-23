@@ -32,7 +32,7 @@
   "dependencies": {
     "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
-    "vue-i18n": "11.1.11"
+    "vue-i18n": "11.1.12"
   },
   "peerDependencies": {
     "inversify": "7.x",

@@ -33,7 +33,7 @@
     "@changesets/cli": "2.29.7",
     "@eslint/config-helpers": "0.3.1",
     "@eslint/eslintrc": "3.3.1",
-    "@eslint/js": "9.35.0",
+    "@eslint/js": "9.36.0",
     "@microsoft/api-extractor": "7.52.13",
     "@microsoft/tsdoc": "0.15.1",
     "@microsoft/tsdoc-config": "0.17.1",

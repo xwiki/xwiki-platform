@@ -39,7 +39,7 @@
     "@blocknote/react": "0.35.0",
     "@mantine/core": "8.2.2",
     "@mantine/hooks": "8.2.2",
-    "@types/react-dom": "19.1.7",
+    "@types/react-dom": "19.1.9",
     "@xwiki/cristal-attachments-api": "workspace:*",
     "@xwiki/cristal-collaboration-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
@@ -59,7 +59,7 @@
   "devDependencies": {
     "@playwright/experimental-ct-react": "1.55.0",
     "@types/lodash-es": "4.17.12",
-    "@types/react": "19.1.9",
+    "@types/react": "19.1.13",
     "@vitejs/plugin-react": "5.0.2",
     "@xwiki/cristal-dev-config": "workspace:*",
     "postcss": "8.5.6",

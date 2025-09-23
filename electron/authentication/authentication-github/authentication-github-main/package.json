@@ -31,7 +31,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-authentication-api": "workspace:*",
-    "axios": "1.12.0",
+    "axios": "1.12.2",
     "electron-store": "10.1.0"
   },
   "peerDependencies": {

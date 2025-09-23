@@ -822,8 +822,8 @@ importers:
         specifier: workspace:*
         version: link:../../../sharedworker/api
       dexie:
-        specifier: 4.0.11
-        version: 4.0.11
+        specifier: 4.2.0
+        version: 4.2.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -7712,8 +7712,8 @@ packages:
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
-  dexie@4.0.11:
-    resolution: {integrity: sha512-SOKO002EqlvBYYKQSew3iymBoN2EQ4BDw/3yprjh7kAfFzjBYkaMNa/pZvcA7HSWlcKSQb9XhPe3wKyQ0x4A8A==}
+  dexie@4.2.0:
+    resolution: {integrity: sha512-OSeyyWOUetDy9oFWeddJgi83OnRA3hSFh3RrbltmPgqHszE9f24eUCVLI4mPg0ifsWk0lQTdnS+jyGNrPMvhDA==}
 
   diff@4.0.2:
     resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
@@ -13976,7 +13976,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  dexie@4.0.11: {}
+  dexie@4.2.0: {}
 
   diff@4.0.2: {}
 

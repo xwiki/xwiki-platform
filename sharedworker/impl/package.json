@@ -54,7 +54,7 @@
   "devDependencies": {
     "@types/sharedworker": "0.0.181",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.9.0",
+    "inversify": "7.10.0",
     "typescript": "5.9.2",
     "vite": "7.1.6",
     "vue": "3.5.21"

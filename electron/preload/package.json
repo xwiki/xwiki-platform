@@ -31,6 +31,6 @@
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "typescript": "5.9.2",
-    "vite": "7.1.5"
+    "vite": "7.1.6"
   }
 }

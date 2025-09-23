@@ -33,6 +33,6 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
     "typescript": "5.9.2",
-    "vue": "3.5.20"
+    "vue": "3.5.21"
   }
 }

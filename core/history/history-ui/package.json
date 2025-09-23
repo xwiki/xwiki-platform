@@ -50,7 +50,7 @@
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.2",
     "vite": "7.1.6",
-    "vue": "3.5.20",
+    "vue": "3.5.21",
     "vue-tsc": "2.2.12"
   },
   "publishConfig": {

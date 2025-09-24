@@ -73,7 +73,10 @@
 #set ($properties = ['logger', 'level'])
 #set ($liveDataConfig = {
   'meta': {
-    'propertyDescriptors': []
+    'propertyDescriptors': [],
+    'entryDescriptor': {
+      'idProperty': 'logger'
+    }
   }
 })
 #if ($services.security.authorization.hasAccess('programming'))

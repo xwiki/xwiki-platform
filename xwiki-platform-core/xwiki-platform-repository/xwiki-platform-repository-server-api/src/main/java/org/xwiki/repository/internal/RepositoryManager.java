@@ -586,6 +586,9 @@ public class RepositoryManager
 
         Set<String> validVersions = new HashSet<>();
 
+        // Check the versions storage mode
+        boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensionObject);
+
         // Remove unexisting versions
         List<BaseObject> versionObjects =
             extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
@@ -595,14 +598,25 @@ public class RepositoryManager
                     String version =
                         this.extensionStore.getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_VERSION);
 
-                    if (StringUtils.isBlank(version) || (this.extensionStore.isVersionProxyingEnabled(extensionDocument)
-                        && !new DefaultVersion(version).equals(extension.getId().getVersion()))) {
-                        // Empty version OR lost versions should be proxied
+                    // Remove the object if:
+                    // * versions should be stored in dedicated pages
+                    // * the version is blank
+                    // * versions should be proxied
+                    if (versionPageEnabled || StringUtils.isBlank(version)
+                        || (this.extensionStore.isVersionProxyingEnabled(extensionDocument)
+                            && !new DefaultVersion(version).equals(extension.getId().getVersion()))) {
                         extensionDocument.removeXObject(versionObject);
                         needSave = true;
+
+                        // When moving from legacy storage to dedicated version page storage, we need to migrate the
+                        // object and not just deleted it
+                        if (versionPageEnabled) {
+                            moveLegacyVersion(extensionDocument, versionObject);
+                        }
                     } else {
                         if (!extensionVersions.containsKey(new DefaultVersion(version))
                             && featureVersions.containsKey(new DefaultVersion(version))) {
+                            // Version are stored on dedicated pages
                             // The version does not exist on remote repository
                             if (!isVersionValid(extensionDocument, extension.getType(), versionObject, xcontext)) {
                                 // The version is invalid, removing it to not make the whole extension invalid
@@ -624,7 +638,7 @@ public class RepositoryManager
         // Current version is valid
         validVersions.add(extension.getId().getVersion().getValue());
 
-        // Cleanup dependencies associated to invalid versions
+        // Cleanup dependencies not associated to valid versions
         List<BaseObject> dependencyObjects =
             extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE);
         if (dependencyObjects != null) {
@@ -660,24 +674,29 @@ public class RepositoryManager
             Version version = entry.getKey();
             String id = entry.getValue();
 
-           updateVersion(id, version, extension, repository, extensionDocument);
+            updateVersion(id, version, extension, repository, extensionDocument);
         }
 
         // Save
 
         if (needSave) {
-            extensionDocument.setAuthorReference(xcontext.getUserReference());
-            if (extensionDocument.isNew()) {
-                extensionDocument.setContentAuthorReference(xcontext.getUserReference());
-                extensionDocument.setCreatorReference(xcontext.getUserReference());
-            }
-
-            xcontext.getWiki().saveDocument(extensionDocument,
-                "Imported extension [" + extensionId + "] from repository [" + repository.getDescriptor() + "]", true,
+            saveDocument(extensionDocument,
+                "Imported extension [" + extensionId + "] from repository [" + repository.getDescriptor() + "]",
                 xcontext);
         }
 
         return extensionDocument.getDocumentReference();
+    }
+
+    private void saveDocument(XWikiDocument document, String comment, XWikiContext xcontext) throws XWikiException
+    {
+        document.setAuthorReference(xcontext.getUserReference());
+        if (document.isNew()) {
+            document.setContentAuthorReference(xcontext.getUserReference());
+            document.setCreatorReference(xcontext.getUserReference());
+        }
+
+        xcontext.getWiki().saveDocument(document, comment, xcontext);
     }
 
     private boolean updateVersion(String id, Version version, Extension extension, ExtensionRepository repository,
@@ -1166,6 +1185,23 @@ public class RepositoryManager
             .anyMatch(version -> version.getValue().equals(extensionVersion));
     }
 
+    private void moveLegacyVersion(XWikiDocument extensionDocument, BaseObject versionObject) throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        // Resolve the version
+        String version = versionObject.getStringValue(XWikiRepositoryModel.PROP_VERSION_VERSION);
+
+        // Resolve the version document
+        XWikiDocument extensionVersionDocument = this.extensionStore
+            .getExtensionVersionDocument(extensionDocument, new DefaultVersion(version), xcontext).clone();
+
+        extensionVersionDocument.addXObject(versionObject.clone());
+
+        // Save if dedicated version page
+        saveDocument(extensionVersionDocument, "Migrate the extension version", xcontext);
+    }
+
     private boolean updateExtensionVersion(Extension extensionVersion, XWikiDocument extensiondocument, boolean save)
         throws XWikiException
     {
@@ -1223,8 +1259,14 @@ public class RepositoryManager
         updateExtension(extensionVersion, versionObject, xcontext);
 
         // Save if dedicated version page
-        if (save && needSave && this.extensionStore.isVersionPageEnabled(extensiondocument)) {
-            xcontext.getWiki().saveDocument(extensionVersionDocument, "Update", xcontext);
+        if (save && needSave) {
+            boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensiondocument);
+            if (versionPageEnabled) {
+                saveDocument(extensionVersionDocument, "Update", xcontext);
+
+                // Since the data are saved, there is no point saving the extension document
+                return false;
+            }
         }
 
         return needSave;

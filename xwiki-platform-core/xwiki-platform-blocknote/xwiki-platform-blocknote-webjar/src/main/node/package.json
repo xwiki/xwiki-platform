@@ -16,7 +16,7 @@
     "@xwiki/cristal-attachments-default": "0.19.0",
     "@xwiki/cristal-authentication-api": "0.19.0",
     "@xwiki/cristal-backend-api": "0.19.0",
-    "@xwiki/cristal-document-api": "0.19.0",
+    "@xwiki/cristal-document-api": "0.22.0",
     "@xwiki/cristal-dsapi": "0.19.0",
     "@xwiki/cristal-editors-blocknote-headless": "0.19.0",
     "@xwiki/cristal-editors-blocknote-react": "0.19.0",

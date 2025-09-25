@@ -43,13 +43,16 @@
 
 #set ($optionsLD = {
   'className': 'ExtensionCode.ExtensionVersionClass',
-  'location': "${locationCriteria}"
+  'location': "${locationCriteria}",
+  'translationPrefix': 'extension.repository.'
 })
 
 {{liveData
   id="versions"
   properties="version,notes"
   source="liveTable"
+  sort="version:desc"
+  limit="5"
   sourceParameters="$services.rendering.escape($escapetool.url($optionsLD), 'xwiki/2.1')"
 }}{
 "meta": {

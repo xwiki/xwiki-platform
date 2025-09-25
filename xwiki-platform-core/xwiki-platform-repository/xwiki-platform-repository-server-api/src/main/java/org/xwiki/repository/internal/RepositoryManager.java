@@ -650,7 +650,7 @@ public class RepositoryManager
 
             // Give priority to extension version in case of conflict
             if (!extensionVersions.containsKey(version)) {
-                //updateVersion(id, version, extension, repository, extensionDocument);
+                updateVersion(id, version, extension, repository, extensionDocument);
             }
         }
 
@@ -660,7 +660,7 @@ public class RepositoryManager
             Version version = entry.getKey();
             String id = entry.getValue();
 
-           // updateVersion(id, version, extension, repository, extensionDocument);
+           updateVersion(id, version, extension, repository, extensionDocument);
         }
 
         // Save

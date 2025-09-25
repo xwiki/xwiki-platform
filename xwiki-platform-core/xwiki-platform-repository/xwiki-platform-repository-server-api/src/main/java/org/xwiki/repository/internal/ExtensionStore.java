@@ -383,6 +383,7 @@ public class ExtensionStore implements Initializable, Disposable
 
     /**
      * Retrieve the extension version document for the given extension document and the given version.
+     * 
      * @param extensionDocument the document of the extension
      * @param extensionVersion the version for which to retrieve the document
      * @param xcontext the current context
@@ -398,6 +399,7 @@ public class ExtensionStore implements Initializable, Disposable
 
     /**
      * Retrieve the extension version document for the given extension document and the given version.
+     * 
      * @param extensionDocument the document of the extension
      * @param extensionVersion the version for which to retrieve the document
      * @param xcontext the current context
@@ -421,6 +423,7 @@ public class ExtensionStore implements Initializable, Disposable
 
     /**
      * Retrieve the xobject of the version for given extension.
+     * 
      * @param extensionVersionDocument the document that might contain the version object
      * @param extensionVersion the version for which to retrieve the object
      * @param create {@code true} to create the object if it doesn't exist
@@ -448,6 +451,7 @@ public class ExtensionStore implements Initializable, Disposable
 
     /**
      * Retrieve the xobject of the version from the given document.
+     * 
      * @param document the document where to retrieve the version object.
      * @param version the version for which to retrieve the object
      * @return the version object or {@code null} if it doesn't exist and shouldn't be created
@@ -460,6 +464,7 @@ public class ExtensionStore implements Initializable, Disposable
 
     /**
      * Retrieve the xobject of the version from the given document.
+     * 
      * @param document the document where to retrieve the version object.
      * @param version the version for which to retrieve the object
      * @return the version object or {@code null} if it doesn't exist and shouldn't be created
@@ -527,6 +532,25 @@ public class ExtensionStore implements Initializable, Disposable
 
         return cachedDocumentReference[0] != null ? xcontext.getWiki().getDocument(cachedDocumentReference[0], xcontext)
             : null;
+    }
+
+    public String getLastVersion(String extensionId) throws QueryException
+    {
+        Query query =
+            this.queryManager.createQuery("select version.version, version.index from Document doc, doc.object("
+                + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME
+                + ") as version where version.id = :extensionId order by version.index desc", Query.XWQL);
+
+        query.bindValue("extensionId", extensionId);
+        query.setLimit(0);
+
+        List<Object[]> results = query.execute();
+
+        if (results.isEmpty()) {
+            return null;
+        }
+
+        return (String) results.get(0)[0];
     }
 
     public BaseObject getExtensionObject(XWikiDocument extensionDocument)

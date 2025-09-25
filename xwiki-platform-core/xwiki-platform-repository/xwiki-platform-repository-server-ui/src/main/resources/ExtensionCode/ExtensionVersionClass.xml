@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="ExtensionCode.ExtensionVersionClass" locale="">
+<xwikidoc version="1.6" reference="ExtensionCode.ExtensionVersionClass" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionVersionClass</name>
   <language/>
@@ -149,6 +149,7 @@
       <number>2</number>
       <picker>0</picker>
       <prettyName>Download URL</prettyName>
+      <restricted>0</restricted>
       <rows>1</rows>
       <size>100</size>
       <unmodifiable>0</unmodifiable>
@@ -159,9 +160,12 @@
     <features>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>input</displayType>
+      <freeText/>
       <hint/>
+      <largeStorage>0</largeStorage>
       <multiSelect>1</multiSelect>
       <name>features</name>
       <number>5</number>
@@ -192,6 +196,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </id>
+    <index>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint/>
+      <name>index</name>
+      <number>20</number>
+      <numberType>long</numberType>
+      <prettyName>index</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+    </index>
     <licenseName>
       <cache>0</cache>
       <customDisplay/>
@@ -241,6 +259,7 @@
       <number>1</number>
       <picker>0</picker>
       <prettyName>Release Notes</prettyName>
+      <restricted>0</restricted>
       <rows>15</rows>
       <size>75</size>
       <unmodifiable>0</unmodifiable>
@@ -276,9 +295,12 @@
     <repositories>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>input</displayType>
+      <freeText/>
       <hint/>
+      <largeStorage>0</largeStorage>
       <multiSelect>1</multiSelect>
       <name>repositories</name>
       <number>6</number>
@@ -495,10 +517,10 @@
         <number>1</number>
         <picker>1</picker>
         <prettyName>Sheet</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>

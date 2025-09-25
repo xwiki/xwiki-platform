@@ -657,24 +657,23 @@ public class RepositoryManager
         }
 
         // Update features versions
-
+        long index = 0;
         for (Map.Entry<Version, String> entry : featureVersions.entrySet()) {
             Version version = entry.getKey();
             String id = entry.getValue();
 
             // Give priority to extension version in case of conflict
             if (!extensionVersions.containsKey(version)) {
-                updateVersion(id, version, extension, repository, extensionDocument);
+                updateVersion(id, version, extension, repository, index++, extensionDocument);
             }
         }
 
         // Update extension versions
-
         for (Map.Entry<Version, String> entry : extensionVersions.entrySet()) {
             Version version = entry.getKey();
             String id = entry.getValue();
 
-            updateVersion(id, version, extension, repository, extensionDocument);
+            updateVersion(id, version, extension, repository, index++, extensionDocument);
         }
 
         // Save
@@ -700,7 +699,7 @@ public class RepositoryManager
     }
 
     private boolean updateVersion(String id, Version version, Extension extension, ExtensionRepository repository,
-        XWikiDocument extensionDocument)
+        long index, XWikiDocument extensionDocument)
     {
         try {
             Extension versionExtension;
@@ -713,7 +712,7 @@ public class RepositoryManager
             }
 
             // Update version related informations
-            return updateExtensionVersion(versionExtension, extensionDocument, true);
+            return updateExtensionVersion(versionExtension, extensionDocument, index, true);
         } catch (Exception e) {
             this.logger.error("Failed to resolve extension with id [" + id + "] and version [" + version
                 + "] on repository [" + repository + "]", e);
@@ -773,7 +772,7 @@ public class RepositoryManager
             // FIXME: find a more elegant solution
             try {
                 XWikiDocument extensionDocumentClone = extensionDocument.clone();
-                updateExtensionVersion(extension, extensionDocumentClone, false);
+                updateExtensionVersion(extension, extensionDocumentClone, 0, false);
                 extensionVersionObject = extensionDocumentClone
                     .getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, "version", version, false);
             } catch (XWikiException e) {
@@ -1202,8 +1201,8 @@ public class RepositoryManager
         saveDocument(extensionVersionDocument, "Migrate the extension version", xcontext);
     }
 
-    private boolean updateExtensionVersion(Extension extensionVersion, XWikiDocument extensiondocument, boolean save)
-        throws XWikiException
+    private boolean updateExtensionVersion(Extension extensionVersion, XWikiDocument extensiondocument,
+     long index, boolean save) throws XWikiException
     {
         boolean needSave = false;
 
@@ -1256,7 +1255,10 @@ public class RepositoryManager
         }
 
         // Common properties
-        updateExtension(extensionVersion, versionObject, xcontext);
+        needSave |= updateExtension(extensionVersion, versionObject, xcontext);
+
+        // index
+        needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_INDEX, index);
 
         // Save if dedicated version page
         if (save && needSave) {

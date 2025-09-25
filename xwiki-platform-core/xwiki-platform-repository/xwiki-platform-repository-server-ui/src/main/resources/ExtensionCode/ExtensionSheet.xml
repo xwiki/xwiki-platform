@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="ExtensionCode.ExtensionSheet" locale="">
+<xwikidoc version="1.6" reference="ExtensionCode.ExtensionSheet" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionSheet</name>
   <language/>
@@ -304,22 +304,29 @@
 
     ## Only display release notes if there are downloads and release notes
     #if ($lastVersionObject)
-      #set ($releaseNotes = [])
-      #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
-      #foreach ($versionObject in $versions)
-        #set ($notes = $!{versionObject.display('notes', 'read')})
-        #set ($version = $!{versionObject.getProperty('version').value})
-        #if ("$!notes" != '' &amp;&amp; "$!version" != '')
-          #set ($discard = $releaseNotes.add([$version, $notes]))
+      #if ($doc.getValue('versionPage') == 1)
+        #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
+        = Versions =
+        
+        {{include page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+      #else
+        #set ($releaseNotes = [])
+        #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
+        #foreach ($versionObject in $versions)
+          #set ($notes = $!{versionObject.display('notes', 'read')})
+          #set ($version = $!{versionObject.getProperty('version').value})
+          #if ("$!notes" != '' &amp;&amp; "$!version" != '')
+            #set ($discard = $releaseNotes.add([$version, $notes]))
+          #end
         #end
-      #end
-      ## Reverse the list to have latest versions first
-      #set ($discard = $collectiontool.reverseModifiable($releaseNotes))
-      #if (!$releaseNotes.isEmpty())
-        = Release Notes =
-        #foreach ($entry in $releaseNotes)
-          == v$services.rendering.escape($entry.get(0), 'xwiki/2.1') ==
-          $entry.get(1)
+        ## Reverse the list to have latest versions first
+        #set ($discard = $collectiontool.reverseModifiable($releaseNotes))
+        #if (!$releaseNotes.isEmpty())
+          = Release Notes =
+          #foreach ($entry in $releaseNotes)
+            == v$services.rendering.escape($entry.get(0), 'xwiki/2.1') ==
+            $entry.get(1)
+          #end
         #end
       #end
 
@@ -405,8 +412,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -426,6 +436,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -435,6 +446,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -470,6 +483,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -545,8 +560,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -566,6 +584,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -575,6 +594,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -610,6 +631,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

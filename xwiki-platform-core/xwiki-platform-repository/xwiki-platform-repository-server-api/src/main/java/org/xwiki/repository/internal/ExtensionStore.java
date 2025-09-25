@@ -84,6 +84,7 @@ import com.xpn.xwiki.objects.NumberProperty;
  */
 @Component(roles = ExtensionStore.class)
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class ExtensionStore implements Initializable, Disposable
 {
     /**
@@ -380,12 +381,30 @@ public class ExtensionStore implements Initializable, Disposable
         return extensionSupporterDocument.getXObject(XWikiRepositoryModel.EXTENSIONSUPPORTER_CLASSREFERENCE);
     }
 
+    /**
+     * Retrieve the extension version document for the given extension document and the given version.
+     * @param extensionDocument the document of the extension
+     * @param extensionVersion the version for which to retrieve the document
+     * @param xcontext the current context
+     * @return the version document or the given extension document
+     * @throws XWikiException in case of problem for loading the document
+     * @since 17.9.0RC1
+     */
     public XWikiDocument getExtensionVersionDocument(XWikiDocument extensionDocument, Version extensionVersion,
         XWikiContext xcontext) throws XWikiException
     {
         return getExtensionVersionDocument(extensionDocument, extensionVersion.getValue(), xcontext);
     }
 
+    /**
+     * Retrieve the extension version document for the given extension document and the given version.
+     * @param extensionDocument the document of the extension
+     * @param extensionVersion the version for which to retrieve the document
+     * @param xcontext the current context
+     * @return the version document or the given extension document
+     * @throws XWikiException in case of problem for loading the document
+     * @since 17.9.0RC1
+     */
     public XWikiDocument getExtensionVersionDocument(XWikiDocument extensionDocument, String extensionVersion,
         XWikiContext xcontext) throws XWikiException
     {
@@ -400,6 +419,16 @@ public class ExtensionStore implements Initializable, Disposable
         return extensionDocument;
     }
 
+    /**
+     * Retrieve the xobject of the version for given extension.
+     * @param extensionVersionDocument the document that might contain the version object
+     * @param extensionVersion the version for which to retrieve the object
+     * @param create {@code true} to create the object if it doesn't exist
+     * @param xcontext the current context
+     * @return the version object or {@code null} if it doesn't exist and shouldn't be created
+     * @throws XWikiException in case of problem for loading the document
+     * @since 17.9.0RC1
+     */
     public BaseObject getExtensionVersionObject(XWikiDocument extensionVersionDocument, Extension extensionVersion,
         boolean create, XWikiContext xcontext) throws XWikiException
     {
@@ -417,11 +446,25 @@ public class ExtensionStore implements Initializable, Disposable
         return versionObject;
     }
 
+    /**
+     * Retrieve the xobject of the version from the given document.
+     * @param document the document where to retrieve the version object.
+     * @param version the version for which to retrieve the object
+     * @return the version object or {@code null} if it doesn't exist and shouldn't be created
+     * @since 17.9.0RC1
+     */
     public BaseObject getExtensionVersionObject(XWikiDocument document, String version)
     {
         return getExtensionVersionObject(document, new DefaultVersion(version));
     }
 
+    /**
+     * Retrieve the xobject of the version from the given document.
+     * @param document the document where to retrieve the version object.
+     * @param version the version for which to retrieve the object
+     * @return the version object or {@code null} if it doesn't exist and shouldn't be created
+     * @since 17.9.0RC1
+     */
     public BaseObject getExtensionVersionObject(XWikiDocument document, Version version)
     {
         List<BaseObject> objects = document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);

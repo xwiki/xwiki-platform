@@ -22,28 +22,56 @@ package org.xwiki.repository.internal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.DefaultExtensionSupportPlan;
 import org.xwiki.extension.DefaultExtensionSupportPlans;
 import org.xwiki.extension.DefaultExtensionSupporter;
+import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionSupportPlan;
 import org.xwiki.extension.ExtensionSupportPlans;
 import org.xwiki.extension.ExtensionSupporter;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.version.internal.DefaultVersion;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.PageReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.NumberProperty;
@@ -56,13 +84,93 @@ import com.xpn.xwiki.objects.NumberProperty;
  */
 @Component(roles = ExtensionStore.class)
 @Singleton
-public class ExtensionStore
+public class ExtensionStore implements Initializable, Disposable
 {
+    /**
+     * The reference to match property {@link XWikiRepositoryModel#PROP_EXTENSION_ID} of class
+     * {@link XWikiRepositoryModel#EXTENSION_CLASSNAME} on whatever wiki.
+     */
+    private static final EntityReference EXTENSIONID_PROPERTY_REFERENCE =
+        new EntityReference(XWikiRepositoryModel.PROP_EXTENSION_ID, EntityType.OBJECT_PROPERTY,
+            XWikiRepositoryModel.EXTENSION_OBJECTREFERENCE);
+
+    private static final List<Event> EVENTS =
+        Arrays.<Event>asList(new XObjectPropertyAddedEvent(EXTENSIONID_PROPERTY_REFERENCE),
+            new XObjectPropertyDeletedEvent(EXTENSIONID_PROPERTY_REFERENCE),
+            new XObjectPropertyUpdatedEvent(EXTENSIONID_PROPERTY_REFERENCE));
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
+    private CacheManager cacheManager;
+
+    @Inject
+    private QueryManager queryManager;
+
+    @Inject
+    private ObservationManager observation;
+
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> currentStringResolver;
+
+    /**
+     * Link extension id to document reference. The tabe contains null if the id link to no extension.
+     */
+    private Cache<DocumentReference[]> documentReferenceCache;
+
+    @Inject
     private Logger logger;
+
+    private EventListener listener = new EventListener()
+    {
+        @Override
+        public void onEvent(Event event, Object source, Object data)
+        {
+            // TODO: Improve a bit by removing only what's changed
+            documentReferenceCache.removeAll();
+        }
+
+        @Override
+        public String getName()
+        {
+            return "repository.DefaultRepositoryManager";
+        }
+
+        @Override
+        public List<Event> getEvents()
+        {
+            return EVENTS;
+        }
+    };
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // Init cache
+        CacheConfiguration cacheConfiguration = new CacheConfiguration();
+        cacheConfiguration.setConfigurationId("repository.extensionid.documentreference");
+        LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+        lru.setMaxEntries(10000);
+        cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
+        try {
+            this.documentReferenceCache = this.cacheManager.createNewCache(cacheConfiguration);
+        } catch (CacheException e) {
+            throw new InitializationException("Failed to initialize cache", e);
+        }
+
+        // Listen to modifications
+        this.observation.addListener(listener, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        this.observation.removeListener(listener.getName());
+        this.documentReferenceCache.dispose();
+    }
 
     /**
      * @param <T> the expected type of the value to return
@@ -272,4 +380,131 @@ public class ExtensionStore
         return extensionSupporterDocument.getXObject(XWikiRepositoryModel.EXTENSIONSUPPORTER_CLASSREFERENCE);
     }
 
+    public XWikiDocument getExtensionVersionDocument(XWikiDocument extensionDocument, String extensionVersion,
+        XWikiContext xcontext) throws XWikiException
+    {
+        if (isVersionPageEnabled(extensionDocument)) {
+            return xcontext.getWiki()
+                .getDocument(new PageReference(extensionVersion, extensionDocument.getPageReference()), xcontext);
+        }
+
+        return extensionDocument;
+    }
+
+    public BaseObject getExtensionVersionObject(XWikiDocument extensionVersionDocument, Extension extensionVersion,
+        boolean create, XWikiContext xcontext) throws XWikiException
+    {
+        // Update version object
+        BaseObject versionObject =
+            getExtensionVersionObject(extensionVersionDocument, extensionVersion.getId().getVersion());
+        if (versionObject == null && create) {
+            versionObject =
+                extensionVersionDocument.newXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, xcontext);
+
+            versionObject.set(XWikiRepositoryModel.PROP_VERSION_VERSION,
+                extensionVersion.getId().getVersion().getValue(), xcontext);
+        }
+
+        return versionObject;
+    }
+
+    public BaseObject getExtensionVersionObject(XWikiDocument document, Version version)
+    {
+        List<BaseObject> objects = document.getXObjects(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE);
+        if (objects != null) {
+            for (BaseObject versionObject : objects) {
+                if (versionObject != null) {
+                    String versionString =
+                        getValue(versionObject, XWikiRepositoryModel.PROP_VERSION_VERSION, (String) null);
+
+                    if (StringUtils.isNotEmpty(versionString) && version.equals(new DefaultVersion(versionString))) {
+                        return versionObject;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @since 42
+     */
+    public boolean isVersionProxyingEnabled(XWikiDocument extensionDocument)
+    {
+        BaseObject extensionProxyObject =
+            extensionDocument.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
+        if (extensionProxyObject == null) {
+            return false;
+        }
+
+        return XWikiRepositoryModel.PROP_PROXY_PROXYLEVEL_VALUE_VERSION
+            .equals(getValue(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_PROXYLEVEL, (String) null));
+    }
+
+    public XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        DocumentReference[] cachedDocumentReference = this.documentReferenceCache.get(extensionId);
+
+        if (cachedDocumentReference == null) {
+            Query query = this.queryManager.createQuery(
+                "select doc.fullName from Document doc, doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME
+                    + ") as extension where extension." + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :extensionId",
+                Query.XWQL);
+
+            query.bindValue("extensionId", extensionId);
+
+            List<String> documentNames = query.execute();
+
+            if (!documentNames.isEmpty()) {
+                cachedDocumentReference =
+                    new DocumentReference[] {this.currentStringResolver.resolve(documentNames.get(0))};
+            } else {
+                cachedDocumentReference = new DocumentReference[1];
+            }
+
+            this.documentReferenceCache.set(extensionId, cachedDocumentReference);
+        }
+
+        return cachedDocumentReference[0] != null ? xcontext.getWiki().getDocument(cachedDocumentReference[0], xcontext)
+            : null;
+    }
+
+    public BaseObject getExtensionObject(XWikiDocument extensionDocument)
+    {
+        return extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+    }
+
+    public boolean isVersionPageEnabled(String extensionId) throws QueryException, XWikiException
+    {
+        XWikiDocument document = getExistingExtensionDocumentById(extensionId);
+
+        return isVersionPageEnabled(document);
+    }
+
+    public boolean isVersionPageEnabled(XWikiDocument extensionDocument)
+    {
+        BaseObject extensionObject = getExtensionObject(extensionDocument);
+
+        return isVersionPageEnabled(extensionObject);
+    }
+
+    /**
+     * @param extensionOject
+     * @return
+     * @since 42
+     */
+    public boolean isVersionPageEnabled(BaseObject extensionOject)
+    {
+        return getBooleanValue(extensionOject, XWikiRepositoryModel.PROP_EXTENSION_VERSIONPAGE, false);
+    }
+
+    public XWikiDocument getDocument(String fullName) throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.getWiki().getDocument(this.currentStringResolver.resolve(fullName), xcontext);
+    }
 }

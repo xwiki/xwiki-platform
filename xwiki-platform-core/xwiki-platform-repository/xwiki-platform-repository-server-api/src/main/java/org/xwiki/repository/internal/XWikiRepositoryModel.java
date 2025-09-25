@@ -187,6 +187,11 @@ public class XWikiRepositoryModel
 
     public static final String PROP_EXTENSION_PROPERTIES = "properties";
 
+    /**
+     * @since 42
+     */
+    public static final String PROP_EXTENSION_VERSIONPAGE = "versionPage";
+
     public static final String PROP_VERSION_ID = "id";
 
     public static final String PROP_VERSION_VERSION = "version";

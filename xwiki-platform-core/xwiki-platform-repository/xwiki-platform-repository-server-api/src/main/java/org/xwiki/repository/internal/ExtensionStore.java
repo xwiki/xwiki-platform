@@ -380,12 +380,21 @@ public class ExtensionStore implements Initializable, Disposable
         return extensionSupporterDocument.getXObject(XWikiRepositoryModel.EXTENSIONSUPPORTER_CLASSREFERENCE);
     }
 
+    public XWikiDocument getExtensionVersionDocument(XWikiDocument extensionDocument, Version extensionVersion,
+        XWikiContext xcontext) throws XWikiException
+    {
+        return getExtensionVersionDocument(extensionDocument, extensionVersion.getValue(), xcontext);
+    }
+
     public XWikiDocument getExtensionVersionDocument(XWikiDocument extensionDocument, String extensionVersion,
         XWikiContext xcontext) throws XWikiException
     {
         if (isVersionPageEnabled(extensionDocument)) {
             return xcontext.getWiki()
-                .getDocument(new PageReference(extensionVersion, extensionDocument.getPageReference()), xcontext);
+                .getDocument(
+                    new PageReference(extensionVersion, new PageReference(
+                        XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME, extensionDocument.getPageReference())),
+                    xcontext);
         }
 
         return extensionDocument;
@@ -406,6 +415,11 @@ public class ExtensionStore implements Initializable, Disposable
         }
 
         return versionObject;
+    }
+
+    public BaseObject getExtensionVersionObject(XWikiDocument document, String version)
+    {
+        return getExtensionVersionObject(document, new DefaultVersion(version));
     }
 
     public BaseObject getExtensionVersionObject(XWikiDocument document, Version version)
@@ -477,6 +491,9 @@ public class ExtensionStore implements Initializable, Disposable
         return extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
     }
 
+    /**
+     * @since 42
+     */
     public boolean isVersionPageEnabled(String extensionId) throws QueryException, XWikiException
     {
         XWikiDocument document = getExistingExtensionDocumentById(extensionId);
@@ -484,6 +501,9 @@ public class ExtensionStore implements Initializable, Disposable
         return isVersionPageEnabled(document);
     }
 
+    /**
+     * @since 42
+     */
     public boolean isVersionPageEnabled(XWikiDocument extensionDocument)
     {
         BaseObject extensionObject = getExtensionObject(extensionDocument);
@@ -492,8 +512,6 @@ public class ExtensionStore implements Initializable, Disposable
     }
 
     /**
-     * @param extensionOject
-     * @return
      * @since 42
      */
     public boolean isVersionPageEnabled(BaseObject extensionOject)
@@ -501,6 +519,23 @@ public class ExtensionStore implements Initializable, Disposable
         return getBooleanValue(extensionOject, XWikiRepositoryModel.PROP_EXTENSION_VERSIONPAGE, false);
     }
 
+    /**
+     * @since 42
+     */
+    public boolean setVersionPageEnabled(BaseObject extensionOject)
+    {
+        if (!isVersionPageEnabled(extensionOject)) {
+            extensionOject.setIntValue(XWikiRepositoryModel.PROP_EXTENSION_VERSIONPAGE, 1);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @since 42
+     */
     public XWikiDocument getDocument(String fullName) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();

@@ -51,6 +51,11 @@ public class XWikiRepositoryModel
      */
     public static final String EXTENSION_SPACENAME = "ExtensionCode";
 
+    /**
+     * @since 42
+     */
+    public static final String EXTENSIONVERSIONS_SPACENAME = "Versions";
+
     public static final String EXTENSION_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionClass";
 
     public static final String AVERAGERATING_CLASSNAME = "XWiki.AverageRatingsClass";

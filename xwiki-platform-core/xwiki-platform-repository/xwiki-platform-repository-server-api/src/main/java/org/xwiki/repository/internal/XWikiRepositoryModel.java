@@ -199,6 +199,11 @@ public class XWikiRepositoryModel
     public static final String PROP_VERSION_FEATURES = "features";
 
     /**
+     * @since 17.9.0RC1
+     */
+    public static final String PROP_VERSION_INDEX = "index";
+
+    /**
      * @since 7.3M1
      */
     public static final String PROP_VERSION_REPOSITORIES = "repositories";

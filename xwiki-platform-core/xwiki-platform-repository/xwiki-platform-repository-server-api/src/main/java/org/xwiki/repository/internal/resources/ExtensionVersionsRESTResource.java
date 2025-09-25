@@ -62,7 +62,9 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
         @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
         @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges) throws QueryException, InvalidVersionRangeException
     {
-        Query query = createExtensionsSummariesQuery(null, "extension.id = :extensionId", 0, -1, true);
+        boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensionId);
+        Query query =
+            createExtensionsSummariesQuery(null, "extensionVersion.id = :extensionId", 0, -1, true, versionPageEnabled);
 
         query.bindValue("extensionId", extensionId);
 
@@ -85,29 +87,6 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
                 }
             }
         }
-
-        // Order by version
-        final Map<String, Version> versionCache = new HashMap<>();
-        Collections.sort(extensions.getExtensionVersionSummaries(), new Comparator<ExtensionVersionSummary>()
-        {
-            @Override
-            public int compare(ExtensionVersionSummary o1, ExtensionVersionSummary o2)
-            {
-                return toVersion(o1.getVersion()).compareTo(toVersion(o2.getVersion()));
-            }
-
-            private Version toVersion(String versionString)
-            {
-                Version version = versionCache.get(versionString);
-
-                if (version == null) {
-                    version = extensionFactory.getVersion(versionString);
-                    versionCache.put(versionString, version);
-                }
-
-                return version;
-            }
-        });
 
         extensions.setTotalHits(extensions.getExtensionVersionSummaries().size());
         extensions.setOffset(offset);

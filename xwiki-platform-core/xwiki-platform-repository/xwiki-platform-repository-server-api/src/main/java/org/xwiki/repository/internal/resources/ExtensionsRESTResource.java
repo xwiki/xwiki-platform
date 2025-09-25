@@ -59,7 +59,7 @@ public class ExtensionsRESTResource extends AbstractExtensionRESTResource
 
         extensions.setOffset(offset);
 
-        Query query = createExtensionsSummariesQuery(null, null, offset, number, false);
+        Query query = createExtensionsSummariesQuery(null, null, offset, number, false, false);
 
         getExtensionSummaries(extensions.getExtensionSummaries(), query);
 

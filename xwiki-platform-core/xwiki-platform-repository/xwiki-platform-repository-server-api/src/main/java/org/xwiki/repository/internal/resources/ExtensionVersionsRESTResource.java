@@ -21,12 +21,8 @@
 package org.xwiki.repository.internal.resources;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Named;
 import javax.ws.rs.DefaultValue;
@@ -40,12 +36,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersions;
 import org.xwiki.extension.version.InvalidVersionRangeException;
-import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.repository.Resources;
+
+import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
@@ -60,7 +57,8 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
     public ExtensionVersions getExtensionVersions(@PathParam("extensionId") String extensionId,
         @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") int offset,
         @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
-        @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges) throws QueryException, InvalidVersionRangeException
+        @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges)
+        throws QueryException, InvalidVersionRangeException, XWikiException
     {
         boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensionId);
         Query query =

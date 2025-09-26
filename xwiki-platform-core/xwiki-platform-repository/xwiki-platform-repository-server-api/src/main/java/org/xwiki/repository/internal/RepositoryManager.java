@@ -74,6 +74,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -83,6 +84,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.repository.internal.reference.ExtensionResourceReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -1298,17 +1300,36 @@ public class RepositoryManager
         needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_INDEX, index);
 
         // Save if dedicated version page
-        if (save && needSave) {
-            boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensiondocument);
-            if (versionPageEnabled) {
-                saveDocument(extensionVersionDocument, "Update", xcontext);
+        if (save) {
+            // Make sure the Versions home page exist
+            updateVersionHome(extensiondocument, xcontext);
 
-                // Since the data are saved, there is no point saving the extension document
-                return false;
+            if (needSave) {
+                boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensiondocument);
+                if (versionPageEnabled) {
+                    // Save the version
+                    saveDocument(extensionVersionDocument, "Update", xcontext);
+
+                    // Since the data are saved, there is no point saving the extension document
+                    return false;
+                }
             }
         }
 
         return needSave;
+    }
+
+    private void updateVersionHome(XWikiDocument extensiondocument, XWikiContext xcontext) throws XWikiException
+    {
+        PageReference versionsReference = new PageReference("Versions", extensiondocument.getPageReference());
+
+        if (!xcontext.getWiki().exists(versionsReference, xcontext)) {
+            XWikiDocument versionsDocument = xcontext.getWiki().getDocument(versionsReference, xcontext);
+
+            versionsDocument.setContent("{{include reference=\"ExtensionCode.VersionsHome\"/}}", Syntax.XWIKI_2_1);
+
+            xcontext.getWiki().saveDocument(versionsDocument, xcontext);
+        }
     }
 
     private String getDownloadURL(Extension extension)
@@ -1354,8 +1375,10 @@ public class RepositoryManager
     protected boolean update(BaseObject object, String fieldName, Object value) throws XWikiException
     {
         // Make sure collection are lists
-        if (value instanceof List list) {
-            value = new ArrayList<>(list);
+        if (value instanceof Collection) {
+            if (!(value instanceof List)) {
+                value = new ArrayList<>((Collection) value);
+            }
         }
 
         if (ObjectUtils.notEqual(value, this.extensionStore.getValue(object, fieldName))) {

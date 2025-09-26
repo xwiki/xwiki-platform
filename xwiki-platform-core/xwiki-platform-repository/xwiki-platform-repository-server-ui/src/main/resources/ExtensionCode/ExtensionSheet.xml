@@ -176,7 +176,7 @@
         ##------- Download button ------
         #set($lastVersion = $doc.getValue("lastVersion"))
         #if ("$!lastVersion" != '')
-          #set ($lastVersionObject = $doc.getObject("ExtensionCode.ExtensionVersionClass", 'version', $lastVersion))
+          #set ($lastVersionObject = $services.repository.getVersionObject($extension.getProperty('id').value, $lastVersion))
           #set ($version = $lastVersionObject.getProperty('version').value)
           #set ($download = $lastVersionObject.getProperty("download").value)
           #if ("$!download" == '')

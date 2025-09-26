@@ -303,49 +303,47 @@
     #end
 
     ## Only display release notes if there are downloads and release notes
-    #if ($lastVersionObject)
-      #if ($doc.getValue('versionPage') == 1)
-        #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
-        = Versions =
-        
-        {{include page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
-      #else
-        #set ($releaseNotes = [])
-        #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
-        #foreach ($versionObject in $versions)
-          #set ($notes = $!{versionObject.display('notes', 'read')})
-          #set ($version = $!{versionObject.getProperty('version').value})
-          #if ("$!notes" != '' &amp;&amp; "$!version" != '')
-            #set ($discard = $releaseNotes.add([$version, $notes]))
-          #end
-        #end
-        ## Reverse the list to have latest versions first
-        #set ($discard = $collectiontool.reverseModifiable($releaseNotes))
-        #if (!$releaseNotes.isEmpty())
-          = Release Notes =
-          #foreach ($entry in $releaseNotes)
-            == v$services.rendering.escape($entry.get(0), 'xwiki/2.1') ==
-            $entry.get(1)
-          #end
+    #if ($doc.getValue('versionPage') == 1)
+      #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
+      = Versions =
+
+      {{include page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+    #elseif ($lastVersionObject)
+      #set ($releaseNotes = [])
+      #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
+      #foreach ($versionObject in $versions)
+        #set ($notes = $!{versionObject.display('notes', 'read')})
+        #set ($version = $!{versionObject.getProperty('version').value})
+        #if ("$!notes" != '' &amp;&amp; "$!version" != '')
+          #set ($discard = $releaseNotes.add([$version, $notes]))
         #end
       #end
+      ## Reverse the list to have latest versions first
+      #set ($discard = $collectiontool.reverseModifiable($releaseNotes))
+      #if (!$releaseNotes.isEmpty())
+        = Release Notes =
+        #foreach ($entry in $releaseNotes)
+          == v$services.rendering.escape($entry.get(0), 'xwiki/2.1') ==
+          $entry.get(1)
+        #end
+      #end
+    #end
 
-      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
-      #if ($extensionDependencies.size() &gt; 0)
-        = Dependencies =
+    #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
+    #if ($extensionDependencies.size() &gt; 0)
+      = Dependencies =
 
-         Dependencies for this extension ($services.rendering.escape("${extension.getValue('id')} ${doc.getValue('lastVersion')}", 'xwiki/2.1')):
-         #foreach($extensionDependency in $extensionDependencies)
-          #set($dependencyDocumentName = $null)
-          #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
-          #if (!$dependencyDocumentNames.isEmpty())
-            #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
-          #end
-          #if ($dependencyDocumentName)
-            * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
-          #else
-            * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
-          #end
+       Dependencies for this extension ($services.rendering.escape("${extension.getValue('id')} ${doc.getValue('lastVersion')}", 'xwiki/2.1')):
+       #foreach($extensionDependency in $extensionDependencies)
+        #set($dependencyDocumentName = $null)
+        #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
+        #if (!$dependencyDocumentNames.isEmpty())
+          #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
+        #end
+        #if ($dependencyDocumentName)
+          * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
+        #else
+          * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
         #end
       #end
     #end

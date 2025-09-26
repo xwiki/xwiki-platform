@@ -539,10 +539,11 @@ public class ExtensionStore implements Initializable, Disposable
         Query query =
             this.queryManager.createQuery("select version.version, version.index from Document doc, doc.object("
                 + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME
-                + ") as version where version.id = :extensionId order by version.index desc", Query.XWQL);
+                + ") as version where version.id = :extensionId and version.index is not null "
+                + "order by version.index desc", Query.XWQL);
 
         query.bindValue("extensionId", extensionId);
-        query.setLimit(0);
+        query.setLimit(1);
 
         List<Object[]> results = query.execute();
 

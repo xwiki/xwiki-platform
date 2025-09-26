@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.ExtensionVersionSheet" locale="">
+<xwikidoc version="1.6" reference="ExtensionCode.ExtensionVersionSheet" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionVersionSheet</name>
   <language/>
@@ -53,6 +53,13 @@
 
 {{velocity}}
 #if ($extensionVersion &amp;&amp; !$extension)
+  #set($type = $extensionVersion.getProperty('type').value)
+  #set ($extensionTypeDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionTypeClass) as type where type.id = :id').bindValue("id", $type).execute())
+  #if ($extensionTypeDocumentNames.size() &gt; 0)
+    #set ($extensionTypeDocumentName = $extensionTypeDocumentNames.get(0))
+    #set($extensionTypeObject = $xwiki.getDocument($extensionTypeDocumentName).getObject("ExtensionCode.ExtensionTypeClass"))
+  #end
+  
   $doc.use("ExtensionCode.ExtensionVersionClass")
   ##------- Back button ----------------
   [[$services.icon.render('left')  Extension page&gt;&gt;$services.model.serialize($doc.getDocumentReference().getParent().getParent().getParent())||class="btn btn-primary"]]##
@@ -67,7 +74,7 @@
     {{box cssClass="floatinginfobox col-xs-12 col-sm-6 pull-right"}}
       (% class="extensionInfo" %)
       ##------- Type --------------
-      #set($typeDisplay = $extensionVersion.getProperty('type').value)
+      #set($typeDisplay = $extensionTypeObject.getProperty('name').value)
       #if ("$!typeDisplay" == '')
         #set($typeDisplay = $type)
       #end
@@ -185,15 +192,6 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <defaultEditMode>
-        <disabled>0</disabled>
-        <name>defaultEditMode</name>
-        <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
     </class>
     <property>
       <defaultEditMode/>

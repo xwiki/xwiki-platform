@@ -1328,7 +1328,7 @@ public class RepositoryManager
 
             versionsDocument.setContent("{{include reference=\"ExtensionCode.VersionsHome\"/}}", Syntax.XWIKI_2_1);
 
-            xcontext.getWiki().saveDocument(versionsDocument, xcontext);
+            saveDocument(versionsDocument, "", xcontext);
         }
     }
 

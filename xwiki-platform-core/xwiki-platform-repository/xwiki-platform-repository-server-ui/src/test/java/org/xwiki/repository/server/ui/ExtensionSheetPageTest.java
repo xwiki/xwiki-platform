@@ -50,6 +50,7 @@ import org.xwiki.rendering.internal.macro.toc.DefaultTocTreeBuilderFactory;
 import org.xwiki.rendering.internal.macro.toc.TocMacro;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.repository.script.RepositoryScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -58,6 +59,7 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
+import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -94,7 +96,7 @@ import static org.mockito.Mockito.when;
     LoggingScriptService.class,
     PermissionCheckerListener.class,
     TestNoScriptMacro.class,
-    TocMacro.class,
+    TocMacro.class
 })
 class ExtensionSheetPageTest extends PageTest
 {
@@ -189,6 +191,13 @@ class ExtensionSheetPageTest extends PageTest
         // Mock restricted contexts.
         when(this.groovyMacroPermissionPolicy.hasPermission(any(), any())).thenAnswer(i ->
             !((MacroTransformationContext) i.getArgument(1)).getTransformationContext().isRestricted());
+
+        // Mock repository script service
+        RepositoryScriptService repositoryScriptService =
+            this.componentManager.registerMockComponent(ScriptService.class, "repository",
+                RepositoryScriptService.class, false);
+        when(repositoryScriptService.getVersionObject(any(), any())).thenReturn(new Object(extensionVersionObject,
+            null));
     }
 
     @Test

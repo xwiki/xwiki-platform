@@ -795,7 +795,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify that the remote change (which included a macro parameter update) didn't steal the focus.
         secondMacroEditModal.getMacroParameterInput("cssClass").sendKeys("a");
         secondMacroEditModal.clickSubmit();
-        secondTextArea.waitForContentRefresh();
+        // The content is refreshed 3 times: after the macro is inserted, after the macro is updated from the first tab
+        // and after the macro is updated from the second tab.
+        secondTextArea.waitForContentRefresh("3");
 
         // Move to the information box title field and type something.
         secondTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);

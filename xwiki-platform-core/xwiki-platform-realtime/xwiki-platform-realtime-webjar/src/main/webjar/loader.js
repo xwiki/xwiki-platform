@@ -141,14 +141,15 @@ define('xwiki-realtime-loader', [
     }
 
     setConcurrentEditing(concurrentEditing) {
+      const show = !this.concurrentEditing;
       this.concurrentEditing = concurrentEditing;
-      this._removeConcurrentEditingWarning();
+      $('.realtime-warning').popover('destroy').remove();
       if (concurrentEditing) {
-        this._showConcurrentEditingWarning();
+        this._createConcurrentEditingWarning(show);
       }
     }
 
-    _showConcurrentEditingWarning() {
+    _createConcurrentEditingWarning(show) {
       const template = document.querySelector('template#realtime-warning');
       const popoverToggle = template.content.querySelector('.realtime-warning-' +
         (this.realtimeEnabled ? 'connected' : 'disconnected')).cloneNode(true);
@@ -157,6 +158,12 @@ define('xwiki-realtime-loader', [
       );
       toolbar.append(popoverToggle);
       $(popoverToggle).popover();
+      if (show) {
+        this._showConcurrentEditingWarning(popoverToggle);
+      }
+    }
+
+    _showConcurrentEditingWarning(popoverToggle) {
       // The warning message is shown when leaving collaboration or when switching to Source mode, in which case there
       // is a toolbar switch, so it's best to wait a bit for the toolbar layout to settle otherwise the position of the
       // popover won't match the position of the toggle button. Moreover, we want to prevent quickly showing and hiding
@@ -171,14 +178,6 @@ define('xwiki-realtime-loader', [
       $(popoverToggle).one('hide.bs.popover', () => {
         clearTimeout(autoHideTimeout);
       });
-    }
-
-    _removeConcurrentEditingWarning() {
-      this._getConcurrentEditingWarning().popover('destroy').remove();
-    }
-
-    _getConcurrentEditingWarning() {
-      return $('.realtime-warning');
     }
 
     /**

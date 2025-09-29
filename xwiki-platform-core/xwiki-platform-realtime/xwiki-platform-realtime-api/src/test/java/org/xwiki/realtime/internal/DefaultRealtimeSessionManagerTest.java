@@ -20,12 +20,6 @@
 
 package org.xwiki.realtime.internal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -57,6 +51,12 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 @ComponentTest
 class DefaultRealtimeSessionManagerTest
 {
@@ -68,8 +68,6 @@ class DefaultRealtimeSessionManagerTest
     private static final String EDITOR = "editor";
 
     private static final String EDIT = "edit";
-
-    private static final String EN = "en";
 
     private static final String CONTENT = "content";
 
@@ -106,11 +104,7 @@ class DefaultRealtimeSessionManagerTest
     @Mock
     private XWiki wiki;
 
-    EntityChannel channel;
-
     private WysiwygEditorScriptService wysiwygEditorScriptService;
-
-    private List<String> path;
 
     @BeforeComponent
     void beforeComponent(MockitoComponentManager componentManager) throws Exception
@@ -144,15 +138,14 @@ class DefaultRealtimeSessionManagerTest
 
         // This case is the default test configuration, but we test both.
         when(wysiwygEditorScriptService.isSyntaxSupported(Syntax.XWIKI_2_1.toIdString())).thenReturn(false);
+    }
 
-        // Configuration for canJoinSession.
-
-        // Define a channel with one user.
-        path = Arrays.asList("translations", EN, "fields", CONTENT, "editors", WIKI);
-
-        channel = new EntityChannel(null, path, "");
-        channel.setUserCount(1);
+    private EntityChannel createChannel(String locale, String editor)
+    {
+        List<String> path = List.of("translations", locale, "fields", CONTENT, "editors", editor);
+        EntityChannel channel = new EntityChannel(null, path, "");
         when(entityChannelStore.getChannel(null, path)).thenReturn(Optional.of(channel));
+        return channel;
     }
 
     @Test
@@ -199,57 +192,47 @@ class DefaultRealtimeSessionManagerTest
     }
 
     @Test
-    void sessionIsActiveSameEditor()
+    void canJoinSession()
     {
-        when(request.getProperty(EDITOR)).thenReturn(WIKI);
-        assertTrue(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
-    }
+        // Unsupported edit mode.
+        when(this.request.getProperty(EDITOR)).thenReturn("inline");
+        assertFalse(this.realtimeSessionManager.canJoinSession(null, Locale.CANADA_FRENCH));
 
-    @Test
-    void sessionIsActiveSameEditorNoUser()
-    {
-        when(scriptContext.getAttribute(EDITOR)).thenReturn(WIKI);
-        channel.setUserCount(0);
-        assertFalse(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
-    }
+        // Missing session.
+        when(this.request.getProperty(EDITOR)).thenReturn(WYSIWYG);
+        assertFalse(this.realtimeSessionManager.canJoinSession(null, Locale.CANADA_FRENCH));
 
-    @Test
-    void sessionIsActiveDifferentEditor()
-    {
-        when(request.getProperty(EDITOR)).thenReturn(WYSIWYG);
-        assertFalse(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
-    }
+        // Inactive session (no users).
+        EntityChannel channel = createChannel("fr_CA", WYSIWYG);
+        assertFalse(this.realtimeSessionManager.canJoinSession(null, Locale.CANADA_FRENCH));
 
-    @Test
-    void sessionIsActiveDifferentLocale()
-    {
-        when(scriptContext.getAttribute(EDITOR)).thenReturn(WIKI);
-        assertFalse(realtimeSessionManager.canJoinSession(null, Locale.GERMAN));
-    }
+        // Active session
 
-    @Test
-    void sessionIsActiveWysiwygAndInplace()
-    {
-        path = Arrays.asList("translations", EN, "fields", CONTENT, "editors", WYSIWYG);
-        channel = new EntityChannel(null, path, "");
+        // Same editor, same locale.
         channel.setUserCount(1);
-        when(entityChannelStore.getChannel(null, path)).thenReturn(Optional.of(channel));
-        when(scriptContext.getAttribute(EDITOR)).thenReturn("inplace");
-        assertTrue(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
+        assertTrue(this.realtimeSessionManager.canJoinSession(null, Locale.CANADA_FRENCH));
+
+        // Same editor, different locale.
+        assertFalse(this.realtimeSessionManager.canJoinSession(null, Locale.FRENCH));
+
+        // Different editor, same locale.
+        when(this.request.getProperty(EDITOR)).thenReturn(WIKI);
+        assertFalse(this.realtimeSessionManager.canJoinSession(null, Locale.CANADA_FRENCH));
+
+        // Different editor, different locale.
+        assertFalse(this.realtimeSessionManager.canJoinSession(null, Locale.FRENCH));
+
+        // Different editor (but same type), same locale.
+        when(this.request.getProperty(EDITOR)).thenReturn("inplace");
+        assertTrue(this.realtimeSessionManager.canJoinSession(null, Locale.CANADA_FRENCH));
     }
 
     @Test
-    void sessionMissing()
+    void canJoinSessionForRootLocale()
     {
-        when(request.getProperty(EDITOR)).thenReturn(WIKI);
-        when(entityChannelStore.getChannel(null, path)).thenReturn(Optional.empty());
-        assertFalse(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
-    }
-
-    @Test
-    void unsupportedEditMode()
-    {
-        when(request.getProperty(EDITOR)).thenReturn("inline");
-        assertFalse(realtimeSessionManager.canJoinSession(null, Locale.ENGLISH));
+        when(this.request.getProperty(EDITOR)).thenReturn(WYSIWYG);
+        EntityChannel channel = createChannel("", WYSIWYG);
+        channel.setUserCount(1);
+        assertTrue(this.realtimeSessionManager.canJoinSession(null, Locale.ROOT));
     }
 }

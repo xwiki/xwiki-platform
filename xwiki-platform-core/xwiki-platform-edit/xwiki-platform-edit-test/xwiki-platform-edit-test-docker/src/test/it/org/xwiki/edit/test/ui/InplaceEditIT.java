@@ -370,6 +370,9 @@ class InplaceEditIT
         RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
         richTextArea.clear();
 
+        // Hide the expected error message because it can interfere with the test.
+        viewPage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
+
         // Insert some long text (vertically).
         for (int i = 1; i < 50; i++) {
             richTextArea.sendKeys(String.valueOf(i), Keys.ENTER);
@@ -389,7 +392,8 @@ class InplaceEditIT
         assertEquals("4", sourceTextArea.getDomProperty("selectionEnd"));
 
         // Verify that the top left corner of the Source text area is visible (inside the viewport).
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 0));
+        // The toolbar is overlapping the text area so we need to add some offset.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 3));
 
         // Select something from the middle of the edited content.
         for (int i = 0; i < 46; i++) {
@@ -442,8 +446,8 @@ class InplaceEditIT
         assertEquals("50", sourceTextArea.getDomProperty("value").substring(selectionStart, selectionEnd));
 
         // Verify that the restored selection is visible (inside the viewport).
-        // Note that we have to subtract 1 from the height because the floating toolbar is overlapping the text area.
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 1));
+        // Note that we have to subtract 4 from the height because the floating toolbar is overlapping the text area.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 4));
 
         viewPage.cancel();
     }

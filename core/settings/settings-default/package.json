@@ -41,7 +41,7 @@
     "@xwiki/cristal-dsapi": "workspace:*",
     "inversify": "7.10.1",
     "typescript": "5.9.2",
-    "vite": "7.1.6",
+    "vite": "7.1.7",
     "vitest-mock-extended": "3.1.0"
   },
   "publishConfig": {

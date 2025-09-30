@@ -40,7 +40,7 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "inversify": "7.10.1",
     "typescript": "5.9.2",
-    "vite": "7.1.6"
+    "vite": "7.1.7"
   },
   "publishConfig": {
     "exports": {

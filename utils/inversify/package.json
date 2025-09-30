@@ -35,7 +35,7 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "inversify": "7.10.0",
+    "inversify": "7.10.1",
     "typescript": "5.9.2",
     "vite": "7.1.6"
   },

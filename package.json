@@ -67,7 +67,7 @@
     "vue-eslint-parser": "10.2.0"
   },
   "engines": {
-    "node": "22.19.0"
+    "node": "22.20.0"
   },
   "packageManager": "pnpm@10.17.1",
   "pnpm": {

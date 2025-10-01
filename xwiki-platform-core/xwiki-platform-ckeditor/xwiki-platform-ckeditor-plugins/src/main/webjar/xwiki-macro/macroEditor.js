@@ -27,7 +27,9 @@ define('macroEditorTranslationKeys', [], [
   'noParameters',
   'content',
   'required',
-  'selectFeature'
+  'selectFeature',
+  'deprecated',
+  'advanced'
 ]);
 
 /**
@@ -297,13 +299,13 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   macroParameterTemplate =
-    '<div class="macro-parameter">' +
-      '<div class="macro-parameter-name-container">' +
-        '<label class="macro-parameter-name" for=""></label>' +
-        '<span class="mandatory"></span>' +
-      '</div>' +
-      '<div class="macro-parameter-description"></div>' +
-    '</div>',
+    `<div class="macro-parameter">
+      <div class="macro-parameter-name-container">
+        <label class="macro-parameter-name" for=""></label>
+        <span class="mandatory"></span>
+      </div>
+      <div class="macro-parameter-description"></div>
+    </div>`,
 
   displayMacroParameter = function(parameter, featureRadioButton) {
     let output = $(macroParameterTemplate);
@@ -312,6 +314,10 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     output.find('.macro-parameter-name').text(parameter.name);
     if (parameter.mandatory) {
       output.find('.mandatory').text('(' + translations.get('required') + ')');
+    } else if (parameter.deprecated) {
+      output.find('.mandatory').text('(' + translations.get('deprecated') + ')');
+    } else if (parameter.advanced) {
+        output.find('.mandatory').text('(' + translations.get('advanced') + ')');
     }
     output.find('.macro-parameter-description').text(parameter.description);
     output.toggleClass('mandatory', !!parameter.mandatory);

@@ -32,8 +32,8 @@ importers:
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-authentication-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)
+        specifier: 0.22.0
+        version: 0.22.0(reflect-metadata@0.2.2)
       '@xwiki/cristal-backend-api':
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
@@ -1166,6 +1166,11 @@ packages:
     resolution: {integrity: sha512-IuN/6MXHWn01sYkKIqB8xotKVSmFyEEhR01QbDTlDAbEAuJGH/7DxrDfy3fO4dFx3gy59S94zhzMy+2TMgb9dA==}
     peerDependencies:
       reflect-metadata: 0.2.2
+
+  '@xwiki/cristal-authentication-api@0.22.0':
+    resolution: {integrity: sha512-wae+0VQoWribrGZT0TrRLjTwwkKK4dx0B8zIc78lEabotlBVSL37mNgt2gmP2aQwj4XSA1QCMd+7YSEMjt6gpw==}
+    peerDependencies:
+      reflect-metadata: 0.x
 
   '@xwiki/cristal-backend-api@0.19.0':
     resolution: {integrity: sha512-/ThyYGWPCJ7GH9aMNDULx3IwBRP4oB3GSt9QFki1l2OGclozXufyNZ1EkwvC+iHzhDBwSetYu67HiSLZZTcvfw==}
@@ -4103,6 +4108,10 @@ snapshots:
       - typescript
 
   '@xwiki/cristal-authentication-api@0.19.0(reflect-metadata@0.2.2)':
+    dependencies:
+      reflect-metadata: 0.2.2
+
+  '@xwiki/cristal-authentication-api@0.22.0(reflect-metadata@0.2.2)':
     dependencies:
       reflect-metadata: 0.2.2
 

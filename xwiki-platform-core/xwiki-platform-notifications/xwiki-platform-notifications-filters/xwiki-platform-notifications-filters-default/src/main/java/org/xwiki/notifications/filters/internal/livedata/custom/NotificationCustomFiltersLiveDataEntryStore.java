@@ -232,9 +232,9 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
             throw new LiveDataException("Currently only integer offsets are supported.");
         }
         TargetInformation targetInformation = getTargetInformation(query);
-        String serializedOwner = this.entityReferenceSerializer.serialize(targetInformation.ownerReference);
+        String serializedOwner = this.entityReferenceSerializer.serialize(targetInformation.getOwnerReference());
         WikiReference wikiReference =
-            new WikiReference(targetInformation.ownerReference.extractReference(EntityType.WIKI));
+            new WikiReference(targetInformation.getOwnerReference().extractReference(EntityType.WIKI));
 
         LiveData liveData = new LiveData();
         try {

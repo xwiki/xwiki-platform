@@ -47,7 +47,10 @@
 
 #macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
 #xwikimessageboxstart($title $message)
-      <div class="buttons"><a href="$urlyes" class="buttonwrapper"><input type="button" class="button" value="$msgyes" onclick="location='$urlyes'; return false;"/></a> <a href="$urlno" class="buttonwrapper"><input type="button" class="button secondary" value="$msgno" onclick="location='$urlno'; return false;"/></a></div>
+      <div class="buttons">
+        <span class="buttonwrapper"><a href="$urlyes" class="button">$msgyes</a></span>
+        <span class="buttonwrapper"><a href="$urlno" class="button secondary">$msgno</a></span>
+      </div>
 #xwikimessageboxend()
 #end
 
@@ -129,7 +132,8 @@
       'transprefix': $transprefix,
       'classname': $classname,
       'collist': $stringtool.join($dataColumns, ','),
-      'queryFilters': $queryFilters
+      'queryFilters': $queryFilters,
+      'tagcloud': $tagcloud
     })
     #set ($discard = $parameters.putAll($classParams))
     #set ($resultPage = $options.resultPage)
@@ -248,7 +252,7 @@
             #livetable_filters($collist $colprops $classname)
             <tr class="xwiki-livetable-initial-message">
               <td colspan="${columnCount}">
-                <div class="warningmessage">$services.localization.render('platform.livetable.environmentCannotLoadTableMessage')</div>
+                #warning($services.localization.render('platform.livetable.environmentCannotLoadTableMessage'))
               </td>
             </tr>
           </thead>
@@ -374,7 +378,8 @@
     #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
-      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
+      data-className="$!escapetool.xml($services.model.serialize($xproperty.reference.parent, 'default'))"
+      data-propertyName="$!escapetool.xml($xproperty.name)"
       title="$!filterTitle">
     </select>
   #end

@@ -39,7 +39,7 @@ public interface PagesResource
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("parentId") String parentFilterExpression,
             @QueryParam("order") String order,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames

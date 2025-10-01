@@ -104,6 +104,7 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo" table="xwikircs">
+        <meta attribute="xwiki-compressed"/>
         <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
             <key-property name="docId" column="XWR_DOCID" type="long" />
             <key-property name="version1" column="XWR_VERSION1" type="integer" />
@@ -118,6 +119,7 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent" table="xwikircs">
+        <meta attribute="xwiki-compressed"/>
         <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
             <key-property name="docId" column="XWR_DOCID" type="long" />
             <key-property name="version1" column="XWR_VERSION1" type="integer" />
@@ -173,12 +175,11 @@
         <id name="id" column="XWL_ID">
             <generator class="native"/>
         </id>
-        <property name="docId" column="XWL_DOC_ID" type="long" unique-key="XWL_UNIQUE_CONSTRAINT"/>
-        <property name="link" type="string" column="XWL_LINK" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
-        <property name="type" type="string" column="XWL_TYPE" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
-        <property name="fullName" type="string" column="XWL_FULLNAME" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
-        <property name="attachmentName" type="string" column="XWL_ATTACHMENT_NAME" length="768"
-          unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="docId" column="XWL_DOC_ID" type="long" index="XWL_DOC_ID" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="link" type="string" column="XWL_LINK" length="768" index="XWL_LINK" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="type" type="string" column="XWL_TYPE" length="768" index="XWL_TYPE" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="fullName" type="string" column="XWL_FULLNAME" length="768" index="XWL_FULLNAME" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="attachmentName" type="string" column="XWL_ATTACHMENT_NAME" length="768" index="XWL_ATTACHMENT_NAME" unique-key="XWL_UNIQUE_CONSTRAINT"/>
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">

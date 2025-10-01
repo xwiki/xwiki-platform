@@ -218,4 +218,16 @@ public class AllIT
     class NestedPageReadyIT extends PageReadyIT
     {
     }
+
+    @Nested
+    @DisplayName("Security Cache Stress Tests")
+    class NestedSecurityCacheStressIT extends SecurityCacheStressIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Servlet Environment Cache Tests")
+    class NestedServletEnvironmentCacheIT extends ServletEnvironmentCacheIT
+    {
+    }
 }

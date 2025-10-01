@@ -274,7 +274,7 @@ class DownloadActionTest
     }
 
     @Test
-    void downloadWhenMissingFile() throws XWikiException
+    void downloadWhenMissingFile()
     {
         setRequestExpectations("/xwiki/bin/download/space/page/nofile.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
         XWikiException xWikiException =
@@ -283,7 +283,7 @@ class DownloadActionTest
     }
 
     @Test
-    void downloadWhenURLNotPointingToAttachment() throws XWikiException
+    void downloadWhenURLNotPointingToAttachment()
     {
         ResourceReference rr = new EntityResourceReference(this.documentReference, EntityResourceAction.VIEW);
         when(this.resourceReferenceManager.getResourceReference()).thenReturn(rr);
@@ -316,26 +316,12 @@ class DownloadActionTest
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), 1, "text/plain", "inline; filename*=utf-8''file.5.txt");
-        verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
-        {
-            @Override
-            public boolean matches(byte[] argument)
-            {
-                return argument[0] == '5';
-            }
-        }), eq(0), eq(1));
-        verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
-        {
-            @Override
-            public boolean matches(byte[] argument)
-            {
-                return argument[0] == '5';
-            }
-        }), eq(0), eq(1));
+        verify(this.out).write(argThat(argument -> argument[0] == '5'), eq(0), eq(1));
+        verify(this.out).write(argThat(argument -> argument[0] == '5'), eq(0), eq(1));
     }
 
     @Test
-    void testDownloadByWrongId() throws XWikiException, IOException
+    void testDownloadByWrongId() throws IOException
     {
         Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
@@ -360,7 +346,7 @@ class DownloadActionTest
     }
 
     @Test
-    void downloadWhenIncompletePath() throws XWikiException
+    void downloadWhenIncompletePath()
     {
         setRequestExpectations("/xwiki/bin/download/", null, null, null, -1l, DEFAULT_FILE_NAME);
 

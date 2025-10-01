@@ -33,8 +33,8 @@
     '</div>';
   var inlineMacroWidgetTemplate = blockMacroWidgetTemplate.replace(/div/g, 'span');
 
-  var nestedEditableTypeAttribute = 'data-xwiki-non-generated-content';
-  var nestedEditableNameAttribute = 'data-xwiki-parameter-name';
+  const nestedEditableTypeAttribute = 'data-xwiki-non-generated-content';
+  const nestedEditableNameAttribute = 'data-xwiki-parameter-name';
 
   var getNestedEditableType = function(nestedEditable) {
     var nestedEditableType;
@@ -166,20 +166,47 @@
       var isWidgetVisible = function(widget) {
         // We don't use CKEDITOR.dom.element#isVisible() because we want to check that the widget has both width and
         // height, otherwise the user cannot select it (to edit it for instance).
-        return widget.element.$.offsetHeight > 0 && widget.element.$.offsetWidth > 0;
+        return isElementVisible(widget.element.$);
       };
 
       var ensureMacroWidgetVisible = function(macroWidget) {
+        // Hide the macro placeholder by default (we want to check if the macro widget is visible without its
+        // placeholder).
+        const placeholder = $(macroWidget.element.$).children('.macro-placeholder').addClass('hidden');
         if (!isWidgetVisible(macroWidget)) {
-          // Show a placeholder if the macro widget is not visible, either because the macro doesn't have ouput or
+          // Show the placeholder if the macro widget is not visible, either because the macro doesn't have ouput or
           // because its output is not visible).
-          $(macroWidget.element.$).children('.macro-placeholder.hidden').removeClass('hidden');
+          placeholder.removeClass('hidden');
         }
       };
 
       // Replace the macro marker comments with a DIV or SPAN in order to be able to initialize the macro widgets.
       editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'macro', {
         toHtml: wrapMacroOutput
+      });
+
+      // Remove the bogus BR tags that are being added by the CKEDITOR.htmlDataProcessor.dataFilter to the empty blocks
+      // from the macro output, since otherwise we can't detect if the macro output is visible or not in order to toggle
+      // the macro placeholder.
+      //
+      // CKEDITOR.htmlDataProcessor.dataFilter is called on the 'toHtml' event with priority 10 and it adds a bogus BR
+      // tag to all the empty block elements, including those from the read-only macro output. These bogus BR tags are
+      // marked with the 'data-cke-bogus' attribute which is removed also by the same dataFilter in a different rule
+      // that has priority 10. We're adding a rule to remove these bogus BR tags from the read-only macro output. This
+      // rule must be applied after the bogus BR tags are added by the dataFilter but before the 'data-cke-bogus'
+      // attribute is removed (with priority 10) so that we can identify the bogus BR tags.
+      // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_editor.html#event-toHtml
+      editor.dataProcessor?.dataFilter?.addRules({
+        elements: {
+          br: function(br) {
+            if (br.attributes['data-cke-bogus'] === 1 && CKEDITOR.plugins.xwikiMacro.isMacroOutput(br)) {
+              return false;
+            }
+          }
+        }
+      }, {
+        applyToAll: true,
+        priority: 9
       });
 
       editor.ui.addButton('xwiki-macro', {
@@ -224,13 +251,10 @@
           return macro;
         },
         getParameterType: function(name) {
-          var descriptor = this.data.descriptor || {};
-          if (name === undefined) {
-            descriptor = descriptor.contentDescriptor || {};
-          } else if (typeof name === 'string') {
-            descriptor = (descriptor.parameterDescriptorMap || {})[name.toLowerCase()] || {};
-          }
-          return descriptor.type;
+          let parametersMap = (this.data.descriptor || {}).parameters || {};
+          let parameterName = (name === undefined) ? '$content' : name.toLowerCase();
+          let param = parametersMap[parameterName] || {};
+          return param.type;
         },
         init: function() {
           // Initialize the nested editables.
@@ -269,7 +293,7 @@
           }
           Object.keys(this.editables).forEach(name => {
             const parameterName = Object.keys(macroCall.parameters)
-              .find(key => key.toLowerCase() === name.toLowerCase());
+                .find(key => key.toLowerCase() === name.toLowerCase());
             delete macroCall.parameters[parameterName];
           });
         },
@@ -317,9 +341,14 @@
           // Show the macro wizard to insert or edit a macro and wait for the result.
           const widget = this;
           const input = {
-            macroCall: macroCall,
-            hiddenMacroParameters: Object.keys(widget.editables || {}),
-            sourceDocumentReference: editor.config.sourceDocument.documentReference
+            macroCall,
+            inlineParameters: Object.entries(widget.editables || {}).reduce((acc, [parameterName, editable]) => {
+              acc[parameterName] = editable.getData();
+              return acc;
+            }, {}),
+            showInlineParameters: (editor.config['xwiki-macro'] || {}).showInlineEditableParameters,
+            sourceDocumentReference: editor.config.sourceDocument.documentReference,
+            syntaxId: editor.config.sourceSyntax,
           };
           let output;
           try {
@@ -390,10 +419,13 @@
             });
           }).fail(this.done.bind(this, false, options));
         },
-        done: function(success, options) {
-          editor.setLoading(false);
+        done: async function(success, options) {
           if (options.preserveSelection) {
-            CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+            await CKEDITOR.plugins.xwikiSelection.restoreSelection(editor, {
+              beforeApply: () => editor.setLoading(false)
+            });
+          } else {
+            editor.setLoading(false);
           }
           if (!success) {
             editor.showNotification(editor.localization.get('xwiki-macro.refreshFailed'), 'warning');
@@ -423,7 +455,7 @@
             var command = this;
 
             // Find the macro we are going to insert.
-            macroService.getMacros(XWiki.docsyntax).done(function (macros) {
+            macroService.getMacros(editor.config.sourceSyntax).done(function (macros) {
               macros.forEach(function (macro) {
                 if (macro.id.id === macroCall.id) {
 
@@ -439,26 +471,25 @@
                     });
 
                     // Retrieve required parameters.
-                    macroService.getMacroDescriptor(macro.id.id).done(function (descriptor) {
+                    macroService.getMacroDescriptor(macro.id.id).done(function (descriptorUI) {
+                      let descriptor = descriptorUI.descriptor;
 
                       // Show the insertion dialog if at least one of the parameters is mandatory.
-                      for (var param in descriptor.parameterDescriptorMap) {
-                        if (descriptor.parameterDescriptorMap[param].mandatory) {
-                          if (widget) {
-                            // Edit existing pre-inserted macro.
-                            widget.edit();
-                          } else {
-                            // Insert and edit macro.
-                            editor.execCommand("xwiki-macro", {
-                              name: macro.id.id
-                            });
-                          }
-                          return;
+                      if (descriptor.mandatoryNodes.length > 0) {
+                        if (widget) {
+                          // Edit existing pre-inserted macro.
+                          widget.edit();
+                        } else {
+                          // Insert and edit macro.
+                          editor.execCommand("xwiki-macro", {
+                            name: macro.id.id
+                          });
                         }
+                        return;
                       }
 
-                      // Minimal insertion parameters
-                      var insertParam = {
+                      // No mandatory parameters. Insert the macro without specifying any parameters.
+                      macroPlugin.insertOrUpdateMacroWidget(editor, {
                         name: macro.id.id,
                         parameters: {},
                         // We consider the macro call to be inline if the macro supports inline mode, as indicated by
@@ -467,15 +498,7 @@
                         // 'xwiki-macro-maybe-install-insert' editor command is used mainly by quick actions which are
                         // triggered by the user typing text, so in an inline context.
                         inline: descriptor.supportsInlineMode
-                      };
-
-                      // Set an empty default content when it is mandatory.
-                      if (descriptor.contentDescriptor && descriptor.contentDescriptor.mandatory) {
-                        insertParam.content = " ";
-                      }
-
-                      // Insert the empty macro.
-                      macroPlugin.insertOrUpdateMacroWidget(editor, insertParam, widget);
+                      }, widget);
                     });
                   };
 
@@ -524,7 +547,7 @@
                                                 'success',
                                                 5000);
                         // Update the cache for future insertions.
-                        macroService.getMacros(XWiki.docsyntax, true);
+                        macroService.getMacros(editor.config.sourceSyntax, true);
 
                         // Update the pre-inserted widget
                         insertMacro(evt.data);
@@ -548,16 +571,16 @@
 
                     return;
                   }
+
                   insertMacro();
                 }
               });
             });
           }
         });
-
-
       });
 
+      this.toggleMacroPlaceholderOnDOMUpdate(editor);
     },
 
     // Setup the balloon tool bar for the nested editables, after the balloontoolbar plugin has been fully initialized.
@@ -620,7 +643,7 @@
         };
 
         // Register macros in Quick Actions plugin
-        macroService.getMacros(XWiki.docsyntax).done(function (macros) {
+        macroService.getMacros(editor.config.sourceSyntax).done(function (macros) {
 
           // Keep track of how many groups we created
           var macroGroupsCount = 0;
@@ -728,6 +751,8 @@
       }
       var updatingWidget = !!widget?.element;
       if (updatingWidget && widget.element.getName() === expectedElementName) {
+        // Ensure to use the nested editable values coming from the macroCall.
+        this.cleanupEditables(editor, widget);
         // We have edited a macro and the macro type (inline vs. block) didn't change.
         // We can safely update the existing macro widget.
         widget.setData(data);
@@ -781,6 +806,15 @@
       if (!skipRefresh) {
         // Refresh all the macros because a change in one macro can affect the output of the other macros.
         setTimeout(editor.execCommand.bind(editor, 'xwiki-refresh'), 0);
+      }
+    },
+
+    cleanupEditables: function (editor, widget) {
+      // remove the inplace editable elements only if the configuration allows to edit them in the macro config UI.
+      if ((editor.config['xwiki-macro'] || {}).showInlineEditableParameters === true) {
+        for (let item in widget.editables) {
+          widget.editables[item].$.remove();
+        }
       }
     },
 
@@ -940,8 +974,70 @@
         output.push(separator, macroCall.content);
       }
       return CKEDITOR.tools.escapeComment(output.join(''));
+    },
+
+    toggleMacroPlaceholderOnDOMUpdate: function(editor) {
+      let cleanUp = () => {};
+      editor.on('contentDom', function() {
+        cleanUp();
+        const doc = editor.document.$;
+        $(doc).on("xwiki:dom:updated", onDOMUpdated);
+        // We need to update the cleanUp function whenever the editing area is (re)created. For in-place edit mode this
+        // happens only once (per editing session) while for standalone edit mode this happens multiple times (e.g.
+        // when we switch to Source and back or when the edited content is refreshed).
+        cleanUp = () => $(doc).off("xwiki:dom:updated", onDOMUpdated);
+      });
+      // We don't pass directly the cleanUp function because the cleanUp function may change during the lifetime of the
+      // editor (e.g. when the editing area is recreated for the standalone edit mode).
+      editor.on('beforeDestroy', () => cleanUp());
+
+      function onDOMUpdated(event, data) {
+        const editable = editor.editable()?.$;
+        const macroElements = data.elements
+          .flatMap(getMacroElements)
+          .filter(element => editable?.contains(element))
+          .sort((alice, bob) => {
+            const delta = alice.compareDocumentPosition(bob);
+            // We need to reverse the pre-order depth-first traversal in order to be able to handle the nested macros
+            // first.
+            if (delta & Node.DOCUMENT_POSITION_PRECEDING) {
+              return -1;
+            } else if (delta & Node.DOCUMENT_POSITION_FOLLOWING) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+        // Hide all the affected macro placeholders first, to trigger a single repaint.
+        macroElements.forEach(hideMacroPlaceholder);
+        // Then show the macro placeholders where needed.
+        macroElements.forEach(maybeToggleMacroPlaceholder);
+      }
+
+      function getMacroElements(root) {
+        const macroElementSelector = '.macro.cke_widget_element[data-macro]';
+        const macroElements = [...root.querySelectorAll(macroElementSelector)];
+        const macroElementAncestor = root.closest(macroElementSelector);
+        if (macroElementAncestor) {
+          macroElements.push(macroElementAncestor);
+        }
+        return macroElements;
+      }
+    
+      function hideMacroPlaceholder(macroElement) {
+        macroElement.querySelector(':scope > .macro-placeholder')?.classList.add('hidden');
+      }
+    
+      function maybeToggleMacroPlaceholder(macroElement) {
+        const macroVisible = isElementVisible(macroElement);
+        macroElement.querySelector(':scope > .macro-placeholder')?.classList.toggle('hidden', macroVisible);
+      }
     }
   });
+
+  function isElementVisible(element) {
+    return element.offsetHeight > 0 && element.offsetWidth > 0;
+  }
 
   CKEDITOR.plugins.xwikiMacro = {
     // The passed element is of type CKEDITOR.htmlParser.element

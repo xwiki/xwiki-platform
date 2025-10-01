@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-vfs</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-vfs-api</artifactId>
   <name>XWiki Platform - VFS - API</name>
@@ -223,8 +223,8 @@
 
     <!-- Test Dependencies -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

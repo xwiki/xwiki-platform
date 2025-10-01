@@ -34,6 +34,7 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Security Authorization Script Service.
@@ -167,5 +168,20 @@ public class SecurityAuthorizationScriptService implements ScriptService
     public List<String> getAllRightsNames()
     {
         return Right.getAllRightsAsString();
+    }
+
+    /**
+     * Check whether the user is {@code superadmin}.
+     *
+     * @param user a user reference
+     * @return {@code true} if the current user is {@code superadmin}, {@code false} otherwise
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    @Unstable
+    public boolean isSuperAdmin(DocumentReference user)
+    {
+        return this.authorizationManager.isSuperAdmin(user);
     }
 }

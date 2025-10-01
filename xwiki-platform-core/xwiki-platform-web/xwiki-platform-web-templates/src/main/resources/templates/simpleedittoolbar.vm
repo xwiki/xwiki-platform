@@ -17,8 +17,6 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-<script src="$xwiki.getSkinFile("js/xwiki/wikieditor/wikibits.js")"></script>
-
 ## Syntax elements is a list of: [identifier, start markup, end markup, image name].
 ## The identifier is used to display the button title, and the sample text.
 ## The image is retrieved from /resources/icons/silk/imageName.png
@@ -92,18 +90,28 @@
   #set ($syntaxElements = $confluence10Elements)
 #end
 #if ($syntaxElements)
-<script>
-// <![CDATA[
-document.writeln("<div class='leftmenu2'>");
-#foreach($item in $syntaxElements)
-  #set($imageFile = $xwiki.getSkinFile("icons/silk/${item.get(3)}.png"))
-  #set($speedTip = $escapetool.javascript($services.localization.render("core.edit.wikiToolbar.${item.get(0)}")))
-  #set($tagOpen = $escapetool.javascript($item.get(1)))
-  #set($tagClose = $escapetool.javascript($item.get(2)))
-  #set($sampleText = $escapetool.javascript($services.localization.render("core.edit.wikiToolbar.${item.get(0)}text")))
-  addButton('$imageFile', '$speedTip', '$tagOpen', '$tagClose', '$sampleText');
-#end
-document.writeln("<" + "/div>");
-// ]]>
-</script>
+  #set ($toolbarJson = [])
+  #foreach($item in $syntaxElements)
+    #set($imageFile = $xwiki.getSkinFile("icons/silk/${item.get(3)}.png"))
+    #set($speedTip = $services.localization.render("core.edit.wikiToolbar.${item.get(0)}"))
+    #set($tagOpen = $item.get(1))
+    #set($tagClose = $item.get(2))
+    #set($sampleText = $services.localization.render("core.edit.wikiToolbar.${item.get(0)}text"))
+    #set ($discard = $toolbarJson.add({
+      "id": "$item.get(0)",
+      "image": "$imageFile",
+      "tagOpen": "$tagOpen",
+      "tagClose": "$tagClose",
+      "sampleText": "$sampleText",
+      "speedTip": "$speedTip"
+    }))
+  #end
+  #set ($discard = $xwiki.jsfx.use('js/xwiki/editors/simpletoolbar.js', true))
+  #set ($discard = $xwiki.ssfx.use('js/xwiki/editors/simpletoolbar.css', true))
+## The configuration is serialized in a data property because when inserted in the content of a script element of
+## type application/json, the html cleaner can wrap the content in a CDATA block, breaking client code
+## (e.g., simpletoolbar.js).
+<div class="hidden" id="simpletoolbar-configuration" data-xwiki-simpletoolbar-configuration="$escapetool.xml($jsontool.serialize({
+  "toolbarElements": $toolbarJson
+}))"></div>
 #end

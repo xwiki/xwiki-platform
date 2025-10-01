@@ -40,6 +40,8 @@ public class WikiSearchQueryResourceImpl extends BaseSearchResult implements Wik
             String queryTypeString, Integer number, Integer start, Boolean distinct, String orderField, String order,
             Boolean withPrettyNames, String className) throws XWikiRestException
     {
+        int limit = validateAndGetLimit(number);
+
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
             searchResults.setTemplate(String.format("%s?%s",
@@ -48,7 +50,7 @@ public class WikiSearchQueryResourceImpl extends BaseSearchResult implements Wik
 
             searchResults.getSearchResults().addAll(searchQuery(query, queryTypeString, wikiName, null,
                     Utils.getXWiki(componentManager).getRightService().hasProgrammingRights(
-                            Utils.getXWikiContext(componentManager)), orderField, order, distinct, number, start,
+                            Utils.getXWikiContext(componentManager)), orderField, order, distinct, limit, start,
                     withPrettyNames, className));
 
             return searchResults;

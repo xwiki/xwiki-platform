@@ -116,6 +116,8 @@ public class ExtensionAdministrationPage extends ViewPage
      */
     public void startIndex()
     {
+        getDriver().addPageNotYetReloadedMarker();
         getDriver().findElement(By.cssSelector("input[name=\"index_start\"]")).click();
+        getDriver().waitUntilPageIsReloaded();
     }
 }

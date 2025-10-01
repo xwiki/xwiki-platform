@@ -18,6 +18,8 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template('display_macros.vm')
+#initRequiredSkinExtensions()
+
 #macro(docTranslationLink $locale $action $fragment)
   #set ($localeName = $locale.getDisplayName($xcontext.locale))
   #if ("$!localeName" == '')
@@ -31,6 +33,15 @@
   #end
   <a href="$translationURL" data-locale="$escapetool.xml($locale)">$escapetool.xml($localeName)</a>
 #end
+
+#macro (_maybeShowNoLocaleWarning)
+  #if ("$!doc.realLocale" == '')
+    <span title="$escapetool.xml($services.localization.render('core.viewers.information.noLocaleWarning'))">
+      $services.icon.renderHTML('warning')
+    </span>
+  #end
+#end
+
 $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
 $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': true, 'language': $xcontext.locale})
@@ -59,6 +70,7 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
   #set ($discard = $staticUIX.add({'content': "
     <dt>
       <label>$escapetool.xml($services.localization.render('core.viewers.information.originalLocale'))</label>
+      #_maybeShowNoLocaleWarning()
     </dt>
     <dd data-key=""originalLocale"">#docTranslationLink($doc.realLocale 'view')</dd>
     ",
@@ -70,40 +82,40 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
 ## Translations
 ##
 #set ($existingTranslations = $doc.translationLocales)
-## Show the list of translations if multilingual is on and either the original page is translatable (has a
-## locale specified) or it has existing translations.
-#if ($xwiki.isMultiLingual() && ("$!doc.realLocale" != '' || !$existingTranslations.isEmpty()))
+## Show the list of translations if multilingual is on.
+#if ($xwiki.isMultiLingual())
   #set ($supportedLocales = $xwiki.availableLocales)
   ## Remove the translations that we already display above.
   #set ($discard = $supportedLocales.remove($tdoc.realLocale))
   #set ($discard = $supportedLocales.remove($doc.realLocale))
-  #if (!$supportedLocales.isEmpty())
-    #set ($output = [])
-    #foreach ($supportedLocale in $supportedLocales)
-      #if ($existingTranslations.contains($supportedLocale))
-        #set ($discard = $output.add($stringtool.trim("#docTranslationLink($supportedLocale 'view')")))
-      #elseif ($hasEdit)
-        ## Show the link to create the missing translation if the current user can edit the page. Use the
-        ## preferred edit mode (in-place versus stand-alone) depending on the user preferences, in order to
-        ## replicate the behavior of the Translate button.
-        #set ($action = 'edit')
-        #set ($fragment = $NULL)
-        #getDefaultDocumentEditor($defaultEditMode)
-        #if ($services.edit.document.inPlaceEditingEnabled() && $defaultEditMode == 'wysiwyg')
-          ## Link to the in-place page editor which currently uses the view action.
-          #set ($action = 'view')
-          #set ($fragment = 'translate')
-        #end
-        #set ($discard = $output.add(
-          "<span class='wikicreatelink skipCreatePagePopup'>" +
-            $stringtool.trim("#docTranslationLink($supportedLocale $action $fragment)") +
-          "</span>"
-        ))
+  #set ($output = [])
+  #foreach ($supportedLocale in $supportedLocales)
+    #if ($existingTranslations.contains($supportedLocale))
+      #set ($discard = $output.add($stringtool.trim("#docTranslationLink($supportedLocale 'view')")))
+    #elseif ($hasEdit && "$!doc.realLocale" != '')
+      ## Show the link to create the missing translation if the current user can edit the page and the default
+      ## translation has a locale set (i.e. if the page can be translated). Use the preferred edit mode (in-place versus
+      ## stand-alone) depending on the user preferences, in order to replicate the behavior of the Translate button.
+      #set ($action = 'edit')
+      #set ($fragment = $NULL)
+      #getDefaultDocumentEditor($defaultEditMode)
+      #if ($services.edit.document.inPlaceEditingEnabled() && $defaultEditMode == 'wysiwyg')
+        ## Link to the in-place page editor which currently uses the view action.
+        #set ($action = 'view')
+        #set ($fragment = 'translate')
       #end
+      #set ($discard = $output.add(
+        "<span class='wikicreatelink skipCreatePagePopup'>" +
+          $stringtool.trim("#docTranslationLink($supportedLocale $action $fragment)") +
+        "</span>"
+      ))
     #end
+  #end
+  #if (!$output.isEmpty())
     #set ($discard = $staticUIX.add({'content': "
       <dt>
         <label>$escapetool.xml($services.localization.render('core.viewers.information.translations'))</label>
+        #_maybeShowNoLocaleWarning()
       </dt>
       <dd data-key=""translations"">$stringtool.join($output, ', ')</dd>
       ",
@@ -267,3 +279,5 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
     <div class="clearfloats">&nbsp;</div>
   </div>## _information
 </div>## informationcontent
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))

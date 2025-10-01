@@ -44,6 +44,7 @@ administration.sectionTitle=管理：{0}
 administration.sectionTitle.page=ページの管理：{0}
 administration.sectionTitle.wiki=ウィキの管理：{0}
 administration.sectionTitle.global=共通設定：{0}
+### Missing: administration.menu.label=Administration sections.
 administration.menu.search.hint=検索…
 administration.menu.search.noResults=結果がありません。
 
@@ -54,8 +55,6 @@ XWiki.XWikiPreferences_confirmation_email_content.hint=ユーザーは、最初�
 XWiki.XWikiPreferences_invitation_email_content.hint=このEメールのテンプレートでは、登録を招待するユーザーに送るメールを設定できます。
 XWiki.Registration_heading.hint=登録中あるいは登録が完了したユーザーに表示されるページの最上部の行を設定できます。Velocityとウィキのシンタックスを使うことができます。
 XWiki.Registration_welcomeMessage.hint=これはユーザーがフォームを入力しているときにのみ表示されます。Velocityとウィキのシンタックスコードを使うことができます。
-XWiki.Registration_liveValidation_enabled.hint=JavaScriptのコードによるライブ認証を無効にする場合は、偽に設定してください（フィールドはサーバーにより検証されます）。
-XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=ライブ認証では、フィールドを適切に入力していることをユーザーに通知するメッセージを表示します。特定のフィールドで上書きされていない場合、このメッセージを表示します。Velocityコードを使うことができます。
 XWiki.Registration_loginButton_enabled.hint=ユーザーが登録すると、クリックするとユーザー名とパスワードをログインアクションに送信し、即座にログインするボタンを表示します。これはユーザー名とパスワードをHTML形式で返すため、必要とするセキュリティーによっては問題があるかもしれません。
 XWiki.Registration_loginButton_autoLogin_enabled.hint=ログインボタンが有効の場合、ユーザーのログインボタンを押すJavaScriptのコードを設定できます。
 XWiki.Registration_defaultRedirect.hint=転送パラメーターを設定していない場合で、ログインボタンを押したときにユーザーを転送するURLを設定できます。Velocityコードを使うことができます。
@@ -141,6 +140,11 @@ administration.section.users.deleteUser.newAuthor.programming=プログラミン
 administration.section.users.deleteUser.newAuthor.script=スクリプト
 admin.usersgroups.extensionrights=拡張機能の権限
 
+# Groups section
+### Missing: administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+### Missing: administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+### Missing: administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
+
 # Other Category
 admin.other=その他
 admin.other.description=拡張機能の様々な設定。
@@ -179,6 +183,8 @@ administration.section.users.deleteUser.markInactiveMessage=ユーザーを削�
 
 ## Deprecated since 11.8RC1
 administration.section.users.deleteUser.markDisabledMessage=ユーザーを削除する代わりに、プロフィールを無効に設定できます。ユーザーのログインを防ぐとともに、ユーザーが作成したスクリプトに関連付けられたアクセス権限を保存します。
+XWiki.Registration_liveValidation_enabled.hint=JavaScriptのコードによるライブ認証を無効にする場合は、偽に設定してください（フィールドはサーバーにより検証されます）。
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=ライブ認証では、フィールドを適切に入力していることをユーザーに通知するメッセージを表示します。特定のフィールドで上書きされていない場合、このメッセージを表示します。Velocityコードを使うことができます。
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

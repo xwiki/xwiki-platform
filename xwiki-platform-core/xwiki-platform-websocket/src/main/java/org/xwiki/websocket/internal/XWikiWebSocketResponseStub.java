@@ -33,24 +33,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.Cookie;
-import javax.websocket.HandshakeResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.websocket.HandshakeResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiResponse;
-import com.xpn.xwiki.web.XWikiServletResponseStub;
+import org.xwiki.container.servlet.HttpServletResponseStub;
 
 /**
- * Adapts a {@link HandshakeResponse} to {@link XWikiResponse}.
+ * Adapts a {@link HandshakeResponse} to {@link jakarta.servlet.http.HttpServletResponse}.
  * 
  * @version $Id$
  * @since 13.7RC1
  */
-public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
+public class XWikiWebSocketResponseStub extends HttpServletResponseStub
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiWebSocketResponseStub.class);
 
@@ -184,16 +181,5 @@ public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
         }
 
         addHeader("Set-Cookie", header.toString());
-    }
-
-    @Override
-    public void removeCookie(String cookieName, XWikiRequest request)
-    {
-        Cookie cookie = request.getCookie(cookieName);
-        if (cookie != null) {
-            cookie.setMaxAge(0);
-            cookie.setPath(cookie.getPath());
-            addCookie(cookie);
-        }
     }
 }

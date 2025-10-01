@@ -27,13 +27,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
 import org.hibernate.dialect.Dialect;
@@ -51,13 +50,15 @@ import org.hibernate.query.NativeQuery;
 import org.slf4j.Logger;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
+import org.xwiki.store.hibernate.HibernateAdapter;
+import org.xwiki.store.hibernate.HibernateStoreException;
+import org.xwiki.store.hibernate.internal.MySQLHibernateAdapter;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.DatabaseProduct;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -104,7 +105,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         // Nothing to do here, everything's done as part of Liquibase pre update
     }
 
-    private void warnDatabaTooOld(String databaseName, Version databaseVersion)
+    private void warnDatabaseTooOld(String databaseName, Version databaseVersion)
     {
         this.logger.warn(
             "The migration cannot run on {} versions lower than {}. The short String limitation will remain 255.",
@@ -127,14 +128,14 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                 if (productName.equalsIgnoreCase("mariadb")) {
                     // Impossible to apply this migration on MariaDB lower than 10.2
                     if (version.compareTo(MARIADB102) < 0) {
-                        warnDatabaTooOld("MariaDB", MARIADB102);
+                        warnDatabaseTooOld("MariaDB", MARIADB102);
 
                         return false;
                     }
                 } else {
                     // Impossible to apply this migration on MySQL lower than 5.7
                     if (version.compareTo(MYSQL57) < 0) {
-                        warnDatabaTooOld("MySQL", MYSQL57);
+                        warnDatabaseTooOld("MySQL", MYSQL57);
 
                         return false;
                     }
@@ -162,7 +163,8 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     }
 
     private void updateColumn(Column column, DatabaseMetaData databaseMetaData, Set<String> dynamicTables,
-        StringBuilder builder) throws SQLException, DataMigrationException
+        Map<String, String> rowFormats, StringBuilder builder, Session session)
+        throws SQLException, HibernateStoreException
     {
         int expectedLenght = column.getLength();
 
@@ -171,19 +173,19 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
 
             // Skip the update if the column does not exist of if its size if greater or equals already
             if (databaseSize != null && databaseSize.intValue() < expectedLenght) {
-                update(column, dynamicTables, builder);
+                update(column, dynamicTables, rowFormats, builder, session);
             }
         }
     }
 
     private Integer getDatabaseSize(Column column, DatabaseMetaData databaseMetaData) throws SQLException
     {
-        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
-        String tableName = this.hibernateStore.getConfiguredTableName(column.getValue().getTable());
+        String databaseName = this.hibernateStore.getAdapter().getDatabaseFromWikiName();
+        String tableName = this.hibernateStore.getAdapter().getTableName(column.getValue().getTable());
         String columnName = this.hibernateStore.getConfiguredColumnName(column);
 
         ResultSet resultSet;
-        if (this.hibernateStore.isCatalog()) {
+        if (this.hibernateStore.getAdapter().isCatalog()) {
             resultSet = databaseMetaData.getColumns(databaseName, null, tableName, columnName);
         } else {
             resultSet = databaseMetaData.getColumns(null, databaseName, tableName, columnName);
@@ -197,27 +199,29 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     }
 
     private void updateProperty(Property property, DatabaseMetaData databaseMetaData, Set<String> dynamicTables,
-        StringBuilder builder) throws SQLException, DataMigrationException
+        Map<String, String> rowFormats, StringBuilder builder, Session session)
+        throws SQLException, HibernateStoreException
     {
         if (property != null) {
-            updateValue(property.getValue(), databaseMetaData, dynamicTables, builder);
+            updateValue(property.getValue(), databaseMetaData, dynamicTables, rowFormats, builder, session);
         }
     }
 
     private void updateValue(Value value, DatabaseMetaData databaseMetaData, Set<String> dynamicTables,
-        StringBuilder builder) throws SQLException, DataMigrationException
+        Map<String, String> rowFormats, StringBuilder builder, Session session)
+        throws SQLException, HibernateStoreException
     {
-        if (value instanceof Collection) {
-            Table collectionTable = ((Collection) value).getCollectionTable();
+        if (value instanceof Collection collection) {
+            Table collectionTable = collection.getCollectionTable();
 
             for (Iterator<Column> it = collectionTable.getColumnIterator(); it.hasNext();) {
-                updateColumn(it.next(), databaseMetaData, dynamicTables, builder);
+                updateColumn(it.next(), databaseMetaData, dynamicTables, rowFormats, builder, session);
             }
         } else if (value != null) {
             for (Iterator<Selectable> it = value.getColumnIterator(); it.hasNext();) {
                 Selectable selectable = it.next();
-                if (selectable instanceof Column) {
-                    updateColumn((Column) selectable, databaseMetaData, dynamicTables, builder);
+                if (selectable instanceof Column column) {
+                    updateColumn(column, databaseMetaData, dynamicTables, rowFormats, builder, session);
                 }
             }
         }
@@ -237,7 +241,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                 java.util.Collection<PersistentClass> bindings =
                     this.hibernateStore.getConfigurationMetadata().getEntityBindings();
 
-                Set<String> dynamicTables = new HashSet<>();
+                Set<String> updatedTables = new HashSet<>();
 
                 // Gather existing tables
                 List<PersistentClass> existingTables = new ArrayList<>(bindings.size());
@@ -248,23 +252,26 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                 }
 
                 // Cleanup specific to MySQL/MariaDB
-                if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
-                    // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
+                Map<String, String> rowFormats = null;
+                MySQLHibernateAdapter adapter = getMySQLAdapter();
+                if (adapter != null) {
+                    // Make sure all MySQL/MariaDB tables use the expected row format (required to support key prefix
                     // length limit up to 3072 bytes)
+                    rowFormats = adapter.getRowFormats(session);
                     for (PersistentClass entity : existingTables) {
-                        setTableDYNAMIC(entity, builder, dynamicTables);
+                        setTableRowFormat(entity, rowFormats, builder, updatedTables, session);
                     }
 
                     // Remove combined UNIQUE KEY affecting xwikiattrecyclebin#XDA_FILENAME column since those are not
                     // supposed to exist anymore and it can prevent the resize on MySQL/MariaDB
-                    removeAttachmentRecycleFilenameMultiKey(builder);
-                    removeRecycleFilenameMultiKey(builder);
+                    removeAttachmentRecycleFilenameMultiKey(builder, session);
+                    removeRecycleFilenameMultiKey(builder, session);
                 }
 
                 // Update columns for which the size changed
-                updateColumns(existingTables, databaseMetaData, builder, dynamicTables);
+                updateColumns(existingTables, databaseMetaData, builder, updatedTables, rowFormats, session);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new DataMigrationException("Error while extracting metadata", e);
         }
 
@@ -280,29 +287,29 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         return null;
     }
 
-    private void removeAttachmentRecycleFilenameMultiKey(StringBuilder builder) throws DataMigrationException
+    private void removeAttachmentRecycleFilenameMultiKey(StringBuilder builder, Session session)
     {
         PersistentClass persistentClass =
             this.hibernateStore.getConfigurationMetadata().getEntityBinding(DeletedAttachment.class.getName());
-        String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+        String tableName = this.hibernateStore.getAdapter().getTableName(persistentClass);
 
-        removeFilenameMultiKey(tableName, builder);
+        removeFilenameMultiKey(tableName, builder, session);
     }
 
-    private void removeRecycleFilenameMultiKey(StringBuilder builder) throws DataMigrationException
+    private void removeRecycleFilenameMultiKey(StringBuilder builder, Session session)
     {
         PersistentClass persistentClass =
             this.hibernateStore.getConfigurationMetadata().getEntityBinding(XWikiDeletedDocument.class.getName());
-        String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+        String tableName = this.hibernateStore.getAdapter().getTableName(persistentClass);
 
-        removeFilenameMultiKey(tableName, builder);
+        removeFilenameMultiKey(tableName, builder, session);
     }
 
-    private void removeFilenameMultiKey(String tableName, StringBuilder builder) throws DataMigrationException
+    private void removeFilenameMultiKey(String tableName, StringBuilder builder, Session session)
     {
-        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
+        String databaseName = this.hibernateStore.getAdapter().getDatabaseFromWikiName();
 
-        for (String key : getUniqueKeys(databaseName, tableName)) {
+        for (String key : getUniqueKeys(databaseName, tableName, session)) {
             builder.append("<dropUniqueConstraint");
             appendXmlAttribute("constraintName", key, builder);
             appendXmlAttribute("tableName", tableName, builder);
@@ -310,99 +317,73 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         }
     }
 
-    private List<String> getUniqueKeys(String databaseName, String tableName) throws DataMigrationException
+    private List<String> getUniqueKeys(String databaseName, String tableName, Session session)
     {
-        try {
-            return getStore().executeRead(getXWikiContext(), new HibernateCallback<List<String>>()
-            {
-                @Override
-                public List<String> doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    NativeQuery<String> query = session
-                        .createNativeQuery("SELECT DISTINCT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS "
-                            + "WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table AND CONSTRAINT_TYPE = 'UNIQUE'");
-                    query.setParameter("schema", databaseName);
-                    query.setParameter("table", tableName);
+        NativeQuery<String> query =
+            session.createNativeQuery("SELECT DISTINCT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS "
+                + "WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table AND CONSTRAINT_TYPE = 'UNIQUE'");
+        query.setParameter("schema", databaseName);
+        query.setParameter("table", tableName);
 
-                    return query.list();
-                }
-            });
-        } catch (XWikiException e) {
-            throw new DataMigrationException("Failed to get unique keys", e);
-        }
+        return query.list();
     }
 
     private void updateColumns(List<PersistentClass> existingTables, DatabaseMetaData databaseMetaData,
-        StringBuilder builder, Set<String> dynamicTables) throws SQLException, DataMigrationException
+        StringBuilder builder, Set<String> dynamicTables, Map<String, String> rowFormats, Session session)
+        throws SQLException, HibernateStoreException
     {
         for (PersistentClass entity : existingTables) {
             // Find properties to update
             for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
-                updateProperty(it.next(), databaseMetaData, dynamicTables, builder);
+                updateProperty(it.next(), databaseMetaData, dynamicTables, rowFormats, builder, session);
             }
 
             // Check the key
-            updateValue(entity.getKey(), databaseMetaData, dynamicTables, builder);
+            updateValue(entity.getKey(), databaseMetaData, dynamicTables, rowFormats, builder, session);
         }
     }
 
-    private void setTableDYNAMIC(PersistentClass entity, StringBuilder builder, Set<String> dynamicTables)
-        throws DataMigrationException
+    private MySQLHibernateAdapter getMySQLAdapter()
     {
-        String tableName = this.hibernateStore.getConfiguredTableName(entity);
+        HibernateAdapter adapter = this.hibernateStore.getAdapter();
 
-        setTableDYNAMIC(tableName, builder, dynamicTables);
+        return adapter instanceof MySQLHibernateAdapter mysqlApater ? mysqlApater : null;
     }
 
-    private void setTableDYNAMIC(String tableName, StringBuilder builder, Set<String> dynamicTables)
-        throws DataMigrationException
+    private void setTableRowFormat(PersistentClass entity, Map<String, String> rowFormats, StringBuilder builder,
+        Set<String> updatedTables, Session session) throws HibernateStoreException
     {
-        if (!dynamicTables.contains(tableName) && !StringUtils.equalsIgnoreCase(getRowFormat(tableName), "Dynamic")) {
+        String tableName = getMySQLAdapter().getTableName(entity);
+        boolean compressed = entity.getMetaAttribute(HibernateAdapter.META_ATTRIBUTE_COMPRESSED) != null;
+
+        setTableRowFormat(tableName, compressed, rowFormats, builder, updatedTables, session);
+    }
+
+    private void setTableRowFormat(String tableName, boolean compressed, Map<String, String> rowFormats,
+        StringBuilder builder, Set<String> updatedTables, Session session) throws HibernateStoreException
+    {
+        MySQLHibernateAdapter adapater = (MySQLHibernateAdapter) this.hibernateStore.getAdapter();
+
+        String statement = adapater.getAlterRowFormatString(tableName, compressed, rowFormats, session);
+
+        if (statement != null) {
             this.logger.debug("Converting raw format for table [{}]", tableName);
 
             builder.append("<sql>");
-            builder.append("ALTER TABLE ");
-            builder.append(tableName);
-            builder.append(" ROW_FORMAT=DYNAMIC");
+            builder.append(statement);
             builder.append("</sql>");
 
-            dynamicTables.add(tableName);
-        }
-    }
-
-    private String getRowFormat(String tableName) throws DataMigrationException
-    {
-        try {
-            return getStore().executeRead(getXWikiContext(), new HibernateCallback<String>()
-            {
-                @Override
-                public String doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    NativeQuery<String> query =
-                        session.createNativeQuery("SELECT DISTINCT ROW_FORMAT FROM INFORMATION_SCHEMA.TABLES "
-                            + "WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table");
-                    query.setParameter("schema", hibernateStore.getDatabaseFromWikiName());
-                    query.setParameter("table", tableName);
-
-                    String rawFormat = query.uniqueResult();
-
-                    logger.debug("Row format for table [{}]: {}", tableName, rawFormat);
-
-                    return rawFormat;
-                }
-            });
-        } catch (XWikiException e) {
-            throw new DataMigrationException("Failed to get unique keys", e);
+            updatedTables.add(tableName);
         }
     }
 
     private boolean exists(PersistentClass entity, DatabaseMetaData databaseMetaData) throws SQLException
     {
-        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
-        String tableName = this.hibernateStore.getConfiguredTableName(entity);
+        String databaseName = this.hibernateStore.getAdapter().getDatabaseFromWikiName();
+        String tableName = this.hibernateStore.getAdapter().getTableName(entity);
 
         ResultSet resultSet;
-        if (this.hibernateStore.isCatalog()) {
+        if (this.hibernateStore.getAdapter().isCatalog()) {
             resultSet = databaseMetaData.getTables(databaseName, null, tableName, null);
         } else {
             resultSet = databaseMetaData.getTables(null, databaseName, tableName, null);
@@ -411,13 +392,12 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         return resultSet.next();
     }
 
-    private void update(Column column, Set<String> dynamicTables, StringBuilder builder) throws DataMigrationException
+    private void update(Column column, Set<String> dynamicTables, Map<String, String> rowFormats, StringBuilder builder,
+        Session session) throws HibernateStoreException
     {
-        DatabaseProduct productName = this.hibernateStore.getDatabaseProductName();
+        MySQLHibernateAdapter mysqlAdapater = getMySQLAdapter();
 
-        this.logger.debug("Database product name: {}", productName);
-
-        if (productName == DatabaseProduct.MYSQL) {
+        if (mysqlAdapater != null) {
             JdbcEnvironment jdbcEnvironment =
                 this.hibernateStore.getConfigurationMetadata().getDatabase().getJdbcEnvironment();
             String tableName = jdbcEnvironment.getQualifiedObjectNameFormatter()
@@ -427,10 +407,10 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
 
             this.logger.debug("Updating column [{}] in table [{}]", quotedColumn, tableName);
 
-            // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
+            // Make sure all MySQL/MariaDB tables use the expected row format (required to support key prefix
             // length limit up to 3072 bytes)
-            // Check again in case it's a special table which was missed in the previous pass
-            setTableDYNAMIC(tableName, builder, dynamicTables);
+            // Check again in case it's a special table which was missing in the previous pass
+            setTableRowFormat(tableName, false, rowFormats, builder, dynamicTables, session);
 
             // Not using <modifyDataType> here because Liquibase ignores attributes likes "NOT NULL"
             builder.append("<sql>");
@@ -442,7 +422,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
             builder.append("</sql>");
         } else {
             builder.append("<modifyDataType");
-            appendXmlAttribute("tableName", this.hibernateStore.getConfiguredTableName(column.getValue().getTable()),
+            appendXmlAttribute("tableName", this.hibernateStore.getAdapter().getTableName(column.getValue().getTable()),
                 builder);
             appendXmlAttribute("columnName", this.hibernateStore.getConfiguredColumnName(column), builder);
             appendXmlAttribute("newDataType",

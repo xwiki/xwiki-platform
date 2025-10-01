@@ -156,7 +156,30 @@
    *
    *###
   #set($mainFields = [])
+
+  ## The first name field.
+  #set($field =
+    {'name' : 'register_first_name',
+      'label' : $services.localization.render('core.register.firstName'),
+      'params' : {
+        'type' : 'text',
+        'size' : '60',
+        'autocomplete' : 'given-name'
+      }
+    })
+  #set($discard = $mainFields.add($field))
   ##
+  ## The last name field.
+  #set($field =
+    {'name' : 'register_last_name',
+    'label' : $services.localization.render('core.register.lastName'),
+    'params' : {
+      'type' : 'text',
+      'size' : '60',
+      'autocomplete' : 'family-name'
+      }
+    })
+  #set($discard = $mainFields.add($field))
   ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
   #set($field =
     {'name' : 'xwikiname',
@@ -246,31 +269,6 @@
     $userDoc.saveWithProgrammingRights("Saved favorite color from registration form.")
   #end
   *********###
-  #set($aboutYouFields = [])
-  ##
-  ## The first name field, no checking.
-  #set($field =
-    {'name' : 'register_first_name',
-      'label' : $services.localization.render('core.register.firstName'),
-      'params' : {
-        'type' : 'text',
-        'size' : '60',
-        'autocomplete' : 'given-name'
-      }
-    })
-  #set($discard = $aboutYouFields.add($field))
-  ##
-  ## The last name field, no checking.
-  #set($field =
-    {'name' : 'register_last_name',
-      'label' : $services.localization.render('core.register.lastName'),
-      'params' : {
-        'type' : 'text',
-        'size' : '60',
-        'autocomplete' : 'family-name'
-      }
-    })
-  #set($discard = $aboutYouFields.add($field))
   ##
   ## To disable the CAPTCHA on this page, comment out the next entry.
   ## The CAPTCHA, not really an input field but still defined the same way.
@@ -297,7 +295,7 @@
         },
         'noReturn' : true
       })
-    #set($discard = $aboutYouFields.add($field))
+    #set($discard = $mainFields.add($field))
   #end
   ## Pass the redirect parameter on so that the login page may redirect to the right place.
   ## Not necessary in Firefox 3.0.10 or Opera 9.64, I don't know about IE or Safari.
@@ -307,10 +305,8 @@
         'type' : 'hidden'
       }
     })
-  #set($discard = $aboutYouFields.add($field))
-  #set($fields = [])
-  #set($discard = $fields.addAll($mainFields))
-  #set($discard = $fields.addAll($aboutYouFields))
+  #set($discard = $mainFields.add($field))
+  #set($fields = $mainFields)
   ##
   #######################################################################
   ## The Code.
@@ -346,9 +342,11 @@
   ## If the submit button has been pressed, then we test the input and maybe create the user.
   #if($request.getParameter('xwikiname'))
     ## Do server side validation of input fields.
-    ## This must not be in a #set directive as it will output messages if something goes wrong.
-    #validateFields($fields, $request)
-    ## If server side validation was successfull, create the user
+    ## This will output messages if something goes wrong, nothing if everything is alright.
+    ## We need to trim the output so that we can keep indentations in the validation script.
+    #set ($validationText = $stringtool.trim("#validateFields($fields, $request)"))
+    $validationText##
+    ## If server side validation was successful, create the user
     #if($allFieldsValid)
       #createUser($fields, $request, $response, $doAfterRegistration)
     #end
@@ -371,8 +369,6 @@
         &lt;/div&gt;
         ## Note that the macro inject the form_token field.
         #generateHtml($mainFields, $request, 'false')
-        &lt;h2&gt;$services.localization.render('core.register.aboutYou')&lt;/h2&gt;
-        #generateHtml($aboutYouFields, $request, 'false')
         &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()" /&gt;
         #generateJavascript($fields)
         &lt;p class="buttons"&gt;

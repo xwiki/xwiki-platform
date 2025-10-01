@@ -157,7 +157,7 @@ class ClassSheetIT
         assertEquals("Tester", descriptionProperty.getDisplayValue());
 
         assertEquals(pageName, viewPage.getDocumentTitle());
-        assertEquals("YOUR FAVORITE COLOR\npink\nYOUR CURRENT AGE\n27\nDESCRIPTION\nTester", viewPage.getContent());
+        assertEquals("Your favorite color\npink\nYour current age\n27\nDescription\nTester", viewPage.getContent());
         viewPage.clickBreadcrumbLink(classTitle);
 
         // Assert the created document is listed.

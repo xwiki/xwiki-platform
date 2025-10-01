@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.DocumentTreeMacros" locale="">
+<xwikidoc version="1.6" reference="XWiki.DocumentTreeMacros" locale="">
   <web>XWiki</web>
   <name>DocumentTreeMacros</name>
   <language/>
@@ -69,9 +69,15 @@
   #end
   ## Handle relative references
   #makeNodeReferencesAbsolute($docTreeConfig ['root', 'openTo'])
-  ## Sort the child documents by (raw) title when the node label is the document title.
-  #if ($docTreeConfig.showDocumentTitle)
-    #set ($docTreeConfig.orderBy = 'title')
+  ## FIXME: The 'orderBy' property of the tree API is shared by all tree node types, which means we can't indicate a
+  ## different sort field per tree node type (e.g. sort wiki nodes by name and document nodes by last modification
+  ## date). At the same time, this property is currently taken into account only for sorting document tree nodes, so for
+  ## now we set its value to the specified document sort. In the future we may want to convert this into a map, where
+  ## the key is the node type.
+  #set ($docTreeConfig.orderBy = $docTreeConfig.sortDocumentsBy)
+  ## Sort the child documents by (raw) title when the node label is the document title and there's no sort specified.
+  #if ($docTreeConfig.showDocumentTitle &amp;&amp; "$!docTreeConfig.orderBy" == '')
+    #set ($docTreeConfig.orderBy = 'title:asc')
   #end
   ## Determine which hierarchy needs to be used.
   #if ($docTreeConfig.showSpaces)
@@ -184,6 +190,8 @@
   #set ($limit = $mathtool.max($numbertool.toNumber($request.limit).intValue(), 1))
   #if ("$!limit" == '')
     #set ($limit = 15)
+  #else
+    #validateQueryLimit($limit)
   #end
   #if ($nodeId == '#' &amp;&amp; $docTreeConfig.showRoot)
     #maybeAddNode($actualNodeId $children)
@@ -237,6 +245,7 @@
 
 #macro (maybeAddFarmNode $nodeReference $siblings)
   #set ($farmHomeReference = $services.model.resolveDocument('', 'default'))
+  #set ($isOpened = $docTreeConfig.expandToLevel &gt; 0)
   #set ($discard = $siblings.add({
     'id': 'farm:*',
     'text': 'Farm',
@@ -245,6 +254,9 @@
     'data': {
       'type': 'farm',
       'validChildren': ['wiki', 'pagination']
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($farmHomeReference)
@@ -274,6 +286,7 @@
   #else
     #set ($label = $wiki.id)
   #end
+  #set ($isOpened = $docTreeConfig.expandToLevel &gt; 0)
   #set ($discard = $siblings.add({
     'id': "wiki:$wiki.id",
     'text': $label,
@@ -284,6 +297,9 @@
       'type': 'wiki',
       'validChildren': ['space', 'document', 'pagination'],
       'canDelete': $canDeleteWiki
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($wiki.mainPageReference)
@@ -310,6 +326,7 @@
 
 #macro (addSpaceNode $spaceReference $siblings)
   #set ($spaceId = $services.model.serialize($spaceReference, 'default'))
+  #set ($spaceNodeId = "space:$spaceId")
   #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spaceReference))
   #set ($canViewSpace = $services.security.authorization.hasAccess('view', $spaceReference))
   #if ($docTreeConfig.showTerminalDocuments)
@@ -317,10 +334,21 @@
     #set ($hasChildren = true)
   #else
     ## We display only the nested spaces. This space might contain only documents.
-    #set ($hasChildren = $tree.getChildCount("space:$spaceId") &gt; 0)
+    #set ($hasChildren = $tree.getChildCount($spaceNodeId) &gt; 0)
+  #end
+  #set ($isOpened = false)
+  #if ("$!docTreeConfig.expandToLevel" != '')
+    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #if ("$!docTreeConfig.root" != '')
+      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #else
+      #set ($rootNode = $docTreeConfig.root)
+    #end
+    #set ($rootDistance = $tree.getPath($spaceNodeId).size())
+    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
   #end
   #set ($discard = $siblings.add({
-    'id': "space:$spaceId",
+    'id': $spaceNodeId,
     'text': $spaceReference.name,
     'icon': 'fa fa-folder-o',
     'iconOpened': 'fa fa-folder-open-o',
@@ -337,6 +365,9 @@
       'canDelete': $hasSpaceAdmin,
       'createDocumentURL': $xwiki.getURL($spaceReference, 'create', $NULL),
       'deleteURL': $xwiki.getURL($spaceReference, 'deletespace', $NULL)
+    },
+    'state': {
+      'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($spaceReference)
@@ -363,6 +394,7 @@
 
 #macro (addDocumentNode $documentReference $siblings)
   #set ($documentId = $services.model.serialize($documentReference, 'default'))
+  #set ($docNodeId = "document:$documentId")
   #set ($label = $documentReference.name)
   #if (!$docTreeConfig.showSpaces &amp;&amp;
       $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
@@ -379,9 +411,20 @@
       #set ($label = $plainTitle)
     #end
   #end
-  #set ($hasChildren = $tree.getChildCount("document:$documentId") &gt; 0)
+  #set ($hasChildren = $tree.getChildCount($docNodeId) &gt; 0)
+  #set ($isOpened = false)
+  #if ("$!docTreeConfig.expandToLevel" != '')
+    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #if ("$!docTreeConfig.root" != '')
+      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #else
+      #set ($rootNode = $docTreeConfig.root)
+    #end
+    #set ($rootDistance = $tree.getPath($docNodeId).size())
+    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
+  #end
   #set ($discard = $siblings.add({
-    'id': "document:$documentId",
+    'id': $docNodeId,
     'text': $label,
     'icon': 'fa fa-file-o',
     'children': $hasChildren,
@@ -395,6 +438,9 @@
       'canMove': $canDeleteDoc,
       'canCopy': $canViewDoc,
       'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL)
+    },
+    'state': {
+       'opened': $isOpened
     },
     'a_attr': {
       'href': $xwiki.getURL($documentReference)

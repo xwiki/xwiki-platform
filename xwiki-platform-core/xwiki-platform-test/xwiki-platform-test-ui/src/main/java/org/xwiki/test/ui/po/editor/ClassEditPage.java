@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.FormContainerElement;
 
 /**
@@ -58,6 +59,20 @@ public class ClassEditPage extends EditPage
         return new ClassEditPage();
     }
 
+    /**
+     * Edit the specified class.
+     *
+     * @param classReference the reference of the class to edit
+     * @return the class edit page
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public static ClassEditPage gotoPage(EntityReference classReference)
+    {
+        getUtil().gotoPage(classReference, "edit", "editor=class");
+        return new ClassEditPage();
+    }
+
     public ClassPropertyEditPane addProperty(String propertyName, String propertyType)
     {
         addPropertyWithoutWaiting(propertyName, propertyType);
@@ -88,6 +103,17 @@ public class ClassEditPage extends EditPage
         getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
         getDriver().findElement(By.cssSelector(".xdialog-box-confirmation input[value='Yes']")).click();
         getDriver().waitUntilElementDisappears(propertyLocator);
+    }
+
+    /**
+     * Test that a property is present in the editor.
+     * @param propertyName the name of the property
+     * @return {@code true} if the property can be found.
+     * @since 17.7.0RC1
+     */
+    public boolean hasProperty(String propertyName)
+    {
+        return getDriver().hasElement(By.id("xproperty_" + propertyName));
     }
 
     private FormContainerElement getForm()

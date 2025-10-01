@@ -99,10 +99,9 @@ select[size="0"], select[size="1"] {
       }
       .label {
         color: @text-color;
-        font-size: 0.85em;
-        font-weight: 700;
+        font-size: 1em;
+        font-weight: ~"var(--font-weight-semibold)";
         margin-bottom: 0.3em;
-        text-transform: uppercase;
         .buttonwrapper a {
           .btn-xs;
           margin: 0;
@@ -127,8 +126,9 @@ select[size="0"], select[size="1"] {
   }
   .xHint, .xRequired, .xErrorMsg {
     .text-muted-smaller;
-    font-weight: 400;
+    font-weight: ~"var(--font-weight-regular)";
     text-transform: none;
+    margin-bottom: .5em;
   }
   .xHint {
     display: block;

@@ -44,6 +44,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.hql.internal.HQLStatementValidator;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationException;
@@ -58,6 +59,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
 import com.xpn.xwiki.internal.XWikiInitializerJobStatus;
+import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
@@ -104,6 +106,8 @@ public class XWiki extends Api
     private DocumentRevisionProvider documentRevisionProvider;
 
     private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    private HQLStatementValidator hqlValidator;
 
     /**
      * XWiki API Constructor
@@ -165,6 +169,15 @@ public class XWiki extends Api
         }
 
         return this.documentRevisionProvider;
+    }
+
+    private HQLStatementValidator getHQLStatementValidator()
+    {
+        if (this.hqlValidator == null) {
+            this.hqlValidator = Utils.getComponent(HQLStatementValidator.class);
+        }
+
+        return this.hqlValidator;
     }
 
     /**
@@ -710,6 +723,23 @@ public class XWiki extends Api
         return this.xwiki.getMetaclass();
     }
 
+    private void checkSearchQueryAllowed(String whereSQL) throws XWikiException
+    {
+        if (!hasProgrammingRights()) {
+            try {
+                if (!getHQLStatementValidator()
+                    .isSafe(HqlQueryUtils.createLegacySQLQuery("select distinct doc.fullName", whereSQL))) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        "The query [" + whereSQL + "] requires programming right");
+                }
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Failed to validate the query [" + whereSQL + "], requiring programming right", e);
+            }
+        }
+    }
+
     /**
      * API allowing to search for document names matching a query. Examples:
      * <ul>
@@ -742,6 +772,8 @@ public class XWiki extends Api
     @Deprecated
     public List<String> searchDocuments(String wheresql) throws XWikiException
     {
+        checkSearchQueryAllowed(wheresql);
+
         return this.xwiki.getStore().searchDocumentsNames(wheresql, getXWikiContext());
     }
 
@@ -760,6 +792,8 @@ public class XWiki extends Api
     @Deprecated
     public List<String> searchDocuments(String wheresql, int nb, int start) throws XWikiException
     {
+        checkSearchQueryAllowed(wheresql);
+
         return this.xwiki.getStore().searchDocumentsNames(wheresql, nb, start, getXWikiContext());
     }
 
@@ -796,6 +830,8 @@ public class XWiki extends Api
      */
     public List<Document> searchDocuments(String wheresql, boolean distinctbylocale) throws XWikiException
     {
+        checkSearchQueryAllowed(wheresql);
+
         return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylocale, getXWikiContext()));
     }
 
@@ -812,6 +848,8 @@ public class XWiki extends Api
     public List<Document> searchDocuments(String wheresql, boolean distinctbylocale, int nb, int start)
         throws XWikiException
     {
+        checkSearchQueryAllowed(wheresql);
+
         return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylocale, nb, start, getXWikiContext()));
     }
 
@@ -845,6 +883,8 @@ public class XWiki extends Api
     public List<String> searchDocuments(String parameterizedWhereClause, int maxResults, int startOffset,
         List<?> parameterValues) throws XWikiException
     {
+        checkSearchQueryAllowed(parameterizedWhereClause);
+
         return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, maxResults, startOffset,
             parameterValues, getXWikiContext());
     }
@@ -858,6 +898,8 @@ public class XWiki extends Api
     @Deprecated
     public List<String> searchDocuments(String parameterizedWhereClause, List<?> parameterValues) throws XWikiException
     {
+        checkSearchQueryAllowed(parameterizedWhereClause);
+
         return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, parameterValues, getXWikiContext());
     }
 
@@ -885,6 +927,8 @@ public class XWiki extends Api
         try {
             this.context.setWikiId(wikiName);
 
+            checkSearchQueryAllowed(parameterizedWhereClause);
+
             return searchDocuments(parameterizedWhereClause, maxResults, startOffset, parameterValues);
         } finally {
             this.context.setWikiId(database);
@@ -895,7 +939,7 @@ public class XWiki extends Api
      * Search spaces by passing HQL where clause values as parameters. See
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
      *
-     * @param parametrizedSqlClause the HQL where clause. For example
+     * @param parameterizedSqlClause the HQL where clause. For example
      *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
@@ -903,10 +947,12 @@ public class XWiki extends Api
      * @return a list of spaces names.
      * @throws XWikiException in case of error while performing the query
      */
-    public List<String> searchSpacesNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
+    public List<String> searchSpacesNames(String parameterizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
-        return this.xwiki.getStore().search("select distinct doc.space from XWikiDocument doc " + parametrizedSqlClause,
+        checkSearchQueryAllowed(parameterizedSqlClause);
+
+        return this.xwiki.getStore().search("select distinct doc.space from XWikiDocument doc " + parameterizedSqlClause,
             nb, start, parameterValues, this.context);
     }
 
@@ -915,7 +961,7 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses. You can specify
      * properties of attach (the attachment) or doc (the document it is attached to)
      *
-     * @param parametrizedSqlClause The HQL where clause. For example
+     * @param parameterizedSqlClause The HQL where clause. For example
      *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.
@@ -924,17 +970,19 @@ public class XWiki extends Api
      * @throws XWikiException in case of error while performing the query
      * @since 5.0M2
      */
-    public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
+    public List<Attachment> searchAttachments(String parameterizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
+        checkSearchQueryAllowed(parameterizedSqlClause);
+
         return convertAttachments(
-            this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues, this.context));
+            this.xwiki.searchAttachments(parameterizedSqlClause, true, nb, start, parameterValues, this.context));
     }
 
     /**
      * Count attachments returned by a given parameterized query
      *
-     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL see:
+     * @param parameterizedSqlClause Everything which would follow the "WHERE" in HQL see:
      *            {@link #searchDocuments(String, int, int, List)}
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
      * @return int number of attachments found.
@@ -942,9 +990,11 @@ public class XWiki extends Api
      * @see #searchAttachments(String, int, int, List)
      * @since 5.0M2
      */
-    public int countAttachments(String parametrizedSqlClause, List<?> parameterValues) throws XWikiException
+    public int countAttachments(String parameterizedSqlClause, List<?> parameterValues) throws XWikiException
     {
-        return this.xwiki.countAttachments(parametrizedSqlClause, parameterValues, this.context);
+        checkSearchQueryAllowed(parameterizedSqlClause);
+
+        return this.xwiki.countAttachments(parameterizedSqlClause, parameterValues, this.context);
     }
 
     /**
@@ -1597,7 +1647,10 @@ public class XWiki extends Api
      * @return {@code true} if the rename succeeded. {@code false} if there was any issue.
      * @throws XWikiException if the document cannot be renamed properly.
      * @since 12.5RC1
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences) throws XWikiException

@@ -22,8 +22,9 @@ package org.xwiki.edit;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.script.ScriptContext;
+
+import jakarta.inject.Inject;
 
 import org.xwiki.script.ScriptContextManager;
 

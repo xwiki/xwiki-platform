@@ -22,9 +22,9 @@ package org.xwiki.netflux.internal;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -84,7 +84,7 @@ public class EntityChannelScriptAuthorBot extends AbstractBot
     {
         // We're interested only in messages that have content (we want to ignore for instance join, leave or ping
         // messages).
-        if (MessageDispatcher.COMMAND_MSG.equals(messageType)) {
+        if (MessageBuilder.COMMAND_MSG.equals(messageType)) {
             this.entityChannels.getChannel(channel.getKey())
                 .ifPresent(entityChannel -> this.webSocketContext.run(sender.getSession(), () -> {
                     UserReference senderUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);

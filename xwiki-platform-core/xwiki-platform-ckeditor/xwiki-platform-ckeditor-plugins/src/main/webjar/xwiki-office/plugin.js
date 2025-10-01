@@ -89,6 +89,37 @@
       }
     },
 
+    afterInit: function(editor) {
+      if (editor.config.applyPasteFilterAfterPasteFromWord) {
+        const triggerAfterPasteFromWord = filteredWordContent => {
+          const data = {dataValue: filteredWordContent};
+          // This will apply the XWiki paste filter to the filtered content. See below.
+          editor.fire('afterPasteFromWord', data);
+          return data.dataValue;
+        };
+
+        // Make sure the XWiki paste filter is also applied when pasting from LibreOffice and Google Docs.
+        // See XWIKI-22750: Styles are not filtered anymore when pasting from LibreOffice
+        // The problem is that the LibreOffice and Google Docs paste filters are loaded and registered on demand, when
+        // the user pastes content from these tools, so we need to overwrite them when the paste event is triggered.
+        const targetPasteFilters = {'gdocs': false, 'libreoffice': false};
+        editor.on('paste', function(event) {
+          Object.keys(targetPasteFilters)
+            // Overwrite the target filters that have been loaded and are not already overwritten.
+            .filter(filterName => !targetPasteFilters[filterName] && CKEDITOR.pasteFilters?.[filterName])
+            .forEach(filterName => {
+              targetPasteFilters[filterName] = CKEDITOR.pasteFilters[filterName];
+              // Overwrite the target paste filter to trigger the 'afterPasteFromWord' event.
+              CKEDITOR.pasteFilters[filterName] = function(...args) {
+                const result = targetPasteFilters[filterName].apply(this, args);
+                return triggerAfterPasteFromWord(result);
+              };
+            });
+        // Our paste listener needs to be called before the pastetools one (which uses priority 3).
+        }, this, null, 2);
+      }
+    },
+
     // The paste filter is not applied by default for content pasted from Word.
     // https://dev.ckeditor.com/ticket/13093
     // https://stackoverflow.com/questions/45501341/ckeditor-pastefromword-ignores-pastefilter

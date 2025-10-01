@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -279,5 +280,23 @@ public class CommentsTab extends BaseElement
             .findElement(By.id(String.format("xwikicomment_%d", id)))
             .findElement(By.cssSelector("blockquote.annotatedText"))
             .click();
+    }
+
+    /**
+     * Retrieve the list of comments in their displayed order. Note that in case of thread, the list contains also the
+     * comments that belongs to the threads in the order they appear. e.g. Comment 0, first reply of 0, second reply
+     * of 0, Comment 1, etc.
+     * @return the list of comments in their order of appearance.
+     * @since 17.3.0RC1
+     * @since 16.10.6
+     * @since 16.4.8
+     */
+    public List<CommentElement> getComments()
+    {
+        List<CommentElement> result = new ArrayList<CommentElement>();
+        for (WebElement xwikicomment : getDriver().findElementsWithoutWaiting(By.className("xwikicomment"))) {
+            result.add(new CommentElement(xwikicomment));
+        }
+        return result;
     }
 }

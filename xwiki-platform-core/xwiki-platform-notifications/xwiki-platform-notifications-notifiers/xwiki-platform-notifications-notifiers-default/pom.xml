@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-notifiers</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
   <name>XWiki Platform - Notifications - Notifiers - Default bridge</name>
@@ -75,8 +75,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -144,4 +144,10 @@ public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
     {
         return false;
     }
+
+    @Override
+    public boolean isExecutionIsolated(GalleryMacroParameters parameters, String content)
+    {
+        return true;
+    }
 }

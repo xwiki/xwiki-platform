@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-webjars</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-webjars-api</artifactId>
   <name>XWiki Platform - WebJars - API</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
@@ -99,8 +99,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
 
     <!-- Test dependencies -->

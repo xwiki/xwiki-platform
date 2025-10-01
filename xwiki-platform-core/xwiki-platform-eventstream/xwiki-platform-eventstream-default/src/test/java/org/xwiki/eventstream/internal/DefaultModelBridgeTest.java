@@ -19,32 +19,27 @@
  */
 package org.xwiki.eventstream.internal;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,26 +49,20 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.6RC1
  */
-public class DefaultModelBridgeTest
+@ComponentTest
+class DefaultModelBridgeTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<ModelBridge> mocker =
-            new MockitoComponentMockingRule<>(DefaultModelBridge.class);
+    @InjectMockComponents
+    private DefaultModelBridge defaultModelBridge;
 
+    @MockComponent
     private Provider<XWikiContext> contextProvider;
 
+    @MockComponent
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        this.contextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
-
-        this.documentReferenceResolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-    }
-
     @Test
-    public void testAuthorReference() throws Exception
+    void authorReference() throws Exception
     {
         XWikiContext context = mock(XWikiContext.class);
         XWiki xwiki = mock(XWiki.class);
@@ -86,48 +75,35 @@ public class DefaultModelBridgeTest
         when(xwiki.getDocument(entityReference, context)).thenReturn(document);
         when(document.getAuthorReference()).thenReturn(authorReference);
 
-        DocumentReference result = this.mocker.getComponentUnderTest().getAuthorReference(entityReference);
+        DocumentReference result = this.defaultModelBridge.getAuthorReference(entityReference);
 
         assertEquals(authorReference, result);
     }
 
     @Test
-    public void testCheckXObjectPresenceWithEmptyList() throws Exception
+    void checkXObjectPresenceWithEmptyList()
     {
-        Object object = new Object();
-        List<String> xObjectTypes = Collections.EMPTY_LIST;
-
-        assertTrue(this.mocker.getComponentUnderTest().checkXObjectPresence(xObjectTypes, object));
+        assertTrue(this.defaultModelBridge.checkXObjectPresence(List.of(), new Object()));
     }
 
     @Test
-    public void testCheckXObjectPresenceWithPresentXObject() throws Exception
+    void checkXObjectPresenceWithPresentXObject()
     {
         XWikiDocument document = mock(XWikiDocument.class);
-        List<String> xObjectTypes = Arrays.asList("type1");
-
-        DocumentReference documentReferenceFromDocumentXObjects = mock(DocumentReference.class);
-        Map<DocumentReference, List<BaseObject>> documentXObjects =
-                new HashMap<DocumentReference, List<BaseObject>>() {{
-                    put(documentReferenceFromDocumentXObjects, Collections.EMPTY_LIST);
-                }};
-
         DocumentReference resolvedType1 = mock(DocumentReference.class);
+        DocumentReference documentReferenceFromDocumentXObjects = mock(DocumentReference.class);
         LocalDocumentReference localDocumentReferenceType1 = mock(LocalDocumentReference.class);
-
-        when(resolvedType1.getLocalDocumentReference()).thenReturn(localDocumentReferenceType1);
-        when(this.documentReferenceResolver.resolve(eq("type1"))).thenReturn(resolvedType1);
-        when(document.getXObjects()).thenReturn(documentXObjects);
-
-        when(documentReferenceFromDocumentXObjects.getLocalDocumentReference()).thenReturn(localDocumentReferenceType1);
-
         DocumentReference resolvedType2 = mock(DocumentReference.class);
         LocalDocumentReference localDocumentReferenceType2 = mock(LocalDocumentReference.class);
 
+        when(resolvedType1.getLocalDocumentReference()).thenReturn(localDocumentReferenceType1);
+        when(this.documentReferenceResolver.resolve("type1")).thenReturn(resolvedType1);
+        when(document.getXObjects()).thenReturn(Map.of(documentReferenceFromDocumentXObjects, List.of()));
+        when(documentReferenceFromDocumentXObjects.getLocalDocumentReference()).thenReturn(localDocumentReferenceType1);
         when(resolvedType2.getLocalDocumentReference()).thenReturn(localDocumentReferenceType2);
-        when(this.documentReferenceResolver.resolve(eq("type2"))).thenReturn(resolvedType2);
+        when(this.documentReferenceResolver.resolve("type2")).thenReturn(resolvedType2);
 
-        assertTrue(this.mocker.getComponentUnderTest().checkXObjectPresence(xObjectTypes, document));
-        assertFalse(this.mocker.getComponentUnderTest().checkXObjectPresence(Arrays.asList("type2"), document));
+        assertTrue(this.defaultModelBridge.checkXObjectPresence(List.of("type1"), document));
+        assertFalse(this.defaultModelBridge.checkXObjectPresence(List.of("type2"), document));
     }
 }

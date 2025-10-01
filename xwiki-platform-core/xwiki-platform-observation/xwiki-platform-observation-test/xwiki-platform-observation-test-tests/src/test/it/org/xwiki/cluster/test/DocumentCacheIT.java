@@ -41,7 +41,7 @@ import org.xwiki.test.ui.AbstractTest;
  */
 public class DocumentCacheIT extends AbstractClusterHttpIT
 {
-    private final static String TEST_SPACE = "Test";
+    private static final String TEST_SPACE = "Test";
 
     @Test
     public void documentModifiedCacheSync() throws Exception

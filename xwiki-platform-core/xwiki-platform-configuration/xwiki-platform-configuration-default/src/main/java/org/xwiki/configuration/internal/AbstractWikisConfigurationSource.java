@@ -61,37 +61,49 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
         @Override
         public boolean containsKey(String key)
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.containsKey(key));
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.containsKeyInternal(key));
         }
 
         @Override
         public List<String> getKeys()
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getKeys());
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getKeysInternal());
+        }
+
+        @Override
+        public List<String> getKeys(String prefix)
+        {
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getKeysInternal(prefix));
         }
 
         @Override
         public <T> T getProperty(String key)
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getProperty(key));
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getPropertyInternal(key));
         }
 
         @Override
         public <T> T getProperty(String key, T defaultValue)
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getProperty(key, defaultValue));
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getPropertyInternal(key, defaultValue));
         }
 
         @Override
         public <T> T getProperty(String key, Class<T> valueClass)
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getProperty(key, valueClass));
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getPropertyInternal(key, valueClass));
         }
 
         @Override
         public boolean isEmpty()
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.isEmpty());
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.isEmptyInternal());
+        }
+
+        @Override
+        public boolean isEmpty(String prefix)
+        {
+            return getFromWiki(() -> AbstractWikisConfigurationSource.super.isEmptyInternal(prefix));
         }
 
         private <T> T getFromWiki(Supplier<T> supplier)
@@ -119,39 +131,51 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
     }
 
     @Override
-    public boolean containsKey(String key)
+    protected boolean containsKeyInternal(String key)
     {
         return getConfigurationSource().containsKey(key);
     }
 
     @Override
-    public List<String> getKeys()
+    protected List<String> getKeysInternal()
     {
         return getConfigurationSource().getKeys();
     }
 
     @Override
-    public <T> T getProperty(String key)
+    protected List<String> getKeysInternal(String prefix)
+    {
+        return getConfigurationSource().getKeys(prefix);
+    }
+
+    @Override
+    protected <T> T getPropertyInternal(String key)
     {
         return getConfigurationSource().getProperty(key);
     }
 
     @Override
-    public <T> T getProperty(String key, T defaultValue)
+    protected <T> T getPropertyInternal(String key, T defaultValue)
     {
         return getConfigurationSource().getProperty(key, defaultValue);
     }
 
     @Override
-    public <T> T getProperty(String key, Class<T> valueClass)
+    protected <T> T getPropertyInternal(String key, Class<T> valueClass)
     {
         return getConfigurationSource().getProperty(key, valueClass);
     }
 
     @Override
-    public boolean isEmpty()
+    protected boolean isEmptyInternal()
     {
         return getConfigurationSource().isEmpty();
+    }
+
+    @Override
+    protected boolean isEmptyInternal(String prefix)
+    {
+        return getConfigurationSource().isEmpty(prefix);
     }
 
     private ConfigurationSource getConfigurationSource()

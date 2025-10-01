@@ -49,12 +49,38 @@
     },
 
     getFullData: function(editor) {
-      var isFullData = editor.config.fullData;
+      const isFullData = editor.config.fullData;
       editor.config.fullData = true;
-      var fullData = editor.getData();
+      // The full data is sometimes used to restore the editor content and unfortunately CKEditor has a problem with
+      // the content that it finds after the BODY tag (e.g. the user avatars when editing in realtime). The HTML is
+      // "fixed" by moving the content inside the BODY tag. In order to avoid this we temporarily remove the content
+      // after the BODY tag.
+      const contentAfterBody = [];
+      const editable = editor.editable()?.$;
+      if (editable?.tagName.toUpperCase() === 'BODY') {
+        while (editable.nextSibling) {
+          contentAfterBody.push(editable.nextSibling);
+          editable.nextSibling.remove();
+        }
+      }
+      const fullData = editor.getData();
+      // Restore the content after the BODY tag.
+      editable?.after(...contentAfterBody);
       editor.config.fullData = isFullData;
       return fullData;
-    }
+    },
+
+    addModeChangeHandler: function(editor, handler, priority = 0) {
+      editor._.modeChangeHandlers = editor._.modeChangeHandlers || [];
+      editor._.modeChangeHandlers.push({handler, priority});
+      return {
+        removeListener: () => {
+          editor._.modeChangeHandlers = editor._.modeChangeHandlers.filter(
+            entry => entry.handler !== handler || entry.priority !== priority
+          );
+        }
+      };
+    },
   };
 
   CKEDITOR.plugins.add('xwiki-source', {
@@ -74,23 +100,10 @@
     },
 
     afterInit: function(editor) {
-      // The source command is not registered if the editor is loaded in-line.
-      var sourceCommand = editor.getCommand('source');
-      if (sourceCommand) {
-        editor.on('beforeSetMode', this.onBeforeSetMode.bind(this));
-        editor.on('beforeModeUnload', this.onBeforeModeUnload.bind(this));
-        editor.on('mode', this.onMode.bind(this));
-
-        // The default source command is not asynchronous so it becomes (re)enabled right after the editing mode is
-        // changed. In our case switching between WYSIWYG and Source mode is asynchronous because we need to convert the
-        // edited content on the server side. Thus we need to prevent the source command from being enabled while the
-        // conversion takes place.
-        // CKEDITOR-66: Switch to source corrupt page when connection lost or when connection is very slow
-        var oldCheckAllowed = sourceCommand.checkAllowed;
-        sourceCommand.checkAllowed = function() {
-          return !this.running && oldCheckAllowed.apply(this, arguments);
-        };
-      }
+      editor.on('beforeSetMode', this.onBeforeSetMode.bind(this));
+      editor.on('beforeModeUnload', this.onBeforeModeUnload.bind(this));
+      editor.on('mode', this.onMode.bind(this));
+      CKEDITOR.plugins.xwikiSource.addModeChangeHandler(editor, this.onModeChanged.bind(this), 5);
     },
 
     onBeforeSetMode: function(event) {
@@ -124,20 +137,34 @@
       }
     },
 
-    onMode: function(event) {
+    onMode: async function(event) {
       var editor = event.editor;
-      var promise;
-      if (editor.mode === 'wysiwyg' && editor._.previousMode === 'source') {
-        // Convert from wiki syntax to HTML.
-        promise = this.maybeConvertHTML(editor, true);
-      } else if (editor.mode === 'source' && editor._.previousMode === 'wysiwyg') {
-        // Convert from HTML to wiki syntax.
-        promise = this.maybeConvertHTML(editor, false);
-      } else if (this.isModeSupported(editor.mode)) {
-        promise = $.Deferred().resolve(editor);
+      if (this.isModeSupported(editor.mode)) {
+        try {
+          await this.callModeChangeHandlers(editor);
+        } finally {
+          await this.endLoading(editor);
+          editor.fire('modeReady');
+        }
       }
-      if (promise) {
-        promise.always(this.endLoading.bind(this)).done(editor.fire.bind(editor, 'modeReady'));
+    },
+
+    callModeChangeHandlers: async function(editor) {
+      editor._.modeChangeHandlers.sort((a, b) => a.priority - b.priority);
+      for (const {handler} of editor._.modeChangeHandlers) {
+        await handler(editor, {
+          previousMode: editor._.previousMode,
+        });
+      }
+    },
+
+    onModeChanged: async function(editor, {previousMode}) {
+      if (editor.mode === 'wysiwyg' && previousMode === 'source') {
+        // Convert from wiki syntax to HTML.
+        await this.maybeConvertHTML(editor, true);
+      } else if (editor.mode === 'source' && previousMode === 'wysiwyg') {
+        // Convert from HTML to wiki syntax.
+        await this.maybeConvertHTML(editor, false);
       }
     },
 
@@ -181,13 +208,9 @@
     },
 
     startLoading: function(editor) {
+      this.getSourceButton(editor)?.addClass('loading');
       CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
       editor.setLoading(true);
-      // Prevent the source command from being enabled while the conversion takes place.
-      var sourceCommand = editor.getCommand('source');
-      // We have to set the flag before setting the command state in order to be taken into account.
-      sourceCommand.running = true;
-      sourceCommand.setState(CKEDITOR.TRISTATE_DISABLED);
       if (editor.mode === 'source') {
         // When switching from Source mode to WYSIWYG mode the wiki syntax is converted to HTML on the server side.
         // Before we receive the result the Source plugin sets the source (wiki syntax) as the data for the WYSIWYG
@@ -195,9 +218,6 @@
         // lock the undo history until the conversion is done.
         // See CKEDITOR-58: Undo operation can replace the rich text content with wiki syntax
         editor.fire('lockSnapshot');
-      }
-      if (editor.editable()) {
-        $(editor.container.$).find('.cke_button__source_icon').first().addClass('loading');
       }
       // A bug in Internet Explorer 11 prevents the user from typing into the Source text area if the WYSIWYG text
       // area is focused and the selection is collapsed before switching to Source mode. In order to avoid this
@@ -215,20 +235,19 @@
       }
     },
 
-    endLoading: function(editor) {
-      if (editor.editable()) {
-        $(editor.container.$).find('.cke_button__source_icon').first().removeClass('loading');
-      }
+    endLoading: async function(editor) {
       if (editor.mode === 'wysiwyg') {
         // Unlock the undo history after the conversion is done and the WYSIWYG mode data is set.
         editor.fire('unlockSnapshot');
       }
-      var sourceCommand = editor.getCommand('source');
-      // We have to set the flag before setting the command state in order to be taken into account.
-      sourceCommand.running = false;
-      sourceCommand.setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
-      editor.setLoading(false);
-      CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+      await CKEDITOR.plugins.xwikiSelection.restoreSelection(editor, {
+        beforeApply: () => editor.setLoading(false)
+      });
+      this.getSourceButton(editor)?.removeClass('loading');
+    },
+
+    getSourceButton: function(editor) {
+      return editor.ui.space('top').find('.cke_button__source_icon').getItem(0);
     }
   });
 })();

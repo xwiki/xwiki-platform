@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.attachment.validation.AttachmentValidationException;
@@ -264,14 +265,14 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
             return null;
         }
 
-        byte[] data = new byte[size];
+        try (InputStream fileis = getFileItemInputStream(formfieldName, context)) {
+            byte[] data = new byte[size];
 
-        try {
-            InputStream fileis = getFileItemInputStream(formfieldName, context);
             if (fileis != null) {
-                fileis.read(data);
-                fileis.close();
+                IOUtils.readFully(fileis, data);
             }
+
+            return data;
         } catch (java.lang.OutOfMemoryError e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
                 "Java Heap Space, Out of memory exception", e);
@@ -280,8 +281,6 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
                 XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file",
                 ie);
         }
-
-        return data;
     }
 
     /**

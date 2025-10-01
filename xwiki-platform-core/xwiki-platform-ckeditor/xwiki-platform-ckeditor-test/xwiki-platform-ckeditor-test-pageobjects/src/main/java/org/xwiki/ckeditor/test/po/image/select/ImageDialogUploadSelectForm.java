@@ -19,10 +19,7 @@
  */
 package org.xwiki.ckeditor.test.po.image.select;
 
-import java.io.File;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -51,7 +48,7 @@ public class ImageDialogUploadSelectForm extends BaseElement
         try {
             getDriver().setFileDetector(new LocalFileDetector());
             WebElement fileInput = getDriver().findElementWithoutWaitingWithoutScrolling(By.id("fileUploadField"));
-            fileInput.sendKeys(getAbsolutePath(path));
+            fileInput.sendKeys(getUtil().getResourceFile(path).getAbsolutePath());
             WebElement uploadButton = getDriver()
                 .findElementWithoutWaitingWithoutScrolling(By.cssSelector("input[type=submit][value=Upload]"));
             uploadButton.click();
@@ -59,12 +56,5 @@ public class ImageDialogUploadSelectForm extends BaseElement
         } finally {
             getDriver().setFileDetector(originalFileDetector);
         }
-    }
-
-    private String getAbsolutePath(String path) throws URISyntaxException
-    {
-        URL resource = getClass().getResource(path);
-        File file = Paths.get(resource.toURI()).toFile();
-        return file.getAbsolutePath();
     }
 }

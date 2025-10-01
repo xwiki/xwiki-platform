@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.CreateGroupModal;
+import org.xwiki.administration.test.po.DeleteUserConfirmationModal;
 import org.xwiki.administration.test.po.EditGroupModal;
 import org.xwiki.administration.test.po.GroupEditPage;
 import org.xwiki.administration.test.po.GroupsPage;
@@ -50,8 +51,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // Add the RightsManagerPlugin needed by the test
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin",
     // Programming rights are required to disable/enable user profiles (cf. XWIKI-21238)
-    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet"
-})
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet",
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+    // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+    // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+    "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class UsersGroupsRightsManagementIT
 {
     @BeforeEach
@@ -417,5 +425,27 @@ class UsersGroupsRightsManagementIT
         groupEditPage.getMembersTable().filterColumn("Member", groupName.substring(2));
         assertEquals(1, groupEditPage.getMembersTable().countRows());
         groupEditPage.getMembersTable().assertRow("Member", userName);
+    }
+
+    @Test
+    @Order(8)
+    void deleteUserWithScriptRights(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        String scriptUserName = testReference.getLastSpaceReference().getName();
+        String scriptUserPassword = "password";
+        setup.createUser(scriptUserName, scriptUserPassword, "");
+        setup.setGlobalRights( "", "XWiki.%s".formatted(scriptUserName), "script", true);
+        setup.login(scriptUserName, scriptUserPassword);
+        setup.createPage(testReference, "");
+        setup.loginAsSuperAdmin();
+        UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
+        usersPage.getUsersLiveData().getTableLayout().filterColumn("User", scriptUserName);
+        usersPage.disableUser(1);
+        DeleteUserConfirmationModal deleteUserConfirmationModal = usersPage.clickDeleteUser(1);
+        assertEquals("/xwiki/bin/view/Main/AllDocs?doc.author=XWiki.%s".formatted(scriptUserName),
+            deleteUserConfirmationModal.getScriptRightUserErrorMessageHrefValue());
+        deleteUserConfirmationModal.clickOk();
+        assertEquals(0, usersPage.getUsersLiveData().getTableLayout().countRows());
     }
 }

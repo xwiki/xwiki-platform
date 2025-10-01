@@ -5,7 +5,7 @@
 // Local Mixins ===========================================================
 
 .text-smaller {
-  font-size: floor(@font-size-base * 0.9);
+  font-size: floor(@font-size-base * 0.95);
 }
 
 .text-muted-smaller {
@@ -61,7 +61,7 @@
 // (e.g., 1.250 larger than the content's h1 headings)
 @min-document-title-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 5))));
 @max-document-title-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale, 5))));
-@font-size-document-title: ~"max(@{min-document-title-font-size}px, min(@{max-document-title-font-size}px, calc(@{min-document-title-font-size}px + (@{max-document-title-font-size} - @{min-document-title-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))";
+@font-size-document-title: ~"max(@{min-document-title-font-size}px, min(@{max-document-title-font-size}px, calc(@{min-document-title-font-size}px - (@{min-document-title-font-size} - @{max-document-title-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))";
 
 #document-title h1 {
   font-size: @font-size-document-title;

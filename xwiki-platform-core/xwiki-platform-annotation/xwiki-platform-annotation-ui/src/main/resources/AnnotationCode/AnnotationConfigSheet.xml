@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.AnnotationConfigSheet" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.AnnotationConfigSheet" locale="">
   <web>AnnotationCode</web>
   <name>AnnotationConfigSheet</name>
   <language/>
@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>{{velocity}}
 #set ($annotationsConfigClassName = 'AnnotationCode.AnnotationConfig')
 #set ($annotationsConfigDoc = $xwiki.getDocument($annotationsConfigClassName))
@@ -178,8 +179,11 @@ $annotationsConfigDoc.display('annotationClass', 'edit')
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -193,10 +197,13 @@ $annotationsConfigDoc.display('annotationClass', 'edit')
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -225,6 +232,8 @@ $annotationsConfigDoc.display('annotationClass', 'edit')
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -368,6 +377,43 @@ $annotationsConfigDoc.display('annotationClass', 'edit')
     </property>
     <property>
       <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>AnnotationCode.AnnotationConfigSheet</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>94892c72-5951-4500-b105-cb95f7bc354e</guid>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <prettyName>Level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>edit|script|wiki_admin|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <property>
+      <level>script</level>
     </property>
   </object>
 </xwikidoc>

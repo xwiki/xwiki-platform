@@ -29,13 +29,14 @@ import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
-import static org.apache.commons.lang.StringEscapeUtils.escapeJavaScript;
+import static org.apache.commons.text.StringEscapeUtils.escapeEcmaScript;
 
 public class StringClass extends PropertyClass
 {
@@ -80,7 +81,7 @@ public class StringClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty property = newProperty();
         property.setValue(value);
@@ -111,6 +112,11 @@ public class StringClass extends PropertyClass
         input.setID(prefix + name);
         input.setSize(getSize());
         input.setDisabled(isDisabled());
+        /* This is a text alternative fallback to explain what the input is about. 
+         If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
+         */
+        input.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+            this.getTranslatedPrettyName(context)));
 
         if (isPicker()) {
             displayPickerEdit(input);
@@ -136,7 +142,7 @@ public class StringClass extends PropertyClass
         String path = xwiki.getURL(new LocalDocumentReference("Main", "WebHome"), "view", xWikiContext);
         String stringBuilder = String.format("%s?%s&", path, new EscapeTool().url(getParametersMap()));
         input.setOnFocus(String.format("new ajaxSuggest(this, {script:\"%s\", varname:\"input\"} )",
-            escapeJavaScript(stringBuilder)));
+            escapeEcmaScript(stringBuilder)));
     }
 
     private Map<String, String> getParametersMap()

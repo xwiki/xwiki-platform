@@ -149,7 +149,7 @@ help.start.title=Pour commencer
 help.templates.article.description=Page d'article
 help.templates.article.title=Article
 help.templates.create.description=Intégrer la structure et les macros dans une page existante, et la transformer en modèle.
-help.templates.create.tip=Les {0}fournisseurs de modèles{1} présentent les modèles à la création d''une page, afin que les utilisateurs puissent les utiliser.
+help.templates.create.tip=Les {0}fournisseurs de modèles{1} présentent les modèles dans la fenêtre de création d''une page pour que les utilisateurs les utilisent.
 help.templates.create.title=Créer votre modèle
 help.templates.description=Les modèles sont des pages prédéfinies qui sont copiées lors de la création d'une nouvelle page.
 help.templates.encyclopedia.description=Page Encyclopédie
@@ -192,5 +192,12 @@ help.videos.videoCard5.topic2=Apprenez à utiliser votre application
 help.videos.videoCard6.title=Ajout / Suppression d'extensions
 help.videos.videoCard6.topic1=Découvrez comment gérer vos extensions avec le Gestionnaire d'extensions
 help.videos.videoCard6.topic2=Découvrez l'interface d'Administration XWiki
-help.videos.watch=Voir</content>
+help.videos.hint=Cette vidéo présente les fonctionnalités de XWiki avec une capture d'écrans vidéo sous-titrée, sans bande son. Le lien suivant, pointant vers la documentation, fournit une alternative textuelle à cette vidéo.
+help.videos.watch=Voir
+
+## Example Macro
+rendering.macro.example.name=Exemple
+rendering.macro.example.description=Afficher un exemple et le code source correspondant.
+rendering.macro.example.content.description=L'exemple de code.
+</content>
 </xwikidoc>

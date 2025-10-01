@@ -20,7 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
+<!--
+     Custom version of
+     https://raw.githubusercontent.com/jetty/jetty.project/refs/tags/jetty-12.1.1/jetty-core/jetty-util/src/main/config/etc/console-capture.xml
+     to send the log both to the console and to a file.
+     TODO: it should be possible to remove this customization by making Jetty use another logger (like logback)
+-->
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <Configure id="logging">
   <New id="ServerLog" class="java.io.PrintStream">

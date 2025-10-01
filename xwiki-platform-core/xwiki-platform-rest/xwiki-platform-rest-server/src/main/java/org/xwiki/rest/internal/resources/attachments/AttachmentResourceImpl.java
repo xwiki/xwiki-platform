@@ -30,15 +30,13 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
@@ -106,20 +104,12 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);
+            Attachment xwikiAttachment = doc.removeAttachment(attachmentName);
             if (xwikiAttachment == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
-                Utils.getXWikiContext(componentManager));
-            XWikiAttachment baseXWikiAttachment = xwikiDocument.getAttachment(attachmentName);
-
-            xwikiDocument.removeAttachment(baseXWikiAttachment);
-
-            Utils.getXWiki(componentManager).saveDocument(xwikiDocument,
-                "Deleted attachment [" + baseXWikiAttachment.getFilename() + "]",
-                Utils.getXWikiContext(componentManager));
+            doc.save("Deleted attachment [" + attachmentName + "]");
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.xwiki.mail.EmailAddressObfuscator;
@@ -55,6 +56,7 @@ import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Hierarchy;
 import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Translations;
@@ -76,6 +78,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ComputedFieldClass;
 import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StringClass;
@@ -86,9 +89,13 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @OldcoreTest
@@ -101,6 +108,8 @@ class ModelFactoryTest
     private static final String TEST_PASSWORD_FIELD = "passwordValue";
 
     private static final String TEST_PASSWORD_VALUE = "secret";
+
+    private static final String TEST_COMPUTED_FIELD = "content";
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -190,7 +199,10 @@ class ModelFactoryTest
         pwElement.setValue(TEST_PASSWORD_VALUE);
         when(xwikiObject.get(TEST_PASSWORD_FIELD)).thenReturn(pwElement);
 
-        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] {stringField, pwField});
+        ComputedFieldClass computedField = new ComputedFieldClass();
+        computedField.setName(TEST_COMPUTED_FIELD);
+
+        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] {stringField, pwField, computedField});
 
         return xwikiObject;
     }
@@ -507,5 +519,29 @@ class ModelFactoryTest
 
         assertEquals(this.testDocument.getDisplayTitle(), pageSummary.getTitle());
         assertEquals(this.testDocument.getTitle(), pageSummary.getRawTitle());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "true, true",
+        "true, false",
+        "false, true",
+        "false, false"
+    })
+    void toDocumentWithJustHidden(boolean pageHidden, boolean restHidden) throws Exception
+    {
+        when(this.testDocument.isHidden()).thenReturn(pageHidden);
+
+        Page restPage = new Page();
+        restPage.setHidden(restHidden);
+
+        boolean modified = this.modelFactory.toDocument(this.testDocument, restPage);
+        if (pageHidden != restHidden) {
+            assertTrue(modified);
+            verify(this.testDocument).setHidden(restHidden);
+        } else {
+            assertFalse(modified);
+            verify(this.testDocument, never()).setHidden(anyBoolean());
+        }
     }
 }

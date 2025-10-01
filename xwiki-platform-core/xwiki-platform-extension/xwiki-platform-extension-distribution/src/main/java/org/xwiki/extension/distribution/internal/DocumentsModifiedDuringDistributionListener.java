@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -174,7 +174,7 @@ public class DocumentsModifiedDuringDistributionListener extends AbstractEventLi
                 Request request = this.jobContext.getCurrentJob().getRequest();
 
                 // It's a job started by the Distribution Wizard
-                if (StringUtils.equals(request.<String>getProperty("context.action"), "distribution")) {
+                if (Strings.CS.equals(request.<String>getProperty("context.action"), "distribution")) {
                     String distributionWiki = request.getProperty("context.wiki");
 
                     if (distributionWiki != null) {

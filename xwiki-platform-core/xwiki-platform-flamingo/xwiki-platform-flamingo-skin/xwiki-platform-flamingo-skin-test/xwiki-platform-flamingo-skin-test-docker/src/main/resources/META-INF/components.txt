@@ -1,3 +1,4 @@
 org.xwiki.test.CustomUserUpdatedDocumentEventListener
 org.xwiki.test.TestMacro
 org.xwiki.test.SleepScriptService
+org.xwiki.test.SecurityCachePerformanceTestScriptService

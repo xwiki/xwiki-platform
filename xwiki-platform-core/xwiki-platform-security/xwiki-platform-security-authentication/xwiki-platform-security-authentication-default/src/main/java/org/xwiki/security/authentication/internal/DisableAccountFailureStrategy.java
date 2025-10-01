@@ -26,7 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
@@ -109,6 +110,7 @@ public class DisableAccountFailureStrategy implements AuthenticationFailureStrat
         if (userDocumentReference != null) {
             return !new XWikiUser(userDocumentReference).isDisabled(this.contextProvider.get());
         }
+
         return false;
     }
 

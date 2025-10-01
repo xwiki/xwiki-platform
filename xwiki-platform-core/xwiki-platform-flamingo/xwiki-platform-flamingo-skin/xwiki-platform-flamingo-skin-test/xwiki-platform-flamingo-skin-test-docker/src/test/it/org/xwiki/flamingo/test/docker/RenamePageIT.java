@@ -40,12 +40,15 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DocumentPicker;
@@ -157,9 +160,12 @@ class RenamePageIT
      * question to be renamed.
      */
     @Order(3)
-    @Test
-    void renamePageWithUsedClass(TestUtils setup, TestReference testReference)
+    @ParameterizedTest
+    @WikisSource
+    void renamePageWithUsedClass(WikiReference wikiReference, TestUtils setup, TestLocalReference localReference)
     {
+        DocumentReference testReference = new DocumentReference(localReference, wikiReference);
+
         // Create 4 pages under the same parent
         // 2 of them are free pages (WebHome and FreePage)
         // 1 of them is a class (ClassPage)
@@ -529,6 +535,8 @@ class RenamePageIT
         // add attachment
         AttachmentReference attachmentReference = new AttachmentReference("file.txt", testReference);
         testUtils.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
+        testUtils.rest().attachFile(attachmentReference, "attachment2".getBytes(), false);
+        testUtils.rest().attachFile(attachmentReference, "attachment3".getBytes(), false);
         //add object
         Object styleSheetObject = testUtils.rest().object(testReference, "XWiki.StyleSheetExtension");
         styleSheetObject.getProperties().add(testUtils.rest().property("title", "a ssx"));
@@ -536,8 +544,8 @@ class RenamePageIT
 
         ViewPage viewPage = testUtils.gotoPage(testReference);
         HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
-        assertEquals(7, historyPane.getNumberOfVersions());
-        assertEquals("7.1", historyPane.getCurrentVersion());
+        assertEquals(9, historyPane.getNumberOfVersions());
+        assertEquals("9.1", historyPane.getCurrentVersion());
 
         RenamePage rename = viewPage.rename();
         rename.getDocumentPicker().setTitle("Another Title");
@@ -545,9 +553,11 @@ class RenamePageIT
         assertEquals("Done.", statusPage.getInfoMessage());
         viewPage = statusPage.gotoNewPage();
         historyPane = viewPage.openHistoryDocExtraPane();
-        assertEquals(7, historyPane.getNumberOfVersions());
-        assertEquals("7.2", historyPane.getCurrentVersion());
+        assertEquals(9, historyPane.getNumberOfVersions());
+        assertEquals("9.2", historyPane.getCurrentVersion());
         assertEquals("Update document after refactoring.", historyPane.getCurrentVersionComment());
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
     }
 
     @Order(7)
@@ -674,8 +684,12 @@ class RenamePageIT
         throws Exception
     {
         SpaceReference rootSpaceReference = testReference.getLastSpaceReference();
+        DocumentReference externalLinkPage = new DocumentReference("xwiki", "RenamePageIT", "ExternalPage");
+        testUtils.rest().savePage(externalLinkPage);
         testUtils.rest().savePage(testReference, 
-            String.format("[[Alice]]%n[[page:../%s/Alice]]%n[[Bob]]%n[[Eve]]", rootSpaceReference.getName()), 
+            String.format("[[Alice]]%n[[page:../%s/Alice]]%n[[Bob]]%n[[Eve]]"
+                    + "%n[[Other link>>RenamePageIT.ExternalPage]]",
+                rootSpaceReference.getName()),
             "Test relative links");
         
         SpaceReference aliceSpace = new SpaceReference("Alice", rootSpaceReference);
@@ -697,7 +711,8 @@ class RenamePageIT
             new SpaceReference(rootSpaceReference.getName() + "Foo", rootSpaceReference.getParent());
         WikiEditPage wikiEditPage = statusPage.gotoNewPage().editWiki();
         String newRootSpaceSerialized = testUtils.serializeLocalReference(newRootSpace).replaceAll("\\.", "/");
-        assertEquals(String.format("[[Alice]]%n[[page:%s/Alice]]%n[[Bob]]%n[[Eve]]", newRootSpaceSerialized),
+        assertEquals(String.format("[[Alice]]%n[[page:%s/Alice]]%n[[Bob]]%n[[Eve]]"
+                + "%n[[Other link>>RenamePageIT.ExternalPage]]", newRootSpaceSerialized),
             wikiEditPage.getContent());
 
         SpaceReference newBobSpace = new SpaceReference("Bob", newRootSpace);
@@ -716,7 +731,8 @@ class RenamePageIT
         DocumentReference alice2Reference = new DocumentReference("WebHome", alice2Space);
         wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newRootSpace));
         String serializedAlice2Reference = testUtils.serializeLocalReference(alice2Reference);
-        assertEquals(String.format("[[%s]]%n[[page:%s/Alice2]]%n[[Bob]]%n[[Eve]]",
+        assertEquals(String.format("[[%s]]%n[[page:%s/Alice2]]%n[[Bob]]%n[[Eve]]"
+                + "%n[[Other link>>RenamePageIT.ExternalPage]]",
             serializedAlice2Reference, newRootSpaceSerialized), wikiEditPage.getContent());
 
         // FIXME: ideally this one should be refactored too, however it's not a regression.
@@ -742,5 +758,69 @@ class RenamePageIT
         assertEquals("Done.", statusPage.getInfoMessage());
         WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
         assertEquals("[[MyPage>>xwiki:TestLinkWithWikiNew.WebHome]]", wikiEditPage.getContent());
+    }
+
+    @Order(11)
+    @Test
+    void renameLinkInXObject(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        String userLogin = "RenamePageUser";
+        String userPwd = "renamepageuser";
+        testUtils.createUserAndLogin(userLogin, userPwd);
+        testUtils.loginAsSuperAdmin();
+        testUtils.createPage(testReference, "Space test");
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+        testUtils.setRightsOnSpace(testSpaceReference, "", userLogin, "edit", true);
+
+        DocumentReference p1 = new DocumentReference("P1", testSpaceReference);
+        String p1Reference = testUtils.serializeReference(p1);
+        testUtils.rest().savePage(p1, "Content P1", "Title P1");
+
+        DocumentReference p2 = new DocumentReference("P2", testSpaceReference);
+        String p2Reference = testUtils.serializeReference(p2);
+        testUtils.createPage(p2, "Some P2 content", "titleP2");
+
+        DocumentReference p3 = new DocumentReference("P3", testSpaceReference);
+        String script = String.format("{{velocity}}\n"
+            + "#set ($p2Doc = $xwiki.getDocument('%s'))\n"
+            + "#set ($authors = $p2Doc.authors)\n"
+            + "Effective metadata author: $services.user.serialize($authors.effectiveMetadataAuthor)\n"
+            + "Original metadata author: $services.user.serialize($authors.originalMetadataAuthor)\n"
+            + "Content author: $services.user.serialize($authors.contentAuthor)\n"
+            + "{{/velocity}}", p2Reference);
+
+        String displayedContent = "Effective metadata author: %1$s\n"
+            + "Original metadata author: %2$s\n"
+            + "Content author: %3$s";
+
+        testUtils.createPage(p3, script, "titleP3");
+        String p3Content = testUtils.gotoPage(p3).getContent();
+
+        assertEquals(String.format(displayedContent, "XWiki.superadmin", "XWiki.superadmin", "XWiki.superadmin"),
+            p3Content);
+
+        testUtils.login(userLogin, userPwd);
+        testUtils.rest().savePage(p2, String.format("[[P1 link>>doc:%s]]", p1Reference), "titleP2");
+        p3Content = testUtils.gotoPage(p3).getContent();
+        assertEquals(String.format(displayedContent, "xwiki:XWiki." + userLogin, "xwiki:XWiki." + userLogin,
+                "xwiki:XWiki." + userLogin),
+            p3Content);
+
+        testUtils.loginAsSuperAdmin();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        RenamePage renamePage = testUtils.gotoPage(p1).rename();
+        renamePage.getDocumentPicker().setName("P43");
+        CopyOrRenameOrDeleteStatusPage statusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", statusPage.getInfoMessage());
+
+        testUtils.gotoPage(p2, "edit", "editor=wiki");
+        WikiEditPage wikiEditPage = new WikiEditPage();
+        assertEquals(String.format("[[P1 link>>doc:%s]]", p1Reference.replace("P1", "P43")), wikiEditPage.getContent());
+
+        p3Content = testUtils.gotoPage(p3).getContent();
+        assertEquals(String.format(displayedContent, "xwiki:XWiki." + userLogin, "XWiki.superadmin",
+                "xwiki:XWiki." + userLogin),
+            p3Content);
     }
 }

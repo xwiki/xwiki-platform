@@ -42,11 +42,9 @@ solr.admin.error.action={0} अयशस्वी:
 solr.admin.error.notallowed=आपल्याला ही क्रिया करण्याची परवानगी नाही.
 solr.admin.error.norights=या विभागात प्रवेश करण्यासाठी प्रशासनाचे अधिकार आवश्यक आहेत.
 solr.admin.success.action={0} यशस्वीरित्या ट्रिगर झाला.
-
 ### Missing: solr.admin.status.title=Status
 ### Missing: solr.admin.status.queueSize.label=Queue size
 ### Missing: solr.admin.status.queueSize.hint=The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
-
 ### Missing: solr.admin.indexing.title=Indexing
 ### Missing: solr.admin.indexing.action.label=Action
 ### Missing: solr.admin.indexing.action.hint=The action to perform on the index.
@@ -58,9 +56,7 @@ solr.admin.success.action={0} यशस्वीरित्या ट्रि�
 ### Missing: solr.admin.indexing.wiki.select_farm=Entire farm
 ### Missing: solr.admin.indexing.query.label=Custom query
 ### Missing: solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
-
 ### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-
 ### Missing: solr.sortBy=Sort by:
 ### Missing: solr.sortBy.score=Relevance
 ### Missing: solr.sortBy.title_sort=Title
@@ -72,20 +68,17 @@ solr.admin.success.action={0} यशस्वीरित्या ट्रि�
 ### Missing: solr.sortBy.attauthor_display_sort=Uploaded by
 ### Missing: solr.sortOrder.asc=Ascending
 ### Missing: solr.sortOrder.desc=Descending
-
 ### Missing: solr.options=Show:
 ### Missing: solr.options.highlight=Highlighting
-### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
+### Missing: solr.options.highlight.title=
 ### Missing: solr.options.facet=Facets
 ### Missing: solr.options.facet.title=Allow extra filtering of the result
-
 ### Missing: solr.result.language=Language
 ### Missing: solr.result.locatedIn=Located in
 ### Missing: solr.result.author=Modified by {0} on {1}
 ### Missing: solr.result.mediaType=File of type {0}
 ### Missing: solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
 ### Missing: solr.result.highlightAll=Highlight all matches
-
 ### Missing: solr.facets.title=Refine your search
 ### Missing: solr.facets.hint=Select a category and activate filters on the current results
 ### Missing: solr.facets.resetAll=Reset all
@@ -93,12 +86,10 @@ solr.admin.success.action={0} यशस्वीरित्या ट्रि�
 ### Missing: solr.facets.collapseAll=Collapse all
 ### Missing: solr.facets.emptyValue=Empty value
 ### Missing: solr.facets.moreValues={0} more
-
 ### Missing: solr.filterBy.type.document=Document
 ### Missing: solr.filterBy.type.attachment=Attachment
 ### Missing: solr.filterBy.type.object=Object
 ### Missing: solr.filterBy.type.object_property=Object property
-
 ### Missing: solr.filterBy.fileType.image=Image
 ### Missing: solr.filterBy.fileType.audio=Audio
 ### Missing: solr.filterBy.fileType.video=Video
@@ -118,7 +109,6 @@ solr.admin.success.action={0} यशस्वीरित्या ट्रि�
 ### Missing: solr.facet.fileType.archive.java-archive=JAR
 ### Missing: solr.facet.fileType.archive.xara=XAR
 ### Missing: solr.facet.fileType.other.octet-stream=Binary data
-
 ### Missing: solr.facet.date.today=Today
 ### Missing: solr.facet.date.last7Days=Last 7 days
 ### Missing: solr.facet.date.last30Days=Last 30 days
@@ -131,7 +121,6 @@ solr.admin.success.action={0} यशस्वीरित्या ट्रि�
 ### Missing: solr.facet.date.after=After {0}
 ### Missing: solr.facet.date.before=Before {0}
 ### Missing: solr.facet.date.any=Any date
-
 ### Missing: solr.facet.size.tiny=Tiny
 ### Missing: solr.facet.size.small=Small
 ### Missing: solr.facet.size.medium=Medium
@@ -140,7 +129,6 @@ solr.admin.success.action={0} यशस्वीरित्या ट्रि�
 ### Missing: solr.facet.size.lessThan=Less than {0}
 ### Missing: solr.facet.size.moreThan=More than {0}
 ### Missing: solr.facet.size.any=Any size
-
 ### Missing: solr.field.type=Result type
 ### Missing: solr.field.locale=Language
 ### Missing: solr.field.locale.emptyValue=No language
@@ -173,7 +161,6 @@ solr.admin.success.action={0} यशस्वीरित्या ट्रि�
 ### Missing: solr.field.attauthor_display=Uploaded by
 ### Missing: solr.field.attdate=Upload date
 ### Missing: solr.field.attsize=File size
-
 ### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
 ### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
 
@@ -187,5 +174,6 @@ solr.admin.success.action={0} यशस्वीरित्या ट्रि�
 ### Missing: solr.field.space=Location
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

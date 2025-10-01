@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSaveException;
@@ -105,7 +106,7 @@ public class DefaultAuthenticationConfiguration implements AuthenticationConfigu
             List.of());
         return rawValues.stream()
             .map(Object::toString)
-            .map(cookie -> StringUtils.startsWith(cookie, COOKIE_PREFIX) ? cookie : COOKIE_PREFIX + cookie)
+            .map(cookie -> Strings.CS.startsWith(cookie, COOKIE_PREFIX) ? cookie : COOKIE_PREFIX + cookie)
             .collect(toList());
     }
 

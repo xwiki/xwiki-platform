@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.solr.common.SolrDocument;
 import org.xwiki.component.phase.Initializable;
@@ -445,7 +446,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             if (dependencies != null) {
                 for (BaseObject dependencyObject : dependencies) {
                     if (dependencyObject != null) {
-                        if (StringUtils.equals(this.extensionStore.getValue(dependencyObject,
+                        if (Strings.CS.equals(this.extensionStore.getValue(dependencyObject,
                             XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, (String) null), version)) {
                             ExtensionDependency dependency = extensionObjectFactory.createExtensionDependency();
                             dependency.setId((String) this.extensionStore.getValue(dependencyObject,

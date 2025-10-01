@@ -210,7 +210,10 @@ public class ModelFactory
             modified = true;
         }
 
-        doc.setHidden(restPage.isHidden());
+        if (doc.isHidden() != restPage.isHidden()) {
+            doc.setHidden(restPage.isHidden());
+            modified = true;
+        }
 
         if (restPage.isEnforceRequiredRights() != null) {
             doc.setEnforceRequiredRights(restPage.isEnforceRequiredRights());
@@ -326,6 +329,7 @@ public class ModelFactory
     }
 
     public void toObject(com.xpn.xwiki.api.Object xwikiObject, org.xwiki.rest.model.jaxb.Object restObject)
+        throws XWikiException
     {
         for (Property restProperty : restObject.getProperties()) {
             xwikiObject.set(restProperty.getName(), restProperty.getValue());
@@ -386,7 +390,8 @@ public class ModelFactory
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            if (hasAccess(property)) {
+            // ComputedField properties don't have any value by definition so we ignore those.
+            if (hasAccess(property) && !(propertyClass instanceof ComputedFieldClass)) {
                 try {
                     property.setValue(
                         serializePropertyValue(xwikiObject.get(propertyClass.getName()), propertyClass, xwikiContext));

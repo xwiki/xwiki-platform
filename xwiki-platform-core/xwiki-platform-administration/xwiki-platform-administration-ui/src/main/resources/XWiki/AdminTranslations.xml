@@ -78,7 +78,7 @@ XWiki.XWikiPreferences_showattachments.hint=Display the attachments section in t
 XWiki.XWikiPreferences_showhistory.hint=Display the history section in the page layout.
 XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
 XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.
-XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
+XWiki.XWikiPreferences_meta.hint=Specifies the metadata that is included in the HTML header of each page, including the page description, author, and keywords. The default meta.vm template is used when the meta field is blank. Use #template('meta.vm') as part of the field content to benefit from future enhancements to the default meta definition.
 XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
 XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
 XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
@@ -155,6 +155,10 @@ administration.section.analytics.status.hint=Determine if the tracking in Google
 # Social category
 admin.social=Social
 admin.social.description=Configuration for social features.
+
+# Network category
+admin.network=Network
+admin.network.description=Network related features.
 
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=Display in section

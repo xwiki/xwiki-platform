@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war</artifactId>
   <name>XWiki Platform - Distribution - War</name>
@@ -158,7 +158,7 @@
                     <exclude>junit:*</exclude>
                     <exclude>org.junit.*:*</exclude>
                     <exclude>org.mockito:*</exclude>
-                    <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
+                    <exclude>jakarta.servlet:jakarta.servlet-api:*:*:compile</exclude>
                     <exclude>jakarta.mail:jakarta.mail-api</exclude>
                   </excludes>
                   <includes>

@@ -80,12 +80,18 @@ XWiki.Dashboard = Class.create( {
     // find out all the gadget-containers in element and add them ids
     this.containers = element.select(".gadget-container");
     this.createDragAndDrops();
-    this.addGadgetsHandlers();``
+    this.addGadgetsHandlers();
     // Create the section to contain add buttons
     var sectionAddButtons = new Element('section', {
       'class': 'containeradd'
-    })
-    this.element.insert({'top' : sectionAddButtons});
+    });
+    // check if the warning is there, if it is, put the button under it
+    var warning = this.element.down('.differentsource');
+    if (warning) {
+      warning.insert({'after' : sectionAddButtons});
+    } else {
+      this.element.insert({'top' : sectionAddButtons});
+    }
     this.addNewGadgetHandler();
     this.addNewContainerHandler();
 
@@ -108,6 +114,7 @@ XWiki.Dashboard = Class.create( {
     this.sourceSpace = this.element.down('.metadata .sourcespace').innerHTML;
     this.sourceWiki = this.element.down('.metadata .sourcewiki').innerHTML;
     this.sourceURL = this.element.down('.metadata .sourceurl').readAttribute('href');
+    this.sourceSyntax = this.element.querySelector('.metadata')?.dataset.sourceSyntax || 'xwiki/2.0';
   },
 
   /**
@@ -295,13 +302,7 @@ XWiki.Dashboard = Class.create( {
     });
     addButton.update(icons.add + l10n['dashboard.actions.add.button']);
     addButton.observe('click', this.onAddGadgetClick.bindAsEventListener(this));
-    // check if the warning is there, if it is, put the button under it
-    var warning = this.element.down('.differentsource');
-    if (warning) {
-      warning.insert({'after' : addButton});
-    } else {
-      this.element.down('.containeradd').insert(addButton);
-    }
+    this.element.down('.containeradd').insert(addButton);
   },
 
   /**
@@ -318,8 +319,8 @@ XWiki.Dashboard = Class.create( {
       return;
     }
     button.addClassName('loading');
-    require(['gadgetWizard'], function(gadgetWizard) {
-      gadgetWizard(gadget).then(callback).finally(() => {
+    require(['gadgetWizard'], (gadgetWizard) => {
+      gadgetWizard(gadget, this.sourceSyntax).then(callback).finally(() => {
         button.removeClassName('loading');
       });
     });
@@ -348,7 +349,7 @@ XWiki.Dashboard = Class.create( {
     // content
     addParameters.set(this.gadgetsClass + '_content', contentField);
     addParameters.set('RequiresHTMLConversion', this.gadgetsClass + '_content');
-    addParameters.set(this.gadgetsClass + '_content_syntax', "xwiki/2.0");
+    addParameters.set(this.gadgetsClass + '_content_syntax', this.sourceSyntax);
     // position
     addParameters.set(this.gadgetsClass + '_position', lastColumn + ', ' + lastIndex);
     // steal the form token of the edit form around the dashboard and send it with the form
@@ -458,7 +459,7 @@ XWiki.Dashboard = Class.create( {
     // content
     editParameters.set(this.gadgetsClass + '_' + gadgetId + '_content', contentField);
     editParameters.set('RequiresHTMLConversion', this.gadgetsClass + '_' + gadgetId + '_content');
-    editParameters.set(this.gadgetsClass + '_' + gadgetId + '_content_syntax', "xwiki/2.0");
+    editParameters.set(this.gadgetsClass + '_' + gadgetId + '_content_syntax', this.sourceSyntax);
     editParameters.set('ajax', '1');
     // steal form token parameter to be able to submit a valid form on the server
     var formToken = this.getFormToken();

@@ -48,17 +48,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @ComponentTest
 class XWikiRealtimeDocumentLockEditConfirmationCheckerTest
 {
-
-    private static final String WYSIWYG = "wysiwyg";
-
-    // We use the Spy decorator on the class to test because we need to mock the
-    // super call.
+    // We use the Spy decorator on the class to test because we need to mock the super call.
     @Spy
     @InjectMockComponents
     private XWikiRealtimeDocumentLockEditConfirmationChecker xwikiRealtimeDocumentLockEditConfirmationChecker;
 
     @MockComponent
-    private RealtimeEditorManager realtimeEditorManager;
+    private RealtimeSessionManager realtimeEditorManager;
 
     @MockComponent
     private Provider<XWikiContext> xwikiContextProvider;
@@ -82,13 +78,13 @@ class XWikiRealtimeDocumentLockEditConfirmationCheckerTest
         when(document.getDocumentReference()).thenReturn(reference);
         when(xwikiContext.get("tdoc")).thenReturn(document);
         when(xwikiContextProvider.get()).thenReturn(xwikiContext);
- 
+
         // We consider the active session case the default, but we test both.
-        when(realtimeEditorManager.getSelectedEditor()).thenReturn(WYSIWYG);
-        when(realtimeEditorManager.sessionIsActive(reference, Locale.ENGLISH, WYSIWYG)).thenReturn(true);
-        
+        when(realtimeEditorManager.canJoinSession(reference, Locale.ENGLISH)).thenReturn(true);
+
         // Provide a dummy result for the super call.
-        doReturn(Optional.of(mock(EditConfirmationCheckerResult.class))).when(xwikiRealtimeDocumentLockEditConfirmationChecker).parentCheck();
+        doReturn(Optional.of(mock(EditConfirmationCheckerResult.class)))
+            .when(xwikiRealtimeDocumentLockEditConfirmationChecker).parentCheck();
     }
 
     @Test
@@ -103,7 +99,7 @@ class XWikiRealtimeDocumentLockEditConfirmationCheckerTest
     @Test
     void checkWhenInactive()
     {
-        when(realtimeEditorManager.sessionIsActive(reference, Locale.ENGLISH, WYSIWYG)).thenReturn(false);
+        when(realtimeEditorManager.canJoinSession(reference, Locale.ENGLISH)).thenReturn(false);
         assertTrue(xwikiRealtimeDocumentLockEditConfirmationChecker.check().isPresent());
         // When the session is not active, we should use the behavior of the parent class.
         // The parent check should be called.

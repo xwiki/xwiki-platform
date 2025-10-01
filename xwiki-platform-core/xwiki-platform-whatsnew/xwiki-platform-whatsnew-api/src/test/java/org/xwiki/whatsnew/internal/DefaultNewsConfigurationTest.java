@@ -105,8 +105,8 @@ class DefaultNewsConfigurationTest
         data.setProperty("sourceid2", "sourcetype2");
         when(this.configurationSource.containsKey("whatsnew.sources")).thenReturn(true);
         when(this.configurationSource.getProperty("whatsnew.sources", Properties.class)).thenReturn(data);
-        when(this.configurationSource.getKeys()).thenReturn(List.of("whatever", "whatsnew.sources",
-            "whatsnew.source.sourceid1.a", "whatsnew.source.sourceid1.aa", "whatsnew.source.sourceid2.c"));
+        when(this.configurationSource.getKeys("whatsnew.source.")).thenReturn(
+            List.of("whatsnew.source.sourceid1.a", "whatsnew.source.sourceid1.aa", "whatsnew.source.sourceid2.c"));
         when(this.configurationSource.getProperty("whatsnew.source.sourceid1.a", String.class)).thenReturn("b");
         when(this.configurationSource.getProperty("whatsnew.source.sourceid1.aa", String.class)).thenReturn("bb");
         when(this.configurationSource.getProperty("whatsnew.source.sourceid2.c", String.class)).thenReturn("d");

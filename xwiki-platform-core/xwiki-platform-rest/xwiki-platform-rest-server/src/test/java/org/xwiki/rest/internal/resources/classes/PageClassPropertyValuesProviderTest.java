@@ -24,14 +24,18 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -39,9 +43,11 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.PageClass;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rest.internal.resources.classes.AbstractClassPropertyValuesProvider.META_DATA_ICON;
@@ -53,7 +59,8 @@ import static org.xwiki.rest.internal.resources.classes.AbstractClassPropertyVal
  * @since 10.6
  */
 @ComponentTest
-public class PageClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
+@ReferenceComponentList
+class PageClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
     @InjectMockComponents
     private PageClassPropertyValuesProvider provider;
@@ -61,6 +68,7 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
     @MockComponent
     private PageClass pageClass;
 
+    @Override
     @BeforeEach
     public void configure() throws Exception
     {
@@ -69,9 +77,12 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
         when(this.pageClass.getOwnerDocument()).thenReturn(this.classDocument);
     }
 
-    @Test
-    public void getValues() throws Exception
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void getValues(boolean hasAccess) throws Exception
     {
+        when(this.authorizationManager.hasAccess(any(), any())).thenReturn(hasAccess);
+
         WikiReference wikiRef = new WikiReference("wiki");
         SpaceReference space1Ref = new SpaceReference("space1", wikiRef);
         SpaceReference space2Ref = new SpaceReference("space2", space1Ref);
@@ -97,14 +108,22 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
         assertEquals(1, values.getPropertyValues().size());
 
         Map<String, Object> metadata = values.getPropertyValues().get(0).getMetaData();
-        assertEquals("Space 1 / Space 2", metadata.get("hint"));
-        assertEquals("Page", metadata.get("label"));
+        if (hasAccess) {
+            assertEquals("Space 1 / Space 2", metadata.get("hint"));
+            assertEquals("Page", metadata.get("label"));
+        } else {
+            assertEquals("space1 / space2", metadata.get("hint"));
+            assertEquals("page", metadata.get("label"));
+        }
         assertTrue(metadata.containsKey(META_DATA_ICON));
     }
 
-    @Test
-    public void getValuesWithTerminalPage() throws Exception
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void getValuesWithTerminalPage(boolean hasAccess) throws Exception
     {
+        when(this.authorizationManager.hasAccess(any(), any())).thenReturn(hasAccess);
+
         WikiReference wikiRef = new WikiReference("wiki");
         SpaceReference space1Ref = new SpaceReference("space1", wikiRef);
         SpaceReference space2Ref = new SpaceReference("space2", space1Ref);
@@ -135,13 +154,58 @@ public class PageClassPropertyValuesProviderTest extends AbstractListClassProper
         assertEquals(2, values.getPropertyValues().size());
 
         Map<String, Object> metadata = values.getPropertyValues().get(0).getMetaData();
-        assertEquals("Space 1 / Page 2", metadata.get("hint"));
-        assertEquals("Page 1", metadata.get("label"));
+        if (hasAccess) {
+            assertEquals("Space 1 / Page 2", metadata.get("hint"));
+            assertEquals("Page 1", metadata.get("label"));
+        } else {
+            assertEquals("space1 / space2", metadata.get("hint"));
+            assertEquals("page", metadata.get("label"));
+        }
         assertTrue(metadata.containsKey(META_DATA_ICON));
 
         metadata = values.getPropertyValues().get(1).getMetaData();
-        assertEquals("Space 1", metadata.get("hint"));
-        assertEquals("Page 2", metadata.get("label"));
+        if (hasAccess) {
+            assertEquals("Space 1", metadata.get("hint"));
+            assertEquals("Page 2", metadata.get("label"));
+        } else {
+            assertEquals("space1", metadata.get("hint"));
+            assertEquals("space2", metadata.get("label"));
+        }
         assertTrue(metadata.containsKey(META_DATA_ICON));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void getValue(boolean hasAccess) throws Exception
+    {
+        String spaceName = "DocumentSpace";
+        String pageName = "DocumentPage";
+        String stringReference = "%s.%s".formatted(spaceName, pageName);
+        DocumentReference documentReference =
+            new DocumentReference(this.classReference.getWikiReference().getName(), spaceName, pageName);
+        when(this.authorizationManager.hasAccess(Right.VIEW, documentReference)).thenReturn(hasAccess);
+
+        XWikiDocument document = mock();
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(this.xwiki.getDocument((EntityReference) documentReference, this.xcontext)).thenReturn(document);
+
+        String title = "Title";
+        when(document.getRenderedTitle(Syntax.PLAIN_1_0, this.xcontext)).thenReturn(title);
+        when(document.getTranslatedDocument(this.xcontext)).thenReturn(document);
+        when(this.xwiki.exists(documentReference, this.xcontext)).thenReturn(true);
+
+        String propertyName = "propertyName";
+        ClassPropertyReference propertyReference = new ClassPropertyReference(propertyName, this.classReference);
+        addProperty(propertyName, new PageClass(), false);
+
+        PropertyValue value = this.provider.getValue(propertyReference, stringReference);
+
+        assertEquals(stringReference, value.getValue());
+        if (!hasAccess) {
+            assertEquals(Map.of(), value.getMetaData());
+        } else {
+            assertEquals(title, value.getMetaData().get("label"));
+            assertEquals(spaceName, value.getMetaData().get("hint"));
+        }
     }
 }

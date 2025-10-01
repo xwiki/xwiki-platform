@@ -52,13 +52,6 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * @returns {Element} the DOM element that represents the toolbar of the editor
-     */
-    getToolBar() {
-      throw new Error('Not implemented!');
-    }
-
-    /**
      * Update the edited content as a result of a remote change.
      *
      * @param {Function} updater a function that takes the current content of the editor, modifies it and returns the
@@ -76,6 +69,8 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * Adds a callback to be called whenever the editor content changes as a result of user interaction (local change).
      *
      * @param {Function} callback the function to call when the editor content changes
+     * @returns {Object} an object containing the {@code removeListener} function, which can be used to remove the
+     *   listener at any time
      */
     onChange(callback) {
       throw new Error('Not implemented!');
@@ -106,7 +101,7 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * @param {Range[]} ranges the DOM selection ranges to restore; if not specified, the last saved text selection is
      *   restored
      */
-    restoreSelection(ranges) {
+    async restoreSelection(ranges) {
       throw new Error('Not implemented!');
     }
 
@@ -154,8 +149,12 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * the editor is destroyed.
      *
      * @param {Function} callback the function to call before the editor is destroyed
+     * @param {boolean} isAsync {@code true} if the callback needs to perform asynchronous operations, {@code false}
+     *   otherwise
+     * @returns {Object} an object containing the {@code removeListener} function, which can be used to remove the
+     *   listener at any time
      */
-    onBeforeDestroy(callback) {
+    onBeforeDestroy(callback, isAsync) {
       throw new Error('Not implemented!');
     }
 
@@ -163,6 +162,8 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * Adds a callback to be called before the editor is locked.
      *
      * @param {Function} callback the function to call before the editor is locked
+     * @returns {Object} an object containing the {@code removeListener} function, which can be used to remove the
+     *   listener at any time
      */
     onLock(callback) {
       throw new Error('Not implemented!');
@@ -172,8 +173,17 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * Adds a callback to be called after the editor is unlocked.
      *
      * @param {Function} callback the function to call after the editor is unlocked
+     * @returns {Object} an object containing the {@code removeListener} function, which can be used to remove the
+     *   listener at any time
      */
     onUnlock(callback) {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * @returns {boolean} {@code true} if the editor is in read-only mode, false otherwise
+     */
+    isReadOnly() {
       throw new Error('Not implemented!');
     }
 
@@ -181,6 +191,24 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * @param {boolean} readOnly {@code true} if the editor should be set to read-only mode, false otherwise
      */
     setReadOnly(readOnly) {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * This method is used to inform the underlying editor that the realtime connection status has changed. The
+     * underlying editor can use this information to enable or disable some features that don't support realtime
+     * collaboration.
+     *
+     * @param {number} status the new connection status
+     */
+    setConnectionStatus(status) {
+      // Do nothing by default.
+    }
+
+    /**
+     * Moves the selection focus to the editing area space in the editor.
+     */
+    focus() {
       throw new Error('Not implemented!');
     }
   }

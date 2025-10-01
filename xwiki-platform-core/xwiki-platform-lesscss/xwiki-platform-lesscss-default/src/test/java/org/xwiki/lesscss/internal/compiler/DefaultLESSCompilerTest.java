@@ -21,7 +21,7 @@ package org.xwiki.lesscss.internal.compiler;
 
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -210,8 +210,8 @@ public class DefaultLESSCompilerTest
         String result = mocker.getComponentUnderTest().compile(lessResourceReference, false, false, false);
         
         // Asserts
-        assertTrue(StringUtils.startsWith(result, "/* org.xwiki.lesscss.compiler.LESSCompilerException: an exception"));
-        assertTrue(StringUtils.endsWith(result, "*/"));
+        assertTrue(Strings.CS.startsWith(result, "/* org.xwiki.lesscss.compiler.LESSCompilerException: an exception"));
+        assertTrue(Strings.CS.endsWith(result, "*/"));
         verify(cache).set(eq(lessResourceReference), eq(skinReference), eq(colorThemeReference), eq(result));
         verify(mocker.getMockedLogger()).error(eq("Error during the compilation of the resource [{}]."),
                 eq(lessResourceReference), eq(expectedException));

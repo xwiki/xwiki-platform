@@ -113,7 +113,7 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
             List<Object> queryResult = null;
             Query query = queryManager.createQuery(queryString, Query.XWQL)
                 .setWiki(wikiName)
-                .setLimit(number)
+                .setLimit(validateAndGetLimit(number))
                 .setOffset(start);
 
             for (Map.Entry<String, String> filterEntry : filters.entrySet()) {

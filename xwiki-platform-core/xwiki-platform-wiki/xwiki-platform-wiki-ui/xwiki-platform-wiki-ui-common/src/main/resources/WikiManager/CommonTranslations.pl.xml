@@ -40,7 +40,7 @@
 admin.wikis.descriptor=deskryptor
 admin.wikis.descriptor.description=skonfiguruj deskryptor wiki
 admin.wiki.description=opisz twoją wiki (ładne imię i opis) i ustaw ją jako użytkownika i stronę główną.
-platform.wiki.admin.wiki.ownerProblemConfirmation=Nowy użytkownik właściciela nie istnieje lub może pochodzić z innej wiki.\\nCzy jesteś pewny że chcesz tego użyć i kontynuować operacje zapisu?
+platform.wiki.admin.wiki.ownerProblemConfirmation=Nowy użytkownik właściciela nie istnieje lub może pochodzić z innej wiki.\nCzy jesteś pewny że chcesz tego użyć i kontynuować operacje zapisu?
 platform.wiki.admin.wiki.csrfInvalidError=Nieprawidłowy token bezpieczeństwa (CSRF). Proszę odświeżyć stronę i spróbować ponownie.
 platform.wiki.admin.wiki.requiredFieldsError=Pole 'Strony głównej' nie może być puste.
 platform.wiki.admin.wiki.ownerWarning=Ostrzeżenie : Gdy raz to zmienisz, poprzedni właściciel straci prawa użytkownika. Jeśli to ty, upewnij się że nie zablokowałeś się w wiki. Jeśli to się stało przez pomyłkę, będziesz musiał skontaktować się z głównym administratorem wiki lub użyć konta superadmina.

@@ -244,11 +244,13 @@
 #macro (maybeShowDeleteUserWarning $userReference $right)
   #countPagesLastModifiedBy($userReference)
   #if ($pageCount &gt; 0)
-    &lt;div class="box errormessage xform"&gt;
+    {{/html}}
+    
+    {{error cssClass="xform"}}
+      {{html}}
       #set ($pageIndexReference = $services.model.createDocumentReference(
         $userReference.wikiReference.name, 'Main', 'AllDocs'))
-      #set ($pageIndexURL = $xwiki.getURL($pageIndexReference) + '#|t=alldocs&amp;doc.author=' +
-        $escapetool.url($services.model.serialize($userReference, 'local')))
+      #set ($pageIndexURL = $xwiki.getURL($pageIndexReference, 'view', "doc.author=${escapetool.url($services.model.serialize($userReference, 'local'))}"))
       #set ($translationKey = "administration.section.users.deleteUser.${right}RightsWarning")
       $services.localization.render($translationKey, ["&lt;a href='$pageIndexURL'&gt;", $pageCount, '&lt;/a&gt;'])
       &lt;dl&gt;
@@ -273,7 +275,10 @@
             [$rightTranslation]))&lt;/span&gt;
         &lt;/dd&gt;
       &lt;/dl&gt;
-    &lt;/div&gt;
+      {{/html}}
+    {{/error}}
+    
+    {{html clean="false"}}
   #end
 #end
 

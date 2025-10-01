@@ -1,0 +1,2 @@
+org.xwiki.platform.security.requiredrights.ui.MissingRequiredRightWarningUIExtension
+org.xwiki.platform.security.requiredrights.ui.RequiredRightsInfoUIExtension

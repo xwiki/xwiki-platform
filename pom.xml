@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>17.0.0-SNAPSHOT</version>
+  <version>17.9.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -49,42 +49,40 @@
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
     <platform.version>${commons.version}</platform.version>
 
+    <!-- GitHub related metadata -->
+    <xwiki.github.repository>xwiki-platform</xwiki.github.repository>
+
+    <!-- xwiki-platform is directly released on the configured distributionManagement -->
+    <releaseProfiles>release</releaseProfiles>
+
     <!-- Dependencies versions -->
-    <batik.version>1.18</batik.version>
+    <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.9.2</tika.version>
-    <pdfbox.version>2.0.31</pdfbox.version>
+    <tika.version>2.9.4</tika.version>
+    <pdfbox.version>2.0.34</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.15</jetty.server.version>
-    <jetty.client.version>10.0.24</jetty.client.version>
+    <jetty.server.version>12.1.1</jetty.server.version>
+    <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
-         by jetty is referenced in its mod files. When upgrading Jetty, check the version of SLF4J used and set the
-         version here. -->
-    <jetty.server.slf4j.version>2.0.16</jetty.server.slf4j.version>
-    <!-- Force using the version of apache-el from Jetty dependencies instead of the one set by XWiki. The version used
-         by jetty is referenced in its mod files. When upgrading Jetty, check the version of apache-el used and set the
-         version here. -->
-    <jetty.server.apache-el.version>9.0.96</jetty.server.apache-el.version>
-    <netty.version>4.1.116.Final</netty.version>
+    <netty.version>4.2.6.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.4.1</dockerJava.version>
+    <dockerJava.version>3.6.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
-    <jersey.version>2.46</jersey.version>
+    <jersey.version>2.47</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.3</zookeeper.version>
+    <zookeeper.version>3.9.4</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.20.4</testcontainers.version>
+    <testcontainers.version>1.21.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>24.8.4</libreoffice.version>
+    <libreoffice.version>25.2.5</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -100,9 +98,6 @@
     </xwiki.extension.recommendedVersions.platform>
     <xwiki.extension.recommendedVersions>${xwiki.extension.recommendedVersions.platform}</xwiki.extension.recommendedVersions>
 
-    <!-- Disable release staging and directly deploy on the configured distributionManagement -->
-    <xwiki.nexus.skipLocalStaging>true</xwiki.nexus.skipLocalStaging>
-
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
     <xwiki.enforcer.enforce-tika2-parsers.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-tika2-parsers.skip>
     <xwiki.enforcer.banneddependencytype-xar.skip>${xwiki.enforcer.skip}</xwiki.enforcer.banneddependencytype-xar.skip>
@@ -115,29 +110,27 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.1.0</mysql.version>
+    <mysql.version>9.4.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.1</mariadb.version>
+    <mariadb.version>3.5.5</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.4</pgsql.version>
+    <pgsql.version>42.7.7</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.16.0.0</oracle.version>
-    
+    <oracle.version>21.19.0.0</oracle.version>
+
     <!-- Versions of Node related tools -->
-    <node.version>v20.12.0</node.version>
-    <npm.version>10.5.1</npm.version>
+    <node.version>v22.16.0</node.version>
+    <npm.version>11.4.1</npm.version>
+    <pnpm.version>10.11.0</pnpm.version>
   </properties>
   <scm>
-    <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
-    <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
-    <url>https://github.com/xwiki/xwiki-platform/tree/master/</url>
-    <tag>stable-12.7.x</tag>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -154,12 +147,12 @@
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>mchange-commons-java</artifactId>
-        <version>0.3.1</version>
+        <version>0.3.2</version>
       </dependency>
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
-        <version>0.10.1</version>
+        <version>0.11.2</version>
       </dependency>
       <!-- Hibernate -->
       <dependency>
@@ -186,7 +179,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.30.0</version>
+        <version>4.33.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -405,7 +398,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.13.0</version>
+        <version>2.14.0</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -578,17 +571,6 @@
       </dependency>
 
       <dependency>
-        <groupId>net.java.dev.jna</groupId>
-        <artifactId>jna</artifactId>
-        <version>5.15.0</version>
-      </dependency>
-      <dependency>
-        <groupId>net.java.dev.jna</groupId>
-        <artifactId>jna-platform</artifactId>
-        <version>5.15.0</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
         <version>2.4.0</version>
@@ -602,7 +584,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.18.3</version>
+        <version>1.21.2</version>
       </dependency>
 
       <!-- PDF -->
@@ -667,7 +649,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.10</version>
+        <version>2.11</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -732,19 +714,19 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>5.0</version>
+        <version>6.1</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>carte-util</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>3.6.0</version>
+        <version>3.7</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <!-- Note: has a different release cycle than CSS4J "core" -->
-        <version>5.0</version>
+        <version>6.1</version>
       </dependency>
 
       <!-- Carte XML DTD -->
@@ -759,7 +741,7 @@
       <dependency>
         <groupId>com.google.re2j</groupId>
         <artifactId>re2j</artifactId>
-        <version>1.7</version>
+        <version>1.8</version>
       </dependency>
 
       <!-- Mails -->
@@ -989,22 +971,22 @@
       <dependency>
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
-        <version>1.1.10.7</version>
+        <version>1.1.10.8</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-core</artifactId>
-        <version>1.38.0</version>
+        <version>1.40.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-linq4j</artifactId>
-        <version>1.38.0</version>
+        <version>1.40.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
-        <version>1.25.0</version>
+        <version>1.26.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.zookeeper</groupId>
@@ -1062,6 +1044,10 @@
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1145,6 +1131,17 @@
       <!-- Database connectors -->
       <!-- Exclude optional dependencies -->
       <dependency>
+        <groupId>${hsqldb.groupId}</groupId>
+        <artifactId>${hsqldb.artifactId}</artifactId>
+        <version>${hsqldb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>${mysql.groupId}</groupId>
         <artifactId>${mysql.artifactId}</artifactId>
         <version>${mysql.version}</version>
@@ -1191,15 +1188,12 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>2.7.16</version>
-        <exclusions>
-          <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
-          not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
-          <exclusion>
-            <groupId>org.webjars.npm</groupId>
-            <artifactId>vue__compiler-sfc</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>3.5.22</version>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>vue-i18n</artifactId>
+        <version>11.1.12</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1209,6 +1203,11 @@
       <extension>
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-webjar-handlers</artifactId>
+        <version>${commons.version}</version>
+      </extension>
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-webjar-node-handlers</artifactId>
         <version>${commons.version}</version>
       </extension>
       <!-- Needed to add support for the "xar" packaging -->
@@ -1435,13 +1434,6 @@
                 <features>com.google.inject:guice</features>
               </extensionOverride>
               <extensionOverride>
-                <id>net.sf.json-lib:json-lib:jdk15</id>
-                <features>
-                  net.sf.json-lib:json-lib,
-                  net.sf.json-lib:json-lib:jdk13
-                </features>
-              </extensionOverride>
-              <extensionOverride>
                 <id>com.sun.activation:jakarta.activation</id>
                 <features>
                   javax.activation:activation,
@@ -1563,6 +1555,11 @@
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
           <version>1.15.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.gmavenplus</groupId>
+          <artifactId>gmavenplus-plugin</artifactId>
+          <version>4.2.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1708,7 +1705,7 @@
                 <!-- Forbid JAR extensions to have XAR runtime dependencies -->
                 <bannedDependencyType>
                   <dependencyType>xar</dependencyType>
-                  <projectPackaging>jar|webjar</projectPackaging>
+                  <projectPackaging>jar|webjar|webjar-node</projectPackaging>
                   <!-- Integration test modules are never going to be installed as extension, and they need to depend
                        on XAR modules -->
                   <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>

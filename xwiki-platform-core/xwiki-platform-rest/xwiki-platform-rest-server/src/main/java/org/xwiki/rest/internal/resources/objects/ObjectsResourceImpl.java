@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.resources.objects;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -29,19 +30,17 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Objects;
-import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * @version $Id$
@@ -50,6 +49,9 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Named("org.xwiki.rest.internal.resources.objects.ObjectsResourceImpl")
 public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsResource
 {
+    @Inject
+    private ModelFactory factory;
+
     @Override
     public Objects getObjects(String wikiName, String spaceName, String pageName, Integer start, Integer number,
         Boolean withPrettyNames) throws XWikiRestException
@@ -99,40 +101,22 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            XWikiDocument xwikiDocument =
-                Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
-                    Utils.getXWikiContext(componentManager));
-
-            BaseObject xwikiObject =
-                xwikiDocument.newObject(object.getClassName(), Utils.getXWikiContext(componentManager));
+            com.xpn.xwiki.api.Object xwikiObject = doc.newObject(object.getClassName());
 
             if (xwikiObject == null) {
                 throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
             }
 
-            // We must initialize all the fields to an empty value in order to correctly create the object
-            BaseClass xwikiClass =
-                Utils.getXWiki(componentManager).getClass(xwikiObject.getClassName(),
-                    Utils.getXWikiContext(componentManager));
-            for (java.lang.Object propertyNameObject : xwikiClass.getPropertyNames()) {
-                String propertyName = (String) propertyNameObject;
-                xwikiObject.set(propertyName, "", Utils.getXWikiContext(componentManager));
-            }
-
-            for (Property property : object.getProperties()) {
-                xwikiObject.set(property.getName(), property.getValue(), Utils.getXWikiContext(componentManager));
-            }
+            this.factory.toObject(xwikiObject, object);
 
             doc.save("", Boolean.TRUE.equals(minorRevision));
 
+            BaseObject baseObject = getBaseObject(doc, object.getClassName(), xwikiObject.getNumber());
+
             return Response
-                .created(
-                    Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaces, pageName,
-                        object.getClassName(), xwikiObject.getNumber()))
-                .entity(
-                    DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(),
-                        Utils.getXWikiContext(componentManager), doc, xwikiObject, false,
-                        Utils.getXWikiApi(componentManager), false)).build();
+                .created(Utils.createURI(this.uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaces, pageName,
+                    object.getClassName(), baseObject.getNumber()))
+                .entity(this.factory.toRestObject(this.uriInfo.getBaseUri(), doc, baseObject, false, false)).build();
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

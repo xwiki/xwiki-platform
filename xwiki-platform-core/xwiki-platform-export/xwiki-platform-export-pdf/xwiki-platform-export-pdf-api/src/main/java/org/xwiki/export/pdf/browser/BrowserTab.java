@@ -24,8 +24,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
+
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a web browser tab.
@@ -50,6 +54,27 @@ public interface BrowserTab extends AutoCloseable
     }
 
     /**
+     * Navigates to the specified web page, optionally waiting for it to be ready (fully loaded). The process can be
+     * canceled using the provided supplier.
+     * 
+     * @param url the URL of the web page we are going to navigate to
+     * @param cookies the cookies to use when loading the specified web page
+     * @param wait {@code true} to wait for the page to be ready, {@code false} otherwise
+     * @param timeout the number of seconds to wait for the web page to be ready before timing out
+     * @param isCanceled a supplier that indicates whether the process should be canceled
+     * @return {@code true} if the navigation was successful, {@code false} otherwise
+     * @throws IOException if navigating to the specified web page fails
+     * @since 16.10.8
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    default boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout, BooleanSupplier isCanceled)
+        throws IOException
+    {
+        return navigate(url, cookies, wait, timeout);
+    }
+
+    /**
      * Navigates to the specified web page, optionally waiting for it to be ready (fully loaded).
      * 
      * @param url the URL of the web page we are going to navigate to
@@ -59,8 +84,27 @@ public interface BrowserTab extends AutoCloseable
      * @return {@code true} if the navigation was successful, {@code false} otherwise
      * @throws IOException if navigating to the specified web page fails
      * @since 14.9
+     * @deprecated use {@link #navigate(URL, Cookie[], boolean, int)} instead
      */
-    boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout) throws IOException;
+    @Deprecated(since = "17.0.0RC1")
+    boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait, int timeout) throws IOException;
+
+    /**
+     * Navigates to the specified web page, optionally waiting for it to be ready (fully loaded).
+     * 
+     * @param url the URL of the web page we are going to navigate to
+     * @param cookies the cookies to use when loading the specified web page
+     * @param wait {@code true} to wait for the page to be ready, {@code false} otherwise
+     * @param timeout the number of seconds to wait for the web page to be ready before timing out
+     * @return {@code true} if the navigation was successful, {@code false} otherwise
+     * @throws IOException if navigating to the specified web page fails
+     * @since 17.0.0RC1
+     */
+    @Unstable
+    default boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout) throws IOException
+    {
+        return navigate(url, JakartaServletBridge.toJavax(cookies), wait, timeout);
+    }
 
     /**
      * Navigates to the specified web page, optionally waiting for it to be ready (fully loaded).
@@ -71,6 +115,23 @@ public interface BrowserTab extends AutoCloseable
      * @return {@code true} if the navigation was successful, {@code false} otherwise
      * @throws IOException if navigating to the specified web page fails
      */
+    @Deprecated(since = "17.0.0RC1")
+    default boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait) throws IOException
+    {
+        return navigate(url, cookies, wait, 60);
+    }
+
+    /**
+     * Navigates to the specified web page, optionally waiting for it to be ready (fully loaded).
+     *
+     * @param url the URL of the web page we are going to navigate to
+     * @param cookies the cookies to use when loading the specified web page
+     * @param wait {@code true} to wait for the page to be ready, {@code false} otherwise
+     * @return {@code true} if the navigation was successful, {@code false} otherwise
+     * @throws IOException if navigating to the specified web page fails
+     * @since 17.0.0RC1
+     */
+    @Unstable
     default boolean navigate(URL url, Cookie[] cookies, boolean wait) throws IOException
     {
         return navigate(url, cookies, wait, 60);
@@ -86,7 +147,7 @@ public interface BrowserTab extends AutoCloseable
      */
     default boolean navigate(URL url, boolean wait) throws IOException
     {
-        return navigate(url, null, wait);
+        return navigate(url, (Cookie[]) null, wait);
     }
 
     /**

@@ -26,9 +26,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
-import javax.servlet.http.HttpSession;
-import javax.websocket.server.HandshakeRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpSession;
+import jakarta.websocket.server.HandshakeRequest;
 
 import org.junit.jupiter.api.Test;
 
@@ -80,7 +82,9 @@ class XWikiWebSocketRequestStubTest
         assertEquals("red", stub.getParameter("color"));
         assertArrayEquals(new String[] {"red", "blue"}, stub.getParameterValues("color"));
 
-        assertEquals("xyz", stub.getCookie("validation").getValue());
+        String validationCookie = Stream.of(stub.getCookies()).filter(c -> c.getName().equals("validation"))
+            .map(Cookie::getValue).findFirst().get();
+        assertEquals("xyz", validationCookie);
         assertEquals(6, stub.getCookies().length);
 
         assertEquals(1212491130000L, stub.getDateHeader("daTe"));

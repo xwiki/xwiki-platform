@@ -18,14 +18,10 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template('job/question/macros.vm')
-
 #questionHeader()
-
 #set ($jobStatus = $job.status)
 #set ($question = $jobStatus.question)
-
-<div class="warningmessage deleteWarningExtensions">
-  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title"))</strong></p>
+#define ($warningMessageContent)
   <p>$escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.explanation"))</p>
   #set ($url = $xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'section=XWiki.Extensions&search=&repo=installed'))
   #set ($link = '<a href="' + $url + '">')
@@ -42,5 +38,15 @@
     </div>
   </div>
   #questionButtons($jobStatus)
-</div>
+#end
+#set( $parameters = {
+  'text': "$warningMessageContent",
+  'classAffix': 'warning',
+  'iconName': 'warning',
+  'prettyNameKey': 'warning',
+  'extraClass':'deleteWarningExtensions',
+  'title': $escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title"))
+})
+#_genericMessage($parameters)
+
 #questionFooter()

@@ -19,14 +19,9 @@
  */
 package org.xwiki.netflux.internal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -35,6 +30,11 @@ import org.xwiki.netflux.EntityChannel;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultEntityChannelStore}.

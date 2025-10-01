@@ -126,15 +126,15 @@
     </property>
     <property>
       <code>define('xwiki-ckeditor-inline', ['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
-  var loadCSS = function(url) {
+  function loadCSS(url) {
     $('&lt;link&gt;').attr({
       type: 'text/css',
       rel: 'stylesheet',
       href: url
     }).appendTo('head');
-  };
+  }
 
-  var css = [
+  const css = [
     // Styles for the editor UI (tool bar, dialogs, etc.).
     new XWiki.Document('EditSheet', 'CKEditor').getURL('ssx'),
     // Custom styles for the edited content.
@@ -150,14 +150,20 @@
 
   $(document).on('xwiki:actions:edit', function(event, config) {
     if (config &amp;&amp; config.contentType === 'org.xwiki.rendering.syntax.SyntaxContent' &amp;&amp; config.editMode === 'wysiwyg') {
-      var container = $(event.target);
+      const container = $(event.target);
+
+      // CKEditor is expecting HTML as input so we fill the edit container with the rendered content. We don't trigger
+      // the xwiki:dom:updated event here because we want to let the editor trigger the event only for the content areas
+      // that are safe to be updated from JavaScript (i.e. the macro output).
+      container.html(config.document.renderedContent);
+
       ckeditorPromise.done(function(ckeditor) {
         createEditors(ckeditor, container, config);
       });
     }
   });
 
-  var startAvoidingCKAndSaveBarOverlap = function(editor) {
+  function startAvoidingCKAndSaveBarOverlap(editor) {
     // CKEDITOR-470 - CKEditor's toolbar may overlap with XWiki's save bar.
     // This function is a workaround that checks if they overlap when the page
     // is scrolled and when the CKEditor's toolbar's CSS style is changed
@@ -176,9 +182,9 @@
       // This callback will be called when the page is scrolled or when the
       // CKEditor's toolbar position is changed.
 
-      var ckBRC = ckFloatingToolbar.getBoundingClientRect();
-      var saveBRC = saveBar.getBoundingClientRect();
-      var collision = ckBRC.top + ckBRC.height &gt; saveBRC.top;
+      const ckBRC = ckFloatingToolbar.getBoundingClientRect();
+      const saveBRC = saveBar.getBoundingClientRect();
+      const collision = ckBRC.top + ckBRC.height &gt; saveBRC.top;
       if (saveBar.classList.contains("sticky-buttons-fixed")) {
           // If XWiki's save bar is sticky, it should not have our custom
           // padding-top.
@@ -221,11 +227,11 @@
       }
     }
 
-    var ckFloatingToolbar = document.getElementById('cke_' + editor.name);
-    var saveBar = document.getElementsByClassName('inplace-editing-buttons')[0];
+    const ckFloatingToolbar = document.getElementById('cke_' + editor.name);
+    const saveBar = document.getElementsByClassName('inplace-editing-buttons')[0];
     if (ckFloatingToolbar &amp;&amp; saveBar) {
       window.addEventListener("scroll", avoidCKAndSaveBarOverlap);
-      var mutationObserver = new MutationObserver(avoidCKAndSaveBarOverlap);
+      const mutationObserver = new MutationObserver(avoidCKAndSaveBarOverlap);
       mutationObserver.observe(ckFloatingToolbar, {
         attributes: true,
         attributeFilter: ['style']
@@ -238,9 +244,9 @@
     }
 
     return null;
-  };
+  }
 
-  var createEditors = function(ckeditor, container, config) {
+  function createEditors(ckeditor, container, config) {
     if (config.editorName) {
       // We cannot set the editor name through the editor configuration. The editor name is taken by default from the
       // container id or name. To overcome this we set the editor name just after the editor instance is created.
@@ -265,63 +271,123 @@
         config.deferred.reject();
       }
     });
-  };
+  }
 
-  var createEditor = function(ckeditor, element, config, instanceConfig) {
-    var stopAvoidingCKAndSaveBarOverlap = null;
-    var deferred = $.Deferred();
-    var editor = ckeditor.inline(element, $.extend({
+  function createEditor(ckeditor, element, config, instanceConfig) {
+    let stopAvoidingCKAndSaveBarOverlap = null;
+    const fieldSet = createFieldSet(element.ownerDocument, config);
+    const deferred = $.Deferred();
+    const editor = ckeditor.inline(element, $.extend({
+      startupFocus: config.startupFocus,
+      formId: config.formId,
       // It doesn't make sense to resize the editor when editing in-line and it also creates problems with the way
       // we implemented the maximize feature for the in-line editor.
       resize_enabled: false
     }, instanceConfig));
-    // Disable the source mode if the in-place editor doesn't support it, i.e. XWiki [12.3RC1, 12.4].
-    if (!config.enableSourceMode) {
-      editor.once('configLoaded', function(event) {
-        if (typeof editor.config.removePlugins === 'string') {
-          editor.config.removePlugins += ',xwiki-source,xwiki-sourcearea';
-        }
-      });
-    }
     editor.once('instanceReady', function() {
+      element.after(fieldSet.wrapper);
       deferred.resolve(editor);
       // Make the content editable after the editor is ready and visible.
       // See CKEDITOR-390: The inline editor loads as read-only in Safari
       editor.setReadOnly(false);
       stopAvoidingCKAndSaveBarOverlap = startAvoidingCKAndSaveBarOverlap(editor);
     });
+    editor.once('beforeDestroy', function() {
+      fieldSet.wrapper.remove();
+    });
     editor.once('reload', function(event) {
-      $(document).off(['xwiki:actions:view.contentEditor', 'xwiki:actions:beforeSave.contentEditor'].join(' '));
+      $(document).off([
+        'xwiki:actions:view.contentEditor',
+        'xwiki:actions:beforeSave.contentEditor',
+        'xwiki:actions:beforePreview.contentEditor'
+      ].join(' '));
       event.data.promise = event.data.promise.then(createEditor.bind(null, ckeditor, element, config));
     });
-    $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
+    $(document).on('xwiki:actions:beforeSave.contentEditor xwiki:actions:beforePreview.contentEditor', event =&gt; {
       config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
       // Delete the document content field that is not used so that the in-place editor knows what to submit on save.
       delete config.document[editor.mode === 'source' ? 'renderedContent' : 'content'];
       config.document.syntax = editor.config.sourceSyntax;
+      updateFieldSet(fieldSet, config.document);
     });
     $(document).one('xwiki:actions:view.contentEditor', function(event, data) {
-      $(document).off('xwiki:actions:beforeSave.contentEditor');
+      $(document).off('xwiki:actions:beforeSave.contentEditor xwiki:actions:beforePreview.contentEditor');
       // Blur the edited content to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit shortcut).
       // We also do this because destroying the editor while the edited content has the focus can lead to an error.
       // See below.
       $(element).blur().prop('contenteditable', false).removeAttr('contenteditable');
-      // We destroy the editor after the edited content has lost the focus completely because the editor has a
-      // delayed event listener that tries to access the selection even after the editor has been destroyed.
-      setTimeout(function() {
-        // Don't update the edited element with the data from the editor because:
-        // * the editor data might be wiki syntax if the current mode is Source
-        // * the in-place editor updates the edited element anyway using the view HTML (without rendering markers)
-        //   and we risk overwriting it.
-        editor.destroy(/* noUpdate: */ true);
-        if (stopAvoidingCKAndSaveBarOverlap) {
-          stopAvoidingCKAndSaveBarOverlap();
-          stopAvoidingCKAndSaveBarOverlap = null;
-        }
-      }, 0);
+      data.promises.push(new Promise((resolve, reject) =&gt; {
+        // We destroy the editor after the edited content has lost the focus completely because the editor has a
+        // delayed event listener that tries to access the selection even after the editor has been destroyed.
+        setTimeout(async () =&gt; {
+          // Don't update the edited element with the data from the editor because:
+          // * the editor data might be wiki syntax if the current mode is Source
+          // * the in-place editor updates the edited element anyway using the view HTML (without rendering markers)
+          //   and we risk overwriting it.
+          await editor.destroy(/* noUpdate: */ true);
+          if (stopAvoidingCKAndSaveBarOverlap) {
+            stopAvoidingCKAndSaveBarOverlap();
+            stopAvoidingCKAndSaveBarOverlap = null;
+          }
+          resolve();
+        }, 0);
+      }));
     });
     return deferred.promise();
-  };
+  }
+
+  function createFieldSet(document, config) {
+    const fieldSet = document.createElement('fieldset');
+    fieldSet.setAttribute('form', config.formId);
+    fieldSet.setAttribute('hidden', 'hidden');
+
+    const valueField = document.createElement('input');
+    valueField.setAttribute('type', 'hidden');
+    valueField.setAttribute('name', config.editorName);
+    valueField.setAttribute('form', config.formId);
+    fieldSet.append(valueField);
+
+    const conversionField = document.createElement('input');
+    conversionField.setAttribute('type', 'hidden');
+    conversionField.setAttribute('name', 'RequiresHTMLConversion');
+    conversionField.setAttribute('value', config.editorName);
+    conversionField.setAttribute('form', config.formId);
+    fieldSet.append(conversionField);
+
+    const syntaxField = document.createElement('input');
+    syntaxField.setAttribute('type', 'hidden');
+    syntaxField.setAttribute('name', config.editorName + '_syntax');
+    syntaxField.setAttribute('form', config.formId);
+    fieldSet.append(syntaxField);
+
+    return {wrapper: fieldSet, valueField, conversionField, syntaxField};
+  }
+
+  function updateFieldSet(fieldSet, xwikiDocument) {
+    // Submit either the raw (source) content (no syntax conversion needed in this case) or the rendered content (HTML)
+    // in which case we have to force the conversion to the document syntax on the server.
+    const submitRawContent = typeof xwikiDocument.renderedContent !== 'string';
+    fieldSet.valueField.value = submitRawContent ? xwikiDocument.content : xwikiDocument.renderedContent;
+    fieldSet.conversionField.disabled = submitRawContent;
+    fieldSet.syntaxField.value = xwikiDocument.syntax;
+    fieldSet.syntaxField.disabled = submitRawContent;
+  }
+
+  return {
+    getRenderingConfig: function() {
+      return {
+        outputSyntax: {
+          // We need to render the content as Annotated HTML when editing in order to be able to protect the rendering
+          // transformations (macros) and to be able to recreate the wiki syntax on save.
+          type: 'annotatedhtml',
+          version: '5.0'
+        },
+        // Currently, only the macro transformations are protected and thus can be edited.
+        // See XRENDERING-78: Add markers to modified XDOM by Transformations/Macros
+        transformations: ['macro']
+      };
+    }
+  }
 });</code>
     </property>
     <property>

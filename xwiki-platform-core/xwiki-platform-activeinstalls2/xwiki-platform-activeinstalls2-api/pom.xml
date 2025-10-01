@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activeinstalls2</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activeinstalls2-api</artifactId>
   <name>XWiki Platform - Active Installs 2 - API</name>
@@ -74,9 +74,10 @@
     </dependency>
     <!-- We want to log the Servlet Container name/version in the ping -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.testcontainers</groupId>

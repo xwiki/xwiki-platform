@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-realtime-wiki-test</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-realtime-wiki-test-docker</artifactId>
   <name>XWiki Platform - Realtime - Wiki - Test - Functional Tests in Docker</name>
@@ -76,8 +76,13 @@
     </dependency>
     <!-- Realtime synchronization is done through WebSockets. -->
     <dependency>
-      <groupId>javax.websocket</groupId>
-      <artifactId>javax.websocket-api</artifactId>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-client-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

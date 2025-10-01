@@ -165,7 +165,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   ## This variable should be true only for an authenticate user that matches the comment author.
   ## We don't allow guests to be edit or delete comments because we can't know if they are the comment author.
   #set ($isUserComment = $commentAuthor != '' && $services.model.resolveDocument($commentAuthor, 'user') == $xcontext.userReference)
-  <div id="xwikicomment_${comment.number}" class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
+  <div id="xwikicomment_${comment.number}" #if("$!comment.replyto" != '')data-replyto="$comment.replyto"#end class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($commentAuthor)#{else}#mediumUserAvatar($commentAuthor)#end</div>
     <div class="commentheader">
       <div>
@@ -398,10 +398,41 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #error($services.localization.render('core.viewers.comments.edit.notFound'))
   #end
 #else
+#set ($comments = $doc.getComments())
+
+## Build a map on the form Date -> List<Comment object>
+## We also keep the set of keys when we have multiple comments at same date just to order them later (it should be a
+## very rare case but let's ensure we keep a deterministic order)
+#set ($commentMap = $collectiontool.getSortedMap())
+#set ($keysWithMultipleComments = $collectiontool.getSet())
+#foreach ($comment in $comments)
+  #set ($key = $comment.getValue('date'))
+  #if ($commentMap.containsKey($key))
+    #set ($discard = $commentMap.get($key).add($comment))
+    #set ($discard = $keysWithMultipleComments.add($key))
+  #else
+    #set ($discard = $commentMap.put($key, [$comment]))
+  #end
+#end
+
+## We perform an ascending ordering of the keys
 #if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 1)
-  #set($comments = $doc.getComments())
+  #set ($orderSuffix = ':asc')
 #else
-  #set($comments = $doc.getComments(false))
+  #set ($orderSuffix = ':desc')
+  #set ($commentMap = $commentMap.descendingMap())
+#end
+
+## Ensure to order list with multiple entries if needed
+#foreach ($keyMultipleComment in $keysWithMultipleComments)
+  #set ($reorderedList = $collectiontool.sort($commentMap.get($keyMultipleComment), "number$orderSuffix"))
+  #set ($discard = $commentMap.put($keyMultipleComment, $reorderedList))
+#end
+
+## Finally obtained an ordered list
+#set ($comments = $collectiontool.getLinkedList())
+#foreach ($commentList in $commentMap.values())
+  #set ($discard = $comments.addAll($commentList))
 #end
 ##
 ##

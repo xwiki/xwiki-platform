@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -201,7 +202,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         StringBuilder url = new StringBuilder(context.getWiki().getSkinFile(filename, forceSkinAction, context));
         if (forceSkinAction) {
             String parameters =
-                StringUtils.removeStart(parametersAsQueryString(filename, context), PARAMETER_SEPARATOR);
+                Strings.CS.removeStart(parametersAsQueryString(filename, context), PARAMETER_SEPARATOR);
             if (!StringUtils.isEmpty(parameters)) {
                 String queryParamDelimiter =
                     StringUtils.contains(url, QUERY_PARAMETER_DELIMITER) ? PARAMETER_SEPARATOR

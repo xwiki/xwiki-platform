@@ -19,31 +19,56 @@
  */
 package org.xwiki.container.servlet;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.ObjectName;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.reflect.ConstructorUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.internal.StackingComponentEventManager;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.internal.HttpSessionManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.extension.handler.ExtensionInitializer;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
 
 /**
  * Implementation of the {@link ServletContextListener}. Initializes component manager and application context.
+ * <p>
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
+ * @since 17.0.0RC1
  */
 public class XWikiServletContextListener implements ServletContextListener
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletContextListener.class);
+
+    private static final String TOMCAT_CATALINA = "Catalina";
+
     /**
      * Logger to use to log shutdown information (opposite of initialization).
      */
@@ -63,14 +88,8 @@ public class XWikiServletContextListener implements ServletContextListener
         ecm.initialize(this.getClass().getClassLoader());
         this.componentManager = ecm;
 
-        // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
         // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
-        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
-        // Class that need to lookup then just need to get it from the XWikiContext instance.
-        // This is of course not necessary for XWiki components since they just need to implement
-        // the Composable interface to get access to the Component Manager or better they simply
-        // need to declare their components requirements using the @Inject annotation of the xwiki
-        // component manager together with a private class member, for automatic injection by the CM on init.
+        // available in Servlets and Filters.
         servletContextEvent.getServletContext()
             .setAttribute(org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
 
@@ -97,7 +116,8 @@ public class XWikiServletContextListener implements ServletContextListener
         try {
             ServletContainerInitializer containerInitializer =
                 this.componentManager.getInstance(ServletContainerInitializer.class);
-            containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
+            containerInitializer
+                .initializeApplicationContext(JakartaServletBridge.toJavax(servletContextEvent.getServletContext()));
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the Application Context", e);
         }
@@ -118,7 +138,7 @@ public class XWikiServletContextListener implements ServletContextListener
             throw new RuntimeException("Failed to initialize installed extensions", e);
         }
 
-        // Register the  HttpSessionManager as a listener.
+        // Register the HttpSessionManager as a listener.
         try {
             HttpSessionManager httpSessionManager = this.componentManager.getInstance(HttpSessionManager.class);
             servletContextEvent.getServletContext().addListener(httpSessionManager);
@@ -132,8 +152,160 @@ public class XWikiServletContextListener implements ServletContextListener
         eventManager.shouldStack(false);
         eventManager.flushEvents();
 
+        // Force allowing any character in the input URLs, contrary to what Servlet 6 specifications indicate
+        // FIXME: Remove when https://jira.xwiki.org/browse/XWIKI-19167 is fully fixed
+        allowAllURLCharacters(servletContextEvent.getServletContext());
+
         // Indicate to the various components that XWiki is ready
         observationManager.notify(new ApplicationStartedEvent(), this);
+    }
+
+    private void allowAllURLCharacters(ServletContext servletContext)
+    {
+        if (isForceAllowAnyCharacter()) {
+            // Tomcat
+            allowAllURLCharactersTomcat();
+
+            // Jetty
+            allowAllURLCharactersJetty(servletContext);
+        }
+    }
+
+    private boolean isForceAllowAnyCharacter()
+    {
+        ConfigurationSource configuration;
+        try {
+            configuration = this.componentManager.getInstance(ConfigurationSource.class, "xwikiproperties");
+
+            return configuration.getProperty("url.forceAllowAnyCharacter", true);
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Failed to access the configuration", e);
+        }
+    }
+
+    private void allowAllURLCharactersTomcat()
+    {
+        try {
+            ArrayList<MBeanServer> mbeanServers = MBeanServerFactory.findMBeanServer(null);
+            if (!mbeanServers.isEmpty()) {
+                MBeanServer mBeanServer = mbeanServers.get(0);
+                ObjectName name = new ObjectName(TOMCAT_CATALINA, "type", "Server");
+                Object server = mBeanServer.getAttribute(name, "managedResource");
+                Object service = MethodUtils.invokeMethod(server, "findService", TOMCAT_CATALINA);
+                Object connectors = MethodUtils.invokeMethod(service, "findConnectors");
+                for (int i = 0; i < Array.getLength(connectors); ++i) {
+                    Object connector = Array.get(connectors, i);
+
+                    // Allow backslash (\)
+                    MethodUtils.invokeMethod(connector, "setAllowBackslash", true);
+                    // Allow slash/solidus (/)
+                    MethodUtils.invokeMethod(connector, "setEncodedSolidusHandling", "passthrough");
+                    // Try as much as possible to have XWiki being called directly for any URI
+                    MethodUtils.invokeMethod(connector, "setRejectSuspiciousURIs", false);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Failed to configure Tomcat URL constraints", e);
+        }
+    }
+
+    private void allowAllURLCharactersJetty(ServletContext servletContext)
+    {
+        try {
+            Object contextHandler = MethodUtils.invokeMethod(servletContext, "getContextHandler");
+
+            // setDecodeAmbiguousURIs
+            Object servletHandler = MethodUtils.invokeMethod(contextHandler, "getServletHandler");
+            MethodUtils.invokeMethod(servletHandler, "setDecodeAmbiguousURIs", true);
+
+            // URI compliance
+            Object server = MethodUtils.invokeMethod(contextHandler, "getServer");
+            Object connectors = MethodUtils.invokeMethod(server, "getConnectors");
+            Object uriCompliance = null;
+            for (int i = 0; i < Array.getLength(connectors); ++i) {
+                uriCompliance = configureConnectorJetty(Array.get(connectors, i), uriCompliance);
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Failed to configure Jetty URL constraints", e);
+        }
+    }
+
+    private Object configureConnectorJetty(Object connector, Object inputUriCompliance)
+    {
+        Object uriCompliance = inputUriCompliance;
+
+        Object factories;
+        try {
+            factories = MethodUtils.invokeMethod(connector, "getConnectionFactories");
+            if (factories instanceof Collection factoriesCollection) {
+                for (Object factory : factoriesCollection) {
+                    uriCompliance = configureFactoryJetty(factory, uriCompliance);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Failed to get factories", e);
+        }
+
+        return uriCompliance;
+    }
+
+    private Object configureFactoryJetty(Object factory, Object inputUriCompliance)
+    {
+        Object uriCompliance = inputUriCompliance;
+
+        try {
+            Object httpConfiguration = MethodUtils.invokeMethod(factory, "getHttpConfiguration");
+
+            if (uriCompliance == null) {
+                uriCompliance = getUriCompliance(httpConfiguration);
+            }
+
+            // Disable various violations applied by default by Jetty to URIs and redirect URIs
+            MethodUtils.invokeMethod(httpConfiguration, "setUriCompliance", uriCompliance);
+            MethodUtils.invokeMethod(httpConfiguration, "setRedirectUriCompliance", uriCompliance);
+        } catch (Exception e) {
+            LOGGER.debug("Failed to set the URI compliance", e);
+        }
+
+        return uriCompliance;
+    }
+
+    private Object getUriCompliance(Object httpConfiguration)
+        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException
+    {
+        // Create a UriCompliance with the right class (we cannot use the one in the current classloader since it's
+        // coming from XWiki WAR)
+
+        Class<?> uriComplianceClass = MethodUtils.invokeMethod(httpConfiguration, "getUriCompliance").getClass();
+        Class violationsClass = getViolationClass(uriComplianceClass);
+        Set<Object> violations = new HashSet<>();
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEGMENT"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_EMPTY_SEGMENT"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEPARATOR"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_PARAMETER"));
+        violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_ENCODING"));
+
+        // Allow fragments in redirects (violation introduced in Jetty 12.1.0)
+        Object fragmentViolation = EnumUtils.getEnum(violationsClass, "FRAGMENT");
+        if (fragmentViolation != null) {
+            violations.add(fragmentViolation);
+        }
+
+        return ConstructorUtils.invokeConstructor(uriComplianceClass, "XWiki", violations);
+    }
+
+    private Class getViolationClass(Class<?> uriComplianceClass)
+    {
+        for (Class<?> innerClass : uriComplianceClass.getDeclaredClasses()) {
+            // We cannot manipulate the class directly because it would probably be the wrong one, so we use reflection
+            @SuppressWarnings("java:S1872")
+            boolean isViolationClass = innerClass.getName().equals("org.eclipse.jetty.http.UriCompliance$Violation");
+            if (isViolationClass) {
+                return innerClass;
+            }
+        }
+
+        return null;
     }
 
     @Override

@@ -29,6 +29,7 @@ import javax.mail.BodyPart;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -91,84 +92,70 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 )
 class InvitationIT
 {
-    private static boolean initialized;
-
-    private InvitationSenderPage senderPage;
-
     private GreenMail greenMail;
 
-    @BeforeEach
-    void setUp(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    @BeforeAll
+    void initialize(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
-        // TODO: replace with @BeforeAll the parts of the setup that can be executed only once.
+        setup.loginAsSuperAdmin();
+        configureEmail(setup, testConfiguration);
+
+        // We have to go to sender page before any config shows up.
+        InvitationSenderPage.gotoPage();
+
+        AdministrationSectionPage config = AdministrationSectionPage.gotoPage("Invitation");
+        // Set port to 3025
+        config.getFormContainerElement("admin-page-content")
+            .setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_smtp_port"),
+                "3025");
+        config.getFormContainerElement("admin-page-content")
+            .setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_smtp_server"),
+                testConfiguration.getServletEngine().getHostIP());
+        // Make sure that by default we don't allow non admin to send emails to multiple addresses
+        config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
+            + "usersMaySendToMultiple"), "false");
+        config.clickSave(true);
+
+        // Make sure the users we're registering in testAcceptInvitation and testAcceptInvitationToCloseWiki don't
+        // exist.
+        // TODO: Fix this whole mess of having try/finally blocks in tests below which is an anti pattern. Instead
+        // we need to separate tests by fixture.
+        setup.rest().deletePage("XWiki", "InvitedMember");
+        setup.rest().deletePage("XWiki", "AnotherInvitedMember");
+    }
+
+    @BeforeEach
+    void setUp(TestUtils setup) throws Exception
+    {
         // Login as admin and delete existing messages.
         setup.loginAsSuperAdmin();
-        setup.recacheSecretToken();
-        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
         setup.rest().deletePage("Invitation", "InvitationMessages");
-
-        if (!initialized) {
-            configureEmail(setup, testConfiguration);
-
-            // We have to go to sender page before any config shows up.
-            InvitationSenderPage.gotoPage();
-
-            AdministrationSectionPage config = AdministrationSectionPage.gotoPage("Invitation");
-            // Set port to 3025
-            config.getFormContainerElement("admin-page-content")
-                .setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_smtp_port"),
-                    "3025");
-            config.getFormContainerElement("admin-page-content")
-                .setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_smtp_server"),
-                    testConfiguration.getServletEngine().getHostIP());
-            // Make sure that by default we don't allow non admin to send emails to multiple addresses
-            config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
-                + "usersMaySendToMultiple"), "false");
-            config.clickSave(true);
-
-            // Make sure the users we're registering in testAcceptInvitation and testAcceptInvitationToCloseWiki don't
-            // exist.
-            // TODO: Fix this whole mess of having try/finally blocks in tests below which is an anti pattern. Instead
-            // we need to separate tests by fixture.
-            setup.rest().deletePage("XWiki", "InvitedMember");
-            setup.rest().deletePage("XWiki", "AnotherInvitedMember");
-
-            initialized = true;
-        }
-
-        setSenderPage(InvitationSenderPage.gotoPage());
-        getSenderPage().fillInDefaultValues();
     }
 
     @Test
     @Order(1)
     void guestActionsOnNonexistantMessage(TestUtils setup)
     {
-        TestUtils.Session s = setup.getSession();
-        try {
-            setup.forceGuestUser();
+        setup.forceGuestUser();
 
-            // Try to accept nonexistent message.
-            setup.gotoPage("Invitation", "InvitationGuestActions", "view", "doAction_accept&messageID=12345");
-            InvitationGuestActionsPage guestPage = new InvitationGuestActionsPage();
-            assertNotNull(guestPage.getMessage(), "Guests able to accept nonexistent invitation");
-            assertEquals("No message was found by the given ID. It might have been deleted "
-                + "or maybe the system is experiencing difficulties.", guestPage.getMessage());
+        // Try to accept nonexistent message.
+        setup.gotoPage("Invitation", "InvitationGuestActions", "view", "doAction_accept&messageID=12345");
+        InvitationGuestActionsPage guestPage = new InvitationGuestActionsPage();
+        assertNotNull(guestPage.getMessage(), "Guests able to accept nonexistent invitation");
+        assertEquals("No message was found by the given ID. It might have been deleted "
+            + "or maybe the system is experiencing difficulties.", guestPage.getMessage());
 
-            // Try to decline nonexistent message.
-            setup.gotoPage("Invitation", "InvitationGuestActions", "view", "doAction_decline&messageID=12345");
-            assertNotNull(guestPage.getMessage(), "Guests able to decline nonexistent invitation");
-            assertEquals("No invitation was found by the given ID. It might have been deleted or "
-                + "maybe the system is experiencing difficulties.", guestPage.getMessage());
+        // Try to decline nonexistent message.
+        setup.gotoPage("Invitation", "InvitationGuestActions", "view", "doAction_decline&messageID=12345");
+        assertNotNull(guestPage.getMessage(), "Guests able to decline nonexistent invitation");
+        assertEquals("No invitation was found by the given ID. It might have been deleted or "
+            + "maybe the system is experiencing difficulties.", guestPage.getMessage());
 
-            // Try to report nonexistent message.
-            setup.gotoPage("Invitation", "InvitationGuestActions", "view", "doAction_report&messageID=12345");
-            assertNotNull(guestPage.getMessage(), "Guests able to report nonexistent invitation as spam");
-            assertEquals("There was no message found by the given ID. Maybe an administrator "
-                + "deleted the message from our system.", guestPage.getMessage());
-        } finally {
-            setup.setSession(s);
-        }
+        // Try to report nonexistent message.
+        setup.gotoPage("Invitation", "InvitationGuestActions", "view", "doAction_report&messageID=12345");
+        assertNotNull(guestPage.getMessage(), "Guests able to report nonexistent invitation as spam");
+        assertEquals("There was no message found by the given ID. Maybe an administrator "
+            + "deleted the message from our system.", guestPage.getMessage());
     }
 
     @Test
@@ -177,8 +164,9 @@ class InvitationIT
     {
         try {
             startGreenMail();
-            getSenderPage().fillForm("user@localhost.localdomain anotheruser@localhost.localdomain", null, null);
-            InvitationSenderPage.InvitationSentPage sent = getSenderPage().send();
+            InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
+            invitationSenderPage.fillForm("user@localhost.localdomain anotheruser@localhost.localdomain", null, null);
+            InvitationSenderPage.InvitationSentPage sent = invitationSenderPage.send();
             getGreenMail().waitForIncomingEmail(10000, 2);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
 
@@ -232,7 +220,9 @@ class InvitationIT
     @Order(3)
     void previewMessage()
     {
-        InvitationMessageDisplayElement preview = getSenderPage().preview();
+        InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
+        invitationSenderPage.fillInDefaultValues();
+        InvitationMessageDisplayElement preview = invitationSenderPage.preview();
         assertTrue(preview.getSubjectLine().contains("has invited you to join"));
         assertTrue(preview.getMessageBody().contains("If this message looks like abuse of our system"));
         assertTrue(preview.getValidRecipients().get(0).getText().contains("user@localhost.localdomain"));
@@ -242,14 +232,13 @@ class InvitationIT
     @Order(4)
     void nonAdminCanSend(TestUtils setup) throws Exception
     {
-        TestUtils.Session s = setup.getSession();
         try {
             setup.forceGuestUser();
             setup.createUserAndLogin("NonMailAdminUser", "WeakPassword");
-            setSenderPage(InvitationSenderPage.gotoPage());
+            InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
             startGreenMail();
-            getSenderPage().fillForm("user@localhost.localdomain", null, null);
-            InvitationSenderPage.InvitationSentPage sent = getSenderPage().send();
+            invitationSenderPage.fillForm("user@localhost.localdomain", null, null);
+            InvitationSenderPage.InvitationSentPage sent = invitationSenderPage.send();
 
             // Prove that the message was sent.
             getGreenMail().waitForIncomingEmail(10000, 1);
@@ -267,7 +256,7 @@ class InvitationIT
             assertTrue(table.getRow(1).get(2).getText().contains("Pending"));
         } finally {
             stopGreenMail();
-            setup.setSession(s);
+            setup.loginAsSuperAdmin();
             setup.rest().deletePage("XWiki", "NonMailAdminUser");
         }
     }
@@ -281,8 +270,6 @@ class InvitationIT
     @Order(5)
     void unpermittedUserCannotSendToMultipleAddresses(TestUtils setup) throws Exception
     {
-        TestUtils.Session admin = setup.getSession();
-
         // Make sure users don't have the right to send to multiple.
         AdministrationSectionPage config = AdministrationSectionPage.gotoPage("Invitation");
         config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
@@ -292,10 +279,10 @@ class InvitationIT
         try {
             setup.forceGuestUser();
             setup.createUserAndLogin("NonMailAdminUser", "WeakPassword");
-            setSenderPage(InvitationSenderPage.gotoPage());
+            InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
             startGreenMail();
-            getSenderPage().fillForm("user@localhost.localdomain anotheruser@localhost.localdomain", null, null);
-            InvitationSenderPage.InvitationSentPage sent = getSenderPage().send();
+            invitationSenderPage.fillForm("user@localhost.localdomain anotheruser@localhost.localdomain", null, null);
+            InvitationSenderPage.InvitationSentPage sent = invitationSenderPage.send();
             getGreenMail().waitForIncomingEmail(2000, 2);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             assertEquals(0, messages.length, "Messages were received when they shouldn't have been sent!");
@@ -305,19 +292,17 @@ class InvitationIT
             stopGreenMail();
 
             // Become admin and allow users to send to multiple.
-            TestUtils.Session nonAdmin = setup.getSession();
-            setup.setSession(admin);
+            setup.loginAsSuperAdmin();
             config = AdministrationSectionPage.gotoPage("Invitation");
             config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
                 + "usersMaySendToMultiple"), "true");
             config.clickSave(true);
-            setup.setSession(nonAdmin);
-
+            setup.login("NonMailAdminUser", "WeakPassword");
             // Prove that the user can now send to multiple recipients.
             startGreenMail();
-            setSenderPage(InvitationSenderPage.gotoPage());
-            getSenderPage().fillForm("user@localhost.localdomain anotheruser@localhost.localdomain", null, null);
-            sent = getSenderPage().send();
+            invitationSenderPage = InvitationSenderPage.gotoPage();
+            invitationSenderPage.fillForm("user@localhost.localdomain anotheruser@localhost.localdomain", null, null);
+            sent = invitationSenderPage.send();
             getGreenMail().waitForIncomingEmail(10000, 2);
             messages = getGreenMail().getReceivedMessages();
             assertEquals(2, messages.length, "Non admins cannot send mail to even with permission");
@@ -325,7 +310,7 @@ class InvitationIT
                 "User was not given the message that their mail was sent.");
         } finally {
             stopGreenMail();
-            setup.setSession(admin);
+            setup.loginAsSuperAdmin();
             setup.rest().deletePage("XWiki", "NonMailAdminUser");
         }
     }
@@ -339,25 +324,23 @@ class InvitationIT
     @Order(6)
     void spamReporting(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
-        TestUtils.Session admin = setup.getSession();
         try {
             setup.forceGuestUser();
             setup.createUserAndLogin("spam", "andEggs");
-            setSenderPage(InvitationSenderPage.gotoPage());
+            InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
             startGreenMail();
-            getSenderPage().fillForm("undisclosed-recipients@localhost.localdomain", null,
+            invitationSenderPage.fillForm("undisclosed-recipients@localhost.localdomain", null,
                 "You have won the email lottery!");
-            getSenderPage().send();
+            invitationSenderPage.send();
             getGreenMail().waitForIncomingEmail(10000, 1);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             String htmlMessage = getMessageContent(messages[0]).get("htmlPart");
 
-            // Restare greenmail to clear message
+            // Restart greenmail to clear message
             stopGreenMail();
             startGreenMail();
 
             // Now switch to guest.
-            TestUtils.Session spammer = setup.getSession();
             setup.forceGuestUser();
 
             InvitationGuestActionsPage guestPage =
@@ -377,23 +360,20 @@ class InvitationIT
                     + "spam and thus cannot be declined.", guestPage.getMessage(),
                 "After a message is reported a user can decline it, clearing the spam report");
             // Switch to admin
-            setup.setSession(admin);
-            // Go to invitation sender.
-            setSenderPage(InvitationSenderPage.gotoPage());
+            setup.loginAsSuperAdmin();
             // Switch back to spammer.
-            setup.setSession(spammer);
-            getSenderPage().send();
-            getGreenMail().waitForIncomingEmail(2000, 1);
-            assertEquals(0, getGreenMail().getReceivedMessages().length, "Reported spammers can send mail!");
-            assertTrue(getSenderPage().userIsSpammer(), "No message telling user he's reported spammer.");
+            setup.login("spam", "andEggs");
+            // Go to invitation sender.
+            invitationSenderPage = InvitationSenderPage.gotoPage();
+            assertTrue(invitationSenderPage.userIsSpammer(), "No message telling user he's reported spammer.");
 
             // Switch to admin.
-            setup.setSession(admin);
-            setSenderPage(InvitationSenderPage.gotoPage());
-            assertEquals(1, getSenderPage().getFooter().spamReports(),
+            setup.loginAsSuperAdmin();
+            invitationSenderPage = InvitationSenderPage.gotoPage();
+            assertEquals(1, invitationSenderPage.getFooter().spamReports(),
                 "No warning in footer that a message is reported as spam");
             // View spam message.
-            InspectInvitationsPage inspectPage = getSenderPage().getFooter().inspectAllInvitations();
+            InspectInvitationsPage inspectPage = invitationSenderPage.getFooter().inspectAllInvitations();
             InspectInvitationsPage.OneMessage inspect =
                 inspectPage.getMessageWhere("Subject",
                     String.format("spam has invited you to join %s", new URL(setup.getBaseURL()).getHost()));
@@ -414,16 +394,16 @@ class InvitationIT
                 "Admin got incorrect message after marking invitation as not spam\nExpecting:"
                     + expectedSuccessMessage + "\n      Got:" + successMessage);
             // Switch back to spammer
-            setup.setSession(spammer);
-            setSenderPage(InvitationSenderPage.gotoPage());
-            assertFalse(getSenderPage().userIsSpammer(),
+            setup.login("spam", "andEggs");
+            invitationSenderPage = InvitationSenderPage.gotoPage();
+            assertFalse(invitationSenderPage.userIsSpammer(),
                 "User permission to send not returned by admin action.");
 
             logCaptureConfiguration
                 .registerExcludes("Login cookie validation hash mismatch! Cookies have been tampered with");
         } finally {
             stopGreenMail();
-            setup.setSession(admin);
+            setup.loginAsSuperAdmin();
             setup.rest().deletePage("XWiki", "spam");
         }
     }
@@ -437,14 +417,15 @@ class InvitationIT
     @Order(7)
     void declineInvitation(TestUtils setup) throws Exception
     {
-        TestUtils.Session admin = setup.getSession();
         try {
             startGreenMail();
-            getSenderPage().send();
+            InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
+            invitationSenderPage.fillInDefaultValues();
+            invitationSenderPage.send();
             getGreenMail().waitForIncomingEmail(10000, 1);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             String htmlMessage = getMessageContent(messages[0]).get("htmlPart");
-            assertEquals(1, getSenderPage().getFooter().myPendingInvitations(),
+            assertEquals(1, invitationSenderPage.getFooter().myPendingInvitations(),
                 "New invitation is not listed as pending in the footer.");
             // Now switch to guest.
             setup.forceGuestUser();
@@ -456,14 +437,14 @@ class InvitationIT
             assertTrue(setup.getDriver().getPageSource().contains("This invitation has successfully been declined."),
                 "Failed to decline invitation");
             // Switch to admin
-            setup.setSession(admin);
+            setup.loginAsSuperAdmin();
             // Go to invitation sender.
-            setSenderPage(InvitationSenderPage.gotoPage());
-            assertEquals(0, getSenderPage().getFooter().spamReports(),
+            invitationSenderPage = InvitationSenderPage.gotoPage();
+            assertEquals(0, invitationSenderPage.getFooter().spamReports(),
                 "Declined invitation is still listed as pending in the footer.");
 
             // View declined invitation.
-            InspectInvitationsPage inspectPage = getSenderPage().getFooter().inspectMyInvitations();
+            InspectInvitationsPage inspectPage = invitationSenderPage.getFooter().inspectMyInvitations();
             InspectInvitationsPage.OneMessage inspect = inspectPage.getMessageWhere("Status", "Declined");
 
             assertEquals("Declined with message: I'm not interested thank you.", inspect.getStatusAndMemo(),
@@ -491,7 +472,6 @@ class InvitationIT
                 "After the invitation was declined it now cannot be reported as spam.");
         } finally {
             stopGreenMail();
-            setup.setSession(admin);
         }
     }
 
@@ -504,14 +484,15 @@ class InvitationIT
     @Order(8)
     void acceptInvitation(TestUtils setup) throws Exception
     {
-        TestUtils.Session admin = setup.getSession();
         try {
             startGreenMail();
-            getSenderPage().send();
+            InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
+            invitationSenderPage.fillInDefaultValues();
+            invitationSenderPage.send();
             getGreenMail().waitForIncomingEmail(10000, 1);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             String htmlMessage = getMessageContent(messages[0]).get("htmlPart");
-            assertEquals(1, getSenderPage().getFooter().myPendingInvitations(),
+            assertEquals(1, invitationSenderPage.getFooter().myPendingInvitations(),
                 "New invitation is not listed as pending in the footer.");
             // Now switch to guest.
             setup.forceGuestUser();
@@ -547,7 +528,6 @@ class InvitationIT
                 "After the invitation was accepted it now cannot be reported as spam.");
         } finally {
             stopGreenMail();
-            setup.setSession(admin);
         }
     }
 
@@ -559,7 +539,6 @@ class InvitationIT
     @Order(9)
     void acceptInvitationToClosedWiki(TestUtils setup) throws Exception
     {
-        TestUtils.Session admin = setup.getSession();
         try {
             // First we ban anon from registering.
             setup.setGlobalRights("", "XWiki.XWikiGuest", "register", false);
@@ -569,16 +548,16 @@ class InvitationIT
             setup.assertOnPage(setup.getURL("XWiki", "XWikiLogin", "login"));
 
             // Now we try sending and accepting an invitation.
-            setup.setSession(admin);
-            setSenderPage(InvitationSenderPage.gotoPage());
-            getSenderPage().fillInDefaultValues();
+            setup.loginAsSuperAdmin();
+            InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
+            invitationSenderPage.fillInDefaultValues();
 
             startGreenMail();
-            getSenderPage().send();
+            invitationSenderPage.send();
             getGreenMail().waitForIncomingEmail(10000, 1);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             String htmlMessage = getMessageContent(messages[0]).get("htmlPart");
-            assertEquals(1, getSenderPage().getFooter().myPendingInvitations(),
+            assertEquals(1, invitationSenderPage.getFooter().myPendingInvitations(),
                 "New invitation is not listed as pending in the footer.");
             // Now switch to guest.
             setup.forceGuestUser();
@@ -599,7 +578,7 @@ class InvitationIT
             assertTrue(rp.isAuthenticated(), "Failed to log user in after registering from invitation.");
         } finally {
             stopGreenMail();
-            setup.setSession(admin);
+            setup.loginAsSuperAdmin();
             setup.deleteObject("XWiki", "XWikiPreferences", "XWiki.XWikiGlobalRights", 0);
         }
     }
@@ -614,17 +593,18 @@ class InvitationIT
     @Order(10)
     void cancelInvitation(TestUtils setup) throws Exception
     {
-        TestUtils.Session admin = setup.getSession();
         try {
             startGreenMail();
-            getSenderPage().send();
+            InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
+            invitationSenderPage.fillInDefaultValues();
+            invitationSenderPage.send();
             getGreenMail().waitForIncomingEmail(10000, 1);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             String htmlMessage = getMessageContent(messages[0]).get("htmlPart");
-            assertEquals(1, getSenderPage().getFooter().myPendingInvitations(),
+            assertEquals(1, invitationSenderPage.getFooter().myPendingInvitations(),
                 "New invitation is not listed as pending in the footer.");
 
-            InspectInvitationsPage.OneMessage message = getSenderPage().getFooter().inspectMyInvitations()
+            InspectInvitationsPage.OneMessage message = invitationSenderPage.getFooter().inspectMyInvitations()
                 .getMessageWhere("Subject",
                     String.format("superadmin has invited you to join %s This is a subject line.",
                         new URL(setup.getBaseURL()).getHost()));
@@ -664,7 +644,6 @@ class InvitationIT
                 + "be investigated as soon as possible, we apologize for the inconvenience.", guestPage.confirm());
         } finally {
             stopGreenMail();
-            setup.setSession(admin);
         }
     }
 
@@ -676,7 +655,6 @@ class InvitationIT
     @Order(11)
     void sendManyToOneAddress(TestUtils setup) throws Exception
     {
-        TestUtils.Session admin = setup.getSession();
         try {
             // Allow users to send to multiple.
             AdministrationSectionPage config = AdministrationSectionPage.gotoPage("Invitation");
@@ -687,18 +665,17 @@ class InvitationIT
             // Now switch to a wizeguy user
             setup.forceGuestUser();
             setup.createUserAndLogin("tr0ll", "StrongPassword");
-            setSenderPage(InvitationSenderPage.gotoPage());
-
+            InvitationSenderPage invitationSenderPage = InvitationSenderPage.gotoPage();
             startGreenMail();
-            getSenderPage().fillForm("user@localhost.localdomain user@localhost.localdomain "
+            invitationSenderPage.fillForm("user@localhost.localdomain user@localhost.localdomain "
                 + "user@localhost.localdomain user@localhost.localdomain", null, null);
-            getSenderPage().send();
+            invitationSenderPage.send();
             getGreenMail().waitForIncomingEmail(10000, 1);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             assertEquals(1, messages.length, "One user is able to send multiple messages to the same poor recipient.");
         } finally {
             stopGreenMail();
-            setup.setSession(admin);
+            setup.loginAsSuperAdmin();
             setup.rest().deletePage("XWiki", "tr0ll");
         }
     }
@@ -781,16 +758,6 @@ class InvitationIT
     private GreenMail getGreenMail()
     {
         return this.greenMail;
-    }
-
-    private InvitationSenderPage getSenderPage()
-    {
-        return this.senderPage;
-    }
-
-    private void setSenderPage(InvitationSenderPage senderPage)
-    {
-        this.senderPage = senderPage;
     }
 
     private void configureEmail(TestUtils setup, TestConfiguration testConfiguration)

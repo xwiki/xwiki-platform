@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-rendering-wikimacro</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-rendering-wikimacro-api</artifactId>
   <name>XWiki Platform - Legacy - Rendering - Wiki Macro Bridge - API</name>
@@ -34,7 +34,7 @@
     <xwiki.extension.features>
       org.xwiki.platform:xwiki-platform-rendering-wikimacro-api
     </xwiki.extension.features>
-    <xwiki.jacoco.instructionRatio>0.20</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.16</xwiki.jacoco.instructionRatio>
     <!-- Skipping spoon since the inspection of WikiMacroDescriptorAspect is causing troubles during the processing. -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>

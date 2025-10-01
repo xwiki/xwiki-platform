@@ -132,7 +132,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     private int toMaxCount(String maxCount, int defaultMaxCount)
     {
-        return NumberUtils.toInt(maxCount, defaultMaxCount);
+        return validateAndGetLimit(NumberUtils.toInt(maxCount, defaultMaxCount));
     }
 
     private Object getCompositeEvents(String useUserPreferences, String userId, String untilDate,

@@ -31,6 +31,7 @@ import org.xwiki.store.merge.MergeManager;
 import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -39,6 +40,8 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,7 +54,7 @@ import static org.mockito.Mockito.when;
  */
 @ReferenceComponentList
 @OldcoreTest
-public class BaseObjectTest
+class BaseObjectTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -60,7 +63,7 @@ public class BaseObjectTest
     private MergeManager mergeManager;
     
     @Test
-    public void testSetDocumentReference() throws Exception
+    void testSetDocumentReference() throws Exception
     {
         BaseObject baseObject = new BaseObject();
 
@@ -71,7 +74,7 @@ public class BaseObjectTest
     }
 
     @Test
-    public void testSetName() throws Exception
+    void testSetName() throws Exception
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseObject baseObject = new BaseObject();
@@ -84,7 +87,7 @@ public class BaseObjectTest
     }
 
     @Test
-    public void testSetNameAloneWithChangingContext() throws Exception
+    void testSetNameAloneWithChangingContext() throws Exception
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseObject baseObject = new BaseObject();
@@ -127,7 +130,7 @@ public class BaseObjectTest
     }
 
     @Test
-    public void getReference()
+    void getReference()
     {
         BaseObject baseObject = new BaseObject();
 
@@ -141,7 +144,7 @@ public class BaseObjectTest
     }
 
     @Test
-    public void setXClassReference()
+    void setXClassReference()
     {
         BaseObject baseObject = new BaseObject();
 
@@ -156,7 +159,7 @@ public class BaseObjectTest
     }
 
     @Test
-    public void testMerge()
+    void testMerge()
     {
         BaseObject previousObject = new BaseObject();
         previousObject.setStringValue("str", "value");
@@ -186,7 +189,7 @@ public class BaseObjectTest
     }
 
     @Test
-    public void testHashCode()
+    void testHashCode()
     {
         final int number = 101;
 
@@ -204,5 +207,21 @@ public class BaseObjectTest
         o2.setNumber(number);
 
         assertEquals(o1.hashCode(), o2.hashCode());
+    }
+
+    @Test
+    void cloneWithoutDetach()
+    {
+        XWikiDocument ownerDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+
+        BaseObject object = new BaseObject();
+
+        object.setOwnerDocument(ownerDocument);
+
+        BaseObject clonedObject = object.clone();
+
+        assertNotSame(object, clonedObject);
+        assertNotSame(object.getOwnerDocument(), clonedObject.getOwnerDocument());
+        assertNotNull(clonedObject.getOwnerDocument());
     }
 }

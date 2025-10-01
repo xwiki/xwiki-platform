@@ -27,7 +27,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.ModelContext;
@@ -88,22 +87,6 @@ public class DefaultAuthorizationManager implements AuthorizationManager
 
     @Inject
     private ModelContext modelContext;
-
-    /**
-     * Check if the user is the super admin.
-     *
-     * NOTE: We rely on that the authentication service especially
-     * authenticates user names matching superadmin's in a case
-     * insensitive match, and will ignore any user profile's that may
-     * be matching the superadmin's user name.
-     *
-     * @param user A document reference representing a user identity.
-     * @return {@code true} if and only if the user is determined to be the super user.
-     */
-    private boolean isSuperAdmin(DocumentReference user)
-    {
-        return user != null && StringUtils.equalsIgnoreCase(user.getName(), AuthorizationManager.SUPERADMIN_USER);
-    }
 
     @Override
     public void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)

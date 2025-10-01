@@ -590,7 +590,7 @@ require(['scriptaculous/effects'], function() {
   margin-left: 15px;
 }
 
-.panel-width-Small .applicationPanelMoreContainer > ul > li > a {
+.panel-width-Small .applicationPanelMoreContainer &gt; ul &gt; li &gt; a {
   gap: .5em;
   text-align: left;
   margin-left: 0;

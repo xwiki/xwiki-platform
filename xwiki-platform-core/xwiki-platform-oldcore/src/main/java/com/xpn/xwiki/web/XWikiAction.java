@@ -33,10 +33,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.script.ScriptContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -56,6 +58,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.internal.web.DocExistValidator;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -329,7 +332,8 @@ public abstract class XWikiAction implements LegacyAction
             // Initialize the XWiki Context which is the main object used to pass information across
             // classes/methods. It's also wrapping the request, response, and all container objects
             // in general.
-            context = initializeXWikiContext(servletRequest, servletResponse);
+            context =
+                initializeXWikiContext(JakartaServletBridge.toJavax(servletRequest), JakartaServletBridge.toJavax(servletResponse));
 
             // From this line forward all information can be found in the XWiki Context.
             execute(context);
@@ -393,7 +397,7 @@ public abstract class XWikiAction implements LegacyAction
         DefaultJobProgress actionProgress = null;
         String docName = "";
 
-        boolean debug = StringUtils.equals(context.getRequest().get("debug"), "true");
+        boolean debug = Strings.CS.equals(context.getRequest().get("debug"), "true");
 
         String sasync = context.getRequest().get("async");
 
@@ -422,7 +426,7 @@ public abstract class XWikiAction implements LegacyAction
             // Verify that the requested wiki exists
             try {
                 // Don't show init screen if async is forced to false
-                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization || StringUtils.equals(sasync, "false"), context);
+                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization || Strings.CS.equals(sasync, "false"), context);
 
                 // If XWiki is still initializing display initialization template
                 if (xwiki == null) {
@@ -827,8 +831,9 @@ public abstract class XWikiAction implements LegacyAction
         xcontext.setFinished(true);
     }
 
-    protected XWikiContext initializeXWikiContext(HttpServletRequest servletRequest,
-        HttpServletResponse servletResponse)
+    @Deprecated(since = "17.0.0RC1")
+    protected XWikiContext initializeXWikiContext(javax.servlet.http.HttpServletRequest servletRequest,
+        javax.servlet.http.HttpServletResponse servletResponse)
         throws XWikiException, ServletException, InstantiationException, IllegalAccessException
     {
         XWikiForm form;
@@ -850,8 +855,9 @@ public abstract class XWikiAction implements LegacyAction
         return this.componentDescriptor.getRoleHint();
     }
 
-    protected XWikiContext initializeXWikiContext(HttpServletRequest servletRequest,
-        HttpServletResponse servletResponse, XWikiForm form) throws XWikiException, ServletException
+    @Deprecated(since = "17.0.0RC1")
+    protected XWikiContext initializeXWikiContext(javax.servlet.http.HttpServletRequest servletRequest,
+        javax.servlet.http.HttpServletResponse servletResponse, XWikiForm form) throws XWikiException, ServletException
     {
         String action = getName();
 
@@ -906,8 +912,8 @@ public abstract class XWikiAction implements LegacyAction
     {
         Request request = this.container.getRequest();
 
-        if (request instanceof ServletRequest) {
-            return ((ServletRequest) request).getHttpServletRequest().getServletContext().getRealPath(path);
+        if (request instanceof ServletRequest servletRequest) {
+            return servletRequest.getRequest().getServletContext().getRealPath(path);
         }
 
         return null;
@@ -1290,5 +1296,36 @@ public abstract class XWikiAction implements LegacyAction
             }
         }
         return false;
+    }
+
+    /**
+     * @param isAjaxRequest Indicate if this is an ajax request.
+     * @param exception The exception to handle.
+     * @param context The XWiki context.
+     * @throws XWikiException unless it is an ajax request.
+     */
+    protected void handleSaveException(boolean isAjaxRequest, Exception exception, XWikiContext context)
+        throws XWikiException
+    {
+        if (isAjaxRequest) {
+            String errorMessage =
+                localizePlainOrKey("core.editors.saveandcontinue.exceptionWhileSaving", exception.getMessage());
+
+            writeAjaxErrorResponse(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
+
+            String logMessage = "Caught exception during save and continue";
+            if (exception instanceof XWikiException) {
+                LOGGER.info(logMessage, exception);
+            } else {
+                LOGGER.error(logMessage, exception);
+            }
+        } else {
+            if (exception instanceof XWikiException) {
+                throw (XWikiException) exception;
+            } else {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Uncaught exception", exception);
+            }
+        }
     }
 }

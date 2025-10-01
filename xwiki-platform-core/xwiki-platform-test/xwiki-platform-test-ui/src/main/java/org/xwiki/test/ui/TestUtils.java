@@ -27,10 +27,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -411,11 +415,13 @@ public class TestUtils
      */
     public void loginAndGotoPage(String username, String password, String pageURL, boolean checkLoginSuccess)
     {
+        // ensure to be on a wiki page before performing check on the username.
+        getDriver().get(getURL("XWiki", "Register", "register", "_=" + new Date().getTime()));
         if (!username.equals(getLoggedInUserName())) {
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.
             // Also recache the CSRF token
-            String destUrl = getURL("XWiki", "Register", "register");
+            String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
             getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
 
             if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
@@ -704,6 +710,19 @@ public class TestUtils
             fail("Failed to add rights object of class [" + rightClassName + "] with groups [" + normalizedGroups
                 + "], users [" + normalizedUsers + "], rights [" + rights + "] and enabled [" + enabled + "]", e);
         }
+    }
+
+    /**
+     * Attempt to navigate to the specified page without waiting for the page to load. This is useful for instance when
+     * leaving the current page triggers a confirmation alert that you want to accept or dismiss.
+     * 
+     * @param reference the reference of the page to go to
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void gotoPageWithoutWaiting(EntityReference reference)
+    {
+        getDriver().executeScript("window.location.href = arguments[0]", getURL(reference));
     }
 
     public ViewPage gotoPage(String space, String page)
@@ -1257,7 +1276,7 @@ public class TestUtils
             setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
 
             // Save the page with the content to execute
-            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
+            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
         } finally {
             // Restore initial credentials
             setDefaultCredentials(currentCredentials);
@@ -1490,8 +1509,8 @@ public class TestUtils
     private void recacheSecretTokenWhenOnRegisterPage()
     {
         try {
-            WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
-            this.secretToken = tokenInput.getAttribute("value");
+            WebElement htmlElement = getDriver().findElement(By.tagName("html"));
+            this.secretToken = htmlElement.getDomAttribute("data-xwiki-form-token");
         } catch (NoSuchElementException exception) {
             // Something is really wrong if this happens.
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
@@ -1558,6 +1577,49 @@ public class TestUtils
         {
             return this.secretToken;
         }
+    }
+
+    /**
+     * @return the current edit mode, or null / empty string if we're not currently in edit mode
+     */
+    public String getEditMode()
+    {
+        return (String) getDriver().executeScript("return window.XWiki?.editor");
+    }
+
+    /**
+     * If we are in edit mode, leave using the cancel shortcut key (ALT + C).
+     *
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void maybeLeaveEditMode()
+    {
+        String editMode = getEditMode();
+        List<String> adminModes = List.of("globaladmin", "spaceadmin");
+        if (StringUtils.isNotEmpty(editMode) && !adminModes.contains(editMode)) {
+            leaveEditMode();
+        }
+    }
+
+    /**
+     * Leave the edit mode using the cancel shortcut key (ALT + C).
+     *
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void leaveEditMode()
+    {
+        // Use the cancel shortcut key to leave the edit mode, but since the shortcut keys are handled with JavaScript
+        // we need to wait for view mode ourselves. We can't use the page reload marker because the in-place editor
+        // doesn't reload the page on cancel. We can only rely on the fact that the URL will change (even for the
+        // in-place editor where the '#edit' URL fragment is removed).
+        String editURL = getDriver().getCurrentUrl();
+        getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
+        getDriver().waitUntilCondition(driver -> {
+            String viewURL = driver.getCurrentUrl();
+            return !viewURL.equals(editURL);
+        });
     }
 
     public boolean isInWYSIWYGEditMode()
@@ -2481,6 +2543,7 @@ public class TestUtils
             RESOURCES_MAP.put(EntityType.OBJECT, new ResourceAPI(ObjectResource.class, null));
             RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, new ResourceAPI(ObjectPropertyResource.class, null));
             RESOURCES_MAP.put(EntityType.CLASS_PROPERTY, new ResourceAPI(ClassPropertyResource.class, null));
+            RESOURCES_MAP.put(EntityType.ATTACHMENT, new ResourceAPI(AttachmentResource.class, null));
         }
 
         /**
@@ -2799,7 +2862,7 @@ public class TestUtils
          */
         public void savePage(EntityReference reference) throws Exception
         {
-            savePage(reference, null, null, null, null);
+            savePage(reference, null, null, null, null, false);
         }
 
         /**
@@ -2807,14 +2870,14 @@ public class TestUtils
          */
         public void savePage(EntityReference reference, String content, String title) throws Exception
         {
-            savePage(reference, content, null, title, null);
+            savePage(reference, content, null, title, null, false);
         }
 
         /**
          * @since 7.3M1
          */
         public void savePage(EntityReference reference, String content, String syntaxId, String title,
-            String parentFullPageName) throws Exception
+            String parentFullPageName, boolean isHidden) throws Exception
         {
             Page page = page(reference);
 
@@ -2830,6 +2893,7 @@ public class TestUtils
             if (parentFullPageName != null) {
                 page.setParent(parentFullPageName);
             }
+            page.setHidden(isHidden);
 
             save(page, true);
         }
@@ -2862,7 +2926,8 @@ public class TestUtils
             // Make sure the page exist (object add fail otherwise)
             // TODO: improve object add API to allow adding an object in a page that does not yet exist
             if (!exists(documentReference)) {
-                savePage(documentReference);
+                boolean isHidden = "WebPreferences".equals(documentReference.getName());
+                savePage(documentReference, null, null, null, null, isHidden);
             }
 
             // Create the object
@@ -3073,6 +3138,19 @@ public class TestUtils
         public <T> T get(Object resourceURI, boolean failIfNotFound) throws Exception
         {
             return get(resourceURI, null, failIfNotFound);
+        }
+
+        /**
+         * @param attachmentReference the reference of the attachment
+         * @return the attachment content as byte array
+         * @throws Exception when failing to get the attachment content
+         * @since 17.3.0RC1
+         */
+        public byte[] getAttachmentAsByteArray(EntityReference attachmentReference) throws Exception
+        {
+            try (InputStream stream = get(attachmentReference)) {
+                return IOUtils.toByteArray(stream);
+            }
         }
 
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
@@ -3362,5 +3440,17 @@ public class TestUtils
         switchTab(secondTabHandle);
         getDriver().close();
         switchTab(currentTab);
+    }
+
+    /**
+     * @param path the resource path
+     * @return the corresponding {@link File}
+     * @throws URISyntaxException
+     * @since 17.3.0RC1
+     */
+    public File getResourceFile(String path) throws URISyntaxException
+    {
+        URL resource = getClass().getResource(path);
+        return Paths.get(resource.toURI()).toFile();
     }
 }

@@ -19,19 +19,10 @@
  */
 package org.xwiki.netflux.internal;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Optional;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -44,6 +35,15 @@ import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.websocket.WebSocketContext;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link EntityChannelScriptAuthorBot}.

@@ -134,4 +134,99 @@ We found the following usernames related to this email address:
 You can login from this URL: $xwiki.getURL('XWiki.XWikiLogin', 'login').</text>
     </property>
   </object>
+  <object>
+    <name>XWiki.ForgotUsernameMailContent</name>
+    <number>1</number>
+    <className>XWiki.Mail</className>
+    <guid>8f01399c-fa0c-4008-b821-d298c84ade24</guid>
+    <class>
+      <name>XWiki.Mail</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <html>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>html</name>
+        <number>4</number>
+        <prettyName>HTML</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </html>
+      <language>
+        <disabled>0</disabled>
+        <name>language</name>
+        <number>2</number>
+        <prettyName>Language</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </language>
+      <subject>
+        <disabled>0</disabled>
+        <name>subject</name>
+        <number>1</number>
+        <prettyName>Subject</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </subject>
+      <text>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>text</name>
+        <number>3</number>
+        <prettyName>Text</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </text>
+    </class>
+    <property>
+      <html>&lt;h2&gt;Bonjour,&lt;/h2&gt;
+#set ($wikiURL = $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
+#set ($xwikiLoginURL = $xwiki.getURL('XWiki.XWikiLogin', 'login'))
+#set ($wikiName = $request.serverName)
+&lt;p&gt;Une demande de rappel d'identifiant a été effectuée sur &lt;a href="$escapetool.xml($wikiURL)"&gt;$escapetool.xml($wikiName)&lt;/a&gt;.
+Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer ce message.&lt;/p&gt;
+&lt;p&gt;Les identifiants suivants sont associés à cette addresse :&lt;/p&gt;
+&lt;ul&gt;
+#foreach ($username in $usernames)
+  &lt;li&gt;$escapetool.xml($username)&lt;/li&gt;
+#end
+&lt;/ul&gt;
+
+&lt;p&gt;
+Vous pouvez vous authentifier depuis la page suivante : &lt;a href="$escapetool.xml($xwikiLoginURL)"&gt;Authentification XWiki&lt;/a&gt;.
+&lt;/p&gt;</html>
+    </property>
+    <property>
+      <language>fr</language>
+    </property>
+    <property>
+      <subject>Identifiant oublié sur ${request.getServerName()}</subject>
+    </property>
+    <property>
+      <text>Bonjour,
+
+Une demande de rappel d'identifiant a été effectuée sur ${request.getServerName()}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer ce message.
+
+Les identifiants suivants sont associés à cette addresse :
+
+#foreach ($username in $usernames)
+- $usernames
+#end
+
+Vous pouvez vous authentifier depuis la page suivante : $xwiki.getURL('XWiki.XWikiLogin', 'login')</text>
+    </property>
+  </object>
 </xwikidoc>

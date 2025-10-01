@@ -72,17 +72,17 @@
 
 ## Menus
 platform.wiki.menu.wikiindex=Wiki 索引
-platform.wiki.menu.deletewiki=删除wiki
+platform.wiki.menu.deletewiki=删除Wiki
 platform.wiki.menu.userwikis=Wikis
 
 ## Dependencies
-platform.wiki.dependencies.wiki.missing=未安装“ Wiki” java组件。此页面将无法正常工作。确保安装了“ Wiki API”和“ Wiki Script”扩展（使用扩展管理器）或文件“ xwiki-platform-wiki-api- &lt;版本&gt; .jar”和“ xwiki-platform-wiki-script- &lt;版本&gt; .jar”位于“ WEB-INF / lib /” Web应用程序的文件夹下（如果是手动安装）。
-platform.wiki.dependencies.template.missing=未安装“Wiki Template” java组件。此页面将无法正常工作。确保已安装“Wiki Template API”和“Wiki Template Script”扩展（使用扩展管理器）或文件'xwiki-platform-wiki-template-api- &lt;version&gt; .jar'和'xwiki-platform-wiki-template-script- &lt;version&gt; .jar'位于"WEB-INF / lib / "Web应用程序的文件夹下（如果是手动安装）。
-platform.wiki.dependencies.user.missing=未安装“Wiki User” java组件。此页面将无法正常工作。确保已安装“Wiki User API”和“Wiki User Script”扩展（使用扩展管理器）或文件'xwiki-platform-wiki-user-api- &lt;version&gt; .jar'和'xwiki-platform-wiki-user-script- &lt;version&gt; .jar'位于“WEB-INF / lib / ”Web应用程序的文件夹下（如果是手动安装）。
+platform.wiki.dependencies.wiki.missing=未安装“ Wiki” java组件。此页面将无法正常工作。确保安装了“ Wiki API”和“ Wiki Script”扩展（使用扩展管理器）或文件“ xWiki-platform-Wiki-api- &lt;版本&gt; .jar”和“ xWiki-platform-Wiki-script- &lt;版本&gt; .jar”位于“ WEB-INF / lib /” Web应用程序的文件夹下（如果是手动安装）。
+platform.wiki.dependencies.template.missing=未安装“Wiki Template” java组件。此页面将无法正常工作。确保已安装“Wiki Template API”和“Wiki Template Script”扩展（使用扩展管理器）或文件'xWiki-platform-Wiki-template-api- &lt;version&gt; .jar'和'xWiki-platform-Wiki-template-script- &lt;version&gt; .jar'位于"WEB-INF / lib / "Web应用程序的文件夹下（如果是手动安装）。
+platform.wiki.dependencies.user.missing=未安装“Wiki User” java组件。此页面将无法正常工作。确保已安装“Wiki User API”和“Wiki User Script”扩展（使用扩展管理器）或文件'xWiki-platform-Wiki-user-api- &lt;version&gt; .jar'和'xWiki-platform-Wiki-user-script- &lt;version&gt; .jar'位于“WEB-INF / lib / ”Web应用程序的文件夹下（如果是手动安装）。
 
 ## Create
 platform.wiki.create.button=创建 Wiki
-platform.wiki.create.title=创建一个新的 wiki
+platform.wiki.create.title=创建一个新的 Wiki
 platform.wiki.create.members=成员
 platform.wiki.create.prettyname.empty=Pretty name 不能为空
 platform.wiki.create.error=Wiki "{0}" 创建失败: {1}.
@@ -99,173 +99,173 @@ platform.wiki.form.requiredField=需要
 platform.wiki.csrf.error=无效的安全令牌。请重试您的操作。
 
 ## Users
-platform.wiki.users.userAlreadyMemberOfWiki=用户 {0}{1}{2} 已经是wiki {3}{4}{5}的成员。
-### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
-### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.error.needInvitation=This wiki is invite only. To do so, you need to receive an invitation from one of its admins.
-### Missing: platform.wiki.users.join.request.pendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
-### Missing: platform.wiki.users.join.request.cancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
-### Missing: platform.wiki.users.join.request.cancelYes=Yes
-### Missing: platform.wiki.users.join.request.cancelNo=No
-### Missing: platform.wiki.users.join.request.cancelSuccess=The user {0}{1}{2} successfully cancelled the request to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.request.saveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.join.request.success=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.confirmation=Are you sure you want to join the wiki {0}{1}{2}?
-### Missing: platform.wiki.users.join.yes=Yes
-### Missing: platform.wiki.users.join.no=No
-### Missing: platform.wiki.users.join.success=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
-### Missing: platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki cannot leave it unless the wiki is deleted or the owner is changed.
-### Missing: platform.wiki.users.leave.confirmation=Are you sure you want to leave wiki {0}{1}{2}?
-### Missing: platform.wiki.users.leave.confirmation.yes=Yes
-### Missing: platform.wiki.users.leave.confirmation.no=No
-### Missing: platform.wiki.users.leave.success=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.title=Join Wiki
-### Missing: platform.wiki.users.leave.title=Leave Wiki "{0}"
-### Missing: platform.wiki.users.leave.empty=Leave Wiki
-### Missing: platform.wiki.users.delete.title=Delete Wiki "{0}"
-### Missing: platform.wiki.users.delete.empty=Delete Wiki
-### Missing: platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
-### Missing: platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
-### Missing: platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
-### Missing: platform.wiki.users.invitation.title=You have been invited to join the wiki {0}{1}{2}.
-### Missing: platform.wiki.users.invitation.message.label=Invitation message
-### Missing: platform.wiki.users.invitation.reply.title=Reply
-### Missing: platform.wiki.users.invitation.accept.label=Accept
-### Missing: platform.wiki.users.invitation.reject.label=Reject
-### Missing: platform.wiki.users.invitation.postpone.label=Later
-### Missing: platform.wiki.users.join.request.message.label=Message
-### Missing: platform.wiki.users.join.request.send.label=Send Request
-### Missing: platform.wiki.users.join.request.cancel.label=Back
+platform.wiki.users.userAlreadyMemberOfWiki=用户 {0}{1}{2} 已经是Wiki {3}{4}{5}的成员。
+platform.wiki.users.userNotMemberOfWiki=用户 {0}{1}{2} 不是 Wiki {3}{4}{5} 的成员。
+platform.wiki.users.logInToContinue=要继续，您需要先 {0}登录{1}。
+platform.wiki.users.invitation.userAcceptedNotification=用户''{0}'' ({1}) 已接受加入Wiki ''{2}'' ({3}) 的邀请。
+platform.wiki.users.invitation.userAcceptedSuccess=用户 {0}{1}{2} 成功接受邀请并加入了Wiki {3}{4}{5}。
+platform.wiki.users.invitation.userRejectedSuccess=用户 {0}{1}{2} 成功拒绝了加入 Wiki {3}{4}{5} 的邀请。
+platform.wiki.users.join.error.needInvitation=这个 Wiki 只能通过邀请加入。要这样做，你需要从一个管理员那里收到邀请。
+platform.wiki.users.join.request.pendingRequestExists=用户{0}{1}{2}已经有一个加入Wiki {3}{4}{5}的待处理请求。请等待Wiki管理员审核。
+platform.wiki.users.join.request.cancelConfirmation=您确定要取消加入Wiki的请求{0}{1}{2}吗？
+platform.wiki.users.join.request.cancelYes=是
+platform.wiki.users.join.request.cancelNo=否
+platform.wiki.users.join.request.cancelSuccess=用户{0}{1}{2}成功取消了加入Wiki{3}{4}{5}的请求。
+platform.wiki.users.join.request.saveNotification=用户''{0}'' ({1})已请求加入Wiki''{2}'' ({3})。
+platform.wiki.users.join.request.success=用户{0}{1}{2}已成功发送加入 wiki {3}{4}{5}的请求。
+platform.wiki.users.join.confirmation=你确定要加入Wiki {0}{1}{2} 吗？
+platform.wiki.users.join.yes=是
+platform.wiki.users.join.no=不
+platform.wiki.users.join.success=用户{0}{1}{2}成功加入了Wiki{3}{4}{5}。
+platform.wiki.users.leave.error.userIsOwner=用户 {0}{1}{2} 是Wiki {3}{4}{5} 的所有者。Wiki的所有者不能离开，除非Wiki被删除或所有者被更改。
+platform.wiki.users.leave.confirmation=你确定要离开 wiki {0}{1}{2} 吗？
+platform.wiki.users.leave.confirmation.yes=是
+platform.wiki.users.leave.confirmation.no=不
+platform.wiki.users.leave.success=用户{0}{1}{2}已成功离开 wiki {3}{4}{5}。
+platform.wiki.users.join.title=加入Wiki
+platform.wiki.users.leave.title=离开Wiki "{0}"
+platform.wiki.users.leave.empty=离开 Wiki
+platform.wiki.users.delete.title=删除 Wiki "{0}"
+platform.wiki.users.delete.empty=删除 Wiki
+platform.wiki.users.invitation.reply.hint=一条回复消息，可供Wiki管理员查看，其中可以说明你的决定。
+platform.wiki.users.join.request.hint=要加入 {0}{1}{2} 这个Wiki，你必须首先提交加入请求。提交后，Wiki管理员将审核并考虑你的请求。
+platform.wiki.users.join.request.message.hint=一条可由Wiki管理员查看的消息，用于激励此加入请求。
+platform.wiki.users.invitation.title=您已被邀请加入Wiki {0}{1}{2}。
+platform.wiki.users.invitation.message.label=邀请信息
+platform.wiki.users.invitation.reply.title=回复
+platform.wiki.users.invitation.accept.label=接受
+platform.wiki.users.invitation.reject.label=拒绝
+platform.wiki.users.invitation.postpone.label=稍后
+platform.wiki.users.join.request.message.label=消息
+platform.wiki.users.join.request.send.label=发送请求
+platform.wiki.users.join.request.cancel.label=后
 
 ## User profile
-platform.wiki.users.profile.joinedwikis.label=已加入的wiki
-platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=你还不是任何wiki的成员。
-platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=该用户还不是任何wiki的成员。
+platform.wiki.users.profile.joinedwikis.label=已加入的Wiki
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=你还不是任何Wiki的成员。
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=该用户还不是任何Wiki的成员。
 platform.wiki.users.profile.activity.title={0} 的活动
-### Missing: platform.wiki.users.profile.activity.hint=Generates an activity stream for the given wiki(s).
-### Missing: platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
+platform.wiki.users.profile.activity.hint=为指定的 wiki(s)生成活动流。
+platform.wiki.users.profile.activity.multipletitle=Wikis {0} 的活动
 platform.wiki.users.profile.activity.show=显示活动
 
 ## Wiki Deletion
-### Missing: platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
-### Missing: platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
-### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
-### Missing: platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
+platform.wiki.delete.confirmation=你确定要删除这个 wiki {0}{1}{2} 吗？这个操作无法撤销！
+platform.wiki.delete.confirmation.retypeWikiId=请在此处重复Wiki的标识符：
+platform.wiki.delete.error.wikiIdDoesNotMatch=输入应删除的 wiki 的确切标识符。
+platform.wiki.delete.success=用户 {0}{1}{2} 成功删除了Wiki ''{3}''。
 
 ## Wiki macro
-### Missing: platform.wiki.macro.noWikis=There are currently no wikis created (except the main one).
-### Missing: rendering.macro.wikis.name=Wikis
-### Missing: rendering.macro.wikis.description=List all wikis
+platform.wiki.macro.noWikis=目前还没有创建任何Wiki（除了主Wiki）。
+rendering.macro.wikis.name=Wiki
+rendering.macro.wikis.description=List all Wikis
 
 ## LegacyWorkspaces macro
-### Missing: rendering.macro.workspaces.name=Workspaces (Legacy)
-### Missing: rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
+rendering.macro.workspaces.name=工作区（旧版）
+rendering.macro.workspaces.description=已弃用的宏，由于兼容性问题不应在此使用。请使用 "Wikis" 宏代替。
 
 ## Browse
-### Missing: platform.wiki.browse=Browse Wikis
+platform.wiki.browse=浏览Wiki
 ### Missing: platform.wiki.browse.emptyvalue=N/A
-### Missing: platform.wiki.browse.wikiprettyname=Name
-### Missing: platform.wiki.browse.description=Description
-### Missing: platform.wiki.browse.owner=Owner
-### Missing: platform.wiki.browse.membershipType=Membership Type
-### Missing: platform.wiki.browse.doc.creationDate=Creation Date
-### Missing: platform.wiki.browse._actions=Actions
-### Missing: platform.wiki.browse._actions.join=Join
-### Missing: platform.wiki.browse._actions.requestJoin=Request Join
-### Missing: platform.wiki.browse._actions.viewInvitation=View Invitation
-### Missing: platform.wiki.browse._actions.cancelJoinRequest=Cancel Request
-### Missing: platform.wiki.browse._actions.leave=Leave
-### Missing: platform.wiki.browse._actions.delete=Delete
+platform.wiki.browse.wikiprettyname=名称
+platform.wiki.browse.description=描述
+platform.wiki.browse.owner=所有者
+platform.wiki.browse.membershipType=成员类型
+platform.wiki.browse.doc.creationDate=创建日期
+platform.wiki.browse._actions=操作
+platform.wiki.browse._actions.join=加入
+platform.wiki.browse._actions.requestJoin=请求加入
+platform.wiki.browse._actions.viewInvitation=查看邀请
+platform.wiki.browse._actions.cancelJoinRequest=取消请求
+platform.wiki.browse._actions.leave=离开
+platform.wiki.browse._actions.delete=删除
 
 ## Classes
-### Missing: WikiManager.WikiUserClass_membershipType_open=Open for any user to join
-### Missing: WikiManager.WikiUserClass_membershipType_request=Any global user can request to join but an admin must accept
-### Missing: WikiManager.WikiUserClass_membershipType_invite=Only an admin can send invitations to join this wiki
-### Missing: WikiManager.WikiUserClass_userScope_local_only=Only local users are available in the wiki
-### Missing: WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki
-### Missing: WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
-### Missing: platform.wiki.prop.wikiname=Wiki Identifier
-### Missing: platform.wiki.prop.wikiprettyname=Pretty Name
-### Missing: platform.wiki.prop.wikialias=Alias
-### Missing: platform.wiki.prop.description=Description
-### Missing: platform.wiki.prop.owner=Owner
-### Missing: platform.wiki.prop.membershipType.label=Membership Type
-### Missing: platform.wiki.prop.membershipType.hint=The way users can join this wiki.
+WikiManager.WikiUserClass_membershipType_open=任何用户都可以加入
+WikiManager.WikiUserClass_membershipType_request=任何全局用户都可以申请加入，但管理员必须接受
+WikiManager.WikiUserClass_membershipType_invite=只有管理员可以发送邀请加入此 wiki
+WikiManager.WikiUserClass_userScope_local_only=Wiki中仅提供本地用户
+WikiManager.WikiUserClass_userScope_global_only=只有全局用户可以在Wiki中访问
+WikiManager.WikiUserClass_userScope_local_and_global=全球和本地用户都可在Wiki中使用
+platform.wiki.prop.wikiname=Wiki 标识符
+platform.wiki.prop.wikiprettyname=漂亮名称
+platform.wiki.prop.wikialias=别名
+platform.wiki.prop.description=描述
+platform.wiki.prop.owner=所有者
+platform.wiki.prop.membershipType.label=成员类型
+platform.wiki.prop.membershipType.hint=用户加入此 wiki 的方式。
 
 ## Wizard
-### Missing: platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
-### Missing: platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
-### Missing: platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
-### Missing: platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all pages will be cloned).
-### Missing: platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
-### Missing: platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independent of the rights configured in the Administration.
-### Missing: platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
-### Missing: platform.wiki.create.wizard.step.nameAndType=Step 1 — Choose a name
-### Missing: platform.wiki.create.wizard.step.nameAndType.shortname=Name
-### Missing: platform.wiki.create.wizard.step.users=Step 2 — Choose members
-### Missing: platform.wiki.create.wizard.step.users.shortname=Users
-### Missing: platform.wiki.create.wizard.step.cleaningUp=Cleaning Up
-### Missing: platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete this wiki
-### Missing: platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningUp.confirmmessage=You are about to delete wiki {0}. Please confirm.
-### Missing: platform.wiki.create.wizard.step.cleaningUp.confirm=Confirm
-### Missing: platform.wiki.create.wizard.setAsTemplate.label=This wiki will be a template
-### Missing: platform.wiki.create.wizard.template.noTemplate=No template (default)
-### Missing: platform.wiki.create.wizard.userScope.label=User Scope
-### Missing: platform.wiki.create.wizard.userScope.hint=Select what kind of users can access the wiki
-### Missing: platform.wiki.create.wizard.template.label=Template
-### Missing: platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
-### Missing: platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
-### Missing: platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
-### Missing: platform.wiki.create.wizard.flavortemplate.templateTab=Template
-### Missing: platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created and the Distribution Wizard will be started in order to help you initialize your wiki. If you skip the wizard, your wiki will be empty.
-### Missing: platform.wiki.create.wizard.step.previous=Previous Step
-### Missing: platform.wiki.create.wizard.step.next=Next step
-### Missing: platform.wiki.create.wizard.step.create=Create
-### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
-### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
-### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=However, error(s) have been generated during that process and you might want to review them.
-### Missing: platform.wiki.create.wizard.step.creation.error=The creation of the wiki {0} failed. It''s recommended to delete it.
-### Missing: platform.wiki.create.wizard.step.creation.go=Go to the wiki
+platform.wiki.create.wizard.desc.wikiname=新站点的唯一标识符。
+platform.wiki.create.wizard.desc.wikiprettyname=Wiki的显示名称。
+platform.wiki.create.wizard.desc.wikialias=将要指向Wiki的域名。
+platform.wiki.create.wizard.desc.newTemplateHint=用于此新站点的模板（所有页面将被克隆）。
+platform.wiki.create.wizard.desc.description=对Wiki及其目的的简要描述。
+platform.wiki.create.wizard.desc.owner=一个用户将始终拥有对此 wiki 的所有权限，不受管理设置中配置的权限影响。
+platform.wiki.create.wizard.desc.members=可以参与 Wiki 的用户。
+platform.wiki.create.wizard.step.nameAndType=步骤 1 — 选择一个名称
+platform.wiki.create.wizard.step.nameAndType.shortname=名称
+platform.wiki.create.wizard.step.users=第二步 — 选择成员
+platform.wiki.create.wizard.step.users.shortname=用户
+platform.wiki.create.wizard.step.cleaningUp=清理
+platform.wiki.create.wizard.step.provisioning.cleanUp=清理并删除此 wiki
+platform.wiki.create.wizard.step.cleaningup.success=Wiki {0} 已成功删除。
+platform.wiki.create.wizard.step.cleaningup.error=错误，wiki {0} 未被删除。
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=您即将删除Wiki {0}。请确认。
+platform.wiki.create.wizard.step.cleaningUp.confirm=确认
+platform.wiki.create.wizard.setAsTemplate.label=这个Wiki将成为一个模板
+platform.wiki.create.wizard.template.noTemplate=无模板（默认）
+platform.wiki.create.wizard.userScope.label=用户范围
+platform.wiki.create.wizard.userScope.hint=选择哪些用户可以访问Wiki
+platform.wiki.create.wizard.template.label=模板
+platform.wiki.create.wizard.flavortemplate.label=风味 / 模板
+platform.wiki.create.wizard.flavortemplate.hint=用于新 wiki 的初始内容的口味或模板
+platform.wiki.create.wizard.flavortemplate.flavorTab=风味
+platform.wiki.create.wizard.flavortemplate.templateTab=模板
+platform.wiki.create.wizard.step.dw=点击"创建"按钮后，将创建Wiki并启动分发向导以帮助您初始化Wiki。如果您跳过向导，您的Wiki将是空的。
+platform.wiki.create.wizard.step.previous=上一步
+platform.wiki.create.wizard.step.next=下一步
+platform.wiki.create.wizard.step.create=创建
+platform.wiki.create.wizard.step.creation=创建 Wiki
+platform.wiki.create.wizard.step.creation.wait=请等待 wiki 创建完成。
+platform.wiki.create.wizard.step.creation.complete=wiki {0} 已成功创建。您现在可以访问它了。
+platform.wiki.create.wizard.step.creation.errorlog=然而，在创建过程中生成了错误，您可能需要查看它们。
+platform.wiki.create.wizard.step.creation.error=创建Wiki {0} 失败。建议删除它。
+platform.wiki.create.wizard.step.creation.go=前往 Wiki
 
 ## Admin
-### Missing: admin.wikis.description=Wikis management.
-### Missing: admin.wikis.templates=Wiki Templates
-### Missing: admin.wikis.templates.description=Manage the wiki templates
-### Missing: admin.wikis.templates.hint=A template is a wiki that will be considered as a model to create new wikis. When a user selects a template to create a new wiki, all the content of the template is copied in the new wiki.
-### Missing: admin.wikis.rights=Creation Right
+admin.wikis.description=Wiki管理。
+admin.wikis.templates=Wiki 模板
+admin.wikis.templates.description=管理 Wiki 模板
+admin.wikis.templates.hint=模板是一个将被视为创建新 Wiki 模板的 Wiki。当用户选择一个模板来创建新 Wiki 时，模板中的所有内容都会被复制到新 Wiki 中。
+admin.wikis.rights=创建权限
 
 ## XWikiServer Sheet
-### Missing: platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
-### Missing: platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exist.
-### Missing: platform.wiki.sheet.title.settings=Wiki properties
-### Missing: platform.wiki.sheet.title.createnewalias=Create new alias
-### Missing: platform.wiki.sheet.title.viewaliases=View aliases
-### Missing: platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
-### Missing: platform.wiki.sheet.desc.owner=A user who will have all the rights on this wiki.
-### Missing: platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with \"https\".
-### Missing: platform.wiki.sheet.desc.port=The port to use for all this wiki's generated externals URLs. If not set it's inherited from the configuration and the main wiki. Only taken into account for domain based URLs.
-### Missing: platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be used as a template when creating a new wiki.
-### Missing: platform.wiki.sheet.desc.server=The alias used to access the wiki.
-### Missing: platform.wiki.sheet.desc.description=A brief wiki description.
-### Missing: platform.wiki.sheet.desc.homepage=The homepage of the wiki.
-### Missing: platform.wiki.sheet.prop.wikiprettyname=Pretty name
-### Missing: platform.wiki.sheet.prop.owner=Owner
-### Missing: platform.wiki.sheet.prop.secure=Secure (SSL)
-### Missing: platform.wiki.sheet.prop.port=Port
-### Missing: platform.wiki.sheet.prop.description=Description
-### Missing: platform.wiki.sheet.prop.server=Alias
-### Missing: platform.wiki.sheet.prop.homepage=Homepage
-### Missing: platform.wiki.sheet.prop.iswikitemplate=Wiki template
-### Missing: platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
-### Missing: platform.wiki.sheet.descriptor.admin=administration page of the wiki.
-### Missing: platform.wiki.sheet.aliases=An alias is another name for the wiki. You can add aliases to create different URLs for the wiki.
+platform.wiki.sheet.title=Wiki "{0}"的描述符
+platform.wiki.sheet.erroraliasalreadynotexists=Wiki 别名"{0}"已存在。
+platform.wiki.sheet.erroraliasdoesnotexists=Wiki 别名"{0}"不存在。
+platform.wiki.sheet.title.settings=Wiki 属性
+platform.wiki.sheet.title.createnewalias=创建新别名
+platform.wiki.sheet.title.viewaliases=查看别名
+platform.wiki.sheet.desc.wikiprettyname=Wiki的显示名称。
+platform.wiki.sheet.desc.owner=一个将拥有此 wiki 所有权限的用户。
+platform.wiki.sheet.desc.secure=如果启用，所有这个 wiki 生成的外部 URL 都将以"https"开头。
+platform.wiki.sheet.desc.port=用于所有此 wiki 生成的外部 URL 的端口。如果未设置，则从配置和主 wiki 继承。仅适用于基于域的 URL。
+platform.wiki.sheet.desc.iswikitemplate=指示在创建新Wiki时是否可将此Wiki用作模板。
+platform.wiki.sheet.desc.server=用于访问Wiki的别名。
+platform.wiki.sheet.desc.description=一个简短的Wiki描述。
+platform.wiki.sheet.desc.homepage=Wiki 的主页。
+platform.wiki.sheet.prop.wikiprettyname=漂亮名称
+platform.wiki.sheet.prop.owner=所有者
+platform.wiki.sheet.prop.secure=安全（SSL）
+platform.wiki.sheet.prop.port=端口
+platform.wiki.sheet.prop.description=描述
+platform.wiki.sheet.prop.server=别名
+platform.wiki.sheet.prop.homepage=主页
+platform.wiki.sheet.prop.iswikitemplate=Wiki 模板
+platform.wiki.sheet.descriptor=本页面定义了如何访问"{0}"Wiki，以及它的某些属性。更多配置请前往
+platform.wiki.sheet.descriptor.admin=Wiki 的管理页面。
+platform.wiki.sheet.aliases=别名是 Wiki 的另一个名称。您可以添加别名来为 Wiki 创建不同的 URL。
 
 ###############################################################################
 ## Deprecated
@@ -278,28 +278,28 @@ platform.wiki.users.profile.activity.show=显示活动
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing={0}应用管理插件{1}未安装。请安装后重试。
 
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
-### Missing: admin.wikis.template=Wiki Template
+admin.wikis=Wiki实例
+admin.wikis.template=Wiki 模板
 
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning=系统正在配置 Wiki。
+platform.wiki.create.wizard.step.provisioning.wait=请等待系统配置 Wiki。
+platform.wiki.create.wizard.step.provisioning.complete=Wiki 已接近准备就绪。请点击“完成”以执行最后操作。
+platform.wiki.create.wizard.step.provisioning.error=该Wiki {0} 已创建，但模板中包含的一些页面未复制。您可能应该将其删除。
+platform.wiki.create.wizard.step.provisioning.finalize=完成
 
 #######################################
 ## until 9.5-rc-1
 #######################################
-### Missing: platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
-### Missing: platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.confirmation.yes=是的，请删除这个Wiki！
+platform.wiki.delete.confirmation.no=不，带我回去！
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

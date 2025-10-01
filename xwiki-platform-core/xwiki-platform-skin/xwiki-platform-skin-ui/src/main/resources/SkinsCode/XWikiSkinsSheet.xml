@@ -99,9 +99,7 @@
     
     {{html}}
     &lt;noscript&gt;
-      &lt;div class="box errormessage"&gt;
-        $escapetool.xml($services.localization.render('skin.sheet.nojs', ['LINK_START', 'LINK_END', 'XWiki.XWikiSkinFileOverrideClass'])).replace('LINK_START', "&lt;a href='$escapetool.xml($doc.getURL('edit', 'editor=object'))'&gt;").replace('LINK_END', '&lt;/a&gt;')
-      &lt;/div&gt;
+      #error($escapetool.xml($services.localization.render('skin.sheet.nojs', ['LINK_START', 'LINK_END', 'XWiki.XWikiSkinFileOverrideClass'])).replace('LINK_START', "&lt;a href='$escapetool.xml($doc.getURL('edit', 'editor=object'))'&gt;").replace('LINK_END', '&lt;/a&gt;'))
     &lt;/noscript&gt;
     {{/html}}
     
@@ -359,10 +357,19 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // Then we hide the object via jQuery
       properties.hide();
       // So now we can make it slide (not possible if it were not hidden by jQuery first)
-      properties.slideDown();
+      properties.slideDown(400, function () {
+        $(this).addClass('property-slided');
+      });
     } else {
       // The other time, we just use the toggle function
-      properties.slideToggle();
+      properties.slideToggle({
+        'start': function() {
+          $(this).removeClass('property-slided');
+        },
+        'complete': function() {
+          $(this).addClass('property-slided');
+        }
+      });
     }
   }
 

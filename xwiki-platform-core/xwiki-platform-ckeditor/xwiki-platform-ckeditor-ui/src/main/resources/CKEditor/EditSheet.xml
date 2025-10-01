@@ -181,9 +181,11 @@ define('xwiki-ckeditor', [
     }
 
     var uploadDisabled = element.hasAttribute('data-upload-disabled');
+    var startupFocus = element.hasAttribute('data-startup-focus');
 
     var config = {
       filebrowserUploadUrl: uploadDisabled ? '' : getUploadURL(sourceDocument, 'filebrowser'),
+      startupFocus,
       height: $(element).height(),
       // Used to resolve and serialize relative references. Also used to make HTTP requests with the right context.
       sourceDocument: sourceDocument,
@@ -411,7 +413,9 @@ define('xwiki-ckeditor', [
     container.find('.ckeditor-textarea').each(function() {
       // Wrap in try/catch so that a failure to load one editor doesn't affect the other editors.
       try {
-        createEditor(ckeditor, this);
+        createEditor(ckeditor, this).then(() =&gt; {
+          this.classList.remove('loading');
+        });
       } catch(e) {
         console.log(e);
       }
@@ -565,6 +569,13 @@ define('xwiki-ckeditor', [
   cursor: wait;
   overflow: hidden;
   resize: none;
+}
+
+/* Hide the form action bar while the editor is loading in order to avoid UI flickering (because the editor may enhance
+  or replace the form action bar). */
+main &gt; div:has(.ckeditor-textarea.loading) ~ .bottom-editor,
+#xwikicontent.loading ~ form#inplace-editing {
+  visibility: hidden;
 }
 
 /* Show the modal above the CKEditor dialogs */
@@ -727,6 +738,25 @@ td.cke_dialog_contents_body {
 }
 
 /**
+ * Handle the layout and display of the warning message for headerless tables.
+ * This message is added by the xwiki-table plugin.
+ * Some of the default styles are just overridden by the CKEditor reset.
+ */
+.cke_dialog_container span.box.warningmessage {
+  .alert-warning;
+  /* Default warning boxes are not meant to be used in a strict layout like the one of this table dialog.
+   * We need an extra customization to avoid breaking this layout. */
+  white-space: break-spaces;
+  /* By default, the warning is not shown. */
+  display: none;
+}
+
+/* When the value of the previous field is the one we want to avoid, we show the warning. */
+.cke_dialog_container tr:has(select [value=""]:checked) + tr span.box.warningmessage {
+  display: unset;
+}
+
+/**
  * Link Options Toggle
  */
 
@@ -865,6 +895,12 @@ ul.cke_autocomplete_panel {
   max-width: 64px;
   vertical-align: text-top;
 }
+/* The image still takes some space in all browsers even if there's no source specified. Let's make sure it's hidden.
+  See CKEDITOR-389: Missing space in the suggestions that appear while using the autocomplete function on IE 11 */
+.ckeditor-autocomplete-item-preview-wrapper img[src=""],
+.ckeditor-autocomplete-item-icon-wrapper img[src=""] {
+  display: none;
+}
 .ckeditor-autocomplete-item-label {
   /* Push the shortcut to the right edge of the item. */
   flex-grow: 1;
@@ -912,26 +948,86 @@ ul.cke_autocomplete_panel {
 }
 
 .cke_contents &gt; textarea.cke_source.cke_editable_inline {
-  border: 1px solid transparent;
-  border-radius: 0;
   box-shadow: none;
-  margin-top: -1px;
-  margin-left: -1px;
-
-  .form-control-focus();
-}
-
-.cke_contents.fake {
-  /* We need this to have the box shadow visible when the source area is focused. */
-  overflow: visible;
 }
 
 #xwikicontent + .cke_contents &gt; textarea.cke_source.cke_editable_inline {
   /* Don't take the padding and the margin into account when computing the 100% width. */
   box-sizing: content-box;
   /* Make sure the Source area has the same width as the WYSIWYG area. */
-  margin-left: -@grid-gutter-width / 2 - 1px;
-  margin-right: -@grid-gutter-width / 2 - 1px;
+  margin-left: -@grid-gutter-width / 2;
+  margin-right: -@grid-gutter-width / 2;
+}
+
+/**
+ * Custom styles to match XWiki's Look &amp; Feel
+ */
+.cke_chrome,
+.cke_chrome &gt; .cke_inner {
+  border-radius: @border-radius-base;
+}
+
+.cke_chrome &gt; .cke_inner &gt; .cke_top {
+  border-top-right-radius: @border-radius-base;
+  border-top-left-radius: @border-radius-base;
+}
+
+.cke_chrome &gt; .cke_inner &gt; .cke_bottom {
+  border-bottom-right-radius: @border-radius-base;
+  border-bottom-left-radius: @border-radius-base;
+}
+
+/* The standalone WYSIWYG edit mode shows the form action toolbar right below the CKEditor instance used to edit the
+  document content. We make the bottom border rounded on the form action toolbar instead. */
+#xwikieditcontent &gt; .cke_chrome,
+#xwikieditcontent &gt; .cke_chrome &gt; .cke_inner,
+#xwikieditcontent &gt; .cke_chrome &gt; .cke_inner &gt; .cke_bottom {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+a.cke_button,
+a.cke_combo_button {
+  border-radius: @border-radius-small;
+}
+
+.cke_panel,
+.cke_dialog_body,
+.cke_dialog a.cke_dialog_ui_button,
+.cke_dialog input.cke_dialog_ui_input_text,
+.cke_dialog select.cke_dialog_ui_input_select,
+.cke_dialog fieldset.cke_dialog_ui_fieldset,
+.cke_notification {
+  border-radius: @border-radius-base;
+}
+
+.cke_panel.cke_menu_panel,
+.cke_panel.cke_combopanel {
+  margin: 2px 0;
+}
+
+.cke_dialog_title,
+.cke_dialog a.cke_dialog_tab {
+  border-top-right-radius: @border-radius-base;
+  border-top-left-radius: @border-radius-base;
+}
+
+.cke_dialog_contents,
+.cke_dialog_footer {
+  border-bottom-right-radius: @border-radius-base;
+  border-bottom-left-radius: @border-radius-base;
+}
+
+/**
+ * Custom styles for the in-line editor
+ */
+.viewbody &gt; .cke_float {
+  /* Shift the floating toolbar in order to match the content padding. */
+  margin-right: floor((@grid-gutter-width / 2));
+  margin-left: ceil((@grid-gutter-width / 2));
+}
+.cke_float .cke_top {
+  border-radius: @border-radius-base;
 }
 
 /**
@@ -970,12 +1066,6 @@ body[data-maximized="true"] {
     margin: 0 !important;
     overflow-y: auto !important;
     z-index: 9995;
-
-    &amp;:focus {
-      /* Remove the focus border. */
-      border-color: transparent !important;
-      box-shadow: none !important;
-    }
   }
   .cke_maximize_backdrop {
     top: 0;
@@ -1011,6 +1101,23 @@ body[data-maximized="true"] {
 .cke_editable.cke_show_borders table.cke_show_border &gt; tfoot &gt; tr &gt; td {
   border-color: @table-border-color;
   border-style: solid;
+}
+
+/* CKEditor contains a CSS reset. It works with its own style sheets and does not use the ones in XWiki.
+However, we want `.sr-only` from XWiki to still be usable in our CKEditor environment.
+We need to redefine the XWiki styles of this class to have better priority than the CKEditor CSS reset.
+Without this, the elements with this class are still shown which would be different from the behaviour 
+of `.sr-only` anywhere else in XWiki (as described in our doc).
+This redefinition allows for a more consistent behaviour of the `.sr-only` class. */
+.cke_reset_all .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }</code>
     </property>
     <property>

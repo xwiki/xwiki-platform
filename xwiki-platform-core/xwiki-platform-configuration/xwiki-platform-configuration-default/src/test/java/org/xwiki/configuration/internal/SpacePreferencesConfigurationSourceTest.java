@@ -19,8 +19,7 @@
  */
 package org.xwiki.configuration.internal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,14 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link SpacePreferencesConfigurationSource}.
@@ -74,8 +80,37 @@ class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumentConfig
     @Test
     void getPropertyForStringWhenExists() throws Exception
     {
+        assertNull(this.source.getProperty("key", String.class));
+
         setStringProperty(SPACE_DOCUMENT, "key", "value");
 
         assertEquals("value", this.source.getProperty("key", String.class));
+    }
+
+    @Test
+    void getKeys() throws XWikiException
+    {
+        assertEquals(List.of(), this.source.getKeys());
+        assertEquals(List.of(), this.source.getKeys("prefix"));
+
+        setStringProperty(SPACE_DOCUMENT, "key", "value");
+        setStringProperty(SPACE_DOCUMENT, "prefixkey", "value2");
+
+        assertEquals(List.of("prefixkey", "key"), this.source.getKeys());
+        assertEquals(List.of("prefixkey"), this.source.getKeys("prefix"));
+    }
+
+    @Test
+    void isEmpty() throws XWikiException
+    {
+        assertTrue(this.source.isEmpty());
+        assertTrue(this.source.isEmpty("prefix"));
+
+        setStringProperty(SPACE_DOCUMENT, "key", "value");
+        setStringProperty(SPACE_DOCUMENT, "prefixkey", "value2");
+
+        assertFalse(this.source.isEmpty());
+        assertFalse(this.source.isEmpty("prefix"));
+        assertTrue(this.source.isEmpty("otherprefix"));
     }
 }

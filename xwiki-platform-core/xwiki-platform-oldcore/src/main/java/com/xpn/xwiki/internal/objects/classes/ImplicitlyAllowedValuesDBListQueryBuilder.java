@@ -26,18 +26,30 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.GeneralMailConfiguration;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
-import org.xwiki.text.StringUtils;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DBTreeListClass;
+import com.xpn.xwiki.objects.classes.EmailClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 
 /**
  * Builds a query from the meta data of a Database List property.
@@ -52,23 +64,25 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
 {
     private static final class DBListQuerySpec
     {
-        public String wiki;
+        private String wiki;
 
-        public String className;
+        private String className;
 
-        public String idField;
+        private String idField;
 
-        public String valueField;
+        private String valueField;
 
-        public String parentField;
+        private String parentField;
 
-        public boolean hasClassName;
+        private boolean hasClassName;
 
-        public boolean hasIdField;
+        private boolean hasIdField;
 
-        public boolean hasValueField;
+        private boolean hasValueField;
 
-        public boolean hasParentField;
+        private boolean hasParentField;
+
+        private BaseClass xClass;
     }
 
     private static final String DOC_PREFIX = "doc.";
@@ -87,6 +101,15 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
     @Inject
     @Named("viewableAllowedDBListPropertyValue")
     private QueryFilter viewableValueFilter;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private GeneralMailConfiguration mailConfiguration;
+
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
      * {@inheritDoc} The query is constructed according to the following rules:
@@ -148,22 +171,58 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         return query;
     }
 
-    private void addFieldToQuery(String fieldName, String fieldAlias, boolean hasClassName, List<String> selectClause,
-        List<String> fromClause, List<String> whereClause, Map<String, Object> parameters)
+    private void addFieldToQuery(String fieldName, String fieldAlias, DBListQuerySpec spec, List<String> selectClause,
+        List<String> fromClause, List<String> whereClause, Map<String, Object> parameters) throws QueryException
     {
         if (fieldName.startsWith(DOC_PREFIX) || fieldName.startsWith(OBJ_PREFIX)) {
+            checkSimpleFieldName(fieldName);
             selectClause.add(fieldName);
-        } else if (!hasClassName) {
+        } else if (!spec.hasClassName) {
+            checkSimpleFieldName(fieldName);
             selectClause.add(DOC_PREFIX + fieldName);
         } else {
-            selectClause.add(fieldAlias + ".value");
-            fromClause.add("StringProperty as " + fieldAlias);
-            whereClause.add(String.format("obj.id = %1$s.id.id and %1$s.id.name = :%1$s", fieldAlias));
-            parameters.put(fieldAlias, fieldName);
+            try {
+                // Only load the XClass when really needed.
+                if (spec.xClass == null) {
+                    // Resolve the reference relative to the specified wiki.
+                    DocumentReference classReference = this.documentReferenceResolver.resolve(spec.className,
+                        new WikiReference(spec.wiki));
+                    XWikiContext xWikiContext = this.contextProvider.get();
+                    spec.xClass = xWikiContext.getWiki().getXClass(classReference, xWikiContext);
+                }
+
+                PropertyInterface propertyInterface = spec.xClass.get(fieldName);
+                if (propertyInterface instanceof PasswordClass) {
+                    throw new QueryException("Queries for password field [%s] on class [%s] aren't allowed"
+                        .formatted(fieldName, spec.className), null);
+                } else if (propertyInterface instanceof EmailClass && this.mailConfiguration.shouldObfuscate()) {
+                    throw new QueryException(("Queries for email property [%s] on class [%s] aren't allowed as email "
+                        + "obfuscation is enabled.").formatted(fieldName, spec.className), null);
+                }
+                selectClause.add(fieldAlias + ".value");
+                fromClause.add("StringProperty as " + fieldAlias);
+                whereClause.add(String.format("obj.id = %1$s.id.id and %1$s.id.name = :%1$s", fieldAlias));
+                parameters.put(fieldAlias, fieldName);
+            } catch (XWikiException e) {
+                throw new QueryException("Failed to get the XClass definition", null, e);
+            }
+        }
+    }
+
+    private void checkSimpleFieldName(String fieldName) throws QueryException
+    {
+        // Ensure that the passed string is really a (single) database field and nothing else.
+        if (!StringUtils.isAlphanumeric(
+            // Remove whitespace at both ends and a document or object prefix. We don't care about having both
+            // prefixes after each other, this is not about catching all invalid names.
+            Strings.CS.removeStart(Strings.CS.removeStart(StringUtils.strip(fieldName), DOC_PREFIX), OBJ_PREFIX)))
+        {
+            throw new QueryException("Invalid field name [%s]".formatted(fieldName), null);
         }
     }
 
     private String getStatementWhenIdOrValueFieldsAreSpecified(DBListQuerySpec spec, Map<String, Object> parameters)
+        throws QueryException
     {
         // Make sure we always have an id field. Ignore the value field if it duplicates the id field and there's no
         // parent field specified.
@@ -184,6 +243,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
     }
 
     private String getStatementWhenIdFieldIsSpecified(DBListQuerySpec spec, Map<String, Object> parameters)
+        throws QueryException
     {
         List<String> selectClause = new ArrayList<>();
         List<String> fromClause = new ArrayList<>();
@@ -207,16 +267,16 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
             }
         }
 
-        addFieldToQuery(spec.idField, "idProp", spec.hasClassName, selectClause, fromClause, whereClause, parameters);
+        addFieldToQuery(spec.idField, "idProp", spec, selectClause, fromClause, whereClause, parameters);
 
         if (spec.hasValueField) {
-            addFieldToQuery(spec.valueField, "valueProp", spec.hasClassName, selectClause, fromClause, whereClause,
+            addFieldToQuery(spec.valueField, "valueProp", spec, selectClause, fromClause, whereClause,
                 parameters);
 
             // We cannot include the parent field if there's no value field because we would confuse it with the value
             // field (the second column in the result set is reserved for the value).
             if (spec.hasParentField) {
-                addFieldToQuery(spec.parentField, "parentProp", spec.hasClassName, selectClause, fromClause,
+                addFieldToQuery(spec.parentField, "parentProp", spec, selectClause, fromClause,
                     whereClause, parameters);
             }
         }

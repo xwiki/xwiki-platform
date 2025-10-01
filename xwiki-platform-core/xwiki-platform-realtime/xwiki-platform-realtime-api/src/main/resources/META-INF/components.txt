@@ -1,2 +1,2 @@
-org.xwiki.realtime.internal.DefaultRealtimeEditorManager
+org.xwiki.realtime.internal.DefaultRealtimeSessionManager
 500:org.xwiki.realtime.internal.XWikiRealtimeDocumentLockEditConfirmationChecker

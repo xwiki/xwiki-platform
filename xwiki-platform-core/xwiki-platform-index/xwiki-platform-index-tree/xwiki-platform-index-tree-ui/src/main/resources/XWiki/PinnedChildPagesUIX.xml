@@ -1,0 +1,887 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.6" reference="XWiki.PinnedChildPagesUIX" locale="">
+  <web>XWiki</web>
+  <name>PinnedChildPagesUIX</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>PinnedChildPagesUIX</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>XWiki.PinnedChildPagesUIX</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>37484be0-45ce-4ec2-98fe-336d5522a39d</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('xwiki-panels-navigation-config-messages', {
+  keys: [
+    'index.documentTree.empty',
+    'index.tree.pinnedChildPages.pin',
+    'index.tree.pinnedChildPages.pin.hint',
+    'index.tree.pinnedChildPages.unpin',
+    'index.tree.pinnedChildPages.unpin.hint',
+    'index.tree.pinnedChildPages.saveComment',
+    'core.editors.saveandcontinue.notification.inprogress',
+    'core.editors.saveandcontinue.notification.error',
+    'core.editors.saveandcontinue.notification.done'
+  ]
+});
+
+require([
+  'jquery',
+  'xwiki-l10n!xwiki-panels-navigation-config-messages',
+  'xwiki-meta',
+  'jquery-ui',
+  'jquery-ui-touch-punch',
+  'xwiki-events-bridge'
+], function($, l10n, xwikiMeta) {
+  const $navigationTree = $('.navigationPanelConfiguration .xtree');
+
+  // Make sure the root node accepts known node types as children.
+  $navigationTree.on('ready.jstree', function(event, data) {
+    const tree = data.instance;
+    const root = tree.get_node($.jstree.root);
+    root.data.validChildren = ['document', 'pagination', 'empty'];
+
+    // Make sure top level nodes can't be moved to a lower level. We only allow reordering the top level nodes.
+    const originalCheckCallback = tree.settings.core.check_callback;
+    tree.settings.core.check_callback = function(operation, node, parent, position, more) {
+      if (operation === 'move_node' &amp;&amp; (parent.id !== $.jstree.root || node.parent !== $.jstree.root)) {
+        return false;
+      } else {
+        // FIXME: this doesn't seem good but if use the originalCheck then standard editor cannot use drag&amp;drop
+        return true; //originalCheckCallback.apply(this, arguments);
+      }
+    };
+
+  // Prevent drag &amp; drop for tree nodes that are not on the top level.
+  }).on('model.jstree', function(event, data) {
+    if (data.parent !== $.jstree.root) {
+      const tree = data.instance;
+      data.nodes.forEach(nodeId =&gt; {
+        const node = tree.get_node(nodeId);
+        if (node?.data) {
+          node.data.draggable = false;
+        }
+      });
+    }
+  });
+
+  //
+  // Tree Node Actions
+  //
+
+  let navigationTree = $navigationTree.jstree?.(true);
+  const nodeTemplate = navigationTree?._data?.core?.node;
+  if (!nodeTemplate) {
+    // The tree node template hasn't been initialized yet.
+    $navigationTree.on('loading.jstree', function(event, data) {
+      navigationTree = data.instance;
+      modifyNodeTemplate(navigationTree._data.core.node);
+    });
+  } else {
+    modifyNodeTemplate(nodeTemplate);
+    if (navigationTree._data.core.ready) {
+      // Tree nodes have already been created from the template. We have to redraw them in order to use the modified
+      // template.
+      navigationTree.redraw(true);
+    }
+  }
+
+  function modifyNodeTemplate(nodeTemplate) {
+    const $anchor = $(nodeTemplate).find('.jstree-anchor');
+    const $actions = $anchor.nextAll('.jstree-actions');
+    if (!$actions.length) {
+      $anchor.after('&lt;div class="jstree-actions"&gt;&lt;/div&gt;');
+    }
+  }
+
+  $navigationTree.on('focusin mouseenter', '.jstree-actions', function(event) {
+    const $node = $(event.target).closest('.jstree-node');
+    $navigationTree.jstree(true).hover_node($node);
+    if (event.type === 'focusin') {
+      // Make sure we can get back from the actions to the node anchor (e.g. using Shift + Tab) and continue navigating
+      // the tree using the arrow keys.
+      $node.children('.jstree-anchor').attr('tabindex', 0);
+    }
+  });
+
+  $navigationTree.on('mouseleave', '.jstree-actions', function(event) {
+    const $node = $(event.target).closest('.jstree-node');
+    $navigationTree.jstree(true).dehover_node($node);
+  });
+
+  $navigationTree.on('hover_node.jstree', function(event, data) {
+    const tree = data.instance;
+    tree.get_node(data.node, true).children('.jstree-anchor').addClass('jstree-active');
+  });
+
+  $navigationTree.on('dehover_node.jstree', function(event, data) {
+    const tree = data.instance;
+    const $nodeAnchor = tree.get_node(data.node, true).children('.jstree-anchor');
+    // We remove the active class with a small delay to allow the user to jump to the action buttons using the Tab key.
+    setTimeout(() =&gt; {
+      // Remove the active class only if the node has not been hovered back in the mean time (which happens when you use
+      // the Tab key to jump to the node action buttons).
+      if (!$nodeAnchor.hasClass('jstree-hovered')) {
+        $nodeAnchor.removeClass('jstree-active');
+      }
+    }, 0);
+  });
+
+  //
+  // Reorder tree nodes using the keyboard.
+  //
+
+  $navigationTree.on('keydown', function(event) {
+    if (event.altKey &amp;&amp; event.shiftKey) {
+      const $node = $(event.target).closest('.jstree-node');
+      const node = navigationTree?.get_node($node);
+      if (node?.data?.draggable) {
+        node.a_attr['data-moving'] = true;
+        $node.children('.jstree-anchor').attr('data-moving', true);
+      }
+    }
+  });
+
+  $navigationTree.on('keyup', function(event) {
+    if (!event.altKey || !event.shiftKey) {
+      const $node = $(event.target).closest('.jstree-node');
+      $node.children('.jstree-anchor').removeAttr('data-moving');
+      const node = navigationTree?.get_node($node);
+      if (node?.a_attr) {
+        delete node.a_attr['data-moving'];
+      }
+    } else if (event.code === 'ArrowUp') {
+      maybeMoveNode(event, 'before');
+    } else if (event.code === 'ArrowDown') {
+      maybeMoveNode(event, 'after');
+    }
+  });
+
+  function maybeMoveNode(event, position) {
+    const $node = $(event.target).closest('.jstree-node');
+    const node = navigationTree?.get_node($node);
+    if (node?.data?.draggable) {
+      let $referenceNode;
+      if (position === 'before') {
+        $referenceNode = navigationTree.get_prev_dom($node, true);
+      } else {
+        $referenceNode = navigationTree.get_next_dom($node, true);
+      }
+      if ($referenceNode.length) {
+        const referenceNode = navigationTree.get_node($referenceNode);
+        // We allow to swap only nodes of the same type (in order to prevent moving a node after the pagination).
+        if (node.data.type === referenceNode?.data?.type) {
+          navigationTree.move_node($node, $referenceNode, position, null, true, true);
+        }
+      }
+    }
+  }
+
+  //
+  // Pinned Top Level Pages
+  //
+
+  const pinActionTemplate = $(`
+    &lt;button class="jstree-action-pin" type="button"&gt;
+      &lt;i class="icon fa fa-thumb-tack"&gt;&lt;/i&gt;
+      &lt;span class="jstree-action-pin-on"&gt;&lt;/span&gt;
+      &lt;span class="jstree-action-pin-off"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+  `);
+  pinActionTemplate.find('.jstree-action-pin-on').text(l10n['index.tree.pinnedChildPages.pin'])
+    .attr('title', l10n['index.tree.pinnedChildPages.pin.hint']);
+  pinActionTemplate.find('.jstree-action-pin-off').text(l10n['index.tree.pinnedChildPages.unpin'])
+    .attr('title', l10n['index.tree.pinnedChildPages.unpin.hint']);
+
+  const pinnedTopLevelPages = JSON.parse($('.navigationPanelConfiguration input[name=pinnedPages]').val() || '[]')
+    .map(value =&gt; decodeURIComponent(value.endsWith('/') ? value.substring(0, value.length - 1) : value));
+  let pinnedTopLevelPagesDirty = false;
+
+  $navigationTree.on('model.jstree', function(event, data) {
+    // Mark pinned top level pages.
+    const tree = data.instance;
+    if (data.parent === $.jstree.root) {
+      data.nodes.forEach(nodeId =&gt; {
+        const node = tree.get_node(nodeId);
+        if (node?.data?.type === 'document') {
+          if (pinnedTopLevelPages.includes(node.data.id)) {
+            node.a_attr['data-pinned'] = true;
+          }
+        }
+      });
+    }
+  });
+
+  // Add the pin action. The redraw event is triggered only for top level nodes, but that is fine because we allow the
+  // user to pin only the top level pages from the Navigation tree.
+  $navigationTree.on('redraw.jstree', function(event, data) {
+    const tree = data.instance;
+    data.nodes.forEach(nodeId =&gt; {
+      const node = tree.get_node(nodeId);
+      // We allow to pin only top level nodes that correspond to wiki pages.
+      if (node.data.type === 'document' &amp;&amp; node.parent === $.jstree.root) {
+        const $node = tree.get_node(nodeId, true);
+        $node.children('.jstree-actions').append(pinActionTemplate.clone());
+      }
+    });
+  });
+
+  // Pin top level pages when they are manually re-ordered.
+  $navigationTree.on('move_node.jstree', function(event, data) {
+    if (data.instance === data.old_instance &amp;&amp; data.parent === data.old_parent &amp;&amp; data.parent === $.jstree.root) {
+      // The position of a top level page has changed (the page was moved inside the same tree, without changing its
+      // parent, the root). Pin this page and all the pages that appear before it in the page tree.
+      pinTopLevelPages(data.instance, data.node);
+    }
+  });
+
+  $navigationTree.on('click', '.jstree-action-pin', function(event) {
+    const $node = $(event.target).closest('.jstree-node');
+    const node = navigationTree.get_node($node);
+    if (node.a_attr['data-pinned']) {
+      unpinTopLevelPages(navigationTree, node);
+    } else {
+      pinTopLevelPages(navigationTree, node);
+    }
+  });
+
+  function pinTopLevelPages(tree, node) {
+    do {
+      pinTopLevelPage(tree, node);
+      node = tree.get_node(tree.get_prev_dom(node, true));
+    } while (node);
+  }
+
+  function pinTopLevelPage(tree, node) {
+    // We can pin only tree nodes that correspond to wiki pages.
+    if (node.data.type === 'document') {
+      node.a_attr['data-pinned'] = true;
+      tree.get_node(node, true).children('.jstree-anchor').attr('data-pinned', true);
+      pinnedTopLevelPagesDirty = true;
+    }
+  }
+
+  function unpinTopLevelPages(tree, node) {
+    do {
+      unpinTopLevelPage(tree, node);
+      node = tree.get_node(tree.get_next_dom(node, true));
+    } while (node);
+  }
+
+  function unpinTopLevelPage(tree, node) {
+    // We can unpin only tree nodes that correspond to wiki pages.
+    if (node.data.type === 'document') {
+      delete node.a_attr['data-pinned'];
+      tree.get_node(node, true).children('.jstree-anchor').removeAttr('data-pinned');
+      pinnedTopLevelPagesDirty = true;
+    }
+  }
+
+  function getPinnedTopLevelPages() {
+    const pinnedTopLevelPages = navigationTree.get_json()
+      .filter(node =&gt; node.data?.type === 'document' &amp;&amp; node.a_attr['data-pinned'])
+      .map(node =&gt; {
+        return node.data.id;
+      });
+    // We need to have at least one value in order to be able to overwrite the value stored on the server.
+    return pinnedTopLevelPages.length ? pinnedTopLevelPages : [''];
+  }
+
+  const saveButton = $('.admin-buttons input[type=button]');
+  
+  saveButton.on('click', function (event) {
+    if (pinnedTopLevelPagesDirty) {
+      // We want to save the pinned top level pages first.
+      event.preventDefault();
+      const notification = new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.inprogress'], 'inprogress');
+      const restURL = xwikiMeta.restURL;
+      const saveURL = restURL.substring(0, restURL.indexOf('/pages/')) + '/pinnedChildPages';
+      let pinnedChildPages = {
+        pinnedChildPages: getPinnedTopLevelPages()
+      };
+      $.post({
+        url: saveURL,
+        data: JSON.stringify(getPinnedTopLevelPages()),
+        contentType: 'application/json'
+      }).done(function() {
+        notification.replace(new XWiki.widgets.Notification(l10n.get('core.editors.saveandcontinue.notification.done'), 'done'));
+        pinnedTopLevelPagesDirty = false;
+      }).fail(function (response) {
+        notification.replace(new XWiki.widgets.Notification(l10n.get('core.editors.saveandcontinue.notification.error',response.statusText), 'error'));
+      });
+    }
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.PinnedChildPagesUIX</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>220e7a32-022b-459c-bda2-d677a15f4912</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/**
+ * Improve the tree style in order to be able to show node action buttons.
+ */
+
+.navigationPanelConfiguration .jstree-xwiki .jstree-no-icons {
+  .jstree-node {
+    // Using flex display so that the node anchor can take the full width (without changing the HTML structure).
+    display: flex;
+    // We want the children to be displayed on a new flex row, taking the full width.
+    flex-wrap: wrap;
+
+    &amp;.jstree-hidden {
+      display: none;
+    }
+  }
+
+  .jstree-anchor,
+  .jstree-actions {
+    // Leave some space so that the background of the selected and focused node don't merge.
+    margin-top: 1px;
+    margin-bottom: 1px;
+    // We need the border for when the node is moved using the keyboard.
+    border: 1px solid transparent;
+    // Reduce the line height to take into account the border.
+    line-height: 30px;
+  }
+
+  .jstree-anchor {
+    // Take the remaining width, but leave some space for the action buttons.
+    flex: 1 1 0%;
+    // Use a single line and hide the text overflow.
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    // Leave some padding so that the highlight background looks nice.
+    padding: 0 6px;
+    // Disable the animation because it doesn't cover the node actions.
+    transition: none;
+    border-right-width: 0;
+
+    &amp;.jstree-clicked,
+    &amp;.jstree-hovered {
+      // We want the hover/selected background to continue to the node actions (that follows the node anchor) so we
+      // remove the box shadow and rounded corners on the right side.
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      clip-path: inset(-1px 2px -1px -1px);
+    }
+  }
+
+  .jstree-children {
+    // Take the full flex row width.
+    flex: 0 0 100%;
+  }
+
+  .jstree-actions {
+    padding: 0 4px;
+    border-left-width: 0;
+  }
+
+  .jstree-clicked + .jstree-actions,
+  .jstree-hovered + .jstree-actions {
+    // Use the same background color and border radius as the node anchor.
+    background-color: @nav-link-hover-bg;
+    border-radius: 0 5px 5px 0;
+    // Remove the left box shadow so that the background from the node anchor continues smoothly to the node actions.
+    clip-path: inset(-1px -1px -1px 2px);
+    // We clipped 2px from the right of the node anchor and 2px from the left of the node actions in order to hide the
+    // box shadow between them, so we now need to remove the 4px gap.
+    margin-left: -4px;
+  }
+
+  .jstree-hovered + .jstree-actions {
+    // Use the same box shadow as when the node is hovered.
+    box-shadow: inset 0 0 1px #ccc;
+  }
+  .jstree-clicked + .jstree-actions {
+    // Use the same box shadow as when the node is selected.
+    box-shadow: inset 0 0 1px #999;
+  }
+
+  .jstree-anchor[data-moving],
+  .jstree-anchor[data-moving] + .jstree-actions {
+    box-shadow: none;
+    border: 1px dashed black;
+  }
+}
+
+/**
+ * Pin Action
+ */
+
+.navigationPanelConfiguration .jstree-action-pin {
+  // Hide by default. See below for the cases where it is shown.
+  display: none;
+  border-radius: @border-radius-small;
+  border: 0 none;
+  background: none;
+  // Must be less than the height of the tree node (32px).
+  line-height: 22px;
+}
+.navigationPanelConfiguration .jstree-action-pin:hover {
+  background-color: @btn-default-bg;
+}
+// Show when a node is pinned (so that the user can see the state), or when a node is hovered or selected (to that the
+// user can toggle the state).
+.navigationPanelConfiguration [data-pinned=true] + .jstree-actions .jstree-action-pin,
+.navigationPanelConfiguration .jstree-clicked + .jstree-actions .jstree-action-pin,
+.navigationPanelConfiguration .jstree-active + .jstree-actions .jstree-action-pin {
+  display: inline-block;
+}
+// When a node is pinned but not in focus anymore, the pin is still shown, and we make sure an alternative text is still
+// available for assistive technologies.
+.navigationPanelConfiguration [data-pinned=true]:not(.jstree-clicked):not(.jstree-active) + .jstree-actions
+.jstree-action-pin-off {
+  display: inline;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+}
+.navigationPanelConfiguration .jstree-action-pin-on,
+.navigationPanelConfiguration .jstree-action-pin-off {
+  display: none;
+}
+.navigationPanelConfiguration .jstree-active[data-pinned=true] + .jstree-actions .jstree-action-pin-off,
+.navigationPanelConfiguration .jstree-clicked[data-pinned=true] + .jstree-actions .jstree-action-pin-off,
+.navigationPanelConfiguration .jstree-active:not([data-pinned=true]) + .jstree-actions .jstree-action-pin-on,
+.navigationPanelConfiguration .jstree-clicked:not([data-pinned=true]) + .jstree-actions .jstree-action-pin-on {
+  display: inline;
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.PinnedChildPagesUIX</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>84105711-ec9c-416b-82e5-7537d17ffe7a</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{template name="documentTree_macros.vm" /}}
+{{velocity output="false"}}
+#macro (displayEdit $configObj)
+  #set ($discard = $xwiki.ssx.use('XWiki.PinnedChildPagesUIX'))
+  #set ($discard = $xwiki.jsx.use('XWiki.PinnedChildPagesUIX'))
+  {{html clean="false"}}
+  &lt;div class="hidden"&gt;
+    #set ($pinnedPages = $services.index.tree.getPinnedChildPages($doc.documentReference))
+    #set ($serializedPinnedPages = [])
+    #foreach ($pinnedPage in $pinnedPages)
+      #set ($discard = $serializedPinnedPages.add($services.model.serialize($pinnedPage, 'default')))
+    #end
+    &lt;input type="hidden" name="pinnedPages" value="$escapetool.xml($jsontool.serialize($serializedPinnedPages))" /&gt;
+  &lt;/div&gt;
+  {{/html}}
+  
+  {{info}}{{translation key="index.tree.pinnedChildPages.topLevelHint" /}}{{/info}}
+  
+  {{html}}
+  #displayNavigationPanel
+  &lt;div class="admin-buttons"&gt;
+  &lt;input type="button" value="Save" class="btn btn-primary" /&gt;
+  &lt;/div&gt;
+  {{/html}}
+#end
+
+#macro (displayNavigationPanel)
+  #set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
+  &lt;div class="panel expanded"&gt;
+  &lt;div class="xwikipanelcontents jstree-xwiki-large"&gt;
+  #documentTree({
+    'dragAndDrop': true,
+    'root': "document:$openToDoc",
+    'showTranslations': false,
+    'showAttachments': false,
+    'compact': true
+  })
+  &lt;/div&gt;
+  &lt;/div&gt;
+#end
+{{/velocity}}
+
+{{velocity}}
+#set ($configDoc = $xwiki.getDocument('XWiki.PinnedChildPagesUIX'))
+#set ($configObj = $configDoc.getObject('PanelsCode.NavigationConfigurationClass', true))
+(% class="xform navigationPanelConfiguration" %)(((
+  #displayEdit($configObj)
+)))
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.template.childrenViewer</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.index.pinnedChildpages</name>
+    </property>
+    <property>
+      <parameters>order=10
+tabName=pinnedChildPages
+title=index.pinnedChildPages.title
+right=edit</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

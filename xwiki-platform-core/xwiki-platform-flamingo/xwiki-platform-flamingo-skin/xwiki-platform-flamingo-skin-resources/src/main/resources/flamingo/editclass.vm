@@ -125,16 +125,20 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
  * Inline form for adding a new property to the class.
  *#
 #macro(addPropertyForm)
-  <div id="add_xproperty">
-    $services.icon.renderHTML('add')
-    <label for="propname" class="property-name-label">$services.localization.render('core.editors.class.addProperty.name.label')</label>
-    <input type="text" id="propname" name="propname" value="name" size="20" class='withTip'/>
-    <label for="proptype" class="property-type-label">$services.localization.render('core.editors.class.addProperty.type.label'):</label>
-    <select id="proptype" name="proptype" size="1">
-      #foreach($prop in $xwiki.metaclass.properties)
-        <option value="${prop.name}">${escapetool.xml($prop.prettyName)}</option>
-      #end
-    </select>
+  <div id="add_xproperty" class="add-xproperty">
+    <div>
+      $services.icon.renderHTML('add')
+      <label for="propname" class="property-name-label">$services.localization.render('core.editors.class.addProperty.name.label')</label>
+      <input type="text" id="propname" name="propname" value="name" size="20" class='withTip'/>
+    </div>
+    <div>
+      <label for="proptype" class="property-type-label">$services.localization.render('core.editors.class.addProperty.type.label'):</label>
+      <select id="proptype" name="proptype" size="1">
+        #foreach($prop in $xwiki.metaclass.properties)
+          <option value="${prop.name}">${escapetool.xml($prop.prettyName)}</option>
+        #end
+      </select>
+    </div>
     <span class="buttonwrapper">
       <input type="submit" class="button" value="$services.localization.render('core.editors.class.addProperty.submit')" name="action_propadd"/>
     </span>

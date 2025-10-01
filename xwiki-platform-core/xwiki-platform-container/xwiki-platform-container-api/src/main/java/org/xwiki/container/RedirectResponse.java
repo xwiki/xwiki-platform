@@ -27,7 +27,9 @@ import java.io.IOException;
  *
  * @version $Id$
  * @since 10.0
+ * @deprecated merged with {@link Response}
  */
+@Deprecated(since = "17.0.0RC1")
 public interface RedirectResponse extends Response
 {
     /**

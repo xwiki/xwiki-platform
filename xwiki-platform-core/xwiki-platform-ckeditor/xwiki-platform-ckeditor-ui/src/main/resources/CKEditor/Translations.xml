@@ -63,9 +63,6 @@ ckeditor.plugin.link.defaultLabel=type the link label
 ckeditor.plugin.link.openInNewTab=Open Link in New Tab
 ckeditor.plugin.link.upload=Upload Attachment
 ckeditor.plugin.link.uploadHint=Link to a newly uploaded attachment.
-ckeditor.plugin.link.uploadProgress=Uploading {0}...
-ckeditor.plugin.link.uploadSuccess=Successfully uploaded {0}
-ckeditor.plugin.link.uploadError=Failed to upload {0}
 
 ckeditor.plugin.list.listType.none=None
 
@@ -94,9 +91,13 @@ ckeditor.plugin.office.importer.noUploadURL=File upload URL is not configured.
 ckeditor.plugin.office.importer.failedToLoadForm=Failed to load the form.
 
 ckeditor.plugin.resource.notSpecified=The {0} is not specified.
+ckeditor.plugin.resource.selectValue=Please select a value for the link location.
 ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
 ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
 ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
+ckeditor.plugin.selection.restoring=Restoring selection...
+
+ckeditor.plugin.table.header.accessibilityWarning=Using headers will make your table easier to understand.
 
 ckeditor.plugin.toolbar.basicStyles=Basic Styles
 ckeditor.plugin.toolbar.lists=Lists
@@ -165,9 +166,6 @@ ckeditor.plugin.image.slash.currentPageBadge=This page
 ckeditor.plugin.image.slash.externalBadge=External
 ckeditor.plugin.image.slash.loading=Loading...
 ckeditor.plugin.image.slash.upload=Upload Image
-ckeditor.plugin.image.slash.uploadProgress=Uploading {0}...
-ckeditor.plugin.image.slash.uploadSuccess=Successfully uploaded {0}
-ckeditor.plugin.image.slash.uploadError=Failed to upload {0}
 
 ckeditor.plugin.slash.group.Layout=Layout
 ckeditor.plugin.slash.group.Content=Content
@@ -266,10 +264,14 @@ ckeditor.plugin.focusedplaceholder.placeholder.caption=Title
 ckeditor.plugin.focusedplaceholder.placeholder.th=Header
 ckeditor.plugin.focusedplaceholder.placeholder.td=Cell
 
-ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=Temporarily leaving the realtime session.
-ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=No changes were made. Re-joining the realtime session.
-ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=There are unsaved changes, but no one else is in the realtime session. Re-joining.
-ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=Could not rejoin the realtime session because there are unsaved changes.
+ckeditor.plugin.realtime.leavingCollaboration=Leaving realtime collaboration
+ckeditor.plugin.realtime.joiningCollaboration=Joining realtime collaboration
+
+ckeditor.plugin.upload.downloadingPastedImages=Downloading pasted images: {0} / {1}
+ckeditor.plugin.upload.imageDownloadFailed=Failed to download {0} out of {1} pasted images
+ckeditor.plugin.upload.starting=Starting upload in {0}s
+ckeditor.plugin.upload.uploadingPastedImages=Uploading pasted images: {0} / {1}
+ckeditor.plugin.upload.imageUploadFailed=Failed to upload {0} out of {1} pasted images
 
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 
@@ -300,6 +302,7 @@ resource.user.placeholder=alias
 
 resourcePicker.attach.hint=Select an attachment
 resourcePicker.doc.hint=Select a page
+resourcePicker.dropdown.toggle.title=Toggle the display of resource types.
 
 entityResourceSuggester.doc.placeholder=Find a page...
 entityResourceSuggester.attach.placeholder=Find an attachment...
@@ -325,12 +328,15 @@ macroSelector.filter.category.placeholder=Select a category...
 
 macroEditor.title=Edit Macro
 macroEditor.more=More
+macroEditor.required=Required
 macroEditor.changeMacro=Change Macro
 macroEditor.submit=Submit
 macroEditor.content=Content
 macroEditor.noParameters=This macro has no parameters.
 macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+macroEditor.parametersRequestFailed=Failed to retrieve the parameters for {0}.
 macroEditor.installRequestFailed=Failed to install the {0} macro.
+macroEditor.selectFeature=Select parameter {0}
 
 
 imageEditor.modal.changeImage.button=Change Image
@@ -354,6 +360,20 @@ imageSelector.modal.initialization.fail=Failed to retrieve the image selection f
 ## Deprecated since 14.10
 imageEditor.modal.backToEditor.button=Back
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=Document Tree
+
+## Deprecated since 16.10.10, 17.4.3, 17.6.0RC1
+ckeditor.plugin.link.uploadProgress=Uploading {0}...
+ckeditor.plugin.link.uploadSuccess=Successfully uploaded {0}
+ckeditor.plugin.link.uploadError=Failed to upload {0}
+ckeditor.plugin.image.slash.uploadProgress=Uploading {0}...
+ckeditor.plugin.image.slash.uploadSuccess=Successfully uploaded {0}
+ckeditor.plugin.image.slash.uploadError=Failed to upload {0}
+
+## Deprecated since 16.10.12, 17.4.5, 17.8.0
+ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=Temporarily leaving the realtime session.
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=No changes were made. Re-joining the realtime session.
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=There are unsaved changes, but no one else is in the realtime session. Re-joining.
+ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=Could not rejoin the realtime session because there are unsaved changes.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

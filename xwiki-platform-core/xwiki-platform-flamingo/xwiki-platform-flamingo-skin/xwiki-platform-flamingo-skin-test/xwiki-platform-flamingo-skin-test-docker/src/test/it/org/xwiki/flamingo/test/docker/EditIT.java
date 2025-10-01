@@ -129,7 +129,7 @@ public class EditIT
      */
     @Test
     @Order(2)
-    public void minorEdit(TestUtils setup, TestReference reference)
+    public void minorEdit(TestUtils setup, TestReference reference) throws Exception
     {
         setup.deletePage(reference);
         ViewPage vp = setup.gotoPage(reference);
@@ -139,14 +139,20 @@ public class EditIT
         // Save & Continue = minor edit.
         wep.clickSaveAndContinue();
 
+        wep.setContent("version=1.2");
+        wep.clickSaveAndContinue();
+
         wep.setContent("version=2.1");
 
         // Save & View = major edit
         wep.clickSaveAndView();
 
-        // Verify that the revision exists by navigating to it and by asserting its content
-        setup.gotoPage(reference, "view", "rev=2.1");
+        // Verify that the revisions exists by navigating to it and by asserting its content
+        setup.gotoPage(reference, "view", "rev=1.2");
+        vp = new ViewPage();
+        assertEquals("version=1.2", vp.getContent());
 
+        setup.gotoPage(reference, "view", "rev=2.1");
         vp = new ViewPage();
         assertEquals("version=2.1", vp.getContent());
 
@@ -159,6 +165,22 @@ public class EditIT
         setup.gotoPage(reference, "view", "rev=2.2");
         vp = new ViewPage();
         assertEquals("version=2.2", vp.getContent());
+
+        try {
+            // Verify that disabling the minor edit from preference hide it and prevent using it
+            setup.setWikiPreference("minoredit", "0");
+            wep = vp.editWiki();
+            assertFalse(wep.hasMinorEdit());
+
+            wep.setContent("version=3.1");
+            wep.clickSaveAndContinue();
+
+            setup.gotoPage(reference, "view", "rev=3.1");
+            vp = new ViewPage();
+            assertEquals("version=3.1", vp.getContent());
+        } finally {
+            setup.setWikiPreference("minoredit", "1");
+        }
     }
 
     /**
@@ -867,17 +889,15 @@ public class EditIT
 
         // Right now error messages from the server are different if we are using Save&View or Save&Continue.
         // This needs to be fixed as part of XWIKI-16425.
-        String saveContinueErrorMessage = "Failed to save the page. Reason: An error occured while saving: Error number"
+        String saveErrorMessage = "Failed to save the page. Reason: An error occured while saving: Error number"
             + " 3201 in 3: Exception while saving document " + setup.serializeReference(testReference) + ".";
-
-        String saveViewErrorMessage = "Failed to save the page. Reason: Server Error";
 
         // try with save and continue
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
         wikiEditPage.setTitle(veryLongTitle);
         wikiEditPage.clickSaveAndContinue(false);
         //wikiEditPage.waitForNotificationErrorMessage(saveContinueErrorMessage);
-        waitForSaveError(setup, wikiEditPage, saveContinueErrorMessage);
+        waitForSaveError(setup, saveErrorMessage);
         wikiEditPage.setTitle("Lorem Ipsum");
         wikiEditPage.clickSaveAndContinue();
 
@@ -885,7 +905,7 @@ public class EditIT
         wikiEditPage.setTitle(veryLongTitle);
         wikiEditPage.clickSaveAndView(false);
         //wikiEditPage.waitForNotificationErrorMessage(saveViewErrorMessage);
-        waitForSaveError(setup, wikiEditPage, saveViewErrorMessage);
+        waitForSaveError(setup, saveErrorMessage);
         wikiEditPage.setTitle("Lorem Ipsum version 2");
         ViewPage viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("Lorem Ipsum version 2", viewPage.getDocumentTitle());
@@ -911,12 +931,13 @@ public class EditIT
     }
 
     // FIXME: remove when https://jira.xwiki.org/browse/XWIKI-18513 is fixed
-    private void waitForSaveError(TestUtils setup, WikiEditPage wikiEditPage, String mainError)
+    private void waitForSaveError(TestUtils setup, String mainError)
     {
         String fallbackError = "Failed to save the page. Reason: Server not responding";
 
         By notificationMessageLocator =
-            By.xpath(String.format("//div[contains(@class,'xnotification-error') and (contains(., '%s') or contains(., '%s'))]", mainError, fallbackError));
+            By.xpath(String.format("//div[contains(@class,'xnotification-error') and "
+                + "(contains(., '%s') or contains(., '%s'))]", mainError, fallbackError));
         setup.getDriver().waitUntilElementIsVisible(notificationMessageLocator);
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.

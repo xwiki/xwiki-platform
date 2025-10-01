@@ -19,9 +19,12 @@
  */
 package org.xwiki.livedata;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Describes the live data selection configuration.
- * 
+ *
  * @version $Id$
  * @since 12.10.1
  * @since 13.0
@@ -43,11 +46,43 @@ public class LiveDataSelectionConfiguration implements InitializableLiveDataElem
 
     /**
      * Sets whether live data entry selection is enabled.
-     * 
+     *
      * @param enabled {@code true} to enable the live data entry selection, {@code false} to disable it
      */
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        LiveDataSelectionConfiguration that = (LiveDataSelectionConfiguration) o;
+
+        return new EqualsBuilder()
+            .append(this.enabled, that.enabled)
+            .isEquals();
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.enabled)
+            .toHashCode();
     }
 }

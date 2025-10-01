@@ -146,6 +146,7 @@ class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 
         // The document holding the UI extension object.
         this.componentDoc = mock(XWikiDocument.class, "xwiki:XWiki.MyUIExtension");
+        when(this.componentDoc.clone()).thenReturn(this.componentDoc);
         when(this.componentDoc.getDocumentReference()).thenReturn(DOC_REF);
         when(this.componentDoc.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
         when(this.componentDoc.getContentAuthorReference()).thenReturn(AUTHOR_REFERENCE);

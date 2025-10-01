@@ -32,7 +32,8 @@
   'reference': '',
   'root': '',
   'rootData': {},
-  'showRoot': false
+  'showRoot': false,
+  'expandToLevel': 0
 })
 
 #macro (tree $options)
@@ -79,7 +80,7 @@
   #set ($discard = $attributes.put('data-responsive', true))
   #if ("$!macro.options.reference" != '')
     #set ($resourceParams = {})
-    #foreach ($resourceParameterName in ['exclusions', 'limit', 'root', 'showRoot'])
+    #foreach ($resourceParameterName in ['exclusions', 'limit', 'root', 'showRoot', 'expandToLevel'])
       #set ($value = $macro.options.get($resourceParameterName))
       #set ($defaultValue = $defaultTreeOptions.get($resourceParameterName))
       #if ("$!value" != '' && $value != "$!defaultValue")

@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-api</artifactId>
   <name>XWiki Platform - User - API</name>
   <packaging>jar</packaging>
   <description>APIs to manipulate users and groups</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
     <xwiki.extension.name>User API</xwiki.extension.name>
     <xwiki.extension.features>
       <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->

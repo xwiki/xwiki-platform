@@ -46,7 +46,7 @@ admin.emailstatus=Statut d'envoi des courriels
 admin.emailstatus.description=Voir le statut des courriels envoyés et ré-envoyer les courriels qui sont revenus en échec.
 admin.emailstatus.hint=Si vous ne pouvez pas trouver le statut d'un courriel c'est probablement parce que la propriété qui a expédié ce courriel n'a pas spécifié que son statut devait persister.
 Mail.GeneralMailConfigClass_obfuscate=Masquer l'adresse email
-Mail.GeneralMailConfigClass_obfuscate.hint=Cela affecte seulement les adresses email enregistrées dans les propriétés de l'objet de type Email, aussi longtemps que l'afficheur par défaut pour le type de propriété Email n'est pas écrasé.
+Mail.GeneralMailConfigClass_obfuscate.hint=Ceci n'affecte que les adresses email enregistrées dans les propriétés de l'objet de type Email tant que l'afficheur par défaut pour le type de propriété Email n'est pas écrasé. Par example : a...@domain.org
 Mail.SendMailConfigClass_from=Adresse email de l'expéditeur
 Mail.SendMailConfigClass_from.hint=L'adresse email utilisée par défaut pour envoyer les courriels de notifications
 Mail.SendMailConfigClass_bcc=Adresses email en CCI (copie conforme invisible)
@@ -74,7 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Erreur
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Renvoyer
+Mail.SendMailStatus_livetable.delete=Supprimer
 mailSender.admin.resendSuccess=Le courriel a été envoyé avec succès
-mailSender.admin.resendFailure=Le courriel n'a pas pu être envoyé de nouveau. Cliquez pour avoir plus d'information.
+mailSender.admin.resendFailure=Impossible de renvoyer le courriel. Cliquez pour plus d'information.
+mailSender.admin.deleteSuccess=L'email a été supprimé avec succès
+mailSender.admin.deleteFailure=Impossible de supprimer l'email. Cliquez pour plus de détails.
 </content>
 </xwikidoc>

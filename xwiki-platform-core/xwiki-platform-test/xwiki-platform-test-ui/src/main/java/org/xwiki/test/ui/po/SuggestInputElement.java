@@ -210,15 +210,29 @@ public class SuggestInputElement extends BaseElement
     }
 
     /**
+     * Waits until suggestions beyond the option to choose the typed text are displayed.
+     *
+     * @return the current suggest input element
+     * @since 17.8.0RC1
+     * @since 17.4.5
+     * @since 16.10.12
+     */
+    public SuggestInputElement waitForNonTypedSuggestions()
+    {
+        getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading")
+            && !driver.findElements(By.cssSelector(".selectize-dropdown.active .xwiki-selectize-option")).isEmpty());
+        return this;
+    }
+
+    /**
      * Waits until the suggestions have disappeared.
      *
      * @return the current suggest input element
      */
     public SuggestInputElement waitForSuggestionsClearance()
     {
-        getDriver().waitUntilCondition(driver ->
-            getDriver().findElementsWithoutWaiting(this.container, By.xpath("//*[contains(@class, 'selectize-input') "
-                + "and contains(@class, 'dropdown-active')]")).size() == 0);
+        getDriver().waitUntilCondition(driver -> getDriver()
+            .findElementsWithoutWaiting(this.container, By.cssSelector(".selectize-input.dropdown-active")).isEmpty());
         return this;
     }
 
@@ -239,7 +253,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByIndex(int index)
     {
-        getDriver().findElementWithoutWaiting(
+        getDriver().findElement(
             By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
                 + "//*[contains(@class, 'xwiki-selectize-option')][" + (index + 1) + "]"))
             .click();
@@ -254,7 +268,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByValue(String value)
     {
-        getDriver().findElementWithoutWaiting(
+        getDriver().findElement(
             By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
                 + "//*[contains(@class, 'xwiki-selectize-option') and @data-value = '" + value + "']"))
             .click();
@@ -269,7 +283,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectByVisibleText(String text)
     {
-        getDriver().findElementWithoutWaiting(
+        getDriver().findElement(
             By.xpath("//*[contains(@class, 'selectize-dropdown') and contains(@class, 'active')]"
                 + "//*[contains(@class, 'xwiki-selectize-option-label') and . = '" + text + "']"))
             .click();
@@ -284,7 +298,7 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement selectTypedText()
     {
-        getDriver().findElementWithoutWaiting(By.cssSelector(".selectize-dropdown.active .create")).click();
+        getDriver().findElement(By.cssSelector(".selectize-dropdown.active .create")).click();
 
         return this;
     }
@@ -318,8 +332,19 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement hideSuggestions()
     {
-        getTextInput().sendKeys(Keys.ESCAPE);
-        waitForSuggestionsClearance();
+        if (isDropDownOpened()) {
+            getTextInput().sendKeys(Keys.ESCAPE);
+            waitForSuggestionsClearance();
+        }
         return this;
+    }
+
+    /**
+     * @return {@code true} if the suggestions dropdown is opened, {@code false} otherwise
+     */
+    public boolean isDropDownOpened()
+    {
+        return !getDriver()
+            .findElementsWithoutWaiting(this.container, By.cssSelector(".selectize-input.dropdown-active")).isEmpty();
     }
 }

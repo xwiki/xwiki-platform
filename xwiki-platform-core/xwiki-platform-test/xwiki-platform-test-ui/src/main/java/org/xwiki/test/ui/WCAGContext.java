@@ -432,6 +432,9 @@ public class WCAGContext
     }
 
     /**
+     * This setter allows among other things to disable the WCAG validation for a single page test.
+     * This should only be done with careful consideration. 
+     * Keep track of such usages in our `WCAG Testing` documentation.
      * @param wcag validation enabled setup parameter to use in the test suite.
      */
     public void setWCAGEnabled(boolean wcag)

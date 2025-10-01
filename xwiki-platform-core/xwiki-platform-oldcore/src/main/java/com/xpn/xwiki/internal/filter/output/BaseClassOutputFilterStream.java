@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class BaseClassOutputFilterStream extends AbstractEntityOutputFilterStream<BaseClass> implements Initializable
+public class BaseClassOutputFilterStream extends AbstractElementOutputFilterStream<BaseClass> implements Initializable
 {
     @Inject
     private EntityOutputFilterStream<PropertyClass> propertyFilter;

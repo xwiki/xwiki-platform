@@ -21,6 +21,7 @@ package com.xpn.xwiki.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,10 +29,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +45,16 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.filter.output.DefaultWriterOutputTarget;
+import org.xwiki.filter.output.OutputTarget;
+import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageReference;
@@ -1164,6 +1171,24 @@ public class Document extends Api
     }
 
     /**
+     * Creates a new XObject from the given class reference.
+     *
+     * @param classReference the reference to the class of the XObject to be created
+     * @return the object created
+     * @throws XWikiException if an error occurs while creating the XObject
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    public Object newObject(EntityReference classReference) throws XWikiException
+    {
+        int index = getDoc().createXObject(classReference, getXWikiContext());
+
+        updateAuthor();
+
+        return getObject(classReference, index);
+    }
+
+    /**
      * @return true of the document has been loaded from cache
      */
     public boolean isFromCache()
@@ -1220,6 +1245,21 @@ public class Document extends Api
     public Vector<Object> getObjects(String className)
     {
         List<BaseObject> objects = this.getDoc().getXObjects(this.doc.resolveClassReference(className));
+        return getXObjects(objects);
+    }
+
+    /**
+     * Retrieves and returns all objects corresponding to the class reference corresponding to the resolution of the
+     * given entity reference, or an empty list if there are none.
+     *
+     * @param classReference the reference that is resolved to an XClass for retrieving the corresponding xobjects
+     * @return a list of xobjects corresponding to the given XClass or an empty list.
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    public List<Object> getObjects(EntityReference classReference)
+    {
+        List<BaseObject> objects = this.getDoc().getXObjects(classReference);
         return getXObjects(objects);
     }
 
@@ -1382,6 +1422,29 @@ public class Document extends Api
     }
 
     /**
+     * Gets the object matching the given class reference and given object number.
+     *
+     * @param classReference the reference of the class of the object
+     * @param nb the number of the object
+     * @return the XWiki Object
+     * @since 17.4.0RC1
+     */
+    @Unstable
+    public Object getObject(EntityReference classReference, int nb)
+    {
+        try {
+            BaseObject obj = this.getDoc().getXObject(classReference, nb);
+            if (obj == null) {
+                return null;
+            } else {
+                return newObjectApi(obj, getXWikiContext());
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * @param objectReference the object reference
      * @return the XWiki object from this document that matches the specified object reference
      * @since 12.3RC1
@@ -1419,10 +1482,24 @@ public class Document extends Api
 
     public String getXMLContent() throws XWikiException
     {
-        String xml = this.doc.getXMLContent(getXWikiContext());
-        return getXWikiContext().getUtil().substitute("s/<email>.*?<\\/email>/<email>********<\\/email>/goi",
-            getXWikiContext().getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
-                xml));
+        StringWriter writer = new StringWriter();
+        OutputTarget outputTarget = new DefaultWriterOutputTarget(writer);
+
+        DocumentInstanceInputProperties documentProperties = new DocumentInstanceInputProperties();
+        documentProperties.setWithWikiDocumentContentHTML(true);
+        documentProperties.setWithWikiAttachmentsContent(false);
+        documentProperties.setWithJRCSRevisions(false);
+        documentProperties.setWithRevisions(false);
+        documentProperties.setExcludedPropertyTypes(Set.of("Email", "Password"));
+
+        // Output
+        XAROutputProperties xarProperties = new XAROutputProperties();
+        xarProperties.setPreserveVersion(false);
+        xarProperties.setTarget(outputTarget);
+
+        this.doc.toXML(documentProperties, xarProperties);
+
+        return writer.toString();
     }
 
     public String toXML() throws XWikiException
@@ -1664,7 +1741,7 @@ public class Document extends Api
     /**
      * Displays the given field. The display mode will be decided depending on page context (edit or inline context will
      * display in edit, view context in view) This function uses the active object or will find the first object that
-     * has the given field. This function can return html inside and html macro
+     * has the given field. This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @return the display of the field.
@@ -1680,7 +1757,7 @@ public class Document extends Api
 
     /**
      * Displays the given field in the given mode. This function uses the active object or will find the first object
-     * that has the given field. This function can return html inside and html macro
+     * that has the given field. This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @param mode display mode to use (view, edit, hidden, search)
@@ -1697,7 +1774,7 @@ public class Document extends Api
 
     /**
      * Displays the given field in the given mode. This function uses the active object or will find the first object
-     * that has the given field. This function can return html inside and html macro A given prefix is added to the
+     * that has the given field. This function can return html inside an html macro. A given prefix is added to the
      * field names when these are forms.
      *
      * @param fieldname fieldname to display
@@ -1717,7 +1794,7 @@ public class Document extends Api
 
     /**
      * Displays the given field of the given object The display mode will be decided depending on page context (edit or
-     * inline context will display in edit, view context in view) This function can return html inside and html macro
+     * inline context will display in edit, view context in view). This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @param obj object from which to take the field
@@ -1858,6 +1935,25 @@ public class Document extends Api
         } else {
             return new Attachment(this, attach, getXWikiContext());
         }
+    }
+
+    /**
+     * @param filename the name of the attachment
+     * @return the attachment with the given filename or null if the attachment doesn’t exist
+     * @since 17.2.0RC1
+     */
+    public Attachment removeAttachment(String filename)
+    {
+        XWikiAttachment attachment = getDoc().getAttachment(filename);
+        if (attachment != null) {
+            attachment = this.doc.removeAttachment(attachment);
+
+            if (attachment != null) {
+                return new Attachment(this, attachment, getXWikiContext());
+            }
+        }
+
+        return null;
     }
 
     public List<Delta> getContentDiff(Document origdoc, Document newdoc)
@@ -2477,7 +2573,7 @@ public class Document extends Api
         return this.doc.isCreator(username);
     }
 
-    public void set(String fieldname, java.lang.Object value)
+    public void set(String fieldname, java.lang.Object value) throws XWikiException
     {
         Object obj;
         if (this.currentObj != null) {
@@ -2488,7 +2584,7 @@ public class Document extends Api
         set(fieldname, value, obj);
     }
 
-    public void set(String fieldname, java.lang.Object value, Object obj)
+    public void set(String fieldname, java.lang.Object value, Object obj) throws XWikiException
     {
         if (obj == null) {
             return;
@@ -3194,11 +3290,17 @@ public class Document extends Api
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newReference the reference to the new document
      * @throws XWikiException in case of an error
      * @since 2.3M2
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public void rename(DocumentReference newReference) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
@@ -3224,13 +3326,18 @@ public class Document extends Api
      * <p>
      * Note: links without a space are renamed with the space added and all documents which have the document being
      * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
-     * </p>
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
      *            new renamed document.
      * @throws XWikiException in case of an error
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public void rename(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
     {
         rename(newDocumentName, backlinkDocumentNames, Collections.emptyList());
@@ -3239,13 +3346,19 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
      *            new renamed document.
      * @param childDocumentNames the list of documents whose parent field will be set to the new document name.
      * @throws XWikiException in case of an error
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames)
         throws XWikiException
     {
@@ -3266,6 +3379,9 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newReference the reference to the new document
      * @param backlinkDocumentNames the list of reference to documents to parse and for which links will be modified to
@@ -3274,7 +3390,10 @@ public class Document extends Api
      *            reference
      * @throws XWikiException in case of an error
      * @since 2.3M2
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public void rename(DocumentReference newReference, List<DocumentReference> backlinkDocumentNames,
         List<DocumentReference> childDocumentNames) throws XWikiException
     {

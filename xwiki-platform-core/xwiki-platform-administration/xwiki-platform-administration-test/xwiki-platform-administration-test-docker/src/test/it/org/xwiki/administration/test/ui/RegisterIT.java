@@ -64,7 +64,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 13.4RC1
  * @since 12.10.8
  */
-@UITest
+@UITest(
+    properties = {
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class RegisterIT
 {
     private AbstractRegistrationPage setUp(TestUtils testUtils, boolean isModal, boolean closeWiki,
@@ -261,7 +270,7 @@ class RegisterIT
         // Can't use validateAndRegister here because user existence is not checked by LiveValidation.
         assertFalse(tryToRegister(testUtils, registrationPage, isModal));
         if (closedWiki) {
-            assertTrue(registrationPage.errorMessageInclude("Error: User already exists."));
+            assertTrue(registrationPage.errorMessageInclude("User already exists."));
         } else {
             assertTrue(registrationPage.validationFailureMessagesInclude("User already exists."));
         }
@@ -347,7 +356,7 @@ class RegisterIT
             assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
                 + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
             // TODO: looks like a pretty strange behavior, there might be a message box title missing somewhere
-            String messagePrefix = closedWiki ? "" : "Information ";
+            String messagePrefix = "Information ";
             messagePrefix = !closedWiki&&withRegistrationConfig ? "Welcome ": messagePrefix;
             // TODO: clean up this test with a better final assertion. 
             //  As of now, the string retrieved changes a lot depending on the test parameters

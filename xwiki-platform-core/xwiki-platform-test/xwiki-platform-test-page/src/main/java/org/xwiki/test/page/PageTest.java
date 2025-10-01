@@ -31,6 +31,8 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.container.servlet.HttpServletRequestStub;
+import org.xwiki.container.servlet.HttpServletResponseStub;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
@@ -50,6 +52,8 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityManager;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -60,10 +64,6 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
-
-import net.sf.json.JSON;
-import net.sf.json.JSONException;
-import net.sf.json.JSONSerializer;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -89,12 +89,32 @@ public class PageTest
 
     /**
      * The stubbed request used to simulate a real Servlet Request.
+     * 
+     * @since 17.0.0RC1
      */
+    protected HttpServletRequestStub stubRequest;
+
+    /**
+     * The javax version of the stubbed request used to simulate a real Servlet Request.
+     * 
+     * @deprecated use {@link #stubRequest} instead
+     */
+    @Deprecated(since = "17.0.0RC1")
     protected XWikiServletRequestStub request;
 
     /**
      * The stubbed response used to simulate a real Servlet Response.
+     * 
+     * @since 17.0.0RC1
      */
+    protected HttpServletResponseStub stubResponse;
+
+    /**
+     * The javax version of the stubbed response used to simulate a real Servlet Response.
+     * 
+     * @deprecated use {@link #stubResponse} instead
+     */
+    @Deprecated(since = "17.0.0RC1")
     protected XWikiServletResponseStub response;
 
     /**
@@ -205,21 +225,16 @@ public class PageTest
     }
 
     /**
-     * Load a given document reference, render it and parse it as JSON using {@link JSONSerializer}.
+     * Load a given document reference, render it and parse the result as JSON.
      *
      * @param reference the reference of the document to load, render, and parse as JSON
-     * @param <T> a subclass of {@link JSON}
-     * @return the result of the parsing of the rendering of the document using {@link JSONSerializer}
+     * @return the result of the parsing of the rendering of the document
      * @throws Exception in case of error when rendering or parsing the document
      */
-    protected <T extends JSON> T renderJSONPage(DocumentReference reference) throws Exception
+    protected JsonNode renderJSONPage(DocumentReference reference) throws Exception
     {
         String jsonString = renderPage(reference);
-        try {
-            return (T) JSONSerializer.toJSON(jsonString.trim());
-        } catch (JSONException e) {
-            throw new RuntimeException(String.format("Failed to parse [%s]", jsonString), e);
-        }
+        return new ObjectMapper().readTree(jsonString);
     }
 
     /**
@@ -261,39 +276,42 @@ public class PageTest
     void setUpForPageTest() throws Exception
     {
         // Configure mocks from OldcoreRule
-        context = oldcore.getXWikiContext();
-        xwiki = oldcore.getSpyXWiki();
+        this.context = this.oldcore.getXWikiContext();
+        this.xwiki = this.oldcore.getSpyXWiki();
 
         // We need this one because some component in its init creates a query...
-        when(oldcore.getQueryManager().createQuery(any(String.class), any(String.class))).thenReturn(mock(Query.class));
+        when(this.oldcore.getQueryManager().createQuery(any(String.class), any(String.class)))
+            .thenReturn(mock(Query.class));
 
         // Set up a fake Request
         // Configure request so that $!request.outputSyntax" == 'plain
         // Need to be executed before ecm.initialize() so that XWikiScriptContextInitializer will initialize the
         // script context properly
-        request = new XWikiServletRequestStub();
-        request.setScheme("http");
-        context.setRequest(request);
+        this.stubRequest = new HttpServletRequestStub();
+        this.request = new XWikiServletRequestStub(this.stubRequest);
+        this.request.setScheme("http");
+        this.context.setRequest(this.request);
 
-        response = new XWikiServletResponseStub();
-        context.setResponse(response);
+        this.stubResponse = new HttpServletResponseStub();
+        this.response = new XWikiServletResponseStub(this.stubResponse);
+        this.context.setResponse(this.response);
 
-        ExecutionContextManager ecm = componentManager.getInstance(ExecutionContextManager.class);
-        ecm.initialize(oldcore.getExecutionContext());
+        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        ecm.initialize(this.oldcore.getExecutionContext());
 
-        // Let the user have view access to all pages
-        when(oldcore.getMockRightService().hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), any(),
-            eq(context))).thenReturn(true);
-        when(oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.VIEW), any())).thenReturn(true);
+        // Let the user have view access on all pages
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), any(), eq(context)))
+            .thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.VIEW), any())).thenReturn(true);
 
         // Set up URL Factory
-        URLFactorySetup.setUp(context);
+        URLFactorySetup.setUp(this.context);
 
         // Set up Localization
-        LocalizationSetup.setUp(componentManager);
+        LocalizationSetup.setUp(this.componentManager);
 
         // Set up Skin Extensions
-        SkinExtensionSetup.setUp(xwiki, context);
+        SkinExtensionSetup.setUp(this.xwiki, this.context);
     }
 
     /**

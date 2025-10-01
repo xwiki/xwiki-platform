@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -186,6 +189,39 @@ public class LiveDataQuery implements InitializableLiveDataElement
         {
             return constraints;
         }
+
+        /**
+         * @since 17.4.0RC1
+         */
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            Filter filter = (Filter) o;
+
+            return new EqualsBuilder()
+                .append(this.matchAll, filter.matchAll)
+                .append(this.property, filter.property)
+                .append(this.constraints, filter.constraints)
+                .isEquals();
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return new HashCodeBuilder(17, 37)
+                .append(this.property)
+                .append(this.matchAll)
+                .append(this.constraints)
+                .toHashCode();
+        }
     }
 
     /**
@@ -268,6 +304,35 @@ public class LiveDataQuery implements InitializableLiveDataElement
         {
             this.value = value;
         }
+
+        /**
+         * @since 17.4.0RC1
+         */
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            Constraint that = (Constraint) o;
+
+            return new EqualsBuilder().append(this.operator, that.operator)
+                .append(this.value, that.value).isEquals();
+        }
+
+        /**
+         * @since 17.4.0RC1
+         */
+        @Override
+        public int hashCode()
+        {
+            return new HashCodeBuilder(17, 37).append(this.operator).append(this.value).toHashCode();
+        }
     }
 
     /**
@@ -349,6 +414,40 @@ public class LiveDataQuery implements InitializableLiveDataElement
         public void setDescending(boolean descending)
         {
             this.descending = descending;
+        }
+
+        /**
+         * @since 17.4.0RC1
+         */
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            SortEntry sortEntry = (SortEntry) o;
+
+            return new EqualsBuilder()
+                .append(this.descending, sortEntry.descending)
+                .append(this.property, sortEntry.property)
+                .isEquals();
+        }
+
+        /**
+         * @since 17.4.0RC1
+         */
+        @Override
+        public int hashCode()
+        {
+            return new HashCodeBuilder(17, 37)
+                .append(this.property)
+                .append(this.descending)
+                .toHashCode();
         }
     }
 
@@ -511,5 +610,47 @@ public class LiveDataQuery implements InitializableLiveDataElement
         if (this.limit == null) {
             this.limit = 15;
         }
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        LiveDataQuery that = (LiveDataQuery) o;
+
+        return new EqualsBuilder()
+            .append(this.properties, that.properties)
+            .append(this.source, that.source)
+            .append(this.filters, that.filters)
+            .append(this.sort, that.sort)
+            .append(this.offset, that.offset)
+            .append(this.limit, that.limit)
+            .isEquals();
+    }
+
+    /**
+     * @since 17.4.0RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.properties)
+            .append(this.source)
+            .append(this.filters)
+            .append(this.sort)
+            .append(this.offset)
+            .append(this.limit)
+            .toHashCode();
     }
 }

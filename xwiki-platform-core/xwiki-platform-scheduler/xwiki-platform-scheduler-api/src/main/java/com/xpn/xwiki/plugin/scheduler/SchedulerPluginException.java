@@ -56,6 +56,8 @@ public class SchedulerPluginException extends PluginException
     
     protected static final int ERROR_SCHEDULERPLUGIN_TRIGGER_JOB = 90012;
 
+    protected static final int ERROR_SCHEDULERPLUGIN_DISABLED = 90013;
+
     public SchedulerPluginException(int code, String message)
     {
         super(SchedulerPlugin.class, code, message);

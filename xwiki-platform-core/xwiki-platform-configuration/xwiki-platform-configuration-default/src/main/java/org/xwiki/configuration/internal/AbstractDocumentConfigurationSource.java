@@ -37,7 +37,6 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.model.reference.DocumentReference;
@@ -70,8 +69,8 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
  * @version $Id$
  * @since 2.0M2
  */
-public abstract class AbstractDocumentConfigurationSource extends AbstractConfigurationSource
-    implements Initializable, Disposable
+public abstract class AbstractDocumentConfigurationSource extends AbstractSystemOverwriteConfigurationSource
+    implements Disposable
 {
     /**
      * Represents no value (ie the default value will be used) in xproperties.
@@ -132,6 +131,8 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public void initialize() throws InitializationException
     {
+        super.initialize();
+
         // Initialize cache
         try {
             this.cache = this.cacheManager.createNewCache(new CacheConfiguration(getCacheId()));
@@ -195,7 +196,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     }
 
     @Override
-    public boolean containsKey(String key)
+    protected boolean containsKeyInternal(String key)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -247,15 +248,14 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     }
 
     protected void setBaseProperty(String propertyName, Object propertyValue, BaseObject baseObject,
-        BaseClass baseClass)
+        BaseClass baseClass) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
         // Convert boolean into integer if the target property is of boolean type, since booleans are implemented
         // as integer in xproperties.
         Object normalizedPropertyValue = propertyValue;
-        if (baseClass.get(propertyName) instanceof BooleanClass && propertyValue instanceof Boolean)
-        {
+        if (baseClass.get(propertyName) instanceof BooleanClass && propertyValue instanceof Boolean) {
             normalizedPropertyValue = ((Boolean) propertyValue) ? 1 : 0;
         }
 
@@ -263,7 +263,13 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     }
 
     @Override
-    public List<String> getKeys()
+    protected List<String> getKeysInternal()
+    {
+        return getKeys("");
+    }
+
+    @Override
+    protected List<String> getKeysInternal(String prefix)
     {
         List<String> keys = Collections.emptyList();
 
@@ -280,7 +286,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
                     for (String key : properties) {
                         // We need to check if the key really have a value as otherwise it does not really make sense to
                         // return it
-                        if (containsKey(key)) {
+                        if (key.startsWith(prefix) && containsKey(key)) {
                             keys.add(key);
                         }
                     }
@@ -294,12 +300,10 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     }
 
     @Override
-    public <T> T getProperty(String key, T defaultValue)
+    protected <T> T getPropertyInternal(String key, T defaultValue)
     {
         T result = getPropertyValue(key, defaultValue != null ? (Class<T>) defaultValue.getClass() : null);
 
-        // Make sure we don't return null values for List and Properties (they must return empty elements
-        // when using the typed API).
         if (result == null) {
             result = defaultValue;
         }
@@ -308,7 +312,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     }
 
     @Override
-    public <T> T getProperty(String key, Class<T> valueClass)
+    protected <T> T getPropertyInternal(String key, Class<T> valueClass)
     {
         T result = getPropertyValue(key, valueClass);
 
@@ -322,8 +326,18 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     }
 
     @Override
+    protected <T> T getPropertyInternal(String key, Class<T> valueClass, T defaultValue)
+    {
+        if (containsKey(key)) {
+            return getPropertyInternal(key, valueClass);
+        }
+
+        return defaultValue;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    public <T> T getProperty(String key)
+    protected <T> T getPropertyInternal(String key)
     {
         return (T) getPropertyValue(key, null);
     }
@@ -354,8 +368,9 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
                     // Void.TYPE is used to keep track of fields that don't exist
                     this.cache.set(cacheKey, result == null ? Void.TYPE : result);
                 } catch (XWikiException e) {
-                    this.logger.error("Failed to access configuration value for property [{}]. Ignoring by returning "
-                        + "null", key, e);
+                    this.logger.error(
+                        "Failed to access configuration value for property [{}]. Ignoring by returning " + "null", key,
+                        e);
                 }
             }
         }
@@ -369,9 +384,15 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     }
 
     @Override
-    public boolean isEmpty()
+    protected boolean isEmptyInternal()
     {
         return getKeys().isEmpty();
+    }
+
+    @Override
+    protected boolean isEmptyInternal(String prefix)
+    {
+        return getKeys(prefix).isEmpty();
     }
 
     @Override
@@ -387,24 +408,24 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
             List<String> setPropertyNames = new ArrayList<>();
             BaseObject baseObject = getBaseObject();
             if (baseObject != null) {
+                XWikiDocument modifiedDocument = baseObject.getOwnerDocument().clone();
+                // Find the object to modify back in the cloned document.
+                baseObject = modifiedDocument.getXObject(baseObject.getReference());
+
                 XWikiContext xcontext = this.xcontextProvider.get();
                 BaseClass baseClass = baseObject.getXClass(xcontext);
                 for (Map.Entry<String, Object> entry : properties.entrySet()) {
                     setBaseProperty(entry.getKey(), entry.getValue(), baseObject, baseClass);
                     setPropertyNames.add(entry.getKey());
                 }
-                DocumentReference documentReference = getFailsafeDocumentReference();
-                if (documentReference != null) {
-                    xcontext.getWiki().saveDocument(getDocument(), String.format("Set properties: %s",
-                        StringUtils.join(setPropertyNames, ',')), xcontext);
-                } else {
-                    // The configuration document doesn't exist, don't do anything
-                }
+                xcontext.getWiki().saveDocument(modifiedDocument,
+                    String.format("Set properties: %s", StringUtils.join(setPropertyNames, ',')), xcontext);
             }
         } catch (Exception e) {
-            throw new ConfigurationSaveException(String.format("Failed to set properties [%s] in document [%s]'s [%s] "
-                + "xobject", getPropertyListAsString(properties), getFailsafeClassReference(),
-                getFailsafeClassReference()), e);
+            throw new ConfigurationSaveException(
+                String.format("Failed to set properties [%s] in document [%s]'s [%s] " + "xobject",
+                    getPropertyListAsString(properties), getFailsafeClassReference(), getFailsafeClassReference()),
+                e);
         }
     }
 

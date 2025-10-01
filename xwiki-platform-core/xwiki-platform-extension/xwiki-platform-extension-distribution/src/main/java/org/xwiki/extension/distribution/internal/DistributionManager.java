@@ -134,11 +134,12 @@ public interface DistributionManager
     /**
      * Starts the distribution job.
      * 
-     * @param wiki the wiki associated to the distribution wyzard
+     * @param wiki the wiki associated to the distribution wizard
+     * @param waitReady if the method should return only when the job is actually running (or finished)
      * @return the distribution job object that can be used to get information like the job status
-     * @since 5.0RC1
+     * @since 17.4.0RC1
      */
-    DistributionJob startWikiJob(String wiki);
+    DistributionJob startWikiJob(String wiki, boolean waitReady);
 
     /**
      * @return the distribution job object that can be used to get information like the job status

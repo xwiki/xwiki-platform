@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-icon</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon-macro</artifactId>
   <name>XWiki Platform - Icon - Macro</name>
@@ -62,6 +62,8 @@
       <artifactId>xwiki-platform-rendering-async-macro</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-test</artifactId>
@@ -87,13 +89,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-el</artifactId>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- For UserReferenceSerializer -->
@@ -105,10 +107,10 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
+      <type>pom</type>
       <scope>test</scope>
-      <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

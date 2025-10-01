@@ -162,15 +162,50 @@
         },
         validate: function() {
           var resourceReference = this.getValue();
+          var resourceTypeConfig = $resource.types[resourceReference.type] || {};
           if (resourceReference.reference === '') {
             // Check if the selected resource type supports empty references.
-            var resourceTypeConfig = $resource.types[resourceReference.type] || {};
             if (resourceTypeConfig.allowEmptyReference !== true) {
               return this.getDialog().getParentEditor().localization.get('xwiki-resource.notSpecified',
                 this.getLabelElement().getText());
             }
+          } else if (resourceReference.notSelected && resourceTypeConfig.mustBeSelected) {
+            return this.validateInput(resourceReference);
           }
           return true;
+        },
+        validateInput: function(resourceReference) {
+          if (!this.validationRequest) {
+            // Trigger a new validation.
+            this.validationRequest = this.validateAsync(resourceReference).always(() => {
+              // Re-submit the dialog after the current event is handled.
+              setTimeout(() => {
+                this.getDialog().click('ok');
+              }, 0);
+            });
+            return false;
+          } else if (this.validationRequest.state() === 'pending') {
+            // Block the submit while the validation takes place.
+            return false;
+          } else {
+            // Trigger a new validation next time validate() is called.
+            delete this.validationRequest;
+            if (!this.validationRequestResult) {
+              return this.getDialog().getParentEditor().localization.get('xwiki-resource.selectValue');
+            }
+          }
+        },
+        validateAsync(resourceReference) {
+          return $.post(new XWiki.Document('LinkNameStrategyHelper', 'CKEditor').getURL('get'), {
+            outputSyntax: 'plain',
+            input: resourceReference.reference,
+            action: 'validate'
+          }).done(data => {
+            this.validationRequestResult = data.validated;
+          }).fail(error => {
+            console.error("Error while loading validation link response", error);
+            this.validationRequestResult = false;
+          });
         },
         getValue: function() {
           var resourcePickerInput = this.getResourcePickerInput();
@@ -187,6 +222,10 @@
               this.selectedResource.reference.reference === resourceReference.reference) {
             // Preserve the typed field if the resource type and reference have not changed.
             resourceReference.typed = this.selectedResource.reference.typed;
+          }
+          if (this.selectedResource.reference.isInitialValue ||
+              this.selectedResource.reference.reference !== resourceReference.reference) {
+            resourceReference.notSelected = true;
           }
           return resourceReference;
         },

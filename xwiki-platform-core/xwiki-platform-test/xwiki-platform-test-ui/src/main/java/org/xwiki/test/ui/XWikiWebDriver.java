@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
@@ -436,7 +437,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         waitUntilCondition(driver -> {
             try {
                 WebElement element = driver.findElement(locator);
-                return !element.getAttribute(attributeName).isEmpty();
+                return StringUtils.isNotEmpty(element.getAttribute(attributeName));
             } catch (NotFoundException e) {
                 return false;
             } catch (StaleElementReferenceException e) {
@@ -971,5 +972,33 @@ public class XWikiWebDriver extends RemoteWebDriver
                 return false;
             }
         });
+    }
+
+    /**
+     * @param element the element to check if it is visible
+     * @param xOffset the horizontal offset from the element's left border
+     * @param yOffset the vertical offset from the element's top border
+     * @return {@code true} if the specified point inside the given element is visible (inside the viewport),
+     *         {@code false} otherwise
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public boolean isVisible(WebElement element, int xOffset, int yOffset)
+    {
+        StringBuilder script = new StringBuilder();
+        script.append("const element = arguments[0];\n");
+        script.append("const xOffset = arguments[1];\n");
+        script.append("const yOffset = arguments[2];\n");
+        script.append("const box = element.getBoundingClientRect();\n");
+        script.append("const x = box.left + xOffset;\n");
+        script.append("const y = box.top + yOffset;\n");
+        script.append("let target = document.elementFromPoint(x, y);\n");
+        script.append("for (; target; target = target.parentElement) {\n");
+        script.append("  if (target === element) {\n");
+        script.append("    return true;\n");
+        script.append("  }\n");
+        script.append("}\n");
+        script.append("return false;\n");
+        return (boolean) executeScript(script.toString(), element, xOffset, yOffset);
     }
 }

@@ -1,0 +1,54 @@
+{
+  "name": "xwiki-platform-livedata",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "test:unit": "vitest --run",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build",
+    "lint": "eslint . --fix",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "dompurify": "3.2.6",
+    "eventemitter3": "5.0.1",
+    "lz-string": "1.5.0",
+    "u-node": "0.0.2",
+    "vue-i18n": "11.1.12",
+    "vue-tippy": "6.7.1",
+    "vue3-touch-events": "5.0.13",
+    "vuedraggable": "4.1.0"
+  },
+  "peerDependencies": {
+    "vue": "3.x"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "22.0.2",
+    "@types/jsdom": "21.1.7",
+    "@types/node": "22.18.0",
+    "@vitejs/plugin-vue": "6.0.1",
+    "@vitest/eslint-plugin": "1.3.4",
+    "@vue/eslint-config-prettier": "10.2.0",
+    "@vue/eslint-config-typescript": "14.6.0",
+    "@vue/test-utils": "2.4.6",
+    "@vue/tsconfig": "0.7.0",
+    "eslint": "9.34.0",
+    "eslint-plugin-vue": "10.4.0",
+    "flush-promises": "1.0.2",
+    "jiti": "2.4.2",
+    "jquery": "3.7.1",
+    "jsdom": "26.1.0",
+    "lodash": "4.17.21",
+    "npm-run-all2": "8.0.4",
+    "sinon": "21.0.0",
+    "typescript": "5.9.2",
+    "vite": "7.1.7",
+    "vitest": "3.2.4",
+    "vue": "3.5.22",
+    "vue-tsc": "3.0.6"
+  }
+}

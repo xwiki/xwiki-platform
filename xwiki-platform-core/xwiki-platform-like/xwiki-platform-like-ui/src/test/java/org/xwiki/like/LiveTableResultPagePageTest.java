@@ -39,11 +39,9 @@ import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.user.UserReferenceComponentList;
 import org.xwiki.velocity.tools.JSONTool;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import net.sf.json.JSON;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -97,13 +95,13 @@ class LiveTableResultPagePageTest extends PageTest
         this.request.put("reqNo", "1");
         this.request.put("limit", "10");
 
-        JSONObject object = renderJSON(DOCUMENT_REFERENCE);
+        JsonNode json = renderJSON(DOCUMENT_REFERENCE);
 
-        assertEquals("xwiki:Space.With\\.ADot", object.getJSONArray("rows").getJSONObject(0).getString("doc_fullName"));
+        assertEquals("xwiki:Space.With\\.ADot", json.get("rows").get(0).get("doc_fullName")
+            .asText());
     }
 
-    @SuppressWarnings("unchecked")
-    private <T extends JSON> T renderJSON(DocumentReference documentReference) throws Exception
+    private JsonNode renderJSON(DocumentReference documentReference) throws Exception
     {
         JSONTool jsonTool = mock(JSONTool.class);
         registerVelocityTool("jsontool", jsonTool);
@@ -113,6 +111,6 @@ class LiveTableResultPagePageTest extends PageTest
         ArgumentCaptor<Object> argument = ArgumentCaptor.forClass(Object.class);
         verify(jsonTool).serialize(argument.capture());
 
-        return (T) JSONSerializer.toJSON(argument.getValue());
+        return new ObjectMapper().valueToTree(argument.getValue());
     }
 }

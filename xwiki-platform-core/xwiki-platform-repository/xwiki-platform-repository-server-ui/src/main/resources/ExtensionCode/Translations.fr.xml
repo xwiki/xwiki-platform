@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Nom
 extension.repository.summary=Résumé
 extension.repository.type=Type
@@ -49,5 +49,34 @@ extension.repository.rating=Evalutations
 extension.repository.installedCount=Installations
 
 ## Administration UI
-admin.repository=Référentiel d'extensions</content>
+admin.repository=Référentiel d'extensions
+
+## Support
+repository.support.createsupporter=S'inscrire
+
+## Supporters
+### Missing: repository.supporter.sheet.description=This page controls how ExtensionSupporter pages are displayed in both view and edit modes.
+### Missing: repository.supporter.sheet.noObject=The current page doesn't have the expected ExtensionSupporter object.
+repository.supporter.sheet.createplan=Ajouter
+### Missing: repository.supporter.sheet.plans=Plans
+### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
+ExtensionCode.ExtensionSupporterClass_doc.title=Nom
+ExtensionCode.ExtensionSupporterClass_summary=Résumé
+ExtensionCode.ExtensionSupporterClass_url=URL
+ExtensionCode.ExtensionSupporterClass_email=Email
+ExtensionCode.ExtensionSupporterClass_content=Détails
+ExtensionCode.ExtensionSupporterClass_active=Actif
+
+## Support plans
+### Missing: repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
+### Missing: repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
+### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+ExtensionCode.ExtensionSupportPlanClass_doc.title=Nom
+ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
+ExtensionCode.ExtensionSupportPlanClass_summary=Résumé
+ExtensionCode.ExtensionSupportPlanClass_url=URL
+ExtensionCode.ExtensionSupportPlanClass_content=Détails
+ExtensionCode.ExtensionSupportPlanClass_active=Actif
+ExtensionCode.ExtensionSupportPlanClass_paying=Paiement
+</content>
 </xwikidoc>

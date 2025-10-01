@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,6 +48,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -59,7 +61,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named("database")
-public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
+public class DatabaseDocumentIterator extends AbstractDocumentIterator<DocumentIteratorEntry>
 {
     /**
      * The current index in the list of {@link #results}.
@@ -126,24 +128,36 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
     @Override
     public boolean hasNext()
     {
-        return getResults().size() > index;
+        return getResults().size() > this.index;
     }
 
     @Override
-    public Pair<DocumentReference, String> next()
+    public Pair<DocumentReference, DocumentIteratorEntry> next()
     {
-        Object[] result = getResults().get(index++);
+        List<Object[]> currentResults = getResults();
+
+        // Make sure there is indeed a next element
+        if (currentResults.size() <= this.index) {
+            throw new NoSuchElementException("No more element");
+        }
+
+        // Get current element
+        Object[] result = currentResults.get(index++);
+
         String localSpaceReference = (String) result[0];
         String name = (String) result[1];
         String locale = (String) result[2];
-        String version = (String) result[3];
         SpaceReference spaceReference = new SpaceReference(this.explicitEntityReferenceResolver
             .resolve(localSpaceReference, EntityType.SPACE, new WikiReference(wiki)));
         DocumentReference documentReference = new DocumentReference(name, spaceReference);
         if (!StringUtils.isEmpty(locale)) {
             documentReference = new DocumentReference(documentReference, LocaleUtils.toLocale(locale));
         }
-        return new ImmutablePair<DocumentReference, String>(documentReference, version);
+        String version = (String) result[3];
+        long docId = (long) result[4];
+
+        return new ImmutablePair<>(documentReference,
+            new DocumentIteratorEntry(documentReference.getWikiReference(), docId, version));
     }
 
     @Override
@@ -199,7 +213,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
             // the synchronization takes place. Also, the database is used as the reference store, meaning that we
             // update the Solr index to match the database, not the other way around.
             results = getQuery().setWiki(wiki).setOffset(offset).execute();
-            offset += LIMIT;
+            offset += getLimit();
         } catch (QueryException e) {
             throw new IllegalStateException("Failed to query the database.", e);
         }
@@ -212,9 +226,9 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
     private Query getQuery() throws QueryException
     {
         if (query == null) {
+            String select = "select doc.space, doc.name, doc.language, doc.version, doc.id from XWikiDocument doc";
             // This iterator must have the same order as the SolrDocumentIterator, otherwise the synchronization fails.
-            String select = "select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc";
-            String orderBy = " order by doc.space, doc.name, doc.language nulls first";
+            String orderBy = " order by doc.id asc";
 
             EntityReference spaceReference = null;
             EntityReference documentReference = null;
@@ -231,7 +245,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
                 }
             }
 
-            query = queryManager.createQuery(select + whereClause + orderBy, Query.HQL).setLimit(LIMIT);
+            query = queryManager.createQuery(select + whereClause + orderBy, Query.HQL).setLimit(getLimit());
             countQuery = queryManager.createQuery(whereClause, Query.HQL).addFilter(countFilter);
 
             if (spaceReference != null) {

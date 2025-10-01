@@ -124,6 +124,8 @@ public class DefaultIOService implements IOService
             // now get the document with that name
             XWikiContext deprecatedContext = getXWikiContext();
             XWikiDocument document = deprecatedContext.getWiki().getDocument(documentFullName, deprecatedContext);
+            // Avoid modifying the cached document
+            document = document.clone();
             // create a new object in this document to hold the annotation
             // Make sure to use a relative reference when creating the XObject, since we can`t use absolute references
             // for an object's class. This avoids ugly log warning messages.
@@ -287,6 +289,9 @@ public class DefaultIOService implements IOService
                 // if the document doesn't exist already skip it
                 return;
             }
+            // Avoid modifying the cached document
+            document = document.clone();
+
             // and the document object on it
             BaseObject annotationObject =
                 document.getXObject(this.configuration.getAnnotationClassReference(),
@@ -333,6 +338,8 @@ public class DefaultIOService implements IOService
             // get the document pointed to by the target
             XWikiContext deprecatedContext = getXWikiContext();
             XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
+            // Avoid modifying the cached document
+            document = document.clone();
             List<String> updateNotifs = new ArrayList<>();
             boolean updated = false;
             for (Annotation annotation : annotations) {
@@ -404,6 +411,7 @@ public class DefaultIOService implements IOService
      * @return {@code true} if any modification was done on this object, {@code false} otherwise
      */
     protected boolean updateObject(BaseObject object, Annotation annotation, XWikiContext deprecatedContext)
+        throws XWikiException
     {
         boolean updated = false;
         // TODO: there's an issue here to solve with (custom) types which need to be serialized before saved. Some do,
@@ -440,6 +448,7 @@ public class DefaultIOService implements IOService
      * @return {@code true} if the field was set to newValue, {@code false} otherwise
      */
     protected boolean setIfNotNull(BaseObject object, String fieldName, Object newValue, XWikiContext deprecatedContext)
+        throws XWikiException
     {
         if (newValue != null) {
             object.set(fieldName, newValue, deprecatedContext);

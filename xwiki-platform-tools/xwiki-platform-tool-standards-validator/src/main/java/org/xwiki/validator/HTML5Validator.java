@@ -19,7 +19,6 @@
  */
 package org.xwiki.validator;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -42,7 +41,7 @@ public class HTML5Validator implements Validator
     /**
      * Error handler.
      */
-    private XMLErrorHandler errorHandler = new XMLErrorHandler();
+    private final XMLErrorHandler errorHandler = new XMLErrorHandler();
 
     @Override
     public void setDocument(InputStream document)
@@ -55,38 +54,34 @@ public class HTML5Validator implements Validator
     {
         clear();
 
-        // Don't enable the language detection as it can lead to too any false positives. See XWIKI-17776 for more.
+        // Don't enable the language detection as it can lead to too many false positives. See XWIKI-17776 for more.
         SimpleDocumentValidator validator = new SimpleDocumentValidator(true, true, false);
 
         String schemaUrl = "http://s.validator.nu/html5-all.rnc";
 
-        InputSource source = new InputSource(document);
+        InputSource source = new InputSource(this.document);
         try {
-            validator.setUpMainSchema(schemaUrl, errorHandler);
-            validator.setUpValidatorAndParsers(errorHandler, false, false);
+            validator.setUpMainSchema(schemaUrl, this.errorHandler);
+            validator.setUpValidatorAndParsers(this.errorHandler, false, false);
             validator.checkHtmlInputSource(source);
         } catch (SAXException e) {
             // Ignore - Let XMLErrorHandler handle it
-        } catch (SimpleDocumentValidator.SchemaReadException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return errorHandler.getErrors();
+        return this.errorHandler.getErrors();
     }
 
     @Override
     public List<ValidationError> getErrors()
     {
-        return errorHandler.getErrors();
+        return this.errorHandler.getErrors();
     }
 
     @Override
     public void clear()
     {
-        errorHandler.clear();
+        this.errorHandler.clear();
     }
 
     @Override

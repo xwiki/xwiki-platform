@@ -38,7 +38,9 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -75,6 +77,9 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -111,6 +116,12 @@ import static org.mockito.Mockito.when;
 // @formatter:on
 class DefaultReferenceUpdaterTest
 {
+    private static final String SAVE_COMMENT_RELATIVE_LINK_KEY =
+        "refactoring.referenceUpdater.saveMessage.relativeLink";
+    private static final String SAVE_COMMENT_BACKLINK_KEY = "refactoring.referenceUpdater.saveMessage.backlinks";
+    private static final String TRANSLATED_RELATIVE_COMMENT = "Relative link save";
+    private static final String TRANSLATED_BACKLINK_COMMENT = "Back-link save";
+
     @MockComponent
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
@@ -169,6 +180,12 @@ class DefaultReferenceUpdaterTest
     @MockComponent
     private JobProgressManager progressManager;
 
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> userReferenceResolver;
+
+    @MockComponent
+    private LocalizationManager localizationManager;
+
     @InjectMockComponents
     private DefaultReferenceUpdater updater;
 
@@ -177,6 +194,9 @@ class DefaultReferenceUpdaterTest
 
     @Mock
     private XWikiContext xcontext;
+
+    @Mock
+    private UserReference currentUserReference;
 
     private MutableRenderingContext mutableRenderingContext;
 
@@ -203,6 +223,12 @@ class DefaultReferenceUpdaterTest
         when(this.jobContext.getCurrentJob()).thenReturn(this.job);
         when(this.job.getRequest()).thenReturn(jobrequest);
         when(this.jobrequest.isVerbose()).thenReturn(true);
+        when(this.localizationManager.getDefaultLocale()).thenReturn(Locale.FRENCH);
+        when(this.localizationManager.getTranslationPlain(SAVE_COMMENT_RELATIVE_LINK_KEY, Locale.FRENCH))
+            .thenReturn(TRANSLATED_RELATIVE_COMMENT);
+        when(this.localizationManager.getTranslationPlain(SAVE_COMMENT_BACKLINK_KEY, Locale.FRENCH))
+            .thenReturn(TRANSLATED_BACKLINK_COMMENT);
+        when(this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(currentUserReference);
     }
 
     private void setTextarea(XWikiDocument document, XDOM xdom)
@@ -238,10 +264,10 @@ class DefaultReferenceUpdaterTest
         AttachmentReference oldImageTargetAttachment = new AttachmentReference("attachment.txt", oldReference);
         DocumentReference newReference = new DocumentReference("wiki", "X", "Y");
         AttachmentReference newImageTargetAttachment = new AttachmentReference("attachment.txt", newReference);
-        AttachmentReference absoluteTargetAttachment = new AttachmentReference("attachment.txt",
-            new DocumentReference("wiki", "Main", "WebHome"));
 
         XWikiDocument newDocument = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(newDocument.getAuthors()).thenReturn(authors);
         when(this.xcontext.getWiki().getDocument(newReference, this.xcontext)).thenReturn(newDocument);
         when(newDocument.getDocumentReference()).thenReturn(newReference);
         when(newDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
@@ -276,12 +302,9 @@ class DefaultReferenceUpdaterTest
         DocumentReference absoluteDocLinkReference = new DocumentReference("WebHome", new SpaceReference("wiki", "C"));
         EntityReference relativeDocLinkReference = new EntityReference("WebHome", EntityType.DOCUMENT,
             new EntityReference("C", EntityType.SPACE));
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null))
-            .thenReturn(absoluteDocLinkReference);
+
         when(this.relativeEntityReferenceResolver.resolve(docLinkReference, null, null))
             .thenReturn(relativeDocLinkReference);
-        when(this.resourceReferenceResolver.resolve(absoluteDocLinkResourceReference, null))
-            .thenReturn(absoluteDocLinkReference);
         when(this.relativeEntityReferenceResolver.resolve(absoluteDocLinkResourceReference, null, null))
             .thenReturn(absoluteDocLinkReference);
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
@@ -294,8 +317,7 @@ class DefaultReferenceUpdaterTest
             .thenReturn(relativeDocLinkReference);
         when(this.resourceReferenceResolver.resolve(xobjectDocLinkReference, null, oldReference))
             .thenReturn(originalDocLinkReference);
-        when(this.resourceReferenceResolver.resolve(imageReference, null))
-            .thenReturn(absoluteTargetAttachment);
+
         when(this.resourceReferenceResolver.resolve(imageReference, null, oldReference))
             .thenReturn(oldImageTargetAttachment);
         when(this.relativeEntityReferenceResolver.resolve(imageReference, null, null))
@@ -313,14 +335,12 @@ class DefaultReferenceUpdaterTest
 
         SpaceReference originalSpaceReference = new SpaceReference("wiki", "Z");
         EntityReference relativeSpaceReference = new EntityReference("Z", EntityType.SPACE);
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null))
-            .thenReturn(originalSpaceReference);
+
         when(this.relativeEntityReferenceResolver.resolve(spaceLinkReference, null, null))
             .thenReturn(relativeSpaceReference);
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference))
             .thenReturn(originalSpaceReference);
-        when(this.resourceReferenceResolver.resolve(xobjectSpaceLinkReference, null))
-            .thenReturn(originalSpaceReference);
+
         when(this.resourceReferenceResolver.resolve(xobjectSpaceLinkReference, null, oldReference))
             .thenReturn(originalSpaceReference);
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, newReference))
@@ -354,7 +374,7 @@ class DefaultReferenceUpdaterTest
         // Image link relative to the document stay the same
         assertEquals("attachment.txt", xobjectImageBlock.getReference().getReference());
 
-        verifyDocumentSave(newDocument, "Updated the relative links.", true, true);
+        verifyDocumentSave(newDocument, true);
     }
 
     @Test
@@ -364,6 +384,8 @@ class DefaultReferenceUpdaterTest
         DocumentReference newReference = new DocumentReference("wiki2", "X", "Y");
 
         XWikiDocument newDocument = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(newDocument.getAuthors()).thenReturn(authors);
         when(this.xcontext.getWiki().getDocument(newReference, this.xcontext)).thenReturn(newDocument);
         when(newDocument.getDocumentReference()).thenReturn(newReference);
         when(newDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
@@ -381,11 +403,9 @@ class DefaultReferenceUpdaterTest
             .thenReturn(List.of(docLinkBlock, spaceLinkBlock));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
-        DocumentReference absoluteDocLinkReference = new DocumentReference("C", new SpaceReference("xwiki", "Main"));
         EntityReference relativeDocLinkReference = new EntityReference("C", EntityType.DOCUMENT,
             new EntityReference("B", EntityType.SPACE));
         EntityReference relativeSpaceLinkReference = new EntityReference("Z", EntityType.SPACE);
-        when(this.resourceReferenceResolver.resolve(docLinkReference, null)).thenReturn(absoluteDocLinkReference);
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
             .thenReturn(originalDocLinkReference);
         DocumentReference newDocLinkReference = new DocumentReference("C", newReference.getLastSpaceReference());
@@ -395,8 +415,6 @@ class DefaultReferenceUpdaterTest
             .thenReturn(relativeDocLinkReference);
 
         SpaceReference originalSpaceReference = new SpaceReference("wiki1", "Z");
-        SpaceReference absoluteSpaceReference = new SpaceReference("xwiki", "Z");
-        when(this.resourceReferenceResolver.resolve(spaceLinkReference, null)).thenReturn(absoluteSpaceReference);
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference))
             .thenReturn(originalSpaceReference);
         SpaceReference newSpaceReference = new SpaceReference("wiki2", "Z");
@@ -418,7 +436,7 @@ class DefaultReferenceUpdaterTest
         // Space link is also updated, since they were referring entities on a different wiki.
         assertEquals("wiki1:Z", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.SPACE, spaceLinkBlock.getReference().getType());
-        verifyDocumentSave(newDocument, "Updated the relative links.", true, true);
+        verifyDocumentSave(newDocument, true);
     }
 
     @Test
@@ -426,6 +444,8 @@ class DefaultReferenceUpdaterTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(document.getAuthors()).thenReturn(authors);
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
@@ -481,7 +501,7 @@ class DefaultReferenceUpdaterTest
         assertEquals("xwiki:X.Y.WebHome", absoluteLinkBlock.getReference().getReference());
         assertEquals("X.Y", xobjectLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, linkBlock.getReference().getType());
-        verifyDocumentSave(document, "Renamed back-links.", false, false);
+        verifyDocumentSave(document, false);
     }
 
     @Test
@@ -489,6 +509,8 @@ class DefaultReferenceUpdaterTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(document.getAuthors()).thenReturn(authors);
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
@@ -523,7 +545,7 @@ class DefaultReferenceUpdaterTest
 
         assertEquals("X.Y@attachment.txt", imageBlock.getReference().getReference());
         assertEquals(ResourceType.ATTACHMENT, imageBlock.getReference().getType());
-        verifyDocumentSave(document, "Renamed back-links.", false, false);
+        verifyDocumentSave(document, false);
     }
 
     @Test
@@ -531,6 +553,8 @@ class DefaultReferenceUpdaterTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(document.getAuthors()).thenReturn(authors);
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
@@ -565,7 +589,7 @@ class DefaultReferenceUpdaterTest
 
         assertEquals("X.Y@attachment.txt", linkBlock.getReference().getReference());
         assertEquals(ResourceType.ATTACHMENT, linkBlock.getReference().getType());
-        verifyDocumentSave(document, "Renamed back-links.", false, false);
+        verifyDocumentSave(document, false);
     }
 
     @Test
@@ -573,6 +597,8 @@ class DefaultReferenceUpdaterTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(document.getAuthors()).thenReturn(authors);
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
@@ -623,7 +649,7 @@ class DefaultReferenceUpdaterTest
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
         assertEquals("X", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.SPACE, spaceLinkBlock.getReference().getType());
-        verifyDocumentSave(document, "Renamed back-links.", false, false);
+        verifyDocumentSave(document, false);
     }
 
     @Test
@@ -631,6 +657,8 @@ class DefaultReferenceUpdaterTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(document.getAuthors()).thenReturn(authors);
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
@@ -685,7 +713,7 @@ class DefaultReferenceUpdaterTest
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
         assertEquals("X.Y", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, spaceLinkBlock.getReference().getType());
-        verifyDocumentSave(document, "Renamed back-links.", false, false);
+        verifyDocumentSave(document, false);
     }
 
     @Test
@@ -693,6 +721,8 @@ class DefaultReferenceUpdaterTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(document.getAuthors()).thenReturn(authors);
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
@@ -750,7 +780,7 @@ class DefaultReferenceUpdaterTest
         verify(this.mutableRenderingContext, times(3)).push(any(), any(), eq(Syntax.XWIKI_2_1), any(), anyBoolean(),
             any());
         verify(this.mutableRenderingContext, times(3)).pop();
-        verifyDocumentSave(document, "Renamed back-links.", false, false);
+        verifyDocumentSave(document, false);
     }
 
     @Test
@@ -765,6 +795,8 @@ class DefaultReferenceUpdaterTest
         LinkBlock documentLinkBlock = new LinkBlock(List.of(), resourceReference, false);
 
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(document.getAuthors()).thenReturn(authors);
         XDOM xdom = mock(XDOM.class);
 
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
@@ -783,16 +815,7 @@ class DefaultReferenceUpdaterTest
         updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         verify(this.progressManager).pushLevelProgress(1, updater);
-        verify(document).setContent(xdom);
-        verify(document).setContentDirty(false);
-        verify(document).setMetaDataDirty(true);
-        verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", false, this.xcontext);
-        verify(this.progressManager).popLevelProgress(updater);
-        assertEquals(1, this.logCapture.size());
-        assertEquals(
-            "The links from [null] that were targeting [Attachment wiki:Space.Source@oldname.txt] have "
-                + "been updated to target [Attachment wiki:Space.Target@newname.txt].", this.logCapture.getMessage(0));
-        assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
+        verifyDocumentSave(document, false);
     }
 
     @Test
@@ -800,6 +823,8 @@ class DefaultReferenceUpdaterTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentAuthors authors = mock(DocumentAuthors.class);
+        when(document.getAuthors()).thenReturn(authors);
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
@@ -840,17 +865,19 @@ class DefaultReferenceUpdaterTest
             newLinkTarget, false, Map.of(oldLinkTarget, newLinkTarget));
         assertEquals("X.Y", documentLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
-        verifyDocumentSave(document, "Renamed back-links.", false, false);
+        verifyDocumentSave(document, false);
     }
 
-    private void verifyDocumentSave(XWikiDocument document, String comment, boolean minorEdit, boolean relative)
+    private void verifyDocumentSave(XWikiDocument document, boolean relative)
         throws Exception
     {
         // Verify we preserve the content author.
         verify(document).setContentDirty(false);
         // Verify the version is going to be incremented.
         verify(document).setMetaDataDirty(true);
-        verify(this.xcontext.getWiki()).saveDocument(document, comment, minorEdit, this.xcontext);
+        String comment = (relative) ? TRANSLATED_RELATIVE_COMMENT : TRANSLATED_BACKLINK_COMMENT;
+        verify(this.xcontext.getWiki()).saveDocument(document, comment, true, this.xcontext);
+        verify(document.getAuthors()).setOriginalMetadataAuthor(currentUserReference);
         ILoggingEvent logEvent = this.logCapture.getLogEvent(this.logIndex++);
         if (relative) {
             assertEquals("Updated the relative links from [{}].", logEvent.getMessage());
@@ -866,17 +893,23 @@ class DefaultReferenceUpdaterTest
     {
         DocumentReference baseDocumentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument baseDocument = mock(XWikiDocument.class);
+        DocumentAuthors baseAuthors = mock(DocumentAuthors.class);
+        when(baseDocument.getAuthors()).thenReturn(baseAuthors);
         when(this.xcontext.getWiki().getDocument(baseDocumentReference, this.xcontext)).thenReturn(baseDocument);
         when(baseDocument.getDocumentReference()).thenReturn(baseDocumentReference);
 
         when(baseDocument.getTranslationLocales(xcontext)).thenReturn(List.of(Locale.FRENCH, Locale.ENGLISH));
         DocumentReference frenchDocumentReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         XWikiDocument frenchDocument = mock(XWikiDocument.class);
+        DocumentAuthors frenchAuthors = mock(DocumentAuthors.class);
+        when(frenchDocument.getAuthors()).thenReturn(frenchAuthors);
         when(baseDocument.getTranslatedDocument(Locale.FRENCH, xcontext)).thenReturn(frenchDocument);
         when(frenchDocument.getDocumentReference()).thenReturn(frenchDocumentReference);
 
         DocumentReference englishDocumentReference = new DocumentReference("wiki", "Space", "Page", Locale.ENGLISH);
         XWikiDocument englishDocument = mock(XWikiDocument.class);
+        DocumentAuthors englishAuthors = mock(DocumentAuthors.class);
+        when(englishDocument.getAuthors()).thenReturn(englishAuthors);
         when(baseDocument.getTranslatedDocument(Locale.ENGLISH, xcontext)).thenReturn(englishDocument);
         when(englishDocument.getDocumentReference()).thenReturn(englishDocumentReference);
 
@@ -910,7 +943,7 @@ class DefaultReferenceUpdaterTest
         updater.update(baseDocumentReference, oldLinkTarget, newLinkTarget);
 
         for (XWikiDocument xWikiDocument : documentsToUpdate) {
-            verifyDocumentSave(xWikiDocument, "Renamed back-links.", false, false);
+            verifyDocumentSave(xWikiDocument, false);
             LinkBlock linkBlock =
                 (LinkBlock) xWikiDocument.getXDOM().getBlocks(mock(BlockMatcher.class), Block.Axes.DESCENDANT).get(0);
             assertEquals("X.Y", linkBlock.getReference().getReference());

@@ -22,10 +22,12 @@ package com.xpn.xwiki.objects;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.Objects;
 
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dom4j.Element;
 import org.dom4j.io.DocumentResult;
 import org.slf4j.Logger;
@@ -37,6 +39,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.store.merge.MergeManagerResult;
 
@@ -101,7 +104,37 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
 
     private ContextualLocalizationManager localization;
-    
+
+    private transient boolean dirty = true;
+
+    /**
+     * @return true of the element was modified (or created)
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    @Unstable
+    public boolean isDirty()
+    {
+        return this.dirty;
+    }
+
+    /**
+     * @param dirty true if the element was modified (or created)
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    @Unstable
+    public void setDirty(boolean dirty)
+    {
+        this.dirty = dirty;
+
+        if (dirty && this.ownerDocument != null) {
+            this.ownerDocument.setMetaDataDirty(true);
+        }
+    }
+
     /**
      * @return a merge manager instance.
      * @since 11.8RC1
@@ -161,12 +194,18 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     @Override
-    public void setDocumentReference(DocumentReference reference)
+    public void setDocumentReference(DocumentReference documentReference)
     {
-        // If the name is already set then reset it since we're now using a reference
-        this.documentReference = reference;
-        this.name = null;
-        this.referenceCache = null;
+        if (!Objects.equals(documentReference, this.documentReference)) {
+            // If the name is already set then reset it since we're now using a reference
+            this.documentReference = documentReference;
+            this.name = null;
+            this.referenceCache = null;
+
+            if (isDirty()) {
+                setDirty(true);
+            }
+        }
     }
 
     /**
@@ -185,8 +224,12 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
             throw new IllegalStateException("BaseElement#setName could not be called when a reference has been set.");
         }
 
-        this.name = name;
-        this.referenceCache = null;
+        if (!Strings.CS.equals(name, this.name)) {
+            this.name = name;
+            this.referenceCache = null;
+
+            setDirty(true);
+        }
     }
 
     public String getPrettyName()
@@ -332,29 +375,85 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         return true;
     }
 
-    @Override
-    public BaseElement clone()
+    /**
+     * Reset any reference to the owner of this element.
+     * 
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    protected void detachOwner()
     {
-        BaseElement element;
+        this.ownerDocument = null;
+        this.documentReference = null;
+        this.referenceCache = null;
+    }
+
+    /**
+     * Clone the owner referenced by this element.
+     * 
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    protected void cloneOwner()
+    {
+        if (this.ownerDocument != null) {
+            this.ownerDocument = this.ownerDocument.clone();
+        }
+    }
+
+    @Override
+    public BaseElement<R> clone()
+    {
+        return clone(false);
+    }
+
+    /**
+     * @param detach true if the element should be detached from its parent container, if false then the parent
+     *            container is cloned too
+     * @return a clone of this element
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    public BaseElement<R> clone(boolean detach)
+    {
+        BaseElement<R> element;
         try {
-            element = (BaseElement) super.clone();
+            element = (BaseElement<R>) super.clone();
 
-            element.setOwnerDocument(getOwnerDocument());
-
-            // Make sure we clone either the reference or the name depending on which one is used.
-            if (this.documentReference != null) {
-                element.setDocumentReference(getDocumentReference());
-            } else if (this.name != null) {
-                element.setName(getName());
+            if (detach) {
+                // This element is not attached to any container yet
+                element.detachOwner();
+            } else {
+                // For retro compatibility reasons we clone the owner document
+                element.cloneOwner();
             }
 
-            element.setPrettyName(getPrettyName());
-        } catch (Exception e) {
+            cloneContent(element);
+
+            // Restore the dirty state
+            element.setDirty(isDirty());
+        } catch (CloneNotSupportedException e) {
             // This should not happen
             element = null;
         }
 
         return element;
+    }
+
+    /**
+     * Extra clone related operation between the handling of the owner and the reset of the dirty flag.
+     * 
+     * @param element the cloned element
+     * @since 17.3.0RC1
+     * @since 17.2.1
+     */
+    @Unstable
+    protected void cloneContent(BaseElement<R> element)
+    {
+        element.setPrettyName(getPrettyName());
     }
 
     @Override
@@ -401,7 +500,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         BaseElement<R> newBaseElement = (BaseElement<R>) newElement;
 
         // Pretty name
-        if (!StringUtils.equals(newBaseElement.getPrettyName(), getPrettyName())) {
+        if (!Strings.CS.equals(newBaseElement.getPrettyName(), getPrettyName())) {
             setPrettyName(newBaseElement.getPrettyName());
             modified = true;
         }
@@ -417,7 +516,13 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      */
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        this.ownerDocument = ownerDocument;
+        if (this.ownerDocument != ownerDocument) {
+            this.ownerDocument = ownerDocument;
+
+            if (this.ownerDocument != null && isDirty()) {
+                this.ownerDocument.setMetaDataDirty(true);
+            }
+        }
     }
 
     /**

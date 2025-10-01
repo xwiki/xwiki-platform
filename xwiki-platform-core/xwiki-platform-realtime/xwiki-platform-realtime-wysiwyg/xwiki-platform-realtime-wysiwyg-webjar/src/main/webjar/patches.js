@@ -144,6 +144,15 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
     async setHyperJSON(remoteHyperJSON, propagate) {
+      const localHyperJSON = this.getHyperJSON();
+      // Avoid processing the remote HyperJSON, computing the DOM diff (which is not necessarily empty if the HyperJSON
+      // is the same because you can always have some BR tag or some DOM attribute added by the browser and which are
+      // not serialized in the HyperJSON), saving the selection, applying the DOM patch and restoring the selection, if
+      // there is no actual change.
+      if (remoteHyperJSON === localHyperJSON) {
+        return;
+      }
+
       let contentWrapper = this._hyperJSONToDOM(remoteHyperJSON);
       // HyperJSON doesn't support comments, so we had to convert them to custom HTML elements. Let's restore them.
       contentWrapper = this._restoreComments(contentWrapper);
@@ -238,7 +247,7 @@ define('xwiki-realtime-wysiwyg-patches', [
         return updatedNodes;
       }, propagate);
 
-      this._restoreSelection(selection);
+      await this._restoreSelection(selection);
     }
 
     /**
@@ -248,6 +257,11 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @returns {Array[Object]} an array of objects (relative ranges) that could be used to restore the selection
      */
     _saveSelection() {
+      if (this._editor.isReadOnly()) {
+        // Let the code that put the editor in read-only mode handle the selection restore.
+        return [];
+      }
+
       // Save the selection as a text selection.
       this._editor.saveSelection();
       // Save the selection as an array of relative ranges.
@@ -351,7 +365,7 @@ define('xwiki-realtime-wysiwyg-patches', [
      *
      * @param {Array[Object]} selection an array of objects (relative ranges) that can be used to restore the selection
      */
-    _restoreSelection(selection) {
+    async _restoreSelection(selection) {
       const invalidRange = selection.find(savedRange =>
         [savedRange.startContainer, savedRange.startAfter?.node, savedRange.startBefore?.node]
           .every(node => !node?.isConnected) ||
@@ -360,10 +374,10 @@ define('xwiki-realtime-wysiwyg-patches', [
       if (invalidRange) {
         // Some of the selected nodes were removed from the DOM or the selection was in a text node that was modified.
         // Restore the text selection.
-        this._editor.restoreSelection();
-      } else {
+        await this._editor.restoreSelection();
+      } else if (selection.length) {
         // The selected nodes are still in the DOM so we can restore the selection using the relative ranges.
-        this._editor.restoreSelection(selection.map(savedRange => {
+        await this._editor.restoreSelection(selection.map(savedRange => {
           const range = this._editor.getContentWrapper().ownerDocument.createRange();
           range.reversed = savedRange.reversed;
           if (savedRange.startContainer?.isConnected) {

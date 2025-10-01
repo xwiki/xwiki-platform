@@ -60,28 +60,12 @@
     #end
     #set ($discard = $sameKeyObjects.add($object))
   #end
-  #foreach ($key in $properSortTool.sort($objectsMap.keySet()))
+  #foreach ($key in $collectiontool.sort($objectsMap.keySet()))
     #set ($sameKeyObjects = $objectsMap.get($key))
     #foreach ($sameKeyObject in $sameKeyObjects)
       #set ($discard = $outputObjects.add($sameKeyObject))
     #end
   #end
 #end
-
-#macro (defineSortTool $sortToolVariable)
-  #set ($checkedExtension = "org.xwiki.commons:xwiki-commons-velocity")
-  ## Because of an API collision, $collectionstool has been replaced by $collectiontool in XCOMMONS-1861
-  #if ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.1-SNAPSHOT") &gt;= 0)
-    #setVariable ($sortToolVariable, $collectiontool)
-  ## With the upgrade of Velocity $sorttool has been replaced by $collectionstool (XCOMMONS-1296)
-  #elseif ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.0-SNAPSHOT") &gt;= 0)
-    #setVariable ($sortToolVariable, $collectionstool)
-  ## Old API for sorting was $sorttool
-  #else
-    #setVariable ($sortToolVariable, $sorttool)
-  #end
-#end
-
-#defineSortTool("$properSortTool")
 {{/velocity}}</content>
 </xwikidoc>

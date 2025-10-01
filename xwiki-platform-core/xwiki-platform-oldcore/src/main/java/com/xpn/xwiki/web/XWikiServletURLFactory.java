@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+@Deprecated(since = "17.0.0RC1")
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
@@ -272,7 +274,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         // Path based mode we fallback on original default
-        if (context.getWiki().isPathBased() && !StringUtils.equals(context.getOriginalWikiId(), wikiId)) {
+        if (context.getWiki().isPathBased() && !Strings.CS.equals(context.getOriginalWikiId(), wikiId)) {
             return getServerURL(context.getOriginalWikiId(), context);
         }
 
@@ -490,7 +492,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         try {
             String encodedFragment =
-                StringUtils.removeStart(new URI(null, null, null, -1, null, null, fragment).toString(), "#");
+                Strings.CS.removeStart(new URI(null, null, null, -1, null, null, fragment).toString(), "#");
             // We encode single quotes (apostrophes) even though they are allowed in the URL fragment component because
             // we want to avoid breaking HTML links. This is also consistent with the encoding we do for the path URL
             // component where we also encode single quotes, see #encodeWithinPath().

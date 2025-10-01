@@ -58,6 +58,7 @@ solr.admin.indexing.wiki.hint=The wiki for which all its documents will be affec
 solr.admin.indexing.wiki.select_farm=Entire farm
 solr.admin.indexing.query.label=Custom query
 solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
+solr.admin.indexing.query.language.label=Language of the custom query
 
 solr.admin.info.affectedDocuments=Affected documents in the index:
 
@@ -75,7 +76,7 @@ solr.sortOrder.desc=Descending
 
 solr.options=Show:
 solr.options.highlight=Highlighting
-solr.options.highlight.title=Display en extract of what was matched in each result
+solr.options.highlight.title=Display an extract of what was matched in each result
 solr.options.facet=Facets
 solr.options.facet.title=Allow extra filtering of the result
 

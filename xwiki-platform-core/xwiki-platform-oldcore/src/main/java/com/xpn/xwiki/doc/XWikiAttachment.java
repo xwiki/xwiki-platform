@@ -32,6 +32,7 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.Tika;
@@ -59,6 +60,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.tika.internal.TikaUtils;
 
@@ -541,6 +543,24 @@ public class XWikiAttachment implements Cloneable
         this.isMetaDataDirty = metaDataDirty;
         if (metaDataDirty && this.doc != null) {
             this.doc.setMetaDataDirty(true);
+        }
+    }
+
+    /**
+     * @param dirty true the value of the dirty flag(s)
+     * @param deep true if the dirty flag should be set to all children
+     * @since 17.2.1
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public void setDirty(boolean dirty, boolean deep)
+    {
+        setMetaDataDirty(dirty);
+
+        if (deep) {
+            if (this.content != null) {
+                this.content.setContentDirty(dirty);
+            }
         }
     }
 
@@ -1280,7 +1300,7 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException
     {
-        if (StringUtils.equals(rev, this.getVersion())) {
+        if (Strings.CS.equals(rev, this.getVersion())) {
             return this;
         }
 
@@ -1304,7 +1324,7 @@ public class XWikiAttachment implements Cloneable
             modified = true;
         }
 
-        if (StringUtils.equals(getMimeType(), attachment.getMimeType())) {
+        if (Strings.CS.equals(getMimeType(), attachment.getMimeType())) {
             setMimeType(attachment.getMimeType());
             modified = true;
         }

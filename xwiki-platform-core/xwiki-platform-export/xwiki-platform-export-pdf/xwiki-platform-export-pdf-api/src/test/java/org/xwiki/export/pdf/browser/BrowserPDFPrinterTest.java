@@ -19,18 +19,6 @@
  */
 package org.xwiki.export.pdf.browser;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -39,8 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,6 +45,19 @@ import org.xwiki.export.pdf.internal.browser.CookieFilter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter.CookieFilterContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AbstractBrowserPDFPrinter}.
@@ -100,7 +101,7 @@ class BrowserPDFPrinterTest
         when(this.cookieFilter.isFilterRequired()).thenReturn(true);
 
         when(this.printer.getBrowserManager()).thenReturn(this.browserManager);
-        when(this.printer.getRequest()).thenReturn(this.request);
+        when(this.printer.getJakartaRequest()).thenReturn(this.request);
 
         when(this.request.getContextPath()).thenReturn("/xwiki");
         when(this.configuration.getXWikiURI()).thenReturn(new URI("//xwiki-host"));
@@ -133,7 +134,7 @@ class BrowserPDFPrinterTest
         when(this.request.getScheme()).thenReturn("https");
 
         when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
-        when(this.browserTab.navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"))).thenReturn(true);
+        when(this.browserTab.navigate(eq(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json")))).thenReturn(true);
         when(this.browserTab.getSource()).thenReturn("{\"ip\":\"172.12.0.3\"}");
         when(this.browserTab.navigate(browserPrintPreviewURL, cookies, true, 30)).thenReturn(true);
 
@@ -154,11 +155,15 @@ class BrowserPDFPrinterTest
         assertSame(pdfInputStream, this.printer.print(printPreviewURL));
 
         verify(this.cookieFilter).filter(eq(Arrays.asList(cookies)), this.cookieFilterContextCaptor.capture());
-        assertEquals("172.12.0.3", this.cookieFilterContextCaptor.getValue().getBrowserIPAddress());
+        assertEquals("172.12.0.3", this.cookieFilterContextCaptor.getValue().getClientIPAddress());
         assertEquals(browserPrintPreviewURL, this.cookieFilterContextCaptor.getValue().getTargetURL());
 
         verify(this.browserTab).setExtraHTTPHeaders(
             Map.of("Forwarded", List.of("by=172.12.0.3;for=192.168.0.118;host=external:9293;proto=https")));
+
+        // Once to get the browser IP address used to set the Forwarded header, and once to the the client IP address
+        // used to filter the authentication cookies.
+        verify(this.browserTab, times(2)).navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"));
 
         // Only the configured XWiki URI should be used to get the browser IP address.
         verify(this.browserTab, never()).navigate(new URL("http://external:9293/xwiki/rest/client?media=json"));
@@ -191,13 +196,17 @@ class BrowserPDFPrinterTest
         when(this.request.getCookies()).thenReturn(cookies);
 
         when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
+        when(this.browserTab.navigate(eq(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"))))
+            .thenReturn(true);
+        when(this.browserTab.getSource()).thenReturn("{\"ip\":\"172.12.0.3\"}");
         when(this.browserTab.navigate(new URL("http://xwiki-host:9293/xwiki/bin/export/Some/Page?x=y#z"), cookies, true,
             30)).thenReturn(true);
 
         this.printer.print(new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z"));
 
         verify(this.browserTab, never()).navigate(new URL("http://external:9293/xwiki/rest/client?media=json"));
-        verify(this.browserTab, never()).navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"));
+        // Called only once to get the browser IP address used to set the Forwarded header.
+        verify(this.browserTab, times(1)).navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"));
         verify(this.cookieFilter, never()).filter(any(), any());
     }
 
@@ -227,19 +236,19 @@ class BrowserPDFPrinterTest
         URL printPreviewURL = new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z");
         URL browserPrintPreviewURL = new URL("http://xwiki-host:9293/xwiki/bin/export/Some/Page?x=y#z");
 
-        when(this.cookieFilter.isFilterRequired()).thenReturn(false);
-
         when(this.request.getHeader("X-Forwarded-For")).thenReturn("192.168.0.117");
         when(this.request.getHeader("Host")).thenReturn("external:9293");
         when(this.request.getHeader("X-Forwarded-Proto")).thenReturn("ftp");
 
         when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
-        when(this.browserTab.navigate(browserPrintPreviewURL, null, true, 30)).thenReturn(true);
+        when(this.browserTab.navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"))).thenReturn(true);
+        when(this.browserTab.getSource()).thenReturn("{\"ip\":\"172.12.0.3\"}");
+        when(this.browserTab.navigate(browserPrintPreviewURL, (Cookie[]) null, true, 30)).thenReturn(true);
 
         this.printer.print(printPreviewURL);
 
         verify(this.browserTab).setExtraHTTPHeaders(
-            Map.of("Forwarded", List.of("by=192.168.0.117;for=192.168.0.117;host=external:9293;proto=ftp")));
+            Map.of("Forwarded", List.of("by=172.12.0.3;for=192.168.0.117;host=external:9293;proto=ftp")));
     }
 
     @Test
@@ -261,7 +270,7 @@ class BrowserPDFPrinterTest
     void navigate() throws Exception
     {
         URL url = new URL("http://xwiki.org");
-        when(this.browserTab.navigate(url, null, false, 60)).thenReturn(true);
+        when(this.browserTab.navigate(url, (jakarta.servlet.http.Cookie[]) null, false, 60)).thenReturn(true);
         assertTrue(this.browserTab.navigate(url));
     }
 }

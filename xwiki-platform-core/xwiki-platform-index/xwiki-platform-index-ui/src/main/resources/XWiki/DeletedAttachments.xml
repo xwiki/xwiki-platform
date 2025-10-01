@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.DeletedAttachments" locale="">
+<xwikidoc version="1.6" reference="XWiki.DeletedAttachments" locale="">
   <web>XWiki</web>
   <name>DeletedAttachments</name>
   <language/>
@@ -83,8 +83,16 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
       &lt;td&gt;$xwiki.formatDate($datt.getDate(), $dateFormat)&lt;/td&gt;
       &lt;td&gt;$xwiki.getUserName($datt.getDeleter())&lt;/td&gt;
       &lt;td class="itemActions"&gt;
-        #if($datt.canDelete())
-          &lt;a href="${originalDocument.getAttachmentURL($datt.filename, 'delattachment', "trashId=${datt.id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip')"&gt;$services.localization.render('platform.index.trashAttachmentsDeleteText')&lt;/a&gt;
+        #if ($datt.canDelete())
+          &lt;a
+            class="tool delete"
+            href="$escapetool.xml($originalDocument.getAttachmentURL($datt.filename, 'delattachment', $escapetool.url({
+              'trashId': $datt.id,
+              'xredirect': "$!request.getRequestURI()?$!request.getQueryString()"
+            })))"
+            title="$escapetool.xml($services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip'))"&gt;
+          $escapetool.xml($services.localization.render('platform.index.trashAttachmentsActionsDeleteText'))
+          &lt;/a&gt;
         #end
       &lt;/td&gt;
     &lt;/tr&gt;
@@ -138,10 +146,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
   #if (!$offset || $offset &lt; 0)
     #set ($offset = 0)
   #end
-  #set ($limit = $numbertool.toNumber($request.get('limit')).intValue())
-  #if (!$limit)
-    #set ($limit = 15)
-  #end
+  #getAndValidateQueryLimitFromRequest('limit', 15, $limit)
   #set ($filenameFilter = $request.get('datt.filename'))
   #set ($docNameFilter = $request.get('datt.docName'))
   #set ($dateFilter = $request.get('datt.date'))
@@ -244,8 +249,11 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -265,6 +273,7 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -293,6 +302,8 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -437,8 +448,11 @@ document.observe('xwiki:dom:loaded', function() {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -458,6 +472,7 @@ document.observe('xwiki:dom:loaded', function() {
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -467,6 +482,8 @@ document.observe('xwiki:dom:loaded', function() {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -502,6 +519,8 @@ document.observe('xwiki:dom:loaded', function() {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

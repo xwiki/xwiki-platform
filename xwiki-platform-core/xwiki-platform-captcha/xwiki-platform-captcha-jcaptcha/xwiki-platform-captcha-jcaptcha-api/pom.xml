@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-captcha-jcaptcha</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha-jcaptcha-api</artifactId>
   <name>XWiki Platform - CAPTCHA - JCaptcha - API</name>
@@ -94,8 +94,8 @@
 
     <!-- Need servlet api for getting HttpSession id and flushing generated CAPTCHAs to HttpResponse -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

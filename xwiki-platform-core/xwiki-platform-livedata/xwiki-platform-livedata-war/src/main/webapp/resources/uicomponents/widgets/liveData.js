@@ -18,20 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($liveDataEntry = 'xwiki-livedata.min')
-#set ($liveDataPath = $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', $liveDataEntry))
 #set ($paths = {
   'js': {
-    'xwiki-livedata': $liveDataPath,
-    'xwiki-livedata-vue': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'xwiki-livedata-vue.umd.min'),
-    'vue': $services.webjars.url('org.webjars.npm:vue', 'dist/vue.min'),
-    'vue-i18n': $services.webjars.url('org.webjars.npm:vue-i18n', 'dist/vue-i18n.min'),
+    'vue': $services.webjars.url('org.webjars.npm:vue', 'dist/vue.runtime.esm-browser.prod'),
     'daterangepicker': $services.webjars.url('bootstrap-daterangepicker', 'js/bootstrap-daterangepicker.js')
+  },
+  'module': {
+    'xwiki-livedata': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar', 'main.es.js')
   },
   'css': {
     'liveData': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
-      'xwiki-livedata-vue.umd.min.less', {'evaluate': true}),
+      'xwiki-platform-livedata.css'),
+    'liveDataLessVariables': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'variables.less', {'evaluate': true}),
+    'liveDataLessReactive': $services.webjars.url('org.xwiki.platform:xwiki-platform-livedata-webjar',
+      'reactive.less', {'evaluate': true}),
     'dateRangePicker': $services.webjars.url('bootstrap-daterangepicker', 'css/bootstrap-daterangepicker.css'),
     'selectize': [
       $services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
@@ -49,81 +50,68 @@
   require.config({
     paths: paths.js,
     map: {
-      '*': {
-        'xwiki-livedata-vue': 'xwiki-livedata-vue-with-css',
-        daterangepicker: 'daterangepicker-with-css',
-        'xwiki-selectize': 'xwiki-selectize-with-css'
+      "*": {
+        "xwiki-livedata": "xwiki-livedata-with-css",
+        daterangepicker: "daterangepicker-with-css",
+        "xwiki-selectize": "xwiki-selectize-with-css",
       },
-      'xwiki-livedata-vue-with-css': {
-        'xwiki-livedata-vue': 'xwiki-livedata-vue'
+      "xwiki-livedata-with-css": {
+        "xwiki-livedata": "xwiki-livedata",
       },
-      'daterangepicker-with-css': {
-        daterangepicker: 'daterangepicker'
+      "daterangepicker-with-css": {
+        daterangepicker: "daterangepicker",
       },
-      'xwiki-selectize-with-css': {
-        'xwiki-selectize': 'xwiki-selectize'
-      }
+      "xwiki-selectize-with-css": {
+        "xwiki-selectize": "xwiki-selectize",
+      },
     },
     config: {
-      'xwiki-livedata-source': {
-        contextPath: paths.contextPath
-      }
-    }
+      "xwiki-livedata-source": {
+        contextPath: paths.contextPath,
+      },
+    },
   });
 
-  define('loadCSS', function() {
-    var loadCSS = function(url) {
-      var link = document.createElement("link");
-      link.type = "text/css";
-      link.rel = "stylesheet";
-      link.href = url;
-      document.getElementsByTagName("head")[0].appendChild(link);
-    };
-  
+  function loadCSS(url) {
+    const link = document.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    link.href = url;
+    document.getElementsByTagName("head")[0].appendChild(link);
+  }
+
+  function loadModule(url) {
+    const script = document.createElement("script");
+    script.type = "module";
+    script.src = url;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  }
+
+  define("loadCSS", function() {
     return (url) => {
-      var urls = Array.isArray(url) ? url : [url];
+      const urls = Array.isArray(url) ? url : [url];
       urls.forEach(loadCSS);
     };
   });
-  
-  define('xwiki-livedata-vue-with-css', ['loadCSS', 'xwiki-livedata-vue'], function(loadCSS) {
-    // Load the CSS for the live data.
-    loadCSS(paths.css.liveData);
-    return arguments[1];
-  });
-  
-  define('daterangepicker-with-css', ['loadCSS', 'daterangepicker'], function(loadCSS) {
+
+  define("daterangepicker-with-css", ["loadCSS", "daterangepicker"], function(loadCSS) {
     // Load the CSS for the date range picker.
     loadCSS(paths.css.dateRangePicker);
     return arguments[1];
   });
-  
-  define('xwiki-selectize-with-css', ['loadCSS', 'xwiki-selectize'], function(loadCSS) {
+
+  define("xwiki-selectize-with-css", ["loadCSS", "xwiki-selectize"], function(loadCSS) {
     // Load the CSS for the suggest picker.
     loadCSS(paths.css.selectize);
     return arguments[1];
   });
-  
-  window.liveDataBaseURL = paths.liveDataBasePath;
-  
-  require(['jquery', 'xwiki-livedata'], function($, LiveData) {
-    $.fn.liveData = function(config) {
-      return this.each(function() {
-        if (!$(this).data('liveData')) {
-          var instanceConfig = $.extend($(this).data('config'), config);
-          $(this).attr('data-config', JSON.stringify(instanceConfig)).data('liveData', LiveData(this));
-        }
-      });
-    };
-  
-    var init = function(event, data) {
-      var container = $((data && data.elements) || document);
-      container.find('.liveData').liveData();
-    };
-  
-    $(document).on('xwiki:dom:updated', init);
-    $(init);
-  });
+
+  loadModule(paths.module["xwiki-livedata"]);
+  loadCSS(paths.css.liveData);
+  // Load a small less file with the declarations of a few LESS values that are not exported
+  // elsewhere
+  loadCSS(paths.css.liveDataLessVariables);
+  loadCSS(paths.css.liveDataLessReactive);
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths]));
+}).apply("]]#", $jsontool.serialize([$paths]));

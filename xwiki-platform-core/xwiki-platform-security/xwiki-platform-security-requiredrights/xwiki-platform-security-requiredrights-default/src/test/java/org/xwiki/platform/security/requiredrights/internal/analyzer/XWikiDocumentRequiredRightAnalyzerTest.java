@@ -23,13 +23,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import jakarta.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
+import org.xwiki.platform.security.requiredrights.display.BlockSupplierProvider;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -46,10 +50,11 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWikiDocumentRequiredRightAnalyzer}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
+@ComponentList(XWikiDocumentContentRequiredRightAnalyzer.class)
 class XWikiDocumentRequiredRightAnalyzerTest
 {
     @InjectMockComponents
@@ -69,6 +74,12 @@ class XWikiDocumentRequiredRightAnalyzerTest
 
     @MockComponent
     private VelocityDetector velocityDetector;
+
+    // Explicitly mock the translation message block supplier so it can be used in
+    // XWikiDocumentContentRequiredRightAnalyzer.
+    @MockComponent
+    @Named("translation")
+    private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @Test
     void analyze() throws Exception

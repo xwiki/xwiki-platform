@@ -77,7 +77,7 @@ XWiki.XWikiPreferences_showattachments.hint=Zeige den Bereich für Anhänge im S
 XWiki.XWikiPreferences_showhistory.hint=Zeige den Bereich mit der Historie im Seitenlayout.
 XWiki.XWikiPreferences_showinformation.hint=Zeige den Informationsbereich im Seitenlayout.
 XWiki.XWikiPreferences_title.hint=Definiere das Seitentitel-Format wie es von Browsern angezeigt wird.
-XWiki.XWikiPreferences_meta.hint=Definieren Sie die Metadaten, die jeder Seite hinzugefügt werden, unter Angabe von Seitenbeschreibung, Autor, Keywords usw.
+XWiki.XWikiPreferences_meta.hint=Legt die Metadaten fest, die in die HTML-Kopfzeile jeder Seite aufgenommen werden, einschließlich der Seitenbeschreibung, des Autors und der Schlüsselwörter. Die Standardvorlage meta.vm wird verwendet, wenn das Meta-Feld leer ist. Verwende #template('meta.vm') als Teil des Feldinhalts, um von zukünftigen Erweiterungen der Standard-Meta-Definition zu profitieren.
 XWiki.XWikiPreferences_webcopyright.hint=Definieren Sie die Informationen, die im Abschnitt Copyright der Fußzeile angezeigt werden.
 XWiki.XWikiPreferences_version.hint=Definieren Sie die Informationen, die im Versionsbereich der Fußzeile angezeigt werden.
 XWiki.XWikiPreferences_skin.hint=Geben Sie den verwendeten Standard-Skin an. Es kann ein Dateisystem-Skin sein, z.B. "Flamingo", oder ein benutzerdefinierter Seiten-Skin, z.B. "XWiki.DefaultSkin"
@@ -154,6 +154,10 @@ administration.section.analytics.status.hint=Bestimmen Sie, ob das Tracking in G
 # Social category
 ### Missing: admin.social=Social
 admin.social.description=Konfiguration für soziale Funktionen.
+
+# Network category
+admin.network=Netzwerk
+admin.network.description=Netzwerkbezogene Funktionen.
 
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=Anzeigen in Sektion

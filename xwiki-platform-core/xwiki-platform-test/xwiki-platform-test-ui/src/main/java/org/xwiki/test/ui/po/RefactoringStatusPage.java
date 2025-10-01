@@ -32,7 +32,8 @@ import org.openqa.selenium.support.FindBy;
 public class RefactoringStatusPage extends BasePage
 {
     private static final String MESSAGE_CSS_SELECTOR =
-        ".xcontent.job-status .box.successmessage, .xcontent.job-status .box.errormessage";
+        ".xcontent.job-status .box.successmessage > div, .xcontent.job-status .box.errormessage > div, " 
+            + ".xcontent.job-status .box.warningmessage > div";
 
     @FindBy(css = MESSAGE_CSS_SELECTOR)
     private WebElement message;

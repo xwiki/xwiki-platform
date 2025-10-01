@@ -103,7 +103,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
             resolve(context.getCurrentMacroBlock(), parameters.getReference(), parameters.getType(), "include");
         checkRecursion(context.getCurrentMacroBlock(), includedReference);
 
-        // Step 2: Retrieve the included document.
+        // Step 2a: Retrieve the included document.
         DocumentModelBridge documentBridge;
         try {
             documentBridge = this.documentAccessBridge.getDocumentInstance(includedReference);
@@ -111,6 +111,11 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
             throw new MacroExecutionException(
                 "Failed to load Document [" + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]",
                 e);
+        }
+
+        // Step 2b: Make sure the page exists
+        if (documentBridge.isNew()) {
+            return List.of();
         }
 
         // Step 3: Check right

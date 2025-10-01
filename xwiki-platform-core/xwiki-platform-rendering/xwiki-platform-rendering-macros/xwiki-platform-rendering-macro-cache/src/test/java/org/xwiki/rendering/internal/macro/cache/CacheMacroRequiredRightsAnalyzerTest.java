@@ -19,7 +19,14 @@
  */
 package org.xwiki.rendering.internal.macro.cache;
 
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.platform.security.requiredrights.MacroRequiredRightReporter;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -27,7 +34,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link CacheMacroRequiredRightsAnalyzer}.
@@ -40,19 +46,40 @@ class CacheMacroRequiredRightsAnalyzerTest
     @InjectMockComponents
     private CacheMacroRequiredRightsAnalyzer analyzer;
 
-    @Test
-    void analyze()
+    @ParameterizedTest
+    @MethodSource("idValuesProvider")
+    void analyze(String parameterName)
     {
-        MacroBlock macroBlock = mock();
         String idValue = "idValue";
         String contentValue = "contentValue";
-        when(macroBlock.getParameter("id")).thenReturn(idValue);
-        when(macroBlock.getContent()).thenReturn(contentValue);
+        MacroBlock macroBlock = new MacroBlock("cache", Map.of(parameterName, idValue), contentValue, false);
         MacroRequiredRightReporter reporter = mock();
 
         this.analyzer.analyze(macroBlock, reporter);
 
         verify(reporter).analyzeContent(macroBlock, idValue);
         verify(reporter).analyzeContent(macroBlock, contentValue);
+    }
+
+    @Test
+    void analyzeAllInOne()
+    {
+        Map<String, String> parameters = idValuesProvider().collect(Collectors.toMap(Function.identity(),
+            Function.identity()));
+        String content = "content";
+        MacroBlock macroBlock = new MacroBlock("cache", parameters, content, false);
+        MacroRequiredRightReporter reporter = mock();
+
+        this.analyzer.analyze(macroBlock, reporter);
+
+        verify(reporter).analyzeContent(macroBlock, content);
+        for (String value : parameters.values()) {
+            verify(reporter).analyzeContent(macroBlock, value);
+        }
+    }
+
+    static Stream<String> idValuesProvider()
+    {
+        return Stream.of("id", "ID", "Id", "iD");
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-docker</artifactId>
   <name>XWiki Platform - Test - Docker UI Test Framework</name>
@@ -165,8 +165,8 @@
       <artifactId>commons-httpclient</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>compile</scope>
     </dependency>
     <!-- Dependency to generate XED files by reusing existing code -->
@@ -187,21 +187,17 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
       <version>${project.version}</version>
-      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
-           stop the chain -->
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
+    <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
+         they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
-      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
-           stop the chain -->
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
-    <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
-         they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-minimaldependencies</artifactId>

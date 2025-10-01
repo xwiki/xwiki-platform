@@ -35,7 +35,7 @@ public interface PagesForTagsResource
             @PathParam("wikiName") String wikiName,
             @PathParam("tagNames") String tagNames,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;
 }

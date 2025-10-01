@@ -62,6 +62,7 @@ tour.livetable.targetClass=Classe cible
 tour.popover.previous=« Précédent
 tour.popover.next=Suivant »
 tour.popover.end=Terminer
+tour.popover.quit=Arrêter la visite
 tour.popover.show=Lancer la visite guidée
 tour.popover.show.hint=Vous pouvez relancer la visite guidée à tout moment en cliquant sur ce bouton
 

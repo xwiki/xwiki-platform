@@ -191,11 +191,11 @@ public class Importer
     private void setHistoryStrategy(String historyStrategy, XARInputProperties xarProperties,
         DocumentInstanceOutputProperties instanceProperties)
     {
-        if (StringUtils.equals(historyStrategy, "reset")) {
+        if (StringUtils.equalsIgnoreCase(historyStrategy, "reset")) {
             instanceProperties.setPreviousDeleted(true);
             instanceProperties.setVersionPreserved(false);
             xarProperties.setWithHistory(false);
-        } else if (StringUtils.equals(historyStrategy, "replace")) {
+        } else if (StringUtils.equalsIgnoreCase(historyStrategy, "replace")) {
             instanceProperties.setPreviousDeleted(true);
             instanceProperties.setVersionPreserved(true);
             xarProperties.setWithHistory(true);

@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -92,7 +92,7 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
 
         // Get the annotated syntax corresponding to the current target syntax
         String annotatedTargetSyntax = currentTargetSyntax.toIdString();
-        if (!StringUtils.startsWith(annotatedTargetSyntax, ANNOTATED_SYNTAXES_PREFIX)) {
+        if (!Strings.CS.startsWith(annotatedTargetSyntax, ANNOTATED_SYNTAXES_PREFIX)) {
             annotatedTargetSyntax = ANNOTATED_SYNTAXES_PREFIX + annotatedTargetSyntax;
         }
         

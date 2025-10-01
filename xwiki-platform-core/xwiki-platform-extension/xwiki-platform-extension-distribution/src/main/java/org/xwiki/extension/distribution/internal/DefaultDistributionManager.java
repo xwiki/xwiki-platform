@@ -47,18 +47,18 @@ import org.xwiki.extension.distribution.internal.job.DistributionRequest;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.job.Job;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserException;
+import org.xwiki.user.UserManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
 
 /**
  * Default {@link DistributionManager} implementation.
@@ -124,10 +124,19 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     private JobStatusStore jobStatusStorage;
 
     @Inject
-    private Logger logger;
+    private JobExecutor jobExecutor;
+
+    @Inject
+    private UserManager userManager;
 
     @Inject
     private ConfigurationSource configuration;
+
+    @Inject
+    protected DistributionConfiguration distributionConfiguration;
+
+    @Inject
+    private Logger logger;
 
     private CoreExtension distributionExtension;
 
@@ -202,7 +211,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             request.setId(getFarmJobId());
             request.setWiki(xcontext.getMainXWiki());
             request.setUserReference(xcontext.getUserReference());
-            request.setInteractive(this.configuration.getProperty("distribution.job.interactive", true));
+            request.setInteractive(this.distributionConfiguration.isInteractiveDistributionWizardEnabledForMainWiki());
 
             Thread distributionJobThread = new Thread(new Runnable()
             {
@@ -244,46 +253,51 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     }
 
     @Override
-    public DistributionJob startWikiJob(String wiki)
+    public DistributionJob startWikiJob(String wiki, boolean waitReady)
     {
+        DistributionRequest request = new DistributionRequest();
+        request.setId(getWikiJobId(wiki));
+        request.setWiki(wiki);
+        request.setUserReference(this.xcontextProvider.get().getUserReference());
+        request.setInteractive(this.distributionConfiguration.isInteractiveDistributionWizardEnabledForWiki());
+
         try {
-            DistributionJob wikiJob = this.componentManager.getInstance(Job.class, DefaultDistributionJob.HINT);
-            this.wikiDistributionJobs.put(wiki, wikiJob);
+            if (waitReady) {
+                DistributionJob wikiJob = this.componentManager.getInstance(Job.class, DefaultDistributionJob.HINT);
+                this.wikiDistributionJobs.put(wiki, wikiJob);
 
-            final DistributionRequest request = new DistributionRequest();
-            request.setId(getWikiJobId(wiki));
-            request.setWiki(wiki);
-            request.setUserReference(this.xcontextProvider.get().getUserReference());
-            request.setInteractive(this.configuration.getProperty("distribution.job.interactive.wiki", true));
-
-            Thread distributionJobThread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
+                Thread distributionJobThread = new Thread(new Runnable()
                 {
-                    // Create a clean Execution Context
-                    ExecutionContext context = new ExecutionContext();
+                    @Override
+                    public void run()
+                    {
+                        // Create a clean Execution Context
+                        ExecutionContext context = new ExecutionContext();
 
-                    try {
-                        executionContextManager.initialize(context);
-                    } catch (ExecutionContextException e) {
-                        throw new RuntimeException("Failed to initialize wiki distribution job execution context", e);
+                        try {
+                            executionContextManager.initialize(context);
+                        } catch (ExecutionContextException e) {
+                            throw new RuntimeException("Failed to initialize wiki distribution job execution context",
+                                e);
+                        }
+
+                        DistributionJob job = wikiDistributionJobs.get(request.getWiki());
+                        job.initialize(request);
+                        job.run();
                     }
+                });
 
-                    DistributionJob job = wikiDistributionJobs.get(request.getWiki());
-                    job.initialize(request);
-                    job.run();
-                }
-            });
+                distributionJobThread.setDaemon(true);
+                distributionJobThread.setName("Distribution initialization of wiki [" + wiki + "]");
+                distributionJobThread.start();
 
-            distributionJobThread.setDaemon(true);
-            distributionJobThread.setName("Distribution initialization of wiki [" + wiki + "]");
-            distributionJobThread.start();
+                // Wait until the job is ready (or finished)
+                wikiJob.awaitReady();
 
-            // Wait until the job is ready (or finished)
-            wikiJob.awaitReady();
-
-            return wikiJob;
+                return wikiJob;
+            } else {
+                return (DistributionJob) this.jobExecutor.execute(DefaultDistributionJob.HINT, request);
+            }
         } catch (Exception e) {
             this.logger.error("Failed to create distribution job for wiki [" + wiki + "]", e);
         }
@@ -400,17 +414,16 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
         // If not guest make sure the user has admin right
         if (currentUser != null) {
-            return this.authorizationManager.hasAccess(Right.ADMIN, currentUser,
-                new WikiReference(xcontext.getWikiId()));
+            return this.authorizationManager.hasAccess(Right.ADMIN, currentUser, xcontext.getWikiReference());
         }
 
         // Give guess access if there is no other user already registered
         if (xcontext.isMainWiki()) {
             // If there is no user on main wiki let guest access distribution wizard
             try {
-                return RightsManager.getInstance().countAllGlobalUsersOrGroups(true, null, xcontext) == 0;
-            } catch (XWikiException e) {
-                this.logger.error("Failed to count global users", e);
+                return !this.userManager.hasUsers(xcontext.getWikiReference());
+            } catch (UserException e) {
+                this.logger.error("Failed to check if main wiki has any user", e);
             }
         }
 

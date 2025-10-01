@@ -153,13 +153,13 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     @Override
     public void initialize() throws InitializationException
     {
-        initialize(100, false, true);
-
         try {
             this.client = this.solr.getClient(EventsSolrCoreInitializer.NAME);
         } catch (SolrException e) {
             throw new InitializationException("Failed to get the events Solr core", e);
         }
+
+        initialize(100, false, true);
     }
 
     @Override

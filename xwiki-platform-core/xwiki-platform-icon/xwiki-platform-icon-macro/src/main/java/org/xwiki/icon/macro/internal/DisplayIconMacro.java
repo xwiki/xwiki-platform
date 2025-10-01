@@ -197,4 +197,10 @@ public class DisplayIconMacro extends AbstractExecutedContentMacro<DisplayIconMa
 
         return iconSet;
     }
+
+    @Override
+    public boolean isExecutionIsolated(DisplayIconMacroParameters parameters, String content)
+    {
+        return true;
+    }
 }

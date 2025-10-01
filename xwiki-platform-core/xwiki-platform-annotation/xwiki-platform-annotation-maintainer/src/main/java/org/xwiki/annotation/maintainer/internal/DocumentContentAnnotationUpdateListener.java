@@ -19,10 +19,6 @@
  */
 package org.xwiki.annotation.maintainer.internal;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -34,7 +30,7 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 
 /**
@@ -47,7 +43,7 @@ import org.xwiki.observation.event.Event;
 @Component
 @Named("document-content-annotation-updater")
 @Singleton
-public class DocumentContentAnnotationUpdateListener implements EventListener
+public class DocumentContentAnnotationUpdateListener extends AbstractLocalEventListener
 {
     /**
      * Entity reference serializer, to serialize the modified document reference to send to the annotations service.
@@ -75,24 +71,15 @@ public class DocumentContentAnnotationUpdateListener implements EventListener
     private volatile boolean isUpdating;
 
     /**
-     * The events observed by this observation manager.
+     * The default constructor.
      */
-    private final List<Event> eventsList = new ArrayList<Event>(Arrays.asList(new DocumentUpdatedEvent()));
-
-    @Override
-    public List<Event> getEvents()
+    public DocumentContentAnnotationUpdateListener()
     {
-        return eventsList;
+        super("DocumentContentAnnotationUpdateListener", new DocumentUpdatedEvent());
     }
 
     @Override
-    public String getName()
-    {
-        return "DocumentContentAnnotationUpdateListener";
-    }
-
-    @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
         DocumentModelBridge currentDocument = (DocumentModelBridge) source;
 

@@ -57,7 +57,10 @@ public class WebDriverFactory
                 // Make sure Firefox doesn't upgrade automatically on CI agents.
                 .addPreference("app.update.auto", false)
                 .addPreference("app.update.enabled", false)
-                .addPreference("app.update.silent", false);
+                .addPreference("app.update.silent", false)
+                // Fix a recent regression leading to JavascriptException: Cyclic object value errors
+                // See: https://github.com/mozilla/geckodriver/issues/2212
+                .addPreference("remote.events.async.enabled", false);
             driver = new FirefoxDriver(options);
 
             // Hide the Add-on bar (from the bottom of the window, with "WebDriver" written on the right) because it can

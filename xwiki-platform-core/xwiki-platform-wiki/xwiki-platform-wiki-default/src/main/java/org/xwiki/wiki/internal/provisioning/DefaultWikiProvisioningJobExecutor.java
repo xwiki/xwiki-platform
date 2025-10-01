@@ -86,7 +86,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
 
         // Setup jobs thread
         BasicThreadFactory factory =
-                new BasicThreadFactory.Builder().namingPattern("XWiki provisioning thread").daemon(true)
+                BasicThreadFactory.builder().namingPattern("XWiki provisioning thread").daemon(true)
                         .priority(Thread.MIN_PRIORITY).build();
         this.jobExecutor = Executors.newCachedThreadPool(factory);
     }

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.store.hibernate.query;
 
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,7 +36,19 @@ import org.xwiki.query.WrappingQuery;
  */
 public final class HqlQueryUtils
 {
+    private static final String FROM = "from";
+
+    private static final String WHERE = "where ";
+
+    private static final String ORDER = "order";
+
+    private static final String ORDER_BY = "order by";
+
+    private static final String COMMA = ",";
+
     private static final Pattern LEGACY_ORDINAL_PARAMS_PATTERN = Pattern.compile("([=\\s,\\(<>])\\?([=\\s,\\)<>]|$)");
+
+    private static final Set<String> VALID_ORDER = Set.of("asc", "desc");
 
     private HqlQueryUtils()
     {
@@ -47,7 +61,7 @@ public final class HqlQueryUtils
      */
     public static boolean isShortFormStatement(String statement)
     {
-        return StringUtils.startsWithAny(statement.trim().toLowerCase(), ",", "from", "where", "order");
+        return StringUtils.startsWithAny(statement.trim().toLowerCase(), COMMA, WHERE, ORDER_BY);
     }
 
     /**
@@ -128,5 +142,85 @@ public final class HqlQueryUtils
         }
 
         return completeQuery;
+    }
+
+    /**
+     * @param queryPrefix the start of the SQL query (for example "select distinct doc.space, doc.name")
+     * @param whereSQL the where clause to append
+     * @return the full formed SQL query, to which the order by columns have been added as returned columns (this is
+     *         required for example for HSQLDB).
+     * @since 17.0.3RC1
+     * @since 16.10.6
+     */
+    public static String createLegacySQLQuery(String queryPrefix, String whereSQL)
+    {
+        StringBuilder sql = new StringBuilder(queryPrefix);
+
+        String normalizedWhereSQL;
+        if (StringUtils.isBlank(whereSQL)) {
+            normalizedWhereSQL = "";
+        } else {
+            normalizedWhereSQL = whereSQL.trim();
+        }
+
+        sql.append(getColumnsForSelectStatement(normalizedWhereSQL));
+        sql.append(" from XWikiDocument as doc");
+
+        if (!normalizedWhereSQL.equals("")) {
+            if ((!normalizedWhereSQL.startsWith(WHERE)) && (normalizedWhereSQL.charAt(0) != ',')) {
+                sql.append(" where ");
+            } else {
+                sql.append(" ");
+            }
+            sql.append(normalizedWhereSQL);
+        }
+
+        return sql.toString();
+    }
+
+    /**
+     * @param whereSQL the SQL where clause
+     * @return the list of columns to return in the select clause as a string starting with ", " if there are columns or
+     *         an empty string otherwise. The returned columns are extracted from the where clause. One reason for doing
+     *         so is because HSQLDB only support SELECT DISTINCT SQL statements where the columns operated on are
+     *         returned from the query.
+     * @since 17.0.3RC1
+     * @since 16.10.6
+     */
+    public static String getColumnsForSelectStatement(String whereSQL)
+    {
+        StringBuilder columns = new StringBuilder();
+
+        int orderByPos = whereSQL.toLowerCase().indexOf(ORDER_BY);
+        if (orderByPos >= 0) {
+            String orderByStatement = whereSQL.substring(orderByPos + ORDER_BY.length() + 1);
+            StringTokenizer tokenizer = new StringTokenizer(orderByStatement, COMMA);
+            while (tokenizer.hasMoreTokens()) {
+                String column = tokenizer.nextToken().trim();
+                // Remove "desc" or "asc" from the column found
+                column = StringUtils.removeEndIgnoreCase(column, " desc");
+                column = StringUtils.removeEndIgnoreCase(column, " asc");
+                columns.append(", ").append(column.trim());
+            }
+        }
+
+        return columns.toString();
+    }
+
+    /**
+     * @param order the order
+     * @param def the default value to return if the value is not valid
+     * @return the valid value
+     * @since 17.5.0
+     * @since 17.4.2
+     * @since 16.10.9
+     */
+    public static String getValidQueryOrder(String order, String def)
+    {
+        if (order == null || !VALID_ORDER.contains(order.toLowerCase())) {
+            return def;
+        }
+
+        return order;
     }
 }

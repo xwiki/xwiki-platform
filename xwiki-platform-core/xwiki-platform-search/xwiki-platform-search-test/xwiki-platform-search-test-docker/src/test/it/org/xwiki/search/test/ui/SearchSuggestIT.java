@@ -19,13 +19,16 @@
  */
 package org.xwiki.search.test.ui;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebElement;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.search.test.po.QuickSearchElement;
+import org.xwiki.search.test.po.QuickSearchResult;
+import org.xwiki.search.test.po.SearchAdministrationPage;
 import org.xwiki.search.test.po.SearchSuggestAdministrationPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -34,6 +37,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,7 +47,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @version $Id$
  */
-@UITest
+@UITest(properties = {
+    // Exclude the Groovy script below from the PR checker.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*Test\\.Execute\\..*"
+}, extraJARs = {
+    // Solr initialization isn't reliable when it's not part of the WAR.
+    "org.xwiki.platform:xwiki-platform-search-solr-query"
+})
 class SearchSuggestIT
 {
     @Test
@@ -61,15 +71,59 @@ class SearchSuggestIT
 
         QuickSearchElement quickSearchElement = new QuickSearchElement();
         quickSearchElement.search(testDocumentTitle);
-        WebElement firstSuggestElement = quickSearchElement.getSuggestItemTitles(0);
-        assertEquals(testDocumentTitle, firstSuggestElement.getText());
+        assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
+    }
+
+    /**
+     * This test checks if the search exclusions filter is applied. The behavior of the filter is tested more thoroughly
+     * in {@link SolrSearchIT#searchExclusions(TestUtils, TestConfiguration, TestReference)}.
+     */
+    @Test
+    @Order(2)
+    void searchExclusions(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        // Create some pages to appear in search results.
+        String matchedWord = "foobar";
+        setup.rest().savePage(new DocumentReference("Apple", testReference.getLastSpaceReference()), matchedWord,
+            "Apple");
+        setup.rest().savePage(new DocumentReference("Banana", testReference.getLastSpaceReference()), matchedWord,
+            "Banana");
+
+        // Wait for the created pages to be indexed.
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+
+        // Reset search exclusions.
+        SearchAdministrationPage searchAdminPage = SearchAdministrationPage.gotoPage();
+        searchAdminPage.getSearchExclusionsField().clearSelectedSuggestions().hideSuggestions();
+        searchAdminPage.clickSave();
+
+        // Check the search results without search exclusions.
+        QuickSearchElement quickSearchElement = new QuickSearchElement();
+        quickSearchElement.search(matchedWord);
+        assertThat(quickSearchElement.getResults("Page content").stream().map(QuickSearchResult::getTitle).toList(),
+            containsInAnyOrder("Apple", "Banana"));
+
+        // Configure search exclusions.
+        searchAdminPage = SearchAdministrationPage.gotoPage();
+        searchAdminPage.getSearchExclusionsField().sendKeys("Banana").waitForSuggestions().selectByVisibleText("Banana")
+            .hideSuggestions();
+        searchAdminPage.clickSave();
+
+        // Check the search results after configuring search exclusions.
+        quickSearchElement = new QuickSearchElement();
+        quickSearchElement.search(matchedWord);
+        assertEquals(List.of("Apple"),
+            quickSearchElement.getResults("Page content").stream().map(QuickSearchResult::getTitle).toList());
     }
 
     /**
      * Note: must be the last test since it de-activates the search suggest.
      */
     @Test
-    @Order(2)
+    @Order(3)
     void verifyDisablingSearchSuggest(TestUtils setup, TestReference testReference)
     {
         // Navigate to any page and verify that the page source loads the search suggest script.

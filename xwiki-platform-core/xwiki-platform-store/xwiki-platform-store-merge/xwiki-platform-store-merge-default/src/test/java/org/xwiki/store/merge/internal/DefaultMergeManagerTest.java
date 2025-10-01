@@ -449,11 +449,42 @@ public class DefaultMergeManagerTest
             newobj.setStringValue("newtest", "newtest");
             this.nextDocument.addXObject(newobj);
 
-            merge();
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            // We get 2 logs: one for the change on existing property, one for the new property.
+            assertEquals(2, logs.size());
+            assertEquals("Collision found on object [Object wiki:space.page^classspace.class[0]]",
+                logs.get(0).getFormattedMessage());
+            assertEquals("Collision found on object [Object wiki:space.page^classspace.class[0]]",
+                logs.get(1).getFormattedMessage());
 
-            BaseObject mergedobj = this.currentDocument.getXObject(this.xclass.getReference(), 0);
-
+            BaseObject mergedobj = ((XWikiDocument) result.getMergeResult()).getXObject(this.xclass.getReference(), 0);
             assertNull(mergedobj);
+        }
+
+        @Test
+        public void testMergeCurrentObjectRemovedFallbackNext() throws Exception
+        {
+            this.configuration.setConflictFallbackVersion(MergeConfiguration.ConflictFallbackVersion.NEXT);
+            this.xobject.setStringValue("test", "");
+            this.xobject.setStringValue("previoustest", "previoustest");
+            this.previousDocument.addXObject(this.xobject);
+
+            BaseObject newobj = this.xobject.clone();
+            newobj.setStringValue("test", "test2");
+            newobj.setStringValue("newtest", "newtest");
+            this.nextDocument.addXObject(newobj);
+
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            // We get a single log because at second pass the object is set.
+            assertEquals(1, logs.size());
+            assertEquals("Collision found on object [Object wiki:space.page^classspace.class[0]]", logs.get(0).getFormattedMessage());
+
+            BaseObject mergedobj = ((XWikiDocument) result.getMergeResult()).getXObject(this.xclass.getReference(), 0);
+            assertEquals(newobj, mergedobj);
         }
 
         @Test
@@ -621,6 +652,69 @@ public class DefaultMergeManagerTest
 
             XWikiAttachment newAttachment = this.currentDocument.getAttachment("file");
 
+            assertNotNull(newAttachment);
+            assertEquals(9, newAttachment.getLongSize());
+            assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, newAttachment.getContent(null));
+        }
+
+        @Test
+        public void testMergeAttachmentModifiedDeletedInCurrent() throws Exception
+        {
+            XWikiAttachment attachment = new XWikiAttachment();
+
+            attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            attachment.setLongSize(10);
+            attachment.setFilename("file");
+
+            this.previousDocument.addAttachment(attachment);
+
+            attachment = attachment.clone();
+            attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+            attachment.setLongSize(9);
+
+            this.nextDocument.addAttachment(attachment);
+
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            assertEquals(1, logs.size());
+            assertEquals("Collision found on attachment [Attachment wiki:space.page@file]",
+                logs.get(0).getFormattedMessage());
+
+            assertFalse(result.isModified());
+
+            XWikiAttachment newAttachment = ((XWikiDocument) result.getMergeResult()).getAttachment("file");
+            assertNull(newAttachment);
+        }
+
+        @Test
+        public void testMergeAttachmentModifiedDeletedInCurrentFallbackOnNext() throws Exception
+        {
+            this.configuration.setConflictFallbackVersion(MergeConfiguration.ConflictFallbackVersion.NEXT);
+            XWikiAttachment attachment = new XWikiAttachment();
+
+            attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            attachment.setLongSize(10);
+            attachment.setFilename("file");
+
+            this.previousDocument.addAttachment(attachment);
+
+            attachment = attachment.clone();
+            attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+            attachment.setLongSize(9);
+
+            this.nextDocument.addAttachment(attachment);
+
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            assertEquals(1, logs.size());
+            assertEquals("Collision found on attachment [Attachment wiki:space.page@file]",
+                logs.get(0).getFormattedMessage());
+
+            assertTrue(result.isModified());
+
+            XWikiAttachment newAttachment = ((XWikiDocument) result.getMergeResult()).getAttachment("file");
             assertNotNull(newAttachment);
             assertEquals(9, newAttachment.getLongSize());
             assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, newAttachment.getContent(null));

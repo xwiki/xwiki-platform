@@ -120,7 +120,7 @@ public class RightsFilterListener extends AbstractEventListener
                 } catch (AccessDeniedException e) {
                     event.cancel(
                         "The author doesn't have the right [%s] on the [%s] level that has been specified as required."
-                            .formatted(requiredRight.right().getName(), requiredRight.scope().getLowerCase()));
+                            .formatted(requiredRight.right().getName(), requiredRight.scope()));
                     break;
                 }
             }

@@ -28,8 +28,8 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -68,7 +68,7 @@ public class RichTextAreaElement extends BaseElement
     /**
      * The CKEditor instance that owns this rich text area.
      */
-    private CKEditor editor;
+    protected CKEditor editor;
 
     /**
      * The element that defines the rich text area.
@@ -179,9 +179,31 @@ public class RichTextAreaElement extends BaseElement
         if (keysToSend.length > 0) {
             try {
                 getActiveElement().sendKeys(keysToSend);
+                maybeForceSelectionChange();
             } finally {
                 maybeSwitchToDefaultContent();
             }
+        }
+    }
+
+    private void maybeForceSelectionChange()
+    {
+        String browserName = getDriver().getCapabilities().getBrowserName().toLowerCase();
+        if (!this.isFrame && browserName.contains("firefox")) {
+            // When editing in-place in Firefox, the selection (caret position) is not updated if the editor is losing
+            // focus immediately after some text has been typed. This happens for instance if you type and then quickly
+            // switch to a different browser tab. When you get back the caret is before the newly typed text instead of
+            // after it. Same happens if you type and then quickly focus another element on the same page (e.g. another
+            // form field). This is a CKEditor bug, which you can reproduce using the CKEditor 4 demo, after selecting
+            // the "Inline" mode. The workaround we found is to force CKEditor to acknowledge the selection change right
+            // after typing, before the editor loses focus. Note that we could have waited for the "selectionChange"
+            // event to be fired after typing, but its documentation says: "this event is fired only when selection's
+            // start element (container of a selecion start) changes, not on every possible selection change", which
+            // means this event is not triggered when we type.
+            getDriver().executeScript("""
+                const name = arguments[0];
+                const editor = CKEDITOR.instances[name];
+                editor.selectionChange(true);""", this.editor.getName());
         }
     }
 
@@ -231,6 +253,11 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentContains(String html)
     {
+        waitUntilContentContains(html, getDriver().getTimeout());
+    }
+
+    protected void waitUntilContentContains(String html, int timeout)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
                 return StringUtils.contains(getContent(), html);
@@ -239,7 +266,7 @@ public class RichTextAreaElement extends BaseElement
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
                 return false;
             }
-        });
+        }, timeout);
     }
 
     /**
@@ -251,6 +278,11 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilTextContains(String textFragment)
     {
+        waitUntilTextContains(textFragment, getDriver().getTimeout());
+    }
+
+    protected void waitUntilTextContains(String textFragment, int timeout)
+    {
         getDriver().waitUntilCondition(driver -> {
             try {
                 return StringUtils.contains(getText(), textFragment);
@@ -259,7 +291,7 @@ public class RichTextAreaElement extends BaseElement
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
                 return false;
             }
-        });
+        }, timeout);
     }
 
     /**
@@ -321,7 +353,7 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilContentEditable()
     {
         getDriver().waitUntilCondition(driver -> getFromEditedContent(
-            () -> getRootEditableElement(false).getAttribute("contenteditable").equals("true")));
+            () -> getRootEditableElement(false).getDomAttribute("contenteditable").equals("true")));
         this.cachedRefreshCounter = getRefreshCounter();
     }
 
@@ -334,7 +366,7 @@ public class RichTextAreaElement extends BaseElement
         try {
             WebElement rootEditableElement = getRootEditableElement();
             getDriver().waitUntilCondition(
-                driver -> Objects.equals(placeholder, rootEditableElement.getAttribute("data-cke-editorplaceholder")));
+                driver -> Objects.equals(placeholder, rootEditableElement.getDomAttribute("data-cke-editorplaceholder")));
         } finally {
             maybeSwitchToDefaultContent();
         }
@@ -423,44 +455,7 @@ public class RichTextAreaElement extends BaseElement
      */
     public String getRefreshCounter()
     {
-        return getFromEditedContent(() -> getRootEditableElement(false).getAttribute("data-xwiki-refresh-counter"));
-    }
-
-    /**
-     * Sends the Save &amp; Continue shortcut key to the text area and waits for the success notification message.
-     *
-     * @since 16.9.0RC1
-     * @since 16.4.5
-     * @since 15.10.13
-     */
-    public void sendSaveShortcutKey()
-    {
-        sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
-
-        // The code that waits for the save confirmation clicks on the success notification message to hide it and this
-        // steals the focus from the rich text area. Unfortunately this makes Chrome lose the caret position: the next
-        // sendKeys will insert the text at the end of the edited content. To avoid this, we backup the active element
-        // and restore it after the save confirmation.
-        WebElement activeElement;
-        try {
-            activeElement = getActiveElement();
-        } finally {
-            maybeSwitchToDefaultContent();
-        }
-
-        // This steals the focus from the rich text area because it clicks on the success notification message in order
-        // to hide it.
-        waitForNotificationSuccessMessage("Saved");
-
-        // Restore the focus to the previously active element. We cannot simply focus the rich text area because the
-        // previously active element might have been a nested editable area (e.g. from an inline editable macro or from
-        // the image caption).
-        maybeSwitchToEditedContent();
-        try {
-            focus(activeElement);
-        } finally {
-            maybeSwitchToDefaultContent();
-        }
+        return getFromEditedContent(() -> getRootEditableElement(false).getDomAttribute("data-xwiki-refresh-counter"));
     }
 
     private void focus(WebElement element)
@@ -570,22 +565,35 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitForOwnNotificationSuccessMessage(String message)
     {
-        waitForOwnNotificationMessage("success", message);
+        waitForOwnNotificationMessage("success", message, true);
     }
 
-    private void waitForOwnNotificationMessage(String level, String message)
+    /**
+     * Waits for a progress notification message to be displayed for this rich text area element.
+     *
+     * @param message the notification message to wait for
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     */
+    public void waitForOwnNotificationProgressMessage(String message)
+    {
+        waitForOwnNotificationMessage("info", message, false);
+    }
+
+    private void waitForOwnNotificationMessage(String level, String message, boolean close)
     {
         String notificationMessageLocator =
             String.format("//div[contains(@class,'cke_notification_%s') and contains(., '%s')]", level, message);
         getDriver().waitUntilElementIsVisible(By.xpath(notificationMessageLocator));
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.
-        try {
-            String notificationCloseLocator = notificationMessageLocator + "/a[@class = 'cke_notification_close']";
-            getDriver().findElementWithoutWaiting(By.xpath(notificationCloseLocator)).click();
-        } catch (WebDriverException e) {
-            // The notification message may disappear before we get to click on it and thus we ignore in case there's
-            // an error.
+        if (close) {
+            try {
+                String notificationCloseLocator = notificationMessageLocator + "/a[@class = 'cke_notification_close']";
+                getDriver().findElementWithoutWaiting(By.xpath(notificationCloseLocator)).click();
+            } catch (WebDriverException e) {
+                // The notification message may disappear before we get to click on it.
+            }
         }
     }
 
@@ -620,5 +628,72 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilWidgetSelected()
     {
         waitUntilContentContains("cke_widget_selected");
+    }
+
+    /**
+     * @return the text selected in the rich text area, or an empty string if no text is selected
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public String getSelectedText()
+    {
+        return (String) getDriver().executeScript(
+            "return CKEDITOR.instances[arguments[0]].getSelection().getSelectedText()", this.editor.getName());
+    }
+
+    /**
+     * @return the size of the rich text area
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public Dimension getSize()
+    {
+        return this.container.getSize();
+    }
+
+    /**
+     * @param xOffset the horizontal offset from the text area's left border
+     * @param yOffset the vertical offset from the text area's top border
+     * @return {@code true} if the specified point inside the text area is visible (i.e. inside the viewport),
+     *         {@code false} otherwise
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public boolean isVisible(int xOffset, int yOffset)
+    {
+        return getDriver().isVisible(this.container, xOffset, yOffset);
+    }
+
+    /**
+     * Drag the specified image relative to its current position.
+     * 
+     * @param imageIndex the index of the image to be dragged (0-based)
+     * @param xOffset the horizontal move offset (from the current position of the image)
+     * @param yOffset the vertical move offset (from the current position of the image)
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void dragAndDropImageBy(int imageIndex, int xOffset, int yOffset)
+    {
+        verifyContent(editedContent -> {
+            WebElement targetImage = editedContent.getImages().get(imageIndex);
+            WebElement dragHandle = targetImage
+                .findElement(By.xpath("./ancestor::*[@data-cke-widget-wrapper]//*[@data-cke-widget-drag-handler]"));
+            // This doesn't seem to work in Firefox, at least not for the standalone WYSIWYG edit mode, where the rich
+            // text area is implemented using an iframe. Here's what we tried:
+            // * pausing after each action (e.g. hover the image, pause 2s, click and hold the drag handle, pause 2s,
+            //   and so on)
+            // * clicking the image before dragging it
+            // * clicking the rich text area before dragging the image
+            // * use the root editable element as the drop target, and consider the offsets relative to the top left
+            //   corner of the rich text area
+            // * calling perform() after each action
+            // * switching to the top frame and dropping on the iframe element used by the rich text area
+            getDriver().createActions()
+                // Hover the image first to make sure the drag handle is visible.
+                .moveToElement(targetImage)
+                // We have to drag the image using the dedicated drag handle.
+                .dragAndDropBy(dragHandle, xOffset, yOffset).perform();
+        });
     }
 }

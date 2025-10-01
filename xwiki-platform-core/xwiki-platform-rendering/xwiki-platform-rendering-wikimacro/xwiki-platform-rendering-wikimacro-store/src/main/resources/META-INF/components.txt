@@ -7,3 +7,4 @@ org.xwiki.rendering.wikimacro.internal.WikiMacroClassDocumentInitializer
 org.xwiki.rendering.wikimacro.internal.WikiMacroContentMacro
 org.xwiki.rendering.wikimacro.internal.WikiMacroParameterClassDocumentInitializer
 org.xwiki.rendering.wikimacro.internal.WikiMacroParameterMacro
+org.xwiki.rendering.wikimacro.internal.WikiMacroParameterObjectRequiredRightAnalyzer

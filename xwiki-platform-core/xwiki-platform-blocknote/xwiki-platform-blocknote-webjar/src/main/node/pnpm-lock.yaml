@@ -62,8 +62,8 @@ importers:
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-uniast':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+        specifier: 0.21.1
+        version: 0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.3)
       inversify:
         specifier: 7.5.2
         version: 7.5.2(reflect-metadata@0.2.2)
@@ -1218,6 +1218,11 @@ packages:
 
   '@xwiki/cristal-uniast@0.19.0':
     resolution: {integrity: sha512-IsgeSKZbBKyL7yALPrwtRxtNMprvKTBWd+eBRqfJE1cfHgw0+0EfDjCo4J/hkAQRplkT4bfIq5FB/hnQ+8dSLA==}
+
+  '@xwiki/cristal-uniast@0.21.1':
+    resolution: {integrity: sha512-wPFXNq7XFsuW/hUpBCVLDtb7GlzFTwd0dkg0XXbZysNNBTsIsKQvn/YDkfn0dsscOimm7s9pLJCU2yAD2NnsCQ==}
+    peerDependencies:
+      inversify: 7.5.2
 
   abbrev@2.0.0:
     resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
@@ -4262,6 +4267,26 @@ snapshots:
       - typescript
 
   '@xwiki/cristal-uniast@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+    dependencies:
+      '@xwiki/cristal-fn-utils': 0.19.0
+      '@xwiki/cristal-model-api': 0.19.0
+      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      inversify: 7.5.2(reflect-metadata@0.2.2)
+      mdast-util-gfm-strikethrough: 2.0.0
+      mdast-util-gfm-table: 2.0.0
+      mdast-util-gfm-task-list-item: 2.0.0
+      micromark-extension-gfm-strikethrough: 2.1.0
+      micromark-extension-gfm-table: 2.1.1
+      micromark-extension-gfm-task-list-item: 2.1.0
+      remark-parse: 11.0.0
+      unified: 11.0.5
+    transitivePeerDependencies:
+      - reflect-metadata
+      - supports-color
+      - typescript
+
+  '@xwiki/cristal-uniast@0.21.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
       '@xwiki/cristal-fn-utils': 0.19.0
       '@xwiki/cristal-model-api': 0.19.0

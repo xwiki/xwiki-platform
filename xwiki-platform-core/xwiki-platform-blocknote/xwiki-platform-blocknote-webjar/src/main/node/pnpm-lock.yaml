@@ -27,49 +27,49 @@ importers:
         version: 8.1.1(@mantine/hooks@8.1.1(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@xwiki/cristal-api':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-attachments-default':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-authentication-api':
         specifier: 0.19.0
         version: 0.19.0(reflect-metadata@0.2.2)
       '@xwiki/cristal-backend-api':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-document-api':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-dsapi':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-editors-blocknote-headless':
         specifier: 0.19.0
-        version: 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.2)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
+        version: 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
       '@xwiki/cristal-editors-blocknote-react':
         specifier: 0.19.0
-        version: 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.2)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
+        version: 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
       '@xwiki/cristal-link-suggest-api':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api':
         specifier: 0.19.0
         version: 0.19.0
       '@xwiki/cristal-model-reference-api':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-remote-url-api':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-uniast':
         specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       inversify:
         specifier: 7.5.2
         version: 7.5.2(reflect-metadata@0.2.2)
       pinia:
         specifier: 3.0.2
-        version: 3.0.2(typescript@5.9.2)(vue@3.5.22(typescript@5.9.2))
+        version: 3.0.2(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -78,7 +78,7 @@ importers:
         version: 19.1.0(react@19.1.0)
       vue-i18n:
         specifier: 11.1.12
-        version: 11.1.12(vue@3.5.22(typescript@5.9.2))
+        version: 11.1.12(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@eslint/js':
         specifier: 9.34.0
@@ -97,7 +97,7 @@ importers:
         version: 5.0.1(vite@7.1.7(@types/node@22.18.0)(jiti@2.4.2))
       '@vitejs/plugin-vue':
         specifier: 6.0.1
-        version: 6.0.1(vite@7.1.7(@types/node@22.18.0)(jiti@2.4.2))(vue@3.5.22(typescript@5.9.2))
+        version: 6.0.1(vite@7.1.7(@types/node@22.18.0)(jiti@2.4.2))(vue@3.5.22(typescript@5.9.3))
       '@vue/eslint-config-prettier':
         specifier: 10.2.0
         version: 10.2.0(eslint@9.34.0(jiti@2.4.2))(prettier@3.6.2)
@@ -106,7 +106,7 @@ importers:
         version: 2.4.6
       '@vue/tsconfig':
         specifier: 0.7.0
-        version: 0.7.0(typescript@5.9.2)(vue@3.5.22(typescript@5.9.2))
+        version: 0.7.0(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       eslint:
         specifier: 9.34.0
         version: 9.34.0(jiti@2.4.2)
@@ -115,7 +115,7 @@ importers:
         version: 10.1.8(eslint@9.34.0(jiti@2.4.2))
       eslint-plugin-vue:
         specifier: 10.4.0
-        version: 10.4.0(@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2))(eslint@9.34.0(jiti@2.4.2))(vue-eslint-parser@10.2.0(eslint@9.34.0(jiti@2.4.2)))
+        version: 10.4.0(@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3))(eslint@9.34.0(jiti@2.4.2))(vue-eslint-parser@10.2.0(eslint@9.34.0(jiti@2.4.2)))
       globals:
         specifier: 16.3.0
         version: 16.3.0
@@ -126,11 +126,11 @@ importers:
         specifier: 26.1.0
         version: 26.1.0
       typescript:
-        specifier: 5.9.2
-        version: 5.9.2
+        specifier: 5.9.3
+        version: 5.9.3
       typescript-eslint:
         specifier: 8.41.0
-        version: 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
+        version: 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)
       vite:
         specifier: 7.1.7
         version: 7.1.7(@types/node@22.18.0)(jiti@2.4.2)
@@ -139,10 +139,10 @@ importers:
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.18.0)(jiti@2.4.2)(jsdom@26.1.0)
       vue:
         specifier: 3.5.22
-        version: 3.5.22(typescript@5.9.2)
+        version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 3.0.6
-        version: 3.0.6(typescript@5.9.2)
+        version: 3.0.6(typescript@5.9.3)
 
 packages:
 
@@ -2589,8 +2589,8 @@ packages:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <6.0.0'
 
-  typescript@5.9.2:
-    resolution: {integrity: sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==}
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -3774,41 +3774,41 @@ snapshots:
 
   '@types/use-sync-external-store@0.0.6': {}
 
-  '@typescript-eslint/eslint-plugin@8.41.0(@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2))(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)':
+  '@typescript-eslint/eslint-plugin@8.41.0(@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3))(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
+      '@typescript-eslint/parser': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)
       '@typescript-eslint/scope-manager': 8.41.0
-      '@typescript-eslint/type-utils': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
+      '@typescript-eslint/type-utils': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)
+      '@typescript-eslint/utils': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)
       '@typescript-eslint/visitor-keys': 8.41.0
       eslint: 9.34.0(jiti@2.4.2)
       graphemer: 1.4.0
       ignore: 7.0.5
       natural-compare: 1.4.0
-      ts-api-utils: 2.1.0(typescript@5.9.2)
-      typescript: 5.9.2
+      ts-api-utils: 2.1.0(typescript@5.9.3)
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)':
+  '@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.41.0
       '@typescript-eslint/types': 8.41.0
-      '@typescript-eslint/typescript-estree': 8.41.0(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.41.0(typescript@5.9.3)
       '@typescript-eslint/visitor-keys': 8.41.0
       debug: 4.4.1
       eslint: 9.34.0(jiti@2.4.2)
-      typescript: 5.9.2
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.41.0(typescript@5.9.2)':
+  '@typescript-eslint/project-service@8.41.0(typescript@5.9.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.41.0(typescript@5.9.2)
+      '@typescript-eslint/tsconfig-utils': 8.41.0(typescript@5.9.3)
       '@typescript-eslint/types': 8.41.0
       debug: 4.4.1
-      typescript: 5.9.2
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
@@ -3817,28 +3817,28 @@ snapshots:
       '@typescript-eslint/types': 8.41.0
       '@typescript-eslint/visitor-keys': 8.41.0
 
-  '@typescript-eslint/tsconfig-utils@8.41.0(typescript@5.9.2)':
+  '@typescript-eslint/tsconfig-utils@8.41.0(typescript@5.9.3)':
     dependencies:
-      typescript: 5.9.2
+      typescript: 5.9.3
 
-  '@typescript-eslint/type-utils@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)':
+  '@typescript-eslint/type-utils@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/types': 8.41.0
-      '@typescript-eslint/typescript-estree': 8.41.0(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.41.0(typescript@5.9.3)
+      '@typescript-eslint/utils': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)
       debug: 4.4.1
       eslint: 9.34.0(jiti@2.4.2)
-      ts-api-utils: 2.1.0(typescript@5.9.2)
-      typescript: 5.9.2
+      ts-api-utils: 2.1.0(typescript@5.9.3)
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@8.41.0': {}
 
-  '@typescript-eslint/typescript-estree@8.41.0(typescript@5.9.2)':
+  '@typescript-eslint/typescript-estree@8.41.0(typescript@5.9.3)':
     dependencies:
-      '@typescript-eslint/project-service': 8.41.0(typescript@5.9.2)
-      '@typescript-eslint/tsconfig-utils': 8.41.0(typescript@5.9.2)
+      '@typescript-eslint/project-service': 8.41.0(typescript@5.9.3)
+      '@typescript-eslint/tsconfig-utils': 8.41.0(typescript@5.9.3)
       '@typescript-eslint/types': 8.41.0
       '@typescript-eslint/visitor-keys': 8.41.0
       debug: 4.4.1
@@ -3846,19 +3846,19 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.5
       semver: 7.7.2
-      ts-api-utils: 2.1.0(typescript@5.9.2)
-      typescript: 5.9.2
+      ts-api-utils: 2.1.0(typescript@5.9.3)
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)':
+  '@typescript-eslint/utils@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.7.0(eslint@9.34.0(jiti@2.4.2))
       '@typescript-eslint/scope-manager': 8.41.0
       '@typescript-eslint/types': 8.41.0
-      '@typescript-eslint/typescript-estree': 8.41.0(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.41.0(typescript@5.9.3)
       eslint: 9.34.0(jiti@2.4.2)
-      typescript: 5.9.2
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
@@ -3881,11 +3881,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue@6.0.1(vite@7.1.7(@types/node@22.18.0)(jiti@2.4.2))(vue@3.5.22(typescript@5.9.2))':
+  '@vitejs/plugin-vue@6.0.1(vite@7.1.7(@types/node@22.18.0)(jiti@2.4.2))(vue@3.5.22(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-beta.29
       vite: 7.1.7(@types/node@22.18.0)(jiti@2.4.2)
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -4018,7 +4018,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/eslint'
 
-  '@vue/language-core@3.0.6(typescript@5.9.2)':
+  '@vue/language-core@3.0.6(typescript@5.9.3)':
     dependencies:
       '@volar/language-core': 2.4.23
       '@vue/compiler-dom': 3.5.20
@@ -4029,7 +4029,7 @@ snapshots:
       path-browserify: 1.0.1
       picomatch: 4.0.2
     optionalDependencies:
-      typescript: 5.9.2
+      typescript: 5.9.3
 
   '@vue/reactivity@3.5.22':
     dependencies:
@@ -4047,11 +4047,11 @@ snapshots:
       '@vue/shared': 3.5.22
       csstype: 3.1.3
 
-  '@vue/server-renderer@3.5.22(vue@3.5.22(typescript@5.9.2))':
+  '@vue/server-renderer@3.5.22(vue@3.5.22(typescript@5.9.3))':
     dependencies:
       '@vue/compiler-ssr': 3.5.22
       '@vue/shared': 3.5.22
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
 
   '@vue/shared@3.5.20': {}
 
@@ -4062,43 +4062,43 @@ snapshots:
       js-beautify: 1.15.4
       vue-component-type-helpers: 2.2.12
 
-  '@vue/tsconfig@0.7.0(typescript@5.9.2)(vue@3.5.22(typescript@5.9.2))':
+  '@vue/tsconfig@0.7.0(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))':
     optionalDependencies:
-      typescript: 5.9.2
-      vue: 3.5.22(typescript@5.9.2)
+      typescript: 5.9.3
+      vue: 3.5.22(typescript@5.9.3)
 
-  '@xwiki/cristal-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
       '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
       '@xwiki/cristal-configuration-api': 0.19.0
       inversify: 7.5.2(reflect-metadata@0.2.2)
-      vue: 3.5.22(typescript@5.9.2)
-      vue-router: 4.5.1(vue@3.5.22(typescript@5.9.2))
+      vue: 3.5.22(typescript@5.9.3)
+      vue-router: 4.5.1(vue@3.5.22(typescript@5.9.3))
     transitivePeerDependencies:
       - reflect-metadata
       - typescript
 
-  '@xwiki/cristal-attachments-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-attachments-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
       '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
       '@xwiki/cristal-model-api': 0.19.0
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
     transitivePeerDependencies:
       - reflect-metadata
       - typescript
 
-  '@xwiki/cristal-attachments-default@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-attachments-default@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
-      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
-      '@xwiki/cristal-backend-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-backend-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       inversify: 7.5.2(reflect-metadata@0.2.2)
-      pinia: 3.0.2(typescript@5.9.2)(vue@3.5.22(typescript@5.9.2))
+      pinia: 3.0.2(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       reflect-metadata: 0.2.2
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -4106,9 +4106,9 @@ snapshots:
     dependencies:
       reflect-metadata: 0.2.2
 
-  '@xwiki/cristal-backend-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-backend-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       inversify: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
     transitivePeerDependencies:
@@ -4118,47 +4118,47 @@ snapshots:
     dependencies:
       utility-types: 3.11.0
 
-  '@xwiki/cristal-document-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-document-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
     transitivePeerDependencies:
       - reflect-metadata
       - typescript
 
-  '@xwiki/cristal-dsapi@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-dsapi@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-navigation-tree-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      vue: 3.5.22(typescript@5.9.2)
+      '@xwiki/cristal-navigation-tree-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      vue: 3.5.22(typescript@5.9.3)
     transitivePeerDependencies:
       - reflect-metadata
       - typescript
 
-  '@xwiki/cristal-editors-blocknote-headless@0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.2)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
+  '@xwiki/cristal-editors-blocknote-headless@0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
     dependencies:
       '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
       '@hocuspocus/provider': 2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
-      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
-      '@xwiki/cristal-document-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-dsapi': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-editors-blocknote-react': 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.2)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
+      '@xwiki/cristal-document-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-dsapi': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-editors-blocknote-react': 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
       '@xwiki/cristal-fn-utils': 0.19.0
-      '@xwiki/cristal-icons': 0.19.0(typescript@5.9.2)
-      '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-icons': 0.19.0(typescript@5.9.3)
+      '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       eventemitter3: 5.0.1
       inversify: 7.5.2(reflect-metadata@0.2.2)
       lodash-es: 4.17.21
       reflect-metadata: 0.2.2
-      vue: 3.5.22(typescript@5.9.2)
-      vue-i18n: 11.1.5(vue@3.5.22(typescript@5.9.2))
+      vue: 3.5.22(typescript@5.9.3)
+      vue-i18n: 11.1.5(vue@3.5.22(typescript@5.9.3))
     transitivePeerDependencies:
       - '@tiptap/pm'
       - '@types/hast'
@@ -4175,7 +4175,7 @@ snapshots:
       - y-protocols
       - yjs
 
-  '@xwiki/cristal-editors-blocknote-react@0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.2)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
+  '@xwiki/cristal-editors-blocknote-react@0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
     dependencies:
       '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
       '@blocknote/mantine': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -4185,19 +4185,19 @@ snapshots:
       '@mantine/core': 8.1.1(@mantine/hooks@8.1.1(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mantine/hooks': 8.1.1(react@19.1.0)
       '@types/react-dom': 19.1.6(@types/react@19.1.8)
-      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-document-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-document-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-fn-utils': 0.19.0
-      '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      i18next: 25.2.1(typescript@5.9.2)
+      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      i18next: 25.2.1(typescript@5.9.3)
       lodash-es: 4.17.21
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-      react-i18next: 15.5.3(i18next@25.2.1(typescript@5.9.2))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.2)
+      react-i18next: 15.5.3(i18next@25.2.1(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
       react-icons: 5.5.0(react@19.1.0)
     transitivePeerDependencies:
       - '@tiptap/pm'
@@ -4218,16 +4218,16 @@ snapshots:
 
   '@xwiki/cristal-fn-utils@0.19.0': {}
 
-  '@xwiki/cristal-icons@0.19.0(typescript@5.9.2)':
+  '@xwiki/cristal-icons@0.19.0(typescript@5.9.3)':
     dependencies:
       bootstrap-icons: 1.13.1
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
-  '@xwiki/cristal-link-suggest-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-link-suggest-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       inversify: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
     transitivePeerDependencies:
@@ -4235,38 +4235,38 @@ snapshots:
 
   '@xwiki/cristal-model-api@0.19.0': {}
 
-  '@xwiki/cristal-model-reference-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-model-reference-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
       inversify: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
     transitivePeerDependencies:
       - typescript
 
-  '@xwiki/cristal-model-remote-url-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-model-remote-url-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
       inversify: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
     transitivePeerDependencies:
       - typescript
 
-  '@xwiki/cristal-navigation-tree-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-navigation-tree-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
     transitivePeerDependencies:
       - reflect-metadata
       - typescript
 
-  '@xwiki/cristal-uniast@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)':
+  '@xwiki/cristal-uniast@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
       '@xwiki/cristal-fn-utils': 0.19.0
       '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.2)
+      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       inversify: 7.5.2(reflect-metadata@0.2.2)
       mdast-util-gfm-strikethrough: 2.0.0
       mdast-util-gfm-table: 2.0.0
@@ -4515,7 +4515,7 @@ snapshots:
     optionalDependencies:
       eslint-config-prettier: 10.1.8(eslint@9.34.0(jiti@2.4.2))
 
-  eslint-plugin-vue@10.4.0(@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2))(eslint@9.34.0(jiti@2.4.2))(vue-eslint-parser@10.2.0(eslint@9.34.0(jiti@2.4.2))):
+  eslint-plugin-vue@10.4.0(@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3))(eslint@9.34.0(jiti@2.4.2))(vue-eslint-parser@10.2.0(eslint@9.34.0(jiti@2.4.2))):
     dependencies:
       '@eslint-community/eslint-utils': 4.7.0(eslint@9.34.0(jiti@2.4.2))
       eslint: 9.34.0(jiti@2.4.2)
@@ -4526,7 +4526,7 @@ snapshots:
       vue-eslint-parser: 10.2.0(eslint@9.34.0(jiti@2.4.2))
       xml-name-validator: 4.0.0
     optionalDependencies:
-      '@typescript-eslint/parser': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
+      '@typescript-eslint/parser': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)
 
   eslint-scope@8.4.0:
     dependencies:
@@ -4843,11 +4843,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  i18next@25.2.1(typescript@5.9.2):
+  i18next@25.2.1(typescript@5.9.3):
     dependencies:
       '@babel/runtime': 7.27.6
     optionalDependencies:
-      typescript: 5.9.2
+      typescript: 5.9.3
 
   iconv-lite@0.6.3:
     dependencies:
@@ -5416,12 +5416,12 @@ snapshots:
 
   picomatch@4.0.3: {}
 
-  pinia@3.0.2(typescript@5.9.2)(vue@3.5.22(typescript@5.9.2)):
+  pinia@3.0.2(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3)):
     dependencies:
       '@vue/devtools-api': 7.7.7
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
     optionalDependencies:
-      typescript: 5.9.2
+      typescript: 5.9.3
 
   postcss-selector-parser@6.1.2:
     dependencies:
@@ -5569,15 +5569,15 @@ snapshots:
       react: 19.1.0
       scheduler: 0.26.0
 
-  react-i18next@15.5.3(i18next@25.2.1(typescript@5.9.2))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.2):
+  react-i18next@15.5.3(i18next@25.2.1(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3):
     dependencies:
       '@babel/runtime': 7.27.6
       html-parse-stringify: 3.0.1
-      i18next: 25.2.1(typescript@5.9.2)
+      i18next: 25.2.1(typescript@5.9.3)
       react: 19.1.0
     optionalDependencies:
       react-dom: 19.1.0(react@19.1.0)
-      typescript: 5.9.2
+      typescript: 5.9.3
 
   react-icons@5.5.0(react@19.1.0):
     dependencies:
@@ -5861,9 +5861,9 @@ snapshots:
 
   trough@2.2.0: {}
 
-  ts-api-utils@2.1.0(typescript@5.9.2):
+  ts-api-utils@2.1.0(typescript@5.9.3):
     dependencies:
-      typescript: 5.9.2
+      typescript: 5.9.3
 
   tslib@2.8.1: {}
 
@@ -5873,18 +5873,18 @@ snapshots:
 
   type-fest@4.41.0: {}
 
-  typescript-eslint@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2):
+  typescript-eslint@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.41.0(@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2))(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
-      '@typescript-eslint/parser': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
-      '@typescript-eslint/typescript-estree': 8.41.0(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
+      '@typescript-eslint/eslint-plugin': 8.41.0(@typescript-eslint/parser@8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3))(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)
+      '@typescript-eslint/typescript-estree': 8.41.0(typescript@5.9.3)
+      '@typescript-eslint/utils': 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.3)
       eslint: 9.34.0(jiti@2.4.2)
-      typescript: 5.9.2
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
-  typescript@5.9.2: {}
+  typescript@5.9.3: {}
 
   uc.micro@2.1.0: {}
 
@@ -6092,40 +6092,40 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vue-i18n@11.1.12(vue@3.5.22(typescript@5.9.2)):
+  vue-i18n@11.1.12(vue@3.5.22(typescript@5.9.3)):
     dependencies:
       '@intlify/core-base': 11.1.12
       '@intlify/shared': 11.1.12
       '@vue/devtools-api': 6.6.4
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
 
-  vue-i18n@11.1.5(vue@3.5.22(typescript@5.9.2)):
+  vue-i18n@11.1.5(vue@3.5.22(typescript@5.9.3)):
     dependencies:
       '@intlify/core-base': 11.1.5
       '@intlify/shared': 11.1.5
       '@vue/devtools-api': 6.6.4
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
 
-  vue-router@4.5.1(vue@3.5.22(typescript@5.9.2)):
+  vue-router@4.5.1(vue@3.5.22(typescript@5.9.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
-      vue: 3.5.22(typescript@5.9.2)
+      vue: 3.5.22(typescript@5.9.3)
 
-  vue-tsc@3.0.6(typescript@5.9.2):
+  vue-tsc@3.0.6(typescript@5.9.3):
     dependencies:
       '@volar/typescript': 2.4.23
-      '@vue/language-core': 3.0.6(typescript@5.9.2)
-      typescript: 5.9.2
+      '@vue/language-core': 3.0.6(typescript@5.9.3)
+      typescript: 5.9.3
 
-  vue@3.5.22(typescript@5.9.2):
+  vue@3.5.22(typescript@5.9.3):
     dependencies:
       '@vue/compiler-dom': 3.5.22
       '@vue/compiler-sfc': 3.5.22
       '@vue/runtime-dom': 3.5.22
-      '@vue/server-renderer': 3.5.22(vue@3.5.22(typescript@5.9.2))
+      '@vue/server-renderer': 3.5.22(vue@3.5.22(typescript@5.9.3))
       '@vue/shared': 3.5.22
     optionalDependencies:
-      typescript: 5.9.2
+      typescript: 5.9.3
 
   w3c-keyname@2.2.8: {}
 

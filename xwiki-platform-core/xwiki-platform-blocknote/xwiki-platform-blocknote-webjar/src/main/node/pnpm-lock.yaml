@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@xwiki/cristal-fn-utils': 0.19.0
+  '@xwiki/cristal-fn-utils': 0.22.0
   '@xwiki/cristal-model-api': 0.19.0
   '@xwiki/cristal-model-reference-api': 0.19.0
   '@xwiki/cristal-model-remote-url-api': 0.19.0
@@ -1189,8 +1189,8 @@ packages:
   '@xwiki/cristal-editors-blocknote-react@0.19.0':
     resolution: {integrity: sha512-vwDwl8xu2H23zZbD9u1V/DHakolTbprH2HHVz9oHa1spUpNTRP2WG1Y5Vnko15XS+bsk6N3Y+76dw/16ZVfCkw==}
 
-  '@xwiki/cristal-fn-utils@0.19.0':
-    resolution: {integrity: sha512-K5vl/SdDA3yzSKR0W7E3WE9DjQWwxj1hPjYkedlz58bdX6ByvZElCYho2igc2dKAEJRHHR+dhAPjEaS3MTk5Dw==}
+  '@xwiki/cristal-fn-utils@0.22.0':
+    resolution: {integrity: sha512-cYDJRL5DjlL2NZJ/+9Mjes9up0X3pTX/m76rttUZrrndyaR4tdf9N97VxLn9Y7uhpIhWWP8m4q7jYBKlhBrhew==}
 
   '@xwiki/cristal-icons@0.19.0':
     resolution: {integrity: sha512-oejEkr9+crt7E9gv8BkyPFs8kvHsNPT7PG8oRoE1gLxH/sxR5wwiRwggPbFvo5jZOuGQ2Ndi2RWM8gFPfRGGnQ==}
@@ -4146,7 +4146,7 @@ snapshots:
       '@xwiki/cristal-document-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-dsapi': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-editors-blocknote-react': 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
-      '@xwiki/cristal-fn-utils': 0.19.0
+      '@xwiki/cristal-fn-utils': 0.22.0
       '@xwiki/cristal-icons': 0.19.0(typescript@5.9.3)
       '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
@@ -4187,7 +4187,7 @@ snapshots:
       '@types/react-dom': 19.1.6(@types/react@19.1.8)
       '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-document-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-fn-utils': 0.19.0
+      '@xwiki/cristal-fn-utils': 0.22.0
       '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-api': 0.19.0
       '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
@@ -4216,7 +4216,7 @@ snapshots:
       - y-protocols
       - yjs
 
-  '@xwiki/cristal-fn-utils@0.19.0': {}
+  '@xwiki/cristal-fn-utils@0.22.0': {}
 
   '@xwiki/cristal-icons@0.19.0(typescript@5.9.3)':
     dependencies:
@@ -4263,7 +4263,7 @@ snapshots:
 
   '@xwiki/cristal-uniast@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
     dependencies:
-      '@xwiki/cristal-fn-utils': 0.19.0
+      '@xwiki/cristal-fn-utils': 0.22.0
       '@xwiki/cristal-model-api': 0.19.0
       '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
       '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)

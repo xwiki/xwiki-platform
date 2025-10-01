@@ -22,7 +22,7 @@
     "@xwiki/cristal-editors-blocknote-react": "0.19.0",
     "@xwiki/cristal-link-suggest-api": "0.19.0",
     "@xwiki/cristal-model-api": "0.19.0",
-    "@xwiki/cristal-model-reference-api": "0.19.0",
+    "@xwiki/cristal-model-reference-api": "0.22.0",
     "@xwiki/cristal-model-remote-url-api": "0.19.0",
     "@xwiki/cristal-uniast": "0.19.0",
     "inversify": "7.5.2",
@@ -61,7 +61,7 @@
     "overrides": {
       "@xwiki/cristal-fn-utils": "0.19.0",
       "@xwiki/cristal-model-api": "0.19.0",
-      "@xwiki/cristal-model-reference-api": "0.19.0",
+      "@xwiki/cristal-model-reference-api": "0.22.0",
       "@xwiki/cristal-model-remote-url-api": "0.19.0",
       "inversify": "7.5.2",
       "vue": "3.5.22"

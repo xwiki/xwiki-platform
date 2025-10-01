@@ -74,7 +74,7 @@
     {
       "matchDatasources": ["npm"],
       "groupName": "cristal",
-      "matchDepPatterns": "@cristal/.+"
+      "matchDepPatterns": "@xwiki/cristal-.+"
     }
   ]
 }

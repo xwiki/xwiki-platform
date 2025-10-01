@@ -37,7 +37,7 @@
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "0.7.0",
     "eslint": "9.36.0",
-    "eslint-plugin-vue": "10.4.0",
+    "eslint-plugin-vue": "10.5.0",
     "flush-promises": "1.0.2",
     "jiti": "2.6.0",
     "jquery": "3.7.1",

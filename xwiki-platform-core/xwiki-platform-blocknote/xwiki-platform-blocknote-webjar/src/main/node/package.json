@@ -50,7 +50,7 @@
     "globals": "16.3.0",
     "jiti": "2.6.0",
     "jsdom": "26.1.0",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "typescript-eslint": "8.45.0",
     "vite": "7.1.7",
     "vitest": "3.2.4",

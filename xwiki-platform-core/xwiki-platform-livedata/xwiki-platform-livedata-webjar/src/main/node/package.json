@@ -45,7 +45,7 @@
     "lodash": "4.17.21",
     "npm-run-all2": "8.0.4",
     "sinon": "21.0.0",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "vite": "7.1.7",
     "vitest": "3.2.4",
     "vue": "3.5.22",

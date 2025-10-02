@@ -793,6 +793,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 .notification-event {
   border: 1px dashed $theme.borderColor;
   padding: 1em;
+  overflow-wrap: break-word;
 }
 
 .notification-event-unread {

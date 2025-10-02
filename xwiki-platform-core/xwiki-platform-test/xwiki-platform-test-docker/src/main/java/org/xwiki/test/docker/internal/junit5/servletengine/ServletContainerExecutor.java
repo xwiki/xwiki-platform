@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,6 +78,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String ROOT_USER = "root";
 
     private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
+
+    private static final String TOMCAT = "tomcat";
+
+    private static final String JETTY = "jetty";
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -347,8 +352,26 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private String getDockerImageTag()
     {
-        return this.testConfiguration.getServletEngineTag() != null ? this.testConfiguration.getServletEngineTag()
-            : LATEST;
+        if (this.testConfiguration.getServletEngineTag() != null) {
+            return this.testConfiguration.getServletEngineTag();
+        } else {
+            try {
+                String javaMaxVersion = this.mavenResolver.getPropertyFromCurrentPOM("xwiki.java.version.support");
+                String dockerImageName = this.testConfiguration.getServletEngine().name().toLowerCase();
+                if (Objects.equals(dockerImageName, TOMCAT)) {
+                    return "jre%s".formatted(javaMaxVersion);
+                } else if (Objects.equals(dockerImageName, JETTY)) {
+                    // At the time of writing, jetty does not provide a "jreXY" tag.
+                    return "jdk%s".formatted(javaMaxVersion);
+                }
+            } catch (Exception e) {
+                // An exception is only thrown when xwiki.java.version.support is not defined.
+                // In this case we return the "latest" tag
+                return LATEST;
+            }
+        }
+        // We also return "latest" if a servlet different from tomcat of jetty is defined without an explicit tag.
+        return LATEST;
     }
 
     private String getDockerImageHash() throws InterruptedException
@@ -434,7 +457,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             builder.run("mkdir -p /home/jetty && chown jetty:jetty /home/jetty")
                                 // Put back the user as jetty since it's a best practice to not execute the container as
                                 // root.
-                                .user("jetty");
+                                .user(JETTY);
                         }
 
                         builder.build();

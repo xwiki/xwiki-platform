@@ -149,44 +149,9 @@
               </differences>
             </revapi.differences>
             -->
-            <revapi.differences>
-              <justification>Extracted code from HqlQueryExecutor to an abstract base class to facilitate reuse. HqlQueryExecutor is a component implementation so it should be treated as internal, even if it's not inside an internal package.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</old>
-                  <new>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</new>
-                  <superClass>org.xwiki.query.internal.AbstractQueryExecutor</superClass>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Unstable API: the signature changes here but the API always returned a String so there's no breaking behaviour for scripts.</justification>
-              <criticality>documented</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChangedCovariantly</code>
-                  <old>method java.lang.Object com.xpn.xwiki.api.Object::display(java.lang.String, java.lang.String, boolean, boolean)</old>
-                  <new>method java.lang.String com.xpn.xwiki.api.Object::display(java.lang.String, java.lang.String, boolean, boolean)</new>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>It's not a breakage because that component was not registered at all previously.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.added</code>
-                  <old>class org.xwiki.container.script.ContainerScriptService</old>
-                  <new>class org.xwiki.container.script.ContainerScriptService</new>
-                  <annotation>@javax.inject.Named("container")</annotation>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

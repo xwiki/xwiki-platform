@@ -109,3 +109,13 @@ HTTP_PORT=9001 pnpm run --filter ./web test:e2e
 ```sh
 pnpm lint
 ```
+
+### Check for API changes
+
+```sh
+pnpm run api-extractor:local
+# Produces reports in the `etc/` folder of each package.
+# The changes in the Markdown files reflects changes in the public APIs of the packages and must be discussed 
+# collectively.
+# The CI is configured to fail if the command produces unversioned changes.
+```

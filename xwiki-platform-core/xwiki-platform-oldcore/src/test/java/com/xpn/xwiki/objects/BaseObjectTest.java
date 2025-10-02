@@ -31,17 +31,29 @@ import org.xwiki.store.merge.MergeManager;
 import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -204,5 +216,55 @@ public class BaseObjectTest
         o2.setNumber(number);
 
         assertEquals(o1.hashCode(), o2.hashCode());
+    }
+
+    @Test
+    void setObject() throws XWikiException
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "document");
+        DocumentReference classReference = new DocumentReference("wiki", "space", "class");
+        XWikiDocument classDocument = new XWikiDocument(classReference);
+        XWikiDocument ownerDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        BaseObject object = new BaseObject();
+        object.setDocumentReference(documentReference);
+        object.setXClassReference(classReference);
+        object.setOwnerDocument(ownerDocument);
+
+        XWikiContext context = this.oldcore.getXWikiContext();;
+        String fieldName = "myField";
+        Object value = 4545;
+
+        BaseClass baseClass = mock(BaseClass.class);
+        classDocument.setXClass(baseClass);
+        when(this.oldcore.getSpyXWiki().getDocument(classReference, context)).thenReturn(classDocument);
+
+        PropertyClass propertyClass = mock(PropertyClass.class);
+        when(baseClass.get(fieldName)).thenReturn(propertyClass);
+
+        BaseProperty newProp = mock(BaseProperty.class);
+        when(propertyClass.newProperty()).thenReturn(newProp);
+
+        object.set(fieldName, value, context);
+        assertTrue(object.isDirty());
+        assertTrue(ownerDocument.isMetaDataDirty());
+        verify(newProp).setValue(value);
+        verify(newProp, times(2)).setOwnerDocument(ownerDocument);
+        verify(newProp).setName(fieldName);
+        verify(newProp).setObject(object);
+        assertTrue(object.getFieldList().contains(newProp));
+
+        ownerDocument.setMetaDataDirty(false);
+        object.setDirty(false);
+
+        // Now the property exists let's call it again
+        object.set(fieldName, value, context);
+        verify(newProp, times(2)).setValue(value);
+        assertFalse(object.isDirty());
+        assertFalse(ownerDocument.isMetaDataDirty());
+
+        // no new calls
+        verify(newProp, times(2)).setOwnerDocument(ownerDocument);
+        verify(newProp).setName(fieldName);
+        verify(newProp).setObject(object);
     }
 }

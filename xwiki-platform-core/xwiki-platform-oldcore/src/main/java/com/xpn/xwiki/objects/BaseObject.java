@@ -456,18 +456,26 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         BaseClass bclass = getXClass(context);
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         BaseProperty prop = (BaseProperty) safeget(fieldname);
+        boolean createProp = false;
         if ((value instanceof String) && (pclass != null)) {
-            prop = pclass.fromString((String) value);
+            BaseProperty newProp = pclass.fromString((String) value);
+            if (prop == null) {
+                prop = newProp;
+                createProp = true;
+            } else {
+                prop.setValue(newProp.getValue());
+            }
         } else {
             if ((prop == null) && (pclass != null)) {
                 prop = pclass.newProperty();
+                createProp = true;
             }
             if (prop != null) {
                 prop.setValue(value);
             }
         }
 
-        if (prop != null) {
+        if (prop != null && createProp) {
             prop.setOwnerDocument(getOwnerDocument());
             safeput(fieldname, prop);
         }

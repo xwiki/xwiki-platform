@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { defineModel, ref, watch } from "vue";
+import { ref, useId, watch } from "vue";
 import type { FileInputModel, TextFieldProps } from "@xwiki/cristal-dsapi";
 import "@shoelace-style/shoelace/dist/components/input/input";
 
@@ -47,6 +47,9 @@ watch(model, (model) => {
     inputElement.value.value = "";
   }
 });
+
+// Generates a unique id shared between the file input and its label.
+const inputId = useId();
 </script>
 
 <!--
@@ -55,7 +58,7 @@ is not supported by shoelace currently.
 -->
 <template>
   <div class="form-control form-control--medium form-control--has-label">
-    <label class="form-control__label" for="input" :aria-hidden="false">
+    <label class="form-control__label" :for="inputId" :aria-hidden="false">
       <slot name="label">{{ label }}</slot>
     </label>
 
@@ -75,6 +78,7 @@ is not supported by shoelace currently.
           ref="inputElement"
           :disabled="false"
           :name="name"
+          :id="inputId"
           :readonly="true"
           :required="required"
           class="input__control"

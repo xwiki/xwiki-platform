@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>{{include reference="TourCode.Macros"/}}
 
-    {{velocity wiki="false"}}
+{{velocity wiki="false" output="false"}}
 #if ($xcontext.action == 'get')
   ##--------------------------------------------------------
   ## Get the tour steps corresponding to the target page
@@ -138,8 +138,7 @@
   ##--------------------------------------------------------
   ## Display the results as JSON
   ##--------------------------------------------------------
-  #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize({'tours': $tours})
+  #jsonResponse({'tours': $tours})
 #end
 {{/velocity}}</content>
 </xwikidoc>

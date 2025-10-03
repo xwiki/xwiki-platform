@@ -431,7 +431,6 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     }).fail(function (data) {
       console.error("Querying the JSON for the Tour failed. %o", data);
     });
-    ;
   });
 });</code>
     </property>

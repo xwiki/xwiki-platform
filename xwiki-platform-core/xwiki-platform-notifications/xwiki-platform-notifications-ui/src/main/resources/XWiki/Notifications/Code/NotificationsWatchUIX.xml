@@ -542,8 +542,11 @@
         &lt;div class="panel-title" id="title-$attributeName"&gt;
           $services.icon.renderHTML("$iconName") 
           &lt;label for="option-$attributeName"&gt;$services.localization.render("notifications.watch.modal.option.${translationSuffix}.title", 'html/5.0', [])&lt;/label&gt;
-          &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-$attributeName" aria-controls="xhint-$attributeName"&gt;
+          &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" 
+            href="#xhint-$attributeName" aria-controls="xhint-$attributeName" 
+            title="$escapetool.xml($services.localization.render('notifications.watch.modal.option.hint.toggle'))"&gt;
             &lt;span class="help-icon"&gt;$services.icon.renderHTML('question')&lt;/span&gt;
+            &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('notifications.watch.modal.option.hint.toggle'))&lt;/span&gt;
           &lt;/a&gt;
         &lt;/div&gt;
     &lt;/div&gt;&lt;!-- end panel heading --&gt;

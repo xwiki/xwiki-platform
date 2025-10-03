@@ -73,11 +73,10 @@ define('macroParameterEnhancer', ['jquery'], function($) {
     // if the group contains a single parameter then we don't consider it's a feature only.
     } else if (group.children.length === 1) {
       group.featureOnly = false;
-      // if it's a group of a single parameter inside a feature, we just drop the group.
-      if (typeof group.parent === 'string' && group.parent.startsWith('FEATURE:')) {
-          let featureChildren = parametersMap[group.parent].children;
-          group.hidden = true;
-          featureChildren.push(group.children[0]);
+      // if the single children is a group, we actually remove it to display directly the parameters
+      let uniqueChildKey = group.children[0];
+      if (isNodeAGroup(uniqueChildKey)) {
+        group.children = parametersMap[uniqueChildKey].children;
       }
     }
     visitedGroups.push(group.id);

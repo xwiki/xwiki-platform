@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,6 +53,7 @@ import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Image;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isInAContainer;
 
 /**
@@ -77,6 +79,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String ROOT_USER = "root";
 
     private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
+
+    private static final String TOMCAT = "tomcat";
+
+    private static final String JETTY = "jetty";
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -347,8 +353,24 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private String getDockerImageTag()
     {
-        return this.testConfiguration.getServletEngineTag() != null ? this.testConfiguration.getServletEngineTag()
-            : LATEST;
+        if (this.testConfiguration.getServletEngineTag() != null) {
+            return this.testConfiguration.getServletEngineTag();
+        } else {
+            String dockerImageName = this.testConfiguration.getServletEngine().name().toLowerCase();
+            try {
+                String javaMaxVersion = this.mavenResolver.getPropertyFromCurrentPOM("xwiki.java.version.support");
+                if (Objects.equals(dockerImageName, TOMCAT)) {
+                    return "jre%s".formatted(javaMaxVersion);
+                } else if (Objects.equals(dockerImageName, JETTY)) {
+                    // At the time of writing, jetty does not provide a "jreXY" tag.
+                    return "jdk%s".formatted(javaMaxVersion);
+                }
+            } catch (Exception e) {
+                LOGGER.debug("Failed to resolve the docker image tag for image [{}]. Cause: [{}]", dockerImageName,
+                    getRootCauseMessage(e));
+            }
+        }
+        return LATEST;
     }
 
     private String getDockerImageHash() throws InterruptedException
@@ -434,7 +456,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             builder.run("mkdir -p /home/jetty && chown jetty:jetty /home/jetty")
                                 // Put back the user as jetty since it's a best practice to not execute the container as
                                 // root.
-                                .user("jetty");
+                                .user(JETTY);
                         }
 
                         builder.build();

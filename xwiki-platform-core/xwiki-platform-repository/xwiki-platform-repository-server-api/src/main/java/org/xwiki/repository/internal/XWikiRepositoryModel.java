@@ -52,7 +52,7 @@ public class XWikiRepositoryModel
     public static final String EXTENSION_SPACENAME = "ExtensionCode";
 
     /**
-     * @since 42
+     * @since 17.9.0RC1
      */
     public static final String EXTENSIONVERSIONS_SPACENAME = "Versions";
 
@@ -193,7 +193,7 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_PROPERTIES = "properties";
 
     /**
-     * @since 42
+     * @since 17.9.0RC1
      */
     public static final String PROP_EXTENSION_VERSIONPAGE = "versionPage";
 

@@ -94,8 +94,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 
+/**
+ * Expose various tools to manipulate extensions in the wiki.
+ * 
+ * @version $Id$
+ */
 @Component(roles = RepositoryManager.class)
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class RepositoryManager
 {
     private static final Pattern PATTERN_NEWLINE = Pattern.compile("[\n\r]");
@@ -150,7 +156,7 @@ public class RepositoryManager
     private ExtensionFactory extensionFactory;
 
     @Inject
-    protected ExtensionStore extensionStore;
+    private ExtensionStore extensionStore;
 
     @Inject
     private Logger logger;
@@ -422,12 +428,23 @@ public class RepositoryManager
             + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension", Query.XWQL);
 
         for (String documentName : query.<String>execute()) {
-            validateExtension(this.extensionStore.getDocument(documentName), true);
+            validateExtension(getDocument(documentName), true);
         }
     }
 
+    private XWikiDocument getDocument(String fullName) throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.getWiki().getDocument(this.currentStringResolver.resolve(fullName), xcontext);
+    }
+
     /**
-     * @since 42
+     * @param document the document holding the extension metadata
+     * @param extensionVersion the version for which to return the download reference
+     * @return the download reference
+     * @throws ResolveException when failing to resolve the download reference
+     * @throws XWikiException when failing to resolve the download reference
      */
     public ResourceReference getDownloadReference(XWikiDocument document, String extensionVersion)
         throws ResolveException, XWikiException
@@ -758,7 +775,11 @@ public class RepositoryManager
     }
 
     /**
-     * @since 42
+     * @param extensionDocument the document holder the main extension metadata
+     * @param version the version for which to return the object
+     * @param xcontext the XWiki Context
+     * @return the object holding the extension version metadata, or null if none could be found
+     * @throws XWikiException when failing to get the extension version object
      */
     public BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version, XWikiContext xcontext)
         throws XWikiException
@@ -767,7 +788,12 @@ public class RepositoryManager
     }
 
     /**
-     * @since 42
+     * @param extensionDocument the document holder the main extension metadata
+     * @param version the version for which to return the object
+     * @param allowProxying true if the method to follow the proxy when the version cannot be found locally
+     * @param xcontext the XWiki Context
+     * @return the object holding the extension version metadata, or null if none could be found
+     * @throws XWikiException when failing to get the extension version object
      */
     public BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version, boolean allowProxying,
         XWikiContext xcontext) throws XWikiException

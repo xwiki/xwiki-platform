@@ -62,7 +62,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
-import org.xwiki.search.solr.test.SolrComponentList;
+import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -92,7 +92,7 @@ import static org.mockito.Mockito.when;
 @ComponentList({EventsSolrCoreInitializer.class, WikiDeletedListener.class, WikiReferenceConverter.class,
     SpaceReferenceConverter.class, DocumentReferenceConverter.class, EntityReferenceConverter.class})
 @ReferenceComponentList
-@SolrComponentList
+@EmbeddedSolrComponentList
 public class EventStoreTest
 {
     private static final DefaultEvent EVENT1 = event("id1");

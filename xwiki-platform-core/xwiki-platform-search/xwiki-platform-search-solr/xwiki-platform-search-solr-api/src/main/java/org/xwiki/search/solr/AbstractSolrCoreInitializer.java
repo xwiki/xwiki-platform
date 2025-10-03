@@ -28,8 +28,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.schema.AnalyzerDefinition;
@@ -39,16 +37,6 @@ import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.schema.BinaryField;
-import org.apache.solr.schema.BoolField;
-import org.apache.solr.schema.DatePointField;
-import org.apache.solr.schema.DoublePointField;
-import org.apache.solr.schema.FieldType;
-import org.apache.solr.schema.FloatPointField;
-import org.apache.solr.schema.IntPointField;
-import org.apache.solr.schema.LongPointField;
-import org.apache.solr.schema.StrField;
-import org.apache.solr.schema.TextField;
 import org.slf4j.Logger;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
@@ -276,40 +264,47 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         // TYPES
         //////////
 
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_STRINGS, StrField.class.getName(), SOLR_FIELD_SORTMISSINGLAST, true,
-            SOLR_FIELD_MULTIVALUED, true, SOLR_FIELD_DOCVALUES, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_STRINGS, SolrSchemaUtils.SOLR_FIELD_CLASS_STR,
+            SOLR_FIELD_SORTMISSINGLAST, true, SOLR_FIELD_MULTIVALUED, true, SOLR_FIELD_DOCVALUES, true);
 
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEAN, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST, true);
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEANS, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST, true,
-            SOLR_FIELD_MULTIVALUED, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEAN, SolrSchemaUtils.SOLR_FIELD_CLASS_BOOLEAN,
+            SOLR_FIELD_SORTMISSINGLAST, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEANS, SolrSchemaUtils.SOLR_FIELD_CLASS_BOOLEAN,
+            SOLR_FIELD_SORTMISSINGLAST, true, SOLR_FIELD_MULTIVALUED, true);
 
         // Numeric field types that index values using KD-trees.
         // Point fields don't support FieldCache, so they must have docValues="true" if needed for sorting,
         // faceting, functions, etc.
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_PINT, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOAT, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLE, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PINT, SolrSchemaUtils.SOLR_FIELD_CLASS_INTPOINT, SOLR_FIELD_DOCVALUES,
+            true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOAT, SolrSchemaUtils.SOLR_FIELD_CLASS_FLOATPOINT,
+            SOLR_FIELD_DOCVALUES, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PLONG, SolrSchemaUtils.SOLR_FIELD_CLASS_LONGPOINT, SOLR_FIELD_DOCVALUES,
+            true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLE, SolrSchemaUtils.SOLR_FIELD_CLASS_DOUBLEPOINT,
+            SOLR_FIELD_DOCVALUES, true);
 
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_PINTS, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-            SOLR_FIELD_MULTIVALUED, true);
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOATS, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-            SOLR_FIELD_MULTIVALUED, true);
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_PLONGS, LongPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-            SOLR_FIELD_MULTIVALUED, true);
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLES, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-            SOLR_FIELD_MULTIVALUED, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PINTS, SolrSchemaUtils.SOLR_FIELD_CLASS_INTPOINT, SOLR_FIELD_DOCVALUES,
+            true, SOLR_FIELD_MULTIVALUED, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOATS, SolrSchemaUtils.SOLR_FIELD_CLASS_FLOATPOINT,
+            SOLR_FIELD_DOCVALUES, true, SOLR_FIELD_MULTIVALUED, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PLONGS, SolrSchemaUtils.SOLR_FIELD_CLASS_LONGPOINT,
+            SOLR_FIELD_DOCVALUES, true, SOLR_FIELD_MULTIVALUED, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLES, SolrSchemaUtils.SOLR_FIELD_CLASS_DOUBLEPOINT,
+            SOLR_FIELD_DOCVALUES, true, SOLR_FIELD_MULTIVALUED, true);
 
         // Since fields of this type are by default not stored or indexed, any data added to them will be ignored
         // outright
         addFieldType("ignored", "solr.StrField", SOLR_FIELD_STORED, false, SOLR_FIELD_INDEXED, false,
             SOLR_FIELD_MULTIVALUED, true);
 
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATE, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATES, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-            SOLR_FIELD_MULTIVALUED, true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATE, SolrSchemaUtils.SOLR_FIELD_CLASS_DATEPOINT, SOLR_FIELD_DOCVALUES,
+            true);
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATES, SolrSchemaUtils.SOLR_FIELD_CLASS_DATEPOINT,
+            SOLR_FIELD_DOCVALUES, true, SOLR_FIELD_MULTIVALUED, true);
 
         // Binary data type. The data should be sent/retrieved in as Base64 encoded Strings
-        addFieldType(DefaultSolrUtils.SOLR_TYPE_BINARY, BinaryField.class.getName());
+        addFieldType(DefaultSolrUtils.SOLR_TYPE_BINARY, SolrSchemaUtils.SOLR_FIELD_CLASS_BINARY);
 
         migrateBaseSchema(SCHEMA_VERSION_12_3);
     }
@@ -332,10 +327,10 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     private void addTextGeneralFieldType(String fieldName, boolean multiValued) throws SolrException
     {
         Map<String, Object> tokenizer = new HashMap<>();
-        tokenizer.put(FieldType.CLASS_NAME, StandardTokenizerFactory.class.getName());
+        tokenizer.put(SolrSchemaUtils.FIELD_CLASS, "org.apache.lucene.analysis.standard.StandardTokenizerFactory");
 
         Map<String, Object> lowerCaseFilter = new HashMap<>();
-        lowerCaseFilter.put(FieldType.CLASS_NAME, LowerCaseFilterFactory.class.getName());
+        lowerCaseFilter.put(SolrSchemaUtils.FIELD_CLASS, "org.apache.lucene.analysis.core.LowerCaseFilterFactory");
 
         AnalyzerDefinition indexAnalyzer = new AnalyzerDefinition();
         indexAnalyzer.setTokenizer(tokenizer);
@@ -346,8 +341,8 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         queryAnalyzer.setFilters(Arrays.asList(lowerCaseFilter));
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put(FieldType.TYPE_NAME, fieldName);
-        attributes.put(FieldType.CLASS_NAME, TextField.class.getName());
+        attributes.put(SolrSchemaUtils.SOLR_FIELD_NAME, fieldName);
+        attributes.put(SolrSchemaUtils.FIELD_CLASS, "org.apache.solr.schema.TextField");
 
         if (multiValued) {
             attributes.put(SOLR_FIELD_MULTIVALUED, multiValued);

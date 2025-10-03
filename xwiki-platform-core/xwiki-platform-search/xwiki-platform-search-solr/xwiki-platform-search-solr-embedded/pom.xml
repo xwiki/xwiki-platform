@@ -27,19 +27,20 @@
     <artifactId>xwiki-platform-search-solr</artifactId>
     <version>17.9.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search-solr-api</artifactId>
-  <name>XWiki Platform - Search - Solr - API</name>
+  <artifactId>xwiki-platform-search-solr-embedded</artifactId>
+  <name>XWiki Platform - Search - Solr - Embedded</name>
   <packaging>jar</packaging>
-  <description>Solr engine management: configuration, indexing, listeners, script service, etc. This module does not handle the search queries</description>
+  <description>Add support for an embedded version of Solr.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Solr Search API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
+    <xwiki.extension.name>Solr Embedded</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
     <!-- The Solr framework is designed to be shared for the whole farm -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -47,52 +48,27 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
     </dependency>
-    <!-- Apache Commons -->
+    <!-- Embedded Solr instance. -->
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-core</artifactId>
     </dependency>
-    <!-- Extract data from attachments -->
+    <!-- Jersey require javax validation but declare a dependency on jakarta validation -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tika-parsers</artifactId>
-      <version>${project.version}</version>
-      <type>pom</type>
-    </dependency>
-    <!-- XWiki dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-environment-api</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-analysis-extras</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-backward-codecs</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-query-manager</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-link</artifactId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Embedded in the JAR to be used as default SOLR configuration -->
@@ -110,7 +86,6 @@
       <type>zip</type>
       <scope>provided</scope>
     </dependency>
-    
 
     <!-- Testing dependencies -->
     <!-- Since we're mocking a class (XWiki) we need those -->
@@ -132,6 +107,24 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/test/**.class</include>
+                <include>META-INF/**</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <executions>
           <execution>
@@ -139,10 +132,7 @@
             <id>default</id>
             <configuration>
               <excludes>
-                **/DefaultSolrIndexer.java,
-                **/SolrIndexEventListener.java,
-                **/AbstractSolrMetadataExtractor.java,
-                **/SolrSchemaUtils.java
+                **/EmbeddedSolr.java
               </excludes>
             </configuration>
           </execution>

@@ -33,7 +33,6 @@ import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
-import org.apache.solr.schema.FieldType;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.XWikiSolrCore;
@@ -60,6 +59,43 @@ public class SolrSchemaUtils
     public static final String SOLR_VERSIONFIELDTYPE_VALUE = "defVal";
 
     /**
+     * The name of property holding the field class.
+     * 
+     * @since 17.9.0RC1
+     */
+    public static final String FIELD_CLASS = "class";
+
+    /**
+     * The name of the attribute containing the name of the Solr field.
+     * 
+     * @since 17.9.0RC1
+     */
+    public static final String SOLR_FIELD_NAME = "name";
+
+    /**
+     * The name of the attribute containing the type of the Solr field.
+     * 
+     * @since 17.9.0RC1
+     */
+    public static final String SOLR_FIELD_TYPE = "type";
+
+    /**
+     * The name of the attribute containing the class of the Solr field.
+     * 
+     * @since 17.9.0RC1
+     */
+    public static final String SOLR_FIELD_CLASS = "class";
+
+    public static final String SOLR_FIELD_CLASS_STR = "org.apache.solr.schema.StrField";
+    public static final String SOLR_FIELD_CLASS_BOOLEAN = "org.apache.solr.schema.BoolField";
+    public static final String SOLR_FIELD_CLASS_INTPOINT = "org.apache.solr.schema.IntPointField";
+    public static final String SOLR_FIELD_CLASS_FLOATPOINT = "org.apache.solr.schema.FloatPointField";
+    public static final String SOLR_FIELD_CLASS_DOUBLEPOINT = "org.apache.solr.schema.DoublePointField";
+    public static final String SOLR_FIELD_CLASS_LONGPOINT = "org.apache.solr.schema.LongPointField";
+    public static final String SOLR_FIELD_CLASS_DATEPOINT = "org.apache.solr.schema.DatePointField";
+    public static final String SOLR_FIELD_CLASS_BINARY = "org.apache.solr.schema.BinaryField";
+
+    /**
      * Contains data of a solr core schema.
      *
      * @version $Id$
@@ -82,11 +118,6 @@ public class SolrSchemaUtils
             this.copyFields = null;
         }
     }
-
-    /**
-     * The name of the attribute containing the name of the Solr field.
-     */
-    private static final String SOLR_FIELD_NAME = "name";
 
     private final Map<String, SolrCoreSchema> coreSchemaMap = new HashMap<>();
 
@@ -116,7 +147,7 @@ public class SolrSchemaUtils
             }
 
             Map<String, FieldTypeRepresentation> map = new HashMap<>(response.getFieldTypes().size());
-            response.getFieldTypes().forEach(t -> map.put((String) t.getAttributes().get(FieldType.TYPE_NAME), t));
+            response.getFieldTypes().forEach(t -> map.put((String) t.getAttributes().get(SOLR_FIELD_NAME), t));
             schema.types = map;
         }
 
@@ -235,7 +266,7 @@ public class SolrSchemaUtils
      */
     public void setFieldType(XWikiSolrCore core, FieldTypeDefinition definition, Boolean add) throws SolrException
     {
-        String filedName = (String) definition.getAttributes().get(FieldType.TYPE_NAME);
+        String filedName = (String) definition.getAttributes().get(SOLR_FIELD_NAME);
 
         Map<String, FieldTypeRepresentation> filedTypes = getFieldTypes(core, false);
 
@@ -335,7 +366,7 @@ public class SolrSchemaUtils
     {
         Map<String, Object> fieldAttributes = new HashMap<>();
         fieldAttributes.put(SOLR_FIELD_NAME, name);
-        fieldAttributes.put(FieldType.TYPE, type);
+        fieldAttributes.put(SOLR_FIELD_TYPE, type);
 
         MapUtils.putAll(fieldAttributes, attributes);
 
@@ -358,7 +389,7 @@ public class SolrSchemaUtils
     {
         Map<String, Object> fieldAttributes = new HashMap<>();
         fieldAttributes.put(SOLR_FIELD_NAME, name);
-        fieldAttributes.put(FieldType.TYPE, type);
+        fieldAttributes.put(SOLR_FIELD_TYPE, type);
 
         MapUtils.putAll(fieldAttributes, attributes);
 
@@ -711,8 +742,8 @@ public class SolrSchemaUtils
     {
         Map<String, Object> attributesMap = new HashMap<>(2 + (attributes.length > 0 ? attributes.length / 2 : 0));
 
-        attributesMap.put(FieldType.TYPE_NAME, name);
-        attributesMap.put(FieldType.CLASS_NAME, solrClass);
+        attributesMap.put(SOLR_FIELD_NAME, name);
+        attributesMap.put(SOLR_FIELD_CLASS, solrClass);
 
         MapUtils.putAll(attributesMap, attributes);
 

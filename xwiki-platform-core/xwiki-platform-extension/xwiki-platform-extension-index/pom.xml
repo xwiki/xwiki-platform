@@ -67,7 +67,7 @@
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>

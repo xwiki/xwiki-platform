@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-index-tree</artifactId>
-    <version>16.10.12-SNAPSHOT</version>
+    <version>16.10.12</version>
   </parent>
   <packaging>pom</packaging>
   <name>XWiki Platform - Index - Tree - Rest - Parent POM</name>

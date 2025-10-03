@@ -265,7 +265,7 @@
 
   // Others (e.g. a custom facet) can trigger a search UI update by firing this event.
   $(document).on('xwiki:search:update', function(event, viewURL) {
-    pushSearchUIState(viewURL, "[data-facet-value='" + event.target.getAttribute('data-facet-value') + "']");
+    pushSearchUIState(viewURL, "[data-facet-value='" + event.target.dataset.facetValue + "']");
   });
 
   $(window).on('popstate', function(event) {

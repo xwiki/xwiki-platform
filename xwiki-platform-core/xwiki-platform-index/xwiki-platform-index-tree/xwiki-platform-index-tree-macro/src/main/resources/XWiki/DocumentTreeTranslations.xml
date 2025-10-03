@@ -94,6 +94,10 @@ rendering.macro.children.parameter.sort.description=The page field used to sort 
 rendering.macro.children.parameter.root.name=Root
 rendering.macro.children.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified. The format of a node identifier is entityType:entityReference, where the entity type can be for instance wiki, space, document. E.g.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
 
+rendering.macro.documentTree.group.show.name=Elements to show
+rendering.macro.documentTree.group.filters.name=Filters
+rendering.macro.documentTree.group.style.name=Display options
+
 index.documentTree.empty=No pages found
 index.documentTree.more={0} more ...
 index.documentTree.addDocument=New page...

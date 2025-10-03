@@ -303,14 +303,14 @@
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jetty-web.xml</linkName>
-              <linkTarget>/etc/xwiki/jetty-web.xml</linkTarget>
+              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee10-web.xml</linkName>
+              <linkTarget>/etc/xwiki/jetty-ee10-web.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee8-web.xml</linkName>
-              <linkTarget>/etc/xwiki/jetty-ee8-web.xml</linkTarget>
+              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee11-web.xml</linkName>
+              <linkTarget>/etc/xwiki/jetty-ee11-web.xml</linkTarget>
             </data>
             <data>
               <type>link</type>

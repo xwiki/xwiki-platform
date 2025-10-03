@@ -53,6 +53,7 @@ import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Image;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isInAContainer;
 
 /**
@@ -355,9 +356,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         if (this.testConfiguration.getServletEngineTag() != null) {
             return this.testConfiguration.getServletEngineTag();
         } else {
+            String dockerImageName = this.testConfiguration.getServletEngine().name().toLowerCase();
             try {
                 String javaMaxVersion = this.mavenResolver.getPropertyFromCurrentPOM("xwiki.java.version.support");
-                String dockerImageName = this.testConfiguration.getServletEngine().name().toLowerCase();
                 if (Objects.equals(dockerImageName, TOMCAT)) {
                     return "jre%s".formatted(javaMaxVersion);
                 } else if (Objects.equals(dockerImageName, JETTY)) {
@@ -365,12 +366,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                     return "jdk%s".formatted(javaMaxVersion);
                 }
             } catch (Exception e) {
-                // An exception is only thrown when xwiki.java.version.support is not defined.
-                // In this case we return the "latest" tag
-                return LATEST;
+                LOGGER.debug("Failed to resolve the docker image tag for image [{}]. Cause: [{}]", dockerImageName,
+                    getRootCauseMessage(e));
             }
         }
-        // We also return "latest" if a servlet different from tomcat of jetty is defined without an explicit tag.
         return LATEST;
     }
 

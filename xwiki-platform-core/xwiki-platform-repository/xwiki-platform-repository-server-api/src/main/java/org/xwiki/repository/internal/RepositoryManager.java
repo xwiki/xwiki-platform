@@ -780,6 +780,7 @@ public class RepositoryManager
      * @param xcontext the XWiki Context
      * @return the object holding the extension version metadata, or null if none could be found
      * @throws XWikiException when failing to get the extension version object
+     * @since 17.9.0RC1
      */
     public BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version, XWikiContext xcontext)
         throws XWikiException
@@ -794,6 +795,7 @@ public class RepositoryManager
      * @param xcontext the XWiki Context
      * @return the object holding the extension version metadata, or null if none could be found
      * @throws XWikiException when failing to get the extension version object
+     * @since 17.9.0RC1
      */
     public BaseObject getExtensionVersionObject(XWikiDocument extensionDocument, String version, boolean allowProxying,
         XWikiContext xcontext) throws XWikiException

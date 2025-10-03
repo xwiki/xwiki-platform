@@ -133,6 +133,14 @@ public class RepositoryScriptService implements ScriptService
         return this.extensionStore.resolveExtensionSupportPlans(supportPlanIds);
     }
 
+    /**
+     * @param extensionId the identifier of the extension
+     * @param version the version for which to find the object
+     * @return the object holding the extension version metadata
+     * @throws QueryException when failing to get the version object
+     * @throws XWikiException when failing to get the version object
+     * @since 17.9.0RC1
+     */
     public Object getVersionObject(String extensionId, String version) throws QueryException, XWikiException
     {
         XWikiDocument extensionDoc = this.extensionStore.getExistingExtensionDocumentById(extensionId);

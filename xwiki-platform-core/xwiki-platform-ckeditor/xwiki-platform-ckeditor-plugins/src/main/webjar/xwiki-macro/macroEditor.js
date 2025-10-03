@@ -73,6 +73,11 @@ define('macroParameterEnhancer', ['jquery'], function($) {
     // if the group contains a single parameter then we don't consider it's a feature only.
     } else if (group.children.length === 1) {
       group.featureOnly = false;
+      // if the single children is a group, we actually remove it to display directly the parameters
+      let uniqueChildKey = group.children[0];
+      if (isNodeAGroup(uniqueChildKey)) {
+        group.children = parametersMap[uniqueChildKey].children;
+      }
     }
     visitedGroups.push(group.id);
   },
@@ -554,8 +559,15 @@ define(
         let emptyMandatoryParams = [];
         // Include the mandatory features for which no option is checked.
         macroEditor.find('.feature-container.mandatory').filter(function () {
-          return $(this).find('.feature-radio').length > 0 &&
-              $(this).find('.feature-radio:checked').length === 0;
+          if ($(this).find('.feature-radio').length > 0) {
+            return $(this).find('.feature-radio:checked').length === 0;
+          } else {
+            return $(this).find('.macro-parameter:not(.hidden)').filter(function() {
+                let id = $(this).attr('data-id');
+                let value = id === '$content' ? macroCall.content : macroCall.parameters[id];
+                return value === undefined || value === '';
+            }).first().length !== 0;
+          }
         }).map((index, elt) => emptyMandatoryParams.push(elt));
         // Exclude the hidden mandatory parameters
         macroEditor.find('.macro-parameter.mandatory:not(.hidden)').filter(function() {

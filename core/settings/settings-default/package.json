@@ -39,7 +39,7 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "inversify": "7.10.1",
+    "inversify": "7.10.2",
     "typescript": "5.9.3",
     "vite": "7.1.9",
     "vitest-mock-extended": "3.1.0"

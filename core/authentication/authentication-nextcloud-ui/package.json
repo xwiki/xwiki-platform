@@ -46,7 +46,7 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dev-test-utils": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "inversify": "7.10.1",
+    "inversify": "7.10.2",
     "reflect-metadata": "0.2.2",
     "typescript": "5.9.3",
     "vite": "7.1.9",

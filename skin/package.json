@@ -70,7 +70,7 @@
     "@vue/test-utils": "2.4.6",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dev-test-utils": "workspace:*",
-    "inversify": "7.10.1",
+    "inversify": "7.10.2",
     "ts-essentials": "10.1.1",
     "typescript": "5.9.3",
     "vite": "7.1.9",

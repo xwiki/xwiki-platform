@@ -24,12 +24,12 @@
   "dependencies": {
     "@xwiki/cristal-electron-storage": "workspace:*",
     "@xwiki/cristal-lib": "workspace:*",
-    "electron-updater": "6.6.2"
+    "electron-updater": "catalog:"
   },
   "devDependencies": {
-    "electron": "38.2.1",
-    "electron-builder": "26.0.12",
-    "typescript": "5.9.3",
-    "vite": "7.1.9"
+    "electron": "catalog:",
+    "electron-builder": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

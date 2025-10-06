@@ -32,20 +32,20 @@
   "dependencies": {
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-uniast-api": "workspace:*",
-    "lodash-es": "4.17.21"
+    "lodash-es": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x"
   },
   "devDependencies": {
-    "@types/lodash-es": "4.17.12",
+    "@types/lodash-es": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
-    "inversify": "7.10.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vitest-mock-extended": "3.1.0"
+    "inversify": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest-mock-extended": "catalog:"
   },
   "publishConfig": {
     "exports": {

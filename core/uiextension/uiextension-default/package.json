@@ -31,19 +31,19 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-uiextension-api": "workspace:*",
-    "lodash-es": "4.17.21"
+    "lodash-es": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x",
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
-    "@types/lodash-es": "4.17.12",
+    "@types/lodash-es": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   },
   "publishConfig": {
     "exports": {

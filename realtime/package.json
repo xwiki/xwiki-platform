@@ -20,16 +20,16 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
-    "@hocuspocus/server": "2.15.3",
-    "express": "5.1.0",
-    "express-ws": "5.0.2"
+    "@hocuspocus/server": "catalog:",
+    "express": "catalog:",
+    "express-ws": "catalog:"
   },
   "devDependencies": {
-    "@types/express": "5.0.3",
-    "@types/express-ws": "3.0.5",
-    "esbuild": "0.25.10",
-    "tsx": "4.20.6",
-    "typescript": "5.9.3",
-    "vite": "7.1.9"
+    "@types/express": "catalog:",
+    "@types/express-ws": "catalog:",
+    "esbuild": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

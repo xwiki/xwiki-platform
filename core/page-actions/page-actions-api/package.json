@@ -30,7 +30,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "vue-i18n": "11.1.12"
+    "vue-i18n": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x",
@@ -39,11 +39,11 @@
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue": "3.5.22"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:"
   },
   "publishConfig": {
     "exports": {

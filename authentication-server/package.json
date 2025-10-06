@@ -21,13 +21,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "express": "5.1.0"
+    "express": "catalog:"
   },
   "devDependencies": {
-    "@types/express": "5.0.3",
-    "esbuild": "0.25.10",
-    "tsx": "4.20.6",
-    "typescript": "5.9.3",
-    "vite": "7.1.9"
+    "@types/express": "catalog:",
+    "esbuild": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

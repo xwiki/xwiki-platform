@@ -30,8 +30,8 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@gouvfr/dsfr": "1.11.2",
-    "@gouvminint/vue-dsfr": "5.11.0",
+    "@gouvfr/dsfr": "catalog:",
+    "@gouvminint/vue-dsfr": "catalog:",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*"
   },
@@ -41,15 +41,15 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@vue/test-utils": "2.4.6",
+    "@vue/test-utils": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue": "3.5.22",
-    "vue-tsc": "2.2.12"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "publishConfig": {
     "exports": {

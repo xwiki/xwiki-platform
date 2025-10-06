@@ -36,8 +36,8 @@
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
-    "vue-i18n": "11.1.12",
-    "vuetify": "3.10.4"
+    "vue-i18n": "catalog:",
+    "vuetify": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x",
@@ -45,15 +45,15 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@vue/test-utils": "2.4.6",
+    "@vue/test-utils": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue": "3.5.22",
-    "vue-tsc": "2.2.12"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "publishConfig": {
     "exports": {

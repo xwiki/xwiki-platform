@@ -33,9 +33,9 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-collaboration-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
-    "lib0": "0.2.114",
-    "y-websocket": "3.0.0",
-    "yjs": "13.6.27"
+    "lib0": "catalog:",
+    "y-websocket": "catalog:",
+    "yjs": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x",
@@ -44,11 +44,11 @@
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue": "3.5.22"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:"
   },
   "publishConfig": {
     "exports": {

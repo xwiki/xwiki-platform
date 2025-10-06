@@ -45,7 +45,7 @@
     "@xwiki/cristal-model-remote-url-filesystem-api": "workspace:*",
     "@xwiki/cristal-page-default": "workspace:*",
     "@xwiki/cristal-utils-inversify": "workspace:*",
-    "mime": "4.1.0"
+    "mime": "catalog:"
   },
   "peerDependencies": {
     "electron": "38.2.1",
@@ -53,13 +53,13 @@
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
-    "@types/node": "22.18.8",
+    "@types/node": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vite-plugin-node": "7.0.0"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-node": "catalog:"
   },
   "publishConfig": {
     "exports": {

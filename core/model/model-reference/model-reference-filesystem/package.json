@@ -41,12 +41,12 @@
   "devDependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vitest-mock-extended": "3.1.0",
-    "vue": "3.5.22"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest-mock-extended": "catalog:",
+    "vue": "catalog:"
   },
   "publishConfig": {
     "exports": {

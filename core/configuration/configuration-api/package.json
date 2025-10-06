@@ -26,10 +26,10 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "utility-types": "3.11.0"
+    "utility-types": "catalog:"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "typescript": "5.9.3"
+    "typescript": "catalog:"
   }
 }

@@ -31,12 +31,12 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-page-api": "workspace:*",
-    "yaml": "2.8.1"
+    "yaml": "catalog:"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "typescript": "5.9.3",
-    "vite": "7.1.9"
+    "typescript": "catalog:",
+    "vite": "catalog:"
   },
   "publishConfig": {
     "exports": {

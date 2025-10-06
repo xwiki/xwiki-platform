@@ -42,9 +42,9 @@
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",
-    "comlink": "4.4.2",
-    "reflect-metadata": "0.2.2",
-    "vue-router": "4.5.1"
+    "comlink": "catalog:",
+    "reflect-metadata": "catalog:",
+    "vue-router": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x",
@@ -52,12 +52,12 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@types/sharedworker": "0.0.184",
+    "@types/sharedworker": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.10.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue": "3.5.22"
+    "inversify": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:"
   },
   "publishConfig": {
     "exports": {

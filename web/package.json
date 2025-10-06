@@ -34,19 +34,19 @@
     "@xwiki/cristal-configuration-web": "workspace:*",
     "@xwiki/cristal-lib": "workspace:*",
     "@xwiki/cristal-settings-browser": "workspace:*",
-    "express": "5.1.0",
-    "inversify": "7.10.2",
-    "vue": "3.5.22"
+    "express": "catalog:",
+    "inversify": "catalog:",
+    "vue": "catalog:"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.1",
-    "@eslint/js": "9.37.0",
-    "@playwright/test": "1.55.1",
-    "@types/node": "22.18.8",
-    "@vitejs/plugin-vue": "6.0.1",
-    "globals": "16.4.0",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue-tsc": "2.2.12"
+    "@eslint/eslintrc": "catalog:",
+    "@eslint/js": "catalog:",
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "globals": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue-tsc": "catalog:"
   }
 }

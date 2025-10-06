@@ -33,8 +33,8 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-authentication-github-state": "workspace:*",
-    "axios": "1.12.2",
-    "js-cookie": "3.0.5"
+    "axios": "catalog:",
+    "js-cookie": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x",
@@ -42,13 +42,13 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@types/js-cookie": "3.0.6",
+    "@types/js-cookie": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue": "3.5.22"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:"
   },
   "publishConfig": {
     "exports": {

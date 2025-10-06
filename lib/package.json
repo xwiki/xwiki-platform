@@ -97,10 +97,10 @@
     "@xwiki/cristal-uniast-html": "workspace:*",
     "@xwiki/cristal-uniast-markdown": "workspace:*",
     "@xwiki/cristal-wiki-config-default": "workspace:*",
-    "pinia": "3.0.2",
-    "reflect-metadata": "0.2.2",
-    "vue-i18n": "11.1.12",
-    "vue-router": "4.5.1"
+    "pinia": "catalog:",
+    "reflect-metadata": "catalog:",
+    "vue-i18n": "catalog:",
+    "vue-router": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x",
@@ -108,14 +108,14 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@shoelace-style/shoelace": "2.20.1",
+    "@shoelace-style/shoelace": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "inversify": "7.10.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue": "3.5.22",
-    "vue-tsc": "2.2.12"
+    "inversify": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "publishConfig": {
     "exports": {

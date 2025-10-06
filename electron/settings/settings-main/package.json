@@ -32,15 +32,15 @@
   "dependencies": {
     "@xwiki/cristal-configuration-api": "workspace:*",
     "@xwiki/cristal-settings-api": "workspace:*",
-    "electron-store": "10.1.0"
+    "electron-store": "catalog:"
   },
   "peerDependencies": {
     "electron": "38.2.1"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "typescript": "5.9.3",
-    "vite": "7.1.9"
+    "typescript": "catalog:",
+    "vite": "catalog:"
   },
   "publishConfig": {
     "exports": {

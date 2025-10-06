@@ -43,9 +43,9 @@
     "@xwiki/cristal-skin": "workspace:*",
     "@xwiki/cristal-uniast-api": "workspace:*",
     "@xwiki/cristal-uniast-markdown": "workspace:*",
-    "lodash-es": "4.17.21",
-    "vue-i18n": "11.1.12",
-    "vue-router": "4.5.1"
+    "lodash-es": "catalog:",
+    "vue-i18n": "catalog:",
+    "vue-router": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x",
@@ -53,15 +53,15 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@types/lodash-es": "4.17.12",
-    "@vitejs/plugin-vue": "6.0.1",
+    "@types/lodash-es": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue": "3.5.22",
-    "vue-tsc": "2.2.12"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "publishConfig": {
     "exports": {

@@ -24,13 +24,13 @@
     "@xwiki/cristal-electron-authentication-nextcloud-preload": "workspace:*",
     "@xwiki/cristal-electron-authentication-xwiki-preload": "workspace:*",
     "@xwiki/cristal-electron-settings-preload": "workspace:*",
-    "reflect-metadata": "0.2.2"
+    "reflect-metadata": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "22.18.8",
+    "@types/node": "catalog:",
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
-    "typescript": "5.9.3",
-    "vite": "7.1.9"
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

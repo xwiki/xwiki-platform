@@ -31,16 +31,16 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "reflect-metadata": "0.2.2"
+    "reflect-metadata": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "inversify": "7.10.2",
-    "typescript": "5.9.3",
-    "vite": "7.1.9"
+    "inversify": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   },
   "publishConfig": {
     "exports": {

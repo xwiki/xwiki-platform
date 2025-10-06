@@ -33,14 +33,14 @@
     "@xwiki/cristal-model-remote-url-filesystem-default": "workspace:*",
     "@xwiki/cristal-navigation-tree-filesystem": "workspace:*",
     "@xwiki/cristal-rename-filesystem": "workspace:*",
-    "inversify": "7.10.2",
-    "reflect-metadata": "0.2.2",
-    "vue": "3.5.22"
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "vue": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "22.18.8",
-    "@vitejs/plugin-vue": "6.0.1",
-    "typescript": "5.9.3",
-    "vite": "7.1.9"
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

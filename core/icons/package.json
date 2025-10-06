@@ -31,19 +31,19 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "bootstrap-icons": "1.13.1"
+    "bootstrap-icons": "catalog:"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
-    "@vue/test-utils": "2.4.6",
+    "@vue/test-utils": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vue": "3.5.22",
-    "vue-tsc": "2.2.12"
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "keywords": [
     "icons"

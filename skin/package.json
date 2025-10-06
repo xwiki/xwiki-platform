@@ -57,9 +57,9 @@
     "@xwiki/cristal-uniast-markdown": "workspace:*",
     "@xwiki/cristal-user-ui": "workspace:*",
     "@xwiki/cristal-wiki-config-api": "workspace:*",
-    "reflect-metadata": "0.2.2",
-    "vue-i18n": "11.1.12",
-    "vue-router": "4.5.1"
+    "reflect-metadata": "catalog:",
+    "vue-i18n": "catalog:",
+    "vue-router": "catalog:"
   },
   "peerDependencies": {
     "inversify": "7.x",
@@ -67,17 +67,17 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@vue/test-utils": "2.4.6",
+    "@vue/test-utils": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dev-test-utils": "workspace:*",
-    "inversify": "7.10.2",
-    "ts-essentials": "10.1.1",
-    "typescript": "5.9.3",
-    "vite": "7.1.9",
-    "vitest": "3.2.4",
-    "vitest-mock-extended": "3.1.0",
-    "vue": "3.5.22",
-    "vue-tsc": "2.2.12"
+    "inversify": "catalog:",
+    "ts-essentials": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vitest-mock-extended": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "publishConfig": {
     "exports": {

@@ -28,6 +28,6 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "typescript": "5.9.3"
+    "typescript": "catalog:"
   }
 }

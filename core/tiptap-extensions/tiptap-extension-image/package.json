@@ -30,9 +30,9 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@tiptap/extension-image": "2.13.0",
-    "@tiptap/pm": "2.13.0",
-    "@tiptap/vue-3": "2.13.0",
+    "@tiptap/extension-image": "catalog:",
+    "@tiptap/pm": "catalog:",
+    "@tiptap/vue-3": "catalog:",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-attachments-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
@@ -41,11 +41,11 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "@xwiki/cristal-tiptap-link-suggest-ui": "workspace:*",
-    "lodash-es": "4.17.21",
-    "prosemirror-markdown": "1.13.2",
-    "vue-i18n": "11.1.12",
-    "vue-tippy": "6.7.1",
-    "vue3-draggable-resizable": "1.6.5"
+    "lodash-es": "catalog:",
+    "prosemirror-markdown": "catalog:",
+    "vue-i18n": "catalog:",
+    "vue-tippy": "catalog:",
+    "vue3-draggable-resizable": "catalog:"
   },
   "peerDependencies": {
     "@tiptap/core": "2.13.0",
@@ -53,12 +53,12 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@tiptap/core": "2.13.0",
-    "@types/lodash-es": "4.17.12",
+    "@tiptap/core": "catalog:",
+    "@types/lodash-es": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "vue": "3.5.22",
-    "vue-tsc": "2.2.12"
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "publishConfig": {
     "exports": {

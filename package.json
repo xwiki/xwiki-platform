@@ -58,7 +58,7 @@
     "prettier": "3.6.2",
     "publint": "0.3.13",
     "rimraf": "6.0.1",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "typescript-eslint": "8.44.1",
     "vite": "7.1.9",
     "vite-plugin-css-injected-by-js": "3.5.2",

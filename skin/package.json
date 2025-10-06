@@ -72,7 +72,7 @@
     "@xwiki/cristal-dev-test-utils": "workspace:*",
     "inversify": "7.10.1",
     "ts-essentials": "10.1.1",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "vite": "7.1.9",
     "vitest": "3.2.4",
     "vitest-mock-extended": "3.1.0",

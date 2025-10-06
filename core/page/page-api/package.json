@@ -33,6 +33,6 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "inversify": "7.10.1",
     "reflect-metadata": "0.2.2",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   }
 }

@@ -31,6 +31,6 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   }
 }

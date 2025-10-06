@@ -57,7 +57,7 @@
     "inversify": "7.10.1",
     "typescript": "5.9.3",
     "vite": "7.1.9",
-    "vue": "3.5.21"
+    "vue": "3.5.22"
   },
   "publishConfig": {
     "exports": {

@@ -48,7 +48,7 @@
     "mime": "4.1.0"
   },
   "peerDependencies": {
-    "electron": "38.1.2",
+    "electron": "38.2.0",
     "inversify": "7.x",
     "reflect-metadata": "0.x"
   },

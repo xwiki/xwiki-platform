@@ -30,7 +30,7 @@
   },
   "types": "./dist/index.d.ts",
   "peerDependencies": {
-    "electron": "38.1.2"
+    "electron": "38.2.0"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

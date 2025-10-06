@@ -35,18 +35,6 @@
     "editor": "tiptap",
     "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
-  "XWikiDSFR": {
-    "name": "XWikiDSFR",
-    "configType": "XWiki",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
-    "baseRestURL": "/rest/cristal/page?media=json",
-    "homePage": "Main.WebHome",
-    "designSystem": "dsfr",
-    "editor": "tiptap",
-    "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
-  },
   "XWikiSL": {
     "name": "XWikiSL",
     "configType": "XWiki",

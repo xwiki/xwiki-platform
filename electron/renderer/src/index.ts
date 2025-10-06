@@ -41,7 +41,6 @@ CristalAppLoader.init(
   [
     "skin",
     "dsvuetify",
-    "dsfr",
     "dsshoelace",
     "macros",
     "storage",

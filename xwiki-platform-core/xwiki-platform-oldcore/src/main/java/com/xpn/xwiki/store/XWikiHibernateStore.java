@@ -1748,9 +1748,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             if (evict) {
                                 session.evict(property);
                             }
-                            if (session.get(property.getClass(), property) != null) {
-                                session.delete(property);
-                            }
+                            session.delete(property);
                         }
                     }
                 }

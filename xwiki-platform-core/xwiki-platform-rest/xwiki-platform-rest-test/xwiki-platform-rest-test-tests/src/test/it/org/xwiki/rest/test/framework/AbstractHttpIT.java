@@ -86,6 +86,12 @@ public abstract class AbstractHttpIT
     @ClassRule
     public static final ValidateConsoleRule validateConsole = new ValidateConsoleRule();
 
+    protected static final String INVALID_LIMIT_MINUS_1 =
+        "Invalid limit value: -1. The limit must be a positive integer and less than or equal to 1000.";
+
+    protected static final String INVALID_LIMIT_1001 =
+        "Invalid limit value: 1001. The limit must be a positive integer and less than or equal to 1000.";
+
     /**
      * The object used to access the name of the current test.
      */

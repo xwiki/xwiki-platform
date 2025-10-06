@@ -138,7 +138,7 @@ Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [@in
 ** **##queryString##**: Eine optionale Abfragezeichenkette, die Parameter spezifiziert, die in der gerenderten URL verwendet werden. Beispiel: ##mydata1=5&amp;mydata2=Hallo##
 ** **##Anker##**: Ein optionaler Ankername, der auf einen Anker im referenzierten Link zeigt. In XWiki werden Anker automatisch für Überschriften und Bilder erstellt. Beispiel: ##HInhaltsverzeichnis##
 * **##interWikiAlias##**: Ein optionales [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] Alias, entsprechend der Definition in der InterWiki Map (siehe [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Dies ist nur für Wikiseitennamen zulässig. Beispiel: ##wikipedia##
-* **##Parameter##**: Eine optionale Liste mit Parametern, die an den Link weitergegeben werden. Beispiel: ##rel="~_~_blank"## (in neuem Fenster öffnen)
+* **##Parameter##**: Eine optionale Liste mit Parametern, die an den Link weitergegeben werden. Beispiel: ##target="~_blank"## (in neuem Fenster öffnen)
 
 
 === 2.1 Links ===
@@ -203,8 +203,8 @@ Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [||P
 ** **UNC (Windows Explorer)** Referenz in der Form **##unc: (Pfad)##**. Der Link wird als ##file:~/~/## gerendet. Beispiele: ##unc:C:Windows##, ##unc:~~myserverpathimg.png##, ##unc:home/user/somefile##
 *** **##unc:##** Eine erforderliche Zeichenkette, die die Ressource als UNC (Windows Explorer) Pfad identifiziert.
 *** **##Pfad##**: Eine erforderliche Zeichenkette, die den lokalen Pfad der Ressource, die dem Nutzer zugänglich ist, enthält. Beispiele: ##C:Windows##, ##~~myserverpathimg.png##, ##home/user/somefile##
-* **##Parameter##**: Eine optionale Liste von Leerzeichen-getrennten Parametern, die an den Link übergeben werden. Beispiel: ##queryString="mydata1=5&amp;mydata2=Hallo" anchor="HInhaltsverzeichnis" rel="~_~_blank"##
+* **##Parameter##**: Eine optionale Liste von Leerzeichen-getrennten Parametern, die an den Link übergeben werden. Beispiel: ##queryString="mydata1=5&amp;mydata2=Hallo" anchor="HInhaltsverzeichnis" target="~_blank"##
 ** **##queryString##**: Eine optionale Abfragezeichenkette, die Parameter spezifiziert, die an die Linkzieladresse angehängt werden und in der gerenderten URL verwendet werden. Beispiel: ##url:http:~/~/domain.com/pfad||queryString="mydata1=5&amp;mydata2=Hello"## erzeugt Zieladresse ##http:~/~/domain.com/pfad?mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: Ein optionaler Ankername, der auf einen Anker im referenzierten Link zeigt. In XWiki werden Anker automatisch für Überschriften und Bilder erstellt. Beispiel: ##url:http:~/~/domain.com/pfad||anchor="HInhaltsverzeichnis"## erzeugt Zieladresse ##http:~/~/domain.com/pfad#HInhaltsverzeichnis##
-** **##rel##**: Ein optionaler Parameter, der es ermöglicht das Linkziel in einem neuen Fenster zu öffnen. Beispiel: ##rel="~_~_blank"##</content>
+** **##target##**: Ein optionaler Parameter, der es ermöglicht das Linkziel in einem neuen Fenster zu öffnen. Beispiel: ##target="~_blank"##</content>
 </xwikidoc>

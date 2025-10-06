@@ -164,75 +164,45 @@
           // Upload a new attachment.
           if (item.id === "_uploadAttachment") {
 
-            // Reuse attachment suggest code to show the file picker.
-            // Provides xwiki-attachments-store and xwiki-file-picker.
+            // Reuse attachment suggest code to show the file picker. Provides the xwiki-file-picker module.
             const requiredSkinExtensions = `<script src=` +
               `'${XWiki.contextPath}/${XWiki.servletpath}` +
               `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
               `defer='defer'></script>`;
             $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
 
-            require([
-              'xwiki-attachments-store',
-              'xwiki-file-picker',
-              'resource'
-            ], function (attachmentsStore, filePicker, resource) {
-              const convertFilesToAttachments = function (files, documentReference) {
-                const attachments = [];
-                for (var i = 0; i < files.length; i++) {
-                  const file = files.item(i);
-                  const attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
-                    documentReference);
-                  attachments.push(attachmentsStore.create(attachmentReference, file));
-                }
-                return attachments;
-              };
-
+            require(['xwiki-file-picker'], function(filePicker) {
               // Open the file picker
               filePicker.pickLocalFiles({
                 accept: "*",
                 multiple: false
               }).then(function (files) {
-                const attachments = convertFilesToAttachments(
-                  files,
-                  editor.config.sourceDocument.documentReference
-                );
-
-                // Cancel the insertion when no file is picked.
-                if (attachments.length === 0) {
-                  return;
+                if (files.length) {
+                  // Disable the upload image widget temporarily because even if the selected file is an image, we want
+                  // to insert a link to the uploaded image attachment.
+                  const uploadImageWidgetDef = editor.widgets.registered.uploadimage;
+                  if (uploadImageWidgetDef) {
+                    uploadImageWidgetDef._supportedTypes = uploadImageWidgetDef.supportedTypes;
+                    // Use a regular expression that doesn't match any file type.
+                    uploadImageWidgetDef.supportedTypes = /\b\B/;
+                  }
+                  try {
+                    // Simulate a paste event, as if the selected files were pasted in the editor.
+                    editor.fire('paste', {
+                      method: 'paste',
+                      dataValue: '',
+                      dataTransfer: new CKEDITOR.plugins.clipboard.dataTransfer({
+                        files,
+                        types: ['Files'],
+                      })
+                    });
+                  } finally {
+                    if (uploadImageWidgetDef) {
+                      // Restore the supported image types configuration.
+                      uploadImageWidgetDef.supportedTypes = uploadImageWidgetDef._supportedTypes;
+                    }
+                  }
                 }
-
-                const attachment = attachments[0];
-                const resourceReference = resource.convertEntityReferenceToResourceReference(
-                  XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT),
-                  editor.config.sourceDocument.documentReference);
-
-                // Insert the link immediately after closing the file picker.
-                editor.insertHtml($('<a></a>').attr({
-                    href: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor),
-                    'data-reference': CKEDITOR.plugins.xwikiResource.serializeResourceReference(resourceReference)
-                  }).text(attachment.name).prop('outerHTML'));
-
-                const notification = new XWiki.widgets.Notification(
-                  editor.localization.get('xwiki-link.uploadProgress', attachment.name),
-                  'inprogress');
-
-                // Upload the selected attachment
-                const attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
-                attachmentsStore.upload(attachmentReference, attachment.file).then(() => {
-                  notification.replace(
-                    new XWiki.widgets.Notification(
-                      editor.localization.get('xwiki-link.uploadSuccess', attachment.name),
-                      'done')
-                  );
-                }).catch(() => {
-                  notification.replace(
-                    new XWiki.widgets.Notification(
-                      editor.localization.get('xwiki-link.uploadError', attachment.name),
-                      'error')
-                  );
-                });
               });
             });
 

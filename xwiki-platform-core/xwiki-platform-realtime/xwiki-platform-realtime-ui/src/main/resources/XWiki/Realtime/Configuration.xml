@@ -321,6 +321,11 @@ ul.realtime-users {
   overflow: auto;
 }
 
+/* Hide the divider when the summarize action is not available. */
+ul.realtime-versions &gt; li.divider:last-child {
+  display: none;
+}
+
 /**
  * Spinner
  */
@@ -374,6 +379,20 @@ ul.realtime-users {
 
 :host(realtime-status[value="clean"])::after {
   content: attr(data-status-clean);
+}
+
+/**
+ * Concurrent editing warning
+ */
+
+.realtime-warning {
+  padding: 6px;
+  border: 0;
+  margin: 0 0 0 .5em;
+}
+
+.buttons:not(.realtime-edit-toolbar) &gt; .realtime-warning &gt; * {
+  vertical-align: baseline;
 }</code>
     </property>
     <property>
@@ -566,16 +585,18 @@ ul.realtime-users {
           &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('core.menu.toggleDropdown'))&lt;/span&gt;
         &lt;/button&gt;
         &lt;ul class="dropdown-menu"&gt;
-          &lt;li&gt;
-            &lt;a
-              href="#"
-              class="realtime-action-summarize"
-              title="$escapetool.xml($services.localization.render('realtime.summarizeAndDone.hint'))"
-              data-continue="false"
-              data-toggle="modal"
-              data-target="#realtime-changeSummaryModal"
-            &gt;$escapetool.xml($services.localization.render('realtime.summarizeAndDone'))&lt;/a&gt;
-          &lt;/li&gt;
+          #if ($xwiki.hasEditComment())
+            &lt;li&gt;
+              &lt;a
+                href="#"
+                class="realtime-action-summarize"
+                title="$escapetool.xml($services.localization.render('realtime.summarizeAndDone.hint'))"
+                data-continue="false"
+                data-toggle="modal"
+                data-target="#realtime-changeSummaryModal"
+              &gt;$escapetool.xml($services.localization.render('realtime.summarizeAndDone'))&lt;/a&gt;
+            &lt;/li&gt;
+          #end
           &lt;li&gt;
             &lt;a
               href="#"
@@ -642,16 +663,18 @@ ul.realtime-users {
             $escapetool.xml($services.localization.render('realtime.history.hint'))
           &lt;/li&gt;
           &lt;li role="separator" class="divider"&gt;&lt;/li&gt;
-          &lt;li&gt;
-            &lt;a
-              href="#"
-              class="realtime-action-summarize"
-              title="$escapetool.xml($services.localization.render('realtime.summarize.hint'))"
-              data-continue="true"
-              data-toggle="modal"
-              data-target="#realtime-changeSummaryModal"
-            &gt;$escapetool.xml($services.localization.render('realtime.summarize'))&lt;/a&gt;
-          &lt;/li&gt;
+          #if ($xwiki.hasEditComment())
+            &lt;li&gt;
+              &lt;a
+                href="#"
+                class="realtime-action-summarize"
+                title="$escapetool.xml($services.localization.render('realtime.summarize.hint'))"
+                data-continue="true"
+                data-toggle="modal"
+                data-target="#realtime-changeSummaryModal"
+              &gt;$escapetool.xml($services.localization.render('realtime.summarize'))&lt;/a&gt;
+            &lt;/li&gt;
+          #end
         &lt;/ul&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -765,18 +788,20 @@ ul.realtime-users {
                     title="$escapetool.xml($services.localization.render('realtime.summary'))"
                   &gt;&lt;/textarea&gt;
                 &lt;/dd&gt;
-                ## Save &amp; Continue always creates a minor change so we show the minor change checkbox only when the
-                ## action is Save &amp; View
-                &lt;dt id="realtime-changeSummaryModal-minorChange" data-continue="false"&gt;
-                  &lt;label&gt;
-                    &lt;input type="checkbox" name="minorChange" /&gt;
-                    $escapetool.xml($services.localization.render('realtime.minorChange'))
-                  &lt;/label&gt;
-                  &lt;span class="xHint"&gt;
-                    $escapetool.xml($services.localization.render('realtime.minorChange.hint'))
-                  &lt;/span&gt;
-                &lt;/dt&gt;
-                &lt;dd&gt;&lt;/dd&gt;
+                #if ($xwiki.hasMinorEdit())
+                  ## Save &amp; Continue always creates a minor change so we show the minor change checkbox only when the
+                  ## action is Save &amp; View
+                  &lt;dt id="realtime-changeSummaryModal-minorChange" data-continue="false"&gt;
+                    &lt;label&gt;
+                      &lt;input type="checkbox" name="minorChange" /&gt;
+                      $escapetool.xml($services.localization.render('realtime.minorChange'))
+                    &lt;/label&gt;
+                    &lt;span class="xHint"&gt;
+                      $escapetool.xml($services.localization.render('realtime.minorChange.hint'))
+                    &lt;/span&gt;
+                  &lt;/dt&gt;
+                  &lt;dd&gt;&lt;/dd&gt;
+                #end
               &lt;/dl&gt;
             &lt;/div&gt;
             &lt;div
@@ -879,6 +904,29 @@ ul.realtime-users {
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-warning"&gt;
+  &lt;button
+    type="button"
+    class="btn btn-link realtime-warning realtime-warning-connected"
+    data-toggle="popover"
+    data-placement="top"
+    title="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning'))"
+    data-content="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning.connected'))"
+  &gt;
+    $services.icon.renderHTML('warning')
+  &lt;/button&gt;
+  &lt;button
+    type="button"
+    class="btn btn-link realtime-warning realtime-warning-disconnected"
+    data-toggle="popover"
+    data-placement="top"
+    title="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning'))"
+    data-content="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning.disconnected'))"
+  &gt;
+    $services.icon.renderHTML('warning')
+  &lt;/button&gt;
 &lt;/template&gt;
 {{/html}}
 {{/velocity}}</content>

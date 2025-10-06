@@ -100,7 +100,7 @@ class XWikiServletURLFactoryTest
     private final Map<String, String> httpHeaders = new HashMap<>();
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         when(this.actionLister.listActions()).thenReturn(Arrays.asList("view"));
         when(this.descriptorManager.getMainWikiDescriptor()).thenReturn(new WikiDescriptor("xwiki", "localhost"));

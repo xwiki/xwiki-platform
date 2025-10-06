@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -596,7 +597,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (StringUtils.isBlank(context.getWiki().Param("xwiki.plugins.feed.entryContent"))) {
             // If entry content is not configured, we do the best guess between XWiki syntaxes 1 and 2
             content =
-                StringUtils.equals(Syntax.XWIKI_1_0.toIdString(), syntaxId)
+                Strings.CS.equals(Syntax.XWIKI_1_0.toIdString(), syntaxId)
                     ? "#includeForm(\"XWiki.FeedEntryClassSheet\")"
                     : "{{include reference=\"XWiki.FeedEntryClassSheet\" /}}";
         } else {

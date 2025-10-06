@@ -176,23 +176,6 @@ export default {
     justify-content: flex-start;
     padding-left: 2rem;
   }
-
-}
-
-/* Responsive mode */
-@media screen and (max-width: var(--screen-xs-max)) {
-  .layout-table .responsive-table > thead {
-    /* Show the table header to allow reordering the properties, sorting and filtering the entries. We use flex display
-      because we have two rows, property names and filters, that we want to display as two equally sized columns. */
-    display: flex;
-
-    > tr {
-      /* We want the property names column to have the same width as the filter column. */
-      flex: 1;
-      /* We need to set the width in order to be able to trim long property names. */
-      width: calc(50vw - var(--grid-gutter-width));
-    }
-  }
 }
 
 .noentries-table {

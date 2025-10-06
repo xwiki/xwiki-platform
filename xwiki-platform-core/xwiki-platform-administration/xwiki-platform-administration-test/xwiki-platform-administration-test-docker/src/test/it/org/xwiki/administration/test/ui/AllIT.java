@@ -67,4 +67,10 @@ public class AllIT
     class NestedRegisterIT extends RegisterIT
     {
     }
+
+    @Nested
+    @DisplayName("Presentation")
+    class NestedPresentationIT extends PresentationIT
+    {
+    }
 }

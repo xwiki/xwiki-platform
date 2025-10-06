@@ -28,6 +28,8 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.Test;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.internal.MapCache;
 import org.xwiki.environment.Environment;
 import org.xwiki.extension.AbstractRemoteExtension;
 import org.xwiki.extension.DefaultExtensionAuthor;
@@ -52,7 +54,7 @@ import org.xwiki.extension.repository.search.ExtensionQuery.COMPARISON;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.rendering.macro.Macro;
-import org.xwiki.search.solr.test.SolrComponentList;
+import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -65,6 +67,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -78,7 +81,7 @@ import static org.mockito.Mockito.when;
 @ComponentList({ ExtensionIndexStore.class, ExtensionIndexSolrCoreInitializer.class, ExtensionIdConverter.class,
     ExtensionAuthorConverter.class, ExtensionFactory.class, ExtensionComponentConverter.class })
 @ReferenceComponentList
-@SolrComponentList
+@EmbeddedSolrComponentList
 class ExtensionIndexStoreTest
 {
     public static class TestExtension extends AbstractRemoteExtension
@@ -110,6 +113,9 @@ class ExtensionIndexStoreTest
     @MockComponent
     private ExtensionIndexSolrUtil extensionIndexSolrUtil;
 
+    @MockComponent
+    private CacheManager cacheManager;
+
     @AfterComponent
     public void afterComponent() throws Exception
     {
@@ -118,6 +124,8 @@ class ExtensionIndexStoreTest
         when(this.mockEnvironment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
         FileUtils.deleteDirectory(this.permanentDirectory);
         this.permanentDirectory.mkdirs();
+
+        when(this.cacheManager.createNewCache(any())).thenReturn(new MapCache<>());
 
         this.testRepositoryDescriptor = new DefaultExtensionRepositoryDescriptor("test", "test", null);
         this.testRepository = mock(ExtensionRepository.class);
@@ -200,6 +208,17 @@ class ExtensionIndexStoreTest
         assertEquals(new ArrayList<>(extension.getExtensionFeatures()),
             new ArrayList<>(storedExtension.getExtensionFeatures()));
         assertEquals(new ArrayList<>(extension.getDependencies()), new ArrayList<>(storedExtension.getDependencies()));
+
+        assertSame(storedExtension, this.indexStore.getSolrExtension(extension.getId()));
+
+        extension.setName("other name");
+
+        this.indexStore.add(extension, true);
+        this.indexStore.commit();
+
+        storedExtension = this.indexStore.getSolrExtension(extension.getId());
+
+        assertEquals(extension.getName(), storedExtension.getName());
 
         ExtensionQuery query = new ExtensionQuery();
         IterableResult<Extension> result = this.indexStore.search(query);

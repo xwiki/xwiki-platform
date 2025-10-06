@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-eventstream-stores</artifactId>
-    <version>17.5.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
   <name>XWiki Platform - Event Stream - Store - Solr</name>
@@ -100,16 +100,22 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
+      <type>pom</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
       <version>${project.version}</version>
-      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -32,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.SuggestInputElement;
@@ -90,6 +91,9 @@ class ObjectEditorIT
 
     @Test
     @Order(1)
+    @IgnoreBrowser(value = "chrome", reason = "Chrome has recently started to ignore the unhandledPromptBehavior "
+        + "capability which allows us to handle alerts shown before page unload. "
+        + "See https://issues.chromium.org/issues/351858989#comment30 .")
     void preventUsersToLeaveTheEditorWithoutSaving(TestUtils testUtils, TestReference testReference)
     {
         // fixture
@@ -108,6 +112,21 @@ class ObjectEditorIT
         assertTrue(objectEditPane.isEditLinkDisplayed());
 
         // we should be able to leave the editor without any warning
+        viewPage = testUtils.gotoPage(testReference);
+
+        // come back to the editor and try to edit the value
+        objectEditPage = viewPage.editObjects();
+        xobjects = objectEditPage.getObjectsOfClass(NUMBER_CLASS);
+        objectEditPane = xobjects.get(0);
+        // edit a field: we should be prevented to leave without saving
+        objectEditPane.setPropertyValue("number", "48");
+
+        testUtils.gotoPageWithoutWaiting(testReference);
+        testUtils.getDriver().switchTo().alert().dismiss();
+
+        objectEditPage.clickSaveAndContinue();
+
+        // we should be able to leave the editor without any warning now
         viewPage = testUtils.gotoPage(testReference);
 
         // come back to the editor and create a new object
@@ -572,6 +591,7 @@ class ObjectEditorIT
         ClassEditPage classEditor = ClassEditPage.gotoPage(testReference);
         classEditor.addProperty("date", "Date");
         classEditor.addProperty("author", "Users");
+        classEditor.clickSaveAndView();
 
         // Add an object of this class and set its properties.
         ObjectEditPage objectEditor = ObjectEditPage.gotoPage(testReference);

@@ -21,11 +21,6 @@ define('xwiki-realtime-messages', {
   prefix: 'realtime.',
   keys: [
     'allowRealtime',
-    'sessionInProgress',
-    'redirectDialog.pluralPrompt',
-    'redirectDialog.create',
-    'redirectDialog.join',
-    'requestASession',
     'requestDialog.prompt',
     'requestDialog.create',
     'requestDialog.reject',
@@ -34,15 +29,7 @@ define('xwiki-realtime-messages', {
     'rejectDialog.prompt',
     'rejectDialog.invalid',
     'rejectDialog.ok',
-    'conflictsWarning',
-    'conflictsWarningInfoRt',
-    'conflictsWarningSuggestion',
-    'conflictsWarningInfoLink',
-    'wsErrorConflicts',
     'forbidden',
-    'reloadDialog.prompt',
-    'reloadDialog.reload',
-    'reloadDialog.exit',
     'autoAcceptSave',
     'join.error'
   ]

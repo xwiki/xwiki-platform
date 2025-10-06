@@ -282,7 +282,7 @@ Generates:
 #set ($propertyDescriptors = [])
 #if ("$!services.like" != "")
   ## We can't make it sortable or filterable right now since it's not stored in DB.
-  #set ($discard = $propertyDescriptors.add({ 'id': '_likes', 'sortable': false, 'filterable': false }))
+  #set ($discard = $propertyDescriptors.add({ 'id': '_likes', 'sortable': false, 'filterable': false, 'editable': false }))
   #set ($discard = $properties.add('_likes'))
 #end
 #if(!$isGuest &amp;&amp; $xcontext.macro.params.actions == "true")

@@ -144,7 +144,9 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Hinzufügen
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Löschen
 appWithinMinutes.templateProviderEditor.hint=Anwendungseinträge sind Wiki-Seiten, die strukturierte Daten enthalten.
+appWithinMinutes.templateProviderEditor.icon.name=Icon
 appWithinMinutes.templateProviderEditor.icon.hint=Das Symbol, das einem Anwendungseintrag zugeordnet ist.
+appWithinMinutes.templateProviderEditor.description.name=Beschreibung
 appWithinMinutes.templateProviderEditor.description.hint=Kurze Beschreibung eines Applikationseintrags.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Woher sollen die Einträge erstellt werden
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Wenn kein Ort ausgewählt ist, können die Einträge von jeder Seite aus erstellt werden.
@@ -152,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Wo die Einträ
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Wenn kein Ort ausgewählt ist, können die Einträge überall im Wiki erstellt werden.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Eintragsort nicht erzwingen
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Verwenden Sie die oben angegebenen Orte nur als Vorschläge, damit der Benutzer beim Erstellen eines Anwendungseintrags einen anderen Ort auswählen kann.
+appWithinMinutes.templateProviderEditor.terminal.name=Terminal
 appWithinMinutes.templateProviderEditor.terminal.hint=Ob die Anwendungseinträge Terminalseiten sein sollen oder nicht.
 
 ### Wizard Step 3: Application Presentation

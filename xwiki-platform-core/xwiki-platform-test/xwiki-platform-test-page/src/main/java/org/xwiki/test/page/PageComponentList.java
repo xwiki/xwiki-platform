@@ -37,6 +37,7 @@ import org.xwiki.display.internal.DefaultDocumentDisplayer;
 import org.xwiki.display.internal.DocumentContentAsyncExecutor;
 import org.xwiki.display.internal.DocumentContentAsyncRenderer;
 import org.xwiki.display.internal.DocumentContentDisplayer;
+import org.xwiki.display.internal.DocumentReferenceDequeContext;
 import org.xwiki.display.internal.DocumentTitleDisplayer;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.internal.script.XWikiScriptContextInitializer;
@@ -212,6 +213,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     BaseAsyncRendererExecutor.class,
     DefaultAsyncContext.class,
     SheetDocumentDisplayer.class,
+    DocumentReferenceDequeContext.class,
 
     // Sheet
     DefaultSheetManager.class,

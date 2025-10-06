@@ -685,6 +685,7 @@ class ImageIT extends AbstractCKEditorIT
         assertIterableEquals(List.of(""), img.getSelectedItem().getBadges());
         textArea.sendKeys(Keys.ENTER);
         img.waitForItemSubmitted();
+        textArea.waitUntilContentContains(otherAttachmentName);
 
         assertSourceEquals("[[image:attachmentOtherPage@otherImage.gif]]");
     }

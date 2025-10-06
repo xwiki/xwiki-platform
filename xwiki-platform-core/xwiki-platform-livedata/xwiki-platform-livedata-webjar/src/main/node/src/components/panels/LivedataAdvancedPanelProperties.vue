@@ -160,13 +160,4 @@ export default {
 .livedata-advanced-panel-properties .property-name {
   padding: 6px 0px;
 }
-
-/* Responsive mode */
-@media screen and (max-width: var(--screen-xs-max)) {
-  .livedata-advanced-panel-properties .handle {
-    /* Always show the drag handler on small screens because we cannot rely on hover. */
-    opacity: 1;
-  }
-}
-
 </style>

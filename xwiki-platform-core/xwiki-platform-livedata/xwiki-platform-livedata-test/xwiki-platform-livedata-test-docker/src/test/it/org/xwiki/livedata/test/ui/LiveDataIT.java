@@ -248,7 +248,7 @@ class LiveDataIT
 
         // Test filtering by label
         suggestInputElement.sendKeys(CHOICE_L_LABEL);
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         List<SuggestInputElement.SuggestionElement> suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         assertEquals(CHOICE_L, suggestionElements.get(0).getValue());
@@ -257,7 +257,7 @@ class LiveDataIT
         // Test filtering by translation
         suggestInputElement.clear();
         suggestInputElement.sendKeys(CHOICE_T_TRANSLATION);
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         assertEquals(CHOICE_T, suggestionElements.get(0).getValue());
@@ -272,7 +272,7 @@ class LiveDataIT
         // Take the focus on the is active filter.
         suggestInputElement = new SuggestInputElement(tableLayout.getFilter(IS_ACTIVE_COLUMN));
         suggestInputElement.sendKeys(Boolean.TRUE.toString());
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
@@ -294,7 +294,7 @@ class LiveDataIT
         suggestInputElement = new SuggestInputElement(isActiveFilter);
         suggestInputElement.clear();
         suggestInputElement.sendKeys(Boolean.FALSE.toString());
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
@@ -307,6 +307,18 @@ class LiveDataIT
         liveDataElement.waitUntilReady();
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
+
+        // Switch to another language to assert that the text is still correctly translated.
+        try {
+            testUtils.setWikiPreference("default_language", "fr");
+            testUtils.getDriver().navigate().refresh();
+            liveDataElement.waitUntilReady();
+            assertEquals(List.of(
+                    "(1) Le titre de certaines pages est calculé. Filtrer et trier sur ces titres ne fonctionnera pas normalement pour ces pages."),
+                liveDataElement.getFootnotesText());
+        } finally {
+            testUtils.setWikiPreference("default_language", "en");
+        }
     }
 
     private void createXObjects(TestUtils testUtils, DocumentReference testReference)
@@ -373,7 +385,7 @@ class LiveDataIT
                       "loadingMessage": "Loading",
                       "successMessage": "Delete Success",
                       "failureMessage": "Failed",
-                      "body": "newBacklinkTarget=&updateLinks=false&autoRedirect=false&form_token=${services.csrf.token}&confirm=1&async=true",
+                      "body": "newBacklinkTarget=&updateLinks=false&autoRedirect=false&form_token=${services.csrf.token}&confirm=1&async=false",
                       "headers": {
                         "Content-Type": "application/x-www-form-urlencoded"
                       }

@@ -112,8 +112,12 @@ async function getTranslations(locale, prefix, keys) {
   return resMap;
 }
 
-export async function i18nResolver(i18n) {
-  const locale = document.documentElement.getAttribute("lang");
+/**
+ * @param i18n the i18n instance to initialize
+ * @param locale the locale to load
+ * @return {Promise<void>} continues once the translation values are fetched remotely
+ */
+export async function i18nResolver(i18n, locale) {
   const messages = await getTranslations(locale, config.prefix, config.keys);
   i18n.global.setLocaleMessage(locale, messages);
 }

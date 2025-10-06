@@ -33,8 +33,7 @@ public interface SecurityConfiguration
     /**
      * @return the number used to control how many items are retrieved through queries (for example inside Velocity
      *         templates). This limit can be customized in the {@code xwiki.properties} file in order to allow
-     *         retrieving more or less items. Default value is {@code 100} (this number corresponds to the
-     *         LiveTable/LiveData max items view limit). This is to avoid DOS attacks.
+     *         retrieving more or less items. Default value is {@code 1000}. This is to avoid DOS attacks.
      */
     int getQueryItemsLimit();
 }

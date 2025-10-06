@@ -22,6 +22,7 @@ package org.xwiki.administration.test.po;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
@@ -113,7 +114,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         getColorThemeOptionElement(colorThemeName).click();
 
         // Waiting to be sure the change is effective
-        getDriver().waitUntilCondition(driver -> StringUtils.equals(getCurrentColorTheme(), colorThemeName));
+        getDriver().waitUntilCondition(driver -> Strings.CS.equals(getCurrentColorTheme(), colorThemeName));
     }
 
     private WebElement getColorThemeOptionElement(String colorThemeName)

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>17.5.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-common</artifactId>
   <packaging>deb</packaging>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war</artifactId>
-      <version>17.5.0-SNAPSHOT</version>
+      <version>17.9.0-SNAPSHOT</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>
@@ -303,14 +303,14 @@
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jetty-web.xml</linkName>
-              <linkTarget>/etc/xwiki/jetty-web.xml</linkTarget>
+              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee10-web.xml</linkName>
+              <linkTarget>/etc/xwiki/jetty-ee10-web.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee8-web.xml</linkName>
-              <linkTarget>/etc/xwiki/jetty-ee8-web.xml</linkTarget>
+              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee11-web.xml</linkName>
+              <linkTarget>/etc/xwiki/jetty-ee11-web.xml</linkTarget>
             </data>
             <data>
               <type>link</type>

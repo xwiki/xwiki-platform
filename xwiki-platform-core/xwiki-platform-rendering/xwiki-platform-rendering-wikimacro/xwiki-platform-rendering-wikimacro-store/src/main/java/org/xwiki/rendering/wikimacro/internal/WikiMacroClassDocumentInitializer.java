@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.internal.mandatory.AbstractAsyncClassDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
@@ -82,6 +83,7 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
 
         xclass.addNumberField(MACRO_PRIORITY_PROPERTY, "Priority", 10, "integer");
         xclass.addBooleanField(MACRO_EXECUTION_ISOLATED_PROPERTY, "Isolated Execution", YESNO, Boolean.FALSE);
+        xclass.addNumberField(MACRO_CONTENT_ORDER_PROPERTY, "Content order property", 30, NumberClass.TYPE_INTEGER);
 
         super.createClass(xclass);
     }

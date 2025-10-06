@@ -32,7 +32,6 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
   $.get(iconURL, function(response) {
     // We override the close button content template if the request is successful
     let iconMetadata = response.getElementsByTagName('icon')[0];
-    console.log(iconMetadata);
     if (iconMetadata.getElementsByTagName('iconSetType')[0].textContent === 'IMAGE') {
       closeIconTemplate = '<img src="' + iconMetadata.getElementsByTagName('url')[0].textContent +
           '" alt="" />';

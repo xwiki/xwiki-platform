@@ -31,7 +31,7 @@ import org.xwiki.security.authorization.Right;
  * Check rights for webjar extensions.
  * 
  * @version $Id$
- * @since 17.5.0RC1
+ * @since 17.5.0
  */
 @Component
 @Named(JarExtensionHandler.WEBJAR_NODE)

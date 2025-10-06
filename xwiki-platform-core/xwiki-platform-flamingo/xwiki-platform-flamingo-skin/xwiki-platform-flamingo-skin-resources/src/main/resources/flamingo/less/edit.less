@@ -86,6 +86,39 @@
   width: 100%;
 }
 
+/**
+ * Document title input displayed as an editable level 1 heading
+ */
+@document-title-input-padding-vertical: @line-height-computed / 4 - 1;
+#document-title h1.editable {
+  /* Move the title heading a bit to the top and to the left in order to accomodate the input border and padding. */
+  margin-top: -@line-height-computed / 4;
+  margin-left: -(ceil(@grid-gutter-width / 2));
+  /* Reduce the bottom margin in order to accomodate the input border and bottom padding. */
+  margin-bottom: @line-height-computed / 4;
+
+  & > input[name="title"] {
+    /* Preserve the heading styles. */
+    color: inherit;
+    font-size: inherit;
+    background-color: transparent;
+    /* It seems it's not enough to set the line height for the text input. We also need to set its height. */
+    height: ~"calc(@{font-size-document-title} * @{headings-line-height} - -2 * (1px - -@{document-title-input-padding-vertical}))";
+    line-height: @headings-line-height;
+    padding: @document-title-input-padding-vertical (ceil(@grid-gutter-width / 2) - 1);
+    width: 100%;
+
+    &:valid {
+      border: 1px solid transparent;
+      box-shadow: none;
+
+      &:focus {
+        outline: 0;
+      }
+    }
+  }
+}
+
 // XWIKI-16344: Use .xform style standard in the wiki and wysiwyg edit modes
 // Fix for the content's margin-bottom which creates a big vertical gap.
 #contentMeta {

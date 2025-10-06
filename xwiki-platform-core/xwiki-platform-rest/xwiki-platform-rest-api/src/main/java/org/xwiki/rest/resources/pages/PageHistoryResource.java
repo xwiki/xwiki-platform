@@ -40,7 +40,7 @@ public interface PageHistoryResource
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("order") @DefaultValue("desc") String order,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;

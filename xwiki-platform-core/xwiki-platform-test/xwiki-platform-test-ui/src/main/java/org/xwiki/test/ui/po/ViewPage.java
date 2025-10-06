@@ -41,6 +41,12 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  */
 public class ViewPage extends BasePage
 {
+    private static final String COMMENTS_TAB_ID = "Commentslink";
+
+    private static final String HISTORY_TAB_ID = "Historylink";
+
+    private static final String INFORMATION_TAB_ID = "Informationlink";
+
     @FindBy(id = "xwikicontent")
     private WebElement content;
 
@@ -50,27 +56,60 @@ public class ViewPage extends BasePage
     private BreadcrumbElement breadcrumb;
 
     /**
+     * @return if the comments extra pane is available on this page
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean hasCommentsDocExtraPane()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(COMMENTS_TAB_ID));
+    }
+
+    /**
      * Opens the comments tab.
      * 
      * @return element for controlling the comments tab
      */
     public CommentsTab openCommentsDocExtraPane()
     {
-        getDriver().findElement(By.id("Commentslink")).click();
+        getDriver().findElement(By.id(COMMENTS_TAB_ID)).click();
         waitForDocExtraPaneActive("comments");
         return new CommentsTab();
     }
 
+    /**
+     * @return if the history extra pane is available on this page
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean hasHistoryDocExtraPane()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(HISTORY_TAB_ID));
+    }
+
     public HistoryPane openHistoryDocExtraPane()
     {
-        getDriver().findElement(By.id("Historylink")).click();
+        getDriver().findElement(By.id(HISTORY_TAB_ID)).click();
         waitForDocExtraPaneActive("history");
         return new HistoryPane();
     }
 
+    /**
+     * @return if the information extra pane is available on this page
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean hasInformationDocExtraPane()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(INFORMATION_TAB_ID));
+    }
+
     public InformationPane openInformationDocExtraPane()
     {
-        getDriver().findElement(By.id("Informationlink")).click();
+        getDriver().findElement(By.id(INFORMATION_TAB_ID)).click();
         waitForDocExtraPaneActive("information");
         return new InformationPane();
     }

@@ -173,6 +173,9 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                     throw new ResetPasswordException(exceptionMessage);
                 }
 
+                // Avoid modifying the cached document
+                userDocument = userDocument.clone();
+
                 BaseObject xObject = userDocument.getXObject(ResetPasswordRequestClassDocumentInitializer.REFERENCE,
                     true, context);
                 String verificationCode = context.getWiki().generateRandomString(30);
@@ -309,15 +312,13 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
                 // If the token is expired we remove it right away to avoid any attack.
                 if (this.isTokenExpired(xObject)) {
-                    this.resetVerificationCode(userDocument, xObject,
-                        "security.authentication.resetPassword.tokenExpired");
+                    resetVerificationCode(userDocument, "security.authentication.resetPassword.tokenExpired");
                     throw new ResetPasswordException(exceptionMessage);
                 } else if (!storedVerificationCode.equals(equivalentPassword)) {
                     // If the token is not correct and there's no lifetime duration set, we immediately get rid of it
                     // so any bruteforce is compromised.
                     if (getTokenLifeTime() <= 0) {
-                        this.resetVerificationCode(userDocument, xObject,
-                            "security.authentication.resetPassword.badToken");
+                        resetVerificationCode(userDocument, "security.authentication.resetPassword.badToken");
                     }
                     throw new ResetPasswordException(exceptionMessage);
                 } else {
@@ -330,13 +331,21 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
         return result;
     }
 
-    private void resetVerificationCode(XWikiDocument userDocument, BaseObject xobject, String saveCommentTranslationKey)
+    private void resetVerificationCode(XWikiDocument userDocument, String saveCommentTranslationKey)
         throws XWikiException
     {
-        XWikiContext context = this.contextProvider.get();
-        userDocument.removeXObject(xobject);
+        XWikiDocument document = userDocument;
+
+        // Avoid modifying the cached document
+        if (document.isCached()) {
+            document = userDocument.clone();
+        }
+
+        document.removeXObjects(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
+
         String saveComment = this.localizationManager.getTranslationPlain(saveCommentTranslationKey);
-        context.getWiki().saveDocument(userDocument, saveComment, true, context);
+        XWikiContext context = this.contextProvider.get();
+        context.getWiki().saveDocument(document, saveComment, true, context);
     }
 
     @Override

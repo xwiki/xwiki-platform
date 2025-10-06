@@ -44,6 +44,7 @@ import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
+import org.xwiki.rest.resources.objects.AllObjectsForClassNameResource;
 import org.xwiki.rest.resources.objects.ObjectAtPageVersionResource;
 import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
@@ -660,6 +661,69 @@ public class ObjectsResourceIT extends AbstractHttpIT
             for (Property p : currentObject.getProperties()) {
                 checkLinks(p);
             }
+        }
+    }
+
+    @Test
+    public void testAllObjectsForClassNameResourcePaginationAndErrors() throws Exception
+    {
+        // Setup: Create two pages with TagClass objects
+        String className = "XWiki.TagClass";
+        List<String> spaces1 = List.of(getTestClassName() + "A");
+        List<String> spaces2 = List.of(getTestClassName() + "B");
+        String pageName1 = getTestMethodName() + "1";
+        String pageName2 = getTestMethodName() + "2";
+        DocumentReference ref1 = new DocumentReference(getWiki(), spaces1, pageName1);
+        DocumentReference ref2 = new DocumentReference(getWiki(), spaces2, pageName2);
+
+        try {
+            this.testUtils.rest().delete(ref1);
+            this.testUtils.rest().delete(ref2);
+            this.testUtils.rest().savePage(ref1);
+            this.testUtils.rest().savePage(ref2);
+
+            // Add TagClass objects to both pages
+            createObjectIfDoesNotExists(className, spaces1, pageName1);
+            createObjectIfDoesNotExists(className, spaces2, pageName2);
+
+            // Test: basic retrieval
+            GetMethod getMethod = executeGet(
+                buildURI(AllObjectsForClassNameResource.class, getWiki(), className));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            Objects objects = (Objects) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertTrue(objects.getObjectSummaries().size() >= 2);
+
+            // Test: pagination with number=2
+            getMethod = executeGet(
+                buildURI(AllObjectsForClassNameResource.class, getWiki(), className) + "?number=2");
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            objects = (Objects) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(2, objects.getObjectSummaries().size());
+
+            String secondPage = objects.getObjectSummaries().get(1).getPageName();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(
+                buildURI(AllObjectsForClassNameResource.class, getWiki(), className) + "?number=1&start=1");
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            objects = (Objects) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, objects.getObjectSummaries().size());
+            Assert.assertEquals(secondPage, objects.getObjectSummaries().get(0).getPageName());
+
+            // Test: error for number=-1
+            getMethod = executeGet(
+                buildURI(AllObjectsForClassNameResource.class, getWiki(), className) + "?number=-1");
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+
+            // Test: error for number=1001
+            getMethod = executeGet(
+                buildURI(AllObjectsForClassNameResource.class, getWiki(), className) + "?number=1001");
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+        } finally {
+            this.testUtils.rest().delete(ref1);
+            this.testUtils.rest().delete(ref2);
         }
     }
 }

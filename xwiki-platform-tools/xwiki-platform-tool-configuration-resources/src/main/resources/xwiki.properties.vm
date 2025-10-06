@@ -464,35 +464,40 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# groovy.customizer.timedInterrupt.timeout = 60
 
 #-------------------------------------------------------------------------------------
-# Events distribution
+# Clustering and events distribution
 #-------------------------------------------------------------------------------------
 
-#-# [Since 17.5.0RC1]
+#-# [Since 17.5.0]
 #-# Indicate the unique identifier of the instance among the members of a cluster.
 #-# By default it is automatically generated from a UUID and stored in the permanent directory.
+#-# 
 # observation.remote.id = node1
 
 #-# [Since 2.0M3]
 #-# Indicate if the network distribution module is enabled or not.
 #-# By default remote events are disabled.
+#-# 
+#-# The default is:
 # observation.remote.enabled = false
 
 #-# [Since 2.0M3]
 #-# The list of events communication channels to start when the application starts.
 #-# By default no channel is configured.
-#-#
+#-# 
 #-# The default remote event distribution implementation is using JGroups and you'll need to either use embedded
 #-# JGroups configuration files or drop your custom configuration in the WEB-INF/observation/remote/jgroups/ directory.
 #-# There's a README file in that directory with more information.
-#-# Example: observation.remote.channels = public, cluster
+#-# 
+# observation.remote.channels = public, cluster
 
 #-# [Since 2.0M4]
 #-# The implementation of network adapter to use.
-#-# The default is jgroups.
 #-#
-#-# By default only jgroups is provided. To add one implements NetworkAdaptor component interface. The identifier
+#-# By default only jgroups is provided. To add one, implements NetworkAdaptor component interface. The identifier
 #-# provided in the configuration is matched with the component role hint.
-#-# Example: observation.remote.networkadapter = jgroups
+#-# 
+#-# The default is:
+#-# observation.remote.networkadapter = jgroups
 
 #-------------------------------------------------------------------------------------
 # CSRF token component
@@ -832,10 +837,15 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 # security.script.save.checkAuthor = true
 
 #-# [Since 13.10]
-#-# Prevent against DOS attacks by limiting the number of entries returned by DB queries, for guest users.
+#-# Prevent DOS attacks by limiting the number of entries returned by search queries and the REST API.
+#-# The query items limit shouldn't be set below 100 (default maximum page size of Live Data/LiveTable).
+#-# The query items limit can be set to -1 to disable any limits (not recommended for instances that are reachable
+#-# from the internet).
+#-# Before XWiki 16.10.11, 17.4.4, and 17.7.0RC1, this limit had a default value of 100 and was only used for guest
+#-# users in a single place.
 #-#
 #-# The default is:
-# security.queryItemsLimit = 100
+# security.queryItemsLimit = 1000
 
 #-# [Since 13.10.1]
 #-# [Since 14.0RC1]
@@ -1660,11 +1670,46 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # Scheduler
 #-------------------------------------------------------------------------------------
 
-#-# [Since 17.5.0]
+#-# [Since 17.5.0, 17.4.1]
 #-# "true" (the default) if the scheduler should be enabled on this instance.
 #-# Disabling the scheduler is often used as a workaround to avoid duplicates in a cluster.
 #-# 
 #-# Default is "true".
-# shceduler.enabled=false
+# scheduler.enabled=false
+
+#-------------------------------------------------------------------------------------
+# REST API
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.5.0]
+#-# The default source for keyword search results at the space and wiki level in the REST API.
+#-# Supported values: database, solr
+#-# Before 17.5.0, the database provided the search results. Since 17.5.0, the default "solr" source is the default
+#-# which provides much better performance in particular for large installations and allows more flexible queries.
+#-# You can change this back to "database" to restore the old behavior.
+# rest.keywordSearchSource=solr
+
+#-------------------------------------------------------------------------------------
+# WYSIWYG API
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.5.0]
+#-# Define if the type of the macro parameter should be inferred from their default value when no specific type is
+#-# indicated to build the macro configuration UI. This is currently used to automatically set the type to Boolean
+#-# when a parameter has a default value set to 'true' or 'false' and doesn't define a specific type.
+# wysiwyig.inferMacroParameterTypeBasedOnDefaultValue=true
+
+#-------------------------------------------------------------------------------------
+# Index Tree
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.6.0]
+#-# Define the database collation used for sorting entries in index trees. This can be used to enable locale-based
+#-# sorting like sorting accented characters at the same place or directly after their non-accented variants.
+#-# When this is set to a non-empty value, the default lowercase transformation for sorting is removed to allow for
+#-# locale-specific lowercase sort handling. Ensure you're using a case-insensitive collation if you want to keep
+#-# case-insensitive sorting. Possible values depend on the used database engine and its configuration, a possible
+#-# value for MariaDB is utf8mb4_general_ci. By default, no collation is configured.
+# index.sortCollation=
 
 $!xwikiPropertiesAdditionalProperties

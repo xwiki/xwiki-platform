@@ -37,7 +37,7 @@ public interface WikiSearchResource
             @PathParam("wikiName") String wikiName,
             @QueryParam("q") String keywords,
             @QueryParam("scope") List<String> searchScopeStrings,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("orderField") @DefaultValue("") String orderField,
             @QueryParam("order") @DefaultValue("asc") String order,

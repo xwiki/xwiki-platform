@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;
 import org.securityfilter.config.SecurityConfig;
@@ -561,7 +562,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
         // Since the encodeURL can potentially add a trailing slash, make sure that the relative URL we return always
         // start with a leadig slash.
-        String strippedURL = StringUtils.removeStart(url.toExternalForm(), encodedUrlPrefix);
+        String strippedURL = Strings.CS.removeStart(url.toExternalForm(), encodedUrlPrefix);
         if (!strippedURL.startsWith("/")) {
             strippedURL = "/" + strippedURL;
         }

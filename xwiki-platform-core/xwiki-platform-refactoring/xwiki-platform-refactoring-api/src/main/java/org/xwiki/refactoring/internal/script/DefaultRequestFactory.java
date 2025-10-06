@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -93,7 +93,7 @@ public class DefaultRequestFactory implements RequestFactory
     private List<String> getJobId(String type, String suffix)
     {
         return Arrays
-            .asList(RefactoringJobs.GROUP, StringUtils.removeStart(type, RefactoringJobs.GROUP_PREFIX), suffix);
+            .asList(RefactoringJobs.GROUP, Strings.CS.removeStart(type, RefactoringJobs.GROUP_PREFIX), suffix);
     }
 
     private void setRightsProperties(AbstractCheckRightsRequest request)

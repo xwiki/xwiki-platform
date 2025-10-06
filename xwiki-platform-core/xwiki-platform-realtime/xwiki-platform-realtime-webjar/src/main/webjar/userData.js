@@ -31,9 +31,6 @@ define('xwiki-realtime-userData', [
       for (let key in json) {
         userData[key] = json[key];
       }
-      if (typeof onChange === 'function') {
-        onChange(userData);
-      }
     } catch (error) {
       console.error('Failed to parse user data.', {userData: textData, error});
     }
@@ -71,6 +68,7 @@ define('xwiki-realtime-userData', [
 
       onLocal: function() {
         if (!module._initializing && online) {
+          onChange(userData);
           const strHyperJSON = jsonSortify(userData);
           module.chainpad.contentUpdate(strHyperJSON);
           if (module.chainpad.getUserDoc() !== strHyperJSON) {
@@ -82,6 +80,7 @@ define('xwiki-realtime-userData', [
       onRemote: function(info) {
         if (!module._initializing) {
           updateUserData(module.chainpad.getUserDoc());
+          onChange(userData);
         }
       },
 
@@ -127,7 +126,6 @@ define('xwiki-realtime-userData', [
           userData[myId] = userData[myId] || getMyUserData(configData);
           userData[myId]['cursor_' + configData.editor] = newCursor;
           oldCursor = newCursor;
-          onChange(userData);
           config.onLocal();
         }
       }, 3000);
@@ -152,7 +150,7 @@ define('xwiki-realtime-userData', [
     }
 
     online = true;
-    onChange = configData.onChange;
+    onChange = configData.onChange || (() => {});
 
     const config = createConfig(network, key, configData);
     userData = createUserData(configData, config);

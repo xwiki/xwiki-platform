@@ -112,7 +112,6 @@ public enum Browser
         logPrefs.enable(LogType.BROWSER, Level.ALL);
         options.enableBiDi();
         options.setCapability(ChromeOptions.LOGGING_PREFS, logPrefs);
-        options.setCapability("unhandledPromptBehavior", "ignore");
         options.addArguments(
             "--whitelisted-ips",
             "--no-sandbox",

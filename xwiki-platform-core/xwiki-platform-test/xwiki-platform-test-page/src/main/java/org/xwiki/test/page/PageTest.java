@@ -52,6 +52,8 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityManager;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -62,10 +64,6 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
-
-import net.sf.json.JSON;
-import net.sf.json.JSONException;
-import net.sf.json.JSONSerializer;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -227,21 +225,16 @@ public class PageTest
     }
 
     /**
-     * Load a given document reference, render it and parse it as JSON using {@link JSONSerializer}.
+     * Load a given document reference, render it and parse the result as JSON.
      *
      * @param reference the reference of the document to load, render, and parse as JSON
-     * @param <T> a subclass of {@link JSON}
-     * @return the result of the parsing of the rendering of the document using {@link JSONSerializer}
+     * @return the result of the parsing of the rendering of the document
      * @throws Exception in case of error when rendering or parsing the document
      */
-    protected <T extends JSON> T renderJSONPage(DocumentReference reference) throws Exception
+    protected JsonNode renderJSONPage(DocumentReference reference) throws Exception
     {
         String jsonString = renderPage(reference);
-        try {
-            return (T) JSONSerializer.toJSON(jsonString.trim());
-        } catch (JSONException e) {
-            throw new RuntimeException(String.format("Failed to parse [%s]", jsonString), e);
-        }
+        return new ObjectMapper().readTree(jsonString);
     }
 
     /**

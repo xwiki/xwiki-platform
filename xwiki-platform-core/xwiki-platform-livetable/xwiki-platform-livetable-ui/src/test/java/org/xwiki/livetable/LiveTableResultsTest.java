@@ -81,6 +81,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
@@ -563,6 +564,19 @@ class LiveTableResultsTest extends PageTest
             + "where obj.name=doc.fullName "
             + "and obj.className = :className "
             + "and doc.fullName not in (:classTemplate1, :classTemplate2)  ");
+    }
+
+    @Test
+    void highLimitIsRejected() throws Exception
+    {
+        setLimit(2000);
+
+        renderPage(new DocumentReference("xwiki", "XWiki", "LiveTableResults"));
+
+        verifyNoInteractions(this.queryService);
+
+        // Unfortunately, we can't verify that sendError was called because the response is neither a mock nor does
+        // it store the error message.
     }
 
     private static Stream<Arguments> provideObfuscateEmails()

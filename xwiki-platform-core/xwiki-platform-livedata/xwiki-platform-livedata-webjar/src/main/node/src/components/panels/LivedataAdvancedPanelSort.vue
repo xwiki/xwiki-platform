@@ -246,13 +246,4 @@ export default {
 .livedata-advanced-panel-sort .add-sort-select {
   margin-top: 1rem;
 }
-
-/* Responsive mode */
-@media screen and (max-width: var(--screen-xs-max)) {
-  .livedata-advanced-panel-sort .delete-sort {
-    /* Always show the delete icon on small screens because we cannot rely on hover. */
-    visibility: visible;
-  }
-}
-
 </style>

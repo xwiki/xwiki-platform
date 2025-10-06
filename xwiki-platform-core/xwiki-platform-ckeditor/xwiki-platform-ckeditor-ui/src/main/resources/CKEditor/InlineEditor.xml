@@ -316,19 +316,22 @@
       // We also do this because destroying the editor while the edited content has the focus can lead to an error.
       // See below.
       $(element).blur().prop('contenteditable', false).removeAttr('contenteditable');
-      // We destroy the editor after the edited content has lost the focus completely because the editor has a
-      // delayed event listener that tries to access the selection even after the editor has been destroyed.
-      setTimeout(function() {
-        // Don't update the edited element with the data from the editor because:
-        // * the editor data might be wiki syntax if the current mode is Source
-        // * the in-place editor updates the edited element anyway using the view HTML (without rendering markers)
-        //   and we risk overwriting it.
-        editor.destroy(/* noUpdate: */ true);
-        if (stopAvoidingCKAndSaveBarOverlap) {
-          stopAvoidingCKAndSaveBarOverlap();
-          stopAvoidingCKAndSaveBarOverlap = null;
-        }
-      }, 0);
+      data.promises.push(new Promise((resolve, reject) =&gt; {
+        // We destroy the editor after the edited content has lost the focus completely because the editor has a
+        // delayed event listener that tries to access the selection even after the editor has been destroyed.
+        setTimeout(async () =&gt; {
+          // Don't update the edited element with the data from the editor because:
+          // * the editor data might be wiki syntax if the current mode is Source
+          // * the in-place editor updates the edited element anyway using the view HTML (without rendering markers)
+          //   and we risk overwriting it.
+          await editor.destroy(/* noUpdate: */ true);
+          if (stopAvoidingCKAndSaveBarOverlap) {
+            stopAvoidingCKAndSaveBarOverlap();
+            stopAvoidingCKAndSaveBarOverlap = null;
+          }
+          resolve();
+        }, 0);
+      }));
     });
     return deferred.promise();
   }

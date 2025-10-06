@@ -187,9 +187,9 @@ class PinnedChildPagesManagerTest
     {
         EntityReference wikiReference = new SpaceReference("xwiki", "Some");
         List<DocumentReference> pinnedChildPages = List.of(
-            new DocumentReference("xwiki", "Some", "Page"),
+            new DocumentReference("xwiki", "Some", "Pa+ge"),
             new DocumentReference("foo", "Main", "WebHome"),
-            new DocumentReference("xwiki", List.of("Some", "Sub"), "WebHome"),
+            new DocumentReference("xwiki", List.of("Some", "S%u/b"), "WebHome"),
             new DocumentReference("foo", "Test", "Page1")
         );
         DocumentReference storageReference = new DocumentReference("xwiki", "Some", "WebPreferences");
@@ -204,7 +204,7 @@ class PinnedChildPagesManagerTest
 
         this.pinnedChildPagesManager.setPinnedChildPages(wikiReference, pinnedChildPages);
         verify(this.storageDocument).setStringListValue(PinnedChildPagesClassInitializer.CLASS_REFERENCE,
-            PinnedChildPagesClassInitializer.PROPERTY_NAME, List.of("Page", "Sub/"));
+            PinnedChildPagesClassInitializer.PROPERTY_NAME, List.of("Pa%2Bge", "S%25u%2Fb/"));
         verify(this.storageDocument, never()).setHidden(true);
         verify(this.storageDocument).clone();
         verify(documentAuthors).setOriginalMetadataAuthor(userReference);

@@ -19,6 +19,8 @@
  */
 package org.xwiki.observation.remote.internal;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -35,12 +37,14 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.NetworkAdapter;
+import org.xwiki.observation.remote.NetworkChannel;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.RemoteEventException;
 import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.observation.remote.converter.EventConverterManager;
+import org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkChannels;
 
 /**
  * JGoups based {@link RemoteObservationManager}. It's also the default implementation for now.
@@ -94,6 +98,9 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private JGroupsNetworkChannels channels;
+
     /**
      * The logger to log.
      */
@@ -112,8 +119,8 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
             String networkAdapterHint = this.configuration.getNetworkAdapter();
             this.networkAdapter = this.componentManager.getInstance(NetworkAdapter.class, networkAdapterHint);
         } catch (ComponentLookupException e) {
-            throw new InitializationException("Failed to initialize network adapter ["
-                + this.configuration.getNetworkAdapter() + "]", e);
+            throw new InitializationException(
+                "Failed to initialize network adapter [" + this.configuration.getNetworkAdapter() + "]", e);
         }
 
         // Start configured channels and register them against the JMX server
@@ -199,5 +206,11 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
                 this.logger.error("failed to initialize execution context", e);
             }
         }
+    }
+
+    @Override
+    public Collection<NetworkChannel> getChannels()
+    {
+        return (Collection) this.channels.getChannels().values();
     }
 }

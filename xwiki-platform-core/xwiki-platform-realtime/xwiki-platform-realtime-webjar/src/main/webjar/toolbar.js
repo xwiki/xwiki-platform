@@ -38,8 +38,6 @@ define('xwiki-realtime-toolbar', [
       // Create the toolbar.
       const toolbarTemplate = document.querySelector('template#realtime-edit-toolbar');
       this._toolbar = toolbarTemplate.content.querySelector('.realtime-edit-toolbar').cloneNode(true);
-      // Inherit some styles from the old toolbar.
-      this._toolbar.classList.add('buttons');
 
       this._dateFormat = moment().toMomentFormatString(realtimeConfig.dateFormat || 'yyyy/MM/dd HH:mm');
 
@@ -48,10 +46,14 @@ define('xwiki-realtime-toolbar', [
         // The old toolbar is moved when editing fullscreen with the standalone editor.
         ' .cke_maximized > .buttons,' +
         ' .inplace-editing-buttons.sticky-buttons > .buttons');
+      // Inherit some styles from the old toolbar.
+      this._toolbar.classList.add(...this._oldToolbar.classList);
       this._oldToolbar.before(this._toolbar);
       this._oldToolbar.hidden = true;
 
-      this._createChangeSummaryModal();
+      if (this._toolbar.querySelector('.realtime-action-summarize')) {
+        this._createChangeSummaryModal();
+      }
       this._createVersionModal();
       this._createLeaveModal();
       this._activateDoneButton();
@@ -92,7 +94,12 @@ define('xwiki-realtime-toolbar', [
         document.body.appendChild(leaveModal);
       }
 
-      $(leaveModal).find('.modal-footer .btn-primary').off('click.realtime').on('click.realtime', () => {
+      const leaveButton = $(leaveModal).find('.modal-footer .btn-primary');
+      // The autofocus HTML attribute has no effect in Bootstrap modals.
+      $(leaveModal).off('shown.bs.modal.realtime').on('shown.bs.modal.realtime', () => {
+        leaveButton.trigger('focus');
+      });
+      leaveButton.off('click.realtime').on('click.realtime', () => {
         this._config.leave();
       });
     }
@@ -200,7 +207,7 @@ define('xwiki-realtime-toolbar', [
       const continueEditing = this._changeSummaryModal.dataset.continue === 'true';
       // Put the change summary and the minor edit checkbox in the form.
       commentInput.value = changeSummaryTextArea.value;
-      if (!xwikiDocument.isNew) {
+      if (!xwikiDocument.isNew && minorChangeCheckbox) {
         const minorEditCheckbox = this._oldToolbar.querySelector('input[name="minorEdit"]');
         minorEditCheckbox.checked = minorChangeCheckbox.checked;
       }
@@ -250,7 +257,15 @@ define('xwiki-realtime-toolbar', [
     onSaveStatusChange(status) {
       this._setStatus('.realtime-save-status', status);
       // Prevent the user from saving while the document is being saved.
-      this._doneButton.disabled = this._summarizeSubmit.disabled = status === 1;
+      this._disableSaveTriggersIf(status === 1);
+    }
+
+    _disableSaveTriggersIf(condition) {
+      this._doneButton.disabled = condition;
+      // The summarize action is not available if version summaries are disabled from the wiki administration.
+      if (this._summarizeSubmit) {
+        this._summarizeSubmit.disabled = condition;
+      }
     }
 
     onCreateVersion(version) {
@@ -304,7 +319,7 @@ define('xwiki-realtime-toolbar', [
 
     onConnectionStatusChange(status, userId) {
       this._setStatus('.realtime-connection-status', status);
-      this._doneButton.disabled = this._summarizeSubmit.disabled = status !== 2 /* connected */;
+      this._disableSaveTriggersIf(status !== 2 /* connected */);
       if (this._doneButton.disabled) {
         this.onUserListChange([]);
       }
@@ -384,7 +399,7 @@ define('xwiki-realtime-toolbar', [
     destroy() {
       this._oldToolbar.hidden = false;
       this._toolbar.remove();
-      this._changeSummaryModal.remove();
+      this._changeSummaryModal?.remove();
     }
   }
 

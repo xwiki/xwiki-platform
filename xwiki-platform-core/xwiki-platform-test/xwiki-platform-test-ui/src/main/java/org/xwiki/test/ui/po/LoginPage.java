@@ -73,7 +73,12 @@ public class LoginPage extends ViewPage
             if (rememberMe) {
                 this.rememberMeCheckbox.click();
             }
+            // For some reason, the WebDriver is not always waiting for the login form to be submitted (even if there is
+            // no JavaScript involved) and the web page to be reloaded (either the same page, in case of a login error,
+            // or a different one, where the user is redirected after a successful login).
+            getDriver().addPageNotYetReloadedMarker();
             this.submitButton.click();
+            getDriver().waitUntilPageIsReloaded();
         }
     }
 

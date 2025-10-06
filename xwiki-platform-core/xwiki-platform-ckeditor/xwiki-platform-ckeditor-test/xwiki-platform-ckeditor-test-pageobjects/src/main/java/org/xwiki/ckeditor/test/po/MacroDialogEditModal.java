@@ -62,6 +62,23 @@ public class MacroDialogEditModal extends BaseElement
     }
 
     /**
+     * Check or uncheck the checkbox parameter.
+     * @param name the name of the parameter.
+     * @param value the value to give.
+     * @return this modal
+     * @since 17.6.0RC1
+     */
+    public MacroDialogEditModal setMacroParameterCheckbox(String name, boolean value)
+    {
+        WebElement parameterInput = getMacroParameterInput(name);
+        boolean selected = parameterInput.isSelected();
+        if (value != selected) {
+            parameterInput.click();
+        }
+        return this;
+    }
+
+    /**
      * Retrieves the value of a macro parameter from the macro editor modal.
      * 
      * @param name the macro parameter name

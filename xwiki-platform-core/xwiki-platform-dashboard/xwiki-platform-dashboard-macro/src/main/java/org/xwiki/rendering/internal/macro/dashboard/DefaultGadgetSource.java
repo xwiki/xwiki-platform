@@ -23,16 +23,21 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -59,6 +64,7 @@ import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -78,6 +84,11 @@ public class DefaultGadgetSource implements GadgetSource
      */
     protected static final EntityReference GADGET_CLASS =
         new EntityReference("GadgetClass", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+
+    private static final String SOURCE_SYNTAX_PARAMETER_NAME = "data-source-syntax";
+
+    static final Pattern TRANSLATION_SCRIPT_PATTERN =
+        Pattern.compile("\\s*\\$services\\.localization\\.render\\(\\s*'([a-zA-Z0-9.]+)'\\s*\\)\\s*");
 
     /**
      * The execution context, to grab XWiki context and access to documents.
@@ -121,6 +132,12 @@ public class DefaultGadgetSource implements GadgetSource
 
     @Inject
     private DocumentAuthorizationManager authorizationManager;
+
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
+    @Inject
+    private Logger logger;
 
     /**
      * Prepare the parser to parse the title and content of the gadget into blocks.
@@ -196,17 +213,8 @@ public class DefaultGadgetSource implements GadgetSource
                 String position = xObject.getStringValue("position");
                 String id = xObject.getNumber() + "";
 
-                String gadgetTitle;
-
                 XWikiDocument ownerDocument = xObject.getOwnerDocument();
-                if (!ownerDocument.isRestricted() && this.authorizationManager.hasAccess(Right.SCRIPT,
-                    EntityType.DOCUMENT, ownerDocument.getAuthorReference(), ownerDocument.getDocumentReference()))
-                {
-                    gadgetTitle =
-                        this.evaluateVelocityTitle(velocityContext, velocityEngine, key, title, ownerDocument);
-                } else {
-                    gadgetTitle = title;
-                }
+                String gadgetTitle = evaluateTitle(title, ownerDocument, velocityContext, velocityEngine, key);
 
                 // parse both the title and content in the syntax of the transformation context
                 List<Block> titleBlocks =
@@ -228,6 +236,35 @@ public class DefaultGadgetSource implements GadgetSource
         }
 
         return gadgets;
+    }
+
+    private String evaluateTitle(String title, XWikiDocument ownerDocument, VelocityContext velocityContext,
+        VelocityEngine velocityEngine, String key) throws Exception
+    {
+        String gadgetTitle;
+        if (StringUtils.isBlank(title)) {
+            gadgetTitle = title;
+        } else {
+            // Gadgets are inserted with a localization script service call as title by default. To not break
+            // backwards compatibility with existing dashboards, just handle those translation calls directly here so
+            // they work even without scripting right.
+            Matcher matcher = TRANSLATION_SCRIPT_PATTERN.matcher(title);
+            if (matcher.matches()) {
+                String translationKey = matcher.group(1);
+                gadgetTitle = this.localizationManager.getTranslationPlain(translationKey);
+                if (gadgetTitle == null) {
+                    gadgetTitle = translationKey;
+                }
+            } else if (!ownerDocument.isRestricted() && this.authorizationManager.hasAccess(Right.SCRIPT,
+                EntityType.DOCUMENT, ownerDocument.getAuthorReference(), ownerDocument.getDocumentReference()))
+            {
+                gadgetTitle =
+                    this.evaluateVelocityTitle(velocityContext, velocityEngine, key, title, ownerDocument);
+            } else {
+                gadgetTitle = title;
+            }
+        }
+        return gadgetTitle;
     }
 
     private String evaluateVelocityTitle(VelocityContext velocityContext, VelocityEngine velocityEngine, String key,
@@ -290,6 +327,18 @@ public class DefaultGadgetSource implements GadgetSource
         String classParameterName = "class";
         GroupBlock metadataContainer = new GroupBlock();
         metadataContainer.setParameter(classParameterName, DashboardMacro.METADATA);
+
+        try {
+            XWikiDocument sourceDocumentInstance =
+                getXWikiContext().getWiki().getDocument(sourceDoc, getXWikiContext());
+            metadataContainer.setParameter(SOURCE_SYNTAX_PARAMETER_NAME,
+                sourceDocumentInstance.getSyntax().toIdString());
+        } catch (XWikiException e) {
+            this.logger.warn(
+                "Failed to get the source document [{}] for the dashboard metadata. "
+                    + "The dashboard might use an incorrect syntax. Root cause: [{}].",
+                sourceDoc, ExceptionUtils.getRootCauseMessage(e));
+        }
 
         // generate anchors for the urls
         XWikiContext xContext = getXWikiContext();

@@ -28,8 +28,8 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.EventConverterManager;
@@ -44,56 +44,57 @@ import org.xwiki.observation.remote.converter.RemoteEventConverter;
  */
 @Component
 @Singleton
-public class DefaultEventConverterManager implements EventConverterManager, Initializable
+public class DefaultEventConverterManager implements EventConverterManager
 {
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    private Logger logger;
+
     /**
      * The local events converters.
      */
-    @Inject
     private List<LocalEventConverter> localEventConverters;
 
     /**
      * The remote events converters.
      */
-    @Inject
     private List<RemoteEventConverter> remoteEventConverters;
 
-    @Inject
-    private Logger logger;
-
-    @Override
-    public void initialize() throws InitializationException
+    private <T> List<T> loadConverters(Class<T> converterType, Comparator<T> c)
     {
-        // sort local events converters by priority
-        Collections.sort(this.localEventConverters, new Comparator<LocalEventConverter>()
-        {
-            @Override
-            public int compare(LocalEventConverter eventConverter1, LocalEventConverter eventConverter2)
-            {
-                return eventConverter1.getPriority() - eventConverter2.getPriority();
-            }
-        });
+        // Load converters lazily to avoid cycles if any of those inject directly or indirectly the converter manager
+        try {
+            List<T> converters = this.componentManager.getInstanceList(converterType);
+            Collections.sort(converters, c);
+            return converters;
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to lookup event converters", e);
+        }
 
-        // sort remote events converters by priority
-        Collections.sort(this.remoteEventConverters, new Comparator<RemoteEventConverter>()
-        {
-            @Override
-            public int compare(RemoteEventConverter eventConverter1, RemoteEventConverter eventConverter2)
-            {
-                return eventConverter1.getPriority() - eventConverter2.getPriority();
-            }
-        });
+        return List.of();
     }
 
     @Override
     public List<LocalEventConverter> getLocalEventConverters()
     {
+        if (this.localEventConverters == null) {
+            this.localEventConverters =
+                loadConverters(LocalEventConverter.class, (c1, c2) -> c1.getPriority() - c2.getPriority());
+        }
+
         return this.localEventConverters;
     }
 
     @Override
     public List<RemoteEventConverter> getRemoteEventConverters()
     {
+        if (this.remoteEventConverters == null) {
+            this.remoteEventConverters =
+                loadConverters(RemoteEventConverter.class, (c1, c2) -> c1.getPriority() - c2.getPriority());
+        }
+
         return this.remoteEventConverters;
     }
 
@@ -102,7 +103,7 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
     {
         RemoteEventData remoteEvent = new RemoteEventData();
 
-        for (LocalEventConverter eventConverter : this.localEventConverters) {
+        for (LocalEventConverter eventConverter : getLocalEventConverters()) {
             try {
                 if (eventConverter.toRemote(localEvent, remoteEvent)) {
                     break;
@@ -124,7 +125,7 @@ public class DefaultEventConverterManager implements EventConverterManager, Init
     {
         LocalEventData localEvent = new LocalEventData();
 
-        for (RemoteEventConverter eventConverter : this.remoteEventConverters) {
+        for (RemoteEventConverter eventConverter : getRemoteEventConverters()) {
             try {
                 if (eventConverter.fromRemote(remoteEvent, localEvent)) {
                     break;

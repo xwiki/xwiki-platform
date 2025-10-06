@@ -56,6 +56,7 @@ solr.admin.indexing.wiki.hint=Das Wiki, auf dessen Dokumente die ausgewählte Ak
 solr.admin.indexing.wiki.select_farm=Alle Wikis
 solr.admin.indexing.query.label=Einschränkende Abfrage
 solr.admin.indexing.query.hint=Optionale Abfrage, welche die gewählte Aktion nur mit den Dokumenten ausführt, die auf die Abfrage passen.
+solr.admin.indexing.query.language.label=Sprache der einschränkenden Abfrage
 solr.admin.info.affectedDocuments=Betroffene Dokumente im Index:
 solr.sortBy=Sortierung:
 solr.sortBy.score=Relevanz

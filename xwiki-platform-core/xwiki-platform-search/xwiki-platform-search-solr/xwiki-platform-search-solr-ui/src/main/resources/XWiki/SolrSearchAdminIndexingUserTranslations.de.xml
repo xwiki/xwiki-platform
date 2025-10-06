@@ -52,4 +52,4 @@ admin.indexinguser.explanation.mainwikionly=Diese Einstellung kann nur im Hauptw
 XWiki.SolrSearchAdminIndexingUser_indexer.description=Indizierungs-Benutzer
 XWiki.SolrSearchAdminIndexingUser_indexer.hint=Das XWiki-Benutzerkonto, das zum Indizieren von Seiten im Hintergrund verwendet wird.
 </content>
-  </xwikidoc>
+</xwikidoc>

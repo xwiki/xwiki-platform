@@ -4925,8 +4925,8 @@ importers:
         version: 4.5.1(vue@3.5.21(typescript@5.9.2))
     devDependencies:
       '@types/sharedworker':
-        specifier: 0.0.182
-        version: 0.0.182
+        specifier: 0.0.184
+        version: 0.0.184
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -6580,8 +6580,8 @@ packages:
   '@types/serve-static@1.15.7':
     resolution: {integrity: sha512-W8Ym+h8nhuRwaKPaDw34QUkwsGi6Rc4yYqvKFo5rm2FUEhCFbzVWrxXUxuKK8TASjWsysJY0nsmNCGhCOIsrOw==}
 
-  '@types/sharedworker@0.0.182':
-    resolution: {integrity: sha512-Qkeqz93vt2cr5R/nZR2MZNjOBnSjFKGeCRZ9Uk/vUByaOBGMU8JWRpRN6tzEIyIrbOrOlF/6T1DLPHS6hRvC6w==}
+  '@types/sharedworker@0.0.184':
+    resolution: {integrity: sha512-bEIoKokq50UiZQDY2TLlaUXaB8PbcKwiZ1gZzMIMuCFPBwY0aQYlpHZcwXtLze/zqD4MPa5ga0HuBS4DZ89CzQ==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -12553,7 +12553,7 @@ snapshots:
       '@types/node': 22.18.7
       '@types/send': 0.17.4
 
-  '@types/sharedworker@0.0.182': {}
+  '@types/sharedworker@0.0.184': {}
 
   '@types/trusted-types@2.0.7': {}
 

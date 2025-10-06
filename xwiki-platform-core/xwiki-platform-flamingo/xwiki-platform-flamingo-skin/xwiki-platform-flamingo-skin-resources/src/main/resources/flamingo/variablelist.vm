@@ -100,7 +100,7 @@
 ## XS specific variables
 ############################################
 ## List of all the variables set in XWiki standard for various purposes.
-#set($xsVariables = {
+#set($xsVariablesCSSValues = {
     "figure-caption-font-size": "90%",
     "figure-caption-color": "var(--text-muted)",
     "target-size-minimum": "24px",

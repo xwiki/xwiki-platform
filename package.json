@@ -34,7 +34,7 @@
     "@eslint/config-helpers": "0.4.0",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.36.0",
-    "@microsoft/api-extractor": "7.52.13",
+    "@microsoft/api-extractor": "7.52.15",
     "@microsoft/tsdoc": "0.15.1",
     "@microsoft/tsdoc-config": "0.17.1",
     "@typescript-eslint/eslint-plugin": "8.44.1",

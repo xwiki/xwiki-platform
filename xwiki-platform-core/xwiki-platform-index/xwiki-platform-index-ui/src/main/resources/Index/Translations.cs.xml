@@ -37,9 +37,9 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Missing: index.deletedDocuments.deleteAll=Delete all
-index.administration.remainingTasks.heading=Tasques restants d'anàlisi de documents
-index.administration.remainingTasks.emptyQueue=No queden tasques.
-admin.documentanalysis=Anàlisi de documents
+### Missing: index.administration.remainingTasks.heading=
+### Missing: index.administration.remainingTasks.emptyQueue=
+### Missing: admin.documentanalysis=
 
 #######################################
 ## until 16.3.0RC1

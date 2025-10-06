@@ -25,7 +25,7 @@
     "@xwiki/cristal-electron-authentication-xwiki-main": "workspace:*",
     "@xwiki/cristal-electron-settings-main": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
-    "electron": "38.2.0",
+    "electron": "38.2.1",
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {

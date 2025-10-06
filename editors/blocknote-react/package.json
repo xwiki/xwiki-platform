@@ -39,7 +39,7 @@
     "@blocknote/react": "0.35.0",
     "@mantine/core": "8.3.3",
     "@mantine/hooks": "8.3.3",
-    "@types/react-dom": "19.1.9",
+    "@types/react-dom": "19.2.0",
     "@xwiki/cristal-attachments-api": "workspace:*",
     "@xwiki/cristal-collaboration-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",

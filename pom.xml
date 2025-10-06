@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>17.4.5</version>
+  <version>17.4.6-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -129,7 +129,7 @@
     <npm.version>11.2.0</npm.version>
   </properties>
   <scm>
-    <tag>xwiki-platform-17.4.5</tag>
+    <tag>stable-17.4.x</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

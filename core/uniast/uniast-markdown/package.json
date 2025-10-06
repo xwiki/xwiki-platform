@@ -55,7 +55,7 @@
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "inversify": "7.10.1",
     "typescript": "5.9.2",
-    "vite": "7.1.7",
+    "vite": "7.1.9",
     "vitest-mock-extended": "3.1.0"
   },
   "publishConfig": {

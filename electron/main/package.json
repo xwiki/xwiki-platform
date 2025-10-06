@@ -31,6 +31,6 @@
   "devDependencies": {
     "@types/node": "22.18.7",
     "typescript": "5.9.2",
-    "vite": "7.1.7"
+    "vite": "7.1.9"
   }
 }

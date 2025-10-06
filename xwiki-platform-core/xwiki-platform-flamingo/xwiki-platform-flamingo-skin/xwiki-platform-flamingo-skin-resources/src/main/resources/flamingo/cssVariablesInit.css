@@ -72,10 +72,8 @@
 
 
 ## $bootstrapVariables is the list of Bootstrap variables we need to give default values for XWiki standard variables
-## We make sure font-size-base is set in em since it's a more powerful and reliable unit for font sizes
 ## The key is their name and the value is the string representing the value in CSS syntax.
 ## The equivalent LESS variables are available in: xwiki-platform-bootstrap-->variables.less
-## The font-size-base unit should be discussed, whether we settle on a rem or em unit.
 
 ## We merge the four maps into one list.
 ## We allow different values from different maps for the same variable. This is an extra fallback in case the first one

@@ -2285,8 +2285,9 @@ $displayName##
 * @since 17.9.0RC1
 * @internal
 *#
-#macro (_paginationURL $baseURL $queryString $hash)
-$baseURL&amp;$queryString$!hash
+#macro (_paginationPageURL $firstItem $params)
+  ${params.url}&amp;${params.itemParamName}=${firstItem}##
+  #if($params.itemsPerPage !=$params.defaultItemsPerPage)&amp;${params.itemsPerPageParamName}=${params.itemsPerPage}#end$!{parameters.hash}
 #end
 
 #**
@@ -2305,7 +2306,7 @@ $baseURL&amp;$queryString$!hash
   #if($pageNumber == $parameters.crtPage)
     <span class="currentPage btn btn-primary btn-xs">$displayedPageNumber</span>
   #else
-    <a href="#_paginationURL($parameters.url, "${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end" , $!{parameters.hash})"
+    <a href="#_paginationPageURL($firstItem, $parameters)"
       class="btn btn-default btn-xs"
       title="$escapetool.xml($services.localization.render('platform.livetable.paginationPageTitle', [$displayedPageNumber]))">$displayedPageNumber</a>
   #end
@@ -2339,7 +2340,8 @@ $baseURL&amp;$queryString$!hash
   #if($parameters.crtPage > 0)
     #set($prevPage = $parameters.crtPage - 1)
     #set($firstItem = $prevPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage !=$parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$escapetool.xml($services.localization.render('platform.livetable.paginationPagePrevTitle'))" class="prevPagination btn btn-xs btn-default">##
+    <a href="#_paginationPageURL($firstItem, $parameters)"##
+      title="$escapetool.xml($services.localization.render('platform.livetable.paginationPagePrevTitle'))" class="prevPagination btn btn-xs btn-default">##
       <span class="sr-only">$escapetool.xml($services.localization.render('platform.livetable.paginationPagePrevious'))</span>##
       $services.icon.renderHTML('caret-right')##
     </a>
@@ -2362,8 +2364,8 @@ $baseURL&amp;$queryString$!hash
   #if($parameters.crtPage < $parameters.lastPage)
     #set($nextPage = $parameters.crtPage + 1)
     #set($firstItem = $nextPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}
-      #if($parameters.itemsPerPage !=$parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$escapetool.xml($services.localization.render('platform.livetable.paginationPageNextTitle'))" class="nextPagination btn btn-xs btn-default">##
+    <a href="#_paginationPageURL($firstItem, $parameters)" 
+      title="$escapetool.xml($services.localization.render('platform.livetable.paginationPageNextTitle'))" class="nextPagination btn btn-xs btn-default">##
       <span class="sr-only">$escapetool.xml($services.localization.render('platform.livetable.paginationPageNext'))</span>##
       $services.icon.renderHTML('caret-right')##
     </a>

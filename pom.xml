@@ -137,6 +137,7 @@
     <npm.version>10.5.1</npm.version>
   </properties>
   <scm>
+    <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>

@@ -32,6 +32,11 @@
 ## Load the current colorTheme in $themeObj and some values from the old colortheme in the $theme variable
 ## List mappings used to initialize both LESS variables here and CSS properties in cssVariablesInit.css
 #template('variablelist.vm')
+## Set generic flamingo related LESS variables.
+#foreach ($variableName in $xsVariablesValuesLESS.keySet())
+  #set($variableValue = $xsVariablesValuesLESS.get($variableName))
+@$variableName: $variableValue;
+#end
 ## Reset $doNotLoadColorThemeFromCSS for future calls (in SSX for examples)
 #set($doNotLoadColorThemeFromCSS = false)
 #if ("$!themeObj" != '')

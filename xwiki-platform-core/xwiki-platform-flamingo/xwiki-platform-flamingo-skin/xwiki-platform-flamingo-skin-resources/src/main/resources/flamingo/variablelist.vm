@@ -100,44 +100,72 @@
 ## XS specific variables
 ############################################
 ## List of all the variables set in XWiki standard for various purposes.
-#set($xsVariablesCSSValues = {
+## This is a single source for both CSS and LESS value, they are separated afterwards.
+#set($xsVariablesValues = {
     "figure-caption-font-size": "90%",
-    "figure-caption-color": "var(--text-muted)",
+    "figure-caption-color": {"css": "var(--text-muted)", "less": "@text-muted"},
     "target-size-minimum": "24px",
     "target-size-recommended": "44px",
+    "breadcrumb-link-color": {"css": "var(--link-color)", "less": "@link-color"},
+    "menu-default-color": {"css": "var(--navbar-default-color)", "less": "@navbar-default-color"},
+    "menu-default-link-color": {"css": "var(--navbar-default-link-color)", "less": "@navbar-default-link-color"},
+    "menu-default-link-hover-color": {"css": "var(--navbar-default-link-hover-color)", "less": "@navbar-default-link-hover-color"},
+    "menu-default-link-hover-bg": {"css": "var(--navbar-default-link-hover-bg)", "less": "@navbar-default-link-hover-bg"},
+    "menu-default-link-active-color": {"css": "var(--navbar-default-link-active-color)", "less": "@navbar-default-link-active-color"},
+    "menu-default-link-active-bg": {"css": "var(--navbar-default-link-active-bg)", "less": "@navbar-default-link-active-bg"},
+    "menu-height": "1.5lh",
+    "menu-default-border": {"css": "var(--navbar-default-border)", "less": "@navbar-default-border"},
     "border-width": "1px",
     "headings-font-weight": "400",
-    "nav-tabs-active-link-hover-bg": "var(--xwiki-page-content-bg)",
+    "nav-tabs-active-link-hover-bg": {"css": "var(--xwiki-page-content-bg)", "less": "@xwiki-page-content-bg"},
     "border-radius-base": "7px",
     "border-radius-large": "10px",
     "border-radius-small": "5px",
     "button-spacing": "2px",
     "button-border-width": "1px",
     "edit-section-relative-height": ".7",
-    "main-padding": "calc(var(--grid-gutter-width) * 2)",
+    "main-padding": {"css": "calc(var(--grid-gutter-width) * 2)", "less": "@grid-gutter-width * 2"},
     "font-size-headings-scale": "1.190",
     "font-size-headings-scale-min": "1.125",
     "min-screen-size": "768",
     "max-screen-size": "1200",
-    "min-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 4))",
-    "max-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 4))",
-    "min-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 3))",
-    "max-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 3))",
-    "min-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 2))",
-    "max-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 2))",
-    "min-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 1))",
-    "max-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))",
-    "min-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), -1))",
-    "max-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))",
-    "min-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))",
-    "max-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 5))",
-    "font-size-document-title": "calc(max(var(--min-document-title-font-size) * 1px, min(var(--max-document-title-font-size) * 1px, var(--min-document-title-font-size) * 1px + (var(--max-document-title-font-size) - var(--min-document-title-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-    "font-size-h1": "calc(max(var(--min-h1-font-size), min(var(--max-h1-font-size), var(--min-h1-font-size) + (var(--max-h1-font-size) - var(--min-h1-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-    "font-size-h2": "calc(max(var(--min-h2-font-size), min(var(--max-h2-font-size), var(--min-h2-font-size) + (var(--max-h2-font-size) - var(--min-h2-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-    "font-size-h3": "calc(max(var(--min-h3-font-size), min(var(--max-h3-font-size), var(--min-h3-font-size) + (var(--max-h3-font-size) - var(--min-h3-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-    "font-size-h4": "calc(max(var(--min-h4-font-size), min(var(--max-h4-font-size), var(--min-h4-font-size) + (var(--max-h4-font-size) - var(--min-h4-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-    "font-size-h5": "var(--font-size-base)",
-    "font-size-h6": "calc(max(var(--min-h6-font-size), min(var(--max-h6-font-size), var(--min-h6-font-size) + (var(--max-h6-font-size) - var(--min-h6-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+    "min-h1-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 4))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 4))))"},
+    "max-h1-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 4))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 4))))"},
+    "min-h2-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 3))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 3))))"},
+    "max-h2-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 3))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 3))))"},
+    "min-h3-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 2))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 2))))"},
+    "max-h3-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 2))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 2))))"},
+    "min-h4-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 1))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 1))))"},
+    "max-h4-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 1))))"},
+    "min-h6-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), -1))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, -1))))"},
+    "max-h6-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, -1))))"},
+    "min-document-title-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 5))))"},
+    "max-document-title-font-size": {"css": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 5))", "less": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 5))))"},
+    "font-size-document-title": {
+        "css": "calc(max(var(--min-document-title-font-size) * 1px, min(var(--max-document-title-font-size) * 1px, var(--min-document-title-font-size) * 1px + (var(--max-document-title-font-size) - var(--min-document-title-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+        "less": '~"max(@{min-document-title-font-size}px, min(@{max-document-title-font-size}px, calc(@{min-document-title-font-size}px - (@{min-document-title-font-size} - @{max-document-title-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))"'
+    },
+    "font-size-h1": {
+        "css": "calc(max(var(--min-h1-font-size), min(var(--max-h1-font-size), var(--min-h1-font-size) + (var(--max-h1-font-size) - var(--min-h1-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+        "less": '~"max(@{min-h1-font-size}px, min(@{max-h1-font-size}px, calc(@{min-h1-font-size}px + (@{max-h1-font-size} - @{min-h1-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))"'
+    },
+    "font-size-h2": {
+        "css": "calc(max(var(--min-h2-font-size), min(var(--max-h2-font-size), var(--min-h2-font-size) + (var(--max-h2-font-size) - var(--min-h2-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+        "less": '~"max(@{min-h2-font-size}px, min(@{max-h2-font-size}px, calc(@{min-h2-font-size}px + (@{max-h2-font-size} - @{min-h2-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))"'
+    },
+    "font-size-h3": {
+        "css": "calc(max(var(--min-h3-font-size), min(var(--max-h3-font-size), var(--min-h3-font-size) + (var(--max-h3-font-size) - var(--min-h3-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+        "less": '~"max(@{min-h3-font-size}px, min(@{max-h3-font-size}px, calc(@{min-h3-font-size}px + (@{max-h3-font-size} - @{min-h3-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))"'
+    },
+    "font-size-h4": {
+        "css": "calc(max(var(--min-h4-font-size), min(var(--max-h4-font-size), var(--min-h4-font-size) + (var(--max-h4-font-size) - var(--min-h4-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+        "less": '~"max(@{min-h4-font-size}px, min(@{max-h4-font-size}px, calc(@{min-h4-font-size}px + (@{max-h4-font-size} - @{min-h4-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))"'
+    },
+    "font-size-h5": {"css": "var(--font-size-base)", "less": "@font-size-base"},
+    "font-size-h6": {
+        "css": "calc(max(var(--min-h6-font-size), min(var(--max-h6-font-size), var(--min-h6-font-size) + (var(--max-h6-font-size) - var(--min-h6-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+        "less": '~"max(@{min-h6-font-size}px, min(@{max-h6-font-size}px, calc(@{min-h6-font-size}px + (@{max-h6-font-size} - @{min-h6-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))"'
+    },
     "navbar-default-link-color": "#727272",
     "navbar-default-color": "#727272",
     "input-color-placeholder": "#727272",
@@ -155,6 +183,21 @@
     "alert-info-bg": "#e1f1f9",
     "brand-danger": "#cc3333"
 })
+
+## Separate values for the CSS and LESS variable sets for convenience sakew
+#set($xsVariablesValuesCSS = {})
+#set($xsVariablesValuesLESS = {})
+#foreach($variableEntry in $xsVariablesValues.entrySet())
+    #set($variableName = $variableEntry.key)
+    #set($variableValue = $variableEntry.value)
+    #if("$!variableValue.css" != '')
+        #set($xsVariablesValuesCSS[$variableName] = $variableValue.css)
+        #set($xsVariablesValuesLESS[$variableName] = $variableValue.less)
+    #else
+        #set($xsVariablesValuesCSS[$variableName] = $variableValue)
+        #set($xsVariablesValuesLESS[$variableName] = $variableValue)
+    #end
+#end
 
 ############################################
 ## Bootstrap variables

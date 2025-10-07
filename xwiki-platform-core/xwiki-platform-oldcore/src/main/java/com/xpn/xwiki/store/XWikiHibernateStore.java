@@ -1610,6 +1610,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     handledProps.add(prop);
                                 }
                             }
+                            // The object should never be dirty after being loaded from the DB.
+                            object.setDirty(false, true);
                         }
                     } catch (HibernateException e) {
                         this.logger.error("Failed loading custom mapping for doc [{}], class [{}], nb [{}]",

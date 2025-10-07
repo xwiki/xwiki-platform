@@ -112,6 +112,8 @@ public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterS
 
             this.entity.setName(name);
             this.entity.setObject(this.currentXClass);
+            // The object should not be dirty there.
+            this.entity.setDirty(false);
         }
     }
 
@@ -161,6 +163,8 @@ public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterS
             }
 
             this.entity.safeput(name, field);
+            // The object should not be dirty there.
+            this.entity.setDirty(false);
         }
     }
 }

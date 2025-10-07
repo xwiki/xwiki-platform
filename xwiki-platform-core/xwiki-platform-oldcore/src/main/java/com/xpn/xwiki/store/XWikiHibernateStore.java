@@ -1116,7 +1116,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     if (cxml != null) {
                         bclass.fromXML(cxml);
                         doc.setXClass(bclass);
-                        bclass.setDirty(false);
+                        bclass.setDirty(false, true);
                     }
 
                     // Store this XWikiClass in the context so that we can use it in case of recursive usage
@@ -1175,7 +1175,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             }
                             doc.setXObject(object.getNumber(), object);
                             // The object just been loaded so make sure it's considered clean
-                            object.setDirty(false);
+                            object.setDirty(false, true);
                         }
 
                         // AFAICT this was added as an emergency patch because loading of objects has proven
@@ -1205,7 +1205,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 ((BaseProperty<?>) obj.getField("member")).setDirty(false);
                                 doc.setXObject(obj.getNumber(), obj);
                                 // The object just been loaded so make sure it's considered clean
-                                obj.setDirty(false);
+                                obj.setDirty(false, true);
                             }
                         }
                     }
@@ -1514,7 +1514,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
 
-                object.setDirty(false);
+                object.setDirty(false, true);
 
                 if (bTransaction) {
                     endTransaction(context, true);
@@ -1610,8 +1610,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     handledProps.add(prop);
                                 }
                             }
-                            // The object should never be dirty after being loaded from the DB.
-                            object.setDirty(false, true);
                         }
                     } catch (HibernateException e) {
                         this.logger.error("Failed loading custom mapping for doc [{}], class [{}], nb [{}]",

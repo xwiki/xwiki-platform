@@ -189,9 +189,6 @@ catalogs:
     electron-store:
       specifier: 11.0.0
       version: 11.0.0
-    electron-updater:
-      specifier: 6.6.2
-      version: 6.6.2
     esbuild:
       specifier: 0.25.10
       version: 0.25.10
@@ -4338,7 +4335,7 @@ importers:
         specifier: workspace:*
         version: link:../lib
       electron-updater:
-        specifier: 'catalog:'
+        specifier: 6.6.2
         version: 6.6.2
     devDependencies:
       electron:

@@ -128,7 +128,6 @@ catalog:
   electron: 38.2.1
   electron-builder: 26.0.12
   electron-store: 11.0.0
-  electron-updater: 6.6.2
   esbuild: 0.25.10
   eslint: 9.37.0
   eslint-config-prettier: 10.1.8
@@ -205,8 +204,6 @@ catalog:
   yaml: 2.8.1
   yjs: 13.6.27
 
-# Makes it mandatory to use the catalog for all dependencies.
 catalogMode: strict
 
-# Automatically remove unused dependencies from the catalog.
 cleanupUnusedCatalogs: true

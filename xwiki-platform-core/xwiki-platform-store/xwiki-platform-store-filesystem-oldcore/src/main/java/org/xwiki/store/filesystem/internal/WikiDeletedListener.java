@@ -19,19 +19,17 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.File;
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStoreException;
 
 /**
  * Automatically delete store corresponding to deleted wiki.
@@ -68,14 +66,12 @@ public class WikiDeletedListener extends AbstractEventListener
     {
         String wikiId = ((WikiDeletedEvent) event).getWikiId();
 
-        File directory = this.store.getWikiDir(wikiId);
+        BlobPath directory = this.store.getWikiDir(wikiId);
 
-        if (directory.exists() && directory.isDirectory()) {
-            try {
-                FileUtils.deleteDirectory(directory);
-            } catch (IOException e) {
-                this.logger.error("Failed to delete storage for the wiki [{}]", wikiId, e);
-            }
+        try {
+            this.store.getStore().deleteBlobs(directory);
+        } catch (BlobStoreException e) {
+            this.logger.error("Failed to delete blobs for the wiki [{}]", wikiId, e);
         }
     }
 }

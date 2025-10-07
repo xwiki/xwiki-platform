@@ -64,19 +64,19 @@ solr.admin.info.affectedDocuments=Affected documents in the index:
 
 search.solr.sortBy.hint=Sort order rule
 search.solr.sortBy.field.score=Sort by relevance
-search.solr.sortBy.field.title_sort=Sort by title
+search.solr.sortBy.field.titleSort=Sort by title
 search.solr.sortBy.field.date=Sort by last edit date
-search.solr.sortBy.field.author_display_sort=Sort by last author name
-search.solr.sortBy.field.filename_sort=Sort by file name
-search.solr.sortBy.field.attsize_sort=Sort by file size
-search.solr.sortBy.field.attdate_sort=Sort by upload date
-search.solr.sortBy.field.attauthor_display_sort=Sort by uploader name
+search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+search.solr.sortBy.field.filenameSort=Sort by file name
+search.solr.sortBy.field.attsizeSort=Sort by file size
+search.solr.sortBy.field.attdateSort=Sort by upload date
+search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
 search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
 search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
 
-search.solr.options.show_highlight=Display highlights of matches
+search.solr.options.showHighlight=Display highlights of matches
 solr.options.highlight.title=Display an extract of what was matched in each result
-search.solr.options.show_facet=Show filters
+search.solr.options.showFacet=Show filters
 solr.options.facet.title=Allow extra filtering of the result
 
 solr.result.language=Language

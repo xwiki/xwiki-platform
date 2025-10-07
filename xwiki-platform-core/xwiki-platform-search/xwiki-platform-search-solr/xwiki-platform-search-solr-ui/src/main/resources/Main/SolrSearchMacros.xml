@@ -367,7 +367,12 @@
       &lt;select id="sort-by-input" name="sort"&gt;
         #foreach ($entry in $defaultSortOrder.entrySet())
           &lt;option class="sort-item" value="$entry.key" #if($sort == $entry.key)selected='selected'#end&gt;
-            $escapetool.xml($services.localization.render("search.solr.sortBy.field.$entry.key"))
+            #set ($sortOptionNameList = $entry.key.split('_'))
+            #set ($camelCasedSortOptionName = $sortOptionNameList.get(0))
+            #foreach ($namePart in $sortOptionNameList.subList(1, $sortOptionNameList.size()))
+              #set ($camelCasedSortOptionName = "${camelCasedSortOptionName}$stringtool.capitalize($namePart)")
+            #end
+            $escapetool.xml($services.localization.render("search.solr.sortBy.field.$camelCasedSortOptionName"))
           &lt;/option&gt;
         #end
       &lt;/select&gt;##
@@ -386,7 +391,7 @@
         aria-describedby="option-highlight-description"
         title="$escapetool.xml($services.localization.render('solr.options.highlight.title'))"
         #if($highlightEnabled)checked#end/&gt;##
-        $escapetool.xml($services.localization.render('search.solr.options.show_highlight'))##
+        $escapetool.xml($services.localization.render('search.solr.options.showHighlight'))##
       &lt;/label&gt;##
       &lt;span id="option-highlight-description" class="sr-only"&gt;
       $escapetool.xml($services.localization.render('solr.options.highlight.title'))
@@ -398,7 +403,7 @@
           aria-describedby="option-facet-description"
           title="$escapetool.xml($services.localization.render('solr.options.facet.title'))"
           #if($facetEnabled)checked#end/&gt;##
-          $escapetool.xml($services.localization.render('search.solr.options.show_facet'))
+          $escapetool.xml($services.localization.render('search.solr.options.showFacet'))
         &lt;/label&gt;##
         &lt;span id="option-facet-description" class="sr-only"&gt;
           $escapetool.xml($services.localization.render('solr.options.facet.title'))

@@ -232,8 +232,8 @@ catalogs:
       specifier: 5.0.2
       version: 5.0.2
     fast-xml-parser:
-      specifier: 5.2.4
-      version: 5.2.4
+      specifier: 5.3.0
+      version: 5.3.0
     filesize.js:
       specifier: 2.0.0
       version: 2.0.0
@@ -1317,7 +1317,7 @@ importers:
         version: link:../../../utils/inversify
       fast-xml-parser:
         specifier: 'catalog:'
-        version: 5.2.4
+        version: 5.3.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -3604,7 +3604,7 @@ importers:
         version: link:../uniast-api
       fast-xml-parser:
         specifier: 'catalog:'
-        version: 5.2.4
+        version: 5.3.0
       mdast-util-gfm-strikethrough:
         specifier: 'catalog:'
         version: 2.0.0
@@ -8278,8 +8278,8 @@ packages:
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==}
 
-  fast-xml-parser@5.2.4:
-    resolution: {integrity: sha512-6mNrAVwHip2nGyPYn6xQJK/znBbIoz6to5VMNysrka1/aoSylbB8vjYgkpaFp05EFojiflVV+3QzXe9Ap3Esng==}
+  fast-xml-parser@5.3.0:
+    resolution: {integrity: sha512-gkWGshjYcQCF+6qtlrqBqELqNqnt4CxruY6UVAWWnqb3DQ6qaNFEIKqzYep1XzHLM/QtrHVCxyPOtTk4LTQ7Aw==}
     hasBin: true
 
   fastq@1.19.1:
@@ -14481,7 +14481,7 @@ snapshots:
 
   fast-uri@3.0.6: {}
 
-  fast-xml-parser@5.2.4:
+  fast-xml-parser@5.3.0:
     dependencies:
       strnum: 2.1.1
 

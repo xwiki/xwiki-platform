@@ -141,15 +141,6 @@
       #end
       ##------- Rating --------
       |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference)
-      ##------- Website --------------
-      #set($website = $extension.getProperty("website").value)
-      #if ("$!website" != '')
-        |(% class="label" %)Website(%%)|#if ($website.length() &gt; 40)
-                                          [[$services.rendering.escape($services.rendering.escape($website.substring(0, 40), 'xwiki/2.1'), 'xwiki/2.1')...&gt;&gt;$services.rendering.escape($website, 'xwiki/2.1')]]
-                                        #else
-                                          [[$services.rendering.escape($website, 'xwiki/2.1')]]
-                                        #end
-      #end
       ##------- License --------
       #set($licenseName = $doc.getValue("licenseName"))
       #if ("$!licenseName" != "")
@@ -173,6 +164,21 @@
       #end
       ##------------------------
       (%class="btn-group pull-right"%)(((
+        ##------- Website button --------------
+        #set($website = $extension.getProperty("website").value)
+        #if ("$!website" != '')
+          [[$services.icon.render('book') Documentation>>$services.rendering.escape($website, 'xwiki/2.1')||class="btn btn-primary"]]##
+        #end
+        ##------- Source --------
+        #set($source = $doc.getValue("source"))
+        #if ("$!source" != "")
+          [[$services.icon.render('file-text') Sources&gt;&gt;$services.rendering.escape($source, 'xwiki/2.1')||class="btn btn-default"]]##
+        #end
+        ##------- Issues --------
+        #set($issues = $doc.getValue("issueManagementURL"))
+        #if ("$!issues" != "")
+          [[$services.icon.render('bug') Issues&gt;&gt;$services.rendering.escape($issues, 'xwiki/2.1')||class="btn btn-default"]]##
+        #end
         ##------- Download button ------
         #set($lastVersion = $doc.getValue("lastVersion"))
         #if ("$!lastVersion" != '')
@@ -181,21 +187,11 @@
           #set ($download = $lastVersionObject.getProperty("download").value)
           #if ("$!download" == '')
             #if ($doc.getAttachment("${id}-${version}.${type}"))
-              [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape("attach:${id}-${version}.${type}")||class="btn btn-primary"]]##
+              [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape("attach:${id}-${version}.${type}")||class="btn btn-default"]]##
             #end
           #else
-            [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($download, 'xwiki/2.1')||class="btn btn-primary"]]##
+            [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($download, 'xwiki/2.1')||class="btn btn-default"]]##
           #end
-        #end
-        ##------- Source --------
-        #set($source = $doc.getValue("source"))
-        #if ("$!source" != "")
-          [[Sources&gt;&gt;$services.rendering.escape($source, 'xwiki/2.1')||class="btn btn-default"]]##
-        #end
-        ##------- Issues --------
-        #set($issues = $doc.getValue("issueManagementURL"))
-        #if ("$!issues" != "")
-          [[Issues&gt;&gt;$services.rendering.escape($issues, 'xwiki/2.1')||class="btn btn-default"]]##
         #end
       )))
     {{/box}}
@@ -256,13 +252,16 @@
     #end
   #end
 
-    = Description =
-    #if ($isViewMode)
+    ## If there's a website specified, then don't display the Description (since Description is a local documentation).
+    #if (($isViewMode &amp;&amp; "$!website" == '') || !$isViewMode)
+      = Description =
+    #end
+    #if ($isViewMode &amp;&amp; "$!website" == '')
       ## Make sure to resolve reference based on the right document
       {{context transformationContext="document" restricted=true}}
         $doc.getValue('description')
       {{/context}}
-    #else
+    #elseif (!$isViewMode)
       $doc.display('description')
     #end
 

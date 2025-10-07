@@ -128,6 +128,7 @@
     <pnpm.version>10.17.1</pnpm.version>
   </properties>
   <scm>
+    <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>

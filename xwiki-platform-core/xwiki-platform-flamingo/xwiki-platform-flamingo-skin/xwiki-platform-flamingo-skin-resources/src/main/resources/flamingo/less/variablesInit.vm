@@ -177,7 +177,7 @@
 #if("$!flamingoColorThemeVariables" != '')
 #set($discard = $mappedVariables.addAll($!flamingoColorThemeVariables.keySet()))
 #end
-#if("$!xsVariables" != '')#set($discard = $mappedVariables.putAll($!xsVariables.keySet()))#end
+#if("$!xsVariablesValuesCSS" != '')#set($discard = $mappedVariables.putAll($!xsVariablesValuesCSS.keySet()))#end
 #if("$!bootstrapVariables" != '')#set($discard = $mappedVariables.putAll($!bootstrapVariables.keySet()))#end
 #if("$!oldColorThemeVariables" != '')#set($discard = $mappedVariables.putAll($!oldColorThemeVariables.keySet()))#end
 ## List all of the CSS property names where we don't want to inherit the value from LESS.

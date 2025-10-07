@@ -64,7 +64,7 @@
 ## we make sure that they all appear in another mapping above.
 ## The key is the name and the value is a type for the variable.
 
-## $xsVariablesCSSValues is the list of all the variables set in XWiki standard for various purposes.
+## $xsVariablesValuesCSS is the list of all the variables set in XWiki standard for various purposes.
 ## Those should all be defined in variables.less and variablesInit.vm
 ## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
 ## The key is their name and the value is the string representing the value in CSS syntax.
@@ -79,7 +79,7 @@
 ## We allow different values from different maps for the same variable. This is an extra fallback in case the first one
 ## doesn't work. This could be the case for defaults that rely on other variables.
 ## Values follow CSS cascading order (last one wins).
-#set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariablesCSSValues, $newVariables])
+#set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariablesValuesCSS, $newVariables])
 
 ######################
 ## Generation

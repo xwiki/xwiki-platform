@@ -101,6 +101,7 @@
 ############################################
 ## List of all the variables set in XWiki standard for various purposes.
 ## This is a single source for both CSS and LESS value, they are separated afterwards.
+## If there's just one value, then 
 #set($xsVariablesValues = {
     "figure-caption-font-size": "90%",
     "figure-caption-color": {"css": "var(--text-muted)", "less": "@text-muted"},

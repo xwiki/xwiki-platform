@@ -187,8 +187,8 @@ catalogs:
       specifier: 26.0.12
       version: 26.0.12
     electron-store:
-      specifier: 10.1.0
-      version: 10.1.0
+      specifier: 11.0.0
+      version: 11.0.0
     electron-updater:
       specifier: 6.6.2
       version: 6.6.2
@@ -4367,7 +4367,7 @@ importers:
         version: 38.2.1
       electron-store:
         specifier: 'catalog:'
-        version: 10.1.0
+        version: 11.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4442,7 +4442,7 @@ importers:
         version: 38.2.1
       electron-store:
         specifier: 'catalog:'
-        version: 10.1.0
+        version: 11.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4523,7 +4523,7 @@ importers:
         version: 38.2.1
       electron-store:
         specifier: 'catalog:'
-        version: 10.1.0
+        version: 11.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4792,7 +4792,7 @@ importers:
         version: 38.2.1
       electron-store:
         specifier: 'catalog:'
-        version: 10.1.0
+        version: 11.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -7687,8 +7687,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  conf@14.0.0:
-    resolution: {integrity: sha512-L6BuueHTRuJHQvQVc6YXYZRtN5vJUtOdCTLn0tRYYV5azfbAFcPghB5zEE40mVrV6w7slMTqUfkDomutIK14fw==}
+  conf@15.0.2:
+    resolution: {integrity: sha512-JBSrutapCafTrddF9dH3lc7+T2tBycGF4uPkI4Js+g4vLLEhG6RZcFi3aJd5zntdf5tQxAejJt8dihkoQ/eSJw==}
     engines: {node: '>=20'}
 
   confbox@0.1.8:
@@ -7885,9 +7885,9 @@ packages:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
     engines: {node: '>=0.10.0'}
 
-  dot-prop@9.0.0:
-    resolution: {integrity: sha512-1gxPBJpI/pcjQhKgIU91II6Wkay+dLcN3M6rf2uwP8hRur3HtQXjVrdAK3sjC0piaEuxzMwjXChcETiJl47lAQ==}
-    engines: {node: '>=18'}
+  dot-prop@10.1.0:
+    resolution: {integrity: sha512-MVUtAugQMOff5RnBy2d9N31iG0lNwg1qAoAOn7pOK5wf94WIaE3My2p3uwTQuvS2AcqchkcR3bHByjaM0mmi7Q==}
+    engines: {node: '>=20'}
 
   dotenv-expand@11.0.7:
     resolution: {integrity: sha512-zIHwmZPRshsCdpMDyVsqGmgyP0yT8GAgXUnkdAoJisxvf33k7yO6OuoKmcTGuXPWSsm8Oh88nZicRLA9Y0rUeA==}
@@ -7936,8 +7936,8 @@ packages:
   electron-publish@26.0.11:
     resolution: {integrity: sha512-a8QRH0rAPIWH9WyyS5LbNvW9Ark6qe63/LqDB7vu2JXYpi0Gma5Q60Dh4tmTqhOBQt0xsrzD8qE7C+D7j+B24A==}
 
-  electron-store@10.1.0:
-    resolution: {integrity: sha512-oL8bRy7pVCLpwhmXy05Rh/L6O93+k9t6dqSw0+MckIc3OmCTZm6Mp04Q4f/J0rtu84Ky6ywkR8ivtGOmrq+16w==}
+  electron-store@11.0.0:
+    resolution: {integrity: sha512-msCXEmzIGdnIq/u3od5mh/Hk5mZAGKa+3gGGTQcqPPkHcD/otlLyIZuRd1WAOhhg0gKo17BK5Avsl7OHkxir7w==}
     engines: {node: '>=20'}
 
   electron-to-chromium@1.5.165:
@@ -10452,6 +10452,10 @@ packages:
   tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
 
+  tagged-tag@1.0.0:
+    resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
+    engines: {node: '>=20'}
+
   tar-stream@2.2.0:
     resolution: {integrity: sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ==}
     engines: {node: '>=6'}
@@ -10604,6 +10608,10 @@ packages:
     resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
     engines: {node: '>=16'}
 
+  type-fest@5.0.1:
+    resolution: {integrity: sha512-9MpwAI52m8H6ssA542UxSLnSiSD2dsC3/L85g6hVubLSXd82wdI80eZwTWhdOfN67NlA+D+oipAs1MlcTcu3KA==}
+    engines: {node: '>=20'}
+
   type-is@2.0.1:
     resolution: {integrity: sha512-OZs6gsjF4vMp32qrCbiVSkrFmXtG/AZhY3t0iAMrMBiAZyV9oALtXO8hsrHbMXF9x6L3grlFuwW2oAz7cav+Gw==}
     engines: {node: '>= 0.6'}
@@ -10647,8 +10655,8 @@ packages:
   ufo@1.6.1:
     resolution: {integrity: sha512-9a4/uxlTWJ4+a5i0ooc1rU7C7YOw3wT+UGqdeNNHWnOF9qcMBgLRS+4IYUqbczewFx4mLEig6gawh7X6mFlEkA==}
 
-  uint8array-extras@1.4.0:
-    resolution: {integrity: sha512-ZPtzy0hu4cZjv3z5NW9gfKnNLjoz4y6uv4HlelAjDK7sY/xOkKZv9xK/WQpcsBB3jEybChz9DPC2U/+cusjJVQ==}
+  uint8array-extras@1.5.0:
+    resolution: {integrity: sha512-rvKSBiC5zqCCiDZ9kAOszZcDvdAHwwIKJG33Ykj43OKcWsnmcBRL09YTU4nOeHZ8Y2a7l1MgTd08SBe9A8Qj6A==}
     engines: {node: '>=18'}
 
   unbox-primitive@1.1.0:
@@ -13732,17 +13740,17 @@ snapshots:
       tree-kill: 1.2.2
       yargs: 17.7.2
 
-  conf@14.0.0:
+  conf@15.0.2:
     dependencies:
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       atomically: 2.0.3
       debounce-fn: 6.0.0
-      dot-prop: 9.0.0
+      dot-prop: 10.1.0
       env-paths: 3.0.0
       json-schema-typed: 8.0.1
       semver: 7.7.2
-      uint8array-extras: 1.4.0
+      uint8array-extras: 1.5.0
 
   confbox@0.1.8: {}
 
@@ -13932,9 +13940,9 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
-  dot-prop@9.0.0:
+  dot-prop@10.1.0:
     dependencies:
-      type-fest: 4.41.0
+      type-fest: 5.0.1
 
   dotenv-expand@11.0.7:
     dependencies:
@@ -14007,10 +14015,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron-store@10.1.0:
+  electron-store@11.0.0:
     dependencies:
-      conf: 14.0.0
-      type-fest: 4.41.0
+      conf: 15.0.2
+      type-fest: 5.0.1
 
   electron-to-chromium@1.5.165: {}
 
@@ -17048,6 +17056,8 @@ snapshots:
 
   tabbable@6.2.0: {}
 
+  tagged-tag@1.0.0: {}
+
   tar-stream@2.2.0:
     dependencies:
       bl: 4.1.0
@@ -17201,6 +17211,10 @@ snapshots:
 
   type-fest@4.41.0: {}
 
+  type-fest@5.0.1:
+    dependencies:
+      tagged-tag: 1.0.0
+
   type-is@2.0.1:
     dependencies:
       content-type: 1.0.5
@@ -17259,7 +17273,7 @@ snapshots:
 
   ufo@1.6.1: {}
 
-  uint8array-extras@1.4.0: {}
+  uint8array-extras@1.5.0: {}
 
   unbox-primitive@1.1.0:
     dependencies:

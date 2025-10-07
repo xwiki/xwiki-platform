@@ -127,7 +127,7 @@ catalog:
   dotenv: 17.2.3
   electron: 38.2.1
   electron-builder: 26.0.12
-  electron-store: 10.1.0
+  electron-store: 11.0.0
   electron-updater: 6.6.2
   esbuild: 0.25.10
   eslint: 9.37.0

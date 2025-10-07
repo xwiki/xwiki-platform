@@ -129,6 +129,7 @@
     <npm.version>11.2.0</npm.version>
   </properties>
   <scm>
+    <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>
     <tag>stable-17.4.x</tag>
   </scm>
   <issueManagement>

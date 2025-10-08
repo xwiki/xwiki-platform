@@ -141,16 +141,12 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
         Blob attachmentMetaBlob = provider.getDeletedAttachmentMetaFile();
         try (Stream<Blob> blobStream =
                  attachmentMetaBlob.getStore().listBlobs(attachmentMetaBlob.getPath().getParent())) {
-            blobStream.forEach(blob -> {
-                try {
-                    new BlobDeleteTransactionRunnable(blob,
-                        this.fileTools.getBackupFile(blob),
-                        this.fileTools.getLockForFile(blob.getPath()))
-                        .runIn(out);
-                } catch (BlobStoreException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            for (Blob blob : (Iterable<Blob>) blobStream::iterator) {
+                new BlobDeleteTransactionRunnable(blob,
+                    this.fileTools.getBackupFile(blob),
+                    this.fileTools.getLockForFile(blob.getPath()))
+                    .runIn(out);
+            }
         }
 
         return out;

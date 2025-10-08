@@ -148,51 +148,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Attach default configuration package -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-search-core</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-core-search</artifactId>
-                  <version>${project.version}</version>
-                  <type>zip</type>
-                  <destFileName>xwiki-platform-search-solr-server-core-search.zip</destFileName>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>attach-minimal-core</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
-                  <version>${project.version}</version>
-                  <type>zip</type>
-                  <destFileName>xwiki-platform-search-solr-server-core-minimal.zip</destFileName>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 </project>

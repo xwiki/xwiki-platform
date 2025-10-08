@@ -20,9 +20,17 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
+import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.junit5.XWikiTempDirExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,27 +41,39 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * 
  * @version $Id$
  */
+@ExtendWith(XWikiTempDirExtension.class)
 class StoreFileUtilsTest
 {
-    @Test
-    void resolveNotExistingFile() throws IOException
+    @XWikiTempDir
+    private File tempDir;
+
+    private BlobStore blobStore;
+
+    @BeforeEach
+    void setUp()
     {
-        File file = new File("does not exist");
-
-        assertFalse(file.exists());
-
-        File foundFile = StoreFileUtils.resolve(file, true);
-
-        assertSame(file, foundFile);
+        this.blobStore = new FileSystemBlobStore("Test", this.tempDir.toPath());
     }
 
     @Test
-    void getLinkFile() throws IOException
+    void resolveNotExistingFile() throws Exception
     {
-        File file = new File("folder/file.ext");
+        Blob blob = this.blobStore.getBlob(BlobPath.of(List.of("does not exist")));
 
-        File linkFile = StoreFileUtils.getLinkFile(file);
+        assertFalse(blob.exists());
 
-        assertEquals("folder/file.ext.lnk", linkFile.getPath());
+        Blob foundBlob = StoreFileUtils.resolve(blob, true);
+
+        assertSame(blob, foundBlob);
+    }
+
+    @Test
+    void getLinkFile() throws Exception
+    {
+        Blob blob = this.blobStore.getBlob(BlobPath.of(List.of("folder", "file.ext")));
+
+        Blob linkFile = StoreFileUtils.getLinkFile(blob);
+
+        assertEquals("folder/file.ext.lnk", linkFile.getPath().toString());
     }
 }

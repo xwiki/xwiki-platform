@@ -111,6 +111,27 @@ public class FilesystemStoreTools implements Initializable
 
     private BlobStore store;
 
+    /**
+     * Default constructor.
+     */
+    public FilesystemStoreTools()
+    {
+        // Nothing to do
+    }
+
+    /**
+     * Constructor used for testing.
+     *
+     * @param blobStore the blob store to use
+     * @param lockProvider the lock provider to use
+     * @since 17.9.0RC1
+     */
+    public FilesystemStoreTools(BlobStore blobStore, LockProvider lockProvider)
+    {
+        this.store = blobStore;
+        this.lockProvider = lockProvider;
+    }
+
     @Override
     public void initialize() throws InitializationException
     {

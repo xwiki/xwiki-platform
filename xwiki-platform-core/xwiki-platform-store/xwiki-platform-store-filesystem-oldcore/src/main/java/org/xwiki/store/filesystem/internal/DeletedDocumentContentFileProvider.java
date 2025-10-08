@@ -19,7 +19,8 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.File;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
 
 /**
  * A means of getting files for storing information about a given deleted document.
@@ -30,7 +31,7 @@ import java.io.File;
 public interface DeletedDocumentContentFileProvider
 {
     /**
-     * @return the File for storing the content of the deleted document.
+     * @return the Blob for storing the content of the deleted document.
      */
-    File getDeletedDocumentContentFile();
+    Blob getDeletedDocumentContentFile() throws BlobStoreException;
 }

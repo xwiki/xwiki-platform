@@ -19,7 +19,8 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.File;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
 
 /**
  * A means of getting files for storing information about a given attachment.
@@ -30,23 +31,23 @@ import java.io.File;
 public interface AttachmentFileProvider
 {
     /**
-     * @return the File for storing the latest version of the attachment's content.
+     * @return the Blob for storing the latest version of the attachment's content.
      */
-    File getAttachmentContentFile();
+    Blob getAttachmentContentFile() throws BlobStoreException;
 
     /**
-     * Get the meta file for the attachment. The meta file contains information about each version of the attachment
+     * Get the meta blob for the attachment. The meta file contains information about each version of the attachment
      * such as who saved it.
      *
-     * @return the File for storing meta data for each version of an attachment.
+     * @return the Blob for storing meta data for each version of an attachment.
      */
-    File getAttachmentVersioningMetaFile();
+    Blob getAttachmentVersioningMetaFile() throws BlobStoreException;
 
     /**
-     * Get a uniquely named file for storing a particular version of the attachment.
+     * Get a uniquely named Blob for storing a particular version of the attachment.
      *
      * @param versionName the name of the version of the attachment eg: "1.1" or "1.2"
-     * @return the File for storing the content of a particular version of the attachment.
+     * @return the Blob for storing the content of a particular version of the attachment.
      */
-    File getAttachmentVersionContentFile(String versionName);
+    Blob getAttachmentVersionContentFile(String versionName) throws BlobStoreException;
 }

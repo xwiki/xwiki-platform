@@ -17,21 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store.filesystem.internal;
+package org.xwiki.store;
 
 import org.xwiki.store.blob.Blob;
-import org.xwiki.store.blob.BlobStoreException;
 
 /**
- * A means of getting files for storing information about a given attachment.
+ * An entity that serializes embedded data to a {@link Blob}.
  *
  * @version $Id$
- * @since 3.0M2
+ * @since 17.8.0RC1
  */
-public interface DeletedAttachmentFileProvider extends AttachmentFileProvider
+public interface BlobSerializer
 {
     /**
-     * @return the Blob for storing the information about the deleted attachment such as who deleted it.
+     * @param blob the file to write to
+     * @throws Exception when failing to serialize the data to the passed blob
      */
-    Blob getDeletedAttachmentMetaFile() throws BlobStoreException;
+    void serialize(Blob blob) throws Exception;
 }

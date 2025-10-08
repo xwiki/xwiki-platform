@@ -37,6 +37,9 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.internal.FileSystemStoreUtils;
@@ -101,13 +104,24 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         }
     }
 
+    private File newPathToFile(BlobPath path) throws DataMigrationException
+    {
+        BlobStore store = this.fstools.getStore();
+        if (store instanceof FileSystemBlobStore fileSystemStore) {
+            return fileSystemStore.getBlobFilePath(path).toFile();
+        } else {
+            throw new DataMigrationException("Cannot migrate from pre-11 filesystem store to non filesystem store");
+        }
+    }
+
     private void migrateWiki(String wikiId) throws DataMigrationException
     {
         // Previous wiki store location
         File oldDirectory = this.getPre11WikiDir(wikiId);
 
         // New wiki store location
-        File newDirectory = this.fstools.getWikiDir(wikiId);
+        BlobStore newBlobStore = this.fstools.getStore();
+        File newDirectory = newPathToFile(this.fstools.getWikiDir(wikiId));
 
         if (oldDirectory.exists()) {
             // Move the wiki store
@@ -121,7 +135,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         }
 
         // Set right root directory
-        setStoreRootDirectory(this.fstools.getStoreRootDirectory());
+        setBlobStore(newBlobStore);
 
         if (newDirectory.exists()) {
             // Rewrite store paths based on reference hash instead of URL encoding for the current wiki
@@ -162,7 +176,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
     {
         DocumentReference documentReference = getPre11DocumentReference(oldDocumentContentDirectory.getParentFile());
 
-        File newDocumentContentDirectory = this.fstools.getDocumentContentDir(documentReference);
+        File newDocumentContentDirectory = newPathToFile(this.fstools.getDocumentContentDir(documentReference));
 
         this.logger.info("Moving document folder [{}] to new location [{}]", oldDocumentContentDirectory,
             newDocumentContentDirectory);
@@ -175,7 +189,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
     }
 
     private void migrateAttachments(File documentContentDirectory, DocumentReference documentReference)
-        throws IOException
+        throws IOException, DataMigrationException
     {
         File attachmentsDirectory = new File(documentContentDirectory, FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
 
@@ -185,7 +199,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
                     AttachmentReference attachmentReference = new AttachmentReference(
                         FileSystemStoreUtils.decode(oldAttachmentDirectory.getName()), documentReference);
 
-                    File newAttachmentDirectory = this.fstools.getAttachmentDir(attachmentReference);
+                    File newAttachmentDirectory = newPathToFile(this.fstools.getAttachmentDir(attachmentReference));
 
                     this.logger.info("Moving attachment folder [{}] to new location [{}]", oldAttachmentDirectory,
                         newAttachmentDirectory);
@@ -242,7 +256,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
     }
 
     private void migrateDeletedAttachments(File documentContentDirectory, DocumentReference documentReference)
-        throws IOException
+        throws IOException, DataMigrationException
     {
         File deletedAttachmentsDirectory =
             new File(documentContentDirectory, FilesystemStoreTools.DELETED_ATTACHMENTS_DIR_NAME);
@@ -260,7 +274,8 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
                     AttachmentReference attachmentReference =
                         new AttachmentReference(attachmentName, documentReference);
 
-                    File newDeletedAttachmentDirectory = this.fstools.getDeletedAttachmentDir(attachmentReference, id);
+                    File newDeletedAttachmentDirectory =
+                        newPathToFile(this.fstools.getDeletedAttachmentDir(attachmentReference, id));
 
                     this.logger.info("Moving deleted attachment folder [{}] to new location [{}]",
                         oldDeletedAttachmentDirectory, newDeletedAttachmentDirectory);

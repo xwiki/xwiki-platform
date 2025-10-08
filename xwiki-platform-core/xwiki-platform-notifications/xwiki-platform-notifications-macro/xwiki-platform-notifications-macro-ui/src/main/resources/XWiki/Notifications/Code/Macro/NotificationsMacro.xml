@@ -423,7 +423,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       if (!entry.read) {
         // On click
         readButton.on('click', function() {
-          var notif = $(this).parents('li.notification-event');
+          let notif = $(this).parents('li.notification-event, .notification-event[role="listitem"]');
           notif.removeClass('notification-event-unread');
           var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
             XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
@@ -596,7 +596,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
           readButton.removeClass('hidden');
           // On click
           readButton.on('click', function() {
-            var notif = $(this).parents('li.notification-event');
+            let notif = $(this).parents('li.notification-event, .notification-event[role="listitem"]');
             notif.removeClass('notification-event-unread');
             var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
               XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');

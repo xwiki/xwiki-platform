@@ -93,12 +93,6 @@
 
     <!-- Test Dependencies -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
@@ -107,15 +101,9 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
+      <artifactId>xwiki-platform-test-solr</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
+      <type>pom</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

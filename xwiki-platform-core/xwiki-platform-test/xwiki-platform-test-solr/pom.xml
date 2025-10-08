@@ -24,35 +24,34 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-test</artifactId>
     <version>17.9.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-test</artifactId>
-  <name>XWiki Platform - Test - Parent POM</name>
+  <artifactId>xwiki-platform-test-solr</artifactId>
+  <name>XWiki Platform - Test - Solr</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Test - Parent POM</description>
-  <properties>
-    <selenium.version>4.36.0</selenium.version>
-    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
-  </properties>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-test-checker</module>
-    <module>xwiki-platform-test-integration</module>
-    <module>xwiki-platform-test-oldcore</module>
-    <module>xwiki-platform-test-solr</module>
-    <module>xwiki-platform-test-page</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-test-ui</module>
-        <module>xwiki-platform-test-upgrade</module>
-        <module>xwiki-platform-test-docker</module>
-        <module>xwiki-platform-test-rest</module>
-      </modules>
-    </profile>
-  </profiles>
+  <description>Entry point for tests that need to manipulate an embedded Solr instance</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 </project>

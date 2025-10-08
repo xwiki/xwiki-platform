@@ -26,6 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.xwiki.store.UnexpectedException;
 import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
@@ -92,7 +93,11 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     @Override
     public boolean exists()
     {
-        return this.storageBlob.exists();
+        try {
+            return this.storageBlob.exists();
+        } catch (BlobStoreException e) {
+            throw new UnexpectedException("Failed to check if attachment content exists", e);
+        }
     }
 
     @Override

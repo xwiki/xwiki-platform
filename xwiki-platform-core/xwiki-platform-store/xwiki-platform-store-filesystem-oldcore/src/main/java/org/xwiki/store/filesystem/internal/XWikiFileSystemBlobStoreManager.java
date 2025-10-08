@@ -30,7 +30,6 @@ import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
-import org.xwiki.store.blob.BlobStore;
 import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.blob.BlobStoreManager;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
@@ -62,7 +61,7 @@ public class XWikiFileSystemBlobStoreManager implements BlobStoreManager
     private Logger logger;
 
     @Override
-    public BlobStore getBlobStore(String name) throws BlobStoreException
+    public FileSystemBlobStore getBlobStore(String name) throws BlobStoreException
     {
         File fileStorageDirectory = this.config.getDirectory();
 

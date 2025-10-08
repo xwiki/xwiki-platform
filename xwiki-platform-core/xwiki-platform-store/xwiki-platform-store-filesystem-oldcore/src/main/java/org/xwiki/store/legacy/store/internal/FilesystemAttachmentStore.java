@@ -66,6 +66,8 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 @Singleton
 public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 {
+    private static final String ATTACHMENT_SAVE_ERROR_MESSAGE = "Exception while saving attachment.";
+
     /**
      * Tools for getting files to store given content in.
      */
@@ -125,7 +127,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             transaction.start();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT, "Exception while saving attachment.", e);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT, ATTACHMENT_SAVE_ERROR_MESSAGE, e);
         }
     }
 
@@ -159,7 +161,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         } catch (BlobStoreException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
-                "Exception while saving attachment.", e);
+                ATTACHMENT_SAVE_ERROR_MESSAGE, e);
         }
     }
 

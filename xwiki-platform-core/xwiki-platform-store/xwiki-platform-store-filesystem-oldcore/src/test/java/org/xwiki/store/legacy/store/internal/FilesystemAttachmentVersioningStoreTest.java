@@ -32,6 +32,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.locks.dummy.internal.DummyLockProvider;
@@ -74,7 +75,9 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         this.storageLocation = new File(tmpDir, "test-storage-location");
 
-        this.fileTools = new FilesystemStoreTools(storageLocation, new DummyLockProvider());
+        FileSystemBlobStore blobStore = new FileSystemBlobStore("Test", this.storageLocation.toPath());
+
+        this.fileTools = new FilesystemStoreTools(blobStore, new DummyLockProvider());
         final AttachmentListMetadataSerializer serializer =
             new AttachmentListMetadataSerializer(new AttachmentMetadataSerializer());
         this.versionStore = new FilesystemAttachmentVersioningStore();
@@ -139,7 +142,7 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
         // <?xml version="1.0" encoding="UTF-8"?>
         // <attachment-list serializer="attachment-list-meta/1.0">
         // </attachment-list>
-        Assert.assertTrue(this.provider.getAttachmentVersioningMetaFile().length() > 120);
+        Assert.assertTrue(this.provider.getAttachmentVersioningMetaFile().getSize() > 120);
 
         Assert.assertTrue(this.provider.getAttachmentVersionContentFile("1.1").exists());
         Assert.assertTrue(this.provider.getAttachmentVersionContentFile("1.2").exists());

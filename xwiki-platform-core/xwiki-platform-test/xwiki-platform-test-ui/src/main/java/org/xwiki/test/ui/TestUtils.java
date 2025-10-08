@@ -1595,7 +1595,9 @@ public class TestUtils
      */
     public void maybeLeaveEditMode()
     {
-        if (StringUtils.isNotEmpty(getEditMode())) {
+        String editMode = getEditMode();
+        List<String> adminModes = List.of("globaladmin", "spaceadmin");
+        if (StringUtils.isNotEmpty(editMode) && !adminModes.contains(editMode)) {
             leaveEditMode();
         }
     }

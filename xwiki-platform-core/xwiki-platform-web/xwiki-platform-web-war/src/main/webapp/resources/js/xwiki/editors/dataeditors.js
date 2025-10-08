@@ -66,6 +66,7 @@
           deletedXObjects: {} // objects deleted but not removed yet
         };
         this.editedDocument = XWiki.currentDocument;
+        this.unsavedChanges = false;
 
         $('.xclass').each(function() {
           self.enhanceClassUX($(this), true);
@@ -104,6 +105,7 @@
           }
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.unsavedChanges = false;
         });
 
         // in case of cancel we just clean everything so that we don't get any warnings for leaving the page without saving.
@@ -113,6 +115,21 @@
           $('input[name=addedObjects]').remove();
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.unsavedChanges = false;
+        });
+        // We don't want to listen on inputs related to an xclass or an xobject, but not the actual inputs allowing
+        // to create a property or an object.
+        let filterInputs = function () {
+            return $(this).parents('#add_xproperty,#add_xobject').length === 0
+                && $(this).parents('.xclass').length > 0;
+        };
+        $('input').filter(filterInputs).on('change', function(e) {
+          self.unsavedChanges = true;
+        });
+        $(document).on('xwiki:dom:updated', function (event, data) {
+          $(data.elements).find('input').filter(filterInputs).on('change', function (e) {
+            self.unsavedChanges = true;
+          });
         });
 
         // We want to the user to be prevented if he tries to leave the editor before saving.
@@ -120,7 +137,8 @@
         // See: https://stackoverflow.com/questions/4376596/jquery-unload-or-beforeunload
         window.onbeforeunload = function(event) {
           if (Object.keys(self.editorStatus.addedXObjects).length > 0
-            || Object.keys(self.editorStatus.deletedXObjects).length > 0) {
+            || Object.keys(self.editorStatus.deletedXObjects).length > 0
+            || self.unsavedChanges) {
             event.preventDefault();
             event.returnValue = "";
           } else {

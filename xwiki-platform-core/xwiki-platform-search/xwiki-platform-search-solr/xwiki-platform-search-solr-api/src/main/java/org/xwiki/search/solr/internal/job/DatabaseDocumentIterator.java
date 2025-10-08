@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,6 +48,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -59,7 +61,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named("database")
-public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
+public class DatabaseDocumentIterator extends AbstractDocumentIterator<DocumentIteratorEntry>
 {
     /**
      * The current index in the list of {@link #results}.
@@ -126,24 +128,36 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
     @Override
     public boolean hasNext()
     {
-        return getResults().size() > index;
+        return getResults().size() > this.index;
     }
 
     @Override
-    public Pair<DocumentReference, String> next()
+    public Pair<DocumentReference, DocumentIteratorEntry> next()
     {
-        Object[] result = getResults().get(index++);
+        List<Object[]> currentResults = getResults();
+
+        // Make sure there is indeed a next element
+        if (currentResults.size() <= this.index) {
+            throw new NoSuchElementException("No more element");
+        }
+
+        // Get current element
+        Object[] result = currentResults.get(index++);
+
         String localSpaceReference = (String) result[0];
         String name = (String) result[1];
         String locale = (String) result[2];
-        String version = (String) result[3];
         SpaceReference spaceReference = new SpaceReference(this.explicitEntityReferenceResolver
             .resolve(localSpaceReference, EntityType.SPACE, new WikiReference(wiki)));
         DocumentReference documentReference = new DocumentReference(name, spaceReference);
         if (!StringUtils.isEmpty(locale)) {
             documentReference = new DocumentReference(documentReference, LocaleUtils.toLocale(locale));
         }
-        return new ImmutablePair<DocumentReference, String>(documentReference, version);
+        String version = (String) result[3];
+        long docId = (long) result[4];
+
+        return new ImmutablePair<>(documentReference,
+            new DocumentIteratorEntry(documentReference.getWikiReference(), docId, version));
     }
 
     @Override

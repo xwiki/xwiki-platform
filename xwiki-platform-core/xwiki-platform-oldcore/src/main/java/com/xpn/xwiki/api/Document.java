@@ -1741,7 +1741,7 @@ public class Document extends Api
     /**
      * Displays the given field. The display mode will be decided depending on page context (edit or inline context will
      * display in edit, view context in view) This function uses the active object or will find the first object that
-     * has the given field. This function can return html inside and html macro
+     * has the given field. This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @return the display of the field.
@@ -1757,7 +1757,7 @@ public class Document extends Api
 
     /**
      * Displays the given field in the given mode. This function uses the active object or will find the first object
-     * that has the given field. This function can return html inside and html macro
+     * that has the given field. This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @param mode display mode to use (view, edit, hidden, search)
@@ -1774,7 +1774,7 @@ public class Document extends Api
 
     /**
      * Displays the given field in the given mode. This function uses the active object or will find the first object
-     * that has the given field. This function can return html inside and html macro A given prefix is added to the
+     * that has the given field. This function can return html inside an html macro. A given prefix is added to the
      * field names when these are forms.
      *
      * @param fieldname fieldname to display
@@ -1794,7 +1794,7 @@ public class Document extends Api
 
     /**
      * Displays the given field of the given object The display mode will be decided depending on page context (edit or
-     * inline context will display in edit, view context in view) This function can return html inside and html macro
+     * inline context will display in edit, view context in view). This function can return html inside an html macro
      *
      * @param fieldname fieldname to display
      * @param obj object from which to take the field
@@ -2573,7 +2573,7 @@ public class Document extends Api
         return this.doc.isCreator(username);
     }
 
-    public void set(String fieldname, java.lang.Object value)
+    public void set(String fieldname, java.lang.Object value) throws XWikiException
     {
         Object obj;
         if (this.currentObj != null) {
@@ -2584,7 +2584,7 @@ public class Document extends Api
         set(fieldname, value, obj);
     }
 
-    public void set(String fieldname, java.lang.Object value, Object obj)
+    public void set(String fieldname, java.lang.Object value, Object obj) throws XWikiException
     {
         if (obj == null) {
             return;

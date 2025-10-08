@@ -46,7 +46,7 @@ import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
-import org.xwiki.search.solr.test.SolrComponentList;
+import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -66,7 +66,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@SolrComponentList
+@EmbeddedSolrComponentList
 @ComponentTest
 @ComponentList({TestSolrCoreInitializer.class, LocaleConverter.class})
 class DefaultSolrTest

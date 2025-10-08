@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-repository-test</artifactId>
-    <version>17.8.0-SNAPSHOT</version>
+    <version>17.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-test-tests</artifactId>
   <name>XWiki Platform - Repository - Tests - Functional Tests</name>
@@ -67,6 +67,13 @@
       <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-embedded</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -92,12 +99,6 @@
       <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
-    </dependency>
-    <!-- We need a Log4j 2.x implementation since Solr uses Log4j 2.x -->
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-to-slf4j</artifactId>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>

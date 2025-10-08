@@ -63,6 +63,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     SolrSchemaUtils.class
 })
 @Inherited
-public @interface SolrComponentList
+public @interface EmbeddedSolrComponentList
 {
 }

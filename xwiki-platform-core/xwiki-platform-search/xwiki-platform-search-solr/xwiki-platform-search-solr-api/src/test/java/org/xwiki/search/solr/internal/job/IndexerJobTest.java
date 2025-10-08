@@ -37,6 +37,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -69,6 +70,12 @@ class IndexerJobTest
 
     private static final String VERSION_TWO = "2.0";
 
+    private static final DocumentIteratorEntry ENTRY_ONE =
+        new DocumentIteratorEntry(DOCUMENT_ONE.getWikiReference(), 1, VERSION_ONE);
+
+    private static final DocumentIteratorEntry ENTRY_TWO =
+        new DocumentIteratorEntry(DOCUMENT_TWO.getWikiReference(), 1, VERSION_TWO);
+
     private static final JobGroupPath INDEXER_JOB_GROUP_PATH = new JobGroupPath(List.of("solr", "indexer"));
 
     @MockComponent
@@ -76,11 +83,11 @@ class IndexerJobTest
 
     @MockComponent
     @Named("database")
-    private DocumentIterator<String> mockDatabaseIterator;
+    private DocumentIterator<DocumentIteratorEntry> mockDatabaseIterator;
 
     @MockComponent
     @Named("solr")
-    private DocumentIterator<String> mockSolrIterator;
+    private DocumentIterator<DocumentIteratorEntry> mockSolrIterator;
 
     @MockComponent
     private EntityReferenceSerializer<String> mockEntityReferenceSerializer;
@@ -121,8 +128,8 @@ class IndexerJobTest
     @Test
     void testRunInternalUpdateSolrIndexNoChanges() throws Exception
     {
-        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, VERSION_ONE));
-        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, VERSION_ONE));
+        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
+        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
 
         this.indexerJob.runInternal();
 
@@ -133,8 +140,8 @@ class IndexerJobTest
     @Test
     void testRunInternalUpdateSolrIndexAddAction() throws Exception
     {
-        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, VERSION_ONE), Pair.of(DOCUMENT_TWO, VERSION_TWO));
-        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, VERSION_ONE));
+        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE), Pair.of(DOCUMENT_TWO, ENTRY_TWO));
+        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
 
         this.indexerJob.runInternal();
 
@@ -166,11 +173,11 @@ class IndexerJobTest
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = { true, false })
+    @ValueSource(booleans = {true, false})
     void testRunInternalUpdateSolrIndexDeleteAction(boolean exists) throws Exception
     {
-        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, VERSION_ONE));
-        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, VERSION_ONE), Pair.of(DOCUMENT_TWO, VERSION_TWO));
+        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE));
+        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE), Pair.of(DOCUMENT_TWO, ENTRY_TWO));
 
         when(this.mockDocumentAccessBridge.exists(DOCUMENT_TWO)).thenReturn(exists);
 
@@ -188,8 +195,8 @@ class IndexerJobTest
     @Test
     void testRunInternalUpdateSolrIndexUpdateAction() throws Exception
     {
-        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, VERSION_ONE), Pair.of(DOCUMENT_TWO, VERSION_TWO));
-        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, VERSION_ONE), Pair.of(DOCUMENT_TWO, VERSION_ONE));
+        mockIterator(this.mockDatabaseIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE), Pair.of(DOCUMENT_TWO, ENTRY_TWO));
+        mockIterator(this.mockSolrIterator, Pair.of(DOCUMENT_ONE, ENTRY_ONE), Pair.of(DOCUMENT_TWO, ENTRY_ONE));
 
         this.indexerJob.runInternal();
 
@@ -201,12 +208,12 @@ class IndexerJobTest
     private void assertLog(int added, int deleted, int updated)
     {
         assertEquals("%d documents added, %d deleted and %d updated during the synchronization of the Solr index."
-                .formatted(added, deleted, updated),
-            this.logCapture.getLogEvent(0).getFormattedMessage());
+            .formatted(added, deleted, updated), this.logCapture.getLogEvent(0).getFormattedMessage());
     }
 
     @SafeVarargs
-    private void mockIterator(DocumentIterator<String> mockIterator, Pair<DocumentReference, String>... pairs)
+    private void mockIterator(DocumentIterator<DocumentIteratorEntry> mockIterator,
+        Pair<DocumentReference, DocumentIteratorEntry>... pairs)
     {
         var iterator = Arrays.asList(pairs).iterator();
         when(mockIterator.hasNext()).then(invocation -> iterator.hasNext());

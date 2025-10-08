@@ -233,6 +233,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
         String firstCoeditorId = firstEditPage.getToolbar().getUserId();
 
+        // Focus the editing area to make sure the caret indicator is displayed.
+        firstTextArea.click();
+
         //
         // Second Tab
         //
@@ -259,6 +262,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Verify the placeholder text is present, because the content is empty.
         secondTextArea.waitForPlaceholder("Start typing here...");
+
+        // Focus the editing area to make sure the caret indicator is displayed.
+        secondTextArea.click();
 
         //
         // First Tab
@@ -803,7 +809,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondMacroEditModal.getMacroParameterInput("cssClass").sendKeys("a");
         secondMacroEditModal.setMacroParameter("title", "Some title");
         secondMacroEditModal.clickSubmit();
-        secondTextArea.waitForContentRefresh();
+        // The content is refreshed 3 times: after the macro is inserted, after the macro is updated from the first tab
+        // and after the macro is updated from the second tab.
+        secondTextArea.waitForContentRefresh("3");
 
         // Move to the information box title field and type something.
         secondTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);
@@ -1319,7 +1327,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // But first we need to enabled multilingual support.
         setup.loginAsSuperAdmin();
-        setMultiLingual(true, "en", "fr", "de");
+        setMultiLingual(setup, true, "en", "fr", "de");
 
         // Switch to French locale and start editing the French translation.
         setup.gotoPage(testReference, "edit", "editor=wysiwyg&language=fr");
@@ -1441,6 +1449,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         // Start fresh.
+        loginAsJohn(setup);
         setup.deletePage(testReference);
 
         // Edit the page in the first browser tab.
@@ -1487,9 +1496,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         assertEquals("one\ntwo\nthree", secondTextArea.getText());
 
-        // Save to make sure the editor is not marked as dirty.
-        secondEditPage.getToolbar().sendSaveShortcutKey();
-
         // Switch to source mode and check that we are not in the realtime session anymore.
         secondEditorToolbar.toggleSourceMode();
         assertFalse(secondEditPage.getToolbar().isCollaborating());
@@ -1501,6 +1507,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Check the contents of the source mode.
         assertEquals("one\n\ntwo\n\nthree", secondEditor.getSourceTextArea().getDomProperty("value"));
 
+        // Make some changes to verify the merge. We try to cover two cases here:
+        // * modify a paragraph that is not modified inside the realtime session
+        // * insert a new paragraph in the same place where the realtime session inserts a new paragraph
+        secondEditor.getSourceTextArea().sendKeys(Keys.UP, Keys.UP, Keys.END, " 2", Keys.DOWN, Keys.DOWN, Keys.END,
+            Keys.ENTER, Keys.ENTER, "four");
+
         //
         // First Tab
         //
@@ -1508,50 +1520,100 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Switch to the first tab and make more changes, while the second user is in source mode.
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
 
-        firstTextArea.sendKeys(Keys.ENTER, "four");
+        // Insert a new paragraph in the same place where the second user is inserting a new paragraph.
+        // We also modify a paragraph that the second user didn't modify.
+        firstTextArea.sendKeys(Keys.ENTER, "quattro", Keys.PAGE_UP, Keys.END, " 1");
+
+        // Wait for the changes to be propagated in order to be sure that the new "quattro" paragraph is inserted before
+        // the new "four" paragraph coming from the second user (source mode).
+        firstTextArea.waitUntilLocalChangesArePushed();
 
         //
         // Second Tab
         //
 
-        // Switch to the second tab and switch back to view mode.
+        // Switch to the second tab.
         setup.getDriver().switchTo().window(secondTabHandle);
-        secondEditorToolbar.toggleSourceMode();
 
-        // After switching back to view mode, we need to recreate the textArea.
+        // Switch back to WYSIWYG mode.
+        secondEditorToolbar.toggleSourceMode();
+        secondEditPage.getToolbar().waitUntilConnected();
         secondTextArea = secondEditor.getRichTextArea();
 
         // Check that the second user re-joined the realtime editing session.
         assertTrue(secondEditPage.getToolbar().isCollaborating());
         assertTrue(secondEditorToolbar.canToggleSourceMode());
-        secondTextArea.waitUntilContentContains("four");
-        assertEquals("one\ntwo\nthree\nfour", secondTextArea.getText());
+        // Wait for the changes done in the realtime session while we were offline.
+        secondTextArea.waitUntilContentContains("quattro");
+        // Verify that the content has been merged (3-way).
+        assertEquals("one 1\ntwo 2\nthree\nquattro\nfour", secondTextArea.getText());
 
         // Check that we can still switch to source mode.
         assertTrue(secondEditorToolbar.canToggleSourceMode());
 
-        // Save again to make the editor not dirty.
-        secondEditPage.getToolbar().sendSaveShortcutKey();
-
-        // Switch to source mode.
-        secondEditorToolbar.toggleSourceMode();
-
-        assertFalse(secondEditPage.getToolbar().isCollaborating());
-        assertFalse(secondEditPage.getToolbar().canJoinCollaboration());
-        // Check the contents of the source mode.
-        assertEquals("one\n\ntwo\n\nthree\n\nfour", secondEditor.getSourceTextArea().getDomProperty("value"));
-
-        // Add some content.
-        secondEditor.getSourceTextArea().sendKeys(Keys.ENTER, Keys.ENTER, "five");
+        // Verify local changes are propagated after we re-joined the realtime session.
+        secondTextArea.sendKeys(" 4");
 
         //
         // First Tab
         //
 
-        // Switch to the first tab and make more changes, while the second user is in source mode.
+        // Verify what happens when both users switch to Source mode (i.e. no one else remains in the realtime session).
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
 
-        firstTextArea.sendKeys(Keys.ENTER, "six");
+        firstTextArea.waitUntilContentContains("4");
+        assertEquals("one 1\ntwo 2\nthree\nquattro\nfour 4", firstTextArea.getText());
+
+        firstEditorToolbar.toggleSourceMode();
+        assertFalse(firstEditPage.getToolbar().isCollaborating());
+        assertEquals("one 1\n\ntwo 2\n\nthree\n\nquattro\n\nfour 4",
+            secondEditor.getSourceTextArea().getDomProperty("value"));
+
+        // Make some changes to verify the merge. We try to cover two cases here:
+        // * modify a paragraph that is not touched by the other user
+        // * modify a paragraph that is also modified by the other user
+        firstEditor.getSourceTextArea().sendKeys(Keys.BACK_SPACE, "uno", Keys.DOWN, Keys.DOWN, Keys.DOWN, Keys.DOWN,
+            Keys.END, " 3");
+
+        //
+        // Second Tab
+        //
+
+        // Switch to the second tab and switch back to Source mode.
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondEditorToolbar.toggleSourceMode();
+        assertFalse(secondEditPage.getToolbar().isCollaborating());
+
+        // At this point both users are editing outside the realtime session, and no one else is left in the realtime
+        // session.
+
+        // Make some changes. We modify two paragraphs:
+        // * one that the other user is also modifying
+        // * one that the other user is not modifying
+        secondEditor.getSourceTextArea().sendKeys(Keys.HOME, Keys.BACK_SPACE, Keys.BACK_SPACE, " ", Keys.UP, Keys.UP, Keys.END,
+            " tre", Keys.UP, Keys.UP, Keys.END, Keys.BACK_SPACE, "due");
+
+        //
+        // First Tab
+        //
+
+        // Switch back to WYSIWYG mode.
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstEditorToolbar.toggleSourceMode();
+        firstEditPage.getToolbar().waitUntilConnected();
+        firstTextArea = firstEditor.getRichTextArea();
+
+        // Check that the second user did not re-join the realtime editing session yet.
+        assertTrue(firstEditPage.getToolbar().isEditingAlone());
+        String firstUserId = firstEditPage.getToolbar().getUserId();
+
+        // Verify that the changes made in source mode have been merged.
+        firstTextArea.waitUntilContentContains("3");
+        assertEquals("one uno\ntwo 2\nthree 3\nquattro\nfour 4", firstTextArea.getText());
+
+        // Wait for local changes to be propagated in order to ensure that "3" inserted by the first user comes before
+        // "tre" inserted by the second user.
+        firstTextArea.waitUntilLocalChangesArePushed();
 
         //
         // Second Tab
@@ -1560,92 +1622,28 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Switch to the second tab and switch back to WYSIWYG mode.
         setup.getDriver().switchTo().window(secondTabHandle);
         secondEditorToolbar.toggleSourceMode();
-
-        // After switching back to WYSIWYG mode, we need to recreate the textArea.
+        secondEditPage.getToolbar().waitUntilConnected();
         secondTextArea = secondEditor.getRichTextArea();
 
-        // Check that the second user did not re-join the realtime editing session.
-        assertFalse(secondEditPage.getToolbar().isCollaborating());
-        assertTrue(secondEditorToolbar.canToggleSourceMode());
-        assertTrue(secondEditPage.getToolbar().canJoinCollaboration());
-        assertEquals("one\ntwo\nthree\nfour\nfive", secondTextArea.getText());
+        // Verify that the content has been merged.
+        secondTextArea.waitUntilContentContains("3");
+        assertEquals("one uno\ntwo due\nthree 3 tre\nquattro four 4", secondTextArea.getText());
 
-        // Join the realtime session again and wait to be in sync.
-        secondEditPage.getToolbar().joinCollaboration();
-        secondTextArea.waitUntilContentContains("six");
-        assertEquals("one\ntwo\nthree\nfour\nsix", secondTextArea.getText());
+        // Check that both users have now joined.
+        secondEditPage.getToolbar().waitForCoeditor(firstUserId);
+        assertFalse(secondEditPage.getToolbar().isEditingAlone());
 
-        // Check that we can still switch to source mode.
-        assertTrue(secondEditorToolbar.canToggleSourceMode());
-
-        // Make the editor dirty by editing the content without saving.
-        secondTextArea.sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "seven");
-
-        // Switch to source mode and back to wysiwyg edit mode.
-        secondEditorToolbar.toggleSourceMode();
-        assertFalse(secondEditPage.getToolbar().isCollaborating());
-        assertFalse(secondEditPage.getToolbar().canJoinCollaboration());
-        assertEquals("one\n\ntwo\n\nthree\n\nfour\n\nsix\n\nseven",
-            secondEditor.getSourceTextArea().getDomProperty("value"));
-        secondEditorToolbar.toggleSourceMode();
-        assertTrue(secondEditPage.getToolbar().canJoinCollaboration());
-
-        // Check that the second user did not re-join the realtime editing session.
-        assertFalse(secondEditPage.getToolbar().isCollaborating());
-        
-        // Switch to source mode and back to wysiwyg again.
-        // We should stay out of the realtime editing session.
-        secondEditorToolbar.toggleSourceMode();
-        assertFalse(secondEditPage.getToolbar().isCollaborating());
-        assertFalse(secondEditPage.getToolbar().canJoinCollaboration());
-        
-        assertEquals("one\n\ntwo\n\nthree\n\nfour\n\nsix\n\nseven",
-            secondEditor.getSourceTextArea().getDomProperty("value"));
-        
-        secondEditorToolbar.toggleSourceMode();
-        assertFalse(secondEditPage.getToolbar().isCollaborating());
-        assertTrue(secondEditPage.getToolbar().canJoinCollaboration());
-
-        // We keep the second user out of the realtime editing session now
-        // and we do more tests with the first user.
+        // Verify local changes are propagated after we re-joined the realtime session.
+        secondTextArea.sendKeys(" deux");
 
         //
         // First Tab
         //
 
-        // Switch to the first tab.
+        // Switch to the first tab and verify the merged content.
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-
-        // Check that the source button is available.
-        assertTrue(firstEditorToolbar.canToggleSourceMode());
-
-        // Saving might merge silently. Here is some bulletproofing cleanup.
-        firstEditPage.getToolbar().sendSaveShortcutKey();
-        firstTextArea.clear();
-
-        // Make the editor is not dirty by saving.
-        firstEditPage.getToolbar().sendSaveShortcutKey();
-
-        // Switch to source mode and back to wysiwyg.
-        firstEditorToolbar.toggleSourceMode();
-        assertFalse(firstEditPage.getToolbar().isCollaborating());
-        firstEditorToolbar.toggleSourceMode();
-        firstEditPage.getToolbar().waitUntilConnected();
-
-        // Bulletproofing: Save to make sure the editor is not dirty.
-        firstEditPage.getToolbar().sendSaveShortcutKey();
-
-        // Switch to source mode, make a change, and switch back to wysiwyg.
-        firstEditorToolbar.toggleSourceMode();
-        assertFalse(firstEditPage.getToolbar().isCollaborating());
-        firstEditor.getSourceTextArea().sendKeys(Keys.ENTER, Keys.ENTER, "eight");
-        firstEditorToolbar.toggleSourceMode();
-        // We are editing alone, so we should have joined the realtime session after switching back to wysiwyg.
-        firstEditPage.getToolbar().waitUntilConnected();
-        assertTrue(firstEditPage.getToolbar().isEditingAlone());
-
-        firstTextArea = firstEditor.getRichTextArea();
-        assertEquals("eight", firstTextArea.getText());
+        firstTextArea.waitUntilContentContains("deux");
+        assertEquals("one uno\ntwo due deux\nthree 3 tre\nquattro four 4", firstTextArea.getText());
     }
 
     @Test
@@ -1912,13 +1910,193 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         });
     }
 
-    private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)
+    @Test
+    @Order(22)
+    void editFullScreen(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        loginAsJohn(setup);
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab (standalone).
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        // Standalone fullscreen.
+        firstEditor.getToolBar().toggleFullScreenMode();
+        firstTextArea.sendKeys("one");
+
+        // Save the page in order to be able to edit in in-place in the second browser tab.
+        firstEditPage.getToolbar().sendSaveShortcutKey();
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab (in-place).
+        RealtimeInplaceEditablePage inplaceEditablePage = RealtimeInplaceEditablePage.gotoPage(testReference);
+        inplaceEditablePage.editInplace();
+        RealtimeCKEditor secondEditor = new RealtimeCKEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        // Focus the editing area to get the floating toolbar.
+        secondTextArea.click();
+
+        // In-place fullscreen.
+        secondEditor.getToolBar().toggleFullScreenMode();
+        secondTextArea.sendKeys(Keys.END, Keys.ENTER, "two");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("two");
+        firstTextArea.sendKeys(" 1");
+
+        // Switch to Source mode.
+        firstEditor.getToolBar().toggleSourceMode();
+        firstEditor.getSourceTextArea().sendKeys(" 3");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("1");
+        inplaceEditablePage.getToolbar().waitForConcurrentEditingWarning();
+        inplaceEditablePage.getToolbar().leaveCollaboration();
+        secondTextArea.sendKeys(" 2");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        // Back to WYSIWYG mode.
+        firstEditor.getToolBar().toggleSourceMode();
+        firstEditPage.getToolbar().waitUntilConnected();
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.sendKeys(" 5");
+
+        // The outcome is different depending on whether these changes are pushed before the second user joins back, so
+        // we enforce an order to avoid test flakiness.
+        firstTextArea.waitUntilLocalChangesArePushed();
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        // Join again the realtime collaboration.
+        inplaceEditablePage.getToolbar().joinCollaboration();
+        secondTextArea.sendKeys(" 4");
+        // Switch to Source mode.
+        secondEditor.getToolBar().toggleSourceMode();
+        // Exit full screen mode.
+        secondEditor.getToolBar().toggleFullScreenMode();
+        assertTrue(secondEditor.getToolBar().isInSourceMode());
+        // Back to WYSIWYG mode.
+        secondEditor.getToolBar().toggleSourceMode();
+        inplaceEditablePage.getToolbar().waitUntilConnected();
+        // Back to full screen mode.
+        secondEditor.getToolBar().toggleFullScreenMode();
+        assertFalse(secondEditor.getToolBar().isInSourceMode());
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        // Exit full screen mode.
+        firstEditor.getToolBar().toggleFullScreenMode();
+        firstTextArea.waitUntilTextContains("4");
+        // Back to Source mode.
+        firstEditor.getToolBar().toggleSourceMode();
+        // Back to full screen mode.
+        firstEditor.getToolBar().toggleFullScreenMode();
+
+        // Save (from full screen mode) and edit again (still standalone).
+        firstEditPage.clickSaveAndView();
+        firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        firstEditor = firstEditPage.getContenEditor();
+        firstTextArea = firstEditor.getRichTextArea();
+
+        // Enter full screen mode again.
+        firstEditor.getToolBar().toggleFullScreenMode();
+        firstTextArea.sendKeys(Keys.END, " 7");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("7");
+        // Exit full screen mode.
+        secondEditor.getToolBar().toggleFullScreenMode();
+        // Leave collaboration.
+        inplaceEditablePage.getToolbar().leaveCollaboration();
+        // Back to full screen mode.
+        secondEditor.getToolBar().toggleFullScreenMode();
+        secondTextArea.sendKeys(" 6");
+        // Join collaboration.
+        inplaceEditablePage.getToolbar().joinCollaboration();
+        secondTextArea.sendKeys(" 8");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("8");
+        // Exit full screen mode.
+        firstEditor.getToolBar().toggleFullScreenMode();
+        // Switch to Source mode.
+        firstEditor.getToolBar().toggleSourceMode();
+        // Back to full screen mode.
+        firstEditor.getToolBar().toggleFullScreenMode();
+        firstEditor.getSourceTextArea().sendKeys(" 9");
+        // Back to WYSIWYG mode.
+        firstEditor.getToolBar().toggleSourceMode();
+        firstEditPage.getToolbar().waitUntilConnected();
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.sendKeys(" 11");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("11");
+        // This will cause a merge conflict because the first user saved from Source mode.
+        inplaceEditablePage.getToolbar().clickDone();
+
+        // Resolve the merge conflict caused by the fact that we saved from Source mode.
+        EditConflictModal editConflictModal = new EditConflictModal();
+        editConflictModal.submitCurrentChoice(true);
+        assertEquals("one 1 3 5 7 9 11\ntwo 2 4 6 8", inplaceEditablePage.getContent());
+    }
+
+    private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)
     {
         AdministrationPage adminPage = AdministrationPage.gotoPage();
         LocalizationAdministrationSectionPage sectionPage = adminPage.clickLocalizationSection();
         sectionPage.setMultiLingual(isMultiLingual);
         sectionPage.setDefaultLanguage("en");
         sectionPage.setSupportedLanguages(List.of(supportedLanguages));
+        // The localization administration section doesn't save asynchronously so we can't wait for the save success
+        // notification. There's no JavaScript involved in the form submit process so Selenium should wait for the page
+        // to be reloaded. However, in practice we noticed that we can't always navigate to another page right after
+        // saving the localization settings, probably because the browser is in the process of reloading the page.
+        setup.getDriver().addPageNotYetReloadedMarker();
         sectionPage.clickSave();
+        setup.getDriver().waitUntilPageIsReloaded();
     }
 }

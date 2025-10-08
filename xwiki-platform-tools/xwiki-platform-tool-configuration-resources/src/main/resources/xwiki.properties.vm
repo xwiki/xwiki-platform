@@ -1016,7 +1016,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # url.trustedSchemes=http,https,ftp
 
-#-# [Since JAKARTA]
+#-# [Since 17.0.0]
 #-# By default, XWiki will try its best to force the application server to let any URL go through despite their default
 #-# protections and what Servlet 6.0 recommend.
 #-# The point of this option is to allow disabling this bypass of the application server default protections.

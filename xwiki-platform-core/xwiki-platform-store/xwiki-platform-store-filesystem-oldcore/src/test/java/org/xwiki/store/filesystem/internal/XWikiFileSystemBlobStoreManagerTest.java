@@ -20,13 +20,14 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -40,15 +41,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link FilesystemStoreTools}.
+ * Unit tests for {@link XWikiFileSystemBlobStoreManager}.
  *
  * @version $Id$
  */
 @ComponentTest
-public class FilesystemStoreToolsTest
+class XWikiFileSystemBlobStoreManagerTest
 {
+    private static final String LOG_MESSAGE = "Using filesystem store directory [%s]";
+
     @InjectMockComponents
-    private FilesystemStoreTools filesystemStoreTools;
+    private XWikiFileSystemBlobStoreManager fileSystemBlobStoreManager;
 
     @MockComponent
     private FilesystemAttachmentsConfiguration config;
@@ -60,35 +63,25 @@ public class FilesystemStoreToolsTest
     private static LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Test
-    void initialize(@XWikiTempDir File configDirectory) throws IOException, InitializationException
+    void getBlobStore(@XWikiTempDir File configDirectory) throws Exception
     {
         // Use Case 1: Null store directory and cleanOnStartup = false
-        // Note: FilesystemStoreTools.initialize() method is first triggered by the test framework when injecting the
-        // component.
-
-        assertEquals(new File(new File("."), "store/file").getCanonicalFile(),
-            filesystemStoreTools.getStoreRootDirectory());
+        FileSystemBlobStore blobStore = this.fileSystemBlobStoreManager.getBlobStore("store/file");
+        Path expectedPath = Path.of("store", "file").toAbsolutePath();
+        assertEquals(expectedPath, blobStore.getBlobFilePath(BlobPath.of(List.of())));
         verify(this.environment).getPermanentDirectory();
+        assertEquals(String.format(LOG_MESSAGE, expectedPath), logCapture.getMessage(0));
 
         // Use Case 2: Non-null store directory and cleanOnStartup = true
 
         when(config.getDirectory()).thenReturn(configDirectory);
         when(config.cleanOnStartup()).thenReturn(true);
 
-        filesystemStoreTools.initialize();
+        blobStore = this.fileSystemBlobStoreManager.getBlobStore("store/file");
 
-        assertEquals(configDirectory, filesystemStoreTools.getStoreRootDirectory());
+        assertEquals(configDirectory, blobStore.getBlobFilePath(BlobPath.of(List.of())).toFile());
         verify(this.environment).getPermanentDirectory();
         verify(this.config, times(2)).cleanOnStartup();
-        assertEquals(String.format("Using filesystem store directory [%s]", configDirectory.toString()),
-            logCapture.getMessage(1));
-    }
-
-    @AfterAll
-    static void verifyLog() throws Exception
-    {
-        // Assert log happening in the first initialize() call.
-        assertEquals(String.format("Using filesystem store directory [%s]",
-            new File(new File("."), "store/file").getCanonicalFile()), logCapture.getMessage(0));
+        assertEquals(String.format(LOG_MESSAGE, configDirectory.toString()), logCapture.getMessage(1));
     }
 }

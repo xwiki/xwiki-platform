@@ -66,15 +66,15 @@ define('macroParameterEnhancer', ['jquery'], function($) {
         childrenToRemove.push(childId);
       }
     }
-    group.children = group.children.filter(element => !childrenToRemove.includes(element));
+    let displayedChildren = group.children.filter(element => !childrenToRemove.includes(element));
     // if the group doesn't contain any children anymore we can just hide it
-    if (group.children.length === 0) {
+    if (displayedChildren === 0) {
       group.hidden = true;
     // if the group contains a single parameter then we don't consider it's a feature only.
-    } else if (group.children.length === 1) {
+    } else if (displayedChildren === 1) {
       group.featureOnly = false;
       // if the single children is a group, we actually remove it to display directly the parameters
-      let uniqueChildKey = group.children[0];
+      let uniqueChildKey = displayedChildren[0];
       if (isNodeAGroup(uniqueChildKey)) {
         group.children = parametersMap[uniqueChildKey].children;
       }
@@ -242,6 +242,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     let paramNode = parametersMap[nodeKey];
     let radioName = 'feature-radio-' + featureName;
     let radioId = radioName + '-' + paramNode.id;
+    let hidden = paramNode.hidden;
 
     let nodeOutput = $(macroFeatureContentTemplate);
     nodeOutput.find('.feature-radio').attr({
@@ -252,7 +253,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     nodeOutput.find('.feature-choice-name').attr('for', radioId);
     nodeOutput.find('.feature-choice-name').text(translations.get('selectFeature', paramNode.name));
 
-    if (isFeature && isMandatory) {
+    if (isFeature && isMandatory && !hidden) {
       nodeOutput.find('.feature-radio').on('change', function() {
         $(this).parents('.feature-container').find('.feature-choice-body').removeClass('mandatory');
         $(this).parents('.feature-parameter').find('.feature-choice-body').addClass('mandatory');

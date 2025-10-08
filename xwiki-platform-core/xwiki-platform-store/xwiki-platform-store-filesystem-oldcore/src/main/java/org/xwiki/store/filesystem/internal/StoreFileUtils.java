@@ -20,6 +20,7 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
@@ -78,10 +79,11 @@ public final class StoreFileUtils
      * @param targetFile the target file
      * @param followLinks true if links should be followed
      * @return the resolved file
-     * @throws Exception when failing to resolve the link
+     * @throws BlobStoreException when failing to resolve the link
+     * @throws IOException when failing to read the link file
      * @since 16.4.0RC1
      */
-    public static Blob resolve(Blob targetFile, boolean followLinks) throws Exception
+    public static Blob resolve(Blob targetFile, boolean followLinks) throws BlobStoreException, IOException
     {
         // Return the target file by default
         Blob file = targetFile;

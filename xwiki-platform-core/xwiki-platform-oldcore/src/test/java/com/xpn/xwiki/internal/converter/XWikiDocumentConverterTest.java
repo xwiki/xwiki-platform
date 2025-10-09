@@ -100,7 +100,7 @@ class XWikiDocumentConverterTest
     {
         Document result = documentConverter.convert(Document.class, xWikiDocument);
         assertSame(this.xWikiDocument, result.getDocument());
-        verify(this.contextProvider, times(1)).get();
+        verify(this.contextProvider).get();
     }
 
     @Test

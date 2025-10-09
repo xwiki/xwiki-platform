@@ -23,6 +23,7 @@ package org.xwiki.realtime.internal;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,7 +94,7 @@ class XWikiRealtimeDocumentLockEditConfirmationCheckerTest
         assertTrue(xwikiRealtimeDocumentLockEditConfirmationChecker.check().isEmpty());
         // When the session is active, we should override the behavior of the parent class.
         // Thus the parent check should *not* be called.
-        verify(xwikiRealtimeDocumentLockEditConfirmationChecker, times(0)).parentCheck();
+        verify(xwikiRealtimeDocumentLockEditConfirmationChecker, never()).parentCheck();
     }
 
     @Test
@@ -103,6 +104,6 @@ class XWikiRealtimeDocumentLockEditConfirmationCheckerTest
         assertTrue(xwikiRealtimeDocumentLockEditConfirmationChecker.check().isPresent());
         // When the session is not active, we should use the behavior of the parent class.
         // The parent check should be called.
-        verify(xwikiRealtimeDocumentLockEditConfirmationChecker, times(1)).parentCheck();
+        verify(xwikiRealtimeDocumentLockEditConfirmationChecker).parentCheck();
     }
 }

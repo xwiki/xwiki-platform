@@ -84,7 +84,7 @@ class SolrIndexEventListenerTest
         this.listener.onEvent(new DocumentUpdatedEvent(), translation, null);
 
         verify(this.indexer).index(translationReference, false);
-        verify(this.indexer, times(1)).index(any(EntityReference.class), any(Boolean.class));
+        verify(this.indexer).index(any(EntityReference.class), any(Boolean.class));
     }
 
     @Test

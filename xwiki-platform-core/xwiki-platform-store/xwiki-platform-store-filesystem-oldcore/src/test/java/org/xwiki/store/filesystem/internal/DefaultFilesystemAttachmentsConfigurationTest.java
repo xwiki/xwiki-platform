@@ -53,7 +53,7 @@ class DefaultFilesystemAttachmentsConfigurationTest
     {
         when(configurationSource.getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE)).thenReturn(true);
         assertTrue(configuration.cleanOnStartup());
-        verify(configurationSource, times(1)).getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE);
+        verify(configurationSource).getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE);
     }
 
     @Test

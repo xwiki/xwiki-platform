@@ -172,7 +172,7 @@ public class DefaultNotificationPreferenceManagerTest
                 .savePreferences(
                         Arrays.asList(mockPreference11, mockPreference12, mockPreference21, mockPreference22));
 
-        verify(mockPreferenceProvider1, times(1))
-                .savePreferences(eq(Arrays.asList(mockPreference11, mockPreference12)));
+        verify(mockPreferenceProvider1)
+            .savePreferences(eq(Arrays.asList(mockPreference11, mockPreference12)));
     }
 }

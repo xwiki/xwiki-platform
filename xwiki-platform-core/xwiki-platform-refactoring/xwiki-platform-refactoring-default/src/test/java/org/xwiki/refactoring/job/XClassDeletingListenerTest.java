@@ -199,7 +199,7 @@ class XClassDeletingListenerTest
         this.deletingListener.onEvent(event, job, concernedEntities);
 
         // Check
-        verify(status, times(1)).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
+        verify(status).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
         this.logCapture.ignoreAllMessages();
     }
 
@@ -257,7 +257,7 @@ class XClassDeletingListenerTest
         this.deletingListener.onEvent(event, job, concernedEntities);
 
         // Check
-        verify(status, times(1)).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
+        verify(status).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
         verify(event).cancel(eq("Question has been interrupted."));
         assertEquals("Confirm question has been interrupted.", this.logCapture.getMessage(0));
     }
@@ -305,7 +305,7 @@ class XClassDeletingListenerTest
         this.deletingListener.onEvent(event, job, concernedEntities);
 
         // Check
-        verify(status, times(1)).ask(any(), eq(1L), eq(TimeUnit.MINUTES));
+        verify(status).ask(any(), eq(1L), eq(TimeUnit.MINUTES));
         verify(event).cancel(eq("The question has been canceled because this refactoring is forbidden."));
     }
 }

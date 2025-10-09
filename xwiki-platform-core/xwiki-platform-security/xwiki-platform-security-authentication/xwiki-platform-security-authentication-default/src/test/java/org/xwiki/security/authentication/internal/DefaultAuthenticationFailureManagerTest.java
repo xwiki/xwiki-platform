@@ -246,10 +246,10 @@ public class DefaultAuthenticationFailureManagerTest
         assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
 
         verify(this.observationManager, times(5)).notify(new AuthenticationFailureEvent(), this.failingLogin);
-        verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
+        verify(this.observationManager).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
-        verify(this.strategy1, times(1)).notify(failingLogin);
-        verify(this.strategy2, times(1)).notify(failingLogin);
+        verify(this.strategy1).notify(failingLogin);
+        verify(this.strategy2).notify(failingLogin);
         verify(this.sessionFailing).set(eq("anotherId"), any(Instant.class));
         verify(this.sessionFailing, times(5)).get("anotherId");
     }
@@ -269,10 +269,10 @@ public class DefaultAuthenticationFailureManagerTest
         assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
 
         verify(this.observationManager, times(5)).notify(new AuthenticationFailureEvent(), this.failingLogin);
-        verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
+        verify(this.observationManager).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
-        verify(this.strategy1, times(1)).notify(failingLogin);
-        verify(this.strategy2, times(1)).notify(failingLogin);
+        verify(this.strategy1).notify(failingLogin);
+        verify(this.strategy2).notify(failingLogin);
         verify(this.sessionFailing).set(eq("foobar"), any(Instant.class));
         verify(this.sessionFailing, times(5)).get("foobar");
     }
@@ -292,10 +292,10 @@ public class DefaultAuthenticationFailureManagerTest
         assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
 
         verify(this.observationManager, times(5)).notify(new AuthenticationFailureEvent(), this.failingLogin);
-        verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
+        verify(this.observationManager).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
-        verify(this.strategy1, times(1)).notify(failingLogin);
-        verify(this.strategy2, times(1)).notify(failingLogin);
+        verify(this.strategy1).notify(failingLogin);
+        verify(this.strategy2).notify(failingLogin);
         verify(this.sessionFailing).set(eq("reset"), any(Instant.class));
         verify(this.sessionFailing, times(5)).get("reset");
     }
@@ -315,10 +315,10 @@ public class DefaultAuthenticationFailureManagerTest
         assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
 
         verify(this.observationManager, times(5)).notify(new AuthenticationFailureEvent(), this.failingLogin);
-        verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
+        verify(this.observationManager).notify(new AuthenticationFailureLimitReachedEvent(),
             this.failingLogin);
-        verify(this.strategy1, times(1)).notify(failingLogin);
-        verify(this.strategy2, times(1)).notify(failingLogin);
+        verify(this.strategy1).notify(failingLogin);
+        verify(this.strategy2).notify(failingLogin);
         verify(this.sessionFailing).set(eq("reset2"), any(Instant.class));
         verify(this.sessionFailing, times(5)).get("reset2");
     }
@@ -347,22 +347,22 @@ public class DefaultAuthenticationFailureManagerTest
         assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login3, request));
 
         verify(this.observationManager, times(3)).notify(new AuthenticationFailureEvent(), login1);
-        verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
+        verify(this.observationManager).notify(new AuthenticationFailureLimitReachedEvent(),
             login1);
-        verify(this.strategy1, times(1)).notify(login1);
-        verify(this.strategy2, times(1)).notify(login1);
+        verify(this.strategy1).notify(login1);
+        verify(this.strategy2).notify(login1);
 
         verify(this.observationManager, times(3)).notify(new AuthenticationFailureEvent(), login2);
-        verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
+        verify(this.observationManager).notify(new AuthenticationFailureLimitReachedEvent(),
             login2);
-        verify(this.strategy1, times(1)).notify(login2);
-        verify(this.strategy2, times(1)).notify(login2);
+        verify(this.strategy1).notify(login2);
+        verify(this.strategy2).notify(login2);
 
         verify(this.observationManager, times(3)).notify(new AuthenticationFailureEvent(), login3);
-        verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
+        verify(this.observationManager).notify(new AuthenticationFailureLimitReachedEvent(),
             login3);
-        verify(this.strategy1, times(1)).notify(login3);
-        verify(this.strategy2, times(1)).notify(login3);
+        verify(this.strategy1).notify(login3);
+        verify(this.strategy2).notify(login3);
         verify(this.sessionFailing, times(3)).set(eq("multilogin"), any(Instant.class));
         verify(this.sessionFailing, times(9)).get("multilogin");
     }
@@ -545,8 +545,8 @@ public class DefaultAuthenticationFailureManagerTest
         assertNull(userReference);
         DocumentReference globalReference = new DocumentReference("mainwiki", "XWiki", "foo");
         DocumentReference localReference = new DocumentReference("currentwiki", "XWiki", "foo");
-        verify(xwiki, times(1)).getDocument(eq(globalReference), eq(context));
-        verify(xwiki, times(1)).getDocument(eq(localReference), eq(context));
+        verify(xwiki).getDocument(eq(globalReference), eq(context));
+        verify(xwiki).getDocument(eq(localReference), eq(context));
     }
 
     /**
@@ -567,7 +567,7 @@ public class DefaultAuthenticationFailureManagerTest
         DocumentReference userReference = this.defaultAuthenticationFailureManager.findUser("foo");
         assertEquals(globalReference, userReference);
 
-        verify(xwiki, times(1)).getDocument(eq(globalReference), eq(context));
+        verify(xwiki).getDocument(eq(globalReference), eq(context));
         verify(xwiki, never()).getDocument(eq(localReference), eq(context));
     }
 
@@ -592,8 +592,8 @@ public class DefaultAuthenticationFailureManagerTest
         DocumentReference userReference = this.defaultAuthenticationFailureManager.findUser("foo");
         assertEquals(localReference, userReference);
 
-        verify(xwiki, times(1)).getDocument(eq(globalReference), eq(context));
-        verify(xwiki, times(1)).getDocument(eq(localReference), eq(context));
+        verify(xwiki).getDocument(eq(globalReference), eq(context));
+        verify(xwiki).getDocument(eq(localReference), eq(context));
     }
 
     @Test
@@ -604,7 +604,7 @@ public class DefaultAuthenticationFailureManagerTest
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(1);
         this.defaultAuthenticationFailureManager.recordAuthenticationFailure("foo", request);
         verify(configuration, times(3)).getFailureStrategies();
-        verify(strategy1, times(1)).notify("foo");
+        verify(strategy1).notify("foo");
         verify(strategy2, never()).notify(any());
 
         // we change the configuration strategy, but we don't reset the list
@@ -613,8 +613,8 @@ public class DefaultAuthenticationFailureManagerTest
 
         // the list is already existing, we still call the old strategy
         verify(configuration, times(6)).getFailureStrategies();
-        verify(strategy1, times(1)).notify("foo");
-        verify(strategy2, times(1)).notify(any());
+        verify(strategy1).notify("foo");
+        verify(strategy2).notify(any());
     }
 
     @Test

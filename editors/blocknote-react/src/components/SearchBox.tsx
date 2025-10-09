@@ -22,8 +22,8 @@ import { t } from "i18next";
 import { debounce } from "lodash-es";
 import { useCallback, useEffect, useState } from "react";
 import { RiLink } from "react-icons/ri";
-import type { LinkSuggestion } from "../misc/linkSuggest";
-import type { ReactElement } from "react";
+import type { LinkEditionContext, LinkSuggestion } from "../misc/linkSuggest";
+import type { KeyboardEvent, ReactElement } from "react";
 
 export type SearchBoxProps = {
   /**
@@ -37,13 +37,20 @@ export type SearchBoxProps = {
   placeholder: string;
 
   /**
+   * Link edition context, required for validate raw entity references on submit
+   *
+   * @since 0.22
+   */
+  linkEditionCtx: LinkEditionContext | null;
+
+  /**
    * Perform a search
    *
    * @param query - A user query (text)
    *
    * @returns Suggestions matching the provided query
    */
-  getSuggestions: (query: string) => Promise<LinkSuggestion[]>;
+  getSuggestions: (query: string) => Promise<LinkSuggestion[] | false>;
 
   /**
    * Render a single suggestion
@@ -70,13 +77,14 @@ export type SearchBoxProps = {
 /**
  * This component provides a search (text) field with a dropdown for the results
  *
- * Raw URLs input is supported.
+ * Raw URLs input is supported, as well as raw entity references.
  *
  * @see SearchBoxProps
  */
 export const SearchBox: React.FC<SearchBoxProps> = ({
   initialValue,
   placeholder,
+  linkEditionCtx,
   getSuggestions,
   renderSuggestion,
   onSelect,
@@ -93,6 +101,9 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         status: "resolved";
         suggestions: LinkSuggestion[];
       }
+    | {
+        status: "backendSearchUnsupported";
+      }
   >({ status: "resolved", suggestions: [] });
 
   const isUrl = (value: string) =>
@@ -107,12 +118,51 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
       setSuggestions({ status: "loading" });
 
-      // eslint-disable-next-line promise/catch-or-return,promise/always-return
+      // eslint-disable-next-line promise/catch-or-return
       getSuggestions(search).then((suggestions) => {
-        setSuggestions({ status: "resolved", suggestions });
+        setSuggestions(
+          // eslint-disable-next-line promise/always-return
+          suggestions !== false
+            ? { status: "resolved", suggestions }
+            : { status: "backendSearchUnsupported" },
+        );
       });
     }),
     [setSuggestions, getSuggestions],
+  );
+
+  const submitRawValue = useCallback(
+    // eslint-disable-next-line max-statements
+    async (e: KeyboardEvent<HTMLInputElement>, value: string) => {
+      if (isUrl(value)) {
+        onSubmit(value);
+        return;
+      }
+
+      if (!linkEditionCtx) {
+        e.preventDefault();
+        return;
+      }
+
+      const reference = await linkEditionCtx.modelReferenceParser
+        .parseAsync(value)
+        .catch(() => null);
+
+      if (!reference) {
+        e.preventDefault();
+        return;
+      }
+
+      const url = linkEditionCtx.remoteURLSerializer.serialize(reference);
+
+      if (url === undefined) {
+        e.preventDefault();
+        throw new Error("Failed to serialize entity reference: " + value);
+      }
+
+      onSubmit(url);
+    },
+    [onSubmit, linkEditionCtx],
   );
 
   // Automatically perform a search when the query changes
@@ -127,7 +177,10 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
       // We don't use a portal as BlockNote's toolbar closes on interaction with an element that isn't part of it in the DOM
       withinPortal={false}
       onOptionSubmit={(url) => {
-        if (suggestions.status === "loading") {
+        if (
+          suggestions.status === "loading" ||
+          suggestions.status === "backendSearchUnsupported"
+        ) {
           return;
         }
 
@@ -159,9 +212,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
             combobox.closeDropdown();
           }}
           onKeyDown={(e) =>
-            e.key === "Enter" &&
-            isUrl(e.currentTarget.value) &&
-            onSubmit(e.currentTarget.value)
+            e.key === "Enter" && submitRawValue(e, e.currentTarget.value)
           }
         />
       </Combobox.Target>
@@ -184,6 +235,10 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
                   {suggestions.status === "loading" ? (
                     <Combobox.Empty>
                       {t("blocknote.combobox.loadingSuggestions")}
+                    </Combobox.Empty>
+                  ) : suggestions.status === "backendSearchUnsupported" ? (
+                    <Combobox.Empty>
+                      {t("blocknote.combobox.backendSearchUnsupported")}
                     </Combobox.Empty>
                   ) : suggestions.suggestions.length > 0 ? (
                     suggestions.suggestions.map((suggestion) => (

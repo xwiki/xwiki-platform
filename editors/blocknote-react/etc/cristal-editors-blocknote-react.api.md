@@ -873,7 +873,7 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 
 // @beta (undocumented)
 export type LinkEditionContext = {
-    linkSuggestService: LinkSuggestService;
+    linkSuggestService: LinkSuggestService | null;
     modelReferenceParser: ModelReferenceParser;
     modelReferenceSerializer: ModelReferenceSerializer;
     modelReferenceHandler: ModelReferenceHandler;

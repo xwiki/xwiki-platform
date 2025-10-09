@@ -38,7 +38,7 @@ export function createLinkEditionContext(
 ): LinkEditionContext {
   const linkSuggestService = container
     .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
-    .get()!;
+    .get();
 
   const modelReferenceParser = container
     .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
@@ -66,7 +66,7 @@ export function createLinkEditionContext(
   const documentService = container.get<DocumentService>("DocumentService")!;
 
   return {
-    linkSuggestService,
+    linkSuggestService: linkSuggestService ?? null,
     modelReferenceParser,
     modelReferenceSerializer,
     modelReferenceHandler,

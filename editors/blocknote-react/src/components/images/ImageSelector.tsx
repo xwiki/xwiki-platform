@@ -125,6 +125,10 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
 
   const searchAttachments = useCallback(
     async (query: string) => {
+      if (!linkEditionCtx.linkSuggestService) {
+        return false;
+      }
+
       const results = await linkEditionCtx.linkSuggestService.getLinks(
         query,
         LinkType.ATTACHMENT,
@@ -180,6 +184,7 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
       <SearchBox
         placeholder={t("blocknote.imageSelector.placeholder")}
         initialValue={initialQuery}
+        linkEditionCtx={linkEditionCtx}
         getSuggestions={searchAttachments}
         renderSuggestion={(suggestion) => (
           <Flex gap="sm">

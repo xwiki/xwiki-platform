@@ -56,7 +56,7 @@ function assertInArray<T, U extends T>(
 }
 
 /**
- * Get a function's output or `null` if thrown an error
+ * Get a function's output or `null` if it thrown an error
  *
  * @since 0.17
  * @beta
@@ -68,8 +68,7 @@ function assertInArray<T, U extends T>(
 function tryFallible<T>(func: () => T): T | null {
   try {
     return func();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e: unknown) {
+  } catch {
     return null;
   }
 }

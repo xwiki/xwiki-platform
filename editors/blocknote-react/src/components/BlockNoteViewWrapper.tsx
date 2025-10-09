@@ -60,7 +60,7 @@ type DefaultEditorOptionsType = BlockNoteEditorOptions<
 >;
 
 /**
- * Properties for the {@link BlockNoteEditor} component.
+ * Properties for the BlockNote editor component.
  * @since 0.16
  * @beta
  */

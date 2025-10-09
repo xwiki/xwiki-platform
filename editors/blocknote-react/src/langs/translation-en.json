@@ -10,6 +10,7 @@
   "blocknote.imageSelector.placeholder": "Query or image URL...",
   "blocknote.linkEditor.submit": "Submit",
   "blocknote.linkEditor.placeholder": "Query or URL...",
+  "blocknote.combobox.backendSearchUnsupported": "Search is not supported for the current backend",
   "blocknote.combobox.noResultFound": "No result found",
   "blocknote.combobox.loadingSuggestions": "Loading suggestions..."
 }

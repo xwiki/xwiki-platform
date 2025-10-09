@@ -53,7 +53,7 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
   creationMode,
 }) => {
   const { t } = useTranslation();
-  const suggestLink = createLinkSuggestor(linkEditionCtx);
+  const linkSuggestor = createLinkSuggestor(linkEditionCtx);
 
   const [title, setTitle] = useState(current?.title ?? "");
   const [url, setUrl] = useState(current?.url ?? "");
@@ -66,6 +66,21 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
       });
     },
     [updateLink, title, url],
+  );
+
+  const suggestLinks = useCallback(
+    async (query: string) => {
+      if (linkSuggestor === null) {
+        return false;
+      }
+
+      const suggestions = await linkSuggestor({ query });
+
+      return suggestions.filter(
+        (suggestion) => suggestion.type === LinkType.PAGE,
+      );
+    },
+    [linkSuggestor],
   );
 
   const combobox = useCombobox({
@@ -94,13 +109,8 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
             ? getSerializedReference(current.url, linkEditionCtx)
             : ""
         }
-        getSuggestions={(query) =>
-          suggestLink({ query }).then((suggestions) =>
-            suggestions.filter(
-              (suggestion) => suggestion.type === LinkType.PAGE,
-            ),
-          )
-        }
+        linkEditionCtx={linkEditionCtx}
+        getSuggestions={suggestLinks}
         renderSuggestion={(link) => (
           <Stack justify="center">
             <Text>

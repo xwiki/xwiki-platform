@@ -186,6 +186,18 @@ public class ExtensionStore implements Initializable, Disposable
 
     /**
      * @param <T> the expected type of the value to return
+     * @param xobjects the xobject to try
+     * @param propertyName the property of the xobject
+     * @return the value
+     * @since 17.9.0RC1
+     */
+    public <T> T getValue(List<BaseObject> xobjects, String propertyName)
+    {
+        return getValue(xobjects, propertyName, (T) null);
+    }
+
+    /**
+     * @param <T> the expected type of the value to return
      * @param xobject the xobject
      * @param propertyName the property of the xobject
      * @param def the value to return if the property is not set
@@ -198,12 +210,37 @@ public class ExtensionStore implements Initializable, Disposable
         T value = def;
         if (property != null) {
             value = (T) property.getValue();
-            if (value == null) {
+            if (value instanceof String stringValue) {
+                value = (T) StringUtils.defaultIfEmpty(stringValue, (String) def);
+            } else if (value instanceof Collection collectionValue) {
+                value = collectionValue.isEmpty() ? def : (T) collectionValue;
+            } else if (value == null) {
                 value = def;
             }
         }
 
         return value;
+    }
+
+    /**
+     * @param <T> the expected type of the value to return
+     * @param xobjects the xobjects to try
+     * @param propertyName the property of the xobject
+     * @param def the value to return if the property is not set
+     * @return the value
+     * @since 17.9.0RC1
+     */
+    public <T> T getValue(List<BaseObject> xobjects, String propertyName, T def)
+    {
+        for (BaseObject xobject : xobjects) {
+            T result = getValue(xobject, propertyName, null);
+
+            if (result != null) {
+                return result;
+            }
+        }
+
+        return def;
     }
 
     private URL getURLValue(BaseProperty<?> property, boolean fallbackOnDocumentURL, XWikiContext xcontext)
@@ -629,5 +666,35 @@ public class ExtensionStore implements Initializable, Disposable
         }
 
         return false;
+    }
+
+    /**
+     * @param document the document holding the extension metadata
+     * @return the identifier of the extension
+     * @since 17.9.0RC1
+     */
+    public String getExtensionId(XWikiDocument document)
+    {
+        return document.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_ID);
+    }
+
+    /**
+     * @param document the document holding the extension metadata
+     * @return the name of the extension
+     * @since 17.9.0RC1
+     */
+    public String getExtensionName(XWikiDocument document)
+    {
+        return document.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_NAME);
+    }
+
+    /**
+     * @param document the document holding the extension metadata
+     * @return the type of the extension
+     * @since 17.9.0RC1
+     */
+    public String getExtensionType(XWikiDocument document)
+    {
+        return document.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_TYPE);
     }
 }

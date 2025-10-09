@@ -39,7 +39,10 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Property;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.repository.Resources;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.repository.test.TestExtension;
@@ -56,11 +59,10 @@ import org.xwiki.repository.test.po.edit.ExtensionSupportPlanInlinePage;
 import org.xwiki.repository.test.po.edit.ExtensionSupporterInlinePage;
 import org.xwiki.repository.test.ui.AbstractExtensionAdminAuthenticatedIT;
 import org.xwiki.rest.model.jaxb.Page;
-import org.xwiki.test.ui.po.editor.ObjectEditPage;
-import org.xwiki.test.ui.po.editor.ObjectEditPane;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -473,10 +475,10 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals("jar", extension.getType());
         assertEquals("1.0", extension.getVersion());
         assertEquals("name", extension.getName());
-        assertEquals("summary2", extension.getSummary());
+        assertEquals("summary", extension.getSummary());
         assertEquals("summary2\n      some more details", extension.getDescription());
-        assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        assertEquals("Previous Name", extension.getAuthors().get(0).getName());
+        assertNull(extension.getAuthors().get(0).getUrl());
         assertEquals(Arrays.asList("maven:oldextension", "maven:oldversionnedextension"),
             extension.getFeatures());
         assertEquals("maven:oldextension", extension.getExtensionFeatures().get(0).getId());
@@ -492,14 +494,14 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
 
         extension = getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "0.9");
 
-        assertEquals("maven:extension", extension.getId());
+        assertEquals("maven:oldextension", extension.getId());
         assertEquals("jar", extension.getType());
         assertEquals("0.9", extension.getVersion());
         assertEquals("name", extension.getName());
         assertEquals("summary2", extension.getSummary());
         assertEquals("summary2\n      some more details", extension.getDescription());
-        assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        assertEquals("Old Name", extension.getAuthors().get(0).getName());
+        assertNull(extension.getAuthors().get(0).getUrl());
         assertEquals(Arrays.asList(), extension.getFeatures());
         assertEquals(Arrays.asList(), extension.getExtensionFeatures());
         assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
@@ -517,8 +519,7 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
             new LocalDocumentReference(List.of("Extension", importedExtensionName), "WebHome");
 
         // assert that this test is going to make sense at all
-        assertTrue(getNumberOfExtensionVersionsObjects(importedExtensionName) > 1);
-        assertTrue(getNumberOfExtensionVersionsDependenciesObjects(importedExtensionName) > 1);
+        assertTrue(getNumberOfExtensionVersionsPages(extensionPageReference) > 1);
 
         // indicate that the history of the extension should be proxied
         getUtil().updateObject(extensionPageReference, XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel",
@@ -527,9 +528,8 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         // refresh extension
         extensionPage.updateExtension();
 
-        // assert that the object to be proxied are now absent
-        assertEquals(1, getNumberOfExtensionVersionsObjects(importedExtensionName));
-        assertEquals(1, getNumberOfExtensionVersionsDependenciesObjects(importedExtensionName));
+        // assert that the version to be proxied are now absent
+        assertEquals(1, getNumberOfExtensionVersionsPages(extensionPageReference));
 
         // Remember the page version
         Page restPage = getUtil().rest().get(extensionPageReference);
@@ -543,25 +543,16 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals(extensionPageVersion, restPage.getVersion());
     }
 
-    private int getNumberOfExtensionVersionsObjects(String extensionName)
+    private int getNumberOfExtensionVersionsPages(LocalDocumentReference extensionPageReference) throws Exception
     {
-        ObjectEditPage objectEditPage = goToObjectEditPage(extensionName);
-        List<ObjectEditPane> versionObjects =
-            objectEditPage.getObjectsOfClass(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
-        return versionObjects.size();
-    }
+        EntityReference versionReference = new EntityReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME,
+            EntityType.SPACE, extensionPageReference.getParent());
+        String result = getUtil().executeWikiPlain(
+            "{{velocity}}$services.query.xwql(\"select space.reference from Space space where space.parent='"
+                + getUtil().serializeLocalReference(versionReference) + "'\").execute().size(){{/velocity}}",
+            Syntax.XWIKI_2_1);
 
-    private int getNumberOfExtensionVersionsDependenciesObjects(String extensionName)
-    {
-        ObjectEditPage objectEditPage = goToObjectEditPage(extensionName);
-        List<ObjectEditPane> dependenciesObjects =
-            objectEditPage.getObjectsOfClass(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME);
-        return dependenciesObjects.size();
-    }
-
-    private ObjectEditPage goToObjectEditPage(String extensionName)
-    {
-        return getRepositoryTestUtils().gotoExtensionObjectsEditPage(extensionName);
+        return Integer.parseInt(result);
     }
 
     private void validateSupport() throws Exception

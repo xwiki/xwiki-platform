@@ -33,9 +33,13 @@ import javax.ws.rs.QueryParam;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersions;
 import org.xwiki.extension.version.InvalidVersionRangeException;
+import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.query.Query;
@@ -43,6 +47,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.repository.Resources;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
@@ -58,17 +63,36 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
         @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") int offset,
         @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
         @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges)
-        throws QueryException, InvalidVersionRangeException, XWikiException
+        throws QueryException, InvalidVersionRangeException, XWikiException, ResolveException
     {
-        boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensionId);
-        Query query =
-            createExtensionsSummariesQuery(null, "extensionVersion.id = :extensionId", 0, -1, true, versionPageEnabled);
+        XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
-        query.bindValue("extensionId", extensionId);
+        checkRights(extensionDocument);
 
         ExtensionVersions extensions = this.extensionObjectFactory.createExtensionVersions();
 
-        getExtensionSummaries(extensions.getExtensionVersionSummaries(), query);
+        if (this.extensionStore.isVersionProxyingEnabled(extensionDocument)) {
+            ExtensionRepository repository = this.repositoryManager.getExtensionRepository(extensionDocument);
+            if (repository != null) {
+                IterableResult<Version> versions = repository.resolveVersions(extensionId, 0, -1);
+
+                String extensionName = this.extensionStore.getExtensionName(extensionDocument);
+                String extensionType = this.extensionStore.getExtensionType(extensionDocument);;
+
+                for (Version version : versions) {
+                    extensions.getExtensionVersionSummaries()
+                        .add(createExtensionVersionSummary(extensionId, extensionType, extensionName, version));
+                }
+            }
+        } else {
+            boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensionDocument);
+            Query query = createExtensionsSummariesQuery(null, "extensionVersion.id = :extensionId", 0, -1, true,
+                versionPageEnabled);
+
+            query.bindValue("extensionId", extensionId);
+
+            getExtensionSummaries(extensions.getExtensionVersionSummaries(), query);
+        }
 
         // Filter by ranges
         if (StringUtils.isNotBlank(ranges)) {

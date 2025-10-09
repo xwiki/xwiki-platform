@@ -72,7 +72,7 @@ public class DefaultNotificationFilterDisplayerTest
         mocker.getComponentUnderTest()
                 .display(filter, mock(NotificationFilterPreference.class));
 
-        verify(templateManager, times(1)).execute(eq(fakeTemplate));
+        verify(templateManager).execute(eq(fakeTemplate));
     }
 
     @Test
@@ -86,6 +86,6 @@ public class DefaultNotificationFilterDisplayerTest
         mocker.getComponentUnderTest()
                 .display(filter, mock(NotificationFilterPreference.class));
 
-        verify(templateManager, times(1)).execute(eq("notification/filters/default.vm"));
+        verify(templateManager).execute(eq("notification/filters/default.vm"));
     }
 }

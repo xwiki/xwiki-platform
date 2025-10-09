@@ -143,7 +143,7 @@ public class DocumentContentDisplayerTest
         assertSame(content, this.documentDisplayer.display(document, parameters));
 
         // Make sure the transformations are executed exactly once, and on the right content.
-        verify(this.transformationManager, times(1)).performTransformations(same(content),
+        verify(this.transformationManager).performTransformations(same(content),
             any(TransformationContext.class));
     }
 }

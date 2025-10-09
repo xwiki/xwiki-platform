@@ -84,9 +84,9 @@ public class UserProfileNotificationPreferenceProviderTest
 
         mocker.getComponentUnderTest().savePreferences(Arrays.asList(pref1, pref2, pref3));
 
-        verify(cachedNotificationPreferenceModelBridge, times(1)).saveNotificationsPreferences(eq(userReference),
+        verify(cachedNotificationPreferenceModelBridge).saveNotificationsPreferences(eq(userReference),
                 any(List.class));
-        verify(cachedNotificationPreferenceModelBridge, times(1)).saveNotificationsPreferences(eq(userReference2),
+        verify(cachedNotificationPreferenceModelBridge).saveNotificationsPreferences(eq(userReference2),
                 any(List.class));
     }
 }

@@ -95,7 +95,7 @@ public class PrefilteringLiveNotificationEmailManagerTest
 
         Thread.sleep(100);
 
-        verify(this.dispatcher, times(1)).addEvent(event, userReference);
+        verify(this.dispatcher).addEvent(event, userReference);
 
         when(this.intervals.getInterval(userReference)).thenReturn(NotificationEmailInterval.DAILY);
 
@@ -103,6 +103,6 @@ public class PrefilteringLiveNotificationEmailManagerTest
 
         Thread.sleep(100);
 
-        verify(this.dispatcher, times(1)).addEvent(event, userReference);
+        verify(this.dispatcher).addEvent(event, userReference);
     }
 }

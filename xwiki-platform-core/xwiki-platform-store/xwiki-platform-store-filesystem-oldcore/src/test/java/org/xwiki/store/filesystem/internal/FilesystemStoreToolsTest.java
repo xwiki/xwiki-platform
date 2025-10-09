@@ -68,7 +68,7 @@ public class FilesystemStoreToolsTest
 
         assertEquals(new File(new File("."), "store/file").getCanonicalFile(),
             filesystemStoreTools.getStoreRootDirectory());
-        verify(this.environment, times(1)).getPermanentDirectory();
+        verify(this.environment).getPermanentDirectory();
 
         // Use Case 2: Non-null store directory and cleanOnStartup = true
 
@@ -78,7 +78,7 @@ public class FilesystemStoreToolsTest
         filesystemStoreTools.initialize();
 
         assertEquals(configDirectory, filesystemStoreTools.getStoreRootDirectory());
-        verify(this.environment, times(1)).getPermanentDirectory();
+        verify(this.environment).getPermanentDirectory();
         verify(this.config, times(2)).cleanOnStartup();
         assertEquals(String.format("Using filesystem store directory [%s]", configDirectory.toString()),
             logCapture.getMessage(1));

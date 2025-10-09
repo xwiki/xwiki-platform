@@ -110,7 +110,7 @@ public class DefaultMergeManagerTest
         assertEquals("content\n", result.getMergeResult());
         assertTrue(result.isModified());
         assertFalse(result.hasConflicts());
-        verify(conflictDecisionsManager, times(1)).getConflictDecisionList(documentReference, userReference);
+        verify(conflictDecisionsManager).getConflictDecisionList(documentReference, userReference);
     }
 
     @Test

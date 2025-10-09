@@ -300,6 +300,8 @@
 #macro(displaySortedEvent $sortedEvent)
   #set ($id = $escapetool.xml($sortedEvent.event.events.get(0).id))
   <div class="notification" style="border-top: 1px dashed #E8E8E8;" id="$id">
+    ## We need that anchor for the internal links to work properly in mail readers.
+    <a name="$id"></a>
     $sortedEvent.html
   </div>
   #foreach ($ev in $sortedEvent.eventsWithTheSameDocument)

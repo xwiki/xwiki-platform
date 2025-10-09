@@ -140,8 +140,8 @@ class CachedLESSCompilerTest
         assertEquals("output", cachedCompiler.compute(resource, false, true, true, "skin2"));
 
         // Verify
-        verify(xcontext, times(1)).put("skin", "skin2");
-        verify(xcontext, times(1)).put("skin", "skin");
+        verify(xcontext).put("skin", "skin2");
+        verify(xcontext).put("skin", "skin");
     }
 
     @Test

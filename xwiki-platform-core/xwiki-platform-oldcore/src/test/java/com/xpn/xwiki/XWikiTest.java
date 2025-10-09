@@ -182,7 +182,7 @@ class XWikiTest
         this.xwiki.setUserDefaultGroup("XWiki.user1", this.oldcore.getXWikiContext());
 
         // then
-        verify(this.xwiki, times(0)).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
+        verify(this.xwiki, never()).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
     }
 
     @Test
@@ -199,7 +199,7 @@ class XWikiTest
         this.xwiki.setUserDefaultGroup("XWiki.user1", this.oldcore.getXWikiContext());
 
         // then
-        verify(this.xwiki, times(1)).addUserToGroup("XWiki.user1", "XWiki.XWikiAllGroup",
+        verify(this.xwiki).addUserToGroup("XWiki.user1", "XWiki.XWikiAllGroup",
             this.oldcore.getXWikiContext());
     }
 

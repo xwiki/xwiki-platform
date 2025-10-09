@@ -134,7 +134,7 @@ class SolrSearchExclusionsQueryFilterTest
 
         assertSame(this.query, this.queryFilter.filterQuery(this.query));
 
-        verify(this.xcontext, times(1)).setWikiId("dev");
+        verify(this.xcontext).setWikiId("dev");
         verify(this.xcontext, times(3)).setWikiId("test");
         verify(this.query).bindValue("fq", List.of("-(wiki:dEv AND space_exact:Path\\.To AND name_exact:Pa\\ ge)",
             "-(wiki:tESt AND space_prefix:Some\\.Space)", "existing"));

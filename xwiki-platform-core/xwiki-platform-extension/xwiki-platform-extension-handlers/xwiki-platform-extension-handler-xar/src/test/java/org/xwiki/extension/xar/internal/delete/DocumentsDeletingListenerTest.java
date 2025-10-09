@@ -152,7 +152,7 @@ class DocumentsDeletingListenerTest
         this.listener.onEvent(event, job, concernedEntities);
 
         // Check
-        verify(status, times(1)).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
+        verify(status).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
         assertEquals(1, logCapture.size());
         assertEquals("The question has been asked, however no answer has been received.", logCapture.getMessage(0));
     }
@@ -205,7 +205,7 @@ class DocumentsDeletingListenerTest
         this.listener.onEvent(event, job, concernedEntities);
 
         // Check
-        verify(status, times(1)).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
+        verify(status).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
         verify(event).cancel(eq("Question has been interrupted."));
         assertEquals(1, logCapture.size());
         assertEquals("Confirm question has been interrupted.", logCapture.getMessage(0));

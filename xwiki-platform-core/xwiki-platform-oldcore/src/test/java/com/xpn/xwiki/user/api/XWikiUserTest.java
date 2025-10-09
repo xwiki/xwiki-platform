@@ -127,10 +127,10 @@ public class XWikiUserTest
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setDisabled(false, this.mockitoOldcore.getXWikiContext());
-        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 1);
-        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+        verify(this.userDocument).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 1);
+        verify(this.mockitoOldcore.getSpyXWiki())
             .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
-        verify(this.authors, times(1)).setOriginalMetadataAuthor(any());
+        verify(this.authors).setOriginalMetadataAuthor(any());
         verify(this.authors, never()).setEffectiveMetadataAuthor(any());
     }
 
@@ -139,10 +139,10 @@ public class XWikiUserTest
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setDisabled(true, this.mockitoOldcore.getXWikiContext());
-        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 0);
-        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+        verify(this.userDocument).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 0);
+        verify(this.mockitoOldcore.getSpyXWiki())
             .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
-        verify(this.authors, times(1)).setOriginalMetadataAuthor(any());
+        verify(this.authors).setOriginalMetadataAuthor(any());
         verify(this.authors, never()).setEffectiveMetadataAuthor(any());
     }
 
@@ -200,8 +200,8 @@ public class XWikiUserTest
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setEmailChecked(false, this.mockitoOldcore.getXWikiContext());
-        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 0);
-        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+        verify(this.userDocument).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 0);
+        verify(this.mockitoOldcore.getSpyXWiki())
             .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
     }
 
@@ -210,8 +210,8 @@ public class XWikiUserTest
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setEmailChecked(true, this.mockitoOldcore.getXWikiContext());
-        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1);
-        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+        verify(this.userDocument).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1);
+        verify(this.mockitoOldcore.getSpyXWiki())
             .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
     }
 

@@ -71,8 +71,8 @@ public class JCaptchaInternalScriptServiceTest
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference("myType", "myEngine");
         jCaptchaResourceReference.addParameter("customParam", "customValue");
 
-        verify(serializer, times(1)).serialize(jCaptchaResourceReference);
-        verify(extendedURL, times(1)).serialize();
+        verify(serializer).serialize(jCaptchaResourceReference);
+        verify(extendedURL).serialize();
     }
 
     @Test
@@ -83,7 +83,7 @@ public class JCaptchaInternalScriptServiceTest
 
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference("myType", "myEngine");
 
-        verify(serializer, times(1)).serialize(jCaptchaResourceReference);
+        verify(serializer).serialize(jCaptchaResourceReference);
         assertEquals("Error while serializing JCaptcha URL for type [myType], engine = [myEngine]."
                 + " Root cause = [UnsupportedResourceReferenceException: customMessage]",
             logCapture.getMessage(0));

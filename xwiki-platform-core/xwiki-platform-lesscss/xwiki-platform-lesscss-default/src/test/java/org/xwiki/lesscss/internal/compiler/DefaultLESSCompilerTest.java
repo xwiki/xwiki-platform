@@ -155,7 +155,7 @@ public class DefaultLESSCompilerTest
                 lessResourceReference, false, false, "skin", true));
 
         // Verify
-        verify(cache, times(1)).set(any(LESSResourceReference.class), any(SkinReference.class),
+        verify(cache).set(any(LESSResourceReference.class), any(SkinReference.class),
                 any(ColorThemeReference.class), any());
         verify(cache, never()).get(eq(lessResourceReference), eq(skinReference), eq(colorThemeReference));
     }

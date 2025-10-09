@@ -1328,7 +1328,7 @@ XWiki.Annotation = Class.create({
     } else {
       // Show the bubble and fetch the annotation display in it.
       var bubble = this.displayLoadingBubble(event.element().cumulativeOffset().top,
-        event.element().cumulativeOffset().left);
+        event.element().cumulativeOffset().left, true);
       bubble.writeAttribute('id', bubbleId);
       this.fetchAndShowAnnotationDetails(id, bubble);
     }
@@ -1361,7 +1361,7 @@ XWiki.Annotation = Class.create({
     }.bind(this));
   },
 
-  displayLoadingBubble : function(verticalCoordinate, horizontalCoordinate) {
+  displayLoadingBubble : function(verticalCoordinate, horizontalCoordinate, hasMarker) {
     // create a bubble element wrapping the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
     // Add a nice loading panel inside
@@ -1377,14 +1377,18 @@ XWiki.Annotation = Class.create({
     // By default, we position it to the right and under the coordinates
     // Position it horizontally.
     let bubbleStyles = getComputedStyle(bubble);
+    // The width in pixels of the annotation marker added in the text.
+    const markerWidth = 10;
+    let markerOffset = hasMarker ? -markerWidth : 0;
     let bubbleWidth = bubble.offsetWidth 
       + parseInt(bubbleStyles.marginLeft)
       + parseInt(bubbleStyles.marginRight);
-    if (horizontalCoordinate &lt; bubbleWidth || horizontalCoordinate + bubbleWidth &lt; window.innerWidth) {
+    if (horizontalCoordinate &lt; bubbleWidth 
+      || horizontalCoordinate + markerOffset + bubbleWidth &lt; window.innerWidth) {
       bubble.style.left = horizontalCoordinate + 'px';
     } else {
       // There isn't enough space on the right of the window to fit the modal, and there is enough on the left.
-      bubble.style.left = (horizontalCoordinate - bubbleWidth) + 'px';
+      bubble.style.left = (horizontalCoordinate + markerOffset - bubbleWidth) + 'px';
       bubble.toggleClassName('annotation-bubble-position-left');
     }
 
@@ -1710,7 +1714,7 @@ XWiki.Annotation = Class.create({
     this.selectionService.highlightSelection('#FFEE99');
     // get the position and build the loading bubble
     var position = this.selectionService.getPositionNextToSelection();
-    this.createPanel = this.displayLoadingBubble(position.top, position.left);
+    this.createPanel = this.displayLoadingBubble(position.top, position.left, false);
     // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
     this.unregisterAddAnnotationShortcut();
   },

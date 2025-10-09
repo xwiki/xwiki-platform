@@ -98,7 +98,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ReferenceComponentList
-public class XWikiHibernateStoreTest
+class XWikiHibernateStoreTest
 {
     private static final String WIKI_NAME = "wiki";
 

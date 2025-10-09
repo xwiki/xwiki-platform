@@ -255,21 +255,17 @@
 
 /* Annotations displayed in the text */
 .annotation-highlight {
-  background-color: #FE9; ## $theme.highlightColor;
+  background-color: #FE9;
 }
-## In velocity comment: settings for using the larger images from silk
+
 .annotation-marker {
-  ##background: transparent #imgURL('note') no-repeat left top;
   background: transparent #attImgURL('notesmall') no-repeat left top;
   display: inline-block;
-  ##height: 16px;
   height: 10px;
   overflow: hidden;
   text-indent: -9999px;
-  ##width: 16px;
   width: 10px;
   vertical-align: baseline;
-  ##margin: -19px -14px 3px -2px;
   margin: -15px -7px 5px -3px;
   z-index: 1;
   position: relative;

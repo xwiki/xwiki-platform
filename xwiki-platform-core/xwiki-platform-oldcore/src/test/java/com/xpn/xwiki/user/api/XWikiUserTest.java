@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class XWikiUserTest
+class XWikiUserTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore mockitoOldcore;
@@ -76,7 +76,7 @@ public class XWikiUserTest
     private final DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
 
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager) throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         when(this.mockitoOldcore.getSpyXWiki().getDocument(this.userReference, this.mockitoOldcore.getXWikiContext()))
             .thenReturn(this.userDocument);
@@ -88,7 +88,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void createWithNullReference()
+    void createWithNullReference()
     {
         XWikiUser user = new XWikiUser((DocumentReference) null);
 
@@ -97,7 +97,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void createWithNullFullName()
+    void createWithNullFullName()
     {
         XWikiUser user = new XWikiUser((String) null);
 
@@ -106,7 +106,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void isDisabled()
+    void isDisabled()
     {
         XWikiUser user = new XWikiUser(this.userReference);
         when(this.userDocument.getIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 1)).thenReturn(1);
@@ -123,7 +123,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void setDisabledFalseNormalUser() throws XWikiException
+    void setDisabledFalseNormalUser() throws XWikiException
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setDisabled(false, this.mockitoOldcore.getXWikiContext());
@@ -135,7 +135,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void setDisabledTrueNormalUser() throws XWikiException
+    void setDisabledTrueNormalUser() throws XWikiException
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setDisabled(true, this.mockitoOldcore.getXWikiContext());
@@ -147,7 +147,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void setDisabledGuestOrSuperadminUser() throws XWikiException
+    void setDisabledGuestOrSuperadminUser() throws XWikiException
     {
         // With guest user we never save anything
         XWikiUser user = new XWikiUser((DocumentReference) null);
@@ -179,7 +179,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void isEmailChecked()
+    void isEmailChecked()
     {
         XWikiUser user = new XWikiUser(this.userReference);
         when(this.userDocument.getIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1)).thenReturn(1);
@@ -196,7 +196,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void setEmailCheckedFalseNormalUser() throws XWikiException
+    void setEmailCheckedFalseNormalUser() throws XWikiException
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setEmailChecked(false, this.mockitoOldcore.getXWikiContext());
@@ -206,7 +206,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void setEmailCheckedTrueNormalUser() throws XWikiException
+    void setEmailCheckedTrueNormalUser() throws XWikiException
     {
         XWikiUser user = new XWikiUser(this.userReference);
         user.setEmailChecked(true, this.mockitoOldcore.getXWikiContext());
@@ -216,7 +216,7 @@ public class XWikiUserTest
     }
 
     @Test
-    public void setEmailCheckedGuestOrSuperadminUser() throws XWikiException
+    void setEmailCheckedGuestOrSuperadminUser() throws XWikiException
     {
         // With guest user we never save anything
         XWikiUser user = new XWikiUser((DocumentReference) null);

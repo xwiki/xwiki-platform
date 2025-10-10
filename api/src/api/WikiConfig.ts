@@ -68,7 +68,7 @@ interface WikiConfig {
    */
   storageRoot?: string;
   /**
-   * The (optional) type of the editor. The default is "tiptap".
+   * The (optional) type of the editor. The default is "blocknote".
    *
    * @since 0.16
    * @beta

@@ -1,7 +1,0 @@
-{
-    "tiptap.image.insertView.upload": "Uploader",
-    "tiptap.image.insertView.search.placeholder": "Nom ou URL de l'image",
-    "tiptap.image.insertView.loading": "Chargement en cours...",
-    "tiptap.image.insertView.uploadOrSelect": "Uploader ou sélectionner une pièce jointe.",
-    "tiptap.image.insertView.noResults": "Aucun résultat"
-}

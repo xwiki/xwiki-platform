@@ -40,10 +40,6 @@
       "minimumReleaseAge": "3 days"
     },
     {
-      "groupName": "tiptap",
-      "matchDepPatterns": "@tiptap/.+"
-    },
-    {
       "groupName": "hocuspocus",
       "matchDepPatterns": "@hocuspocus/.+"
     },

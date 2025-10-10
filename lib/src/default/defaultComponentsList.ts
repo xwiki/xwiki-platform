@@ -136,10 +136,10 @@ async function conditionalComponentsList(
     (await import("./github")).load(container);
   }
 
-  if (configuration.editor === "tiptap" || configuration.editor === undefined) {
-    const { ComponentInit } = await import("@xwiki/cristal-editors-tiptap");
-    new ComponentInit(container);
-  } else if (configuration.editor === "blocknote") {
+  if (
+    configuration.editor === "blocknote" ||
+    configuration.editor === undefined
+  ) {
     const { ComponentInit } = await import("@xwiki/cristal-editors-blocknote");
     new ComponentInit(container);
   }

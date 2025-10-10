@@ -65,7 +65,7 @@ export class HocuspocusCollaborationProvider implements CollaborationManager {
         url: this.cristalApp.getWikiConfig().realtimeURL!,
         // we distinguish from sessions from other editors by suffixing the session with the editor id
         name: `${this.documentService.getCurrentDocumentReferenceString().value}:${
-          this.cristalApp.getWikiConfig().editor ?? "tiptap"
+          this.cristalApp.getWikiConfig().editor ?? "blocknote"
         }`,
       });
       // As soon as the provider's status changes, update it

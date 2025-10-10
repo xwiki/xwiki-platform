@@ -8,7 +8,7 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
-    "editor": "tiptap",
+    "editor": "blocknote",
     "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
   "XWikiOffline": {
@@ -20,8 +20,19 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
-    "editor": "tiptap",
+    "editor": "blocknote",
     "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
+  },
+  "XWikiNoRealtime": {
+    "name": "XWikiXWikiNoRealtime",
+    "configType": "XWiki",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "vuetify",
+    "editor": "blocknote"
   },
   "XWikiSSR": {
     "name": "XWikiSSR",
@@ -32,7 +43,7 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
-    "editor": "tiptap",
+    "editor": "blocknote",
     "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
   "XWikiSL": {
@@ -44,31 +55,8 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "shoelace",
-    "editor": "tiptap",
-    "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
-  },
-  "XWikiBlocknote": {
-    "name": "XWikiBlocknote",
-    "configType": "XWiki",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
-    "baseRestURL": "/rest/cristal/page?media=json",
-    "homePage": "Main.WebHome",
-    "designSystem": "vuetify",
     "editor": "blocknote",
     "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
-  },
-  "XWikiBlocknoteNoRealtime": {
-    "name": "XWikiBlocknoteNoRealtime",
-    "configType": "XWiki",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
-    "baseRestURL": "/rest/cristal/page?media=json",
-    "homePage": "Main.WebHome",
-    "designSystem": "vuetify",
-    "editor": "blocknote"
   },
   "Localhost": {
     "name": "Localhost",
@@ -79,23 +67,11 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
-    "editor": "tiptap",
-    "realtimeURL": "http://localhost:15681/collaboration"
-  },
-  "LocalhostBlocknote": {
-    "name": "LocalhostBlocknote",
-    "configType": "XWiki",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
-    "baseRestURL": "/rest/cristal/page?media=json",
-    "homePage": "Main.WebHome",
-    "designSystem": "vuetify",
     "editor": "blocknote",
     "realtimeURL": "http://localhost:15681/collaboration"
   },
-  "LocalhostBlocknoteNoRealtime": {
-    "name": "LocalhostBlocknoteNoRealtime",
+  "LocalhostNoRealtime": {
+    "name": "LocalhostNoRealtime",
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
@@ -114,7 +90,7 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "shoelace",
-    "editor": "tiptap",
+    "editor": "blocknote",
     "realtimeURL": "http://localhost:15681/collaboration"
   },
   "LocalhostOffline": {
@@ -126,7 +102,7 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
-    "editor": "tiptap",
+    "editor": "blocknote",
     "realtimeURL": "http://localhost:15681/collaboration"
   },
   "GitHub": {
@@ -161,7 +137,7 @@
     "baseURL": "http://localhost:9292",
     "baseRestURL": "http://localhost:9292/remote.php/dav",
     "designSystem": "shoelace",
-    "editor": "tiptap",
+    "editor": "blocknote",
     "homePage": "home",
     "realtimeURL": "http://localhost:15681/collaboration",
     "authenticationBaseURL": "http://localhost:15682/nextcloud",

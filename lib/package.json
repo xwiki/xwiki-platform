@@ -54,7 +54,6 @@
     "@xwiki/cristal-dsshoelace": "workspace:*",
     "@xwiki/cristal-dsvuetify": "workspace:*",
     "@xwiki/cristal-editors-blocknote": "workspace:*",
-    "@xwiki/cristal-editors-tiptap": "workspace:*",
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-extension-menubuttons": "workspace:*",
     "@xwiki/cristal-extra-tabs-default": "workspace:*",

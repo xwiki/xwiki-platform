@@ -31,7 +31,6 @@ packages:
   - core/reactivue
   - core/rename/*
   - core/settings/*
-  - core/tiptap-extensions/*
   - core/uiextension/*
   - core/uniast/*
   - core/user/*
@@ -84,21 +83,6 @@ catalog:
   '@playwright/experimental-ct-react': 1.55.1
   '@playwright/test': 1.55.1
   '@shoelace-style/shoelace': 2.20.1
-  '@tiptap/core': 2.13.0
-  '@tiptap/extension-collaboration': 2.13.0
-  '@tiptap/extension-collaboration-cursor': 2.13.0
-  '@tiptap/extension-heading': 2.13.0
-  '@tiptap/extension-image': 2.13.0
-  '@tiptap/extension-link': 2.13.0
-  '@tiptap/extension-placeholder': 2.13.0
-  '@tiptap/extension-table': 2.13.0
-  '@tiptap/extension-table-cell': 2.13.0
-  '@tiptap/extension-table-header': 2.13.0
-  '@tiptap/extension-table-row': 2.13.0
-  '@tiptap/pm': 2.13.0
-  '@tiptap/starter-kit': 2.13.0
-  '@tiptap/suggestion': 2.13.0
-  '@tiptap/vue-3': 2.13.0
   '@types/async-lock': 1.4.2
   '@types/express': 5.0.3
   '@types/express-ws': 3.0.5
@@ -166,7 +150,6 @@ catalog:
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
   prettier: 3.6.2
-  prosemirror-markdown: 1.13.2
   publint: 0.3.14
   react: 19.2.0
   react-dom: 19.2.0
@@ -175,9 +158,6 @@ catalog:
   reflect-metadata: 0.2.2
   remark-parse: 11.0.0
   rimraf: 6.0.1
-  tippy.js: 6.3.7
-  tiptap-extension-global-drag-handle: 0.1.18
-  tiptap-markdown: 0.8.10
   ts-essentials: 10.1.1
   ts-node: 10.9.2
   tsx: 4.20.6
@@ -195,9 +175,7 @@ catalog:
   vue-eslint-parser: 10.2.0
   vue-i18n: 11.1.12
   vue-router: 4.5.1
-  vue-tippy: 6.7.1
   vue-tsc: 2.2.12
-  vue3-draggable-resizable: 1.6.5
   vuetify: 3.10.4
   xml-escape: 1.1.0
   y-websocket: 3.0.0

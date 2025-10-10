@@ -57,7 +57,7 @@ const designSystems = ["shoelace", "vuetify"];
 
 // TODO: find a way to list available editors automatically.
 // https://jira.xwiki.org/browse/CRISTAL-541
-const editors = ["tiptap", "blocknote"];
+const editors = ["blocknote"];
 
 const configuration: Ref<Configuration | undefined> = ref(undefined);
 

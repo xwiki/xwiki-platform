@@ -35,7 +35,7 @@ const editComponent =
   comps.find(
     (item) =>
       // TODO: fix unsafe access to editorname
-      (item as { editorname: string }).editorname === (editor ?? "tiptap"),
+      (item as { editorname: string }).editorname === (editor ?? "blocknote"),
   ) ?? comps[0];
 
 logger?.debug("Final component ", editComponent);

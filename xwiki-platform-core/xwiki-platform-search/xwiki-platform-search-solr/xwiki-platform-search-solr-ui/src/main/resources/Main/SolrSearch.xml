@@ -212,7 +212,7 @@
   
   let removeQueryString = function(url) {
     let queryIndex = url.indexOf('?');
-    return queryIndex &lt; 0 ? '' : url.substring(0, queryIndex);
+    return queryIndex &lt; 0 ? url : url.substring(0, queryIndex);
   };
 
   var getSearchUIState = function() {

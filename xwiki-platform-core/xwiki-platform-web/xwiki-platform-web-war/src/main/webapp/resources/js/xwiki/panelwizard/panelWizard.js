@@ -78,7 +78,7 @@ function getBlocList(el) {
 }
 
 function getDragBoxPos(list, y) {
-  let nb = list.length;
+  const nb = list.length;
   if (nb === 0) {
     return 0;
   }

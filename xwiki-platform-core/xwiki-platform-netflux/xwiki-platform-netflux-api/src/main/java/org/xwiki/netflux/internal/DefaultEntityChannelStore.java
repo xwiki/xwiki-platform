@@ -101,7 +101,7 @@ public class DefaultEntityChannelStore implements EntityChannelStore
     {
         Channel rawChannel = this.channelStore.get(channel.getKey());
         if (rawChannel != null) {
-            channel.setUserCount(rawChannel.getConnectedUsers().size());
+            channel.setUserCount(rawChannel.getUsers().size());
             return true;
         } else {
             return false;

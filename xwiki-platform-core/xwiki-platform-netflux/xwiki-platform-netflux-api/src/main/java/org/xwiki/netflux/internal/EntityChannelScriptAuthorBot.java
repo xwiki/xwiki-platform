@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.netflux.EntityChannel;
 import org.xwiki.netflux.EntityChannelStore;
+import org.xwiki.netflux.internal.user.local.LocalUser;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -80,7 +81,7 @@ public class EntityChannelScriptAuthorBot extends AbstractBot
     }
 
     @Override
-    public void onChannelMessage(Channel channel, User sender, String messageType, String message)
+    public void onChannelMessage(Channel channel, LocalUser sender, String messageType, String message)
     {
         // We're interested only in messages that have content (we want to ignore for instance join, leave or ping
         // messages).

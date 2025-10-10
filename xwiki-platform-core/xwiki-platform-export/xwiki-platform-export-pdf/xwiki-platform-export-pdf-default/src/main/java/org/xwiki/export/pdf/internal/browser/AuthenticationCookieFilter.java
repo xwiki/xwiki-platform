@@ -127,6 +127,12 @@ public class AuthenticationCookieFilter implements CookieFilter
                             .forEach(cookie -> setCookie(cookies, cookie.getName(), cookie.getValue()));
                     }
                 }
+
+                @Override
+                public void addCookie(javax.servlet.http.Cookie cookie)
+                {
+                    setCookie(cookies, cookie.getName(), cookie.getValue());
+                }
             };
             loginManager.rememberLogin(fakeRequest, fakeResponse, userName, password);
         } catch (Exception e) {

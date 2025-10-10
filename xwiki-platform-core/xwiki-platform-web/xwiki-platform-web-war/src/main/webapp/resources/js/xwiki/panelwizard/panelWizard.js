@@ -95,8 +95,7 @@ function getAllPanels(el){
   let j = 0;
   for (let div of divs) {
     if (isPanel(div)) {
-      list[j] = div;
-      j++;
+      list.push(div);
     }
   }
   return list;

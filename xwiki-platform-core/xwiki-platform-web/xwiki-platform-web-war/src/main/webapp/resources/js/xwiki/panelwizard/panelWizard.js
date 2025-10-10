@@ -64,8 +64,8 @@ function getY(el) {
 }
 
 function getBlocList(el) {
-  let list = [];
-  let nb = el.childNodes.length;
+  const list = [];
+  const nb = el.childNodes.length;
   for (let i = 0; i < nb; ++i) {
     let el2 = el.childNodes[i];
     if (isPanel(el2)) {

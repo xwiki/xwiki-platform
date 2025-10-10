@@ -90,7 +90,7 @@ function getDragBoxPos(list, y) {
 }
 
 function getAllPanels(el){
-  let list = [];
+  const list = [];
   const divs = el.getElementsByTagName("div");
   let j = 0;
   for (let div of divs) {

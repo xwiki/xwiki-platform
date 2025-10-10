@@ -19,45 +19,49 @@
  */
 package org.xwiki.netflux.internal;
 
-import java.util.List;
-import java.util.Optional;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.netflux.EntityChannel;
-import org.xwiki.netflux.EntityChannelStore;
+import org.xwiki.netflux.internal.event.EntityChannelCreatedEvent;
+import org.xwiki.observation.event.AbstractRemoteEventListener;
+import org.xwiki.observation.event.Event;
 
 /**
- * Default {@link EntityChannelStore} implementation.
+ * Add channels created on other cluster members.
  * 
  * @version $Id$
- * @since 13.9RC1
+ * @since 17.10.0
  */
 @Component
+@Named(EntityChannelsListener.NAME)
 @Singleton
-public class DefaultEntityChannelStore implements EntityChannelStore
+public class EntityChannelsListener extends AbstractRemoteEventListener
 {
+    /**
+     * The name of this event listener (and its component hint at the same time).
+     */
+    public static final String NAME = "org.xwiki.netflux.internal.EntityChannelsListener";
+
     @Inject
-    private InternalEntityChannelStore store;
+    private InternalEntityChannelStore channelStore;
 
-    @Override
-    public List<EntityChannel> getChannels(EntityReference entityReference)
+    /**
+     * Setup the listener.
+     */
+    public EntityChannelsListener()
     {
-        return store.getChannels(entityReference);
+        super(NAME, new EntityChannelCreatedEvent());
     }
 
     @Override
-    public synchronized EntityChannel createChannel(EntityReference entityReference, List<String> path)
+    public void processRemoteEvent(Event event, Object source, Object data)
     {
-        return store.createChannel(entityReference, path);
-    }
-
-    @Override
-    public Optional<EntityChannel> getChannel(String key)
-    {
-        return store.getChannel(key);
+        if (event instanceof EntityChannelCreatedEvent channelEvent) {
+            this.channelStore.createChannel(channelEvent.getChannelKey(), channelEvent.getEntityReference(),
+                channelEvent.getPath());
+        }
     }
 }

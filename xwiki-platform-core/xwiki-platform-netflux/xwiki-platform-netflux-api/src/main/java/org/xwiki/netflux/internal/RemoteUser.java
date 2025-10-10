@@ -19,45 +19,34 @@
  */
 package org.xwiki.netflux.internal;
 
-import java.util.List;
-import java.util.Optional;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.netflux.EntityChannel;
-import org.xwiki.netflux.EntityChannelStore;
-
 /**
- * Default {@link EntityChannelStore} implementation.
+ * A user accessing the current instance.
  * 
  * @version $Id$
- * @since 13.9RC1
+ * @since 17.10.0
  */
-@Component
-@Singleton
-public class DefaultEntityChannelStore implements EntityChannelStore
+public class RemoteUser extends User
 {
-    @Inject
-    private InternalEntityChannelStore store;
+    private final String instance;
 
-    @Override
-    public List<EntityChannel> getChannels(EntityReference entityReference)
+    /**
+     * Creates a new user with the specified name, using the given WebSocket session.
+     * 
+     * @param name the identifier of the user
+     * @param instance the identifier of the instance on which the user is connected
+     */
+    public RemoteUser(String name, String instance)
     {
-        return store.getChannels(entityReference);
+        super(name);
+
+        this.instance = instance;
     }
 
-    @Override
-    public synchronized EntityChannel createChannel(EntityReference entityReference, List<String> path)
+    /**
+     * @return the identifier of the instance on which the user is connected
+     */
+    public String getInstance()
     {
-        return store.createChannel(entityReference, path);
-    }
-
-    @Override
-    public Optional<EntityChannel> getChannel(String key)
-    {
-        return store.getChannel(key);
+        return this.instance;
     }
 }

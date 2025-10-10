@@ -19,6 +19,7 @@
  */
 package org.xwiki.netflux.internal;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -35,8 +36,10 @@ import org.xwiki.user.UserReference;
  * @since 16.4.1
  * @since 16.6.0RC1
  */
-public class EntityChange implements Comparable<EntityChange>
+public class EntityChange implements Serializable, Comparable<EntityChange>
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The script level for a given entity change.
      */

@@ -105,7 +105,7 @@ class EntityChannelScriptAuthorBotTest
     @Test
     void onChannelMessage()
     {
-        User sender = mock(User.class);
+        LocalUser sender = mock(LocalUser.class);
         Session session = mock(Session.class);
         when(sender.getSession()).thenReturn(session);
 

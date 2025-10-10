@@ -93,12 +93,10 @@
 ##############################################
 #macro(_initFromFlamingoTheme)
   // Colors from the new flamingo theme class
-  ## Initialize the XWiki variables (if not already initialized)
-  #if (!$xwikiLessVarsInitialized)
-    ## These are the variables that can only be overwritten by the @lessCode variable.
-    ## For them, we should not overwrite what @lessCode did
-    #_initDefaultXWikiVariables()
-  #end
+  ## Initialize the XWiki variables 
+  ## These are the variables that can only be overwritten by the @lessCode variable.
+  ## For them, we should not overwrite what @lessCode did
+  #_initDefaultXWikiVariables()
   ## Now set the variables with the values of the Flamingo object
   #if ("$!themeObj" != '')
     ## variables of the class, retrieved from the variablelist template.
@@ -124,11 +122,14 @@
 ##
 ##############################################
 #macro(_initDefaultXWikiVariables)
-  ## Flag to track the execution of this step (we don't need to run it more than once)
-  #set ($xwikiLessVarsInitialized = true)
-  #foreach ($variableName in $xsFromOldColorThemeVariables.keySet())
-    #set($variableValue = $xsFromOldColorThemeVariables.get($variableName))
-    @$variableName: $variableValue;
+  ## Only initialize it if it's the first time callign this template
+  #if (!$xwikiLessVarsInitialized)
+    ## Flag to track the execution of this step (we don't need to run it more than once)
+    #set ($xwikiLessVarsInitialized = true)
+    #foreach ($variableName in $xsFromOldColorThemeVariables.keySet())
+      #set($variableValue = $xsFromOldColorThemeVariables.get($variableName))
+      @$variableName: $variableValue;
+    #end
   #end
 #end
 

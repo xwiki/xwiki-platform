@@ -37,6 +37,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.xwiki.test.ui.TestUtils.ADMIN_CREDENTIALS;
 
@@ -236,5 +237,9 @@ class LoginIT
 
         viewPage.logout();
         assertFalse(viewPage.isAuthenticated());
+
+        // Ensure that the cookies used for persistent login are deleted upon logout.
+        assertNull(options.getCookieNamed("username"));
+        assertNull(options.getCookieNamed("password"));
     }
 }

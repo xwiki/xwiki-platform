@@ -86,10 +86,19 @@ public class EntityChannelScriptAuthorBot extends AbstractBot
         // messages).
         if (MessageBuilder.COMMAND_MSG.equals(messageType)) {
             this.entityChannels.getChannel(channel.getKey())
-                .ifPresent(entityChannel -> this.webSocketContext.run(sender.getSession(), () -> {
-                    UserReference senderUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
-                    this.scriptAuthorTracker.maybeUpdateScriptAuthor(entityChannel, senderUserReference);
-                }));
+                .ifPresent(entityChannel -> maybeUpdateScriptAuthor(sender, entityChannel));
+        }
+    }
+
+    private void maybeUpdateScriptAuthor(User sender, EntityChannel entityChannel)
+    {
+        if (sender instanceof LocalUser localUser) {
+            this.webSocketContext.run(localUser.getSession(), () -> {
+                UserReference senderUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
+                this.scriptAuthorTracker.maybeUpdateScriptAuthor(entityChannel, senderUserReference);
+            });
+        } else if (sender instanceof RemoteUser remoteUser) {
+            this.scriptAuthorTracker.maybeUpdateScriptAuthor(entityChannel, remoteUser.getUserReference());
         }
     }
 

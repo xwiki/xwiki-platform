@@ -316,9 +316,16 @@
         let queryFieldName = this.getAttribute('data-query-name');
         let queryField = document.querySelector('input[name="' + queryFieldName + '"]');
         queryField.value = this.checked ? 'true' : 'false';
-        let baseURL = removeQueryString(this.form.getAttribute('action'));
-        let params = new URLSearchParams(new FormData(this.form));
-        pushSearchUIState(baseURL + '?' + params.toString(),
+        // We want to build the URL the same way it's done in the velocimacro #extendQueryString
+        // We retrieve the search parameters of the latest request
+        let params = new URLSearchParams(window.location.search);
+        let formParams = new URLSearchParams(new FormData(this.form));
+        // We replace the existing parameters with their value from the form
+        for (let param of formParams.keys()) {
+          if (params.has(param)) params.delete(param);
+          params.set(param,formParams.get(param));
+        }
+        pushSearchUIState(window.location.pathname + '?' + params.toString(),
           'input[data-query-name="' + queryFieldName + '"]');
       });
     });

@@ -22,6 +22,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.security.Principal;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
         // Security check: only decide that the passed user is the super admin if the
         // super admin password is configured in XWiki's configuration.
         String superadminpassword = context.getWiki().Param(SUPERADMIN_PASSWORD_CONFIG);
-        if ((superadminpassword != null) && (superadminpassword.equals(password))) {
+        if ((superadminpassword != null) && validateSuperAdminPassword(password, superadminpassword)) {
             if (context.isMainWiki()) {
                 principal = new SimplePrincipal(XWikiRightService.SUPERADMIN_USER_FULLNAME);
             } else {
@@ -99,5 +100,14 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
         }
 
         return principal;
+    }
+
+    private static boolean validateSuperAdminPassword(String password, String superadminpassword)
+    {
+        if (superadminpassword.startsWith("$2") && superadminpassword.length() == 60) {
+            // The superadmin password is a BCrypt hash.
+            return OpenBSDBCrypt.checkPassword(superadminpassword, password.toCharArray());
+        }
+        return superadminpassword.equals(password);
     }
 }

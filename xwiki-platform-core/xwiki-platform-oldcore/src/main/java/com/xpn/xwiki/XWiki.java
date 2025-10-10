@@ -3870,6 +3870,9 @@ public class XWiki implements EventListener
             }
             XWikiDocument userDocument = getDocument(username, context);
 
+            // Avoid modifying the cached document
+            userDocument = userDocument.clone();
+
             // Get the stored validation key
             BaseObject userObject = userDocument.getObject("XWiki.XWikiUsers", 0);
             String storedKey = userObject.getStringValue("validkey");

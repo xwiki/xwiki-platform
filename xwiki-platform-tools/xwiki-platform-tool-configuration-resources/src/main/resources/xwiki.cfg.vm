@@ -302,6 +302,8 @@ xwiki.inactiveuser.allowedpages=
 #-# Enable to allow superadmin. It is disabled by default as this could be a
 #-# security breach if it were set and you forgot about it. Should only be enabled
 #-# for recovering the Wiki when the rights are completely messed.
+#-# [Since 17.9.0RC1] Instead of plain text password, you can use a bcrypt-hashed password string that starts with $2,
+#-# e.g., generated using htpasswd -bnBC 10 "" yourpassword | tr -d ':\n'
 #if ($xwikiCfgSuperadminPassword)
 xwiki.superadminpassword=$xwikiCfgSuperadminPassword
 #else

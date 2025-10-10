@@ -2287,7 +2287,7 @@ $displayName##
 *#
 #macro (_paginationPageURL $firstItem $params)
   ${params.url}&amp;${params.itemParamName}=${firstItem}##
-  #if($params.itemsPerPage !=$params.defaultItemsPerPage)&amp;${params.itemsPerPageParamName}=${params.itemsPerPage}#end$!{parameters.hash}
+  #if($params.itemsPerPage != $params.defaultItemsPerPage)&amp;${params.itemsPerPageParamName}=${params.itemsPerPage}#end$!{params.hash}
 #end
 
 #**

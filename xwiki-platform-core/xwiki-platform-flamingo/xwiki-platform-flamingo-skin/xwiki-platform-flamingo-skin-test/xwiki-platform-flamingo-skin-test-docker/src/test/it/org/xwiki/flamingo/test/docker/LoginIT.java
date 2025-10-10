@@ -22,6 +22,8 @@ package org.xwiki.flamingo.test.docker;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.WebDriver;
 import org.xwiki.administration.test.po.GlobalRightsAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -34,7 +36,9 @@ import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.test.ui.TestUtils.ADMIN_CREDENTIALS;
 
 /**
  * Test the Login feature.
@@ -199,5 +203,38 @@ class LoginIT
 
         // Since we got a CSRF warning, we expect it to be in the logs too.
         logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
+    }
+
+    @Test
+    @Order(6)
+    void persistentLoginWhenSessionExpired(TestUtils setup, TestReference testReference)
+    {
+        // Login as Admin.
+        setup.loginAsAdmin();
+        ViewPage viewPage = setup.gotoPage(testReference);
+        assertEquals(ADMIN_CREDENTIALS.getUserName(), viewPage.getCurrentUser());
+
+        WebDriver.Options options = setup.getDriver().manage();
+        Cookie sessionId = options.getCookieNamed("JSESSIONID");
+        assertNotNull(sessionId);
+        // Delete the session cookie to simulate a session expiration.
+        options.deleteCookie(sessionId);
+
+        // Refresh the page to see the effect of the deleted session cookie.
+        setup.getDriver().navigate().refresh();
+        // New ViewPage to correctly wait for the page to load.
+        viewPage = new ViewPage();
+        // Verify that we're still logged-in thanks to the persistent login feature.
+        assertTrue(viewPage.isAuthenticated());
+        assertEquals(ADMIN_CREDENTIALS.getUserName(), viewPage.getCurrentUser());
+
+        // Verify that the cookies for persistent login are HttpOnly for better security. Only verify the username
+        // cookie since all cookies are set by the same code path and should have the same HttpOnly attribute.
+        Cookie usernameCookie = options.getCookieNamed("username");
+        assertNotNull(usernameCookie);
+        assertTrue(usernameCookie.isHttpOnly());
+
+        viewPage.logout();
+        assertFalse(viewPage.isAuthenticated());
     }
 }

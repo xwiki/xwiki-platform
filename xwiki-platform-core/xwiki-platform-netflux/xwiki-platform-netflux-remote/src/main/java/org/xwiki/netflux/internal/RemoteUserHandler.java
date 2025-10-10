@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +16,31 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.netflux.internal;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>17.9.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-netflux</artifactId>
-  <name>XWiki Platform - Netflux</name>
-  <packaging>pom</packaging>
-  <description>The Netflux modules used to support real-time synchronization in XWiki.</description>
-  <modules>
-    <module>xwiki-platform-netflux-api</module>
-    <module>xwiki-platform-netflux-rest</module>
-    <module>xwiki-platform-netflux-remote</module>
-  </modules>
-</project>
+import java.io.IOException;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.netflux.internal.user.UserHandler;
+
+/**
+ * {@link UserHandler} implementation for {@link RemoteUser}.
+ * 
+ * @version $Id$
+ * @since 17.10.0RC1
+ */
+@Component
+public class RemoteUserHandler implements UserHandler<RemoteUser>
+{
+    @SuppressWarnings("resource")
+    @Override
+    public void sendText(RemoteUser user, String text) throws NetfluxException
+    {
+        if (text == null) {
+            throw new IllegalArgumentException("Text must not be null");
+        }
+
+        TODO
+    }
+}

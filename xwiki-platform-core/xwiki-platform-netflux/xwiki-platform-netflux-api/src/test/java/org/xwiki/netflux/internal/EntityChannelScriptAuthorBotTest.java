@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.netflux.EntityChannel;
 import org.xwiki.netflux.EntityChannelStore;
+import org.xwiki.netflux.internal.user.local.LocalUser;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -105,7 +106,7 @@ class EntityChannelScriptAuthorBotTest
     @Test
     void onChannelMessage()
     {
-        User sender = mock(User.class);
+        LocalUser sender = mock(LocalUser.class);
         Session session = mock(Session.class);
         when(sender.getSession()).thenReturn(session);
 

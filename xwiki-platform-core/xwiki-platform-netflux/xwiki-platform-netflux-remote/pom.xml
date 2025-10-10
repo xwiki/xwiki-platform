@@ -24,16 +24,41 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-netflux</artifactId>
     <version>17.9.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-netflux</artifactId>
-  <name>XWiki Platform - Netflux</name>
-  <packaging>pom</packaging>
-  <description>The Netflux modules used to support real-time synchronization in XWiki.</description>
-  <modules>
-    <module>xwiki-platform-netflux-api</module>
-    <module>xwiki-platform-netflux-rest</module>
-    <module>xwiki-platform-netflux-remote</module>
-  </modules>
+  <artifactId>xwiki-platform-netflux-remote</artifactId>
+  <name>XWiki Platform - Netflux - Remote</name>
+  <description>Clustering related real-time communication.</description>
+  <packaging>jar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Netflux Remote</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-netflux-api</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

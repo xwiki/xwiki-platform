@@ -67,7 +67,7 @@ function getBlocList(el) {
   const list = [];
   const nb = el.childNodes.length;
   for (let i = 0; i < nb; ++i) {
-    let el2 = el.childNodes[i];
+    const el2 = el.childNodes[i];
     if (isPanel(el2)) {
       if (!el2.isDragging) {
         list.push(el2);

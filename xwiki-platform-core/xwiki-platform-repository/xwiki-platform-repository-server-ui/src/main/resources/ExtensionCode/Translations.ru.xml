@@ -52,7 +52,7 @@ extension.repository.installedCount=Количество установок
 admin.repository=Репозиторий расширений
 
 ## Support
-### Missing: repository.support.createsupporter=Register
+repository.support.createsupporter=Регистрация
 
 ## Supporters
 repository.supporter.sheet.description=Эта страница управляет отображением страниц ExtensionSupporter в режимах просмотра и редактирования.

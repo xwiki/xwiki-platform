@@ -56,6 +56,7 @@ solr.admin.indexing.wiki.hint=Вики, для которой все ее док
 solr.admin.indexing.wiki.select_farm=Везде
 solr.admin.indexing.query.label=Произвольный запрос
 solr.admin.indexing.query.hint=Необязательный запрос для ограничения документов, которые будут затронуты выбранным действием в индексе.
+solr.admin.indexing.query.language.label=Язык произвольных запросов
 solr.admin.info.affectedDocuments=Затронутых документов в индексе:
 solr.sortBy=Сортировать:
 solr.sortBy.score=Значимость

@@ -82,11 +82,28 @@ rendering.macro.documentTree.parameter.limit.name=Максимальное ко�
 rendering.macro.documentTree.parameter.limit.description=Максимальное количество дочерних узлов, отображаемых при первом раскрытии родительского узла. Остальные дочерние узлы доступны через ссылку «подробнее ...». Этот параметр в основном используется для разбиения на страницы дочерних узлов и, таким образом, помогает масштабировать дерево, когда число дочерних узлов велико.
 rendering.macro.documentTree.parameter.exclusions.name=Исключения
 rendering.macro.documentTree.parameter.exclusions.description=Список узлов для исключения из дерева. Узлы указываются по их идентификатору и разделяются запятой.
+### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.name=Sort pages by
+### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.description=The page field used to sort the child pages, followed by the sort order.
+rendering.macro.documentTree.parameter.expandToLevel.name=Развертывать до уровня
+rendering.macro.documentTree.parameter.expandToLevel.description=Определите глубину дерева для автоматического развертывания. По умолчанию значение равно 0, что означает отображение только узлов верхнего уровня. Уровень 1 открывает эти узлы, уровень 2 также открывает дочерние узлы под вновь отображенными узлами и т. д. Обратите внимание, что высокое значение может привести к увеличению размера макроса, отображаемого в браузере.
 rendering.macro.children.name=Дочерние
 rendering.macro.children.description=Отображает дерево дочерних страниц текущей страницы
+### Missing: rendering.macro.children.parameter.sort.name=Sort by
+### Missing: rendering.macro.children.parameter.sort.description=The page field used to sort the child pages, followed by the sort order.
+rendering.macro.children.parameter.root.name=Корневой узел
+rendering.macro.children.parameter.root.description=Идентификатор корневого узла. Это полезно, если вы хотите отобразить только потомков данного узла (который является указанным корнем). Дерево отображает дочерние элементы корневого узла на первом уровне, поэтому корневой узел фактически не отображается. Если корневой узел не указан, отображается все дерево. Формат идентификатора узла: entityType:entityReference, где тип сущности может быть, например, wiki, space, document. Например: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
 index.documentTree.empty=Страницы не найдены
 index.documentTree.more={0} подробнее ...
 index.documentTree.addDocument=Новая страница...
+### Missing: index.documentTree.documentSortDisplayer.field=Sort field
+### Missing: index.documentTree.documentSortDisplayer.field.default=---
+### Missing: index.documentTree.documentSortDisplayer.field.title=Title
+### Missing: index.documentTree.documentSortDisplayer.field.date=Last modification date
+### Missing: index.documentTree.documentSortDisplayer.field.creationDate=Creation date
+### Missing: index.documentTree.documentSortDisplayer.order=Sort order
+### Missing: index.documentTree.documentSortDisplayer.order.default=---
+### Missing: index.documentTree.documentSortDisplayer.order.asc=Ascending
+### Missing: index.documentTree.documentSortDisplayer.order.desc=Descending
 
 ## Deprecated translation keys
 

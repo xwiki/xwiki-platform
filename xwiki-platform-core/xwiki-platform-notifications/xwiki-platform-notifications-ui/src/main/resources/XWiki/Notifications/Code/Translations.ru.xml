@@ -257,6 +257,7 @@ notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS
 notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Вы игнорируете эту страницу и ее дочерние страницы: вы не будете получать уведомления о ней.
 notifications.watch.modal.title.CUSTOM=Индивидуальные настройки наблюдения
 notifications.watch.modal.description.CUSTOM=Вы используете особые настройки уведомлений для этой страницы: возможно, вы следите или блокируете определенные события для этой страницы или нацеливаете уведомления только на определенные каналы. Мы приглашаем вас просмотреть настройки уведомлений в вашем профиле.
+notifications.watch.modal.option.hint.toggle=Показать подробную информацию об этой опции
 notifications.watch.modal.option.watchpage.title=Следить за текущей страницей
 notifications.watch.modal.option.watchpage.hint=Вы будете получать уведомления только для этой страницы.
 notifications.watch.modal.option.watchspace.title=Следить за текущей страницей и ее дочерними

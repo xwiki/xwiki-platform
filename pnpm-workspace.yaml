@@ -144,7 +144,7 @@ catalog:
   micromark-extension-gfm-task-list-item: 2.1.0
   mime: 4.1.0
   nodemon: 3.1.10
-  nx: 21.6.3
+  nx: 21.6.4
   pinia: 3.0.2
   postcss: 8.5.6
   postcss-preset-mantine: 1.18.0

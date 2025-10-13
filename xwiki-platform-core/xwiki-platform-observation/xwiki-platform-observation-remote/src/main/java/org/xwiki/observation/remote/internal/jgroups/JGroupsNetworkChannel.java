@@ -189,7 +189,8 @@ public class JGroupsNetworkChannel implements NetworkChannel
         // Add current instance to the maping
         // Need to be done after starting the channel to know the address
         this.membersIdMap.put(this.jchannel.getAddress().toString(), currentMemberId);
-        this.members = Map.of(currentMemberId, new JGroupsNetworkMember(currentMemberId, this.jchannel.getAddress()));
+        this.members =
+            Map.of(currentMemberId, new JGroupsNetworkMember(this, currentMemberId, this.jchannel.getAddress()));
 
         // Send the to other members and wait for their ids in response (wait for 1min max).
         RspList<String> responses = this.memberIdDispatcher.castMessage(null, new ObjectMessage(null, currentMemberId),
@@ -313,7 +314,7 @@ public class JGroupsNetworkChannel implements NetworkChannel
         JGroupsNetworkMember newLeader = null;
         for (Address jmember : jmembers) {
             String remoteId = this.membersIdMap.get(jmember.toString());
-            JGroupsNetworkMember member = new JGroupsNetworkMember(remoteId, jmember);
+            JGroupsNetworkMember member = new JGroupsNetworkMember(this, remoteId, jmember);
 
             newMembers.put(remoteId, member);
 

@@ -55,13 +55,13 @@ public class SafeNetworkChannel implements NetworkChannel
     @Override
     public Collection<NetworkMember> getMembers()
     {
-        return this.wrapped.getMembers().stream().<NetworkMember>map(SafeNetworkMember::new).toList();
+        return this.wrapped.getMembers().stream().<NetworkMember>map(m -> new SafeNetworkMember(this, m)).toList();
     }
 
     @Override
     public NetworkMember getLeader()
     {
-        return new SafeNetworkMember(this.wrapped.getLeader());
+        return new SafeNetworkMember(this, this.wrapped.getLeader());
     }
 
     // Object

@@ -31,6 +31,11 @@ import org.xwiki.stability.Unstable;
 public interface NetworkMember
 {
     /**
+     * @return the channel this member belongs to
+     */
+    NetworkChannel getChannel();
+
+    /**
      * @return the identifier of the member, as provided by {@link RemoteObservationManagerConfiguration#getId()}
      */
     String getId();

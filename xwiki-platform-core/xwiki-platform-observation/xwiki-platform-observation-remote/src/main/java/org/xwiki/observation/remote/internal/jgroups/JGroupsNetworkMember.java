@@ -33,18 +33,28 @@ import org.xwiki.observation.remote.NetworkMember;
  */
 public class JGroupsNetworkMember implements NetworkMember
 {
+    private final JGroupsNetworkChannel channel;
+
     private final String id;
 
     private final Address address;
 
     /**
+     * @param channel the channel this member belongs to
      * @param id the identifier of the member from XWiki point of view
      * @param address the identifier of the member from JGroups point of view
      */
-    public JGroupsNetworkMember(String id, Address address)
+    public JGroupsNetworkMember(JGroupsNetworkChannel channel, String id, Address address)
     {
+        this.channel = channel;
         this.id = id;
         this.address = address;
+    }
+
+    @Override
+    public JGroupsNetworkChannel getChannel()
+    {
+        return this.channel;
     }
 
     @Override

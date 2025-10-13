@@ -19,6 +19,7 @@
  */
 package org.xwiki.observation.remote.script;
 
+import org.xwiki.observation.remote.NetworkChannel;
 import org.xwiki.observation.remote.NetworkMember;
 import org.xwiki.stability.Unstable;
 
@@ -31,14 +32,24 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class SafeNetworkMember implements NetworkMember
 {
+    private final SafeNetworkChannel channel;
+
     private final NetworkMember wrapped;
 
     /**
+     * @param channel the channel this member belongs to
      * @param wrapped the wrapped {@link NetworkMember} instance
      */
-    public SafeNetworkMember(NetworkMember wrapped)
+    public SafeNetworkMember(SafeNetworkChannel channel, NetworkMember wrapped)
     {
+        this.channel = channel;
         this.wrapped = wrapped;
+    }
+
+    @Override
+    public NetworkChannel getChannel()
+    {
+        return this.channel;
     }
 
     @Override

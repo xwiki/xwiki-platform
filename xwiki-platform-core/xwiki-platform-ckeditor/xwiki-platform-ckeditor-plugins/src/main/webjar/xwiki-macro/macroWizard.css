@@ -47,13 +47,13 @@ ul.macro-list .macro-extension {
   margin-right: 1em;
 }
 
-.macro-name::first-letter,
-.macro-description::first-letter,
-.macro-parameter-name::first-letter,
-.macro-parameter-description::first-letter,
-.macro-parameter-group-name::first-letter,
-.feature-title:first-letter,
-.feature-choice-name:first-letter {
+.macro-name,
+.macro-description,
+.macro-parameter-name,
+.macro-parameter-description,
+.macro-parameter-group-name,
+.feature-title,
+.feature-choice-name {
   text-transform: capitalize;
 }
 

@@ -112,6 +112,11 @@
       <artifactId>oracle-xe</artifactId>
       <version>${testcontainers.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>minio</artifactId>
+      <version>${testcontainers.version}</version>
+    </dependency>
     <!-- Needed by TestContainers, to verify that the DBs are started -->
     <dependency>
       <groupId>${mysql.groupId}</groupId>

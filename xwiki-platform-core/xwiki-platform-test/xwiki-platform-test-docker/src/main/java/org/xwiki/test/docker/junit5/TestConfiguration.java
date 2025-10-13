@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.test.docker.internal.junit5.configuration.PropertiesMerger;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -94,6 +95,10 @@ public class TestConfiguration
 
     private List<String> servletEngineNetworkAliases;
 
+    private BlobStore blobStore;
+
+    private String blobStoreTag;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
@@ -125,6 +130,8 @@ public class TestConfiguration
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
         mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
         mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
+        mergeBlobStore(testConfiguration.getBlobStore());
+        mergeBlobStoreTag(testConfiguration.getBlobStoreTag());
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -355,6 +362,34 @@ public class TestConfiguration
             mergedAliases.addAll(aliases);
         }
         this.servletEngineNetworkAliases = mergedAliases;
+    }
+
+    private void mergeBlobStore(BlobStore blobStore) throws DockerTestException
+    {
+        if (getBlobStore() != null) {
+            if (blobStore != null && !getBlobStore().equals(blobStore)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge blob store [%s] since it was already specified as [%s]", blobStore,
+                        getBlobStore()));
+            } else {
+                this.blobStore = getBlobStore();
+            }
+        } else {
+            this.blobStore = blobStore;
+        }
+    }
+
+    private void mergeBlobStoreTag(String blobStoreTag) throws DockerTestException
+    {
+        if (getBlobStoreTag() != null) {
+            if (blobStoreTag != null && !getBlobStoreTag().equals(blobStoreTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge blob store tag [%s] since it was already specified as [%s]",
+                        blobStoreTag, getBlobStoreTag()));
+            }
+        } else {
+            this.blobStoreTag = blobStoreTag;
+        }
     }
 
     /**
@@ -829,5 +864,41 @@ public class TestConfiguration
     public void setServletEngineNetworkAliases(List<String> servletEngineNetworkAliases)
     {
         this.servletEngineNetworkAliases = servletEngineNetworkAliases;
+    }
+
+    /**
+     * @return the blob store to use
+     * @since 17.9.0RC1
+     */
+    public BlobStore getBlobStore()
+    {
+        return this.blobStore;
+    }
+
+    /**
+     * @param blobStore see {@link #getBlobStore()}
+     * @since 17.9.0RC1
+     */
+    public void setBlobStore(BlobStore blobStore)
+    {
+        this.blobStore = blobStore;
+    }
+
+    /**
+     * @return the docker image tag to use for the blob store container (if not specified, uses the "latest" tag)
+     * @since 17.9.0RC1
+     */
+    public String getBlobStoreTag()
+    {
+        return this.blobStoreTag;
+    }
+
+    /**
+     * @param blobStoreTag see {@link #getBlobStoreTag()}
+     * @since 17.9.0RC1
+     */
+    public void setBlobStoreTag(String blobStoreTag)
+    {
+        this.blobStoreTag = blobStoreTag;
     }
 }

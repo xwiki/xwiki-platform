@@ -33,6 +33,7 @@ import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.utility.DockerLoggerFactory;
 import org.testcontainers.utility.TestcontainersConfiguration;
 import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -144,6 +145,12 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
             // running outside of docker and thus outside of the shared docker network...
             LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
             startDatabase(testConfiguration);
+
+            // Start the Blob Store container (if needed)
+            if (testConfiguration.getBlobStore() != null) {
+                LOGGER.info("(*) Starting blob store [{}]...", testConfiguration.getBlobStore());
+                startBlobStore(testConfiguration);
+            }
 
             // Build the XWiki WAR
             LOGGER.info("(*) Building custom XWiki WAR...");
@@ -336,6 +343,12 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
 
         // Only stop DB and Servlet Engine if we have started them
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
+            // Stop the Blob Store
+            if (testConfiguration.getBlobStore() != null) {
+                LOGGER.info("(*) Stopping blob store [{}]...", testConfiguration.getBlobStore());
+                stopBlobStore(testConfiguration);
+            }
+
             // Stop the DB
             LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
             stopDatabase(testConfiguration);
@@ -403,6 +416,18 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
     private void stopDatabase(TestConfiguration testConfiguration)
     {
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
+        executor.stop(testConfiguration);
+    }
+
+    private void startBlobStore(TestConfiguration testConfiguration) throws Exception
+    {
+        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
+        executor.start(testConfiguration);
+    }
+
+    private void stopBlobStore(TestConfiguration testConfiguration)
+    {
+        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
         executor.stop(testConfiguration);
     }
 

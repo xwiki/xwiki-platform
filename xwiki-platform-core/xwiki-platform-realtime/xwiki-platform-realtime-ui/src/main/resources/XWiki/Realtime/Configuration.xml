@@ -656,7 +656,7 @@ ul.realtime-versions &gt; li.divider:last-child {
           &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('realtime.history'))&lt;/span&gt;
         &lt;/button&gt;
         &lt;ul
-          class="dropdown-menu realtime-versions"
+          class="dropdown-menu dropdown-menu-right realtime-versions"
           data-limit="5"
         &gt;
           &lt;li class="dropdown-header"&gt;

@@ -68,20 +68,19 @@ public class CKEditor extends BaseElement
     public CKEditor waitToLoad()
     {
         StringBuilder script = new StringBuilder();
-        script.append("var name = arguments[0];\n");
-        script.append("var callback = arguments[1];\n");
-        script.append("require(['deferred!ckeditor'], function(ckeditorPromise) {\n");
-        script.append("  ckeditorPromise.done(function(ckeditor) {\n");
+        script.append("const name = arguments[0];\n");
+        script.append("const callback = arguments[1];\n");
+        script.append("require(['deferred!ckeditor'], ckeditorPromise => {\n");
+        script.append("  ckeditorPromise.done(ckeditor => {\n");
         script.append("    // In case the editor instance is not ready yet.\n");
-        script.append("    var handler = ckeditor.on('instanceReady', function(event) {\n");
+        script.append("    const handler = ckeditor.on('instanceReady', event => {\n");
         script.append("      if (name === event.editor.name) {\n");
         script.append("        handler.removeListener();\n");
         script.append("        callback();\n");
         script.append("      }\n");
         script.append("    });\n");
         script.append("    // In case the editor instance is ready.\n");
-        script.append("    var instance = ckeditor.instances[name];\n");
-        script.append("    instance && instance.status === 'ready' && callback();\n");
+        script.append("    ckeditor.instances[name]?.status === 'ready' && callback();\n");
         script.append("  });\n");
         script.append("});\n");
 

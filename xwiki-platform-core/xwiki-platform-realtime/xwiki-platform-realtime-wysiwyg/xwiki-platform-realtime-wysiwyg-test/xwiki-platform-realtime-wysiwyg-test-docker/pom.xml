@@ -54,6 +54,14 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <dependency>
+      <!-- We need this to test the syntax change from the Document Information panel. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!-- The JavaScript code needs to display localized messages and for this it needs to fetch them through REST so we
       need an implementation of the localization REST API. -->
     <dependency>

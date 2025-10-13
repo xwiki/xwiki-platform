@@ -138,7 +138,7 @@ define('xwiki-realtime-saver', [
       return '';
     }
 
-    _pushState(immediate) {
+    async _pushState(immediate) {
       // Must be implemented by subclasses.
     }
 
@@ -275,6 +275,18 @@ define('xwiki-realtime-saver', [
         this._realtimeInput?.stop();
         delete this._realtimeInput;
       });
+
+      const visibilityChangeListener = () => {
+        if (document.visibilityState === 'hidden') {
+          // Push uncommitted changes to the server because when a document is hidden its window can be closed without
+          // notice, so this might be the last chance to propagate our local state to the other collaborators.
+          this._pushState(true);
+        }
+      };
+      document.addEventListener('visibilitychange', visibilityChangeListener);
+      this._revertList.push(() => {
+        document.removeEventListener('visibilitychange', visibilityChangeListener);
+      });
     }
 
     _getClientId() {
@@ -285,12 +297,13 @@ define('xwiki-realtime-saver', [
       return this._states;
     }
 
-    _pushState(immediate) {
+    async _pushState(immediate) {
       this._state.id = this._myId;
       this._getStates()[this._getClientId()] = this._state;
       this._onLocal();
       if (immediate) {
         this._chainpad.sync();
+        await new Promise(resolve => this._chainpad.onSettle(resolve));
       }
     }
 
@@ -372,13 +385,8 @@ define('xwiki-realtime-saver', [
 
       if (this._chainpad) {
         // Push uncommitted changes to the server before disconnecting.
-        await new Promise(resolve => {
-          this._chainpad.sync();
-          this._chainpad.onSettle(() => {
-            delete this._chainpad;
-            resolve();
-          });
-        });
+        await this._pushState(true);
+        delete this._chainpad;
       }
 
       // Disconnect from the realtime channel and revert the changes made by this saver (i.e. remove event listeners,
@@ -394,6 +402,7 @@ define('xwiki-realtime-saver', [
     constructor(config) {
       super({
         formId: 'edit',
+        onLocalStatusChange: () => {},
         onStatusChange: () => {},
         onCreateVersion: () => {},
         ...config
@@ -495,10 +504,16 @@ define('xwiki-realtime-saver', [
     }
 
     _notifyStatusChange() {
-      const status = (this._isSomeoneSaving() && 1) || (this._isSomeoneDirty() ? 0 : 2);
-      if (this._previousStatus !== status) {
-        this._previousStatus = status;
-        this._config.onStatusChange(status);
+      const localStatus = (this._state.saving && 1) || (this._state.dirty ? 0 : 2);
+      if (this._previousLocalStatus !== localStatus) {
+        this._previousLocalStatus = localStatus;
+        this._config.onLocalStatusChange(localStatus);
+      }
+
+      const globalStatus = (this._isSomeoneSaving() && 1) || (this._isSomeoneDirty() ? 0 : 2);
+      if (this._previousGlobalStatus !== globalStatus) {
+        this._previousGlobalStatus = globalStatus;
+        this._config.onStatusChange(globalStatus);
       }
     }
 

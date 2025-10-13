@@ -28,10 +28,12 @@ define('xwiki-realtime-wysiwyg', [
   'chainpad',
   'xwiki-realtime-crypto',
   'xwiki-realtime-document',
-  'xwiki-realtime-wysiwyg-patches'
+  'xwiki-realtime-wysiwyg-patches',
+  'xwiki-l10n!xwiki-realtime-messages'
 ], function (
   /* jshint maxparams:false */
-  $, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver, ChainPad, Crypto, xwikiDocument, Patches
+  $, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver, ChainPad, Crypto, xwikiDocument, Patches,
+  Messages
 ) {
   'use strict';
 
@@ -130,6 +132,9 @@ define('xwiki-realtime-wysiwyg', [
 
       this._createToolbar();
 
+      // Check the session storage for unsaved changes from a previous collaboration session.
+      this._maybeRestoreUnsavedChanges();
+
       this._connection.realtimeInput = ChainPadNetflux.start(this._getRealtimeOptions());
 
       // Notify the others that we're editing in realtime.
@@ -149,11 +154,49 @@ define('xwiki-realtime-wysiwyg', [
       return this._connection.promise;
     }
 
+    _maybeRestoreUnsavedChanges() {
+      // We use the session storage to keep unsaved changes.
+      this._sessionStorageKey = 'xwiki.realtime.unsavedChanges/' +
+        XWiki.Model.serialize(xwikiDocument.documentReference) + '/' + this._editor.getFormFieldName();
+
+      // If present, the remote content before disconnect is always more recent than the last saved content, so it wins.
+      if (typeof this._connection.remoteContentBeforeDisconnect !== 'string') {
+        // The remote content before disconnect is not known, so we check if there are unsaved changes in the session
+        // storage, from a previous collaboration session.
+        const {previous, current} = JSON.parse(sessionStorage.getItem(this._sessionStorageKey) || '{}');
+        if (typeof previous === 'string' && typeof current === 'string') {
+          // Rebase unsaved changes on top of the current content.
+          const next = this._patchedEditor.getHyperJSON();
+          if (next === current) {
+            // It looks like our unsaved changes were saved in the end, so there's nothing to restore.
+            return;
+          }
+          const merged = this._merge(previous, next, current);
+          let failedToRestore = this._connection.lastMergeFailed;
+          this._patchedEditor.setHyperJSON(merged);
+          // Rebase the local unsaved changes on top of the remote content when connecting to the realtime session.
+          this._connection.remoteContentBeforeDisconnect = previous;
+          this.toBeConnected().then(() => {
+            failedToRestore = failedToRestore || this._connection.lastMergeFailed;
+            if (failedToRestore) {
+              this._editor.showNotification(Messages.unsavedChangesRestoreFailed, 'warning');
+            } else {
+              this._editor.showNotification(Messages.unsavedChangesRestored, 'info');
+            }
+          });
+        }
+      }
+    }
+
     _registerEventListeners() {
       this._connection.listeners = [];
+      let formActionInProgress = false;
 
       // Listen to local changes and propagate them to the other users.
-      this._connection.listeners.push(this._editor.onChange(this._onLocalContentChange.bind(this)));
+      this._connection.listeners.push(this._editor.onChange(() => {
+        formActionInProgress = false;
+        this._scheduleLocalChangeHandling();
+      }));
 
       this._connection.listeners.push(this._editor.onLock(this._pauseRealtimeSync.bind(this)));
       this._connection.listeners.push(this._editor.onUnlock(() => {
@@ -164,14 +207,22 @@ define('xwiki-realtime-wysiwyg', [
         setTimeout(this._resumeRealtimeSync.bind(this), 0);
       }));
 
-      // Flush the uncommitted work back to the server on actions that might cause the editor to be destroyed without
-      // the beforeDestroy event being called.
       const form = document.getElementById(RealtimeEditor._getFormId());
-      const flushUncommittedWork = this._flushUncommittedWork.bind(this);
-      $(form).on('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', flushUncommittedWork);
+      const onFormAction = () => {
+        // Flush the uncommitted work back to the server on actions that might cause the editor to be destroyed without
+        // the beforeDestroy event being called.
+        this._flushUncommittedWork();
+
+        // Don't keep and restore unsaved changes if the user leaves the edit session as a result of a form action:
+        // * for cancel action the user explicitly decided to discard the unsaved changes
+        // * for save action there are no unsaved changes
+        // * for reload action we need to take the latest version of the content from the server
+        formActionInProgress = true;
+      };
+      $(form).on('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', onFormAction);
       this._connection.listeners.push({
         removeListener: () => {
-          $(form).off('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', flushUncommittedWork);
+          $(form).off('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', onFormAction);
         }
       });
 
@@ -192,6 +243,50 @@ define('xwiki-realtime-wysiwyg', [
         // Destroy the editor only after all uncommitted work has been pushed to the server.
         event.data.promises.push(this._onAbort());
       }, true));
+
+      // Push unsaved changes to the session storage when the page becomes hidden. We don't save because it can lead to
+      // a merge conflict that would not be seen and resolved until the page is visible again (blocking the save for the
+      // other realtime collaborators in the mean time). Even if we save by forcing an overwrite, we might not be able
+      // to propagate the new version (that we get in the response) to the other collaborators (e.g. if the page was
+      // hidden because the user navigated to a different page or closed the browser tab), which would lead to a merge
+      // conflict on their side. Moreover, saving whenever the user switches to a different tab affects our automated
+      // functional tests which rely a lot on tab switching. Last but not least, we could have multiple users leaving
+      // the collaboration session at the same time, e.g. at the end of a meeting, which would lead to many revisions
+      // overwriting each other. Ideally, we would have an "auto-save" bot server-side that connects to the realtime
+      // session and uses its own ChainPad instance to reconstruct the content from the received patches, but it's not
+      // easy to run ChainPad (JavaScript) code server-side.
+      const visibilityChangeListener = () => {
+        if (document.visibilityState === 'hidden') {
+          // The user is either switching to a different window / tab, or closing this window / tab or navigating away.
+          // In all these cases the user is not actively editing anymore so first we make sure their local changes are
+          // propagated to the other collaborators and then we store the unsaved changes in the session storage.
+          //
+          // 1. Push the local changes to the other collaborators immediately (instead of waiting for the scheduled
+          //    timer). This will mark the content as dirty in the Saver if there are unsaved local changes.
+          this._flushUncommittedWork();
+          // 2. Store the unsaved local changes in the session storage, unless the user is leaving the edit session
+          //    as a result of a form action (e.g. using the Cancel shortcut key).
+          if (this._saver?.isDirty() && !formActionInProgress) {
+            // The user might be leaving the editing session by accident (without using the form actions) and they have
+            // unsaved changes that they might not want to lose.
+            sessionStorage.setItem(this._sessionStorageKey, JSON.stringify({
+              // We keep the last saved content as well in order to be able to perform a 3-way merge when the user joins
+              // back the realtime collaboration session.
+              previous: this._connection.lastSavedContent,
+              current: this._patchedEditor.getHyperJSON()
+            }));
+          }
+        } else if (document.visibilityState == 'visible') {
+          // The user is actively editing again. Clean up the session storage.
+          sessionStorage.removeItem(this._sessionStorageKey);
+        }
+      };
+      document.addEventListener('visibilitychange', visibilityChangeListener);
+      this._connection.listeners.push({
+        removeListener: () => {
+          document.removeEventListener('visibilitychange', visibilityChangeListener);
+        }
+      });
     }
 
     async _flushUncommittedWork() {
@@ -205,14 +300,9 @@ define('xwiki-realtime-wysiwyg', [
       }
     }
 
-    _onLocalContentChange() {
+    _scheduleLocalChangeHandling() {
       clearTimeout(this._localContentChangeTimeout);
-      this._localContentChangeTimeout = setTimeout(() => {
-        if (this._connection.status === ConnectionStatus.CONNECTED) {
-          this._onLocal();
-          this._saver.contentModifiedLocally();
-        }
-      }, 100);
+      this._localContentChangeTimeout = setTimeout(this._onLocal.bind(this), 100);
     }
 
     _createToolbar() {
@@ -298,12 +388,24 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     async _createSaver(info) {
+      // Remember the last saved content in order to be able to restore unsaved changes in case the user leaves the edit
+      // mode or closes the browser tab / window without saving.
+      this._connection.lastSavedContent = this._patchedEditor.getHyperJSON() || '{}';
       this._saver = await new Saver({
         // Edit form ID.
         formId: RealtimeEditor._getFormId(),
         userName: this._realtimeContext.user.sessionId,
         network: info.network,
         channel: this._saverChannel,
+        onLocalStatusChange: (localStatus) => {
+          if (localStatus === 2 /* clean */) {
+            // All local changes are saved. Remember this version of the content in order to be able to restore future
+            // local changes in case the user leaves without saving.
+            this._connection.lastSavedContent = this._connection.chainpad.getUserDoc();
+            // No unsaved local changes to restore.
+            sessionStorage.removeItem(this._sessionStorageKey);
+          }
+        },
         onStatusChange: this._connection.toolbar.onSaveStatusChange.bind(this._connection.toolbar),
         onCreateVersion: version => {
           version.author = Object.values(this._connection.userData).find(
@@ -430,12 +532,6 @@ define('xwiki-realtime-wysiwyg', [
 
         onInit: this._onInit.bind(this),
         onReady: this._onReady.bind(this),
-
-        // This function resets the realtime fields after coming back from source mode.
-        onLocalFromSource: () => {
-          this._onLocal();
-        },
-
         onLocal: this._onLocal.bind(this),
         onRemote: this._onRemote.bind(this),
         onConnectionChange: this._onConnectionChange.bind(this),
@@ -538,13 +634,20 @@ define('xwiki-realtime-wysiwyg', [
         return;
       }
       if (typeof localContent !== 'string') {
-        // Stringify the JSON and send it into ChainPad.
+        // Get the local content from the editor.
         localContent = this._patchedEditor.getHyperJSON();
       }
+      let remoteContent = this._connection.chainpad.getUserDoc();
+      if (localContent === remoteContent) {
+        // Nothing changed.
+        return;
+      }
+
       console.debug('Push local content: ' + localContent);
       this._connection.chainpad.contentUpdate(localContent);
+      this._saver.contentModifiedLocally();
 
-      const remoteContent = this._connection.chainpad.getUserDoc();
+      remoteContent = this._connection.chainpad.getUserDoc();
       if (remoteContent !== localContent) {
         console.warn('Unexpected remote content after synchronization: ', {
           expected: localContent,
@@ -723,11 +826,34 @@ define('xwiki-realtime-wysiwyg', [
             next: remoteContentAfterPause,
             current: localContentAfterPause
           });
-          this._onLocal(Patches.merge(this._connection.remoteContentBeforeDisconnect, remoteContentAfterPause,
+          this._onLocal(this._merge(this._connection.remoteContentBeforeDisconnect, remoteContentAfterPause,
             localContentAfterPause));
           await this._onRemote({
             realtime: this._connection.chainpad
           });
+        }
+      }
+    }
+
+    _merge(previous, next, current) {
+      /* jshint camelcase:false */
+      const debug = ChainPad.Common.global.REALTIME_DEBUG = ChainPad.Common.global.REALTIME_DEBUG || {};
+      const previousParseError = debug.ot_parseError;
+      const previousApplyError = debug.ot_applyError;
+      delete debug.ot_parseError;
+      delete debug.ot_applyError;
+      try {
+        return Patches.merge(previous, next, current);
+      } finally {
+        // Merged failed.
+        this._connection.lastMergeFailed = debug.ot_parseError || debug.ot_applyError;
+
+        // Restore the previous errors.
+        if (!debug.ot_parseError) {
+          debug.ot_parseError = previousParseError;
+        }
+        if (!debug.ot_applyError) {
+          debug.ot_applyError = previousApplyError;
         }
       }
     }

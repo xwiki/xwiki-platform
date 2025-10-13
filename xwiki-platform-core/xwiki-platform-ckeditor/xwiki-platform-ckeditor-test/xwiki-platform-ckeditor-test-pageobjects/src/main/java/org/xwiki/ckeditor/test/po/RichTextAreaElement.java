@@ -569,6 +569,32 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
+     * Waits for an information notification message to be displayed for this rich text area element.
+     *
+     * @param message the notification message to wait for
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public void waitForOwnNotificationInfoMessage(String message)
+    {
+        waitForOwnNotificationMessage("info", message, true);
+    }
+
+    /**
+     * Waits for a warning notification message to be displayed for this rich text area element.
+     *
+     * @param message the notification message to wait for
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public void waitForOwnNotificationWarningMessage(String message)
+    {
+        waitForOwnNotificationMessage("warning", message, true);
+    }
+
+    /**
      * Waits for a progress notification message to be displayed for this rich text area element.
      *
      * @param message the notification message to wait for

@@ -29,7 +29,7 @@
   CKEDITOR.plugins.add('xwiki-realtime', {
     requires: 'notification,xwiki-loading',
 
-    init : function(editor) {
+    init: function(editor) {
       applyStyleSheets(editor);
 
       if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
@@ -247,18 +247,38 @@
           editor._realtime.connect = async () => {
             if (!editor._realtime.editor) {
               editor._realtime.editor = new RealtimeWysiwygEditor(editor._realtime.adapter, editor._realtime.context);
-              return await editor._realtime.editor.toBeConnected();
+              await editor._realtime.editor.toBeConnected();
             } else {
               await editor._realtime.editor._updateChannels();
               await editor._realtime.editor._startRealtimeSync();
             }
+            onAfterJoinCollaboration(editor);
+            return editor._realtime.editor;
           };
           editor._realtime.disconnect = async () => {
             await editor._realtime.editor?._onAbort();
+            onAfterLeaveCollaboration(editor);
           };
           return editor._realtime.connect();
         }, resolve, reject), reject);
       });
+    }
+  }
+
+  function onAfterJoinCollaboration(editor) {
+    // Disable the leave confirmation because we have automatic saving.
+    const config = editor.config['xwiki-save'] = editor.config['xwiki-save'] || {};
+    // Backup the current value in order to be able to restore it when leaving the collaboration.
+    config._oldLeaveConfirmation = config.leaveConfirmation;
+    config.leaveConfirmation = false;
+  }
+
+  function onAfterLeaveCollaboration(editor) {
+    // Restore the leave confirmation.
+    const config = editor.config['xwiki-save'];
+    if (config?._oldLeaveConfirmation !== undefined) {
+      config.leaveConfirmation = config._oldLeaveConfirmation;
+      delete config._oldLeaveConfirmation;
     }
   }
 

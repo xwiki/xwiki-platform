@@ -303,6 +303,7 @@
       ].join(' '));
       event.data.promise = event.data.promise.then(createEditor.bind(null, ckeditor, element, config));
     });
+    fixShowNotification(editor);
     $(document).on('xwiki:actions:beforeSave.contentEditor xwiki:actions:beforePreview.contentEditor', event =&gt; {
       config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
       // Delete the document content field that is not used so that the in-place editor knows what to submit on save.
@@ -334,6 +335,26 @@
       }));
     });
     return deferred.promise();
+  }
+
+  function fixShowNotification(editor) {
+    // The position where the notification is displayed is wrongly computed for the in-place edit mode if the CKEditor
+    // instance is not ready yet (because the content editor is kept hidden until it's fully ready in order to reduce UI
+    // flickering). To avoid this problem we postpone showing the notifications until the editor is ready.
+    let pendingNotifications = [];
+    let ready = false;
+    editor.once('instanceReady', function() {
+      ready = true;
+      setTimeout(() =&gt; {
+        pendingNotifications.forEach(notification =&gt; notification?.show());
+      }, 0);
+    });
+    editor.on('notificationShow', function(event) {
+      if (!ready) {
+        event.cancel();
+        pendingNotifications.push(event.data.notification);
+      }
+    });
   }
 
   function createFieldSet(document, config) {

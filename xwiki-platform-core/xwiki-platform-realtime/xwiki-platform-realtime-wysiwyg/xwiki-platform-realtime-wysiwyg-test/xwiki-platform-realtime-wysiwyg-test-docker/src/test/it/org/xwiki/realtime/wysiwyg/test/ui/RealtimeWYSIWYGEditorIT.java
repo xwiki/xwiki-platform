@@ -2095,6 +2095,165 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("one 1 3 5 7 9 11\ntwo 2 4 6 8", inplaceEditablePage.getContent());
     }
 
+    @Test
+    @Order(23)
+    void restoreUnsavedChanges(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        loginAsJohn(setup);
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab (standalone).
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeRichTextAreaElement firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
+
+        // Type something to have unsaved changes.
+        firstTextArea.sendKeys("one");
+
+        // Leave the page by clicking on the breadcrumb link.
+        new ViewPage().getBreadcrumb().clickPathElement(testReference.getLastSpaceReference().getName());
+        // Edit again the page.
+        firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
+
+        // Verify that the unsaved changes have been restored.
+        firstTextArea.waitForOwnNotificationInfoMessage("Unsaved changes restored");
+        firstTextArea.waitUntilTextContains("one");
+        assertEquals(SaveStatus.UNSAVED, firstEditPage.getToolbar().getSaveStatus());
+
+        // Leave the page again, same way.
+        new ViewPage().getBreadcrumb().clickPathElement(testReference.getLastSpaceReference().getName());
+        // Edit again the page.
+        firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
+
+        // Verify that the unsaved changes have been restored.
+        firstTextArea.waitForOwnNotificationInfoMessage("Unsaved changes restored");
+        firstTextArea.waitUntilTextContains("one");
+        assertEquals(SaveStatus.UNSAVED, firstEditPage.getToolbar().getSaveStatus());
+
+        // Cancel the unsaved changes.
+        setup.leaveEditMode();
+
+        // Edit again the page. This time unsaved changes should not be restored.
+        firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
+
+        // Save in order to be able to edit in-place in the second tab.
+        firstEditPage.getToolbar().sendSaveShortcutKey();
+
+        // Verify the case when unsaved changes can't be restored because the merge fails.
+        firstTextArea.sendKeys("two");
+
+        // Leave the page again, but this time edit it in a separate tab.
+        new ViewPage().getBreadcrumb().clickPathElement(testReference.getLastSpaceReference().getName());
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab (in-place).
+        RealtimeInplaceEditablePage inplaceEditablePage = RealtimeInplaceEditablePage.gotoPage(testReference);
+        inplaceEditablePage.editInplace();
+        RealtimeRichTextAreaElement secondTextArea = new RealtimeCKEditor().getRichTextArea();
+
+        secondTextArea.sendKeys("three");
+        secondTextArea.waitUntilLocalChangesArePushed();
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
+
+        firstTextArea.waitForOwnNotificationWarningMessage("Failed to restore unsaved changes");
+        firstTextArea.waitUntilTextContains("three");
+        assertEquals(SaveStatus.UNSAVED, firstEditPage.getToolbar().getSaveStatus());
+
+        // Leave edit mode to test how unsaved changes are restored on the second tab using the in-place edit mode.
+        setup.leaveEditMode();
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        // Leave the edit mode with unsaved changes, by clicking on the breadcrumb link.
+        inplaceEditablePage.getBreadcrumb().clickPathElement(testReference.getLastSpaceReference().getName());
+        // Edit again the page.
+        inplaceEditablePage.editInplace();
+        secondTextArea = new RealtimeCKEditor().getRichTextArea();
+
+        // Verify that the unsaved changes have been restored.
+        secondTextArea.waitForOwnNotificationInfoMessage("Unsaved changes restored");
+        secondTextArea.waitUntilTextContains("three");
+        assertEquals(SaveStatus.UNSAVED, inplaceEditablePage.getToolbar().getSaveStatus());
+
+        // Try again.
+        inplaceEditablePage.getBreadcrumb().clickPathElement(testReference.getLastSpaceReference().getName());
+        inplaceEditablePage.editInplace();
+        secondTextArea = new RealtimeCKEditor().getRichTextArea();
+
+        // Verify that the unsaved changes have been restored.
+        secondTextArea.waitForOwnNotificationInfoMessage("Unsaved changes restored");
+        secondTextArea.waitUntilTextContains("three");
+        assertEquals(SaveStatus.UNSAVED, inplaceEditablePage.getToolbar().getSaveStatus());
+
+        // This time cancel the unsaved changes.
+        setup.leaveEditMode();
+
+        // Edit again the page. This time unsaved changes should not be restored.
+        inplaceEditablePage.editInplace();
+        secondTextArea = new RealtimeCKEditor().getRichTextArea();
+
+        // Let's verify a case where unsaved changes can be merged.
+        secondTextArea.sendKeys("four");
+        inplaceEditablePage.getToolbar().sendSaveShortcutKey();
+        secondTextArea.sendKeys(" five");
+
+        // Leave the edit mode with unsaved changes and edit the page in the first tab.
+        inplaceEditablePage.getBreadcrumb().clickPathElement(testReference.getLastSpaceReference().getName());
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        firstTextArea = firstEditPage.getContenEditor().getRichTextArea();
+        firstTextArea.waitUntilTextContains("four");
+        firstTextArea.sendKeys("zero ");
+        firstTextArea.waitUntilLocalChangesArePushed();
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        inplaceEditablePage.editInplace();
+        secondTextArea = new RealtimeCKEditor().getRichTextArea();
+
+        // Verify that the unsaved changes have been restored and merged.
+        secondTextArea.waitForOwnNotificationInfoMessage("Unsaved changes restored");
+        secondTextArea.waitUntilTextContains("zero four five");
+        assertEquals(SaveStatus.UNSAVED, inplaceEditablePage.getToolbar().getSaveStatus());
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("zero four five");
+    }
+
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)
     {
         AdministrationPage adminPage = AdministrationPage.gotoPage();

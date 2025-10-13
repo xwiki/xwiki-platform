@@ -136,7 +136,7 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * Shows a notification message inside the editor.
      * 
      * @param {string} message the notification message to show
-     * @param {string} type the type of notification (e.g. 'info', 'warning', 'error')
+     * @param {string} type the type of notification ('info', 'warning', 'success' or 'progress')
      */
     showNotification(message, type) {
       throw new Error('Not implemented!');

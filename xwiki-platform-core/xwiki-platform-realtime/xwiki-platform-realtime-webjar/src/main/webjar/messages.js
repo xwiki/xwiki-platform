@@ -31,6 +31,8 @@ define('xwiki-realtime-messages', {
     'rejectDialog.ok',
     'forbidden',
     'autoAcceptSave',
-    'join.error'
+    'join.error',
+    'unsavedChangesRestored',
+    'unsavedChangesRestoreFailed'
   ]
 });

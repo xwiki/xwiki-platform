@@ -68,10 +68,10 @@ define('macroParameterEnhancer', ['jquery'], function($) {
     }
     let displayedChildren = group.children.filter(element => !childrenToRemove.includes(element));
     // if the group doesn't contain any children anymore we can just hide it
-    if (displayedChildren === 0) {
+    if (displayedChildren.length === 0) {
       group.hidden = true;
     // if the group contains a single parameter then we don't consider it's a feature only.
-    } else if (displayedChildren === 1) {
+    } else if (displayedChildren.length === 1) {
       group.featureOnly = false;
       // if the single children is a group, we actually remove it to display directly the parameters
       let uniqueChildKey = displayedChildren[0];

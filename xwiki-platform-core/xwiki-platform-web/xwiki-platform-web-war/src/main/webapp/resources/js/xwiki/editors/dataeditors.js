@@ -740,8 +740,10 @@
 
       updateOrder() {
         let i = 1;
-        $(this).find(".xproperty-content").data('numberProperty').val(function() {
-          return i++;
+        $(this).find(".xproperty-content").each(function () {
+          let item = $(this);
+          // the numberProperty data is actually a reference to an input.
+          item.data('numberProperty').val(i++);
         });
       }
 

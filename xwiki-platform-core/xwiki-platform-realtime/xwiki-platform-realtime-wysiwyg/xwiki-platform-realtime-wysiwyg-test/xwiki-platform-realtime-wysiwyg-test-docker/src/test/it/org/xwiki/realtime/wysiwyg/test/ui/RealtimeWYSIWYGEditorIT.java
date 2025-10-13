@@ -49,6 +49,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.panels.test.po.DocumentInformationPanel;
 import org.xwiki.realtime.test.RealtimeTestUtils;
 import org.xwiki.realtime.test.po.Coeditor;
 import org.xwiki.realtime.test.po.RealtimeEditToolbar;
@@ -63,7 +64,10 @@ import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.DocumentSyntaxPicker;
+import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
 import org.xwiki.test.ui.po.HistoryPane;
+import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -2252,6 +2256,91 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("zero four five");
+    }
+
+    @Test
+    @Order(24)
+    void syntaxChange(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        // Start fresh.
+        loginAsJohn(setup);
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "[[label>>#target]]", "", "xwiki/2.0");
+
+        //
+        // Perform the syntax change from the standalone editor.
+        //
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        // Type some text to verify that it isn't lost when we change the syntax.
+        // First move the cursor to the start before entering the text to ensure it is outside the link, being
+        // outside the link is the initial state in Chrome but not in Firefox.
+        firstTextArea.sendKeys(Keys.HOME, "before ");
+
+        // Change the syntax.
+        DocumentSyntaxPicker documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
+        assertEquals("xwiki/2.0", documentSyntaxPicker.getSelectedSyntax());
+
+        // Confirm the syntax conversion.
+        SyntaxConversionConfirmationModal syntaxConfirmationModal = documentSyntaxPicker.selectSyntaxById("xwiki/2.1");
+        assertTrue(syntaxConfirmationModal.getMessage()
+            .contains("from the previous XWiki 2.0 syntax to the selected XWiki 2.1 syntax?"));
+        syntaxConfirmationModal.confirmSyntaxConversion();
+        // Wait for the syntax conversion.
+        firstEditPage.waitForNotificationSuccessMessage("Syntax converted");
+        // Wait for the editor to be reloaded (recreated).
+        firstEditPage.waitForNotificationSuccessMessage("WYSIWYG editor updated");
+
+        // The editor was recreated.
+        firstEditor = firstEditPage.getContenEditor();
+        // Verify that we are still connected to the realtime collaboration session.
+        assertTrue(firstEditPage.getToolbar().isCollaborating());
+        firstEditor.getToolBar().toggleSourceMode();
+        String source = firstEditor.getSourceTextArea().getDomProperty("value").replace('\u00A0', ' ');
+        assertEquals("before [[label>>||anchor=\"target\"]]", source);
+
+        firstEditPage.clickCancel();
+
+        //
+        // Perform the syntax change from the in-place editor.
+        //
+
+        // Open the document information tab before editing in-place because both change the document fragment (anchor)
+        // in the current URL. We need the #edit fragment in the URL in order to detect when the user leaves the edit
+        // mode. See TestUtils#leaveEditMode().
+        RealtimeInplaceEditablePage inplaceEditablePage = new RealtimeInplaceEditablePage();
+        InformationPane informationPane = inplaceEditablePage.openInformationDocExtraPane();
+
+        // Start editing in-place.
+        inplaceEditablePage.editInplace();
+        firstEditor = new RealtimeCKEditor();
+        firstTextArea = firstEditor.getRichTextArea();
+        // Type some text to verify that it isn't lost when we change the syntax.
+        firstTextArea.sendKeys(Keys.END, " after");
+
+        // Change the syntax.
+        documentSyntaxPicker = informationPane.editSyntax().getSyntaxPicker();
+        syntaxConfirmationModal = documentSyntaxPicker.selectSyntaxById("xwiki/2.1");
+        // Confirm the syntax conversion.
+        assertTrue(syntaxConfirmationModal.getMessage()
+            .contains("from the previous XWiki 2.0 syntax to the selected XWiki 2.1 syntax?"));
+        syntaxConfirmationModal.confirmSyntaxConversion();
+        // Wait for the editor to be reloaded (recreated).
+        firstEditPage.waitForNotificationSuccessMessage("WYSIWYG editor updated");
+
+        // The editor was re-created.
+        firstEditor = new RealtimeCKEditor();
+        firstTextArea = firstEditor.getRichTextArea();
+        // Verify that we are still connected to the realtime collaboration session.
+        assertTrue(firstEditPage.getToolbar().isCollaborating());
+        // Focus the editing area to get the floating toolbar and access the Source button.
+        firstTextArea.click();
+        firstEditor.getToolBar().toggleSourceMode();
+        source = firstEditor.getSourceTextArea().getDomProperty("value").replace('\u00A0', ' ');
+        assertEquals("[[label>>||anchor=\"target\"]] after", source);
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

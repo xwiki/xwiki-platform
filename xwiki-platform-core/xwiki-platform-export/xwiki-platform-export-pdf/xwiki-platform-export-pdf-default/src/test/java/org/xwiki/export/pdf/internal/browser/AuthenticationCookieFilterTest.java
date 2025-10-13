@@ -47,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -140,6 +141,39 @@ class AuthenticationCookieFilterTest
         // but this may be a good thing as it will force us to double check that the authentication cookie
         // filtering is still correct.
         assertEquals(expectedValidation, validationCookie.getValue());
+
+        // Verify that the response isn't modified, e.g., by setting cookies (which should be intercepted by the
+        // cookie filter).
+        verifyNoInteractions(this.httpResponse);
+    }
+
+    /**
+     * Test that cookies are also handled when set via response headers. This doesn't correspond to the current
+     * implementation anymore but as the persistent login manager might be replaced by a custom implementation that
+     * uses the previous approach it is safer to still support it and this test verifies that it actually works.
+     */
+    @Test
+    void filterAddHeader() throws Exception
+    {
+        when(this.cookieFilterContext.getClientIPAddress()).thenReturn("172.17.0.3");
+        Cookie cookie = new Cookie("test", "before");
+
+        when(this.loginManager.getRememberedUsername(this.httpRequest, this.httpResponse)).thenReturn("alice");
+        when(this.loginManager.getRememberedPassword(this.httpRequest, this.httpResponse)).thenReturn("wonderland");
+
+        // Mock the previous behavior of the persistent login manager which was setting cookies via response headers
+        // directly instead of using the servlet API.
+        doAnswer(invocation -> {
+            String ip = ((HttpServletRequest) invocation.getArgument(0)).getHeader("X-Forwarded-For");
+            ((HttpServletResponse) invocation.getArgument(1)).addHeader("Set-Cookie",
+                String.format("test=value_bound_to_%s; Secure; HttpOnly", ip));
+            return null;
+        }).when(this.loginManager).rememberLogin(any(HttpServletRequest.class), any(HttpServletResponse.class),
+            eq("alice"), eq("wonderland"));
+
+        this.authCookieFilter.filter(List.of(cookie), this.cookieFilterContext);
+
+        assertEquals("value_bound_to_172.17.0.3", cookie.getValue());
 
         // Verify that the response isn't modified, e.g., by setting cookies (which should be intercepted by the
         // cookie filter).

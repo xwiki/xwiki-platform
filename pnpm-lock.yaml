@@ -40,8 +40,8 @@ catalogs:
       specifier: 8.3.3
       version: 8.3.3
     '@microsoft/api-extractor':
-      specifier: 7.53.0
-      version: 7.53.0
+      specifier: 7.53.1
+      version: 7.53.1
     '@microsoft/tsdoc':
       specifier: 0.15.1
       version: 0.15.1
@@ -370,7 +370,7 @@ importers:
         version: 9.37.0
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.53.0(@types/node@24.1.0)
+        version: 7.53.1(@types/node@24.1.0)
       '@microsoft/tsdoc':
         specifier: 'catalog:'
         version: 0.15.1
@@ -5902,11 +5902,11 @@ packages:
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
 
-  '@microsoft/api-extractor-model@7.31.0':
-    resolution: {integrity: sha512-DqbB4G33bYTsS8hxdmyjpLXjQTjf/05Jsk82d4ldb5UaYi5kt7imJDcSJh5K+bgJXLBn63MAPAJTUNVXsniFCQ==}
+  '@microsoft/api-extractor-model@7.31.1':
+    resolution: {integrity: sha512-Dhnip5OFKbl85rq/ICHBFGhV4RA5UQSl8AC/P/zoGvs+CBudPkatt5kIhMGiYgVPnUWmfR6fcp38+1AFLYNtUw==}
 
-  '@microsoft/api-extractor@7.53.0':
-    resolution: {integrity: sha512-gbeBZm5ni4VIo7oUIq0u2UpIJsayBzxxsqE6dk1G/lrjef4OuuCJh09BakPH348JhD0ZIa3M+c0wGphLkYohTA==}
+  '@microsoft/api-extractor@7.53.1':
+    resolution: {integrity: sha512-bul5eTNxijLdDBqLye74u9494sRmf+9QULtec9Od0uHnifahGeNt8CC4/xCdn7mVyEBrXIQyQ5+sc4Uc0QfBSA==}
     hasBin: true
 
   '@microsoft/tsdoc-config@0.17.1':
@@ -6152,8 +6152,8 @@ packages:
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
 
-  '@rushstack/node-core-library@5.16.0':
-    resolution: {integrity: sha512-bO2LN3olkALZawMqPtBgRGtSzd9l306imZYE0kCiCHNvMEvCB40GqbNFZBds0RcQxx/Am2oohPSJA15UP/MrSA==}
+  '@rushstack/node-core-library@5.17.0':
+    resolution: {integrity: sha512-24vt1GbHN6kyIglRMTVpyEiNRRRJK8uZHc1XoGAhmnTDKnrWet8OmOpImMswJIe6gM78eV8cMg1HXwuUHkSSgg==}
     peerDependencies:
       '@types/node': '*'
     peerDependenciesMeta:
@@ -6171,16 +6171,16 @@ packages:
   '@rushstack/rig-package@0.6.0':
     resolution: {integrity: sha512-ZQmfzsLE2+Y91GF15c65L/slMRVhF6Hycq04D4TwtdGaUAbIXXg9c5pKA5KFU7M4QMaihoobp9JJYpYcaY3zOw==}
 
-  '@rushstack/terminal@0.19.0':
-    resolution: {integrity: sha512-Q0eHHuK3V4yLJ8mMuwal+YKhp1TcT0tW9Pr3xJDXyNGlpishp5M9qRTsLsk1d8GcIF15APV9vcKkFDtTvzFGHQ==}
+  '@rushstack/terminal@0.19.1':
+    resolution: {integrity: sha512-jsBuSad67IDVMO2yp0hDfs0OdE4z3mDIjIL2pclDT3aEJboeZXE85e1HjuD0F6JoW3XgHvDwoX+WOV+AVTDQeA==}
     peerDependencies:
       '@types/node': '*'
     peerDependenciesMeta:
       '@types/node':
         optional: true
 
-  '@rushstack/ts-command-line@5.1.0':
-    resolution: {integrity: sha512-ncUEFDUU/RMwCmQpwy8fcA3CenEV0ZsNg8m1IJYGVUVzC5WdfeeoDEWhMjNqjq9DYcE4VXTXwQwyAeGo3ugSLg==}
+  '@rushstack/ts-command-line@5.1.1':
+    resolution: {integrity: sha512-HPzFsUcr+wZ3oQI08Ec/E6cuiAVHKzrXZGHhwiwIGygAFiqN5QzX+ff30n70NU2WyE26CykgMwBZZSSyHCJrzA==}
 
   '@shikijs/types@3.2.1':
     resolution: {integrity: sha512-/NTWAk4KE2M8uac0RhOsIhYQf4pdU0OywQuYDGIGAJ6Mjunxl2cGiuLkvu4HLCMn+OTTLRWkjZITp+aYJv60yA==}
@@ -11664,23 +11664,23 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@microsoft/api-extractor-model@7.31.0(@types/node@24.1.0)':
+  '@microsoft/api-extractor-model@7.31.1(@types/node@24.1.0)':
     dependencies:
       '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.16.0(@types/node@24.1.0)
+      '@rushstack/node-core-library': 5.17.0(@types/node@24.1.0)
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/api-extractor@7.53.0(@types/node@24.1.0)':
+  '@microsoft/api-extractor@7.53.1(@types/node@24.1.0)':
     dependencies:
-      '@microsoft/api-extractor-model': 7.31.0(@types/node@24.1.0)
+      '@microsoft/api-extractor-model': 7.31.1(@types/node@24.1.0)
       '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.16.0(@types/node@24.1.0)
+      '@rushstack/node-core-library': 5.17.0(@types/node@24.1.0)
       '@rushstack/rig-package': 0.6.0
-      '@rushstack/terminal': 0.19.0(@types/node@24.1.0)
-      '@rushstack/ts-command-line': 5.1.0(@types/node@24.1.0)
+      '@rushstack/terminal': 0.19.1(@types/node@24.1.0)
+      '@rushstack/ts-command-line': 5.1.1(@types/node@24.1.0)
       lodash: 4.17.21
       minimatch: 10.0.3
       resolve: 1.22.10
@@ -11899,7 +11899,7 @@ snapshots:
 
   '@rtsao/scc@1.1.0': {}
 
-  '@rushstack/node-core-library@5.16.0(@types/node@24.1.0)':
+  '@rushstack/node-core-library@5.17.0(@types/node@24.1.0)':
     dependencies:
       ajv: 8.13.0
       ajv-draft-04: 1.0.0(ajv@8.13.0)
@@ -11921,17 +11921,17 @@ snapshots:
       resolve: 1.22.10
       strip-json-comments: 3.1.1
 
-  '@rushstack/terminal@0.19.0(@types/node@24.1.0)':
+  '@rushstack/terminal@0.19.1(@types/node@24.1.0)':
     dependencies:
-      '@rushstack/node-core-library': 5.16.0(@types/node@24.1.0)
+      '@rushstack/node-core-library': 5.17.0(@types/node@24.1.0)
       '@rushstack/problem-matcher': 0.1.1(@types/node@24.1.0)
       supports-color: 8.1.1
     optionalDependencies:
       '@types/node': 24.1.0
 
-  '@rushstack/ts-command-line@5.1.0(@types/node@24.1.0)':
+  '@rushstack/ts-command-line@5.1.1(@types/node@24.1.0)':
     dependencies:
-      '@rushstack/terminal': 0.19.0(@types/node@24.1.0)
+      '@rushstack/terminal': 0.19.1(@types/node@24.1.0)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -17035,7 +17035,7 @@ snapshots:
 
   vite-plugin-dts@4.5.4(@types/node@24.1.0)(rollup@4.46.2)(typescript@5.9.3)(vite@7.1.9(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)):
     dependencies:
-      '@microsoft/api-extractor': 7.53.0(@types/node@24.1.0)
+      '@microsoft/api-extractor': 7.53.1(@types/node@24.1.0)
       '@rollup/pluginutils': 5.2.0(rollup@4.46.2)
       '@volar/typescript': 2.4.22
       '@vue/language-core': 2.2.0(typescript@5.9.3)

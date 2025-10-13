@@ -21,8 +21,8 @@
 import "reflect-metadata";
 import { XWikiStorage } from "../xwikiStorage";
 import { DefaultLogger } from "@xwiki/cristal-api";
-import { describe, expect, it } from "vitest";
-import { mock } from "vitest-mock-extended";
+import { describe, expect, it, vi } from "vitest";
+import { anyObject, mock } from "vitest-mock-extended";
 import type { AlertsServiceProvider } from "@xwiki/cristal-alerts-api";
 import type { WikiConfig } from "@xwiki/cristal-api";
 import type {
@@ -32,7 +32,7 @@ import type {
 
 describe("getPageFromViewURL", () => {
   const wikiConfig: WikiConfig = {
-    baseURL: "<baseURL>",
+    baseURL: "http://baseurl",
   } as WikiConfig;
 
   class MockAuthenticationManagerProvider
@@ -52,20 +52,35 @@ describe("getPageFromViewURL", () => {
   it("regular identifier", () => {
     expect(
       xwikiStorage.getPageFromViewURL(
-        "<baseURL>/bin/view/Space1/Space2/WebHome",
+        "http://baseurl/bin/view/Space1/Space2/WebHome",
       ),
     ).toStrictEqual("Space1.Space2.WebHome");
   });
   it("identifier with special characters", () => {
     expect(
       xwikiStorage.getPageFromViewURL(
-        "<baseURL>/bin/view/Space1%5C.Space%5C2/Web%2FHome",
+        "http://baseurl/bin/view/Space1%5C.Space%5C2.Space3/Web%2FHome",
       ),
-    ).toStrictEqual("Space1\\\\\\.Space\\\\2.Web/Home");
+    ).toStrictEqual("Space1\\\\\\.Space\\\\2\\.Space3.Web/Home");
   });
   it("missing terminal page", () => {
     expect(
-      xwikiStorage.getPageFromViewURL("<baseURL>/bin/view/Space1/Space2/"),
+      xwikiStorage.getPageFromViewURL("http://baseurl/bin/view/Space1/Space2/"),
     ).toStrictEqual("Space1.Space2.WebHome");
+  });
+  it("fetch page with dots", async () => {
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve({}),
+      } as Response),
+    );
+    await xwikiStorage.getPageContent(
+      "Main.Page\\.With\\.Dots.WebHome",
+      "html",
+    );
+    expect(global.fetch).toHaveBeenCalledExactlyOnceWith(
+      "http://baseurl/rest/cristal/wikis/xwiki/spaces/Main/spaces/Page.With.Dots/pages/WebHome?format=html",
+      anyObject(),
+    );
   });
 });

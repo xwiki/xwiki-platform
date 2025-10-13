@@ -301,6 +301,13 @@ configs.forEach(
       });
     });
 
+    test(`[${name}] can load pages with dots`, async ({ page }) => {
+      await page.goto("Localhost/#/Main.Page%5C.With%5C.Dots/view");
+
+      const locator = page.locator("#xwikicontent");
+      await expect(locator).toContainText("Welcome to Main.Page\\.With\\.Dots");
+    });
+
     if (offlineDefaultPage) {
       test(`[${name}] offline actually fetch updated versions`, async ({
         page,

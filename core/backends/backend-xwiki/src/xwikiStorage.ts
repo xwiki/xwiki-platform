@@ -396,11 +396,14 @@ export class XWikiStorage extends AbstractStorage {
 
   private buildPageRestBaseURL(page: string, segments: string[]) {
     const url = this.wikiConfig.baseURL;
-    const referenceParts = page.split(".");
+    // We split around dots that are not escaped.
+    // (i.e., not preceded by an odd number of backslashes)
+    const referenceParts = page.split(/(?<=(?<!\\)(?:\\\\)*)\./);
     for (let i = 0; i < referenceParts.length; i++) {
       const segment = i < referenceParts.length - 1 ? "spaces" : "pages";
       segments.push(segment);
-      segments.push(referenceParts[i]);
+      // We unescape previously escaped dots, if any.
+      segments.push(referenceParts[i].replace(/\\\./g, "."));
     }
 
     return `${url}/${segments.join("/")}`;

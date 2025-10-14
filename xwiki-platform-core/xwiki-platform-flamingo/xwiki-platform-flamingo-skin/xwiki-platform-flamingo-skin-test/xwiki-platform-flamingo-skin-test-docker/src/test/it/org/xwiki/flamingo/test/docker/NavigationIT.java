@@ -182,14 +182,14 @@ public class NavigationIT
     public void docExtraLoadingFromURLAnchor(TestUtils testUtils, TestReference testReference)
     {
         LocalDocumentReference otherPageReference = new LocalDocumentReference("Main", "ThisPageDoesNotExist");
-        List<String> docExtraPanes = Arrays.asList("attachments", "history", "information", "comments");
+        List<String> docExtraPanes = Arrays.asList("Attachments", "History", "Information", "Comments");
 
         ViewPage viewPage;
         for (String docExtraPane : docExtraPanes) {
             // We have to load a different page first since opening the same page with a new anchor doesn't call
             // our functions (on purpose).
             testUtils.gotoPage(otherPageReference);
-            testUtils.gotoPage(testReference, "view", null, StringUtils.capitalize(docExtraPane));
+            testUtils.gotoPage(testReference, "view", null, docExtraPane);
             viewPage = new ViewPage();
             viewPage.waitForDocExtraPaneActive(docExtraPane);
         }

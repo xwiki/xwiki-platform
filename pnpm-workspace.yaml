@@ -2,3 +2,63 @@ packages:
   - xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
+catalog:
+  "@blocknote/core": 0.31.3
+  "@blocknote/mantine": 0.31.3
+  "@eslint/js": 9.34.0
+  "@mantine/core": 8.1.1
+  "@tsconfig/node22": 22.0.2
+  "@types/jsdom": 27.0.0
+  "@types/node": 22.18.8
+  "@vitejs/plugin-react": 5.0.1
+  "@vitejs/plugin-vue": 6.0.1
+  "@vitest/eslint-plugin": 1.3.4
+  "@vue/eslint-config-prettier": 10.2.0
+  "@vue/eslint-config-typescript": 14.6.0
+  "@vue/test-utils": 2.4.6
+  "@vue/tsconfig": 0.7.0
+  "@xwiki/cristal-api": 0.19.0
+  "@xwiki/cristal-attachments-default": 0.19.0
+  "@xwiki/cristal-authentication-api": 0.19.0
+  "@xwiki/cristal-backend-api": 0.19.0
+  "@xwiki/cristal-document-api": 0.19.0
+  "@xwiki/cristal-dsapi": 0.19.0
+  "@xwiki/cristal-editors-blocknote-headless": 0.19.0
+  "@xwiki/cristal-editors-blocknote-react": 0.19.0
+  "@xwiki/cristal-link-suggest-api": 0.19.0
+  "@xwiki/cristal-model-api": 0.19.0
+  "@xwiki/cristal-model-reference-api": 0.19.0
+  "@xwiki/cristal-model-remote-url-api": 0.19.0
+  "@xwiki/cristal-uniast": 0.19.0
+  dompurify: 3.2.6
+  eslint: 9.36.0
+  eslint-config-prettier: 10.1.8
+  eslint-plugin-vue: 10.5.0
+  eventemitter3: 5.0.1
+  flush-promises: 1.0.2
+  globals: 16.4.0
+  inversify: 7.5.2
+  jiti: 2.6.0
+  jquery: 3.7.1
+  jsdom: 27.0.0
+  lodash: 4.17.21
+  lz-string: 1.5.0
+  npm-run-all2: 8.0.4
+  pinia: 3.0.2
+  react: 19.1.0
+  react-dom: 19.1.0
+  sinon: 21.0.0
+  tippy.js: 6.3.7
+  typescript: 5.9.3
+  typescript-eslint: 8.45.0
+  u-node: 0.0.2
+  vite: 7.1.7
+  vitest: 3.2.4
+  vue: 3.5.22
+  vue-i18n: 11.1.12
+  vue-tippy: 6.7.1
+  vue-tsc: 3.0.6
+  vue3-touch-events: 5.0.13
+  vuedraggable: 4.1.0
+catalogMode: strict
+cleanupUnusedCatalogs: true

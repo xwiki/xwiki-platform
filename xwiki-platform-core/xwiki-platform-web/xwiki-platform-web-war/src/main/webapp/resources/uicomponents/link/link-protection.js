@@ -30,7 +30,7 @@ require(['jquery', 'xwiki-events-bridge'], function ($) {
   };
 
 function askIfLinkNotTrusted (event, anchor, configuration) {
-    if (!isAnchorTrustedOomain(anchor, configuration.trustedDomains, configuration.whitelistedUrls)) {
+    if (!isAnchorTrustedOomain(anchor, configuration.trustedDomains, configuration.allowedUrls)) {
       let currentHostname = window.location.hostname;
       let anchorHostname = anchor.hostname;
       let customizedMessage = configuration.confirmationText
@@ -42,14 +42,14 @@ function askIfLinkNotTrusted (event, anchor, configuration) {
     }
   };
 
-  let isAnchorTrustedOomain = function (anchor, trustedDomains, whitelistedUrls) {
+  let isAnchorTrustedOomain = function (anchor, trustedDomains, allowedUrls) {
     let currentHostname = window.location.hostname;
     let anchorHostname = anchor.hostname;
     if (currentHostname === anchorHostname) {
       return true;
     } else {
-      for (let i = 0; i < whitelistedUrls.length; i++) {
-        if (anchor.href.startsWith(whitelistedUrls[i])) {
+      for (let i = 0; i < allowedUrls.length; i++) {
+        if (anchor.href.startsWith(allowedUrls[i])) {
           return true;
         }
       }

@@ -1042,12 +1042,12 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 # url.frontendUrlCheckEnabled=true
 
 #-# [Since 17.9.0RC1]
-#-# Allow to whitelist specific URLs to be accessible from the frontend without asking confirmation, and without
-#-# needing to whitelist and entire domain. The expected format is absolute URLs separated by commas, e.g.:
+#-# Allow to allow specific URLs to be accessible from the frontend without asking confirmation, and without
+#-# needing to allow and entire domain. The expected format is absolute URLs separated by commas, e.g.:
 #-# https://github.com/xwiki/xwiki-platform,https://www.xwiki.org/xwiki/bin/view/Main/WebHome
 #-#
 #-# By default this property is empty:
-# url.whitelistedFrontendUrls=
+# url.allowedFrontendUrls=
 
 #-------------------------------------------------------------------------------------
 # Attachment

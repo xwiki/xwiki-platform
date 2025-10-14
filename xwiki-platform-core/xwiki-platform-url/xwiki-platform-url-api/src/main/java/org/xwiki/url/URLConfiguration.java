@@ -102,15 +102,15 @@ public interface URLConfiguration
     }
 
     /**
-     * Define a list of whitelisted frontend URLs: in case the {@link #isFrontendUrlCheckEnabled()} is enabled, then
+     * Define a list of allowed frontend URLs: in case the {@link #isFrontendUrlCheckEnabled()} is enabled, then
      * this list can be used to allow specific URLs without asking confirmation from the user, while avoiding to add
      * an entire domain in the list of trusted domains.
      *
-     * @return the list of whitelisted frontend URLs
+     * @return the list of allowed frontend URLs
      * @since 17.9.0RC1
      */
     @Unstable
-    default List<String> getWhitelistedFrontendUrls()
+    default List<String> getAllowedFrontendUrls()
     {
         return List.of();
     }

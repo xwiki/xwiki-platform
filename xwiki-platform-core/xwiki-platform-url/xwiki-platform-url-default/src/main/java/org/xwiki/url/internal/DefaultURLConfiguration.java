@@ -88,8 +88,8 @@ public class DefaultURLConfiguration implements URLConfiguration
     }
 
     @Override
-    public List<String> getWhitelistedFrontendUrls()
+    public List<String> getAllowedFrontendUrls()
     {
-        return this.configuration.get().getProperty(PREFIX + "whitelistedFrontendUrls", List.of());
+        return this.configuration.get().getProperty(PREFIX + "allowedFrontendUrls", List.of());
     }
 }

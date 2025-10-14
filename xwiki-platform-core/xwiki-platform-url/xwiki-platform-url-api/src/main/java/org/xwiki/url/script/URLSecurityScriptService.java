@@ -99,12 +99,12 @@ public class URLSecurityScriptService implements ScriptService
     }
 
     /**
-     * @return the list of URLs that are whitelisted to avoid asking confirmation to users when accessing them.
+     * @return the list of URLs that are allowed to avoid asking confirmation to users when accessing them.
      * @since 17.9.0RC1
      */
     @Unstable
-    public List<String> getWhitelistedFrontendUrls()
+    public List<String> getAllowedFrontendUrls()
     {
-        return this.urlConfiguration.getWhitelistedFrontendUrls();
+        return this.urlConfiguration.getAllowedFrontendUrls();
     }
 }

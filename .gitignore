@@ -76,3 +76,4 @@ xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-templates/src/main/res
 ## Node specific
 node_modules/
 dist/
+.nx/

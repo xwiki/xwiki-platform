@@ -1,12 +1,12 @@
 {
+  "private": true,
   "name": "xwiki-platform-blocknote",
   "version": "0.0.0",
-  "private": true,
   "type": "module",
   "scripts": {
     "build": "vue-tsc --project tsconfig.json && vite build",
-    "test": "vitest --run",
-    "lint": "eslint \"./src/**/*.{js,ts,vue}\" --fix --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{js,ts,vue}\" --fix --max-warnings=0",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@blocknote/core": "0.31.3",
@@ -56,18 +56,5 @@
     "vitest": "3.2.4",
     "vue": "3.5.22",
     "vue-tsc": "3.0.6"
-  },
-  "pnpm": {
-    "overrides": {
-      "@xwiki/cristal-fn-utils": "0.19.0",
-      "@xwiki/cristal-model-api": "0.19.0",
-      "@xwiki/cristal-model-reference-api": "0.19.0",
-      "@xwiki/cristal-model-remote-url-api": "0.19.0",
-      "inversify": "7.5.2",
-      "vue": "3.5.22"
-    },
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }

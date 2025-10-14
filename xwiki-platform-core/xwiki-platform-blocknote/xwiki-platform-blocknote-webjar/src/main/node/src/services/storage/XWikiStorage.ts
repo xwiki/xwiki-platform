@@ -106,7 +106,7 @@ export class XWikiStorage extends AbstractStorage {
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   public async move(): Promise<{ success: boolean; error?: string }> {
     // TODO
     throw new Error("Method not implemented.");

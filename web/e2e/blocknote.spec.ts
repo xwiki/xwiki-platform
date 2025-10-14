@@ -21,7 +21,7 @@ import test, { expect } from "@playwright/test";
 import { screenshotIfTestFailed } from "./screenshot-failures";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/XWikiBlocknoteNoRealtime/#/Main.WebHome/edit");
+  await page.goto("/XWikiNoRealtime/#/Main.WebHome/edit");
   await page.waitForLoadState("networkidle");
 
   await expect(page).toHaveTitle("Cristal Wiki");
@@ -68,7 +68,7 @@ test("Content can be saved", async ({ page }) => {
 
   // await saveBtn.click();
 
-  // await page.waitForURL("/XWikiBlocknoteNoRealtime/#/Main.WebHome/view");
+  // await page.waitForURL("/XWikiNoRealtime/#/Main.WebHome/view");
   // await page.waitForLoadState("networkidle");
 
   // const content = page.locator("#xwikicontent");

@@ -24,7 +24,7 @@
     "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
   "XWikiNoRealtime": {
-    "name": "XWikiXWikiNoRealtime",
+    "name": "XWikiNoRealtime",
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,

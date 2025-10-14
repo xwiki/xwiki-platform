@@ -17,19 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(['jquery', 'xwiki-events-bridge'], function($) {
+require(['jquery', 'xwiki-events-bridge'], function ($) {
 
-  let protectLinks = function(elements) {
-    let trustedDomainConfigElement = $('#trusted-domains-configuration');
+  let protectLinks = function (elements) {
+    let trustedDomainConfigElement = $('script#trusted-domains-configuration');
     if (trustedDomainConfigElement.length > 0) {
       let configuration = JSON.parse(trustedDomainConfigElement.text());
-      elements.find('a[href]').on('click', function (event) {
+      $(document).on('click', 'a[href]', function (event) {
         return askIfLinkNotTrusted(event, this, configuration);
       });
     }
   };
 
-  let askIfLinkNotTrusted = function (event, anchor, configuration) {
+function askIfLinkNotTrusted (event, anchor, configuration) {
     if (!isAnchorTrustedOomain(anchor, configuration.trustedDomains, configuration.whitelistedUrls)) {
       let currentHostname = window.location.hostname;
       let anchorHostname = anchor.hostname;

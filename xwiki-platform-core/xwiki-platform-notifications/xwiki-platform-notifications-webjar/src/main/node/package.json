@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "pnpm run type-check && pnpm run build-only",
     "build-only": "vite build",
     "dev": "vite",
     "format": "prettier --write src/",
@@ -30,7 +30,6 @@
     "eslint-plugin-vue": "catalog:",
     "jiti": "catalog:",
     "jsdom": "catalog:",
-    "npm-run-all2": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

@@ -41,11 +41,11 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  */
 public class ViewPage extends BasePage
 {
-    private static final String COMMENTS_TAB_ID = "Commentslink";
+    private static final String COMMENTS_TAB_ID = "Comments";
 
-    private static final String HISTORY_TAB_ID = "Historylink";
+    private static final String HISTORY_TAB_ID = "History";
 
-    private static final String INFORMATION_TAB_ID = "Informationlink";
+    private static final String INFORMATION_TAB_ID = "Information";
 
     @FindBy(id = "xwikicontent")
     private WebElement content;
@@ -56,6 +56,63 @@ public class ViewPage extends BasePage
     private BreadcrumbElement breadcrumb;
 
     /**
+     * @param id the tab identifier
+     * @return {@code true} if the tab with the given id is available on this page, {@code false} otherwise
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public boolean hasDocExtraPane(String id)
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(id + "link"));
+    }
+
+    /**
+     * Opens the document extra tab with the given id and returns its content.
+     * 
+     * @param id the tab identifier
+     * @return the content of the specified document extra tab
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public DocExtraPane openDocExtraPane(String id)
+    {
+        getDriver().findElement(By.id(id + "link")).click();
+        waitForDocExtraPaneActive(id);
+        return new DocExtraPane(id);
+    }
+
+    /**
+     * @param id the tab identifier
+     * @return {@code true} if the tab with the given id is currently active (visible), {@code false} otherwise
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public boolean isDocExtraPaneActive(String id)
+    {
+        return getDriver().findElement(By.id(id + "pane")).isDisplayed();
+    }
+
+    /**
+     * @param id the tab identifier
+     */
+    public void waitForDocExtraPaneActive(String id)
+    {
+        getDriver().waitUntilElementIsVisible(By.id(id + "pane"));
+    }
+
+    public DocExtraPane useShortcutForDocExtraPane(String id, CharSequence... shortcut)
+    {
+        // We send the shortcut to the active element because using the Actions API doesn't seem to work with key
+        // combinations (like Shift+T, tested both on Firefox and Chrome).
+        getDriver().switchTo().activeElement().sendKeys(shortcut);
+        waitForDocExtraPaneActive(id);
+        return new DocExtraPane(id);
+    }
+
+    /**
      * @return if the comments extra pane is available on this page
      * @since 17.7.0RC1
      * @since 17.4.3
@@ -63,7 +120,7 @@ public class ViewPage extends BasePage
      */
     public boolean hasCommentsDocExtraPane()
     {
-        return getDriver().hasElementWithoutWaiting(By.id(COMMENTS_TAB_ID));
+        return hasDocExtraPane(COMMENTS_TAB_ID);
     }
 
     /**
@@ -73,8 +130,13 @@ public class ViewPage extends BasePage
      */
     public CommentsTab openCommentsDocExtraPane()
     {
-        getDriver().findElement(By.id(COMMENTS_TAB_ID)).click();
-        waitForDocExtraPaneActive("comments");
+        openDocExtraPane(COMMENTS_TAB_ID);
+        return new CommentsTab();
+    }
+
+    public CommentsTab useShortcutKeyForCommentPane()
+    {
+        useShortcutForDocExtraPane(COMMENTS_TAB_ID, "c");
         return new CommentsTab();
     }
 
@@ -86,13 +148,18 @@ public class ViewPage extends BasePage
      */
     public boolean hasHistoryDocExtraPane()
     {
-        return getDriver().hasElementWithoutWaiting(By.id(HISTORY_TAB_ID));
+        return hasDocExtraPane(HISTORY_TAB_ID);
     }
 
     public HistoryPane openHistoryDocExtraPane()
     {
-        getDriver().findElement(By.id(HISTORY_TAB_ID)).click();
-        waitForDocExtraPaneActive("history");
+        openDocExtraPane(HISTORY_TAB_ID);
+        return new HistoryPane();
+    }
+
+    public HistoryPane useShortcutKeyForHistoryPane()
+    {
+        useShortcutForDocExtraPane(HISTORY_TAB_ID, "h");
         return new HistoryPane();
     }
 
@@ -104,13 +171,18 @@ public class ViewPage extends BasePage
      */
     public boolean hasInformationDocExtraPane()
     {
-        return getDriver().hasElementWithoutWaiting(By.id(INFORMATION_TAB_ID));
+        return hasDocExtraPane(INFORMATION_TAB_ID);
     }
 
     public InformationPane openInformationDocExtraPane()
     {
-        getDriver().findElement(By.id(INFORMATION_TAB_ID)).click();
-        waitForDocExtraPaneActive("information");
+        openDocExtraPane(INFORMATION_TAB_ID);
+        return new InformationPane();
+    }
+
+    public InformationPane useShortcutKeyForInformationPane()
+    {
+        useShortcutForDocExtraPane(INFORMATION_TAB_ID, "i");
         return new InformationPane();
     }
 
@@ -244,14 +316,6 @@ public class ViewPage extends BasePage
     }
 
     /**
-     * @param paneId valid values: "history", "comments", etc
-     */
-    public void waitForDocExtraPaneActive(String paneId)
-    {
-        getDriver().waitUntilElementIsVisible(By.id(paneId + "content"));
-    }
-
-    /**
      * Waits until the page has the passed content by refreshing the page
      * 
      * @param expectedValue the content value to wait for (in regex format), can be a subset of the full content
@@ -303,30 +367,6 @@ public class ViewPage extends BasePage
         // Note: this action was previously performed by sending a home key pressed event, which was not synchronous on 
         // Chrome, leading to flickering tests, notably when the scroll was followed by a drag and drop action.
         getDriver().scrollTo(0, 0);
-    }
-
-    protected void useShortcutForDocExtraPane(String shortcut, String pane)
-    {
-        getDriver().createActions().sendKeys(shortcut).perform();
-        waitForDocExtraPaneActive(pane);
-    }
-
-    public HistoryPane useShortcutKeyForHistoryPane()
-    {
-        useShortcutForDocExtraPane("h", "history");
-        return new HistoryPane();
-    }
-
-    public CommentsTab useShortcutKeyForCommentPane()
-    {
-        useShortcutForDocExtraPane("c", "comments");
-        return new CommentsTab();
-    }
-
-    public InformationPane useShortcutKeyForInformationPane()
-    {
-        useShortcutForDocExtraPane("i", "information");
-        return new InformationPane();
     }
 
     public String getTitleColor()

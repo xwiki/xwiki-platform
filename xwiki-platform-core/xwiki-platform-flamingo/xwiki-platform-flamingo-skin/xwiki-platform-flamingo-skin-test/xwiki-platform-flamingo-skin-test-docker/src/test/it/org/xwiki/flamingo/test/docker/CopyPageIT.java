@@ -137,7 +137,7 @@ class CopyPageIT
 
         // Verify the attachment version is the same
         // FIXME: Remove the following wait when XWIKI-6688 is fixed.
-        viewPage.waitForDocExtraPaneActive("comments");
+        viewPage.waitForDocExtraPaneActive("Comments");
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
     }

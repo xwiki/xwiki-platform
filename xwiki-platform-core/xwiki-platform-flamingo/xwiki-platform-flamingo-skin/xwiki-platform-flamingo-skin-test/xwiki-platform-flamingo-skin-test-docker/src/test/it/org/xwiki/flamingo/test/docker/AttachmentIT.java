@@ -138,13 +138,13 @@ class AttachmentIT
         assertEquals("This is a small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
 
-        viewPage.waitForDocExtraPaneActive("attachments");
+        viewPage.waitForDocExtraPaneActive("Attachments");
         attachmentsPane.waitForAttachmentsLiveData();
 
         attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).click();
         assertEquals("This is another small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
-        viewPage.waitForDocExtraPaneActive("attachments");
+        viewPage.waitForDocExtraPaneActive("Attachments");
 
         // Upload another version of the first attachment
         attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, "v2/" + FIRST_ATTACHMENT).getAbsolutePath());
@@ -158,7 +158,7 @@ class AttachmentIT
         attachmentsPane.getAttachmentLink(FIRST_ATTACHMENT).click();
         assertEquals("This is a small attachment v2.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
-        viewPage.waitForDocExtraPaneActive("attachments");
+        viewPage.waitForDocExtraPaneActive("Attachments");
         attachmentsPane.waitForAttachmentsLiveData();
 
         attachmentsPane.deleteAttachmentByFileByName(FIRST_ATTACHMENT);

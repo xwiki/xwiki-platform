@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="ExtensionCode.ExtensionSheet" locale="">
+<xwikidoc version="1.6" reference="ExtensionCode.ExtensionSheet" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionSheet</name>
   <language/>
@@ -182,7 +182,7 @@
         ##------- Download button ------
         #set($lastVersion = $doc.getValue("lastVersion"))
         #if ("$!lastVersion" != '')
-          #set ($lastVersionObject = $doc.getObject("ExtensionCode.ExtensionVersionClass", 'version', $lastVersion))
+          #set ($lastVersionObject = $services.repository.getVersionObject($extension.getProperty('id').value, $lastVersion))
           #set ($version = $lastVersionObject.getProperty('version').value)
           #set ($download = $lastVersionObject.getProperty("download").value)
           #if ("$!download" == '')
@@ -302,7 +302,12 @@
     #end
 
     ## Only display release notes if there are downloads and release notes
-    #if ($lastVersionObject)
+    #if ($doc.getValue('versionPage') == 1)
+      #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
+      = Versions =
+
+      {{include page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+    #elseif ($lastVersionObject)
       #set ($releaseNotes = [])
       #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
       #foreach ($versionObject in $versions)
@@ -321,23 +326,23 @@
           $entry.get(1)
         #end
       #end
+    #end
 
-      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
-      #if ($extensionDependencies.size() &gt; 0)
-        = Dependencies =
+    #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
+    #if ($extensionDependencies.size() &gt; 0)
+      = Dependencies =
 
-         Dependencies for this extension ($services.rendering.escape("${extension.getValue('id')} ${doc.getValue('lastVersion')}", 'xwiki/2.1')):
-         #foreach($extensionDependency in $extensionDependencies)
-          #set($dependencyDocumentName = $null)
-          #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
-          #if (!$dependencyDocumentNames.isEmpty())
-            #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
-          #end
-          #if ($dependencyDocumentName)
-            * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
-          #else
-            * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
-          #end
+       Dependencies for this extension ($services.rendering.escape("${extension.getValue('id')} ${doc.getValue('lastVersion')}", 'xwiki/2.1')):
+       #foreach($extensionDependency in $extensionDependencies)
+        #set($dependencyDocumentName = $null)
+        #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
+        #if (!$dependencyDocumentNames.isEmpty())
+          #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
+        #end
+        #if ($dependencyDocumentName)
+          * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
+        #else
+          * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
         #end
       #end
     #end
@@ -404,8 +409,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -425,6 +433,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -434,6 +443,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -469,6 +480,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -549,8 +562,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -570,6 +586,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -579,6 +596,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -614,6 +633,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

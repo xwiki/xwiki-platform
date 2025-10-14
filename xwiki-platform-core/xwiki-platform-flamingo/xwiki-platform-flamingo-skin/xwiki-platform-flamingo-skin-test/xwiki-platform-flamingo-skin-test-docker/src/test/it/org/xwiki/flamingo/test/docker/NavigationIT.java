@@ -27,6 +27,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoAlertPresentException;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
@@ -35,6 +38,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.InformationPane;
@@ -43,6 +47,7 @@ import org.xwiki.test.ui.po.editor.EditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests related to navigation in the wiki.
@@ -50,7 +55,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.10
  * @version $Id$
  */
-@UITest
+@UITest(properties = {
+    "xwikiPropertiesAdditionalProperties=url.trustedDomains=www.xwiki.org,extensions.xwiki.org\n"
+        + "url.allowedFrontendUrls=https://github.com/xwiki/xwiki-platform,https://github.com/xwiki/"
+})
 public class NavigationIT
 {
     @BeforeAll
@@ -205,5 +213,88 @@ public class NavigationIT
         testUtils.gotoPage(testUtils.getBaseBinURL());
         ViewPage viewPage = new ViewPage();
         assertEquals("XWiki - Main - Main", viewPage.getPageTitle());
+    }
+
+    @Order(5)
+    @Test
+    void navigationToExternalPages(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        String pageContent = """
+            [[Internal link>>doc:Navigation.Test]]
+            [[Google external>>https://www.google.com]]
+            [[XWiki.org external>>https://www.xwiki.org]]
+            [[Contrib xwiki>>https://contrib.xwiki.org]]
+            [[Extensions xwiki>>https://extensions.xwiki.org]]
+            [[Specific extensions pages>>https://extensions.xwiki.org/bin/view/WebHome]]
+            [[Github commons>>https://github.com/xwiki/xwiki-commons]]
+            [[Github XWiki>>https://github.com/xwiki/]]
+            [[Github platform>>https://github.com/xwiki/xwiki-platform]]
+            """;
+        testUtils.rest().savePage(testReference, pageContent, "Test link navigation");
+        testUtils.rest().savePage(new DocumentReference("xwiki", "Navigation", "Test"), "Test navigation internal "
+            + "link", "Navigation test page");
+
+        XWikiWebDriver driver = testUtils.getDriver();
+        testUtils.gotoPage(testReference);
+        driver.findElementWithoutWaiting(By.linkText("Google external")).click();
+        Alert alert = driver.switchTo().alert();
+        assertEquals("You are about to leave the domain \"host.testcontainers.internal\" to follow a link "
+            + "to \"www.google.com\". Are you sure you want to continue?", alert.getText());
+        alert.dismiss();
+
+        driver.findElementWithoutWaiting(By.linkText("Internal link")).click();
+        ViewPage viewPage = new ViewPage();
+        assertEquals("Test navigation internal link", viewPage.getContent());
+
+        testUtils.gotoPage(testReference);
+        driver.findElementWithoutWaiting(By.linkText("XWiki.org external")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        testUtils.gotoPage(testReference);
+        driver.findElementWithoutWaiting(By.linkText("Contrib xwiki")).click();
+        alert = driver.switchTo().alert();
+        assertEquals("You are about to leave the domain \"host.testcontainers.internal\" to follow a link "
+            + "to \"contrib.xwiki.org\". Are you sure you want to continue?", alert.getText());
+        alert.dismiss();
+
+        driver.findElementWithoutWaiting(By.linkText("Extensions xwiki")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        testUtils.gotoPage(testReference);
+        driver.findElementWithoutWaiting(By.linkText("Specific extensions pages")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        testUtils.gotoPage(testReference);
+        driver.findElementWithoutWaiting(By.linkText("Github commons")).click();
+        assertEquals("You are about to leave the domain \"host.testcontainers.internal\" to follow a link "
+            + "to \"github.com\". Are you sure you want to continue?", alert.getText());
+        alert.dismiss();
+
+        driver.findElementWithoutWaiting(By.linkText("Github XWiki")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        testUtils.gotoPage(testReference);
+        driver.findElementWithoutWaiting(By.linkText("Github platform")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
     }
 }

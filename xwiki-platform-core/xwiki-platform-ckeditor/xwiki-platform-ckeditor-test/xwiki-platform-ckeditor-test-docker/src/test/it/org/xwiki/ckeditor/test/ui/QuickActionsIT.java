@@ -30,10 +30,12 @@ import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditorDialog;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
@@ -456,20 +458,27 @@ class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(20)
-    void include()
+    void include(TestUtils testUtils) throws Exception
     {
+        testUtils.rest().savePage(new DocumentReference("xwiki", "QuickActionsIT", "TestInclude"), "Test include",
+            "Test include");
         textArea.sendKeys("/inc");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/inc", "Include Page");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        // Empty form
-        new MacroDialogEditModal().waitUntilReady().clickSubmit();
+        MacroDialogEditModal macroDialogEditModal = new MacroDialogEditModal().waitUntilReady();
+        SuggestInputElement reference =
+            new SuggestInputElement(macroDialogEditModal.getMacroParameterInput("reference"));
+        reference.sendKeys("TestInclude")
+            .waitForNonTypedSuggestions()
+            .selectByIndex(0);
+        macroDialogEditModal.clickSubmit();
 
         textArea = editor.getRichTextArea();
 
-        assertSourceEquals("{{include/}}");
+        assertSourceEquals("{{include reference=\"QuickActionsIT.TestInclude\"/}}");
     }
 
     @Test

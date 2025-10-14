@@ -303,9 +303,7 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
 <script type="application/json" id="trusted-domains-configuration">
 {
   "trustedDomains": $jsontool.serialize($services.security.url.getTrustedDomains()),
-  "allowedUrls": $jsontool.serialize($services.security.url.getAllowedFrontendUrls()),
-  "confirmationText": $jsontool.serialize($services.localization.render('url.api.followLinkConfirmationText',
-    ['__CURRENT_DOMAIN__', '__EXTERNAL_DOMAIN__']))
+  "allowedUrls": $jsontool.serialize($services.security.url.getAllowedFrontendUrls())
 }
 </script>
   $xwiki.jsfx.use('uicomponents/link/link-protection.js')##

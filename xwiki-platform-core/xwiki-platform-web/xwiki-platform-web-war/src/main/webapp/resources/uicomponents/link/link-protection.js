@@ -17,53 +17,69 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(['jquery', 'xwiki-events-bridge'], function ($) {
+define('link-protection-translations', {
+  prefix: '',
+  keys: [
+    'url.api.followLinkConfirmationText'
+  ]
+});
+require(['jquery', 'xwiki-l10n!link-protection-translations', 'xwiki-events-bridge'], function ($, l10n) {
 
-  let protectLinks = function (elements) {
-    let trustedDomainConfigElement = $('script#trusted-domains-configuration');
-    if (trustedDomainConfigElement.length > 0) {
-      let configuration = JSON.parse(trustedDomainConfigElement.text());
-      $(document).on('click', 'a[href]', function (event) {
-        return askIfLinkNotTrusted(event, this, configuration);
-      });
+  function protectLinks () {
+    let configuration = null;
+    try {
+      const trustedDomainConfigElement = $('script#trusted-domains-configuration');
+      if (trustedDomainConfigElement.length > 0) {
+        configuration = JSON.parse(trustedDomainConfigElement.text());
+      }
+    } catch (err) {
+      console.error("Error while parsing the trusted domain configurations, falling back on enforcing checks on all" +
+        " links going outside current domain.", err);
     }
-  };
+    $(document).on('click', 'a[href]', function (event) {
+      return askIfLinkNotTrusted(event, this, configuration);
+    });
+  }
 
-function askIfLinkNotTrusted (event, anchor, configuration) {
-    if (!isAnchorTrustedOomain(anchor, configuration.trustedDomains, configuration.allowedUrls)) {
-      let currentHostname = window.location.hostname;
-      let anchorHostname = anchor.hostname;
-      let customizedMessage = configuration.confirmationText
-        .replace('__CURRENT_DOMAIN__', currentHostname)
-        .replace('__EXTERNAL_DOMAIN__', anchorHostname);
+  function askIfLinkNotTrusted (event, anchor, configuration) {
+    let currentHostname = window.location.hostname;
+    let anchorHostname = anchor.hostname;
+    let customizedMessage = l10n.get('url.api.followLinkConfirmationText', currentHostname, anchorHostname);
+    if (configuration == null && !isAnchorCurrentDomain(anchor)) {
+      return confirm(customizedMessage);
+    } else if (!isAnchorTrustedOomain(anchor, configuration.trustedDomains, configuration.allowedUrls)) {
       return confirm(customizedMessage);
     } else {
       return true;
     }
-  };
+  }
 
-  let isAnchorTrustedOomain = function (anchor, trustedDomains, allowedUrls) {
+  function isAnchorCurrentDomain (anchor) {
     let currentHostname = window.location.hostname;
     let anchorHostname = anchor.hostname;
-    if (currentHostname === anchorHostname) {
+    return (!anchorHostname || anchorHostname === currentHostname);
+  }
+
+  function isAnchorTrustedOomain (anchor, trustedDomains, allowedUrls) {
+    if (isAnchorCurrentDomain(anchor)) {
       return true;
     } else {
-      for (let i = 0; i < allowedUrls.length; i++) {
-        if (anchor.href.startsWith(allowedUrls[i])) {
-          return true;
-        }
+      if (allowedUrls.indexOf(anchor.href) > -1) {
+        return true;
       }
-      for (let i = 0; i < trustedDomains.length; i++) {
-        if (anchorHostname.indexOf(trustedDomains[i]) !== -1) {
+      let host = anchor.hostname;
+      do {
+        if (trustedDomains.indexOf(host) > -1) {
           return true;
+        } else if (host.indexOf(".") > -1) {
+          host = host.substring(host.indexOf(".") + 1);
+        } else {
+          host = "";
         }
-      }
+      } while (host !== "");
     }
     return false;
-  };
+  }
 
-  $(document).on('xwiki:dom:updated', function(event, data) {
-    protectLinks($(data.elements));
-  });
-  protectLinks($('body'));
+  (XWiki.domIsLoaded && protectLinks()) || document.observe('xwiki:dom:loaded', protectLinks);
 });

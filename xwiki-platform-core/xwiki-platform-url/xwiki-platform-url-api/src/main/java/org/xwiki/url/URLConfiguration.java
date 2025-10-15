@@ -94,6 +94,8 @@ public interface URLConfiguration
      * to an authorized domain. This is independent from {@link #isTrustedDomainsEnabled()} which aims at enabling
      * checks server side only.
      * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
      */
     @Unstable
     default boolean isFrontendUrlCheckEnabled()
@@ -108,6 +110,8 @@ public interface URLConfiguration
      *
      * @return the list of allowed frontend URLs
      * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
      */
     @Unstable
     default List<String> getAllowedFrontendUrls()

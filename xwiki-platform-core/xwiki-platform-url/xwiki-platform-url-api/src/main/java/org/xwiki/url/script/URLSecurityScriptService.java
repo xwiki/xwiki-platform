@@ -81,6 +81,8 @@ public class URLSecurityScriptService implements ScriptService
     /**
      * @return the list of trusted domains.
      * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
      */
     @Unstable
     public List<String> getTrustedDomains()
@@ -91,6 +93,8 @@ public class URLSecurityScriptService implements ScriptService
     /**
      * @return {@code true} if the mechanism to enforce URLs check on frontend is enabled.
      * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
      */
     @Unstable
     public boolean isFrontendUrlCheckEnabled()
@@ -101,6 +105,8 @@ public class URLSecurityScriptService implements ScriptService
     /**
      * @return the list of URLs that are allowed to avoid asking confirmation to users when accessing them.
      * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
      */
     @Unstable
     public List<String> getAllowedFrontendUrls()

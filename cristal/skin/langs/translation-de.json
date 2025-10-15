@@ -1,0 +1,21 @@
+{
+    "page.creation.menu.button": "Neue Seite",
+    "information.extraTabs.title": "Information",
+    "page.creation.menu.field.name": "Name",
+    "third": "Dritte",
+    "page.creation.menu.title": "Neue Seite",
+    "page.actions.create.label": "Erstelle ein neues Dokument",
+    "page.creation.menu.field.location": "Übergeordneter Speicherort",
+    "history.alert.content": "Du siehst gerade Version {revision} von {pageName}. Die Bearbeitung ist deaktiviert.",
+    "history.alert.link.label": "Klicke hier, um zur neuesten Version zurückzukehren.",
+    "page.creation.menu.submit": "Erstellen",
+    "article.loading": "Lädt...",
+    "page.edited.details.user": "{user} bearbeitete am {date}",
+    "page.edited.details": "Bearbeitet am {date}",
+    "page.creation.menu.alert.content": "Die Seite {pageName} existiert bereits.",
+    "page.creation.menu.alert.content.edit": "Die Seite {pageName} existiert bereits, verwende entweder einen anderen Namen oder {link}.",
+    "page.creation.menu.alert.content.edit.link": "die bestehende Seite bearbeiten",
+    "page.creation.menu.field.location.help": "Übergeordnete Seite der neuen Seite",
+    "page.creation.menu.field.name.help": "Name der neuen Seite",
+    "page.creation.menu.cancel": "Abbrechen"
+}

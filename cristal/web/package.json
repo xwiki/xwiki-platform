@@ -1,0 +1,52 @@
+{
+  "private": true,
+  "name": "@xwiki/cristal-web",
+  "version": "0.22.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "web",
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "clean": "rimraf dist",
+    "dev": "vite dev",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "quickstart": "pnpm run build --scope @xwiki/cristal-app && NODE_ENV=production node src/server.js",
+    "start": "pnpm run build && NODE_ENV=production node src/server.js",
+    "start:e2e:xwiki": "pnpm run -C ../sources/xwiki/mock-server dev",
+    "test:e2e": "playwright test",
+    "typecheck": "vue-tsc"
+  },
+  "dependencies": {
+    "@xwiki/cristal-authentication-github": "workspace:*",
+    "@xwiki/cristal-authentication-nextcloud": "workspace:*",
+    "@xwiki/cristal-authentication-xwiki": "workspace:*",
+    "@xwiki/cristal-browser-default": "workspace:*",
+    "@xwiki/cristal-configuration-api": "workspace:*",
+    "@xwiki/cristal-configuration-web": "workspace:*",
+    "@xwiki/cristal-lib": "workspace:*",
+    "@xwiki/cristal-settings-browser": "workspace:*",
+    "express": "catalog:",
+    "inversify": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "catalog:",
+    "@eslint/js": "catalog:",
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "globals": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

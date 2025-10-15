@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "types": [
+      "vite/client",
+      "@xwiki/cristal-dsapi"
+    ],
+    "isolatedDeclarations": false
+  },
+  "extends": "./../tsconfig.json",
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "private": true,
+  "name": "@xwiki/cristal-sources-xwiki-mock-server",
+  "version": "0.22.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "sources/xwiki/mock-server",
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "dev": "nodemon src/index.ts",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "dotenv": "catalog:",
+    "express": "catalog:"
+  },
+  "devDependencies": {
+    "@types/express": "catalog:",
+    "nodemon": "catalog:",
+    "ts-node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

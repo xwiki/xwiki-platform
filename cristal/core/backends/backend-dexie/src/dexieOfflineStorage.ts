@@ -1,0 +1,100 @@
+/**
+ * See the LICENSE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+import DexiePageStorage from "./dexiePageStorage";
+import { DefaultPageData } from "@xwiki/cristal-api";
+import { inject, injectable } from "inversify";
+import type { Logger, PageData } from "@xwiki/cristal-api";
+import type { OfflineStorage } from "@xwiki/cristal-backend-api";
+
+@injectable()
+export default class DexieOfflineStorage implements OfflineStorage {
+  private pageStorageMap: Map<string, DexiePageStorage> = new Map<
+    string,
+    DexiePageStorage
+  >();
+  private logger: Logger;
+
+  constructor(@inject("Logger") logger: Logger) {
+    this.logger = logger;
+    this.logger.setModule("storage.components.dexieOfflineStorage");
+  }
+
+  getPageStorage(wikiName: string): DexiePageStorage {
+    let pageStorage = this.pageStorageMap.get(wikiName);
+    if (pageStorage == null) {
+      pageStorage = new DexiePageStorage(wikiName);
+      this.pageStorageMap.set(wikiName, pageStorage);
+    }
+    return pageStorage;
+  }
+
+  async getPage(wikiName: string, id: string): Promise<PageData | undefined> {
+    try {
+      this.logger.debug("Ready to load page from local storage", id);
+      const pageStorage = this.getPageStorage(wikiName);
+      this.logger.debug("pageStorage is ready, asking for page");
+      const pageObject = await pageStorage.pages.get(id);
+      const pageData = new DefaultPageData();
+      pageData.fromObject(pageObject);
+      return pageData;
+    } catch (e) {
+      this.logger.debug("Exception while trying to read from local storage", e);
+      return undefined;
+    }
+  }
+
+  async savePage(wikiName: string, id: string, page: PageData): Promise<void> {
+    try {
+      const pageStorage = this.getPageStorage(wikiName);
+      // Put must be used instead of get since the later does not allow for
+      // content update.
+      await pageStorage.pages.put(page.toObject(), id);
+    } catch (e) {
+      this.logger.debug(
+        "Exception while trying to store in local storage",
+        wikiName,
+        id,
+        page,
+        e,
+      );
+    }
+  }
+
+  async updatePage(
+    wikiName: string,
+    id: string,
+    page: PageData,
+  ): Promise<void> {
+    try {
+      const pageStorage = this.getPageStorage(wikiName);
+      this.logger.debug("Ready to store", page);
+      await pageStorage.pages.update(id, page.toObject());
+    } catch (e) {
+      this.logger.debug(
+        "Exception while trying to store in local storage",
+        wikiName,
+        id,
+        page,
+        e,
+      );
+    }
+  }
+}

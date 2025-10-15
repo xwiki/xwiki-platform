@@ -1,0 +1,330 @@
+/**
+ * See the LICENSE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+import { expect, test } from "@playwright/test";
+import { DesignSystem } from "./DesignSystem";
+import { BreadcrumbPageObject } from "./pageObjects/Breadcrumb";
+import { FormPageObject } from "./pageObjects/Form";
+import { HistoryExtraTabPageObject } from "./pageObjects/HistoryExtraTab";
+import { NavigationTreePageObject } from "./pageObjects/NavigationTree";
+import { SidebarPageObject } from "./pageObjects/Sidebar";
+import { screenshotIfTestFailed } from "./screenshot-failures";
+
+test.afterEach(async ({ page }, testInfo) => {
+  await screenshotIfTestFailed(page, testInfo);
+});
+
+// A set of variability setting
+const configs: {
+  localDefaultPage: string;
+  offlineDefaultPage?: string;
+  name: string;
+  designSystem: DesignSystem;
+}[] = [
+  {
+    name: "Vuetify",
+    localDefaultPage: "/Localhost/#/Main.WebHome/view",
+    offlineDefaultPage: "/LocalhostOffline/#/Main.Offline/view",
+    designSystem: DesignSystem.VUETIFY,
+  },
+  {
+    name: "Shoelace",
+    localDefaultPage: "/LocalhostSL/#/Main.WebHome/view",
+    designSystem: DesignSystem.SHOELACE,
+  },
+];
+configs.forEach(
+  ({ name, localDefaultPage, offlineDefaultPage, designSystem }) => {
+    test(`[${name}] has title`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      // Expect a title "to contain" a substring.
+      await expect(page).toHaveTitle(/Cristal Wiki/);
+    });
+
+    test(`[${name}] has content`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      const locator = page.locator("#xwikicontent");
+      await expect(locator).toContainText("Welcome to Main.WebHome");
+    });
+
+    test(`[${name}] can follow links`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      await page.locator('a[href="Page2.WebHome"]').click();
+
+      await expect(page.locator("#xwikicontent")).toContainText(
+        "Welcome to Page2.WebHome",
+      );
+
+      await page.goBack();
+
+      await expect(page.locator("#xwikicontent")).toContainText(
+        "Welcome to Main.WebHome",
+      );
+    });
+
+    test(`[${name}] has breadcrumb`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      const breadcrumbItems = await new BreadcrumbPageObject(
+        page,
+        designSystem,
+      ).findItems();
+
+      expect(breadcrumbItems.length).toEqual(2);
+      await expect(breadcrumbItems[0].getText()).toContainText("Home");
+      expect(await breadcrumbItems[0].getLinkTarget()).toEqual(
+        "#/Main.WebHome/view",
+      );
+      await expect(breadcrumbItems[1].getText()).toContainText("Main");
+      expect(await breadcrumbItems[1].getLinkTarget()).toEqual(
+        "#/Main.WebHome/view",
+      );
+    });
+
+    test(`[${name}] has navigation tree`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      await new SidebarPageObject(page).openSidebar();
+      const navigationTreeNodes = await new NavigationTreePageObject(
+        page,
+        designSystem,
+      ).findItems();
+
+      expect(navigationTreeNodes.length).toEqual(4);
+      await expect(navigationTreeNodes[0].getText()).toContainText("Help");
+      expect(await navigationTreeNodes[0].getLinkTarget()).toEqual(
+        "#/Help.WebHome/view",
+      );
+      await expect(navigationTreeNodes[1].getText()).toContainText(
+        "Terminal Page",
+      );
+      expect(await navigationTreeNodes[1].getLinkTarget()).toEqual(
+        "#/Terminal/view",
+      );
+      await expect(navigationTreeNodes[2].getText()).toContainText(
+        "Deep Page Root",
+      );
+      expect(await navigationTreeNodes[2].getLinkTarget()).toEqual(
+        "#/Deep1.WebHome/view",
+      );
+      await expect(navigationTreeNodes[3].getText()).toContainText(
+        "Cristal Wiki",
+      );
+      expect(await navigationTreeNodes[3].getLinkTarget()).toEqual(
+        "#/Main.WebHome/view",
+      );
+
+      await navigationTreeNodes[2].expand();
+      const children = await navigationTreeNodes[2].getChildren();
+      expect(children.length).toEqual(1);
+      await expect(children[0].getText()).toContainText("Deep Page Leaf");
+      expect(await children[0].getLinkTarget()).toEqual("#/Deep1.Deep2/view");
+    });
+
+    test(`[${name}] has working history`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      const revisions = await new HistoryExtraTabPageObject(
+        page,
+        designSystem,
+      ).findRevisions();
+      expect(revisions.length == 3);
+      expect(await revisions[0].getVersion()).toEqual("3.1");
+      expect(await revisions[1].getVersion()).toEqual("2.1");
+      expect(await revisions[2].getVersion()).toEqual("1.1");
+      expect(await revisions[0].getDate()).toEqual("1/1/24, 8:00 PM");
+      expect(await revisions[1].getDate()).toEqual("1/1/22, 8:00 PM");
+      expect(await revisions[2].getDate()).toEqual("1/1/20, 8:00 PM");
+      expect(await revisions[0].getUser()).toEqual("XWiki.User3");
+      expect(await revisions[1].getUser()).toEqual("XWiki.User2");
+      expect(await revisions[2].getUser()).toEqual("XWiki.User1");
+      expect(await revisions[0].getComment()).toEqual("Best version");
+      expect(await revisions[1].getComment()).toEqual("");
+      expect(await revisions[2].getComment()).toEqual("Initial version");
+
+      // We open a revision and check that the content updated.
+      await (await revisions[1].getLink()).click();
+      await expect(page.locator("#xwikicontent")).toContainText("Revision 2.1");
+    });
+
+    test(`[${name}] has working editor on new page`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      await new SidebarPageObject(page).openSidebar();
+      await page.locator("#sidebar #new-page-button").nth(0).click();
+
+      const newPageDialogForm = page.locator("#page-creation-form");
+      await newPageDialogForm.dispatchEvent("submit");
+
+      const editorHeader = page.locator(".content .doc-header input").nth(0);
+      const editorContent = page.locator(".content .doc-content p").nth(0);
+      expect(await editorHeader.getAttribute("placeholder")).toEqual("NewPage");
+      await expect(editorHeader).toBeEmpty();
+      expect(await editorContent.getAttribute("data-placeholder")).toEqual(
+        "Type '/' to show the available actions",
+      );
+      expect(await editorContent.textContent()).toBe("");
+    });
+
+    test(`[${name}] checks for existing page during creation`, async ({
+      page,
+    }) => {
+      await page.goto(localDefaultPage);
+
+      await new SidebarPageObject(page).openSidebar();
+      await page.locator("#sidebar #new-page-button").nth(0).click();
+
+      const newPageDialogForm = page.locator("#page-creation-form");
+      await expect(newPageDialogForm).toBeVisible();
+      await page.keyboard.insertText("ExistingPage");
+      await newPageDialogForm.dispatchEvent("submit");
+
+      const newPageDialogAlerts = page.locator("#new-page-content .alerts");
+      await expect(newPageDialogAlerts).toContainText(
+        "The page Main.ExistingPage.WebHome already exists.",
+      );
+
+      // We click outside the dialog to close it.
+      await page.locator("body").click({ position: { x: 0, y: 0 } });
+
+      // We reopen the dialog to check that the error has been cleaned.
+      await page.locator("#sidebar #new-page-button").nth(0).click();
+      await expect(newPageDialogForm).toBeVisible();
+      await expect(newPageDialogAlerts).toBeEmpty();
+    });
+
+    test(`[${name}] has working navigation`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      const sidebar = new SidebarPageObject(page);
+      await sidebar.openSidebar();
+      const navigationTreeNodes = await new NavigationTreePageObject(
+        page,
+        designSystem,
+      ).findItems();
+
+      expect(await navigationTreeNodes[2].getLinkTarget()).toEqual(
+        "#/Deep1.WebHome/view",
+      );
+      await navigationTreeNodes[2].expand();
+      const children = await navigationTreeNodes[2].getChildren();
+      expect(await children[0].getLinkTarget()).toEqual("#/Deep1.Deep2/view");
+
+      // We navigate to Deep1.Deep2 through the Navigation Tree.
+      await children[0].getLink().click();
+      expect(page.url()).toMatch(/#\/Deep1\.Deep2\/view$/);
+      await sidebar.hideSidebar();
+
+      const breadcrumbItems = await new BreadcrumbPageObject(
+        page,
+        designSystem,
+      ).findItems();
+      expect(await breadcrumbItems[1].getLinkTarget()).toEqual(
+        "#/Deep1.WebHome/view",
+      );
+
+      // We navigate to Deep1.WebHome through the Breadcrumb.
+      await breadcrumbItems[1].getLink().click();
+      expect(page.url()).toMatch(/#\/Deep1\.WebHome\/view$/);
+    });
+
+    test(`[${name}] allows creating a new configuration`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      const sidebar = new SidebarPageObject(page);
+      await sidebar.openSidebar();
+      await page.locator(".bi-gear").nth(0).click();
+
+      const configurationForm = new FormPageObject(
+        page,
+        page.locator("form").filter({ visible: true }).nth(0),
+        designSystem,
+      );
+
+      await configurationForm
+        .findInputFromLabel("Name")
+        .setValue("Test Configuration");
+      await configurationForm.findSelectFromLabel("Type").setValue("XWiki");
+      await configurationForm.submit();
+
+      await expect(
+        page.getByText("Editing Test Configuration (XWiki)"),
+      ).toBeVisible();
+      const configurationEditForm = new FormPageObject(
+        page,
+        page.locator("form").filter({ visible: true }).nth(1),
+        designSystem,
+      );
+
+      await configurationEditForm
+        .findSelectFromLabel("Design System")
+        .setValue("shoelace");
+      await configurationEditForm.submit();
+
+      const newConfiguration = page.locator(".grid-container >div").last();
+      await expect(newConfiguration.locator(".wiki-name")).toContainText(
+        "Test Configuration",
+      );
+      await expect(newConfiguration.locator(".ds-name")).toContainText(
+        "Design System: shoelace",
+      );
+
+      // Check exact stored values in local storage.
+      const storedConfiguration = JSON.parse(
+        (await page.evaluate(() => localStorage.getItem("settings"))) ?? "",
+      )["configuration"]["Test Configuration"];
+
+      expect(storedConfiguration).toStrictEqual({
+        configType: "XWiki",
+        name: "Test Configuration",
+        designSystem: "shoelace",
+      });
+    });
+
+    test(`[${name}] can load pages with dots`, async ({ page }) => {
+      await page.goto("Localhost/#/Main.Page%5C.With%5C.Dots/view");
+
+      const locator = page.locator("#xwikicontent");
+      await expect(locator).toContainText("Welcome to Main.Page\\.With\\.Dots");
+    });
+
+    if (offlineDefaultPage) {
+      test(`[${name}] offline actually fetch updated versions`, async ({
+        page,
+      }) => {
+        await page.goto(offlineDefaultPage);
+
+        const locator = page.locator("#xwikicontent");
+        await expect(locator).toContainText("Welcome to Main.Offline");
+        const textBefore = (await page.locator(".offlinecount").textContent())!;
+        await page.reload();
+        await expect(locator).toContainText("Welcome to Main.Offline");
+        // Assert that at some point to page content is reloaded with a more recent
+        // version from the server (the counter is incremented by one at each
+        // request).
+        const textContent = page.locator(".offlinecount");
+        await expect(textContent).toContainText(`${parseInt(textBefore) + 1}`);
+      });
+    }
+  },
+);

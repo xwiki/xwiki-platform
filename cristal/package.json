@@ -1,0 +1,85 @@
+{
+  "private": true,
+  "name": "@xwiki/cristal-root",
+  "version": "0.0.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "scripts": {
+    "api-extractor:local": "nx run-many -t api-extractor:local",
+    "build": "nx run-many -t build --nxBail=true",
+    "clean": "nx run-many -t clean",
+    "dev": "nx build @xwiki/cristal-web && concurrently --kill-others 'pnpm run dev:cristal-web' 'pnpm run dev:cristal-realtime' 'pnpm run dev:cristal-authentication-server'",
+    "dev:cristal-authentication-server": "nx dev @xwiki/cristal-authentication-server",
+    "dev:cristal-realtime": "nx dev @xwiki/cristal-realtime",
+    "dev:cristal-web": "nx dev @xwiki/cristal-web",
+    "lint": "nx run-many -t lint",
+    "quickstart": "nx run @xwiki/cristal-web:quickstart",
+    "start": "nx run @xwiki/cristal-web:start",
+    "start:electron": "concurrently --kill-others 'pnpm run start:electron:ui' 'pnpm run dev:cristal-realtime' 'pnpm run dev:cristal-authentication-server'",
+    "start:electron:ui": "nx build @xwiki/cristal-electron-main && nx build @xwiki/cristal-electron-renderer && nx build @xwiki/cristal-electron-storage && nx run @xwiki/cristal-electron:start",
+    "test": "nx run-many -t test",
+    "typecheck": "nx run-many -t typecheck"
+  },
+  "devDependencies": {
+    "@changesets/cli": "catalog:",
+    "@eslint/config-helpers": "catalog:",
+    "@eslint/eslintrc": "catalog:",
+    "@eslint/js": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
+    "@microsoft/tsdoc": "catalog:",
+    "@microsoft/tsdoc-config": "catalog:",
+    "@typescript-eslint/eslint-plugin": "catalog:",
+    "@typescript-eslint/parser": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "concurrently": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-import-resolver-typescript": "catalog:",
+    "eslint-plugin-headers": "catalog:",
+    "eslint-plugin-import": "catalog:",
+    "eslint-plugin-prettier": "catalog:",
+    "eslint-plugin-promise": "catalog:",
+    "eslint-plugin-tsdoc": "catalog:",
+    "eslint-plugin-vue": "catalog:",
+    "globals": "catalog:",
+    "happy-dom": "catalog:",
+    "jiti": "catalog:",
+    "nx": "catalog:",
+    "prettier": "catalog:",
+    "publint": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-css-injected-by-js": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:",
+    "vue-eslint-parser": "catalog:"
+  },
+  "engines": {
+    "node": "22.20.0"
+  },
+  "packageManager": "pnpm@10.18.2",
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "electron-winstaller",
+      "esbuild",
+      "nx",
+      "unrs-resolver",
+      "vue-demi"
+    ],
+    "onlyBuiltDependencies": [
+      "electron"
+    ]
+  }
+}

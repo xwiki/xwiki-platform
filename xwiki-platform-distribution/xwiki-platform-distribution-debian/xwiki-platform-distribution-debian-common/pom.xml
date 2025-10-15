@@ -78,6 +78,15 @@
             <goals>
               <goal>register</goal>
             </goals>
+            <configuration>
+              <extensionOverrides combine.children="append">
+                <extensionOverride>
+                  <id>${project.groupId}:${project.artifactId}</id>
+                  <!-- Make sure the xed file ends up with the XWiki version and not the incremented Debian version-->
+                  <version>${platform.version}</version>
+                </extensionOverride>
+              </extensionOverrides>
+            </configuration>
           </execution>
         </executions>
       </plugin>

@@ -19,7 +19,6 @@
  */
 package org.xwiki.url.internal;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -67,7 +66,7 @@ public class DefaultURLConfiguration implements URLConfiguration
     @Override
     public List<String> getTrustedDomains()
     {
-        return this.configuration.get().getProperty(PREFIX + "trustedDomains", Collections.emptyList());
+        return this.configuration.get().getProperty(PREFIX + "trustedDomains", List.of());
     }
 
     @Override
@@ -80,5 +79,17 @@ public class DefaultURLConfiguration implements URLConfiguration
     public List<String> getTrustedSchemes()
     {
         return this.configuration.get().getProperty(PREFIX + "trustedSchemes", List.of("http", "https", "ftp"));
+    }
+
+    @Override
+    public boolean isFrontendUrlCheckEnabled()
+    {
+        return this.configuration.get().getProperty(PREFIX + "frontendUrlCheckEnabled", true);
+    }
+
+    @Override
+    public List<String> getAllowedFrontendUrls()
+    {
+        return this.configuration.get().getProperty(PREFIX + "allowedFrontendUrls", List.of());
     }
 }

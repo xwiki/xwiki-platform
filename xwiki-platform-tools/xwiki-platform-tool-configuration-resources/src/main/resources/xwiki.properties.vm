@@ -1035,6 +1035,24 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # url.forceAllowAnyCharacter=true
 
+#-# [Since 17.9.0RC1]
+#-# [Since 17.4.6]
+#-# [Since 16.10.13]
+#-# Allow to enable or disable checks performed when clicking links in the UI based on the list of trusted domains.
+#-#
+#-# By default this property is set to true:
+# url.frontendUrlCheckEnabled=true
+
+#-# [Since 17.9.0RC1]
+#-# [Since 17.4.6]
+#-# [Since 16.10.13]
+#-# Allow to allow specific URLs to be accessible from the frontend without asking confirmation, and without
+#-# needing to allow and entire domain. The expected format is absolute URLs separated by commas, e.g.:
+#-# https://github.com/xwiki/xwiki-platform,https://www.xwiki.org/xwiki/bin/view/Main/WebHome
+#-#
+#-# By default this property is empty:
+# url.allowedFrontendUrls=
+
 #-------------------------------------------------------------------------------------
 # Attachment
 #-------------------------------------------------------------------------------------

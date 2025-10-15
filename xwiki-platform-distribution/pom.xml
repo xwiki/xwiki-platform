@@ -73,7 +73,7 @@
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
 
     <!-- Features -->
-    <platform.distribution.features>xwiki</platform.distribution.features>
+    <platform.distribution.features>xwiki/${platform.version}</platform.distribution.features>
 
     <!-- xwiki.cfg configuration -->
     <!-- Default plugin list -->

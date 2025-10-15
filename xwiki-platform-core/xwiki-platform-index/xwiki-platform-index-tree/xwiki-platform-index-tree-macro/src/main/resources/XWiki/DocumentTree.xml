@@ -4525,7 +4525,9 @@
       <featureMandatory/>
     </property>
     <property>
-      <group/>
+      <group>
+        <value>filters</value>
+      </group>
     </property>
     <property>
       <hidden/>
@@ -4905,7 +4907,9 @@
       <featureMandatory/>
     </property>
     <property>
-      <group/>
+      <group>
+        <value>style</value>
+      </group>
     </property>
     <property>
       <hidden/>

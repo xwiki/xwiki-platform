@@ -85,7 +85,7 @@
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>13</number>
+        <number>15</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -98,7 +98,7 @@
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>14</number>
+        <number>16</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>, </separator>
@@ -114,7 +114,7 @@
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>12</number>
+        <number>14</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -164,6 +164,16 @@
         <values>Unknown|Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentJavaType>
+      <contentOrder>
+        <disabled>0</disabled>
+        <name>contentOrder</name>
+        <number>13</number>
+        <numberType>integer</numberType>
+        <prettyName>Content order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </contentOrder>
       <contentType>
         <cache>0</cache>
         <disabled>0</disabled>
@@ -213,6 +223,17 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <executionIsolated>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>executionIsolated</name>
+        <number>12</number>
+        <prettyName>Isolated Execution</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </executionIsolated>
       <id>
         <disabled>0</disabled>
         <name>id</name>
@@ -300,6 +321,9 @@
       <contentJavaType/>
     </property>
     <property>
+      <contentOrder/>
+    </property>
+    <property>
       <contentType>No content</contentType>
     </property>
     <property>
@@ -309,6 +333,9 @@
     </property>
     <property>
       <description>Displays the tree of XWiki documents.</description>
+    </property>
+    <property>
+      <executionIsolated/>
     </property>
     <property>
       <id>documentTree</id>
@@ -340,6 +367,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -349,6 +386,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -360,6 +407,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -379,6 +474,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -401,16 +506,37 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>true</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Should the user be able to modify the tree structure, provided she has the necessary rights?</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group/>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>readOnly</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -430,6 +556,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -439,6 +575,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -450,6 +596,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -469,6 +663,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -491,16 +695,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>false</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Whether to show the wiki nodes or not. This can be used only on the main wiki and if the tree source has been saved with programming rights.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showWikis</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -520,6 +747,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -529,6 +766,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -540,6 +787,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -559,6 +854,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -581,16 +886,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>true</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Show the wiki pretty name instead of the wiki id when displaying a wiki node.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showWikiPrettyName</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -610,6 +938,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -619,6 +957,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -630,6 +978,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -649,6 +1045,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -671,16 +1077,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>false</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Whether to show the space nodes or not. The documents are grouped by space if the space nodes are displayed.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showSpaces</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -700,6 +1129,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -709,6 +1148,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -720,6 +1169,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -739,6 +1236,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -761,16 +1268,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>true</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Whether to show the document title instead of the document name when displaying a document node.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showDocumentTitle</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -790,6 +1320,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -799,6 +1339,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -810,6 +1360,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -829,6 +1427,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -851,16 +1459,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>true</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Whether to show the document translations or not.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showTranslations</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -880,6 +1511,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -889,6 +1530,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -900,6 +1551,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -919,6 +1618,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -941,16 +1650,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>true</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Whether to show the document attachments or not.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showAttachments</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -970,6 +1702,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -979,6 +1721,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -990,6 +1742,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1009,6 +1809,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1031,16 +1841,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>false</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Whether to show the document objects or not.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showObjects</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -1060,6 +1893,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1069,6 +1912,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1080,6 +1933,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1099,6 +2000,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1121,16 +2032,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>false</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Whether to show the class properties for documents that define classes.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showClassProperties</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -1150,6 +2084,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1159,6 +2103,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1170,6 +2124,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1189,6 +2191,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1211,16 +2223,37 @@
       </type>
     </class>
     <property>
+      <advanced>1</advanced>
+    </property>
+    <property>
       <defaultValue>reference</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Specifies which hierarchy to use between documents. Possible values are "reference" (default) and "parentchild". If "reference" is used then the document hierarchy is defined using only the document reference, especially the nested spaces component of the document reference. If "parentchild" is used then the hierarchy is based on the parent/child relationship defined by the "parent" document field from the database.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group/>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>hierarchyMode</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -1240,6 +2273,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1249,6 +2292,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1260,6 +2313,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1279,6 +2380,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1301,16 +2412,37 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue/>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified. The format of a node identifier is entityType:entityReference, where the entity type can be for instance wiki, space, document. E.g.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group/>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>root</name>
+    </property>
+    <property>
+      <order>0</order>
     </property>
     <property>
       <type/>
@@ -1330,6 +2462,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1339,6 +2481,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1350,6 +2502,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1369,6 +2569,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1391,16 +2601,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>false</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>If you have limited horizontal space available then you should probably set this to true. The effect is that the node icons and the edges that connect them will be hidden. Some special styles will also be applied to ensure the tree takes less horizontal space while keeping the node labels fully visible.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>style</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>compact</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -1420,6 +2653,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1429,6 +2672,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1440,6 +2693,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1459,6 +2760,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1481,16 +2792,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>true</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Specifies whether the node labels should look and behave as links (anchors).</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>style</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>links</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -1510,6 +2844,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1519,6 +2863,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1530,6 +2884,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1549,6 +2951,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1571,16 +2983,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>false</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Whether to display a checkbox in front of each tree node to allow the user to select multiple tree nodes.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>style</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>checkboxes</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -1600,6 +3035,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1609,6 +3054,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1620,6 +3075,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1639,6 +3142,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1661,16 +3174,37 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue/>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also. The format of the node id is the one used for the root parameter.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group/>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>openTo</name>
+    </property>
+    <property>
+      <order>1</order>
     </property>
     <property>
       <type/>
@@ -1690,6 +3224,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1699,6 +3243,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1710,6 +3264,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1729,6 +3331,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1751,16 +3363,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>true</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Show only the wiki, space and document nodes for which the current user has view right. If this is set to false then the wiki, space and document nodes that are not viewable by the current user are listed in the tree using their names. The user won't be able to see their content by following their links though (the user will just be aware of their existence).</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showOnlyViewable</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -1780,6 +3415,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1789,6 +3434,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1800,6 +3455,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1819,6 +3522,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1841,16 +3554,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue/>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Show only the documents that have an object of the specified type. The value of this parameter is the full name of an XWiki document that holds a class definition. For example, 'Blog.CategoryClass' can be used to show only the documents that represent blog categories. Leave this parameter empty if you don't want to restrict the type of documents shown in the tree.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>filters</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>filterByClass</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -1870,6 +3606,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1879,6 +3625,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1890,6 +3646,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1909,6 +3713,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -1931,16 +3745,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>false</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>style</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>finder</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -1960,6 +3797,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -1969,6 +3816,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -1980,6 +3837,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1999,6 +3904,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -2021,16 +3936,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>false</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Whether to show the root node or not. The root node is not shown by default because it is usually implied from the context where the tree is displayed (e.g. a label before the tree). There are some cases though when you may want to display the root node: to be able to create a new node under the root.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>show</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>showRoot</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -2050,6 +3988,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -2059,6 +4007,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -2070,6 +4028,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -2089,6 +4095,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -2111,16 +4127,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>true</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>Set this parameter to false if you want to include the hidden documents in the tree. Otherwise, if the value is true, the hidden documents are excluded or included based on current user's preferences.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>filters</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>filterHiddenDocuments</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -2140,6 +4179,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -2149,6 +4198,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -2160,6 +4219,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -2179,6 +4286,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -2201,16 +4318,37 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>15</defaultValue>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group/>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>limit</name>
+    </property>
+    <property>
+      <order>2</order>
     </property>
     <property>
       <type/>
@@ -2230,6 +4368,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -2239,6 +4387,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -2250,6 +4408,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -2269,6 +4475,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -2291,16 +4507,39 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue/>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>filters</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>exclusions</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>
@@ -2320,6 +4559,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -2329,6 +4578,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -2340,6 +4599,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -2359,6 +4666,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -2381,16 +4698,37 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue/>
     </property>
     <property>
+      <deprecated/>
+    </property>
+    <property>
       <description>The document field used to sort the child documents, followed optionally by the sort order. E.g.: 'title' or 'date:desc'.</description>
+    </property>
+    <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group/>
+    </property>
+    <property>
+      <hidden/>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>sortDocumentsBy</name>
+    </property>
+    <property>
+      <order>3</order>
     </property>
     <property>
       <type>org.xwiki.index.tree.internal.macro.DocumentSort</type>
@@ -2410,6 +4748,16 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <advanced>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>advanced</name>
+        <number>9</number>
+        <prettyName>Parameter advanced</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </advanced>
       <defaultValue>
         <disabled>0</disabled>
         <name>defaultValue</name>
@@ -2419,6 +4767,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
+      <deprecated>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>deprecated</name>
+        <number>10</number>
+        <prettyName>Parameter deprecated</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </deprecated>
       <description>
         <disabled>0</disabled>
         <name>description</name>
@@ -2430,6 +4788,54 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
+      <feature>
+        <disabled>0</disabled>
+        <name>feature</name>
+        <number>6</number>
+        <prettyName>Parameter feature</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </feature>
+      <featureMandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>featureMandatory</name>
+        <number>11</number>
+        <prettyName>Parameter feature mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </featureMandatory>
+      <group>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>group</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>Parameter group property</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </group>
+      <hidden>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>hidden</name>
+        <number>8</number>
+        <prettyName>Parameter hidden</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </hidden>
       <mandatory>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -2449,6 +4855,16 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <order>
+        <disabled>0</disabled>
+        <name>order</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>Parameter order property</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </order>
       <type>
         <cache>0</cache>
         <defaultValue>Unknown</defaultValue>
@@ -2471,7 +4887,13 @@
       </type>
     </class>
     <property>
+      <advanced/>
+    </property>
+    <property>
       <defaultValue>0</defaultValue>
+    </property>
+    <property>
+      <deprecated/>
     </property>
     <property>
       <description>Define the depth of the tree to expand automatically. Default is 0 and means that only top level
@@ -2479,10 +4901,27 @@
         nodes, etc. Note that a high value can make the macro expansive to display for the browser.</description>
     </property>
     <property>
+      <feature/>
+    </property>
+    <property>
+      <featureMandatory/>
+    </property>
+    <property>
+      <group>
+        <value>style</value>
+      </group>
+    </property>
+    <property>
+      <hidden/>
+    </property>
+    <property>
       <mandatory>0</mandatory>
     </property>
     <property>
       <name>expandToLevel</name>
+    </property>
+    <property>
+      <order/>
     </property>
     <property>
       <type/>

@@ -2,6 +2,15 @@ packages:
   - xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
+  - xwiki-platform-node/api
+  - xwiki-platform-node/core/attachments/attachments-default
+  - xwiki-platform-node/core/authentication/authentication-api
+  - xwiki-platform-node/core/backends/backend-api
+  - xwiki-platform-node/core/document/document-api
+  - xwiki-platform-node/ds/api
+  - xwiki-platform-node/editors/blocknote-headless
+  - xwiki-platform-node/editors/blocknote-react
+  - xwiki-platform-node/core/link-suggest/link-suggest-api
 catalog:
   "@blocknote/core": 0.31.3
   "@blocknote/mantine": 0.31.3
@@ -41,12 +50,12 @@ catalog:
   jiti: 2.6.0
   jquery: 3.7.1
   jsdom: 27.0.0
-  lodash: 4.17.21
   lz-string: 1.5.0
   npm-run-all2: 8.0.4
   pinia: 3.0.2
   react: 19.1.0
   react-dom: 19.1.0
+  reflect-metadata: 0.2.2
   sinon: 21.0.0
   tippy.js: 6.3.7
   typescript: 5.9.3
@@ -56,9 +65,24 @@ catalog:
   vitest: 3.2.4
   vue: 3.5.22
   vue-i18n: 11.1.12
+  vue-router: 4.5.1
   vue-tippy: 6.7.1
   vue-tsc: 3.0.6
   vue3-touch-events: 5.0.13
   vuedraggable: 4.1.0
+  vitest-mock-extended: 3.1.0
+  '@types/lodash-es': 4.17.12
+  lodash-es: 4.17.21
+  '@playwright/experimental-ct-react': 1.55.1
+  '@types/react': 19.2.0
+  postcss: 8.5.6
+  postcss-preset-mantine: 1.18.0
+  postcss-simple-vars: 7.0.1
+  '@blocknote/react': 0.35.0
+  '@mantine/hooks': 8.3.3
+  '@types/react-dom': 19.2.0
+  i18next: 25.5.3
+  react-i18next: 16.0.0
+  react-icons: 5.5.0
 catalogMode: strict
 cleanupUnusedCatalogs: true

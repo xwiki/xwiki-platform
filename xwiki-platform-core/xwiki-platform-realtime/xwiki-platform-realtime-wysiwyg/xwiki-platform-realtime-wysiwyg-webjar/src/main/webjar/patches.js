@@ -268,10 +268,7 @@ define('xwiki-realtime-wysiwyg-patches', [
       return this._editor.getSelection().map(range => {
         // Remember also the selection direction.
         const savedRange = {reversed: range.reversed};
-        if (!range.startContainer.childNodes.length) {
-          savedRange.startContainer = range.startContainer;
-          savedRange.startOffset = range.startOffset;
-        } else {
+        if (range.startContainer.childNodes.length) {
           // We can't simply store a reference to the DOM node before / after the selection boundary because when
           // applying a remote patch, diffDOM can reuse a DOM node for a different purpose (e.g. replacing its content
           // and its attributes). So the fact that a node is still attached to the DOM after the remote patch is applied
@@ -284,13 +281,16 @@ define('xwiki-realtime-wysiwyg-patches', [
           // saved selection if both change after the remote patch is applied.
           savedRange.startAfter = this._getNodePath(range.startContainer.childNodes[range.startOffset - 1]);
           savedRange.startBefore = this._getNodePath(range.startContainer.childNodes[range.startOffset]);
-        }
-        if (!range.endContainer.childNodes.length) {
-          savedRange.endContainer = range.endContainer;
-          savedRange.endOffset = range.endOffset;
         } else {
+          savedRange.startContainer = range.startContainer;
+          savedRange.startOffset = range.startOffset;
+        }
+        if (range.endContainer.childNodes.length) {
           savedRange.endAfter = this._getNodePath(range.endContainer.childNodes[range.endOffset - 1]);
           savedRange.endBefore = this._getNodePath(range.endContainer.childNodes[range.endOffset]);
+        } else {
+          savedRange.endContainer = range.endContainer;
+          savedRange.endOffset = range.endOffset;
         }
         return savedRange;
       });

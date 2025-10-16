@@ -378,7 +378,8 @@
       &lt;/select&gt;##
       &lt;label class="form-control" title="$escapetool.xml($services.localization.render("search.solr.sortOrder.$sortOrder"))"&gt;##
         &lt;input id="sort-order-input" type="checkbox" name="sortOrder" value="asc" #if ("$!sortOrder" == 'asc')checked="checked"#end/&gt;##
-        $services.icon.renderHTML('down')##
+        $services.icon.renderHTML('sort-descending')##
+        $services.icon.renderHTML('sort-ascending')##
         &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render("search.solr.sortOrder.$sortOrder"))&lt;/span&gt;##
       &lt;/label&gt;##
     &lt;/div&gt;

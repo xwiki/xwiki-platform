@@ -534,13 +534,14 @@
 #sort-by-input, .search-results-sort label:has(&gt;#sort-order-input) {
   /* We want most of the styles from "form-control", but not the shadow that comes from bootstrap. */
   box-shadow: none;
+  &amp; :hover,&amp; :focus,&amp; :focus-within {
+    border-color: var(--input-border-focus);
+  }
 }
 
-/* We assume the icons are after the hidden checkbox in the DOM */
-.search-results-sort label #sort-order-input + *,
+/* Flip the second icon so that it's the arrow going up and down. */
 .search-results-sort label #sort-order-input + * + * {
-  transform: none;
-  transition: transform .2s ease-out;
+  transform: scaleY(-1);
 }
 
 /* When the box is checked, we want to hide the first icon. 

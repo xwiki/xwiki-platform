@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -126,9 +127,9 @@ public class TempResourceAction extends XWikiAction
             fileName = Util.encodeURI(fileName, context).replaceAll("\\+", "%20");
             response.addHeader("Content-disposition", "attachment; filename*=utf-8''" + fileName);
         }
-        try {
-            response.setContentLength((int) tempFile.length());
-            IOUtils.copy(FileUtils.openInputStream(tempFile), response.getOutputStream());
+        try (FileInputStream tempFileInputStream = FileUtils.openInputStream(tempFile)) {
+            response.setContentLengthLong(tempFile.length());
+            IOUtils.copy(tempFileInputStream, response.getOutputStream());
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);

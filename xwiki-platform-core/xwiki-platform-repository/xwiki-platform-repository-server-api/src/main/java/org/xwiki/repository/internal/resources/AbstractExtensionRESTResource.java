@@ -63,6 +63,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.License;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Namespaces;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Property;
+import org.xwiki.extension.version.Version;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
@@ -93,38 +94,28 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public static final String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
-        XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME};
-
     protected static final String DEFAULT_BOOST;
 
     protected static final String DEFAULT_FL;
 
-    protected static Map<String, Integer> EPROPERTIES_INDEX = new HashMap<String, Integer>();
+    protected static final Map<String, Integer> EPROPERTIES_INDEX =
+        Map.of(XWikiRepositoryModel.PROP_EXTENSION_ID, 0, XWikiRepositoryModel.PROP_EXTENSION_NAME, 1,
+            XWikiRepositoryModel.PROP_EXTENSION_TYPE, 2, XWikiRepositoryModel.PROP_VERSION_VERSION, 3);
 
-    protected static String SELECT_EXTENSIONSUMMARY;
+    // Note that the order of the retrieved information is stable and documented by EPROPERTIES_INDEX,
+    // therefore it shouldn't be changed or it would break some of the APIs relying on it.
+    protected static final String SELECT_EXTENSIONSUMMARY = String.format(
+        "doc.name, doc.space, " + "extension.%s, extension.%s, extension.%s", XWikiRepositoryModel.PROP_EXTENSION_ID,
+        XWikiRepositoryModel.PROP_EXTENSION_NAME, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
+
+    protected static final String SELECT_EXTENSION_VERSION = String.format(
+        "doc.name, doc.space, " + "extensionVersion.%s, extensionVersion.%s, extensionVersion.%s, "
+            + "extensionVersion.%s, extensionVersion.%s",
+        XWikiRepositoryModel.PROP_EXTENSION_ID, XWikiRepositoryModel.PROP_EXTENSION_NAME,
+        XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_VERSION_VERSION,
+        XWikiRepositoryModel.PROP_VERSION_INDEX);
 
     static {
-        StringBuilder pattern = new StringBuilder();
-
-        int j = 0;
-
-        pattern.append("doc.name");
-        EPROPERTIES_INDEX.put("doc.name", j++);
-        pattern.append(", ");
-        pattern.append("doc.space");
-        EPROPERTIES_INDEX.put("doc.space", j++);
-
-        // Extension summary
-        for (int i = 0; i < EPROPERTIES_SUMMARY.length; ++i, ++j) {
-            String value = EPROPERTIES_SUMMARY[i];
-            pattern.append(", extension.");
-            pattern.append(value);
-            EPROPERTIES_INDEX.put(value, j);
-        }
-
-        SELECT_EXTENSIONSUMMARY = pattern.toString();
-
         // Solr
 
         StringBuilder boostBuilder = new StringBuilder();
@@ -132,7 +123,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         for (SolrField field : XWikiRepositoryModel.SOLR_FIELDS.values()) {
             // Boost
             if (field.boostValue != null) {
-                if (boostBuilder.length() > 0) {
+                if (!boostBuilder.isEmpty()) {
                     boostBuilder.append(' ');
                 }
                 boostBuilder.append(field.boostName);
@@ -142,7 +133,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
             // Fields list
             if (field.name != null) {
-                if (flBuilder.length() > 0) {
+                if (!flBuilder.isEmpty()) {
                     flBuilder.append(',');
                 }
                 flBuilder.append(field.name);
@@ -188,7 +179,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     public XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException
     {
-        XWikiDocument document = this.repositoryManager.getExistingExtensionDocumentById(extensionId);
+        XWikiDocument document = this.extensionStore.getExistingExtensionDocumentById(extensionId);
 
         if (document == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -203,7 +194,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         String select = "count(extension." + XWikiRepositoryModel.PROP_EXTENSION_ID + ")";
 
-        return createExtensionsQuery(select, from, where, 0, -1, false);
+        return createExtensionsQuery(select, from, where, 0, -1, false, false);
     }
 
     protected long getExtensionsCountResult(Query query) throws QueryException
@@ -211,31 +202,36 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return ((Number) query.execute().get(0)).intValue();
     }
 
-    protected Query createExtensionsSummariesQuery(String from, String where, int offset, int number, boolean versions)
-        throws QueryException
+    protected Query createExtensionsSummariesQuery(String from, String where, int offset, int number, boolean versions,
+        boolean pageVersion) throws QueryException
     {
         String select = SELECT_EXTENSIONSUMMARY;
 
-        return createExtensionsQuery(select, from, where, offset, number, versions);
+        if (versions && pageVersion) {
+            select = SELECT_EXTENSION_VERSION;
+        }
+
+        return createExtensionsQuery(select, from, where, offset, number, versions, pageVersion);
     }
 
     private Query createExtensionsQuery(String select, String from, String where, int offset, int number,
-        boolean versions) throws QueryException
+        boolean versions, boolean pageVersion) throws QueryException
     {
         // select
 
         StringBuilder queryStr = new StringBuilder("select ");
         queryStr.append(select);
 
-        if (versions) {
+        if (versions && !pageVersion) {
             queryStr.append(", extensionVersion." + XWikiRepositoryModel.PROP_VERSION_VERSION + "");
         }
 
+        queryStr.append(" from Document doc");
+
         // from
-
-        queryStr
-            .append(" from Document doc, doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension");
-
+        if (!pageVersion) {
+            queryStr.append(", doc.object(" + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension");
+        }
         if (versions) {
             queryStr
                 .append(", doc.object(" + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME + ") as extensionVersion");
@@ -253,9 +249,15 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             queryStr.append('(');
             queryStr.append(where);
             queryStr.append(')');
-            queryStr.append(" and ");
         }
-        queryStr.append("extension." + XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION + " = 1");
+        if (versions && pageVersion) {
+            queryStr.append(" order by extensionVersion." + XWikiRepositoryModel.PROP_VERSION_INDEX);
+        } else {
+            if (where != null) {
+                queryStr.append(" and ");
+            }
+            queryStr.append("extension." + XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION + " = 1");
+        }
 
         Query query = this.queryManager.createQuery(queryStr.toString(), Query.XWQL);
 
@@ -315,8 +317,11 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     }
 
     protected <E extends AbstractExtension> E createExtension(XWikiDocument extensionDocument, String version)
+        throws XWikiException
     {
         BaseObject extensionObject = getExtensionObject(extensionDocument);
+        XWikiDocument versionDocument =
+            this.extensionStore.getExtensionVersionDocument(extensionDocument, version, getXWikiContext());
         DocumentReference extensionDocumentReference = extensionDocument.getDocumentReference();
 
         if (extensionObject == null) {
@@ -326,12 +331,15 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         AbstractExtension extension;
         ExtensionVersion extensionVersion;
         BaseObject extensionVersionObject;
+        List<BaseObject> extensionVersionObjects;
         if (version == null) {
             extension = this.extensionObjectFactory.createExtension();
             extensionVersion = null;
-            extensionVersionObject = null;
+            extensionVersionObject = extensionObject;
+            extensionVersionObjects = List.of(extensionVersionObject);
         } else {
-            extensionVersionObject = repositoryManager.getExtensionVersionObject(extensionDocument, version);
+            extensionVersionObject =
+                this.repositoryManager.getExtensionVersionObject(extensionDocument, version, getXWikiContext());
 
             if (extensionVersionObject == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -339,29 +347,31 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
             extensionVersion = this.extensionObjectFactory.createExtensionVersion();
             extension = extensionVersion;
-            extensionVersion.setVersion((String) this.extensionStore.getValue(extensionVersionObject,
-                XWikiRepositoryModel.PROP_VERSION_VERSION));
+            extensionVersion.setVersion(
+                this.extensionStore.getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_VERSION));
+
+            extensionVersionObjects = List.of(extensionVersionObject, extensionObject);
         }
 
-        extension.setId((String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID));
+        extension.setId(this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_ID));
         extension.setType(StringUtils.stripToNull(
-            (String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE)));
+            this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_TYPE)));
 
         extension.setRating(getExtensionRating(extensionDocumentReference));
         extension.setSummary(
-            (String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
+            this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
         extension.setDescription(
-            (String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
+            this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
         extension
-            .setName((String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME));
+            .setName(this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_NAME));
         extension.setCategory(
-            (String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_CATEGORY));
+            this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_CATEGORY));
         extension.setWebsite(StringUtils.defaultIfEmpty(
-            (String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE),
+            this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE),
             extensionDocument.getExternalURL("view", getXWikiContext())));
 
         // Recommended
-        extension.setRecommended(this.extensionStore.getBooleanValue(extensionVersionObject,
+        extension.setRecommended(this.extensionStore.getBooleanValue(extensionObject,
             XWikiRepositoryModel.PROP_EXTENSION_RECOMMENDED, false));
 
         // Support plans
@@ -370,18 +380,18 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         // SCM
         ExtensionScm scm = new ExtensionScm();
-        scm.setUrl((String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMURL));
+        scm.setUrl(this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_SCMURL));
         scm.setConnection(toScmConnection(
-            (String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION)));
-        scm.setDeveloperConnection(toScmConnection((String) this.extensionStore.getValue(extensionObject,
+            this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION)));
+        scm.setDeveloperConnection(toScmConnection(this.extensionStore.getValue(extensionVersionObjects,
             XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION)));
         extension.setScm(scm);
 
         // Issue Management
         ExtensionIssueManagement issueManagement = new ExtensionIssueManagement();
-        issueManagement.setSystem((String) this.extensionStore.getValue(extensionObject,
+        issueManagement.setSystem(this.extensionStore.getValue(extensionVersionObjects,
             XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM));
-        issueManagement.setUrl((String) this.extensionStore.getValue(extensionObject,
+        issueManagement.setUrl(this.extensionStore.getValue(extensionVersionObjects,
             XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_URL));
         if (StringUtils.isNotEmpty(issueManagement.getSystem()) || StringUtils.isNotEmpty(issueManagement.getUrl())) {
             extension.setIssueManagement(issueManagement);
@@ -389,17 +399,69 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         // Authors
         addExtensionAuthors(extension,
-            this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS));
+            this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS));
 
         // Features
-        List<String> features;
-        if (extensionVersionObject != null) {
-            features = (List<String>) this.extensionStore.getValue(extensionVersionObject,
-                XWikiRepositoryModel.PROP_VERSION_FEATURES);
-        } else {
-            features = (List<String>) this.extensionStore.getValue(extensionObject,
-                XWikiRepositoryModel.PROP_EXTENSION_FEATURES);
+        List<String> features =
+            this.extensionStore.getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_FEATURES);
+
+        extractFeatureInformation(features, extension);
+
+        // License
+        addLicense(extension,
+            this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
+
+        // Allowed namespaces
+        List<String> namespaces =
+            this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES);
+        Integer namespacesEmpty = this.extensionStore.getValue(extensionObject,
+            XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY, 0);
+        if (namespaces != null && (!namespaces.isEmpty() || namespacesEmpty == 1)) {
+            Namespaces restNamespaces = this.extensionObjectFactory.createNamespaces();
+            restNamespaces.withNamespaces(namespaces);
+            extension.setAllowedNamespaces(restNamespaces);
         }
+
+        // Properties
+        addProperties(extension,
+            this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES));
+
+        if (extensionVersion != null) {
+            List<String> repositories =
+                this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_VERSION_REPOSITORIES);
+            extensionVersion.withRepositories(toExtensionRepositories(repositories));
+
+            // Dependencies
+            List<BaseObject> dependencies =
+                versionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE);
+            if (dependencies != null) {
+                for (BaseObject dependencyObject : dependencies) {
+                    if (dependencyObject != null) {
+                        if (Strings.CS.equals(this.extensionStore.getValue(dependencyObject,
+                            XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, null), version)) {
+                            ExtensionDependency dependency = extensionObjectFactory.createExtensionDependency();
+                            dependency.setId(this.extensionStore.getValue(dependencyObject,
+                                XWikiRepositoryModel.PROP_DEPENDENCY_ID));
+                            dependency.setConstraint(this.extensionStore.getValue(dependencyObject,
+                                XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT));
+                            dependency.setOptional(this.extensionStore.getBooleanValue(dependencyObject,
+                                XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, false));
+                            List<String> dependencyRepositories = this.extensionStore.getValue(dependencyObject,
+                                XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
+                            dependency.withRepositories(toExtensionRepositories(dependencyRepositories));
+
+                            extensionVersion.getDependencies().add(dependency);
+                        }
+                    }
+                }
+            }
+        }
+
+        return (E) extension;
+    }
+
+    private void extractFeatureInformation(Collection<String> features, AbstractExtension extension)
+    {
         if (features != null && !features.isEmpty()) {
             for (String feature : features) {
                 org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);
@@ -412,61 +474,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                 extension.getFeatures().add(extensionFeature.getId());
             }
         }
-
-        // License
-        addLicense(extension,
-            this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
-
-        // Allowed namespaces
-        List<String> namespaces = (List<String>) this.extensionStore.getValue(extensionObject,
-            XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES);
-        Integer namespacesEmpty = this.extensionStore.getValue(extensionObject,
-            XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY, 0);
-        if (namespaces != null && (!namespaces.isEmpty() || namespacesEmpty == 1)) {
-            Namespaces restNamespaces = this.extensionObjectFactory.createNamespaces();
-            restNamespaces.withNamespaces(namespaces);
-            extension.setAllowedNamespaces(restNamespaces);
-        }
-
-        // Properties
-        addProperties(extension, (List<String>) this.extensionStore.getValue(extensionObject,
-            XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES));
-
-        if (extensionVersion != null) {
-            // Repositories
-            if (extensionVersionObject != null) {
-                List<String> repositories = (List<String>) this.extensionStore.getValue(extensionVersionObject,
-                    XWikiRepositoryModel.PROP_VERSION_REPOSITORIES);
-                extensionVersion.withRepositories(toExtensionRepositories(repositories));
-            }
-
-            // Dependencies
-            List<BaseObject> dependencies =
-                extensionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE);
-            if (dependencies != null) {
-                for (BaseObject dependencyObject : dependencies) {
-                    if (dependencyObject != null) {
-                        if (Strings.CS.equals(this.extensionStore.getValue(dependencyObject,
-                            XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, (String) null), version)) {
-                            ExtensionDependency dependency = extensionObjectFactory.createExtensionDependency();
-                            dependency.setId((String) this.extensionStore.getValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_ID));
-                            dependency.setConstraint((String) this.extensionStore.getValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT));
-                            dependency.setOptional(this.extensionStore.getBooleanValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, false));
-                            List<String> repositories = (List<String>) this.extensionStore.getValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
-                            dependency.withRepositories(toExtensionRepositories(repositories));
-
-                            extensionVersion.getDependencies().add(dependency);
-                        }
-                    }
-                }
-            }
-        }
-
-        return (E) extension;
     }
 
     protected ExtensionScmConnection toScmConnection(String connectionString)
@@ -675,18 +682,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         // Features
         Collection<String> features = getSolrValues(document, Extension.FIELD_FEATURES);
-        if (features != null && !features.isEmpty()) {
-            for (String feature : features) {
-                org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);
-                ExtensionId extensionFeature = this.extensionObjectFactory.createExtensionId();
-                extensionFeature.setId(extensionId.getId());
-                if (extensionId.getVersion() != null) {
-                    extensionFeature.setVersion(extensionId.getVersion().getValue());
-                }
-                extension.getExtensionFeatures().add(extensionFeature);
-                extension.getFeatures().add(extensionFeature.getId());
-            }
-        }
+        extractFeatureInformation(features, extension);
 
         // License
         addLicense(extension, getSolrValue(document, Extension.FIELD_LICENSE, true));
@@ -751,6 +747,18 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return extensionRating;
     }
 
+    protected ExtensionVersionSummary createExtensionVersionSummary(String extensionId, String type, String name,
+        Version version)
+    {
+        ExtensionVersionSummary extensionVersion = this.extensionObjectFactory.createExtensionVersionSummary();
+        extensionVersion.setVersion(version.getValue());
+        extensionVersion.setId(extensionId);
+        extensionVersion.setType(type);
+        extensionVersion.setName(name);
+
+        return extensionVersion;
+    }
+
     protected <E extends ExtensionSummary> void getExtensionSummaries(List<E> extensions, Query query)
         throws QueryException
     {
@@ -764,7 +772,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected ExtensionSummary createExtensionSummaryFromQueryResult(Object[] entry)
     {
         ExtensionSummary extension;
-        int versionIndex = EPROPERTIES_INDEX.get(EPROPERTIES_SUMMARY[EPROPERTIES_SUMMARY.length - 1]) + 1;
+        int versionIndex = EPROPERTIES_INDEX.get(XWikiRepositoryModel.PROP_VERSION_VERSION);
         if (entry.length == versionIndex) {
             // It's a extension summary without version
             extension = this.extensionObjectFactory.createExtensionSummary();

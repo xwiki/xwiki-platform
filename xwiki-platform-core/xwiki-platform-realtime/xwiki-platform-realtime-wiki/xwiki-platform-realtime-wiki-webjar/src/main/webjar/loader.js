@@ -40,7 +40,7 @@ define('xwiki-realtime-wikiEditor-loader', [
       return new Promise((resolve, reject) => {
         require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
           try {
-            realtimeContext.rtURL = Loader.getEditorURL(window.location.href, info);
+            realtimeContext.rtURL = Loader.getEditorURL(globalThis.location.href, info);
             // TODO: The editor initialization is asynchronous so the resolved value should be a Promise in order to
             // notify the user in case of errors.
             resolve(new RealtimeWikiEditor(realtimeContext));

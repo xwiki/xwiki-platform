@@ -173,6 +173,28 @@ class EditClassIT
         assertFalse(classEditPage.hasProperty("color"));
     }
 
+    @Test
+    @Order(5)
+    void reorderProperty(TestUtils setup, TestReference reference) throws Exception
+    {
+        setup.rest().savePage(reference, "Some content", "");
+        ClassEditPage classEditPage = setup.editClass(reference);
+        classEditPage.addProperty("testA", "Number");
+        classEditPage.addProperty("testB", "Number");
+        classEditPage.addProperty("testC", "Number");
+        classEditPage.clickSaveAndView();
+
+        classEditPage = setup.editClass(reference);
+        assertEquals(List.of("testA", "testB", "testC"), classEditPage.getProperties());
+
+        classEditPage.movePropertyBefore("testC", "testB");
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+        classEditPage.clickSaveAndView();
+
+        classEditPage = setup.editClass(reference);
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+    }
+
     private DocumentReference getTestClassDocumentReference(TestReference reference)
     {
         return new DocumentReference("TestClass", reference.getLastSpaceReference());

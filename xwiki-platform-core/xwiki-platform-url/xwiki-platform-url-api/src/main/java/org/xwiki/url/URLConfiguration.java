@@ -19,10 +19,10 @@
  */
 package org.xwiki.url;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the URL module.
@@ -60,7 +60,7 @@ public interface URLConfiguration
      */
     default List<String> getTrustedDomains()
     {
-        return Collections.emptyList();
+        return List.of();
     }
 
     /**
@@ -87,5 +87,35 @@ public interface URLConfiguration
     default List<String> getTrustedSchemes()
     {
         return List.of("http", "https", "ftp");
+    }
+
+    /**
+     * @return {@code true} if checks should be done in the frontend when clicking on a link to validate it's driving
+     * to an authorized domain. This is independent from {@link #isTrustedDomainsEnabled()} which aims at enabling
+     * checks server side only.
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    @Unstable
+    default boolean isFrontendUrlCheckEnabled()
+    {
+        return true;
+    }
+
+    /**
+     * Define a list of allowed frontend URLs: in case the {@link #isFrontendUrlCheckEnabled()} is enabled, then
+     * this list can be used to allow specific URLs without asking confirmation from the user, while avoiding to add
+     * an entire domain in the list of trusted domains.
+     *
+     * @return the list of allowed frontend URLs
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    @Unstable
+    default List<String> getAllowedFrontendUrls()
+    {
+        return List.of();
     }
 }

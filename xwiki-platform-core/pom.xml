@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>17.8.0-SNAPSHOT</version>
+    <version>17.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -150,40 +150,26 @@
             </revapi.differences>
             -->
             <revapi.differences>
-              <justification>Extracted code from HqlQueryExecutor to an abstract base class to facilitate reuse. HqlQueryExecutor is a component implementation so it should be treated as internal, even if it's not inside an internal package.</justification>
+              <justification>Change the annotation value of the parameter group to make it mandatory,
+                while it was already mandatory in the facts (the macro displays an error when no
+                parameter from the group is used)</justification>
               <criticality>allowed</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</old>
-                  <new>class com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor</new>
-                  <superClass>org.xwiki.query.internal.AbstractQueryExecutor</superClass>
+                  <code>java.annotation.attributeAdded</code>
+                  <old>method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setPage(java.lang.String)</old>
+                  <new>method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setPage(java.lang.String)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
+                  <attribute>mandatory</attribute>
                 </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Unstable API: the signature changes here but the API always returned a String so there's no breaking behaviour for scripts.</justification>
-              <criticality>documented</criticality>
-              <differences>
                 <item>
                   <ignore>true</ignore>
-                  <code>java.method.returnTypeChangedCovariantly</code>
-                  <old>method java.lang.Object com.xpn.xwiki.api.Object::display(java.lang.String, java.lang.String, boolean, boolean)</old>
-                  <new>method java.lang.String com.xpn.xwiki.api.Object::display(java.lang.String, java.lang.String, boolean, boolean)</new>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>It's not a breakage because that component was not registered at all previously.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.added</code>
-                  <old>class org.xwiki.container.script.ContainerScriptService</old>
-                  <new>class org.xwiki.container.script.ContainerScriptService</new>
-                  <annotation>@javax.inject.Named("container")</annotation>
+                  <code>java.annotation.attributeAdded</code>
+                  <old>method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)</old>
+                  <new>method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
+                  <attribute>mandatory</attribute>
                 </item>
               </differences>
             </revapi.differences>

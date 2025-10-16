@@ -92,7 +92,17 @@ public interface PDFExportConfiguration
      */
     default int getChromeRemoteDebuggingTimeout()
     {
-        return 10;
+        // The time it takes to generate the PDF after the HTML page is ready (i.e. after the print layout was generated
+        // by paged.js) is proportional to the time it takes for the page to be ready (load all resources, execute all
+        // JavaScript code, including generating the print layout using paged.js). In other words, if it takes a lot of
+        // time for the HTML page to be ready then chances are it will also take a lot of time to print the HTML page to
+        // PDF. From our tests, the ratio between the page ready time and the print to PDF time is around 6:1. Printing
+        // to PDF is done using a single blocking request to Chrome, so is affected by this remote debugging timeout. We
+        // expose only the page ready timeout in the PDF export administration section currently, so in order to remove
+        // the need to update the remote debugging timeout whenever the page ready timeout is updated, we provide a
+        // default value that is computed based on the page ready timeout. We enforce a lower limit to make sure there
+        // is always a timeout.
+        return Math.max(getPageReadyTimeout() / 6, 1);
     }
 
     /**

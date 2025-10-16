@@ -28,10 +28,10 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.cache.AbstractCachedCompiler;
+import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 
 /**
@@ -47,7 +47,7 @@ public class DefaultLESSCompiler extends AbstractCachedCompiler<String> implemen
     Initializable
 {
     @Inject
-    private LESSResourcesCache cache;
+    private LESSResourcesCache lessResourcesCache;
 
     @Inject
     private CachedLESSCompiler cachedLESSCompiler;
@@ -55,8 +55,8 @@ public class DefaultLESSCompiler extends AbstractCachedCompiler<String> implemen
     @Override
     public void initialize() throws InitializationException
     {
-        super.cache = cache;
-        super.compiler = cachedLESSCompiler;
+        super.cache = this.lessResourcesCache;
+        super.compiler = this.cachedLESSCompiler;
     }
 
     @Override

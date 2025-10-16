@@ -206,7 +206,7 @@ class BrowserPDFPrinterTest
 
         verify(this.browserTab, never()).navigate(new URL("http://external:9293/xwiki/rest/client?media=json"));
         // Called only once to get the browser IP address used to set the Forwarded header.
-        verify(this.browserTab, times(1)).navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"));
+        verify(this.browserTab).navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"));
         verify(this.cookieFilter, never()).filter(any(), any());
     }
 

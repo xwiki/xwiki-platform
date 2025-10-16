@@ -26,6 +26,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -62,7 +64,18 @@ class ThumbnailatorImageProcessorTest
     {
         try (InputStream imageInput = getClass().getResourceAsStream("/test.png")) {
             Image image = this.imageProcessor.readImage(imageInput);
-            assertEquals(BufferedImage.TYPE_4BYTE_ABGR, ((BufferedImage) image).getType(), "Improper image type");
+            // Test that the image contains the right number of colors (7) to ensure that the colors are read properly.
+            BufferedImage bufferedImage = (BufferedImage) image;
+            Set<Integer> colors = new HashSet<>();
+            for (int x = 0; x < bufferedImage.getWidth(); x++) {
+                for (int y = 0; y < bufferedImage.getHeight(); y++) {
+                    colors.add(bufferedImage.getRGB(x, y));
+                }
+            }
+            assertEquals(7, colors.size(), "Improper number of colors");
+            assertEquals(0, bufferedImage.getRGB(0, 0), "Top-left corner should be transparent");
+            assertEquals(726, bufferedImage.getWidth(), "Improper image width");
+            assertEquals(200, bufferedImage.getHeight(), "Improper image height");
         }
     }
 

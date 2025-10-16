@@ -141,11 +141,11 @@ class UpdateRightsOnDocumentRenameListenerTest
             targetUserDocumentReference, mockitoOldcore.getXWikiContext());
 
         // the job for user replacement should be done once
-        verify(replaceUserRequest, times(1)).setReplaceDocumentAuthor(true);
-        verify(replaceUserRequest, times(1)).setReplaceDocumentContentAuthor(true);
-        verify(replaceUserRequest, times(1)).setReplaceDocumentCreator(true);
-        verify(replaceUserRequest, times(1)).setCheckAuthorRights(false);
-        verify(replaceUserJob, times(1)).initialize(replaceUserRequest);
+        verify(replaceUserRequest).setReplaceDocumentAuthor(true);
+        verify(replaceUserRequest).setReplaceDocumentContentAuthor(true);
+        verify(replaceUserRequest).setReplaceDocumentCreator(true);
+        verify(replaceUserRequest).setCheckAuthorRights(false);
+        verify(replaceUserJob).initialize(replaceUserRequest);
     }
 
     @Test
@@ -187,10 +187,10 @@ class UpdateRightsOnDocumentRenameListenerTest
             targetUserDocumentReference, mockitoOldcore.getXWikiContext());
 
         // the job for user replacement should be called once only for users
-        verify(replaceUserRequest, times(1)).setReplaceDocumentAuthor(true);
-        verify(replaceUserRequest, times(1)).setReplaceDocumentContentAuthor(true);
-        verify(replaceUserRequest, times(1)).setReplaceDocumentCreator(true);
-        verify(replaceUserRequest, times(1)).setCheckAuthorRights(false);
-        verify(replaceUserJob, times(1)).initialize(replaceUserRequest);
+        verify(replaceUserRequest).setReplaceDocumentAuthor(true);
+        verify(replaceUserRequest).setReplaceDocumentContentAuthor(true);
+        verify(replaceUserRequest).setReplaceDocumentCreator(true);
+        verify(replaceUserRequest).setCheckAuthorRights(false);
+        verify(replaceUserJob).initialize(replaceUserRequest);
     }
 }

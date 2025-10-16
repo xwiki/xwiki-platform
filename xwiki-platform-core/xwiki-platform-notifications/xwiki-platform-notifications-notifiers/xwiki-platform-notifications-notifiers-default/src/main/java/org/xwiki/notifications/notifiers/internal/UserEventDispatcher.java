@@ -217,8 +217,12 @@ public class UserEventDispatcher
         }
 
         try {
+            this.logger.debug("Start dispatching event with id [{}]", event.getId());
+
             return dispatchInContext(event);
         } finally {
+            this.logger.debug("Done dispatching event with id [{}]", event.getId());
+
             // Get rid of current context
             this.ecm.popContext();
         }

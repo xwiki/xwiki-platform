@@ -77,7 +77,7 @@ class InternalTemplateManagerTest
         assertNull(this.templates.getTemplate("template"));
 
         verify(this.cache, never()).remove(any());
-        verify(this.cache, times(1)).get(FS_TEMPLATE_ID);
+        verify(this.cache).get(FS_TEMPLATE_ID);
     }
 
     @Test
@@ -87,8 +87,8 @@ class InternalTemplateManagerTest
 
         assertNull(this.templates.getTemplate("template"));
 
-        verify(this.cache, times(1)).get(FS_TEMPLATE_ID);
-        verify(this.cache, times(1)).remove(any());
+        verify(this.cache).get(FS_TEMPLATE_ID);
+        verify(this.cache).remove(any());
     }
 
     @Test

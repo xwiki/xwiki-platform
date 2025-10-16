@@ -238,6 +238,11 @@ public class ArtifactResolver
             JAR, platformVersion);
         dependentArtifacts.add(componentScript);
 
+        // Many features need Solr and most integration tests are expecting and embedded Solr setup
+        Artifact embeddedSolr =
+            new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-search-solr-embedded", JAR, platformVersion);
+        dependentArtifacts.add(embeddedSolr);
+
         // Add the PR Checker JAR so that we can verify that we don't have wiki pages requiring PR rights (except when
         // explicitly allowed).
         Artifact prCheckerArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-test-checker", JAR,

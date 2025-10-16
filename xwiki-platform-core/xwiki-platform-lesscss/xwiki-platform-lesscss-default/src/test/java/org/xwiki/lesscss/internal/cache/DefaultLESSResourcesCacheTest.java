@@ -35,7 +35,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -144,7 +143,7 @@ public class DefaultLESSResourcesCacheTest
         mocker.getComponentUnderTest().clearFromSkin(new FSSkinReference("skin1"));
 
         // Verify
-        verify(cache, times(1)).remove("k1");
+        verify(cache).remove("k1");
         verify(cache).remove("k4");
         verify(cache, never()).remove("k3");
     }
@@ -178,7 +177,7 @@ public class DefaultLESSResourcesCacheTest
         mocker.getComponentUnderTest().clearFromColorTheme(new NamedColorThemeReference("colorTheme1"));
 
         // Verify
-        verify(cache, times(1)).remove("k1");
+        verify(cache).remove("k1");
         verify(cache).remove("k4");
         verify(cache, never()).remove("k3");
     }
@@ -213,7 +212,7 @@ public class DefaultLESSResourcesCacheTest
         mocker.getComponentUnderTest().clearFromLESSResource(createLESSSkinFileResourceReference("file1"));
 
         // Verify
-        verify(cache, times(1)).remove("k1");
+        verify(cache).remove("k1");
         verify(cache).remove("k4");
         verify(cache, never()).remove("k3");
     }

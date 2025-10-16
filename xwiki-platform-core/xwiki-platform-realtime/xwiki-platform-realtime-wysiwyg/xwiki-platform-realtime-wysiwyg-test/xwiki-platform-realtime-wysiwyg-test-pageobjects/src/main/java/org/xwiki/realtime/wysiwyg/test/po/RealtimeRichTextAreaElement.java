@@ -163,6 +163,27 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     }
 
     /**
+     * Wait for local changes to be pushed to the server. This only guarantees that the server has aknowledged receiving
+     * the changes, not that other users have received them. Use this in tests when you need to force a specific order
+     * of changes.
+     *
+     * @since 17.8.0
+     * @since 17.4.5
+     * @since 16.10.12
+     */
+    public void waitUntilLocalChangesArePushed()
+    {
+        StringBuilder script = new StringBuilder();
+        script.append("const name = arguments[0];\n");
+        script.append("const callback = arguments[1];\n");
+        script.append("const editor = CKEDITOR.instances[name]._realtime.editor;\n");
+        // Commit local changes, push to the server and wait for aknowledgement.
+        script.append("editor._flushUncommittedWork().finally(callback);\n");
+
+        getDriver().executeAsyncScript(script.toString(), this.editor.getName());
+    }
+
+    /**
      * When testing realtime editing we often need to switch between the browser tabs. The problem is that browsers are
      * throttling (slowing down) timers in inactive tabs, and sometimes they can even suspend the inactive tabs. This
      * means we can have a situation where the test is switching the tab very fast, immediately after typing something

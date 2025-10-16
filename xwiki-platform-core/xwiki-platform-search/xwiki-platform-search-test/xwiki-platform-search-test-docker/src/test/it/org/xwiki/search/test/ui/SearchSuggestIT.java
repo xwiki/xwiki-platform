@@ -37,6 +37,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -102,8 +103,8 @@ class SearchSuggestIT
         // Check the search results without search exclusions.
         QuickSearchElement quickSearchElement = new QuickSearchElement();
         quickSearchElement.search(matchedWord);
-        assertEquals(List.of("Apple", "Banana"),
-            quickSearchElement.getResults("Page content").stream().map(QuickSearchResult::getTitle).toList());
+        assertThat(quickSearchElement.getResults("Page content").stream().map(QuickSearchResult::getTitle).toList(),
+            containsInAnyOrder("Apple", "Banana"));
 
         // Configure search exclusions.
         searchAdminPage = SearchAdministrationPage.gotoPage();

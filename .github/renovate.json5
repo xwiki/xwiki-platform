@@ -68,6 +68,13 @@
       "matchDatasources": ["maven"],
       "matchPackageNames": ["!org.webjars*"],
       "assignees": ["tmortagne"]
+    },
+
+    // Group all cristal releases in the same PR.
+    {
+      "matchDatasources": ["npm"],
+      "groupName": "cristal",
+      "matchDepPatterns": "@xwiki/cristal-.+"
     }
   ]
 }

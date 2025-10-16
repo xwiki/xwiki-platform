@@ -26,7 +26,7 @@ define('xwiki-realtime-document', [
 
   const channelListAPI = {
     getByPath: function(path) {
-      return this.filter(channel => JSON.stringify(channel.path) === JSON.stringify(path))[0];
+      return this.find(channel => JSON.stringify(channel.path) === JSON.stringify(path));
     },
     getByPathPrefix: function(pathPrefix) {
       return this.filter(channel => channel.path.length >= pathPrefix.length &&
@@ -44,7 +44,7 @@ define('xwiki-realtime-document', [
     reload() {
       return $.getJSON(meta.restURL, {
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
-        timestamp: new Date().getTime()
+        timestamp: Date.now()
       }).then(updatedDocument => {
         // Reload succeeded.
         // We were able to load the document so it's not new.
@@ -53,8 +53,8 @@ define('xwiki-realtime-document', [
           // We need the real locale.
           language: updatedDocument.language || updatedDocument.translations['default']
         });
-      }, jqXHR => {
-        if (jqXHR.status === 404) {
+      }, error => {
+        if (error.status === 404) {
           // The document doesn't exist anymore. Maybe it was deleted?
           return $.extend(this, {
             version: '1.1',
@@ -90,7 +90,7 @@ define('xwiki-realtime-document', [
     }
 
     save(data) {
-      return $.post(window.docsaveurl, $.param($.extend({
+      return $.post(globalThis.docsaveurl, $.param($.extend({
         /* jshint camelcase:false */
         form_token: meta.form_token,
         xredirect: '',
@@ -110,19 +110,17 @@ define('xwiki-realtime-document', [
       const url = new XWiki.Document(this.documentReference).getRestURL('channels');
       params = $.extend({
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
-        timestamp: new Date().getTime()
+        timestamp: Date.now()
       }, params);
       return $.getJSON(url, $.param(params, true)).then(function(data) {
         if (Array.isArray(data)) {
           return $.extend(data, channelListAPI);
         } else {
-          return Promise.reject(new Error(
-            'Invalid response from the server when requesting the list of document channels.',
-            {cause: data}
-          ));
+          throw new TypeError('Invalid response from the server when requesting the list of document channels.',
+            {cause: data});
         }
-      }, function(jqXHR) {
-        return Promise.reject(new Error('Failed to retrieve the list of document channels.', {cause: jqXHR}));
+      }, function(error) {
+        throw new Error('Failed to retrieve the list of document channels.', {cause: error});
       });
     }
 

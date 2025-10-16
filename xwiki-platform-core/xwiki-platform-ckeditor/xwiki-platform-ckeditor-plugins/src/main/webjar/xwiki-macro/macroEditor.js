@@ -27,7 +27,9 @@ define('macroEditorTranslationKeys', [], [
   'noParameters',
   'content',
   'required',
-  'selectFeature'
+  'selectFeature',
+  'deprecated',
+  'advanced'
 ]);
 
 /**
@@ -64,13 +66,18 @@ define('macroParameterEnhancer', ['jquery'], function($) {
         childrenToRemove.push(childId);
       }
     }
-    group.children = group.children.filter(element => !childrenToRemove.includes(element));
+    let displayedChildren = group.children.filter(element => !childrenToRemove.includes(element));
     // if the group doesn't contain any children anymore we can just hide it
-    if (group.children.length === 0) {
+    if (displayedChildren.length === 0) {
       group.hidden = true;
     // if the group contains a single parameter then we don't consider it's a feature only.
-    } else if (group.children.length === 1) {
+    } else if (displayedChildren.length === 1) {
       group.featureOnly = false;
+      // if the single children is a group, we actually remove it to display directly the parameters
+      let uniqueChildKey = displayedChildren[0];
+      if (isNodeAGroup(uniqueChildKey)) {
+        group.children = parametersMap[uniqueChildKey].children;
+      }
     }
     visitedGroups.push(group.id);
   },
@@ -235,6 +242,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     let paramNode = parametersMap[nodeKey];
     let radioName = 'feature-radio-' + featureName;
     let radioId = radioName + '-' + paramNode.id;
+    let hidden = paramNode.hidden;
 
     let nodeOutput = $(macroFeatureContentTemplate);
     nodeOutput.find('.feature-radio').attr({
@@ -245,7 +253,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     nodeOutput.find('.feature-choice-name').attr('for', radioId);
     nodeOutput.find('.feature-choice-name').text(translations.get('selectFeature', paramNode.name));
 
-    if (isFeature && isMandatory) {
+    if (isFeature && isMandatory && !hidden) {
       nodeOutput.find('.feature-radio').on('change', function() {
         $(this).parents('.feature-container').find('.feature-choice-body').removeClass('mandatory');
         $(this).parents('.feature-parameter').find('.feature-choice-body').addClass('mandatory');
@@ -297,13 +305,13 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
   },
 
   macroParameterTemplate =
-    '<div class="macro-parameter">' +
-      '<div class="macro-parameter-name-container">' +
-        '<label class="macro-parameter-name" for=""></label>' +
-        '<span class="mandatory"></span>' +
-      '</div>' +
-      '<div class="macro-parameter-description"></div>' +
-    '</div>',
+    `<div class="macro-parameter">
+      <div class="macro-parameter-name-container">
+        <label class="macro-parameter-name" for=""></label>
+        <span class="mandatory"></span>
+      </div>
+      <div class="macro-parameter-description"></div>
+    </div>`,
 
   displayMacroParameter = function(parameter, featureRadioButton) {
     let output = $(macroParameterTemplate);
@@ -312,6 +320,10 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     output.find('.macro-parameter-name').text(parameter.name);
     if (parameter.mandatory) {
       output.find('.mandatory').text('(' + translations.get('required') + ')');
+    } else if (parameter.deprecated) {
+      output.find('.mandatory').text('(' + translations.get('deprecated') + ')');
+    } else if (parameter.advanced) {
+        output.find('.mandatory').text('(' + translations.get('advanced') + ')');
     }
     output.find('.macro-parameter-description').text(parameter.description);
     output.toggleClass('mandatory', !!parameter.mandatory);
@@ -548,8 +560,15 @@ define(
         let emptyMandatoryParams = [];
         // Include the mandatory features for which no option is checked.
         macroEditor.find('.feature-container.mandatory').filter(function () {
-          return $(this).find('.feature-radio').length > 0 &&
-              $(this).find('.feature-radio:checked').length === 0;
+          if ($(this).find('.feature-radio').length > 0) {
+            return $(this).find('.feature-radio:checked').length === 0;
+          } else {
+            return $(this).find('.macro-parameter:not(.hidden)').filter(function() {
+                let id = $(this).attr('data-id');
+                let value = id === '$content' ? macroCall.content : macroCall.parameters[id];
+                return value === undefined || value === '';
+            }).first().length !== 0;
+          }
         }).map((index, elt) => emptyMandatoryParams.push(elt));
         // Exclude the hidden mandatory parameters
         macroEditor.find('.macro-parameter.mandatory:not(.hidden)').filter(function() {

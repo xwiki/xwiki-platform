@@ -210,22 +210,25 @@ Object.extend(XWiki, {
         }
         $("docextrapanes").className="loading";
 
-        const parameters = {
-          'xpage': 'xpart',
-          'vm': extraTemplate,
-          'language': document.documentElement.dataset.xwikiLocale
-        };
+        const parameters = new URLSearchParams([
+          ['xpage', 'xpart'],
+          // Note that extraTemplate may contain additional parameters, e.g. "template.vm&key=value". This is used to
+          // pass additional information when loading the document extra tab (e.g. the id of the UI extension that
+          // provides the tab).
+          ...new URLSearchParams(`vm=${extraTemplate}`),
+          ['language', document.documentElement.dataset.xwikiLocale]
+        ]);
         // Determine if JavaScript minification is disabled from the URL. We need to pass it to the AJAX call in order
         // to get the right resources on the response.
         if (new URLSearchParams(window.location.search).get('minify') === 'false') {
-          parameters.minify = 'false';
+          parameters.append('minify', 'false');
         }
 
         new Ajax.Request(
           window.docgeturl,
                 {
                     method: 'get',
-                    parameters,
+                    parameters: parameters.toString(),
                     onSuccess: function(response) {
                       // Do the work that Ajax.Updater is supposed to do, but we can't use it because it strips the <script>s
                       // from the output and we need to inject the external scripts from the reply (in the DOM's dead), to execute them.

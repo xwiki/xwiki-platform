@@ -226,4 +226,28 @@ public class RealtimeEditToolbar extends BaseElement
                 .waitUntilCondition(ExpectedConditions.attributeToBe(SAVE_STATUS, VALUE, SaveStatus.SAVED.getValue()));
         }
     }
+
+    /**
+     * Wait for the warning that informs the user that they, or some other user, are editing the same page outside the
+     * realtime collaboration session, which may lead to merge conflicts on save.
+     *
+     * @return this instance
+     * @since 17.8.0
+     * @since 17.4.5
+     * @since 16.10.12
+     */
+    public RealtimeEditToolbar waitForConcurrentEditingWarning()
+    {
+        String toggleSelector = "button.realtime-warning[data-toggle=\"popover\"]";
+        getDriver().waitUntilElementIsVisible(By.cssSelector(toggleSelector));
+        String popoverSelector = toggleSelector + " + .popover";
+        if (!getDriver().findElementsWithoutWaiting(By.cssSelector(popoverSelector)).isEmpty()) {
+            // The popover is displayed. Let's hide it as it can cover other UI elements.
+            WebElement toggle = getDriver().findElementWithoutWaiting(By.cssSelector(toggleSelector));
+            // We have to click twice because the popover was displayed without focusing the toggle.
+            toggle.click();
+            toggle.click();
+        }
+        return this;
+    }
 }

@@ -24,10 +24,8 @@ import java.security.Principal;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -37,14 +35,16 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -55,16 +55,17 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@OldcoreTest
 @ReferenceComponentList
-public class XWikiAuthServiceImplTest
+class XWikiAuthServiceImplTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private XWikiAuthServiceImpl authService;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    void before() throws Exception
     {
         this.oldcore.getMocker().registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, PersistentLoginManagerInterface.class));
@@ -73,14 +74,8 @@ public class XWikiAuthServiceImplTest
 
         // Dummy response
         XWikiResponse xwikiResponse = mock(XWikiResponse.class);
-        when(xwikiResponse.encodeURL(any())).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.getArgument(0);
-            }
-        });
+        when(xwikiResponse.encodeURL(any())).then(
+            (Answer<String>) invocation -> invocation.getArgument(0));
         this.oldcore.getXWikiContext().setResponse(xwikiResponse);
     }
 
@@ -89,7 +84,7 @@ public class XWikiAuthServiceImplTest
      * off.
      */
     @Test
-    public void testAuthenticateWithSuperAdminWhenSuperAdminPasswordIsTurnedOff() throws Exception
+    void authenticateWithSuperAdminWhenSuperAdminPasswordIsTurnedOff() throws Exception
     {
         Principal principal = this.authService.authenticate(XWikiRightService.SUPERADMIN_USER, "whatever",
             this.oldcore.getXWikiContext());
@@ -102,7 +97,7 @@ public class XWikiAuthServiceImplTest
      * off.
      */
     @Test
-    public void testAuthenticateWithSuperAdminPrefixedWithXWikiWhenSuperAdminPasswordIsTurnedOff() throws Exception
+    void authenticateWithSuperAdminPrefixedWithXWikiWhenSuperAdminPasswordIsTurnedOff() throws Exception
     {
         Principal principal = this.authService.authenticate(XWikiRightService.SUPERADMIN_USER_FULLNAME, "whatever",
             this.oldcore.getXWikiContext());
@@ -111,7 +106,7 @@ public class XWikiAuthServiceImplTest
     }
 
     @Test
-    public void testAuthenticateWithSuperAdminWithWhiteSpacesWhenSuperAdminPasswordIsTurnedOff() throws Exception
+    void authenticateWithSuperAdminWithWhiteSpacesWhenSuperAdminPasswordIsTurnedOff() throws Exception
     {
         Principal principal = this.authService.authenticate(" " + XWikiRightService.SUPERADMIN_USER + " ", "whatever",
             this.oldcore.getXWikiContext());
@@ -123,7 +118,7 @@ public class XWikiAuthServiceImplTest
      * Test that superadmin is authenticated as superadmin whatever the case.
      */
     @Test
-    public void testAuthenticateWithSuperAdminWithDifferentCase() throws Exception
+    void authenticateWithSuperAdminWithDifferentCase() throws Exception
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.superadminpassword", "pass");
 
@@ -134,9 +129,11 @@ public class XWikiAuthServiceImplTest
         assertEquals(XWikiRightService.SUPERADMIN_USER_FULLNAME, principal.getName());
     }
 
-    /** Test that SomeUser is correctly authenticated as XWiki.SomeUser when xwiki:SomeUser is entered as username. */
+    /**
+     * Test that SomeUser is correctly authenticated as XWiki.SomeUser when xwiki:SomeUser is entered as username.
+     */
     @Test
-    public void testLoginWithWikiPrefix() throws Exception
+    void loginWithWikiPrefix() throws Exception
     {
         // Setup a simple user profile document
         XWikiDocument userDoc =
@@ -159,7 +156,7 @@ public class XWikiAuthServiceImplTest
      * contains a wiki prefix.
      */
     @Test
-    public void testLogintoVirtualXwikiWithWikiPrefixUsername() throws Exception
+    void logintoVirtualXwikiWithWikiPrefixUsername() throws Exception
     {
         // Setup simple user profile documents
         XWikiDocument userDocLocal =
@@ -188,7 +185,7 @@ public class XWikiAuthServiceImplTest
     }
 
     @Test
-    public void testStripContextPathFromURLWithSlashAfter() throws Exception
+    void stripContextPathFromURLWithSlashAfter() throws Exception
     {
         doReturn("xwiki/").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
@@ -197,7 +194,7 @@ public class XWikiAuthServiceImplTest
     }
 
     @Test
-    public void testStripContextPathFromURLWhenRootContextPathWithSlash() throws Exception
+    void stripContextPathFromURLWhenRootContextPathWithSlash() throws Exception
     {
         doReturn("/").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
@@ -206,7 +203,7 @@ public class XWikiAuthServiceImplTest
     }
 
     @Test
-    public void testStripContextPathFromURLWhenRootContextPathWithoutSlash() throws Exception
+    void stripContextPathFromURLWhenRootContextPathWithoutSlash() throws Exception
     {
         doReturn("").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
@@ -218,7 +215,7 @@ public class XWikiAuthServiceImplTest
      * Simulates the use case when the {@code HttpServletResponse.encodeURL()} changes the context path.
      */
     @Test
-    public void testStripContextPathFromURLWhenOutBoundRewriteRuleChangingContextPath() throws Exception
+    void stripContextPathFromURLWhenOutBoundRewriteRuleChangingContextPath() throws Exception
     {
         doReturn("xwiki/").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
@@ -234,7 +231,7 @@ public class XWikiAuthServiceImplTest
     }
 
     @Test
-    public void testStripContextPathFromURLWithSlashBefore() throws Exception
+    void stripContextPathFromURLWithSlashBefore() throws Exception
     {
         doReturn("xwiki/").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
@@ -243,7 +240,7 @@ public class XWikiAuthServiceImplTest
     }
 
     @Test
-    public void testStripContextPathFromURLWhenRootWebAppAndJSessionId() throws Exception
+    void stripContextPathFromURLWhenRootWebAppAndJSessionId() throws Exception
     {
         doReturn("").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 

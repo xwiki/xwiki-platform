@@ -22,11 +22,9 @@ package org.xwiki.observation.remote.internal.jgroups;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.jgroups.BytesMessage;
 import org.jgroups.Message;
 import org.jgroups.blocks.cs.ReceiverAdapter;
 import org.slf4j.Logger;
-import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -56,9 +54,6 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
     @Inject
     private ComponentManager componentManager;
 
-    @Inject
-    private ClassLoaderManager classLoaderManager;
-
     /**
      * The logger to log.
      */
@@ -84,10 +79,7 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
     @Override
     public void receive(Message msg)
     {
-        if (msg instanceof BytesMessage) {
-            RemoteEventData remoteEvent = (RemoteEventData) ((BytesMessage) msg)
-                .getObject(this.classLoaderManager.getURLClassLoader(null, false));
-
+        if (msg.getObject() instanceof RemoteEventData remoteEvent) {
             this.logger.debug("Received JGroups remote event [{}]", remoteEvent);
 
             getRemoteObservationManager().notify(remoteEvent);

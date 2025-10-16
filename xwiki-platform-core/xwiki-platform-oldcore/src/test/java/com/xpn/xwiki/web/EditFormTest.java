@@ -49,7 +49,7 @@ class EditFormTest
     private EditForm editForm;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         this.editForm = new EditForm();
         this.httpRequest = mock(HttpServletRequest.class);
@@ -57,7 +57,7 @@ class EditFormTest
     }
 
     @Test
-    public void getContent()
+    void getContent()
     {
         when(this.httpRequest.getParameter("content")).thenReturn("My new content");
         this.editForm.readRequest();
@@ -65,7 +65,7 @@ class EditFormTest
     }
 
     @Test
-    public void getObjectPolicy()
+    void getObjectPolicy()
     {
         when(this.httpRequest.getParameter("objectPolicy")).thenReturn("updateOrCreate");
         this.editForm.readRequest();
@@ -89,7 +89,7 @@ class EditFormTest
     }
 
     @Test
-    public void getUpdateOrCreateMap()
+    void getUpdateOrCreateMap()
     {
         when(this.httpRequest.getParameter("objectPolicy")).thenReturn("");
         Map<String, String[]> parameterMap = new HashMap<>();
@@ -152,7 +152,7 @@ class EditFormTest
     }
 
     @Test
-    public void getObjectsToAdd()
+    void getObjectsToAdd()
     {
         when(this.httpRequest.getParameterValues("addedObjects")).thenReturn(null);
         this.editForm.readRequest();
@@ -188,7 +188,7 @@ class EditFormTest
     }
 
     @Test
-    public void getObjectsToRemove()
+    void getObjectsToRemove()
     {
         when(this.httpRequest.getParameterValues("deletedObjects")).thenReturn(null);
         this.editForm.readRequest();

@@ -20,26 +20,36 @@
 package org.xwiki.annotation.renderer;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.FieldSource;
+import org.mockito.Mock;
 import org.xwiki.annotation.TestDocumentFactory;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.test.MockWikiModel;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 
-import static org.junit.Assert.assertEquals;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.web.XWikiURLFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Renderer tests for the XHTML annotations renderer, from the test files.
@@ -47,167 +57,131 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 2.3M1
  */
-@RunWith(Parameterized.class)
-public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
+@AllComponents
+@OldcoreTest
+class AnnotationXHTMLRendererTest
 {
     /**
      * Document description files to run this test for.
      */
-    private static Collection<String[]> files = new ArrayList<String[]>();
+    private static final List<String> files = List.of(
+        // tests containing only plain text content
+        "renderer/plain/Plain1.test",
+        "renderer/plain/Plain2.test",
+        "renderer/plain/Plain3.test",
+        "renderer/plain/Plain4.test",
+        "renderer/plain/Plain5.test",
+        "renderer/plain/Plain6.test",
+
+        // tests containing formatting
+        "renderer/format/Format1.test",
+        "renderer/format/Format2.test",
+        "renderer/format/Format3.test",
+        "renderer/format/Format4.test",
+        "renderer/format/Format5.test",
+
+        // tests containing special characters in the annotated content
+        "renderer/specialchars/SpecialChars1.test",
+        "renderer/specialchars/SpecialChars2.test",
+        "renderer/specialchars/SpecialChars3.test",
+        "renderer/specialchars/SpecialChars4.test",
+        "renderer/specialchars/SpecialChars5.test",
+
+        // tests for which the selection of the annotation appears more than once in the document content
+        "renderer/ambiguous/Ambiguous1.test",
+        "renderer/ambiguous/Ambiguous2.test",
+        "renderer/ambiguous/Ambiguous3.test",
+        "renderer/ambiguous/Ambiguous4.test",
+        "renderer/ambiguous/Ambiguous5.test",
+        "renderer/ambiguous/Ambiguous6.test",
+        // FIXME: fix support for empty selection annotations by making sure that, at each point, for the same
+        // annotation, startEvents & end events are sent in this order. FTM the convention is that annotations are
+        // closed before are opened, for which reason the annotation is something like: </span><span
+        // class="annotation annotationID0">...
+        // "renderer/ambiguous/Ambiguous7.test",
+
+        // tests in which more than one annotation needs to be rendered in the content
+        "renderer/multiple/Multiple1.test",
+        "renderer/multiple/Multiple2.test",
+        "renderer/multiple/Multiple3.test",
+        "renderer/multiple/Multiple4.test",
+        "renderer/multiple/Multiple5.test",
+
+        // tests containing links in the annotated content
+        "renderer/links/Links1.test",
+        "renderer/links/Links2.test",
+        "renderer/links/Links3.test",
+        "renderer/links/Links4.test",
+        "renderer/links/Links5.test",
+        "renderer/links/Links6.test",
+        "renderer/links/Links7.test",
+        "renderer/links/Links8.test",
+
+        // tests containing macros generating content in the annotated content
+        "renderer/macros/Macros1.test",
+        "renderer/macros/Macros2.test",
+        "renderer/macros/Macros3.test",
+        "renderer/macros/Macros4.test",
+        "renderer/macros/Macros5.test",
+        "renderer/macros/Macros6.test",
+        "renderer/macros/Macros7.test",
+
+        // tests where the annotated content is in a table
+        "renderer/tables/Tables1.test",
+        "renderer/tables/Tables2.test",
+
+        // tests where the annotated content is inside some verbatim blocks
+        "renderer/verbatim/Verbatim1.test",
+        "renderer/verbatim/Verbatim2.test",
+        "renderer/verbatim/Verbatim3.test",
+        "renderer/verbatim/Verbatim4.test",
+        "renderer/verbatim/Verbatim5.test",
+        "renderer/verbatim/Verbatim6.test",
+        "renderer/verbatim/Verbatim7.test",
+        "renderer/verbatim/Verbatim8.test",
+        "renderer/verbatim/Verbatim9.test",
+        "renderer/verbatim/Verbatim10.test",
+        "renderer/verbatim/Verbatim11.test",
+
+        // tests where annotations start and/or end in the middle of a word rather than at the beginning or end
+        "renderer/partialwords/PartialWords1.test",
+        "renderer/partialwords/PartialWords2.test",
+        "renderer/partialwords/PartialWords3.test",
+        "renderer/partialwords/PartialWords4.test",
+        "renderer/partialwords/PartialWords5.test",
+        "renderer/partialwords/PartialWords6.test",
+
+        "renderer/spaces/Spaces1.test",
+        "renderer/spaces/Spaces2.test",
+        "renderer/spaces/Spaces3.test"
+    );
+
+    @InjectComponentManager
+    private ComponentManager componentManager;
+
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @Mock
+    private XWikiURLFactory urlFactory;
 
     /**
      * The annotations renderer hint.
      */
     private static final String ANNOTATIONS_RENDERER_HINT = "annotations-xhtml/1.0";
 
-    /**
-     * Mock document to run tests for.
-     */
-    protected String docName;
+    private TestDocumentFactory docFactory;
 
-    /**
-     * Factory to load test documents.
-     */
-    protected TestDocumentFactory docFactory;
-
-    static {
-        // tests containing only plain text content
-        addFileToTest("renderer/plain/Plain1.test");
-        addFileToTest("renderer/plain/Plain2.test");
-        addFileToTest("renderer/plain/Plain3.test");
-        addFileToTest("renderer/plain/Plain4.test");
-        addFileToTest("renderer/plain/Plain5.test");
-        addFileToTest("renderer/plain/Plain6.test");
-
-        // tests containing formatting
-        addFileToTest("renderer/format/Format1.test");
-        addFileToTest("renderer/format/Format2.test");
-        addFileToTest("renderer/format/Format3.test");
-        addFileToTest("renderer/format/Format4.test");
-        addFileToTest("renderer/format/Format5.test");
-
-        // tests containing special characters in the annotated content
-        addFileToTest("renderer/specialchars/SpecialChars1.test");
-        addFileToTest("renderer/specialchars/SpecialChars2.test");
-        addFileToTest("renderer/specialchars/SpecialChars3.test");
-        addFileToTest("renderer/specialchars/SpecialChars4.test");
-        addFileToTest("renderer/specialchars/SpecialChars5.test");
-
-        // tests for which the selection of the annotation appears more than once in the document content
-        addFileToTest("renderer/ambiguous/Ambiguous1.test");
-        addFileToTest("renderer/ambiguous/Ambiguous2.test");
-        addFileToTest("renderer/ambiguous/Ambiguous3.test");
-        addFileToTest("renderer/ambiguous/Ambiguous4.test");
-        addFileToTest("renderer/ambiguous/Ambiguous5.test");
-        addFileToTest("renderer/ambiguous/Ambiguous6.test");
-        // FIXME: fix support for empty selection annotations by making sure that, at each point, for the same
-        // annotation, startEvents & end events are sent in this order. FTM the convention is that annotations are
-        // closed before are opened, for which reason the annotation is something like: </span><span
-        // class="annotation annotationID0">...
-        // addFileToTest("renderer/ambiguous/Ambiguous7.test");
-
-        // tests in which more than one annotation needs to be rendered in the content
-        addFileToTest("renderer/multiple/Multiple1.test");
-        addFileToTest("renderer/multiple/Multiple2.test");
-        addFileToTest("renderer/multiple/Multiple3.test");
-        addFileToTest("renderer/multiple/Multiple4.test");
-        addFileToTest("renderer/multiple/Multiple5.test");
-
-        // tests containing links in the annotated content
-        addFileToTest("renderer/links/Links1.test");
-        addFileToTest("renderer/links/Links2.test");
-        addFileToTest("renderer/links/Links3.test");
-        addFileToTest("renderer/links/Links4.test");
-        addFileToTest("renderer/links/Links5.test");
-        addFileToTest("renderer/links/Links6.test");
-        addFileToTest("renderer/links/Links7.test");
-        addFileToTest("renderer/links/Links8.test");
-
-        // tests containing macros generating content in the annotated content
-        addFileToTest("renderer/macros/Macros1.test");
-        addFileToTest("renderer/macros/Macros2.test");
-        addFileToTest("renderer/macros/Macros3.test");
-        addFileToTest("renderer/macros/Macros4.test");
-        addFileToTest("renderer/macros/Macros5.test");
-        addFileToTest("renderer/macros/Macros6.test");
-        addFileToTest("renderer/macros/Macros7.test");
-
-        // tests where the annotated content is in a table
-        addFileToTest("renderer/tables/Tables1.test");
-        addFileToTest("renderer/tables/Tables2.test");
-
-        // tests where the annotated content is inside some verbatim blocks
-        addFileToTest("renderer/verbatim/Verbatim1.test");
-        addFileToTest("renderer/verbatim/Verbatim2.test");
-        addFileToTest("renderer/verbatim/Verbatim3.test");
-        addFileToTest("renderer/verbatim/Verbatim4.test");
-        addFileToTest("renderer/verbatim/Verbatim5.test");
-        addFileToTest("renderer/verbatim/Verbatim6.test");
-        addFileToTest("renderer/verbatim/Verbatim7.test");
-        addFileToTest("renderer/verbatim/Verbatim8.test");
-        addFileToTest("renderer/verbatim/Verbatim9.test");
-        addFileToTest("renderer/verbatim/Verbatim10.test");
-        addFileToTest("renderer/verbatim/Verbatim11.test");
-
-        // tests where annotations start and/or end in the middle of a word rather than at the beginning or end
-        addFileToTest("renderer/partialwords/PartialWords1.test");
-        addFileToTest("renderer/partialwords/PartialWords2.test");
-        addFileToTest("renderer/partialwords/PartialWords3.test");
-        addFileToTest("renderer/partialwords/PartialWords4.test");
-        addFileToTest("renderer/partialwords/PartialWords5.test");
-        addFileToTest("renderer/partialwords/PartialWords6.test");
-
-        addFileToTest("renderer/spaces/Spaces1.test");
-        addFileToTest("renderer/spaces/Spaces2.test");
-        addFileToTest("renderer/spaces/Spaces3.test");
-    }
-
-    /**
-     * Creates a test for the passed document. Will be instantiated by the parameterized runner for all the parameters.
-     *
-     * @param docName the document (and corpus filename) to run tests for
-     */
-    public AnnotationXHTMLRendererTest(String docName)
+    @BeforeEach
+    void setUp() throws Exception
     {
-        this.docName = docName;
-    }
-
-    /**
-     * Adds a file to the list of files to run tests for.
-     *
-     * @param docName the name of the document / file to test
-     */
-    private static void addFileToTest(String docName)
-    {
-        files.add(new String[] { docName });
-    }
-
-    /**
-     * @return list of corpus files to instantiate tests for
-     */
-    @Parameters
-    public static Collection<String[]> data()
-    {
-        return files;
-    }
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        // register wiki model mock so that we can use documents / attachments information
-        getComponentManager().registerComponent(MockWikiModel.getComponentDescriptor());
-        // make sure to use the default link label generator
-        registerComponent(DefaultLinkLabelGenerator.class);
-    }
-
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
         docFactory = new TestDocumentFactory();
+
+        XWikiContext context = this.oldcore.getXWikiContext();
+        context.setURLFactory(this.urlFactory);
+        when(this.urlFactory.getURL(any(), eq(context))).thenReturn("viewurl");
+        this.oldcore.getSpyXWiki().saveDocument(
+            new XWikiDocument(new DocumentReference("xwiki", "Space", "ExistingPage")), context);
     }
 
     /**
@@ -215,21 +189,22 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
      *
      * @throws Exception in case something goes wrong looking up components and rendering
      */
-    @Test
-    public void getAnnotatedHTML() throws Exception
+    @ParameterizedTest
+    @FieldSource("files")
+    void getAnnotatedHTML(String docName) throws Exception
     {
-        Parser parser = getComponentManager().getInstance(Parser.class, docFactory.getDocument(docName).getSyntax());
+        Parser parser = this.componentManager.getInstance(Parser.class, docFactory.getDocument(docName).getSyntax());
         XDOM xdom = parser.parse(new StringReader(docFactory.getDocument(docName).getSource()));
 
         // run transformations
-        TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
+        TransformationManager transformationManager = this.componentManager.getInstance(TransformationManager.class);
         TransformationContext context = new TransformationContext(xdom,
             Syntax.valueOf(docFactory.getDocument(docName).getSyntax()));
         context.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
         transformationManager.performTransformations(xdom, context);
 
         AnnotationPrintRenderer renderer =
-            getComponentManager().getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
+            this.componentManager.getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
         WikiPrinter printer = new DefaultWikiPrinter();
         renderer.setPrinter(printer);
         // set the annotations for this renderer
@@ -237,8 +212,8 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         xdom.traverse(renderer);
 
-        assertEquals("[" + docName + "] test failed", docFactory.getDocument(docName).getAnnotatedContent(),
-            printer.toString());
+        assertEquals(docFactory.getDocument(docName).getAnnotatedContent(),
+            printer.toString(), "[" + docName + "] test failed");
     }
 
     /**
@@ -246,27 +221,28 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
      *
      * @throws Exception in case something goes wrong looking up components and rendering
      */
-    @Test
-    public void getAnnotatedHTMLWithoutAnnotations() throws Exception
+    @ParameterizedTest
+    @FieldSource("files")
+    void getAnnotatedHTMLWithoutAnnotations(String docName) throws Exception
     {
-        Parser parser = getComponentManager().getInstance(Parser.class, docFactory.getDocument(docName).getSyntax());
+        Parser parser = this.componentManager.getInstance(Parser.class, docFactory.getDocument(docName).getSyntax());
         XDOM xdom = parser.parse(new StringReader(docFactory.getDocument(docName).getSource()));
 
         // run transformations
-        TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
+        TransformationManager transformationManager = this.componentManager.getInstance(TransformationManager.class);
         TransformationContext context = new TransformationContext(xdom,
             Syntax.valueOf(docFactory.getDocument(docName).getSyntax()));
         context.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
         transformationManager.performTransformations(xdom, context);
 
         AnnotationPrintRenderer renderer =
-            getComponentManager().getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
+            this.componentManager.getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
         WikiPrinter printer = new DefaultWikiPrinter();
         renderer.setPrinter(printer);
 
         xdom.traverse(renderer);
 
-        assertEquals("[" + docName + "] test failed", docFactory.getDocument(docName).getRenderedContent(),
-            printer.toString());
+        assertEquals(docFactory.getDocument(docName).getRenderedContent(),
+            printer.toString(), "[" + docName + "] test failed");
     }
 }

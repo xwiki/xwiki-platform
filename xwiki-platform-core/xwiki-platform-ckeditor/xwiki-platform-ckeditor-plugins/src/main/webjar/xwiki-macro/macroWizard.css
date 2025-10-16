@@ -52,8 +52,8 @@ ul.macro-list .macro-extension {
 .macro-parameter-name::first-letter,
 .macro-parameter-description::first-letter,
 .macro-parameter-group-name::first-letter,
-.feature-title:first-letter,
-.feature-choice-name:first-letter {
+.feature-title::first-letter,
+.feature-choice-name::first-letter {
   text-transform: capitalize;
 }
 

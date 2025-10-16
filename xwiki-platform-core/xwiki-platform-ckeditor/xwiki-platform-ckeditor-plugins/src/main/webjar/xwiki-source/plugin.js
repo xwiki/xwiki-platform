@@ -73,6 +73,13 @@
     addModeChangeHandler: function(editor, handler, priority = 0) {
       editor._.modeChangeHandlers = editor._.modeChangeHandlers || [];
       editor._.modeChangeHandlers.push({handler, priority});
+      return {
+        removeListener: () => {
+          editor._.modeChangeHandlers = editor._.modeChangeHandlers.filter(
+            entry => entry.handler !== handler || entry.priority !== priority
+          );
+        }
+      };
     },
   };
 
@@ -201,6 +208,7 @@
     },
 
     startLoading: function(editor) {
+      this.getSourceButton(editor)?.addClass('loading');
       CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
       editor.setLoading(true);
       if (editor.mode === 'source') {
@@ -210,9 +218,6 @@
         // lock the undo history until the conversion is done.
         // See CKEDITOR-58: Undo operation can replace the rich text content with wiki syntax
         editor.fire('lockSnapshot');
-      }
-      if (editor.editable()) {
-        $(editor.container.$).find('.cke_button__source_icon').first().addClass('loading');
       }
       // A bug in Internet Explorer 11 prevents the user from typing into the Source text area if the WYSIWYG text
       // area is focused and the selection is collapsed before switching to Source mode. In order to avoid this
@@ -231,9 +236,6 @@
     },
 
     endLoading: async function(editor) {
-      if (editor.editable()) {
-        $(editor.container.$).find('.cke_button__source_icon').first().removeClass('loading');
-      }
       if (editor.mode === 'wysiwyg') {
         // Unlock the undo history after the conversion is done and the WYSIWYG mode data is set.
         editor.fire('unlockSnapshot');
@@ -241,6 +243,11 @@
       await CKEDITOR.plugins.xwikiSelection.restoreSelection(editor, {
         beforeApply: () => editor.setLoading(false)
       });
+      this.getSourceButton(editor)?.removeClass('loading');
+    },
+
+    getSourceButton: function(editor) {
+      return editor.ui.space('top').find('.cke_button__source_icon').getItem(0);
     }
   });
 })();

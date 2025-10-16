@@ -53,7 +53,6 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -140,8 +139,8 @@ class CachedLESSCompilerTest
         assertEquals("output", cachedCompiler.compute(resource, false, true, true, "skin2"));
 
         // Verify
-        verify(xcontext, times(1)).put("skin", "skin2");
-        verify(xcontext, times(1)).put("skin", "skin");
+        verify(xcontext).put("skin", "skin2");
+        verify(xcontext).put("skin", "skin");
     }
 
     @Test

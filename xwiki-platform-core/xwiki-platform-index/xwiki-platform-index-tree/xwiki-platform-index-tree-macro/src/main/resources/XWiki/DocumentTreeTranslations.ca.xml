@@ -82,13 +82,33 @@ rendering.macro.documentTree.parameter.limit.name=Límit
 ### Missing: rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
 rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 ### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
-
+rendering.macro.documentTree.parameter.sortDocumentsBy.name=Ordena les pàgines per
+rendering.macro.documentTree.parameter.sortDocumentsBy.description=El camp de pàgina utilitzat per ordenar les pàgines filles, seguit de l'ordre d'ordenació.
+rendering.macro.documentTree.parameter.expandToLevel.name=Expandeix al nivell
+rendering.macro.documentTree.parameter.expandToLevel.description=Defineix la profunditat de l'arbre a expandir automàticament. Per defecte és 0 i significa que només es mostren els nodes de nivell superior. Un nivell d'1 els obre, un nivell de 2 també obre els nens per sota dels nodes recentment mostrats, etc. Tingueu en compte que un valor alt pot fer que la macro expansiva es mostri per al navegador.
+rendering.macro.children.name=Filles
+rendering.macro.children.description=Mostra un arbre de pàgines filles de la pàgina actual
+rendering.macro.children.parameter.sort.name=Ordena per
+rendering.macro.children.parameter.sort.description=El camp de pàgina utilitzat per ordenar les pàgines filles, seguit de l'ordre d'ordenació.
+rendering.macro.children.parameter.root.name=Arrel
+rendering.macro.children.parameter.root.description=L'identificador del node arrel. Això és útil si voleu mostrar només els descendents d'un determinat node (que és l'arrel especificada). L'arbre mostra els fills del node arrel en el primer nivell, de manera que el node arrel no es mostra realment. Es mostra tot l'arbre si no s'especifica el node arrel. El format d'un identificador de node és entityType:entityReference, on el tipus d'entitat pot ser, per exemple, wiki, space, document. P. ex.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
 index.documentTree.empty=No s'han trobat pàgines
 index.documentTree.more={0} més ...
+index.documentTree.addDocument=Nova pàgina...
+index.documentTree.documentSortDisplayer.field=Camp d'ordenació
+index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.title=Títol
+index.documentTree.documentSortDisplayer.field.date=Data de la darrera modificació
+index.documentTree.documentSortDisplayer.field.creationDate=Data de creació
+index.documentTree.documentSortDisplayer.order=Ordre d'ordenació
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=Ascendent
+index.documentTree.documentSortDisplayer.order.desc=Descendent
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Mostra els documents fills
-### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.</content>
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.
+</content>
 </xwikidoc>

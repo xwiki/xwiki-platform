@@ -299,6 +299,15 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
     'wysiwyg': true
   })##
 #end
+#if ($services.security.url.isFrontendUrlCheckEnabled())
+<script type="application/json" id="trusted-domains-configuration">
+{
+  "trustedDomains": $jsontool.serialize($services.security.url.getTrustedDomains()),
+  "allowedUrls": $jsontool.serialize($services.security.url.getAllowedFrontendUrls())
+}
+</script>
+  $xwiki.jsfx.use('uicomponents/link/link-protection.js')##
+#end
 ##
 ## Hooks for inserting JavaScript skin extensions
 ##

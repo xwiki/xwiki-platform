@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * 
  * @version $Id$
  */
-public class VoidMailListenerTest
+class VoidMailListenerTest
 {
     @Test
     void test()

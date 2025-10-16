@@ -19,7 +19,6 @@
  */
 package org.xwiki.flamingo.skin.test.po;
 
-import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -30,9 +29,7 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class AttachmentsViewPage extends ViewPage
 {
-    private static final String ATTACHMENTS = "attachments";
-
-    private static final String ATTACHMENTSLINK = "Attachmentslink";
+    private static final String ATTACHMENTS = "Attachments";
 
     /**
      * @return if the attachments pane is available
@@ -42,7 +39,7 @@ public class AttachmentsViewPage extends ViewPage
      */
     public boolean isAttachmentsDocExtraPaneAvailable()
     {
-        return getDriver().hasElementWithoutWaiting(By.id(ATTACHMENTSLINK));
+        return hasDocExtraPane(ATTACHMENTS);
     }
 
     /**
@@ -52,8 +49,7 @@ public class AttachmentsViewPage extends ViewPage
      */
     public AttachmentsPane openAttachmentsDocExtraPane()
     {
-        getDriver().findElement(By.id(ATTACHMENTSLINK)).click();
-        waitForDocExtraPaneActive(ATTACHMENTS);
+        openDocExtraPane(ATTACHMENTS);
         return new AttachmentsPane();
     }
 
@@ -64,7 +60,7 @@ public class AttachmentsViewPage extends ViewPage
      */
     public AttachmentsPane useShortcutKeyForAttachmentPane()
     {
-        useShortcutForDocExtraPane("a", ATTACHMENTS);
+        useShortcutForDocExtraPane(ATTACHMENTS, "a");
         return new AttachmentsPane();
     }
 }

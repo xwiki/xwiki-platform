@@ -88,8 +88,11 @@ public class DefaultRealtimeSessionManager implements RealtimeSessionManager
             // For the standalone WYSIWYG, inplace WYSIWYG and Wiki edit modes we check if there is an active realtime
             // editing session where the same editor is used to edit the document content.
             String contentEditor = WIKI.equals(editMode) ? WIKI : WYSIWYG;
+            // We use Locale.toString() instead of Locale.toLanguageTag() in order to match the output of the Page REST
+            // API (see ModelFactory#toRestPage()), which is used by the JavaScript code to determine the locale of the
+            // edited document and create the associated Netflux channel.
             List<String> contentChannelPath =
-                List.of("translations", locale.toLanguageTag(), "fields", "content", "editors", contentEditor);
+                List.of("translations", locale.toString(), "fields", "content", "editors", contentEditor);
             return this.entityChannelStore.getChannel(documentReference, contentChannelPath)
                 .map(contentChannel -> contentChannel.getUserCount() > 0).orElse(false);
         } else if (INLINE.equals(editMode)) {

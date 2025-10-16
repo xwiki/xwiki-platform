@@ -44,7 +44,7 @@ import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
-import org.xwiki.search.solr.test.SolrComponentList;
+import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@SolrComponentList
+@EmbeddedSolrComponentList
 @ReferenceComponentList
 @ComponentList({TestEnvironment.class, SolrSearchCoreUtils.class, SolrLinkSerializer.class,
     CurrentPageReferenceDocumentReferenceResolver.class})

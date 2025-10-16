@@ -32,6 +32,10 @@ app.get("/", (_req, res) => {
 });
 
 let offlineCount = 0;
+// Flag to indicate if the page is new (true) or already exists (false).
+// It is changed when requesting a first time for Main.NewPage2.WebHome.
+// It can be reset to true by calling the /reset path.
+let newNewPage2 = true;
 
 function getHtml(
   page: string,
@@ -57,6 +61,7 @@ ${revision ? "Revision " + revision : ""}
 
 app.get(
   "/xwiki/rest/cristal/wikis/xwiki/spaces/*page",
+  // eslint-disable-next-line max-statements
   (req: Request, res: Response) => {
     res.appendHeader("Access-Control-Allow-Origin", "*");
 
@@ -71,6 +76,7 @@ app.get(
     let revision: string | undefined = undefined;
     let text: string = "";
     let html: string = "";
+    let encodingFormat = "xwiki/2.1";
 
     switch (id) {
       case "Main.WebHome":
@@ -97,6 +103,19 @@ ${revision ? "Revision " + revision : ""}
         res.sendStatus(404);
         return;
 
+      case "Main.NewPage2.WebHome": {
+        console.log("is NewPage2 new ?", newNewPage2);
+        if (newNewPage2) {
+          newNewPage2 = false;
+          res.sendStatus(404);
+          return;
+        } else {
+          page = "Main.NewPage2.WebHome";
+          encodingFormat = "markdown/1.2";
+        }
+        break;
+      }
+
       default:
         page = id;
         name = "WebHome";
@@ -111,7 +130,7 @@ ${revision ? "Revision " + revision : ""}
       headline: page,
       headlineRaw: page,
       creator: page,
-      encodingFormat: "xwiki/2.1",
+      encodingFormat,
       text: text,
       html: html,
     });
@@ -294,6 +313,16 @@ app.options(
   },
 );
 
+app.options(
+  "/xwiki/rest/wikis/xwiki/spaces/Main/spaces/NewPage2/pages/WebHome",
+  (_req: Request, res: Response) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "PUT");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.status(200).send("Preflight request allowed");
+  },
+);
+
 app.put(
   "/xwiki/rest/wikis/xwiki/spaces/Main/spaces/NewPage/pages/WebHome",
   (_req: Request, res: Response) => {
@@ -301,6 +330,25 @@ app.put(
     res.json({});
   },
 );
+
+app.put(
+  "/xwiki/rest/wikis/xwiki/spaces/Main/spaces/NewPage2/pages/WebHome",
+  (_req: Request, res: Response) => {
+    res.appendHeader("Access-Control-Allow-Origin", "*");
+    res.contentType("application/xml;charset=UTF-8");
+    res.write(
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        "<page></page>",
+    );
+  },
+);
+
+// Reset the state of the server. Can be caledl at the start of tests that need
+// a predicatable state.
+app.get("/reset", (_req, res) => {
+  newNewPage2 = true;
+  res.send("ok");
+});
 
 app.listen(port, () => {
   console.log(`XWiki mock server listening on http://localhost:${port}`);

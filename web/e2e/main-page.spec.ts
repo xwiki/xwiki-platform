@@ -167,22 +167,33 @@ configs.forEach(
       await expect(page.locator("#xwikicontent")).toContainText("Revision 2.1");
     });
 
-    test(`[${name}] has working editor on new page`, async ({ page }) => {
+    test(`[${name}] has working editor on new page`, async ({
+      page,
+      request,
+    }) => {
+      // Reset the state of the server beforeh starting the test.
+      await request.get("http://127.0.0.1:15680/reset");
+
       await page.goto(localDefaultPage);
 
       await new SidebarPageObject(page).openSidebar();
       await page.locator("#sidebar #new-page-button").nth(0).click();
 
       const newPageDialogForm = page.locator("#page-creation-form");
+      await expect(newPageDialogForm).toBeVisible();
+      await page.keyboard.insertText("NewPage2");
       await newPageDialogForm.dispatchEvent("submit");
 
       const editorHeader = page.locator(".content .doc-header input").nth(0);
-      const editorContent = page.locator(".content .doc-content p").nth(0);
-      expect(await editorHeader.getAttribute("placeholder")).toEqual("NewPage");
-      await expect(editorHeader).toBeEmpty();
-      expect(await editorContent.getAttribute("data-placeholder")).toEqual(
-        "Type '/' to show the available actions",
+      const editorContent = page
+        .locator(".content .doc-content .bn-container p")
+        .nth(0);
+      const trailingBreakElement = editorContent.locator(
+        ".ProseMirror-trailingBreak",
       );
+      await expect(editorContent).toBeVisible();
+      expect(await trailingBreakElement.count()).toEqual(1);
+      expect(await editorHeader.inputValue()).toEqual("Main.NewPage2.WebHome");
       expect(await editorContent.textContent()).toBe("");
     });
 

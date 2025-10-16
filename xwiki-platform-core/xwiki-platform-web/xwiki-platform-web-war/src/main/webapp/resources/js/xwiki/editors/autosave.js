@@ -31,7 +31,7 @@ editors.AutoSave = Class.create({
     /** Is the autosave enabled ? */
     enabled: false,
     /** If enabled, how frequent are the savings */
-    frequency: 5, // minutes
+    interval: 5, // minutes
     /** Is the UI for configuring the autosave enabled or not? */
     showConfigurationUI: true,
     /**
@@ -45,7 +45,7 @@ editors.AutoSave = Class.create({
   /** Initialization */
   initialize : function(options) {
     this.options = Object.extend(Object.clone(this.options), options || { });
-    this.form = $(this.options.form) || ($("xwikieditcontent") && $("xwikieditcontent").up('form'));
+    this.form = $(this.options.form) || $("xwikieditcontent")?.up('form');
     if (!this.form || this.form.down('#autosaveControl')) {
       return;
     }
@@ -83,35 +83,31 @@ editors.AutoSave = Class.create({
   },
 
   /**
-   * The UI of the autosave feature is created and introduced at the beginning of the edit form. It comprises a checkbox
-   * for enabling / disabling the autosave and an input that allows to set the autosave frequency.
+   * The UI of the autosave feature is created and introduced towards the end of the edit form. 
+   * It contains a checkbox for toggling the autosave and an input that allows to set the autosave interval in minutes.
    */
   createUIElements : function() {
-    // Checkbox to enable/disable the autosave
+    // Toggle for the autosave feature.
     this.autosaveCheckbox = new Element('input', {
       type: "checkbox",
       checked: this.options.enabled,
       name: "doAutosave",
       id: "doAutosave"
     });
-    // Input for setting the autosave frequency
-    this.autosaveInput = new Element('input', {
+    // Input for setting the autosave interval
+    this.autosaveIntervalInput = new Element('input', {
       type: "text",
-      value: this.options.frequency,
+      value: this.options.interval,
       size: "2",
-      "class": "autosave-frequency"
+      "class": "autosave-interval"
     });
     // Labels
-    var autosaveLabel = new Element('label', {'class': 'autosave', 'for' : "doAutosave"});
+    var autosaveLabel = new Element('label', {'class': 'autosave'});
     autosaveLabel.appendChild(this.autosaveCheckbox);
-    autosaveLabel.appendChild(document.createTextNode(" $services.localization.render('core.edit.autosave')"));
-    var frequencyLabel = new Element('label', {'class': 'frequency'});
-    frequencyLabel.appendChild(document.createTextNode("$services.localization.render('core.edit.autosave.every') "));
-    frequencyLabel.appendChild(this.autosaveInput);
-    this.timeUnit = new Element('span');
-    this.setTimeUnit();
-    frequencyLabel.appendChild(document.createTextNode(" "));
-    frequencyLabel.appendChild(this.timeUnit);
+    autosaveLabel.appendChild(document.createTextNode("$!escapetool.javascript($services.localization.render('core.edit.autosave'))"));
+    var intervalLabel = new Element('label', {'class': 'interval'});
+    intervalLabel.appendChild(document.createTextNode("$!escapetool.javascript($services.localization.render('core.edit.autosave.interval.label))"));
+    intervalLabel.appendChild(this.autosaveIntervalInput);
     // A paragraph containing the whole thing
     var container = new Element('div', {"id": "autosaveControl"});
     this.classNameAutosaveDisabled = 'autosaveDisabled';
@@ -120,7 +116,7 @@ editors.AutoSave = Class.create({
     }
     container.appendChild(autosaveLabel);
     container.appendChild(document.createTextNode(" "));
-    container.appendChild(frequencyLabel);
+    container.appendChild(intervalLabel);
     container.appendChild(document.createTextNode(" "));
     // Insert in the editing UI
     this.form.down('.buttons').insert(container);
@@ -138,7 +134,7 @@ editors.AutoSave = Class.create({
       }
     };
     ["keydown", "keyup", "keypress"].each(function(eventName) {
-      this.autosaveInput.observe(eventName, preventSubmit);
+      this.autosaveIntervalInput.observe(eventName, preventSubmit);
       this.autosaveCheckbox.observe(eventName, preventSubmit);
     }.bind(this));
 
@@ -147,19 +143,19 @@ editors.AutoSave = Class.create({
       this.toggleTimer(this.autosaveCheckbox.checked);
     }.bindAsEventListener(this));
 
-    // Set autosave frequency
-    Event.observe(this.autosaveInput, "blur", function() {
+    // Set autosave interval
+    Event.observe(this.autosaveIntervalInput, "blur", function() {
       // is the given value valid?
-      var newFrequency = new Number(this.autosaveInput.value);
-      if (newFrequency > 0) {
+      var newInterval = new Number(this.autosaveIntervalInput.value);
+      if (newInterval > 0) {
         // yes: memorize it
-        this.options.frequency = newFrequency;
+        this.options.interval = newInterval;
         this.setTimeUnit();
         // reset autosave loop
         this.startTimer();
       } else {
         // no: restore the previous value in the input
-        this.autosaveInput.value = this.options.frequency;
+        this.autosaveIntervalInput.value = this.options.interval;
       }
     }.bindAsEventListener(this));
 
@@ -172,7 +168,7 @@ editors.AutoSave = Class.create({
    * TODO This is bad, very difficult to internationalize.
    */
   setTimeUnit : function() {
-    if (this.options.frequency == 1) {
+    if (this.options.interval === 1) {
       this.timeUnit.update("minute");
     } else {
       this.timeUnit.update("minutes");
@@ -207,30 +203,30 @@ editors.AutoSave = Class.create({
     }
     if (this.options.enabled) {
       this.startTimer();
-      if (this.autosaveInput) {
-        this.autosaveInput.up(1).removeClassName(this.classNameAutosaveDisabled);
+      if (this.autosaveIntervalInput) {
+        this.autosaveIntervalInput.up(1).removeClassName(this.classNameAutosaveDisabled);
       }
     } else {
       this.stopTimer();
-      if (this.autosaveInput) {
-        this.autosaveInput.up(1).addClassName(this.classNameAutosaveDisabled);
+      if (this.autosaveIntervalInput) {
+        this.autosaveIntervalInput.up(1).addClassName(this.classNameAutosaveDisabled);
       }
     }
   },
 
   /**
    * Start autosave timer when the autosave is enabled.
-   * Every (this.options.frequency * 60) seconds, the callback function doAutosave is called.
+   * Every (this.options.interval * 60) seconds, the callback function doAutosave is called.
    */
   startTimer : function() {
     // Make sure we stop the existing timer.
     this.stopTimer();
     this.timer = new PeriodicalExecuter(this.doAutosave.bind(this),
-      this.options.frequency * 60 /* seconds in a minute */);
+      this.options.interval * 60 /* seconds in a minute */);
   },
 
   /**
-   * Stop the autosave loop when the autosave is disabled or when the autosave frequency is changed
+   * Stop the autosave loop when the autosave is disabled or when the autosave interval is changed
    * and the loop needs to be restarted.
    */
   stopTimer : function() {

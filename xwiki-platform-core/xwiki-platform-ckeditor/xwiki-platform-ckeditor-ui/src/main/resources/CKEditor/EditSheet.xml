@@ -607,7 +607,7 @@ body &gt; .selectize-dropdown {
 
 /* The 'skin-flamingo' class name is removed from the body element in full-screen mode so we need to fix the auto-save
   styles. */
-.cke_maximized #autosaveControl input.autosave-frequency {
+.cke_maximized #autosaveControl input.autosave-interval {
   width: 3em;
 }
 

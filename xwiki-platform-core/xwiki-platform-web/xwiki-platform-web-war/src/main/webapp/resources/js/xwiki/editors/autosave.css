@@ -1,22 +1,14 @@
-#template('colorThemeInit.vm')
 #autosaveControl {
   display: inline;
   white-space: nowrap;
 }
-#autosaveControl input.autosave-frequency {
+#autosaveControl input.autosave-interval {
   text-align: center;
   width: 2em;
 }
-
-/** Override Toucan styles */
-#body #autosaveControl label {
-  display: inline;
-  margin: 0;
+#autosaveControl .interval {
+  display: none;
 }
-#body #autosaveControl label.frequency, #body #autosaveControl label.frequency span {
-  text-transform: none;
-  font-weight: 400;
-}
-#autosaveControl label.autosave {
-  font-weight: 400;
+#autosaveControl .autosave:has(input:checked) + .interval {
+  display: inline-block;
 }

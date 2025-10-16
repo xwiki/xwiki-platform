@@ -35,24 +35,41 @@ import org.xwiki.stability.Unstable;
 public interface RemoteObservationManager
 {
     /**
-     * Send a event in the different network channels.
+     * @return the configured {@link NetworkAdapter}
+     * @since 17.10.0RC1
+     */
+    @Unstable
+    NetworkAdapter getNetworkAdapter();
+
+    /**
+     * Send an event in the different network channels.
      * <p>
      * This method is not supposed to be used directly for a new event unless the user specifically want to bypass or
      * emulate {@link org.xwiki.observation.ObservationManager}.
      *
-     * @param event the event
+     * @param localEvent the event to send
      */
-    void notify(LocalEventData event);
+    void notify(LocalEventData localEvent);
 
     /**
-     * Inject a remote event in the local {@link org.xwiki.observation.ObservationManager}.
+     * Send an event to the target channel members.
+     * 
+     * @param localEvent the event to send
+     * @param targets the members to send the event to
+     * @since 17.10.0RC1
+     */
+    @Unstable
+    void notify(LocalEventData localEvent, List<NetworkMember> targets);
+
+    /**
+     * Inject an remote event in the local {@link org.xwiki.observation.ObservationManager}.
      * <p>
      * This method is not supposed to be used directly for a new event unless the user specifically want to bypass or
      * emulate network.
      *
-     * @param event the event
+     * @param remoteEvent the event
      */
-    void notify(RemoteEventData event);
+    void notify(RemoteEventData remoteEvent);
 
     /**
      * Stop a running channel.

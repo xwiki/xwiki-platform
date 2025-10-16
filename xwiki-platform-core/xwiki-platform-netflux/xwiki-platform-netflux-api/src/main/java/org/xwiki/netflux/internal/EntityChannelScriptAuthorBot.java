@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.netflux.EntityChannel;
 import org.xwiki.netflux.EntityChannelStore;
+import org.xwiki.netflux.internal.user.local.LocalUser;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;

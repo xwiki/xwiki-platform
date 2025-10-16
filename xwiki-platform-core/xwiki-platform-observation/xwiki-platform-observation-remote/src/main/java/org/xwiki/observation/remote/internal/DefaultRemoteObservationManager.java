@@ -20,6 +20,7 @@
 package org.xwiki.observation.remote.internal;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -38,6 +39,7 @@ import org.xwiki.observation.event.ApplicationStoppedEvent;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.NetworkAdapter;
 import org.xwiki.observation.remote.NetworkChannel;
+import org.xwiki.observation.remote.NetworkMember;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.RemoteEventException;
 import org.xwiki.observation.remote.RemoteObservationManager;
@@ -134,6 +136,12 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
     }
 
     @Override
+    public NetworkAdapter getNetworkAdapter()
+    {
+        return this.networkAdapter;
+    }
+
+    @Override
     public void notify(LocalEventData localEvent)
     {
         if (this.remoteEventManagerContext.isRemoteState()) {
@@ -155,6 +163,23 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
             } catch (RemoteEventException e) {
                 this.logger.error("Failed to stop channels", e);
             }
+        }
+    }
+
+    @Override
+    public void notify(LocalEventData localEvent, List<NetworkMember> targets)
+    {
+        if (this.remoteEventManagerContext.isRemoteState()) {
+            // the event is a remote event
+            return;
+        }
+
+        // Convert local->remote
+        RemoteEventData remoteEvent = this.eventConverterManager.createRemoteEventData(localEvent);
+
+        // if remote event data is not filled it means the message should not be sent to the network
+        if (remoteEvent != null) {
+            this.networkAdapter.send(remoteEvent);
         }
     }
 

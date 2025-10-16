@@ -34,9 +34,8 @@ define('xwiki-realtime-wikiEditor', [
   'use strict';
 
   class RealtimeWikiEditor {
-    editorId = 'wiki';
-
     constructor(editorConfig) {
+      this.editorId = 'wiki';
       this.editorConfig = editorConfig;
       this.channel = editorConfig.channels[this.editorId];
       this.saverChannel = editorConfig.channels.saver;

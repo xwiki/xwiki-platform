@@ -32,12 +32,15 @@ function computeTargetURL(documentReference, mode) {
 }
 
 function getPropertyReference(propertyName, className) {
+  let entityReference;
   if (propertyName.startsWith("doc.")) {
-    return propertyName.substring("doc.".length);
+    entityReference =
+      new XWiki.EntityReference(propertyName.substring("doc.".length), XWiki.EntityType.OBJECT_PROPERTY);
   } else {
-    // We target the first object of the specified type (class name).
-    return className + "[0]." + propertyName;
+    let objectReference = new XWiki.EntityReference(className + "[0]", XWiki.EntityType.OBJECT);
+    entityReference = new XWiki.EntityReference(propertyName, XWiki.EntityType.OBJECT_PROPERTY, objectReference);
   }
+  return XWiki.Model.serialize(entityReference);
 }
 
 async function load(mode, documentReference, property, className) {

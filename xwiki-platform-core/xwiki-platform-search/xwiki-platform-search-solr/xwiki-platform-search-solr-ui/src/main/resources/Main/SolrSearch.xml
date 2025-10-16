@@ -323,7 +323,9 @@
         // We replace the existing parameters with their value from the form
         for (let param of formParams.keys()) {
           if (params.has(param)) params.delete(param);
-          params.set(param,formParams.get(param));
+          for (let paramValue of formParams.getAll(param)) {
+            params.append(param,paramValue);
+          }
         }
         pushSearchUIState(window.location.pathname + '?' + params.toString(),
           'input[data-query-name="' + queryFieldName + '"]');

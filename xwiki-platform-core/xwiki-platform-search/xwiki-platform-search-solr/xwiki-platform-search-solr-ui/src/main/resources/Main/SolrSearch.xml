@@ -517,8 +517,11 @@
  */
 /* This select should be especially lightweight on the UI. We're removing the default border and shadow. */
 #sort-by-input {
-  border:none;
-  box-shadow: none;
+  cursor: pointer;
+
+  &amp;:hover, &amp;:focus {
+      cursor: pointer;
+  }
 }
 
 /* This checkbox input should be styled as a switch between ascending and descending states. */
@@ -528,20 +531,23 @@
   margin: 0;
 }
 
-.search-results-sort label:has(&amp;&gt;#sort-order-input) {
+#sort-by-input, .search-results-sort label:has(&gt;#sort-order-input) {
   /* We want most of the styles from "form-control", but not the shadow that comes from bootstrap. */
   box-shadow: none;
 }
 
-/* We assume the icon is next to the hidden checkbox in the DOM */
-.search-results-sort label #sort-order-input + * {
+/* We assume the icons are after the hidden checkbox in the DOM */
+.search-results-sort label #sort-order-input + *,
+.search-results-sort label #sort-order-input + * + * {
   transform: none;
   transition: transform .2s ease-out;
 }
 
-/* When the box is checked, we want to rotate the icon. */
-.search-results-sort label #sort-order-input:checked + * {
-  transform: rotate(180deg);
+/* When the box is checked, we want to hide the first icon. 
+When the box is not checked, we want to hide the second icon. */
+.search-results-sort label #sort-order-input:checked + *,
+.search-results-sort label #sort-order-input:not(:checked) + * + * {
+  display: none;
 }
 
 /**

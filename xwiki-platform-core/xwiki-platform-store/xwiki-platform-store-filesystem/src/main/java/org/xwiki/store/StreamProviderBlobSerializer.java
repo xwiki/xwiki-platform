@@ -17,21 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store.filesystem.internal;
+package org.xwiki.store;
 
 import org.xwiki.store.blob.Blob;
-import org.xwiki.store.blob.BlobStoreException;
 
 /**
- * A means of getting files for storing information about a given attachment.
+ * A {@link BlobSerializer} which uses a {@link StreamProvider} to get the stream to serialize.
  *
  * @version $Id$
- * @since 3.0M2
+ * @since 17.8.0RC1
  */
-public interface DeletedAttachmentFileProvider extends AttachmentFileProvider
+public class StreamProviderBlobSerializer implements BlobSerializer
 {
+    private final StreamProvider streamProvider;
+
     /**
-     * @return the Blob for storing the information about the deleted attachment such as who deleted it.
+     * @param streamProvider the stream provider to read from
      */
-    Blob getDeletedAttachmentMetaFile() throws BlobStoreException;
+    public StreamProviderBlobSerializer(StreamProvider streamProvider)
+    {
+        this.streamProvider = streamProvider;
+    }
+
+    @Override
+    public void serialize(Blob blob) throws Exception
+    {
+        blob.writeFromStream(this.streamProvider.getStream());
+    }
 }

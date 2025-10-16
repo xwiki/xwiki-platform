@@ -19,11 +19,6 @@
  */
 package org.xwiki.test.docker.junit5;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -36,10 +31,16 @@ import org.xwiki.test.docker.internal.junit5.MultiUserTestUtilsParameterResolver
 import org.xwiki.test.docker.internal.junit5.TestLocalReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
+
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Marks a test as being a functional UI Test.
@@ -233,4 +234,16 @@ public @interface UITest
      * @since 16.6.0RC1
      */
     String[] servletEngineNetworkAliases() default {};
+
+    /**
+     * @return the blob store backend to use, see {@link BlobStore}
+     * @since 17.9.0RC1
+     */
+    BlobStore blobStore() default BlobStore.FILESYSTEM;
+
+    /**
+     * @return the docker image tag to use for the blob store (if not specified, uses the "latest" tag)
+     * @since 17.9.0RC1
+     */
+    String blobStoreTag() default "";
 }

@@ -19,12 +19,11 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,11 +34,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
+import org.xwiki.store.TransactionRunnable;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
+import org.xwiki.store.internal.BlobDeleteTransactionRunnable;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 import org.xwiki.store.serialization.Serializer;
@@ -116,9 +118,8 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     {
         DeletedAttachmentFileProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, index);
 
-        StartableTransactionRunnable tr = getDeletedAttachmentPurgeRunnable(provider);
-
         try {
+            StartableTransactionRunnable tr = getDeletedAttachmentPurgeRunnable(provider);
             tr.start();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
@@ -133,18 +134,19 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
      * @return a StartableTransactionRunnable for removing the attachment.
      */
     private StartableTransactionRunnable getDeletedAttachmentPurgeRunnable(final DeletedAttachmentFileProvider provider)
+        throws BlobStoreException
     {
-        final StartableTransactionRunnable out = new StartableTransactionRunnable();
-        final File deletedAttachDir = provider.getDeletedAttachmentMetaFile().getParentFile();
-        if (!deletedAttachDir.exists()) {
-            // No such dir, return a do-nothing runnable.
-            return out;
-        }
+        final StartableTransactionRunnable<TransactionRunnable<?>> out = new StartableTransactionRunnable<>();
 
-        // Easy thing to do is just delete everything in the deleted-attachment directory.
-        for (File toDelete : deletedAttachDir.listFiles()) {
-            new FileDeleteTransactionRunnable(toDelete, this.fileTools.getBackupFile(toDelete),
-                this.fileTools.getLockForFile(toDelete)).runIn(out);
+        Blob attachmentMetaBlob = provider.getDeletedAttachmentMetaFile();
+        try (Stream<Blob> blobStream =
+                 attachmentMetaBlob.getStore().listBlobs(attachmentMetaBlob.getPath().getParent())) {
+            for (Blob blob : (Iterable<Blob>) blobStream::iterator) {
+                new BlobDeleteTransactionRunnable(blob,
+                    this.fileTools.getBackupFile(blob),
+                    this.fileTools.getLockForFile(blob.getPath()))
+                    .runIn(out);
+            }
         }
 
         return out;
@@ -158,7 +160,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
 
         try {
             return deletedAttachmentContentFromProvider(provider);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
                 "Failed to get deleted attachment [" + reference + "] at index [" + index + "] and date  [" + deleteDate
                     + "]",
@@ -176,9 +178,9 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
      * @throws IOException if deserialization fails or there is a problem loading the archive.
      */
     private DeletedAttachmentContent deletedAttachmentContentFromProvider(final DeletedAttachmentFileProvider provider)
-        throws IOException
+        throws Exception
     {
-        final File deletedMeta = provider.getDeletedAttachmentMetaFile();
+        final Blob deletedMeta = provider.getDeletedAttachmentMetaFile();
 
         // No metadata, no deleted attachment.
         if (!deletedMeta.exists()) {
@@ -186,15 +188,15 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
         }
 
         final XWikiAttachment attachment;
-        ReadWriteLock lock = this.fileTools.getLockForFile(deletedMeta);
+        ReadWriteLock lock = this.fileTools.getLockForFile(deletedMeta.getPath());
         lock.readLock().lock();
         try {
-            attachment = this.metaSerializer.parse(new FileInputStream(deletedMeta));
+            attachment = this.metaSerializer.parse(deletedMeta.getStream());
         } finally {
             lock.readLock().unlock();
         }
 
-        File contentFile = provider.getAttachmentContentFile();
+        Blob contentFile = provider.getAttachmentContentFile();
 
         // Support links
         contentFile = StoreFileUtils.resolve(contentFile, true);
@@ -215,11 +217,11 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        final StartableTransactionRunnable tr = getSaveTrashAttachmentRunnable(attachment, index, xcontext);
-
-        new StartableTransactionRunnable().runIn(tr);
-
         try {
+            final StartableTransactionRunnable tr = getSaveTrashAttachmentRunnable(attachment, index, xcontext);
+
+            new StartableTransactionRunnable().runIn(tr);
+
             tr.start();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.MODULE_XWIKI,
@@ -239,7 +241,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
      *             in order to save it in the deleted section.
      */
     private StartableTransactionRunnable getSaveTrashAttachmentRunnable(final XWikiAttachment deleted, long index,
-        final XWikiContext context) throws XWikiException
+        final XWikiContext context) throws XWikiException, BlobStoreException
     {
         final DeletedAttachmentFileProvider provider =
             this.fileTools.getDeletedAttachmentFileProvider(deleted.getReference(), index);

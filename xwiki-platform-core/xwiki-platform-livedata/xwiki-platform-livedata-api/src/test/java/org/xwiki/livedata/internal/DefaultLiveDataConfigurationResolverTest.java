@@ -186,8 +186,8 @@ class DefaultLiveDataConfigurationResolverTest
         config.setMeta(null);
         String expected = FileUtils.readFileToString(new File("src/test/resources/withInitialize.json"),
             Charset.defaultCharset());
-        assertEquals(this.objectMapper.readValue(expected, LiveDataConfiguration.class),
-            this.resolver.resolve(this.resolver.resolve(config)));
+        assertEquals(expected, this.objectMapper.writerWithDefaultPrettyPrinter()
+            .writeValueAsString(this.resolver.resolve(this.resolver.resolve(config))));
     }
 
     private static Stream<String[]> getTestData() throws Exception

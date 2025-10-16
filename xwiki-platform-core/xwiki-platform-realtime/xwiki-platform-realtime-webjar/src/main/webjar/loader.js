@@ -36,7 +36,7 @@ define('xwiki-realtime-loader', [
   }
 
   let module = {
-    isForced: window.location.href.indexOf('force=1') >= 0,
+    isForced: globalThis.location.href.includes('force=1'),
   },
 
   allRt = {
@@ -49,13 +49,13 @@ define('xwiki-realtime-loader', [
       this.network = allRt.network;
 
       // Realtime enabled by default.
-      this.realtimeEnabled = window.location.href.indexOf('realtime=false') < 0;
+      this.realtimeEnabled = !globalThis.location.href.includes('realtime=false');
       this.webSocketURL = realtimeConfig.webSocketURL;
 
       const userReference = xm.userReference ? XWiki.Model.serialize(xm.userReference) : 'xwiki:XWiki.XWikiGuest';
       this.user = {
         // sessionId === <userReference>-encoded(<userName>)%2d<randomNumber>
-        sessionId: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replace(/-/g, '%2d') +
+        sessionId: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replaceAll('-', '%2d') +
           String(Math.random()).substring(2),
         name: realtimeConfig.user.name,
         reference: userReference,
@@ -339,7 +339,7 @@ define('xwiki-realtime-loader', [
       $(document).one('xwiki:document:saved.createRt', function() {
         $(document).off('xwiki:document:saveFailed.createRt');
         comment.val(previousComment);
-        window.location.href = module.getEditorURL(window.location.href, info);
+        globalThis.location.href = module.getEditorURL(globalThis.location.href, info);
       });
       $(document).one('xwiki:document:saveFailed.createRt', function() {
         $(document).off('xwiki:document:saved.createRt');
@@ -351,7 +351,7 @@ define('xwiki-realtime-loader', [
 
   getCompatibleEditor = function(type) {
     return Object.keys(availableRt).find((availableType) => {
-      return (availableRt[availableType].info.compatible || []).indexOf(type) !== -1;
+      return (availableRt[availableType].info.compatible || []).includes(type);
     });
   },
 
@@ -416,12 +416,8 @@ define('xwiki-realtime-loader', [
       response.state = 2;
       channel.bcast(JSON.stringify(response));
     // Check if our current editor is realtime compatible, i.e. Object editor can't switch to WYSIWYG.
-    } else if (!getCompatibleEditor(data.type)) {
-      response.state = 0;
-      response.reason = 'invalid';
-      channel.bcast(JSON.stringify(response));
-    // We're editing offline: display the modal.
-    } else {
+    } else if (getCompatibleEditor(data.type)) {
+      // We're editing offline: display the modal.
       const content = getRequestContent(availableRt[data.type].info, function(state) {
         if (state) {
           // Accepted: save and create the realtime session.
@@ -434,6 +430,10 @@ define('xwiki-realtime-loader', [
         $('.xdialog-modal-container').css('z-index', '99999');
       });
       displayCustomModal(content);
+    } else {
+      response.state = 0;
+      response.reason = 'invalid';
+      channel.bcast(JSON.stringify(response));
     }
   },
 
@@ -616,7 +616,7 @@ define('xwiki-realtime-loader', [
       this.setAvailableRt(info);
       // We currently support editing in realtime only the content field (using either the Wiki editor, the standalone
       // WYSIWYG editor or the Inplace editor).
-      if (info.field === 'content' && window.XWiki.editor === info.type) {
+      if (info.field === 'content' && globalThis.XWiki.editor === info.type) {
         // The current editor is supported. Check if we can join a realtime session.
         const realtimeContext = new RealtimeContext(info);
         const keys = await realtimeContext.updateChannels();

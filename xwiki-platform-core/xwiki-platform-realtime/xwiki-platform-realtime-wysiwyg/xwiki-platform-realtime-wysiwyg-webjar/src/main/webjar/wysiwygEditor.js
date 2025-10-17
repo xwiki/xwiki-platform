@@ -149,7 +149,7 @@ define('xwiki-realtime-wysiwyg', [
       // Export the typing tests to the window.
       // Call like `test = easyTest()`
       // Terminate the test like `test.cancel()`
-      window.easyTest = this._easyTest.bind(this);
+      globalThis.easyTest = this._easyTest.bind(this);
 
       return this._connection.promise;
     }
@@ -189,23 +189,24 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     _registerEventListeners() {
-      this._connection.listeners = [];
       let formActionInProgress = false;
 
-      // Listen to local changes and propagate them to the other users.
-      this._connection.listeners.push(this._editor.onChange(() => {
-        formActionInProgress = false;
-        this._scheduleLocalChangeHandling();
-      }));
+      this._connection.listeners = [
+        // Listen to local changes and propagate them to the other users.
+        this._editor.onChange(() => {
+          formActionInProgress = false;
+          this._scheduleLocalChangeHandling();
+        }),
 
-      this._connection.listeners.push(this._editor.onLock(this._pauseRealtimeSync.bind(this)));
-      this._connection.listeners.push(this._editor.onUnlock(() => {
-        // The editor is usually unlocked after the content is refreshed (e.g. after a macro is inserted). We execute
-        // our handler on the next tick because our handler can trigger a new refresh (e.g. if we received remote
-        // changes that either add a new macro or modify the parameters of an existing macro), and we want to avoid
-        // executing "nested" refresh (async) commands because CKEditor doesn't handle them well.
-        setTimeout(this._resumeRealtimeSync.bind(this), 0);
-      }));
+        this._editor.onLock(this._pauseRealtimeSync.bind(this)),
+        this._editor.onUnlock(() => {
+          // The editor is usually unlocked after the content is refreshed (e.g. after a macro is inserted). We execute
+          // our handler on the next tick because our handler can trigger a new refresh (e.g. if we received remote
+          // changes that either add a new macro or modify the parameters of an existing macro), and we want to avoid
+          // executing "nested" refresh (async) commands because CKEditor doesn't handle them well.
+          setTimeout(this._resumeRealtimeSync.bind(this), 0);
+        })
+      ];
 
       const form = document.getElementById(RealtimeEditor._getFormId());
       const onFormAction = () => {
@@ -335,7 +336,7 @@ define('xwiki-realtime-wysiwyg', [
         netfluxChannelInput = document.createElement('input');
         netfluxChannelInput.setAttribute('type', 'hidden');
         netfluxChannelInput.setAttribute('name', 'netfluxChannel');
-        netfluxChannelInput.setAttribute('data-for', this._editor.getFormFieldName());
+        netfluxChannelInput.dataset.for = this._editor.getFormFieldName();
         fieldSet.prepend(netfluxChannelInput);
       }
       netfluxChannelInput.value = this._channel;
@@ -439,8 +440,8 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     static _getFormId() {
-      if (window.XWiki.editor === 'wysiwyg') {
-        if (window.XWiki.contextaction === 'view') {
+      if (globalThis.XWiki.editor === 'wysiwyg') {
+        if (globalThis.XWiki.contextaction === 'view') {
           return 'inplace-editing';
         } else {
           return 'edit';
@@ -545,14 +546,14 @@ define('xwiki-realtime-wysiwyg', [
       this._connection.toolbar.onConnectionStatusChange(1 /* connecting */, info.myID);
       // When someone leaves, if they used Save&View, it removes the lock from the document. We're going to add it
       // again to be sure new users will see the lock page and be able to join.
-      let oldUsers = JSON.parse(JSON.stringify(info.userList.users || []));
+      let oldUsers = structuredClone(info.userList.users || []);
       info.userList.change.push(() => {
         if (info.userList.length) {
           // If someone has left, try to get the lock.
-          if (oldUsers.some(user => info.userList.users.indexOf(user) === -1)) {
+          if (oldUsers.some(user => !info.userList.users.includes(user))) {
             this.lockDocument();
           }
-          oldUsers = JSON.parse(JSON.stringify(info.userList.users || []));
+          oldUsers = structuredClone(info.userList.users || []);
         }
       });
     }
@@ -783,7 +784,7 @@ define('xwiki-realtime-wysiwyg', [
       this._removeNetfluxChannelFromSubmittedData();
 
       // Typing tests require the realtime session to be active.
-      delete window.easyTest;
+      delete globalThis.easyTest;
 
       // Cleanup the connection data and prepare for the case the user decides to rejoin the realtime session.
       this._connection = {
@@ -887,13 +888,13 @@ define('xwiki-realtime-wysiwyg', [
     }  
   }
 
-  window.REALTIME_DEBUG = window.REALTIME_DEBUG || {};
-  window.REALTIME_DEBUG.logs = [];
+  globalThis.REALTIME_DEBUG = globalThis.REALTIME_DEBUG || {};
+  globalThis.REALTIME_DEBUG.logs = [];
   ['debug', 'error', 'info', 'log', 'trace', 'warn'].forEach(level => {
     const original = console[level];
     console[level] = function (...args) {
       original(...args);
-      window.REALTIME_DEBUG.logs.push([level, ...args]);
+      globalThis.REALTIME_DEBUG.logs.push([level, ...args]);
     };
   });
 

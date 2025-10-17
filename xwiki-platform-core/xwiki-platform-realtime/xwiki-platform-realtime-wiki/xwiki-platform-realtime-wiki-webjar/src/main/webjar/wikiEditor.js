@@ -65,7 +65,7 @@ define('xwiki-realtime-wikiEditor', [
     }
 
     canonicalize(text) {
-      return text.replace(/\r\n/g, '\n');
+      return text.replaceAll('\r\n', '\n');
     }
 
     /**
@@ -86,7 +86,7 @@ define('xwiki-realtime-wikiEditor', [
         join: () => {
           return new Promise(() => {
             // TODO: Join the realtime editing session without reloading the entire page.
-            window.location.href = this.editorConfig.rtURL;
+            globalThis.location.href = this.editorConfig.rtURL;
           });
         },
         leave: this.onAbort.bind(this)

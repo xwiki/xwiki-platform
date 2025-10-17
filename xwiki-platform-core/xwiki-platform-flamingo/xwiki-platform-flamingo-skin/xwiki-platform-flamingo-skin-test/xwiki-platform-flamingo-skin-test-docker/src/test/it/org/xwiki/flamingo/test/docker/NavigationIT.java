@@ -21,7 +21,9 @@ package org.xwiki.flamingo.test.docker;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -60,6 +62,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 })
 public class NavigationIT
 {
+    private static final String ALERT_EXPRESSION = "^\\QYou are about to leave the domain \"\\E.+\\Q\" to follow a "
+        + "link to \"%s\". Are you sure you want to continue?\\E$";
+
     @BeforeAll
     public void beforeAll(TestUtils testUtils)
     {
@@ -71,6 +76,16 @@ public class NavigationIT
     {
         testUtils.deletePage(testReference);
         testUtils.createPage(testReference, "Some dumb content", "Just a title");
+    }
+
+    @AfterEach
+    void tearDown(TestUtils testUtils)
+    {
+        try {
+            testUtils.getDriver().switchTo().alert().dismiss();
+        }  catch (NoAlertPresentException e) {
+            // do nothing
+        }
     }
 
     @Test
@@ -237,8 +252,7 @@ public class NavigationIT
         testUtils.gotoPage(testReference);
         driver.findElementWithoutWaiting(By.linkText("Google external")).click();
         Alert alert = driver.switchTo().alert();
-        assertEquals("You are about to leave the domain \"host.testcontainers.internal\" to follow a link "
-            + "to \"www.google.com\". Are you sure you want to continue?", alert.getText());
+        assertLeaveDomainAlert("www.google.com", alert.getText());
         alert.dismiss();
 
         driver.findElementWithoutWaiting(By.linkText("Internal link")).click();
@@ -256,8 +270,7 @@ public class NavigationIT
         testUtils.gotoPage(testReference);
         driver.findElementWithoutWaiting(By.linkText("Contrib xwiki")).click();
         alert = driver.switchTo().alert();
-        assertEquals("You are about to leave the domain \"host.testcontainers.internal\" to follow a link "
-            + "to \"contrib.xwiki.org\". Are you sure you want to continue?", alert.getText());
+        assertLeaveDomainAlert("contrib.xwiki.org", alert.getText());
         alert.dismiss();
 
         driver.findElementWithoutWaiting(By.linkText("Extensions xwiki")).click();
@@ -277,8 +290,7 @@ public class NavigationIT
 
         testUtils.gotoPage(testReference);
         driver.findElementWithoutWaiting(By.linkText("Github commons")).click();
-        assertEquals("You are about to leave the domain \"host.testcontainers.internal\" to follow a link "
-            + "to \"github.com\". Are you sure you want to continue?", alert.getText());
+        assertLeaveDomainAlert("github.com", alert.getText());
         alert.dismiss();
 
         driver.findElementWithoutWaiting(By.linkText("Github XWiki")).click();
@@ -295,5 +307,12 @@ public class NavigationIT
             fail("No alert should be present");
         } catch (NoAlertPresentException e) {
         }
+    }
+
+    void assertLeaveDomainAlert(String domain, String alertText)
+    {
+        String expectedExpression = String.format(ALERT_EXPRESSION, domain);
+        assertTrue(Pattern.matches(expectedExpression, alertText),
+            "Expected expression: " + expectedExpression + " \n Obtained alert: " + alertText);
     }
 }

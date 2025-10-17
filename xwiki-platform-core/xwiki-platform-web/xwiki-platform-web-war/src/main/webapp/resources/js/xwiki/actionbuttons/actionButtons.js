@@ -372,22 +372,24 @@ var XWiki = (function(XWiki) {
       $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
       $$('input[name=customChoices]').forEach(function (item) {item.remove();});
 
-      var hasBeenSaved = false;
+      let hasBeenSaved = false;
       if (state.isCreateFromTemplate) {
         // We might have a responseJSON containing other information than links, if the template cannot be accessed.
-        if (response.responseJSON && response.responseJSON.links) {
+        if (response.responseJSON?.links) {
           // Start the progress display.
           this.getStatus(response.responseJSON.links[0].href, state);
         } else {
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
-          // in such case the page is saved, so we'll need to maybe redirect
+          // In such case the page is saved, so we'll need to maybe redirect.
           hasBeenSaved = true;
         }
       } else {
         this.progressBox.hide();
-        if (response.responseJSON && response.responseJSON.mergedDocument) {
+        if (response.responseJSON?.mergedDocument) {
           this.savingBox.replace(this.savedWithMergeBox);
+        } else if (response.responseJSON?.noChanges) {
+          this.savingBox.hide();
         } else {
           this.savingBox.replace(this.savedBox);
         }
@@ -401,23 +403,23 @@ var XWiki = (function(XWiki) {
         }
       }
 
-      if (response.responseJSON && response.responseJSON.newVersion) {
-        // update the version
+      if (response.responseJSON?.newVersion) {
+        // Update the version.
         require(['xwiki-meta'], function (xm) {
           xm.setVersion(response.responseJSON.newVersion);
         });
 
         // We only update this field since the other ones are updated by the callback of setVersion.
         if (editingVersionDateField) {
-          editingVersionDateField.setValue(new Date().getTime());
+          editingVersionDateField.setValue(Date.now());
         }
       }
 
-      // Announce that the document has been saved
+      // Announce that the document has been saved.
       state.saveButton.fire("xwiki:document:saved", response.responseJSON);
 
       // If documents have been merged we need to reload to get latest saved version.
-      if (response.responseJSON && response.responseJSON.mergedDocument) {
+      if (response.responseJSON?.mergedDocument) {
         this.reloadEditor();
       }
     },

@@ -396,7 +396,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         self.blackList.push(entry.ids[i]);
       }
       // Create the container
-      var notif = $('&lt;div&gt;').addClass('notification-event');
+      var notif = $('&lt;li&gt;').addClass('notification-event');
       notif.attr('data-eventtype', entry.type);
       // Put the content
       notif.append(entry.html);
@@ -423,7 +423,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       if (!entry.read) {
         // On click
         readButton.on('click', function() {
-          var notif = $(this).parents('div.notification-event');
+          let notif = $(this).parents('li.notification-event, .notification-event[role="listitem"]');
           notif.removeClass('notification-event-unread');
           var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
             XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
@@ -596,7 +596,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
           readButton.removeClass('hidden');
           // On click
           readButton.on('click', function() {
-            var notif = $(this).parents('div.notification-event');
+            let notif = $(this).parents('li.notification-event, .notification-event[role="listitem"]');
             notif.removeClass('notification-event-unread');
             var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
               XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
@@ -781,6 +781,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
   max-width: 500px;
   min-height: 50px;
   width: 100%;
+  padding-left: 0;
 }
 
 .notifications-macro-rss-link {
@@ -1175,7 +1176,8 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 #set($notifParameters = $services.notification.sources.getNotificationParameters($parameters))
 #set($notifs = $services.notification.notifiers.getNotifications($notifParameters, true))
 {{html clean="false"}}
-&lt;div class="notifications-macro" data-displayReadStatus="$!escapetool.xml($xcontext.macro.params.displayReadStatus)" $stringtool.join($dataParameters, " ")&gt;
+&lt;ul class="notifications-macro" data-displayReadStatus="$!escapetool.xml($xcontext.macro.params.displayReadStatus)"
+ $stringtool.join($dataParameters, " ")&gt;
 #if ('true' == $xcontext.macro.params.displayRSSLink)
   ## Generate the RSS URL to display the same notifications but in the RSS format
   #set ($rssURL = $services.rest.url($doc.documentReference))
@@ -1194,10 +1196,10 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
   #set ($rssURL = "${rssURL}&amp;displayReadStatus=$!escapetool.url($xcontext.macro.params.displayReadStatus)")
   #set ($rssURL = "${rssURL}&amp;tags=$!escapetool.url($xcontext.macro.params.tags)")
   #set ($rssURL = "${rssURL}&amp;currentWiki=$!escapetool.url($services.wiki.currentWikiId)")
-  &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$rssURL" rel="nofollow external"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
+  &lt;li class="notifications-macro-rss-link"&gt;&lt;a href="$rssURL" rel="nofollow external"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/li&gt;
 #end
 $notifs
-&lt;/div&gt;
+&lt;/ul&gt;
 {{/html}}
 #end
 {{/velocity}}</code>

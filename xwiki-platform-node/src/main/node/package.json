@@ -1,0 +1,17 @@
+{
+  "name": "@xwiki/platform-node",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nx run-many -t build",
+    "test:unit": "nx run-many -t test",
+    "lint": "nx run-many -t lint"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "catalog:",
+    "nx": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-css-injected-by-js": "catalog:",
+    "vite-plugin-dts": "catalog:"
+  }
+}

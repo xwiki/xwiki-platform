@@ -9,21 +9,21 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@xwiki/cristal-api": "0.22.0",
-    "@xwiki/cristal-attachments-default": "0.22.0",
-    "@xwiki/cristal-authentication-api": "0.22.0",
-    "@xwiki/cristal-backend-api": "0.22.0",
-    "@xwiki/cristal-collaboration-api": "0.22.0",
-    "@xwiki/cristal-document-api": "0.22.0",
-    "@xwiki/cristal-dsapi": "0.22.0",
-    "@xwiki/cristal-editors-blocknote-headless": "0.22.0",
-    "@xwiki/cristal-editors-blocknote-react": "0.22.0",
-    "@xwiki/cristal-link-suggest-api": "0.22.0",
-    "@xwiki/cristal-model-api": "0.22.0",
-    "@xwiki/cristal-model-reference-api": "0.22.0",
-    "@xwiki/cristal-model-remote-url-api": "0.22.0",
-    "@xwiki/cristal-uniast-api": "0.22.0",
-    "@xwiki/cristal-uniast-markdown": "0.22.0",
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-attachments-default": "workspace:*",
+    "@xwiki/cristal-authentication-api": "workspace:*",
+    "@xwiki/cristal-backend-api": "workspace:*",
+    "@xwiki/cristal-collaboration-api": "workspace:*",
+    "@xwiki/cristal-document-api": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
+    "@xwiki/cristal-editors-blocknote-headless": "workspace:*",
+    "@xwiki/cristal-editors-blocknote-react": "workspace:*",
+    "@xwiki/cristal-link-suggest-api": "workspace:*",
+    "@xwiki/cristal-model-api": "workspace:*",
+    "@xwiki/cristal-model-reference-api": "workspace:*",
+    "@xwiki/cristal-model-remote-url-api": "workspace:*",
+    "@xwiki/cristal-uniast-api": "workspace:*",
+    "@xwiki/cristal-uniast-markdown": "workspace:*",
     "inversify": "7.5.2",
     "pinia": "3.0.2",
     "react": "19.1.1",
@@ -55,10 +55,5 @@
     "vitest": "3.2.4",
     "vue": "3.5.22",
     "vue-tsc": "3.0.6"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }

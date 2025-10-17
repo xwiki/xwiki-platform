@@ -135,6 +135,7 @@
   <modules>
     <module>xwiki-platform-tools</module>
     <module>xwiki-platform-core</module>
+    <module>xwiki-platform-node</module>
   </modules>
   <!-- Dependency Management that are used in platform and in subprojects too (like xwiki-enterprise) -->
   <dependencyManagement>

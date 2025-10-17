@@ -273,7 +273,7 @@ define('xwiki-realtime-toolbar', [
         this._lastReviewedVersion = version.number;
       }
       const versions = this._toolbar.querySelectorAll('.realtime-version');
-      const limit = parseInt(this._toolbar.querySelector('.realtime-versions').dataset.limit) || 5;
+      const limit = Number.parseInt(this._toolbar.querySelector('.realtime-versions').dataset.limit) || 5;
       if (versions.length >= limit) {
         // The version element is wrapped in a list item element.
         versions[0].parentElement.remove();
@@ -336,7 +336,7 @@ define('xwiki-realtime-toolbar', [
     onUserListChange(users) {
       const usersWrapper = this._toolbar.querySelector('.realtime-users');
       usersWrapper.innerHTML = '';
-      const limit = parseInt(usersWrapper.dataset.limit) || 4;
+      const limit = Number.parseInt(usersWrapper.dataset.limit) || 4;
       users.slice(0, limit).forEach(user => {
         usersWrapper.appendChild(this._displayUser(user, true));
       });
@@ -387,7 +387,7 @@ define('xwiki-realtime-toolbar', [
       } else {
         // We assume that the first and the last names are the most important.
         const firstName = names[0];
-        const lastName = names[names.length - 1];
+        const lastName = names.at(-1);
         return firstName[0].toUpperCase() + lastName[0].toUpperCase();
       }
     }

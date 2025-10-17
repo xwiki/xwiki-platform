@@ -284,6 +284,7 @@ public class XWikiServletContextListener implements ServletContextListener
         violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_SEPARATOR"));
         violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_PARAMETER"));
         violations.add(Enum.valueOf(violationsClass, "AMBIGUOUS_PATH_ENCODING"));
+        violations.add(Enum.valueOf(violationsClass, "SUSPICIOUS_PATH_CHARACTERS"));
 
         // Allow fragments in redirects (violation introduced in Jetty 12.1.0)
         Object fragmentViolation = EnumUtils.getEnum(violationsClass, "FRAGMENT");

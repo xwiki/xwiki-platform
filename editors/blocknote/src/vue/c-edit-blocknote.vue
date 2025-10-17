@@ -26,10 +26,8 @@ import {
   collaborationManagerProviderName,
 } from "@xwiki/cristal-collaboration-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
-import {
-  BlocknoteEditor as CBlockNoteView,
-  DEFAULT_MACROS,
-} from "@xwiki/cristal-editors-blocknote-headless";
+import { BlocknoteEditor as CBlockNoteView } from "@xwiki/cristal-editors-blocknote-headless";
+import { macrosServiceName } from "@xwiki/cristal-macros-service";
 import { CArticle } from "@xwiki/cristal-skin";
 import {
   markdownToUniAstConverterName,
@@ -56,6 +54,8 @@ import type {
   User,
 } from "@xwiki/cristal-collaboration-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
+import type { ContextForMacros } from "@xwiki/cristal-editors-blocknote-headless";
+import type { MacrosService } from "@xwiki/cristal-macros-service";
 import type { ModelReferenceHandlerProvider } from "@xwiki/cristal-model-reference-api";
 import type { UniAst } from "@xwiki/cristal-uniast-api";
 import type {
@@ -114,12 +114,23 @@ const editorInstance =
 const markdownToUniAst = container.get<MarkdownToUniAstConverter>(
   markdownToUniAstConverterName,
 );
+
 const uniAstToMarkdown = container.get<UniAstToMarkdownConverter>(
   uniAstToMarkdownConverterName,
 );
 
+// Macros service
+const macrosService = container.get<MacrosService>(macrosServiceName);
+
 // Saving status
 const saveStatus = ref<SaveStatus>(SaveStatus.SAVED);
+
+// Context for macros
+const contextForMacros: ContextForMacros = {
+  openParamsEditor(/*macro, params, update*/) {
+    alert("TODO: params editor for macros in Cristal");
+  },
+};
 
 /**
  * Setup the editor and title input using the fetched page's content
@@ -143,12 +154,6 @@ async function loadEditor(currentPage: PageData | undefined): Promise<void> {
     // TODO: make this customizable
     // https://jira.xwiki.org/browse/CRISTAL-457
     lang: "en",
-    macros: {
-      buildable: Object.values(DEFAULT_MACROS),
-      openMacroParamsEditor(/*macro, params, update*/) {
-        alert("TODO: params editor for macros in Cristal");
-      },
-    },
   };
 
   editorContent.value = await markdownToUniAst.parseMarkdown(
@@ -313,6 +318,10 @@ onBeforeRouteLeave(() => {
                 :editor-content
                 :container
                 :collaboration-provider
+                :macros="{
+                  ctx: contextForMacros,
+                  list: macrosService.list(),
+                }"
                 @instant-change="saveStatus = SaveStatus.UNSAVED"
                 @debounced-change="save"
               />

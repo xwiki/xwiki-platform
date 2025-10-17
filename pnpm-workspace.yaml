@@ -18,6 +18,7 @@ packages:
   - core/icons
   - core/info-actions/*
   - core/link-suggest/*
+  - core/macros/*
   - core/markdown/*
   - core/model/model-api
   - core/model/model-click-listener

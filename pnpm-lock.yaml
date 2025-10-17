@@ -2279,6 +2279,74 @@ importers:
         specifier: 'catalog:'
         version: 7.1.9(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
 
+  core/macros/macros-api:
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.1.9(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
+
+  core/macros/macros-ast-react-jsx:
+    dependencies:
+      '@xwiki/cristal-fn-utils':
+        specifier: workspace:*
+        version: link:../../fn-utils
+      '@xwiki/cristal-macros-api':
+        specifier: workspace:*
+        version: link:../macros-api
+      '@xwiki/cristal-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../model/model-remote-url/model-remote-url-api
+      inversify:
+        specifier: 7.x
+        version: 7.10.2(reflect-metadata@0.2.2)
+    devDependencies:
+      '@types/react':
+        specifier: 19.1.14
+        version: 19.1.14
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      react:
+        specifier: 19.1.1
+        version: 19.1.1
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.1.9(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
+      vitest-mock-extended:
+        specifier: 'catalog:'
+        version: 3.1.0(typescript@5.9.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.1.0)(happy-dom@20.0.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
+
+  core/macros/macros-service:
+    dependencies:
+      '@xwiki/cristal-macros-api':
+        specifier: workspace:*
+        version: link:../macros-api
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      inversify:
+        specifier: 'catalog:'
+        version: 7.10.2(reflect-metadata@0.2.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.1.9(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
+      vitest-mock-extended:
+        specifier: 'catalog:'
+        version: 3.1.0(typescript@5.9.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.1.0)(happy-dom@20.0.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
+
   core/markdown/markdown-api:
     dependencies:
       '@xwiki/cristal-document-api':
@@ -3564,6 +3632,28 @@ importers:
         specifier: 'catalog:'
         version: 3.5.22(typescript@5.9.3)
 
+  core/xwiki/xwiki-macros:
+    dependencies:
+      '@xwiki/cristal-macros-api':
+        specifier: workspace:*
+        version: link:../../macros/macros-api
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      inversify:
+        specifier: 'catalog:'
+        version: 7.10.2(reflect-metadata@0.2.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.1.9(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
+      vitest-mock-extended:
+        specifier: 'catalog:'
+        version: 3.1.0(typescript@5.9.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.1.0)(happy-dom@20.0.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
+
   core/xwiki/xwiki-utils:
     devDependencies:
       '@xwiki/cristal-api':
@@ -3774,6 +3864,9 @@ importers:
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../../core/icons
+      '@xwiki/cristal-macros-service':
+        specifier: workspace:*
+        version: link:../../core/macros/macros-service
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
@@ -3859,6 +3952,9 @@ importers:
       '@xwiki/cristal-link-suggest-api':
         specifier: workspace:*
         version: link:../../core/link-suggest/link-suggest-api
+      '@xwiki/cristal-macros-api':
+        specifier: workspace:*
+        version: link:../../core/macros/macros-api
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
@@ -3938,6 +4034,12 @@ importers:
       '@xwiki/cristal-link-suggest-api':
         specifier: workspace:*
         version: link:../../core/link-suggest/link-suggest-api
+      '@xwiki/cristal-macros-api':
+        specifier: workspace:*
+        version: link:../../core/macros/macros-api
+      '@xwiki/cristal-macros-ast-react-jsx':
+        specifier: workspace:*
+        version: link:../../core/macros/macros-ast-react-jsx
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
@@ -4755,6 +4857,9 @@ importers:
       '@xwiki/cristal-link-suggest-xwiki':
         specifier: workspace:*
         version: link:../core/link-suggest/link-suggest-xwiki
+      '@xwiki/cristal-macros-service':
+        specifier: workspace:*
+        version: link:../core/macros/macros-service
       '@xwiki/cristal-markdown-default':
         specifier: workspace:*
         version: link:../core/markdown/markdown-default
@@ -4836,6 +4941,9 @@ importers:
       '@xwiki/cristal-wiki-config-default':
         specifier: workspace:*
         version: link:../core/wiki-config/wiki-config-default
+      '@xwiki/cristal-xwiki-macros':
+        specifier: workspace:*
+        version: link:../core/xwiki/xwiki-macros
       pinia:
         specifier: 'catalog:'
         version: 3.0.2(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
@@ -6452,6 +6560,9 @@ packages:
     resolution: {integrity: sha512-brtBs0MnE9SMx7px208g39lRmC5uHZs96caOJfTjFcYSLHNamvaSMfJNagChVNkup2SdtOxKX1FDBkRSJe1ZAg==}
     peerDependencies:
       '@types/react': ^19.2.0
+
+  '@types/react@19.1.14':
+    resolution: {integrity: sha512-ukd93VGzaNPMAUPy0gRDSC57UuQbnH9Kussp7HBjM06YFi9uZTFhOvMSO2OKqXm1rSgzOE+pVx1k1PYHGwlc8Q==}
 
   '@types/react@19.2.0':
     resolution: {integrity: sha512-1LOH8xovvsKsCBq1wnT4ntDUdCJKmnEakhsuoUSy6ExlHCkGP2hqnatagYTgFk6oeL0VU31u7SNjunPN+GchtA==}
@@ -9574,6 +9685,10 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  react@19.1.1:
+    resolution: {integrity: sha512-w8nqGImo45dmMIfljjMwOGtbmC/mk4CMYhWIicdSflH91J9TyCyczcPFXJzrZ/ZXcgGRFeP6BU0BEJTw6tZdfQ==}
+    engines: {node: '>=0.10.0'}
+
   react@19.2.0:
     resolution: {integrity: sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ==}
     engines: {node: '>=0.10.0'}
@@ -12185,6 +12300,10 @@ snapshots:
   '@types/react-dom@19.2.0(@types/react@19.2.0)':
     dependencies:
       '@types/react': 19.2.0
+
+  '@types/react@19.1.14':
+    dependencies:
+      csstype: 3.1.3
 
   '@types/react@19.2.0':
     dependencies:
@@ -15938,6 +16057,8 @@ snapshots:
       use-latest: 1.3.0(@types/react@19.2.0)(react@19.2.0)
     transitivePeerDependencies:
       - '@types/react'
+
+  react@19.1.1: {}
 
   react@19.2.0: {}
 

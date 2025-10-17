@@ -38,6 +38,7 @@
     "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-editors-blocknote-headless": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
+    "@xwiki/cristal-macros-service": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",

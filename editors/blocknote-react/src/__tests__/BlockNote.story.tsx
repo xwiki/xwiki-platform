@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DEFAULT_MACROS } from "..";
 import { BlockType } from "../blocknote";
 import { BlockNoteViewWrapper } from "../components/BlockNoteViewWrapper";
 import { LinkEditionContext } from "../misc/linkSuggest";
@@ -44,7 +43,7 @@ export const BlockNoteForTest: React.FC<BlockNoteForTestProps> = ({
       lang="en"
       linkEditionCtx={linkEditionCtx}
       macros={{
-        buildable: Object.values(DEFAULT_MACROS),
+        list: [], // TODO: add tests with actual macros
         openMacroParamsEditor() {
           throw new Error("Macros params editor is not supported");
         },

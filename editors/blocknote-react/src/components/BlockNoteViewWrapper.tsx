@@ -27,6 +27,7 @@ import {
   querySuggestionsMenuItems,
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
+import { adaptMacroForBlockNote } from "../blocknote/utils";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
@@ -37,6 +38,7 @@ import {
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
+import { MacrosAstToReactJsxConverter } from "@xwiki/cristal-macros-ast-react-jsx";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type {
@@ -48,10 +50,14 @@ import type {
   EditorStyleSchema,
   EditorType,
 } from "../blocknote";
-import type { BuildableMacro, ContextForMacros } from "../blocknote/utils";
+import type {
+  BlockNoteConcreteMacro,
+  ContextForMacros,
+} from "../blocknote/utils";
 import type { LinkEditionContext } from "../misc/linkSuggest";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { CollaborationInitializer } from "@xwiki/cristal-collaboration-api";
+import type { MacroWithUnknownParamsType } from "@xwiki/cristal-macros-api";
 
 type DefaultEditorOptionsType = BlockNoteEditorOptions<
   EditorBlockSchema,
@@ -94,17 +100,25 @@ type BlockNoteViewWrapperProps = {
    * @since 0.21
    * @beta
    */
-  macros: null | {
-    /**
-     * List of buildable macros
-     */
-    buildable: BuildableMacro[];
+  macros:
+    | {
+        /**
+         * List of buildable macros
+         *
+         * @since 0.23
+         * @beta
+         */
+        list: MacroWithUnknownParamsType[];
 
-    /**
-     * Open the macros parameters editor
-     */
-    openMacroParamsEditor: ContextForMacros["openParamsEditor"];
-  };
+        /**
+         * Context for macros
+         *
+         * @since 0.23
+         * @beta
+         */
+        ctx: ContextForMacros;
+      }
+    | false;
 
   /**
    * Realtime options
@@ -151,11 +165,20 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   const { t } = useTranslation();
   const collaborationProvider = realtime?.collaborationProvider;
 
-  const builtMacros = macros
-    ? macros.buildable.map((builder) =>
-        builder({ openParamsEditor: macros.openMacroParamsEditor }),
-      )
-    : [];
+  const builtMacros: BlockNoteConcreteMacro[] = [];
+
+  if (macros) {
+    const macroAstToReactJsxConverter = new MacrosAstToReactJsxConverter(
+      linkEditionCtx.remoteURLParser,
+      linkEditionCtx.remoteURLSerializer,
+    );
+
+    for (const macro of macros.list) {
+      builtMacros.push(
+        adaptMacroForBlockNote(macro, macros.ctx, macroAstToReactJsxConverter),
+      );
+    }
+  }
 
   const schema = createBlockNoteSchema(builtMacros);
 

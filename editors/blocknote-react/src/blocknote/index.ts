@@ -32,7 +32,7 @@ import {
 import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/cristal-fn-utils";
-import type { Macro } from "./utils";
+import type { BlockNoteConcreteMacro } from "./utils";
 import type { Block, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 
@@ -45,11 +45,17 @@ import type { DefaultReactSuggestionItem } from "@blocknote/react";
  * @since 0.20
  * @beta
  */
-function createBlockNoteSchema(macros: Macro[]) {
+function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
   // Get rid of some block types
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { audio, video, file, toggleListItem, ...remainingBlockSpecs } =
     defaultBlockSpecs;
+
+  macros = [
+    ...macros.sort((a, b) =>
+      a.macro.infos.name.localeCompare(b.macro.infos.name),
+    ),
+  ];
 
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
@@ -62,9 +68,9 @@ function createBlockNoteSchema(macros: Macro[]) {
 
       // Macros
       ...Object.fromEntries(
-        filterMap(macros, (macro) =>
-          macro.blockNote.type === "block"
-            ? [`${MACRO_NAME_PREFIX}${macro.name}`, macro.blockNote.block.block]
+        filterMap(macros, ({ macro, bnRendering }) =>
+          bnRendering.type === "block"
+            ? [`${MACRO_NAME_PREFIX}${macro.infos.id}`, bnRendering.block.block]
             : null,
         ),
       ),
@@ -75,11 +81,11 @@ function createBlockNoteSchema(macros: Macro[]) {
 
       // Macros
       ...Object.fromEntries(
-        filterMap(macros, (macro) =>
-          macro.blockNote.type === "inline"
+        filterMap(macros, ({ macro, bnRendering }) =>
+          bnRendering.type === "inline"
             ? [
-                `${MACRO_NAME_PREFIX}${macro.name}`,
-                macro.blockNote.inlineContent.inlineContent,
+                `${MACRO_NAME_PREFIX}${macro.infos.id}`,
+                bnRendering.inlineContent.inlineContent,
               ]
             : null,
         ),
@@ -122,7 +128,7 @@ type EditorLanguage = keyof typeof locales & keyof typeof translations;
 function querySuggestionsMenuItems(
   editor: EditorType,
   query: string,
-  macros: Macro[],
+  macros: BlockNoteConcreteMacro[],
 ): DefaultReactSuggestionItem[] {
   return filterSuggestionItems(
     combineByGroup(
@@ -134,17 +140,17 @@ function querySuggestionsMenuItems(
       ),
 
       // Block macros
-      filterMap(macros, (macro) =>
-        macro.blockNote.type === "block" && macro.blockNote.block.slashMenuEntry
-          ? macro.blockNote.block.slashMenuEntry(editor)
+      filterMap(macros, ({ bnRendering }) =>
+        bnRendering.type === "block" && bnRendering.block.slashMenuEntry
+          ? bnRendering.block.slashMenuEntry(editor)
           : null,
       ),
 
       // Inline macros
-      filterMap(macros, (macro) =>
-        macro.blockNote.type === "inline" &&
-        macro.blockNote.inlineContent.slashMenuEntry
-          ? macro.blockNote.inlineContent.slashMenuEntry(editor)
+      filterMap(macros, ({ bnRendering }) =>
+        bnRendering.type === "inline" &&
+        bnRendering.inlineContent.slashMenuEntry
+          ? bnRendering.inlineContent.slashMenuEntry(editor)
           : null,
       ),
     ),
@@ -242,6 +248,7 @@ type BlockType = Block<
 type BlockOfType<B extends BlockType["type"]> = Extract<BlockType, { type: B }>;
 
 export type {
+  BlockNoteConcreteMacro,
   BlockOfType,
   BlockType,
   EditorBlockSchema,

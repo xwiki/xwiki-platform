@@ -57,6 +57,7 @@ export class DefaultUniAstToMarkdownConverter
     const out: Promise<string>[] = [];
 
     for (const element of blocks) {
+      // TODO: fix this (can't error as it's a promise)
       const md = tryFallibleOrError(() => this.blockToMarkdown(element));
 
       if (md instanceof Error) {
@@ -66,6 +67,7 @@ export class DefaultUniAstToMarkdownConverter
       out.push(md);
     }
 
+    // TODO: try fallible here as this could throw
     return (await Promise.all(out)).join("\n\n");
   }
 

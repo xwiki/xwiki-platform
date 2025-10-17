@@ -24,6 +24,7 @@ import { ComponentInit as XWikiLinkSuggestComponentInit } from "@xwiki/cristal-l
 import { ComponentInit as ModelReferenceXWikiComponentInit } from "@xwiki/cristal-model-reference-xwiki";
 import { ComponentInit as ModelRemoteURLXWikiComponentInit } from "@xwiki/cristal-model-remote-url-xwiki";
 import { ComponentInit as XWikiNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-xwiki";
+import { ComponentInit as XWikiMacrosComponentInit } from "@xwiki/cristal-xwiki-macros";
 import type { Container } from "inversify";
 
 export function load(container: Container) {
@@ -33,4 +34,5 @@ export function load(container: Container) {
   new XWikiPageHistoryComponentInit(container);
   new ModelRemoteURLXWikiComponentInit(container);
   new ModelReferenceXWikiComponentInit(container);
+  new XWikiMacrosComponentInit(container);
 }

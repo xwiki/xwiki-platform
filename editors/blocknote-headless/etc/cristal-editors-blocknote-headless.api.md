@@ -9,15 +9,20 @@ import { CollaborationInitializer } from '@xwiki/cristal-collaboration-api';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
-import { DEFAULT_MACROS } from '@xwiki/cristal-editors-blocknote-react';
+import { ContextForMacros } from '@xwiki/cristal-editors-blocknote-react';
 import { DefineComponent } from 'vue';
 import { EditorType } from '@xwiki/cristal-editors-blocknote-react';
+import { MacroWithUnknownParamsType } from '@xwiki/cristal-macros-api';
 import { PublicProps } from 'vue';
 import { UniAst } from '@xwiki/cristal-uniast-api';
 
 // @beta (undocumented)
 export const BlocknoteEditor: DefineComponent<    {
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx">;
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
+macros: {
+list: MacroWithUnknownParamsType[];
+ctx: ContextForMacros;
+} | false;
 editorContent: UniAst | Error;
 collaborationProvider?: () => CollaborationInitializer;
 container: Container;
@@ -27,7 +32,11 @@ getContent: () => UniAst | Error;
 "instant-change": () => any;
 "debounced-change": (content: UniAst) => any;
 }, string, PublicProps, Readonly<{
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx">;
+editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros">;
+macros: {
+list: MacroWithUnknownParamsType[];
+ctx: ContextForMacros;
+} | false;
 editorContent: UniAst | Error;
 collaborationProvider?: () => CollaborationInitializer;
 container: Container;
@@ -38,7 +47,7 @@ container: Container;
 'blocknote-container': HTMLDivElement;
 }, any>;
 
-export { DEFAULT_MACROS }
+export { ContextForMacros }
 
 export { EditorType }
 

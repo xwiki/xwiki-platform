@@ -21,6 +21,7 @@ import { InlineContentSchemaFromSpecs } from '@blocknote/core';
 import { Link } from '@blocknote/core';
 import { LinkSuggestService } from '@xwiki/cristal-link-suggest-api';
 import * as locales from '@blocknote/core/locales';
+import { MacroWithUnknownParamsType } from '@xwiki/cristal-macros-api';
 import { ModelReferenceHandler } from '@xwiki/cristal-model-reference-api';
 import { ModelReferenceParser } from '@xwiki/cristal-model-reference-api';
 import { ModelReferenceSerializer } from '@xwiki/cristal-model-reference-api';
@@ -36,6 +37,21 @@ import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { TiptapBlockImplementation } from '@blocknote/core';
+import { UnknownMacroParamsType } from '@xwiki/cristal-macros-api';
+
+// Warning: (ae-internal-missing-underscore) The name "BlockNoteConcreteMacro" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export type BlockNoteConcreteMacro = {
+    macro: MacroWithUnknownParamsType;
+    bnRendering: {
+        type: "block";
+        block: ReturnType<typeof createCustomBlockSpec>;
+    } | {
+        type: "inline";
+        inlineContent: ReturnType<typeof createCustomInlineContentSpec>;
+    };
+};
 
 // @beta
 export type BlockNoteViewWrapperProps = {
@@ -43,10 +59,10 @@ export type BlockNoteViewWrapperProps = {
     theme?: "light" | "dark";
     lang: EditorLanguage;
     content: BlockType[];
-    macros: null | {
-        buildable: BuildableMacro[];
-        openMacroParamsEditor: ContextForMacros["openParamsEditor"];
-    };
+    macros: {
+        list: MacroWithUnknownParamsType[];
+        ctx: ContextForMacros;
+    } | false;
     realtime?: {
         collaborationProvider: () => CollaborationInitializer;
         user: {
@@ -70,15 +86,14 @@ export type BlockOfType<B extends BlockType["type"]> = Extract<BlockType, {
 export type BlockType = Block<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>;
 
 // @beta
-export type BuildableMacro = (ctx: ContextForMacros) => Macro;
-
-// @beta
 export type ContextForMacros = {
-    openParamsEditor(macro: Macro, params: Record<string, boolean | number | string>, update: (newProps: Record<string, boolean | number | string>) => void): void;
+    openParamsEditor(macro: MacroWithUnknownParamsType, params: UnknownMacroParamsType, update: (newProps: UnknownMacroParamsType) => void): void;
 };
 
+// Warning: (ae-incompatible-release-tags) The symbol "createBlockNoteSchema" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
+//
 // @beta
-export function createBlockNoteSchema(macros: Macro[]): BlockNoteSchema<BlockSchemaFromSpecs<    {
+export function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]): BlockNoteSchema<BlockSchemaFromSpecs<    {
 Heading4: {
 config: {
 readonly type: "Heading4" | "Heading5" | "Heading6";
@@ -512,6 +527,64 @@ implementation: StyleImplementation;
 };
 }>>;
 
+// Warning: (ae-internal-missing-underscore) The name "createCustomBlockSpec" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export function createCustomBlockSpec<const B extends CustomBlockConfig, const I extends InlineContentSchema, const S extends StyleSchema>({ config, implementation, slashMenu, customToolbar, }: {
+    config: B;
+    implementation: ReactCustomBlockImplementation<B, I, S>;
+    slashMenu: false | {
+        title: string;
+        aliases?: string[];
+        group: string;
+        icon: ReactNode;
+        default: () => PartialBlock<Record<B["type"], B>>;
+    };
+    customToolbar: (() => ReactNode) | null;
+}): {
+    block: {
+        config: B;
+        implementation: TiptapBlockImplementation<B, any, InlineContentSchema, StyleSchema>;
+    };
+    slashMenuEntry: false | ((editor: BlockNoteEditor<any>) => {
+        title: string;
+        aliases: string[] | undefined;
+        group: string;
+        icon: ReactNode;
+        onItemClick: () => void;
+    });
+    customToolbar: (() => ReactNode) | null;
+};
+
+// Warning: (ae-internal-missing-underscore) The name "createCustomInlineContentSpec" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export function createCustomInlineContentSpec<const I extends CustomInlineContentConfig, const S extends StyleSchema>({ config, implementation, slashMenu, customToolbar, }: {
+    config: I;
+    implementation: ReactInlineContentImplementation<I, S>;
+    slashMenu: false | {
+        title: string;
+        aliases?: string[];
+        group: string;
+        icon: ReactNode;
+        default: () => PartialInlineContent<Record<I["type"], I>, S>;
+    };
+    customToolbar: (() => ReactNode) | null;
+}): {
+    inlineContent: {
+        config: I;
+        implementation: InlineContentImplementation<I>;
+    };
+    slashMenuEntry: false | ((editor: BlockNoteEditor<any>) => {
+        title: string;
+        aliases: string[] | undefined;
+        group: string;
+        icon: ReactNode;
+        onItemClick: () => void;
+    });
+    customToolbar: (() => ReactNode) | null;
+};
+
 // @beta
 export function createDictionary(lang: EditorLanguage): {
     slash_menu: {
@@ -836,15 +909,6 @@ export function createDictionary(lang: EditorLanguage): {
     };
 };
 
-// @beta
-export function createMacro<Parameters extends Record<string, MacroParameterType>>({ name, parameters, slashMenu, render, renderType, }: MacroCreationArgs<Parameters>): BuildableMacro;
-
-// @beta
-export const DEFAULT_MACROS: {
-    XWikiMacroHTMLBlockMacro: BuildableMacro;
-    XWikiMacroInlineHTMLMacro: BuildableMacro;
-};
-
 // @beta (undocumented)
 export type EditorBlockSchema = EditorSchema extends BlockNoteSchema<infer BlockSchema, infer _, infer __> ? BlockSchema : never;
 
@@ -884,56 +948,21 @@ export type LinkEditionContext = {
 };
 
 // @beta
-export type Macro = {
-    name: string;
-    parameters: Record<string, MacroParameterType>;
-    renderType: "block" | "inline";
-    blockNote: MacroForBlockNote;
-};
-
-// @beta
 export const MACRO_NAME_PREFIX = "Macro_";
-
-// @beta
-export type MacroCreationArgs<Parameters extends Record<string, MacroParameterType>> = {
-    name: string;
-    renderType: "block" | "inline";
-    parameters: Parameters;
-    slashMenu: {
-        description: string;
-        defaultParameters: FilterUndefined<GetConcreteMacroParametersType<Parameters>>;
-    } | false;
-    render(params: GetConcreteMacroParametersType<Parameters>, contentRef: (node: HTMLElement | null) => void, openParamsEditor: () => void): React.ReactNode;
-};
-
-// @beta
-export type MacroParameterType = ({
-    type: "boolean";
-} | {
-    type: "float";
-} | {
-    type: "string";
-} | {
-    type: "stringEnum";
-    possibleValues: string[];
-}) & {
-    optional?: true;
-};
 
 // @beta
 export function mountBlockNote(containerEl: HTMLElement, props: BlockNoteViewWrapperProps): {
     unmount: () => void;
 };
 
+// Warning: (ae-incompatible-release-tags) The symbol "querySuggestionsMenuItems" is marked as @beta, but its signature references "BlockNoteConcreteMacro" which is marked as @internal
+//
 // @beta
-export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: Macro[]): DefaultReactSuggestionItem[];
+export function querySuggestionsMenuItems(editor: EditorType, query: string, macros: BlockNoteConcreteMacro[]): DefaultReactSuggestionItem[];
 
 // Warnings were encountered during analysis:
 //
-// dist/blocknote/utils.d.ts:116:5 - (ae-forgotten-export) The symbol "MacroForBlockNote" needs to be exported by the entry point index.d.ts
-// dist/blocknote/utils.d.ts:206:9 - (ae-forgotten-export) The symbol "FilterUndefined" needs to be exported by the entry point index.d.ts
-// dist/blocknote/utils.d.ts:206:9 - (ae-forgotten-export) The symbol "GetConcreteMacroParametersType" needs to be exported by the entry point index.d.ts
-// dist/components/BlockNoteViewWrapper.d.ts:16:5 - (ae-forgotten-export) The symbol "DefaultEditorOptionsType" needs to be exported by the entry point index.d.ts
+// dist/components/BlockNoteViewWrapper.d.ts:17:5 - (ae-forgotten-export) The symbol "DefaultEditorOptionsType" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

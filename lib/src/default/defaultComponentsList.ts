@@ -38,6 +38,7 @@ import { ComponentInit as DefaultPageHistoryComponentInit } from "@xwiki/cristal
 import { ComponentInit as HistoryUIComponentInit } from "@xwiki/cristal-history-ui";
 import { ComponentInit as InfoActionsComponentInit } from "@xwiki/cristal-info-actions-default";
 import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-api";
+import { ComponentInit as MacrosServiceComponentInit } from "@xwiki/cristal-macros-service";
 import { ComponentInit as MarkdownDefaultComponentInit } from "@xwiki/cristal-markdown-default";
 import { ComponentInit as ClickListenerComponentInit } from "@xwiki/cristal-model-click-listener";
 import { ComponentInit as ModelReferenceAPIComponentInit } from "@xwiki/cristal-model-reference-api";
@@ -91,6 +92,7 @@ async function defaultComponentsList(container: Container): Promise<void> {
   new ModelRemoteURLAPIComponentInit(container);
   new ModelReferenceAPIComponentInit(container);
   new DateAPIComponentInit(container);
+  new MacrosServiceComponentInit(container);
   new MarkdownDefaultComponentInit(container);
   new RenameComponentInit(container);
   new GithubBackendComponentInit(container);

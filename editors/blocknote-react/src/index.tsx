@@ -18,17 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { App } from "./App";
-import { XWikiMacroHTMLBlockMacro } from "./blocknote/macros/XWikiMacroHtmlBlock";
-import { XWikiMacroInlineHTMLMacro } from "./blocknote/macros/XWikiMacroInlineHtml";
-import { MACRO_NAME_PREFIX, createMacro } from "./blocknote/utils";
+import { MACRO_NAME_PREFIX } from "./blocknote/utils";
 import { createRoot } from "react-dom/client";
-import type {
-  BuildableMacro,
-  ContextForMacros,
-  Macro,
-  MacroCreationArgs,
-  MacroParameterType,
-} from "./blocknote/utils";
+import type { ContextForMacros } from "./blocknote/utils";
 import type { BlockNoteViewWrapperProps } from "./components/BlockNoteViewWrapper";
 import type { LinkEditionContext } from "./misc/linkSuggest";
 
@@ -65,31 +57,31 @@ function mountBlockNote(
   };
 }
 
-/**
- * A set of default macros to use in BlockNote
- *
- * These are not enabled by default as some integrations may want to fully disable macros support.
- * In such case, simply ignore this.
- *
- * Otherwise, you can provide this object's values entirely or select only a few macros and pass them to the setup function.
- * @since 0.20
- * @beta
- */
-const DEFAULT_MACROS = {
-  XWikiMacroHTMLBlockMacro,
-  XWikiMacroInlineHTMLMacro,
-};
+export { MACRO_NAME_PREFIX, mountBlockNote };
 
-export { DEFAULT_MACROS, MACRO_NAME_PREFIX, createMacro, mountBlockNote };
+export type { BlockNoteViewWrapperProps, ContextForMacros, LinkEditionContext };
 
 export type {
-  BlockNoteViewWrapperProps,
-  BuildableMacro,
-  ContextForMacros,
-  LinkEditionContext,
-  Macro,
-  MacroCreationArgs,
-  MacroParameterType,
-};
+  BlockNoteConcreteMacro,
+  BlockOfType,
+  BlockType,
+  EditorBlockSchema,
+  EditorInlineContentSchema,
+  EditorLanguage,
+  EditorLink,
+  EditorSchema,
+  EditorStyleSchema,
+  EditorStyledText,
+  EditorType,
+} from "./blocknote";
 
-export * from "./blocknote";
+export {
+  createBlockNoteSchema,
+  createDictionary,
+  querySuggestionsMenuItems,
+} from "./blocknote";
+
+export type {
+  createCustomBlockSpec,
+  createCustomInlineContentSpec,
+} from "./blocknote/utils";

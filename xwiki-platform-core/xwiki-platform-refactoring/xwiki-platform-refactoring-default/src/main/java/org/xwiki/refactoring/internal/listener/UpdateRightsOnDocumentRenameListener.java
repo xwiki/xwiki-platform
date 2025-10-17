@@ -142,11 +142,10 @@ public class UpdateRightsOnDocumentRenameListener extends AbstractLocalEventList
     {
         Collection<String> wikiIds;
 
-        String mainXWiki = context.getMainXWiki();
         String sourceWikiName = sourceReference.getWikiReference().getName();
         String targetWikiName = targetReference.getWikiReference().getName();
-        if (sourceWikiName.equals(mainXWiki) || targetWikiName.equals(mainXWiki)) {
-            // If the user/group is from the main wiki then we need to update all wikis
+        if (context.isMainWiki(sourceWikiName) || context.isMainWiki(targetWikiName)) {
+            // If the user/group is from the main wiki then we need to update all wikis.
             wikiIds = this.wikiDescriptorManager.getAllIds();
         } else if (sourceWikiName.equals(targetWikiName)) {
             // If the user/group is being renamed in the same non-main wiki then we only need to update that wiki.

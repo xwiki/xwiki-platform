@@ -47,11 +47,13 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.panels.test.po.DocumentInformationPanel;
 import org.xwiki.realtime.test.RealtimeTestUtils;
-import org.xwiki.realtime.test.po.Coeditor;
+import org.xwiki.realtime.test.po.CoeditorElement;
+import org.xwiki.realtime.test.po.HistoryDropdown;
 import org.xwiki.realtime.test.po.RealtimeEditToolbar;
 import org.xwiki.realtime.test.po.RealtimeInplaceEditablePage;
 import org.xwiki.realtime.test.po.SaveStatus;
 import org.xwiki.realtime.test.po.SummaryModal;
+import org.xwiki.realtime.test.po.VersionElement;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement.CoeditorPosition;
@@ -173,7 +175,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.UNSAVED);
         inplaceEditablePage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
 
-        inplaceEditablePage.done();
+        setup.leaveEditMode();
         assertEquals("zero\ntwo\nthree", inplaceEditablePage.getContent());
 
         // edit again and test the summarize & done
@@ -189,11 +191,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         summaryModal.clickSave(true);
         inplaceEditablePage.waitForView();
         assertEquals("zero\ntwo\nthree\nfour", inplaceEditablePage.getContent());
-        HistoryPane historyPane = inplaceEditablePage.openHistoryDocExtraPane();
+        HistoryPane historyPane = inplaceEditablePage.openHistoryDocExtraPane().showMinorEdits();
         assertEquals(4, historyPane.getNumberOfVersions());
         assertEquals("Summarize changes", historyPane.getCurrentVersionComment());
 
-        // delete the page to test creation with summarize & done (regression test for XWIKI-23136)
+        // Delete the page to test creation with summarize & done (regression test for XWIKI-23136).
         setup.deletePage(testReference);
         editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         editor = editPage.getContenEditor();
@@ -247,7 +249,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         String secondCoeditorId = secondEditPage.getToolbar().getUserId();
 
         // Verify the list of coeditors.
-        Coeditor self = secondEditPage.getToolbar().waitForCoeditor(firstCoeditorId);
+        CoeditorElement self = secondEditPage.getToolbar().waitForCoeditor(firstCoeditorId);
         assertTrue(self.isDisplayed());
         // The name is not visible when the user is displayed directly on the toolbar.
         assertEquals("", self.getName());
@@ -1440,7 +1442,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("Deutsch content", firstTextArea.getText());
 
         assertEquals("John, superadmin", firstEditPage.getToolbar().getVisibleCoeditors().stream()
-            .map(Coeditor::getAvatarHint).reduce((a, b) -> a + ", " + b).get());
+            .map(CoeditorElement::getAvatarHint).reduce((a, b) -> a + ", " + b).get());
     }
 
     @Test
@@ -2329,6 +2331,171 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstEditor.getToolBar().toggleSourceMode();
         source = firstEditor.getSourceTextArea().getDomProperty("value").replace('\u00A0', ' ');
         assertEquals("[[label>>||anchor=\"target\"]] after", source);
+    }
+
+    @Test
+    @Order(25)
+    void preventEmptyRevisions(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab (standalone).
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+
+        // There are no revisions yet.
+        HistoryDropdown historyDropdown = firstEditPage.getToolbar().getHistoryDropdown();
+        assertTrue(historyDropdown.open().getVersions().isEmpty());
+
+        // Even if there is no change, the document is new so the Done button should create the first revision.
+        firstEditPage.clickDone();
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsJohn(setup);
+
+        // Edit the page in the second browser tab (in-place).
+        RealtimeInplaceEditablePage inplaceEditablePage = RealtimeInplaceEditablePage.gotoPage(testReference);
+        inplaceEditablePage.editInplace();
+        RealtimeCKEditor secondEditor = new RealtimeCKEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        // Verify that the history dropdown contains only one entry (the initial revision).
+        List<VersionElement> versions = historyDropdown.open().getVersions();
+        assertEquals(1, versions.size());
+        assertEquals("1.1", versions.get(0).getNumber());
+        assertEquals("Su", versions.get(0).getAuthor().getAbbreviation());
+
+        // Try to save without making any changes. Even if the author is different, no new revision should be created.
+        inplaceEditablePage.getToolbar().sendSaveShortcutKey();
+
+        // Verify that the history dropdown still contains only one entry (the initial revision).
+        versions = historyDropdown.open().getVersions();
+        assertEquals(1, versions.size());
+        assertEquals("1.1", versions.get(0).getNumber());
+        assertEquals("Su", versions.get(0).getAuthor().getAbbreviation());
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Join the realtime collaboration.
+        firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.sendKeys("one");
+        inplaceEditablePage.getToolbar().sendSaveShortcutKey();
+
+        // Verify that the history dropdown contains two versions.
+        versions = historyDropdown.open().getVersions();
+        assertEquals(2, versions.size());
+        assertEquals("1.1", versions.get(0).getNumber());
+        assertEquals("Su", versions.get(0).getAuthor().getAbbreviation());
+        assertEquals("1.2", versions.get(1).getNumber());
+        assertEquals("Jo", versions.get(1).getAuthor().getAbbreviation());
+        historyDropdown.close();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("one");
+
+        // Verify that the new version was propagated.
+        versions = historyDropdown.waitForVersion("1.2").open().getVersions();
+        assertEquals(2, versions.size());
+        assertEquals("1.1", versions.get(0).getNumber());
+        assertEquals("Su", versions.get(0).getAuthor().getAbbreviation());
+        assertEquals("1.2", versions.get(1).getNumber());
+        assertEquals("Jo", versions.get(1).getAuthor().getAbbreviation());
+
+        // Try to save without making any changes. No new revision should be created.
+        firstEditPage.getToolbar().sendSaveShortcutKey();
+
+        // Verify that the history dropdown still contains only two entries.
+        versions = historyDropdown.open().getVersions();
+        assertEquals(2, versions.size());
+
+        firstTextArea.sendKeys(Keys.END, " two");
+        ViewPage viewPage = firstEditPage.clickDone();
+        assertEquals("one two", viewPage.getContent());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondTextArea.waitUntilTextContains("two");
+
+        // Verify that the new version was propagated.
+        versions = historyDropdown.waitForVersion("2.1").open().getVersions();
+        assertEquals(3, versions.size());
+        assertEquals("1.1", versions.get(0).getNumber());
+        assertEquals("Su", versions.get(0).getAuthor().getAbbreviation());
+        assertEquals("1.2", versions.get(1).getNumber());
+        assertEquals("Jo", versions.get(1).getAuthor().getAbbreviation());
+        assertEquals("2.1", versions.get(2).getNumber());
+        assertEquals("Su", versions.get(2).getAuthor().getAbbreviation());
+
+        // Leave the editing session without making any changes. No new revision should be created.
+        HistoryPane historyPane = inplaceEditablePage.done().openHistoryDocExtraPane().showMinorEdits();
+        assertEquals(3, historyPane.getNumberOfVersions());
+        assertEquals("2.1", historyPane.getCurrentVersion());
+        assertEquals("superadmin", historyPane.getCurrentAuthor());
+
+        //
+        // First Tab
+        //
+
+        // Edit again to check that we can force a new empty revision by specifying a version summary.
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+
+        assertEquals(1, historyDropdown.open().getVersions().size());
+
+        SummaryModal summaryModal = historyDropdown.summarizeChanges();
+        summaryModal.setSummary("An empty revision");
+        summaryModal.clickSave(true);
+
+        versions = historyDropdown.open().getVersions();
+        assertEquals(2, versions.size());
+        assertEquals("2.2", versions.get(1).getNumber());
+        assertEquals("Su", versions.get(1).getAuthor().getAbbreviation());
+
+        // Try again, this time without a summary.
+        summaryModal = historyDropdown.summarizeChanges();
+        summaryModal.setSummary("");
+        summaryModal.clickSave(false);
+        firstEditPage.getToolbar().waitForSaveStatus(SaveStatus.SAVED);
+
+        assertEquals(2, historyDropdown.open().getVersions().size());
+
+        // Leave the editing session with a summary. This should create a new revision.
+        summaryModal = firstEditPage.getToolbar().clickSummarizeAndDone();
+        summaryModal.setSummary("Another empty revision");
+        summaryModal.clickSave(true);
+
+        historyPane = new ViewPage().openHistoryDocExtraPane().showMinorEdits();
+        assertEquals(5, historyPane.getNumberOfVersions());
+        assertEquals("3.1", historyPane.getCurrentVersion());
+        assertEquals("superadmin", historyPane.getCurrentAuthor());
+        assertEquals("Another empty revision", historyPane.getCurrentVersionComment());
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

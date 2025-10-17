@@ -2,13 +2,17 @@
   display: inline;
   white-space: nowrap;
 }
-#autosaveControl input.autosave-interval {
-  text-align: center;
-  width: 2em;
-}
+
 #autosaveControl .interval {
   display: none;
+  margin-left: 2em;
+  
+  & .autosave-interval {
+    width: 3em;
+    margin-left: 1em;
+  }
 }
+
 #autosaveControl .autosave:has(input:checked) + .interval {
   display: inline-block;
 }

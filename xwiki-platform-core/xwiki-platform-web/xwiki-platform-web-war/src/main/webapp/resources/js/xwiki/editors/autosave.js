@@ -102,14 +102,14 @@ editors.AutoSave = Class.create({
       "class": "autosave-interval"
     });
     // Labels
-    var autosaveLabel = new Element('label', {'class': 'autosave'});
+    let autosaveLabel = new Element('label', {'class': 'autosave'});
     autosaveLabel.appendChild(this.autosaveCheckbox);
-    autosaveLabel.appendChild(document.createTextNode("$!escapetool.javascript($services.localization.render('core.edit.autosave'))"));
-    var intervalLabel = new Element('label', {'class': 'interval'});
-    intervalLabel.appendChild(document.createTextNode("$!escapetool.javascript($services.localization.render('core.edit.autosave.interval.label))"));
+    autosaveLabel.appendChild(document.createTextNode("$escapetool.javascript($services.localization.render('core.edit.autosave'))"));
+    let intervalLabel = new Element('label', {'class': 'interval'});
+    intervalLabel.appendChild(document.createTextNode("$escapetool.javascript($services.localization.render('core.edit.autosave.interval.label'))"));
     intervalLabel.appendChild(this.autosaveIntervalInput);
     // A paragraph containing the whole thing
-    var container = new Element('div', {"id": "autosaveControl"});
+    let container = new Element('div', {"id": "autosaveControl"});
     this.classNameAutosaveDisabled = 'autosaveDisabled';
     if (!this.options.enabled) {
       container.addClassName(this.classNameAutosaveDisabled);
@@ -146,11 +146,10 @@ editors.AutoSave = Class.create({
     // Set autosave interval
     Event.observe(this.autosaveIntervalInput, "blur", function() {
       // is the given value valid?
-      var newInterval = new Number(this.autosaveIntervalInput.value);
+      let newInterval = Number(this.autosaveIntervalInput.value);
       if (newInterval > 0) {
         // yes: memorize it
         this.options.interval = newInterval;
-        this.setTimeUnit();
         // reset autosave loop
         this.startTimer();
       } else {
@@ -160,19 +159,6 @@ editors.AutoSave = Class.create({
     }.bindAsEventListener(this));
 
     this._toggleTimerWhenSaveButtonIsEnabledOrDisabled();
-  },
-
-  /**
-   * Changes the label text displaying the time measure unit for autosave freaquency,
-   * according to the value introduced by the user in the input (singular or plural).
-   * TODO This is bad, very difficult to internationalize.
-   */
-  setTimeUnit : function() {
-    if (this.options.interval === 1) {
-      this.timeUnit.update("minute");
-    } else {
-      this.timeUnit.update("minutes");
-    }
   },
 
   /**

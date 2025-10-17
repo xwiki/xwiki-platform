@@ -18,7 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { injectable, unmanaged } from "inversify";
+import { useI18n } from "vue-i18n";
 import type { Component } from "vue";
+import type { ComposerTranslation } from "vue-i18n";
 
 /**
  * Define the information held by a UI Extension (UIX).
@@ -72,4 +75,32 @@ interface UIExtensionsManager {
   list(name: string): Promise<UIExtension[]>;
 }
 
+/**
+ * Abstract class helping with localization of UI extensions.
+ *
+ * @since 0.23
+ * @beta
+ */
+@injectable()
+abstract class AbstractUIExtension implements UIExtension {
+  protected t: ComposerTranslation;
+
+  constructor(@unmanaged() messages: Record<string, Record<string, string>>) {
+    const { t, mergeLocaleMessage } = useI18n();
+    for (const messagesKey in messages) {
+      mergeLocaleMessage(messagesKey, messages[messagesKey]);
+    }
+    this.t = t;
+  }
+
+  abstract id: string;
+  abstract uixpName: string;
+  abstract order: number;
+  abstract parameters: { [key: string]: unknown };
+
+  abstract enabled(): Promise<boolean>;
+  abstract component(): Promise<Component>;
+}
+
+export { AbstractUIExtension };
 export type { UIExtension, UIExtensionsManager };

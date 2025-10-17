@@ -15,6 +15,8 @@ export type DocumentChange = "update" | "delete";
 export interface DocumentService {
     // (undocumented)
     getCurrentDocument(): Ref<PageData | undefined>;
+    // (undocumented)
+    getCurrentDocumentAction(): Ref<string | undefined>;
     getCurrentDocumentReference(): Ref<DocumentReference | undefined>;
     getCurrentDocumentReferenceString(): Ref<string | undefined>;
     // (undocumented)
@@ -28,7 +30,7 @@ export interface DocumentService {
     notifyDocumentChange(change: DocumentChange, page: DocumentReference): Promise<void>;
     refreshCurrentDocument(): Promise<void>;
     registerDocumentChangeListener(change: DocumentChange, listener: (page: DocumentReference) => Promise<void>): void;
-    setCurrentDocument(documentReference: string, revision?: string): Promise<void>;
+    setCurrentDocument(documentReference: string, action?: string, revision?: string): Promise<void>;
 }
 
 // @beta (undocumented)

@@ -155,5 +155,6 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
       "XSelect",
       () => import("../vue/form/x-select.vue"),
     );
+    registerAsyncComponent(app, "XTree", () => import("../vue/x-tree.vue"));
   }
 }

@@ -126,13 +126,13 @@ export class DefaultCristalApp implements CristalApp {
     });
   }
 
-  handlePopState(name: string, revision?: string): void {
+  handlePopState(name: string, action?: string, revision?: string): void {
     this.logger?.debug("In handlePopState ", name);
     this.page.name = name || this.getWikiConfig().defaultPageName();
     this.page.version = revision;
     this.page.source = "";
     this.page.html = "";
-    this.loadPage();
+    this.loadPage(action);
   }
 
   setWikiConfig(wikiConfig: WikiConfig): void {
@@ -205,7 +205,10 @@ export class DefaultCristalApp implements CristalApp {
    */
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
   // eslint-disable-next-line max-statements
-  async loadPage(options?: { requeue: boolean }): Promise<void> {
+  async loadPage(
+    action?: string,
+    options?: { requeue: boolean },
+  ): Promise<void> {
     try {
       this.logger?.debug("Loading page", this.page.name);
 
@@ -214,6 +217,7 @@ export class DefaultCristalApp implements CristalApp {
 
       await documentService.setCurrentDocument(
         this.page.name,
+        action,
         this.page.version,
       );
 
@@ -381,6 +385,11 @@ export class DefaultCristalApp implements CristalApp {
         path: "/:page/",
         component: this.skinManager.getTemplate("content"),
       } as RouteRecordRaw,
+      {
+        path: "/:page/admin",
+        name: "admin",
+        component: this.skinManager.getTemplate("admin"),
+      } as RouteRecordRaw,
     ];
 
     if (this.container.isBound("RouterFactory")) {
@@ -448,6 +457,7 @@ export class DefaultCristalApp implements CristalApp {
     this.router.beforeEach((to) => {
       this.handlePopState(
         to.params.page as string,
+        to.name?.toString() ?? "view",
         to.params.revision as string,
       );
     });

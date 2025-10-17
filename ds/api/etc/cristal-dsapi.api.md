@@ -13,6 +13,7 @@ import { ImgHTMLAttributes } from 'vue';
 import { InputHTMLAttributes } from 'vue';
 import { NavigationTreeNode } from '@xwiki/cristal-navigation-tree-api';
 import { SpaceReference } from '@xwiki/cristal-model-api';
+import { TreeNode } from '@xwiki/cristal-fn-utils';
 
 // @beta
 export type AbstractElements = {
@@ -38,6 +39,7 @@ export type AbstractElements = {
     XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
     XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
     XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
+    XTree: DefineComponent<TreeProps & HTMLAttributes>;
 };
 
 // @beta (undocumented)
@@ -106,6 +108,14 @@ export type DialogProps = {
     logo?: string;
 };
 
+// @beta
+export type DisplayableTreeNode = TreeNode<{
+    id: string;
+    label: string;
+    url?: string;
+    activatable?: boolean;
+}>;
+
 // @beta (undocumented)
 export type DividerProps = unknown;
 
@@ -132,6 +142,7 @@ export type LoadProps = unknown;
 // @beta (undocumented)
 export type MenuItemProps = {
     value: string;
+    disabled?: boolean;
 };
 
 // @beta (undocumented)
@@ -203,6 +214,14 @@ export type TextFieldProps = {
     help?: string;
     readonly?: boolean;
     type?: "date" | "datetime-local" | "email" | "number" | "password" | "search" | "tel" | "text" | "time" | "url";
+};
+
+// @beta
+export type TreeProps = {
+    rootNode: DisplayableTreeNode;
+    showRootNode?: boolean;
+    activated?: string;
+    opened?: string[];
 };
 
 // (No @packageDocumentation comment for this package)

@@ -18,8 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import messages from "./translations";
+import { AbstractUIExtension } from "@xwiki/cristal-uiextension-api";
 import { injectable } from "inversify";
-import type { UIExtension } from "@xwiki/cristal-uiextension-api";
 import type { Component } from "vue";
 
 /**
@@ -29,11 +30,16 @@ import type { Component } from "vue";
  * @beta
  */
 @injectable()
-export class SettingsConfigurationsUIExtension implements UIExtension {
+export class SettingsConfigurationsUIExtension extends AbstractUIExtension {
   id = "settings.categories.configurations";
   uixpName = "settings.categories";
   order = 1000;
-  parameters = {};
+  parameters = { title: "" };
+
+  constructor() {
+    super(messages);
+    this.parameters.title = this.t("settings.configurations.title");
+  }
 
   async component(): Promise<Component> {
     return (await import("./vue/SettingsConfigurations.vue")).default;

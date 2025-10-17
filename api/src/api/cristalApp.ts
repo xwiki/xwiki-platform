@@ -107,7 +107,7 @@ export interface CristalApp {
    */
   loadPageFromURL(url: string): Promise<void>;
 
-  loadPage(options?: { requeue: boolean }): Promise<void>;
+  loadPage(action?: string, options?: { requeue: boolean }): Promise<void>;
 
   /**
    * Return the requested page

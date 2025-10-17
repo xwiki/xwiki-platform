@@ -46,6 +46,7 @@ import type { TabProps } from "./XTab";
 import type { TabGroupProps } from "./XTabGroup";
 import type { TabPanelProps } from "./XTabPanel";
 import type { TextFieldProps } from "./XTextField";
+import type { DisplayableTreeNode, TreeProps } from "./XTree";
 import type {
   ButtonHTMLAttributes,
   DefineComponent,
@@ -87,6 +88,7 @@ type AbstractElements = {
   XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
   XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
   XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
+  XTree: DefineComponent<TreeProps & HTMLAttributes>;
 };
 
 // Expose all the abstract components types. For instance: props, actions, model value.
@@ -103,6 +105,7 @@ export type {
   CardProps,
   CheckboxProps,
   DialogProps,
+  DisplayableTreeNode,
   DividerProps,
   FileInputModel,
   FileInputProps,
@@ -119,6 +122,7 @@ export type {
   TabPanelProps,
   TabProps,
   TextFieldProps,
+  TreeProps,
 };
 
 export { navigationTreePropsDefaults, navigationTreeSelectPropsDefaults };

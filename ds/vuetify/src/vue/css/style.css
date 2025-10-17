@@ -42,6 +42,7 @@ main ul, main ol {
   --cr-base-text-color: var(--cr-color-gray-950);
   --cr-base-link-color: var(--cr-color-sky-700);
   --cr-base-visited-link-color: var(--cr-color-blue-700);
+  --cr-mute-text-color: var(--cr-color-neutral-600);
 
   /*
    * Typography

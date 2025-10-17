@@ -19,6 +19,7 @@
 -->
 <script lang="ts" setup>
 import CPageCreationMenu from "./c-page-creation-menu.vue";
+import CSidebarAdminPanel from "./c-sidebar-admin-panel.vue";
 import CSidebarPanel from "./c-sidebar-panel.vue";
 import UIX from "./c-uix.vue";
 import { useMouseCoordinates } from "../composables/mouse";
@@ -47,6 +48,8 @@ const documentService = cristal
   .get<DocumentService>(documentServiceName);
 const currentPageReference: Ref<DocumentReference | undefined> =
   documentService.getCurrentDocumentReference();
+const currentPageAction: Ref<string | undefined> =
+  documentService.getCurrentDocumentAction();
 
 defineEmits(["collapseMainSidebar"]);
 
@@ -156,7 +159,10 @@ function onClickOutsideMainSidebar() {
     </div>
     <div class="panel-container">
       <!-- TODO: Use wiki name as panel name (CRISTAL-374). -->
-      <c-sidebar-panel name="">
+      <suspense v-if="currentPageAction == 'admin'">
+        <c-sidebar-admin-panel></c-sidebar-admin-panel>
+      </suspense>
+      <c-sidebar-panel v-else name="">
         <c-page-creation-menu
           :current-page-reference="currentPageReference"
         ></c-page-creation-menu>
@@ -166,6 +172,9 @@ function onClickOutsideMainSidebar() {
       </c-sidebar-panel>
       <UIX uixname="sidebar.after" />
     </div>
+    <suspense>
+      <u-i-extensions uix-name="sidebar.bottom.actions"></u-i-extensions>
+    </suspense>
 
     <div
       class="resize-handle"
@@ -183,6 +192,7 @@ function onClickOutsideMainSidebar() {
   overflow-y: auto;
   scrollbar-gutter: stable;
   overflow-x: hidden;
+  border-bottom: 1px solid var(--cr-color-neutral-200);
 }
 
 .search {

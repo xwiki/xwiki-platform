@@ -38,8 +38,10 @@ import type { Ref } from "vue";
 type Id = "document";
 type State = {
   lastDocumentReference: string | undefined;
+  lastAction: string | undefined;
   lastRevision: string | undefined;
   document: PageData | undefined;
+  action: string | undefined;
   revision: string | undefined;
   loading: boolean;
   error: Error | undefined;
@@ -73,11 +75,13 @@ type Actions = {
   /**
    * Update the page data for the provided document reference
    * @param documentReference - the reference of the document to update
+   * @param action - the document action
    * @param requeue - true in case of offline refresh required
    * @param revision - the revision of the document, undefined for latest
    */
   update(
     documentReference: string,
+    action: string,
     requeue: boolean,
     revision?: string,
   ): Promise<void>;
@@ -102,8 +106,10 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
     state() {
       return {
         lastDocumentReference: undefined,
+        lastAction: undefined,
         lastRevision: undefined,
         document: undefined,
+        action: undefined,
         revision: undefined,
         loading: false,
         error: undefined,
@@ -148,20 +154,26 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
       // eslint-disable-next-line max-statements
       async update(
         documentReference: string,
+        action: string,
         requeue: boolean,
         revision?: string,
       ) {
         this.lastDocumentReference = documentReference;
+        this.lastAction = action;
         this.setLoading();
         try {
-          const doc = await cristal.getPage(documentReference, {
-            requeue,
-            revision,
-          });
+          let doc;
+          if (action != "admin") {
+            doc = await cristal.getPage(documentReference, {
+              requeue,
+              revision,
+            });
+          }
           // Only store the result if the current document reference is equal to
           // the most recently requested one.
           if (this.lastDocumentReference === documentReference) {
             this.document = doc;
+            this.action = action;
             // We clean up the revision before storing if it was empty.
             this.revision = revision === "" ? undefined : revision;
             this.error = undefined;
@@ -170,6 +182,7 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
         } catch (e) {
           if (this.lastDocumentReference === documentReference) {
             this.document = undefined;
+            this.action = undefined;
             this.revision = undefined;
             this.loading = false;
             if (e instanceof Error) {
@@ -212,6 +225,10 @@ export class DefaultDocumentService implements DocumentService {
     return this.refs.revision;
   }
 
+  getCurrentDocumentAction(): Ref<string | undefined> {
+    return this.refs.action;
+  }
+
   getDisplayTitle(): Ref<string> {
     return this.refs.displayTitle;
   }
@@ -230,10 +247,16 @@ export class DefaultDocumentService implements DocumentService {
 
   async setCurrentDocument(
     documentReference: string,
+    action?: string,
     revision?: string,
   ): Promise<void> {
     if (this.store) {
-      await this.store.update(documentReference, true, revision);
+      await this.store.update(
+        documentReference,
+        action ?? "view",
+        true,
+        revision,
+      );
     }
   }
 
@@ -243,6 +266,7 @@ export class DefaultDocumentService implements DocumentService {
     if (documentReference) {
       await this.store.update(
         documentReference,
+        this.store.lastAction!,
         false,
         this.store.lastRevision,
       );

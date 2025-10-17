@@ -39,6 +39,7 @@
     "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-extra-tabs-api": "workspace:*",
     "@xwiki/cristal-extra-tabs-ui": "workspace:*",
+    "@xwiki/cristal-fn-utils": "workspace:*",
     "@xwiki/cristal-hierarchy-api": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-info-actions-api": "workspace:*",

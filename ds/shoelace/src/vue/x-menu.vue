@@ -21,7 +21,7 @@
 import "@shoelace-style/shoelace";
 </script>
 <template>
-  <sl-dropdown stay-open-on-select>
+  <sl-dropdown hoist stay-open-on-select>
     <!-- @vue-expect-error the slot attribute is shoelace specific and is not know by the typechecker.
     Disabling it for now as I did not find an elegant solution to declare this property. -->
     <!--eslint-disable-next-line vue/no-deprecated-slot-attribute -->

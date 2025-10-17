@@ -1,6 +1,12 @@
 {
   "settings.configurations.title": "Configurations",
   "settings.configurations.empty": "No configuration defined.",
+  "settings.configurations.in-use": "In Use",
+  "settings.configurations.new": "New Configuration",
+  "settings.configurations.select": "Select Configuration",
+  "settings.configurations.available.title": "Available Configurations",
+  "settings.configurations.current.title": "Current Configuration",
+  "settings.configurations.table.header.ds": "Design System",
   "settings.configurations.table.header.name": "Name",
   "settings.configurations.table.header.type": "Type",
   "settings.configurations.table.header.actions": "Actions",

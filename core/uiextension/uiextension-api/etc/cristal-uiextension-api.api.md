@@ -5,6 +5,28 @@
 ```ts
 
 import type { Component } from 'vue';
+import type { ComposerTranslation } from 'vue-i18n';
+
+// @beta
+export abstract class AbstractUIExtension implements UIExtension {
+    constructor(messages: Record<string, Record<string, string>>);
+    // (undocumented)
+    abstract component(): Promise<Component>;
+    // (undocumented)
+    abstract enabled(): Promise<boolean>;
+    // (undocumented)
+    abstract id: string;
+    // (undocumented)
+    abstract order: number;
+    // (undocumented)
+    abstract parameters: {
+        [key: string]: unknown;
+    };
+    // (undocumented)
+    protected t: ComposerTranslation;
+    // (undocumented)
+    abstract uixpName: string;
+}
 
 // @beta
 export interface UIExtension {

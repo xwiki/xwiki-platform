@@ -15,9 +15,11 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
     }
   },
+  "main": "./src/index.ts",
   "scripts": {
     "api-extractor:local": "api-extractor run --local",
     "build": "rimraf dist && tsc",
@@ -25,7 +27,11 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "types": "./dist/index.d.ts",
+  "dependencies": {
+    "vue-i18n": "catalog:"
+  },
   "peerDependencies": {
+    "inversify": "7.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },

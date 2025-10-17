@@ -19,6 +19,7 @@
  */
 
 import "reflect-metadata";
+import Admin from "../vue/c-admin.vue";
 import Config from "../vue/c-config.vue";
 import Content from "../vue/c-content.vue";
 import Edit from "../vue/c-edit.vue";
@@ -52,6 +53,7 @@ export class DefaultSkinManager implements SkinManager {
     this.templates.set("content", Content);
     this.templates.set("main", Main);
     this.templates.set("edit", Edit);
+    this.templates.set("admin", Admin);
   }
 
   public setDesignSystem(designSystem: string): void {

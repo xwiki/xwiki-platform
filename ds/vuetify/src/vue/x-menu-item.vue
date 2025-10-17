@@ -18,12 +18,12 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-defineProps<{
-  value: string;
-}>();
+import type { MenuItemProps } from "@xwiki/cristal-dsapi";
+
+defineProps<MenuItemProps>();
 </script>
 <template>
-  <v-list-item :value="value">
+  <v-list-item :value="value" :disabled="disabled">
     <slot name="default" />
   </v-list-item>
 </template>

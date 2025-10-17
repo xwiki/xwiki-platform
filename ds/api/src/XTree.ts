@@ -18,17 +18,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import type { TreeNode } from "@xwiki/cristal-fn-utils";
+
 /**
- * @since 0.14
+ * Represents a TreeNode that can be displayed in a Tree component.
+ * @since 0.23
  * @beta
  */
-type MenuItemProps = {
-  value: string;
+type DisplayableTreeNode = TreeNode<{
+  id: string;
+  label: string;
+  url?: string;
+  activatable?: boolean;
+}>;
+
+/**
+ * Props of the Tree component.
+ * @since 0.23
+ * @beta
+ */
+type TreeProps = {
   /**
-   * @since 0.23
-   * @beta
+   * Node that contains the nodes to display.
    */
-  disabled?: boolean;
+  rootNode: DisplayableTreeNode;
+  /**
+   * Whether to display the root node itself (default: false).
+   */
+  showRootNode?: boolean;
+  /**
+   * Model value that contains the id of the current activated node.
+   */
+  activated?: string;
+  /**
+   * Model value that contains the ids of the current opened nodes.
+   */
+  opened?: string[];
 };
 
-export type { MenuItemProps };
+export type { DisplayableTreeNode, TreeProps };

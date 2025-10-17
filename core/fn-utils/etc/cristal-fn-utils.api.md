@@ -20,6 +20,11 @@ export function objectEntries<O extends Record<string, unknown>>(obj: O): Array<
 export function provideTypeInference<T>(value: T): T;
 
 // @beta
+export type TreeNode<T> = T & {
+    children?: TreeNode<T>[];
+};
+
+// @beta
 export function tryFallible<T>(func: () => T): T | null;
 
 // @beta

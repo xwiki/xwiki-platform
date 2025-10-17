@@ -25,8 +25,8 @@ import type { Component } from "vue";
 @injectable()
 export class ConfigMenuUIExtension implements UIExtension {
   id = "sidebar.actions.configMenu";
-  uixpName = "sidebar.actions";
-  order = 1000;
+  uixpName = "sidebar.bottom.actions";
+  order = 9000;
   parameters = {};
 
   async component(): Promise<Component> {

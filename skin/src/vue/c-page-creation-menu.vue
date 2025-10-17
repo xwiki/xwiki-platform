@@ -93,7 +93,10 @@ async function createPage() {
       "html",
     );
 
-    await documentService.setCurrentDocument(newDocumentReferenceString);
+    await documentService.setCurrentDocument(
+      newDocumentReferenceString,
+      "edit",
+    );
     await documentService.notifyDocumentChange("update", newDocumentReference);
 
     await cristal.setCurrentPage(newDocumentReferenceString, "edit");

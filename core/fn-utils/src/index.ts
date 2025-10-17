@@ -217,6 +217,15 @@ function objectEntries<O extends Record<string, unknown>>(
   return Object.entries(obj) as Array<[keyof O & string, O[keyof O]]>;
 }
 
+/**
+ * Generic tree structure type.
+ * @since 0.23
+ * @beta
+ */
+type TreeNode<T> = T & {
+  children?: TreeNode<T>[];
+};
+
 export {
   assertInArray,
   assertUnreachable,
@@ -227,3 +236,5 @@ export {
   tryFallibleOrError,
   tryFalliblePromiseOrError,
 };
+
+export type { TreeNode };

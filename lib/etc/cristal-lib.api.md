@@ -102,12 +102,12 @@ export class DefaultCristalApp implements CristalApp {
     // (undocumented)
     getWikiConfig(): WikiConfig;
     // (undocumented)
-    handlePopState(name: string, revision?: string): void;
+    handlePopState(name: string, action?: string, revision?: string): void;
     // (undocumented)
     initializeRouter(routes: RouteRecordRaw[]): Router;
     // (undocumented)
     isElectron: boolean;
-    loadPage(options?: {
+    loadPage(action?: string, options?: {
         requeue: boolean;
     }): Promise<void>;
     // @deprecated (undocumented)

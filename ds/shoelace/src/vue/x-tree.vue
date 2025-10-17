@@ -17,14 +17,25 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script lang="ts" setup>
-import "@shoelace-style/shoelace/dist/components/menu/menu";
-import type { MenuItemProps } from "@xwiki/cristal-dsapi";
+<script setup lang="ts">
+import XTreeItem from "./x-tree-item.vue";
+import "@shoelace-style/shoelace/dist/components/tree/tree";
+import type { TreeProps } from "@xwiki/cristal-dsapi";
 
-defineProps<MenuItemProps>();
+defineProps<TreeProps>();
+const opened = defineModel<string[]>("opened", { default: [] });
+const activated = defineModel<string | undefined>("activated");
 </script>
+
 <template>
-  <sl-menu-item :value="value" :disabled="disabled">
-    <slot />
-  </sl-menu-item>
+  <sl-tree>
+    <x-tree-item
+      v-for="item in showRootNode ? [rootNode] : rootNode.children"
+      :key="item.id"
+      :node="item"
+      v-model:activated="activated"
+      v-model:opened="opened"
+    >
+    </x-tree-item>
+  </sl-tree>
 </template>

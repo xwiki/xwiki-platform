@@ -17,5 +17,8 @@
   "information.extraTabs.title": "Information",
   "history.alert.content": "You are currently viewing version {revision} of {pageName}. Editing is disabled.",
   "history.alert.link.label": "Click here to go back to the latest version.",
-  "article.loading": "Loading..."
+  "article.loading": "Loading...",
+  "admin.home.title": "Settings: Home",
+  "admin.instance.title": "Instance Administration",
+  "admin.back.button": "Back to Wiki"
 }

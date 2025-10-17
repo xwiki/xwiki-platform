@@ -76,7 +76,7 @@ export interface CristalApp {
     // (undocumented)
     getWikiConfig(): WikiConfig;
     // (undocumented)
-    loadPage(options?: {
+    loadPage(action?: string, options?: {
         requeue: boolean;
     }): Promise<void>;
     // @deprecated (undocumented)

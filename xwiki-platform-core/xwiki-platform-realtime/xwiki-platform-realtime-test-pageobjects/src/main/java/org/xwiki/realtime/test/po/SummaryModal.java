@@ -20,6 +20,7 @@
 package org.xwiki.realtime.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseModal;
 
 /**
@@ -35,16 +36,20 @@ public class SummaryModal extends BaseModal
     public SummaryModal()
     {
         super(By.id("realtime-changeSummaryModal"));
+        getDriver().waitUntilCondition(driver -> this.isDisplayed());
     }
 
     /**
      * Fill the summary textarea with the given content.
+     * 
      * @param summary the text to put in the summary textarea
      */
     public void setSummary(String summary)
     {
-        getDriver().findElementWithoutWaiting(this.container, By.id("realtime-changeSummaryModal-summary"))
-            .sendKeys(summary);
+        WebElement textarea =
+            getDriver().findElementWithoutWaiting(this.container, By.id("realtime-changeSummaryModal-summary"));
+        textarea.clear();
+        textarea.sendKeys(summary);
     }
 
     /**
@@ -52,12 +57,14 @@ public class SummaryModal extends BaseModal
      */
     public void toggleMinorEdit()
     {
-        getDriver().findElementWithoutWaiting(this.container,
-            By.cssSelector("input[type='checkbox'][name='minorChange']")).click();
+        getDriver()
+            .findElementWithoutWaiting(this.container, By.cssSelector("input[type='checkbox'][name='minorChange']"))
+            .click();
     }
 
     /**
      * Click on the save button and eventually wait for the saved success message.
+     * 
      * @param waitSuccess if {@code true} wait for the "Saved" success message
      */
     public void clickSave(boolean waitSuccess)

@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Named;
@@ -197,7 +198,7 @@ class SaveActionTest
         when(mockForm.getTemplate()).thenReturn("");
 
         assertFalse(saveAction.save(this.context));
-        assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
+        assertEquals(Map.of("newVersion", "1.2"), saveAction.getJSONAnswer(context));
 
         verify(mockAuthors).setOriginalMetadataAuthor(this.currentUserReference);
         verify(mockAuthors).setEffectiveMetadataAuthor(this.effectiveAuthor);
@@ -220,7 +221,7 @@ class SaveActionTest
         when(mockRequest.getParameter("previousVersion")).thenReturn("1.1");
         when(mockRequest.getParameter("isNew")).thenReturn("true");
         assertFalse(saveAction.save(this.context));
-        assertEquals(new Version("1.1"), this.context.get("SaveAction.savedObjectVersion"));
+        assertEquals(Map.of("newVersion", "1.1"), saveAction.getJSONAnswer(context));
         verify(this.xWiki).checkSavingDocument(eq(USER_REFERENCE), any(XWikiDocument.class), eq(""), eq(false),
             eq(this.context));
         verify(this.xWiki).saveDocument(any(XWikiDocument.class), eq(""), eq(false), eq(this.context));
@@ -244,7 +245,7 @@ class SaveActionTest
         when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.4"));
         when(mockClonedDocument.getComment()).thenReturn("My Changes");
         assertFalse(saveAction.save(this.context));
-        assertEquals(new Version("1.4"), this.context.get("SaveAction.savedObjectVersion"));
+        assertEquals(Map.of("newVersion", "1.4"), saveAction.getJSONAnswer(context));
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
     }
@@ -275,7 +276,7 @@ class SaveActionTest
         when(mockDocument.getObjectDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
 
         assertFalse(saveAction.save(this.context));
-        assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
+        assertEquals(Map.of("newVersion", "1.2"), saveAction.getJSONAnswer(context));
 
         verify(mockAuthors).setOriginalMetadataAuthor(this.currentUserReference);
         verify(mockAuthors).setEffectiveMetadataAuthor(this.effectiveAuthor);
@@ -288,6 +289,7 @@ class SaveActionTest
     @Test
     void saveFromTemplate() throws Exception
     {
+        when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("3.2"));
         when(this.mockForm.getTemplate()).thenReturn("TemplateSpace.TemplateDocument");
         DocumentReference templateReference =
             new DocumentReference(context.getWikiId(), "TemplateSpace", "TemplateDocument");
@@ -329,6 +331,7 @@ class SaveActionTest
         String comment = "Some comment";
         when(sectionDoc.getComment()).thenReturn(comment);
         when(sectionDoc.isMinorEdit()).thenReturn(true);
+        when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("4.1"));
 
         assertFalse(this.saveAction.save(this.context));
 

@@ -126,9 +126,7 @@ public class RealtimeEditToolbar extends BaseElement
     {
         openDoneDropdown();
         getDriver().findElement(By.cssSelector(".realtime-edit-toolbar .realtime-action-summarize")).click();
-        SummaryModal summaryModal = new SummaryModal();
-        getDriver().waitUntilCondition(it -> summaryModal.isDisplayed());
-        return summaryModal;
+        return new SummaryModal();
     }
 
     /**
@@ -142,10 +140,10 @@ public class RealtimeEditToolbar extends BaseElement
     /**
      * @return the list of coeditors listed directly on the toolbar
      */
-    public List<Coeditor> getVisibleCoeditors()
+    public List<CoeditorElement> getVisibleCoeditors()
     {
         return getDriver().findElements(By.cssSelector(".realtime-edit-toolbar .realtime-users .realtime-user"))
-            .stream().map(Coeditor::new).toList();
+            .stream().map(CoeditorElement::new).toList();
     }
 
     /**
@@ -154,12 +152,12 @@ public class RealtimeEditToolbar extends BaseElement
      * @param coeditorId the coeditor identifier
      * @return this instance
      */
-    public Coeditor waitForCoeditor(String coeditorId)
+    public CoeditorElement waitForCoeditor(String coeditorId)
     {
         By coeditorSelector = By.cssSelector(".realtime-edit-toolbar .realtime-user[data-id='" + coeditorId + "']");
         // The coeditor can be either displayed directly on the toolbar or hidden in the dropdown.
         getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(coeditorSelector));
-        return new Coeditor(getDriver().findElement(coeditorSelector));
+        return new CoeditorElement(getDriver().findElement(coeditorSelector));
     }
 
     /**
@@ -168,7 +166,7 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public boolean isEditingAlone()
     {
-        List<Coeditor> visibleCoeditors = getVisibleCoeditors();
+        List<CoeditorElement> visibleCoeditors = getVisibleCoeditors();
         return visibleCoeditors.size() == 1 && visibleCoeditors.get(0).getId().equals(getUserId());
     }
 
@@ -249,5 +247,13 @@ public class RealtimeEditToolbar extends BaseElement
             toggle.click();
         }
         return this;
+    }
+
+    /**
+     * @return the dropdown listing recent versions of the edited document, and the "Summarize Changes" action
+     */
+    public HistoryDropdown getHistoryDropdown()
+    {
+        return new HistoryDropdown();
     }
 }

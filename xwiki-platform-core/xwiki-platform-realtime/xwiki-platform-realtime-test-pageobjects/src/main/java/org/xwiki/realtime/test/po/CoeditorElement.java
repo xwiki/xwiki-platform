@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * @since 16.10.6
  * @since 17.3.0RC1
  */
-public class Coeditor extends BaseElement
+public class CoeditorElement extends BaseElement
 {
     private WebElement container;
 
@@ -39,7 +39,7 @@ public class Coeditor extends BaseElement
      * 
      * @param container the WebElement used to display the coeditor
      */
-    public Coeditor(WebElement container)
+    public CoeditorElement(WebElement container)
     {
         this.container = container;
     }

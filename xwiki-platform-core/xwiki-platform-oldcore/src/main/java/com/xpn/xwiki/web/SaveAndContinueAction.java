@@ -20,7 +20,6 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -32,7 +31,6 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -52,16 +50,6 @@ public class SaveAndContinueAction extends XWikiAction
 
     /** Key for storing the wrapped action in the context. */
     private static final String WRAPPED_ACTION_CONTEXT_KEY = "SaveAndContinueAction.wrappedAction";
-
-    /**
-     * The key to retrieve the saved object version from the context.
-     */
-    private static final String SAVED_OBJECT_VERSION_KEY = "SaveAction.savedObjectVersion";
-
-    /**
-     * The context key to know if a document has been merged for saving it.
-     */
-    private static final String MERGED_DOCUMENTS = "SaveAction.mergedDocuments";
 
     /**
      * The default context value to put with {@link #MERGED_DOCUMENTS} key.
@@ -175,15 +163,10 @@ public class SaveAndContinueAction extends XWikiAction
 
         // If this is an ajax request, no need to redirect.
         if (isAjaxRequest) {
-            Version newVersion = (Version) context.get(SAVED_OBJECT_VERSION_KEY);
-
-            // in case of property update, SaveAction has not been called, so we don't get the new version.
-            if (newVersion != null) {
-                Map<String, String> jsonAnswer = new LinkedHashMap<>();
-                jsonAnswer.put("newVersion", newVersion.toString());
-                if (MERGED_DOCUMENTS_VALUE.equals(context.get(MERGED_DOCUMENTS))) {
-                    jsonAnswer.put("mergedDocument", MERGED_DOCUMENTS_VALUE);
-                }
+            @SuppressWarnings("unchecked")
+            Map<String, String> jsonAnswer = (Map<String, String>) context.get(SaveAction.JSON_ANSWER_KEY);
+            // In case of property update, SaveAction is not called, so there's no JSON answer.
+            if (jsonAnswer != null) {
                 answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
             } else {
                 context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);

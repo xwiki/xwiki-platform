@@ -272,12 +272,23 @@ define('xwiki-realtime-toolbar', [
       if (!this._lastReviewedVersion) {
         this._lastReviewedVersion = version.number;
       }
-      const versions = this._toolbar.querySelectorAll('.realtime-version');
+      // Make sure we don't add the same version twice. This can happen if some of the previous versions were deleted
+      // and their version numbers are being reused.
+      const versions = [...this._toolbar.querySelectorAll('.realtime-version')].filter(existingVersion => {
+        if (JSON.parse(existingVersion.dataset.version).number === version.number) {
+          // The version element is wrapped in a list item element, that we need to remove as well.
+          existingVersion.parentElement.remove();
+          return false;
+        }
+        return true;
+      });
+      // Limit the number of versions shown in the dropdown.
       const limit = Number.parseInt(this._toolbar.querySelector('.realtime-versions').dataset.limit) || 5;
       if (versions.length >= limit) {
-        // The version element is wrapped in a list item element.
+        // The version element is wrapped in a list item element, that we need to remove as well.
         versions[0].parentElement.remove();
       }
+      // Insert the new version.
       const versionWrapper = this._createVersionElement(version);
       this._toolbar.querySelector('.realtime-versions > .divider').before(versionWrapper);
     }

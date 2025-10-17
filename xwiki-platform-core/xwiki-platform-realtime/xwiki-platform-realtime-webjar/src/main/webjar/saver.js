@@ -667,8 +667,11 @@ define('xwiki-realtime-saver', [
     _afterSave({newVersion}) {
       if (newVersion === '1.1') {
         debug('Created document version 1.1');
-      } else {
+      } else if (newVersion) {
         debug(`Version bumped from ${xwikiDocument.version} to ${newVersion}.`);
+      } else {
+        // There's no new version because there were no changes.
+        return;
       }
       this._state.version = newVersion;
       this._config.onCreateVersion({

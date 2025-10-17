@@ -309,24 +309,6 @@ Object.extend(XWiki, {
   },
 
   /**
-   * Add click listeners on all rendereing error messages to let the user read the detailed error description.
-   * If a content is passed, add click listener for errors reported in this content (usefull for AJAX requests response)
-   * Otherwise make all the document's body errors expandable.
-   */
-  makeRenderingErrorsExpandable: function(content) {
-    $(content || 'body').select(".xwikirenderingerror").each(function(error) {
-        var description = error.next(".xwikirenderingerrordescription");
-        if(description.innerHTML !== "" && description.hasClassName("xwikirenderingerrordescription")) {
-            error.style.cursor="pointer";
-            error.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
-            Event.observe(error, "click", function(event){
-                   event.element().closest(".xwikirenderingerror").next(".xwikirenderingerrordescription").toggleClassName("hidden");
-            });
-        }
-    });
-  },
-
-  /**
    * Make links marked with rel="external" in an external window and sets the target attribute to any
    * rel attribute starting with "_". Note that We need to do this in Javascript
    * as opposed to using target="_blank" since the target attribute is not valid XHTML.
@@ -551,7 +533,6 @@ Object.extend(XWiki, {
   _addBehaviour: function(container) {
     container = container || $('body');
 
-    this.makeRenderingErrorsExpandable(container);
     this.fixLinksTargetAttribute(container);
     this.insertSectionEditLinks(container);
     this.registerPanelToggle(container);
@@ -1849,6 +1830,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
         if (XWiki.docsyntax !== "xwiki/1.0" && XWiki.contextaction === "view" && XWiki.hasEdit) {
             $(rootElement).find('span.wikicreatelink:not(.skipCreatePagePopup) a').on('click', loadCreateModal);
         }
+        makeRenderingErrorsExpandable(rootElement);
     }
 
     function loadCreateModal(event) {
@@ -1879,6 +1861,34 @@ require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
         }).fail(function (data) {
             notification.replace(new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.ajax.error'))", 'error', {inactive: true}));
         })
+    }
+
+    /**
+     * Add click listeners on all rendering error messages to let the user read the detailed error description.
+     * If a content is passed, add click listener for errors reported in this content (useful for AJAX requests response)
+     * Otherwise make all the document's body errors expandable.
+     */
+    function makeRenderingErrorsExpandable(content) {
+        $(content || 'body').find('.xwikirenderingerror').each(function (index) {
+            let error = $(this);
+            let description = error.next(".xwikirenderingerrordescription");
+            if (description.innerHTML !== "" && description.hasClass("xwikirenderingerrordescription")) {
+                error.attr('id', 'xwikirenderingerror-' + index);
+                error.attr('role', 'button');
+                description.attr('id', 'xwikirenderingerrordescription-' + index);
+                error.attr('aria-controls', 'xwikirenderingerrordescription-' + index);
+                error.attr('aria-expanded', false);
+                let buttonDescription = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))"
+                error.attr('title', buttonDescription);
+                error.on("click", function () {
+                    // Toggle both the description class and the aria-expanded attribute of the button.
+                    let error = $(this);
+                    let description = error.next('.xwikirenderingerrordescription');
+                    description.toggleClass("hidden");
+                    error.attr('aria-expanded', error.attr('aria-expanded') === 'true' ? 'false' : 'true')
+                });
+            }
+        });
     }
 
     $(document).on('xwiki:dom:updated', (event, data) => {

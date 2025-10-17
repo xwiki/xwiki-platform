@@ -22,6 +22,7 @@ package org.xwiki.administration.test.ui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.CreateGroupModal;
 import org.xwiki.administration.test.po.DeleteUserConfirmationModal;
@@ -32,12 +33,16 @@ import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.administration.test.po.UsersAdministrationSectionPage;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ConfirmationModal;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.EditRightsPane;
+import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 
@@ -447,5 +452,136 @@ class UsersGroupsRightsManagementIT
             deleteUserConfirmationModal.getScriptRightUserErrorMessageHrefValue());
         deleteUserConfirmationModal.clickOk();
         assertEquals(0, usersPage.getUsersLiveData().getTableLayout().countRows());
+    }
+
+    @ParameterizedTest
+    @Order(9)
+    @WikisSource(extensions = { "org.xwiki.platform:xwiki-platform-administration-ui" })
+    void renameUserUpdatesGroupAndRights(WikiReference wiki, TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setCurrentWiki(wiki.getName());
+        String userName = "userToRename";
+        String newUserName = "renamedUser";
+        String groupName = "groupForRenamedUser";
+        DocumentReference userRef = new DocumentReference(wiki.getName(), "XWiki", userName);
+        // Ensure the user and group doesn't exist yet.
+        setup.deletePage("XWiki", userName);
+        setup.deletePage("XWiki", newUserName);
+        setup.deletePage("XWiki", groupName);
+
+        // Create user, group and put the user has member of the group.
+        setup.createUser(userName, userName, "");
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        groupsPage = groupsPage.addNewGroup(groupName);
+        groupsPage.clickEditGroup(groupName).addMember(userName, true).close();
+
+        // Give "view" global right to the user on wiki.
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        EditRightsPane editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
+        editRightsPane.switchToUsers();
+        assertTrue(editRightsPane.hasEntity(userName));
+        editRightsPane.setRight(userName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+
+        // Rename the user.
+        ViewPage userProfile = setup.gotoPage(userRef);
+        RenamePage rename = userProfile.rename();
+        rename.getDocumentPicker().setTitle(newUserName);
+        rename.setTerminal(true);
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = rename.clickRenameButton();
+        renameStatusPage.waitUntilFinished();
+
+        // Verify the user has been renamed.
+        UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
+        TableLayoutElement usersTable = usersPage.getUsersLiveData().getTableLayout();
+        usersTable.filterColumn("User", userName);
+        assertEquals(0, usersTable.countRows());
+        usersTable.filterColumn("User", newUserName);
+        usersTable.assertRow("User", newUserName);
+
+        // Verify the group has been updated with the new user name.
+        groupsPage = GroupsPage.gotoPage();
+        EditGroupModal editGroupModal = groupsPage.clickEditGroup(groupName);
+        TableLayoutElement membersTable = editGroupModal.getMembersTable();
+        membersTable.filterColumn("Member", userName);
+        assertEquals(0, membersTable.countRows());
+        membersTable.filterColumn("Member", newUserName);
+        membersTable.assertRow("Member", newUserName);
+        editGroupModal.close();
+
+        // Verify the global rights have been updated with the new user name.
+        administrationPage = AdministrationPage.gotoPage();
+        editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
+        editRightsPane.switchToUsers();
+        assertFalse(editRightsPane.hasEntity(userName));
+        assertTrue(editRightsPane.hasEntity(newUserName));
+        assertEquals(EditRightsPane.State.ALLOW, editRightsPane.getRight(newUserName, EditRightsPane.Right.VIEW));
+        // Reset the right to avoid interference with other tests.
+        editRightsPane.setRight(newUserName, EditRightsPane.Right.VIEW, EditRightsPane.State.NONE);
+    }
+
+    @ParameterizedTest
+    @Order(10)
+    @WikisSource(extensions = { "org.xwiki.platform:xwiki-platform-administration-ui" })
+    void renameGroupUpdatesGroupsAndRights(WikiReference wiki, TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setCurrentWiki(wiki.getName());
+        String groupName = "groupToRename";
+        String newGroupName = "renamedGroupName";
+        String parentGroupName = "parentGroupForRenamedGroup";
+        DocumentReference groupRef = new DocumentReference(wiki.getName(), "XWiki", groupName);
+        // Ensure the group doesn't exist yet.
+        setup.deletePage("XWiki", groupName);
+        setup.deletePage("XWiki", newGroupName);
+        setup.deletePage("XWiki", parentGroupName);
+
+        // create groups and put one group as member of the other group.
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        groupsPage.addNewGroup(groupName).addNewGroup(parentGroupName);
+        groupsPage.clickEditGroup(parentGroupName).addMember(groupName, false).close();
+
+        // Give "view" global right to the group on wiki.
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        EditRightsPane editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
+        editRightsPane.switchToGroups();
+        assertTrue(editRightsPane.hasEntity(groupName));
+        editRightsPane.setRight(groupName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+
+        // Rename the group.
+        ViewPage groupPage = setup.gotoPage(groupRef);
+        RenamePage rename = groupPage.rename();
+        rename.getDocumentPicker().setTitle(newGroupName);
+        rename.setTerminal(true);
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = rename.clickRenameButton();
+        renameStatusPage.waitUntilFinished();
+
+        // Verify the group has been renamed.
+        groupsPage = GroupsPage.gotoPage();
+        TableLayoutElement groupsTable = groupsPage.getGroupsTable();
+        groupsTable.filterColumn("Group Name", groupName);
+        assertEquals(0, groupsTable.countRows());
+        groupsTable.filterColumn("Group Name", newGroupName);
+        groupsTable.assertRow("Group Name", newGroupName);
+
+        // Verify the global rights have been updated with the new group name.
+        administrationPage = AdministrationPage.gotoPage();
+        editRightsPane = administrationPage.clickGlobalRightsSection().getEditRightsPane();
+        editRightsPane.switchToGroups();
+        assertFalse(editRightsPane.hasEntity(groupName));
+        assertTrue(editRightsPane.hasEntity(newGroupName));
+        assertEquals(EditRightsPane.State.ALLOW, editRightsPane.getRight(newGroupName, EditRightsPane.Right.VIEW));
+        // Reset the right to avoid interference with other tests.
+        editRightsPane.setRight(newGroupName, EditRightsPane.Right.VIEW, EditRightsPane.State.NONE);
+
+        // Verify the parent group has been updated with the new group name.
+        groupsPage = GroupsPage.gotoPage();
+        EditGroupModal editGroupModal = groupsPage.clickEditGroup(parentGroupName);
+        TableLayoutElement membersTable = editGroupModal.getMembersTable();
+        membersTable.filterColumn("Member", groupName);
+        assertEquals(0, membersTable.countRows());
+        membersTable.filterColumn("Member", newGroupName);
+        membersTable.assertRow("Member", newGroupName);
+        editGroupModal.close();
     }
 }

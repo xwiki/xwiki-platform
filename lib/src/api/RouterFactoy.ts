@@ -18,18 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DefaultCristalApp } from "./components/DefaultCristalApp";
-import { CristalAppLoader } from "./components/cristalAppLoader";
-import {
-  conditionalComponentsList,
-  defaultComponentsList,
-} from "./default/defaultComponentsList";
-import type { RouterFactory } from "./api/RouterFactoy";
+import type { RouteRecordRaw, Router } from "vue-router";
 
-export {
-  CristalAppLoader,
-  DefaultCristalApp,
-  conditionalComponentsList,
-  defaultComponentsList,
-};
+/**
+ * A factory to initialize an instance of Vue router.
+ * By default, no implementation is provided. If there is one available,
+ * it will be used instead of the default initialization. Use the
+ * "RouterFactory" role to bind your custom implementation.
+ * @since 0.23
+ * @beta
+ */
+interface RouterFactory {
+  initializeRouter(routes: RouteRecordRaw[]): Router;
+}
+
 export type { RouterFactory };

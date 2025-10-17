@@ -19,6 +19,7 @@ import { LoggerConfig } from '@xwiki/cristal-api';
 import { PageData } from '@xwiki/cristal-api';
 import { Ref } from 'vue';
 import { Router } from 'vue-router';
+import { RouteRecordRaw } from 'vue-router';
 import { SkinManager } from '@xwiki/cristal-api';
 import { VueTemplateProvider } from '@xwiki/cristal-skin';
 import { WikiConfig } from '@xwiki/cristal-api';
@@ -103,6 +104,8 @@ export class DefaultCristalApp implements CristalApp {
     // (undocumented)
     handlePopState(name: string, revision?: string): void;
     // (undocumented)
+    initializeRouter(routes: RouteRecordRaw[]): Router;
+    // (undocumented)
     isElectron: boolean;
     loadPage(options?: {
         requeue: boolean;
@@ -137,6 +140,12 @@ export class DefaultCristalApp implements CristalApp {
     vueTemplateProviders: VueTemplateProvider[];
     // (undocumented)
     wikiConfig: WikiConfig;
+}
+
+// @beta
+export interface RouterFactory {
+    // (undocumented)
+    initializeRouter(routes: RouteRecordRaw[]): Router;
 }
 
 // (No @packageDocumentation comment for this package)

@@ -29,6 +29,7 @@ import { createPinia } from "pinia";
 import { createApp } from "vue";
 import { createI18n } from "vue-i18n";
 import { createRouter, createWebHashHistory } from "vue-router";
+import type { RouterFactory } from "../api/RouterFactoy";
 import type {
   CristalApp,
   Logger,
@@ -382,18 +383,13 @@ export class DefaultCristalApp implements CristalApp {
       } as RouteRecordRaw,
     ];
 
-    this.router = createRouter({
-      /*
-       4. Provide the history implementation to use. We are using the hash
-       history for simplicity here. See
-       https://router.vuejs.org/guide/essentials/history-mode.html for more
-       details. The hash history is not the best for SEO, but does not require
-       anything special server-side (which is good for partability), and works
-       well with electron.
-      */
-      history: createWebHashHistory(),
-      routes,
-    });
+    if (this.container.isBound("RouterFactory")) {
+      this.router = this.container
+        .get<RouterFactory>("RouterFactory")
+        .initializeRouter(routes);
+    } else {
+      this.router = this.initializeRouter(routes);
+    }
 
     this.app = createApp(Index)
       .use(this.router)
@@ -457,12 +453,30 @@ export class DefaultCristalApp implements CristalApp {
     });
 
     this.logger?.debug("After vue");
+  }
+
+  initializeRouter(routes: RouteRecordRaw[]): Router {
+    const router = createRouter({
+      /*
+       4. Provide the history implementation to use. We are using the hash
+       history for simplicity here. See
+       https://router.vuejs.org/guide/essentials/history-mode.html for more
+       details. The hash history is not the best for SEO, but does not require
+       anything special server-side (which is good for partability), and works
+       well with electron.
+      */
+      history: createWebHashHistory(),
+      routes,
+    });
+
     this.logger?.debug("Replacing state in history " + this.getCurrentPage());
     history.replaceState(
       { page: this.getCurrentPage() },
       "",
       "/" + this.wikiConfig.name + "/#/" + this.getCurrentPage() + "/view",
     );
+
+    return router;
   }
 
   getMenuEntries(): Array<string> {

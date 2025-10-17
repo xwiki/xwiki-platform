@@ -605,12 +605,6 @@ body &gt; .selectize-dropdown {
   padding: .5em;
 }
 
-/* The 'skin-flamingo' class name is removed from the body element in full-screen mode so we need to fix the auto-save
-  styles. */
-.cke_maximized #autosaveControl input.autosave-interval {
-  width: 3em;
-}
-
 /* Make sure the notifications (e.g. for Save &amp; Continue action) and the modals (e.g. for expired session) are visible
   when editing in full-screen mode. */
 body[data-maximized] .xnotification-container,

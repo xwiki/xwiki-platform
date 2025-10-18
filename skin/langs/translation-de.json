@@ -17,5 +17,8 @@
     "page.creation.menu.alert.content.edit.link": "die bestehende Seite bearbeiten",
     "page.creation.menu.field.location.help": "Übergeordnete Seite der neuen Seite",
     "page.creation.menu.field.name.help": "Name der neuen Seite",
-    "page.creation.menu.cancel": "Abbrechen"
+    "page.creation.menu.cancel": "Abbrechen",
+    "admin.home.title": "Einstellungen: Startseite",
+    "admin.instance.title": "Instanzverwaltung",
+    "admin.back.button": "Zurück zu Wiki"
 }

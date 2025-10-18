@@ -32,5 +32,11 @@
     "settings.configurations.edit.storageroot.help": "Der Speicherort im Backend, wo die Ressourcen abgelegt werden.",
     "settings.configurations.edit.realtimeurl.help": "URL zum Echtzeitserver.",
     "settings.configurations.edit.authenticationbaseurl.help": "Basis-URL zum Authentifizierungs-Bridge-Server.",
-    "settings.configurations.edit.editor.help": "Standard-Editor, der mit dieser Konfiguration verwendet wird."
+    "settings.configurations.edit.editor.help": "Standard-Editor, der mit dieser Konfiguration verwendet wird.",
+    "settings.configurations.new": "Neue Konfiguration",
+    "settings.configurations.select": "Konfiguration auswählen",
+    "settings.configurations.current.title": "Aktuelle Konfiguration",
+    "settings.configurations.table.header.ds": "Designsystem",
+    "settings.configurations.in-use": "In Gebrauch",
+    "settings.configurations.available.title": "Verfügbare Konfigurationen"
 }

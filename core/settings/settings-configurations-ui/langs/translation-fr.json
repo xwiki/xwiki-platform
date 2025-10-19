@@ -32,5 +32,11 @@
     "settings.configurations.edit.authenticationbaseurl.help": "URL de base vers le serveur passerelle d'authentification.",
     "settings.configurations.edit.editor.label": "Éditeur",
     "settings.configurations.edit.editor.help": "Éditeur à utiliser par défaut avec cette configuration.",
-    "settings.configurations.edit.submit": "Enregistrer"
+    "settings.configurations.edit.submit": "Enregistrer",
+    "settings.configurations.table.header.ds": "Design System",
+    "settings.configurations.new": "Nouvelle configuration",
+    "settings.configurations.select": "Sélectionner la configuration",
+    "settings.configurations.available.title": "Configurations disponibles",
+    "settings.configurations.current.title": "Configuration actuelle",
+    "settings.configurations.in-use": "Utilisé"
 }

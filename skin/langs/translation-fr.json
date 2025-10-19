@@ -17,5 +17,8 @@
     "information.extraTabs.title": "Informations",
     "history.alert.content": "Vous consultez actuellement la version {revision} de la page {pageName}. La modification est désactivée.",
     "history.alert.link.label": "Cliquez ici pour retourner à la dernière version.",
-    "article.loading": "Chargement en cours..."
+    "article.loading": "Chargement en cours...",
+    "admin.back.button": "Retour au Wiki",
+    "admin.instance.title": "Administration de l'instance",
+    "admin.home.title": "Paramètres : Accueil"
 }

@@ -27,7 +27,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * Represents a document version listed in the history dropdown from the realtime editing toolbar.
  * 
  * @version $Id$
- * @since 17.9.0RC1
+ * @since 17.9.0
  * @since 17.4.6
  * @since 16.10.13
  */

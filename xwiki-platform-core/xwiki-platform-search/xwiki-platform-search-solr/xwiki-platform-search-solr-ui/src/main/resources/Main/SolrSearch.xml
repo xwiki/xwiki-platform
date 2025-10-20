@@ -686,7 +686,7 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 
 .search-facets-header,
 .search-facets-actions {
-  padding: .5em 1em;
+  padding: .5em 0;
 }
 
 .search-facet {

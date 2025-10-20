@@ -1,10 +1,9 @@
-#template('colorThemeInit.vm')
 .paginationFilter {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
   gap: .5rem;
-  padding: 2px 0 5px 5px;
+  padding: 1em 0 5px 5px;
 }
 
 /* Show the status of the current page. */

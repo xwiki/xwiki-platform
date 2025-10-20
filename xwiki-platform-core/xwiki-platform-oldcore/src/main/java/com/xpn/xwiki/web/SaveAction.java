@@ -307,13 +307,17 @@ public class SaveAction extends EditAction
             // We take the version summary comment from the document being saved because it may have been modified by an
             // event listener after it was copied from the EditForm by the call to readFromForm.
             xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
-
-            // Return the new version number to the editor that triggered the save.
-            jsonAnswer.put("newVersion", tdoc.getRCSVersion().toString());
         } else {
             // Let the editor know that the document was not saved because there were no changes.
             jsonAnswer.put("noChanges", "true");
         }
+
+        // Return the latest version number to the editor that triggered the save. We do this even if we didn't create a
+        // new revision because the editor may have an outdated version number. This can happen for instance if two
+        // users save the same document state one after the other (either because both didn't make any changes, or
+        // because both made the same changes). Having an up-to-date version number is important for properly detecting
+        // and handling merge conflicts on save.
+        jsonAnswer.put("newVersion", tdoc.getRCSVersion().toString());
 
         // Cleanup temporary attachments that were uploaded while editing the document. We do this even if we didn't
         // create a new revision (e.g. if there were no changes) because those attachments are not needed anymore (e.g.

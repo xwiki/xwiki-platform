@@ -269,6 +269,7 @@
 {{velocity}}
 #macro(displayMember $member)
 $member.id#if ($member.id == $remoteObservation.id) //({{translation key="observation.remote.admin.channel.leader.current"/}})//#end
+
 #end
 #set($remoteObservation = $services.observation.remote)
 ; {{translation key="observation.remote.admin.id"/}}

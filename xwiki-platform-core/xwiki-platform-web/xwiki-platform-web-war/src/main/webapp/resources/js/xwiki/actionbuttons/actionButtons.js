@@ -23,24 +23,15 @@
 
 var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
-  var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
+  const actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
-  // we need to handle the creation of document
-  var currentDocument;
-  var editingVersionDateField = $('editingVersionDate');
-  var previousVersionField = $('previousVersion');
-  var isNewField = $('isNew');
-
-  var refreshVersion = function (event) {
-    if (currentDocument.equals(event.memo.documentReference)) {
-      if (previousVersionField) {
-        previousVersionField.setValue(event.memo.version);
-      }
-      if (isNewField) {
-        isNewField.setValue(false);
-      }
+  function refreshVersion(event) {
+    if (XWiki.currentDocument.documentReference.equals(event.memo.documentReference)) {
+      $('previousVersion')?.setValue(event.memo.version);
+      $('editingVersionDate')?.setValue(Date.now());
+      $('isNew')?.setValue(false);
     }
-  };
+  }
 
   /**
    * Allow custom validation messages to be set on the validated field usin data attributes.
@@ -408,11 +399,6 @@ var XWiki = (function(XWiki) {
         require(['xwiki-meta'], function (xm) {
           xm.setVersion(response.responseJSON.newVersion);
         });
-
-        // We only update this field since the other ones are updated by the callback of setVersion.
-        if (editingVersionDateField) {
-          editingVersionDateField.setValue(Date.now());
-        }
       }
 
       // Announce that the document has been saved.
@@ -808,10 +794,6 @@ var XWiki = (function(XWiki) {
   });
 
   function init() {
-    require(['xwiki-meta'], function (xm) {
-      currentDocument = xm.documentReference;
-    });
-
     new actionButtons.EditActions();
     new actionButtons.AjaxSaveAndContinue();
     return true;

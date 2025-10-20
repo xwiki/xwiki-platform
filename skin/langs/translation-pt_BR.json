@@ -14,5 +14,8 @@
     "page.creation.menu.submit": "Criar",
     "page.creation.menu.title": "Nova Página",
     "page.edited.details": "Editada em {date}",
-    "page.edited.details.user": "{user} editou em {date}"
+    "page.edited.details.user": "{user} editou em {date}",
+    "page.creation.menu.field.location.help": "Pai para a nova página",
+    "page.creation.menu.field.name.help": "Nome da página",
+    "admin.back.button": "Voltar à Wiki"
 }

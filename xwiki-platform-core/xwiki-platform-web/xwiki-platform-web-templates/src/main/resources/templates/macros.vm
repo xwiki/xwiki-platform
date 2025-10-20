@@ -2202,7 +2202,7 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
- * @since 17.9.0RC1
+ * @since 17.9.0
  * @internal
  *#
 #macro(_paginationDisplay $parameters)
@@ -2238,7 +2238,7 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
- * @since 17.9.0RC1
+ * @since 17.9.0
  * @internal
  *#
 #macro(_paginationPages $parameters)
@@ -2282,7 +2282,7 @@ $displayName##
   </span>
 #end
 #**
-* @since 17.9.0RC1
+* @since 17.9.0
 * @internal
 *#
 #macro (_paginationPageURL $firstItem $params)
@@ -2296,7 +2296,7 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
- * @since 17.9.0RC1
+ * @since 17.9.0
  * @internal
  *#
 #macro(_paginationPageLink $pageNumber $parameters)
@@ -2318,7 +2318,7 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
- * @since 17.9.0RC1
+ * @since 17.9.0
  * @internal
  *#
 #macro(_paginationControl $parameters)
@@ -2333,7 +2333,7 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
- * @since 17.9.0RC1
+ * @since 17.9.0
  * @internal
  *#
 #macro(_paginationControlLeft $parameters)
@@ -2357,7 +2357,7 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
- * @since 17.9.0RC1
+ * @since 17.9.0
  * @internal
  *#
 #macro(_paginationControlRight $parameters)

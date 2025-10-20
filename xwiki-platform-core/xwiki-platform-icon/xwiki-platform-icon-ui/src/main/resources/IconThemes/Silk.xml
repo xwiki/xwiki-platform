@@ -200,7 +200,7 @@ fast-backward = control_rewind
 arrow_in = arrow_in
 reposition = reposition
 
-## Since 17.9.0RC1
+## Since 17.9.0
 sort-ascending = arrow_up
 sort-descending = arrow_down
 

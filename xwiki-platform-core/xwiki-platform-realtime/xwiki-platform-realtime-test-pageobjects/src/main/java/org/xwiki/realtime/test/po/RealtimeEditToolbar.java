@@ -237,15 +237,20 @@ public class RealtimeEditToolbar extends BaseElement
     public RealtimeEditToolbar waitForConcurrentEditingWarning()
     {
         String toggleSelector = "button.realtime-warning[data-toggle=\"popover\"]";
-        getDriver().waitUntilElementIsVisible(By.cssSelector(toggleSelector));
         String popoverSelector = toggleSelector + " + .popover";
-        if (!getDriver().findElementsWithoutWaiting(By.cssSelector(popoverSelector)).isEmpty()) {
-            // The popover is displayed. Let's hide it as it can cover other UI elements.
-            WebElement toggle = getDriver().findElementWithoutWaiting(By.cssSelector(toggleSelector));
-            // We have to click twice because the popover was displayed without focusing the toggle.
-            toggle.click();
-            toggle.click();
-        }
+
+        // Wait for the popover to be fully displayed, because it uses a fade-in animation.
+        getDriver().waitUntilElementIsVisible(By.cssSelector(popoverSelector + ".fade.in"));
+
+        // Hide the popover because it can cover other UI elements.
+        WebElement toggle = getDriver().findElementWithoutWaiting(By.cssSelector(toggleSelector));
+        // We have to click twice because the popover was displayed without focusing the toggle.
+        toggle.click();
+        toggle.click();
+
+        // Wait for the popover to be fully hidden, because it uses a fade-out animation.
+        getDriver().waitUntilCondition(ExpectedConditions.numberOfElementsToBe(By.cssSelector(popoverSelector), 0));
+
         return this;
     }
 

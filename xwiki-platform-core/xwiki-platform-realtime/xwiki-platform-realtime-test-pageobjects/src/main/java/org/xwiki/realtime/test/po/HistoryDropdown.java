@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * The dropdown that lists recent versions of the edited document.
  * 
  * @version $Id$
- * @since 17.9.0RC1
+ * @since 17.9.0
  * @since 17.4.6
  * @since 16.10.13
  */

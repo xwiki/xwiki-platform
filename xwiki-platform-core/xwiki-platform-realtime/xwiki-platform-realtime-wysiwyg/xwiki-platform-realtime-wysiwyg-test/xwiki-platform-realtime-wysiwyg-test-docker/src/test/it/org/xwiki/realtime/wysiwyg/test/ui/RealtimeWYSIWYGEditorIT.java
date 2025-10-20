@@ -2433,8 +2433,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals(2, versions.size());
 
         firstTextArea.sendKeys(Keys.END, " two");
-        ViewPage viewPage = firstEditPage.clickDone();
-        assertEquals("one two", viewPage.getContent());
+        assertEquals("one two", firstEditPage.clickDone().getContent());
 
         //
         // Second Tab
@@ -2496,6 +2495,93 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("3.1", historyPane.getCurrentVersion());
         assertEquals("superadmin", historyPane.getCurrentAuthor());
         assertEquals("Another empty revision", historyPane.getCurrentVersionComment());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        // Edit again to verify that the latest version is returned even when there are no changes. The plan is to save
+        // the same document state with both users, before making any changes and after making the same changes.
+        inplaceEditablePage = RealtimeInplaceEditablePage.gotoPage(testReference);
+        inplaceEditablePage.editInplace();
+        secondEditor = new RealtimeCKEditor();
+        secondTextArea = secondEditor.getRichTextArea();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        firstEditor = firstEditPage.getContenEditor();
+        firstTextArea = firstEditor.getRichTextArea();
+
+        // Verify that there is a single revision listed in the history dropdown.
+        versions = historyDropdown.open().getVersions();
+        assertEquals(1, versions.size());
+        assertEquals("3.1", versions.get(0).getNumber());
+        assertEquals("Su", versions.get(0).getAuthor().getAbbreviation());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        // Focus the editing area to get the floating toolbar.
+        secondTextArea.click();
+        secondEditor.getToolBar().toggleSourceMode();
+        // Close the concurrent editing warning popover because it may cover other UI elements (like the Save button if
+        // the window width is too small for the toolbar to fit in a single line).
+        inplaceEditablePage.getToolbar().waitForConcurrentEditingWarning();
+        // Save without making any changes.
+        inplaceEditablePage.save();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Save without making any changes.
+        firstEditPage.getToolbar().sendSaveShortcutKey();
+        // Verify that we have two revisions listed in the history dropdown.
+        versions = historyDropdown.open().getVersions();
+        assertEquals(2, versions.size());
+        assertEquals("3.2", versions.get(1).getNumber());
+        // The save action doesn't return the latest revision author so we assume the current user is the author.
+        assertEquals("Su", versions.get(1).getAuthor().getAbbreviation());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        // Make some changes and save. We'll do the same changes in the first tab afterwards.
+        secondEditor.getSourceTextArea().sendKeys(Keys.END, " three");
+        inplaceEditablePage.save();
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Make the same changes and save.
+        firstTextArea.sendKeys(Keys.END, " three");
+        firstEditPage.getToolbar().sendSaveShortcutKey();
+        // Verify that we have three revisions listed in the history dropdown.
+        versions = historyDropdown.open().getVersions();
+        assertEquals(3, versions.size());
+        assertEquals("3.3", versions.get(2).getNumber());
+        // Again, the current user is not the real author of the new revision but the save action doesn't help us.
+        assertEquals("Su", versions.get(2).getAuthor().getAbbreviation());
+
+        // Make some more changes to verify we don't get a merge conflict.
+        firstTextArea.clear();
+        firstTextArea.sendKeys("final");
+        historyPane = firstEditPage.clickDone().openHistoryDocExtraPane().showMinorEdits();
+        assertEquals(8, historyPane.getNumberOfVersions());
+        assertEquals("4.1", historyPane.getCurrentVersion());
+        assertEquals("superadmin", historyPane.getCurrentAuthor());
     }
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)

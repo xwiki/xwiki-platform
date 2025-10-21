@@ -1,5 +1,17 @@
 # @xwiki/cristal-hierarchy-api
 
+## 0.23.0
+
+### Minor Changes
+
+- Cristal 0.23 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.23.0
+  - @xwiki/cristal-model-api@0.23.0
+
 ## 0.22.0
 
 ### Minor Changes

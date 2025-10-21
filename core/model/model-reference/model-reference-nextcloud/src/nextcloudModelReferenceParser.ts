@@ -120,7 +120,7 @@ export class NextcloudModelReferenceParser implements ModelReferenceParser {
             : documentName,
           new SpaceReference(
             undefined,
-            ...segments.slice(0, segments.length - 2),
+            ...segments.slice(0, segments.length - 3),
           ),
         ),
       );

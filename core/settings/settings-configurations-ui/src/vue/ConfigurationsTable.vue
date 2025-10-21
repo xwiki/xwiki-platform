@@ -142,7 +142,7 @@ function isEditable(configName: string): boolean {
     :title="t('settings.configurations.new')"
   >
     <template #activator>
-      <x-btn variant="primary">
+      <x-btn id="new-configuration-button" variant="primary">
         <c-icon name="plus"></c-icon>
         {{ t("settings.configurations.new") }}</x-btn
       >

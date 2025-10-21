@@ -265,6 +265,9 @@ configs.forEach(
       const sidebar = new SidebarPageObject(page);
       await sidebar.openSidebar();
       await page.locator(".bi-gear").nth(0).click();
+      await sidebar.hideSidebar();
+
+      await page.locator("#new-configuration-button").nth(0).click();
 
       const configurationForm = new FormPageObject(
         page,
@@ -283,7 +286,7 @@ configs.forEach(
       ).toBeVisible();
       const configurationEditForm = new FormPageObject(
         page,
-        page.locator("form").filter({ visible: true }).nth(1),
+        page.locator("form").filter({ visible: true }).nth(0),
         designSystem,
       );
 
@@ -292,12 +295,15 @@ configs.forEach(
         .setValue("shoelace");
       await configurationEditForm.submit();
 
-      const newConfiguration = page.locator(".grid-container >div").last();
-      await expect(newConfiguration.locator(".wiki-name")).toContainText(
+      const newConfiguration = page.locator("table tbody tr").last();
+      await expect(newConfiguration.locator("td").nth(0)).toContainText(
         "Test Configuration",
       );
-      await expect(newConfiguration.locator(".ds-name")).toContainText(
-        "Design System: shoelace",
+      await expect(newConfiguration.locator("td").nth(1)).toContainText(
+        "XWiki",
+      );
+      await expect(newConfiguration.locator("td").nth(2)).toContainText(
+        "shoelace",
       );
 
       // Check exact stored values in local storage.

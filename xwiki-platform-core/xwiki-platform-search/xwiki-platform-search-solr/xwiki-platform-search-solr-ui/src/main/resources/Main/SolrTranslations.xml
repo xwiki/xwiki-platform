@@ -186,7 +186,7 @@ solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
 ## until 7.2RC1
 solr.field.space=Location
 
-## until 17.9.0
+## until 17.10.0RC1
 ## Those translations were composed together, they have been replaced with new keys that follow translation guidelines.
 solr.sortBy=Sort by:
 solr.sortBy.score=Relevance

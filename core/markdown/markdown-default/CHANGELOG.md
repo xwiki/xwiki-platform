@@ -1,5 +1,19 @@
 # @xwiki/cristal-markdown-default
 
+## 0.23.0
+
+### Minor Changes
+
+- Cristal 0.23 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-markdown-api@0.23.0
+  - @xwiki/cristal-model-api@0.23.0
+  - @xwiki/cristal-model-reference-api@0.23.0
+  - @xwiki/cristal-model-remote-url-api@0.23.0
+
 ## 0.22.0
 
 ### Minor Changes

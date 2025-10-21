@@ -1,5 +1,19 @@
 # @xwiki/cristal-electron-preload
 
+## 0.23.0
+
+### Minor Changes
+
+- Cristal 0.23 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-electron-authentication-github-preload@0.23.0
+  - @xwiki/cristal-electron-authentication-nextcloud-preload@0.23.0
+  - @xwiki/cristal-electron-authentication-xwiki-preload@0.23.0
+  - @xwiki/cristal-electron-settings-preload@0.23.0
+
 ## 0.22.0
 
 ### Minor Changes

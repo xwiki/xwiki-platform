@@ -1,5 +1,27 @@
 # @xwiki/cristal-sharedworker-impl
 
+## 0.23.0
+
+### Minor Changes
+
+- Cristal 0.23 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.23.0
+  - @xwiki/cristal-alerts-default@0.23.0
+  - @xwiki/cristal-authentication-default@0.23.0
+  - @xwiki/cristal-backend-dexie@0.23.0
+  - @xwiki/cristal-backend-github@0.23.0
+  - @xwiki/cristal-backend-nextcloud@0.23.0
+  - @xwiki/cristal-backend-xwiki@0.23.0
+  - @xwiki/cristal-configuration-api@0.23.0
+  - @xwiki/cristal-configuration-web@0.23.0
+  - @xwiki/cristal-document-api@0.23.0
+  - @xwiki/cristal-extension-manager@0.23.0
+  - @xwiki/cristal-sharedworker-api@0.23.0
+
 ## 0.22.0
 
 ### Minor Changes

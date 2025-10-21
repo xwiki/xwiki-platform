@@ -202,7 +202,7 @@ fast-backward = fast-backward
 arrow_in = window-minimize
 reposition = arrows
 
-## Since 17.9.0
+## Since 17.10.0RC1
 sort-ascending = sort-amount-asc
 sort-descending = sort-amount-desc
 

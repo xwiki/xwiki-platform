@@ -157,7 +157,7 @@ log-out=user_go
 th=application_view_tile
 reposition=reposition
 
-## Since 17.9.0
+## Since 17.10.0RC1
 sort-ascending = arrow_up
 sort-descending = arrow_down
 

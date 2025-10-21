@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.BaseElement;
  * 
  * @version $Id$
  * @since 17.9.0
- * @since 17.4.6
+ * @since 17.4.7
  * @since 16.10.13
  */
 public class VersionElement extends BaseElement

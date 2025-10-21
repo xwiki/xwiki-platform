@@ -20,12 +20,11 @@
 <template>
   <div class="xwiki-blocknote">
     <suspense>
-      <BlocknoteEditor
+      <BlocknoteEditor v-if="editorContent"
         ref="editor"
         :editor-props
         :editor-content
         :container
-        :realtime-server-u-r-l
         @instant-change="dirty = true"
         @debounced-change="updateValue"
       ></BlocknoteEditor>
@@ -38,28 +37,17 @@
 </template>
 
 <script setup lang="ts">
-// We shouldn't have to import these styles normally, because they are imported by the BlocknoteEditor component, but
-// for some reason Vite doesn't see this and thus doesn't include them in the generated CSS bundle.
-import "@mantine/core/styles.layer.css";
-import "@blocknote/core/fonts/inter.css";
-import "@blocknote/mantine/style.css";
-
 import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
-import { EditorLanguage } from "@xwiki/cristal-editors-blocknote-react";
-import {
-  MarkdownToUniAstConverter,
-  UniAst,
-  UniAstToMarkdownConverter,
-  createConverterContext,
-} from "@xwiki/cristal-uniast";
 import { Container } from "inversify";
-import { computed, inject, ref, shallowRef, useTemplateRef } from "vue";
-import { Logic } from "../services/Logic";
+import { EditorLanguage } from "@xwiki/cristal-editors-blocknote-react";
+import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
+import type { MarkdownToUniAstConverter, UniAstToMarkdownConverter } from "@xwiki/cristal-uniast-markdown";
+import { markdownToUniAstConverterName, uniAstToMarkdownConverterName } from "@xwiki/cristal-uniast-markdown";
+import type { UniAst } from "@xwiki/cristal-uniast-api";
 
 //
 // Injected
 //
-const logic = inject<Logic>("logic")!;
 const container = inject<Container>("container")!;
 
 //
@@ -98,11 +86,19 @@ const {
 const value = ref(initialValue);
 const dirty = ref(false);
 
-const converterContext = createConverterContext(container);
-const markdownToUniAst = new MarkdownToUniAstConverter(converterContext);
-const uniAstToMarkdown = new UniAstToMarkdownConverter(converterContext);
+const markdownToUniAst = container.get<MarkdownToUniAstConverter>(
+    markdownToUniAstConverterName,
+);
+const uniAstToMarkdown = container.get<UniAstToMarkdownConverter>(
+    uniAstToMarkdownConverterName,
+);
 
-const editorContent = shallowRef<UniAst | Error>(markdownToUniAst.parseMarkdown(initialValue));
+const editorContent = ref();
+
+onBeforeMount(async () => {
+  editorContent.value = await markdownToUniAst.parseMarkdown(initialValue);
+})
+
 const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]>({
   blockNoteOptions: {
     // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
@@ -111,6 +107,10 @@ const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["e
   },
   theme: "light",
   lang: getLanguage(),
+  macros: {
+    buildable: [],
+    openMacroParamsEditor() {},
+  }
 });
 
 //
@@ -118,14 +118,11 @@ const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["e
 //
 const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
 const editorInstance = useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
-const realtimeServerURL = computed(() => {
-  return logic.realtimeServerURL;
-});
 
 //
 // Methods
 //
-function updateValue(editorContent?: UniAst | Error): string {
+async function updateValue(editorContent?: UniAst | Error): Promise<string> {
   if (!dirty.value) {
     // The value is already up-to-date.
     return value.value;
@@ -137,7 +134,7 @@ function updateValue(editorContent?: UniAst | Error): string {
     throw editorContent || new Error("Could not get the editor content.");
   }
 
-  const newValue = uniAstToMarkdown.toMarkdown(editorContent as UniAst);
+  const newValue = await uniAstToMarkdown.toMarkdown(editorContent as UniAst);
   if (newValue instanceof Error) {
     throw newValue;
   }

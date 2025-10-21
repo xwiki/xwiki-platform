@@ -42,8 +42,10 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecutor;
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -225,6 +227,36 @@ public class ConfigurationFilesGenerator
         // main and subwikis will be empty by default). If you need to test the DW, set these properties to true.
         props.setProperty("xwikiPropertiesAutomaticStartOnMainWiki", Boolean.FALSE.toString());
         props.setProperty("xwikiPropertiesAutomaticStartOnWiki", Boolean.FALSE.toString());
+
+        // Configure blob store properties
+        props.putAll(getBlobStoreConfigurationProperties());
+
+        return props;
+    }
+
+    private Properties getBlobStoreConfigurationProperties()
+    {
+        Properties props = new Properties();
+
+        BlobStore blobStore = this.testConfiguration.getBlobStore();
+        if (blobStore == BlobStore.S3) {
+            // Configure S3 blob store using additional properties
+            String additionalProperties =
+                """
+                    store.blobStoreHint=%s
+                    store.s3.bucketName=%s
+                    store.s3.accessKey=%s
+                    store.s3.secretKey=%s
+                    store.s3.endpoint=%s
+                    store.s3.pathStyleAccess=true""".formatted(
+                    blobStore.getHint(),
+                    BlobStoreContainerExecutor.getBucketName(),
+                    BlobStoreContainerExecutor.getAccessKey(),
+                    BlobStoreContainerExecutor.getSecretKey(),
+                    blobStore.getEndpoint());
+
+            props.setProperty("xwikiPropertiesAdditionalProperties", additionalProperties);
+        }
 
         return props;
     }

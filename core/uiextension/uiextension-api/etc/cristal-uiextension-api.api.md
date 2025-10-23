@@ -4,8 +4,8 @@
 
 ```ts
 
-import type { Component } from 'vue';
-import type { ComposerTranslation } from 'vue-i18n';
+import { Component } from 'vue';
+import { ComposerTranslation } from 'vue-i18n';
 
 // @beta
 export abstract class AbstractUIExtension implements UIExtension {

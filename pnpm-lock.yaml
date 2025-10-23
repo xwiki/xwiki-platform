@@ -3367,12 +3367,6 @@ importers:
 
   core/uiextension/uiextension-api:
     dependencies:
-      inversify:
-        specifier: 7.x
-        version: 7.10.2(reflect-metadata@0.2.2)
-      reflect-metadata:
-        specifier: 0.x
-        version: 0.2.2
       vue-i18n:
         specifier: 'catalog:'
         version: 11.1.12(vue@3.5.22(typescript@5.9.3))
@@ -3380,9 +3374,18 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      inversify:
+        specifier: 'catalog:'
+        version: 7.10.2(reflect-metadata@0.2.2)
+      reflect-metadata:
+        specifier: 'catalog:'
+        version: 0.2.2
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.1.9(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.22(typescript@5.9.3)

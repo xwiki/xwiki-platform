@@ -29,6 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-like-api</artifactId>
   <name>XWiki Platform - Like - API</name>
+  <description>API for liking pages</description>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>

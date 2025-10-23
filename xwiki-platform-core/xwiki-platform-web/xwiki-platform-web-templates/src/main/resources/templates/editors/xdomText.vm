@@ -18,8 +18,5 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template('editors/xdom_macros.vm')
-#if ($edit.parameters.name == 'content')
-  ## TODO: Fix the tool bar so that it can be used for TextArea properties.
-  #template('simpleedittoolbar.vm')
-#end
+#template('simpleedittoolbar.vm')
 #textArea

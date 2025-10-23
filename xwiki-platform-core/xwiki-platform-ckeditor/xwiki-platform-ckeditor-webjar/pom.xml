@@ -195,6 +195,7 @@
       <artifactId>ckeditor4</artifactId>
       <version>${ckeditor.version}</version>
       <type>zip</type>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

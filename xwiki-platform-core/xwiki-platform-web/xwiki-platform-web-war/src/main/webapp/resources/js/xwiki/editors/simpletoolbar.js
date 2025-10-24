@@ -23,12 +23,15 @@ require(['jquery'], function ($) {
     {
       let self = this;
       self._insertTagFunction = self._defaultInsertTag;
-      $('.simpletoolbar-configuration').each(function() {
-        self._initTextarea($(this), self);
+      $('textarea').each(function() {
+          self._initTextarea($(this), self);
       });
       $(document).on('xwiki:dom:updated', function (event, data) {
-        $(data.elements).find('.simpletoolbar-configuration').each(function() {
-          self._initTextarea($(this), self);
+        $(data.elements).find('textarea').each(function() {
+          let syntax = $(this).data('syntax');
+          if (typeof syntax === 'string' && syntax.startsWith('xwiki')) {
+            self._initTextarea($(this), self);
+          }
         });
       })
     }
@@ -74,47 +77,43 @@ require(['jquery'], function ($) {
       return text.replace(/\\n/g, '\n');
     }
 
-    _initTextarea(configElement, self) {
+    _initTextarea(textarea, self) {
       let buttonMenu = $('<div class="leftmenu2"></div>');
-      let buttonConfig = this._parseConfiguration(configElement);
-      let textarea = configElement.siblings('textarea:first');
-      let syntax = textarea.data('syntax');
-      if (typeof syntax === 'string' && (syntax.startsWith('xwiki') || syntax === 'confluence/1.0')) {
-        const toolbarElement = buttonConfig.toolbarElements || [];
-        for (let item of toolbarElement) {
-          let button = $('<button></button>');
-          button.attr({
+      let buttonConfig = this._parseConfiguration();
+      const toolbarElement = buttonConfig.toolbarElements || [];
+      for (let item of toolbarElement) {
+        let button = $('<button></button>');
+        button.attr({
             type: 'button',
             class: 'wikitoolbar-button',
             title: item.speedTip
-          });
-          let image = $('<img />');
-          image.attr({
-            src: item.image,
-            alt: item.speedTip,
-            title: item.speedTip
-          });
-          button.on('click', function () {
-            self._insertTagFunction(textarea[0],
-              self._unescapeLineBreaks(item.tagOpen),
-              self._unescapeLineBreaks(item.tagClose),
-              item.sampleText);
-          });
-          button.append(image);
-          buttonMenu.append(button);
-        }
-        textarea.before(buttonMenu);
-        $(document).trigger('xwiki:dom:updated', {'elements': [buttonMenu.parent()[0]]});
+        });
+        let image = $('<img />');
+        image.attr({
+          src: item.image,
+          alt: item.speedTip,
+          title: item.speedTip
+        });
+        button.on('click', function () {
+          self._insertTagFunction(textarea[0],
+            self._unescapeLineBreaks(item.tagOpen),
+            self._unescapeLineBreaks(item.tagClose),
+            item.sampleText);
+        });
+        button.append(image);
+        buttonMenu.append(button);
       }
+      textarea.before(buttonMenu);
+      $(document).trigger('xwiki:dom:updated', {'elements': [buttonMenu.parent()[0]]});
     }
 
     /**
      * @returns {Object} the resolved configuration as an unstructured object, or the empty object in case of error.
      */
-    _parseConfiguration(configElement)
+    _parseConfiguration()
     {
       try {
-        return configElement.data('xwiki-simpletoolbar-configuration');
+        return $('#simpletoolbar-configuration').data('xwiki-simpletoolbar-configuration');
       } catch (e) {
         console.error('Error parsing simpletoolbar configuration: ', e);
         return {};

@@ -637,8 +637,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     /** AJAX deletion of attachments. */
     onDelete : function(event) {
       event.stop();
-      let deleteTool = event.element();
-      if (!deleteTool.hasClassName('btn')) deleteTool = deleteTool.up('.btn');
+      const deleteTool = event.target.closest('.btn');
       if (!deleteTool.disabled) {
         new XWiki.widgets.ConfirmedAjaxRequest(
           deleteTool.readAttribute('href'),

@@ -32,8 +32,23 @@ public interface RemoteObservationManagerContext
 {
     /**
      * Set the remote state to true.
+     * 
+     * @deprecated use {@link #pushRemoteState(NetworkMember)} instead
      */
+    @Deprecated(since = "17.10.0RC1")
     void pushRemoteState();
+
+    /**
+     * Store in the context metadata associated to the current event.
+     * 
+     * @param sender the member who sent the event which triggered this thread, or it's not called in a remote event
+     *            thread
+     * @since 17.10.0RC1
+     */
+    default void pushRemoteState(NetworkMember sender)
+    {
+        pushRemoteState();
+    }
 
     /**
      * Set the remote state to false.
@@ -44,4 +59,10 @@ public interface RemoteObservationManagerContext
      * @return indicate if the event in the current thread is a remote event
      */
     boolean isRemoteState();
+
+    /**
+     * @return the member who sent the event which triggered this thread, or it's not called in a remote event thread
+     * @since 17.10.0RC1
+     */
+    NetworkMember getSender();
 }

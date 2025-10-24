@@ -2228,7 +2228,7 @@ $displayName##
       #end
     #end
     #if($parameters.position == 'top')
-      #paginationResultsRange($parameters)
+      #_paginationResultsRange($parameters)
     #end
   </div>
 #end
@@ -2383,7 +2383,7 @@ $displayName##
  * @see #pagination
  * @internal
  *#
-#macro(paginationResultsRange $parameters)
+#macro(_paginationResultsRange $parameters)
   #set($from = $parameters.firstItem + 1)
   #set($to =   $parameters.firstItem + $parameters.itemsPerPage)
   #if ($to > $parameters.totalItems)

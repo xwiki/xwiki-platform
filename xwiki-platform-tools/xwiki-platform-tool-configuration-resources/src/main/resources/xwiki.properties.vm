@@ -1025,13 +1025,18 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # url.forceAllowAnyCharacter=true
 
-#-# [Since 17.9.0RC1]
-#-# [Since 17.4.6]
-#-# [Since 16.10.13]
-#-# Allow to enable or disable checks performed when clicking links in the UI based on the list of trusted domains.
+#-# [Since 17.9.0]
+#-# [Since 17.4.7]
+#-# [Since 16.10.14]
+#-# Define the policy to use for URL checks performed in the UI, whether the user should be asked for confirmation
+#-# when going to an untrusted domain.
+#-# Accepted values for this property are: enabled, disabled, or comments.
+#-# Enabled means that the check will be enforced in all the wiki UI, disabled that the check will never be
+#-# performed, and comments (default value) means that the check will only be performed on links provided in the
+#-# comments of the wiki.
 #-#
-#-# By default this property is set to true:
-# url.frontendUrlCheckEnabled=true
+#-# By default this property is set to comments:
+# url.frontendUrlCheckPolicy=comments
 
 #-# [Since 17.9.0RC1]
 #-# [Since 17.4.6]

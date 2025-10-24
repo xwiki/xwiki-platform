@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.url.FrontendURLCheckPolicy;
 import org.xwiki.url.URLConfiguration;
 
 /**
@@ -82,9 +83,29 @@ public class DefaultURLConfiguration implements URLConfiguration
     }
 
     @Override
-    public boolean isFrontendUrlCheckEnabled()
+    public FrontendURLCheckPolicy getFrontendUrlCheckPolicy()
     {
-        return this.configuration.get().getProperty(PREFIX + "frontendUrlCheckEnabled", true);
+        // We use to have a property to only switch on or off the check:
+        // this property should still be taken into account if the new property value is not defined.
+        // The algorithm is then to check presence of the new property, and return the value based on it,
+        // and if no value is defined then check presence of the old property, and only if there's no value for it,
+        // fallback on the default value.
+        String deprecatedProperty = PREFIX + "frontendUrlCheckEnabled";
+        String newProperty = PREFIX + "frontendUrlCheckPolicy";
+        ConfigurationSource configurationSource = this.configuration.get();
+        FrontendURLCheckPolicy result = FrontendURLCheckPolicy.COMMENTS;
+        if (configurationSource.containsKey(newProperty)) {
+            String propertyString = configurationSource.getProperty(newProperty);
+            try {
+                result = FrontendURLCheckPolicy.valueOf(propertyString.toUpperCase());
+            } catch (Throwable e) {
+                result = FrontendURLCheckPolicy.COMMENTS;
+            }
+        } else if (configurationSource.containsKey(deprecatedProperty)) {
+            result = (configurationSource.getProperty(deprecatedProperty, Boolean.class))
+                ? FrontendURLCheckPolicy.ENABLED : FrontendURLCheckPolicy.DISABLED;
+        }
+        return result;
     }
 
     @Override

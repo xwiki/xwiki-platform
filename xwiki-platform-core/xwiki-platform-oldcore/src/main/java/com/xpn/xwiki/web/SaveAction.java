@@ -647,8 +647,13 @@ public class SaveAction extends EditAction
                 XWikiDocument tdoc = doc.getTranslatedDocument(locale, xcontext);
                 // Double check if the syntax has changed because each document translation can have a different syntax.
                 if (!tdoc.getSyntax().toIdString().equals(targetSyntaxId)) {
-                    // Convert the syntax and save the changes.
+                    // Avoid modifying the cached document
+                    tdoc = tdoc.clone();
+
+                    // Convert the syntax
                     tdoc.convertSyntax(targetSyntaxId, xcontext);
+
+                    // Save the changes
                     xcontext.getWiki().saveDocument(tdoc,
                         String.format("Document converted from syntax %s to syntax %s", tdoc.getSyntax().toIdString(),
                             targetSyntaxId),

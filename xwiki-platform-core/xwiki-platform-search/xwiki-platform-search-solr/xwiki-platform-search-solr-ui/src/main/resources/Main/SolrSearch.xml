@@ -161,10 +161,11 @@
   var addFacetValueCheckbox = function() {
     // Create an id unique to the facet value.
     let facetContainer = $(this).parents('.search-facet').first();
+    // We need the ids of the target facet elements to stay stable through the change, in order to refocus the item
+    // that was clicked and triggered the change.
     // We use the JQuery index, so that id indexes are reset across facetContainers.
-    // This allows for stable indexes: when reloading the facets after changing the filter for facet X,
-    // the ids of all the checkbox for facet X will keep the same index.
-    // This allows us to refocus exactly the element interacted with to make this filter change.
+    // This allows for stable indexes: when reloading the facets after changing the filter for the target facet X,
+    // the ids of all the checkbox for the target facet X will keep the same index.
     // This property is lost if multiple facets are changed in the query at once.
     $(this).attr('id', facetContainer.attr('data-name') + '-' + facetContainer.find('a.itemName').index($(this)));
     // Initialize the checkbox.

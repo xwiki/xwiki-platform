@@ -64,7 +64,7 @@ public class DisplayMacroParameters
      */
     @PropertyDescription("the reference of the resource to display")
     @PropertyGroup("stringReference")
-    @PropertyFeature("reference")
+    @PropertyFeature(value = "reference", mandatory = true)
     @PropertyDisplayType(EntityReferenceString.class)
     public void setReference(String reference)
     {
@@ -149,7 +149,7 @@ public class DisplayMacroParameters
      * @since 10.6RC1
      */
     @PropertyDescription("The reference of the page to display")
-    @PropertyFeature("reference")
+    @PropertyFeature(value = "reference", mandatory = true)
     @PropertyDisplayType(PageReference.class)
     // Display hidden because we don't want to confuse our users by proposing two ways to enter the reference to
     // display and ATM we don't have a picker for PageReference types and we do have a picker for EntityReference string

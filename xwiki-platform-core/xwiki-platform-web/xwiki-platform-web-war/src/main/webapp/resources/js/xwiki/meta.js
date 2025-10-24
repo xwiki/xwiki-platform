@@ -74,11 +74,13 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
     }
 
     setVersion(newVersion) {
-      this.version = newVersion;
-      $(document).trigger('xwiki:document:changeVersion', {
-        'version': this.version,
-        'documentReference': this.documentReference
-      });
+      if (newVersion !== this.version) {
+        this.version = newVersion;
+        $(document).trigger('xwiki:document:changeVersion', {
+          'version': this.version,
+          'documentReference': this.documentReference
+        });
+      }
     }
 
     /**

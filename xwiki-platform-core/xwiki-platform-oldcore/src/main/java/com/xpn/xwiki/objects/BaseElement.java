@@ -219,6 +219,12 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     @Override
     public void setName(String name)
     {
+        // Empty property name is forbidden because it will cause problem (impossible to create an EntityReference for
+        // it)
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("An element name cannot be null or empty");
+        }
+
         // If a reference is already set, then you cannot set a name
         if (this.documentReference != null) {
             throw new IllegalStateException("BaseElement#setName could not be called when a reference has been set.");

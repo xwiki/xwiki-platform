@@ -37,6 +37,7 @@ import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -113,12 +114,14 @@ public class XWikiContextInitializationFilter implements Filter
     protected void initializeXWikiContext(ServletRequest request, ServletResponse response) throws ServletException
     {
         try {
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
+
             // Not all request types specify an action (e.g. GWT-RPC) so we default to the empty string.
             String action = "";
             XWikiServletContext xwikiEngine =
                 new XWikiServletContext(JakartaServletBridge.toJavax(request.getServletContext()));
             XWikiServletRequest xwikiRequest =
-                new XWikiServletRequest(JakartaServletBridge.toJavax((HttpServletRequest) request));
+                new XWikiServletRequest(JakartaServletBridge.toJavax(httpRequest));
             XWikiServletResponse xwikiResponse =
                 new XWikiServletResponse(JakartaServletBridge.toJavax((HttpServletResponse) response));
 
@@ -144,15 +147,29 @@ public class XWikiContextInitializationFilter implements Filter
             // Prepare the localized resources, according to the selected language.
             xwiki.prepareResources(context);
 
-            // Initialize the current user.
-            XWikiUser user = context.getWiki().checkAuth(context);
-            if (user != null) {
-                DocumentReference userReference = user.getUserReference();
-                context.setUserReference(
-                    XWikiRightService.GUEST_USER.equals(userReference.getName()) ? null : userReference);
-            }
+            authenticate(context, httpRequest);
         } catch (XWikiException e) {
             throw new ServletException("Failed to initialize the XWiki context.", e);
+        }
+    }
+
+    /**
+     * Resolve and validate the current user.
+     * 
+     * @param context the XWiki context
+     * @param request the <code>ServletRequest</code> object contains the client's request
+     * @throws XWikiException when failing to authenticate
+     * @since 17.10.0RC1
+     */
+    @Unstable
+    protected void authenticate(XWikiContext context, HttpServletRequest request) throws XWikiException
+    {
+        // Initialize the current user.
+        XWikiUser user = context.getWiki().checkAuth(context);
+        if (user != null) {
+            DocumentReference userReference = user.getUserReference();
+            context
+                .setUserReference(XWikiRightService.GUEST_USER.equals(userReference.getName()) ? null : userReference);
         }
     }
 

@@ -111,7 +111,7 @@
 ## The configuration is serialized in a data property because when inserted in the content of a script element of
 ## type application/json, the html cleaner can wrap the content in a CDATA block, breaking client code
 ## (e.g., simpletoolbar.js).
-<div class="hidden" id="simpletoolbar-configuration" data-xwiki-simpletoolbar-configuration="$escapetool.xml($jsontool.serialize({
+<div class="hidden simpletoolbar-configuration" data-xwiki-simpletoolbar-configuration="$escapetool.xml($jsontool.serialize({
   "toolbarElements": $toolbarJson
 }))"></div>
 #end

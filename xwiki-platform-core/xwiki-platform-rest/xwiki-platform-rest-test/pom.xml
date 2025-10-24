@@ -40,4 +40,12 @@
   <modules>
     <module>xwiki-platform-rest-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-rest-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

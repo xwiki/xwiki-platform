@@ -22,7 +22,7 @@
 
 <!--
      Custom version of
-     https://raw.githubusercontent.com/jetty/jetty.project/refs/tags/jetty-12.1.1/jetty-core/jetty-util/src/main/config/etc/console-capture.xml
+     https://raw.githubusercontent.com/jetty/jetty.project/refs/tags/jetty-12.1.3/jetty-core/jetty-util/src/main/config/etc/console-capture.xml
      to send the log both to the console and to a file.
      TODO: it should be possible to remove this customization by making Jetty use another logger (like logback)
 -->

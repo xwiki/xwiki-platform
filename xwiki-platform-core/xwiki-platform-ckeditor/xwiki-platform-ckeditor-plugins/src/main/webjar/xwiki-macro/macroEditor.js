@@ -147,8 +147,10 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       output.append(displayOptionalNodes(parametersMap, macroParameterTree.optionalNodes));
     }
     // if there's only optional nodes and all nodes belongs to the same group, we don't display the tabs.
+    // (note that optionalNodes contains always GROUP:defaultOptionalNodes, any other value means there's another
+    // group of optional nodes to be displayed)
     if (macroParameterTree.mandatoryNodes.length < 1 && macroParameterTree.optionalNodes.length < 2) {
-      output.remove('.nav-tabs');
+      output.find('.nav-tabs').remove();
     }
 
     output.find('a[role="tab"]').on('click', function(event) {
@@ -197,7 +199,6 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     let activeTab = tabs.children().not('.hidden').first();
     let activeTabPanel = tabPanels.children().not('.hidden').first();
     activeTab.add(activeTabPanel).addClass('active');
-    toggleMacroParameterGroupVisibility(output);
     // we remove all occurrences of feature title since we already have the tabs name.
     output.find('.feature-container .panel-heading').remove();
     return output;
@@ -295,13 +296,6 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     if (childNodes.length === 1 && childNodes[0] && parametersMap[childNodes[0]].name === node.name) {
       tabPanel.find('.macro-parameter-name').hide();
     }
-  },
-
-  // Make the macro parameter grouping (tabs) invisible if there is only one visible tab and it contains a single item.
-  toggleMacroParameterGroupVisibility = function(group) {
-    const visibleTabs = group.find('ul[role="tablist"]').first().children().not('.hidden');
-    const firstVisibleTabPanel = group.find('.tab-content').first().children().not('.hidden').first();
-    group.toggleClass('invisible', visibleTabs.length < 2 && firstVisibleTabPanel.children().not('.hidden').length < 2);
   },
 
   macroParameterTemplate =

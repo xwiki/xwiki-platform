@@ -429,6 +429,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public void setName(String name)
     {
+        // Empty property name is forbidden because it will cause problem (impossible to create an EntityReference for
+        // it and it's not supported by the XML format)
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("A property name cannot be null or empty");
+        }
+
         setStringValue("name", name);
         this.referenceCache = null;
     }

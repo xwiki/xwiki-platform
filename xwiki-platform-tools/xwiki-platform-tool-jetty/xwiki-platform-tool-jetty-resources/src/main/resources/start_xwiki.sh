@@ -199,6 +199,9 @@ JETTY_BASE=$PRGDIR
 # Also make sure the log directory exists since Jetty won't create it.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
 
+# Make sure the environments folder exist
+mkdir -p environments
+
 # Specify Jetty's home directory to be the directory named "jetty" inside the Jetty base directory.
 JETTY_HOME="$JETTY_BASE/jetty"
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"

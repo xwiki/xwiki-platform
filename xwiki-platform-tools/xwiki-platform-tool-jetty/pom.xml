@@ -31,6 +31,12 @@
   <name>XWiki Platform - Tools - Jetty - Parent POM</name>
   <packaging>pom</packaging>
   <description>Tools for packaging a Jetty installation</description>
+  <properties>
+    <!--
+        Those modules a only used in the context of Jetty Serer so make sure to use the right Jetty Client version.
+    -->
+    <jetty.version>${jetty.server.version}</jetty.version>
+  </properties>
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-tool-jetty-listener</module>

@@ -93,14 +93,9 @@ public class SaveAction extends EditAction
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAction.class);
 
     /**
-     * The key to retrieve the saved object version from the context.
+     * The key used to store the JSON answer for the save action on the XWiki context.
      */
-    private static final String SAVED_OBJECT_VERSION_KEY = "SaveAction.savedObjectVersion";
-
-    /**
-     * The context key to know if a document has been merged for saving it.
-     */
-    private static final String MERGED_DOCUMENTS = "SaveAction.mergedDocuments";
+    static final String JSON_ANSWER_KEY = "SaveAction.jsonAnswer";
 
     /**
      * Parameter value used with forceSave to specify that the merge should be performed even if there is conflicts.
@@ -238,37 +233,6 @@ public class SaveAction extends EditAction
             tdoc.readFromForm(form, context);
         }
 
-        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
-        tdoc.getAuthors().setOriginalMetadataAuthor(currentUserReference);
-        request.getEffectiveAuthor().ifPresent(tdoc.getAuthors()::setEffectiveMetadataAuthor);
-
-        if (tdoc.isNew()) {
-            tdoc.getAuthors().setCreator(currentUserReference);
-        }
-
-        // Make sure we have at least the meta data dirty status
-        tdoc.setMetaDataDirty(true);
-
-        // Validate the document if we have xvalidate=1 in the request
-        if ("1".equals(request.getParameter("xvalidate"))) {
-            boolean validationResult = tdoc.validate(context);
-            // If the validation fails we should show the "Inline form" edit mode
-            if (validationResult == false) {
-                // Set display context to 'edit'
-                context.put("display", "edit");
-                // Set the action used by the "Inline form" edit mode as the context action. See #render(XWikiContext).
-                context.setAction(tdoc.getDefaultEditMode(context));
-                // Set the document in the context
-                context.put("doc", doc);
-                context.put("cdoc", tdoc);
-                context.put("tdoc", tdoc);
-                // Force the "Inline form" edit mode.
-                getCurrentScriptContext().setAttribute("editor", "inline", ScriptContext.ENGINE_SCOPE);
-
-                return true;
-            }
-        }
-
         // Remove the redirect object if the save request doesn't update it. This allows users to easily overwrite
         // redirect place-holders that are created when we move pages around.
         if (tdoc.getXObject(RedirectClassDocumentInitializer.REFERENCE) != null
@@ -276,26 +240,94 @@ public class SaveAction extends EditAction
             tdoc.removeXObjects(RedirectClassDocumentInitializer.REFERENCE);
         }
 
-        // We only proceed on the check between versions in case of AJAX request, so we currently stay in the edit form
-        // This can be improved later by displaying a nice UI with some merge options in a sync request.
-        // For now we don't want our user to loose their changes.
-        if (isConflictCheckEnabled() && Utils.isAjaxRequest(context)
-            && request.getParameter("previousVersion") != null) {
-            if (isConflictingWithVersion(context, originalDoc, tdoc)) {
-                return true;
-            }
+        // There are cases (e.g. when leaving a realtime collaboration session) when we don't want to create a new
+        // document revision unless there are actual changes. This is indicated by setting the preventEmptyRevision
+        // request parameter to true. Changing the document authors marks the document metadata as dirty, which is why
+        // we need to remember the dirty state before updating the authors, if we want to prevent empty revisions. Note
+        // that the document can be further modified by the save event listeners called below, but we expect them to set
+        // a version summary comment if they want to force the save even when preventEmptyRevision is true.
+        boolean dirtyBeforeSettingAuthors = tdoc.isContentDirty() || tdoc.isMetaDataDirty();
+
+        // Update the document authors.
+        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
+        tdoc.getAuthors().setOriginalMetadataAuthor(currentUserReference);
+        request.getEffectiveAuthor().ifPresent(tdoc.getAuthors()::setEffectiveMetadataAuthor);
+        if (tdoc.isNew()) {
+            tdoc.getAuthors().setCreator(currentUserReference);
         }
 
-        // Make sure the user is allowed to make this modification
+        // Validate the document if we have xvalidate=1 in the request.
+        if ("1".equals(request.getParameter("xvalidate")) && !tdoc.validate(context)) {
+            // Validation failed. Redirect to "Inline form" edit mode.
+            // Set display context to "edit".
+            context.put("display", "edit");
+            // Set the action used by the "Inline form" edit mode as the context action. See #render(XWikiContext).
+            context.setAction(tdoc.getDefaultEditMode(context));
+            // Set the document in the context.
+            context.put("doc", doc);
+            context.put("cdoc", tdoc);
+            context.put("tdoc", tdoc);
+            // Force the "Inline form" edit mode.
+            getCurrentScriptContext().setAttribute("editor", "inline", ScriptContext.ENGINE_SCOPE);
+            return true;
+        }
+
+        // Prepare the JSON answer that will be sent to the editor in case of an async request. We put it on the XWiki
+        // context so that other parts of the code (e.g. event listeners) can add more information if needed.
+        Map<String, String> jsonAnswer = new LinkedHashMap<>();
+        context.put(JSON_ANSWER_KEY, jsonAnswer);
+
+        // Detect merge conflicts. We do this only if the previous version is known, otherwise a 3-way merge is not
+        // possible, and the save request is asynchronous, i.e. the user is waiting in edit mode for the save result. If
+        // a merge conflict is detected the editor will display the merge conflict modal.
+        if (isConflictCheckEnabled() && Utils.isAjaxRequest(context) && request.getParameter("previousVersion") != null
+            && isConflictingWithVersion(context, originalDoc, tdoc)) {
+            return true;
+        }
+
+        // Make sure the user is allowed to save the document. This triggers an event whose listeners can block (cancel)
+        // the save if needed. We trigger the event even if the document is not dirty (i.e. doesn't need to be saved)
+        // because:
+        // * the listeners can change the document (i.e. even if the document is not dirty now, it may become dirty
+        //   after the event listeners are called)
+        // * the listeners may want to block a hierarchy template from being applied, even if the root document is not
+        //   itself affected.
         xwiki.checkSavingDocument(context.getUserReference(), tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
 
-        // We get the comment to be used from the document
-        // It was read using readFromForm
-        xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
+        // Note that users may save an existing document without making any changes just to update the author, e.g. to
+        // change access rights. In this or other similar cases the version summary comment can be used to justify the
+        // action, which is why we force the save if a comment is provided. We consider preventEmptyRevision to be false
+        // by default for backward compatibility. This is currently used by realtime collaboration to avoid creating
+        // empty revisions when leaving the editing session.
+        if (tdoc.isNew() || dirtyBeforeSettingAuthors || StringUtils.isNotEmpty(tdoc.getComment())
+            || !"true".equals(request.getParameter("preventEmptyRevision"))) {
+            // Make sure we have at least the meta data dirty otherwise the version is not incremented.
+            tdoc.setMetaDataDirty(true);
+
+            // We take the version summary comment from the document being saved because it may have been modified by an
+            // event listener after it was copied from the EditForm by the call to readFromForm.
+            xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
+        } else {
+            // Let the editor know that the document was not saved because there were no changes.
+            jsonAnswer.put("noChanges", "true");
+        }
+
+        // Return the latest version number to the editor that triggered the save. We do this even if we didn't create a
+        // new revision because the editor may have an outdated version number. This can happen for instance if two
+        // users save the same document state one after the other (either because both didn't make any changes, or
+        // because both made the same changes). Having an up-to-date version number is important for properly detecting
+        // and handling merge conflicts on save.
+        jsonAnswer.put("newVersion", tdoc.getRCSVersion().toString());
+
+        // Cleanup temporary attachments that were uploaded while editing the document. We do this even if we didn't
+        // create a new revision (e.g. if there were no changes) because those attachments are not needed anymore (e.g.
+        // the user may have discarded the changes that lead to the upload of those attachments).
         this.temporaryAttachmentSessionsManager.removeUploadedAttachments(tdoc.getDocumentReference());
 
-        context.put(SAVED_OBJECT_VERSION_KEY, tdoc.getRCSVersion());
-
+        // If a template hierarchy is specified we start a job to copy the child pages. Even if we didn't create a new
+        // revision for the root document (because there were no changes) the child pages may still need to be created
+        // or updated, because the template can be applied on existing documents, even on documents where the template
+        // was previously applied.
         Job createJob = startCreateJob(tdoc.getDocumentReference(), form);
         if (createJob != null) {
             if (isAsync(request)) {
@@ -479,7 +511,7 @@ public class SaveAction extends EditAction
                         // then we pursue to save the document.
                         if (FORCE_SAVE_MERGE.equals(request.getParameter("forceSave"))
                             || !mergeDocumentResult.hasConflicts()) {
-                            context.put(MERGED_DOCUMENTS, "true");
+                            getJSONAnswer(context).put("mergedDocument", "true");
                             return false;
 
                             // If we got merge conflicts and we don't want to force it, then we record the conflict in
@@ -509,6 +541,12 @@ public class SaveAction extends EditAction
         return false;
     }
 
+    @SuppressWarnings("unchecked")
+    Map<String, String> getJSONAnswer(XWikiContext context)
+    {
+        return (Map<String, String>) context.get(JSON_ANSWER_KEY);
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -529,13 +567,7 @@ public class SaveAction extends EditAction
 
         // forward to view
         if (isAjaxRequest) {
-            Map<String, String> jsonAnswer = new LinkedHashMap<>();
-            Version newVersion = (Version) context.get(SAVED_OBJECT_VERSION_KEY);
-            jsonAnswer.put("newVersion", newVersion.toString());
-            if ("true".equals(context.get(MERGED_DOCUMENTS))) {
-                jsonAnswer.put("mergedDocument", "true");
-            }
-            answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
+            answerJSON(context, HttpStatus.SC_OK, getJSONAnswer(context));
         } else {
             sendRedirect(context.getResponse(), Utils.getRedirect("view", context));
         }

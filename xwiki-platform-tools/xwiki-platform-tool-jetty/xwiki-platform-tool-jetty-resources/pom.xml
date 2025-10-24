@@ -31,14 +31,6 @@
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>
   <packaging>pom</packaging>
   <description>Packages a Jetty installation</description>
-  <properties>
-    <!-- Use a different version of Jetty the one used for the Jetty client JARs packaged inside the XWiki WAR.
-         The reason is that our dependencies (mainly Solr) are not necessarily compatibles with this version of Jetty.
-
-         Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
-    -->
-    <jetty.version>${jetty.server.version}</jetty.version>
-  </properties>
 
   <dependencies>
     <dependency>

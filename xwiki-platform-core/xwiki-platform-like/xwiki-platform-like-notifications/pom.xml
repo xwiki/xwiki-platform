@@ -29,9 +29,12 @@
   </parent>
   <artifactId>xwiki-platform-like-notifications</artifactId>
   <name>XWiki Platform - Like - Notifications</name>
+  <description>Provides Like notifications</description>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
+    <xwiki.extension.name>Like Notifications</xwiki.extension.name>
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

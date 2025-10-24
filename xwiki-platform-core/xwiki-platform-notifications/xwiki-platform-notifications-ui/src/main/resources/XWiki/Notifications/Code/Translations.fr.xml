@@ -254,7 +254,7 @@ notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS
 notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Vous ignorez cette page et ses enfants : vous ne recevrez pas de notifications pour celles-ci.
 notifications.watch.modal.title.CUSTOM=Paramètres de suivi personnalisés
 notifications.watch.modal.description.CUSTOM=Vous utilisez des paramètres de notification personnalisés pour cette page : il se peut que vous suiviez ou bloquiez des événements spécifiques pour la page ou que vous ne cibliez que des canaux spécifiques pour les notifications. Nous vous invitons à revoir vos paramètres de notification à partir de votre profil.
-notifications.watch.modal.option.hint.toggle=Détails de cette option
+notifications.watch.modal.option.hint.toggle=Affiche / Masque les détails de cette option
 notifications.watch.modal.option.watchpage.title=Suivre la page courante
 notifications.watch.modal.option.watchpage.hint=Vous recevrez des notifications uniquement pour cette page.
 notifications.watch.modal.option.watchspace.title=Suivre la page actuelle et ses enfants

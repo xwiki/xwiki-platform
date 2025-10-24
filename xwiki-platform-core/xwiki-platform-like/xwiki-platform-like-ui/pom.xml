@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-like-ui</artifactId>
   <name>XWiki Platform - Like - UI</name>
-  <description>Like and unlike XWiki entities.</description>
+  <description>Like and unlike pages</description>
   <packaging>xar</packaging>
   <properties>
     <!-- Name to display by the Extension Manager -->

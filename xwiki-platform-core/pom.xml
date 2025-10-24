@@ -171,6 +171,22 @@
                   <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
                   <attribute>mandatory</attribute>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.attributeAdded</code>
+                  <old>method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setPage(java.lang.String)</old>
+                  <new>method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setPage(java.lang.String)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
+                  <attribute>mandatory</attribute>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.attributeAdded</code>
+                  <old>method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)</old>
+                  <new>method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
+                  <attribute>mandatory</attribute>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

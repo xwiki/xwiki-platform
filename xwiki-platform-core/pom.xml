@@ -149,7 +149,23 @@
               </differences>
             </revapi.differences>
             -->
-            
+            <revapi.differences>
+              <justification>Very recent unstable API introduced in 17.4.6 and replaced by
+                getFrontendUrlCheckPolicy.</justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean org.xwiki.url.URLConfiguration::isFrontendUrlCheckEnabled()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean org.xwiki.url.script.URLSecurityScriptService::isFrontendUrlCheckEnabled()</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

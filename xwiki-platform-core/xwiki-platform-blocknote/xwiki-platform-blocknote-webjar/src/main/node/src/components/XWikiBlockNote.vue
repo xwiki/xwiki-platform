@@ -27,6 +27,7 @@
         :container
         @instant-change="dirty = true"
         @debounced-change="updateValue"
+        :macros="false"
       ></BlocknoteEditor>
     </suspense>
     <input v-if="name" ref="valueInput" type="hidden" :name :value :form :disabled />
@@ -107,10 +108,6 @@ const editorProps = shallowRef<InstanceType<typeof BlocknoteEditor>["$props"]["e
   },
   theme: "light",
   lang: getLanguage(),
-  macros: {
-    buildable: [],
-    openMacroParamsEditor() {},
-  }
 });
 
 //

@@ -98,6 +98,10 @@ catalog:
   nx: 21.6.4
   vite-plugin-css-injected-by-js: 3.5.2
   vite-plugin-dts: 4.5.4
+  "@eslint/js": 9.34.0
+  "eslint-config-prettier": 10.1.8
+  "globals": 16.4.0
+  "typescript-eslint": 8.45.0
 
 catalogMode: strict
 

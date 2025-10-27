@@ -23,7 +23,7 @@ require(['jquery'], function ($) {
     {
       let self = this;
       self._insertTagFunction = self._defaultInsertTag;
-      $('.simpletoolbar-configuration').each(function() {
+      $('.simpletoolbar-configuration').not('.initialized').each(function() {
         self._initTextarea($(this), self);
       });
       $(document).on('xwiki:dom:updated', function (event, data) {
@@ -77,7 +77,7 @@ require(['jquery'], function ($) {
     _initTextarea(configElement, self) {
       let buttonMenu = $('<div class="leftmenu2"></div>');
       let buttonConfig = this._parseConfiguration(configElement);
-      let textarea = configElement.siblings('textarea:first');
+      let textarea = configElement.nextAll('textarea:first');
       let syntax = textarea.data('syntax');
       if (typeof syntax === 'string' && (syntax.startsWith('xwiki') || syntax === 'confluence/1.0')) {
         const toolbarElement = buttonConfig.toolbarElements || [];

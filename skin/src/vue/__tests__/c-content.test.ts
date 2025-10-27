@@ -27,15 +27,12 @@ import {
   wrapInSuspense,
 } from "@xwiki/cristal-dev-test-utils";
 import { DocumentService } from "@xwiki/cristal-document-api";
-import {
-  PageHierarchyResolver,
-  PageHierarchyResolverProvider,
-} from "@xwiki/cristal-hierarchy-api";
 import { DocumentReference, SpaceReference } from "@xwiki/cristal-model-api";
 import { ClickListener } from "@xwiki/cristal-model-click-listener";
 import { Container } from "inversify";
 import { DeepPartial } from "ts-essentials";
 import { beforeAll, describe, expect, it, vi } from "vitest";
+import { mock } from "vitest-mock-extended";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import type { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
@@ -92,27 +89,22 @@ function mountCComponent(params: {
     },
   );
 
-  const pageHierarchyResolver = vi.fn().mockImplementation(() => {
-    const newVar: DeepPartial<PageHierarchyResolver> = {
-      async getPageHierarchy() {
-        return [];
-      },
-    };
-    return newVar;
-  });
+  class PageHierarchyResolver {
+    async getPageHierarchy() {
+      return [];
+    }
+  }
 
-  const pageHierarchyResolverProvider = vi.fn().mockImplementation(() => {
-    return {
-      get() {
-        return new pageHierarchyResolver();
-      },
-    };
-  });
+  class PageHierarchyResolverProvider {
+    get() {
+      return new PageHierarchyResolver();
+    }
+  }
 
   container.bind<DocumentService>("DocumentService").to(mockDocumentService);
   container
     .bind<PageHierarchyResolverProvider>("PageHierarchyResolverProvider")
-    .to(makeInjectable(pageHierarchyResolverProvider));
+    .to(makeInjectable(PageHierarchyResolverProvider));
   container.bind<ClickListener>("ClickListener").to(
     makeInjectable(
       vi.fn().mockImplementation(() => {
@@ -122,7 +114,9 @@ function mountCComponent(params: {
       }),
     ),
   );
+
   class MockMarkdownRenderer implements DeepPartial<MarkdownRenderer> {}
+
   container
     .bind<MarkdownRenderer>("MarkdownRenderer")
     .to(makeInjectable(vi.fn().mockImplementation(() => MockMarkdownRenderer)));
@@ -191,24 +185,19 @@ describe("c-context", () => {
     );
   });
 
-  it("display page with empty content", () => {
-    const component = mountCComponent({
-      currentDocument: new (vi.fn().mockImplementation(() => {
-        return {};
-      }))(),
-    });
+  it("display page with empty content", async () => {
+    const currentDocument = mock<PageData>();
+    currentDocument.html = "";
+    currentDocument.source = undefined;
+    const component = mountCComponent({ currentDocument });
     expect(component.find("#xwikicontent").text()).eq("");
     expect(component.find(".doc-info-extra").exists()).eq(true);
   });
 
   it("display page with html content", () => {
-    const component = mountCComponent({
-      currentDocument: new (vi.fn().mockImplementation(() => {
-        return {
-          html: "<strong>content</strong>",
-        };
-      }))(),
-    });
+    const currentDocument = mock<PageData>();
+    currentDocument.html = "<strong>content</strong>";
+    const component = mountCComponent({ currentDocument });
 
     // Both assert that the content is
     expect(component.find("#xwikicontent").text()).eq("content");

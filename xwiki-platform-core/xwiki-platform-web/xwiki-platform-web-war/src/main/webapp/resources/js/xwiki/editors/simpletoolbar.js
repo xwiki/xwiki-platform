@@ -27,7 +27,7 @@ require(['jquery'], function ($) {
         self._initTextarea($(this), self);
       });
       $(document).on('xwiki:dom:updated', function (event, data) {
-        $(data.elements).find('.simpletoolbar-configuration').each(function() {
+        $(data.elements).find('.simpletoolbar-configuration').not('.initialized').each(function() {
           self._initTextarea($(this), self);
         });
       })
@@ -104,6 +104,7 @@ require(['jquery'], function ($) {
           buttonMenu.append(button);
         }
         textarea.before(buttonMenu);
+        configElement.addClass('initialized');
         $(document).trigger('xwiki:dom:updated', {'elements': [buttonMenu.parent()[0]]});
       }
     }

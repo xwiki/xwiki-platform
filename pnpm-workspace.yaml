@@ -108,7 +108,7 @@ catalog:
   comlink: 4.4.2
   concurrently: 9.2.1
   dayjs: 1.11.18
-  dexie: 4.2.0
+  dexie: 4.2.1
   dotenv: 17.2.3
   electron: 38.2.1
   electron-builder: 26.0.12

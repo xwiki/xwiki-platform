@@ -31,6 +31,7 @@ widgets.FullScreen = Class.create({
   buttonSize : 16,
   editFullScreenLabel: $jsontool.serialize($services.localization.render('core.editors.fullscreen.editFullScreen')),
   exitFullScreenLabel: $jsontool.serialize($services.localization.render('core.editors.fullscreen.exitFullScreen')),
+  domInitialized: false,
   /**
    * Full screen control initialization
    * Identifies the elements that must be visible in full screen: the textarea or the rich text editor, along with their
@@ -41,46 +42,38 @@ widgets.FullScreen = Class.create({
    * inserted in the corresponding toolbar, if there is any, or simply next to the textarea in the document
    * (see the {@link #addBehavior} function),
    */
-  initialize : function() {
-    // The action buttons need to be visible in full screen
-    this.buttons = $(document.body).down(".bottombuttons");
-    // If there are no buttons, at least the Exit FS button should be visible, so create an empty button container
-    if (!this.buttons) {
-      this.buttons = new Element("div", {"class" : "bottombuttons"}).update(new Element("div", {"class" : "buttons"}));
-      this.buttons._x_isCustom = true;
-      // It doesn't matter where the container is, it will only be needed in fullScreen.
-      document.body.appendChild(this.buttons.hide());
-    }
-    // When the full screen is activated, the buttons will be brought in the fullscreen, thus removed from their parent
-    // element, where they are replaced by a placeholder, so that we know exactly where to put them back.
-    this.buttonsPlaceholder = new Element("span");
-    // Placeholder for the toolbar, see above.
-    this.toolbarPlaceholder = new Element("span");
-    // The controls that will close the fullscreen
-    this.createCloseButtons();
-    // Prepare textareas / maximizable elements for full screen editing
-    $$('textarea', '.maximizable').each(function(element) {
-      this.addBehavior(element);
-    }.bind(this));
-    document.observe('xwiki:dom:updated', function(event) {
-      event.memo.elements.each(function(element) {
-        element.select('textarea', '.maximizable').each(function(element) {
-          this.addBehavior(element);
-        }.bind(this));
-      }.bind(this));
-    }.bind(this));
-    // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
-    // that full screen
-    this.maximizedReference = $(document.body).down("input[name='x-maximized']");
-    if (this.maximizedReference && this.maximizedReference.value != "") {
-      var matches = $$(this.maximizedReference.value);
-      if (matches && matches.length > 0) {
-        this.makeFullScreen(matches[0]);
+  initDom : function () {
+    if (!this.domInitialized) {
+      // The action buttons need to be visible in full screen
+      this.buttons = $(document.body).down(".bottombuttons");
+      // If there are no buttons, at least the Exit FS button should be visible, so create an empty button container
+      if (!this.buttons) {
+        this.buttons = new Element("div", {"class" : "bottombuttons"}).update(new Element("div", {"class" : "buttons"}));
+        this.buttons._x_isCustom = true;
+        // It doesn't matter where the container is, it will only be needed in fullScreen.
+        document.body.appendChild(this.buttons.hide());
       }
+      // When the full screen is activated, the buttons will be brought in the fullscreen, thus removed from their parent
+      // element, where they are replaced by a placeholder, so that we know exactly where to put them back.
+      this.buttonsPlaceholder = new Element("span");
+      // Placeholder for the toolbar, see above.
+      this.toolbarPlaceholder = new Element("span");
+      // The controls that will close the fullscreen
+      this.createCloseButtons();
+      // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
+      // that full screen
+      this.maximizedReference = $(document.body).down("input[name='x-maximized']");
+      if (this.maximizedReference && this.maximizedReference.value != "") {
+        var matches = $$(this.maximizedReference.value);
+        if (matches && matches.length > 0) {
+          this.makeFullScreen(matches[0]);
+        }
+      }
+      // Cleanup before the window unloads.
+      this.unloadHandler = this.cleanup.bind(this);
+      Event.observe(window, 'unload', this.unloadHandler);
+      this.domInitialized = true;
     }
-    // Cleanup before the window unloads.
-    this.unloadHandler = this.cleanup.bind(this);
-    Event.observe(window, 'unload', this.unloadHandler);
   },
   /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
@@ -100,18 +93,20 @@ widgets.FullScreen = Class.create({
   },
   // Some simple functions that help deciding what kind of editor is the target element
   isWikiContent : function (textarea) {
-    // If the textarea is not visible, then the WYSIWYG editor is active.
-    return textarea.name == 'content' && textarea.visible();
+    // If there's a toolbar and the textarea is visible
+    return textarea.previous('.leftmenu2') !== undefined && textarea.visible();
   },
   isWikiField : function (textarea) {
-    // If the textarea is not visible, then the WYSIWYG editor is active.
     return textarea.visible();
   },
   /** Adds the fullscreen button in the Wiki editor toolbar. */
   addWikiContentButton : function (textarea) {
-    textarea._toolbar = $(document.body).down(".leftmenu2");
+    textarea._toolbar = textarea.previous('.leftmenu2');
     // Normally there should be a simple toolbar with basic actions
     if (textarea._toolbar) {
+      if (textarea.previous('.fullScreenEditLinkContainer')) {
+        textarea.previous('.fullScreenEditLinkContainer').remove();
+      }
       textarea._toolbar.insert({top: this.createOpenButton(textarea)});
     } else {
       this.addWikiFieldButton(textarea);
@@ -404,15 +399,21 @@ widgets.FullScreen = Class.create({
     }
   }
 });
-
-function init() {
-  return new widgets.FullScreen();
-}
-
-// When the document is loaded, enable the fullscreen behavior.
-(XWiki.domIsLoaded && init())
-|| document.observe("xwiki:dom:loaded", init);
+XWiki.widgets.__fullscreenInstance = new XWiki.widgets.FullScreen();
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
-
+require(['jquery', 'xwiki-events-bridge'], function ($) {
+  $(document).on('xwiki:dom:updated', function (event, data) {
+    $(data.elements).find('textarea,.maximizable').each(function () {
+      XWiki.widgets.__fullscreenInstance.initDom() && XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
+    });
+  });
+  let init = function () {
+    XWiki.widgets.__fullscreenInstance.initDom();
+    $(document).find('textarea,.maximizable').each(function () {
+      XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
+    });
+  }
+  XWiki.domIsLoaded && init() || document.observe('xwiki:dom:loaded', init);
+});

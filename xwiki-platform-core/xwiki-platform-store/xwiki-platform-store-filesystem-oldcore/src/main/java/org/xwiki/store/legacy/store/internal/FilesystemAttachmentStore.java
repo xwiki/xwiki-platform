@@ -69,7 +69,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     private static final String ATTACHMENT_SAVE_ERROR_MESSAGE = "Exception while saving attachment.";
 
     /**
-     * Tools for getting files to store given content in.
+     * Tools for getting blobs to store given content in.
      */
     @Inject
     private FilesystemStoreTools fileTools;
@@ -155,7 +155,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         try {
             // This is the permanent location where the attachment content will go.
             final Blob attachFile =
-                this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
+                this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentBlob();
 
             return new AttachmentSaveTransactionRunnable(attachment, updateDocument, context, attachFile);
         } catch (BlobStoreException e) {
@@ -217,7 +217,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     {
         Blob attachFile;
         try {
-            attachFile = this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
+            attachFile = this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentBlob();
 
             // Support links
             attachFile = StoreFileUtils.resolve(attachFile, true);
@@ -254,7 +254,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         Blob attachFile;
         try {
             attachFile = StoreFileUtils.resolve(
-                this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile(), false);
+                this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentBlob(), false);
             return attachFile.exists();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
@@ -298,7 +298,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     {
         try {
             final Blob attachFile =
-                this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
+                this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentBlob();
 
             return new AttachmentDeleteTransactionRunnable(attachment, updateDocument, context, attachFile);
         } catch (BlobStoreException e) {
@@ -377,7 +377,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             //////////////////
             // CURRENT
 
-            Blob linkAttachFile = StoreFileUtils.getLinkFile(attachFile);
+            Blob linkAttachFile = StoreFileUtils.getLinkBlob(attachFile);
 
             Blob finalAttachFile;
             Blob otherAttachFile;
@@ -459,7 +459,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             final XWikiContext context, final Blob attachFile) throws XWikiException, BlobStoreException
         {
             // Delete both the standard and link location
-            Blob linkAtachFile = StoreFileUtils.getLinkFile(attachFile);
+            Blob linkAtachFile = StoreFileUtils.getLinkBlob(attachFile);
             new BlobDeleteTransactionRunnable(attachFile, fileTools.getBackupFile(attachFile),
                 fileTools.getLockForFile(attachFile.getPath())).runIn(this);
             new BlobDeleteTransactionRunnable(linkAtachFile, fileTools.getBackupFile(linkAtachFile),

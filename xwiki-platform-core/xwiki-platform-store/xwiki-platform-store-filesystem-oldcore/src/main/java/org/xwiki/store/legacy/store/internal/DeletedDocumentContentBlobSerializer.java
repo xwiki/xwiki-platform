@@ -42,9 +42,9 @@ import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
  * @version $Id$
  * @since 9.0RC1
  */
-@Component(roles = DeletedDocumentContentFileSerializer.class)
+@Component(roles = DeletedDocumentContentBlobSerializer.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DeletedDocumentContentFileSerializer implements BlobSerializer
+public class DeletedDocumentContentBlobSerializer implements BlobSerializer
 {
     @Inject
     private XWikiDocumentFilterUtils serializer;

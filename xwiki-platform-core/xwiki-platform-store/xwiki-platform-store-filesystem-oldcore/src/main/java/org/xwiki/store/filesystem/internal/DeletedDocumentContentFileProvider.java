@@ -33,5 +33,5 @@ public interface DeletedDocumentContentFileProvider
     /**
      * @return the Blob for storing the content of the deleted document.
      */
-    Blob getDeletedDocumentContentFile() throws BlobStoreException;
+    Blob getDeletedDocumentContentBlob() throws BlobStoreException;
 }

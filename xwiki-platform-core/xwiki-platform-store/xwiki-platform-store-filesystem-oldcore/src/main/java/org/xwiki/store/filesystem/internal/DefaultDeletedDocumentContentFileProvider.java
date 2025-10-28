@@ -58,7 +58,7 @@ public class DefaultDeletedDocumentContentFileProvider implements DeletedDocumen
     }
 
     @Override
-    public Blob getDeletedDocumentContentFile() throws BlobStoreException
+    public Blob getDeletedDocumentContentBlob() throws BlobStoreException
     {
         return this.store.getBlob(this.deletedDocumentDir.resolve(DELETED_DOCUMENT_FILE_NAME));
     }

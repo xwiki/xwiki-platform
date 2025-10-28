@@ -61,7 +61,7 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private Provider<DeletedDocumentContentFileSerializer> serializerProvider;
+    private Provider<DeletedDocumentContentBlobSerializer> serializerProvider;
 
     @Override
     public String getHint()
@@ -79,8 +79,8 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
         try {
             final Blob contentFile =
                 this.fileTools.getDeletedDocumentFileProvider(document.getDocumentReferenceWithLocale(), index)
-                    .getDeletedDocumentContentFile();
-            DeletedDocumentContentFileSerializer serializer = this.serializerProvider.get();
+                    .getDeletedDocumentContentBlob();
+            DeletedDocumentContentBlobSerializer serializer = this.serializerProvider.get();
             serializer.init(document, StandardCharsets.UTF_8.name());
             new BlobSaveTransactionRunnable(contentFile, this.fileTools.getTempFile(contentFile),
                 this.fileTools.getBackupFile(contentFile),
@@ -100,7 +100,7 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
     {
         try {
             final Blob contentFile =
-                this.fileTools.getDeletedDocumentFileProvider(reference, index).getDeletedDocumentContentFile();
+                this.fileTools.getDeletedDocumentFileProvider(reference, index).getDeletedDocumentContentBlob();
 
             if (contentFile.exists()) {
                 return new XWikiFileDeletedDocumentContent(contentFile, StandardCharsets.UTF_8);
@@ -123,7 +123,7 @@ public class FilesystemRecycleBinContentStore implements XWikiRecycleBinContentS
 
         try {
             final Blob contentFile =
-                this.fileTools.getDeletedDocumentFileProvider(reference, index).getDeletedDocumentContentFile();
+                this.fileTools.getDeletedDocumentFileProvider(reference, index).getDeletedDocumentContentBlob();
             new BlobDeleteTransactionRunnable(contentFile, this.fileTools.getBackupFile(contentFile),
                 this.fileTools.getLockForFile(contentFile.getPath())).runIn(transaction);
 

@@ -38,7 +38,7 @@ import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.TransactionRunnable;
 import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobStoreException;
-import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
+import org.xwiki.store.filesystem.internal.DeletedAttachmentBlobProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.internal.BlobDeleteTransactionRunnable;
@@ -116,7 +116,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     public void delete(AttachmentReference reference, Date deleteDate, long index, boolean bTransaction)
         throws XWikiException
     {
-        DeletedAttachmentFileProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, index);
+        DeletedAttachmentBlobProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, index);
 
         try {
             StartableTransactionRunnable tr = getDeletedAttachmentPurgeRunnable(provider);
@@ -133,12 +133,12 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
      * @param provider the file provider for the deleted attachment to purge from the recycle bin.
      * @return a StartableTransactionRunnable for removing the attachment.
      */
-    private StartableTransactionRunnable getDeletedAttachmentPurgeRunnable(final DeletedAttachmentFileProvider provider)
+    private StartableTransactionRunnable getDeletedAttachmentPurgeRunnable(final DeletedAttachmentBlobProvider provider)
         throws BlobStoreException
     {
         final StartableTransactionRunnable<TransactionRunnable<?>> out = new StartableTransactionRunnable<>();
 
-        Blob attachmentMetaBlob = provider.getDeletedAttachmentMetaFile();
+        Blob attachmentMetaBlob = provider.getDeletedAttachmentMetaBlob();
         try (Stream<Blob> blobStream =
                  attachmentMetaBlob.getStore().listBlobs(attachmentMetaBlob.getPath().getParent())) {
             for (Blob blob : (Iterable<Blob>) blobStream::iterator) {
@@ -156,7 +156,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     public DeletedAttachmentContent get(AttachmentReference reference, Date deleteDate, long index,
         boolean bTransaction) throws XWikiException
     {
-        DeletedAttachmentFileProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, index);
+        DeletedAttachmentBlobProvider provider = this.fileTools.getDeletedAttachmentFileProvider(reference, index);
 
         try {
             return deletedAttachmentContentFromProvider(provider);
@@ -177,10 +177,10 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
      * @return the deleted attachment for that directory.
      * @throws IOException if deserialization fails or there is a problem loading the archive.
      */
-    private DeletedAttachmentContent deletedAttachmentContentFromProvider(final DeletedAttachmentFileProvider provider)
+    private DeletedAttachmentContent deletedAttachmentContentFromProvider(final DeletedAttachmentBlobProvider provider)
         throws Exception
     {
-        final Blob deletedMeta = provider.getDeletedAttachmentMetaFile();
+        final Blob deletedMeta = provider.getDeletedAttachmentMetaBlob();
 
         // No metadata, no deleted attachment.
         if (!deletedMeta.exists()) {
@@ -196,7 +196,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
             lock.readLock().unlock();
         }
 
-        Blob contentFile = provider.getAttachmentContentFile();
+        Blob contentFile = provider.getAttachmentContentBlob();
 
         // Support links
         contentFile = StoreFileUtils.resolve(contentFile, true);
@@ -243,7 +243,7 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
     private StartableTransactionRunnable getSaveTrashAttachmentRunnable(final XWikiAttachment deleted, long index,
         final XWikiContext context) throws XWikiException, BlobStoreException
     {
-        final DeletedAttachmentFileProvider provider =
+        final DeletedAttachmentBlobProvider provider =
             this.fileTools.getDeletedAttachmentFileProvider(deleted.getReference(), index);
 
         return new SaveDeletedAttachmentContentRunnable(deleted, provider, this.fileTools, this.metaSerializer,

@@ -19,6 +19,7 @@
  */
 package org.xwiki.store;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.blob.Blob;
 
 /**
@@ -27,6 +28,7 @@ import org.xwiki.store.blob.Blob;
  * @version $Id$
  * @since 17.8.0RC1
  */
+@Unstable
 public interface BlobSerializer
 {
     /**

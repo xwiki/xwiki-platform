@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.FileSystemBlobStoreProperties;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.XWikiTempDirExtension;
@@ -52,7 +53,11 @@ class StoreFileUtilsTest
     @BeforeEach
     void setUp()
     {
-        this.blobStore = new FileSystemBlobStore("Test", this.tempDir.toPath());
+        FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
+        properties.setRootDirectory(this.tempDir.toPath());
+        properties.setName("Test");
+        properties.setType("filesystem");
+        this.blobStore = new FileSystemBlobStore(properties);
     }
 
     @Test
@@ -68,11 +73,11 @@ class StoreFileUtilsTest
     }
 
     @Test
-    void getLinkFile() throws Exception
+    void getLinkBlob() throws Exception
     {
         Blob blob = this.blobStore.getBlob(BlobPath.of(List.of("folder", "file.ext")));
 
-        Blob linkFile = StoreFileUtils.getLinkFile(blob);
+        Blob linkFile = StoreFileUtils.getLinkBlob(blob);
 
         assertEquals("folder/file.ext.lnk", linkFile.getPath().toString());
     }

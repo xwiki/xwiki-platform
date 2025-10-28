@@ -35,6 +35,7 @@ import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStore;
 import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.blob.FileSystemBlobStoreProperties;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.XWikiTempDirExtension;
@@ -67,7 +68,11 @@ class BlobDeleteTransactionRunnableTest
     @BeforeEach
     void setUp() throws Exception
     {
-        BlobStore blobStore = new FileSystemBlobStore("Test", this.tmpDir.toPath());
+        FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
+        properties.setRootDirectory(this.tmpDir.toPath());
+        properties.setName("Test");
+        properties.setType("filesystem");
+        BlobStore blobStore = new FileSystemBlobStore(properties);
 
         BlobPath blobPath = BlobPath.of(Arrays.asList(FILE_PATH));
 

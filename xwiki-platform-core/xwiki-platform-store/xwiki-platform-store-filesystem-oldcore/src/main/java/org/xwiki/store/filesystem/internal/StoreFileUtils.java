@@ -74,40 +74,40 @@ public final class StoreFileUtils
     }
 
     /**
-     * A helper which return either the file if it exist or the linked file if there is a link instead.
+     * A helper that returns either the blob if it exists or the linked blob if there is a link instead.
      * 
-     * @param targetFile the target file
+     * @param targetBlob the target blob
      * @param followLinks true if links should be followed
-     * @return the resolved file
+     * @return the resolved blob
      * @throws BlobStoreException when failing to resolve the link
-     * @throws IOException when failing to read the link file
+     * @throws IOException when failing to read the link blob
      * @since 16.4.0RC1
      */
-    public static Blob resolve(Blob targetFile, boolean followLinks) throws BlobStoreException, IOException
+    public static Blob resolve(Blob targetBlob, boolean followLinks) throws BlobStoreException, IOException
     {
-        // Return the target file by default
-        Blob file = targetFile;
+        // Return the target blob by default
+        Blob blob = targetBlob;
 
-        while (!file.exists()) {
-            // If the file does not exist, check if there is a link instead
-            Blob linkFile = getLinkFile(file);
+        while (!blob.exists()) {
+            // If the blob does not exist, check if there is a link instead
+            Blob linkBlob = getLinkBlob(blob);
 
-            if (linkFile.exists()) {
+            if (linkBlob.exists()) {
                 if (followLinks) {
-                    // Move the target file to the link's target file
-                    String linkContent = IOUtils.toString(linkFile.getStream(), StandardCharsets.UTF_8).trim();
-                    file = linkFile.getStore().getBlob(linkFile.getPath().getParent().resolve(linkContent));
+                    // Move the target blob to the link's target blob
+                    String linkContent = IOUtils.toString(linkBlob.getStream(), StandardCharsets.UTF_8).trim();
+                    blob = linkBlob.getStore().getBlob(linkBlob.getPath().getParent().resolve(linkContent));
                 } else {
-                    // Stop at the link file if we don't follow it
-                    file = linkFile;
+                    // Stop at the link blob if we don't follow it
+                    blob = linkBlob;
                 }
             } else {
-                // Stop the loop since no file or link could be found
+                // Stop the loop since no blob or link could be found
                 break;
             }
         }
 
-        return file;
+        return blob;
     }
 
     /**
@@ -115,7 +115,7 @@ public final class StoreFileUtils
      * @return the File representing the link for the passed location
      * @since 16.4.0RC1
      */
-    public static Blob getLinkFile(Blob originalfile) throws BlobStoreException
+    public static Blob getLinkBlob(Blob originalfile) throws BlobStoreException
     {
         BlobPath linkPath = originalfile.getPath().appendSuffix(".lnk");
         return originalfile.getStore().getBlob(linkPath);

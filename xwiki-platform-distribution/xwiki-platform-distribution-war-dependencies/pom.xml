@@ -681,6 +681,13 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Filesystem store migrations -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-filesystem-migrations</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- S3 storage support. TODO: this could be a separate WAR build for cluster setups? -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-store-blob-s3</artifactId>

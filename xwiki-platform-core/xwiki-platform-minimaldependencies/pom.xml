@@ -328,6 +328,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-store-blob-filesystem</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Merge script service is used by the merging conflict window, so we need to render it in case of conflict. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

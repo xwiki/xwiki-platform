@@ -28,26 +28,10 @@ import org.xwiki.store.blob.BlobStoreException;
  * @version $Id$
  * @since 3.0M2
  */
-public interface AttachmentFileProvider
+public interface DeletedAttachmentBlobProvider extends AttachmentBlobProvider
 {
     /**
-     * @return the Blob for storing the latest version of the attachment's content.
+     * @return the Blob for storing the information about the deleted attachment such as who deleted it.
      */
-    Blob getAttachmentContentFile() throws BlobStoreException;
-
-    /**
-     * Get the meta blob for the attachment. The meta file contains information about each version of the attachment
-     * such as who saved it.
-     *
-     * @return the Blob for storing meta data for each version of an attachment.
-     */
-    Blob getAttachmentVersioningMetaFile() throws BlobStoreException;
-
-    /**
-     * Get a uniquely named Blob for storing a particular version of the attachment.
-     *
-     * @param versionName the name of the version of the attachment eg: "1.1" or "1.2"
-     * @return the Blob for storing the content of a particular version of the attachment.
-     */
-    Blob getAttachmentVersionContentFile(String versionName) throws BlobStoreException;
+    Blob getDeletedAttachmentMetaBlob() throws BlobStoreException;
 }

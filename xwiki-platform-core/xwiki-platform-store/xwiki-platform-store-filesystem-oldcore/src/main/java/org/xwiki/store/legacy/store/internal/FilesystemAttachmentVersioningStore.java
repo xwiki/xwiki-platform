@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobStoreException;
-import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
+import org.xwiki.store.filesystem.internal.AttachmentBlobProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
@@ -107,10 +107,10 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
      * @return an XWikiAttachmentArchive for the given attachment.
      * @throws IOException if the metadata cannot be found or there is a failure while parsing it.
      */
-    XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, final AttachmentFileProvider provider)
+    XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, final AttachmentBlobProvider provider)
         throws Exception
     {
-        final Blob metaFile = provider.getAttachmentVersioningMetaFile();
+        final Blob metaFile = provider.getAttachmentVersioningMetaBlob();
 
         // If no meta file then assume no archive and return an empty archive.
         if (!metaFile.exists()) {
@@ -128,7 +128,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
 
         // Get the content file and lock for each revision.
         for (XWikiAttachment attach : attachList) {
-            final Blob contentFile = provider.getAttachmentVersionContentFile(attach.getVersion());
+            final Blob contentFile = provider.getAttachmentVersionContentBlob(attach.getVersion());
             attach.setAttachment_content(new FilesystemAttachmentContent(contentFile, attach));
             attach.setContentStore(FileSystemStoreUtils.HINT);
             // Pass the document since it will be lost in the serialize/deserialize.

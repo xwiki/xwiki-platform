@@ -30,12 +30,12 @@ import org.xwiki.store.blob.BlobStoreException;
  * @version $Id$
  * @since 3.0M2
  */
-public class DefaultAttachmentFileProvider implements AttachmentFileProvider
+public class DefaultAttachmentBlobProvider implements AttachmentBlobProvider
 {
     /**
      * This stores the attachment metadata for each revision of the attachment in XML format.
      *
-     * @see #getAttachmentVersioningMetaFile()
+     * @see #getAttachmentVersioningMetaBlob()
      */
     private static final String ATTACH_ARCHIVE_META_FILENAME = "~METADATA.xml";
 
@@ -61,7 +61,7 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
      * @param attachmentDir a directory where all information about this attachment is stored.
      * @param fileName the name of the attachment file.
      */
-    public DefaultAttachmentFileProvider(BlobStore store, final BlobPath attachmentDir, final String fileName)
+    public DefaultAttachmentBlobProvider(BlobStore store, final BlobPath attachmentDir, final String fileName)
     {
         this.store = store;
         this.attachmentDir = attachmentDir;
@@ -85,20 +85,20 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
     }
 
     @Override
-    public Blob getAttachmentContentFile() throws BlobStoreException
+    public Blob getAttachmentContentBlob() throws BlobStoreException
     {
         return this.store.getBlob(
             this.attachmentDir.resolve(StoreFileUtils.getStoredFilename(this.attachmentFileName, null)));
     }
 
     @Override
-    public Blob getAttachmentVersioningMetaFile() throws BlobStoreException
+    public Blob getAttachmentVersioningMetaBlob() throws BlobStoreException
     {
         return this.store.getBlob(this.attachmentDir.resolve(ATTACH_ARCHIVE_META_FILENAME));
     }
 
     @Override
-    public Blob getAttachmentVersionContentFile(final String versionName) throws BlobStoreException
+    public Blob getAttachmentVersionContentBlob(final String versionName) throws BlobStoreException
     {
         return this.store.getBlob(
             this.attachmentDir.resolve(StoreFileUtils.getStoredFilename(this.attachmentFileName, versionName)));

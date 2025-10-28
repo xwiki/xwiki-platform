@@ -113,7 +113,7 @@ catalog:
   electron: 39.0.0
   electron-builder: 26.0.12
   electron-store: 11.0.2
-  esbuild: 0.25.10
+  esbuild: 0.25.11
   eslint: 9.38.0
   eslint-config-prettier: 10.1.8
   eslint-import-resolver-typescript: 4.4.4

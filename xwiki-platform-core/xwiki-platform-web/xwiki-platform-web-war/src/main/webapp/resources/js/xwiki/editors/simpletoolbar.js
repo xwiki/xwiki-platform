@@ -98,7 +98,6 @@ require(['jquery'], function ($) {
         textarea.before(buttonMenu);
         configElement.addClass('initialized');
         $(document).trigger('xwiki:dom:updated', {'elements': [buttonMenu.parent()[0]]});
-        console.log("Simple toolbar trigger dom:updated event");
       }
     }
 

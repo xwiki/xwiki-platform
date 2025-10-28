@@ -225,7 +225,9 @@ public class NotificationNotifiersScriptService implements ScriptService
             if (result != null && !configuration.isPlaceHolderForced()) {
                 return result.getResult();
             } else {
-                return computeAsyncPlaceholder(response, configuration.isCount());
+                // We wrap the async placeholder in a listitem which makes it more consistent with the 
+                // result of the macro.
+                return String.format("<li>%s</li>", computeAsyncPlaceholder(response, configuration.isCount()));
             }
         } catch (ComponentLookupException | JobException | RenderingException e) {
             throw new NotificationException("Unable to retrieve notifications", e);

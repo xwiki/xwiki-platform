@@ -131,7 +131,7 @@ catalog:
   globals: 16.4.0
   happy-dom: 20.0.2
   i18next: 25.5.3
-  inversify: 7.10.2
+  inversify: 7.10.3
   jiti: 2.6.1
   js-cookie: 3.0.5
   lib0: 0.2.114

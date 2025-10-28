@@ -88,8 +88,8 @@ catalogs:
       specifier: 19.2.0
       version: 19.2.0
     '@types/sharedworker':
-      specifier: 0.0.187
-      version: 0.0.187
+      specifier: 0.0.189
+      version: 0.0.189
     '@types/xml-escape':
       specifier: 1.1.3
       version: 1.1.3
@@ -5091,7 +5091,7 @@ importers:
     devDependencies:
       '@types/sharedworker':
         specifier: 'catalog:'
-        version: 0.0.187
+        version: 0.0.189
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -6750,8 +6750,8 @@ packages:
   '@types/serve-static@1.15.7':
     resolution: {integrity: sha512-W8Ym+h8nhuRwaKPaDw34QUkwsGi6Rc4yYqvKFo5rm2FUEhCFbzVWrxXUxuKK8TASjWsysJY0nsmNCGhCOIsrOw==}
 
-  '@types/sharedworker@0.0.187':
-    resolution: {integrity: sha512-qJ+gj2yk8sCPD8YrqwtGywcA469n69aXQN7mfeVLB/FHUmczXIrjhVNQ76CX09LfElaaJOYk9xQl0NyWA9TTcQ==}
+  '@types/sharedworker@0.0.189':
+    resolution: {integrity: sha512-cEqDYwktoTzLSeU6J8uws8GLhBnQS+6/LDYVutkVtun9xYB7ZPmZuGo53Kz7vrknO+kdT3kU2BTGZTEc3z/FbQ==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -12567,7 +12567,7 @@ snapshots:
       '@types/node': 24.1.0
       '@types/send': 0.17.4
 
-  '@types/sharedworker@0.0.187': {}
+  '@types/sharedworker@0.0.189': {}
 
   '@types/trusted-types@2.0.7': {}
 

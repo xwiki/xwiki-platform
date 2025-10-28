@@ -35,7 +35,7 @@
     "electron-store": "catalog:"
   },
   "peerDependencies": {
-    "electron": "38.2.1"
+    "electron": "39.0.0"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

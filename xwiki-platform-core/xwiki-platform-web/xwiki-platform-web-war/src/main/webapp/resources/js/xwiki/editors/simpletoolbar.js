@@ -23,14 +23,6 @@ require(['jquery'], function ($) {
     {
       let self = this;
       self._insertTagFunction = self._defaultInsertTag;
-      $('.simpletoolbar-configuration').not('.initialized').each(function() {
-        self._initTextarea($(this), self);
-      });
-      $(document).on('xwiki:dom:updated', function (event, data) {
-        $(data.elements).find('.simpletoolbar-configuration').not('.initialized').each(function() {
-          self._initTextarea($(this), self);
-        });
-      })
     }
 
    /**
@@ -123,10 +115,18 @@ require(['jquery'], function ($) {
     }
   }
 
+  XWiki = window.XWiki || {};
+  XWiki.editors = XWiki.editors || {};
+  XWiki.editors.SimpleToolbar = new SimpleToolbar();
+  $(document).on('xwiki:dom:updated', function (event, data) {
+    $(data.elements).find('.simpletoolbar-configuration').not('.initialized').each(function () {
+      XWiki.editors.SimpleToolbar._initTextarea($(this), XWiki.editors.SimpleToolbar);
+    });
+  });
   let init = function () {
-    XWiki = window.XWiki || {};
-    XWiki.editors = XWiki.editors || {};
-    XWiki.editors.SimpleToolbar = new SimpleToolbar();
-  };
-  (XWiki && XWiki.isInitialized && init()) || document.observe('xwiki:dom:loading', init);
+    $(document).find('.simpletoolbar-configuration').not('.initialized').each(function () {
+      XWiki.editors.SimpleToolbar._initTextarea($(this), XWiki.editors.SimpleToolbar);
+    });
+  }
+  XWiki.domIsLoaded && init() || document.observe('xwiki:dom:loaded', init);
 });

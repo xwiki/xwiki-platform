@@ -27,7 +27,7 @@ import org.hibernate.HibernateException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.store.blob.BlobStoreException;
-import org.xwiki.store.filesystem.internal.DefaultAttachmentFileProvider;
+import org.xwiki.store.filesystem.internal.DefaultAttachmentBlobProvider;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -66,8 +66,8 @@ public class R1004001XWIKI15249DataMigration extends AbstractXWIKI15249DataMigra
     protected boolean isFile(AttachmentReference attachmentReference)
     {
         try {
-            return new DefaultAttachmentFileProvider(getBlobStore(), getAttachmentDir(attachmentReference),
-                attachmentReference.getName()).getAttachmentVersioningMetaFile().exists();
+            return new DefaultAttachmentBlobProvider(getBlobStore(), getAttachmentDir(attachmentReference),
+                attachmentReference.getName()).getAttachmentVersioningMetaBlob().exists();
         } catch (BlobStoreException e) {
             throw new HibernateException("Error checking if attachment versioning meta file exists.", e);
         }

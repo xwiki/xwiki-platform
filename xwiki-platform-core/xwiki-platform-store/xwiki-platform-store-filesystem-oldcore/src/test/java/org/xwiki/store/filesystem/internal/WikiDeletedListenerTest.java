@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.FileSystemBlobStoreProperties;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.XWikiTempDirExtension;
@@ -57,9 +58,13 @@ class WikiDeletedListenerTest
     private BlobStore blobStore;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
-        this.blobStore = new FileSystemBlobStore("Test", this.tempDir.toPath());
+        FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
+        properties.setRootDirectory(this.tempDir.toPath());
+        properties.setName("Test");
+        properties.setType("filesystem");
+        this.blobStore = new FileSystemBlobStore(properties);
         when(this.filesystemStoreTools.getStore()).thenReturn(this.blobStore);
     }
 

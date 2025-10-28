@@ -41,6 +41,7 @@ import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStore;
 import org.xwiki.store.blob.BlobStoreException;
 import org.xwiki.store.blob.BlobStoreManager;
+import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.locks.LockProvider;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -136,7 +137,7 @@ public class FilesystemStoreTools implements Initializable
     public void initialize() throws InitializationException
     {
         try {
-            this.store = this.blobStoreManager.getBlobStore(XWikiFileSystemBlobStoreManager.NAME);
+            this.store = this.blobStoreManager.getBlobStore("store/" + FileSystemStoreUtils.HINT);
         } catch (BlobStoreException e) {
             throw new InitializationException("Failed to initialize attachments blob store.", e);
         }
@@ -183,7 +184,7 @@ public class FilesystemStoreTools implements Initializable
     }
 
     /**
-     * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate
+     * Get an instance of AttachmentBlobProvider which will save everything to do with an attachment in a separate
      * location which is repeatable only with the same attachment name, containing document, and date of deletion.
      *
      * @param attachment the reference of the attachment
@@ -191,10 +192,10 @@ public class FilesystemStoreTools implements Initializable
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
      * @since 9.10RC1
      */
-    public DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final AttachmentReference attachment,
+    public DeletedAttachmentBlobProvider getDeletedAttachmentFileProvider(final AttachmentReference attachment,
         final long index)
     {
-        return new DefaultDeletedAttachmentFileProvider(getStore(), getDeletedAttachmentDir(attachment, index),
+        return new DefaultDeletedAttachmentBlobProvider(getStore(), getDeletedAttachmentDir(attachment, index),
             attachment.getName());
     }
 
@@ -215,16 +216,16 @@ public class FilesystemStoreTools implements Initializable
     }
 
     /**
-     * Get an instance of AttachmentFileProvider which will save everything to do with an attachment in a separate
+     * Get an instance of AttachmentBlobProvider which will save everything to do with an attachment in a separate
      * location which is repeatable only with the same attachment name, and containing document.
      *
      * @param attachmentReference the reference attachment to get a tools for.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
      * @since 9.10RC1
      */
-    public AttachmentFileProvider getAttachmentFileProvider(final AttachmentReference attachmentReference)
+    public AttachmentBlobProvider getAttachmentFileProvider(final AttachmentReference attachmentReference)
     {
-        return new DefaultAttachmentFileProvider(getStore(), getAttachmentDir(attachmentReference),
+        return new DefaultAttachmentBlobProvider(getStore(), getAttachmentDir(attachmentReference),
             attachmentReference.getName());
     }
 
@@ -235,9 +236,9 @@ public class FilesystemStoreTools implements Initializable
      */
     public String getLinkContent(XWikiAttachment attachment) throws BlobStoreException
     {
-        AttachmentFileProvider provider = getAttachmentFileProvider(attachment.getReference());
-        Blob defaultFile = provider.getAttachmentContentFile();
-        Blob versionFile = provider.getAttachmentVersionContentFile(attachment.getVersion());
+        AttachmentBlobProvider provider = getAttachmentFileProvider(attachment.getReference());
+        Blob defaultFile = provider.getAttachmentContentBlob();
+        Blob versionFile = provider.getAttachmentVersionContentBlob(attachment.getVersion());
 
         // TODO: implement this in a cleaner way. We shouldn't rely on both files being in the same directory.
         assert defaultFile.getPath().getParent().equals(versionFile.getPath().getParent());

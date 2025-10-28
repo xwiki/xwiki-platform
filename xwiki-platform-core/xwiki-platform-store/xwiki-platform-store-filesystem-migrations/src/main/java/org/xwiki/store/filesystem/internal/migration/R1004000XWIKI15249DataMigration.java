@@ -27,7 +27,7 @@ import org.hibernate.HibernateException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.store.blob.BlobStoreException;
-import org.xwiki.store.filesystem.internal.DefaultAttachmentFileProvider;
+import org.xwiki.store.filesystem.internal.DefaultAttachmentBlobProvider;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -66,9 +66,9 @@ public class R1004000XWIKI15249DataMigration extends AbstractXWIKI15249DataMigra
     protected boolean isFile(AttachmentReference attachmentReference)
     {
         try {
-            return new DefaultAttachmentFileProvider(getBlobStore(), getAttachmentDir(attachmentReference),
+            return new DefaultAttachmentBlobProvider(getBlobStore(), getAttachmentDir(attachmentReference),
                 attachmentReference.getName())
-                .getAttachmentContentFile().exists();
+                .getAttachmentContentBlob().exists();
         } catch (BlobStoreException e) {
             throw new HibernateException("Error checking if attachment file exists.", e);
         }

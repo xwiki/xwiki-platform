@@ -32,8 +32,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @since 3.0M2
  */
-public class DefaultDeletedAttachmentFileProvider extends DefaultAttachmentFileProvider
-    implements DeletedAttachmentFileProvider
+public class DefaultDeletedAttachmentBlobProvider extends DefaultAttachmentBlobProvider
+    implements DeletedAttachmentBlobProvider
 {
     /**
      * This stores the metadata for the deleted attachment such as who deleted it.
@@ -49,13 +49,13 @@ public class DefaultDeletedAttachmentFileProvider extends DefaultAttachmentFileP
      * @param attachmentDir the location where the information about the deleted attachment will be stored.
      * @param fileName the name of the attachment file.
      */
-    public DefaultDeletedAttachmentFileProvider(BlobStore store, final BlobPath attachmentDir, final String fileName)
+    public DefaultDeletedAttachmentBlobProvider(BlobStore store, final BlobPath attachmentDir, final String fileName)
     {
         super(store, attachmentDir, fileName);
     }
 
     @Override
-    public Blob getDeletedAttachmentMetaFile() throws BlobStoreException
+    public Blob getDeletedAttachmentMetaBlob() throws BlobStoreException
     {
         return this.store.getBlob(this.getAttachmentDir().resolve(DELETED_ATTACH_META_FILENAME));
     }

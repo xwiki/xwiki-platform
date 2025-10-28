@@ -43,12 +43,12 @@ public class XWikiFileDeletedDocumentContent implements XWikiDeletedDocumentCont
     private final Charset charset;
 
     /**
-     * @param file the serialized document as XML
-     * @param charset the charset of the file
+     * @param blob the serialized document as XML
+     * @param charset the charset of the blob
      */
-    public XWikiFileDeletedDocumentContent(Blob file, Charset charset)
+    public XWikiFileDeletedDocumentContent(Blob blob, Charset charset)
     {
-        this.content = file;
+        this.content = blob;
         this.charset = charset;
     }
 

@@ -28,7 +28,7 @@ import org.xwiki.store.StreamProvider;
 import org.xwiki.store.StringStreamProvider;
 import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobStoreException;
-import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
+import org.xwiki.store.filesystem.internal.DeletedAttachmentBlobProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.internal.BlobSaveTransactionRunnable;
@@ -59,7 +59,7 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
      * @param context the legacy XWikiContext which might be needed to get the attachment archive.
      * @throws XWikiException if loading the attachment content or archive fails.
      */
-    SaveDeletedAttachmentContentRunnable(final XWikiAttachment attachment, final DeletedAttachmentFileProvider provider,
+    SaveDeletedAttachmentContentRunnable(final XWikiAttachment attachment, final DeletedAttachmentBlobProvider provider,
         final FilesystemStoreTools fileTools, final Serializer<XWikiAttachment, XWikiAttachment> metaSerializer,
         final Serializer<List<XWikiAttachment>, List<XWikiAttachment>> versionSerializer, final XWikiContext context)
         throws XWikiException, BlobStoreException
@@ -69,7 +69,7 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
 
         final StreamProvider metaProvider =
             new SerializationStreamProvider<XWikiAttachment>(metaSerializer, attachment);
-        addSaver(metaProvider, fileTools, provider.getDeletedAttachmentMetaFile());
+        addSaver(metaProvider, fileTools, provider.getDeletedAttachmentMetaBlob());
 
         //////////////////////////////////////////////
         // Save the archive for the deleted attachment.
@@ -83,8 +83,8 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
         //////////////////////////////////////////////
         // Save the attachment's content.
 
-        Blob attachFile = provider.getAttachmentContentFile();
-        Blob linkAttachFile = StoreFileUtils.getLinkFile(attachFile);
+        Blob attachBlob = provider.getAttachmentContentBlob();
+        Blob linkAttachBlob = StoreFileUtils.getLinkBlob(attachBlob);
 
         // If the last archive is identical to the current version (which is the case except in very rare
         // cases), don't duplicate content
@@ -97,11 +97,11 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
         if (archiveAttachment != null && Objects.equals(archiveAttachment.getDate(), attachment.getDate())
             && archiveAttachment.getLongSize() == attachment.getLongSize()) {
             // Create a link to the current version
-            finalAttachFile = linkAttachFile;
+            finalAttachFile = linkAttachBlob;
             streamProvider = new StringStreamProvider(fileTools.getLinkContent(attachment), StandardCharsets.UTF_8);
         } else {
             // Save the content as is
-            finalAttachFile = attachFile;
+            finalAttachFile = attachBlob;
             streamProvider = new AttachmentContentStreamProvider(attachment, context);
         }
 

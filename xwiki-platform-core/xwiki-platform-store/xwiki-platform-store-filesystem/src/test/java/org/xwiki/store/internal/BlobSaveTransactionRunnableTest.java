@@ -36,6 +36,7 @@ import org.xwiki.store.TransactionRunnable;
 import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.FileSystemBlobStoreProperties;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.XWikiTempDirExtension;
@@ -84,7 +85,11 @@ class BlobSaveTransactionRunnableTest
     void beforeEach() throws Exception
     {
         File storageLocation = new File(this.testDirectory, "test-storage" + System.identityHashCode(this.getClass()));
-        this.blobStore = spy(new FileSystemBlobStore("test", storageLocation.toPath()));
+        FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
+        properties.setRootDirectory(storageLocation.toPath());
+        properties.setName("Test");
+        properties.setType("filesystem");
+        this.blobStore = spy(new FileSystemBlobStore(properties));
 
         BlobPath blobPath = BlobPath.of(Arrays.asList(FILE_PATH));
         this.toSave = this.blobStore.getBlob(blobPath);

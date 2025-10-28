@@ -120,7 +120,7 @@ public class BlobDeleteTransactionRunnable extends StartableTransactionRunnable<
      * @see StartableTransactionRunnable#onRollback()
      */
     @Override
-    protected void onRollback() throws BlobStoreException
+    protected void onRollback() throws BlobStoreException, IOException
     {
         // If this is false then we know run() has not yet happened and we know there is nothing to do.
         if (this.preRunComplete) {
@@ -145,11 +145,9 @@ public class BlobDeleteTransactionRunnable extends StartableTransactionRunnable<
 
             // 4.
             if (isBackupFile && isMainFile) {
-                throw new IllegalStateException("Tried to rollback the deletion of file "
-                    + this.toDelete.getPath() + " and encountered a "
-                    + "backup and a main file. Since the main file is renamed "
-                    + "to a backup location before deleting, this should never "
-                    + "happen.");
+                // This could happen because we use copy + delete instead of rename on some file systems. In this
+                // case, we apparently copied the file to the backup location but failed to delete the original.
+                clearBackup();
             }
         }
     }

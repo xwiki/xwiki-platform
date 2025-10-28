@@ -44,6 +44,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.blob.FileSystemBlobStoreProperties;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
@@ -185,14 +186,18 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         this.storageLocation = new File(tmpDir, "test-storage-location");
 
-        FileSystemBlobStore blobStore = new FileSystemBlobStore("Test", this.storageLocation.toPath());
+        FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
+        properties.setRootDirectory(this.storageLocation.toPath());
+        properties.setName("Test");
+        properties.setType("filesystem");
+        FileSystemBlobStore blobStore = new FileSystemBlobStore(properties);
 
         this.fileTools = new FilesystemStoreTools(blobStore, new DummyLockProvider());
 
         this.attachStore = new FilesystemAttachmentStore();
         FieldUtils.writeField(this.attachStore, "fileTools", this.fileTools, true);
 
-        this.storeFile = this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentFile();
+        this.storeFile = this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
         HELLO_STREAM.reset();
     }
 
@@ -207,7 +212,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
     public void saveContentTest() throws Exception
     {
         final Blob storeFile =
-            this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentFile();
+            this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
         Assert.assertFalse(this.storeFile.exists());
 
         getMockery().checking(new Expectations()
@@ -229,7 +234,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
     public void saveTwoOfSameAttachmentInOneTransactionTest() throws Exception
     {
         final Blob storeFile =
-            this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentFile();
+            this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
         Assert.assertFalse(this.storeFile.exists());
 
         getMockery().checking(new Expectations()

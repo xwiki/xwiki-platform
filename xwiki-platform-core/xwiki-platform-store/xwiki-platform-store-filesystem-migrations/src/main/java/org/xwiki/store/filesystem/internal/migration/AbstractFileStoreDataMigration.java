@@ -38,6 +38,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.FileSystemBlobStoreProperties;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
@@ -85,18 +86,18 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
         String pre11StoreName = "storage";
         this.pre11StoreRootDirectory = new File(this.environment.getPermanentDirectory(), pre11StoreName);
 
-        this.pre11BlobStore = new FileSystemBlobStore(pre11StoreName, this.pre11StoreRootDirectory.toPath());
+        // TODO: not sure if this is the best way to get the pre-11 blob store. Maybe use the factory instead?
+        FileSystemBlobStoreProperties pre11Properties = new FileSystemBlobStoreProperties();
+        pre11Properties.setName(pre11StoreName);
+        pre11Properties.setType("filesystem");
+        pre11Properties.setRootDirectory(this.pre11StoreRootDirectory.toPath());
+        this.pre11BlobStore = new FileSystemBlobStore(pre11Properties);
 
         if (getVersion().getVersion() < R1100000XWIKI15620DataMigration.VERSION) {
             this.blobStore = this.pre11BlobStore;
         } else {
             this.blobStore = this.fstools.getStore();
         }
-    }
-
-    protected FileSystemBlobStore getPre11BlobStore()
-    {
-        return this.pre11BlobStore;
     }
 
     protected File getPre11StoreRootDirectory()

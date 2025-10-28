@@ -47,7 +47,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-store-blob-filesystem</artifactId>
+      <artifactId>xwiki-commons-store-blob-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <!-- Needed for DocumentReferenceSerializer implementation. -->
@@ -126,6 +126,12 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-store-blob-filesystem</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -141,7 +147,6 @@
               <excludes>
                 <!-- Fan-out violation in an implementation of a legacy interface. -->
                 org/xwiki/store/legacy/store/internal/FilesystemAttachmentRecycleBinContentStore.java,
-                org/xwiki/store/filesystem/internal/migration/R910100XWIKI14871DataMigration.java
               </excludes>
             </configuration>
           </execution>

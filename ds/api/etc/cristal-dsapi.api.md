@@ -5,19 +5,24 @@
 ```ts
 
 import { ButtonHTMLAttributes } from 'vue';
+import { ComponentOptionsMixin } from 'vue';
+import { ComputedOptions } from 'vue';
 import { DefineComponent } from 'vue';
 import { DocumentReference } from '@xwiki/cristal-model-api';
 import { FormHTMLAttributes } from 'vue';
 import { HTMLAttributes } from 'vue';
 import { ImgHTMLAttributes } from 'vue';
 import { InputHTMLAttributes } from 'vue';
+import { MethodOptions } from 'vue';
 import { NavigationTreeNode } from '@xwiki/cristal-navigation-tree-api';
 import { SpaceReference } from '@xwiki/cristal-model-api';
 import { TreeNode } from '@xwiki/cristal-fn-utils';
 
 // @beta
 export type AbstractElements = {
-    XAlert: DefineComponent<AlertProps & HTMLAttributes>;
+    XAlert: DefineComponent<AlertProps & HTMLAttributes, object, object, ComputedOptions, MethodOptions, ComponentOptionsMixin, ComponentOptionsMixin, {
+        "update:modelValue": (open: boolean) => never;
+    }>;
     XAvatar: DefineComponent<AvatarProps & HTMLAttributes>;
     XBtn: DefineComponent<BtnProps & ButtonHTMLAttributes>;
     XBreadcrumb: DefineComponent<BreadcrumbProps & HTMLAttributes>;

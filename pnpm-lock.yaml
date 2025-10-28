@@ -334,8 +334,8 @@ catalogs:
       specifier: 4.5.1
       version: 4.5.1
     vue-tsc:
-      specifier: 2.2.12
-      version: 2.2.12
+      specifier: 3.1.2
+      version: 3.1.2
     vuetify:
       specifier: 3.10.4
       version: 3.10.4
@@ -494,7 +494,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   authentication-server:
     dependencies:
@@ -603,7 +603,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/attachments/attachments-api:
     dependencies:
@@ -762,7 +762,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/authentication/authentication-api:
     devDependencies:
@@ -924,7 +924,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/authentication/authentication-nextcloud:
     dependencies:
@@ -1043,7 +1043,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/authentication/authentication-ui:
     dependencies:
@@ -1098,7 +1098,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/authentication/authentication-xwiki:
     dependencies:
@@ -1530,7 +1530,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/document/document-api:
     dependencies:
@@ -1682,7 +1682,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/file-preview/file-preview-ui:
     dependencies:
@@ -1713,7 +1713,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/fn-utils:
     devDependencies:
@@ -2032,7 +2032,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/history/history-xwiki:
     dependencies:
@@ -2094,7 +2094,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/info-actions/info-actions-api:
     dependencies:
@@ -2178,7 +2178,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/link-suggest/link-suggest-api:
     dependencies:
@@ -3097,7 +3097,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/page/page-api:
     devDependencies:
@@ -3335,7 +3335,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/settings/settings-default:
     dependencies:
@@ -3444,7 +3444,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/uniast/uniast-api:
     dependencies:
@@ -3586,7 +3586,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   core/wiki-config/wiki-config-api:
     dependencies:
@@ -3793,7 +3793,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   ds/vuetify:
     dependencies:
@@ -3851,7 +3851,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   editors/blocknote:
     dependencies:
@@ -3933,7 +3933,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   editors/blocknote-headless:
     dependencies:
@@ -4012,7 +4012,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   editors/blocknote-react:
     dependencies:
@@ -4115,7 +4115,7 @@ importers:
         version: 7.1.12(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   electron:
     dependencies:
@@ -4751,7 +4751,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   lib:
     dependencies:
@@ -4995,7 +4995,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   realtime:
     dependencies:
@@ -5236,7 +5236,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   sources/xwiki/mock-server:
     dependencies:
@@ -5343,7 +5343,7 @@ importers:
         version: 7.1.12(@types/node@22.18.9)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
   xwiki/remoteinlineeditor:
     dependencies:
@@ -5374,7 +5374,7 @@ importers:
         version: 3.5.22(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 2.2.12(typescript@5.9.3)
+        version: 3.1.2(typescript@5.9.3)
 
 packages:
 
@@ -6832,23 +6832,23 @@ packages:
   '@vitest/utils@3.2.4':
     resolution: {integrity: sha512-fB2V0JFrQSMsCo9HiSq3Ezpdv4iYaXRG1Sx8edX3MwxfyNn83mKiGzOcH+Fkxt4MHxr3y42fQi1oeAInqgX2QA==}
 
-  '@volar/language-core@2.4.15':
-    resolution: {integrity: sha512-3VHw+QZU0ZG9IuQmzT68IyN4hZNd9GchGPhbD9+pa8CVv7rnoOZwo7T8weIbrRmihqy3ATpdfXFnqRrfPVK6CA==}
-
   '@volar/language-core@2.4.22':
     resolution: {integrity: sha512-gp4M7Di5KgNyIyO903wTClYBavRt6UyFNpc5LWfyZr1lBsTUY+QrVZfmbNF2aCyfklBOVk9YC4p+zkwoyT7ECg==}
 
-  '@volar/source-map@2.4.15':
-    resolution: {integrity: sha512-CPbMWlUN6hVZJYGcU/GSoHu4EnCHiLaXI9n8c9la6RaI9W5JHX+NqG+GSQcB0JdC2FIBLdZJwGsfKyBB71VlTg==}
+  '@volar/language-core@2.4.23':
+    resolution: {integrity: sha512-hEEd5ET/oSmBC6pi1j6NaNYRWoAiDhINbT8rmwtINugR39loROSlufGdYMF9TaKGfz+ViGs1Idi3mAhnuPcoGQ==}
 
   '@volar/source-map@2.4.22':
     resolution: {integrity: sha512-L2nVr/1vei0xKRgO2tYVXtJYd09HTRjaZi418e85Q+QdbbqA8h7bBjfNyPPSsjnrOO4l4kaAo78c8SQUAdHvgA==}
 
-  '@volar/typescript@2.4.15':
-    resolution: {integrity: sha512-2aZ8i0cqPGjXb4BhkMsPYDkkuc2ZQ6yOpqwAuNwUoncELqoy5fRgOQtLR9gB0g902iS0NAkvpIzs27geVyVdPg==}
+  '@volar/source-map@2.4.23':
+    resolution: {integrity: sha512-Z1Uc8IB57Lm6k7q6KIDu/p+JWtf3xsXJqAX/5r18hYOTpJyBn0KXUR8oTJ4WFYOcDzWC9n3IflGgHowx6U6z9Q==}
 
   '@volar/typescript@2.4.22':
     resolution: {integrity: sha512-6ZczlJW1/GWTrNnkmZxJp4qyBt/SGVlcTuCWpI5zLrdPdCZsj66Aff9ZsfFaT3TyjG8zVYgBMYPuCm/eRkpcpQ==}
+
+  '@volar/typescript@2.4.23':
+    resolution: {integrity: sha512-lAB5zJghWxVPqfcStmAP1ZqQacMpe90UrP5RJ3arDyrhy4aCUQqmxPPLB2PWDKugvylmO41ljK7vZ+t6INMTag==}
 
   '@vue/compiler-core@3.5.22':
     resolution: {integrity: sha512-jQ0pFPmZwTEiRNSb+i9Ow/I/cHv2tXYqsnHKKyCQ08irI2kdF5qmYedmF8si8mA7zepUFmJ2hqzS8CQmNOWOkQ==}
@@ -6885,8 +6885,8 @@ packages:
       typescript:
         optional: true
 
-  '@vue/language-core@2.2.12':
-    resolution: {integrity: sha512-IsGljWbKGU1MZpBPN+BvPAdr55YPkj2nB/TBNGNC32Vy2qLG25DYu/NBN2vNtZqdRbTRjaoYrahLrToim2NanA==}
+  '@vue/language-core@3.1.2':
+    resolution: {integrity: sha512-PyFDCqpdfYUT+oMLqcc61oHfJlC6yjhybaefwQjRdkchIihToOEpJ2Wu/Ebq2yrnJdd1EsaAvZaXVAqcxtnDxQ==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
@@ -7011,8 +7011,8 @@ packages:
   alien-signals@0.4.14:
     resolution: {integrity: sha512-itUAVzhczTmP2U5yX67xVpsbbOiquusbWVyA9N+sy6+r6YVbFkahXvNCeEPWEOMhwDYwbVbGHFkVL03N9I5g+Q==}
 
-  alien-signals@1.0.13:
-    resolution: {integrity: sha512-OGj9yyTnJEttvzhTUWuscOvtqxq5vrhF7vL9oS0xJ2mK0ItPYP1/y+vCFebfxoEyAz0++1AIwJ5CMr+Fk3nDmg==}
+  alien-signals@3.0.3:
+    resolution: {integrity: sha512-2JXjom6R7ZwrISpUphLhf4htUq1aKRCennTJ6u9kFfr3sLmC9+I4CxxVi+McoFnIg+p1HnVrfLT/iCt4Dlz//Q==}
 
   ansi-colors@4.1.3:
     resolution: {integrity: sha512-/6w/C21Pm1A7aZitlI5Ni/2J6FFQN8i1Cvz3kHABAAbw93v/NlvKdVOqz7CCWz/3iv/JplRSEEZ83XION15ovw==}
@@ -10670,8 +10670,8 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  vue-tsc@2.2.12:
-    resolution: {integrity: sha512-P7OP77b2h/Pmk+lZdJ0YWs+5tJ6J2+uOQPo7tlBnY44QqQSPYvS0qVT4wqDJgwrZaLe47etJLLQRFia71GYITw==}
+  vue-tsc@3.1.2:
+    resolution: {integrity: sha512-3fd4DY0rFczs5f+VB3OhcLU83V6+3Puj2yLBe0Ak65k7ERk+STVNKaOAi0EBo6Lc15UiJB6LzU6Mxy4+h/pKew==}
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
@@ -12606,27 +12606,27 @@ snapshots:
       loupe: 3.2.0
       tinyrainbow: 2.0.0
 
-  '@volar/language-core@2.4.15':
-    dependencies:
-      '@volar/source-map': 2.4.15
-
   '@volar/language-core@2.4.22':
     dependencies:
       '@volar/source-map': 2.4.22
 
-  '@volar/source-map@2.4.15': {}
+  '@volar/language-core@2.4.23':
+    dependencies:
+      '@volar/source-map': 2.4.23
 
   '@volar/source-map@2.4.22': {}
 
-  '@volar/typescript@2.4.15':
-    dependencies:
-      '@volar/language-core': 2.4.15
-      path-browserify: 1.0.1
-      vscode-uri: 3.1.0
+  '@volar/source-map@2.4.23': {}
 
   '@volar/typescript@2.4.22':
     dependencies:
       '@volar/language-core': 2.4.22
+      path-browserify: 1.0.1
+      vscode-uri: 3.1.0
+
+  '@volar/typescript@2.4.23':
+    dependencies:
+      '@volar/language-core': 2.4.23
       path-browserify: 1.0.1
       vscode-uri: 3.1.0
 
@@ -12698,16 +12698,15 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  '@vue/language-core@2.2.12(typescript@5.9.3)':
+  '@vue/language-core@3.1.2(typescript@5.9.3)':
     dependencies:
-      '@volar/language-core': 2.4.15
+      '@volar/language-core': 2.4.23
       '@vue/compiler-dom': 3.5.22
-      '@vue/compiler-vue2': 2.7.16
       '@vue/shared': 3.5.22
-      alien-signals: 1.0.13
-      minimatch: 9.0.5
+      alien-signals: 3.0.3
       muggle-string: 0.4.1
       path-browserify: 1.0.1
+      picomatch: 4.0.3
     optionalDependencies:
       typescript: 5.9.3
 
@@ -12842,7 +12841,7 @@ snapshots:
 
   alien-signals@0.4.14: {}
 
-  alien-signals@1.0.13: {}
+  alien-signals@3.0.3: {}
 
   ansi-colors@4.1.3: {}
 
@@ -17175,10 +17174,10 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.22(typescript@5.9.3)
 
-  vue-tsc@2.2.12(typescript@5.9.3):
+  vue-tsc@3.1.2(typescript@5.9.3):
     dependencies:
-      '@volar/typescript': 2.4.15
-      '@vue/language-core': 2.2.12(typescript@5.9.3)
+      '@volar/typescript': 2.4.23
+      '@vue/language-core': 3.1.2(typescript@5.9.3)
       typescript: 5.9.3
 
   vue@3.5.22(typescript@5.9.3):

@@ -24,7 +24,7 @@ import type { DisplayableTreeNode, TreeProps } from "@xwiki/cristal-dsapi";
 import type { Ref } from "vue";
 
 defineProps<TreeProps>();
-const opened = defineModel<string[]>("opened", { default: [] });
+const opened = defineModel("opened", { default: [], type: Array<string> });
 const activated = defineModel<string | undefined>("activated");
 
 const activatedNodes: Ref<Array<string>> = ref([]);
@@ -52,10 +52,11 @@ function updateActivated(newActivatedNode: DisplayableTreeNode) {
     activatable
     active-strategy="independent"
     item-value="id"
-    v-model:opened="opened"
+    :opened="opened"
+    @update:opened="($event) => (opened = $event as string[])"
     @update:activated="resetActivated"
   >
-    <template #title="{ item }: { item: DisplayableTreeNode }">
+    <template #title="{ item }">
       <a :href="item.url" @click="updateActivated(item)">{{ item.label }}</a>
     </template>
   </v-treeview>

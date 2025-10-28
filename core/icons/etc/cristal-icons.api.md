@@ -13,10 +13,14 @@ import { PublicProps } from 'vue';
 export const CIcon: DefineComponent<    {
 name: string;
 size?: Size;
-}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<{
+}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
+click: (event: MouseEvent) => any;
+}, string, PublicProps, Readonly<{
 name: string;
 size?: Size;
-}> & Readonly<{}>, {
+}> & Readonly<{
+onClick?: ((event: MouseEvent) => any) | undefined;
+}>, {
 size: Size;
 }, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLSpanElement>;
 

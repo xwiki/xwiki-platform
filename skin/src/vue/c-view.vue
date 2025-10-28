@@ -70,6 +70,8 @@ function onCollapseMainSidebar() {
       :class="{ 'sidebar-is-collapsed': isMainSidebarCollapsed }"
     >
       <UIX uixname="view.before" />
+      <!-- @vue-expect-error @collapse-main-sidebar is not known on c-template
+        but is raised by underlying components -->
       <CTemplate
         name="sidebar"
         @collapse-main-sidebar="onCollapseMainSidebar"

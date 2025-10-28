@@ -49,11 +49,14 @@ import type { TextFieldProps } from "./XTextField";
 import type { DisplayableTreeNode, TreeProps } from "./XTree";
 import type {
   ButtonHTMLAttributes,
+  ComponentOptionsMixin,
+  ComputedOptions,
   DefineComponent,
   FormHTMLAttributes,
   HTMLAttributes,
   ImgHTMLAttributes,
   InputHTMLAttributes,
+  MethodOptions,
 } from "vue";
 
 /**
@@ -64,7 +67,18 @@ import type {
  * @beta
  */
 type AbstractElements = {
-  XAlert: DefineComponent<AlertProps & HTMLAttributes>;
+  XAlert: DefineComponent<
+    AlertProps & HTMLAttributes,
+    object,
+    object,
+    ComputedOptions,
+    MethodOptions,
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      "update:modelValue": (open: boolean) => never;
+    }
+  >;
   XAvatar: DefineComponent<AvatarProps & HTMLAttributes>;
   XBtn: DefineComponent<BtnProps & ButtonHTMLAttributes>;
   XBreadcrumb: DefineComponent<BreadcrumbProps & HTMLAttributes>;

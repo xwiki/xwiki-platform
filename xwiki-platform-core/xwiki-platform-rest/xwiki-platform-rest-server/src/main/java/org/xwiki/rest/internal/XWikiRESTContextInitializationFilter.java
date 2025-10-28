@@ -40,9 +40,12 @@ public class XWikiRESTContextInitializationFilter extends XWikiContextInitializa
     {
         // Before running the authentication, switch the the right context wiki (if the path if of the form
         // /wikis/{wikiid}[/*])
-        String wiki = extractWiki(request.getPathInfo());
-        if (wiki != null) {
-            context.setWikiId(wiki);
+        String path = request.getPathInfo();
+        if (path != null) {
+            String wiki = extractWiki(path);
+            if (wiki != null) {
+                context.setWikiId(wiki);
+            }
         }
 
         super.authenticate(context, request);

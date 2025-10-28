@@ -19,8 +19,8 @@ catalogs:
       specifier: 2.29.7
       version: 2.29.7
     '@eslint/config-helpers':
-      specifier: 0.4.0
-      version: 0.4.0
+      specifier: 0.4.1
+      version: 0.4.1
     '@eslint/eslintrc':
       specifier: 3.3.1
       version: 3.3.1
@@ -361,7 +361,7 @@ importers:
         version: 2.29.7(@types/node@24.1.0)
       '@eslint/config-helpers':
         specifier: 'catalog:'
-        version: 0.4.0
+        version: 0.4.1
       '@eslint/eslintrc':
         specifier: 'catalog:'
         version: 3.3.1
@@ -5786,10 +5786,6 @@ packages:
 
   '@eslint/config-array@0.21.1':
     resolution: {integrity: sha512-aw1gNayWpdI/jSYVgzN5pL0cfzU02GT3NBpeT/DXbx1/1x7ZKxFPd9bwrzygx/qiwIQiJ1sw/zD8qY/kRvlGHA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@eslint/config-helpers@0.4.0':
-    resolution: {integrity: sha512-WUFvV4WoIwW8Bv0KeKCIIEgdSiFOsulyN0xrMu+7z43q/hkOLXjvb5u7UC9jDxvRzcrbEmuZBX5yJZz1741jog==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/config-helpers@0.4.1':
@@ -11420,10 +11416,6 @@ snapshots:
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
-
-  '@eslint/config-helpers@0.4.0':
-    dependencies:
-      '@eslint/core': 0.16.0
 
   '@eslint/config-helpers@0.4.1':
     dependencies:

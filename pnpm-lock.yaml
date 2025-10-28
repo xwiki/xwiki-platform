@@ -142,8 +142,8 @@ catalogs:
       specifier: 26.0.12
       version: 26.0.12
     electron-store:
-      specifier: 11.0.0
-      version: 11.0.0
+      specifier: 11.0.2
+      version: 11.0.2
     esbuild:
       specifier: 0.25.10
       version: 0.25.10
@@ -4155,7 +4155,7 @@ importers:
         version: 38.2.1
       electron-store:
         specifier: 'catalog:'
-        version: 11.0.0
+        version: 11.0.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4230,7 +4230,7 @@ importers:
         version: 38.2.1
       electron-store:
         specifier: 'catalog:'
-        version: 11.0.0
+        version: 11.0.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4311,7 +4311,7 @@ importers:
         version: 38.2.1
       electron-store:
         specifier: 'catalog:'
-        version: 11.0.0
+        version: 11.0.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -4580,7 +4580,7 @@ importers:
         version: 38.2.1
       electron-store:
         specifier: 'catalog:'
-        version: 11.0.0
+        version: 11.0.2
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -7628,8 +7628,8 @@ packages:
   electron-publish@26.0.11:
     resolution: {integrity: sha512-a8QRH0rAPIWH9WyyS5LbNvW9Ark6qe63/LqDB7vu2JXYpi0Gma5Q60Dh4tmTqhOBQt0xsrzD8qE7C+D7j+B24A==}
 
-  electron-store@11.0.0:
-    resolution: {integrity: sha512-msCXEmzIGdnIq/u3od5mh/Hk5mZAGKa+3gGGTQcqPPkHcD/otlLyIZuRd1WAOhhg0gKo17BK5Avsl7OHkxir7w==}
+  electron-store@11.0.2:
+    resolution: {integrity: sha512-4VkNRdN+BImL2KcCi41WvAYbh6zLX5AUTi4so68yPqiItjbgTjqpEnGAqasgnG+lB6GuAyUltKwVopp6Uv+gwQ==}
     engines: {node: '>=20'}
 
   electron-to-chromium@1.5.165:
@@ -13554,7 +13554,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron-store@11.0.0:
+  electron-store@11.0.2:
     dependencies:
       conf: 15.0.2
       type-fest: 5.0.1

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-administration-test</artifactId>
-    <version>17.9.0-SNAPSHOT</version>
+    <version>17.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-administration-test-docker</artifactId>
   <name>XWiki Platform - Administration - Tests - Functional Docker Tests</name>
@@ -70,6 +70,17 @@
       <artifactId>xwiki-platform-user-profile-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <!-- Needed to execute tests on subwikis -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-template-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- ================================
          Test only dependencies

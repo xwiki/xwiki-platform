@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class EditActionTest
+class EditActionTest
 {
     private static final DocumentReference USER_DOCUMENT_REFERENCE = new DocumentReference("wiki", "XWiki", "user");
 
@@ -88,7 +88,7 @@ public class EditActionTest
     private XWikiRequest request;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         when(this.documentReferenceUserReferenceResolver.resolve(USER_DOCUMENT_REFERENCE)).thenReturn(USER_REFERENCE);
         when(this.documentReferenceUserReferenceSerializer.serialize(USER_REFERENCE)).thenReturn(USER_DOCUMENT_REFERENCE);

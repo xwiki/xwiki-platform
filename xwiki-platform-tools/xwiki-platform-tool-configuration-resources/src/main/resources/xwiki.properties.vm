@@ -464,35 +464,40 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# groovy.customizer.timedInterrupt.timeout = 60
 
 #-------------------------------------------------------------------------------------
-# Events distribution
+# Clustering and events distribution
 #-------------------------------------------------------------------------------------
 
 #-# [Since 17.5.0]
 #-# Indicate the unique identifier of the instance among the members of a cluster.
 #-# By default it is automatically generated from a UUID and stored in the permanent directory.
+#-# 
 # observation.remote.id = node1
 
 #-# [Since 2.0M3]
 #-# Indicate if the network distribution module is enabled or not.
 #-# By default remote events are disabled.
+#-# 
+#-# The default is:
 # observation.remote.enabled = false
 
 #-# [Since 2.0M3]
 #-# The list of events communication channels to start when the application starts.
 #-# By default no channel is configured.
-#-#
+#-# 
 #-# The default remote event distribution implementation is using JGroups and you'll need to either use embedded
 #-# JGroups configuration files or drop your custom configuration in the WEB-INF/observation/remote/jgroups/ directory.
 #-# There's a README file in that directory with more information.
-#-# Example: observation.remote.channels = public, cluster
+#-# 
+# observation.remote.channels = public, cluster
 
 #-# [Since 2.0M4]
 #-# The implementation of network adapter to use.
-#-# The default is jgroups.
 #-#
-#-# By default only jgroups is provided. To add one implements NetworkAdaptor component interface. The identifier
+#-# By default only jgroups is provided. To add one, implements NetworkAdaptor component interface. The identifier
 #-# provided in the configuration is matched with the component role hint.
-#-# Example: observation.remote.networkadapter = jgroups
+#-# 
+#-# The default is:
+#-# observation.remote.networkadapter = jgroups
 
 #-------------------------------------------------------------------------------------
 # CSRF token component
@@ -1021,7 +1026,7 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # url.trustedSchemes=http,https,ftp
 
-#-# [Since JAKARTA]
+#-# [Since 17.0.0]
 #-# By default, XWiki will try its best to force the application server to let any URL go through despite their default
 #-# protections and what Servlet 6.0 recommend.
 #-# The point of this option is to allow disabling this bypass of the application server default protections.
@@ -1029,6 +1034,29 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-#
 #-# The default is:
 # url.forceAllowAnyCharacter=true
+
+#-# [Since 17.9.0]
+#-# [Since 17.4.7]
+#-# [Since 16.10.14]
+#-# Define the policy to use for URL checks performed in the UI, whether the user should be asked for confirmation
+#-# when going to an untrusted domain.
+#-# Accepted values for this property are: enabled, disabled, or comments.
+#-# Enabled means that the check will be enforced in all the wiki UI, disabled that the check will never be
+#-# performed, and comments (default value) means that the check will only be performed on links provided in the
+#-# comments of the wiki.
+#-#
+#-# By default this property is set to comments:
+# url.frontendUrlCheckPolicy=comments
+
+#-# [Since 17.9.0RC1]
+#-# [Since 17.4.6]
+#-# [Since 16.10.13]
+#-# Allow to allow specific URLs to be accessible from the frontend without asking confirmation, and without
+#-# needing to allow and entire domain. The expected format is absolute URLs separated by commas, e.g.:
+#-# https://github.com/xwiki/xwiki-platform,https://www.xwiki.org/xwiki/bin/view/Main/WebHome
+#-#
+#-# By default this property is empty:
+# url.allowedFrontendUrls=
 
 #-------------------------------------------------------------------------------------
 # Attachment

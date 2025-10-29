@@ -85,19 +85,19 @@ public class CoeditorsDropdown extends BaseElement
     /**
      * @return the list of users that are currently editing the page in realtime
      */
-    public List<Coeditor> getCoeditors()
+    public List<CoeditorElement> getCoeditors()
     {
         return getDriver().findElements(By.cssSelector(".realtime-users-dropdown .realtime-user")).stream()
-            .map(Coeditor::new).toList();
+            .map(CoeditorElement::new).toList();
     }
 
     /**
      * @param coeditorId the coeditor identifier
      * @return the coeditor with the specified identifier
      */
-    public Coeditor getCoeditor(String coeditorId)
+    public CoeditorElement getCoeditor(String coeditorId)
     {
-        return new Coeditor(
+        return new CoeditorElement(
             getDriver().findElement(By.cssSelector(".realtime-users-dropdown[data-id='" + coeditorId + "']")));
     }
 }

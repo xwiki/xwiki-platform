@@ -231,6 +231,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam2.setDisplayType("java.lang.Boolean");
         nodeParam2.setEditTemplate("<input type=\"checkbox\" name=\"param2\" value=\"true\"/>\n"
             + "<input type=\"hidden\" name=\"param2\" value=\"false\"/>");
+        nodeParam2.setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter nodeParam3 = new MacroUINodeParameter("param3");
         nodeParam3.setName("rendering.macro.myMacro.parameter.param3.nameTranslated");
@@ -239,6 +240,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam3.setDeprecated(true);
         nodeParam3.setDisplayType("java.lang.String");
         nodeParam3.setEditTemplate("<input type=\"text\" name=\"param3\" />");
+        nodeParam3.setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter nodeParam4 = new MacroUINodeParameter("param4");
         nodeParam4.setName("rendering.macro.myMacro.parameter.param4.nameTranslated");
@@ -246,6 +248,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam4.setOrder(4);
         nodeParam4.setDisplayType("java.lang.String");
         nodeParam4.setEditTemplate("<input type=\"text\" name=\"param4\" />");
+        nodeParam4.setParent("FEATURE:myFeature");
 
         MacroUINodeParameter nodeParam5 = new MacroUINodeParameter("param5");
         nodeParam5.setName("rendering.macro.myMacro.parameter.param5.nameTranslated");
@@ -266,12 +269,14 @@ class MacroDescriptorUIFactoryTest
         nodeParam6.setOrder(6);
         nodeParam6.setDisplayType("java.lang.String");
         nodeParam6.setEditTemplate("<input type=\"text\" name=\"param6\" />");
+        nodeParam6.setParent("FEATURE:myFeature");
 
         MacroUINodeParameter nodeParam7 = new MacroUINodeParameter("param7");
         nodeParam7.setName("rendering.macro.myMacro.parameter.param7.nameTranslated");
         nodeParam7.setDescription("rendering.macro.myMacro.parameter.param7.descriptionTranslated");
         nodeParam7.setDisplayType("java.lang.String");
         nodeParam7.setEditTemplate("<input type=\"text\" name=\"param7\" />");
+        nodeParam7.setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter nodeParam8 = new MacroUINodeParameter("param8");
         nodeParam8.setName("rendering.macro.myMacro.parameter.param8.nameTranslated");
@@ -285,6 +290,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam9.setDescription("rendering.macro.myMacro.parameter.param9.descriptionTranslated");
         nodeParam9.setDisplayType("java.lang.String");
         nodeParam9.setEditTemplate("<input type=\"text\" name=\"param9\" />");
+        nodeParam9.setParent("GROUP:someGroup");
 
         MacroUINodeParameter nodeParam10 = new MacroUINodeParameter("param10");
         nodeParam10.setName("rendering.macro.myMacro.parameter.param10.nameTranslated");
@@ -292,6 +298,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam10.setOrder(8);
         nodeParam10.setDisplayType("java.lang.String");
         nodeParam10.setEditTemplate("<input type=\"text\" name=\"param10\" />");
+        nodeParam10.setParent("GROUP:someGroup");
 
         MacroUINodeParameter nodeParam11 = new MacroUINodeParameter("param11");
         nodeParam11.setName("rendering.macro.myMacro.parameter.param11.nameTranslated");
@@ -300,6 +307,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam11.setHidden(true);
         nodeParam11.setDisplayType("java.lang.String");
         nodeParam11.setEditTemplate("<input type=\"text\" name=\"param11\" />");
+        nodeParam11.setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter nodeParam12 = new MacroUINodeParameter("param12");
         nodeParam12.setName("rendering.macro.myMacro.parameter.param12.nameTranslated");
@@ -308,6 +316,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam12.setAdvanced(true);
         nodeParam12.setDisplayType("java.lang.String");
         nodeParam12.setEditTemplate("<input type=\"text\" name=\"param12\" />");
+        nodeParam12.setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter nodeParam13 = new MacroUINodeParameter("param13");
         nodeParam13.setName("rendering.macro.myMacro.parameter.param13.nameTranslated");
@@ -315,6 +324,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam13.setOrder(11);
         nodeParam13.setDisplayType("java.lang.String");
         nodeParam13.setEditTemplate("<input type=\"text\" name=\"param13\" />");
+        nodeParam13.setParent("GROUP:someGroup");
 
         MacroUINodeParameter nodeParam14 = new MacroUINodeParameter("param14");
         nodeParam14.setName("rendering.macro.myMacro.parameter.param14.nameTranslated");
@@ -322,12 +332,14 @@ class MacroDescriptorUIFactoryTest
         nodeParam14.setAdvanced(true);
         nodeParam14.setDisplayType("java.lang.String");
         nodeParam14.setEditTemplate("<input type=\"text\" name=\"param14\" />");
+        nodeParam14.setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter nodeParam15 = new MacroUINodeParameter("param15");
         nodeParam15.setName("rendering.macro.myMacro.parameter.param15.nameTranslated");
         nodeParam15.setDescription("rendering.macro.myMacro.parameter.param15.descriptionTranslated");
         nodeParam15.setDisplayType("java.lang.String");
         nodeParam15.setEditTemplate("<input type=\"text\" name=\"param15\" />");
+        nodeParam15.setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter nodeParam16 = new MacroUINodeParameter("param16");
         nodeParam16.setName("rendering.macro.myMacro.parameter.param16.nameTranslated");
@@ -335,6 +347,7 @@ class MacroDescriptorUIFactoryTest
         nodeParam16.setOrder(12);
         nodeParam16.setDisplayType("java.lang.String");
         nodeParam16.setEditTemplate("<input type=\"text\" name=\"param16\" />");
+        nodeParam16.setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter nodeContent = new MacroUINodeParameter("$content");
         nodeContent.setName("rendering.macroContentTranslated");
@@ -343,6 +356,7 @@ class MacroDescriptorUIFactoryTest
         nodeContent.setDisplayType("java.util.List<org.xwiki.rendering.block.Block>");
         nodeContent.setEditTemplate("<textarea name=\"$content\" rows=\"7\"></textarea>");
         nodeContent.setOrder(0);
+        nodeContent.setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeGroup featureNode = new MacroUINodeGroup("myFeature");
         featureNode.setFeature(true);
@@ -509,23 +523,27 @@ class MacroDescriptorUIFactoryTest
 
         MacroUINodeParameter referenceNode = new MacroUINodeParameter("reference")
             .setEditTemplate("<input type=\"text\" name=\"reference\" />")
-            .setDisplayType("org.xwiki.model.reference.EntityReferenceString");
+            .setDisplayType("org.xwiki.model.reference.EntityReferenceString")
+            .setParent("GROUP:stringReference");
 
         MacroUINodeParameter sectionNode = new MacroUINodeParameter("section")
             .setEditTemplate("<input type=\"text\" name=\"section\" />")
             .setDisplayType("java.lang.String")
-            .setAdvanced(true);
+            .setAdvanced(true)
+            .setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter excludeFirstHeadingNode = new MacroUINodeParameter("excludeFirstHeading")
             .setEditTemplate("<input type=\"text\" name=\"excludeFirstHeading\" />")
             .setDisplayType("java.lang.String")
-            .setAdvanced(true);
+            .setAdvanced(true)
+            .setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter contextNode = new MacroUINodeParameter("context")
             .setEditTemplate("<input type=\"text\" name=\"context\" />")
             .setDisplayType("java.lang.String")
             .setAdvanced(true)
-            .setDeprecated(true);
+            .setDeprecated(true)
+            .setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeParameter typeNode = new MacroUINodeParameter("type")
             .setDisplayType("org.xwiki.model.EntityType")
@@ -546,12 +564,14 @@ class MacroDescriptorUIFactoryTest
                 + "</select>")
             .setCaseInsensitive(true)
             .setAdvanced(true)
-            .setHidden(true);
+            .setHidden(true)
+            .setParent("GROUP:stringReference");
 
         MacroUINodeParameter pageNode = new MacroUINodeParameter("page")
             .setDisplayType("org.xwiki.model.reference.PageReference")
             .setEditTemplate("<input type=\"text\" name=\"page\" />")
-            .setHidden(true);
+            .setHidden(true)
+            .setParent("FEATURE:reference");
 
         MacroUINodeParameter authorNode = new MacroUINodeParameter("author")
             .setDisplayType("org.xwiki.wysiwyg.internal.macro.MacroDescriptorUIFactoryTest$TestEnum")
@@ -560,7 +580,8 @@ class MacroDescriptorUIFactoryTest
                 + "<option value=\"VALUE1\">VALUE1</option>"
                 + "<option value=\"VALUE2\">VALUE2</option>"
                 + "</select>")
-            .setAdvanced(true);
+            .setAdvanced(true)
+            .setParent("GROUP:defaultOptionalGroup");
 
         MacroUINodeGroup stringReferenceGroup = new MacroUINodeGroup("stringReference")
             .setFeature(true)
@@ -569,6 +590,7 @@ class MacroDescriptorUIFactoryTest
                 "PARAMETER:reference",
                 "PARAMETER:type"
             ))
+            .setParent("FEATURE:reference")
             .setName("stringReference");
 
         MacroUINodeGroup referenceFeature = new MacroUINodeGroup("reference")

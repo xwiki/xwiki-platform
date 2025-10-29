@@ -48,7 +48,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -155,7 +154,7 @@ public class DefaultLESSCompilerTest
                 lessResourceReference, false, false, "skin", true));
 
         // Verify
-        verify(cache, times(1)).set(any(LESSResourceReference.class), any(SkinReference.class),
+        verify(cache).set(any(LESSResourceReference.class), any(SkinReference.class),
                 any(ColorThemeReference.class), any());
         verify(cache, never()).get(eq(lessResourceReference), eq(skinReference), eq(colorThemeReference));
     }

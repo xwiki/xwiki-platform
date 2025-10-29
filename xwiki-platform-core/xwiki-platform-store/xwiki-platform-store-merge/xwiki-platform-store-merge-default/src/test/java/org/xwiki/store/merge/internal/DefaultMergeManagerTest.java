@@ -63,7 +63,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -110,7 +109,7 @@ public class DefaultMergeManagerTest
         assertEquals("content\n", result.getMergeResult());
         assertTrue(result.isModified());
         assertFalse(result.hasConflicts());
-        verify(conflictDecisionsManager, times(1)).getConflictDecisionList(documentReference, userReference);
+        verify(conflictDecisionsManager).getConflictDecisionList(documentReference, userReference);
     }
 
     @Test

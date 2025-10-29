@@ -29,18 +29,26 @@
 ##
 ##############################################
 #set($doNotLoadColorThemeFromCSS = true)
-#template('colorThemeInit.vm')
+## Load the current colorTheme in $themeObj and some values from the old colortheme in the $theme variable
+## List mappings used to initialize both LESS variables here and CSS properties in cssVariablesInit.css
 #template('variablelist.vm')
+## Set generic flamingo related LESS variables.
+#foreach ($variableName in $xsVariablesValuesLESS.keySet())
+  #set($variableValue = $xsVariablesValuesLESS.get($variableName))
+@$variableName: $variableValue;
+#end
 ## Reset $doNotLoadColorThemeFromCSS for future calls (in SSX for examples)
 #set($doNotLoadColorThemeFromCSS = false)
 #if ("$!themeObj" != '')
-  #initFromOldColorTheme()
+  #_initFromOldColorTheme()
 #else
   #set($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
   #if ("$!themeObj" != '')
-    #initFromFlamingoTheme()
+    #_initFromFlamingoTheme()
   #else
-    #initDefaultXWikiVariables()
+    ## We reached here when there is no old colorTheme or Flamingo colorTheme loaded.
+    ## We make sure we still initialize XWiki specific values (and other values are initialized by bootstrap)
+    #_initDefaultXWikiVariables()
   #end
 #end
 
@@ -50,7 +58,7 @@
 ## (ColorTheme.ColorThemeClass)
 ##
 ##############################################
-#macro(initFromOldColorTheme)
+#macro(_initFromOldColorTheme)
   ##
   ## Bootstrap: Mapping between XWiki Color Theme and Bootstrap variables
   ##
@@ -83,15 +91,12 @@
 ## we are consistent with the live preview (no bad surprise !)
 ##
 ##############################################
-#macro(initFromFlamingoTheme)
+#macro(_initFromFlamingoTheme)
   // Colors from the new flamingo theme class
-  ## Init the XWiki variables
-  #if (!$xwikiLessVarsInitialized)
-    ## These are the variables that can only be overwritten by the @lessCode variable.
-    ## For them, we should not overwrite what @lessCode did
-    #set ($xwikiLessVarsInitialized = true)
-    #initDefaultXWikiVariables()
-  #end
+  ## Initialize the XWiki variables 
+  ## These are the variables that can only be overwritten by the @lessCode variable.
+  ## For them, we should not overwrite what @lessCode did
+  #_initDefaultXWikiVariables()
   ## Now set the variables with the values of the Flamingo object
   #if ("$!themeObj" != '')
     ## variables of the class, retrieved from the variablelist template.
@@ -116,52 +121,16 @@
 ## Initialize XWiki variables when no color theme is used
 ##
 ##############################################
-#macro(initDefaultXWikiVariables)
-  ## currently, it comes from the old color theme object (see colorThemeInit.vm)
-  // Default
-  @xwiki-border-color:                  $theme.borderColor;
-  @panel-header-bg:                     $theme.panelHeaderBackgroundColor;
-  @panel-header-text:                   $theme.panelHeaderTextColor;
-  @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
-  @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
-  @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
-  @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
-  ## Kept for backward compatibility
-  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
-
-  ## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
-  ## Make sure the links are dark enough in the tmDrawer
-  @navbar-default-link-color:           #727272;
-  @navbar-default-color:                #727272;
-  ## Make sure the placeholder are not too light (the default from bootstrap is #999, which does not have enough contrast with a white bg)
-  @input-color-placeholder:             #727272;
-  ## Make sure the breadcrumb links are dark enough
-  @breadcrumb-active-color:             #707070;
-  @breadcrumb-color:                    #707070;
-  ## Make sure that all text-muted based components have sufficient contrast on white
-  @text-muted:                          @gray;
-  ## Make the links a bit darker than the default from bootstrap. Default #337ab7 has sufficient contrast on white
-  ## but this updated value allows light grey background to keep enough contrast.
-  @brand-primary:                       #2f70a7;
-  ## Make regular text darker so that the contrast with links is high enough to differentiate them easily.
-  @text-color:                          #222222;
-  ## Make sure button white text has enough contrast on the whole gradient
-  @btn-primary-bg:                      #386da7;
-  ## Make sure all kinds of buttons have proper contrast
-  @btn-danger-bg:                       #ca302c;
-  @brand-success:                       #077537;
-  ## For the warning buttons, since the saturation is very high, we'd need to make the background way darker, going
-  ## from an orangish yellow to complete brown. Instead, we change the text color to black.
-  @btn-warning-color:                   #000;
-  ## The boxes should have enough contrast by default, we make it lighter than bootstrap.
-  ## @alert-warning-bg default value from bootstrap does not pose contrast issues, so we don't override it.
-  @alert-danger-bg:                     #f8ecec;
-  @alert-success-bg:                    #e5f3df;
-  @alert-info-bg:                       #e1f1f9;
-  ## We override the @brand-danger value from bootstrap as it does not pass contrast checks on #fff
-  @brand-danger:                        #cc3333;
+#macro(_initDefaultXWikiVariables)
+  ## Only initialize it if it's the first time callign this template
+  #if (!$xwikiLessVarsInitialized)
+    ## Flag to track the execution of this step (we don't need to run it more than once)
+    #set ($xwikiLessVarsInitialized = true)
+    #foreach ($variableName in $xsFromOldColorThemeVariables.keySet())
+      #set($variableValue = $xsFromOldColorThemeVariables.get($variableName))
+      @$variableName: $variableValue;
+    #end
+  #end
 #end
 
 ##############################################
@@ -192,3 +161,64 @@
 @xwiki-icon-spinner:                  "$xwiki.getSkinFile('icons/xwiki/spinner.gif')";
 @xwiki-icon-spinner-height:           16px;
 @xwiki-icon-link-external:            "$xwiki.getSkinFile('icons/xwiki/external-link.png')";
+
+##############################################
+##
+## 3/ Uniformize the CSS variable values with the latest compiled LESS values.
+##
+##############################################
+:root {
+## All of those variables exist both in CSS and LESS.
+## Trying to make this mapping with a variable that doesn't exist in LESS will end up in an error.
+## Trying to make this mapping with a property that doesn't exist in CSS will (unexpectedly) create it.
+## CSS property initialization should be done directly in cssVariablesInit.css
+## The goal of this mapping is to make sure the transition from the LESS variables to CSS properties is seamless 
+## whatever the customizations implemented.
+#set($mappedVariables = $collectiontool.getSet())
+#if("$!flamingoColorThemeVariables" != '')
+#set($discard = $mappedVariables.addAll($!flamingoColorThemeVariables.keySet()))
+#end
+#if("$!xsVariablesValuesCSS" != '')#set($discard = $mappedVariables.putAll($!xsVariablesValuesCSS.keySet()))#end
+#if("$!bootstrapVariables" != '')#set($discard = $mappedVariables.putAll($!bootstrapVariables.keySet()))#end
+#if("$!oldColorThemeVariables" != '')#set($discard = $mappedVariables.putAll($!oldColorThemeVariables.keySet()))#end
+## List all of the CSS property names where we don't want to inherit the value from LESS.
+## Adding a variable name here will make sure its CSS property will stay unrelated to the corresponding LESS variable.
+## By default, most CSS variables should inherit their values, to make sure that LESS customizations are still taken
+## into account.
+## However, we might want to change the exact meaning of a variable with the CSS system. 
+## This is where this list is useful.
+## Examples 
+## 1. the font-size variables in LESS are defined in px. We want to move to em/rem font-sizes for the CSS 
+## properties. We make sure values from LESS don't get used for CSS properties.
+## 2. The 'dropdown-bg' variable is just a color. As long as we don't feel like it should represent anything 
+## different in our CSS property system (which is likely what will happen), there's no issue with retrieving its 
+## value from LESS.
+#set($preventMapping = [
+  'font-size-base',
+  'min-h1-font-size',
+  'max-h1-font-size',
+  'min-h2-font-size',
+  'max-h2-font-size',
+  'min-h3-font-size',
+  'max-h3-font-size',
+  'min-h4-font-size',
+  'max-h4-font-size',
+  'min-h5-font-size',
+  'max-h5-font-size',
+  'min-h6-font-size',
+  'max-h6-font-size',
+  'min-document-title-font-size',
+  'max-document-title-font-size',
+  'font-size-document-title',
+  'font-size-h1',
+  'font-size-h2',
+  'font-size-h3',
+  'font-size-h4',
+  'font-size-h5',
+  'font-size-h6'
+])
+#set($discard = $mappedVariables.removeAll($preventMapping))
+#foreach($variableName in $mappedVariables)
+  -/**/-$variableName: @$variableName;
+#end
+}

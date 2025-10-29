@@ -21,9 +21,12 @@ package com.xpn.xwiki.internal.store;
 
 import java.util.Arrays;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.xpn.xwiki.objects.DoubleProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
@@ -34,25 +37,35 @@ import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link PropertyConverter}.
  * 
  * @version $Id$
  */
+@ComponentTest
 public class PropertyConverterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<PropertyConverter> mocker = new MockitoComponentMockingRule<PropertyConverter>(
-        PropertyConverter.class);
+    @InjectMockComponents
+    private PropertyConverter converter;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     /**
-     * @see XWIKI-8649: Error when changing the number type of a field from an application
+     * XWIKI-8649: Error when changing the number type of a field from an application
      */
     @Test
-    public void doubleToInteger() throws Exception
+    void doubleToInteger() throws Exception
     {
         // The number property whose type has changed from Double to Integer.
         NumberClass numberClass = mock(NumberClass.class);
@@ -63,20 +76,20 @@ public class PropertyConverterTest
         DoubleProperty doubleProperty = mock(DoubleProperty.class);
         when(doubleProperty.getValue()).thenReturn(3.5);
 
-        assertEquals(integerProperty, this.mocker.getComponentUnderTest().convertProperty(doubleProperty, numberClass));
+        assertEquals(integerProperty, this.converter.convertProperty(doubleProperty, numberClass));
         verify(integerProperty).setValue(3);
     }
 
     @Test
-    public void unsetDoubleToInteger() throws Exception
+    void unsetDoubleToInteger() throws Exception
     {
         NumberClass numberClass = mock(NumberClass.class);
         DoubleProperty unsetDoubleProperty = mock(DoubleProperty.class, "unset");
-        assertNull(this.mocker.getComponentUnderTest().convertProperty(unsetDoubleProperty, numberClass));
+        assertNull(this.converter.convertProperty(unsetDoubleProperty, numberClass));
     }
 
     @Test
-    public void multipleToSingleSelectOnDBList() throws Exception
+    void multipleToSingleSelectOnDBList() throws Exception
     {
         // The Database List property that was switched from multiple select to single select.
         DBListClass dbListClass = mock(DBListClass.class);
@@ -87,13 +100,12 @@ public class PropertyConverterTest
         StringListProperty stringListProperty = mock(StringListProperty.class);
         when(stringListProperty.getValue()).thenReturn(Arrays.asList("one", "two"));
 
-        assertEquals(stringProperty,
-            this.mocker.getComponentUnderTest().convertProperty(stringListProperty, dbListClass));
+        assertEquals(stringProperty, this.converter.convertProperty(stringListProperty, dbListClass));
         verify(stringProperty).setValue("one");
     }
 
     @Test
-    public void multipleToSingleSelectOnEmptyDBList() throws Exception
+    void multipleToSingleSelectOnEmptyDBList() throws Exception
     {
         // The Database List property that was switched from multiple select to single select.
         DBListClass dbListClass = mock(DBListClass.class);
@@ -102,11 +114,11 @@ public class PropertyConverterTest
         StringListProperty emptyListProperty = mock(StringListProperty.class);
         when(emptyListProperty.getValue()).thenReturn(Arrays.asList());
 
-        assertNull(this.mocker.getComponentUnderTest().convertProperty(emptyListProperty, dbListClass));
+        assertNull(this.converter.convertProperty(emptyListProperty, dbListClass));
     }
 
     @Test
-    public void singleToMultipleSelectOnDBList() throws Exception
+    void singleToMultipleSelectOnDBList() throws Exception
     {
         // The Database List property that was switched from single select to multiple select.
         DBListClass dbListClass = mock(DBListClass.class);
@@ -117,13 +129,12 @@ public class PropertyConverterTest
         StringProperty stringProperty = mock(StringProperty.class);
         when(stringProperty.getValue()).thenReturn("one");
 
-        assertEquals(stringListProperty,
-            this.mocker.getComponentUnderTest().convertProperty(stringProperty, dbListClass));
+        assertEquals(stringListProperty, this.converter.convertProperty(stringProperty, dbListClass));
         verify(stringListProperty).setValue(Arrays.asList("one"));
     }
 
     @Test
-    public void singleToMultipleSelectOnUnsetDBList() throws Exception
+    void singleToMultipleSelectOnUnsetDBList() throws Exception
     {
         // The Database List property that was switched from single select to multiple select.
         DBListClass dbListClass = mock(DBListClass.class);
@@ -132,25 +143,28 @@ public class PropertyConverterTest
         StringProperty stringProperty = mock(StringProperty.class);
         when(stringProperty.getValue()).thenReturn(null);
 
-        assertNull(this.mocker.getComponentUnderTest().convertProperty(stringProperty, dbListClass));
+        assertNull(this.converter.convertProperty(stringProperty, dbListClass));
     }
 
     @Test
-    public void longToString() throws Exception
+    void longToString() throws Exception
     {
         LongProperty longProperty = new LongProperty();
+        longProperty.setName("property");
         longProperty.setValue(Long.MAX_VALUE);
+
+        StringProperty stringProperty = new StringProperty();
+        stringProperty.setName(longProperty.getName());
 
         StringClass stringClass = mock(StringClass.class);
         when(stringClass.newProperty()).thenReturn(new StringProperty());
-        StringProperty stringProperty = new StringProperty();
         when(stringClass.fromString(longProperty.toText())).thenReturn(stringProperty);
 
-        assertEquals(stringProperty, this.mocker.getComponentUnderTest().convertProperty(longProperty, stringClass));
+        assertEquals(stringProperty, this.converter.convertProperty(longProperty, stringClass));
     }
 
     @Test
-    public void stringToNumber() throws Exception
+    void stringToNumber() throws Exception
     {
         StringProperty stringProperty = new StringProperty();
         stringProperty.setValue("one");
@@ -161,8 +175,10 @@ public class PropertyConverterTest
         when(numberClass.getName()).thenReturn("age");
         when(numberClass.getClassName()).thenReturn("Some.Class");
 
-        assertNull(this.mocker.getComponentUnderTest().convertProperty(stringProperty, numberClass));
-        verify(this.mocker.getMockedLogger()).warn(
-            "Incompatible data migration when changing field [{}] of class [{}]", "age", "Some.Class");
+        assertNull(this.converter.convertProperty(stringProperty, numberClass));
+        ILoggingEvent logEvent = this.logCapture.getLogEvent(0);
+        assertSame(Level.WARN, logEvent.getLevel());
+        assertEquals("Incompatible data migration when changing field [age] of class [Some.Class]",
+            logEvent.getFormattedMessage());
     }
 }

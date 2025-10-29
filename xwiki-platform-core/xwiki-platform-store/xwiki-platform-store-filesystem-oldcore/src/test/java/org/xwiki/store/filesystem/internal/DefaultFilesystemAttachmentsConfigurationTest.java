@@ -34,7 +34,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +52,7 @@ class DefaultFilesystemAttachmentsConfigurationTest
     {
         when(configurationSource.getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE)).thenReturn(true);
         assertTrue(configuration.cleanOnStartup());
-        verify(configurationSource, times(1)).getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE);
+        verify(configurationSource).getProperty("store.fsattach.cleanOnStartup", Boolean.TRUE);
     }
 
     @Test

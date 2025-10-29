@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>17.9.0-SNAPSHOT</version>
+    <version>17.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
@@ -34,37 +34,18 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.44</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
     <!-- The Solr framework is designed to be shared for the whole farm -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <!-- Solr -->
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
-    </dependency>
-    <!-- Embedded Solr instance. -->
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-core</artifactId>
-    </dependency>
-    <!-- Jersey require javax validation but declare a dependency on jakarta validation -->
-    <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-analysis-extras</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-backward-codecs</artifactId>
     </dependency>
     <!-- Apache Commons -->
     <dependency>
@@ -151,24 +132,6 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>**/test/**.class</include>
-                <include>META-INF/**</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <executions>
           <execution>
@@ -179,54 +142,8 @@
                 **/DefaultSolrIndexer.java,
                 **/SolrIndexEventListener.java,
                 **/AbstractSolrMetadataExtractor.java,
-                **/EmbeddedSolr.java,
                 **/SolrSchemaUtils.java
               </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Attach default configuration package -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-search-core</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-core-search</artifactId>
-                  <version>${project.version}</version>
-                  <type>zip</type>
-                  <destFileName>xwiki-platform-search-solr-server-core-search.zip</destFileName>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>attach-minimal-core</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
-                  <version>${project.version}</version>
-                  <type>zip</type>
-                  <destFileName>xwiki-platform-search-solr-server-core-minimal.zip</destFileName>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
             </configuration>
           </execution>
         </executions>

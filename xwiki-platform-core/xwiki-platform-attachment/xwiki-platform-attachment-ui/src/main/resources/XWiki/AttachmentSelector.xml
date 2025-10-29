@@ -637,7 +637,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     /** AJAX deletion of attachments. */
     onDelete : function(event) {
       event.stop();
-      deleteTool = event.element().up('a.delete') || event.element();
+      const deleteTool = event.target.closest('.btn');
       if (!deleteTool.disabled) {
         new XWiki.widgets.ConfirmedAjaxRequest(
           deleteTool.readAttribute('href'),
@@ -680,7 +680,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     /** Update the property with the selected value without reloading the page. */
     onSelect : function(event) {
       event.stop();
-      var targetElement = event.element().up('a.select') || event.element();
+      const targetElement = event.target.closest('.btn');
       var attachmentName = targetElement.up('.gallery_attachmentbox').down('.gallery_attachmenttitle').title;
       var imageSource = targetElement.up('.gallery_attachmentbox.gallery_image');
       if (imageSource) {

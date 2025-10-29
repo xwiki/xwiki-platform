@@ -120,7 +120,7 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     /** @inheritdoc */
     onChange(callback) {
-      this._ckeditor.on('change', () => {
+      return this._ckeditor.on('change', () => {
         if (!this._isRemoteChange && !this._ckeditor.readOnly) {
           callback();
         }
@@ -171,17 +171,32 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     /** @inheritdoc */
     onBeforeDestroy(callback, isAsync) {
-      this._ckeditor.on(isAsync ? 'beforeDestroyAsync' : 'beforeDestroy', callback);
+      return this._ckeditor.on(isAsync ? 'beforeDestroyAsync' : 'beforeDestroy', callback);
     }
 
     /** @inheritdoc */
     onLock(callback) {
       this._lockCallbacks.push(callback);
+      return {
+        removeListener: () => {
+          this._lockCallbacks = this._lockCallbacks.filter(cb => cb !== callback);
+        }
+      };
     }
 
     /** @inheritdoc */
     onUnlock(callback) {
       this._unlockCallbacks.push(callback);
+      return {
+        removeListener: () => {
+          this._unlockCallbacks = this._unlockCallbacks.filter(cb => cb !== callback);
+        }
+      };
+    }
+
+    /** @inheritdoc */
+    isReadOnly() {
+      return this._ckeditor.readOnly;
     }
 
     /** @inheritdoc */
@@ -476,7 +491,7 @@ define('xwiki-ckeditor-realtime-adapter', [
         // document.
         if (!this._focusHandler) {
           this._focusHandler = this._ckeditor.on('focus', () => {
-            this._ckeditor._realtime.lockDocument();
+            this._ckeditor._realtime.editor.lockDocument();
           });
         }
       } else if (status === 0 /* Disconnected */) {
@@ -491,6 +506,11 @@ define('xwiki-ckeditor-realtime-adapter', [
           delete this._focusHandler;
         }
       }
+    }
+
+    /** @inheritdoc */
+    focus() {
+      this._ckeditor.focus();
     }
   }
 

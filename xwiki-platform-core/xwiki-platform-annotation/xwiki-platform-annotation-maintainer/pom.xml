@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotation</artifactId>
-    <version>17.9.0-SNAPSHOT</version>
+    <version>17.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-maintainer</artifactId>
   <name>XWiki Platform - Annotations - Maintainer</name>
@@ -96,15 +96,16 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-transformation-macro</artifactId>
       <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used for the component list -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

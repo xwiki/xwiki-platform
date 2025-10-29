@@ -50,10 +50,6 @@ define('xwiki-realtime-saver', [
   // the chances of concurrent saves (which often lead to merge conflicts).
   const SAVE_DELAY = 1000;
 
-  function now() {
-    return new Date().getTime();
-  }
-
   /**
    * Generic auto-saver that keeps track of local update count and schedules saves when the content is modified.
    */
@@ -95,7 +91,7 @@ define('xwiki-realtime-saver', [
     _scheduleSave() {
       // Cancel the previous scheduled save.
       clearTimeout(this._saveTimer);
-      if (!this._dirtyTimestamp || now() - this._dirtyTimestamp < SAVE_INTERVAL) {
+      if (!this._dirtyTimestamp || Date.now() - this._dirtyTimestamp < SAVE_INTERVAL) {
         this._saveTimer = setTimeout(this._maybeSave.bind(this), SAVE_INTERVAL);
       } else {
         // Save right away because too much time has passed since the last time the content became dirty.
@@ -119,7 +115,7 @@ define('xwiki-realtime-saver', [
         } else {
           // Remember the last time when the content became dirty in order to be able to save immediately when the save
           // interval is reached (even if the user is still making changes).
-          this._dirtyTimestamp = now();
+          this._dirtyTimestamp = Date.now();
         }
       } else if (this._isSomeoneSaving()) {
         // Avoid auto-saving more often than the SAVE_INTERVAL. It's possible that the SAVE_INTERVAL is reached for
@@ -138,7 +134,7 @@ define('xwiki-realtime-saver', [
       return '';
     }
 
-    _pushState(immediate) {
+    async _pushState(immediate) {
       // Must be implemented by subclasses.
     }
 
@@ -275,6 +271,18 @@ define('xwiki-realtime-saver', [
         this._realtimeInput?.stop();
         delete this._realtimeInput;
       });
+
+      const visibilityChangeListener = () => {
+        if (document.visibilityState === 'hidden') {
+          // Push uncommitted changes to the server because when a document is hidden its window can be closed without
+          // notice, so this might be the last chance to propagate our local state to the other collaborators.
+          this._pushState(true);
+        }
+      };
+      document.addEventListener('visibilitychange', visibilityChangeListener);
+      this._revertList.push(() => {
+        document.removeEventListener('visibilitychange', visibilityChangeListener);
+      });
     }
 
     _getClientId() {
@@ -285,12 +293,13 @@ define('xwiki-realtime-saver', [
       return this._states;
     }
 
-    _pushState(immediate) {
+    async _pushState(immediate) {
       this._state.id = this._myId;
       this._getStates()[this._getClientId()] = this._state;
       this._onLocal();
       if (immediate) {
         this._chainpad.sync();
+        await new Promise(resolve => this._chainpad.onSettle(resolve));
       }
     }
 
@@ -372,13 +381,8 @@ define('xwiki-realtime-saver', [
 
       if (this._chainpad) {
         // Push uncommitted changes to the server before disconnecting.
-        await new Promise(resolve => {
-          this._chainpad.sync();
-          this._chainpad.onSettle(() => {
-            delete this._chainpad;
-            resolve();
-          });
-        });
+        await this._pushState(true);
+        delete this._chainpad;
       }
 
       // Disconnect from the realtime channel and revert the changes made by this saver (i.e. remove event listeners,
@@ -394,6 +398,7 @@ define('xwiki-realtime-saver', [
     constructor(config) {
       super({
         formId: 'edit',
+        onLocalStatusChange: () => {},
         onStatusChange: () => {},
         onCreateVersion: () => {},
         ...config
@@ -444,13 +449,13 @@ define('xwiki-realtime-saver', [
         },
         // Redirect only after we have confirmation that the saver state has been propagated to all clients.
         maybeRedirect: function(continueEditing) {
-          if (!continueEditing) {
+          if (continueEditing) {
+            return originalAjaxSaveAndContinue.maybeRedirect.apply(this, arguments);
+          } else {
             self._chainpad.onSettle(() => {
               originalAjaxSaveAndContinue.maybeRedirect.apply(this, arguments);
             });
             return true;
-          } else {
-            return originalAjaxSaveAndContinue.maybeRedirect.apply(this, arguments);
           }
         }
       };
@@ -481,7 +486,7 @@ define('xwiki-realtime-saver', [
       if (this._compareVersions(latestVersion, xwikiDocument.version) > 0) {
         xwikiDocument.update({
           version: latestVersion,
-          modified: now(),
+          modified: Date.now(),
           isNew: false
         });
         if (savedBy !== this._getClientId()) {
@@ -495,10 +500,16 @@ define('xwiki-realtime-saver', [
     }
 
     _notifyStatusChange() {
-      const status = (this._isSomeoneSaving() && 1) || (this._isSomeoneDirty() ? 0 : 2);
-      if (this._previousStatus !== status) {
-        this._previousStatus = status;
-        this._config.onStatusChange(status);
+      const localStatus = (this._state.saving && 1) || (this._state.dirty ? 0 : 2);
+      if (this._previousLocalStatus !== localStatus) {
+        this._previousLocalStatus = localStatus;
+        this._config.onLocalStatusChange(localStatus);
+      }
+
+      const globalStatus = (this._isSomeoneSaving() && 1) || (this._isSomeoneDirty() ? 0 : 2);
+      if (this._previousGlobalStatus !== globalStatus) {
+        this._previousGlobalStatus = globalStatus;
+        this._config.onStatusChange(globalStatus);
       }
     }
 
@@ -513,8 +524,8 @@ define('xwiki-realtime-saver', [
             number: revision.version,
             date: new Date(revision.modified).getTime(),
             author: {
-              reference: this._getAbsoluteUserReference(revision.modifier),
-              name: revision.modifierName
+              reference: this._getAbsoluteUserReference(revision.author),
+              name: revision.authorName
             }
           });
         }).catch(error => {
@@ -640,7 +651,7 @@ define('xwiki-realtime-saver', [
     _once(target, removeListeners, ...args) {
       // Wrap the original handler so that we can remove all the event listeners in the group after one of them is
       // triggered.
-      const originalHandler = args[args.length - 1];
+      const originalHandler = args.at(-1);
       args[args.length - 1] = (...params) => {
         const result = originalHandler(...params);
         if (result !== true) {
@@ -654,7 +665,10 @@ define('xwiki-realtime-saver', [
     }
 
     _afterSave({newVersion}) {
-      if (newVersion === '1.1') {
+      if (newVersion === xwikiDocument.version) {
+        // The version didn't change because the document hasn't been modified.
+        return;
+      } else if (newVersion === '1.1') {
         debug('Created document version 1.1');
       } else {
         debug(`Version bumped from ${xwikiDocument.version} to ${newVersion}.`);
@@ -662,7 +676,7 @@ define('xwiki-realtime-saver', [
       this._state.version = newVersion;
       this._config.onCreateVersion({
         number: newVersion,
-        date: now(),
+        date: Date.now(),
         author: this._getClientId()
       });
     }

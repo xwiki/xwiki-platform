@@ -230,4 +230,10 @@ public class AllIT
     class NestedServletEnvironmentCacheIT extends ServletEnvironmentCacheIT
     {
     }
+
+    @Nested
+    @DisplayName("Document Extra Tabs Tests")
+    class NestedDocExtraTabsIT extends DocExtraTabsIT
+    {
+    }
 }

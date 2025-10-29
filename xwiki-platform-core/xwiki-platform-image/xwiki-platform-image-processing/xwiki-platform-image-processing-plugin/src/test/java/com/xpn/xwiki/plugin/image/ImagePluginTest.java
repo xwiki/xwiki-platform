@@ -52,7 +52,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -184,8 +183,8 @@ class ImagePluginTest
         // Load again, this time from cache.
         assertSame(scaled, this.plugin.downloadAttachment(attachment, xcontext));
 
-        verify(this.imageProcessor, times(1)).writeImage(renderedImage, "image/png", .5F, attachmentOutputStream);
-        verify(imageCache, times(1)).set(cacheKey, attachment);
+        verify(this.imageProcessor).writeImage(renderedImage, "image/png", .5F, attachmentOutputStream);
+        verify(imageCache).set(cacheKey, attachment);
     }
 
     @ParameterizedTest

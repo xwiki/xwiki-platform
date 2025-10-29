@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>17.9.0-SNAPSHOT</version>
+    <version>17.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -75,7 +75,7 @@
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
 
     <!-- Features -->
-    <platform.distribution.features>xwiki</platform.distribution.features>
+    <platform.distribution.features>xwiki/${platform.version}</platform.distribution.features>
 
     <!-- xwiki.cfg configuration -->
     <!-- Default plugin list -->
@@ -223,12 +223,12 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-webjars-api</artifactId>
-        <version>17.9.0-SNAPSHOT</version>
+        <version>17.10.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-        <version>17.9.0-SNAPSHOT</version>
+        <version>17.10.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

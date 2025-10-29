@@ -70,6 +70,7 @@ ExtensionCode.ExtensionSupporterClass_active=Actif
 ## Support plans
 ### Missing: repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
 ### Missing: repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
+repository.supportplan.sheet.supportedExtensions=Extensions supportées
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Nom
 ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter

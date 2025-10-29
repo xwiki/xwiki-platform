@@ -179,8 +179,8 @@ class ExtendedMimeMessageTest
     @Test
     void setMessageIdWhenException()
     {
+        ExtendedMimeMessage message = new ThrowingeExtendedMimeMessage();
         Throwable exception = assertThrows(RuntimeException.class, () -> {
-            ExtendedMimeMessage message = new ThrowingeExtendedMimeMessage();
             message.setMessageId("whatever");
         });
         assertEquals("Failed to set Message ID header to [whatever]", exception.getMessage());

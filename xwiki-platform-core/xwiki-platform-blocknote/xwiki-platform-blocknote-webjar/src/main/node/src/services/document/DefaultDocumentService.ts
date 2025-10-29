@@ -48,6 +48,11 @@ export class DefaultDocumentService implements DocumentService {
     throw new Error("Method not implemented.");
   }
 
+  public getCurrentDocumentAction(): Ref<string | undefined> {
+      // TODO
+      throw new Error("Method not implemented.");
+  }
+
   public getDisplayTitle(): Ref<string> {
     // TODO
     throw new Error("Method not implemented.");

@@ -19,53 +19,71 @@
  */
 require(['jquery', 'xwiki-events-bridge'], function ($) {
 
-  function syncFields() {
-    $('.entitytreenode-container').map(syncContainer);
-  }
-
   function syncContainer(index, container) {
     let hiddenInput = $(container).find('input.entitytreenode-input');
     let typeInput = $(container).find('input.entityType');
     let referenceInput = $(container).find('input.entitytreenode-text');
     let typeLabel = $(container).find('.entitytype-label');
+    let typeSelector = $(container).find('.type-selector');
     $(container).find('a.type-change-link').on('click', function (event) {
       event.preventDefault();
       let type = $(this).data('type');
-      let reference = $(this).data('reference');
-      typeInput.val(reference.toUpperCase());
+      let pickerType = $(this).data('pickerType');
+      typeInput.val(pickerType);
       typeInput.trigger('change');
       typeLabel.text($(this).text());
+      typeLabel.data('type', type);
       syncValues(hiddenInput, type, referenceInput.val());
+      setTypeSelectorStyle(typeSelector, pickerType);
     });
     referenceInput.on('change', function() {
-      syncValues(hiddenInput, typeInput.val(), referenceInput.val());
+      syncValues(hiddenInput, typeLabel.data('type'), referenceInput.val());
+      setTypeSelectorStyle(typeSelector, typeMapping[typeLabel.data('type')].pickerType);
     });
-    let labelMapping = {};
+    let typeMapping = {};
     $(container).find('a.type-change-link').each((index, element) => {
-      labelMapping[$(element).data('reference')] = $(element).text();
+      typeMapping[$(element).data('type')] = {
+        'pickerType': $(element).data('pickerType'),
+        'label': $(element).text()
+      };
     });
     hiddenInput.on('change', function() {
-      setValuesFromHiddenInput(hiddenInput, typeInput, referenceInput, typeLabel, labelMapping);
+      setValuesFromHiddenInput(hiddenInput, typeInput, referenceInput, typeLabel, typeMapping);
     });
-    setValuesFromHiddenInput(hiddenInput, typeInput, referenceInput, typeLabel, labelMapping);
+    setValuesFromHiddenInput(hiddenInput, typeInput, referenceInput, typeLabel, typeMapping);
+    setTypeSelectorStyle(typeSelector, typeMapping[typeLabel.data('type')].pickerType);
+    $(container).addClass('initialized');
   }
 
-  function setValuesFromHiddenInput(hiddenInput, typeInput, referenceInput, typeLabel, labelMapping) {
+  function setTypeSelectorStyle(typeSelector, pickerType) {
+    typeSelector.toggleClass('type-selector-with-suggest', pickerType !== 'CUSTOM');
+  }
+
+  function setValuesFromHiddenInput(hiddenInput, typeInput, referenceInput, typeLabel, typeMapping) {
     let fullRef = hiddenInput.val() || '';
     let firstColon = fullRef.indexOf(':');
     if (firstColon !== -1) {
       let type = fullRef.substring(0, firstColon);
       let reference = fullRef.substring(firstColon + 1);
-      typeInput.val(type.toUpperCase());
+      let dataType = typeMapping[type];
+      typeInput.val(dataType.pickerType);
       referenceInput.val(reference);
       typeInput.trigger('change');
-      typeLabel.text(labelMapping[type]);
+      typeLabel.text(dataType.label);
+      typeLabel.data('type', type);
     }
   }
 
-  function syncValues(hiddenInput, typeValue, referenceValue) {
-    hiddenInput.val(typeValue.toLowerCase() + ':' + referenceValue);
+  function syncValues(hiddenInput, typeValue, referenceValue)
+  {
+    hiddenInput.val(typeValue + ':' + referenceValue);
   }
 
-  (XWiki.domIsLoaded && syncFields()) || document.observe('xwiki:dom:updated', syncFields);
+  function init() {
+    $('.entitytreenode-container').not('.initialized').map(syncContainer);
+  }
+  $(document).on('xwiki:dom:updated', function (event, data) {
+    $(data.elements).find('.entitytreenode-container').not('.initialized').map(syncContainer);
+  });
+  XWiki.domIsLoaded && init() || document.observe('xwiki:dom:loaded', init);
 });

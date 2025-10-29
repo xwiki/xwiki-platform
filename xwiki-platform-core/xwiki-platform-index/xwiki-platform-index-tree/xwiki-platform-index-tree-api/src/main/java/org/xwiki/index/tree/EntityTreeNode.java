@@ -19,8 +19,16 @@
  */
 package org.xwiki.index.tree;
 
-import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
+/**
+ * Dedicated type for tree node using format {@code entityType:entityReference} where entityType is specific to tree.
+ * This type aims at having a dedicated picker for the tree macro.
+ *
+ * @version $Id$
+ * @since 17.10.0RC1
+ */
+@Unstable
 public interface EntityTreeNode
 {
 }

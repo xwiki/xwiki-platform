@@ -22,18 +22,17 @@ package com.xpn.xwiki.objects.classes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 
@@ -42,29 +41,24 @@ import static org.mockito.Mockito.doAnswer;
  *
  * @version $Id$
  */
+@OldcoreTest
 @ReferenceComponentList
-public class DBListClassTest
+class DBListClassTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    void before()
     {
-        doAnswer(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.getArgument(0);
-            }
-        }).when(this.oldcore.getSpyXWiki()).parseContent(any(), any(XWikiContext.class));
+        doAnswer(invocation -> invocation.getArgument(0))
+            .when(this.oldcore.getSpyXWiki()).parseContent(any(), any(XWikiContext.class));
 
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument());
     }
 
     @Test
-    public void testGetDefaultQueryWhenNoSqlSCriptSpecified()
+    void testGetDefaultQueryWhenNoSqlSCriptSpecified()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("", dblc.getSql());
@@ -73,7 +67,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testGetQueryWithSqlScriptSpecified()
+    void testGetQueryWithSqlScriptSpecified()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("", dblc.getSql());
@@ -83,7 +77,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testGetQueryWithClassSpecified()
+    void testGetQueryWithClassSpecified()
     {
         DBListClass dblc = new DBListClass();
         dblc.setClassname("XWiki.XWikiUsers");
@@ -94,7 +88,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdSpecified()
+    void testGetQueryWithIdSpecified()
     {
         DBListClass dblc = new DBListClass();
         dblc.setIdField("doc.name");
@@ -109,7 +103,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testGetQueryWithValueSpecified()
+    void testGetQueryWithValueSpecified()
     {
         DBListClass dblc = new DBListClass();
         dblc.setValueField("doc.name");
@@ -124,7 +118,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdAndClassnameSpecified()
+    void testGetQueryWithIdAndClassnameSpecified()
     {
         DBListClass dblc = new DBListClass();
         dblc.setClassname("XWiki.XWikiUsers");
@@ -144,7 +138,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdAndValueSpecified()
+    void testGetQueryWithIdAndValueSpecified()
     {
         DBListClass dblc = new DBListClass();
         dblc.setIdField("doc.name");
@@ -197,7 +191,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testGetQueryWithIdValueAndClassSpecified()
+    void testGetQueryWithIdValueAndClassSpecified()
     {
         DBListClass dblc = new DBListClass();
         dblc.setClassname("XWiki.XWikiUsers");
@@ -274,7 +268,7 @@ public class DBListClassTest
 
     /** Tests that {@link DBListClass#getList} returns values sorted according to the property's sort option. */
     @Test
-    public void testGetListIsSorted()
+    void testGetListIsSorted()
     {
         List<ListItem> values = new ArrayList<>(4);
         values.add(new ListItem("a", "A"));
@@ -285,22 +279,26 @@ public class DBListClassTest
         dblc.setCache(true);
         dblc.setCachedDBList(values, this.oldcore.getXWikiContext());
 
-        assertEquals("Default order was not preserved.", "[a, c, d, b]",
-            dblc.getList(this.oldcore.getXWikiContext()).toString());
+        assertEquals("[a, c, d, b]",
+            dblc.getList(this.oldcore.getXWikiContext()).toString(),
+            "Default order was not preserved.");
         dblc.setSort("none");
-        assertEquals("Default order was not preserved.", "[a, c, d, b]",
-            dblc.getList(this.oldcore.getXWikiContext()).toString());
+        assertEquals("[a, c, d, b]",
+            dblc.getList(this.oldcore.getXWikiContext()).toString(),
+            "Default order was not preserved.");
         dblc.setSort("id");
-        assertEquals("Items were not ordered by ID.", "[a, b, c, d]",
-            dblc.getList(this.oldcore.getXWikiContext()).toString());
+        assertEquals("[a, b, c, d]",
+            dblc.getList(this.oldcore.getXWikiContext()).toString(),
+            "Items were not ordered by ID.");
         dblc.setSort("value");
-        assertEquals("Items were not ordered by value.", "[a, b, d, c]",
-            dblc.getList(this.oldcore.getXWikiContext()).toString());
+        assertEquals("[a, b, d, c]",
+            dblc.getList(this.oldcore.getXWikiContext()).toString(),
+            "Items were not ordered by value.");
     }
 
     /** Tests that {@link DBListClass#getMap} returns values sorted according to the property's sort option. */
     @Test
-    public void testGetMapIsSorted()
+    void testGetMapIsSorted()
     {
         List<ListItem> values = new ArrayList<>(4);
         values.add(new ListItem("a", "A"));
@@ -311,21 +309,25 @@ public class DBListClassTest
         dblc.setCache(true);
         dblc.setCachedDBList(values, this.oldcore.getXWikiContext());
 
-        assertEquals("Default order was not preserved.", "{a=[a, A, ], c=[c, D, ], d=[d, C, ], b=[b, B, ]}",
-            dblc.getMap(this.oldcore.getXWikiContext()).toString());
+        assertEquals("{a=[a, A, ], c=[c, D, ], d=[d, C, ], b=[b, B, ]}",
+            dblc.getMap(this.oldcore.getXWikiContext()).toString(),
+            "Default order was not preserved.");
         dblc.setSort("none");
-        assertEquals("Default order was not preserved.", "{a=[a, A, ], c=[c, D, ], d=[d, C, ], b=[b, B, ]}",
-            dblc.getMap(this.oldcore.getXWikiContext()).toString());
+        assertEquals("{a=[a, A, ], c=[c, D, ], d=[d, C, ], b=[b, B, ]}",
+            dblc.getMap(this.oldcore.getXWikiContext()).toString(),
+            "Default order was not preserved.");
         dblc.setSort("id");
-        assertEquals("Items were not ordered by ID.", "{a=[a, A, ], b=[b, B, ], c=[c, D, ], d=[d, C, ]}",
-            dblc.getMap(this.oldcore.getXWikiContext()).toString());
+        assertEquals("{a=[a, A, ], b=[b, B, ], c=[c, D, ], d=[d, C, ]}",
+            dblc.getMap(this.oldcore.getXWikiContext()).toString(),
+            "Items were not ordered by ID.");
         dblc.setSort("value");
-        assertEquals("Items were not ordered by value.", "{a=[a, A, ], b=[b, B, ], d=[d, C, ], c=[c, D, ]}",
-            dblc.getMap(this.oldcore.getXWikiContext()).toString());
+        assertEquals("{a=[a, A, ], b=[b, B, ], d=[d, C, ], c=[c, D, ]}",
+            dblc.getMap(this.oldcore.getXWikiContext()).toString(),
+            "Items were not ordered by value.");
     }
 
     @Test
-    public void testReturnColWithOneColumn()
+    void testReturnColWithOneColumn()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("doc.fullName", dblc.returnCol("select doc.fullName from XWikiDocument as doc", true));
@@ -333,7 +335,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testReturnColWithOneColumnAndExtraWhitespace()
+    void testReturnColWithOneColumnAndExtraWhitespace()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("doc.fullName", dblc.returnCol("select   doc.fullName   from XWikiDocument as doc", true));
@@ -341,7 +343,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testReturnColWithOneColumnAndUppercaseTokens()
+    void testReturnColWithOneColumnAndUppercaseTokens()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("doc.fullName", dblc.returnCol("SELECT doc.fullName FROM XWikiDocument as doc", true));
@@ -349,7 +351,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testReturnColWithTwoColumns()
+    void testReturnColWithTwoColumns()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("doc.fullName", dblc.returnCol("select doc.fullName, doc.title from XWikiDocument as doc", true));
@@ -357,7 +359,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testReturnColWithTwoColumnsAndExtraWhitespace()
+    void testReturnColWithTwoColumnsAndExtraWhitespace()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("doc.fullName",
@@ -367,7 +369,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testReturnColWithTwoColumnsAndUppercaseTokens()
+    void testReturnColWithTwoColumnsAndUppercaseTokens()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("doc.fullName", dblc.returnCol("SELECT doc.fullName, doc.title FROM XWikiDocument as doc", true));
@@ -375,7 +377,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testReturnColWithNullQuery()
+    void testReturnColWithNullQuery()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("-", dblc.returnCol(null, true));
@@ -383,7 +385,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testReturnColWithEmptyQuery()
+    void testReturnColWithEmptyQuery()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("-", dblc.returnCol("", true));
@@ -391,7 +393,7 @@ public class DBListClassTest
     }
 
     @Test
-    public void testReturnColWithInvalidQuery()
+    void testReturnColWithInvalidQuery()
     {
         DBListClass dblc = new DBListClass();
         assertEquals("-", dblc.returnCol("do something", true));

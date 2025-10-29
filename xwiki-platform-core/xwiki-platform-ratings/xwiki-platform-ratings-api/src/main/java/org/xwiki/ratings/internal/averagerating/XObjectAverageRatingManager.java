@@ -109,14 +109,19 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
         // and we avoid trying to load document to avoid errors.
         if (entityReference.getType() != EntityType.WIKI) {
             try {
-                BaseObject baseObject = retrieveAverageRatingXObject(entityReference);
+                DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);
+                XWikiDocument actualDoc = (XWikiDocument) documentInstance;
+
+                // Avoid modifying the cached document
+                actualDoc = actualDoc.clone();
+
+                BaseObject baseObject = retrieveAverageRatingXObject(actualDoc);
                 if (baseObject != null) {
-                    XWikiDocument ownerDocument = baseObject.getOwnerDocument();
-                    ownerDocument.removeXObject(baseObject);
+                    actualDoc.removeXObject(baseObject);
                     XWikiContext context = this.contextProvider.get();
                     String comment = this.contextualLocalizationManager
                         .getTranslationPlain("ratings.averagerating.manager.remove.comment");
-                    context.getWiki().saveDocument(ownerDocument, comment, true, context);
+                    context.getWiki().saveDocument(actualDoc, comment, true, context);
                     result = 1;
                 }
             } catch (Exception e) {
@@ -146,6 +151,9 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
 
         try {
             XWikiDocument actualDoc = (XWikiDocument) this.documentAccessBridge.getDocumentInstance(newReference);
+
+            // Avoid modifying the cached document
+            actualDoc = actualDoc.clone();
 
             // We must inspect all the XObject to see of they need to be updated, some of them can be attached to
             // sub-elements of the page.
@@ -236,7 +244,14 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
     {
         DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);
         XWikiDocument actualDoc = (XWikiDocument) documentInstance;
-        String serializedReference = this.entityReferenceConverter.convert(String.class, entityReference);
+
+        return retrieveAverageRatingXObject(actualDoc);
+    }
+
+    private BaseObject retrieveAverageRatingXObject(XWikiDocument actualDoc) throws Exception
+    {
+        String serializedReference =
+            this.entityReferenceConverter.convert(String.class, actualDoc.getDocumentReference());
         for (BaseObject xObject : actualDoc
             .getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE)) {
             if (xObject != null) {
@@ -289,19 +304,21 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
     {
         try {
             EntityReference entityReference = averageRating.getReference();
-            BaseObject baseObject = this.retrieveAverageRatingXObject(entityReference);
+            DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);
+            XWikiDocument actualDoc = (XWikiDocument) documentInstance;
+
+            // Avoid modifying the cached document
+            actualDoc = actualDoc.clone();
+
+            BaseObject baseObject = this.retrieveAverageRatingXObject(actualDoc);
             XWikiContext context = this.contextProvider.get();
 
-            // if the base object is null, we create it.
+            // If the base object is null, we create it.
             if (baseObject == null) {
-                DocumentModelBridge documentInstance = this.documentAccessBridge.getDocumentInstance(entityReference);
-                XWikiDocument actualDoc = (XWikiDocument) documentInstance;
-                int xObjectNumber =
-                    actualDoc.createXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE,
-                        context);
-                baseObject = actualDoc.getXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE,
-                    xObjectNumber);
+                baseObject =
+                    actualDoc.newXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE, context);
             }
+
             String serializedEntityReference = this.entityReferenceConverter.convert(String.class, entityReference);
             baseObject.setStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName(), this.getIdentifier());
             baseObject.setStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(),
@@ -314,7 +331,7 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
 
             String comment =
                 this.contextualLocalizationManager.getTranslationPlain("ratings.averagerating.manager.update.comment");
-            context.getWiki().saveDocument(baseObject.getOwnerDocument(), comment, true, context);
+            context.getWiki().saveDocument(actualDoc, comment, true, context);
         } catch (Exception e) {
             throw new RatingsException(String.format("Error while saving Average Rating [%s].", averageRating), e);
         }

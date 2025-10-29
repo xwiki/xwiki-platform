@@ -149,46 +149,7 @@
               </differences>
             </revapi.differences>
             -->
-            <revapi.differences>
-              <justification>Change the annotation value of the parameter group to make it mandatory,
-                while it was already mandatory in the facts (the macro displays an error when no
-                parameter from the group is used)</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeAdded</code>
-                  <old>method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setPage(java.lang.String)</old>
-                  <new>method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setPage(java.lang.String)</new>
-                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
-                  <attribute>mandatory</attribute>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeAdded</code>
-                  <old>method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)</old>
-                  <new>method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setReference(java.lang.String)</new>
-                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
-                  <attribute>mandatory</attribute>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeAdded</code>
-                  <old>method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setPage(java.lang.String)</old>
-                  <new>method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setPage(java.lang.String)</new>
-                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
-                  <attribute>mandatory</attribute>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeAdded</code>
-                  <old>method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)</old>
-                  <new>method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)</new>
-                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
-                  <attribute>mandatory</attribute>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

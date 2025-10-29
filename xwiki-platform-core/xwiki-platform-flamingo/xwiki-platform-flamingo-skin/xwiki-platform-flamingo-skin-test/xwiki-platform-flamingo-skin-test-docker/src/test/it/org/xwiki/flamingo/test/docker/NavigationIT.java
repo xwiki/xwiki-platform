@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
@@ -40,6 +41,8 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
+import org.xwiki.test.ui.po.CommentElement;
+import org.xwiki.test.ui.po.CommentForm;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.InformationPane;
@@ -58,6 +61,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 @UITest(properties = {
     "xwikiPropertiesAdditionalProperties=url.trustedDomains=www.xwiki.org,extensions.xwiki.org\n"
+        + "url.frontendUrlCheckPolicy=comments\n"
         + "url.allowedFrontendUrls=https://github.com/xwiki/xwiki-platform,https://github.com/xwiki/"
 })
 public class NavigationIT
@@ -233,7 +237,7 @@ public class NavigationIT
     @Test
     void navigationToExternalPages(TestUtils testUtils, TestReference testReference) throws Exception
     {
-        String pageContent = """
+        String content = """
             [[Internal link>>doc:Navigation.Test]]
             [[Google external>>https://www.google.com]]
             [[XWiki.org external>>https://www.xwiki.org]]
@@ -244,18 +248,27 @@ public class NavigationIT
             [[Github XWiki>>https://github.com/xwiki/]]
             [[Github platform>>https://github.com/xwiki/xwiki-platform]]
             """;
-        testUtils.rest().savePage(testReference, pageContent, "Test link navigation");
+        testUtils.rest().savePage(testReference, content, "Test link navigation");
         testUtils.rest().savePage(new DocumentReference("xwiki", "Navigation", "Test"), "Test navigation internal "
             + "link", "Navigation test page");
 
         XWikiWebDriver driver = testUtils.getDriver();
         testUtils.gotoPage(testReference);
-        driver.findElementWithoutWaiting(By.linkText("Google external")).click();
-        Alert alert = driver.switchTo().alert();
-        assertLeaveDomainAlert("www.google.com", alert.getText());
-        alert.dismiss();
 
+        driver.findElementWithoutWaiting(By.linkText("Google external")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        testUtils.gotoPage(testReference);
         driver.findElementWithoutWaiting(By.linkText("Internal link")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
         ViewPage viewPage = new ViewPage();
         assertEquals("Test navigation internal link", viewPage.getContent());
 
@@ -269,10 +282,13 @@ public class NavigationIT
 
         testUtils.gotoPage(testReference);
         driver.findElementWithoutWaiting(By.linkText("Contrib xwiki")).click();
-        alert = driver.switchTo().alert();
-        assertLeaveDomainAlert("contrib.xwiki.org", alert.getText());
-        alert.dismiss();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
 
+        testUtils.gotoPage(testReference);
         driver.findElementWithoutWaiting(By.linkText("Extensions xwiki")).click();
         try {
             driver.switchTo().alert();
@@ -290,9 +306,13 @@ public class NavigationIT
 
         testUtils.gotoPage(testReference);
         driver.findElementWithoutWaiting(By.linkText("Github commons")).click();
-        assertLeaveDomainAlert("github.com", alert.getText());
-        alert.dismiss();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
 
+        testUtils.gotoPage(testReference);
         driver.findElementWithoutWaiting(By.linkText("Github XWiki")).click();
         try {
             driver.switchTo().alert();
@@ -302,6 +322,84 @@ public class NavigationIT
 
         testUtils.gotoPage(testReference);
         driver.findElementWithoutWaiting(By.linkText("Github platform")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        viewPage = testUtils.gotoPage(testReference);
+        CommentsTab commentsTab = viewPage.openCommentsDocExtraPane();
+        CommentForm addCommentForm = commentsTab.getAddCommentForm();
+        addCommentForm.addToContentField(content);
+        addCommentForm.clickSubmit();
+
+        List<CommentElement> comments = commentsTab.getComments();
+        assertEquals(comments.size(), 1);
+        WebElement commentElement = driver.findElementWithoutWaiting(By.className("xwikicomment"));
+
+        driver.findElementWithoutWaiting(commentElement, By.linkText("Google external")).click();
+        Alert alert = driver.switchTo().alert();
+        assertLeaveDomainAlert("www.google.com", alert.getText());
+        alert.dismiss();
+
+        driver.findElementWithoutWaiting(commentElement, By.linkText("Internal link")).click();
+        viewPage = new ViewPage();
+        assertEquals("Test navigation internal link", viewPage.getContent());
+
+        viewPage = testUtils.gotoPage(testReference);
+        commentsTab = viewPage.openCommentsDocExtraPane();
+        commentElement = driver.findElementWithoutWaiting(By.className("xwikicomment"));
+        driver.findElementWithoutWaiting(commentElement, By.linkText("XWiki.org external")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        viewPage = testUtils.gotoPage(testReference);
+        commentsTab = viewPage.openCommentsDocExtraPane();
+        commentElement = driver.findElementWithoutWaiting(By.className("xwikicomment"));
+        driver.findElementWithoutWaiting(commentElement, By.linkText("Contrib xwiki")).click();
+        alert = driver.switchTo().alert();
+        assertLeaveDomainAlert("contrib.xwiki.org", alert.getText());
+        alert.dismiss();
+
+        driver.findElementWithoutWaiting(commentElement, By.linkText("Extensions xwiki")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        viewPage = testUtils.gotoPage(testReference);
+        commentsTab = viewPage.openCommentsDocExtraPane();
+        commentElement = driver.findElementWithoutWaiting(By.className("xwikicomment"));
+        driver.findElementWithoutWaiting(commentElement, By.linkText("Specific extensions pages")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        viewPage = testUtils.gotoPage(testReference);
+        commentsTab = viewPage.openCommentsDocExtraPane();
+        commentElement = driver.findElementWithoutWaiting(By.className("xwikicomment"));
+        driver.findElementWithoutWaiting(commentElement, By.linkText("Github commons")).click();
+        assertLeaveDomainAlert("github.com", alert.getText());
+        alert.dismiss();
+
+        driver.findElementWithoutWaiting(commentElement, By.linkText("Github XWiki")).click();
+        try {
+            driver.switchTo().alert();
+            fail("No alert should be present");
+        } catch (NoAlertPresentException e) {
+        }
+
+        viewPage = testUtils.gotoPage(testReference);
+        commentsTab = viewPage.openCommentsDocExtraPane();
+        commentElement = driver.findElementWithoutWaiting(By.className("xwikicomment"));
+        driver.findElementWithoutWaiting(commentElement, By.linkText("Github platform")).click();
         try {
             driver.switchTo().alert();
             fail("No alert should be present");

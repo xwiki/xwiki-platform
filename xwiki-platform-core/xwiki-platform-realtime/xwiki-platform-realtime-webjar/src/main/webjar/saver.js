@@ -524,8 +524,8 @@ define('xwiki-realtime-saver', [
             number: revision.version,
             date: new Date(revision.modified).getTime(),
             author: {
-              reference: this._getAbsoluteUserReference(revision.modifier),
-              name: revision.modifierName
+              reference: this._getAbsoluteUserReference(revision.author),
+              name: revision.authorName
             }
           });
         }).catch(error => {
@@ -665,7 +665,10 @@ define('xwiki-realtime-saver', [
     }
 
     _afterSave({newVersion}) {
-      if (newVersion === '1.1') {
+      if (newVersion === xwikiDocument.version) {
+        // The version didn't change because the document hasn't been modified.
+        return;
+      } else if (newVersion === '1.1') {
         debug('Created document version 1.1');
       } else {
         debug(`Version bumped from ${xwikiDocument.version} to ${newVersion}.`);

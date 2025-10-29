@@ -565,6 +565,7 @@ ul.realtime-versions &gt; li.divider:last-child {
 &lt;template id="realtime-edit-toolbar"&gt;
   &lt;div class="realtime-edit-toolbar" data-user-id=""&gt;
     &lt;div class="realtime-edit-toolbar-left"&gt;
+      &lt;input type="hidden" name="preventEmptyRevision" value="true" /&gt;
       &lt;div class="btn-group dropup"&gt;
         &lt;button
           type="button"

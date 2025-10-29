@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
+import org.xwiki.url.FrontendURLCheckPolicy;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.url.URLSecurityManager;
 
@@ -91,15 +92,17 @@ public class URLSecurityScriptService implements ScriptService
     }
 
     /**
-     * @return {@code true} if the mechanism to enforce URLs check on frontend is enabled.
-     * @since 17.9.0RC1
-     * @since 17.4.6
-     * @since 16.10.13
+     * Define the policy to use for URL checks performed in the UI, whether the user should be asked for confirmation
+     * when going to an untrusted domain.
+     * @return the configured policy
+     * @since 17.9.0
+     * @since 17.4.7
+     * @since 16.10.14
      */
     @Unstable
-    public boolean isFrontendUrlCheckEnabled()
+    public FrontendURLCheckPolicy getFrontendUrlCheckPolicy()
     {
-        return this.urlConfiguration.isFrontendUrlCheckEnabled();
+        return this.urlConfiguration.getFrontendUrlCheckPolicy();
     }
 
     /**

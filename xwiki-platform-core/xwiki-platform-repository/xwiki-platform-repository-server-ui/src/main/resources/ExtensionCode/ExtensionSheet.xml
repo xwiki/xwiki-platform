@@ -262,7 +262,9 @@
         $doc.getValue('description')
       {{/context}}
     #elseif (!$isViewMode)
+      (((
       $doc.display('description')
+      )))
     #end
 
     #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
@@ -293,7 +295,9 @@
       #if ($isEditMode)
         == Custom installation instructions
 
+        (((
         $extension.display('installation', 'edit')
+        )))
       #elseif ($extraInstallation != '')
         {{context transformationContext="document" restricted=true}}
           $extraInstallation

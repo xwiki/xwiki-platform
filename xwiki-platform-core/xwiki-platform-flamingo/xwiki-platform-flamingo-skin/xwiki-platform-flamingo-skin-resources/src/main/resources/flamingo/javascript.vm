@@ -299,11 +299,13 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
     'wysiwyg': true
   })##
 #end
-#if ($services.security.url.isFrontendUrlCheckEnabled())
+#if ("$!services.security.url.getFrontendUrlCheckPolicy()" != '' &&
+    "$!services.security.url.getFrontendUrlCheckPolicy()" != 'DISABLED')
 <script type="application/json" id="trusted-domains-configuration">
 {
   "trustedDomains": $jsontool.serialize($services.security.url.getTrustedDomains()),
-  "allowedUrls": $jsontool.serialize($services.security.url.getAllowedFrontendUrls())
+  "allowedUrls": $jsontool.serialize($services.security.url.getAllowedFrontendUrls()),
+  "frontendUrlCheckPolicy": $jsontool.serialize($!services.security.url.getFrontendUrlCheckPolicy())
 }
 </script>
   $xwiki.jsfx.use('uicomponents/link/link-protection.js')##

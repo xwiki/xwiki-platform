@@ -61,8 +61,8 @@ catalogs:
       specifier: 1.4.2
       version: 1.4.2
     '@types/express':
-      specifier: 5.0.4
-      version: 5.0.4
+      specifier: 5.0.5
+      version: 5.0.5
     '@types/express-ws':
       specifier: 3.0.5
       version: 3.0.5
@@ -504,7 +504,7 @@ importers:
     devDependencies:
       '@types/express':
         specifier: 'catalog:'
-        version: 5.0.4
+        version: 5.0.5
       esbuild:
         specifier: 'catalog:'
         version: 0.25.11
@@ -5011,7 +5011,7 @@ importers:
     devDependencies:
       '@types/express':
         specifier: 'catalog:'
-        version: 5.0.4
+        version: 5.0.5
       '@types/express-ws':
         specifier: 'catalog:'
         version: 3.0.5
@@ -5249,7 +5249,7 @@ importers:
     devDependencies:
       '@types/express':
         specifier: 'catalog:'
-        version: 5.0.4
+        version: 5.0.5
       nodemon:
         specifier: 'catalog:'
         version: 3.1.10
@@ -6664,8 +6664,8 @@ packages:
   '@types/express-ws@3.0.5':
     resolution: {integrity: sha512-lbWMjoHrm/v85j81UCmb/GNZFO3genxRYBW1Ob7rjRI+zxUBR+4tcFuOpKKsYQ1LYTYiy3356epLeYi/5zxUwA==}
 
-  '@types/express@5.0.4':
-    resolution: {integrity: sha512-g64dbryHk7loCIrsa0R3shBnEu5p6LPJ09bu9NG58+jz+cRUjFrc3Bz0kNQ7j9bXeCsrRDvNET1G54P/GJkAyA==}
+  '@types/express@5.0.5':
+    resolution: {integrity: sha512-LuIQOcb6UmnF7C1PCFmEU1u2hmiHL43fgFQX67sN3H4Z+0Yk0Neo++mFsBjhOAuLzvlQeqAAkeDOZrJs9rzumQ==}
 
   '@types/fs-extra@9.0.13':
     resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
@@ -12478,11 +12478,11 @@ snapshots:
 
   '@types/express-ws@3.0.5':
     dependencies:
-      '@types/express': 5.0.4
+      '@types/express': 5.0.5
       '@types/express-serve-static-core': 5.0.6
       '@types/ws': 8.18.1
 
-  '@types/express@5.0.4':
+  '@types/express@5.0.5':
     dependencies:
       '@types/body-parser': 1.19.5
       '@types/express-serve-static-core': 5.0.6

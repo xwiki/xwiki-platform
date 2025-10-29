@@ -85,7 +85,7 @@ catalog:
   '@playwright/test': 1.56.1
   '@shoelace-style/shoelace': 2.20.1
   '@types/async-lock': 1.4.2
-  '@types/express': 5.0.4
+  '@types/express': 5.0.5
   '@types/express-ws': 3.0.5
   '@types/js-cookie': 3.0.6
   '@types/lodash-es': 4.17.12

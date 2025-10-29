@@ -5,14 +5,19 @@
     "nx": "catalog:"
   },
   "nx": {
-    "targetDefaults": {
+    "targets": {
       "build": {
+        "cache": true,
         "dependsOn": [
           "^build",
           "typecheck"
+        ],
+        "outputs": [
+          "{projectRoot}/dist"
         ]
       },
       "typecheck": {
+        "cache": true,
         "dependsOn": [
           "^build"
         ]

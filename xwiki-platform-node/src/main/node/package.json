@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "catalog:",
-    "nx": "21.6.4",
+    "nx": "catalog:",
     "vite": "catalog:",
     "vite-plugin-css-injected-by-js": "catalog:",
     "vite-plugin-dts": "catalog:"

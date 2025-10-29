@@ -29,6 +29,7 @@ catalog:
   '@blocknote/core': 0.31.3
   '@blocknote/mantine': 0.31.3
   '@blocknote/react': 0.35.0
+  '@eslint/js': 9.34.0
   '@mantine/core': 8.1.1
   '@mantine/hooks': 8.3.3
   '@playwright/experimental-ct-react': 1.55.1
@@ -49,10 +50,12 @@ catalog:
   bootstrap-icons: 1.13.1
   dompurify: 3.2.6
   eslint: 9.36.0
+  eslint-config-prettier: 10.1.8
   eslint-plugin-vue: 10.5.0
   eventemitter3: 5.0.1
   fast-xml-parser: 5.3.0
   flush-promises: 1.0.2
+  globals: 16.4.0
   i18next: 25.5.3
   inversify: 7.5.2
   jiti: 2.6.0
@@ -67,6 +70,7 @@ catalog:
   micromark-extension-gfm-table: 2.1.1
   micromark-extension-gfm-task-list-item: 2.1.0
   npm-run-all2: 8.0.4
+  nx: 21.6.4
   pinia: 3.0.2
   postcss: 8.5.6
   postcss-preset-mantine: 1.18.0
@@ -81,10 +85,13 @@ catalog:
   sinon: 21.0.0
   tippy.js: 6.3.7
   typescript: 5.9.3
+  typescript-eslint: 8.45.0
   u-node: 0.0.2
   unified: 11.0.5
   utility-types: 3.11.0
   vite: 7.1.7
+  vite-plugin-css-injected-by-js: 3.5.2
+  vite-plugin-dts: 4.5.4
   vitest: 3.2.4
   vitest-mock-extended: 3.1.0
   vue: 3.5.22
@@ -95,13 +102,6 @@ catalog:
   vue3-touch-events: 5.0.13
   vuedraggable: 4.1.0
   yjs: 13.6.27
-  nx: 21.6.4
-  vite-plugin-css-injected-by-js: 3.5.2
-  vite-plugin-dts: 4.5.4
-  "@eslint/js": 9.34.0
-  "eslint-config-prettier": 10.1.8
-  "globals": 16.4.0
-  "typescript-eslint": 8.45.0
 
 catalogMode: strict
 

@@ -19,21 +19,22 @@
 ## ---------------------------------------------------------------------------
 #if ($displayer.mode == 'edit')
 #set ($entityTypeMapping = {
-    'farm': 'custom',
-    'wiki': 'wiki',
-    'space': 'space',
-    'document': 'document',
-    'attachments': 'document',
-    'attachment': 'attachment',
-    'translations': 'document',
-    'objects': 'document',
-    'objectsOfType': 'custom'
+  'farm': 'CUSTOM',
+  'wiki': 'CUSTOM',
+  'space': 'DOCUMENT',
+  'document': 'DOCUMENT',
+  'attachments': 'DOCUMENT',
+  'attachment': 'ATTACHMENT',
+  'translations': 'DOCUMENT',
+  'objects': 'DOCUMENT',
+  'objectsOfType': 'CUSTOM'
 })
 ## We define a container span to identify the elements to synchronize.
 <span class="entitytreenode-container">
 ## Main input is hidden since it's serialization of the combination of the displayed fields.
 ## That's also why we need the javascript to keep this hidden input in sync.
 #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/entitytreenode.js', true))
+#set ($discard = $xwiki.ssfx.use('uicomponents/suggest/entitytreenode.css', true))
 #if ("$!displayer.value" != '')
   #set ($firstColon = $displayer.value.indexOf(':'))
   #set ($type = $displayer.value.substring(0, $firstColon))
@@ -44,37 +45,37 @@
 #end
 #set ($pickerType = $entityTypeMapping[$type])
 #set ($typeLabel = $stringtool.capitalize($type))
+## FIXME: the type label should be translated
 ## Load the JavaScript code that switches the picker based on the entity type value.
 #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestEntities.js', true))
 #set ($discard = $displayer.parameters.put('class', "entitytreenode entitytreenode-input hidden form-control"))
 <input type="text" value="$!escapetool.xml($displayer.value)"
-    #foreach ($parameter in $displayer.parameters.entrySet())
-        $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
-    #end
+  #foreach ($parameter in $displayer.parameters.entrySet())
+    $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+  #end
 />
 <div class="input-group">
   <div class="input-group-btn">
-      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Type: <span class="entitytype-label">$typeLabel</span> <span class="caret"></span>
-      </button>
-        <ul class="dropdown-menu">
-          #foreach($entry in $entityTypeMapping.entrySet())
-              #set ($entryType = $entry.key)
-              #set ($entryReference = $entry.value)
-              #set ($label = $stringtool.capitalize($entryType))
-              <li>
-                  <a class="type-change-link" data-type="$escapetool.xml($entryType)"
-                     data-reference="$escapetool.xml($entryReference)" href="#">
-                      $label
-                  </a>
-              </li>
-          #end
-        </ul>
+    <button type="button" class="btn btn-default dropdown-toggle type-selector" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="entitytype-label" data-type="$escapetool.xml($type)">$typeLabel</span><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      #foreach($entry in $entityTypeMapping.entrySet())
+        #set ($entryType = $entry.key)
+        #set ($entryPickerType = $entry.value)
+        #set ($label = $stringtool.capitalize($entryType))
+        <li>
+          <a class="type-change-link" data-type="$escapetool.xml($entryType)"
+             data-picker-type="$escapetool.xml($entryPickerType)" href="#">
+            $label
+          </a>
+        </li>
+      #end
+    </ul>
   </div><!-- /btn-group -->
 #pagePicker_import
 #attachmentPicker_import
-<input type="hidden" class="entityType" data-property-group="entitytreenode"
-       value="$escapetool.xml($pickerType.toUpperCase())" />
+<input type="hidden" class="entityType" data-property-group="entitytreenode" value="$escapetool.xml($pickerType)" />
 <input type="text" class="form-control entityReferenceString entitytreenode-text"
    data-xwiki-selectize='{"maxItems": 1}'
    value="$escapetool.xml($reference)" data-property-group="entitytreenode" />

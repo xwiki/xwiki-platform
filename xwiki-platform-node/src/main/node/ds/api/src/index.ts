@@ -46,13 +46,17 @@ import type { TabProps } from "./XTab";
 import type { TabGroupProps } from "./XTabGroup";
 import type { TabPanelProps } from "./XTabPanel";
 import type { TextFieldProps } from "./XTextField";
+import type { DisplayableTreeNode, TreeProps } from "./XTree";
 import type {
   ButtonHTMLAttributes,
+  ComponentOptionsMixin,
+  ComputedOptions,
   DefineComponent,
   FormHTMLAttributes,
   HTMLAttributes,
   ImgHTMLAttributes,
   InputHTMLAttributes,
+  MethodOptions,
 } from "vue";
 
 /**
@@ -63,7 +67,18 @@ import type {
  * @beta
  */
 type AbstractElements = {
-  XAlert: DefineComponent<AlertProps & HTMLAttributes>;
+  XAlert: DefineComponent<
+    AlertProps & HTMLAttributes,
+    object,
+    object,
+    ComputedOptions,
+    MethodOptions,
+    ComponentOptionsMixin,
+    ComponentOptionsMixin,
+    {
+      "update:modelValue": (open: boolean) => never;
+    }
+  >;
   XAvatar: DefineComponent<AvatarProps & HTMLAttributes>;
   XBtn: DefineComponent<BtnProps & ButtonHTMLAttributes>;
   XBreadcrumb: DefineComponent<BreadcrumbProps & HTMLAttributes>;
@@ -87,6 +102,7 @@ type AbstractElements = {
   XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
   XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
   XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
+  XTree: DefineComponent<TreeProps & HTMLAttributes>;
 };
 
 // Expose all the abstract components types. For instance: props, actions, model value.
@@ -103,6 +119,7 @@ export type {
   CardProps,
   CheckboxProps,
   DialogProps,
+  DisplayableTreeNode,
   DividerProps,
   FileInputModel,
   FileInputProps,
@@ -119,6 +136,7 @@ export type {
   TabPanelProps,
   TabProps,
   TextFieldProps,
+  TreeProps,
 };
 
 export { navigationTreePropsDefaults, navigationTreeSelectPropsDefaults };

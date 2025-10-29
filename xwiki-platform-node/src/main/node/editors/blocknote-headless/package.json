@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/cristal-editors-blocknote-headless",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
@@ -40,6 +40,7 @@
     "@xwiki/cristal-fn-utils": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
+    "@xwiki/cristal-macros-api": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
@@ -58,7 +59,6 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",
-    "rimraf": "catalog:",
     "vite": "catalog:",
     "vue": "catalog:",
     "vue-tsc": "catalog:"

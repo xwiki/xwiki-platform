@@ -5,9 +5,6 @@
     /* Bundler mode */
     "jsx": "react-jsx",
 
-    // Required to access BlockNote's locales API (only compatible with 'bundler' and 'nodenext')
-    "moduleResolution": "bundler",
-
     // Required as we use tons of generics between modules, so even though we **could**
     // use isolated declarations, it would make the code much, MUCH less readable
     "isolatedDeclarations": false

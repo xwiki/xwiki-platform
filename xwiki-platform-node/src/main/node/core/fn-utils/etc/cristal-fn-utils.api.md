@@ -14,13 +14,24 @@ export function assertUnreachable(value: never): never;
 export function filterMap<T, U>(array: T[], filterMap: (value: T, index: number) => U | null | undefined): U[];
 
 // @beta
+export function objectEntries<O extends Record<string, unknown>>(obj: O): Array<[keyof O & string, O[keyof O]]>;
+
+// @beta
 export function provideTypeInference<T>(value: T): T;
+
+// @beta
+export type TreeNode<T> = T & {
+    children?: TreeNode<T>[];
+};
 
 // @beta
 export function tryFallible<T>(func: () => T): T | null;
 
 // @beta
 export function tryFallibleOrError<T>(func: () => T): T | Error;
+
+// @beta
+export function tryFalliblePromiseOrError<T>(func: () => Promise<T>): Promise<T | Error>;
 
 // (No @packageDocumentation comment for this package)
 

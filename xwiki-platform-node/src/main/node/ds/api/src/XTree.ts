@@ -17,17 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { createMacro } from "../utils";
 
-export const XWikiMacroInlineHTMLMacro = createMacro({
-  name: "XWikiMacroInlineHtml",
-  parameters: {
-    html: { type: "string" },
-    metadata: { type: "string" },
-  },
-  renderType: "inline",
-  render(parameters) {
-    return <span dangerouslySetInnerHTML={{ __html: parameters.html }} />;
-  },
-  slashMenu: false,
-});
+import type { TreeNode } from "@xwiki/cristal-fn-utils";
+
+/**
+ * Represents a TreeNode that can be displayed in a Tree component.
+ * @since 0.23
+ * @beta
+ */
+type DisplayableTreeNode = TreeNode<{
+  id: string;
+  label: string;
+  url?: string;
+  activatable?: boolean;
+}>;
+
+/**
+ * Props of the Tree component.
+ * @since 0.23
+ * @beta
+ */
+type TreeProps = {
+  /**
+   * Node that contains the nodes to display.
+   */
+  rootNode: DisplayableTreeNode;
+  /**
+   * Whether to display the root node itself (default: false).
+   */
+  showRootNode?: boolean;
+  /**
+   * Model value that contains the id of the current activated node.
+   */
+  activated?: string;
+  /**
+   * Model value that contains the ids of the current opened nodes.
+   */
+  opened?: string[];
+};
+
+export type { DisplayableTreeNode, TreeProps };

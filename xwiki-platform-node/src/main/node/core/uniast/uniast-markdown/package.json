@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/cristal-uniast-markdown",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
@@ -54,7 +54,6 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "inversify": "catalog:",
-    "rimraf": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest-mock-extended": "catalog:"

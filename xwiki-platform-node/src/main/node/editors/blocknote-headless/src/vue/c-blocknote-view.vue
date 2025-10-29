@@ -26,7 +26,6 @@ import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
 import { mountBlockNote } from "@xwiki/cristal-editors-blocknote-react";
 import { Container } from "inversify";
-
 import { debounce } from "lodash-es";
 import {
   onBeforeUnmount,
@@ -40,26 +39,44 @@ import type { AuthenticationManagerProvider } from "@xwiki/cristal-authenticatio
 import type { CollaborationInitializer } from "@xwiki/cristal-collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
+  ContextForMacros,
   EditorType,
 } from "@xwiki/cristal-editors-blocknote-react";
-import type { ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";
-import type {
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/cristal-model-remote-url-api";
+import type { MacroWithUnknownParamsType } from "@xwiki/cristal-macros-api";
 import type { UniAst } from "@xwiki/cristal-uniast-api";
+
+type Props = {
+  /** Main properties for the BlockNote editor */
+  editorProps: Omit<
+    BlockNoteViewWrapperProps,
+    "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros"
+  >;
+
+  /** Set to `false` to disable macros entirely */
+  macros:
+    | {
+        list: MacroWithUnknownParamsType[];
+        ctx: ContextForMacros;
+      }
+    | false;
+
+  /** Content to initialize the editor with */
+  editorContent: UniAst | Error;
+
+  /** Collaboration initialization method */
+  collaborationProvider?: () => CollaborationInitializer;
+
+  /** InversifyJS container to inject dependencies from */
+  container: Container;
+};
 
 const {
   editorProps,
   editorContent: uniAst,
+  macros,
   collaborationProvider = undefined,
   container,
-} = defineProps<{
-  editorProps: Omit<BlockNoteViewWrapperProps, "content" | "linkEditionCtx">;
-  editorContent: UniAst | Error;
-  collaborationProvider?: () => CollaborationInitializer;
-  container: Container;
-}>();
+} = defineProps<Props>();
 
 const editorRef = shallowRef<EditorType | null>(null);
 
@@ -127,6 +144,9 @@ const { t } = useI18n({
   messages,
 });
 
+// Create the link edition context
+const linkEditionCtx = createLinkEditionContext(container);
+
 // Build the properties object for the React BlockNoteView component
 const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   ...editorProps,
@@ -135,7 +155,8 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
     notifyChangesDebounced();
   },
   blockNoteOptions: editorProps.blockNoteOptions,
-  linkEditionCtx: createLinkEditionContext(container),
+  macros,
+  linkEditionCtx,
   realtime: await getRealtimeOptions(),
   refs: {
     setEditor(editor) {
@@ -144,21 +165,14 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
 };
 
-const remoteURLSerializer = container
-  .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-  .get()!;
-const remoteURLParser = container
-  .get<RemoteURLParserProvider>("RemoteURLParserProvider")
-  .get()!;
-const modelReferenceSerializer = container
-  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
-  .get()!;
-
 const blockNoteToUniAst = new BlockNoteToUniAstConverter(
-  remoteURLParser,
-  modelReferenceSerializer,
+  linkEditionCtx.remoteURLParser,
+  linkEditionCtx.modelReferenceSerializer,
 );
-const uniAstToBlockNote = new UniAstToBlockNoteConverter(remoteURLSerializer);
+
+const uniAstToBlockNote = new UniAstToBlockNoteConverter(
+  linkEditionCtx.remoteURLSerializer,
+);
 
 const content =
   uniAst instanceof Error

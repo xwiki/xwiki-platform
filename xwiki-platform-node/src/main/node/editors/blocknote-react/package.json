@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/cristal-editors-blocknote-react",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
@@ -45,6 +45,8 @@
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-fn-utils": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
+    "@xwiki/cristal-macros-api": "workspace:*",
+    "@xwiki/cristal-macros-ast-react-jsx": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
@@ -65,7 +67,6 @@
     "postcss": "catalog:",
     "postcss-preset-mantine": "catalog:",
     "postcss-simple-vars": "catalog:",
-    "rimraf": "catalog:",
     "vite": "catalog:",
     "vue-tsc": "catalog:"
   },

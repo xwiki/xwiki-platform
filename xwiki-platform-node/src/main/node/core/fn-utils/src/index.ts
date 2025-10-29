@@ -74,7 +74,7 @@ function tryFallible<T>(func: () => T): T | null {
 }
 
 /**
- * Get a function's output of the thrown error
+ * Get a function's output or the thrown error
  * Will construct a new Error object if the thrown value is not an instance of the Error class
  *
  * @since 0.17
@@ -88,6 +88,49 @@ function tryFallible<T>(func: () => T): T | null {
 function tryFallibleOrError<T>(func: () => T): T | Error {
   try {
     return func();
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      return e;
+    }
+
+    if (typeof e === "string") {
+      return new Error(e);
+    }
+
+    if (typeof e === "number" || typeof e === "boolean") {
+      return new Error(e.toString());
+    }
+
+    if (e === null) {
+      return new Error("null");
+    }
+
+    if (e === undefined) {
+      return new Error("undefined");
+    }
+
+    console.error({ throw: e });
+    return new Error("<thrown unknown value type>");
+  }
+}
+
+/**
+ * Get a funcion's promise's output or the thrown error
+ * Will construct a new Error object if the thrown value is not an instance of the Error class
+ *
+ * @since 0.23
+ * @beta
+ *
+ * @param func - The function to try
+ *
+ * @returns The promise's output, the thrown/resolved error if it's an instance of the `Error` class, or a constructed `Error` instance
+ */
+// eslint-disable-next-line max-statements
+async function tryFalliblePromiseOrError<T>(
+  func: () => Promise<T>,
+): Promise<T | Error> {
+  try {
+    return await func();
   } catch (e: unknown) {
     if (e instanceof Error) {
       return e;
@@ -156,11 +199,42 @@ function filterMap<T, U>(
     .filter((value) => value !== null && value !== undefined);
 }
 
+/**
+ * Get correctly-typed object entries, functionally equivalent to `Object.entries`
+ *
+ * Fixes builtin `Object.entries` which types the returned object values as `any`
+ *
+ * @param obj - The object to get the entries of
+ *
+ * @returns - The correctly-typed object's entries
+ *
+ * @since 0.23
+ * @beta
+ */
+function objectEntries<O extends Record<string, unknown>>(
+  obj: O,
+): Array<[keyof O & string, O[keyof O]]> {
+  return Object.entries(obj) as Array<[keyof O & string, O[keyof O]]>;
+}
+
+/**
+ * Generic tree structure type.
+ * @since 0.23
+ * @beta
+ */
+type TreeNode<T> = T & {
+  children?: TreeNode<T>[];
+};
+
 export {
   assertInArray,
   assertUnreachable,
   filterMap,
+  objectEntries,
   provideTypeInference,
   tryFallible,
   tryFallibleOrError,
+  tryFalliblePromiseOrError,
 };
+
+export type { TreeNode };

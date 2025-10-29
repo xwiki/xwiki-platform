@@ -64,6 +64,12 @@ interface DocumentService {
   getCurrentDocumentRevision(): Ref<string | undefined>;
 
   /**
+   * @returns the current document action
+   * @since 0.23
+   */
+  getCurrentDocumentAction(): Ref<string | undefined>;
+
+  /**
    * Return the document title, either with the defined title (from {@link getTitle}), or by using the name of the
    * document reference.
    *
@@ -94,13 +100,15 @@ interface DocumentService {
   /**
    * Update the reference of the latest document.
    * @param documentReference - the current document reference
+   * @param action - the current document action (default: "view")
    * @param revision - the revision of the document, undefined for latest
    *
-   * @since 0.18
+   * @since 0.23
    * @beta
    */
   setCurrentDocument(
     documentReference: string,
+    action?: string,
     revision?: string,
   ): Promise<void>;
 

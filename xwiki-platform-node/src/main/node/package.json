@@ -12,6 +12,5 @@
     "vite": "catalog:",
     "vite-plugin-css-injected-by-js": "catalog:",
     "vite-plugin-dts": "catalog:"
-  },
-  "nx": {}
+  }
 }

@@ -22,6 +22,13 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { Size } from "../size";
 import { computed } from "vue";
 
+// Define the click event explicitly because vue-tsc v3 is stricter and does not
+// allow using the @click "native" event directly, reusable components must
+// explicitly state the event they support.
+defineEmits<{
+  click: [event: MouseEvent];
+}>();
+
 // TODO: make sure that we have the good parameters available for accessibility
 const props = withDefaults(
   defineProps<{
@@ -56,7 +63,7 @@ const classes = computed(() => {
 </script>
 
 <template>
-  <span :class="classes" />
+  <span :class="classes" @click="$emit('click', $event)" />
 </template>
 
 <style scoped>

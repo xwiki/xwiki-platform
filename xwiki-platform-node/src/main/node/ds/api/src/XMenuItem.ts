@@ -24,6 +24,11 @@
  */
 type MenuItemProps = {
   value: string;
+  /**
+   * @since 0.23
+   * @beta
+   */
+  disabled?: boolean;
 };
 
 export type { MenuItemProps };

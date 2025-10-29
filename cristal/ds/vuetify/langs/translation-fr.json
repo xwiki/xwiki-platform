@@ -1,7 +1,0 @@
-{
-    "vuetify.file.input.mandatory": "Champ obligatoire",
-    "vuetify.select.input.mandatory": "Champ obligatoire",
-    "vuetify.text.input.mandatory": "Champ obligatoire",
-    "vuetify.tree.select.location.label": "Changer l'emplacement de la page",
-    "vuetify.tree.select.location.select": "Sélectionner"
-}

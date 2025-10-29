@@ -19,7 +19,6 @@
  */
 package org.xwiki.attachment.test.ui.docker;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -32,7 +31,6 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Muli wiki REST tests")
     class NestedWikisT extends WikisIT
     {
     }

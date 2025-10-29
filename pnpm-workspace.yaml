@@ -130,7 +130,7 @@ catalog:
   filesize.js: 2.0.0
   globals: 16.4.0
   happy-dom: 20.0.8
-  i18next: 25.5.3
+  i18next: 25.6.0
   inversify: 7.10.4
   jiti: 2.6.1
   js-cookie: 3.0.5

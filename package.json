@@ -1,4 +1,22 @@
 {
   "private": true,
-  "name": "@xwiki/platform"
+  "name": "@xwiki/platform",
+  "devDependencies": {
+    "nx": "catalog:"
+  },
+  "nx": {
+    "targetDefaults": {
+      "build": {
+        "dependsOn": [
+          "^build",
+          "typecheck"
+        ]
+      },
+      "typecheck": {
+        "dependsOn": [
+          "^build"
+        ]
+      }
+    }
+  }
 }

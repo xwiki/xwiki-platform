@@ -29,6 +29,7 @@
     "@xwiki/cristal-model-api": "workspace:*"
   },
   "devDependencies": {
+    "rimraf": "catalog:",
     "typescript": "catalog:"
   }
 }

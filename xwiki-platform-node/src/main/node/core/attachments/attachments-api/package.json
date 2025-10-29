@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
+    "rimraf": "catalog:",
     "typescript": "catalog:",
     "vue": "catalog:"
   }

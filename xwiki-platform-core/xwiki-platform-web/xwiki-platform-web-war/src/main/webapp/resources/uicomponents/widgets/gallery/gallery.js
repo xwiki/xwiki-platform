@@ -140,11 +140,11 @@ XWiki.Gallery = Class.create({
       this.currentImage.title = imageData.title;
       // If the alt is just the name of the file, we instead fall back on the human-readable currentImage translation.
       if(!imageData.url.includes(imageData.alt)) {
-        this.currentImage.alt = this.images[index].alt;
+        this.currentImage.alt = imageData.alt;
       } else {
         this.currentImage.alt = '$escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))';
       }
-      this.currentImage.src = this.images[index].url;
+      this.currentImage.src = imageData.url;
     }
     this.index = index;
     this.indexDisplay.update((index + 1) + ' / ' + this.images.length);

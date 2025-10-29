@@ -64,8 +64,8 @@ catalogs:
       specifier: 5.0.5
       version: 5.0.5
     '@types/express-ws':
-      specifier: 3.0.5
-      version: 3.0.5
+      specifier: 3.0.6
+      version: 3.0.6
     '@types/js-cookie':
       specifier: 3.0.6
       version: 3.0.6
@@ -5014,7 +5014,7 @@ importers:
         version: 5.0.5
       '@types/express-ws':
         specifier: 'catalog:'
-        version: 3.0.5
+        version: 3.0.6
       esbuild:
         specifier: 'catalog:'
         version: 0.25.11
@@ -6661,8 +6661,8 @@ packages:
   '@types/express-serve-static-core@5.0.6':
     resolution: {integrity: sha512-3xhRnjJPkULekpSzgtoNYYcTWgEZkp4myc+Saevii5JPnHNvHMRlBSHDbs7Bh1iPPoVTERHEZXyhyLbMEsExsA==}
 
-  '@types/express-ws@3.0.5':
-    resolution: {integrity: sha512-lbWMjoHrm/v85j81UCmb/GNZFO3genxRYBW1Ob7rjRI+zxUBR+4tcFuOpKKsYQ1LYTYiy3356epLeYi/5zxUwA==}
+  '@types/express-ws@3.0.6':
+    resolution: {integrity: sha512-6ZDt+tMEQgM4RC1sMX1fIO7kHQkfUDlWfxoPddXUeeDjmc+Yt/fCzqXfp8rFahNr5eIxdomrWphLEWDkB2q3UQ==}
 
   '@types/express@5.0.5':
     resolution: {integrity: sha512-LuIQOcb6UmnF7C1PCFmEU1u2hmiHL43fgFQX67sN3H4Z+0Yk0Neo++mFsBjhOAuLzvlQeqAAkeDOZrJs9rzumQ==}
@@ -12481,7 +12481,7 @@ snapshots:
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
 
-  '@types/express-ws@3.0.5':
+  '@types/express-ws@3.0.6':
     dependencies:
       '@types/express': 5.0.5
       '@types/express-serve-static-core': 5.0.6

@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "test:unit": "nx run-many -t test",
-    "lint": "nx run-many -t lint"
+    "lint": "nx run-many -t lint",
+    "build": "nx run-many -t build"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "catalog:",

@@ -23,6 +23,8 @@ packages:
   - xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
   - xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
   - xwiki-platform-node/src/main/node/core/fn-utils
+  - xwiki-platform-node/src/main/node/core/macros/macros-api
+  - xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx
   - xwiki-platform-node/src/main/node
 
 catalog:
@@ -81,7 +83,6 @@ catalog:
   react-icons: 5.5.0
   reflect-metadata: 0.2.2
   remark-parse: 11.0.0
-  rimraf: 6.0.1
   sinon: 21.0.0
   tippy.js: 6.3.7
   typescript: 5.9.3

@@ -1,12 +1,4 @@
 {
   "private": true,
-  "name": "@xwiki/platform",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ],
-    "ignoredBuiltDependencies": [
-      "nx"
-    ]
-  }
+  "name": "@xwiki/platform"
 }

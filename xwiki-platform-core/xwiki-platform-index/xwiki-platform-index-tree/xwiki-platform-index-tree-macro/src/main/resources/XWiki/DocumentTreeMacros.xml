@@ -487,7 +487,7 @@
 #end
 
 #macro (addTranslationsNode $documentReference $siblings)
-  #set ($discard = $children.add({
+  #set ($discard = $siblings.add({
     'id': "translations:${documentReference}",
     'text': 'Translations',
     'icon': 'fa fa-language',
@@ -670,7 +670,7 @@
 #end
 
 #macro (addClassPropertiesNode $documentReference $siblings)
-  #set ($discard = $children.add({
+  #set ($discard = $siblings.add({
     'id': "classProperties:${documentReference}",
     'text': 'Class Properties',
     'icon': 'fa fa-gears',
@@ -736,7 +736,7 @@
 #end
 
 #macro (addObjectsNode $documentReference $siblings)
-  #set ($discard = $children.add({
+  #set ($discard = $siblings.add({
     'id': "objects:${documentReference}",
     'text': 'Objects',
     'icon': 'fa fa-cubes',
@@ -755,7 +755,7 @@
     #set ($documentReference = $services.model.resolveDocument($parts.get(0)))
     #set ($classReference = $services.model.resolveDocument($parts.get(1)))
     #if ($services.security.authorization.hasAccess('view', $documentReference))
-      #set ($discard = $children.add({
+      #set ($discard = $siblings.add({
         'id': "objectsOfType:$documentReference/$classReference",
         'text': $services.model.serialize($classReference, 'local'),
         'icon': 'fa fa-cubes',
@@ -790,7 +790,7 @@
 
 #macro (addObjectNode $object $objectReference $siblings)
   #set ($objectId = $services.model.serialize($objectReference, 'default'))
-  #set ($discard = $children.add({
+  #set ($discard = $siblings.add({
     'id': "object:$objectId",
     'text': "[$object.number]",
     'icon': 'fa fa-cube',

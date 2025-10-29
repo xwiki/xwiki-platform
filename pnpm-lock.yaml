@@ -331,8 +331,8 @@ catalogs:
       specifier: 11.1.12
       version: 11.1.12
     vue-router:
-      specifier: 4.5.1
-      version: 4.5.1
+      specifier: 4.6.3
+      version: 4.6.3
     vue-tsc:
       specifier: 3.1.2
       version: 3.1.2
@@ -472,7 +472,7 @@ importers:
         version: link:../core/configuration/configuration-api
       vue-router:
         specifier: 'catalog:'
-        version: 4.5.1(vue@3.5.22(typescript@5.9.3))
+        version: 4.6.3(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -725,7 +725,7 @@ importers:
         version: 11.1.12(vue@3.5.22(typescript@5.9.3))
       vue-router:
         specifier: 'catalog:'
-        version: 4.5.1(vue@3.5.22(typescript@5.9.3))
+        version: 4.6.3(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@vue/test-utils':
         specifier: 'catalog:'
@@ -2007,7 +2007,7 @@ importers:
         version: 11.1.12(vue@3.5.22(typescript@5.9.3))
       vue-router:
         specifier: 'catalog:'
-        version: 4.5.1(vue@3.5.22(typescript@5.9.3))
+        version: 4.6.3(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2156,7 +2156,7 @@ importers:
         version: 0.2.2
       vue-router:
         specifier: 'catalog:'
-        version: 4.5.1(vue@3.5.22(typescript@5.9.3))
+        version: 4.6.3(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@vue/test-utils':
         specifier: 'catalog:'
@@ -3905,7 +3905,7 @@ importers:
         version: 11.1.12(vue@3.5.22(typescript@5.9.3))
       vue-router:
         specifier: 'catalog:'
-        version: 4.5.1(vue@3.5.22(typescript@5.9.3))
+        version: 4.6.3(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@types/lodash-es':
         specifier: 'catalog:'
@@ -4970,7 +4970,7 @@ importers:
         version: 11.1.12(vue@3.5.22(typescript@5.9.3))
       vue-router:
         specifier: 'catalog:'
-        version: 4.5.1(vue@3.5.22(typescript@5.9.3))
+        version: 4.6.3(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@shoelace-style/shoelace':
         specifier: 'catalog:'
@@ -5087,7 +5087,7 @@ importers:
         version: 0.2.2
       vue-router:
         specifier: 'catalog:'
-        version: 4.5.1(vue@3.5.22(typescript@5.9.3))
+        version: 4.6.3(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@types/sharedworker':
         specifier: 'catalog:'
@@ -5202,7 +5202,7 @@ importers:
         version: 11.1.12(vue@3.5.22(typescript@5.9.3))
       vue-router:
         specifier: 'catalog:'
-        version: 4.5.1(vue@3.5.22(typescript@5.9.3))
+        version: 4.6.3(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@vue/test-utils':
         specifier: 'catalog:'
@@ -10820,10 +10820,10 @@ packages:
     peerDependencies:
       vue: ^3.0.0
 
-  vue-router@4.5.1:
-    resolution: {integrity: sha512-ogAF3P97NPm8fJsE4by9dwSYtDwXIY1nFY9T6DyQnGHd1E2Da94w9JIolpe42LJGIl0DwOHBi8TcRPlPGwbTtw==}
+  vue-router@4.6.3:
+    resolution: {integrity: sha512-ARBedLm9YlbvQomnmq91Os7ck6efydTSpRP3nuOKCvgJOHNrhRoJDSKtee8kcL1Vf7nz6U+PMBL+hTvR3bTVQg==}
     peerDependencies:
-      vue: ^3.2.0
+      vue: ^3.5.0
 
   vue-tsc@3.1.2:
     resolution: {integrity: sha512-3fd4DY0rFczs5f+VB3OhcLU83V6+3Puj2yLBe0Ak65k7ERk+STVNKaOAi0EBo6Lc15UiJB6LzU6Mxy4+h/pKew==}
@@ -17416,7 +17416,7 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.22(typescript@5.9.3)
 
-  vue-router@4.5.1(vue@3.5.22(typescript@5.9.3)):
+  vue-router@4.6.3(vue@3.5.22(typescript@5.9.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.22(typescript@5.9.3)

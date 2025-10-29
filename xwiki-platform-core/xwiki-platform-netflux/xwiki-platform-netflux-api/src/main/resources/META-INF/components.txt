@@ -2,4 +2,6 @@ org.xwiki.netflux.internal.DefaultEntityChannelStore
 org.xwiki.netflux.internal.EffectiveAuthorSetterListener
 org.xwiki.netflux.internal.EntityChannelScriptAuthorBot
 org.xwiki.netflux.internal.EntityChannelScriptAuthorTracker
+org.xwiki.netflux.internal.XWikiLocalUserFactory
+org.xwiki.netflux.internal.event.RemoteCommandEventConverter
 org.xwiki.netflux.script.NetfluxScriptService

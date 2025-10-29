@@ -84,9 +84,9 @@ public class EntityChannelScriptAuthorBot extends AbstractBot
     {
         // We're interested only in messages that have content (we want to ignore for instance join, leave or ping
         // messages).
-        if (MessageBuilder.COMMAND_MSG.equals(messageType)) {
+        if (MessageBuilder.COMMAND_MSG.equals(messageType) && sender instanceof LocalUser localSender) {
             this.entityChannels.getChannel(channel.getKey())
-                .ifPresent(entityChannel -> this.webSocketContext.run(sender.getSession(), () -> {
+                .ifPresent(entityChannel -> this.webSocketContext.run(localSender.getSession(), () -> {
                     UserReference senderUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
                     this.scriptAuthorTracker.maybeUpdateScriptAuthor(entityChannel, senderUserReference);
                 }));

@@ -24,7 +24,6 @@ import java.util.List;
 import jakarta.websocket.Session;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.netflux.EntityChannel;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -34,6 +33,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -49,9 +49,6 @@ class DefaultEntityChannelStoreTest
 
     @MockComponent
     private ChannelStore channelStore;
-
-    @Mock
-    private Session session;
 
     private final WikiReference entityReference = new WikiReference("test");
 
@@ -77,17 +74,13 @@ class DefaultEntityChannelStoreTest
         assertSame(entityChannel, this.entityChannelStore.createChannel(this.entityReference, path));
 
         // Add an user to the channel.
-        User me = new User(this.session, "mflorea");
+        User me = new LocalUser(mock(Session.class), "mflorea");
         channel.getUsers().put(me.getName(), me);
 
         // Get should return the existing channel.
         assertSame(entityChannel, this.entityChannelStore.getChannel(this.entityReference, path).get());
         assertSame(entityChannel, this.entityChannelStore.getChannel(channel.getKey()).get());
         assertEquals(1, entityChannel.getUserCount());
-
-        // Disconnect the user and check again the user count.
-        me.setConnected(false);
-        assertEquals(0, this.entityChannelStore.getChannel(this.entityReference, path).get().getUserCount());
 
         // Disconnect the raw channel and check the entity channel.
         when(this.channelStore.get(channel.getKey())).thenReturn(null);

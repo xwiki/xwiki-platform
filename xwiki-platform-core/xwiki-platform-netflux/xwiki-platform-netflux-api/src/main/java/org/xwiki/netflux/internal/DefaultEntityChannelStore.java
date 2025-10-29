@@ -49,8 +49,6 @@ public class DefaultEntityChannelStore implements EntityChannelStore
     @Inject
     private ChannelStore channelStore;
 
-    private final Map<EntityReference, List<EntityChannel>> entityChannels = new ConcurrentHashMap<>();
-
     @Override
     public List<EntityChannel> getChannels(EntityReference entityReference)
     {
@@ -84,6 +82,8 @@ public class DefaultEntityChannelStore implements EntityChannelStore
             this.entityChannels.computeIfAbsent(entityReference, key -> new CopyOnWriteArrayList<>());
         channels.add(channel);
 
+        TODO: event
+
         // Ask again the bots to join the channel now that we have an entity channel.
         this.channelStore.askBotsToJoin(this.channelStore.get(channel.getKey()));
 
@@ -101,7 +101,7 @@ public class DefaultEntityChannelStore implements EntityChannelStore
     {
         Channel rawChannel = this.channelStore.get(channel.getKey());
         if (rawChannel != null) {
-            channel.setUserCount(rawChannel.getConnectedUsers().size());
+            channel.setUserCount(rawChannel.getUsers().size());
             return true;
         } else {
             return false;

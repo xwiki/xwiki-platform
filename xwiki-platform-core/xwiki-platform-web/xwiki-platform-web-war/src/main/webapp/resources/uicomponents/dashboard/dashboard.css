@@ -35,6 +35,10 @@
   border-radius: 7px;
 }
 
+.gadget .gadget-content {
+  overflow: hidden;
+}
+
 .panels .gadget .gadget-content, .dashboard-edit .gadget .gadget-content {
   background-color: $theme.panelBackgroundColor;
   color: $theme.panelTextColor;

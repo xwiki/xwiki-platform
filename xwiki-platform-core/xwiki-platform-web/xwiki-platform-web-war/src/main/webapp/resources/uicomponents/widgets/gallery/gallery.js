@@ -63,7 +63,7 @@ XWiki.Gallery = Class.create({
     var imageElements = container.select('img');
     for(var i = 0; i < imageElements.length; i++) {
       var imageElement = imageElements[i];
-      images.push({url: imageElement.getAttribute('src'), title: imageElement.title});
+      images.push({url: imageElement.getAttribute('src'), title: imageElement.title, alt: imageElement.alt});
       imageElement.removeAttribute('src');
     }
     return images;
@@ -133,10 +133,17 @@ XWiki.Gallery = Class.create({
     }
     // Update only if it's a different image. Some browsers, e.g. Chrome, don't fire the load event if the image URL
     // doesn't change. Another trick would be to reset the src attribute before setting the actual URL (set to '').
-    if (this.currentImage.src != this.images[index].url) {
+    let imageData = this.images[index];
+    if (this.currentImage.src !== imageData.url) {
       this.currentImage.style.visibility = 'hidden';
       Element.addClassName(this.currentImage.parentNode, 'loading');
-      this.currentImage.title = this.images[index].title;
+      this.currentImage.title = imageData.title;
+      // If the alt is just the name of the file, we instead fall back on the human-readable currentImage translation.
+      if(!imageData.url.includes(imageData.alt)) {
+        this.currentImage.alt = this.images[index].alt;
+      } else {
+        this.currentImage.alt = '$escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))';
+      }
       this.currentImage.src = this.images[index].url;
     }
     this.index = index;

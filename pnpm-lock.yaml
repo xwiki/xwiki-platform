@@ -106,8 +106,8 @@ catalogs:
       specifier: 6.0.1
       version: 6.0.1
     '@vitest/coverage-v8':
-      specifier: 4.0.3
-      version: 4.0.3
+      specifier: 4.0.4
+      version: 4.0.4
     '@vue/test-utils':
       specifier: 2.4.6
       version: 2.4.6
@@ -388,7 +388,7 @@ importers:
         version: 6.0.1(vite@7.1.12(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))
       '@vitest/coverage-v8':
         specifier: 'catalog:'
-        version: 4.0.3(vitest@4.0.3(@types/debug@4.1.12)(@types/node@24.1.0)(happy-dom@20.0.8)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
+        version: 4.0.4(vitest@4.0.3(@types/debug@4.1.12)(@types/node@24.1.0)(happy-dom@20.0.8)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
       concurrently:
         specifier: 'catalog:'
         version: 9.2.1
@@ -6956,11 +6956,11 @@ packages:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
       vue: ^3.2.25
 
-  '@vitest/coverage-v8@4.0.3':
-    resolution: {integrity: sha512-I+MlLwyJRBjmJr1kFYSxoseINbIdpxIAeK10jmXgB0FUtIfdYsvM3lGAvBu5yk8WPyhefzdmbCHCc1idFbNRcg==}
+  '@vitest/coverage-v8@4.0.4':
+    resolution: {integrity: sha512-YM7gDj2TX2AXyGLz0p/B7hvTsTfaQc+kSV/LU0nEnKlep/ZfbdCDppPND4YQiQC43OXyrhkG3y8ZSTqYb2CKqQ==}
     peerDependencies:
-      '@vitest/browser': 4.0.3
-      vitest: 4.0.3
+      '@vitest/browser': 4.0.4
+      vitest: 4.0.4
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
@@ -6982,6 +6982,9 @@ packages:
   '@vitest/pretty-format@4.0.3':
     resolution: {integrity: sha512-N7gly/DRXzxa9w9sbDXwD9QNFYP2hw90LLLGDobPNwiWgyW95GMxsCt29/COIKKh3P7XJICR38PSDePenMBtsw==}
 
+  '@vitest/pretty-format@4.0.4':
+    resolution: {integrity: sha512-lHI2rbyrLVSd1TiHGJYyEtbOBo2SDndIsN3qY4o4xe2pBxoJLD6IICghNCvD7P+BFin6jeyHXiUICXqgl6vEaQ==}
+
   '@vitest/runner@4.0.3':
     resolution: {integrity: sha512-1/aK6fPM0lYXWyGKwop2Gbvz1plyTps/HDbIIJXYtJtspHjpXIeB3If07eWpVH4HW7Rmd3Rl+IS/+zEAXrRtXA==}
 
@@ -6993,6 +6996,9 @@ packages:
 
   '@vitest/utils@4.0.3':
     resolution: {integrity: sha512-qV6KJkq8W3piW6MDIbGOmn1xhvcW4DuA07alqaQ+vdx7YA49J85pnwnxigZVQFQw3tWnQNRKWwhz5wbP6iv/GQ==}
+
+  '@vitest/utils@4.0.4':
+    resolution: {integrity: sha512-4bJLmSvZLyVbNsYFRpPYdJViG9jZyRvMZ35IF4ymXbRZoS+ycYghmwTGiscTXduUg2lgKK7POWIyXJNute1hjw==}
 
   '@volar/language-core@2.4.22':
     resolution: {integrity: sha512-gp4M7Di5KgNyIyO903wTClYBavRt6UyFNpc5LWfyZr1lBsTUY+QrVZfmbNF2aCyfklBOVk9YC4p+zkwoyT7ECg==}
@@ -11869,7 +11875,7 @@ snapshots:
   '@jridgewell/gen-mapping@0.3.12':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
-      '@jridgewell/trace-mapping': 0.3.29
+      '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/remapping@2.3.5':
     dependencies:
@@ -12788,10 +12794,10 @@ snapshots:
       vite: 7.1.12(@types/node@24.1.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
       vue: 3.5.22(typescript@5.9.3)
 
-  '@vitest/coverage-v8@4.0.3(vitest@4.0.3(@types/debug@4.1.12)(@types/node@24.1.0)(happy-dom@20.0.8)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))':
+  '@vitest/coverage-v8@4.0.4(vitest@4.0.3(@types/debug@4.1.12)(@types/node@24.1.0)(happy-dom@20.0.8)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
-      '@vitest/utils': 4.0.3
+      '@vitest/utils': 4.0.4
       ast-v8-to-istanbul: 0.3.8
       debug: 4.4.3
       istanbul-lib-coverage: 3.2.2
@@ -12826,6 +12832,10 @@ snapshots:
     dependencies:
       tinyrainbow: 3.0.3
 
+  '@vitest/pretty-format@4.0.4':
+    dependencies:
+      tinyrainbow: 3.0.3
+
   '@vitest/runner@4.0.3':
     dependencies:
       '@vitest/utils': 4.0.3
@@ -12842,6 +12852,11 @@ snapshots:
   '@vitest/utils@4.0.3':
     dependencies:
       '@vitest/pretty-format': 4.0.3
+      tinyrainbow: 3.0.3
+
+  '@vitest/utils@4.0.4':
+    dependencies:
+      '@vitest/pretty-format': 4.0.4
       tinyrainbow: 3.0.3
 
   '@volar/language-core@2.4.22':
@@ -15034,7 +15049,7 @@ snapshots:
 
   istanbul-lib-source-maps@5.0.6:
     dependencies:
-      '@jridgewell/trace-mapping': 0.3.29
+      '@jridgewell/trace-mapping': 0.3.31
       debug: 4.4.3
       istanbul-lib-coverage: 3.2.2
     transitivePeerDependencies:

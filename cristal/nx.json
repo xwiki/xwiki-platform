@@ -1,0 +1,110 @@
+{
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "build",
+          "typecheck",
+          "test",
+          "lint",
+          "start",
+          "api-extractor:local"
+        ]
+      }
+    }
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "!{projectRoot}/dist/**/*",
+      "!{projectRoot}/vite.config.ts.timestamp-*"
+    ],
+    "eslintconf": [
+      "{workspaceRoot}/.eslintrc",
+      "{workspaceRoot}/**/.eslintrc"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "dependsOn": [
+        "^build",
+        "typecheck"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ]
+    },
+    "typecheck": {
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "clean": {
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "dependsOn": [
+        "clean"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ]
+    },
+    "test": {
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "outputs": [
+        "{projectRoot}/unit-tests.xml"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "default",
+        "^default",
+        "eslintconf"
+      ]
+    },
+    "compile": {
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "dependsOn": [
+        "^compile"
+      ]
+    },
+    "api-extractor:local": {
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "dependsOn": [
+        "compile"
+      ]
+    },
+    "start": {
+      "inputs": [
+        "default",
+        "^default",
+        {
+          "env": "API_KEY"
+        }
+      ],
+      "dependsOn": [
+        "build"
+      ]
+    }
+  }
+}

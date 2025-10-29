@@ -1,0 +1,7 @@
+{
+    "vuetify.file.input.mandatory": "Pflichtfeld",
+    "vuetify.select.input.mandatory": "Pflichtfeld",
+    "vuetify.text.input.mandatory": "Pflichtfeld",
+    "vuetify.tree.select.location.label": "Speicherort der Seite ändern",
+    "vuetify.tree.select.location.select": "Auswählen"
+}

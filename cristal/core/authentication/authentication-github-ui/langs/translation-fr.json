@@ -1,0 +1,8 @@
+{
+  "authentication.github.modal.title": "Connexion à GitHub",
+  "authentication.github.modal.step1": "Étape 1 : Copier le code suivant",
+  "authentication.github.modal.step2": "Étape 2 : Cliquer {link}, coller le code et autoriser l'application.",
+  "authentication.github.modal.step2.link": "ici",
+  "authentication.github.modal.timeLeft": "Temps restant : {expiration}.",
+  "authentication.github.modal.userCode.label": "Code utilisateur"
+}

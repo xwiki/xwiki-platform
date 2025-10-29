@@ -1,10 +1,12 @@
 {
   "private": true,
   "name": "@xwiki/platform",
-  "packageManager": "pnpm@10.18.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
+    ],
+    "ignoredBuiltDependencies": [
+      "nx"
     ]
   }
 }

@@ -26,41 +26,41 @@ packages:
   - xwiki-platform-node/src/main/node
 
 catalog:
-  '@blocknote/core': 0.31.3
-  '@blocknote/mantine': 0.31.3
+  '@blocknote/core': 0.35.0
+  '@blocknote/mantine': 0.35.0
   '@blocknote/react': 0.35.0
-  '@eslint/js': 9.34.0
-  '@mantine/core': 8.1.1
-  '@mantine/hooks': 8.3.3
-  '@playwright/experimental-ct-react': 1.55.1
-  '@tsconfig/node22': 22.0.2
+  '@eslint/js': 9.38.0
+  '@mantine/core': 8.3.6
+  '@mantine/hooks': 8.3.6
+  '@playwright/experimental-ct-react': 1.56.1
+  '@tsconfig/node24': 24.0.1
   '@types/jsdom': 27.0.0
   '@types/lodash-es': 4.17.12
   '@types/mdast': 4.0.4
-  '@types/node': 22.18.8
-  '@types/react': 19.2.0
-  '@types/react-dom': 19.2.0
-  '@vitejs/plugin-react': 5.0.1
+  '@types/node': 24.9.2
+  '@types/react': 19.2.2
+  '@types/react-dom': 19.2.2
+  '@vitejs/plugin-react': 5.1.0
   '@vitejs/plugin-vue': 6.0.1
-  '@vitest/eslint-plugin': 1.3.4
+  '@vitest/eslint-plugin': 1.3.26
   '@vue/eslint-config-prettier': 10.2.0
   '@vue/eslint-config-typescript': 14.6.0
   '@vue/test-utils': 2.4.6
-  '@vue/tsconfig': 0.7.0
+  '@vue/tsconfig': 0.8.1
   bootstrap-icons: 1.13.1
-  dompurify: 3.2.6
-  eslint: 9.36.0
+  dompurify: 3.3.0
+  eslint: 9.38.0
   eslint-config-prettier: 10.1.8
-  eslint-plugin-vue: 10.5.0
+  eslint-plugin-vue: 10.5.1
   eventemitter3: 5.0.1
   fast-xml-parser: 5.3.0
   flush-promises: 1.0.2
   globals: 16.4.0
   i18next: 25.5.3
-  inversify: 7.5.2
-  jiti: 2.6.0
+  inversify: 7.10.4
+  jiti: 2.6.1
   jquery: 3.7.1
-  jsdom: 27.0.0
+  jsdom: 27.0.1
   lodash-es: 4.17.21
   lz-string: 1.5.0
   mdast-util-gfm-strikethrough: 2.0.0
@@ -70,13 +70,13 @@ catalog:
   micromark-extension-gfm-table: 2.1.1
   micromark-extension-gfm-task-list-item: 2.1.0
   npm-run-all2: 8.0.4
-  nx: 21.6.4
-  pinia: 3.0.2
+  nx: 22.0.2
+  pinia: 3.0.3
   postcss: 8.5.6
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
-  react: 19.1.0
-  react-dom: 19.1.0
+  react: 19.2.0
+  react-dom: 19.2.0
   react-i18next: 16.0.0
   react-icons: 5.5.0
   reflect-metadata: 0.2.2
@@ -85,20 +85,20 @@ catalog:
   sinon: 21.0.0
   tippy.js: 6.3.7
   typescript: 5.9.3
-  typescript-eslint: 8.45.0
+  typescript-eslint: 8.46.2
   u-node: 0.0.2
   unified: 11.0.5
   utility-types: 3.11.0
-  vite: 7.1.7
+  vite: 7.1.12
   vite-plugin-css-injected-by-js: 3.5.2
   vite-plugin-dts: 4.5.4
-  vitest: 3.2.4
+  vitest: 4.0.4
   vitest-mock-extended: 3.1.0
   vue: 3.5.22
   vue-i18n: 11.1.12
   vue-router: 4.5.1
   vue-tippy: 6.7.1
-  vue-tsc: 3.0.6
+  vue-tsc: 3.1.2
   vue3-touch-events: 5.0.13
   vuedraggable: 4.1.0
   yjs: 13.6.27

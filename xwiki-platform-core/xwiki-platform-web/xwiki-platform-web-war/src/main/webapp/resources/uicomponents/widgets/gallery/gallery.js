@@ -151,7 +151,7 @@ XWiki.Gallery = Class.create({
     }
     // Update only if it's a different image. Some browsers, e.g. Chrome, don't fire the load event if the image URL
     // doesn't change. Another trick would be to reset the src attribute before setting the actual URL (set to '').
-    let imageData = this.images[index];
+    const imageData = this.images[index];
     if (this.currentImage.src !== imageData.url) {
       this.currentImage.style.visibility = 'hidden';
       Element.addClassName(this.currentImage.parentNode, 'loading');

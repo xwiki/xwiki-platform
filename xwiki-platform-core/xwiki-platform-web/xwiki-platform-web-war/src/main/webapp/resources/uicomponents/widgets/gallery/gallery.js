@@ -17,18 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($l10nKeys = [
+ 'core.widgets.gallery.maximize',
+ 'core.widgets.gallery.previousImage',
+ 'core.widgets.gallery.currentImage',
+ 'core.widgets.gallery.nextImage',
+ 'core.widgets.gallery.index.description',
+ 'core.widgets.gallery.maximize',
+ 'core.widgets.gallery.minimize'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($discard = $l10n.put($key, $services.localization.render($key)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(l10n) {
+  "use strict";
+  
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Gallery = Class.create({
   initialize : function(container) {
     this.images = this._collectImages(container);
     this.container = container.update(
-      '<button class="maximize" title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}"></button>' +
-      '<button class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</button>' +
-      '<img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/>' +
-      '<button class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</button>' +
-      '<div class="index" tabindex="0" title="${escapetool.xml($services.localization.render("core.widgets.gallery.index.description"))}" aria-description="${escapetool.xml($services.localization.render("core.widgets.gallery.index.description"))}">0 / 0</div>'
-    );
+      `<button class="maximize" title="${l10n['core.widgets.gallery.maximize']}"></button>` +
+      `<button class="previous" title="${l10n['core.widgets.gallery.previousImage']}">&lt;</button>` +
+      `<img class="currentImage" alt="${l10n['core.widgets.gallery.currentImage']}"/>` +
+      `<button class="next" title="${l10n['core.widgets.gallery.nextImage']}">&gt;</button>` +
+      `<div class="index" tabindex="0" title="${l10n['core.widgets.gallery.index.description']}" aria-description="${l10n['core.widgets.gallery.index.description']}">0 / 0</div>`
+    ); 
     this.container.addClassName('xGallery');    
     
     // Instead of an arbitrary element to catch focus, we use the index.
@@ -117,8 +136,7 @@ XWiki.Gallery = Class.create({
     this.maximizeToggle.toggleClassName('maximize');
     this.maximizeToggle.toggleClassName('minimize');
     this.maximizeToggle.title = this.maximizeToggle.hasClassName('maximize') ?
-      "${escapetool.javascript($services.localization.render('core.widgets.gallery.maximize'))}" :
-      "${escapetool.javascript($services.localization.render('core.widgets.gallery.minimize'))}";
+      l10n['core.widgets.gallery.maximize'] : l10n['core.widgets.gallery.minimize'];
     this.container.toggleClassName('maximized');
     $(document.documentElement).toggleClassName('maximized');
     // When a keyboard shortcut is used, the gallery is not focused by default. In order to keep the screen at the
@@ -142,7 +160,7 @@ XWiki.Gallery = Class.create({
       if (!imageData.url.includes(imageData.alt)) {
         this.currentImage.alt = imageData.alt;
       } else {
-        this.currentImage.alt = '$escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))';
+        this.currentImage.alt = l10n['core.widgets.gallery.currentImage'];
       }
       this.currentImage.src = imageData.url;
     }
@@ -174,3 +192,5 @@ if (XWiki.contextaction !== 'export') {
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$l10n]));

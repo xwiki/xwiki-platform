@@ -87,9 +87,7 @@ class BlobSaveTransactionRunnableTest
         File storageLocation = new File(this.testDirectory, "test-storage" + System.identityHashCode(this.getClass()));
         FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
         properties.setRootDirectory(storageLocation.toPath());
-        properties.setName("Test");
-        properties.setType("filesystem");
-        this.blobStore = spy(new FileSystemBlobStore(properties));
+        this.blobStore = spy(new FileSystemBlobStore("Test", properties));
 
         BlobPath blobPath = BlobPath.of(Arrays.asList(FILE_PATH));
         this.toSave = this.blobStore.getBlob(blobPath);

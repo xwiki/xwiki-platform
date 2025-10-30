@@ -55,9 +55,7 @@ class StoreFileUtilsTest
     {
         FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
         properties.setRootDirectory(this.tempDir.toPath());
-        properties.setName("Test");
-        properties.setType("filesystem");
-        this.blobStore = new FileSystemBlobStore(properties);
+        this.blobStore = new FileSystemBlobStore("Test", properties);
     }
 
     @Test

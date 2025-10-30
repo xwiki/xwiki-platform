@@ -62,9 +62,7 @@ class WikiDeletedListenerTest
     {
         FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
         properties.setRootDirectory(this.tempDir.toPath());
-        properties.setName("Test");
-        properties.setType("filesystem");
-        this.blobStore = new FileSystemBlobStore(properties);
+        this.blobStore = new FileSystemBlobStore("Test", properties);
         when(this.filesystemStoreTools.getStore()).thenReturn(this.blobStore);
     }
 

@@ -78,9 +78,7 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
 
         FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
         properties.setRootDirectory(this.storageLocation.toPath());
-        properties.setName("Test");
-        properties.setType("filesystem");
-        FileSystemBlobStore blobStore = new FileSystemBlobStore(properties);
+        FileSystemBlobStore blobStore = new FileSystemBlobStore("Test", properties);
 
         this.fileTools = new FilesystemStoreTools(blobStore, new DummyLockProvider());
         final AttachmentListMetadataSerializer serializer =

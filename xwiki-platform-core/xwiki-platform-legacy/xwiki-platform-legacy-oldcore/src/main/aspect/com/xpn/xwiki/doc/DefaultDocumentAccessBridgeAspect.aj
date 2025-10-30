@@ -40,6 +40,4 @@ privileged public aspect DefaultDocumentAccessBridgeAspect
         {
             return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
         }
-
-
 }

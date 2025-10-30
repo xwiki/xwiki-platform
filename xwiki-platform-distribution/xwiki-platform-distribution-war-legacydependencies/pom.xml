@@ -68,6 +68,7 @@
                     <exclude>org.xwiki.platform:xwiki-platform-mail-send-storage:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-notifications-api:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-notifications-filters-api:*:jar:*</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-bridge:*:jar:*</exclude>
                   </excludes>
                   <message>We should not get both the clean and the legacy JARs</message>
                 </bannedDependencies>
@@ -159,6 +160,10 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-notifications-api</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>xwiki-platform-bridge</artifactId>
+          <groupId>org.xwiki.platform</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -223,6 +228,10 @@
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>xwiki-platform-bridge</artifactId>
+          <groupId>org.xwiki.platform</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -238,6 +247,10 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>xwiki-platform-bridge</artifactId>
+          <groupId>org.xwiki.platform</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -288,6 +301,10 @@
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>xwiki-platform-bridge</artifactId>
+          <groupId>org.xwiki.platform</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -336,7 +353,11 @@
            <groupId>org.xwiki.rendering</groupId>
            <artifactId>xwiki-rendering-transformation-macro</artifactId>
          </exclusion>
-      </exclusions>
+         <exclusion>
+           <artifactId>xwiki-platform-bridge</artifactId>
+           <groupId>org.xwiki.platform</groupId>
+         </exclusion>
+       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -350,6 +371,10 @@
         <exclusion>
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
           <groupId>org.xwiki.rendering</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>xwiki-platform-bridge</artifactId>
+          <groupId>org.xwiki.platform</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -390,6 +415,10 @@
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>xwiki-platform-bridge</artifactId>
+          <groupId>org.xwiki.platform</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -402,6 +431,10 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-oldcore</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>xwiki-platform-bridge</artifactId>
+          <groupId>org.xwiki.platform</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -413,6 +446,18 @@
         <exclusion>
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-bridge</artifactId>
+      <version>${project.version}</version>
+      <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -533,6 +578,10 @@
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-notifications-filters-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>xwiki-platform-bridge</artifactId>
+          <groupId>org.xwiki.platform</groupId>
         </exclusion>
       </exclusions>
     </dependency>

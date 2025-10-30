@@ -29,7 +29,6 @@ import org.xwiki.security.authorization.Right;
  * @version $Id$
  * @since 17.10.0RC1
  */
-
 public interface CompatibilityDocumentAccessBridge
 {
     /**

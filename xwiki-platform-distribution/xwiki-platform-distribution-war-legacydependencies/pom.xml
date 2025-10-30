@@ -461,8 +461,8 @@
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
         <exclusion>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-bridge</artifactId>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

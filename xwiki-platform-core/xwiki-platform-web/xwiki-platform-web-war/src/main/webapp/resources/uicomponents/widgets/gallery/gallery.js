@@ -35,18 +35,21 @@
 // Start JavaScript-only code.
 (function(l10n) {
   "use strict";
-  
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
+// Improve the default prototype escaping method to include quotes.
+String.prototype.escapeHTML = String.prototype.escapeHTML.wrap(function(originalCall){
+  return originalCall().replace(/"/g,'&quot;');
+});
 XWiki.Gallery = Class.create({
   initialize : function(container) {
     this.images = this._collectImages(container);
     this.container = container.update(
-      `<button class="maximize" title="${l10n['core.widgets.gallery.maximize']}"></button>` +
-      `<button class="previous" title="${l10n['core.widgets.gallery.previousImage']}">&lt;</button>` +
-      `<img class="currentImage" alt="${l10n['core.widgets.gallery.currentImage']}"/>` +
-      `<button class="next" title="${l10n['core.widgets.gallery.nextImage']}">&gt;</button>` +
-      `<div class="index" tabindex="0" title="${l10n['core.widgets.gallery.index.description']}" aria-description="${l10n['core.widgets.gallery.index.description']}">0 / 0</div>`
+      `<button class="maximize" title="${l10n['core.widgets.gallery.maximize'].escapeHTML()}"></button>` +
+      `<button class="previous" title="${l10n['core.widgets.gallery.previousImage'].escapeHTML()}">&lt;</button>` +
+      `<img class="currentImage" alt="${l10n['core.widgets.gallery.currentImage'].escapeHTML()}"/>` +
+      `<button class="next" title="${l10n['core.widgets.gallery.nextImage'].escapeHTML()}">&gt;</button>` +
+      `<div class="index" tabindex="0" title="${l10n['core.widgets.gallery.index.description'].escapeHTML()}" aria-description="${l10n['core.widgets.gallery.index.description'].escapeHTML()}">0 / 0</div>`
     ); 
     this.container.addClassName('xGallery');    
     

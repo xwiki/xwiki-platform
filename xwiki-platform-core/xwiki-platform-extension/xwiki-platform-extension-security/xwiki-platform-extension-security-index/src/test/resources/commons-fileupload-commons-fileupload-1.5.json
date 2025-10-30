@@ -1,0 +1,132 @@
+{
+  "vulns": [
+    {
+      "id": "GHSA-vv7r-c36w-3prj",
+      "summary": "Apache Commons FileUpload, Apache Commons FileUpload: FileUpload DoS via part headers",
+      "details": "Allocation of resources for multipart headers with insufficient limits enabled a DoS vulnerability in Apache Commons FileUpload.\n\nThis issue affects Apache Commons FileUpload: from 1.0 before 1.6; from 2.0.0-M1 before 2.0.0-M4.\n\nUsers are recommended to upgrade to versions 1.6 or 2.0.0-M4, which fix the issue.",
+      "aliases": [
+        "CVE-2025-48976"
+      ],
+      "modified": "2025-07-09T19:02:20.198824Z",
+      "published": "2025-06-16T15:32:28Z",
+      "related": [
+        "CGA-xmrq-2g6w-rj66"
+      ],
+      "database_specific": {
+        "github_reviewed": true,
+        "github_reviewed_at": "2025-06-16T16:52:30Z",
+        "severity": "HIGH",
+        "nvd_published_at": "2025-06-16T15:15:24Z",
+        "cwe_ids": [
+          "CWE-770"
+        ]
+      },
+      "references": [
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48976"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/commons-fileupload/commit/b247774a72a044f5d5380ae947140ee80af4e78b"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/commons-fileupload/commit/bf68f63cfb312ef4710fb3dfb4d8e4e1665f4497"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/tomcat/commit/97790a35a27d236fa053e660676c3f8196284d93"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/apache/commons-fileupload"
+        },
+        {
+          "type": "WEB",
+          "url": "https://lists.apache.org/thread/fbs3wrr3p67vkjcxogqqqqz45pqtso12"
+        },
+        {
+          "type": "WEB",
+          "url": "http://www.openwall.com/lists/oss-security/2025/06/16/4"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "commons-fileupload:commons-fileupload",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/commons-fileupload/commons-fileupload"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "1.0"
+                },
+                {
+                  "fixed": "1.6.0"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "1.0",
+            "1.1",
+            "1.1.1",
+            "1.2",
+            "1.2.1",
+            "1.2.2",
+            "1.3",
+            "1.3.1",
+            "1.3.1-jenkins-1",
+            "1.3.1-jenkins-2",
+            "1.3.2",
+            "1.3.3",
+            "1.4",
+            "1.5"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/06/GHSA-vv7r-c36w-3prj/GHSA-vv7r-c36w-3prj.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.commons:commons-fileupload2-core",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.apache.commons/commons-fileupload2-core"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.0.0-M1"
+                },
+                {
+                  "fixed": "2.0.0-M4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.0.0-M1",
+            "2.0.0-M2",
+            "2.0.0-M3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/06/GHSA-vv7r-c36w-3prj/GHSA-vv7r-c36w-3prj.json"
+          }
+        }
+      ],
+      "schema_version": "1.7.3",
+      "severity": [
+        {
+          "type": "CVSS_V4",
+          "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N"
+        }
+      ]
+    }
+  ]
+}

@@ -124,6 +124,26 @@ class OsvResponseAnalyzerTest
             extensionSecurityAnalysisResult.getSecurityVulnerabilities().get(0).getFixVersion());
     }
 
+    @Test
+    void analyzeCommonsFileuploadOsvResponse()
+    {
+        OsvResponse osvResponse = readJson("commons-fileupload-commons-fileupload-1.5.json");
+        ExtensionSecurityAnalysisResult extensionSecurityAnalysisResult =
+            this.analyzer.analyzeOsvResponse("commons-fileupload:commons-fileupload", "1.5", osvResponse);
+        assertEquals(1, extensionSecurityAnalysisResult.getSecurityVulnerabilities().size());
+        assertEquals(8.7, extensionSecurityAnalysisResult.getMaxCVSS());
+    }
+
+    @Test
+    void analyzeCommonsHttpclientOsvResponse()
+    {
+        OsvResponse osvResponse = readJson("commons-httpclient-commons-httpclient-3.1.json");
+        ExtensionSecurityAnalysisResult extensionSecurityAnalysisResult =
+            this.analyzer.analyzeOsvResponse("commons-httpclient:commons-httpclient", "3.1", osvResponse);
+        assertEquals(1, extensionSecurityAnalysisResult.getSecurityVulnerabilities().size());
+        assertEquals(0, extensionSecurityAnalysisResult.getMaxCVSS());
+    }
+
     private OsvResponse readJson(String name)
     {
         InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream(name);

@@ -127,15 +127,15 @@ public class VulnObject
     }
 
     /**
-     * @return the CVSS V3 {@link #getSeverity()}
+     * @return the CVSS {@link #getSeverity()}
      */
-    public String getSeverityCCSV3()
+    public String getSeverityCVSS()
     {
         if (this.severity == null) {
             return "";
         }
         return this.severity.stream()
-            .filter(s -> Objects.equals("CVSS_V3", s.getType()))
+            .filter(s -> s.getType().matches("^(CVSS_V)[2-4]$"))
             .map(SeverityObject::getScore)
             .findFirst()
             .orElse(null);

@@ -413,16 +413,7 @@
   #end
   #set ($hasChildren = $tree.getChildCount($docNodeId) &gt; 0)
   #set ($isOpened = false)
-  #if ("$!docTreeConfig.expandToLevel" != '')
-    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
-    #if ("$!docTreeConfig.root" != '')
-      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
-    #else
-      #set ($rootNode = $docTreeConfig.root)
-    #end
-    #set ($rootDistance = $tree.getPath($docNodeId).size())
-    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
-  #end
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
     'id': $docNodeId,
     'text': $label,
@@ -486,9 +477,27 @@
   #end
 #end
 
+#macro (computeIsOpened $docNodeId $result)
+  #set ($isOpened = false)
+  #if ("$!docTreeConfig.expandToLevel" != '')
+    #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #if ("$!docTreeConfig.root" != '')
+      #set ($rootNode = "wiki:$services.wiki.currentWikiId")
+    #else
+      #set ($rootNode = $docTreeConfig.root)
+    #end
+    #set ($rootDistance = $tree.getPath($docNodeId).size())
+    #set ($isOpened = ($rootDistance != -1 &amp;&amp; $docTreeConfig.expandToLevel &gt;= $rootDistance))
+  #end
+  #setVariable("$result" $isOpened)
+#end
+
 #macro (addTranslationsNode $documentReference $siblings)
+  #set ($isOpened = false)
+  #set ($docNodeId = "translations:${documentReference}")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "translations:${documentReference}",
+    'id': $docNodeId,
     'text': 'Translations',
     'icon': 'fa fa-language',
     'children': true,
@@ -496,6 +505,9 @@
       'type': 'translations',
       'validChildren': ['translation'],
       'canDelete': $services.security.authorization.hasAccess('delete', $documentReference)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -512,8 +524,11 @@
 
 #macro (addTranslationNode $translationReference $siblings)
   #set ($currentLocale = $services.localization.currentLocale)
+  #set ($isOpened = false)
+  #set ($docNodeId = "translation:$services.model.serialize($translationReference, 'default')_$translationReference.locale")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "translation:$services.model.serialize($translationReference, 'default')_$translationReference.locale",
+    'id': $docNodeId,
     'text': $translationReference.locale.getDisplayName($currentLocale),
     'icon': 'fa fa-file-text-o',
     'children': false,
@@ -524,6 +539,9 @@
     },
     'a_attr': {
       'href': $xwiki.getURL($translationReference)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -540,8 +558,11 @@
 #end
 
 #macro (addAttachmentsNode $documentReference $siblings)
+  #set ($isOpened = false)
+  #set ($docNodeId = "attachments:${documentReference}")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "attachments:${documentReference}",
+    'id': $docNodeId,
     'text': 'Attachments',
     'icon': 'fa fa-paperclip',
     'children': true,
@@ -553,6 +574,9 @@
     },
     'a_attr': {
       'href': $xwiki.getURL($documentReference, 'view', 'viewer=attachments')
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -572,8 +596,11 @@
   #set ($attachmentId = $services.model.serialize($attachmentReference, 'default'))
   #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $attachmentReference.parent))
   #getAttachmentIcon($attachment $icon)
+  #set ($isOpened = false)
+  #set ($docNodeId = "attachment:$attachmentId")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "attachment:$attachmentId",
+    'id': $docNodeId,
     'text': $attachment.filename,
     'icon': $icon,
     'children': false,
@@ -592,6 +619,9 @@
     },
     'a_attr': {
       'href': $attachment.document.getAttachmentURL($attachment.filename)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -670,8 +700,11 @@
 #end
 
 #macro (addClassPropertiesNode $documentReference $siblings)
+  #set ($isOpened = false)
+  #set ($docNodeId = "classProperties:${documentReference}")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "classProperties:${documentReference}",
+    'id': $docNodeId,
     'text': 'Class Properties',
     'icon': 'fa fa-gears',
     'children': true,
@@ -679,6 +712,9 @@
       'type': 'classProperties',
       'validChildren': ['classProperty'],
       'canDelete': $services.security.authorization.hasAccess('edit', $documentReference)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -711,8 +747,11 @@
   #if (!$icon)
     #set ($icon = 'gear')
   #end
+  #set ($isOpened = false)
+  #set ($docNodeId = "classProperty:$classPropertyId")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "classProperty:$classPropertyId",
+    'id': $docNodeId,
     'text': $property.name,
     'icon': "fa fa-$icon",
     'children': false,
@@ -720,6 +759,9 @@
       'id': $classPropertyId,
       'type': 'classProperty',
       'validChildren': []
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -736,8 +778,11 @@
 #end
 
 #macro (addObjectsNode $documentReference $siblings)
+  #set ($isOpened = false)
+  #set ($docNodeId = "objects:${documentReference}")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "objects:${documentReference}",
+    'id': $docNodeId,
     'text': 'Objects',
     'icon': 'fa fa-cubes',
     'children': true,
@@ -745,6 +790,9 @@
       'type': 'objects',
       'validChildren': ['objectsOfType'],
       'canDelete': $services.security.authorization.hasAccess('edit', $documentReference)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -755,8 +803,11 @@
     #set ($documentReference = $services.model.resolveDocument($parts.get(0)))
     #set ($classReference = $services.model.resolveDocument($parts.get(1)))
     #if ($services.security.authorization.hasAccess('view', $documentReference))
+      #set ($isOpened = false)
+      #set ($docNodeId = "objectsOfType:$documentReference/$classReference")
+      #computeIsOpened($docNodeId $isOpened)
       #set ($discard = $siblings.add({
-        'id': "objectsOfType:$documentReference/$classReference",
+        'id': $docNodeId,
         'text': $services.model.serialize($classReference, 'local'),
         'icon': 'fa fa-cubes',
         'children': true,
@@ -764,6 +815,9 @@
           'type': 'objectsOfType',
           'validChildren': ['object', 'pagination'],
           'canDelete': $services.security.authorization.hasAccess('edit', $documentReference)
+        },
+        'state': {
+          'opened': $isOpened
         }
       }))
     #end
@@ -790,8 +844,11 @@
 
 #macro (addObjectNode $object $objectReference $siblings)
   #set ($objectId = $services.model.serialize($objectReference, 'default'))
+  #set ($isOpened = false)
+  #set ($docNodeId = "object:$objectId")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "object:$objectId",
+    'id': $docNodeId,
     'text': "[$object.number]",
     'icon': 'fa fa-cube',
     'children': true,
@@ -800,6 +857,9 @@
       'type': 'object',
       'validChildren': ['objectProperty'],
       'canDelete': $services.security.authorization.hasAccess('edit', $objectReference.parent)
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end
@@ -824,8 +884,11 @@
   #end
   #set ($objectPropertyReference = $services.model.createEntityReference($property.name, 'OBJECT_PROPERTY', $objRef))
   #set ($objectPropertyId = $services.model.serialize($objectPropertyReference, 'default'))
+  #set ($isOpened = false)
+  #set ($docNodeId = "objectProperty:$objectPropertyId")
+  #computeIsOpened($docNodeId $isOpened)
   #set ($discard = $siblings.add({
-    'id': "objectProperty:$objectPropertyId",
+    'id': $docNodeId,
     'text': $property.name,
     'icon': "fa fa-$icon",
     'children': false,
@@ -833,6 +896,9 @@
       'id': $objectPropertyId,
       'type': 'objectProperty',
       'validChildren': []
+    },
+    'state': {
+      'opened': $isOpened
     }
   }))
 #end

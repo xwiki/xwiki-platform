@@ -19,7 +19,6 @@
  */
 package org.xwiki.officeimporter.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -37,13 +36,11 @@ import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 public class AllIT
 {
     @Nested
-    @DisplayName("Office Importer tests")
     class NestedOfficeImporterIT extends OfficeImporterIT
     {
     }
 
     @Nested
-    @DisplayName("Office Exporter tests")
     class NestedOfficeExporterIT extends OfficeExporterIT
     {
     }

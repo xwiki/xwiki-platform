@@ -103,6 +103,14 @@
           <artifactId>xwiki-commons-velocity</artifactId>
         </exclusion>
         <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-job-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-job-default</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
         </exclusion>
@@ -199,11 +207,23 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-job-default</artifactId>
       <version>${commons.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-legacy-api</artifactId>
       <version>${rendering.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-filter-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -222,6 +242,10 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId> org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-job-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.rendering</groupId>
@@ -417,6 +441,10 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-job-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.rendering</groupId>

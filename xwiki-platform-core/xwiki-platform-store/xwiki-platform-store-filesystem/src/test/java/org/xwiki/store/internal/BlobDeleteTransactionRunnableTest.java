@@ -70,9 +70,7 @@ class BlobDeleteTransactionRunnableTest
     {
         FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
         properties.setRootDirectory(this.tmpDir.toPath());
-        properties.setName("Test");
-        properties.setType("filesystem");
-        BlobStore blobStore = new FileSystemBlobStore(properties);
+        BlobStore blobStore = new FileSystemBlobStore("Test", properties);
 
         BlobPath blobPath = BlobPath.of(Arrays.asList(FILE_PATH));
 

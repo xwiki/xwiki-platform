@@ -61,7 +61,7 @@ public class XWikiFilesystemBlobStorePropertiesCustomizer implements BlobStorePr
     public void customize(BlobStorePropertiesBuilder propertiesBuilder)
     {
         // Only adjust for filesystem stores
-        if (!"filesystem".equals(propertiesBuilder.getType())) {
+        if (!"filesystem".equals(propertiesBuilder.getHint())) {
             return;
         }
 

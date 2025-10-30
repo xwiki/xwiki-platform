@@ -88,10 +88,8 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
 
         // TODO: not sure if this is the best way to get the pre-11 blob store. Maybe use the factory instead?
         FileSystemBlobStoreProperties pre11Properties = new FileSystemBlobStoreProperties();
-        pre11Properties.setName(pre11StoreName);
-        pre11Properties.setType("filesystem");
         pre11Properties.setRootDirectory(this.pre11StoreRootDirectory.toPath());
-        this.pre11BlobStore = new FileSystemBlobStore(pre11Properties);
+        this.pre11BlobStore = new FileSystemBlobStore(pre11StoreName, pre11Properties);
 
         if (getVersion().getVersion() < R1100000XWIKI15620DataMigration.VERSION) {
             this.blobStore = this.pre11BlobStore;

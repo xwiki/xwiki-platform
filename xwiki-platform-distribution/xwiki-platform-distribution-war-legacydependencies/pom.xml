@@ -161,8 +161,8 @@
           <artifactId>xwiki-platform-notifications-api</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>xwiki-platform-bridge</artifactId>
           <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -234,8 +234,8 @@
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>xwiki-platform-bridge</artifactId>
           <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -254,8 +254,8 @@
           <artifactId>xwiki-commons-component-api</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>xwiki-platform-bridge</artifactId>
           <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -307,8 +307,8 @@
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>xwiki-platform-bridge</artifactId>
           <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -378,8 +378,8 @@
           <groupId>org.xwiki.rendering</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>xwiki-platform-bridge</artifactId>
           <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -421,8 +421,8 @@
           <artifactId>xwiki-rendering-api</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>xwiki-platform-bridge</artifactId>
           <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -437,8 +437,8 @@
           <artifactId>xwiki-platform-oldcore</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>xwiki-platform-bridge</artifactId>
           <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -585,8 +585,8 @@
           <artifactId>xwiki-platform-notifications-filters-api</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>xwiki-platform-bridge</artifactId>
           <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

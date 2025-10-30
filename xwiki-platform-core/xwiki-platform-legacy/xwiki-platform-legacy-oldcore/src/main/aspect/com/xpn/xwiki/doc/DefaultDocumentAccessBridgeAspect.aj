@@ -37,7 +37,7 @@ privileged public aspect DefaultDocumentAccessBridgeAspect
 
     @Deprecated(since = "6.1RC1")
     public boolean DefaultDocumentAccessBridge.hasProgrammingRights()
-        {
-            return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
-        }
+    {
+        return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
+    }
 }

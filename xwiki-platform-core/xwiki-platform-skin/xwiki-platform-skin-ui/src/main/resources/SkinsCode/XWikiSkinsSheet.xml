@@ -78,17 +78,34 @@
   #set ($deprecatedProperties = [])
   #set ($className = 'XWiki.XWikiSkins')
   #set ($class = $doc.getObject($className).xWikiClass)
+  {{html wiki='true'}}
+  &lt;dl&gt;
   #foreach ($prop in $class.properties)
     #if ($prop.classType != 'TextArea')
-    ; {{html}}&lt;label for="${className}_$escapetool.xml($doc.getObject($className).getNumber())_$escapetool.xml($prop.name)"&gt;$escapetool.xml($prop.prettyName)&lt;/label&gt;{{/html}}
-    : #if($prop.name == 'logo')## Avoid line break
-      {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}}## Avoid line break
-    #else$doc.display($prop.name)#end
+    &lt;dt&gt;
+      &lt;label for="${className}_$escapetool.xml($services.rendering.escape($doc.getObject($className).getNumber(), 'xwiki/2.1'))_$escapetool.xml($services.rendering.escape($prop.name, 'xwiki/2.1'))"&gt;
+        $escapetool.xml($services.rendering.escape($prop.prettyName, 'xwiki/2.1'))
+      &lt;/label&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      #if($prop.name == 'logo')
+        
+        {{warning}}
+          {{translation key="skin.sheet.properties.logo.warning" /}}
+        {{/warning}}
+        
+        {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}} 
+      #else 
+        $doc.display($prop.name)
+      #end
+    &lt;/dd&gt;
     
     #else
       #set($discard = $deprecatedProperties.add($prop))
     #end
   #end
+  &lt;/dl&gt;
+  {{/html}}
   (% id="overrideSection" %)
   (((
     == {{translation key="skin.sheet.overriddenTemplates" /}} ==

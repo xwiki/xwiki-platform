@@ -19,6 +19,7 @@
  */
 package org.xwiki.component.script;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -42,6 +44,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.security.authorization.Right.PROGRAM;
 
 /**
  * Unit tests for {@link ComponentScriptService}.
@@ -62,11 +65,8 @@ class ComponentScriptServiceTest
     @InjectMockComponents
     private ComponentScriptService componentScriptService;
 
-    /**
-     * Used to check programming rights.
-     */
     @MockComponent
-    private DocumentAccessBridge documentAccessBridge;
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     /**
      * The mock component manager used by the script service under test.
@@ -98,7 +98,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentManagerWhenNoProgrammingRights()
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(false);
 
         assertNull(this.componentScriptService.getComponentManager());
     }
@@ -106,7 +106,7 @@ class ComponentScriptServiceTest
     @Test
     void getRootComponentManagerWhenNoProgrammingRights()
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(false);
 
         assertNull(this.componentScriptService.getRootComponentManager());
     }
@@ -114,7 +114,7 @@ class ComponentScriptServiceTest
     @Test
     void getContextComponentManagerWhenNoProgrammingRights()
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(false);
 
         assertNull(this.componentScriptService.getContextComponentManager());
     }
@@ -122,7 +122,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentManagerWhenProgrammingRights()
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
 
         assertSame(this.contextrootComponentManager, this.componentScriptService.getComponentManager());
     }
@@ -130,7 +130,7 @@ class ComponentScriptServiceTest
     @Test
     void getRootComponentManagerWhenProgrammingRights()
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
 
         assertSame(this.rootComponentManager, this.componentScriptService.getRootComponentManager());
     }
@@ -138,7 +138,7 @@ class ComponentScriptServiceTest
     @Test
     void getContextComponentManagerWhenProgrammingRights()
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
 
         assertSame(this.contextComponentManager, this.componentScriptService.getContextComponentManager());
     }
@@ -146,7 +146,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentManagerForNamespaceWhenNoProgrammingRights()
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(false);
 
         assertNull(this.componentScriptService.getComponentManager("wiki:xwiki"));
 
@@ -156,7 +156,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentManagerForNamespaceWhenProgrammingRights()
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
 
         ComponentManager wikiComponentManager = mock(ComponentManager.class);
         when(this.componentManagerManager.getComponentManager("wiki:chess", false)).thenReturn(wikiComponentManager);
@@ -167,7 +167,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentInstanceWithNoHintWhenNoProgrammingRights() throws Exception
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(false);
 
         assertNull(this.componentScriptService.getInstance(SomeRole.class));
 
@@ -177,7 +177,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentInstanceWithNoHintWhenProgrammingRights() throws Exception
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
 
         SomeRole instance = mock(SomeRole.class);
         when(this.contextComponentManager.getInstance(SomeRole.class)).thenReturn(instance);
@@ -188,7 +188,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentInstanceWithHintWhenNoProgrammingRights() throws Exception
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(false);
 
         assertNull(this.componentScriptService.getInstance(SomeRole.class, "hint"));
 
@@ -198,7 +198,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentInstanceWithHintWhenProgrammingRights() throws Exception
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
 
         SomeRole instance = mock(SomeRole.class);
         when(this.contextComponentManager.getInstance(SomeRole.class, "hint")).thenReturn(instance);
@@ -209,7 +209,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentInstanceWhenComponentDoesntExist() throws Exception
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
         when(this.contextComponentManager.getInstance(SomeRole.class)).thenThrow(new ComponentLookupException("error"));
         ExecutionContext context = new ExecutionContext();
         when(this.execution.getContext()).thenReturn(context);
@@ -221,7 +221,7 @@ class ComponentScriptServiceTest
     @Test
     void getComponentInstanceWithHintWhenComponentDoesntExist() throws Exception
     {
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
         when(this.contextComponentManager.getInstance(SomeRole.class, "hint")).thenThrow(
             new ComponentLookupException("error"));
         ExecutionContext context = new ExecutionContext();

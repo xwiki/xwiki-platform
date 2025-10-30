@@ -23,13 +23,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServerException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -43,6 +43,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.security.authorization.Right.PROGRAM;
 
 /**
  * Test the behaviour of {@link OfficeServerScriptService}.
@@ -63,7 +64,7 @@ class OfficeServerScriptServiceTest
     private ModelContext modelContext;
 
     @MockComponent
-    private DocumentAccessBridge documentAccessBridge;
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @MockComponent
     private OfficeServer officeServer;
@@ -87,7 +88,7 @@ class OfficeServerScriptServiceTest
     void startServer() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
         assertTrue(this.officeServerScriptService.startServer());
         verify(this.officeServer).start();
     }
@@ -96,7 +97,7 @@ class OfficeServerScriptServiceTest
     void startServerForbidden() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("subwiki"));
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
         assertFalse(this.officeServerScriptService.startServer());
         verify(this.officeServer, never()).start();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
@@ -107,7 +108,7 @@ class OfficeServerScriptServiceTest
     void startServerPrivileges() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(false);
         assertFalse(this.officeServerScriptService.startServer());
         verify(this.officeServer, never()).start();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
@@ -118,7 +119,7 @@ class OfficeServerScriptServiceTest
     void startServerError() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
         doThrow(new OfficeServerException("Error while starting")).when(this.officeServer).start();
         assertFalse(this.officeServerScriptService.startServer());
         verify(this.officeServer).start();
@@ -132,7 +133,7 @@ class OfficeServerScriptServiceTest
     void stopServer() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
         assertTrue(this.officeServerScriptService.stopServer());
         verify(this.officeServer).stop();
     }
@@ -141,7 +142,7 @@ class OfficeServerScriptServiceTest
     void stopServerForbidden() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("subwiki"));
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
         assertFalse(this.officeServerScriptService.stopServer());
         verify(this.officeServer, never()).stop();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
@@ -152,7 +153,7 @@ class OfficeServerScriptServiceTest
     void stopServerPrivileges() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(false);
         assertFalse(this.officeServerScriptService.stopServer());
         verify(this.officeServer, never()).stop();
         verify(this.executionContext).setProperty(OfficeServerScriptService.OFFICE_MANAGER_ERROR,
@@ -163,7 +164,7 @@ class OfficeServerScriptServiceTest
     void stopServerError() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(PROGRAM)).thenReturn(true);
         doThrow(new OfficeServerException("Error while stopping")).when(this.officeServer).stop();
         assertFalse(this.officeServerScriptService.stopServer());
         verify(this.officeServer).stop();

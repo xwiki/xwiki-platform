@@ -31,9 +31,6 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
@@ -48,8 +45,6 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -80,9 +75,6 @@ privileged public aspect XWikiDocumentCompatibilityAspect
      */
     @Deprecated
     public static final String XWikiDocument.XWIKI20_SYNTAXID = Syntax.XWIKI_2_0.toIdString();
-
-    @Inject
-    private Provider<ContextualAuthorizationManager> XWikiDocument.authorizationProvider;
 
     /**
      * @deprecated use setStringListValue or setDBStringListProperty
@@ -625,11 +617,5 @@ privileged public aspect XWikiDocumentCompatibilityAspect
             }
 
             return result;
-        }
-
-    @Deprecated(since = "6.1RC1")
-    public boolean XWikiDocument.hasProgrammingRights()
-        {
-            return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
         }
 }

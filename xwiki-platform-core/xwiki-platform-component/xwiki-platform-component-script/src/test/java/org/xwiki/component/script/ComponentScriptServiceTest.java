@@ -63,6 +63,9 @@ class ComponentScriptServiceTest
     @InjectMockComponents
     private ComponentScriptService componentScriptService;
 
+    /**
+     * Used to check programming rights.
+     */
     @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
 

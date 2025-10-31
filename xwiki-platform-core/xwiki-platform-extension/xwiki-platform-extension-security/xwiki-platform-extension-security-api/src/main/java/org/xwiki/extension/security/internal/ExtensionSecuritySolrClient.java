@@ -170,7 +170,7 @@ public class ExtensionSecuritySolrClient
         }
         // Only include extensions with a computed CVSS score, meaning that they have at least one known security
         // vulnerability.
-        solrQuery.addFilterQuery(String.format("%s:{0 TO 10]", SECURITY_MAX_CVSS));
+        solrQuery.addFilterQuery(String.format("%s:[* TO *]", SECURITY_CVE_ID));
         solrQuery.addFilterQuery(String.format("(%s:[* TO *] OR %s:true)",
             FIELD_INSTALLED_NAMESPACES, IS_CORE_EXTENSION));
     }

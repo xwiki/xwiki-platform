@@ -166,7 +166,7 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
     }
 
     /**
-     * @since 17.4.0RC1
+     * @since 17.10.0RC1
      * @return whether to show or not the pagination should be shown when there's only one page.
      */
     @Unstable
@@ -177,7 +177,7 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
 
     /**
      * Sets whether to show or not the pagination should be shown when there's only one page.
-     * @since 17.4.0RC1
+     * @since 17.10.0RC1
      * @param showPaginationOnSinglePage {@code true} to always show the pagination, {@code false} otherwise
      */
     @Unstable

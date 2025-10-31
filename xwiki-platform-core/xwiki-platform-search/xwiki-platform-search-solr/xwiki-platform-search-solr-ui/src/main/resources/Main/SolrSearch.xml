@@ -259,7 +259,7 @@
       window.history.replaceState &amp;&amp; window.history.replaceState(state, document.title);
       // Make sure the browser address bar reflects the new state (and thus the new state can be bookmarked).
       window.history.pushState &amp;&amp; window.history.pushState(state, document.title, viewURL);
-      document.querySelector(changeTargetSelector).focus();
+      document.querySelector(changeTargetSelector)?.focus();
     });
   };
 

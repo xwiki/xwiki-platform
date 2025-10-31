@@ -37,6 +37,10 @@ import org.xwiki.text.XWikiToStringBuilder;
  */
 public class VulnObject
 {
+    private static final String CVSS_V4 = "CVSS_V4";
+    private static final String CVSS_V3 = "CVSS_V3";
+    private static final String CVSS_V2 = "CVSS_V2";
+
     private List<AffectObject> affected;
 
     private String id;
@@ -136,9 +140,26 @@ public class VulnObject
         }
         return this.severity.stream()
             .filter(s -> s.getType().matches("^(CVSS_V)[2-4]$"))
-            .map(SeverityObject::getScore)
-            .findFirst()
-            .orElse(null);
+            .max((t1, t2) -> {
+                int result;
+                if (t1.getType().equals(t2.getType())) {
+                    result = 0;
+                } else if (CVSS_V4.equals(t1.getType())) {
+                    result = 1;
+                } else if (CVSS_V4.equals(t2.getType())) {
+                    result = -1;
+                } else if (CVSS_V3.equals(t1.getType())) {
+                    result = 1;
+                } else if (CVSS_V3.equals(t2.getType())) {
+                    result = -1;
+                } else if (CVSS_V2.equals(t1.getType())) {
+                    result = 1;
+                } else {
+                    result = -1;
+                }
+                return result;
+            })
+            .map(SeverityObject::getScore).orElse(null);
     }
 
     /**

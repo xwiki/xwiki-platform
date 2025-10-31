@@ -135,6 +135,42 @@ class OsvResponseAnalyzerTest
     }
 
     @Test
+    void analyzeOsvResponseCVSSV2()
+    {
+        OsvResponse osvResponse = readJson("osvResponseCVSSV2.json");
+
+        ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
+        SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor = new SecurityVulnerabilityDescriptor();
+        securityVulnerabilityDescriptor.setId("CVE-1");
+        securityVulnerabilityDescriptor.setAliases(Set.of("A1", "VULN_ID"));
+        securityVulnerabilityDescriptor.setURL("https://main.ref/");
+        securityVulnerabilityDescriptor.setScore(7.5);
+        securityVulnerabilityDescriptor.setFixVersion(new DefaultVersion("15.7"));
+        expected.setResults(List.of(securityVulnerabilityDescriptor));
+
+        assertEquals(expected,
+            this.analyzer.analyzeOsvResponse("org.test:my-ext", "7.5", osvResponse));
+    }
+
+    @Test
+    void analyzeOsvResponseMultipleSeverities()
+    {
+        OsvResponse osvResponse = readJson("osvResponseMultipleSeverities.json");
+
+        ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
+        SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor = new SecurityVulnerabilityDescriptor();
+        securityVulnerabilityDescriptor.setId("CVE-1");
+        securityVulnerabilityDescriptor.setAliases(Set.of("A1", "VULN_ID"));
+        securityVulnerabilityDescriptor.setURL("https://main.ref/");
+        securityVulnerabilityDescriptor.setScore(8.7);
+        securityVulnerabilityDescriptor.setFixVersion(new DefaultVersion("15.7"));
+        expected.setResults(List.of(securityVulnerabilityDescriptor));
+
+        assertEquals(expected,
+            this.analyzer.analyzeOsvResponse("org.test:my-ext", "7.5", osvResponse));
+    }
+
+    @Test
     void analyzeCommonsHttpclientOsvResponse()
     {
         OsvResponse osvResponse = readJson("commons-httpclient-commons-httpclient-3.1.json");

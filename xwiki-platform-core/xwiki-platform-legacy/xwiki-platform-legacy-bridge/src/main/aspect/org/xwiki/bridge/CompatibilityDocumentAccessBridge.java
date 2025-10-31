@@ -23,8 +23,8 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
- * Compatibility interface for the {@link DocumentAccessBridge} class. The methods of this class are woven on
- * {@link DocumentAccessBridge} by {@link DocumentAccessBridgeAspect}.
+ * Compatibility interface for {@link DocumentAccessBridge}. The methods of this class are woven on
+ * {@link DocumentAccessBridge} by DocumentAccessBridgeAspect.
  *
  * @version $Id$
  * @since 17.10.0RC1

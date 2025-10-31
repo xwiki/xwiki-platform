@@ -29,7 +29,7 @@
     "eslint": "9.36.0",
     "eslint-plugin-vue": "10.5.0",
     "jiti": "2.6.0",
-    "jsdom": "27.0.0",
+    "jsdom": "27.1.0",
     "npm-run-all2": "8.0.4",
     "typescript": "5.9.3",
     "vite": "7.1.12",

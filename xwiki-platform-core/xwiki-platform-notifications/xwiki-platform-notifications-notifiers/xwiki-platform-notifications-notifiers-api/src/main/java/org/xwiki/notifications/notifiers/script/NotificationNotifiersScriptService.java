@@ -140,7 +140,7 @@ public class NotificationNotifiersScriptService implements ScriptService
     /**
      * Compute the HTML fragment for the async placehoder.
      * @param response the async response containing ID informations for the placeholder
-     * @param inline if {@code true} returns a span else a div.
+     * @param inline if {@code true} returns a list element with a nested span else a nested div.
      * @return a string containing the HTML for the placeholder.
      */
     private String computeAsyncPlaceholder(AsyncRendererExecutorResponse response, boolean inline)
@@ -150,9 +150,9 @@ public class NotificationNotifiersScriptService implements ScriptService
 
         String result;
         if (inline) {
-            result = String.format("<span %s></span>", commonPart);
+            result = String.format("<li %s><span></span></li>", commonPart);
         } else {
-            result = String.format("<div %s></div>", commonPart);
+            result = String.format("<li %s><div></div></li>", commonPart);
         }
         return result;
     }

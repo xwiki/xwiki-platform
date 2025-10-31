@@ -35,6 +35,11 @@
     </properties>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-store-blob-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-store-api</artifactId>
       <version>${project.version}</version>
@@ -58,6 +63,12 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-store-blob-filesystem</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>

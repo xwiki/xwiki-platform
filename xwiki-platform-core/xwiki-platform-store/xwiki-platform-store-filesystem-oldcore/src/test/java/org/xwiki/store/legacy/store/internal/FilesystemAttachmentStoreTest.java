@@ -22,16 +22,13 @@ package org.xwiki.store.legacy.store.internal;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Session;
@@ -45,6 +42,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.blob.FileSystemBlobStoreProperties;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 import org.xwiki.store.locks.dummy.internal.DummyLockProvider;
@@ -97,7 +98,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
     /**
      * The file which will hold content for this attachment.
      */
-    private File storeFile;
+    private Blob storeFile;
 
     /**
      * The dir in /tmp/ which we use as our sandbox.
@@ -185,12 +186,16 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         this.storageLocation = new File(tmpDir, "test-storage-location");
 
-        this.fileTools = new FilesystemStoreTools(storageLocation, new DummyLockProvider());
+        FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
+        properties.setRootDirectory(this.storageLocation.toPath());
+        FileSystemBlobStore blobStore = new FileSystemBlobStore("Test", properties);
+
+        this.fileTools = new FilesystemStoreTools(blobStore, new DummyLockProvider());
 
         this.attachStore = new FilesystemAttachmentStore();
         FieldUtils.writeField(this.attachStore, "fileTools", this.fileTools, true);
 
-        this.storeFile = this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentFile();
+        this.storeFile = this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
         HELLO_STREAM.reset();
     }
 
@@ -204,8 +209,8 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
     @Test
     public void saveContentTest() throws Exception
     {
-        final File storeFile =
-            this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentFile();
+        final Blob storeFile =
+            this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
         Assert.assertFalse(this.storeFile.exists());
 
         getMockery().checking(new Expectations()
@@ -220,14 +225,14 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
 
         Assert.assertTrue("The attachment file was not created.", this.storeFile.exists());
         Assert.assertEquals("The attachment file contained the wrong content", HELLO,
-            FileUtils.readFileToString(storeFile, StandardCharsets.UTF_8));
+            IOUtils.toString(storeFile.getStream(), StandardCharsets.UTF_8));
     }
 
     @Test
     public void saveTwoOfSameAttachmentInOneTransactionTest() throws Exception
     {
-        final File storeFile =
-            this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentFile();
+        final Blob storeFile =
+            this.fileTools.getAttachmentFileProvider(this.mockAttachReference).getAttachmentContentBlob();
         Assert.assertFalse(this.storeFile.exists());
 
         getMockery().checking(new Expectations()
@@ -246,16 +251,13 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
 
         Assert.assertTrue("The attachment file was not created.", this.storeFile.exists());
         Assert.assertEquals("The attachment file contained the wrong content", HELLO,
-            FileUtils.readFileToString(storeFile, StandardCharsets.UTF_8));
+            IOUtils.toString(storeFile.getStream(), StandardCharsets.UTF_8));
     }
 
     @Test
     public void loadContentTest() throws Exception
     {
-        this.storeFile.getParentFile().mkdirs();
-        OutputStream os = new FileOutputStream(this.storeFile, false);
-        IOUtils.copy(HELLO_STREAM, os);
-        os.close();
+        this.storeFile.writeFromStream(HELLO_STREAM);
 
         getMockery().checking(new Expectations()
         {
@@ -354,12 +356,9 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
 
     /* -------------------- Helpers -------------------- */
 
-    private void createFile() throws IOException
+    private void createFile() throws BlobStoreException
     {
-        this.storeFile.getParentFile().mkdirs();
-        OutputStream os = new FileOutputStream(this.storeFile, false);
-        IOUtils.copy(HELLO_STREAM, os);
-        os.close();
+        this.storeFile.writeFromStream(HELLO_STREAM);
         Assert.assertTrue("The attachment file not created for the test.", this.storeFile.exists());
     }
 

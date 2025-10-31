@@ -17,21 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store.filesystem.internal;
+package org.xwiki.store;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.blob.Blob;
-import org.xwiki.store.blob.BlobStoreException;
 
 /**
- * A means of getting files for storing information about a given deleted document.
+ * An entity that serializes embedded data to a {@link Blob}.
  *
  * @version $Id$
- * @since 9.0RC1
+ * @since 17.8.0RC1
  */
-public interface DeletedDocumentContentFileProvider
+@Unstable
+public interface BlobSerializer
 {
     /**
-     * @return the Blob for storing the content of the deleted document.
+     * @param blob the file to write to
+     * @throws Exception when failing to serialize the data to the passed blob
      */
-    Blob getDeletedDocumentContentBlob() throws BlobStoreException;
+    void serialize(Blob blob) throws Exception;
 }

@@ -23,15 +23,15 @@ import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobStoreException;
 
 /**
- * A means of getting files for storing information about a given deleted document.
+ * A means of getting files for storing information about a given attachment.
  *
  * @version $Id$
- * @since 9.0RC1
+ * @since 3.0M2
  */
-public interface DeletedDocumentContentFileProvider
+public interface DeletedAttachmentBlobProvider extends AttachmentBlobProvider
 {
     /**
-     * @return the Blob for storing the content of the deleted document.
+     * @return the Blob for storing the information about the deleted attachment such as who deleted it.
      */
-    Blob getDeletedDocumentContentBlob() throws BlobStoreException;
+    Blob getDeletedAttachmentMetaBlob() throws BlobStoreException;
 }

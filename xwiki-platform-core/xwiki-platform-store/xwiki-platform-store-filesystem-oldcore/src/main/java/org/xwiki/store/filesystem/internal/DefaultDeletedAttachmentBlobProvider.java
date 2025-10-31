@@ -19,7 +19,12 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.File;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.BlobStoreException;
+
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * A means of getting files for storing information about a given deleted attachment.
@@ -27,8 +32,8 @@ import java.io.File;
  * @version $Id$
  * @since 3.0M2
  */
-public class DefaultDeletedAttachmentFileProvider extends DefaultAttachmentFileProvider
-    implements DeletedAttachmentFileProvider
+public class DefaultDeletedAttachmentBlobProvider extends DefaultAttachmentBlobProvider
+    implements DeletedAttachmentBlobProvider
 {
     /**
      * This stores the metadata for the deleted attachment such as who deleted it.
@@ -40,17 +45,18 @@ public class DefaultDeletedAttachmentFileProvider extends DefaultAttachmentFileP
     /**
      * The Constructor.
      *
+     * @param store the blob store where the attachment information is stored.
      * @param attachmentDir the location where the information about the deleted attachment will be stored.
      * @param fileName the name of the attachment file.
      */
-    public DefaultDeletedAttachmentFileProvider(final File attachmentDir, final String fileName)
+    public DefaultDeletedAttachmentBlobProvider(BlobStore store, final BlobPath attachmentDir, final String fileName)
     {
-        super(attachmentDir, fileName);
+        super(store, attachmentDir, fileName);
     }
 
     @Override
-    public File getDeletedAttachmentMetaFile()
+    public Blob getDeletedAttachmentMetaBlob() throws BlobStoreException
     {
-        return new File(this.getAttachmentDir(), DELETED_ATTACH_META_FILENAME);
+        return this.store.getBlob(this.getAttachmentDir().resolve(DELETED_ATTACH_META_FILENAME));
     }
 }

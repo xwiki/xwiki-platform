@@ -19,52 +19,51 @@
  */
 package org.xwiki.javascript.importmap.internal;
 
-import java.util.Map;
+import java.util.List;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.uiextension.UIExtension;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
+import org.xwiki.extension.event.ExtensionUninstalledEvent;
+import org.xwiki.extension.event.ExtensionUpgradedEvent;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.Event;
 
 /**
- * Retrieve the resolved importmap from {@link JavascriptImportmapResolver} and inject it in the page headers with the
- * {@code "org.xwiki.platform.html.head"} extension point.
+ * List for extensions related events (installed, uninstalled, upgraded) and clear {@link JavascriptImportmapResolver}
+ * cache when the events are received.
  *
  * @version $Id$
  * @since 17.10.0RC1
  */
 @Component
 @Singleton
-@Named("JavascriptImportmap")
-public class JavascriptImportmapUIExtension implements UIExtension
+public class JavascriptImportmapEventListener implements EventListener
 {
     @Inject
     private JavascriptImportmapResolver javascriptImportmapResolver;
 
     @Override
-    public String getId()
+    public String getName()
     {
-        return "org.xwiki.platform.javascript.importmap.html.head";
+        return "JavascriptImportmapUIExtension";
     }
 
     @Override
-    public String getExtensionPointId()
+    public List<Event> getEvents()
     {
-        return "org.xwiki.platform.html.head";
+        return List.of(
+            new ExtensionInstalledEvent(),
+            new ExtensionUninstalledEvent(),
+            new ExtensionUpgradedEvent()
+        );
     }
 
     @Override
-    public Map<String, String> getParameters()
+    public void onEvent(Event event, Object source, Object data)
     {
-        return Map.of("order", "1000");
-    }
-
-    @Override
-    public Block execute()
-    {
-        return this.javascriptImportmapResolver.getBlock();
+        this.javascriptImportmapResolver.clearCache();
     }
 }

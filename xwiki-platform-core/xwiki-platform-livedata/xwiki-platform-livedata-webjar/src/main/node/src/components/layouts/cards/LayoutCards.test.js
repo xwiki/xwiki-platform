@@ -64,8 +64,7 @@ function initWrapper({ options, afterEntryFetchWrapper } = {}) {
             if (afterEntryFetchWrapper) {
               afterEntryFetchWrapper.callback = callback;
             }
-          },
-          data: {
+          }, data: {
             data: {
               entries: [],
             },

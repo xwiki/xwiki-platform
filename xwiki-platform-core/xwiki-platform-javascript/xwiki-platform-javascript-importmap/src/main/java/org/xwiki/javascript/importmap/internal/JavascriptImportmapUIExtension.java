@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.javascript.importmap.internal;
 
 import java.util.HashMap;
@@ -26,6 +45,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.rendering.syntax.Syntax.HTML_5_0;
 
+/**
+ * Resolve the importmap from the webjar declarations, using the {@code "xwiki.javascript.modules.importmap"} pom
+ * property. The resolved mapping in injected in the page headers with the {@code "org.xwiki.platform.html.head"}
+ * extension point.
+ *
+ * @version $Id$
+ * @since 17.10.0RC1
+ */
 @Component
 @Singleton
 @Named("JavascriptImportmap")
@@ -93,16 +120,25 @@ public class JavascriptImportmapUIExtension implements UIExtension
             })
             .toList();
 
-        Map<String, String> pouet = new HashMap<>();
+        Map<String, String> resolvedMap = new HashMap<>();
         for (Map<String, String> objectObjectMap : extensionsWithImportMap) {
             for (Map.Entry<String, String> objectObjectEntry : objectObjectMap.entrySet()) {
-                // TODO: merge resolutions + raise warning in case of conflict.
+                String key = objectObjectEntry.getKey();
+                String value = objectObjectEntry.getValue();
+                String existingValue = resolvedMap.get(key);
+                if (existingValue == null) {
+                    resolvedMap.put(key, value);
+                } else if (!value.equals(existingValue)) {
+                    this.logger.warn(
+                        "Conflicting importmap resolution for key [{}]. Existing value: [{}], new value: [{}]",
+                        key, existingValue, value);
+                }
             }
         }
 
-        String json = extensionsWithImportMap.toString();
+        String json;
         try {
-            json = OBJECT_MAPPER.writeValueAsString(Map.of());
+            json = OBJECT_MAPPER.writeValueAsString(resolvedMap);
         } catch (JsonProcessingException e) {
             this.logger.warn("Failed to serialize the importmap. Cause: [{}]", getRootCauseMessage(e));
             json = "{}";

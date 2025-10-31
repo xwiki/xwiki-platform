@@ -4,66 +4,55 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@xwiki/cristal-fn-utils': 0.19.0
-  '@xwiki/cristal-model-api': 0.19.0
-  '@xwiki/cristal-model-reference-api': 0.19.0
-  '@xwiki/cristal-model-remote-url-api': 0.19.0
-  inversify: 7.5.2
-  vue: 3.5.22
-
 importers:
 
   .:
     dependencies:
-      '@blocknote/core':
-        specifier: 0.31.3
-        version: 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
-      '@blocknote/mantine':
-        specifier: 0.31.3
-        version: 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@mantine/core':
-        specifier: 8.1.1
-        version: 8.1.1(@mantine/hooks@8.1.1(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@xwiki/cristal-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       '@xwiki/cristal-attachments-default':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       '@xwiki/cristal-authentication-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)
+        specifier: 0.23.1
+        version: 0.23.1(reflect-metadata@0.2.2)
       '@xwiki/cristal-backend-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-collaboration-api':
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       '@xwiki/cristal-document-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       '@xwiki/cristal-dsapi':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       '@xwiki/cristal-editors-blocknote-headless':
-        specifier: 0.19.0
-        version: 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
+        specifier: 0.23.1
+        version: 0.23.1(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       '@xwiki/cristal-editors-blocknote-react':
-        specifier: 0.19.0
-        version: 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
+        specifier: 0.23.1
+        version: 0.23.1(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       '@xwiki/cristal-link-suggest-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       '@xwiki/cristal-model-api':
-        specifier: 0.19.0
-        version: 0.19.0
+        specifier: 0.23.1
+        version: 0.23.1
       '@xwiki/cristal-model-reference-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       '@xwiki/cristal-model-remote-url-api':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-uniast':
-        specifier: 0.19.0
-        version: 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-uniast-api':
+        specifier: 0.23.1
+        version: 0.23.1
+      '@xwiki/cristal-uniast-markdown':
+        specifier: 0.23.1
+        version: 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       inversify:
         specifier: 7.5.2
         version: 7.5.2(reflect-metadata@0.2.2)
@@ -71,11 +60,11 @@ importers:
         specifier: 3.0.2
         version: 3.0.2(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       react:
-        specifier: 19.1.0
-        version: 19.1.0
+        specifier: 19.2.0
+        version: 19.2.0
       react-dom:
-        specifier: 19.1.0
-        version: 19.1.0(react@19.1.0)
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
       vue-i18n:
         specifier: 11.1.12
         version: 11.1.12(vue@3.5.22(typescript@5.9.3))
@@ -153,8 +142,8 @@ packages:
   '@asamuzakjp/css-color@4.0.5':
     resolution: {integrity: sha512-lMrXidNhPGsDjytDy11Vwlb6OIGrT3CmLg3VWNFyWkLWtijKl7xjvForlh8vuj0SHGjgl4qZEQzUmYTeQA2JFQ==}
 
-  '@asamuzakjp/dom-selector@6.5.7':
-    resolution: {integrity: sha512-cvdTPsi2qC1c22UppvuVmx/PDwuc6+QQkwt9OnwQD6Uotbh//tb2XDF0OoK2V0F4b8d02LIwNp3BieaDMAhIhA==}
+  '@asamuzakjp/dom-selector@6.6.2':
+    resolution: {integrity: sha512-+AG0jN9HTwfDLBhjhX1FKi6zlIAc/YGgEHlN/OMaHD1pOPFsC5CpYQpLkPX0aFjyaVmoq9330cQDCU4qnSL1qA==}
 
   '@asamuzakjp/nwsapi@2.3.9':
     resolution: {integrity: sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==}
@@ -213,11 +202,6 @@ packages:
     resolution: {integrity: sha512-PTNtvUQihsAsDHMOP5pfobP8C6CM4JWXmP8DrEIt46c3r2bf87Ua1zoqevsMo9g+tWDwgWrFP5EIxuBx5RudAw==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/parser@7.28.3':
-    resolution: {integrity: sha512-7+Ey1mAgYqFAx2h0RuoxcQT5+MlG3GTV0TQrgr7/ZliKsm/MNDxVVutlWaziMq7wJNAz8MTqz55XLpWvva6StA==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-
   '@babel/parser@7.28.4':
     resolution: {integrity: sha512-yZbBqeM6TkpP9du/I2pUZnJsRMGGvOuIrhjzC1AwHwW+6he4mni6Bp/m8ijn0iOuZuPI2BfkCoSRunpyjnrQKg==}
     engines: {node: '>=6.0.0'}
@@ -247,36 +231,26 @@ packages:
     resolution: {integrity: sha512-7w4kZYHneL3A6NP2nxzHvT3HCZ7puDZZjFMqDpBPECub79sTtSO5CGXDkKrTQq8ksAwfD/XI2MRFX23njdDaIQ==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/types@7.28.2':
-    resolution: {integrity: sha512-ruv7Ae4J5dUYULmeXw1gmb7rYRz57OWCPM57pHojnLq/3Z1CK2lNSLTCVjxVk1F/TZHwOZZrOWi0ur95BbLxNQ==}
-    engines: {node: '>=6.9.0'}
-
   '@babel/types@7.28.4':
     resolution: {integrity: sha512-bkFqkLhh3pMBUQQkpVgWDWq/lqzc2678eUyDlTBhRqhCHFguYYGM0Efga7tYk4TogG/3x0EEl66/OQ+WGbWB/Q==}
     engines: {node: '>=6.9.0'}
 
-  '@blocknote/core@0.31.3':
-    resolution: {integrity: sha512-gTg+oYeI0UmYLw1/c5VwEuQMj42LNRvLjVqr2yCU0mnoJdW2dB4fjYMhj8s1f9KWiwMrkc8y8l6DqFzKFWezfw==}
+  '@blocknote/core@0.35.0':
+    resolution: {integrity: sha512-Pn0DZHIU0fgKw8Cw4s7dspRXML6jZn3a0CUKnXOTsDEuJBoPrvFmQEPGb/OpFDfvCh5YftKoQYUAsiy1HJYN7A==}
     peerDependencies:
       '@hocuspocus/provider': ^2.15.2
     peerDependenciesMeta:
       '@hocuspocus/provider':
         optional: true
 
-  '@blocknote/mantine@0.31.3':
-    resolution: {integrity: sha512-Kql4zjl6liRXroDi45r3aMp+MdJgwkuyvXZ6Qz4+TkxByd4/HWFynWEtFI1XOLTso/45Q+hOPrpxZPTITea99Q==}
+  '@blocknote/mantine@0.35.0':
+    resolution: {integrity: sha512-Ao8Z2d84MQIuVRVobymYYyayFkYxtRW3L3XGNMqBPtezX0qsRivUGCmmRoBmbjbcJ2EqtGOVpTEU8jecYUZe5g==}
     peerDependencies:
       react: ^18.0 || ^19.0 || >= 19.0.0-rc
       react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
 
-  '@blocknote/react@0.31.3':
-    resolution: {integrity: sha512-Y2BbZChxvVKfoV1dShxiM+cepm5mHJmQHw0pEMtHx+fLlyfdkLkFbIIVNMIYm12Ba6UFhzDMOlCK23WW0NHb/Q==}
-    peerDependencies:
-      react: ^18.0 || ^19.0 || >= 19.0.0-rc
-      react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
-
-  '@blocknote/xl-multi-column@0.31.3':
-    resolution: {integrity: sha512-FMUbAxJPCMPXZiuupt1YaFJmEc98/Ltc+BDByXileCNWzP3NSi05Kq/GZxjr3/rrQWslRuq5DxHaqoeSAQhUbQ==}
+  '@blocknote/react@0.35.0':
+    resolution: {integrity: sha512-SZqbVUmPGIBoqv/oCDN8LKGdDY04A+BlXptHAojeH5UY6gH7N6/kRTNvzZ9OIrCKlCHbRGK+8eiHjSTBFRAXUQ==}
     peerDependencies:
       react: ^18.0 || ^19.0 || >= 19.0.0-rc
       react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
@@ -474,12 +448,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@eslint-community/eslint-utils@4.7.0':
-    resolution: {integrity: sha512-dyybb3AcajC7uha6CvhdVRJqaKyn7w2YKqKyAN37NKYgZT36w+iRb0Dymmc5qEJ549c/S31cMMSFd75bteCpCw==}
-    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-    peerDependencies:
-      eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
-
   '@eslint-community/eslint-utils@4.9.0':
     resolution: {integrity: sha512-ayVFHdtZ+hsq1t2Dy24wCmGXGe4q9Gu3smhLYALJrr473ZH27MsnSL+LKUlimp4BWJqMDMLmPpx/Q9R3OAlL4g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -525,11 +493,23 @@ packages:
   '@floating-ui/core@1.7.2':
     resolution: {integrity: sha512-wNB5ooIKHQc+Kui96jE/n69rHFWAVoxn5CAzL1Xdd8FG03cgY3MLO+GF9U3W737fYDSgPWA6MReKhBQBop6Pcw==}
 
+  '@floating-ui/core@1.7.3':
+    resolution: {integrity: sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w==}
+
   '@floating-ui/dom@1.7.2':
     resolution: {integrity: sha512-7cfaOQuCS27HD7DX+6ib2OrnW+b4ZBwDNnCcT0uTyidcmyWb03FnQqJybDBoCnpdxwBSfA94UAYlRCt7mV+TbA==}
 
+  '@floating-ui/dom@1.7.4':
+    resolution: {integrity: sha512-OOchDgh4F2CchOX94cRVqhvy7b3AFb+/rQXyswmzmGakRfkMgoWVjfnLWkRirfLEfuD4ysVW16eXzwt3jHIzKA==}
+
   '@floating-ui/react-dom@2.1.4':
     resolution: {integrity: sha512-JbbpPhp38UmXDDAu60RJmbeme37Jbgsm7NrHGgzYYFKmblzRUh6Pa641dII6LsjwF4XlScDrde2UAzDo/b9KPw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
+  '@floating-ui/react-dom@2.1.6':
+    resolution: {integrity: sha512-4JX6rEatQEvlmgU80wZyq9RT96HZJa88q8hp0pBd+LrczeDI4o6uA2M+uvxngVHo4Ihr8uibXxH6+70zhAFrVw==}
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -539,6 +519,12 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
+
+  '@floating-ui/react@0.27.16':
+    resolution: {integrity: sha512-9O8N4SeG2z++TSM8QA/KTeKFBVCNEz/AGS7gWPJf6KFRzmRWixFRnCnkPHRDwSVZW6QPDO6uT0P2SpWNKCc9/g==}
+    peerDependencies:
+      react: '>=17.0.0'
+      react-dom: '>=17.0.0'
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
@@ -576,24 +562,12 @@ packages:
     resolution: {integrity: sha512-whh0trqRsSqVLNEUCwU59pyJZYpU8AmSWl8M3Jz2Mv5ESPP6kFh4juas2NpZ1iCvy7GlNRffUD1xr84gceimjg==}
     engines: {node: '>= 16'}
 
-  '@intlify/core-base@11.1.5':
-    resolution: {integrity: sha512-xGRkISwV/2Trqb8yVQevlHm5roaQqy+75qwUzEQrviaQF0o4c5VDhjBW7WEGEoKFx09HSgq7NkvK/DAyuerTDg==}
-    engines: {node: '>= 16'}
-
   '@intlify/message-compiler@11.1.12':
     resolution: {integrity: sha512-Fv9iQSJoJaXl4ZGkOCN1LDM3trzze0AS2zRz2EHLiwenwL6t0Ki9KySYlyr27yVOj5aVz0e55JePO+kELIvfdQ==}
     engines: {node: '>= 16'}
 
-  '@intlify/message-compiler@11.1.5':
-    resolution: {integrity: sha512-YLSBbjD7qUdShe3ZAat9Hnf9E8FRpN6qmNFD/x5Xg5JVXjsks0kJ90Zj6aAuyoppJQA/YJdWZ8/bB7k3dg2TjQ==}
-    engines: {node: '>= 16'}
-
   '@intlify/shared@11.1.12':
     resolution: {integrity: sha512-Om86EjuQtA69hdNj3GQec9ZC0L0vPSAnXzB3gP/gyJ7+mA7t06d9aOAiqMZ+xEOsumGP4eEBlfl8zF2LOTzf2A==}
-    engines: {node: '>= 16'}
-
-  '@intlify/shared@11.1.5':
-    resolution: {integrity: sha512-+I4vRzHm38VjLr/CAciEPJhGYFzWWW4HMTm+6H3WqknXLh0ozNX9oC8ogMUwTSXYR/wGUb1/lTpNziiCH5MybQ==}
     engines: {node: '>= 16'}
 
   '@inversifyjs/common@1.5.0':
@@ -648,10 +622,10 @@ packages:
       react: ^18.x || ^19.x
       react-dom: ^18.x || ^19.x
 
-  '@mantine/core@8.1.1':
-    resolution: {integrity: sha512-fW5phaeraz5F2+rnu3cz9aqzyOdvK8ZKi3fWgfhURVt8lo7+oZOVmqsKnvnxw4clJvj/A51wLCmgN9uhlm0n2g==}
+  '@mantine/core@8.3.3':
+    resolution: {integrity: sha512-OdTAQ0lsXjEqfea0KyXJ1rV9cZb/Rtqv5l3luG2m8Sx5BTGMqXas6mKHtdj4LwIiUKeFkIkZYjNmH6ri1HXjSA==}
     peerDependencies:
-      '@mantine/hooks': 8.1.1
+      '@mantine/hooks': 8.3.3
       react: ^18.x || ^19.x
       react-dom: ^18.x || ^19.x
 
@@ -660,8 +634,8 @@ packages:
     peerDependencies:
       react: ^18.x || ^19.x
 
-  '@mantine/hooks@8.1.1':
-    resolution: {integrity: sha512-C+p9pPDPl/IMcVCN44XMa9MbuUOEJS3PG9Wklw9Z+ooJqkBnc7aXs3xTAjIsaUCinR9hMqT19cwiYb+W88leVg==}
+  '@mantine/hooks@8.3.3':
+    resolution: {integrity: sha512-nmspxbFSjFkimRXYhgAujnyBwGeAWDSP1WKHFR+Yl5x3Q0IkmsiOTE9yJPjMjmjffZfunFXQFwQDl1OF3m42Pw==}
     peerDependencies:
       react: ^18.x || ^19.x
 
@@ -962,10 +936,10 @@ packages:
   '@types/node@22.18.8':
     resolution: {integrity: sha512-pAZSHMiagDR7cARo/cch1f3rXy0AEXwsVsVH09FcyeJVAzCnGgmYis7P3JidtTUjyadhTeSo8TgRPswstghDaw==}
 
-  '@types/react-dom@19.1.6':
-    resolution: {integrity: sha512-4hOiT/dwO8Ko0gV1m/TJZYk3y0KBnY9vzDh7W+DH17b2HFSOGgdj33dhihPeuy3l0q23+4e+hoXHV6hCC4dCXw==}
+  '@types/react-dom@19.2.0':
+    resolution: {integrity: sha512-brtBs0MnE9SMx7px208g39lRmC5uHZs96caOJfTjFcYSLHNamvaSMfJNagChVNkup2SdtOxKX1FDBkRSJe1ZAg==}
     peerDependencies:
-      '@types/react': ^19.0.0
+      '@types/react': ^19.2.0
 
   '@types/react@19.1.8':
     resolution: {integrity: sha512-AwAfQ2Wa5bCx9WP8nZL2uMZWod7J7/JSplxbTmBQ5ms6QpqNYm672H0Vu9ZVKVngQ+ii4R/byguVEUZQyeg44g==}
@@ -1052,7 +1026,7 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
-      vue: 3.5.22
+      vue: ^3.2.25
 
   '@vitest/expect@3.2.4':
     resolution: {integrity: sha512-Io0yyORnB6sikFlt8QW5K7slY4OjqNX9jmJQ02QDda8lyM6B5oNgVWoSoKPac8/kgnCUzuHQKrSLtu/uOqqrig==}
@@ -1092,14 +1066,8 @@ packages:
   '@volar/typescript@2.4.23':
     resolution: {integrity: sha512-lAB5zJghWxVPqfcStmAP1ZqQacMpe90UrP5RJ3arDyrhy4aCUQqmxPPLB2PWDKugvylmO41ljK7vZ+t6INMTag==}
 
-  '@vue/compiler-core@3.5.20':
-    resolution: {integrity: sha512-8TWXUyiqFd3GmP4JTX9hbiTFRwYHgVL/vr3cqhr4YQ258+9FADwvj7golk2sWNGHR67QgmCZ8gz80nQcMokhwg==}
-
   '@vue/compiler-core@3.5.22':
     resolution: {integrity: sha512-jQ0pFPmZwTEiRNSb+i9Ow/I/cHv2tXYqsnHKKyCQ08irI2kdF5qmYedmF8si8mA7zepUFmJ2hqzS8CQmNOWOkQ==}
-
-  '@vue/compiler-dom@3.5.20':
-    resolution: {integrity: sha512-whB44M59XKjqUEYOMPYU0ijUV0G+4fdrHVKDe32abNdX/kJe1NUEMqsi4cwzXa9kyM9w5S8WqFsrfo1ogtBZGQ==}
 
   '@vue/compiler-dom@3.5.22':
     resolution: {integrity: sha512-W8RknzUM1BLkypvdz10OVsGxnMAuSIZs9Wdx1vzA3mL5fNMN15rhrSCLiTm6blWeACwUwizzPVqGJgOGBEN/hA==}
@@ -1153,9 +1121,6 @@ packages:
     peerDependencies:
       vue: 3.5.22
 
-  '@vue/shared@3.5.20':
-    resolution: {integrity: sha512-SoRGP596KU/ig6TfgkCMbXkr4YJ91n/QSdMuqeP5r3hVIYA3CPHUBCc7Skak0EAKV+5lL4KyIh61VA/pK1CIAA==}
-
   '@vue/shared@3.5.22':
     resolution: {integrity: sha512-F4yc6palwq3TT0u+FYf0Ns4Tfl9GRFURDN2gWG7L1ecIaS/4fCIuFOjMTnCyjsu/OK6vaDKLCrGAa+KvvH+h4w==}
 
@@ -1166,80 +1131,124 @@ packages:
     resolution: {integrity: sha512-ku2uNz5MaZ9IerPPUyOHzyjhXoX2kVJaVf7hL315DC17vS6IiZRmmCPfggNbU16QTvM80+uYYy3eYJB59WCtvg==}
     peerDependencies:
       typescript: 5.x
-      vue: 3.5.22
+      vue: ^3.4.0
     peerDependenciesMeta:
       typescript:
         optional: true
       vue:
         optional: true
 
-  '@xwiki/cristal-api@0.19.0':
-    resolution: {integrity: sha512-W2v6R9o+oB5dARFEkY1OUmcJ7vsO++a3xxcEJMwcJBL2rrd+HLQm8aPVuc793ReM6wMYEnw2KEjzrYBwyRMBRw==}
-
-  '@xwiki/cristal-attachments-api@0.19.0':
-    resolution: {integrity: sha512-RPTdA65TDB/qenOBkZbWntm26tGnjZA8p8Ev5jFO1DX1TWkuKPmylbSI/TI2Cx1JS6fi+GUT8+vkqyYjNicRQw==}
-
-  '@xwiki/cristal-attachments-default@0.19.0':
-    resolution: {integrity: sha512-K28C0nLl+qLs4uS103YyUaKTpUK02tFiORsLf+zihKVrX7WpM/UAibOOy/0dgqolOgKCfs1put872Q/YeBuEOQ==}
+  '@xwiki/cristal-api@0.23.1':
+    resolution: {integrity: sha512-5me0y2img3sHboBVXvcUsdauB42LIs74MudQWRo2IYMqUYezn/GU/5YhW/O66SQF/4uIqepd5Bzs56KIMAeClA==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      inversify: 7.x
+      reflect-metadata: 0.x
+      vue: 3.x
 
-  '@xwiki/cristal-authentication-api@0.19.0':
-    resolution: {integrity: sha512-IuN/6MXHWn01sYkKIqB8xotKVSmFyEEhR01QbDTlDAbEAuJGH/7DxrDfy3fO4dFx3gy59S94zhzMy+2TMgb9dA==}
+  '@xwiki/cristal-attachments-api@0.23.1':
+    resolution: {integrity: sha512-3zWINWWWo8Ea/utWsn4YAS7FtC5nvxfhq55JuEfIYMwIR60/wvvOQ/v/XYfmPdnPXoDTqHkz0B40DY7z9yhSvQ==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      reflect-metadata: 0.x
+      vue: 3.x
 
-  '@xwiki/cristal-backend-api@0.19.0':
-    resolution: {integrity: sha512-/ThyYGWPCJ7GH9aMNDULx3IwBRP4oB3GSt9QFki1l2OGclozXufyNZ1EkwvC+iHzhDBwSetYu67HiSLZZTcvfw==}
+  '@xwiki/cristal-attachments-default@0.23.1':
+    resolution: {integrity: sha512-SBQI4wtvNveSVJQNESyOfWcI70Yrr/Dfoo0AZhF64DxJA7QJZLNcaHRqHZ6480H5jzaQynMXDnbd90syiL3ERA==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      inversify: 7.x
+      reflect-metadata: 0.x
+      vue: 3.x
 
-  '@xwiki/cristal-configuration-api@0.19.0':
-    resolution: {integrity: sha512-Mq2t83gydM3ioG3zjzjHvTD2fc+gnFdbgqjes56Dx33wu9NOTF5adFwKfVSfaDF6twW/o9h7wO6wXEdCLZnCxQ==}
-
-  '@xwiki/cristal-document-api@0.19.0':
-    resolution: {integrity: sha512-6b3V/EVTEfrGmhF75UQBcKOYp9q3/9Aqs/x0L0wZ57b1P7Wdj7bGkBnP1iEX+IGfAuKMDxns99HwpkKF0yyrkg==}
-
-  '@xwiki/cristal-dsapi@0.19.0':
-    resolution: {integrity: sha512-DyqMJKa1tKeNQO5QqZSjlr5szvyF4PVYQbT7Y3zPsGtCrVGcIb1YlHlqbSQRpb4soEohbkLDC5jU2aoOB/iMUw==}
-
-  '@xwiki/cristal-editors-blocknote-headless@0.19.0':
-    resolution: {integrity: sha512-06o9EapIEtI0aFEIbQvMgIp1E68RhCONiGleGGIRKD0jR8N9utpRU1TwpjGrQ2mMmohxVdZRm/y8XPYbtNxTtQ==}
+  '@xwiki/cristal-authentication-api@0.23.1':
+    resolution: {integrity: sha512-R6QFVZEJUZ6MallY9lGiW1XUgE0HE5xwZMf9sDoC44ZqpLOIeEywdGrRH2aomn+JX1yl0cB3e0id75Oe/zwTpg==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      reflect-metadata: 0.x
 
-  '@xwiki/cristal-editors-blocknote-react@0.19.0':
-    resolution: {integrity: sha512-vwDwl8xu2H23zZbD9u1V/DHakolTbprH2HHVz9oHa1spUpNTRP2WG1Y5Vnko15XS+bsk6N3Y+76dw/16ZVfCkw==}
-
-  '@xwiki/cristal-fn-utils@0.19.0':
-    resolution: {integrity: sha512-K5vl/SdDA3yzSKR0W7E3WE9DjQWwxj1hPjYkedlz58bdX6ByvZElCYho2igc2dKAEJRHHR+dhAPjEaS3MTk5Dw==}
-
-  '@xwiki/cristal-icons@0.19.0':
-    resolution: {integrity: sha512-oejEkr9+crt7E9gv8BkyPFs8kvHsNPT7PG8oRoE1gLxH/sxR5wwiRwggPbFvo5jZOuGQ2Ndi2RWM8gFPfRGGnQ==}
-
-  '@xwiki/cristal-link-suggest-api@0.19.0':
-    resolution: {integrity: sha512-4NT+gRYciPBTGrDT3SP+0OzfiOQUlU5nlsV6V0SigrzNk7yu68nPmSyXegwS5o2LqkFkmlD+EXP/IjwHpOyHUQ==}
+  '@xwiki/cristal-backend-api@0.23.1':
+    resolution: {integrity: sha512-u5csB8qupmU/+P0KZHBfQUq5yX4LWMwjf9dB5vRdiiBt3aA7FJ8TnW6cSe/WcSRpRt+vtk+RQJvdRiOp70Wgsw==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      inversify: 7.x
+      reflect-metadata: 0.x
 
-  '@xwiki/cristal-model-api@0.19.0':
-    resolution: {integrity: sha512-vzxbBI3TbOgsNzRrrNqTWiOqz1GAa9QOU4KPbaUG1Ksvwrjq3o7oaxWL9qeZeb2zorSZQcXZnPmvdcfmbTPK7Q==}
-
-  '@xwiki/cristal-model-reference-api@0.19.0':
-    resolution: {integrity: sha512-YMfzMY7mGhOByB7iPnxdSuGn5oMxthBW6ddu6t8hjF4F5KESdotNjvxs7KgQn/J5F7QfaWAY2j1UuPixG4EuYA==}
+  '@xwiki/cristal-collaboration-api@0.23.1':
+    resolution: {integrity: sha512-zLiKpkwzU2I2J2FdIFRG2ZiyfxQpYr+jLt9wiJ+nJwNugCmjrc1kFNaR2fDAG4ACaM2m9l1UNt6W0yB/M1uaUg==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      inversify: 7.x
+      reflect-metadata: 0.x
+      vue: 3.x
 
-  '@xwiki/cristal-model-remote-url-api@0.19.0':
-    resolution: {integrity: sha512-gJcNfGWruoLFosl3H+841TJd2N5B1xk6mAM7lCFFDXZ+wcTrW1m3vDMisqkZCI/kadbdWlyRsSPDcjCxqLqVQg==}
+  '@xwiki/cristal-configuration-api@0.23.1':
+    resolution: {integrity: sha512-47WEOFzG8J8bxRrn/CZXO+jpUw8q3YQ8wezijC1vDgJCl2tR2Egqit5rpE+axX8yJbx6gZ1Aw4TwNU8C4iVGXA==}
+
+  '@xwiki/cristal-document-api@0.23.1':
+    resolution: {integrity: sha512-ruqL9TqMzaddWES1LPapjI4u4qvbXgfdPbdImo+ErigQfPC6wxbhfLohH7gfLFDMwGthrtUKbksSL3xOu/f/gQ==}
     peerDependencies:
-      reflect-metadata: 0.2.2
+      reflect-metadata: 0.x
+      vue: 3.x
 
-  '@xwiki/cristal-navigation-tree-api@0.19.0':
-    resolution: {integrity: sha512-hd9K0G/4fZSwn8kSwH2RcR0ztHlhMSKxssgz/cYh9nb+hCGIHpuK5YAsyIIqWV9MwRXGOHn3Sx3cH6DY4+YQBw==}
+  '@xwiki/cristal-dsapi@0.23.1':
+    resolution: {integrity: sha512-7iUcVbl7RtobXODd+MgFtd//4rx9e6tYw8PEafb4ThB3jO6H1qXieHSAZs+TomBnPyb8KKQAVsFSEfChwVY+1g==}
+    peerDependencies:
+      reflect-metadata: 0.x
+      vue: 3.x
 
-  '@xwiki/cristal-uniast@0.19.0':
-    resolution: {integrity: sha512-IsgeSKZbBKyL7yALPrwtRxtNMprvKTBWd+eBRqfJE1cfHgw0+0EfDjCo4J/hkAQRplkT4bfIq5FB/hnQ+8dSLA==}
+  '@xwiki/cristal-editors-blocknote-headless@0.23.1':
+    resolution: {integrity: sha512-QB4gBYCzwWpAqio6dGPCvPcgFzkcoSfp/GqB+wKcZPk+d+QuvLv4OJB7Qh/8DDBGulnvBbrMf2EH8M1Q9wZT1Q==}
+    peerDependencies:
+      inversify: 7.x
+      reflect-metadata: 0.x
+      vue: 3.x
+
+  '@xwiki/cristal-editors-blocknote-react@0.23.1':
+    resolution: {integrity: sha512-OpARNoef71Bt8felzus9t+Gg78uT3LOVQ0lPMBcJtbvxpgF1JKbSpa2AgxDAb6HDA633gC+7KoX1fyQL+3wVtg==}
+
+  '@xwiki/cristal-fn-utils@0.23.1':
+    resolution: {integrity: sha512-KqD7pkatmh7YBiRgROgtlNjo4w/5NnkJ3L5K5dQlJ91RHLG1JNPyV1TNJa3VIyOWsFSKvwVid7labCUvR6yRfA==}
+
+  '@xwiki/cristal-icons@0.23.1':
+    resolution: {integrity: sha512-lnp12g9VtVggmNr8UI6a6O5q4ewbjqXxv7MIEkyXtmqq+l+ah73NiKiyoFAW2Na1fEKHALtnlMXY9UweyTnl3Q==}
+    peerDependencies:
+      reflect-metadata: 0.x
+      vue: 3.x
+
+  '@xwiki/cristal-link-suggest-api@0.23.1':
+    resolution: {integrity: sha512-5NoAJqeKeGxwzE5IAJRd+rP/hn+e/ITDdgaZbq/tBOSIpBXsA4Lgx2FJPPK7BE/wJOtAzlVTnTrr6BQKMCJK5Q==}
+    peerDependencies:
+      inversify: 7.x
+      reflect-metadata: 0.x
+
+  '@xwiki/cristal-macros-api@0.23.1':
+    resolution: {integrity: sha512-RGNhoJ8a3r6cKUmVoBRBydXeMJvHoGfDTibZ06bhwsOhxgRxKsDPrIspfXnDxnbvS1TRTHWvhJiiJB9TDd8rdA==}
+
+  '@xwiki/cristal-macros-ast-react-jsx@0.23.1':
+    resolution: {integrity: sha512-r5+QuDoM1DhhD07ql9T+LI+eXBs3MAj2aB+nImRq9iWr8wCwR+wQHcL7V5uwajHEYJicUFQhaRXTEag4G4h75w==}
+    peerDependencies:
+      inversify: 7.x
+
+  '@xwiki/cristal-model-api@0.23.1':
+    resolution: {integrity: sha512-EPXiqklu/ZC7C14LdwmFSkIcRdeHJ2BnB06LTSjv+h2yusEmUQrQC1IsTquz7pyHJ22bhm0kiRqzI3ois4pSsw==}
+
+  '@xwiki/cristal-model-reference-api@0.23.1':
+    resolution: {integrity: sha512-Ks5VoAciDngpTRTjC5FJpB36aRKKsEGVnDPOLbyCshRLHbr3BszhoXm3+TGgX2gsQhiaLlHWsOXhwxfBglMb1w==}
+    peerDependencies:
+      inversify: 7.x
+      reflect-metadata: 0.x
+
+  '@xwiki/cristal-model-remote-url-api@0.23.1':
+    resolution: {integrity: sha512-dN2f1MBYbK4Jng2+m0o/gFcWVHXIYERnVvzOr1/ShGN9+A0l2HvCdkxGis6TFE6zo3g4Lu3AhDgYFxPLgBaI/g==}
+    peerDependencies:
+      inversify: 7.x
+      reflect-metadata: 0.x
+
+  '@xwiki/cristal-navigation-tree-api@0.23.1':
+    resolution: {integrity: sha512-vXko/TWcDuuaCM9XZ2EmywFOuY79w/24uCR8hA/S2s4HIThtZuI6ufWl3GZayNOvPGDrEIz42UVT5OC1OIyonA==}
+
+  '@xwiki/cristal-uniast-api@0.23.1':
+    resolution: {integrity: sha512-2mLkUwLVi89BiER/B386FlP9cVl5AIDk4Nf2O2MEy4br1ldhX0pc4O0naiLYKYsvNp30NCuHxZs+h3x9BjKXHg==}
+
+  '@xwiki/cristal-uniast-markdown@0.23.1':
+    resolution: {integrity: sha512-RvfoZDy/M3qPRPrkBGjxxg5S7XjHV1wJnvsvZHzCpdD9S8xpAT3Z5PWVoBX19q2hVMB3QTJBabcW2AkLO6EZKQ==}
+    peerDependencies:
+      inversify: 7.x
 
   abbrev@2.0.0:
     resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
@@ -1262,8 +1271,8 @@ packages:
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
-  alien-signals@2.0.7:
-    resolution: {integrity: sha512-wE7y3jmYeb0+h6mr5BOovuqhFv22O/MV9j5p0ndJsa7z1zJNPGQ4ph5pQk/kTTCWRC3xsA4SmtwmkzQO+7NCNg==}
+  alien-signals@2.0.8:
+    resolution: {integrity: sha512-844G1VLkk0Pe2SJjY0J8vp8ADI73IM4KliNu2OGlYzWpO28NexEUvjHTcFjFX3VXoiUtwTbHxLNI9ImkcoBqzA==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -1605,6 +1614,10 @@ packages:
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
+  fast-xml-parser@5.3.0:
+    resolution: {integrity: sha512-gkWGshjYcQCF+6qtlrqBqELqNqnt4CxruY6UVAWWnqb3DQ6qaNFEIKqzYep1XzHLM/QtrHVCxyPOtTk4LTQ7Aw==}
+    hasBin: true
+
   fastq@1.19.1:
     resolution: {integrity: sha512-GwLTyxkCXjXbxqIhTsMI2Nui8huMPtnxg7krajPJAjnEG/iiOS7i+zCtWGZR9G0NBKbXKh6X9m9UIsYX/N6vvQ==}
 
@@ -1756,8 +1769,8 @@ packages:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
 
-  i18next@25.2.1:
-    resolution: {integrity: sha512-+UoXK5wh+VlE1Zy5p6MjcvctHXAhRwQKCxiJD8noKZzIXmnAX8gdHX5fLPA3MEVxEN4vbZkQFy8N0LyD9tUqPw==}
+  i18next@25.5.3:
+    resolution: {integrity: sha512-joFqorDeQ6YpIXni944upwnuHBf5IoPMuqAchGVeQLdWC2JOjxgM9V8UGLhNIIH/Q8QleRxIi0BSRQehSrDLcg==}
     peerDependencies:
       typescript: ^5
     peerDependenciesMeta:
@@ -2182,7 +2195,7 @@ packages:
     resolution: {integrity: sha512-sH2JK3wNY809JOeiiURUR0wehJ9/gd9qFN2Y828jCbxEzKEmEt0pzCXwqiSTfuRsK9vQsOflSdnbdBOGrhtn+g==}
     peerDependencies:
       typescript: '>=4.4.4'
-      vue: 3.5.22
+      vue: ^2.7.0 || ^3.5.11
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -2318,15 +2331,15 @@ packages:
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
-  react-dom@19.1.0:
-    resolution: {integrity: sha512-Xs1hdnE+DyKgeHJeJznQmYMIBG3TKIHJJT95Q58nHLSrElKlGQqDTR2HQ9fx5CN/Gk6Vh/kupBTDLU11/nDk/g==}
+  react-dom@19.2.0:
+    resolution: {integrity: sha512-UlbRu4cAiGaIewkPyiRGJk0imDN2T3JjieT6spoL2UeSf5od4n5LB/mQ4ejmxhCFT1tYe8IvaFulzynWovsEFQ==}
     peerDependencies:
-      react: ^19.1.0
+      react: ^19.2.0
 
-  react-i18next@15.5.3:
-    resolution: {integrity: sha512-ypYmOKOnjqPEJZO4m1BI0kS8kWqkBNsKYyhVUfij0gvjy9xJNoG/VcGkxq5dRlVwzmrmY1BQMAmpbbUBLwC4Kw==}
+  react-i18next@16.0.0:
+    resolution: {integrity: sha512-JQ+dFfLnFSKJQt7W01lJHWRC0SX7eDPobI+MSTJ3/gP39xH2g33AuTE7iddAfXYHamJdAeMGM0VFboPaD3G68Q==}
     peerDependencies:
-      i18next: '>= 23.2.3'
+      i18next: '>= 25.5.2'
       react: '>= 16.8.0'
       react-dom: '*'
       react-native: '*'
@@ -2390,8 +2403,8 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  react@19.1.0:
-    resolution: {integrity: sha512-FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==}
+  react@19.2.0:
+    resolution: {integrity: sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ==}
     engines: {node: '>=0.10.0'}
 
   reflect-metadata@0.2.2:
@@ -2460,8 +2473,8 @@ packages:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
 
-  scheduler@0.26.0:
-    resolution: {integrity: sha512-NlHwttCI/l5gCPR3D1nNXtWABUmBwvZpEQiD4IXSbIDq8BzLIK/7Ir5gTFSGZDUu37K5cMNp0hFtzO38sC7gWA==}
+  scheduler@0.27.0:
+    resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -2530,6 +2543,9 @@ packages:
   strip-literal@3.0.0:
     resolution: {integrity: sha512-TcccoMhJOM3OebGhSBEmp3UZ2SfDMZUEBdRA/9ynfLi8yYajyWX3JiXArcJt4Umh4vISpspkQIY8ZZoCqjbviA==}
 
+  strnum@2.1.1:
+    resolution: {integrity: sha512-7ZvoFTiCnGxBtDqJ//Cu6fWtZtc7Y3x+QOirG15wztbdngGSkht27o2pyGWrVy0b4WAy3jbKmnoK6g5VlVNUUw==}
+
   superjson@2.2.2:
     resolution: {integrity: sha512-5JRxVqC8I8NuOUjzBbvVJAKNM8qoVuH0O77h4WInc/qC2q5IreqKxYwgkga3PfA22OayK2ikceb/B26dztPl+Q==}
     engines: {node: '>=16'}
@@ -2577,11 +2593,11 @@ packages:
   tippy.js@6.3.7:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
 
-  tldts-core@7.0.16:
-    resolution: {integrity: sha512-XHhPmHxphLi+LGbH0G/O7dmUH9V65OY20R7vH8gETHsp5AZCjBk9l8sqmRKLaGOxnETU7XNSDUPtewAy/K6jbA==}
+  tldts-core@7.0.17:
+    resolution: {integrity: sha512-DieYoGrP78PWKsrXr8MZwtQ7GLCUeLxihtjC1jZsW1DnvSMdKPitJSe8OSYDM2u5H6g3kWJZpePqkp43TfLh0g==}
 
-  tldts@7.0.16:
-    resolution: {integrity: sha512-5bdPHSwbKTeHmXrgecID4Ljff8rQjv7g8zKQPkCozRo2HWWni+p310FSn5ImI+9kWw9kK4lzOB5q/a6iv0IJsw==}
+  tldts@7.0.17:
+    resolution: {integrity: sha512-Y1KQBgDd/NUc+LfOtKS6mNsC9CCaH+m2P1RoIZy7RAPo3C3/t8X45+zgut31cRZtZ3xKPjfn3TkGTrctC2TQIQ==}
     hasBin: true
 
   to-regex-range@5.0.1:
@@ -2835,18 +2851,12 @@ packages:
     resolution: {integrity: sha512-BnstPj3KLHLrsqbVU2UOrPmr0+Mv11bsUZG0PyCOzsawCivk8W00GMXHeVUWIDOgNaScCuZah47CZFE+Wnl8mw==}
     engines: {node: '>= 16'}
     peerDependencies:
-      vue: 3.5.22
-
-  vue-i18n@11.1.5:
-    resolution: {integrity: sha512-XCwuaEA5AF97g1frvH/EI1zI9uo1XKTf2/OCFgts7NvUWRsjlgeHPrkJV+a3gpzai2pC4quZ4AnOHFO8QK9hsg==}
-    engines: {node: '>= 16'}
-    peerDependencies:
-      vue: 3.5.22
+      vue: ^3.0.0
 
   vue-router@4.5.1:
     resolution: {integrity: sha512-ogAF3P97NPm8fJsE4by9dwSYtDwXIY1nFY9T6DyQnGHd1E2Da94w9JIolpe42LJGIl0DwOHBi8TcRPlPGwbTtw==}
     peerDependencies:
-      vue: 3.5.22
+      vue: ^3.2.0
 
   vue-tsc@3.0.6:
     resolution: {integrity: sha512-Tbs8Whd43R2e2nxez4WXPvvdjGbW24rOSgRhLOHXzWiT4pcP4G7KeWh0YCn18rF4bVwv7tggLLZ6MJnO6jXPBg==}
@@ -2978,7 +2988,7 @@ snapshots:
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 11.2.2
 
-  '@asamuzakjp/dom-selector@6.5.7':
+  '@asamuzakjp/dom-selector@6.6.2':
     dependencies:
       '@asamuzakjp/nwsapi': 2.3.9
       bidi-js: 1.0.3
@@ -3004,10 +3014,10 @@ snapshots:
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-module-transforms': 7.28.3(@babel/core@7.28.3)
       '@babel/helpers': 7.28.3
-      '@babel/parser': 7.28.3
+      '@babel/parser': 7.28.4
       '@babel/template': 7.27.2
       '@babel/traverse': 7.28.3
-      '@babel/types': 7.28.2
+      '@babel/types': 7.28.4
       convert-source-map: 2.0.0
       debug: 4.4.1
       gensync: 1.0.0-beta.2
@@ -3018,8 +3028,8 @@ snapshots:
 
   '@babel/generator@7.28.3':
     dependencies:
-      '@babel/parser': 7.28.3
-      '@babel/types': 7.28.2
+      '@babel/parser': 7.28.4
+      '@babel/types': 7.28.4
       '@jridgewell/gen-mapping': 0.3.12
       '@jridgewell/trace-mapping': 0.3.29
       jsesc: 3.1.0
@@ -3037,7 +3047,7 @@ snapshots:
   '@babel/helper-module-imports@7.27.1':
     dependencies:
       '@babel/traverse': 7.28.3
-      '@babel/types': 7.28.2
+      '@babel/types': 7.28.4
     transitivePeerDependencies:
       - supports-color
 
@@ -3061,11 +3071,7 @@ snapshots:
   '@babel/helpers@7.28.3':
     dependencies:
       '@babel/template': 7.27.2
-      '@babel/types': 7.28.2
-
-  '@babel/parser@7.28.3':
-    dependencies:
-      '@babel/types': 7.28.2
+      '@babel/types': 7.28.4
 
   '@babel/parser@7.28.4':
     dependencies:
@@ -3086,32 +3092,27 @@ snapshots:
   '@babel/template@7.27.2':
     dependencies:
       '@babel/code-frame': 7.27.1
-      '@babel/parser': 7.28.3
-      '@babel/types': 7.28.2
+      '@babel/parser': 7.28.4
+      '@babel/types': 7.28.4
 
   '@babel/traverse@7.28.3':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/generator': 7.28.3
       '@babel/helper-globals': 7.28.0
-      '@babel/parser': 7.28.3
+      '@babel/parser': 7.28.4
       '@babel/template': 7.27.2
-      '@babel/types': 7.28.2
+      '@babel/types': 7.28.4
       debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
-
-  '@babel/types@7.28.2':
-    dependencies:
-      '@babel/helper-string-parser': 7.27.1
-      '@babel/helper-validator-identifier': 7.27.1
 
   '@babel/types@7.28.4':
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@blocknote/core@0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)':
+  '@blocknote/core@0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)':
     dependencies:
       '@emoji-mart/data': 1.2.1
       '@shikijs/types': 3.2.1
@@ -3162,16 +3163,16 @@ snapshots:
       - sugar-high
       - supports-color
 
-  '@blocknote/mantine@0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@blocknote/mantine@0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
-      '@blocknote/react': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@mantine/core': 7.17.8(@mantine/hooks@7.17.8(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@mantine/hooks': 7.17.8(react@19.1.0)
-      '@mantine/utils': 6.0.22(react@19.1.0)
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      react-icons: 5.5.0(react@19.1.0)
+      '@blocknote/core': 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
+      '@blocknote/react': 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@mantine/core': 7.17.8(@mantine/hooks@7.17.8(react@19.2.0))(@types/react@19.1.8)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@mantine/hooks': 7.17.8(react@19.2.0)
+      '@mantine/utils': 6.0.22(react@19.2.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      react-icons: 5.5.0(react@19.2.0)
     transitivePeerDependencies:
       - '@hocuspocus/provider'
       - '@types/hast'
@@ -3182,44 +3183,21 @@ snapshots:
       - sugar-high
       - supports-color
 
-  '@blocknote/react@0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@blocknote/react@0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
+      '@blocknote/core': 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
       '@emoji-mart/data': 1.2.1
-      '@floating-ui/react': 0.26.28(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@floating-ui/react': 0.26.28(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tiptap/core': 2.25.0(@tiptap/pm@2.25.0)
       '@tiptap/pm': 2.25.0
-      '@tiptap/react': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tiptap/react': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       emoji-mart: 5.6.0
       lodash.merge: 4.6.2
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      react-icons: 5.5.0(react@19.1.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      react-icons: 5.5.0(react@19.2.0)
     transitivePeerDependencies:
       - '@hocuspocus/provider'
-      - '@types/hast'
-      - highlight.js
-      - lowlight
-      - refractor
-      - sugar-high
-      - supports-color
-
-  '@blocknote/xl-multi-column@0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
-    dependencies:
-      '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
-      '@blocknote/react': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@tiptap/core': 2.25.0(@tiptap/pm@2.25.0)
-      prosemirror-model: 1.25.1
-      prosemirror-state: 1.4.3
-      prosemirror-tables: 1.7.1
-      prosemirror-transform: 1.10.4
-      prosemirror-view: 1.40.0
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      react-icons: 5.5.0(react@19.1.0)
-    transitivePeerDependencies:
-      - '@hocuspocus/provider'
-      - '@tiptap/pm'
       - '@types/hast'
       - highlight.js
       - lowlight
@@ -3331,11 +3309,6 @@ snapshots:
   '@esbuild/win32-x64@0.25.6':
     optional: true
 
-  '@eslint-community/eslint-utils@4.7.0(eslint@9.36.0(jiti@2.6.0))':
-    dependencies:
-      eslint: 9.36.0(jiti@2.6.0)
-      eslint-visitor-keys: 3.4.3
-
   '@eslint-community/eslint-utils@4.9.0(eslint@9.36.0(jiti@2.6.0))':
     dependencies:
       eslint: 9.36.0(jiti@2.6.0)
@@ -3386,23 +3359,46 @@ snapshots:
     dependencies:
       '@floating-ui/utils': 0.2.10
 
+  '@floating-ui/core@1.7.3':
+    dependencies:
+      '@floating-ui/utils': 0.2.10
+
   '@floating-ui/dom@1.7.2':
     dependencies:
       '@floating-ui/core': 1.7.2
       '@floating-ui/utils': 0.2.10
 
-  '@floating-ui/react-dom@2.1.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@floating-ui/dom@1.7.4':
+    dependencies:
+      '@floating-ui/core': 1.7.3
+      '@floating-ui/utils': 0.2.10
+
+  '@floating-ui/react-dom@2.1.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@floating-ui/dom': 1.7.2
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
 
-  '@floating-ui/react@0.26.28(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@floating-ui/react-dom@2.1.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@floating-ui/react-dom': 2.1.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@floating-ui/dom': 1.7.4
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+
+  '@floating-ui/react@0.26.28(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+    dependencies:
+      '@floating-ui/react-dom': 2.1.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@floating-ui/utils': 0.2.10
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      tabbable: 6.2.0
+
+  '@floating-ui/react@0.27.16(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+    dependencies:
+      '@floating-ui/react-dom': 2.1.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@floating-ui/utils': 0.2.10
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
       tabbable: 6.2.0
 
   '@floating-ui/utils@0.2.10': {}
@@ -3410,6 +3406,7 @@ snapshots:
   '@hocuspocus/common@2.15.3':
     dependencies:
       lib0: 0.2.109
+    optional: true
 
   '@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
     dependencies:
@@ -3422,6 +3419,7 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    optional: true
 
   '@humanfs/core@0.19.1': {}
 
@@ -3441,24 +3439,12 @@ snapshots:
       '@intlify/message-compiler': 11.1.12
       '@intlify/shared': 11.1.12
 
-  '@intlify/core-base@11.1.5':
-    dependencies:
-      '@intlify/message-compiler': 11.1.5
-      '@intlify/shared': 11.1.5
-
   '@intlify/message-compiler@11.1.12':
     dependencies:
       '@intlify/shared': 11.1.12
       source-map-js: 1.2.1
 
-  '@intlify/message-compiler@11.1.5':
-    dependencies:
-      '@intlify/shared': 11.1.5
-      source-map-js: 1.2.1
-
   '@intlify/shared@11.1.12': {}
-
-  '@intlify/shared@11.1.5': {}
 
   '@inversifyjs/common@1.5.0': {}
 
@@ -3499,7 +3485,7 @@ snapshots:
 
   '@jridgewell/gen-mapping@0.3.12':
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.4
+      '@jridgewell/sourcemap-codec': 1.5.5
       '@jridgewell/trace-mapping': 0.3.29
 
   '@jridgewell/resolve-uri@3.1.2': {}
@@ -3511,49 +3497,50 @@ snapshots:
   '@jridgewell/trace-mapping@0.3.29':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.4
+      '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@lifeomic/attempt@3.1.0': {}
+  '@lifeomic/attempt@3.1.0':
+    optional: true
 
-  '@mantine/core@7.17.8(@mantine/hooks@7.17.8(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@mantine/core@7.17.8(@mantine/hooks@7.17.8(react@19.2.0))(@types/react@19.1.8)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@floating-ui/react': 0.26.28(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@mantine/hooks': 7.17.8(react@19.1.0)
+      '@floating-ui/react': 0.26.28(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@mantine/hooks': 7.17.8(react@19.2.0)
       clsx: 2.1.1
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      react-number-format: 5.4.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      react-remove-scroll: 2.7.1(@types/react@19.1.8)(react@19.1.0)
-      react-textarea-autosize: 8.5.9(@types/react@19.1.8)(react@19.1.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      react-number-format: 5.4.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      react-remove-scroll: 2.7.1(@types/react@19.1.8)(react@19.2.0)
+      react-textarea-autosize: 8.5.9(@types/react@19.1.8)(react@19.2.0)
       type-fest: 4.41.0
     transitivePeerDependencies:
       - '@types/react'
 
-  '@mantine/core@8.1.1(@mantine/hooks@8.1.1(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@mantine/core@8.3.3(@mantine/hooks@8.3.3(react@19.2.0))(@types/react@19.1.8)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@floating-ui/react': 0.26.28(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@mantine/hooks': 8.1.1(react@19.1.0)
+      '@floating-ui/react': 0.27.16(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@mantine/hooks': 8.3.3(react@19.2.0)
       clsx: 2.1.1
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      react-number-format: 5.4.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      react-remove-scroll: 2.7.1(@types/react@19.1.8)(react@19.1.0)
-      react-textarea-autosize: 8.5.9(@types/react@19.1.8)(react@19.1.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      react-number-format: 5.4.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      react-remove-scroll: 2.7.1(@types/react@19.1.8)(react@19.2.0)
+      react-textarea-autosize: 8.5.9(@types/react@19.1.8)(react@19.2.0)
       type-fest: 4.41.0
     transitivePeerDependencies:
       - '@types/react'
 
-  '@mantine/hooks@7.17.8(react@19.1.0)':
+  '@mantine/hooks@7.17.8(react@19.2.0)':
     dependencies:
-      react: 19.1.0
+      react: 19.2.0
 
-  '@mantine/hooks@8.1.1(react@19.1.0)':
+  '@mantine/hooks@8.3.3(react@19.2.0)':
     dependencies:
-      react: 19.1.0
+      react: 19.2.0
 
-  '@mantine/utils@6.0.22(react@19.1.0)':
+  '@mantine/utils@6.0.22(react@19.2.0)':
     dependencies:
-      react: 19.1.0
+      react: 19.2.0
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -3743,7 +3730,7 @@ snapshots:
       prosemirror-transform: 1.10.4
       prosemirror-view: 1.40.0
 
-  '@tiptap/react@2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@tiptap/react@2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@tiptap/core': 2.25.0(@tiptap/pm@2.25.0)
       '@tiptap/extension-bubble-menu': 2.25.0(@tiptap/core@2.25.0(@tiptap/pm@2.25.0))(@tiptap/pm@2.25.0)
@@ -3751,32 +3738,32 @@ snapshots:
       '@tiptap/pm': 2.25.0
       '@types/use-sync-external-store': 0.0.6
       fast-deep-equal: 3.1.3
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      use-sync-external-store: 1.5.0(react@19.1.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      use-sync-external-store: 1.5.0(react@19.2.0)
 
   '@tsconfig/node22@22.0.2': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
-      '@babel/parser': 7.28.3
-      '@babel/types': 7.28.2
+      '@babel/parser': 7.28.4
+      '@babel/types': 7.28.4
       '@types/babel__generator': 7.27.0
       '@types/babel__template': 7.4.4
       '@types/babel__traverse': 7.20.7
 
   '@types/babel__generator@7.27.0':
     dependencies:
-      '@babel/types': 7.28.2
+      '@babel/types': 7.28.4
 
   '@types/babel__template@7.4.4':
     dependencies:
-      '@babel/parser': 7.28.3
-      '@babel/types': 7.28.2
+      '@babel/parser': 7.28.4
+      '@babel/types': 7.28.4
 
   '@types/babel__traverse@7.20.7':
     dependencies:
-      '@babel/types': 7.28.2
+      '@babel/types': 7.28.4
 
   '@types/chai@5.2.2':
     dependencies:
@@ -3821,7 +3808,7 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/react-dom@19.1.6(@types/react@19.1.8)':
+  '@types/react-dom@19.2.0(@types/react@19.1.8)':
     dependencies:
       '@types/react': 19.1.8
 
@@ -3914,7 +3901,7 @@ snapshots:
 
   '@typescript-eslint/utils@8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.7.0(eslint@9.36.0(jiti@2.6.0))
+      '@eslint-community/eslint-utils': 4.9.0(eslint@9.36.0(jiti@2.6.0))
       '@typescript-eslint/scope-manager': 8.45.0
       '@typescript-eslint/types': 8.45.0
       '@typescript-eslint/typescript-estree': 8.45.0(typescript@5.9.3)
@@ -4002,14 +3989,6 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.1.0
 
-  '@vue/compiler-core@3.5.20':
-    dependencies:
-      '@babel/parser': 7.28.3
-      '@vue/shared': 3.5.20
-      entities: 4.5.0
-      estree-walker: 2.0.2
-      source-map-js: 1.2.1
-
   '@vue/compiler-core@3.5.22':
     dependencies:
       '@babel/parser': 7.28.4
@@ -4017,11 +3996,6 @@ snapshots:
       entities: 4.5.0
       estree-walker: 2.0.2
       source-map-js: 1.2.1
-
-  '@vue/compiler-dom@3.5.20':
-    dependencies:
-      '@vue/compiler-core': 3.5.20
-      '@vue/shared': 3.5.20
 
   '@vue/compiler-dom@3.5.22':
     dependencies:
@@ -4082,13 +4056,13 @@ snapshots:
   '@vue/language-core@3.0.6(typescript@5.9.3)':
     dependencies:
       '@volar/language-core': 2.4.23
-      '@vue/compiler-dom': 3.5.20
+      '@vue/compiler-dom': 3.5.22
       '@vue/compiler-vue2': 2.7.16
-      '@vue/shared': 3.5.20
-      alien-signals: 2.0.7
+      '@vue/shared': 3.5.22
+      alien-signals: 2.0.8
       muggle-string: 0.4.1
       path-browserify: 1.0.1
-      picomatch: 4.0.2
+      picomatch: 4.0.3
     optionalDependencies:
       typescript: 5.9.3
 
@@ -4114,8 +4088,6 @@ snapshots:
       '@vue/shared': 3.5.22
       vue: 3.5.22(typescript@5.9.3)
 
-  '@vue/shared@3.5.20': {}
-
   '@vue/shared@3.5.22': {}
 
   '@vue/test-utils@2.4.6':
@@ -4128,34 +4100,30 @@ snapshots:
       typescript: 5.9.3
       vue: 3.5.22(typescript@5.9.3)
 
-  '@xwiki/cristal-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+  '@xwiki/cristal-api@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
-      '@xwiki/cristal-configuration-api': 0.19.0
+      '@xwiki/cristal-authentication-api': 0.23.1(reflect-metadata@0.2.2)
+      '@xwiki/cristal-configuration-api': 0.23.1
       inversify: 7.5.2(reflect-metadata@0.2.2)
+      reflect-metadata: 0.2.2
       vue: 3.5.22(typescript@5.9.3)
       vue-router: 4.5.1(vue@3.5.22(typescript@5.9.3))
-    transitivePeerDependencies:
-      - reflect-metadata
-      - typescript
 
-  '@xwiki/cristal-attachments-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+  '@xwiki/cristal-attachments-api@0.23.1(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
-      '@xwiki/cristal-model-api': 0.19.0
+      '@xwiki/cristal-authentication-api': 0.23.1(reflect-metadata@0.2.2)
+      '@xwiki/cristal-model-api': 0.23.1
+      reflect-metadata: 0.2.2
       vue: 3.5.22(typescript@5.9.3)
-    transitivePeerDependencies:
-      - reflect-metadata
-      - typescript
 
-  '@xwiki/cristal-attachments-default@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+  '@xwiki/cristal-attachments-default@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
-      '@xwiki/cristal-backend-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-attachments-api': 0.23.1(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-authentication-api': 0.23.1(reflect-metadata@0.2.2)
+      '@xwiki/cristal-backend-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-model-api': 0.23.1
+      '@xwiki/cristal-model-reference-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-model-remote-url-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       inversify: 7.5.2(reflect-metadata@0.2.2)
       pinia: 3.0.2(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       reflect-metadata: 0.2.2
@@ -4163,68 +4131,77 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@xwiki/cristal-authentication-api@0.19.0(reflect-metadata@0.2.2)':
+  '@xwiki/cristal-authentication-api@0.23.1(reflect-metadata@0.2.2)':
     dependencies:
       reflect-metadata: 0.2.2
 
-  '@xwiki/cristal-backend-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+  '@xwiki/cristal-backend-api@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       inversify: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
     transitivePeerDependencies:
-      - typescript
+      - vue
 
-  '@xwiki/cristal-configuration-api@0.19.0':
+  '@xwiki/cristal-collaboration-api@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
+    dependencies:
+      '@xwiki/cristal-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      inversify: 7.5.2(reflect-metadata@0.2.2)
+      reflect-metadata: 0.2.2
+      vue: 3.5.22(typescript@5.9.3)
+      yjs: 13.6.27
+
+  '@xwiki/cristal-configuration-api@0.23.1':
     dependencies:
       utility-types: 3.11.0
 
-  '@xwiki/cristal-document-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+  '@xwiki/cristal-document-api@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-api': 0.19.0
+      '@xwiki/cristal-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-model-api': 0.23.1
+      reflect-metadata: 0.2.2
       vue: 3.5.22(typescript@5.9.3)
     transitivePeerDependencies:
-      - reflect-metadata
-      - typescript
+      - inversify
 
-  '@xwiki/cristal-dsapi@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+  '@xwiki/cristal-dsapi@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-navigation-tree-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-fn-utils': 0.23.1
+      '@xwiki/cristal-model-api': 0.23.1
+      '@xwiki/cristal-navigation-tree-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      reflect-metadata: 0.2.2
       vue: 3.5.22(typescript@5.9.3)
     transitivePeerDependencies:
-      - reflect-metadata
-      - typescript
+      - inversify
 
-  '@xwiki/cristal-editors-blocknote-headless@0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
+  '@xwiki/cristal-editors-blocknote-headless@0.23.1(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
-      '@hocuspocus/provider': 2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
-      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-authentication-api': 0.19.0(reflect-metadata@0.2.2)
-      '@xwiki/cristal-document-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-dsapi': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-editors-blocknote-react': 0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
-      '@xwiki/cristal-fn-utils': 0.19.0
-      '@xwiki/cristal-icons': 0.19.0(typescript@5.9.3)
-      '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@blocknote/core': 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
+      '@xwiki/cristal-attachments-api': 0.23.1(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-authentication-api': 0.23.1(reflect-metadata@0.2.2)
+      '@xwiki/cristal-collaboration-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-document-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-dsapi': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-editors-blocknote-react': 0.23.1(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-fn-utils': 0.23.1
+      '@xwiki/cristal-icons': 0.23.1(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-link-suggest-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-macros-api': 0.23.1
+      '@xwiki/cristal-model-api': 0.23.1
+      '@xwiki/cristal-model-reference-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-model-remote-url-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-uniast-api': 0.23.1
       eventemitter3: 5.0.1
       inversify: 7.5.2(reflect-metadata@0.2.2)
       lodash-es: 4.17.21
       reflect-metadata: 0.2.2
       vue: 3.5.22(typescript@5.9.3)
-      vue-i18n: 11.1.5(vue@3.5.22(typescript@5.9.3))
+      vue-i18n: 11.1.12(vue@3.5.22(typescript@5.9.3))
     transitivePeerDependencies:
-      - '@tiptap/pm'
+      - '@hocuspocus/provider'
       - '@types/hast'
       - '@types/react'
-      - bufferutil
       - highlight.js
       - lowlight
       - react-native
@@ -4232,40 +4209,38 @@ snapshots:
       - sugar-high
       - supports-color
       - typescript
-      - utf-8-validate
-      - y-protocols
-      - yjs
 
-  '@xwiki/cristal-editors-blocknote-react@0.19.0(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(@types/react@19.1.8)(reflect-metadata@0.2.2)(typescript@5.9.3)(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)':
+  '@xwiki/cristal-editors-blocknote-react@0.23.1(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@blocknote/core': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
-      '@blocknote/mantine': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@blocknote/react': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@blocknote/xl-multi-column': 0.31.3(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@tiptap/pm@2.25.0)(@types/hast@3.0.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@hocuspocus/provider': 2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27)
-      '@mantine/core': 8.1.1(@mantine/hooks@8.1.1(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@mantine/hooks': 8.1.1(react@19.1.0)
-      '@types/react-dom': 19.1.6(@types/react@19.1.8)
-      '@xwiki/cristal-attachments-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-document-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-fn-utils': 0.19.0
-      '@xwiki/cristal-link-suggest-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-uniast': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      i18next: 25.2.1(typescript@5.9.3)
+      '@blocknote/core': 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
+      '@blocknote/mantine': 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(@types/react@19.1.8)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@blocknote/react': 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@mantine/core': 8.3.3(@mantine/hooks@8.3.3(react@19.2.0))(@types/react@19.1.8)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@mantine/hooks': 8.3.3(react@19.2.0)
+      '@types/react-dom': 19.2.0(@types/react@19.1.8)
+      '@xwiki/cristal-attachments-api': 0.23.1(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-collaboration-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-document-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-fn-utils': 0.23.1
+      '@xwiki/cristal-link-suggest-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-macros-api': 0.23.1
+      '@xwiki/cristal-macros-ast-react-jsx': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-model-api': 0.23.1
+      '@xwiki/cristal-model-reference-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-model-remote-url-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-uniast-markdown': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      i18next: 25.5.3(typescript@5.9.3)
       lodash-es: 4.17.21
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      react-i18next: 15.5.3(i18next@25.2.1(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
-      react-icons: 5.5.0(react@19.1.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      react-i18next: 16.0.0(i18next@25.5.3(typescript@5.9.3))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
+      react-icons: 5.5.0(react@19.2.0)
     transitivePeerDependencies:
-      - '@tiptap/pm'
+      - '@hocuspocus/provider'
       - '@types/hast'
       - '@types/react'
-      - bufferutil
       - highlight.js
+      - inversify
       - lowlight
       - react-native
       - reflect-metadata
@@ -4273,61 +4248,77 @@ snapshots:
       - sugar-high
       - supports-color
       - typescript
-      - utf-8-validate
-      - y-protocols
-      - yjs
+      - vue
 
-  '@xwiki/cristal-fn-utils@0.19.0': {}
+  '@xwiki/cristal-fn-utils@0.23.1': {}
 
-  '@xwiki/cristal-icons@0.19.0(typescript@5.9.3)':
+  '@xwiki/cristal-icons@0.23.1(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
       bootstrap-icons: 1.13.1
+      reflect-metadata: 0.2.2
       vue: 3.5.22(typescript@5.9.3)
-    transitivePeerDependencies:
-      - typescript
 
-  '@xwiki/cristal-link-suggest-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+  '@xwiki/cristal-link-suggest-api@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       inversify: 7.5.2(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
     transitivePeerDependencies:
-      - typescript
+      - vue
 
-  '@xwiki/cristal-model-api@0.19.0': {}
+  '@xwiki/cristal-macros-api@0.23.1': {}
 
-  '@xwiki/cristal-model-reference-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+  '@xwiki/cristal-macros-ast-react-jsx@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-api': 0.19.0
+      '@xwiki/cristal-fn-utils': 0.23.1
+      '@xwiki/cristal-macros-api': 0.23.1
+      '@xwiki/cristal-model-remote-url-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
       inversify: 7.5.2(reflect-metadata@0.2.2)
-      reflect-metadata: 0.2.2
-    transitivePeerDependencies:
-      - typescript
-
-  '@xwiki/cristal-model-remote-url-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
-    dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-api': 0.19.0
-      inversify: 7.5.2(reflect-metadata@0.2.2)
-      reflect-metadata: 0.2.2
-    transitivePeerDependencies:
-      - typescript
-
-  '@xwiki/cristal-navigation-tree-api@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
-    dependencies:
-      '@xwiki/cristal-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-api': 0.19.0
     transitivePeerDependencies:
       - reflect-metadata
-      - typescript
+      - vue
 
-  '@xwiki/cristal-uniast@0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)':
+  '@xwiki/cristal-model-api@0.23.1': {}
+
+  '@xwiki/cristal-model-reference-api@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
     dependencies:
-      '@xwiki/cristal-fn-utils': 0.19.0
-      '@xwiki/cristal-model-api': 0.19.0
-      '@xwiki/cristal-model-reference-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
-      '@xwiki/cristal-model-remote-url-api': 0.19.0(reflect-metadata@0.2.2)(typescript@5.9.3)
+      '@xwiki/cristal-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-model-api': 0.23.1
+      inversify: 7.5.2(reflect-metadata@0.2.2)
+      reflect-metadata: 0.2.2
+    transitivePeerDependencies:
+      - vue
+
+  '@xwiki/cristal-model-remote-url-api@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
+    dependencies:
+      '@xwiki/cristal-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-model-api': 0.23.1
+      inversify: 7.5.2(reflect-metadata@0.2.2)
+      reflect-metadata: 0.2.2
+    transitivePeerDependencies:
+      - vue
+
+  '@xwiki/cristal-navigation-tree-api@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
+    dependencies:
+      '@xwiki/cristal-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-model-api': 0.23.1
+    transitivePeerDependencies:
+      - inversify
+      - reflect-metadata
+      - vue
+
+  '@xwiki/cristal-uniast-api@0.23.1':
+    dependencies:
+      '@xwiki/cristal-model-api': 0.23.1
+
+  '@xwiki/cristal-uniast-markdown@0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))':
+    dependencies:
+      '@xwiki/cristal-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-document-api': 0.23.1(inversify@7.5.2(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(vue@3.5.22(typescript@5.9.3))
+      '@xwiki/cristal-fn-utils': 0.23.1
+      '@xwiki/cristal-model-api': 0.23.1
+      '@xwiki/cristal-uniast-api': 0.23.1
+      fast-xml-parser: 5.3.0
       inversify: 7.5.2(reflect-metadata@0.2.2)
       mdast-util-gfm-strikethrough: 2.0.0
       mdast-util-gfm-table: 2.0.0
@@ -4340,7 +4331,7 @@ snapshots:
     transitivePeerDependencies:
       - reflect-metadata
       - supports-color
-      - typescript
+      - vue
 
   abbrev@2.0.0: {}
 
@@ -4359,7 +4350,7 @@ snapshots:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
-  alien-signals@2.0.7: {}
+  alien-signals@2.0.8: {}
 
   ansi-regex@5.0.1: {}
 
@@ -4590,7 +4581,7 @@ snapshots:
 
   eslint-plugin-vue@10.5.0(@typescript-eslint/parser@8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3))(eslint@9.36.0(jiti@2.6.0))(vue-eslint-parser@10.2.0(eslint@9.36.0(jiti@2.6.0))):
     dependencies:
-      '@eslint-community/eslint-utils': 4.7.0(eslint@9.36.0(jiti@2.6.0))
+      '@eslint-community/eslint-utils': 4.9.0(eslint@9.36.0(jiti@2.6.0))
       eslint: 9.36.0(jiti@2.6.0)
       natural-compare: 1.4.0
       nth-check: 2.1.1
@@ -4697,6 +4688,10 @@ snapshots:
   fast-json-stable-stringify@2.1.0: {}
 
   fast-levenshtein@2.0.6: {}
+
+  fast-xml-parser@5.3.0:
+    dependencies:
+      strnum: 2.1.1
 
   fastq@1.19.1:
     dependencies:
@@ -4916,7 +4911,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  i18next@25.2.1(typescript@5.9.3):
+  i18next@25.5.3(typescript@5.9.3):
     dependencies:
       '@babel/runtime': 7.27.6
     optionalDependencies:
@@ -4994,7 +4989,7 @@ snapshots:
 
   jsdom@27.0.0(postcss@8.5.6):
     dependencies:
-      '@asamuzakjp/dom-selector': 6.5.7
+      '@asamuzakjp/dom-selector': 6.6.2
       cssstyle: 5.3.1(postcss@8.5.6)
       data-urls: 6.0.0
       decimal.js: 10.6.0
@@ -5640,69 +5635,69 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  react-dom@19.1.0(react@19.1.0):
+  react-dom@19.2.0(react@19.2.0):
     dependencies:
-      react: 19.1.0
-      scheduler: 0.26.0
+      react: 19.2.0
+      scheduler: 0.27.0
 
-  react-i18next@15.5.3(i18next@25.2.1(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3):
+  react-i18next@16.0.0(i18next@25.5.3(typescript@5.9.3))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3):
     dependencies:
       '@babel/runtime': 7.27.6
       html-parse-stringify: 3.0.1
-      i18next: 25.2.1(typescript@5.9.3)
-      react: 19.1.0
+      i18next: 25.5.3(typescript@5.9.3)
+      react: 19.2.0
     optionalDependencies:
-      react-dom: 19.1.0(react@19.1.0)
+      react-dom: 19.2.0(react@19.2.0)
       typescript: 5.9.3
 
-  react-icons@5.5.0(react@19.1.0):
+  react-icons@5.5.0(react@19.2.0):
     dependencies:
-      react: 19.1.0
+      react: 19.2.0
 
-  react-number-format@5.4.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  react-number-format@5.4.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
 
   react-refresh@0.17.0: {}
 
-  react-remove-scroll-bar@2.3.8(@types/react@19.1.8)(react@19.1.0):
+  react-remove-scroll-bar@2.3.8(@types/react@19.1.8)(react@19.2.0):
     dependencies:
-      react: 19.1.0
-      react-style-singleton: 2.2.3(@types/react@19.1.8)(react@19.1.0)
+      react: 19.2.0
+      react-style-singleton: 2.2.3(@types/react@19.1.8)(react@19.2.0)
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.1.8
 
-  react-remove-scroll@2.7.1(@types/react@19.1.8)(react@19.1.0):
+  react-remove-scroll@2.7.1(@types/react@19.1.8)(react@19.2.0):
     dependencies:
-      react: 19.1.0
-      react-remove-scroll-bar: 2.3.8(@types/react@19.1.8)(react@19.1.0)
-      react-style-singleton: 2.2.3(@types/react@19.1.8)(react@19.1.0)
+      react: 19.2.0
+      react-remove-scroll-bar: 2.3.8(@types/react@19.1.8)(react@19.2.0)
+      react-style-singleton: 2.2.3(@types/react@19.1.8)(react@19.2.0)
       tslib: 2.8.1
-      use-callback-ref: 1.3.3(@types/react@19.1.8)(react@19.1.0)
-      use-sidecar: 1.1.3(@types/react@19.1.8)(react@19.1.0)
+      use-callback-ref: 1.3.3(@types/react@19.1.8)(react@19.2.0)
+      use-sidecar: 1.1.3(@types/react@19.1.8)(react@19.2.0)
     optionalDependencies:
       '@types/react': 19.1.8
 
-  react-style-singleton@2.2.3(@types/react@19.1.8)(react@19.1.0):
+  react-style-singleton@2.2.3(@types/react@19.1.8)(react@19.2.0):
     dependencies:
       get-nonce: 1.0.1
-      react: 19.1.0
+      react: 19.2.0
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.1.8
 
-  react-textarea-autosize@8.5.9(@types/react@19.1.8)(react@19.1.0):
+  react-textarea-autosize@8.5.9(@types/react@19.1.8)(react@19.2.0):
     dependencies:
       '@babel/runtime': 7.27.6
-      react: 19.1.0
-      use-composed-ref: 1.4.0(@types/react@19.1.8)(react@19.1.0)
-      use-latest: 1.3.0(@types/react@19.1.8)(react@19.1.0)
+      react: 19.2.0
+      use-composed-ref: 1.4.0(@types/react@19.1.8)(react@19.2.0)
+      use-latest: 1.3.0(@types/react@19.1.8)(react@19.2.0)
     transitivePeerDependencies:
       - '@types/react'
 
-  react@19.1.0: {}
+  react@19.2.0: {}
 
   reflect-metadata@0.2.2: {}
 
@@ -5818,7 +5813,7 @@ snapshots:
     dependencies:
       xmlchars: 2.2.0
 
-  scheduler@0.26.0: {}
+  scheduler@0.27.0: {}
 
   semver@6.3.1: {}
 
@@ -5875,6 +5870,8 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
+  strnum@2.1.1: {}
+
   superjson@2.2.2:
     dependencies:
       copy-anything: 3.0.5
@@ -5915,11 +5912,11 @@ snapshots:
     dependencies:
       '@popperjs/core': 2.11.8
 
-  tldts-core@7.0.16: {}
+  tldts-core@7.0.17: {}
 
-  tldts@7.0.16:
+  tldts@7.0.17:
     dependencies:
-      tldts-core: 7.0.16
+      tldts-core: 7.0.17
 
   to-regex-range@5.0.1:
     dependencies:
@@ -5927,7 +5924,7 @@ snapshots:
 
   tough-cookie@6.0.0:
     dependencies:
-      tldts: 7.0.16
+      tldts: 7.0.17
 
   tr46@6.0.0:
     dependencies:
@@ -6016,43 +6013,43 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  use-callback-ref@1.3.3(@types/react@19.1.8)(react@19.1.0):
+  use-callback-ref@1.3.3(@types/react@19.1.8)(react@19.2.0):
     dependencies:
-      react: 19.1.0
+      react: 19.2.0
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.1.8
 
-  use-composed-ref@1.4.0(@types/react@19.1.8)(react@19.1.0):
+  use-composed-ref@1.4.0(@types/react@19.1.8)(react@19.2.0):
     dependencies:
-      react: 19.1.0
+      react: 19.2.0
     optionalDependencies:
       '@types/react': 19.1.8
 
-  use-isomorphic-layout-effect@1.2.1(@types/react@19.1.8)(react@19.1.0):
+  use-isomorphic-layout-effect@1.2.1(@types/react@19.1.8)(react@19.2.0):
     dependencies:
-      react: 19.1.0
+      react: 19.2.0
     optionalDependencies:
       '@types/react': 19.1.8
 
-  use-latest@1.3.0(@types/react@19.1.8)(react@19.1.0):
+  use-latest@1.3.0(@types/react@19.1.8)(react@19.2.0):
     dependencies:
-      react: 19.1.0
-      use-isomorphic-layout-effect: 1.2.1(@types/react@19.1.8)(react@19.1.0)
+      react: 19.2.0
+      use-isomorphic-layout-effect: 1.2.1(@types/react@19.1.8)(react@19.2.0)
     optionalDependencies:
       '@types/react': 19.1.8
 
-  use-sidecar@1.1.3(@types/react@19.1.8)(react@19.1.0):
+  use-sidecar@1.1.3(@types/react@19.1.8)(react@19.2.0):
     dependencies:
       detect-node-es: 1.1.0
-      react: 19.1.0
+      react: 19.2.0
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.1.8
 
-  use-sync-external-store@1.5.0(react@19.1.0):
+  use-sync-external-store@1.5.0(react@19.2.0):
     dependencies:
-      react: 19.1.0
+      react: 19.2.0
 
   util-deprecate@1.0.2: {}
 
@@ -6174,13 +6171,6 @@ snapshots:
     dependencies:
       '@intlify/core-base': 11.1.12
       '@intlify/shared': 11.1.12
-      '@vue/devtools-api': 6.6.4
-      vue: 3.5.22(typescript@5.9.3)
-
-  vue-i18n@11.1.5(vue@3.5.22(typescript@5.9.3)):
-    dependencies:
-      '@intlify/core-base': 11.1.5
-      '@intlify/shared': 11.1.5
       '@vue/devtools-api': 6.6.4
       vue: 3.5.22(typescript@5.9.3)
 

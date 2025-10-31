@@ -36,6 +36,7 @@
     <xwiki.extension.name>REST endpoints for the Image Style Application</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->
     <xwiki.extension.category>api</xwiki.extension.category>
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>

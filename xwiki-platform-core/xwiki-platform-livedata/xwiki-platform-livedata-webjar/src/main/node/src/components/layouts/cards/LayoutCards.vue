@@ -35,7 +35,7 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataPagination v-if="isMoreThanOnePage" side="left" />
+        <LivedataPagination side="left" />
       </template>
       <template #right>
         <LivedataPagination side="right" />
@@ -124,9 +124,6 @@ export default {
     },
     entries() {
       return this.logic.data.data.entries;
-    },
-    isMoreThanOnePage () {
-      return this.logic.getPageCount() > 1
     },
     isSelectionEnabled() {
       return this.logic.isSelectionEnabled();

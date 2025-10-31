@@ -37,20 +37,33 @@
   "use strict";
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
-// Improve the default prototype escaping method to include quotes.
-String.prototype.escapeHTML = String.prototype.escapeHTML.wrap(function(originalCall){
-  return originalCall().replace(/"/g,'&quot;');
-});
 XWiki.Gallery = Class.create({
   initialize : function(container) {
     this.images = this._collectImages(container);
-    this.container = container.update(
-      `<button class="maximize" title="${l10n['core.widgets.gallery.maximize'].escapeHTML()}"></button>` +
-      `<button class="previous" title="${l10n['core.widgets.gallery.previousImage'].escapeHTML()}">&lt;</button>` +
-      `<img class="currentImage" alt="${l10n['core.widgets.gallery.currentImage'].escapeHTML()}"/>` +
-      `<button class="next" title="${l10n['core.widgets.gallery.nextImage'].escapeHTML()}">&gt;</button>` +
-      `<div class="index" tabindex="0" title="${l10n['core.widgets.gallery.index.description'].escapeHTML()}" aria-description="${l10n['core.widgets.gallery.index.description'].escapeHTML()}">0 / 0</div>`
-    ); 
+    // Generate the different parts of the gallery
+    let maximizeButton = new Element('button', {
+      'class': 'maximize', 'title': l10n['core.widgets.gallery.maximize']});
+    let previousButton = new Element('button', {
+      'class': 'previous', 'title': l10n['core.widgets.gallery.previousImage']});
+    previousButton.insert("&lt;");
+    let currentImage = new Element('img',
+      {'class': 'currentImage', 'title': l10n['core.widgets.gallery.currentImage']});
+    let nextButton = new Element('button',
+      {'class': 'next', 'title': l10n['core.widgets.gallery.nextImage']});
+    nextButton.insert("&gt;");
+    let imageIndex = new Element('div', {
+      'class': 'index', 'tabindex': 0, 'title': l10n['core.widgets.gallery.index.description'],
+      'aria-description': l10n['core.widgets.gallery.index.description']});
+    imageIndex.insert("0 / 0");
+    // Remove the content that's left in the container
+    container.update("");
+    // Add the gallery parts in the container, in the correct order.
+    container.insert(maximizeButton);
+    container.insert(previousButton);
+    container.insert(currentImage);
+    container.insert(nextButton);
+    container.insert(imageIndex);
+    this.container = container;
     this.container.addClassName('xGallery');    
     
     // Instead of an arbitrary element to catch focus, we use the index.

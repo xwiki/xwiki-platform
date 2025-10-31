@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>17.4.7</version>
+    <version>17.4.8-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 

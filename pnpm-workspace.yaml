@@ -52,6 +52,7 @@ catalog:
   react: 19.1.0
   react-dom: 19.1.0
   sinon: 21.0.0
+  tippy.js: 6.3.7
   typescript: 5.9.3
   typescript-eslint: 8.45.0
   u-node: 0.0.2

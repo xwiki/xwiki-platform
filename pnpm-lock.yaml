@@ -129,6 +129,9 @@ catalogs:
     sinon:
       specifier: 21.0.0
       version: 21.0.0
+    tippy.js:
+      specifier: 6.3.7
+      version: 6.3.7
     typescript:
       specifier: 5.9.3
       version: 5.9.3
@@ -313,6 +316,9 @@ importers:
       lz-string:
         specifier: 'catalog:'
         version: 1.5.0
+      tippy.js:
+        specifier: 'catalog:'
+        version: 6.3.7
       u-node:
         specifier: 'catalog:'
         version: 0.0.2

@@ -76,8 +76,8 @@ catalog:
   '@eslint/js': 9.38.0
   '@hocuspocus/provider': 2.15.3
   '@hocuspocus/server': 2.15.3
-  '@mantine/core': 8.3.5
-  '@mantine/hooks': 8.3.5
+  '@mantine/core': 8.3.6
+  '@mantine/hooks': 8.3.6
   '@microsoft/api-extractor': 7.53.3
   '@microsoft/tsdoc': 0.15.1
   '@microsoft/tsdoc-config': 0.17.1

@@ -71,7 +71,7 @@ catalog:
   '@blocknote/mantine': 0.35.0
   '@blocknote/react': 0.35.0
   '@changesets/cli': 2.29.7
-  '@eslint/config-helpers': 0.4.1
+  '@eslint/config-helpers': 0.4.2
   '@eslint/eslintrc': 3.3.1
   '@eslint/js': 9.38.0
   '@hocuspocus/provider': 2.15.3

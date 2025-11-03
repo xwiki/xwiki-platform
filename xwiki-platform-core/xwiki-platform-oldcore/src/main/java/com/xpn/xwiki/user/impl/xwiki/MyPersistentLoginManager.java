@@ -20,6 +20,7 @@
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.MessageDigest;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.servlet.http.Cookie;
@@ -108,34 +109,15 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     }
 
     /**
-     * Ensure cookie domains are prefixed with a dot to conform to RFC 2109.
-     *
-     * @param domain a cookie domain.
-     * @return a conform cookie domain.
-     */
-    private String conformCookieDomain(String domain)
-    {
-        if (domain != null && !domain.startsWith(COOKIE_DOT_PFX)) {
-            return COOKIE_DOT_PFX.concat(domain);
-        } else {
-            return domain;
-        }
-    }
-
-    /**
      * Setter for the {@link #cookieDomains} parameter.
      *
-     * @param cdlist The new value for {@link #cookieDomains}. The list is processed, so that any value not starting
-     *            with a dot is prefixed with one, to respect the RFC 2109.
+     * @param cdlist The new value for {@link #cookieDomains}
      * @see #cookieDomains
      */
     public void setCookieDomains(String[] cdlist)
     {
         if (cdlist != null && cdlist.length > 0) {
-            this.cookieDomains = new String[cdlist.length];
-            for (int i = 0; i < cdlist.length; ++i) {
-                this.cookieDomains[i] = conformCookieDomain(cdlist[i]);
-            }
+            this.cookieDomains = Arrays.copyOf(cdlist, cdlist.length);
         } else {
             this.cookieDomains = null;
         }
@@ -297,10 +279,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String cookieDomain = null;
         if (this.cookieDomains != null) {
-            // Conform the server name like we conform cookie domain by prefixing with a dot.
-            // This will ensure both localhost.localdomain and any.localhost.localdomain will match
-            // the same cookie domain.
-            String servername = conformCookieDomain(request.getServerName());
+            String servername = request.getServerName();
             for (String domain : this.cookieDomains) {
                 if (servername.endsWith(domain)) {
                     cookieDomain = domain;

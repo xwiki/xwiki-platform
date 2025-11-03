@@ -19,6 +19,8 @@
  */
 
 import { DefaultUniAstToHTMLConverter } from "../default-uni-ast-to-html-converter";
+import { macrosAstToHtmlConverterName } from "@xwiki/cristal-macros-ast-html-converter";
+import { macrosServiceName } from "@xwiki/cristal-macros-service";
 import {
   AttachmentReference,
   DocumentReference,
@@ -27,6 +29,8 @@ import {
 import { Container } from "inversify";
 import { describe, expect, test } from "vitest";
 import { any, mock } from "vitest-mock-extended";
+import type { MacrosAstToHtmlConverter } from "@xwiki/cristal-macros-ast-html-converter";
+import type { MacrosService } from "@xwiki/cristal-macros-service";
 import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParser,
@@ -45,6 +49,8 @@ function init() {
   const remoteURLSerializerProvider = mock<RemoteURLSerializerProvider>();
   const modelReferenceParser = mock<ModelReferenceParser>();
   const remoteURLSerializer = mock<RemoteURLSerializer>();
+  const macrosService = mock<MacrosService>();
+  const macrosAstToHtmlConverter = mock<MacrosAstToHtmlConverter>();
 
   const containerMock = mock<Container>();
 
@@ -59,6 +65,7 @@ function init() {
   containerMock.get
     .calledWith("RemoteURLParserProvider")
     .mockReturnValue(mock<RemoteURLParserProvider>());
+
   containerMock.get
     .calledWith("RemoteURLSerializerProvider")
     .mockReturnValue(remoteURLSerializerProvider);
@@ -66,6 +73,14 @@ function init() {
   containerMock.get
     .calledWith("ModelReferenceHandlerProvider")
     .mockReturnValue(mock<ModelReferenceHandlerProvider>());
+
+  containerMock.get
+    .calledWith(macrosServiceName)
+    .mockReturnValue(macrosService);
+
+  containerMock.get
+    .calledWith(macrosAstToHtmlConverterName)
+    .mockReturnValue(macrosAstToHtmlConverter);
 
   modelReferenceParserProvider.get.mockReturnValue(modelReferenceParser);
   remoteURLSerializerProvider.get.mockReturnValue(remoteURLSerializer);
@@ -82,15 +97,28 @@ function init() {
     .calledWith(attachmentReference)
     .mockReturnValue("https://my.site/A/B/image.png");
 
-  return { remoteURLSerializerProvider, modelReferenceParserProvider };
+  return {
+    remoteURLSerializerProvider,
+    modelReferenceParserProvider,
+    macrosService,
+    macrosAstToHtmlConverter,
+  };
 }
 
 // eslint-disable-next-line max-statements
 describe("UniAstToHTMLConverter", () => {
-  const { remoteURLSerializerProvider, modelReferenceParserProvider } = init();
+  const {
+    remoteURLSerializerProvider,
+    modelReferenceParserProvider,
+    macrosService,
+    macrosAstToHtmlConverter,
+  } = init();
+
   const uniAstToHTMLConverter = new DefaultUniAstToHTMLConverter(
     remoteURLSerializerProvider,
     modelReferenceParserProvider,
+    macrosService,
+    macrosAstToHtmlConverter,
   );
 
   test("empty ast", () => {

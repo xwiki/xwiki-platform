@@ -40,6 +40,7 @@
   "devDependencies": {
     "@types/react": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "inversify": "catalog:",
     "react": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

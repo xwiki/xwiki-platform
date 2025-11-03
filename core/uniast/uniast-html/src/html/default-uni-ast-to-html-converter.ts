@@ -17,10 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { macrosAstToHtmlConverterName } from "@xwiki/cristal-macros-ast-html-converter";
+import { macrosServiceName } from "@xwiki/cristal-macros-service";
 import { EntityType } from "@xwiki/cristal-model-api";
 import { inject, injectable } from "inversify";
 import { escape } from "lodash-es";
 import type { UniAstToHTMLConverter } from "./uni-ast-to-html-converter";
+import type { MacrosAstToHtmlConverter } from "@xwiki/cristal-macros-ast-html-converter";
+import type { MacrosService } from "@xwiki/cristal-macros-service";
 import type { EntityReference } from "@xwiki/cristal-model-api";
 import type { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
@@ -39,8 +43,15 @@ export class DefaultUniAstToHTMLConverter implements UniAstToHTMLConverter {
   constructor(
     @inject("RemoteURLSerializerProvider")
     private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
+
     @inject("ModelReferenceParserProvider")
     private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
+
+    @inject(macrosServiceName)
+    private readonly macrosService: MacrosService,
+
+    @inject(macrosAstToHtmlConverterName)
+    private readonly macrosAstToHtmlConverter: MacrosAstToHtmlConverter,
   ) {}
 
   toHtml(uniAst: UniAst): string | Error {
@@ -50,7 +61,7 @@ export class DefaultUniAstToHTMLConverter implements UniAstToHTMLConverter {
 
     for (const block of blocks) {
       try {
-        out.push(this.blockToHTML(block));
+        out.push(this.convertBlock(block));
       } catch (e) {
         console.error(e);
       }
@@ -59,7 +70,11 @@ export class DefaultUniAstToHTMLConverter implements UniAstToHTMLConverter {
     return out.join("\n");
   }
 
-  private blockToHTML(block: Block): string {
+  // eslint-disable-next-line max-statements
+  private convertBlock(block: Block): string {
+    // TODO: all styles are ignored here
+    // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-717
+
     switch (block.type) {
       case "paragraph":
         return `<p>${this.convertInlineContents(block.content)}</p>`;
@@ -76,7 +91,7 @@ export class DefaultUniAstToHTMLConverter implements UniAstToHTMLConverter {
 
       case "quote": {
         const blockquoteContent = block.content
-          .map((item) => this.blockToHTML(item))
+          .map((item) => this.convertBlock(item))
           ?.join("");
         return `<blockquote>${blockquoteContent}</blockquote>`;
       }
@@ -94,14 +109,37 @@ export class DefaultUniAstToHTMLConverter implements UniAstToHTMLConverter {
       case "break":
         return "<hr>";
 
-      case "macroBlock":
-        // TODO: currently unsupported
-        return "";
+      case "macroBlock": {
+        const macro = this.macrosService.get(block.name);
+
+        if (!macro) {
+          // TODO: proper error reporting
+          // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-725
+          return `<strong>Macro "${block.name}" was not found</strong>`;
+        }
+
+        if (macro.renderAs === "inline") {
+          // TODO: proper error reporting
+          // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-725
+          return `<strong>Macro "${block.name}" is of type "inline", but used here as a block</strong>`;
+        }
+
+        const rendered = this.macrosAstToHtmlConverter.blocksToHTML(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          macro.render(block.params as any),
+        );
+
+        if (rendered instanceof Error) {
+          throw rendered;
+        }
+
+        return rendered;
+      }
     }
   }
 
   private convertListItem(listItem: ListItem): string {
-    return `<li>${listItem.content.map((item) => this.blockToHTML(item)).join("")}</li>`;
+    return `<li>${listItem.content.map((item) => this.convertBlock(item)).join("")}</li>`;
   }
 
   private convertImage(image: Image): string {
@@ -154,6 +192,7 @@ export class DefaultUniAstToHTMLConverter implements UniAstToHTMLConverter {
       .join("");
   }
 
+  // eslint-disable-next-line max-statements
   private convertInlineContent(inlineContent: InlineContent): string {
     switch (inlineContent.type) {
       case "text":
@@ -183,9 +222,32 @@ export class DefaultUniAstToHTMLConverter implements UniAstToHTMLConverter {
         break;
       }
 
-      case "inlineMacro":
-        // TODO: currently unsupported
-        return "";
+      case "inlineMacro": {
+        const macro = this.macrosService.get(inlineContent.name);
+
+        if (!macro) {
+          // TODO: proper error reporting
+          // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-725
+          return `<strong>Macro "${inlineContent.name}" was not found</strong>`;
+        }
+
+        if (macro.renderAs === "block") {
+          // TODO: proper error reporting
+          // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-725
+          return `<strong>Macro "${inlineContent.name}" is of type "block", but used here as inline</strong>`;
+        }
+
+        const rendered = this.macrosAstToHtmlConverter.inlineContentsToHTML(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          macro.render(inlineContent.params as any),
+        );
+
+        if (rendered instanceof Error) {
+          throw rendered;
+        }
+
+        return rendered;
+      }
     }
   }
 

@@ -2291,6 +2291,40 @@ importers:
         specifier: 'catalog:'
         version: 7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
 
+  core/macros/macros-ast-html-converter:
+    dependencies:
+      '@xwiki/cristal-fn-utils':
+        specifier: workspace:*
+        version: link:../../fn-utils
+      '@xwiki/cristal-macros-api':
+        specifier: workspace:*
+        version: link:../macros-api
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
+      '@xwiki/cristal-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../model/model-remote-url/model-remote-url-api
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
+      inversify:
+        specifier: 'catalog:'
+        version: 7.10.4(reflect-metadata@0.2.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
+      vitest-mock-extended:
+        specifier: 'catalog:'
+        version: 3.1.0(typescript@5.9.3)(vitest@4.0.5(@types/debug@4.1.12)(@types/node@24.9.2)(happy-dom@20.0.8)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
+
   core/macros/macros-ast-react-jsx:
     dependencies:
       '@xwiki/cristal-fn-utils':
@@ -2302,9 +2336,6 @@ importers:
       '@xwiki/cristal-model-remote-url-api':
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
-      inversify:
-        specifier: 7.x
-        version: 7.10.2(reflect-metadata@0.2.2)
     devDependencies:
       '@types/react':
         specifier: 'catalog:'
@@ -2312,6 +2343,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      inversify:
+        specifier: 'catalog:'
+        version: 7.10.4(reflect-metadata@0.2.2)
       react:
         specifier: 'catalog:'
         version: 19.2.0
@@ -3458,6 +3492,12 @@ importers:
 
   core/uniast/uniast-html:
     dependencies:
+      '@xwiki/cristal-macros-ast-html-converter':
+        specifier: workspace:*
+        version: link:../../macros/macros-ast-html-converter
+      '@xwiki/cristal-macros-service':
+        specifier: workspace:*
+        version: link:../../macros/macros-service
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
@@ -4872,6 +4912,9 @@ importers:
       '@xwiki/cristal-link-suggest-xwiki':
         specifier: workspace:*
         version: link:../core/link-suggest/link-suggest-xwiki
+      '@xwiki/cristal-macros-ast-html-converter':
+        specifier: workspace:*
+        version: link:../core/macros/macros-ast-html-converter
       '@xwiki/cristal-macros-service':
         specifier: workspace:*
         version: link:../core/macros/macros-service
@@ -6061,27 +6104,16 @@ packages:
   '@inversifyjs/common@1.5.2':
     resolution: {integrity: sha512-WlzR9xGadABS9gtgZQ+luoZ8V6qm4Ii6RQfcfC9Ho2SOlE6ZuemFo7PKJvKI0ikm8cmKbU8hw5UK6E4qovH21w==}
 
-  '@inversifyjs/container@1.13.2':
-    resolution: {integrity: sha512-nr02jAB4LSuLNB4d5oFb+yXclfwnQ27QSaAHiO/SMkEc02dLhFMEq+Sk41ycUjvKgbVo6HoxcETJGKBoTlZ+SA==}
-    peerDependencies:
-      reflect-metadata: ~0.2.2
-
   '@inversifyjs/container@1.14.1':
     resolution: {integrity: sha512-OFSlXXFgEk2zSV4ZCapJeVc0jtN+DxiXB1Szz2AManOFEhFc9uiUFBUJ8XxOy4SuIAYPNNLW55F6owm/birqvg==}
     peerDependencies:
       reflect-metadata: ~0.2.2
-
-  '@inversifyjs/core@9.0.1':
-    resolution: {integrity: sha512-glc/HLeHedD4Qy6XKEv065ABWfy23rXuENxy6+GbplQOJFL4rPN6H4XEPmThuXPhmR+a38VcQ5eL/tjcF7HXPQ==}
 
   '@inversifyjs/core@9.1.1':
     resolution: {integrity: sha512-3GNF/a889+Z3AxMZGl5LvBaHYIRvn+rm4b6jec3YncyqNRXoLQjUUAleE0AbVUdUl8YntJ5NW+qe5vjbM0wk/w==}
 
   '@inversifyjs/plugin@0.2.0':
     resolution: {integrity: sha512-R/JAdkTSD819pV1zi0HP54mWHyX+H2m8SxldXRgPQarS3ySV4KPyRdosWcfB8Se0JJZWZLHYiUNiS6JvMWSPjw==}
-
-  '@inversifyjs/prototype-utils@0.1.2':
-    resolution: {integrity: sha512-WZAEycwVd8zVCPCQ7GRzuQmjYF7X5zbjI9cGigDbBoTHJ8y5US9om00IAp0RYislO+fYkMzgcB2SnlIVIzyESA==}
 
   '@inversifyjs/prototype-utils@0.1.3':
     resolution: {integrity: sha512-EzRamZzNgE9Sn3QtZ8NncNa2lpPMZfspqbK6BWFguWnOpK8ymp2TUuH46ruFHZhrHKnknPd7fG22ZV7iF517TQ==}
@@ -8572,9 +8604,6 @@ packages:
   internal-slot@1.1.0:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
-
-  inversify@7.10.2:
-    resolution: {integrity: sha512-BdR5jPo2lm8PlIEiDvEyEciLeLxabnJ6bNV7jv2Ijq6uNxuIxhApKmk360boKbSdRL9SOVMLK/O97S1EzNw+WA==}
 
   inversify@7.10.4:
     resolution: {integrity: sha512-slBB4OeGHNR4yxAz/ChzFrFK9QKtZ+P+Ys0aYMv0nYc05eiB5hk1oqlHhgCZ13tiDj4806tF1LW3NQPcJjmipQ==}
@@ -11816,14 +11845,6 @@ snapshots:
 
   '@inversifyjs/common@1.5.2': {}
 
-  '@inversifyjs/container@1.13.2(reflect-metadata@0.2.2)':
-    dependencies:
-      '@inversifyjs/common': 1.5.2
-      '@inversifyjs/core': 9.0.1(reflect-metadata@0.2.2)
-      '@inversifyjs/plugin': 0.2.0
-      '@inversifyjs/reflect-metadata-utils': 1.4.1(reflect-metadata@0.2.2)
-      reflect-metadata: 0.2.2
-
   '@inversifyjs/container@1.14.1(reflect-metadata@0.2.2)':
     dependencies:
       '@inversifyjs/common': 1.5.2
@@ -11831,14 +11852,6 @@ snapshots:
       '@inversifyjs/plugin': 0.2.0
       '@inversifyjs/reflect-metadata-utils': 1.4.1(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
-
-  '@inversifyjs/core@9.0.1(reflect-metadata@0.2.2)':
-    dependencies:
-      '@inversifyjs/common': 1.5.2
-      '@inversifyjs/prototype-utils': 0.1.2
-      '@inversifyjs/reflect-metadata-utils': 1.4.1(reflect-metadata@0.2.2)
-    transitivePeerDependencies:
-      - reflect-metadata
 
   '@inversifyjs/core@9.1.1(reflect-metadata@0.2.2)':
     dependencies:
@@ -11849,10 +11862,6 @@ snapshots:
       - reflect-metadata
 
   '@inversifyjs/plugin@0.2.0': {}
-
-  '@inversifyjs/prototype-utils@0.1.2':
-    dependencies:
-      '@inversifyjs/common': 1.5.2
 
   '@inversifyjs/prototype-utils@0.1.3':
     dependencies:
@@ -14863,14 +14872,6 @@ snapshots:
       es-errors: 1.3.0
       hasown: 2.0.2
       side-channel: 1.1.0
-
-  inversify@7.10.2(reflect-metadata@0.2.2):
-    dependencies:
-      '@inversifyjs/common': 1.5.2
-      '@inversifyjs/container': 1.13.2(reflect-metadata@0.2.2)
-      '@inversifyjs/core': 9.0.1(reflect-metadata@0.2.2)
-    transitivePeerDependencies:
-      - reflect-metadata
 
   inversify@7.10.4(reflect-metadata@0.2.2):
     dependencies:

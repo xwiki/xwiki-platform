@@ -69,6 +69,7 @@
     "@xwiki/cristal-link-suggest-api": "workspace:*",
     "@xwiki/cristal-link-suggest-nextcloud": "workspace:*",
     "@xwiki/cristal-link-suggest-xwiki": "workspace:*",
+    "@xwiki/cristal-macros-ast-html-converter": "workspace:*",
     "@xwiki/cristal-macros-service": "workspace:*",
     "@xwiki/cristal-markdown-default": "workspace:*",
     "@xwiki/cristal-model-click-listener": "workspace:*",

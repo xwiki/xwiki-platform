@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-uniast-html",
+  "name": "@xwiki/cristal-macros-ast-html-converter",
   "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "core/uniast/uniast-html",
+    "directory": "core/macros/macros-ast-html-converter",
     "url": "git+https://github.com/xwiki-contrib/cristal.git"
   },
   "bugs": {
@@ -30,20 +30,17 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/cristal-macros-ast-html-converter": "workspace:*",
-    "@xwiki/cristal-macros-service": "workspace:*",
-    "@xwiki/cristal-model-api": "workspace:*",
-    "@xwiki/cristal-uniast-api": "workspace:*",
-    "lodash-es": "catalog:"
+    "@xwiki/cristal-fn-utils": "workspace:*",
+    "@xwiki/cristal-macros-api": "workspace:*",
+    "@xwiki/cristal-model-reference-api": "workspace:*",
+    "@xwiki/cristal-model-remote-url-api": "workspace:*"
   },
   "peerDependencies": {
     "inversify": "7.x"
   },
   "devDependencies": {
-    "@types/lodash-es": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "@xwiki/cristal-model-reference-api": "workspace:*",
-    "@xwiki/cristal-model-remote-url-api": "workspace:*",
+    "@xwiki/cristal-model-api": "workspace:*",
     "inversify": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

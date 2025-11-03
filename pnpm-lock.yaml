@@ -106,8 +106,8 @@ catalogs:
       specifier: 6.0.1
       version: 6.0.1
     '@vitest/coverage-v8':
-      specifier: 4.0.4
-      version: 4.0.4
+      specifier: 4.0.6
+      version: 4.0.6
     '@vue/test-utils':
       specifier: 2.4.6
       version: 2.4.6
@@ -388,7 +388,7 @@ importers:
         version: 6.0.1(vite@7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))
       '@vitest/coverage-v8':
         specifier: 'catalog:'
-        version: 4.0.4(vitest@4.0.6(@types/debug@4.1.12)(@types/node@24.9.2)(happy-dom@20.0.10)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
+        version: 4.0.6(vitest@4.0.6(@types/debug@4.1.12)(@types/node@24.9.2)(happy-dom@20.0.10)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
       concurrently:
         specifier: 'catalog:'
         version: 9.2.1
@@ -2323,7 +2323,7 @@ importers:
         version: 7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 3.1.0(typescript@5.9.3)(vitest@4.0.5(@types/debug@4.1.12)(@types/node@24.9.2)(happy-dom@20.0.8)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
+        version: 3.1.0(typescript@5.9.3)(vitest@4.0.6(@types/debug@4.1.12)(@types/node@24.9.2)(happy-dom@20.0.10)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
 
   core/macros/macros-ast-react-jsx:
     dependencies:
@@ -6995,11 +6995,11 @@ packages:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
       vue: ^3.2.25
 
-  '@vitest/coverage-v8@4.0.4':
-    resolution: {integrity: sha512-YM7gDj2TX2AXyGLz0p/B7hvTsTfaQc+kSV/LU0nEnKlep/ZfbdCDppPND4YQiQC43OXyrhkG3y8ZSTqYb2CKqQ==}
+  '@vitest/coverage-v8@4.0.6':
+    resolution: {integrity: sha512-cv6pFXj9/Otk7q1Ocoj8k3BUVVwnFr3jqcqpwYrU5LkKClU9DpaMEdX+zptx/RyIJS+/VpoxMWmfISXchmVDPQ==}
     peerDependencies:
-      '@vitest/browser': 4.0.4
-      vitest: 4.0.4
+      '@vitest/browser': 4.0.6
+      vitest: 4.0.6
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
@@ -7018,9 +7018,6 @@ packages:
       vite:
         optional: true
 
-  '@vitest/pretty-format@4.0.4':
-    resolution: {integrity: sha512-lHI2rbyrLVSd1TiHGJYyEtbOBo2SDndIsN3qY4o4xe2pBxoJLD6IICghNCvD7P+BFin6jeyHXiUICXqgl6vEaQ==}
-
   '@vitest/pretty-format@4.0.6':
     resolution: {integrity: sha512-4vptgNkLIA1W1Nn5X4x8rLJBzPiJwnPc+awKtfBE5hNMVsoAl/JCCPPzNrbf+L4NKgklsis5Yp2gYa+XAS442g==}
 
@@ -7032,9 +7029,6 @@ packages:
 
   '@vitest/spy@4.0.6':
     resolution: {integrity: sha512-g9jTUYPV1LtRPRCQfhbMintW7BTQz1n6WXYQYRQ25qkyffA4bjVXjkROokZnv7t07OqfaFKw1lPzqKGk1hmNuQ==}
-
-  '@vitest/utils@4.0.4':
-    resolution: {integrity: sha512-4bJLmSvZLyVbNsYFRpPYdJViG9jZyRvMZ35IF4ymXbRZoS+ycYghmwTGiscTXduUg2lgKK7POWIyXJNute1hjw==}
 
   '@vitest/utils@4.0.6':
     resolution: {integrity: sha512-bG43VS3iYKrMIZXBo+y8Pti0O7uNju3KvNn6DrQWhQQKcLavMB+0NZfO1/QBAEbq0MaQ3QjNsnnXlGQvsh0Z6A==}
@@ -12817,10 +12811,10 @@ snapshots:
       vite: 7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
       vue: 3.5.22(typescript@5.9.3)
 
-  '@vitest/coverage-v8@4.0.4(vitest@4.0.6(@types/debug@4.1.12)(@types/node@24.9.2)(happy-dom@20.0.10)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))':
+  '@vitest/coverage-v8@4.0.6(vitest@4.0.6(@types/debug@4.1.12)(@types/node@24.9.2)(happy-dom@20.0.10)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
-      '@vitest/utils': 4.0.4
+      '@vitest/utils': 4.0.6
       ast-v8-to-istanbul: 0.3.8
       debug: 4.4.3
       istanbul-lib-coverage: 3.2.2
@@ -12851,10 +12845,6 @@ snapshots:
     optionalDependencies:
       vite: 7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
 
-  '@vitest/pretty-format@4.0.4':
-    dependencies:
-      tinyrainbow: 3.0.3
-
   '@vitest/pretty-format@4.0.6':
     dependencies:
       tinyrainbow: 3.0.3
@@ -12871,11 +12861,6 @@ snapshots:
       pathe: 2.0.3
 
   '@vitest/spy@4.0.6': {}
-
-  '@vitest/utils@4.0.4':
-    dependencies:
-      '@vitest/pretty-format': 4.0.4
-      tinyrainbow: 3.0.3
 
   '@vitest/utils@4.0.6':
     dependencies:

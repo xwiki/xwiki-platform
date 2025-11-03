@@ -100,7 +100,7 @@ catalog:
   '@typescript-eslint/parser': 8.46.2
   '@vitejs/plugin-react': 5.1.0
   '@vitejs/plugin-vue': 6.0.1
-  '@vitest/coverage-v8': 4.0.4
+  '@vitest/coverage-v8': 4.0.6
   '@vue/test-utils': 2.4.6
   async-lock: 1.4.1
   axios: 1.13.1

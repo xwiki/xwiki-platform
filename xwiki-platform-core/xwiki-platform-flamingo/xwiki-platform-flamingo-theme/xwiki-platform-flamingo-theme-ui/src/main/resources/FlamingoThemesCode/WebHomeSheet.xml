@@ -268,7 +268,7 @@
         &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
         &lt;input type="hidden" name="action" value="create"/&gt;
         &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('platform.flamingo.themes.home.newThemeName')&lt;/label&gt;
-        &lt;input type="text" name="newThemeName" id="newThemeName" value="$services.localization.render('platform.flamingo.themes.home.newThemeName')" class="withTip" size="30"/&gt;
+        &lt;input type="text" name="newThemeName" id="newThemeName" placeholder="$services.localization.render('platform.flamingo.themes.home.newThemeName')" size="30"/&gt;
         &lt;input type="submit" value="$services.localization.render('platform.flamingo.themes.home.create')" class="button"/&gt;
       &lt;/form&gt;
     {{/html}}

@@ -129,7 +129,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
     <div>
       $services.icon.renderHTML('add')
       <label for="propname" class="property-name-label">$services.localization.render('core.editors.class.addProperty.name.label')</label>
-      <input type="text" id="propname" name="propname" value="name" size="20" class='withTip'/>
+      <input type="text" id="propname" name="propname" placeholder="name" size="20"/>
     </div>
     <div>
       <label for="proptype" class="property-type-label">$services.localization.render('core.editors.class.addProperty.type.label'):</label>

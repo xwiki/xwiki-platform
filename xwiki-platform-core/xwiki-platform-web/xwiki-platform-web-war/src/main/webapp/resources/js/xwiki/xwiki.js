@@ -1346,40 +1346,6 @@ XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
 };
 
 /**
- * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.
- *
- * To activate this behavior on an input element, set a "placeholder" attribute, or add the "withTip" classname to it,
- * or pass it as the 'element' value of the memo of a 'xwiki:addBehavior:withTip' event.
- */
-(function(){
-  var placeholderPolyfill = function(event) {
-    var item = event.memo.element;
-    if (item.placeholder === '') {
-      if (item.hasClassName('useTitleAsTip')) {
-        // The place-holder text is different than the initial (default) input value.
-        item.placeholder = item.title;
-      } else {
-        // Use the initial (default) input value as place-holder.
-        item.placeholder = item.defaultValue;
-        item.value = '';
-      }
-    }
-  };
-  document.observe('xwiki:addBehavior:withTip', placeholderPolyfill);
-  document.observe('xwiki:dom:loaded', function() {
-    $$("input.withTip", "textarea.withTip", "[placeholder]").each(function(item) {
-      document.fire("xwiki:addBehavior:withTip", {'element' : item});
-    });
-  });
-  document.observe('xwiki:dom:updated', function(event) {
-    event.memo.elements.each(function(element) {
-      element.select("input.withTip", "textarea.withTip", "[placeholder]").each(function(item) {
-        document.fire("xwiki:addBehavior:withTip", {'element' : item});
-      });
-    });
-  });
-})();
-/**
  * Small JS improvement, which suggests document names (doc.fullName) when typing in an input.
  *
  * To activate this behavior on an input elements, add one of the following classname to it :

@@ -125,7 +125,7 @@
     {{html}}
     &lt;div id="addOverride"&gt;
       &lt;label for="newPath" class="newPathLabel"&gt;$services.icon.renderHTML('add') $escapetool.xml($services.localization.render("skin.sheet.addTemplate"))&lt;/label&gt;
-      &lt;input placeholder="file.vm" id="newPath" name="newPath" value="file.vm" size="20" class="withTip" type="text" /&gt;
+      &lt;input placeholder="file.vm" id="newPath" name="newPath" placeholder="file.vm" size="20" type="text" /&gt;
       &lt;button class="btn btn-primary" id="newPathAdd"&gt;$escapetool.xml($services.localization.render("skin.sheet.add"))&lt;/button&gt;
     &lt;/div&gt;
     {{/html}}

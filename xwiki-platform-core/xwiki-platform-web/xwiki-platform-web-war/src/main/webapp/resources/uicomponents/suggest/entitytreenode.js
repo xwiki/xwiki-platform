@@ -20,10 +20,10 @@
 require(['jquery', 'xwiki-events-bridge'], function ($) {
 
   function syncContainer(index, container) {
-    let hiddenInput = $(container).find('input.entitytreenode-input');
+    let hiddenInput = $(container).find('input.entity-tree-node-input');
     let typeInput = $(container).find('input.entityType');
-    let referenceInput = $(container).find('input.entitytreenode-text');
-    let typeLabel = $(container).find('.entitytype-label');
+    let referenceInput = $(container).find('input.entity-tree-node-text');
+    let typeLabel = $(container).find('.entity-type-label');
     let typeSelector = $(container).find('.type-selector');
     $(container).find('a.type-change-link').on('click', function (event) {
       event.preventDefault();
@@ -80,10 +80,10 @@ require(['jquery', 'xwiki-events-bridge'], function ($) {
   }
 
   function init() {
-    $('.entitytreenode-container').not('.initialized').map(syncContainer);
+    $('.entity-tree-node-picker').not('.initialized').map(syncContainer);
   }
   $(document).on('xwiki:dom:updated', function (event, data) {
-    $(data.elements).find('.entitytreenode-container').not('.initialized').map(syncContainer);
+    $(data.elements).find('.entity-tree-node-picker').not('.initialized').map(syncContainer);
   });
   $(init);
 });

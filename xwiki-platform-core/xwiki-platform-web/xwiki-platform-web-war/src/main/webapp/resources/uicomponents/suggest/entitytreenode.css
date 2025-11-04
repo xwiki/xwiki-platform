@@ -2,6 +2,6 @@
 .type-selector-with-suggest {
   margin-top: -5px !important;
 }
-.entitytype-label {
-  padding-right: 1em;
+.entity-type-label {
+  padding-right: 0.5em;
 }

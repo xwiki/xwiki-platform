@@ -75,9 +75,9 @@
 #pagePicker_import
 #attachmentPicker_import
 <input type="hidden" class="entityType" data-property-group="entitytreenode" value="$escapetool.xml($pickerType)" />
-<input type="text" class="form-control entityReferenceString entitytreenode-text"
+<input type="text" class="form-control entityReferenceString entity-tree-node-text"
    data-xwiki-selectize='{"maxItems": 1}'
    value="$escapetool.xml($reference)" data-property-group="entitytreenode" />
 </div>
-</span>
+</div>
 #{else}$!escapetool.xml($displayer.value)#end

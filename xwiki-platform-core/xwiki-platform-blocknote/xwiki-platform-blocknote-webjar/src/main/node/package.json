@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vue-tsc --project tsconfig.json && vite build",
-    "test": "vitest --run",
+    "test:unit": "vitest --run",
     "lint": "eslint \"./src/**/*.{js,ts,vue}\" --fix --max-warnings=0"
   },
   "dependencies": {
@@ -55,10 +55,5 @@
     "vitest": "3.2.4",
     "vue": "3.5.22",
     "vue-tsc": "3.0.6"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }

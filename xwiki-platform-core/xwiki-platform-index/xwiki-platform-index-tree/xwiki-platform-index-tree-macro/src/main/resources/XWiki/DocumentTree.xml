@@ -2445,7 +2445,7 @@
       <order>0</order>
     </property>
     <property>
-      <type>org.xwiki.index.tree.EntityTreeNode</type>
+      <type>org.xwiki.tree.EntityTreeNode</type>
     </property>
   </object>
   <object>
@@ -3207,7 +3207,7 @@
       <order>1</order>
     </property>
     <property>
-      <type>org.xwiki.index.tree.EntityTreeNode</type>
+      <type>org.xwiki.tree.EntityTreeNode</type>
     </property>
   </object>
   <object>

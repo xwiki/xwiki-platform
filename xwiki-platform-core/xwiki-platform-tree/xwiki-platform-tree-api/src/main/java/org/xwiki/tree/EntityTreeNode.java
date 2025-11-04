@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree;
+package org.xwiki.tree;
 
 import org.xwiki.stability.Unstable;
 
@@ -29,6 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 17.10.0RC1
  */
 @Unstable
-public interface EntityTreeNode
+public interface EntityTreeNode extends TreeNode
 {
 }

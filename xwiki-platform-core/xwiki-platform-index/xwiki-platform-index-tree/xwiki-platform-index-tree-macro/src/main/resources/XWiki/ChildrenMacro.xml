@@ -475,7 +475,7 @@
       <name>root</name>
     </property>
     <property>
-      <type/>
+      <type>org.xwiki.tree.EntityTreeNode</type>
     </property>
   </object>
 </xwikidoc>

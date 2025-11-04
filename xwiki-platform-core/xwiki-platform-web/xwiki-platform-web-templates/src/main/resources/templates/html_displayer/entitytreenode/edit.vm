@@ -21,7 +21,7 @@
 #set ($entityTypeMapping = {
   'farm': 'CUSTOM',
   'wiki': 'CUSTOM',
-  'space': 'DOCUMENT',
+  'space': 'CUSTOM',
   'document': 'DOCUMENT',
   'attachments': 'DOCUMENT',
   'attachment': 'ATTACHMENT',
@@ -44,8 +44,7 @@
   #set ($reference = '')
 #end
 #set ($pickerType = $entityTypeMapping[$type])
-#set ($typeLabel = $stringtool.capitalize($type))
-## FIXME: the type label should be translated
+#set ($typeLabel = $services.localization.render("platform.web.entitytreenode.type.${type}"))
 ## Load the JavaScript code that switches the picker based on the entity type value.
 #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestEntities.js', true))
 #set ($discard = $displayer.parameters.put('class', "entity-tree-node-input hidden form-control"))
@@ -63,7 +62,7 @@
       #foreach($entry in $entityTypeMapping.entrySet())
         #set ($entryType = $entry.key)
         #set ($entryPickerType = $entry.value)
-        #set ($label = $stringtool.capitalize($entryType))
+        #set ($label = $services.localization.render("platform.web.entitytreenode.type.${entryType}"))
         <li>
           <a class="type-change-link" data-type="$escapetool.xml($entryType)"
              data-picker-type="$escapetool.xml($entryPickerType)" href="#">

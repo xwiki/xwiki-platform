@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -35,9 +34,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.webjars.WebJarsUrlFactory;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,8 +49,8 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 import static org.xwiki.rendering.syntax.Syntax.HTML_5_0;
 
 /**
- * Resolve the importmap from the webjar declarations, using the {@code "xwiki.javascript.modules.importmap"} pom
- * property.
+ * Resolve the importmap from the webjar declarations, using the {@code "xwiki.extension.javascript.modules.importmap"}
+ * pom property.
  *
  * @version $Id$
  * @since 17.10.0RC1
@@ -63,7 +64,7 @@ public class JavascriptImportmapResolver
         .configure(SORT_PROPERTIES_ALPHABETICALLY, true)
         .build();
 
-    private static final String JAVASCRIPT_IMPORTMAP_PROPERTY = "xwiki.javascript.modules.importmap";
+    private static final String JAVASCRIPT_IMPORTMAP_PROPERTY = "xwiki.extension.javascript.modules.importmap";
 
     /**
      * Cache lock to prevent race conditions when retrieving cached values.
@@ -86,6 +87,9 @@ public class JavascriptImportmapResolver
 
     @Inject
     private WebJarsUrlFactory webJarsUrlFactory;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     /**
      * @return the block to render from the importmap, possibly cached
@@ -112,8 +116,9 @@ public class JavascriptImportmapResolver
 
     private void compute()
     {
+        var wikiNamespace = new WikiNamespace(this.wikiDescriptorManager.getCurrentWikiId()).serialize();
         List<Map<String, String>> extensionsWithImportMap = Stream.concat(
-                this.installedExtensionRepository.getInstalledExtensions().stream(),
+                this.installedExtensionRepository.getInstalledExtensions(wikiNamespace).stream(),
                 this.coreExtensionRepository.getCoreExtensions().stream())
             .filter(extension -> accessProperty(extension) != null)
             .map(extension -> {
@@ -166,16 +171,6 @@ public class JavascriptImportmapResolver
 
     private static String accessProperty(Extension extension)
     {
-        String id = extension.getId().getId();
-        if (Objects.equals(id, "org.xwiki.platform:xwiki-platform-livedata-webjar")) {
-            return """
-                    {
-                      "xwiki-livedata": "org.xwiki.platform:xwiki-platform-livedata-webjar/main.es.js",
-                      "vue": "org.webjars.npm:vue/dist/vue.runtime.esm-browser.prod.js",
-                      "vue-i18n": "org.webjars.npm:vue-i18n/dist/vue-i18n.esm-browser.prod.js"
-                    }
-                """;
-        }
         return extension.getProperty(JAVASCRIPT_IMPORTMAP_PROPERTY);
     }
 

@@ -37,13 +37,13 @@
     <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>
-    <xwiki.javascript.modules.importmap>
+    <xwiki.extension.javascript.modules.importmap>
     {
       "xwiki-livedata": "org.xwiki.platform:xwiki-platform-livedata-webjar/main.es.js",
       "vue": "org.webjars.npm:vue/dist/vue.runtime.esm-browser.prod.js",
       "vue-i18n": "org.webjars.npm:vue-i18n/dist/vue-i18n.esm-browser.prod.js"
     }
-    </xwiki.javascript.modules.importmap>
+    </xwiki.extension.javascript.modules.importmap>
   </properties>
   <dependencies>
     <dependency>

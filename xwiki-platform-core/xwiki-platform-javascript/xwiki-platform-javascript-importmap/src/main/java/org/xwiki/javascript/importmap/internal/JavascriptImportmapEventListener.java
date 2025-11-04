@@ -20,50 +20,68 @@
 package org.xwiki.javascript.importmap.internal;
 
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.event.AbstractExtensionEvent;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
- * List for extensions related events (installed, uninstalled, upgraded) and clear {@link JavascriptImportmapResolver}
+ * Listen for extensions related events (installed, uninstalled, upgraded) and clear {@link JavascriptImportmapResolver}
  * cache when the events are received.
  *
  * @version $Id$
  * @since 17.10.0RC1
  */
 @Component
+@Named(JavascriptImportmapEventListener.HINT)
 @Singleton
 public class JavascriptImportmapEventListener implements EventListener
 {
+    /**
+     * Component hint.
+     */
+    public static final String HINT = "JavascriptImportmapEventListener";
+
     @Inject
     private JavascriptImportmapResolver javascriptImportmapResolver;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public String getName()
     {
-        return "JavascriptImportmapUIExtension";
+        return HINT;
     }
 
     @Override
     public List<Event> getEvents()
     {
-        return List.of(
-            new ExtensionInstalledEvent(),
-            new ExtensionUninstalledEvent(),
-            new ExtensionUpgradedEvent()
-        );
+        return List.of(new ExtensionInstalledEvent(), new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        this.javascriptImportmapResolver.clearCache();
+        if (event instanceof AbstractExtensionEvent extensionInstalledEvent) {
+            if (!extensionInstalledEvent.hasNamespace() || Objects.equals(extensionInstalledEvent.getNamespace(),
+                new WikiNamespace(this.wikiDescriptorManager.getCurrentWikiId()).serialize()))
+            {
+                // Only clear the cache for events related to the current wiki (i.e., local to the wiki or global to
+                // the whole farm).
+                this.javascriptImportmapResolver.clearCache();
+            }
+        }
     }
 }

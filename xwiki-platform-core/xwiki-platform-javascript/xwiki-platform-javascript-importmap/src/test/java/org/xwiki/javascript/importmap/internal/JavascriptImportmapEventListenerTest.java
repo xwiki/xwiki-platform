@@ -20,11 +20,20 @@
 package org.xwiki.javascript.importmap.internal;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.event.AbstractExtensionEvent;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
+import org.xwiki.model.namespace.WikiNamespace;
+import org.xwiki.observation.event.Event;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test of {@link JavascriptImportmapEventListener}.
@@ -41,10 +50,42 @@ class JavascriptImportmapEventListenerTest
     @MockComponent
     private JavascriptImportmapResolver javascriptImportmapResolver;
 
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Test
-    void onEvent()
+    void onEventNoNamespace()
     {
-        this.listener.onEvent(null, null, null);
+        var mock = mock(AbstractExtensionEvent.class);
+        when(mock.hasNamespace()).thenReturn(false);
+        this.listener.onEvent(mock, null, null);
         verify(this.javascriptImportmapResolver).clearCache();
+    }
+
+    @Test
+    void onEventMatchingNamespace()
+    {
+        var extensionInstalledEvent =
+            new ExtensionInstalledEvent(mock(ExtensionId.class), new WikiNamespace("wiki1").serialize());
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki1");
+        this.listener.onEvent(extensionInstalledEvent, null, null);
+        verify(this.javascriptImportmapResolver).clearCache();
+    }
+
+    @Test
+    void onEventDifferentNamespaces()
+    {
+        var extensionInstalledEvent =
+            new ExtensionInstalledEvent(mock(ExtensionId.class), new WikiNamespace("wiki1").serialize());
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki2");
+        this.listener.onEvent(extensionInstalledEvent, null, null);
+        verify(this.javascriptImportmapResolver, never()).clearCache();
+    }
+
+    @Test
+    void onEventWrongEvent()
+    {
+        this.listener.onEvent(mock(Event.class), null, null);
+        verify(this.javascriptImportmapResolver, never()).clearCache();
     }
 }

@@ -56,6 +56,7 @@ solr.admin.indexing.wiki.hint=Wiki în care acțiunea selectată va viza toate d
 solr.admin.indexing.wiki.select_farm=Întreaga fermă
 solr.admin.indexing.query.label=Interogare personalizată
 solr.admin.indexing.query.hint=Interogare opțională pentru a limita documentele care vor fi vizate de acțiunea selectată în index.
+solr.admin.indexing.query.language.label=Limba interogării personalizate
 solr.admin.info.affectedDocuments=Documentele vizate din index:
 solr.sortBy=Sortează după:
 solr.sortBy.score=Relevanță

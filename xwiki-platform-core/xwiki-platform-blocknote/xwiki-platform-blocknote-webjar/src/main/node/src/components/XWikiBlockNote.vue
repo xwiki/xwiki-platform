@@ -20,14 +20,15 @@
 <template>
   <div class="xwiki-blocknote">
     <suspense>
-      <BlocknoteEditor v-if="editorContent"
+      <BlocknoteEditor
+        v-if="editorContent"
         ref="editor"
         :editor-props
         :editor-content
         :container
+        :macros="false"
         @instant-change="dirty = true"
         @debounced-change="updateValue"
-        :macros="false"
       ></BlocknoteEditor>
     </suspense>
     <input v-if="name" ref="valueInput" type="hidden" :name :value :form :disabled />

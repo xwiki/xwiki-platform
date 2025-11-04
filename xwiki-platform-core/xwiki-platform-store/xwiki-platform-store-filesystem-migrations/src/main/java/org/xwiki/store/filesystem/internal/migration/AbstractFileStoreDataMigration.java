@@ -22,7 +22,6 @@ package org.xwiki.store.filesystem.internal.migration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -106,7 +105,7 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
     protected File getStoreRootDirectory()
     {
         if (this.blobStore instanceof FileSystemBlobStore fileSystemBlobStore) {
-            return fileSystemBlobStore.getBlobFilePath(BlobPath.of(List.of())).toFile();
+            return fileSystemBlobStore.getBlobFilePath(BlobPath.ROOT).toFile();
         } else {
             throw new IllegalStateException("The current blob store is not a file system blob store");
         }

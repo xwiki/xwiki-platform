@@ -7,10 +7,7 @@ cleanupUnusedCatalogs: true
 ignoredBuiltDependencies:
   - esbuild
 catalog:
-  "@blocknote/core": 0.31.3
-  "@blocknote/mantine": 0.31.3
   "@eslint/js": 9.34.0
-  "@mantine/core": 8.1.1
   "@tsconfig/node22": 22.0.2
   "@types/jsdom": 27.0.0
   "@types/node": 22.18.8
@@ -21,19 +18,21 @@ catalog:
   "@vue/eslint-config-typescript": 14.6.0
   "@vue/test-utils": 2.4.6
   "@vue/tsconfig": 0.7.0
-  "@xwiki/cristal-api": 0.19.0
-  "@xwiki/cristal-attachments-default": 0.19.0
-  "@xwiki/cristal-authentication-api": 0.19.0
-  "@xwiki/cristal-backend-api": 0.19.0
-  "@xwiki/cristal-document-api": 0.19.0
-  "@xwiki/cristal-dsapi": 0.19.0
-  "@xwiki/cristal-editors-blocknote-headless": 0.19.0
-  "@xwiki/cristal-editors-blocknote-react": 0.19.0
-  "@xwiki/cristal-link-suggest-api": 0.19.0
-  "@xwiki/cristal-model-api": 0.19.0
-  "@xwiki/cristal-model-reference-api": 0.19.0
-  "@xwiki/cristal-model-remote-url-api": 0.19.0
-  "@xwiki/cristal-uniast": 0.19.0
+  "@xwiki/cristal-api": 0.23.1
+  "@xwiki/cristal-attachments-default": 0.23.1
+  "@xwiki/cristal-authentication-api": 0.23.1
+  "@xwiki/cristal-backend-api": 0.23.1
+  "@xwiki/cristal-collaboration-api": 0.23.1
+  "@xwiki/cristal-document-api": 0.23.1
+  "@xwiki/cristal-dsapi": 0.23.1
+  "@xwiki/cristal-editors-blocknote-headless": 0.23.1
+  "@xwiki/cristal-editors-blocknote-react": 0.23.1
+  "@xwiki/cristal-link-suggest-api": 0.23.1
+  "@xwiki/cristal-model-api": 0.23.1
+  "@xwiki/cristal-model-reference-api": 0.23.1
+  "@xwiki/cristal-model-remote-url-api": 0.23.1
+  "@xwiki/cristal-uniast-api": 0.23.1
+  "@xwiki/cristal-uniast-markdown": 0.23.1
   dompurify: 3.2.6
   eslint: 9.36.0
   eslint-config-prettier: 10.1.8
@@ -49,8 +48,8 @@ catalog:
   lz-string: 1.5.0
   npm-run-all2: 8.0.4
   pinia: 3.0.2
-  react: 19.1.0
-  react-dom: 19.1.0
+  react: 19.2.0
+  react-dom: 19.2.0
   sinon: 21.0.0
   tippy.js: 6.3.7
   typescript: 5.9.3

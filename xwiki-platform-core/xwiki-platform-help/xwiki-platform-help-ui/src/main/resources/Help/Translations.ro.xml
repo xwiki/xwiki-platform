@@ -44,6 +44,7 @@ help.tipsPanel.improveXWikiTip=Știai că poți îmbunătăți XWiki? Alocă 5 m
 help.tipsPanel.breadcrumbsTip=Poți face clic pe săgețile de lângă elementele de breadcrumb pentru a naviga rapid la paginile de pe același nivel și copii.
 help.tipsPanel.advancedHiddenShortcutTip=Apasă combinația de taste x+x+x+a pentru a comuta [[Modul avansat&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] și x+ x+x+h pentru a comuta afișarea [[paginilor ascunse&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 help.tipsPanel.linkAutocompleteWYSIWYGTip=Când editezi în WYSIWYG, tastează ##[## și apoi începe să tastezi litere pentru a obține sugestii pentru crearea unui link.
+help.tipsPanel.WYSIWYGEditorTip=În timpul editării în modul WYSIWYG, comanda rapidă {0}Alt + 0{1} ({0}⌥0{1} pe macOS) deschide o fereastră de ajutor cu informații despre utilizarea tastaturii pentru navigarea în editor.
 help.macroList.title=Macro-uri disponibile
 help.macroList.id=Id
 help.macroList.name=Nume

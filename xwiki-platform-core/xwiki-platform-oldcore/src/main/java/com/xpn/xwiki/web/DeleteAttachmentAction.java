@@ -118,9 +118,9 @@ public class DeleteAttachmentAction extends XWikiAction
             ScriptContext scriptContext = getCurrentScriptContext();
             if (scriptContext != null) {
                 scriptContext.setAttribute("message",
-                    localizePlainOrKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
+                    localizePlainOrReturnKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
                 scriptContext.setAttribute("details",
-                    localizePlainOrKey("platform.core.action.deleteAttachment.noAttachment"),
+                    localizePlainOrReturnKey("platform.core.action.deleteAttachment.noAttachment"),
                     ScriptContext.ENGINE_SCOPE);
             }
 
@@ -132,9 +132,9 @@ public class DeleteAttachmentAction extends XWikiAction
         // Set "deleted attachment" as the version comment.
         String comment;
         if (attachment.isImage(context)) {
-            comment = localizePlainOrKey("core.comment.deleteImageComment", filename);
+            comment = localizePlainOrReturnKey("core.comment.deleteImageComment", filename);
         } else {
-            comment = localizePlainOrKey("core.comment.deleteAttachmentComment", filename);
+            comment = localizePlainOrReturnKey("core.comment.deleteAttachmentComment", filename);
         }
 
         try {
@@ -150,7 +150,7 @@ public class DeleteAttachmentAction extends XWikiAction
             ScriptContext scriptContext = getCurrentScriptContext();
             if (scriptContext != null) {
                 scriptContext.setAttribute("message",
-                    localizePlainOrKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
+                    localizePlainOrReturnKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
                 scriptContext.setAttribute("details", ExceptionUtils.getRootCauseMessage(ex),
                     ScriptContext.ENGINE_SCOPE);
             }

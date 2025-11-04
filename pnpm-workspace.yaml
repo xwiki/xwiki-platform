@@ -7,7 +7,7 @@ cleanupUnusedCatalogs: true
 ignoredBuiltDependencies:
   - esbuild
 catalog:
-  "@blocknote/core": 0.31.3
+  "@blocknote/core": 0.41.1
   "@blocknote/mantine": 0.31.3
   "@eslint/js": 9.34.0
   "@mantine/core": 8.1.1

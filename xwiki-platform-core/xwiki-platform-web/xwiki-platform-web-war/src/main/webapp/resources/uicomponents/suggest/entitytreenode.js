@@ -85,5 +85,5 @@ require(['jquery', 'xwiki-events-bridge'], function ($) {
   $(document).on('xwiki:dom:updated', function (event, data) {
     $(data.elements).find('.entitytreenode-container').not('.initialized').map(syncContainer);
   });
-  XWiki.domIsLoaded && init() || document.observe('xwiki:dom:loaded', init);
+  $(init);
 });

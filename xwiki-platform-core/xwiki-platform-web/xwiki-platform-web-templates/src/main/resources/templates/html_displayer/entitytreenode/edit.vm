@@ -30,11 +30,11 @@
   'objectsOfType': 'CUSTOM'
 })
 ## We define a container span to identify the elements to synchronize.
-<span class="entitytreenode-container">
+<div class="entity-tree-node-picker">
 ## Main input is hidden since it's serialization of the combination of the displayed fields.
 ## That's also why we need the javascript to keep this hidden input in sync.
-#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/entitytreenode.js', true))
-#set ($discard = $xwiki.ssfx.use('uicomponents/suggest/entitytreenode.css', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/entitytreenode.js'))
+#set ($discard = $xwiki.ssfx.use('uicomponents/suggest/entitytreenode.css'))
 #if ("$!displayer.value" != '')
   #set ($firstColon = $displayer.value.indexOf(':'))
   #set ($type = $displayer.value.substring(0, $firstColon))
@@ -48,7 +48,7 @@
 ## FIXME: the type label should be translated
 ## Load the JavaScript code that switches the picker based on the entity type value.
 #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestEntities.js', true))
-#set ($discard = $displayer.parameters.put('class', "entitytreenode entitytreenode-input hidden form-control"))
+#set ($discard = $displayer.parameters.put('class', "entity-tree-node-input hidden form-control"))
 <input type="text" value="$!escapetool.xml($displayer.value)"
   #foreach ($parameter in $displayer.parameters.entrySet())
     $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
@@ -57,7 +57,7 @@
 <div class="input-group">
   <div class="input-group-btn">
     <button type="button" class="btn btn-default dropdown-toggle type-selector" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <span class="entitytype-label" data-type="$escapetool.xml($type)">$typeLabel</span><span class="caret"></span>
+      <span class="entity-type-label" data-type="$escapetool.xml($type)">$escapetool.xml($typeLabel)</span><span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
       #foreach($entry in $entityTypeMapping.entrySet())
@@ -67,7 +67,7 @@
         <li>
           <a class="type-change-link" data-type="$escapetool.xml($entryType)"
              data-picker-type="$escapetool.xml($entryPickerType)" href="#">
-            $label
+            $escapetool.xml($label)
           </a>
         </li>
       #end

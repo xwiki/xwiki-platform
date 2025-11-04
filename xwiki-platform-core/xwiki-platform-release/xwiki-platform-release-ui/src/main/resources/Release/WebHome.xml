@@ -53,7 +53,7 @@
   &lt;input type="hidden" name="template" value="ReleaseCode.ReleaseTemplate" /&gt;
   &lt;input type="hidden" name="sheet" value="1" /&gt;
   &lt;label for="versionid"&gt;Version:&lt;/label&gt;
-  &lt;input id="versionid" class="withTip" type="text" name="version" value="" size="30"/&gt;
+  &lt;input id="versionid" type="text" name="version" size="30"/&gt;
   &lt;span class="buttonwrapper"&gt;
     &lt;input class="button" type="submit" value="Create this release" /&gt;
   &lt;/span&gt;

@@ -23,7 +23,8 @@ XWiki.Gallery = Class.create({
   initialize : function(container) {
     this.images = this._collectImages(container);
     this.container = container.update(
-      '<button class="maximize" title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}"></button>' +
+      '<button class="maximize"' +
+       ' title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}">$services.icon.renderHTML("arrow-expand")$services.icon.renderHTML("arrow-compress")</button>' +
       '<button class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</button>' +
       '<img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/>' +
       '<button class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</button>' +

@@ -29,6 +29,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 // https://vite.dev/config/
 export default defineConfig({
   build: {
+    outDir: '../../../target/node-dist',
     lib: {
       entry: resolve(__dirname, 'src/main.js'),
       fileName: (format, entryName) => `${entryName}.${format}.js`,

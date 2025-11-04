@@ -71,58 +71,58 @@
 ###############################################################################
 
 ## Menus
-### Missing: platform.wiki.menu.wikiindex=Wiki Index
-### Missing: platform.wiki.menu.deletewiki=Delete wiki
-### Missing: platform.wiki.menu.userwikis=Wikis
+platform.wiki.menu.wikiindex=Index Wiki
+platform.wiki.menu.deletewiki=Șterge wiki
+platform.wiki.menu.userwikis=Wiki-uri
 
 ## Dependencies
-### Missing: platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.wiki.missing=Componenta Java "Wiki" nu este instalată. Această pagină nu va funcționa corect. Asigură-te că extensiile "Wiki API" și "Wiki Script" sunt instalate (folosind Extension Manager) sau că fișierele 'xwiki-platform-wiki-api-&lt;version&gt;.jar' și 'xwiki-platform-wiki-script-&lt;version&gt;.jar' sunt prezente sub folderul 'WEB-INF/lib/' al aplicației web (în cazul unei instalări manuale).
+platform.wiki.dependencies.template.missing=Componenta Java "Wiki Template" nu este instalată. Această pagină nu va funcționa corect. Asigură-te că extensiile "Wiki Template API" și "Wiki Template Script" sunt instalate (folosind Extension Manager) sau că fișierele 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' și 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' sunt prezente sub folderul 'WEB-INF/lib/' al aplicației web (în cazul unei instalări manuale).
+platform.wiki.dependencies.user.missing=Componenta Java "Wiki User" nu este instalată. Această pagină nu va funcționa corect. Asigură-te că extensiile "Wiki User API" și "Wiki User Script" sunt instalate (folosind Extension Manager) sau că fișierele 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' și 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' sunt prezente sub folderul 'WEB-INF/lib/' al aplicației web (în cazul unei instalări manuale).
 
 ## Create
-### Missing: platform.wiki.create.button=Create Wiki
+platform.wiki.create.button=Creează wiki
 platform.wiki.create.title=Creează un nou wiki
 platform.wiki.create.members=MEMBRI
-### Missing: platform.wiki.create.prettyname.empty=Pretty name must not be empty
-### Missing: platform.wiki.create.error=Wiki \"{0}\" creation failed: {1}.
+platform.wiki.create.prettyname.empty=Numele afișat nu trebuie să fie gol
+platform.wiki.create.error=Crearea wiki-ului "{0}" a eșuat: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=O bază de date cu acest identificator deja exista
 platform.wiki.create.error.wikiname.wikialreadyexists=Acest identificator este deja folosit
 platform.wiki.create.error.wikiname.empty=Identificatorul nu poate fi gol
 
 ## Common errors and messages
-### Missing: platform.wiki.error.wikidoesnotexist=Wiki [{0}] does not exist
-platform.wiki.error.oneParameterNotSpecified=Parametrul ''{0}''  nu a fost specificat
+platform.wiki.error.wikidoesnotexist=Wiki-ul [{0}] nu există
+platform.wiki.error.oneParameterNotSpecified=Parametrul ''{0}'' nu a fost specificat
 platform.wiki.error.parameterAcceptsMultipleValues=Acceptă valori multiple
 platform.wiki.error.exceptionWithMessage=Exceptie\: {0}
 platform.wiki.form.requiredField=Obligatoriu
-### Missing: platform.wiki.csrf.error=Invalid security token. Please retry your operation.
+platform.wiki.csrf.error=Tokenul de securitate este invalid. Reîncearcă operațiunea.
 
 ## Users
-### Missing: platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
-### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.error.needInvitation=This wiki is invite only. To do so, you need to receive an invitation from one of its admins.
-### Missing: platform.wiki.users.join.request.pendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
-### Missing: platform.wiki.users.join.request.cancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
+platform.wiki.users.userAlreadyMemberOfWiki=Utilizatorul {0}{1}{2} este deja membru al wiki-ului {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=Utilizatorul {0}{1}{2} nu este membru al wiki-ului {3}{4}{5}.
+platform.wiki.users.logInToContinue=Pentru a continua, trebuie mai întâi să te {0}autentifici{1}.
+platform.wiki.users.invitation.userAcceptedNotification=Utilizatorul ''{0}'' ({1}) a acceptat invitația de a se alătura wiki-ului ''{2}'' ({3}).
+platform.wiki.users.invitation.userAcceptedSuccess=Utilizatorul {0}{1}{2} a acceptat cu succes invitația și s-a alăturat wiki-ului {3}{4}{5}.
+platform.wiki.users.invitation.userRejectedSuccess=Utilizatorul {0}{1}{2} a refuzat cu succes invitația de a se alătura wiki-ului {3}{4}{5}.
+platform.wiki.users.join.error.needInvitation=Acest wiki este disponibil doar pe bază de invitație. Pentru a continua, trebuie să primești o invitație de la unul dintre administratori.
+platform.wiki.users.join.request.pendingRequestExists=Utilizatorul {0}{1}{2} are deja o cerere în așteptare pentru a se alătura wiki-ului {3}{4}{5}. Așteaptă ca un administrator al wiki-ului să o revizuiască.
+platform.wiki.users.join.request.cancelConfirmation=Ești sigur că vrei să anulezi cererea de a te alătura wiki-ului {0}{1}{2}?
 platform.wiki.users.join.request.cancelYes=Da
 platform.wiki.users.join.request.cancelNo=Nu
-### Missing: platform.wiki.users.join.request.cancelSuccess=The user {0}{1}{2} successfully cancelled the request to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.request.saveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.join.request.success=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.confirmation=Are you sure you want to join the wiki {0}{1}{2}?
+platform.wiki.users.join.request.cancelSuccess=Utilizatorul {0}{1}{2} a anulat cu succes cererea de a se alătura wiki-ului {3}{4}{5}.
+platform.wiki.users.join.request.saveNotification=Utilizatorul ''{0}'' ({1}) a solicitat să se alăture wiki-ului ''{2}'' ({3}).
+platform.wiki.users.join.request.success=Utilizatorul {0}{1}{2} a trimis cu succes cererea de a se alătura wiki-ului {3}{4}{5}.
+platform.wiki.users.join.confirmation=Ești sigur că vrei să te alături wiki-ului {0}{1}{2}?
 platform.wiki.users.join.yes=Da
 platform.wiki.users.join.no=Nu
-### Missing: platform.wiki.users.join.success=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
-### Missing: platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki cannot leave it unless the wiki is deleted or the owner is changed.
-### Missing: platform.wiki.users.leave.confirmation=Are you sure you want to leave wiki {0}{1}{2}?
+platform.wiki.users.join.success=Utilizatorul {0}{1}{2} s-a alăturat cu succes wiki-ului {3}{4}{5}.
+platform.wiki.users.leave.error.userIsOwner=Utilizatorul {0}{1}{2} este proprietarul wiki-ului {3}{4}{5}. Proprietarul unui wiki nu poate părăsi wiki-ul decât dacă acesta este șters sau dacă proprietarul este schimbat.
+platform.wiki.users.leave.confirmation=Ești sigur că vrei să părăsești wiki-ul {0}{1}{2}?
 platform.wiki.users.leave.confirmation.yes=Da
 platform.wiki.users.leave.confirmation.no=Nu
-### Missing: platform.wiki.users.leave.success=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.title=Join Wiki
+platform.wiki.users.leave.success=Utilizatorul {0}{1}{2} a părăsit cu succes wiki-ul {3}{4}{5}.
+platform.wiki.users.join.title=Alătură-te wiki-ului
 platform.wiki.users.leave.title=Părăsește Wiki
 ### Missing: platform.wiki.users.leave.empty=Leave Wiki
 platform.wiki.users.delete.title=Șterge Wiki "{0}"

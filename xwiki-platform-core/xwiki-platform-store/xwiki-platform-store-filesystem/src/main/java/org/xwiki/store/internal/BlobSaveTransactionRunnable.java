@@ -29,6 +29,7 @@ import org.xwiki.store.StreamProviderBlobSerializer;
 import org.xwiki.store.TransactionRunnable;
 import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.blob.BlobWriteMode;
 
 /**
  * A TransactionRunnable for saving a blob safely.
@@ -275,7 +276,7 @@ public class BlobSaveTransactionRunnable extends StartableTransactionRunnable<Tr
      * location but did not move the temporary file to the main location. Move the backup file
      * back to the main location.
      *
-     * 3. If there is a file in each location, we probably used copy + delete instead of rename on a file system which
+     * 3. If there is a file in each location, we probably used copy + delete instead of rename on a blob store which
      * does not support rename. In this case, there are two scenarios: we copied the existing main file to the backup
      * location but failed to delete the original before moving the temporary file to the main location, or we started
      * moving the temporary file to the main location but failed before deleting the original temporary file. We can
@@ -303,8 +304,8 @@ public class BlobSaveTransactionRunnable extends StartableTransactionRunnable<Tr
         // 3.
         if (this.moveToBackupComplete) {
             // We successfully moved the main file to backup, so restore it.
-            this.toSave.getStore().deleteBlob(this.toSave.getPath());
-            this.backupFile.getStore().moveBlob(this.backupFile.getPath(), this.toSave.getPath());
+            this.backupFile.getStore().moveBlob(this.backupFile.getPath(), this.toSave.getPath(),
+                BlobWriteMode.REPLACE_EXISTING);
         } else {
             // We failed to move the main file to backup, so just delete the backup file.
             this.backupFile.getStore().deleteBlob(this.backupFile.getPath());

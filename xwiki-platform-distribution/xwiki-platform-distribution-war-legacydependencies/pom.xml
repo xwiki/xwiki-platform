@@ -55,6 +55,8 @@
                     <exclude>org.xwiki.commons:xwiki-platform-distribution-war-dependencies:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-component-api:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-velocity:*:jar:*</exclude>
+                    <exclude>org.xwiki.commons:xwiki-commons-job-api:*:jar:*</exclude>
+                    <exclude>org.xwiki.commons:xwiki-commons-job-default:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-transformation-macro:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-extension-handler-xar:*:jar:*</exclude>
@@ -68,6 +70,7 @@
                     <exclude>org.xwiki.platform:xwiki-platform-mail-send-storage:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-notifications-api:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-notifications-filters-api:*:jar:*</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-bridge:*:jar:*</exclude>
                   </excludes>
                   <message>We should not get both the clean and the legacy JARs</message>
                 </bannedDependencies>
@@ -98,6 +101,14 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-job-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-job-default</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.rendering</groupId>
@@ -159,6 +170,10 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-notifications-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -192,11 +207,23 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-job-default</artifactId>
       <version>${commons.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-legacy-api</artifactId>
       <version>${rendering.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-filter-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -217,6 +244,10 @@
           <artifactId>xwiki-commons-velocity</artifactId>
         </exclusion>
         <exclusion>
+          <groupId> org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-job-api</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
         </exclusion>
@@ -227,6 +258,10 @@
         <exclusion>
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -243,6 +278,10 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -293,6 +332,10 @@
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -341,7 +384,11 @@
            <groupId>org.xwiki.rendering</groupId>
            <artifactId>xwiki-rendering-transformation-macro</artifactId>
          </exclusion>
-      </exclusions>
+         <exclusion>
+           <artifactId>xwiki-platform-bridge</artifactId>
+           <groupId>org.xwiki.platform</groupId>
+         </exclusion>
+       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -355,6 +402,10 @@
         <exclusion>
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
           <groupId>org.xwiki.rendering</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -392,8 +443,16 @@
           <artifactId>xwiki-commons-component-api</artifactId>
         </exclusion>
         <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-job-api</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -407,6 +466,10 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-oldcore</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -415,6 +478,22 @@
       <version>${rendering.version}</version>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-bridge</artifactId>
+      <version>${project.version}</version>
+      <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
@@ -538,6 +617,10 @@
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-notifications-filters-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bridge</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

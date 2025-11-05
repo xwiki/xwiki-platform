@@ -227,7 +227,11 @@ public class SolrToLiveDataEntryMapper
 
     private Double buildMaxCVSS(SolrDocument doc)
     {
-        return this.solrUtils.get(SECURITY_MAX_CVSS, doc);
+        Double result = this.solrUtils.get(SECURITY_MAX_CVSS, doc);
+        if (result == null) {
+            result = 0.0;
+        }
+        return result;
     }
 
     private String buildExtensionId(SolrDocument doc)

@@ -47,8 +47,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -99,9 +97,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
-
-    @Inject
-    private Provider<ContextualAuthorizationManager> authorizationProvider;
 
     @Inject
     private Logger logger;
@@ -883,12 +878,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public boolean isDocumentEditable(DocumentReference documentReference)
     {
         return hasRight(documentReference, "edit");
-    }
-
-    @Override
-    public boolean hasProgrammingRights()
-    {
-        return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
     }
 
     @Override

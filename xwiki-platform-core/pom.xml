@@ -149,6 +149,18 @@
               </differences>
             </revapi.differences>
             -->
+
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean org.xwiki.bridge.DocumentAccessBridge::hasProgrammingRights()</old>
+                  <justification>Not a breakage, method was moved to legacy</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
             
           </analysisConfiguration>
         </configuration>

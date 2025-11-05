@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "vue-tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{js,ts,vue}\" --fix --max-warnings=0",
-    "test:unit": "vitest --run"
+    "test:unit": "vitest --run",
+    "lint": "eslint \"./src/**/*.{js,ts,vue}\" --fix --max-warnings=0"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
-    "@tsconfig/node24": "catalog:",
+    "@tsconfig/node22": "catalog:",
     "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
     "@vitejs/plugin-react": "catalog:",

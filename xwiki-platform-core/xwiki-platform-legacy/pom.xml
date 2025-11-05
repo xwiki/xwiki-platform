@@ -40,6 +40,7 @@
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-legacy-annotation</module>
+    <module>xwiki-platform-legacy-bridge</module>
     <module>xwiki-platform-legacy-events-hibernate</module>
     <module>xwiki-platform-legacy-extension-handler-xar</module>
     <module>xwiki-platform-legacy-instance</module>

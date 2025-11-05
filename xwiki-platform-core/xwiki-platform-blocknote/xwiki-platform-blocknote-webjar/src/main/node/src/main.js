@@ -44,8 +44,13 @@ require(["jquery", "xwiki-events-bridge"], ($) => {
     if (firstEvent) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      target.data(dataAsynchronousSerializationKey, 'true')
-      await Promise.all(factory.getAll().map((blockNote) => blockNote.data()));
+      target.data(dataAsynchronousSerializationKey, 'true');
+      target.prop('disabled', true);
+      try {
+        await Promise.all(factory.getAll().map((blockNote) => blockNote.data()));
+      } finally {
+        target.prop('disabled', false);
+      }
       event.target.click();
     } else {
       // Clear the data to let the user click again on save?

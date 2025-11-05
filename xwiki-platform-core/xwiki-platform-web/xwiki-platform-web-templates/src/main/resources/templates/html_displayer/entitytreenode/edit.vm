@@ -1,0 +1,81 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#set ($entityTypeMapping = {
+  'farm': 'CUSTOM',
+  'wiki': 'CUSTOM',
+  'space': 'CUSTOM',
+  'document': 'DOCUMENT',
+  'attachments': 'DOCUMENT',
+  'attachment': 'ATTACHMENT',
+  'translations': 'DOCUMENT',
+  'objects': 'DOCUMENT',
+  'objectsOfType': 'CUSTOM'
+})
+## We define a container span to identify the elements to synchronize.
+<div class="entity-tree-node-picker">
+## Main input is hidden since it's serialization of the combination of the displayed fields.
+## That's also why we need the javascript to keep this hidden input in sync.
+#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/entitytreenode.js'))
+#set ($discard = $xwiki.ssfx.use('uicomponents/suggest/entitytreenode.css'))
+#if ("$!displayer.value" != '')
+  #set ($firstColon = $displayer.value.indexOf(':'))
+  #set ($type = $displayer.value.substring(0, $firstColon))
+  #set ($reference = $displayer.value.substring($mathtool.add($firstColon, 1)))
+#else
+  #set ($type = 'document')
+  #set ($reference = '')
+#end
+#set ($pickerType = $entityTypeMapping[$type])
+#set ($typeLabel = $services.localization.render("platform.web.entitytreenode.type.${type}"))
+## Load the JavaScript code that switches the picker based on the entity type value.
+#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestEntities.js', true))
+#set ($discard = $displayer.parameters.put('class', "entity-tree-node-input hidden form-control"))
+<input type="text" value="$!escapetool.xml($displayer.value)"
+  #foreach ($parameter in $displayer.parameters.entrySet())
+    $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+  #end
+/>
+<div class="input-group">
+  <div class="input-group-btn">
+    <button type="button" class="btn btn-default dropdown-toggle type-selector" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="entity-type-label" data-type="$escapetool.xml($type)">$escapetool.xml($typeLabel)</span><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      #foreach($entry in $entityTypeMapping.entrySet())
+        #set ($entryType = $entry.key)
+        #set ($entryPickerType = $entry.value)
+        #set ($label = $services.localization.render("platform.web.entitytreenode.type.${entryType}"))
+        <li>
+          <a class="type-change-link" data-type="$escapetool.xml($entryType)"
+             data-picker-type="$escapetool.xml($entryPickerType)" href="#">
+            $escapetool.xml($label)
+          </a>
+        </li>
+      #end
+    </ul>
+  </div><!-- /btn-group -->
+#pagePicker_import
+#attachmentPicker_import
+<input type="hidden" class="entityType" data-property-group="entitytreenode" value="$escapetool.xml($pickerType)" />
+<input type="text" class="form-control entityReferenceString entity-tree-node-text"
+   data-xwiki-selectize='{"maxItems": 1}'
+   value="$escapetool.xml($reference)" data-property-group="entitytreenode" />
+</div>
+</div>

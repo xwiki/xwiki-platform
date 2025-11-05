@@ -59,9 +59,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>us.springett</groupId>
-      <artifactId>cvss-calculator</artifactId>
-      <version>${cvssCalculator.version}</version>
+      <groupId>org.metaeffekt.core</groupId>
+      <artifactId>ae-security</artifactId>
+      <version>${metaeffekt.version}</version>
     </dependency>
 
     <!-- Test dependencies -->

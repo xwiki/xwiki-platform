@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Backport Action
-        uses: sorenlouv/backport-github-action@v9.5.1
+        uses: sorenlouv/backport-github-action@v10.2.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           auto_backport_label_prefix: backport

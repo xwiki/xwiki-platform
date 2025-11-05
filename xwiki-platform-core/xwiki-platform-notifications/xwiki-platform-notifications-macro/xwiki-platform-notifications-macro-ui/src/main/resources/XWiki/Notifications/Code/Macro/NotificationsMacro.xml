@@ -772,8 +772,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-/***********************************************
+      <code>/***********************************************
  * Notification Container
  ***********************************************/
 .notifications-macro {
@@ -781,6 +780,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
   max-width: 500px;
   min-height: 50px;
   width: 100%;
+  list-style-type: none;
   padding-left: 0;
 }
 
@@ -792,12 +792,12 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
  * Notification Event
  ***********************************************/
 .notification-event {
-  border: 1px dashed $theme.borderColor;
+  border: 1px dashed var(--xwiki-border-color);
   padding: 1em;
 }
 
 .notification-event-unread {
-  background-color: $theme.panelBackgroundColor;
+  background-color: var(--panel-bg);
 }
 
 /***********************************************
@@ -809,7 +809,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 }
 
 .notification-icon .img-thumbnail {
-  background-color: $theme.pageContentBackgroundColor;
+  background-color: var(--xwiki-page-content-bg);
   font-size: 2em;
   height: 2em;
   text-align: center;
@@ -846,7 +846,6 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 .notification-event-user &gt; img {
   height: 16px;
   width: 16px;
-  /* Don't work for Internet Explorer nor Edge 15 */
   object-fit: cover;
   object-position: center;
 }
@@ -855,12 +854,8 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
  * Notification Buttons
  ***********************************************/
 .notification-event-read-button, .toggle-notification-event-details {
-  background-color: $theme.pageContentBackgroundColor;
-  border: 1px solid #ddd;
   position: absolute;
   right: 10px;
-  width: 2em;
-  z-index: 1;
 }
 
 .notification-event-read-button {
@@ -897,10 +892,6 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 .notifications-load-more {
   cursor: pointer;
   min-height: 2em;
-}
-
-.notifications-load-more:hover {
-  background-color: $theme.highlightColor;
 }
 
 .notifications-load-more p {

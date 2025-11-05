@@ -28,7 +28,7 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@tsconfig/node24": "catalog:",
+    "@tsconfig/node22": "catalog:",
     "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
@@ -43,7 +43,7 @@
     "jiti": "catalog:",
     "jquery": "catalog:",
     "jsdom": "catalog:",
-    "lodash-es": "catalog:",
+    "lodash": "catalog:",
     "npm-run-all2": "catalog:",
     "sinon": "catalog:",
     "typescript": "catalog:",

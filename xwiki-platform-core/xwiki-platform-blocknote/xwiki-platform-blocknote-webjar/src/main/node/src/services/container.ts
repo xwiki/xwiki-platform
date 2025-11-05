@@ -77,7 +77,7 @@ new UniastMarkdownComponentList(container);
 
 // FIXME: we have to inject a partial Cristal Application for Blocknote to work at the moment.
 @injectable()
-class MinialApp {
+class MinimalApp {
     getContainer() {
         return container;
     }
@@ -87,6 +87,7 @@ class MinialApp {
         }
     }
 }
-container.bind("CristalApp").to(MinialApp).inSingletonScope()
+
+container.bind("CristalApp").to(MinimalApp).inSingletonScope()
 
 export { container };

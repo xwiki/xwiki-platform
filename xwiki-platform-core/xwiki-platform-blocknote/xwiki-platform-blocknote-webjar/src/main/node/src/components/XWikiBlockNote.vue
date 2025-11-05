@@ -25,6 +25,7 @@
         :editor-props
         :editor-content
         :container
+        :macros="false"
         @instant-change="dirty = true"
         @debounced-change="updateValue"
         :macros="false"

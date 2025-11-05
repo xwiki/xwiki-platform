@@ -67,6 +67,7 @@
     "postcss": "catalog:",
     "postcss-preset-mantine": "catalog:",
     "postcss-simple-vars": "catalog:",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vue-tsc": "catalog:"
   },

@@ -5,7 +5,7 @@
   "scripts": {
     "test:unit": "nx run-many -t test",
     "lint": "nx run-many -t lint",
-    "build": "nx run-many -t build"
+    "build": "nx run-many -t build -p \"xwiki-platform-node/src/main/node/*/**\""
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "catalog:",

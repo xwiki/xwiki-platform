@@ -1,7 +1,7 @@
 {
-  "private": true,
   "name": "xwiki-platform-blocknote",
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "build": "vue-tsc --project tsconfig.json && vite build",

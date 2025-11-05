@@ -3,25 +3,5 @@
   "name": "@xwiki/platform",
   "devDependencies": {
     "nx": "catalog:"
-  },
-  "nx": {
-    "targets": {
-      "build": {
-        "cache": true,
-        "dependsOn": [
-          "^build",
-          "typecheck"
-        ],
-        "outputs": [
-          "{projectRoot}/dist"
-        ]
-      },
-      "typecheck": {
-        "cache": true,
-        "dependsOn": [
-          "^build"
-        ]
-      }
-    }
   }
 }

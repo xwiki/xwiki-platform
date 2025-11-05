@@ -1249,6 +1249,9 @@ importers:
       postcss-simple-vars:
         specifier: 'catalog:'
         version: 7.0.1(postcss@8.5.6)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
       vite:
         specifier: 'catalog:'
         version: 7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)

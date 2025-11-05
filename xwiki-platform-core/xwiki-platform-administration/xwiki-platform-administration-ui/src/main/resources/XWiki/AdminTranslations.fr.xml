@@ -44,6 +44,7 @@ administration.sectionTitle=Administration : {0}
 administration.sectionTitle.page=Administration de la page : {0}
 administration.sectionTitle.wiki=Administration du wiki : {0}
 administration.sectionTitle.global=Administration globale : {0}
+### Missing: administration.menu.label=Administration sections.
 administration.menu.search.hint=Rechercher...
 administration.menu.search.noResults=Aucun résultat.
 
@@ -54,8 +55,6 @@ XWiki.XWikiPreferences_confirmation_email_content.hint=Modèle de courriel qui s
 XWiki.XWikiPreferences_invitation_email_content.hint=Modèle de courriel qui sera envoyé aux utilisateurs invités à s'inscrire.
 XWiki.Registration_heading.hint=Texte affiché en haut de page lorsque les utilisateurs souhaitent s'inscrire ou lorsqu'ils viennent de s'inscrire. Vous pouvez utiliser du code Velocity ou de la syntaxe wiki.
 XWiki.Registration_welcomeMessage.hint=Affiché uniquement lorsque les utilisateurs renseignent le formulaire. Vous pouvez utiliser du code Velocity et de la syntaxe wiki.
-XWiki.Registration_liveValidation_enabled.hint=Définir à Faux pour désactiver la validation temps-réel en code JavaScript (les champs seront toujours validés côté serveur).
-XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=La validation temps-réel affiche un message à l'utilisateur lorsqu'il a renseigné les champs correctement. Vous pouvez indiquer du code Velocity.
 XWiki.Registration_loginButton_enabled.hint=Lorsqu'un utilisateur s'inscrit, le bouton de soumission envoie son nom d'utilisateur et son mot de passe afin qu'il soit immédiatement connecté. Dans ce cas le nom d'utilisateur et le mot de passe sont envoyés dans le flux HTML ce qui peut être jugé inacceptable selon vos exigences de sécurité.
 XWiki.Registration_loginButton_autoLogin_enabled.hint=Si le bouton de connexion est actif, vous pouvez ajouter du code JavaScript pour exécuter ce bouton à la place de l'utilisateur.
 XWiki.Registration_defaultRedirect.hint=URL vers laquelle l'utilisateur sera redirigé après avoir cliqué sur le bouton de Connexion si le paramètre xredirect n'est pas renseigné. Vous pouvez indiquer du code Velocity.
@@ -141,6 +140,11 @@ administration.section.users.deleteUser.newAuthor.programming=de programmation
 administration.section.users.deleteUser.newAuthor.script=script
 admin.usersgroups.extensionrights=Droits des extensions
 
+# Groups section
+administration.section.groups.deleteUserFromGroup.loading=Membre du groupe en cours de suppression
+administration.section.groups.deleteUserFromGroup.success=Le membre a été supprimé du groupe avec succès
+administration.section.groups.deleteUserFromGroup.failure=Échec de suppression du membre du groupe
+
 # Other Category
 admin.other=Divers
 admin.other.description=Autres configurations pour les extensions.
@@ -179,6 +183,8 @@ administration.section.users.deleteUser.markInactiveMessage=Plutôt que de suppr
 
 ## Deprecated since 11.8RC1
 administration.section.users.deleteUser.markDisabledMessage=Plutôt que de supprimer l'utilisateur vous pouvez le désactiver. Ainsi il ne pourra plus se connecter pour autant les scripts associés à cet utilisateur continueront à fonctionner.
+XWiki.Registration_liveValidation_enabled.hint=Définir à Faux pour désactiver la validation temps-réel en code JavaScript (les champs seront toujours validés côté serveur).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=La validation temps-réel affiche un message à l'utilisateur lorsqu'il a renseigné les champs correctement. Vous pouvez indiquer du code Velocity.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -118,9 +118,9 @@ public class DeleteAttachmentAction extends XWikiAction
             ScriptContext scriptContext = getCurrentScriptContext();
             if (scriptContext != null) {
                 scriptContext.setAttribute("message",
-                    localizePlainOrReturnKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
+                    localizePlainOrKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
                 scriptContext.setAttribute("details",
-                    localizePlainOrReturnKey("platform.core.action.deleteAttachment.noAttachment"),
+                    localizePlainOrKey("platform.core.action.deleteAttachment.noAttachment"),
                     ScriptContext.ENGINE_SCOPE);
             }
 
@@ -150,7 +150,7 @@ public class DeleteAttachmentAction extends XWikiAction
             ScriptContext scriptContext = getCurrentScriptContext();
             if (scriptContext != null) {
                 scriptContext.setAttribute("message",
-                    localizePlainOrReturnKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
+                    localizePlainOrKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
                 scriptContext.setAttribute("details", ExceptionUtils.getRootCauseMessage(ex),
                     ScriptContext.ENGINE_SCOPE);
             }

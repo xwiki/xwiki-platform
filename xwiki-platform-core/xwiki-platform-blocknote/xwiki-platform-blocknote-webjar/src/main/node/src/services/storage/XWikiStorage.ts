@@ -90,8 +90,9 @@ export class XWikiStorage extends AbstractStorage {
     throw new Error("Method not implemented.");
   }
 
-  public async saveAttachments(page: string, files: File[]): Promise<unknown> {
-    return Promise.all(files.map((file) => this.saveAttachment(page, file)));
+  public async saveAttachments(page: string, files: File[]): Promise<undefined | (undefined | string)[]> {
+    await Promise.all(files.map((file) => this.saveAttachment(page, file)));
+    return undefined;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -106,7 +107,6 @@ export class XWikiStorage extends AbstractStorage {
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async move(): Promise<{ success: boolean; error?: string }> {
     // TODO
     throw new Error("Method not implemented.");

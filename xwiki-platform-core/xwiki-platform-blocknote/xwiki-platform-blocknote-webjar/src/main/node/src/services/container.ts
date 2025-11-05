@@ -19,7 +19,7 @@
  */
 import { DefaultLogger } from "@xwiki/cristal-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/cristal-attachments-default";
-import { Container } from "inversify";
+import { Container, injectable } from "inversify";
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
@@ -39,6 +39,7 @@ import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { XWikiDesignSystemLoader } from "./skin/XWikiDesignSystemLoader";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { XWikiStorage } from "./storage/XWikiStorage";
+import { ComponentInit as UniastMarkdownComponentList } from "@xwiki/cristal-uniast-markdown"
 
 const container: Container = new Container();
 container.bind("Container").toConstantValue(container);
@@ -72,5 +73,21 @@ XWikiDesignSystemLoader.bind(container);
 DefaultStorageProvider.bind(container);
 XWikiStorage.bind(container);
 new DefaultAttachmentsComponentInit(container);
+new UniastMarkdownComponentList(container);
+
+// FIXME: we have to inject a partial Cristal Application for Blocknote to work at the moment.
+@injectable()
+class MinimalApp {
+    getContainer() {
+        return container;
+    }
+    getWikiConfig() {
+        return {
+            getType: () => "XWiki"
+        }
+    }
+}
+
+container.bind("CristalApp").to(MinimalApp).inSingletonScope()
 
 export { container };

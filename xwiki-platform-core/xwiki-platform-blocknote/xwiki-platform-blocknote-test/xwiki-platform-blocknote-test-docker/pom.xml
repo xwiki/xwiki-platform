@@ -42,6 +42,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-blocknote-api</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- Test only dependencies -->
     <dependency>

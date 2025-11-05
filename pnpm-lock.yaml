@@ -9,9 +9,9 @@ catalogs:
     '@eslint/js':
       specifier: 9.34.0
       version: 9.34.0
-    '@tsconfig/node22':
-      specifier: 22.0.2
-      version: 22.0.2
+    '@tsconfig/node24':
+      specifier: 24.0.1
+      version: 24.0.1
     '@types/jsdom':
       specifier: 27.0.0
       version: 27.0.0
@@ -245,9 +245,9 @@ importers:
       '@eslint/js':
         specifier: 'catalog:'
         version: 9.34.0
-      '@tsconfig/node22':
+      '@tsconfig/node24':
         specifier: 'catalog:'
-        version: 22.0.2
+        version: 24.0.1
       '@types/jsdom':
         specifier: 'catalog:'
         version: 27.0.0
@@ -336,9 +336,9 @@ importers:
         specifier: 'catalog:'
         version: 4.1.0(vue@3.5.22(typescript@5.9.3))
     devDependencies:
-      '@tsconfig/node22':
+      '@tsconfig/node24':
         specifier: 'catalog:'
-        version: 22.0.2
+        version: 24.0.1
       '@types/jsdom':
         specifier: 'catalog:'
         version: 27.0.0
@@ -408,9 +408,9 @@ importers:
 
   xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node:
     devDependencies:
-      '@tsconfig/node22':
+      '@tsconfig/node24':
         specifier: 'catalog:'
-        version: 22.0.2
+        version: 24.0.1
       '@types/jsdom':
         specifier: 'catalog:'
         version: 27.0.0
@@ -1209,8 +1209,8 @@ packages:
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@tsconfig/node22@22.0.2':
-    resolution: {integrity: sha512-Kmwj4u8sDRDrMYRoN9FDEcXD8UpBSaPQQ24Gz+Gamqfm7xxn+GBR7ge/Z7pK8OXNGyUzbSwJj+TH6B+DS/epyA==}
+  '@tsconfig/node24@24.0.1':
+    resolution: {integrity: sha512-3+IXshza3bIrT0tbHBr9CixQDVf4iBf0HTR0hCYowhpLqkzJjswu3UY8aZWjRXZep31kYB+o2SQeD8KwIoUHYw==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -4174,7 +4174,7 @@ snapshots:
       react-dom: 19.2.0(react@19.2.0)
       use-sync-external-store: 1.5.0(react@19.2.0)
 
-  '@tsconfig/node22@22.0.2': {}
+  '@tsconfig/node24@24.0.1': {}
 
   '@types/babel__core@7.20.5':
     dependencies:

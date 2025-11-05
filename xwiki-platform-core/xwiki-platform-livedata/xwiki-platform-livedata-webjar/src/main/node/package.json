@@ -28,7 +28,7 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@tsconfig/node22": "catalog:",
+    "@tsconfig/node24": "catalog:",
     "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
     "@vitejs/plugin-vue": "catalog:",

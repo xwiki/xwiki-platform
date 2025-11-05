@@ -141,7 +141,7 @@ administration.section.users.deleteUser.newAuthor.script=script
 admin.usersgroups.extensionrights=Droits des extensions
 
 # Groups section
-administration.section.groups.deleteUserFromGroup.loading=Membre du groupe en cours de suppression
+administration.section.groups.deleteUserFromGroup.loading=Membre en cours de suppression du groupe
 administration.section.groups.deleteUserFromGroup.success=Le membre a été supprimé du groupe avec succès
 administration.section.groups.deleteUserFromGroup.failure=Échec de suppression du membre du groupe
 

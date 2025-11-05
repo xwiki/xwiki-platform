@@ -17,7 +17,6 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#if ($displayer.mode == 'edit')
 #set ($entityTypeMapping = {
   'farm': 'CUSTOM',
   'wiki': 'CUSTOM',
@@ -80,4 +79,3 @@
    value="$escapetool.xml($reference)" data-property-group="entitytreenode" />
 </div>
 </div>
-#{else}$!escapetool.xml($displayer.value)#end

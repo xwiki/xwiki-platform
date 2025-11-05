@@ -74,10 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Erreur
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Renvoyer
-### Missing: Mail.SendMailStatus_livetable.delete=Delete
+Mail.SendMailStatus_livetable.delete=Supprimer
 mailSender.admin.resendSuccess=Le courriel a été envoyé avec succès
 mailSender.admin.resendFailure=Le courriel n'a pas pu être envoyé de nouveau. Cliquez pour avoir plus d'information.
-### Missing: mailSender.admin.deleteSuccess=The mail has been deleted successfully
-mailSender.admin.deleteFailure=Échec lors de la suppression d’e-mail. Cliquez pour plus de détails.
+mailSender.admin.deleteSuccess=Le courriel a été supprimé avec succès.
+mailSender.admin.deleteFailure=Erreur lors de la suppression du courriel. Cliquez pour afficher les détails.
 </content>
 </xwikidoc>

@@ -124,7 +124,7 @@
     <pgsql.version>42.7.8</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.19.0.0</oracle.version>
+    <oracle.version>21.20.0.0</oracle.version>
   </properties>
   <scm>
     <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>

@@ -125,7 +125,7 @@
     <property>
       <code>require(['jquery', 'xwiki-events-bridge'], function($) {
   var enhanceSearchResultHighlights = function() {
-    var highlights = $(this).removeClass('hidden').prev('.search-result-highlights').addClass('preview');
+    const highlights = $(this).removeClass('hidden').prev('.search-result-highlights').addClass('preview');
 
     $(this).one('click', function(event) {
       event.preventDefault();

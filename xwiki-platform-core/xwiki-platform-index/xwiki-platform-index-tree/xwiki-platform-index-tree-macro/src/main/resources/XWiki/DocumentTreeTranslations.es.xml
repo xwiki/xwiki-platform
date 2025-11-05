@@ -82,13 +82,36 @@ rendering.macro.documentTree.parameter.limit.name=Límite
 rendering.macro.documentTree.parameter.limit.description=El número máximo de nodos secundarios que se mostrarán al expandir un nodo padre por primera vez. El resto de los nodos hijo son accesibles a través de un enlace "más...". Este parámetro se utiliza básicamente para paginar los nodos hijo y por lo tanto ayuda a la escala del árbol cuando el número de nodos hijo es grande.
 rendering.macro.documentTree.parameter.exclusions.name=Exclusiones
 rendering.macro.documentTree.parameter.exclusions.description=La lista de nodos a excluir del árbol. Los nodos se especifican por su id y se separan por comas.
-
+### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.name=Sort pages by
+### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.description=The page field used to sort the child pages, followed by the sort order.
+### Missing: rendering.macro.documentTree.parameter.expandToLevel.name=Expand to level
+### Missing: rendering.macro.documentTree.parameter.expandToLevel.description=Define the depth of the tree to expand automatically. Default is 0 and means that only top level nodes are displayed. A level of 1 opens those, a level of 2 also opens the children below the newly displayed nodes, etc. Note that a high value can make the macro expansive to display for the browser.
+### Missing: rendering.macro.children.name=Children
+### Missing: rendering.macro.children.description=Displays a tree of children pages of the current page
+### Missing: rendering.macro.children.parameter.sort.name=Sort by
+### Missing: rendering.macro.children.parameter.sort.description=The page field used to sort the child pages, followed by the sort order.
+### Missing: rendering.macro.children.parameter.root.name=Root
+### Missing: rendering.macro.children.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified.
+### Missing: rendering.macro.documentTree.group.show.name=Elements to show
+### Missing: rendering.macro.documentTree.group.filters.name=Filters
+### Missing: rendering.macro.documentTree.group.style.name=Display options
 index.documentTree.empty=No se han encontrado páginas
 index.documentTree.more={0} más ...
+### Missing: index.documentTree.addDocument=New page...
+### Missing: index.documentTree.documentSortDisplayer.field=Sort field
+### Missing: index.documentTree.documentSortDisplayer.field.default=---
+### Missing: index.documentTree.documentSortDisplayer.field.title=Title
+### Missing: index.documentTree.documentSortDisplayer.field.date=Last modification date
+### Missing: index.documentTree.documentSortDisplayer.field.creationDate=Creation date
+### Missing: index.documentTree.documentSortDisplayer.order=Sort order
+### Missing: index.documentTree.documentSortDisplayer.order.default=---
+### Missing: index.documentTree.documentSortDisplayer.order.asc=Ascending
+### Missing: index.documentTree.documentSortDisplayer.order.desc=Descending
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Mostrar documentos hijos
-rendering.macro.documentTree.parameter.showChildDocuments.description=Indica si se deben mostrar los documentos inferiores en función del campo Documento padre.</content>
+rendering.macro.documentTree.parameter.showChildDocuments.description=Indica si se deben mostrar los documentos inferiores en función del campo Documento padre.
+</content>
 </xwikidoc>

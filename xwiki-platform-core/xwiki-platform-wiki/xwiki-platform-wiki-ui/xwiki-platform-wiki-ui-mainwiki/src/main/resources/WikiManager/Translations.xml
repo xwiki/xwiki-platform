@@ -165,7 +165,6 @@ rendering.macro.workspaces.name=Workspaces (Legacy)
 rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
 
 ## Browse
-platform.wiki.browse=Browse Wikis
 platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=Name
 platform.wiki.browse.description=Description
@@ -301,6 +300,11 @@ platform.wiki.create.wizard.step.provisioning.finalize=Finalize
 #######################################
 platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
 platform.wiki.delete.confirmation.no=No, take me back!
+
+#######################################
+## until 17.10-rc-1
+#######################################
+platform.wiki.browse=Browse Wikis
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>

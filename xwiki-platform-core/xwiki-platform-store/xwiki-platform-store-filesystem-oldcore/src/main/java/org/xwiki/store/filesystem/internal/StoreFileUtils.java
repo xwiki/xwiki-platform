@@ -22,6 +22,7 @@ package org.xwiki.store.filesystem.internal;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.store.blob.Blob;
@@ -96,7 +97,7 @@ public final class StoreFileUtils
                 if (followLinks) {
                     // Move the target blob to the link's target blob
                     String linkContent = IOUtils.toString(linkBlob.getStream(), StandardCharsets.UTF_8).trim();
-                    blob = linkBlob.getStore().getBlob(linkBlob.getPath().getParent().resolve(linkContent));
+                    blob = linkBlob.getStore().getBlob(linkBlob.getPath().resolveSibling(linkContent));
                 } else {
                     // Stop at the link blob if we don't follow it
                     blob = linkBlob;
@@ -117,7 +118,10 @@ public final class StoreFileUtils
      */
     public static Blob getLinkBlob(Blob originalfile) throws BlobStoreException
     {
-        BlobPath linkPath = originalfile.getPath().appendSuffix(".lnk");
+        BlobPath originalPath = originalfile.getPath();
+        // The file name cannot be null here as the storage file cannot be the root.
+        String fileName = Objects.requireNonNull(originalPath.getFileName()).toString();
+        BlobPath linkPath = originalPath.resolveSibling(fileName + ".lnk");
         return originalfile.getStore().getBlob(linkPath);
     }
 

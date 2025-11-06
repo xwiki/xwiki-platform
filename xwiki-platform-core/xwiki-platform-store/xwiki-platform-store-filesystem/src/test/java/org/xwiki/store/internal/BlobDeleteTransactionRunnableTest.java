@@ -21,7 +21,7 @@ package org.xwiki.store.internal;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -52,7 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(XWikiTempDirExtension.class)
 class BlobDeleteTransactionRunnableTest
 {
-    private static final String[] FILE_PATH = { "path", "to", "file" };
+    private static final BlobPath FILE_PATH = BlobPath.absolute("path", "to", "file");
 
     private Blob location;
 
@@ -72,10 +72,10 @@ class BlobDeleteTransactionRunnableTest
         properties.setRootDirectory(this.tmpDir.toPath());
         BlobStore blobStore = new FileSystemBlobStore("Test", properties);
 
-        BlobPath blobPath = BlobPath.of(Arrays.asList(FILE_PATH));
+        String tmpName = Objects.requireNonNull(FILE_PATH.getFileName()) + "~tmp";
 
-        this.location = blobStore.getBlob(blobPath);
-        this.temp = blobStore.getBlob(blobPath.appendSuffix("~tmp"));
+        this.location = blobStore.getBlob(FILE_PATH);
+        this.temp = blobStore.getBlob(FILE_PATH.resolveSibling(tmpName));
         IOUtils.write("Delete me!", this.location.getOutputStream(), StandardCharsets.UTF_8);
         IOUtils.write("HAHA I am here to trip you up!", this.temp.getOutputStream(), StandardCharsets.UTF_8);
 

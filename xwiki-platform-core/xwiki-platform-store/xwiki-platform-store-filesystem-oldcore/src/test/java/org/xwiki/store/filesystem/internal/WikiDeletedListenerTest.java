@@ -21,7 +21,6 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,16 +72,16 @@ class WikiDeletedListenerTest
         String wikiId = "foo";
         when(wikiDeletedEvent.getWikiId()).thenReturn(wikiId);
 
-        BlobPath wikiPath = BlobPath.of(List.of(wikiId));
+        BlobPath wikiPath = BlobPath.absolute(wikiId);
         BlobPath file1 = wikiPath.resolve("file1");
         this.blobStore.getBlob(file1).writeFromStream(new ByteArrayInputStream("File 1".getBytes()));
 
         when(this.filesystemStoreTools.getWikiDir(wikiId)).thenReturn(wikiPath);
         assertTrue(this.blobStore.getBlob(file1).exists());
-        assertFalse(this.blobStore.isEmptyDirectory(wikiPath));
+        assertTrue(this.blobStore.hasDescendants(wikiPath));
         this.wikiDeletedListener.onEvent(wikiDeletedEvent, null, null);
         assertFalse(this.blobStore.getBlob(file1).exists());
-        assertTrue(this.blobStore.isEmptyDirectory(wikiPath));
+        assertFalse(this.blobStore.hasDescendants(wikiPath));
 
         // Create the wiki path as a blob.
         this.blobStore.getBlob(wikiPath).writeFromStream(new ByteArrayInputStream("I am a blob!".getBytes()));

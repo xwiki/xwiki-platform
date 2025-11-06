@@ -22,7 +22,7 @@ package org.xwiki.store.internal;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -58,7 +58,7 @@ import static org.mockito.Mockito.spy;
 @ExtendWith(XWikiTempDirExtension.class)
 class BlobSaveTransactionRunnableTest
 {
-    private static final String[] FILE_PATH = { "path", "to", "file" };
+    private static final BlobPath FILE_PATH = BlobPath.absolute("path", "to", "file");
 
     private static final String CONTENT_VERSION1 = "Version1";
 
@@ -89,11 +89,11 @@ class BlobSaveTransactionRunnableTest
         properties.setRootDirectory(storageLocation.toPath());
         this.blobStore = spy(new FileSystemBlobStore("Test", properties));
 
-        BlobPath blobPath = BlobPath.of(Arrays.asList(FILE_PATH));
-        this.toSave = this.blobStore.getBlob(blobPath);
+        String fileName = Objects.requireNonNull(FILE_PATH.getFileName()).toString();
+        this.toSave = this.blobStore.getBlob(FILE_PATH);
 
-        this.temp = this.blobStore.getBlob(blobPath.appendSuffix("~tmp"));
-        this.backup = this.blobStore.getBlob(blobPath.appendSuffix("~bak"));
+        this.temp = this.blobStore.getBlob(FILE_PATH.resolveSibling(fileName + "~tmp"));
+        this.backup = this.blobStore.getBlob(FILE_PATH.resolveSibling(fileName + "~bak"));
 
         IOUtils.write(CONTENT_VERSION1, this.toSave.getOutputStream(), StandardCharsets.UTF_8);
         IOUtils.write("HAHA I am here to trip you up!", this.temp.getOutputStream(), StandardCharsets.UTF_8);

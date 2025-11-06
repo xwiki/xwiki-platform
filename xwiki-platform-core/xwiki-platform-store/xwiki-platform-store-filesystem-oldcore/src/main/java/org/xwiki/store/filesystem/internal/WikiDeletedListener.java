@@ -69,7 +69,7 @@ public class WikiDeletedListener extends AbstractEventListener
         BlobPath directory = this.store.getWikiDir(wikiId);
 
         try {
-            this.store.getStore().deleteBlobs(directory);
+            this.store.getStore().deleteDescendants(directory);
         } catch (BlobStoreException e) {
             this.logger.error("Failed to delete blobs for the wiki [{}]", wikiId, e);
         }

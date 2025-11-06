@@ -42,6 +42,8 @@ import com.xpn.xwiki.store.migration.DataMigrationException;
  */
 public abstract class AbstractXWIKI15249DataMigration extends AbstractStoreTypeDataMigration
 {
+    private static final String PATH_SEPARATOR = "/";
+
     @Inject
     @Named(FileSystemStoreUtils.HINT)
     protected EntityReferenceSerializer<String> fileEntitySerializer;
@@ -70,7 +72,8 @@ public abstract class AbstractXWIKI15249DataMigration extends AbstractStoreTypeD
 
     protected BlobPath getDocumentContentDir(final DocumentReference documentReference)
     {
-        BlobPath basePath = BlobPath.from(this.fileEntitySerializer.serialize(documentReference, true));
+        String serialized = this.fileEntitySerializer.serialize(documentReference, true);
+        BlobPath basePath = BlobPath.parse(PATH_SEPARATOR + serialized);
         BlobPath documentContentDir = basePath.resolve(THIS_DIR_NAME);
 
         // Add the locale

@@ -19,8 +19,9 @@
  */
 package org.xwiki.store.filesystem.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.store.blob.Blob;
 import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.BlobWriteMode;
 import org.xwiki.store.blob.FileSystemBlobStoreProperties;
 import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -36,6 +38,7 @@ import org.xwiki.test.junit5.XWikiTempDirExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link StoreFileUtils}.
@@ -59,9 +62,44 @@ class StoreFileUtilsTest
     }
 
     @Test
+    void resolveExistingFile() throws Exception
+    {
+        Blob blob = this.blobStore.getBlob(BlobPath.absolute("folder", "file.ext"));
+        blob.writeFromStream(new ByteArrayInputStream("content".getBytes(StandardCharsets.UTF_8)),
+            BlobWriteMode.REPLACE_EXISTING);
+
+        assertTrue(blob.exists());
+
+        Blob foundBlob = StoreFileUtils.resolve(blob, true);
+
+        assertSame(blob, foundBlob);
+    }
+
+    @Test
+    void resolveExistingBlobFromLink() throws Exception
+    {
+        Blob linkBlob = this.blobStore.getBlob(BlobPath.absolute("folder", "file.ext.lnk"));
+        String versionedName = "file.v1.ext";
+        Blob targetBlob = this.blobStore.getBlob(BlobPath.absolute("folder", versionedName));
+        targetBlob.writeFromStream(new ByteArrayInputStream("content".getBytes(StandardCharsets.UTF_8)),
+            BlobWriteMode.REPLACE_EXISTING);
+
+        // Create link file content.
+        linkBlob.writeFromStream(new ByteArrayInputStream(versionedName.getBytes(StandardCharsets.UTF_8)),
+            BlobWriteMode.REPLACE_EXISTING);
+
+        Blob fileBlob = this.blobStore.getBlob(BlobPath.absolute("folder", "file.ext"));
+        assertFalse(fileBlob.exists());
+
+        Blob foundBlob = StoreFileUtils.resolve(fileBlob, true);
+
+        assertEquals(targetBlob, foundBlob);
+    }
+
+    @Test
     void resolveNotExistingFile() throws Exception
     {
-        Blob blob = this.blobStore.getBlob(BlobPath.of(List.of("does not exist")));
+        Blob blob = this.blobStore.getBlob(BlobPath.absolute("does not exist"));
 
         assertFalse(blob.exists());
 
@@ -73,10 +111,10 @@ class StoreFileUtilsTest
     @Test
     void getLinkBlob() throws Exception
     {
-        Blob blob = this.blobStore.getBlob(BlobPath.of(List.of("folder", "file.ext")));
+        Blob blob = this.blobStore.getBlob(BlobPath.absolute("folder", "file.ext"));
 
         Blob linkFile = StoreFileUtils.getLinkBlob(blob);
 
-        assertEquals("folder/file.ext.lnk", linkFile.getPath().toString());
+        assertEquals("/folder/file.ext.lnk", linkFile.getPath().toString());
     }
 }

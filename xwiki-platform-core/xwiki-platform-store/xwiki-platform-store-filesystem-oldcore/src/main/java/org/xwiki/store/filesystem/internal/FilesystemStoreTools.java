@@ -20,8 +20,8 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
-import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import javax.inject.Inject;
@@ -161,12 +161,7 @@ public class FilesystemStoreTools implements Initializable
      */
     public Blob getBackupFile(final Blob storageFile) throws BlobStoreException
     {
-        // We pad our file names with random alphanumeric characters so that multiple operations on the same
-        // file in the same transaction do not collide, the set of all capital and lower case letters
-        // and numbers has 62 possibilities and 62^8 = 218340105584896 between 2^47 and 2^48.
-        BlobPath path =
-            storageFile.getPath().appendSuffix(BACKUP_FILE_SUFFIX + RandomStringUtils.secure().nextAlphanumeric(8));
-        return storageFile.getStore().getBlob(path);
+        return getBlobWithRandomSuffix(storageFile, BACKUP_FILE_SUFFIX);
     }
 
     /**
@@ -178,8 +173,19 @@ public class FilesystemStoreTools implements Initializable
      */
     public Blob getTempFile(final Blob storageFile) throws BlobStoreException
     {
-        BlobPath path =
-            storageFile.getPath().appendSuffix(TEMP_FILE_SUFFIX + RandomStringUtils.secure().nextAlphanumeric(8));
+        return getBlobWithRandomSuffix(storageFile, TEMP_FILE_SUFFIX);
+    }
+
+    private static Blob getBlobWithRandomSuffix(Blob storageFile, String tempFileSuffix) throws BlobStoreException
+    {
+        // We pad our file names with random alphanumeric characters so that multiple operations on the same
+        // file in the same transaction do not collide, the set of all capital and lower case letters
+        // and numbers has 62 possibilities and 62^8 = 218340105584896 between 2^47 and 2^48.
+        BlobPath basePath = storageFile.getPath();
+        // The storage file cannot be the root, so we know this will have a file name.
+        String fileName = Objects.requireNonNull(basePath.getFileName()).toString();
+        String suffix = tempFileSuffix + RandomStringUtils.secure().nextAlphanumeric(8);
+        BlobPath path = basePath.resolveSibling(fileName + suffix);
         return storageFile.getStore().getBlob(path);
     }
 
@@ -240,10 +246,8 @@ public class FilesystemStoreTools implements Initializable
         Blob defaultFile = provider.getAttachmentContentBlob();
         Blob versionFile = provider.getAttachmentVersionContentBlob(attachment.getVersion());
 
-        // TODO: implement this in a cleaner way. We shouldn't rely on both files being in the same directory.
-        assert defaultFile.getPath().getParent().equals(versionFile.getPath().getParent());
-        List<String> segments = versionFile.getPath().getSegments();
-        return segments.get(segments.size() - 1);
+        // The parent of defaultFile path cannot be null as attachment blobs are never the root.
+        return Objects.requireNonNull(defaultFile.getPath().getParent()).relativize(versionFile.getPath()).toString();
     }
 
     /**
@@ -290,7 +294,8 @@ public class FilesystemStoreTools implements Initializable
      */
     public BlobPath getDeletedDocumentContentDir(final DocumentReference documentReference, final long index)
     {
-        return getDocumentContentDir(documentReference).resolve(DELETED_DOCUMENTS_DIR_NAME, String.valueOf(index));
+        return getDocumentContentDir(documentReference)
+            .resolve(BlobPath.relative(DELETED_DOCUMENTS_DIR_NAME, String.valueOf(index)));
     }
 
     /**
@@ -300,7 +305,7 @@ public class FilesystemStoreTools implements Initializable
      */
     public BlobPath getWikiDir(String wikiId)
     {
-        return BlobPath.of(List.of(wikiId));
+        return BlobPath.absolute(wikiId);
     }
 
     private BlobPath hashDirectory(BlobPath parent, String name)
@@ -309,8 +314,10 @@ public class FilesystemStoreTools implements Initializable
 
         // Avoid having too many files in one folder because some filesystems don't perform well with large numbers of
         // files in one folder
-        return parent.resolve(String.valueOf(md5.charAt(0)), String.valueOf(md5.charAt(1)),
-            md5.substring(2));
+        return parent.resolve(BlobPath.relative(
+            String.valueOf(md5.charAt(0)),
+            String.valueOf(md5.charAt(1)),
+            md5.substring(2)));
     }
 
     /**
@@ -332,13 +339,16 @@ public class FilesystemStoreTools implements Initializable
 
         // Avoid having too many files in one folder because some filesystems don't perform well with large numbers of
         // files in one folder
-        BlobPath documentDirPath = wikiDir.resolve(String.valueOf(md5.charAt(0)),
-            String.valueOf(md5.charAt(1)), md5.substring(2));
+        BlobPath documentDirPath = wikiDir.resolve(BlobPath.relative(
+            String.valueOf(md5.charAt(0)),
+            String.valueOf(md5.charAt(1)),
+            md5.substring(2)));
 
         // Add the locale (if any)
         Locale documentLocale = documentReference.getLocale();
         if (documentLocale != null && !documentLocale.equals(Locale.ROOT)) {
-            documentDirPath = documentDirPath.resolve(DOCUMENT_LOCALES_DIR_NAME, documentLocale.toString());
+            documentDirPath = documentDirPath.resolve(BlobPath.relative(
+                DOCUMENT_LOCALES_DIR_NAME, documentLocale.toString()));
         }
 
         return documentDirPath;

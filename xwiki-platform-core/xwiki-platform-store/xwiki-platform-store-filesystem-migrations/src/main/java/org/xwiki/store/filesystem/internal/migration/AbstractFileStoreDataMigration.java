@@ -85,7 +85,6 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
         String pre11StoreName = "storage";
         this.pre11StoreRootDirectory = new File(this.environment.getPermanentDirectory(), pre11StoreName);
 
-        // TODO: not sure if this is the best way to get the pre-11 blob store. Maybe use the factory instead?
         FileSystemBlobStoreProperties pre11Properties = new FileSystemBlobStoreProperties();
         pre11Properties.setRootDirectory(this.pre11StoreRootDirectory.toPath());
         this.pre11BlobStore = new FileSystemBlobStore(pre11StoreName, pre11Properties);
@@ -105,7 +104,7 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
     protected File getStoreRootDirectory()
     {
         if (this.blobStore instanceof FileSystemBlobStore fileSystemBlobStore) {
-            return fileSystemBlobStore.getBlobFilePath(BlobPath.ROOT).toFile();
+            return fileSystemBlobStore.getBlobFilePath(BlobPath.root()).toFile();
         } else {
             throw new IllegalStateException("The current blob store is not a file system blob store");
         }

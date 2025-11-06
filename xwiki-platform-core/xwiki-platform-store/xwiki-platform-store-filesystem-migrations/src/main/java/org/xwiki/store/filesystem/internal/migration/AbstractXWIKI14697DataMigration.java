@@ -46,6 +46,8 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  */
 public abstract class AbstractXWIKI14697DataMigration extends AbstractStoreTypeDataMigration
 {
+    private static final String PATH_SEPARATOR = "/";
+
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
     protected ConfigurationSource configuration;
@@ -80,7 +82,8 @@ public abstract class AbstractXWIKI14697DataMigration extends AbstractStoreTypeD
 
     protected BlobPath getDocumentDir(final DocumentReference docRef)
     {
-        final BlobPath path = BlobPath.from(this.pathSerializer.serialize(docRef, false));
+        String serialized = this.pathSerializer.serialize(docRef, false);
+        BlobPath path = BlobPath.parse(PATH_SEPARATOR + serialized);
         BlobPath docDir = path.resolve(THIS_DIR_NAME);
 
         // Add the locale

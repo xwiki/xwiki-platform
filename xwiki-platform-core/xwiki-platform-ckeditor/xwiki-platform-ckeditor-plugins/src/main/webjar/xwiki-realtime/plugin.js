@@ -198,7 +198,9 @@
 
   function preserveSpaceCharAtTheEndOfLine(editor) {
     editor.on('beforeGetData', () => {
-      const range = !editor.isDetached() && editor.getSelection()?.getRanges()[0];
+      // The selection is bound to the window so editor.getSelection() throws an exception if there's no window which is
+      // the case when either the editor or its editable area is detached.
+      const range = !editor.isDetached() && !editor.editable()?.isDetached() && editor.getSelection()?.getRanges()[0];
       const textNode = range?.startContainer;
       // Check if the caret is at the end of a text node that ends with a space and is followed by a line break.
       if (editor.mode === 'wysiwyg' && range?.collapsed && textNode.type === CKEDITOR.NODE_TEXT &&

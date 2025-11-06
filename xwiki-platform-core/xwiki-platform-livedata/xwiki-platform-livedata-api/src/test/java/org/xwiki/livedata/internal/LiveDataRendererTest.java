@@ -69,7 +69,7 @@ class LiveDataRendererTest
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigResolver;
 
     @MockComponent
-    private LiveDataRendererConfiguration liveDataRendererConfiguration;
+    private LiveDataScriptServiceConfiguration liveDataScriptServiceConfiguration;
 
     @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
@@ -155,7 +155,7 @@ class LiveDataRendererTest
             liveDataRendererParametersConsumer.accept(parameters);
         }
         LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
-        when(this.liveDataRendererConfiguration.getLiveDataConfiguration(ADVANCED_PARAMETERS_EMPTY, parameters))
+        when(this.liveDataScriptServiceConfiguration.getLiveDataConfiguration(ADVANCED_PARAMETERS_EMPTY, parameters))
             .thenReturn(liveDataConfig);
         when(this.defaultLiveDataConfigResolver.resolve(liveDataConfig)).thenReturn(liveDataConfig);
         return parameters;

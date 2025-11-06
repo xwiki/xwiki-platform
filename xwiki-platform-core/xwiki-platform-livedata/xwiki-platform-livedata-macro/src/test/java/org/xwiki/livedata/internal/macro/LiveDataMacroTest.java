@@ -46,7 +46,7 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSelectionConfiguration;
 import org.xwiki.livedata.internal.DefaultLiveDataConfigurationResolver;
 import org.xwiki.livedata.internal.LiveDataRenderer;
-import org.xwiki.livedata.internal.LiveDataRendererConfiguration;
+import org.xwiki.livedata.internal.LiveDataScriptServiceConfiguration;
 import org.xwiki.livedata.internal.StringLiveDataConfigurationResolver;
 import org.xwiki.livedata.macro.LiveDataMacroParameters;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -106,7 +106,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
     MathMLDefinitions.class,
     SVGDefinitions.class,
     DefaultExecution.class,
-    LiveDataRendererConfiguration.class,
+    LiveDataScriptServiceConfiguration.class,
     LiveDataRenderer.class,
     DefaultLiveDataConfigurationResolver.class,
     StringLiveDataConfigurationResolver.class

@@ -19,23 +19,35 @@
  */
 package org.xwiki.livedata.script;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.livedata.LiveData;
+import org.xwiki.livedata.LiveDataConfigurationResolver;
+import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataException;
+import org.xwiki.livedata.LiveDataQuery;
+import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
+import org.xwiki.livedata.internal.LiveDataScriptServiceConfiguration;
 import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test of {@link LiveDataScriptService}.
@@ -44,6 +56,7 @@ import static org.mockito.Mockito.verify;
  * @since 16.0.0RC1
  */
 @ComponentTest
+@ComponentList({ LiveDataScriptServiceConfiguration.class })
 class LiveDataScriptServiceTest
 {
     @InjectMockComponents
@@ -61,6 +74,9 @@ class LiveDataScriptServiceTest
     @MockComponent
     private LiveDataRenderer liveDataRenderer;
 
+    @MockComponent
+    private LiveDataConfigurationResolver<String> stringLiveDataConfigResolver;
+
     @Test
     void executeUnknownParam()
     {
@@ -68,7 +84,7 @@ class LiveDataScriptServiceTest
         LiveDataException exception =
             assertThrows(LiveDataException.class, () -> this.scriptService.execute(parameters));
         assertThat(exception.getMessage(), matchesPattern(
-            "Failed to set property \\[a] with value \\[b] in object " 
+            "Failed to set property \\[a] with value \\[b] in object "
                 + "\\[org.xwiki.livedata.internal.LiveDataRendererParameters@[^]]+]"));
     }
 
@@ -81,5 +97,31 @@ class LiveDataScriptServiceTest
         LiveDataRendererParameters rendererParameters = new LiveDataRendererParameters();
         rendererParameters.setId(liveDataId);
         verify(this.liveDataRenderer).execute(rendererParameters, (Map<?, ?>) null, false);
+    }
+
+    @Test
+    void query() throws Exception
+    {
+        LiveDataQuery.Source source = new LiveDataQuery.Source("liveTable");
+        source.setParameter("translationPrefix", "xe.userdirectory.");
+        source.setParameter("className", "XWiki.XWikiUsers");
+        LiveDataQuery query = new LiveDataQuery();
+        query.setProperties(List.of("_avatar", "doc.name", "first_name", "last_name"));
+        query.setSource(source);
+
+        LiveDataSource liveDataSource = mock(LiveDataSource.class);
+        LiveDataEntryStore queries = mock(LiveDataEntryStore.class);
+        LiveData liveData = mock(LiveData.class);
+
+        when(liveDataSource.getEntries()).thenReturn(queries);
+        when(queries.get(query)).thenReturn(liveData);
+        when(this.sourceManager.get(source)).thenReturn(Optional.of(liveDataSource));
+
+        var result = this.scriptService.query(Map.of("id", "users",
+            "properties", "_avatar,doc.name,first_name,last_name",
+            "source", "liveTable",
+            "sourceParameters", "className=XWiki.XWikiUsers&translationPrefix=xe.userdirectory."));
+        verify(queries).get(query);
+        assertSame(liveData, result);
     }
 }

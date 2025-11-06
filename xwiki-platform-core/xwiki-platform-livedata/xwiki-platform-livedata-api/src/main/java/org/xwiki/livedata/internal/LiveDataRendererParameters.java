@@ -21,9 +21,10 @@ package org.xwiki.livedata.internal;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.livedata.script.LiveDataScriptService;
 
 /**
- * Parameters for {@link LiveDataRenderer}.
+ * Parameters for {@link LiveDataScriptService}, also used for {@link LiveDataRenderer}.
  *
  * @version $Id$
  * @since 16.0.0RC1

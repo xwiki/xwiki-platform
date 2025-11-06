@@ -32,16 +32,16 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link LiveDataRendererConfiguration}.
+ * Test of {@link LiveDataScriptServiceConfiguration}.
  *
  * @version $Id$
  * @since 16.0.0RC1
  */
 @ComponentTest
-class LiveDataRendererConfigurationTest
+class LiveDataScriptServiceConfigurationTest
 {
     @InjectMockComponents
-    private LiveDataRendererConfiguration configuration;
+    private LiveDataScriptServiceConfiguration configuration;
 
     @MockComponent
     private LiveDataConfigurationResolver<String> stringLiveDataConfigResolver;

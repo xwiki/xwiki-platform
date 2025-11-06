@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
@@ -63,7 +64,9 @@ class DefaultRequestFactoryTest
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    private DocumentReference userReference = new DocumentReference("wiki", "Users", "Carol");
+    private DocumentReference userReference = new DocumentReference("wiki", "Users", "User");
+
+    private DocumentReference authorReference = new DocumentReference("wiki", "Users", "Author");
 
     private WikiReference wikiReference = new WikiReference("wiki");
 
@@ -71,8 +74,15 @@ class DefaultRequestFactoryTest
     void configure()
     {
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(this.userReference);
-        when(documentAccessBridge.getCurrentAuthorReference()).thenReturn(this.userReference);
+        when(documentAccessBridge.getCurrentAuthorReference()).thenReturn(this.authorReference);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn(this.wikiReference.getName());
+    }
+
+    void assertCheckRights(AbstractCheckRightsRequest request)
+    {
+        assertTrue(request.isCheckRights());
+        assertEquals(this.userReference, request.getUserReference());
+        assertEquals(this.authorReference, request.getAuthorReference());
     }
 
     @Test
@@ -84,7 +94,7 @@ class DefaultRequestFactoryTest
         assertEquals(documentIds, restoreRequest.getDeletedDocumentIds());
         assertTrue(StringUtils.join(restoreRequest.getId(), '/')
             .startsWith(RefactoringJobs.RESTORE));
-        assertTrue(restoreRequest.isCheckRights());
+        assertCheckRights(restoreRequest);
         assertEquals(wikiReference, restoreRequest.getWikiReference());
     }
 
@@ -97,7 +107,7 @@ class DefaultRequestFactoryTest
         assertEquals(batchId, restoreRequest.getBatchId());
         assertTrue(StringUtils.join(restoreRequest.getId(), '/')
             .startsWith(RefactoringJobs.RESTORE));
-        assertTrue(restoreRequest.isCheckRights());
+        assertCheckRights(restoreRequest);
         assertEquals(wikiReference, restoreRequest.getWikiReference());
     }
 
@@ -110,7 +120,7 @@ class DefaultRequestFactoryTest
         assertEquals(documentIds, permanentlyDeleteRequest.getDeletedDocumentIds());
         assertTrue(StringUtils.join(permanentlyDeleteRequest.getId(), '/')
             .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
-        assertTrue(permanentlyDeleteRequest.isCheckRights());
+        assertCheckRights(permanentlyDeleteRequest);
         assertEquals(wikiReference, permanentlyDeleteRequest.getWikiReference());
     }
 
@@ -123,7 +133,7 @@ class DefaultRequestFactoryTest
         assertEquals(batchId, permanentlyDeleteRequest.getBatchId());
         assertTrue(StringUtils.join(permanentlyDeleteRequest.getId(), '/')
             .startsWith(RefactoringJobs.PERMANENTLY_DELETE));
-        assertTrue(permanentlyDeleteRequest.isCheckRights());
+        assertCheckRights(permanentlyDeleteRequest);
         assertEquals(wikiReference, permanentlyDeleteRequest.getWikiReference());
     }
 
@@ -137,14 +147,13 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), moveRequest.getEntityReferences());
         assertEquals(destination, moveRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "move"), moveRequest.getId().subList(0, 2));
-        assertEquals(this.userReference, moveRequest.getUserReference());
         assertFalse(moveRequest.isDeep());
         assertTrue(moveRequest.isDeleteSource());
         assertTrue(moveRequest.isUpdateLinks());
         assertTrue(moveRequest.isUpdateParentField());
         assertTrue(moveRequest.isAutoRedirect());
         assertFalse(moveRequest.isInteractive());
-        assertTrue(moveRequest.isCheckRights());
+        assertCheckRights(moveRequest);
         moveRequest.setUpdateParentField(false);
         assertFalse(moveRequest.isUpdateParentField());
     }
@@ -160,14 +169,13 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), renameRequest.getEntityReferences());
         assertEquals(destination, renameRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "rename"), renameRequest.getId().subList(0, 2));
-        assertEquals(this.userReference, renameRequest.getUserReference());
         assertFalse(renameRequest.isDeep());
         assertTrue(renameRequest.isDeleteSource());
         assertTrue(renameRequest.isUpdateLinks());
         assertTrue(renameRequest.isUpdateParentField());
         assertTrue(renameRequest.isAutoRedirect());
         assertFalse(renameRequest.isInteractive());
-        assertTrue(renameRequest.isCheckRights());
+        assertCheckRights(renameRequest);
     }
 
     @Test
@@ -181,14 +189,13 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), renameRequest.getEntityReferences());
         assertEquals(destination, renameRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "rename"), renameRequest.getId().subList(0, 2));
-        assertEquals(this.userReference, renameRequest.getUserReference());
         assertFalse(renameRequest.isDeep());
         assertTrue(renameRequest.isDeleteSource());
         assertTrue(renameRequest.isUpdateLinks());
         assertTrue(renameRequest.isUpdateParentField());
         assertTrue(renameRequest.isAutoRedirect());
         assertFalse(renameRequest.isInteractive());
-        assertTrue(renameRequest.isCheckRights());
+        assertCheckRights(renameRequest);
     }
 
     @Test
@@ -201,11 +208,10 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), copyRequest.getEntityReferences());
         assertEquals(destination.getParent(), copyRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "copy"), copyRequest.getId().subList(0, 2));
-        assertEquals(this.userReference, copyRequest.getUserReference());
         assertFalse(copyRequest.isDeep());
         assertTrue(copyRequest.isUpdateLinks());
         assertFalse(copyRequest.isInteractive());
-        assertTrue(copyRequest.isCheckRights());
+        assertCheckRights(copyRequest);
     }
 
     @Test
@@ -218,11 +224,10 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), copyRequest.getEntityReferences());
         assertEquals(destination, copyRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "copyAs"), copyRequest.getId().subList(0, 2));
-        assertEquals(this.userReference, copyRequest.getUserReference());
         assertFalse(copyRequest.isDeep());
         assertTrue(copyRequest.isUpdateLinks());
         assertFalse(copyRequest.isInteractive());
-        assertTrue(copyRequest.isCheckRights());
+        assertCheckRights(copyRequest);
     }
 
     @Test
@@ -236,11 +241,10 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), copyRequest.getEntityReferences());
         assertEquals(destination, copyRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "copyAs"), copyRequest.getId().subList(0, 2));
-        assertEquals(this.userReference, copyRequest.getUserReference());
         assertFalse(copyRequest.isDeep());
         assertTrue(copyRequest.isUpdateLinks());
         assertFalse(copyRequest.isInteractive());
-        assertTrue(copyRequest.isCheckRights());
+        assertCheckRights(copyRequest);
     }
 
     @Test
@@ -250,10 +254,9 @@ class DefaultRequestFactoryTest
         CreateRequest createRequest = requestFactory.createCreateRequest(Arrays.asList(source));
         assertEquals(Arrays.asList(source), createRequest.getEntityReferences());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "create"), createRequest.getId().subList(0, 2));
-        assertEquals(this.userReference, createRequest.getUserReference());
         assertTrue(createRequest.isDeep());
         assertFalse(createRequest.isInteractive());
-        assertTrue(createRequest.isCheckRights());
+        assertCheckRights(createRequest);
     }
 
     @Test
@@ -263,10 +266,9 @@ class DefaultRequestFactoryTest
         EntityRequest deleteRequest = requestFactory.createDeleteRequest(Arrays.asList(source));
         assertEquals(Arrays.asList(source), deleteRequest.getEntityReferences());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "delete"), deleteRequest.getId().subList(0, 2));
-        assertEquals(this.userReference, deleteRequest.getUserReference());
         assertFalse(deleteRequest.isDeep());
         assertFalse(deleteRequest.isInteractive());
-        assertTrue(deleteRequest.isCheckRights());
+        assertCheckRights(deleteRequest);
     }
 
     @Test
@@ -282,10 +284,8 @@ class DefaultRequestFactoryTest
         assertEquals(alice, request.getOldUserReference());
         assertEquals(bob, request.getNewUserReference());
 
-        assertTrue(request.isCheckRights());
-        assertEquals(this.userReference, request.getUserReference());
-        assertEquals(this.userReference, request.getAuthorReference());
         assertFalse(request.isInteractive());
+        assertCheckRights(request);
 
         assertEquals(Collections.singleton(alice.getWikiReference()), request.getEntityReferences());
     }
@@ -303,10 +303,8 @@ class DefaultRequestFactoryTest
         assertNull(request.getOldUserReference());
         assertEquals(bob, request.getNewUserReference());
 
-        assertTrue(request.isCheckRights());
-        assertEquals(this.userReference, request.getUserReference());
-        assertEquals(this.userReference, request.getAuthorReference());
         assertFalse(request.isInteractive());
+        assertCheckRights(request);
 
         assertEquals(new HashSet<>(Arrays.asList(bob.getWikiReference(), new WikiReference("dev"))),
             request.getEntityReferences());

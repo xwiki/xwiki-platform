@@ -54,6 +54,8 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
@@ -61,6 +63,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
@@ -121,6 +124,9 @@ class DefaultModelBridgeTest
     @MockComponent
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
 
     @MockComponent
     private Provider<LinkStore> linkStoreProvider;
@@ -286,21 +292,58 @@ class DefaultModelBridgeTest
     }
 
     @Test
-    void createRedirect() throws Exception
+    void createRedirectOnNewDocument() throws Exception
     {
         DocumentReference oldReference = new DocumentReference("wiki", "Space", "Old");
         DocumentReference newReference = new DocumentReference("wiki", "Space", "New");
 
-        DocumentReference redirectClassReference = new DocumentReference("wiki", "XWiki", "RedirectClass");
-        when(this.xcontext.getWiki().exists(redirectClassReference, this.xcontext)).thenReturn(true);
+        XWikiDocument oldDocument = mock(XWikiDocument.class);
+        when(oldDocument.clone()).thenReturn(oldDocument);
+        when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
+        when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
+            .thenReturn(mock(BaseObject.class));
+        when(oldDocument.getAuthors()).thenReturn(mock());
+        when(oldDocument.isNew()).thenReturn(true);
+
+        UserReference userReference = mock();
+        when(this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE))
+            .thenReturn(userReference);
+
+        this.modelBridge.createRedirect(oldReference, newReference);
+
+        verify(oldDocument.getAuthors()).setCreator(userReference);
+        verify(oldDocument.getAuthors()).setContentAuthor(userReference);
+        verify(oldDocument.getAuthors()).setEffectiveMetadataAuthor(userReference);
+        verify(oldDocument.getAuthors()).setOriginalMetadataAuthor(userReference);
+        verify(oldDocument).setHidden(true);
+        verify(this.xcontext.getWiki()).saveDocument(oldDocument, "Create automatic redirect.", this.xcontext);
+        assertLog(Level.INFO, "Created automatic redirect from [{}] to [{}].", oldReference, newReference);
+    }
+
+    @Test
+    void createRedirectOnExistingDocument() throws Exception
+    {
+        DocumentReference oldReference = new DocumentReference("wiki", "Space", "Old");
+        DocumentReference newReference = new DocumentReference("wiki", "Space", "New");
 
         XWikiDocument oldDocument = mock(XWikiDocument.class);
         when(oldDocument.clone()).thenReturn(oldDocument);
         when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
-        when(oldDocument.getXObject(eq(redirectClassReference), anyInt())).thenReturn(mock(BaseObject.class));
+        when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
+            .thenReturn(mock(BaseObject.class));
+        when(oldDocument.getAuthors()).thenReturn(mock());
+        when(oldDocument.isNew()).thenReturn(false);
+
+        UserReference userReference = mock();
+        when(this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE))
+            .thenReturn(userReference);
 
         this.modelBridge.createRedirect(oldReference, newReference);
 
+        verify(oldDocument.getAuthors(), never()).setCreator(userReference);
+        verify(oldDocument.getAuthors(), never()).setContentAuthor(userReference);
+        verify(oldDocument.getAuthors(), never()).setEffectiveMetadataAuthor(userReference);
+        verify(oldDocument.getAuthors()).setOriginalMetadataAuthor(userReference);
         verify(oldDocument).setHidden(true);
         verify(this.xcontext.getWiki()).saveDocument(oldDocument, "Create automatic redirect.", this.xcontext);
         assertLog(Level.INFO, "Created automatic redirect from [{}] to [{}].", oldReference, newReference);
@@ -872,8 +915,7 @@ class DefaultModelBridgeTest
 
         assertFalse(this.modelBridge.canOverwriteSilently(documentReference));
 
-        DocumentReference redirectClassReference = new DocumentReference("wiki", "XWiki", "RedirectClass");
-        when(document.getXObject(redirectClassReference)).thenReturn(mock(BaseObject.class));
+        when(document.getXObject(RedirectClassDocumentInitializer.REFERENCE)).thenReturn(mock(BaseObject.class));
 
         assertTrue(this.modelBridge.canOverwriteSilently(documentReference));
     }

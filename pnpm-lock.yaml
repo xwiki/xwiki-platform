@@ -72,9 +72,6 @@ catalogs:
     '@types/lodash-es':
       specifier: 4.17.12
       version: 4.17.12
-    '@types/markdown-it':
-      specifier: 14.1.2
-      version: 14.1.2
     '@types/mdast':
       specifier: 4.0.4
       version: 4.0.4
@@ -213,9 +210,6 @@ catalogs:
     lodash-es:
       specifier: 4.17.21
       version: 4.17.21
-    markdown-it:
-      specifier: 14.1.0
-      version: 14.1.0
     mdast-util-gfm-strikethrough:
       specifier: 2.0.0
       version: 2.0.0
@@ -2371,59 +2365,6 @@ importers:
       inversify:
         specifier: 'catalog:'
         version: 7.10.4(reflect-metadata@0.2.2)
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-      vite:
-        specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)
-      vitest-mock-extended:
-        specifier: 'catalog:'
-        version: 3.1.0(typescript@5.9.3)(vitest@4.0.6(@types/debug@4.1.12)(@types/node@24.9.2)(happy-dom@20.0.10)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1))
-
-  core/markdown/markdown-api:
-    dependencies:
-      '@xwiki/cristal-document-api':
-        specifier: workspace:*
-        version: link:../../document/document-api
-    devDependencies:
-      '@xwiki/cristal-dev-config':
-        specifier: workspace:*
-        version: link:../../../dev/config
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-
-  core/markdown/markdown-default:
-    dependencies:
-      '@xwiki/cristal-markdown-api':
-        specifier: workspace:*
-        version: link:../markdown-api
-      '@xwiki/cristal-model-api':
-        specifier: workspace:*
-        version: link:../../model/model-api
-      '@xwiki/cristal-model-reference-api':
-        specifier: workspace:*
-        version: link:../../model/model-reference/model-reference-api
-      '@xwiki/cristal-model-remote-url-api':
-        specifier: workspace:*
-        version: link:../../model/model-remote-url/model-remote-url-api
-      markdown-it:
-        specifier: 'catalog:'
-        version: 14.1.0
-    devDependencies:
-      '@types/markdown-it':
-        specifier: 'catalog:'
-        version: 14.1.2
-      '@xwiki/cristal-dev-config':
-        specifier: workspace:*
-        version: link:../../../dev/config
-      inversify:
-        specifier: 'catalog:'
-        version: 7.10.4(reflect-metadata@0.2.2)
-      reflect-metadata:
-        specifier: 'catalog:'
-        version: 0.2.2
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -4918,9 +4859,6 @@ importers:
       '@xwiki/cristal-macros-service':
         specifier: workspace:*
         version: link:../core/macros/macros-service
-      '@xwiki/cristal-markdown-default':
-        specifier: workspace:*
-        version: link:../core/markdown/markdown-default
       '@xwiki/cristal-model-click-listener':
         specifier: workspace:*
         version: link:../core/model/model-click-listener
@@ -5195,9 +5133,6 @@ importers:
       '@xwiki/cristal-info-actions-ui':
         specifier: workspace:*
         version: link:../core/info-actions/info-actions-ui
-      '@xwiki/cristal-markdown-api':
-        specifier: workspace:*
-        version: link:../core/markdown/markdown-api
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../core/model/model-api

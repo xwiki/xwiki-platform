@@ -71,7 +71,6 @@
     "@xwiki/cristal-link-suggest-xwiki": "workspace:*",
     "@xwiki/cristal-macros-ast-html-converter": "workspace:*",
     "@xwiki/cristal-macros-service": "workspace:*",
-    "@xwiki/cristal-markdown-default": "workspace:*",
     "@xwiki/cristal-model-click-listener": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-reference-github": "workspace:*",

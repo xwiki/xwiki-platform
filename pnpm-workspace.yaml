@@ -19,7 +19,6 @@ packages:
   - core/info-actions/*
   - core/link-suggest/*
   - core/macros/*
-  - core/markdown/*
   - core/model/model-api
   - core/model/model-click-listener
   - core/model/model-local-url
@@ -89,7 +88,6 @@ catalog:
   '@types/express-ws': 3.0.6
   '@types/js-cookie': 3.0.6
   '@types/lodash-es': 4.17.12
-  '@types/markdown-it': 14.1.2
   '@types/mdast': 4.0.4
   '@types/node': 24.9.2
   '@types/react': 19.2.2
@@ -136,7 +134,6 @@ catalog:
   js-cookie: 3.0.5
   lib0: 0.2.114
   lodash-es: 4.17.21
-  markdown-it: 14.1.0
   mdast-util-gfm-strikethrough: 2.0.0
   mdast-util-gfm-table: 2.0.0
   mdast-util-gfm-task-list-item: 2.0.0

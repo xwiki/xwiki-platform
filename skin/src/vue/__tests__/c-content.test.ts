@@ -35,7 +35,6 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
-import type { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
@@ -114,12 +113,6 @@ function mountCComponent(params: {
       }),
     ),
   );
-
-  class MockMarkdownRenderer implements DeepPartial<MarkdownRenderer> {}
-
-  container
-    .bind<MarkdownRenderer>("MarkdownRenderer")
-    .to(makeInjectable(vi.fn().mockImplementation(() => MockMarkdownRenderer)));
 
   return mount(wrapInSuspense(CContent, {}), {
     provide: {

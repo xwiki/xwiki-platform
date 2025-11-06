@@ -23,7 +23,7 @@ import type { MacroBlock, MacroInlineContent } from "@xwiki/cristal-macros-api";
 /**
  * Convert macros' AST to HTML.
  *
- * @since 0.24
+ * @since 0.24-rc-1
  * @beta
  */
 export interface MacrosAstToHtmlConverter {

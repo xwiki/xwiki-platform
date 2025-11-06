@@ -32,7 +32,7 @@ import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-ur
 /**
  * Converter that transforms a macro's returned AST to HTML
  *
- * @since 0.24
+ * @since 0.24-rc-1
  * @beta
  */
 @injectable()

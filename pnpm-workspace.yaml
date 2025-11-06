@@ -57,7 +57,7 @@ catalog:
   u-node: 0.0.2
   vite: 7.1.12
   vitest: 3.2.4
-  vue: 3.5.22
+  vue: 3.5.23
   vue-i18n: 11.1.12
   vue-tippy: 6.7.1
   vue-tsc: 3.0.6

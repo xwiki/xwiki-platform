@@ -27,7 +27,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -69,9 +68,8 @@ class DefaultRequestFactoryTest
     private WikiReference wikiReference = new WikiReference("wiki");
 
     @BeforeEach
-    void configure() throws Exception
+    void configure()
     {
-        MockitoAnnotations.initMocks(this);
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(this.userReference);
         when(documentAccessBridge.getCurrentAuthorReference()).thenReturn(this.userReference);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn(this.wikiReference.getName());
@@ -139,7 +137,6 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), moveRequest.getEntityReferences());
         assertEquals(destination, moveRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "move"), moveRequest.getId().subList(0, 2));
-        assertEquals(RefactoringJobs.MOVE, moveRequest.getJobType());
         assertEquals(this.userReference, moveRequest.getUserReference());
         assertFalse(moveRequest.isDeep());
         assertTrue(moveRequest.isDeleteSource());
@@ -163,7 +160,6 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), renameRequest.getEntityReferences());
         assertEquals(destination, renameRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "rename"), renameRequest.getId().subList(0, 2));
-        assertEquals(RefactoringJobs.RENAME, renameRequest.getJobType());
         assertEquals(this.userReference, renameRequest.getUserReference());
         assertFalse(renameRequest.isDeep());
         assertTrue(renameRequest.isDeleteSource());
@@ -185,7 +181,6 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), renameRequest.getEntityReferences());
         assertEquals(destination, renameRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "rename"), renameRequest.getId().subList(0, 2));
-        assertEquals(RefactoringJobs.RENAME, renameRequest.getJobType());
         assertEquals(this.userReference, renameRequest.getUserReference());
         assertFalse(renameRequest.isDeep());
         assertTrue(renameRequest.isDeleteSource());
@@ -206,7 +201,6 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), copyRequest.getEntityReferences());
         assertEquals(destination.getParent(), copyRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "copy"), copyRequest.getId().subList(0, 2));
-        assertEquals(RefactoringJobs.COPY, copyRequest.getJobType());
         assertEquals(this.userReference, copyRequest.getUserReference());
         assertFalse(copyRequest.isDeep());
         assertTrue(copyRequest.isUpdateLinks());
@@ -224,7 +218,6 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), copyRequest.getEntityReferences());
         assertEquals(destination, copyRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "copyAs"), copyRequest.getId().subList(0, 2));
-        assertEquals(RefactoringJobs.COPY_AS, copyRequest.getJobType());
         assertEquals(this.userReference, copyRequest.getUserReference());
         assertFalse(copyRequest.isDeep());
         assertTrue(copyRequest.isUpdateLinks());
@@ -243,7 +236,6 @@ class DefaultRequestFactoryTest
         assertEquals(Arrays.asList(source), copyRequest.getEntityReferences());
         assertEquals(destination, copyRequest.getDestination());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "copyAs"), copyRequest.getId().subList(0, 2));
-        assertEquals(RefactoringJobs.COPY_AS, copyRequest.getJobType());
         assertEquals(this.userReference, copyRequest.getUserReference());
         assertFalse(copyRequest.isDeep());
         assertTrue(copyRequest.isUpdateLinks());
@@ -258,7 +250,6 @@ class DefaultRequestFactoryTest
         CreateRequest createRequest = requestFactory.createCreateRequest(Arrays.asList(source));
         assertEquals(Arrays.asList(source), createRequest.getEntityReferences());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "create"), createRequest.getId().subList(0, 2));
-        assertEquals(RefactoringJobs.CREATE, createRequest.getJobType());
         assertEquals(this.userReference, createRequest.getUserReference());
         assertTrue(createRequest.isDeep());
         assertFalse(createRequest.isInteractive());
@@ -272,7 +263,6 @@ class DefaultRequestFactoryTest
         EntityRequest deleteRequest = requestFactory.createDeleteRequest(Arrays.asList(source));
         assertEquals(Arrays.asList(source), deleteRequest.getEntityReferences());
         assertEquals(Arrays.asList(RefactoringJobs.GROUP, "delete"), deleteRequest.getId().subList(0, 2));
-        assertEquals(RefactoringJobs.DELETE, deleteRequest.getJobType());
         assertEquals(this.userReference, deleteRequest.getUserReference());
         assertFalse(deleteRequest.isDeep());
         assertFalse(deleteRequest.isInteractive());

@@ -1197,7 +1197,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.22</version>
+        <version>3.5.23</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>

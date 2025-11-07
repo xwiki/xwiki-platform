@@ -54,13 +54,6 @@
 
 === 2.0 Text Formatting ===
 
-{{info}}
-Nouveau en syntaxe XWiki  {{velocity}}$crtSyntaxVer{{/velocity}} sur la syntaxe XWiki 1.0:
-* Les espaces sont autorisés, juste après les symboles de syntaxe.
-* L'utilisation des symboles doubles au cas où il y avait seulement un symbole en syntaxe XWiki 1.0, de sorte qu'il soit moins probable que l'utilisateur s'en serve dans le texte de manière erronée.
-* La possibilité d'avoir plusieurs lignes.
-{{/info}}
-
 |=Fonctionnalité|=Syntaxe XWiki  {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
 |Gras|{{{**gras**}}}|**gras**
 |Souligné|{{{__souligné__}}}|__souligné__

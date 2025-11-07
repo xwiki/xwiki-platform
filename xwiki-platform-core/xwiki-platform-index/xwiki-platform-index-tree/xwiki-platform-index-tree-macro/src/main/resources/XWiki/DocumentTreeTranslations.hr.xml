@@ -57,7 +57,7 @@ rendering.macro.documentTree.parameter.showObjects.description=Prikazati objekte
 rendering.macro.documentTree.parameter.showClassProperties.name=Prikaži svojstva klase
 rendering.macro.documentTree.parameter.showClassProperties.description=Prikazati svojstva klase stranica koje definiraju klase.
 rendering.macro.documentTree.parameter.root.name=Korijen
-rendering.macro.documentTree.parameter.root.description=Identifikator korijenskog čvora. Ovo je korisno ako želite prikazati samo potomke danog čvora (koji je odabrani čvor). Stablo prikazuje djecu korijenskog čvora na prvoj razini, tako da se korijenski čvor zapravo ne prikazuje. Ukoliko nije naznačen korijenski čvor, prikazuje se čitavo stablo. Format identifikatora čvora je tipEntiteta\:referencaNaEntitet, gdje tip entiteta može biti na primjer wiki, prostor, dokument. Npr.\: wiki\:xwiki, space\:xwiki\:Main, document\:xwiki\:Main.WebHome
+rendering.macro.documentTree.parameter.root.description=Identifikator korijenskog čvora. Ovo je korisno ako želite prikazati samo potomke danog čvora (koji je odabrani čvor). Stablo prikazuje djecu korijenskog čvora na prvoj razini, tako da se korijenski čvor zapravo ne prikazuje. Ukoliko nije naznačen korijenski čvor, prikazuje se čitavo stablo.
 rendering.macro.documentTree.parameter.showRoot.name=Prikaži korijen
 rendering.macro.documentTree.parameter.showRoot.description=Prikazati korijenski čvor ili ne. Korijenski čvor se pretpostavljeno ne prikazuje jer se obično implicira iz konteksta gdje se prikazuje stablo (npr. oznaka prije stabla). Međutim postoje neki slučajevi u kojima ćete htjeti prikazati korijenski čvor\: da biste mogli izraditi novi čvor ispod korijena.
 rendering.macro.documentTree.parameter.compact.name=Kompaktno
@@ -67,7 +67,7 @@ rendering.macro.documentTree.parameter.links.description=Naznačava bi li oznake
 rendering.macro.documentTree.parameter.checkboxes.name=Kućice
 rendering.macro.documentTree.parameter.checkboxes.description=Prikazati kućicu ispred pojedinog čvora stabla kako bi se korisniku omogućio odabir više čvorova stabla.
 rendering.macro.documentTree.parameter.openTo.name=Otvori
-rendering.macro.documentTree.parameter.openTo.description=Identifikator čvora u kojem rastvoriti stablo. Svi pretci naznačenog čvora, do korijena stabla, će također biti rastvoreni. Format identifikatora čvora je onaj koji se koristi za korijenski parametar.
+rendering.macro.documentTree.parameter.openTo.description=Identifikator čvora u kojem rastvoriti stablo. Svi pretci naznačenog čvora, do korijena stabla, će također biti rastvoreni.
 rendering.macro.documentTree.parameter.showOnlyViewable.name=Prikaži samo pregledljive
 rendering.macro.documentTree.parameter.showOnlyViewable.description=Prikaži samo čvorove wikija, prostora i stranica nad kojima trenutni korisnik ima ovlast za pregledavanje. Ukoliko je ovo postavljeno na neistinito, tada se oni čvorovi wikija, prostora i stranica, koji nisu vidljivi trenutnom korisniku, navode u stablu koristeći njihov naziv. Međutim, korisnik neće moći vidjeti njihov sadržaj slijedeći poveznice prema njima (korisnik će samo biti svjestan njihovog postojanja).
 rendering.macro.documentTree.parameter.filterByClass.name=Filtriraj po klasi
@@ -82,13 +82,36 @@ rendering.macro.documentTree.parameter.limit.name=Ograničenje
 rendering.macro.documentTree.parameter.limit.description=Najveći broj čvorova djece za prikazati kod prvog proširenja čvora roditelja. Ostatku čvorova djece može se pristupiti  putem "još..." poveznice. Ovaj parametar se u principu koristi za straničenje čvorova djece i time pomaže kod skaliranja stabla kada je broj čvorova djece velik.
 ### Missing: rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 ### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
-
+### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.name=Sort pages by
+### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.description=The page field used to sort the child pages, followed by the sort order.
+### Missing: rendering.macro.documentTree.parameter.expandToLevel.name=Expand to level
+### Missing: rendering.macro.documentTree.parameter.expandToLevel.description=Define the depth of the tree to expand automatically. Default is 0 and means that only top level nodes are displayed. A level of 1 opens those, a level of 2 also opens the children below the newly displayed nodes, etc. Note that a high value can make the macro expansive to display for the browser.
+### Missing: rendering.macro.children.name=Children
+### Missing: rendering.macro.children.description=Displays a tree of children pages of the current page
+### Missing: rendering.macro.children.parameter.sort.name=Sort by
+### Missing: rendering.macro.children.parameter.sort.description=The page field used to sort the child pages, followed by the sort order.
+### Missing: rendering.macro.children.parameter.root.name=Root
+### Missing: rendering.macro.children.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified.
+### Missing: rendering.macro.documentTree.group.show.name=Elements to show
+### Missing: rendering.macro.documentTree.group.filters.name=Filters
+### Missing: rendering.macro.documentTree.group.style.name=Display options
 index.documentTree.empty=Nisu pronađene stranice
 index.documentTree.more=Još {0}...
+### Missing: index.documentTree.addDocument=New page...
+### Missing: index.documentTree.documentSortDisplayer.field=Sort field
+### Missing: index.documentTree.documentSortDisplayer.field.default=---
+### Missing: index.documentTree.documentSortDisplayer.field.title=Title
+### Missing: index.documentTree.documentSortDisplayer.field.date=Last modification date
+### Missing: index.documentTree.documentSortDisplayer.field.creationDate=Creation date
+### Missing: index.documentTree.documentSortDisplayer.order=Sort order
+### Missing: index.documentTree.documentSortDisplayer.order.default=---
+### Missing: index.documentTree.documentSortDisplayer.order.asc=Ascending
+### Missing: index.documentTree.documentSortDisplayer.order.desc=Descending
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Prikaži dokumente djecu
-rendering.macro.documentTree.parameter.showChildDocuments.description=Prikazati dokumente djecu prema polju dokumenta roditelja.</content>
+rendering.macro.documentTree.parameter.showChildDocuments.description=Prikazati dokumente djecu prema polju dokumenta roditelja.
+</content>
 </xwikidoc>

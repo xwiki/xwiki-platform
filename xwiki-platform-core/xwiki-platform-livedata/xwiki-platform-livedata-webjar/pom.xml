@@ -96,7 +96,7 @@
               </outputDirectory>
               <resources>
                 <resource>
-                  <directory>${project.build.directory}/node-src/src/</directory>
+                  <directory>${basedir}/src/main/node/src</directory>
                   <includes>
                     <include>variables.less</include>
                     <include>reactive.less</include>

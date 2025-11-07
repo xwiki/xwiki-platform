@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@xwiki/platform-dev-config": "workspace:*",
+    "eslint": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

@@ -40,6 +40,7 @@
   "devDependencies": {
     "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "eslint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

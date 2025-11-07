@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@xwiki/platform-dev-config": "workspace:*",
+    "eslint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

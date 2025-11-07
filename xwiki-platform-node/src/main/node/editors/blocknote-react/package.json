@@ -64,6 +64,7 @@
     "@types/react": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "eslint": "catalog:",
     "postcss": "catalog:",
     "postcss-preset-mantine": "catalog:",
     "postcss-simple-vars": "catalog:",

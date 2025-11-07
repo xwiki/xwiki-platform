@@ -46,6 +46,7 @@
   "devDependencies": {
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-dev-config": "workspace:*",
+    "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",
     "typescript": "catalog:",

@@ -29,6 +29,7 @@
     "@xwiki/platform-model-api": "workspace:*"
   },
   "devDependencies": {
+    "eslint": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

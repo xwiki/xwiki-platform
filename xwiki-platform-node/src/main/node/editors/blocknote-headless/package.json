@@ -57,6 +57,7 @@
   "devDependencies": {
     "@types/lodash-es": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",
     "vite": "catalog:",

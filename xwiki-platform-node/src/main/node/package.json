@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "catalog:",
+    "eslint": "catalog:",
     "vite": "catalog:",
     "vite-plugin-css-injected-by-js": "catalog:",
     "vite-plugin-dts": "catalog:",

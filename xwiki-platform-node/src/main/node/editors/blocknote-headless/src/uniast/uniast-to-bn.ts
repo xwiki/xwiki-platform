@@ -19,7 +19,10 @@
  */
 
 import { MACRO_NAME_PREFIX } from "@xwiki/platform-editors-blocknote-react";
-import { assertUnreachable, tryFallibleOrError } from "@xwiki/platform-fn-utils";
+import {
+  assertUnreachable,
+  tryFallibleOrError,
+} from "@xwiki/platform-fn-utils";
 import type { TableCell } from "@blocknote/core";
 import type {
   BlockType,

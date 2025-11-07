@@ -39,7 +39,7 @@ catalog:
   eslint-plugin-vue: 10.5.0
   eventemitter3: 5.0.1
   flush-promises: 1.0.2
-  globals: 16.4.0
+  globals: 16.5.0
   inversify: 7.5.2
   jiti: 2.6.0
   jquery: 3.7.1

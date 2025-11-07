@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -159,8 +160,15 @@ public class DeleteJob extends AbstractEntityJobWithChecks<DeleteRequest, Entity
         this.modelBridge.delete(documentReference, skipRecycleBin);
         this.logger.debug(logMessage, documentReference);
 
+        DocumentReference backlinkDocumentReference = documentReference;
+        // the NewBackLinkTargets map store the document reference without a locale specified so ensure to remove it
+        // from the reference if it's the root locale.
+        if (documentReference.getLocale() == Locale.ROOT) {
+            backlinkDocumentReference = new DocumentReference(documentReference, (Locale) null);
+        }
+
         // Create a redirect, if requested
-        DocumentReference newTarget = getRequest().getNewBacklinkTargets().get(documentReference);
+        DocumentReference newTarget = getRequest().getNewBacklinkTargets().get(backlinkDocumentReference);
 
         if (getRequest().isAutoRedirect() && newTarget != null) {
             if (getRequest().isVerbose()) {

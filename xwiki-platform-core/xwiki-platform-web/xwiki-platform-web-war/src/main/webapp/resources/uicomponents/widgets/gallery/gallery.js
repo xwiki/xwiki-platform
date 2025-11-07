@@ -172,7 +172,7 @@ XWiki.Gallery = Class.create({
       this.currentImage.style.visibility = 'hidden';
       Element.addClassName(this.currentImage.parentNode, 'loading');
       this.currentImage.title = imageData.title;
-      const filename = imageData.url.split('/').pop().split('?')[0];
+      const filename = decodeURI(imageData.url.split('/').pop().split('?')[0]);
       // If the alt is just the name of the file, we instead fall back on the human-readable currentImage translation.
       if (filename !== imageData.alt) {
         this.currentImage.alt = imageData.alt;

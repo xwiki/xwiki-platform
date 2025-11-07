@@ -1,11 +1,11 @@
 {
-  "name": "@xwiki/platform-node",
   "private": true,
+  "name": "@xwiki/platform-node",
   "type": "module",
   "scripts": {
-    "test:unit": "nx run-many -t test",
+    "build": "nx run-many -t build -p \"xwiki-platform-node/src/main/node/*/**\"",
     "lint": "nx run-many -t lint",
-    "build": "nx run-many -t build -p \"xwiki-platform-node/src/main/node/*/**\""
+    "test:unit": "nx run-many -t test"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "catalog:",

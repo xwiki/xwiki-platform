@@ -1,12 +1,12 @@
 {
+  "private": true,
   "name": "xwiki-platform-blocknote",
   "version": "0.0.0",
-  "private": true,
   "type": "module",
   "scripts": {
     "build": "vue-tsc --project tsconfig.json && vite build",
-    "test:unit": "vitest --run",
-    "lint": "eslint \"./src/**/*.{js,ts,vue}\" --fix --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{js,ts,vue}\" --fix --max-warnings=0",
+    "test:unit": "vitest --run"
   },
   "dependencies": {
     "@xwiki/platform-api": "workspace:*",

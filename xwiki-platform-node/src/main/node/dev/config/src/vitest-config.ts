@@ -1,5 +1,5 @@
 /**
- * See the LICENSE file distributed with this work for additional
+ * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -24,7 +24,7 @@ import type { UserConfig } from "vite";
 const userConfig: UserConfig = defineConfig({
   test: {
     reporters: ["junit"],
-    outputFile: "unit-tests.xml",
+    outputFile: "target/unit-tests.xml",
     passWithNoTests: true,
   },
 });

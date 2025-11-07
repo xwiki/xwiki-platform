@@ -1,5 +1,5 @@
 <!--
-  See the LICENSE file distributed with this work for additional
+  See the NOTICE file distributed with this work for additional
   information regarding copyright ownership.
 
   This is free software; you can redistribute it and/or modify it
@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import "@xwiki/platform-editors-blocknote-react/dist/cristal-editors-blocknote-react.css";
+import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
 import { computeCurrentUser } from "../components/currentUser";
 import { createLinkEditionContext } from "../components/linkEditionContext";
 import messages from "../translations";

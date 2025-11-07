@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-icons",
-  "version": "0.23.0",
+  "version": "17.10.0",
   "description": "Provide UI components to display icons.",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
-    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
   },
   "type": "module",
   "exports": {
@@ -42,6 +42,7 @@
     "@xwiki/platform-dev-config": "workspace:*",
     "typescript": "catalog:",
     "vite": "catalog:",
+    "vitest": "catalog:",
     "vue": "catalog:",
     "vue-tsc": "catalog:"
   },

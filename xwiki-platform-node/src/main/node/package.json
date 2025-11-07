@@ -4,13 +4,14 @@
   "type": "module",
   "scripts": {
     "build": "nx run-many -t build -p \"xwiki-platform-node/src/main/node/*/**\"",
-    "lint": "nx run-many -t lint",
-    "test:unit": "nx run-many -t test"
+    "lint": "nx run-many -t lint -p \"xwiki-platform-node/src/main/node/*/**\"",
+    "test:unit": "nx run-many -t test -p \"xwiki-platform-node/src/main/node/*/**\""
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "catalog:",
     "vite": "catalog:",
     "vite-plugin-css-injected-by-js": "catalog:",
-    "vite-plugin-dts": "catalog:"
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   }
 }

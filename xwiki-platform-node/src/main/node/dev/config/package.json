@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@xwiki/platform-dev-config",
-  "version": "0.23.0",
+  "version": "17.10.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
-    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
   },
   "type": "module",
   "exports": {

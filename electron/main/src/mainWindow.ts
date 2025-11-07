@@ -25,7 +25,6 @@ import { join } from "node:path";
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
-    show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

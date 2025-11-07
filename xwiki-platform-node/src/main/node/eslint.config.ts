@@ -33,7 +33,7 @@ import vueEslintParser from "vue-eslint-parser";
 import type { Config } from "@eslint/config-helpers";
 
 const licenseText =
-  "See the LICENSE file distributed with this work for additional\n" +
+  "See the NOTICE file distributed with this work for additional\n" +
   "information regarding copyright ownership.\n" +
   "\n" +
   "This is free software; you can redistribute it and/or modify it\n" +

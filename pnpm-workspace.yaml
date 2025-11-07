@@ -160,7 +160,7 @@ catalog:
   ts-node: 10.9.2
   tsx: 4.20.6
   typescript: 5.9.3
-  typescript-eslint: 8.46.2
+  typescript-eslint: 8.46.3
   unified: 11.0.5
   utility-types: 3.11.0
   vite: 7.1.12

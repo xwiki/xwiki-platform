@@ -1,8 +1,0 @@
-{
-    "authentication.github.modal.title": "GitHub Anmeldung",
-    "authentication.github.modal.step1": "Schritt 1: Kopiere den folgenden Code",
-    "authentication.github.modal.step2": "Schritt 2: Klicke auf {link}, füge den Code ein und autorisiere die Anwendung.",
-    "authentication.github.modal.step2.link": "hier",
-    "authentication.github.modal.timeLeft": "Verbleibende Zeit: {expiration}.",
-    "authentication.github.modal.userCode.label": "Benutzer-Code"
-}

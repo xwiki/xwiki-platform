@@ -1,0 +1,273 @@
+/**
+ * See the LICENSE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+import "reflect-metadata";
+import { WorkerCristalApp } from "./workerCristalApp";
+import WorkerQueueWorker from "./workerQueueWorker";
+import { ComponentInit as AlertsDefaultComponentInit } from "@xwiki/cristal-alerts-default";
+import { ComponentInit as AuthenticationDefaultComponentInit } from "@xwiki/cristal-authentication-default";
+import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backend-dexie";
+import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
+import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
+import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
+import { CristalLoader } from "@xwiki/cristal-extension-manager";
+import * as Comlink from "comlink";
+import type {
+  CristalApp,
+  WikiConfig,
+  WrappingStorage,
+} from "@xwiki/cristal-api";
+import type {
+  ConfigurationLoader,
+  Configurations,
+} from "@xwiki/cristal-configuration-api";
+import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
+import type { Container } from "inversify";
+
+async function loadConfigWeb() {
+  const loadConfig: ConfigurationLoader = (
+    await import("@xwiki/cristal-configuration-web")
+  ).loadConfig("/config.json");
+  return await loadConfig();
+}
+
+/**
+ * Currently, the best know option is to search for a process value at runtime and to decide how to load the
+ * configuration based on this information.
+ */
+async function loadConfig(): Promise<Configurations> {
+  try {
+    // @ts-expect-error process is not a known variable and might not be defined
+    if (!process || !process.versions || !process.versions["electron"]) {
+      // Default configurations are loaded with Electron settings.
+      return {};
+    } else {
+      return await loadConfigWeb();
+    }
+  } catch {
+    return await loadConfigWeb();
+  }
+}
+
+export class Worker implements MyWorker {
+  private currentNumber: number = 0;
+  private queue: Array<string> = [];
+  // @ts-expect-error container is temporarily undefined during class
+  // initialization
+  private container: Container;
+  // @ts-expect-error cristal is temporarily undefined during class
+  // initialization
+  private cristal: CristalApp;
+  // @ts-expect-error configMap is temporarily undefined during class
+  // initialization
+  private configMap: Map<string, object>;
+  private initialized: boolean = false;
+  // @ts-expect-error fct is temporarily undefined during class
+  // initialization
+  private fct: (a: string) => void;
+
+  /*
+     Start worker thread
+    */
+  public async start(): Promise<void> {
+    console.log("Starting worker thread");
+    await this.initialize();
+    while (true) {
+      await this.sleep(1000);
+      await this.checkQueue();
+    }
+  }
+
+  public setPageLoadedCallback(fct: (a: string) => void): void {
+    this.fct = fct;
+  }
+
+  public sleep(ms: number): Promise<unknown> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  public async checkQueue(): Promise<void> {
+    // console.log("Checking queue");
+    const size = this.getQueueSize();
+    // console.log("Current queue size is ", size, this.queue);
+    if (size > 0) {
+      if (this.initialized) {
+        const page = this.queue.pop();
+        if (page) {
+          await this.handleQueueItem(page);
+        }
+        await this.checkQueue();
+      } else {
+        console.log(
+          "Worker cristal code not initialized yet. Cannot process queue items.",
+        );
+      }
+    }
+  }
+
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
+  public async handleQueueItem(page: string): Promise<void> {
+    console.log("Handling queue item code ready to process", page);
+
+    try {
+      let configName = null;
+      let pageName = null;
+      let type = null;
+      const index1 = page.indexOf(":");
+      const index2 = page.lastIndexOf("_");
+      if (index1 != -1 && index2 != -1) {
+        configName = page.substring(0, index1);
+        pageName = page.substring(index1 + 1, index2);
+        type = page.substring(index2 + 1);
+
+        const wikiConfig = this.getWikiConfig(configName);
+        if (wikiConfig == undefined) {
+          console.log("Could not find config for page", page);
+        } else {
+          console.log("Updating page ", pageName, type);
+          const storage = wikiConfig.storage as WrappingStorage;
+          const result = await storage.updatePageContent(pageName, type);
+          if (result) {
+            console.log("Page updated. Calling back to main thread");
+            this.fct(page);
+          }
+        }
+      } else {
+        console.log("Could not process page", page);
+      }
+    } catch (e) {
+      console.log("Exception while trying to load", page, e);
+    }
+  }
+
+  public add(a: number): number {
+    console.log("Worker in add");
+    this.currentNumber += a;
+    return this.currentNumber;
+  }
+
+  public addToQueue(page: string): void {
+    console.log("Worker in addToQueue", page);
+    if (!this.queue.includes(page)) {
+      this.queue.push(page);
+    }
+    return;
+  }
+
+  public getQueueSize(): number {
+    console.log("Worker in getQueueSize");
+    return this.queue.length;
+  }
+
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
+  public getWikiConfig(configName: string): WikiConfig | undefined {
+    const wikiConfigObject = this.configMap.get(configName);
+    if (wikiConfigObject == null) {
+      console.error("Failed to find wikiConfig for configName", configName);
+      return undefined;
+    }
+    const wikiConfigMap = new Map(Object.entries(wikiConfigObject));
+    const configType = wikiConfigMap.get("configType");
+    console.log(
+      "Looking for wikiConfig for name",
+      configName,
+      "and type",
+      configType,
+    );
+
+    let wikiConfig;
+    try {
+      wikiConfig = this.container.get<WikiConfig>("WikiConfig", {
+        name: configType,
+      });
+      this.cristal.setWikiConfig(wikiConfig);
+      wikiConfig.setConfigFromObject(wikiConfigObject);
+
+      // Make sure we have initialized this config
+      // This is necessary for offline mode
+      wikiConfig.initialize();
+
+      console.debug(
+        "Found wikiConfig for",
+        configName,
+        "and type",
+        configType,
+        ":",
+        wikiConfig,
+      );
+      return wikiConfig;
+    } catch (e) {
+      console.error(
+        "Failed to find wikiConfig for name",
+        configName,
+        "and type",
+        configType,
+        e,
+      );
+      return undefined;
+    }
+  }
+
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
+  public async initialize(): Promise<void> {
+    console.log("Starting initialize");
+    const extensionList: Array<string> = ["storage"];
+    const config = await loadConfig();
+    this.configMap = new Map(Object.entries(config));
+    console.log("Loaded json config", this.configMap);
+    const cristalLoader = new CristalLoader(extensionList);
+    cristalLoader.initializeContainer();
+    this.container = cristalLoader.container;
+    console.log("Container status", this.container);
+    this.container
+      .bind<CristalApp>("CristalApp")
+      .to(WorkerCristalApp)
+      .inSingletonScope();
+    this.container
+      .bind<QueueWorker>("QueueWorker")
+      .to(WorkerQueueWorker)
+      .inSingletonScope();
+    this.cristal = this.container.get<CristalApp>("CristalApp");
+    this.cristal.setContainer(this.container);
+    console.log("Container status", this.container);
+    // TODO: find a way to do this loading differently. Here we need to
+    //  explicitly depend on all required storage and this is not good.
+    new DexieBackendComponentInit(cristalLoader.container);
+    new GithubBackendComponentInit(cristalLoader.container);
+    new NextcloudBackendComponentInit(cristalLoader.container);
+    new XWikiBackendComponentInit(cristalLoader.container);
+    new AuthenticationDefaultComponentInit(cristalLoader.container);
+    new AlertsDefaultComponentInit(cristalLoader.container);
+    console.log("Loading storage components");
+    this.initialized = true;
+    console.log("Finished initialize");
+  }
+}
+
+const worker = new Worker();
+worker.start();
+
+onconnect = (e) => {
+  Comlink.expose(worker, e.ports[0]);
+};
+console.log("Worker code loaded");

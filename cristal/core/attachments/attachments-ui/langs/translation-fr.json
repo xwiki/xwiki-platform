@@ -1,0 +1,20 @@
+{
+    "attachments.tab.table.header.name": "Nom",
+    "attachments.tab.table.header.mimetype": "Type MIME",
+    "attachments.tab.loading": "Chargement en cours ...",
+    "attachments.tab.noAttachments": "Aucune pièce jointe.",
+    "attachments.extraTabs.title": "Pièces jointes",
+    "attachments.tab.table.header.date": "Date",
+    "attachments.tab.table.header.size": "Taille",
+    "attachments.tab.table.header.author": "Auteur",
+    "attachment.preview.modal.title": "Voir la pièce jointe",
+    "attachment.preview.name.label": "Nom",
+    "attachment.preview.postedBy.label": "Publié par",
+    "attachment.preview.date.label": "Date",
+    "attachment.preview.size.label": "Taille",
+    "attachment.preview.type.label": "Type",
+    "attachment.preview.download.button": "Télécharger",
+    "attachment.preview.close.button": "Fermer",
+    "attachment.preview.error.unknown": "Message d'erreur inconnu",
+    "attachment.preview.loading": "Chargement en cours…"
+}

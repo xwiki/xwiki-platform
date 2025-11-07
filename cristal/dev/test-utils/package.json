@@ -1,0 +1,42 @@
+{
+  "private": true,
+  "name": "@xwiki/cristal-dev-test-utils",
+  "version": "0.23.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "dev/test-utils",
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "vue-i18n": "catalog:"
+  },
+  "peerDependencies": {
+    "inversify": "7.x",
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
+  },
+  "devDependencies": {
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:"
+  }
+}

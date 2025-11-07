@@ -1,0 +1,137 @@
+{
+  "name": "@xwiki/cristal-lib",
+  "version": "0.23.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "lib",
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "main": "src/index.ts",
+  "scripts": {
+    "api-extractor:local": "api-extractor run --local",
+    "build": "vite build",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run",
+    "typecheck": "vue-tsc"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@xwiki/cristal-alerts-default": "workspace:*",
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-attachments-default": "workspace:*",
+    "@xwiki/cristal-attachments-ui": "workspace:*",
+    "@xwiki/cristal-authentication-api": "workspace:*",
+    "@xwiki/cristal-authentication-default": "workspace:*",
+    "@xwiki/cristal-authentication-github-ui": "workspace:*",
+    "@xwiki/cristal-authentication-nextcloud-ui": "workspace:*",
+    "@xwiki/cristal-authentication-ui": "workspace:*",
+    "@xwiki/cristal-backend-api": "workspace:*",
+    "@xwiki/cristal-backend-dexie": "workspace:*",
+    "@xwiki/cristal-backend-github": "workspace:*",
+    "@xwiki/cristal-backend-nextcloud": "workspace:*",
+    "@xwiki/cristal-backend-xwiki": "workspace:*",
+    "@xwiki/cristal-browser-api": "workspace:*",
+    "@xwiki/cristal-collaboration-api": "workspace:*",
+    "@xwiki/cristal-collaboration-hocuspocus": "workspace:*",
+    "@xwiki/cristal-configuration-api": "workspace:*",
+    "@xwiki/cristal-date-api": "workspace:*",
+    "@xwiki/cristal-document-api": "workspace:*",
+    "@xwiki/cristal-document-default": "workspace:*",
+    "@xwiki/cristal-dsshoelace": "workspace:*",
+    "@xwiki/cristal-dsvuetify": "workspace:*",
+    "@xwiki/cristal-editors-blocknote": "workspace:*",
+    "@xwiki/cristal-extension-manager": "workspace:*",
+    "@xwiki/cristal-extension-menubuttons": "workspace:*",
+    "@xwiki/cristal-extra-tabs-default": "workspace:*",
+    "@xwiki/cristal-hierarchy-default": "workspace:*",
+    "@xwiki/cristal-hierarchy-github": "workspace:*",
+    "@xwiki/cristal-hierarchy-nextcloud": "workspace:*",
+    "@xwiki/cristal-hierarchy-xwiki": "workspace:*",
+    "@xwiki/cristal-history-default": "workspace:*",
+    "@xwiki/cristal-history-github": "workspace:*",
+    "@xwiki/cristal-history-ui": "workspace:*",
+    "@xwiki/cristal-history-xwiki": "workspace:*",
+    "@xwiki/cristal-info-actions-default": "workspace:*",
+    "@xwiki/cristal-link-suggest-api": "workspace:*",
+    "@xwiki/cristal-link-suggest-nextcloud": "workspace:*",
+    "@xwiki/cristal-link-suggest-xwiki": "workspace:*",
+    "@xwiki/cristal-macros-ast-html-converter": "workspace:*",
+    "@xwiki/cristal-macros-service": "workspace:*",
+    "@xwiki/cristal-model-click-listener": "workspace:*",
+    "@xwiki/cristal-model-reference-api": "workspace:*",
+    "@xwiki/cristal-model-reference-github": "workspace:*",
+    "@xwiki/cristal-model-reference-nextcloud": "workspace:*",
+    "@xwiki/cristal-model-reference-xwiki": "workspace:*",
+    "@xwiki/cristal-model-remote-url-api": "workspace:*",
+    "@xwiki/cristal-model-remote-url-github": "workspace:*",
+    "@xwiki/cristal-model-remote-url-nextcloud": "workspace:*",
+    "@xwiki/cristal-model-remote-url-xwiki": "workspace:*",
+    "@xwiki/cristal-navigation-tree-default": "workspace:*",
+    "@xwiki/cristal-navigation-tree-github": "workspace:*",
+    "@xwiki/cristal-navigation-tree-nextcloud": "workspace:*",
+    "@xwiki/cristal-navigation-tree-xwiki": "workspace:*",
+    "@xwiki/cristal-page-actions-default": "workspace:*",
+    "@xwiki/cristal-page-actions-ui": "workspace:*",
+    "@xwiki/cristal-rename-default": "workspace:*",
+    "@xwiki/cristal-settings-api": "workspace:*",
+    "@xwiki/cristal-settings-configurations": "workspace:*",
+    "@xwiki/cristal-settings-configurations-ui": "workspace:*",
+    "@xwiki/cristal-settings-default": "workspace:*",
+    "@xwiki/cristal-sharedworker-impl": "workspace:*",
+    "@xwiki/cristal-skin": "workspace:*",
+    "@xwiki/cristal-uiextension-default": "workspace:*",
+    "@xwiki/cristal-uniast-html": "workspace:*",
+    "@xwiki/cristal-uniast-markdown": "workspace:*",
+    "@xwiki/cristal-wiki-config-default": "workspace:*",
+    "@xwiki/cristal-xwiki-macros": "workspace:*",
+    "pinia": "catalog:",
+    "reflect-metadata": "catalog:",
+    "vue-i18n": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "peerDependencies": {
+    "inversify": "7.x",
+    "reflect-metadata": "0.x",
+    "vue": "3.x"
+  },
+  "devDependencies": {
+    "@shoelace-style/shoelace": "catalog:",
+    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
+    "inversify": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.es.js"
+        },
+        "require": {
+          "types": "./dist/index.d.cts",
+          "default": "./dist/index.umd.js"
+        }
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  }
+}

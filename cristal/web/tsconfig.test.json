@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "jsx": "preserve"
+  },
+  "extends": "./../tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "e2e/**/*.ts",
+  ],
+}

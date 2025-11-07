@@ -1,0 +1,44 @@
+{
+  "configuration": {
+    "FileSystem": {
+      "name": "FileSystem",
+      "configType": "FileSystem",
+      "serverRendering": false,
+      "offline": false,
+      "designSystem": "vuetify",
+      "editor": "blocknote"
+    },
+    "FileSystemSL": {
+      "name": "FileSystemSL",
+      "configType": "FileSystem",
+      "serverRendering": false,
+      "offline": false,
+      "designSystem": "shoelace",
+      "editor": "blocknote"
+    },
+    "XWiki": {
+      "name": "XWiki",
+      "configType": "XWiki",
+      "serverRendering": false,
+      "offline": false,
+      "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
+      "baseRestURL": "/rest/cristal/page?media=json",
+      "homePage": "Main.WebHome",
+      "designSystem": "vuetify",
+      "editor": "blocknote",
+      "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
+    },
+    "XWikiSL": {
+      "name": "XWikiSL",
+      "configType": "XWiki",
+      "serverRendering": false,
+      "offline": false,
+      "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
+      "baseRestURL": "/rest/cristal/page?media=json",
+      "homePage": "Main.WebHome",
+      "designSystem": "shoelace",
+      "editor": "blocknote",
+      "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
+    }
+  }
+}

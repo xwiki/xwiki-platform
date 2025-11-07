@@ -1,0 +1,35 @@
+{
+  "private": true,
+  "name": "@xwiki/cristal-electron",
+  "version": "0.23.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "electron",
+    "url": "git+https://github.com/xwiki-contrib/cristal.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "main": "./main/dist/index.cjs",
+  "scripts": {
+    "build:linux": "electron-builder --linux snap deb rpm flatpak AppImage --x64 --config .electron-builder.config.js --dir",
+    "build:mac": "electron-builder --mac dmg --x64 --arm64 --config .electron-builder.config.js --dir",
+    "build:win": "electron-builder --win nsis msi --x64 --ia32 --config .electron-builder.config.js --dir",
+    "clean": "rimraf dist",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "@xwiki/cristal-electron-storage": "workspace:*",
+    "@xwiki/cristal-lib": "workspace:*",
+    "electron-updater": "6.6.2"
+  },
+  "devDependencies": {
+    "electron": "catalog:",
+    "electron-builder": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

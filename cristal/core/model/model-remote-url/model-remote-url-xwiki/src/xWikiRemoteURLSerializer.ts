@@ -1,0 +1,75 @@
+/**
+ * See the LICENSE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+import {
+  AttachmentReference,
+  DocumentReference,
+  EntityType,
+} from "@xwiki/cristal-model-api";
+import { inject, injectable } from "inversify";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
+
+@injectable()
+class XWikiRemoteURLSerializer implements RemoteURLSerializer {
+  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+
+  serialize(reference?: EntityReference): string | undefined {
+    if (!reference) {
+      return undefined;
+    }
+    switch (reference.type) {
+      case EntityType.WIKI:
+        throw new Error("Not implemented");
+      case EntityType.SPACE:
+        throw new Error("Not implemented");
+      case EntityType.DOCUMENT: {
+        return this.serializeDocument(reference);
+      }
+      case EntityType.ATTACHMENT: {
+        return this.serializeAttachment(reference);
+      }
+    }
+  }
+
+  private serializeAttachment(reference: EntityReference) {
+    const baseURL = this.cristalApp.getWikiConfig().baseURL;
+    const attachmentReference = reference as AttachmentReference;
+    const documentReference = attachmentReference.document;
+    const spaces = documentReference.space?.names.map(encodeURI).join("/");
+    return `${baseURL}/bin/download/${spaces}/${encodeURI(documentReference.name)}/${encodeURI(
+      attachmentReference.name,
+    )}`;
+  }
+
+  private serializeDocument(reference: EntityReference) {
+    const baseURL = this.cristalApp.getWikiConfig().baseURL;
+    const documentReference = reference as DocumentReference;
+    const spaces = documentReference.space?.names.map(encodeURI).join("/");
+    if (documentReference.name == "WebHome") {
+      return `${baseURL}/bin/view/${spaces}/`;
+    } else {
+      return `${baseURL}/bin/view/${spaces}/${encodeURI(documentReference.name)}`;
+    }
+  }
+}
+
+export { XWikiRemoteURLSerializer };

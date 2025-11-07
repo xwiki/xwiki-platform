@@ -40,8 +40,8 @@ catalogs:
       specifier: 8.3.6
       version: 8.3.6
     '@microsoft/api-extractor':
-      specifier: 7.53.3
-      version: 7.53.3
+      specifier: 7.54.0
+      version: 7.54.0
     '@microsoft/tsdoc':
       specifier: 0.15.1
       version: 0.15.1
@@ -364,7 +364,7 @@ importers:
         version: 9.39.1
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.53.3(@types/node@24.10.0)
+        version: 7.54.0(@types/node@24.10.0)
       '@microsoft/tsdoc':
         specifier: 'catalog:'
         version: 0.15.1
@@ -6316,8 +6316,8 @@ packages:
   '@microsoft/api-extractor-model@7.31.3':
     resolution: {integrity: sha512-dv4quQI46p0U03TCEpasUf6JrJL3qjMN7JUAobsPElxBv4xayYYvWW9aPpfYV+Jx6hqUcVaLVOeV7+5hxsyoFQ==}
 
-  '@microsoft/api-extractor@7.53.3':
-    resolution: {integrity: sha512-p2HmQaMSVqMBj3bH3643f8xApKAqrF1jNpPsMCTQOYCYgfwLnvzsve8c+bgBWzCOBBgLK54PB6ZLIWMGLg8CZA==}
+  '@microsoft/api-extractor@7.54.0':
+    resolution: {integrity: sha512-t0SEcbVUPy4yAVykPafTNWktBg728X6p9t8qCuGDsYr1/lz2VQFihYDP2CnBFSArP5vwJPcvxktoKVSqH326cA==}
     hasBin: true
 
   '@microsoft/tsdoc-config@0.17.1':
@@ -7891,6 +7891,10 @@ packages:
 
   diff@4.0.2:
     resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
+    engines: {node: '>=0.3.1'}
+
+  diff@8.0.2:
+    resolution: {integrity: sha512-sSuxWU5j5SR9QQji/o2qMvqRNYRDOcBTgsJ/DeCf4iSN4gW+gNMXM7wFIP+fdXZxoNiAnHUTGjCr+TSWXdRDKg==}
     engines: {node: '>=0.3.1'}
 
   dir-compare@4.2.0:
@@ -12234,7 +12238,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/api-extractor@7.53.3(@types/node@24.10.0)':
+  '@microsoft/api-extractor@7.54.0(@types/node@24.10.0)':
     dependencies:
       '@microsoft/api-extractor-model': 7.31.3(@types/node@24.10.0)
       '@microsoft/tsdoc': 0.15.1
@@ -12243,6 +12247,7 @@ snapshots:
       '@rushstack/rig-package': 0.6.0
       '@rushstack/terminal': 0.19.3(@types/node@24.10.0)
       '@rushstack/ts-command-line': 5.1.3(@types/node@24.10.0)
+      diff: 8.0.2
       lodash: 4.17.21
       minimatch: 10.0.3
       resolve: 1.22.10
@@ -14018,6 +14023,8 @@ snapshots:
   dexie@4.2.1: {}
 
   diff@4.0.2: {}
+
+  diff@8.0.2: {}
 
   dir-compare@4.2.0:
     dependencies:
@@ -17610,7 +17617,7 @@ snapshots:
 
   vite-plugin-dts@4.5.4(@types/node@24.10.0)(rollup@4.46.2)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6)(yaml@2.8.1)):
     dependencies:
-      '@microsoft/api-extractor': 7.53.3(@types/node@24.10.0)
+      '@microsoft/api-extractor': 7.54.0(@types/node@24.10.0)
       '@rollup/pluginutils': 5.2.0(rollup@4.46.2)
       '@volar/typescript': 2.4.22
       '@vue/language-core': 2.2.0(typescript@5.9.3)

@@ -1,6 +1,6 @@
 import { ModelReferenceHandler } from './modelReferenceHandler';
 import { ModelReferenceHandlerProvider } from './modelReferenceHandlerProvider';
-import { CristalApp } from '@xwiki/cristal-api';
+import { CristalApp } from '@xwiki/platform-api';
 /**
  * Default implementation for {@link ModelReferenceHandlerProvider}.
  * Will provide an instance of

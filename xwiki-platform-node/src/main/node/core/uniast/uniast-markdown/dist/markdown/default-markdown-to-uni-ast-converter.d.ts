@@ -1,7 +1,7 @@
 import { ParserConfigurationResolver } from './internal-links/parser/parser-configuration-resolver';
 import { MarkdownToUniAstConverter } from './markdown-to-uni-ast-converter';
-import { ModelReferenceHandlerProvider, ModelReferenceParserProvider } from '@xwiki/cristal-model-reference-api';
-import { UniAst } from '@xwiki/cristal-uniast-api';
+import { ModelReferenceHandlerProvider, ModelReferenceParserProvider } from '@xwiki/platform-model-reference-api';
+import { UniAst } from '@xwiki/platform-uniast-api';
 /**
  * @since 0.22
  */

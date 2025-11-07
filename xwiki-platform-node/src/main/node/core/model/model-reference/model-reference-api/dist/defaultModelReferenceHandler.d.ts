@@ -1,4 +1,4 @@
-import { DocumentReference, EntityReference, SpaceReference } from '@xwiki/cristal-model-api';
+import { DocumentReference, EntityReference, SpaceReference } from '@xwiki/platform-model-api';
 import { ModelReferenceHandler } from './modelReferenceHandler';
 /**
  * Default implementation for {@link ModelReferenceHandler}.

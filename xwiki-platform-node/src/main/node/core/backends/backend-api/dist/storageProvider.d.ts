@@ -1,4 +1,4 @@
-import { Storage } from '@xwiki/cristal-api';
+import { Storage } from '@xwiki/platform-api';
 /**
  * Resolves a {@link Storage} based on the current configuration.
  * @since 0.13

@@ -1,6 +1,6 @@
 import { InternalLinksSerializerResolver } from './internal-links/serializer/internal-links-serializer-resolver';
 import { UniAstToMarkdownConverter } from './uni-ast-to-markdown-converter';
-import { InlineContent, UniAst } from '@xwiki/cristal-uniast-api';
+import { InlineContent, UniAst } from '@xwiki/platform-uniast-api';
 /**
  * @since 0.22
  */

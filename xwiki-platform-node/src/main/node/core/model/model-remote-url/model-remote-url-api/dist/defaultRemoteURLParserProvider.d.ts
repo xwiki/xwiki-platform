@@ -1,6 +1,6 @@
 import { RemoteURLParser } from './remoteURLParser';
 import { RemoteURLParserProvider } from './remoteURLParserProvider';
-import { CristalApp } from '@xwiki/cristal-api';
+import { CristalApp } from '@xwiki/platform-api';
 /**
  * @since 0.12
  * @beta

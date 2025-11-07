@@ -1,5 +1,5 @@
-import { PageData } from '@xwiki/cristal-api';
-import { DocumentReference } from '@xwiki/cristal-model-api';
+import { PageData } from '@xwiki/platform-api';
+import { DocumentReference } from '@xwiki/platform-model-api';
 import { Ref } from 'vue';
 /**
  * @since 0.12

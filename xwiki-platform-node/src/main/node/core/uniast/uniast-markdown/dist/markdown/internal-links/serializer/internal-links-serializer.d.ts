@@ -1,5 +1,5 @@
 import { UniAstToMarkdownConverter } from '../../uni-ast-to-markdown-converter';
-import { Link, LinkTarget } from '@xwiki/cristal-uniast-api';
+import { Link, LinkTarget } from '@xwiki/platform-uniast-api';
 /**
  * Serialize internal link and image for a specific backend.
  *

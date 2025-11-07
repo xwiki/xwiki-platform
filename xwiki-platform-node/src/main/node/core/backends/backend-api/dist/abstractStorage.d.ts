@@ -1,4 +1,4 @@
-import { AttachmentsData, Logger, PageAttachment, PageData, Storage, WikiConfig } from '@xwiki/cristal-api';
+import { AttachmentsData, Logger, PageAttachment, PageData, Storage, WikiConfig } from '@xwiki/platform-api';
 /**
  * @since 1.0
  * @beta

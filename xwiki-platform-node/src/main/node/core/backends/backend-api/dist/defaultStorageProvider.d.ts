@@ -1,5 +1,5 @@
 import { StorageProvider } from './storageProvider';
-import { CristalApp, Storage } from '@xwiki/cristal-api';
+import { CristalApp, Storage } from '@xwiki/platform-api';
 /**
  * Provide the current storage.
  * @since 0.13

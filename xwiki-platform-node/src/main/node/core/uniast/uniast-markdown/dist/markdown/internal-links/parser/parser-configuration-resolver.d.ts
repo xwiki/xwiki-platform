@@ -1,5 +1,5 @@
 import { MarkdownParserConfiguration } from './markdown-parser-configuration';
-import { CristalApp } from '@xwiki/cristal-api';
+import { CristalApp } from '@xwiki/platform-api';
 /**
  * @since 0.22
  */

@@ -1,4 +1,4 @@
-import { EntityType } from '@xwiki/cristal-model-api';
+import { EntityType } from '@xwiki/platform-model-api';
 /**
  * @since 0.22
  * @beta

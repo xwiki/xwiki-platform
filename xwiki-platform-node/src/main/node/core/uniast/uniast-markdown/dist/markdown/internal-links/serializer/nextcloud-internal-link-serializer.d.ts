@@ -1,9 +1,9 @@
 import { InternalLinksSerializer } from './internal-links-serializer';
 import { UniAstToMarkdownConverter } from '../../uni-ast-to-markdown-converter';
-import { CristalApp } from '@xwiki/cristal-api';
-import { DocumentService } from '@xwiki/cristal-document-api';
-import { RemoteURLSerializerProvider } from '@xwiki/cristal-model-remote-url-api';
-import { Link, LinkTarget } from '@xwiki/cristal-uniast-api';
+import { CristalApp } from '@xwiki/platform-api';
+import { DocumentService } from '@xwiki/platform-document-api';
+import { RemoteURLSerializerProvider } from '@xwiki/platform-model-remote-url-api';
+import { Link, LinkTarget } from '@xwiki/platform-uniast-api';
 /**
  * @since 0.22
  */

@@ -1,4 +1,4 @@
-import { DocumentReference, SpaceReference } from '@xwiki/cristal-model-api';
+import { DocumentReference, SpaceReference } from '@xwiki/platform-model-api';
 /**
  * Description of a navigation tree node.
  * @since 0.10

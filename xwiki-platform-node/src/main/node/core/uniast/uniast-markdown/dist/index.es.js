@@ -5,8 +5,8 @@ import { gfmStrikethrough as $ } from "micromark-extension-gfm-strikethrough";
 import { gfmTable as z } from "micromark-extension-gfm-table";
 import { gfmTaskListItem as S } from "micromark-extension-gfm-task-list-item";
 import { injectable as g, inject as d } from "inversify";
-import { assertUnreachable as v, assertInArray as _, tryFallibleOrError as O } from "@xwiki/cristal-fn-utils";
-import { EntityType as w } from "@xwiki/cristal-model-api";
+import { assertUnreachable as v, assertInArray as _, tryFallibleOrError as O } from "@xwiki/platform-fn-utils";
+import { EntityType as w } from "@xwiki/platform-model-api";
 import j from "remark-parse";
 import { unified as E } from "unified";
 function x(e, t) {
@@ -637,7 +637,7 @@ class ue {
     t.bind(
       "Factory<InternalLinksSerializer>"
     ).toFactory((n) => async () => {
-      const a = (await import("./nextcloud-internal-link-serializer-fxgRNT4h.js")).NextcloudInternalLinkSerializer;
+      const a = (await import("./nextcloud-internal-link-serializer-aQPALjjh.js")).NextcloudInternalLinkSerializer;
       return this.bindAndLoad(t, r, a, n);
     }).whenNamed(r);
   }
@@ -646,7 +646,7 @@ class ue {
     t.bind(
       "Factory<InternalLinksSerializer>"
     ).toFactory((n) => async () => {
-      const a = (await import("./github-internal-link-serializer-Cr_EgYzo.js")).GitHubInternalLinkSerializer;
+      const a = (await import("./github-internal-link-serializer-BUSMjHU-.js")).GitHubInternalLinkSerializer;
       return this.bindAndLoad(t, r, a, n);
     }).whenNamed(r);
   }
@@ -655,7 +655,7 @@ class ue {
     t.bind(
       "Factory<InternalLinksSerializer>"
     ).toFactory((n) => async () => {
-      const a = (await import("./filesystem-internal-link-serializer-De0Zjdfl.js")).FilesystemInternalLinkSerializer;
+      const a = (await import("./filesystem-internal-link-serializer-mEYxeQDb.js")).FilesystemInternalLinkSerializer;
       return this.bindAndLoad(t, r, a, n);
     }).whenNamed(r);
   }

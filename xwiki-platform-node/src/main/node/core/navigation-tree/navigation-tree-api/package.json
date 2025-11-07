@@ -3,11 +3,11 @@
   "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
-  "homepage": "https://cristal.xwiki.org/",
+  "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "core/navigation-tree/navigation-tree-api",
-    "url": "git+https://github.com/xwiki-contrib/cristal.git"
+    "directory": "xwiki-platform-node/src/main/node/core/core/navigation-tree/navigation-tree-api",
+    "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"

@@ -1,5 +1,5 @@
-import { DocumentReference } from '@xwiki/cristal-model-api';
-import { NavigationTreeNode } from '@xwiki/cristal-navigation-tree-api';
+import { DocumentReference } from '@xwiki/platform-model-api';
+import { NavigationTreeNode } from '@xwiki/platform-navigation-tree-api';
 /**
  * @since 0.15
  * @beta

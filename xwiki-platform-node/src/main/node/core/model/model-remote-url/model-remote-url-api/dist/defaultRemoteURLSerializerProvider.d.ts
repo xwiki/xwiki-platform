@@ -1,6 +1,6 @@
 import { RemoteURLSerializer } from './remoteURLSerializer';
 import { RemoteURLSerializerProvider } from './remoteURLSerializerProvider';
-import { CristalApp } from '@xwiki/cristal-api';
+import { CristalApp } from '@xwiki/platform-api';
 declare class DefaultRemoteURLSerializerProvider implements RemoteURLSerializerProvider {
     private readonly cristalApp;
     constructor(cristalApp: CristalApp);

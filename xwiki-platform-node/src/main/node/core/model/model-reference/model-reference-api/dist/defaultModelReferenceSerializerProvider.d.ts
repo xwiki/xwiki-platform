@@ -1,6 +1,6 @@
 import { ModelReferenceSerializer } from './modelReferenceSerializer';
 import { ModelReferenceSerializerProvider } from './modelReferenceSerializerProvider';
-import { CristalApp } from '@xwiki/cristal-api';
+import { CristalApp } from '@xwiki/platform-api';
 /**
  * @since 0.12
  * @beta

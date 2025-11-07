@@ -26,7 +26,12 @@ packages:
   - xwiki-platform-node/src/main/node/core/macros/macros-api
   - xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx
   - xwiki-platform-node/src/main/node
-
+catalogMode: strict
+cleanupUnusedCatalogs: true
+ignoredBuiltDependencies:
+  - esbuild
+onlyBuiltDependencies:
+  - nx
 catalog:
   '@blocknote/core': 0.35.0
   '@blocknote/mantine': 0.35.0
@@ -104,13 +109,3 @@ catalog:
   vue3-touch-events: 5.0.13
   vuedraggable: 4.1.0
   yjs: 13.6.27
-
-catalogMode: strict
-
-cleanupUnusedCatalogs: true
-
-ignoredBuiltDependencies:
-  - esbuild
-
-onlyBuiltDependencies:
-  - nx

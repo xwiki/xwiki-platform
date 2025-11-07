@@ -1,4 +1,4 @@
-import { UniAst } from '@xwiki/cristal-uniast-api';
+import { UniAst } from '@xwiki/platform-uniast-api';
 /**
  * Convert Markdown string to a Universal AST.
  *

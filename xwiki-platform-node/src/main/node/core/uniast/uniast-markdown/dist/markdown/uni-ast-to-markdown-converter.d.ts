@@ -1,4 +1,4 @@
-import { InlineContent, UniAst } from '@xwiki/cristal-uniast-api';
+import { InlineContent, UniAst } from '@xwiki/platform-uniast-api';
 /**
  * Converts Universal AST trees to markdown.
  *

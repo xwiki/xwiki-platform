@@ -1,6 +1,6 @@
 import { LinkSuggestServiceProvider } from './LinkSuggestServiceProvider';
 import { LinkSuggestService } from './linkSuggestService';
-import { CristalApp } from '@xwiki/cristal-api';
+import { CristalApp } from '@xwiki/platform-api';
 /**
  * @since 0.11
  * @beta

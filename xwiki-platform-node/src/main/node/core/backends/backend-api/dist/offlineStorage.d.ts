@@ -1,4 +1,4 @@
-import { PageData } from '@xwiki/cristal-api';
+import { PageData } from '@xwiki/platform-api';
 /**
  * @since 0.1
  * @beta

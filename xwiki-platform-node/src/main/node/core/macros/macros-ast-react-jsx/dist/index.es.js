@@ -1,4 +1,4 @@
-import { tryFallibleOrError as ge, assertUnreachable as Ie } from "@xwiki/cristal-fn-utils";
+import { tryFallibleOrError as ge, assertUnreachable as Ie } from "@xwiki/platform-fn-utils";
 function Xe(C) {
   return C && C.__esModule && Object.prototype.hasOwnProperty.call(C, "default") ? C.default : C;
 }

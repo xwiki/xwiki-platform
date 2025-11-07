@@ -1,5 +1,5 @@
-import { MacroBlock, MacroInlineContent } from '@xwiki/cristal-macros-api';
-import { RemoteURLParser, RemoteURLSerializer } from '@xwiki/cristal-model-remote-url-api';
+import { MacroBlock, MacroInlineContent } from '@xwiki/platform-macros-api';
+import { RemoteURLParser, RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
 import { JSX, Ref } from 'react';
 /**
  * @since 0.23

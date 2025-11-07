@@ -1,6 +1,6 @@
 import { CollaborationManager } from './collaborationManager';
 import { CollaborationManagerProvider } from './collaborationManagerProvider';
-import { CristalApp } from '@xwiki/cristal-api';
+import { CristalApp } from '@xwiki/platform-api';
 /**
  * @since 0.20
  * @beta

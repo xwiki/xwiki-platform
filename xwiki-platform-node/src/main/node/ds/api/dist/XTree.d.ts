@@ -1,4 +1,4 @@
-import { TreeNode } from '@xwiki/cristal-fn-utils';
+import { TreeNode } from '@xwiki/platform-fn-utils';
 /**
  * Represents a TreeNode that can be displayed in a Tree component.
  * @since 0.23

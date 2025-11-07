@@ -1,4 +1,4 @@
-# @xwiki/cristal-configuration-api
+# @xwiki/platform-configuration-api
 
 ## 0.23.0
 

@@ -21,7 +21,7 @@
 import { inject, injectable } from "inversify";
 import type { RemoteURLSerializer } from "./remoteURLSerializer";
 import type { RemoteURLSerializerProvider } from "./remoteURLSerializerProvider";
-import type { CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/platform-api";
 
 @injectable()
 class DefaultRemoteURLSerializerProvider

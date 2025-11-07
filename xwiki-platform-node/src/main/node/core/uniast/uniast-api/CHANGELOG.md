@@ -1,4 +1,4 @@
-# @xwiki/cristal-uniast-api
+# @xwiki/platform-uniast-api
 
 ## 0.23.0
 
@@ -9,7 +9,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-model-api@0.23.0
+  - @xwiki/platform-model-api@0.23.0
 
 ## 0.22.0
 
@@ -20,4 +20,4 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-model-api@0.22.0
+  - @xwiki/platform-model-api@0.22.0

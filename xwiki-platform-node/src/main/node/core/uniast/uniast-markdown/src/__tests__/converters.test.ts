@@ -20,7 +20,7 @@
 
 import { DefaultMarkdownToUniAstConverter } from "../markdown/default-markdown-to-uni-ast-converter";
 import { DefaultUniAstToMarkdownConverter } from "../markdown/default-uni-ast-to-markdown-converter";
-import { EntityType } from "@xwiki/cristal-model-api";
+import { EntityType } from "@xwiki/platform-model-api";
 import { Container } from "inversify";
 import { describe, expect, test } from "vitest";
 import { matches, mock } from "vitest-mock-extended";
@@ -34,12 +34,12 @@ import type {
   ModelReferenceParserOptions,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
-} from "@xwiki/cristal-model-reference-api";
+} from "@xwiki/platform-model-reference-api";
 import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
-} from "@xwiki/cristal-model-remote-url-api";
-import type { UniAst } from "@xwiki/cristal-uniast-api";
+} from "@xwiki/platform-model-remote-url-api";
+import type { UniAst } from "@xwiki/platform-uniast-api";
 
 // eslint-disable-next-line max-statements
 function init() {

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { TreeNode } from "@xwiki/cristal-fn-utils";
+import type { TreeNode } from "@xwiki/platform-fn-utils";
 
 /**
  * Represents a TreeNode that can be displayed in a Tree component.

@@ -1,4 +1,4 @@
-# @xwiki/cristal-editors-blocknote-react
+# @xwiki/platform-editors-blocknote-react
 
 ## 0.23.0
 
@@ -9,17 +9,17 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.23.0
-  - @xwiki/cristal-collaboration-api@0.23.0
-  - @xwiki/cristal-document-api@0.23.0
-  - @xwiki/cristal-fn-utils@0.23.0
-  - @xwiki/cristal-link-suggest-api@0.23.0
-  - @xwiki/cristal-macros-api@0.23.0
-  - @xwiki/cristal-macros-ast-react-jsx@0.23.0
-  - @xwiki/cristal-model-api@0.23.0
-  - @xwiki/cristal-model-reference-api@0.23.0
-  - @xwiki/cristal-model-remote-url-api@0.23.0
-  - @xwiki/cristal-uniast-markdown@0.23.0
+  - @xwiki/platform-attachments-api@0.23.0
+  - @xwiki/platform-collaboration-api@0.23.0
+  - @xwiki/platform-document-api@0.23.0
+  - @xwiki/platform-fn-utils@0.23.0
+  - @xwiki/platform-link-suggest-api@0.23.0
+  - @xwiki/platform-macros-api@0.23.0
+  - @xwiki/platform-macros-ast-react-jsx@0.23.0
+  - @xwiki/platform-model-api@0.23.0
+  - @xwiki/platform-model-reference-api@0.23.0
+  - @xwiki/platform-model-remote-url-api@0.23.0
+  - @xwiki/platform-uniast-markdown@0.23.0
 
 ## 0.22.0
 
@@ -30,15 +30,15 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.22.0
-  - @xwiki/cristal-collaboration-api@0.22.0
-  - @xwiki/cristal-document-api@0.22.0
-  - @xwiki/cristal-fn-utils@0.22.0
-  - @xwiki/cristal-link-suggest-api@0.22.0
-  - @xwiki/cristal-model-api@0.22.0
-  - @xwiki/cristal-model-reference-api@0.22.0
-  - @xwiki/cristal-model-remote-url-api@0.22.0
-  - @xwiki/cristal-uniast-markdown@0.22.0
+  - @xwiki/platform-attachments-api@0.22.0
+  - @xwiki/platform-collaboration-api@0.22.0
+  - @xwiki/platform-document-api@0.22.0
+  - @xwiki/platform-fn-utils@0.22.0
+  - @xwiki/platform-link-suggest-api@0.22.0
+  - @xwiki/platform-model-api@0.22.0
+  - @xwiki/platform-model-reference-api@0.22.0
+  - @xwiki/platform-model-remote-url-api@0.22.0
+  - @xwiki/platform-uniast-markdown@0.22.0
 
 ## 0.21.0
 
@@ -49,15 +49,15 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.21.0
-  - @xwiki/cristal-collaboration-api@0.21.0
-  - @xwiki/cristal-document-api@0.21.0
-  - @xwiki/cristal-fn-utils@0.21.0
-  - @xwiki/cristal-link-suggest-api@0.21.0
-  - @xwiki/cristal-model-api@0.21.0
-  - @xwiki/cristal-model-reference-api@0.21.0
-  - @xwiki/cristal-model-remote-url-api@0.21.0
-  - @xwiki/cristal-uniast@0.21.0
+  - @xwiki/platform-attachments-api@0.21.0
+  - @xwiki/platform-collaboration-api@0.21.0
+  - @xwiki/platform-document-api@0.21.0
+  - @xwiki/platform-fn-utils@0.21.0
+  - @xwiki/platform-link-suggest-api@0.21.0
+  - @xwiki/platform-model-api@0.21.0
+  - @xwiki/platform-model-reference-api@0.21.0
+  - @xwiki/platform-model-remote-url-api@0.21.0
+  - @xwiki/platform-uniast@0.21.0
 
 ## 0.20.0
 
@@ -68,15 +68,15 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.20.0
-  - @xwiki/cristal-collaboration-api@0.20.0
-  - @xwiki/cristal-document-api@0.20.0
-  - @xwiki/cristal-fn-utils@0.20.0
-  - @xwiki/cristal-link-suggest-api@0.20.0
-  - @xwiki/cristal-model-api@0.20.0
-  - @xwiki/cristal-model-reference-api@0.20.0
-  - @xwiki/cristal-model-remote-url-api@0.20.0
-  - @xwiki/cristal-uniast@0.20.0
+  - @xwiki/platform-attachments-api@0.20.0
+  - @xwiki/platform-collaboration-api@0.20.0
+  - @xwiki/platform-document-api@0.20.0
+  - @xwiki/platform-fn-utils@0.20.0
+  - @xwiki/platform-link-suggest-api@0.20.0
+  - @xwiki/platform-model-api@0.20.0
+  - @xwiki/platform-model-reference-api@0.20.0
+  - @xwiki/platform-model-remote-url-api@0.20.0
+  - @xwiki/platform-uniast@0.20.0
 
 ## 0.20.0-rc.0
 
@@ -87,15 +87,15 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.20.0-rc.0
-  - @xwiki/cristal-collaboration-api@0.20.0-rc.0
-  - @xwiki/cristal-document-api@0.20.0-rc.0
-  - @xwiki/cristal-fn-utils@0.20.0-rc.0
-  - @xwiki/cristal-link-suggest-api@0.20.0-rc.0
-  - @xwiki/cristal-model-api@0.20.0-rc.0
-  - @xwiki/cristal-model-reference-api@0.20.0-rc.0
-  - @xwiki/cristal-model-remote-url-api@0.20.0-rc.0
-  - @xwiki/cristal-uniast@0.20.0-rc.0
+  - @xwiki/platform-attachments-api@0.20.0-rc.0
+  - @xwiki/platform-collaboration-api@0.20.0-rc.0
+  - @xwiki/platform-document-api@0.20.0-rc.0
+  - @xwiki/platform-fn-utils@0.20.0-rc.0
+  - @xwiki/platform-link-suggest-api@0.20.0-rc.0
+  - @xwiki/platform-model-api@0.20.0-rc.0
+  - @xwiki/platform-model-reference-api@0.20.0-rc.0
+  - @xwiki/platform-model-remote-url-api@0.20.0-rc.0
+  - @xwiki/platform-uniast@0.20.0-rc.0
 
 ## 0.19.0
 
@@ -106,11 +106,11 @@
 ### Patch Changes
 
 - Updated dependencies [3eea53e]
-  - @xwiki/cristal-attachments-api@0.19.0
-  - @xwiki/cristal-document-api@0.19.0
-  - @xwiki/cristal-fn-utils@0.19.0
-  - @xwiki/cristal-link-suggest-api@0.19.0
-  - @xwiki/cristal-model-api@0.19.0
-  - @xwiki/cristal-model-reference-api@0.19.0
-  - @xwiki/cristal-model-remote-url-api@0.19.0
-  - @xwiki/cristal-uniast@0.19.0
+  - @xwiki/platform-attachments-api@0.19.0
+  - @xwiki/platform-document-api@0.19.0
+  - @xwiki/platform-fn-utils@0.19.0
+  - @xwiki/platform-link-suggest-api@0.19.0
+  - @xwiki/platform-model-api@0.19.0
+  - @xwiki/platform-model-reference-api@0.19.0
+  - @xwiki/platform-model-remote-url-api@0.19.0
+  - @xwiki/platform-uniast@0.19.0

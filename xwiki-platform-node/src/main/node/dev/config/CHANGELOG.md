@@ -1,4 +1,4 @@
-# @xwiki/cristal-dev-config
+# @xwiki/platform-dev-config
 
 ## 0.23.0
 

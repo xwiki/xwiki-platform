@@ -19,19 +19,19 @@
  */
 
 import { Container } from "inversify";
-import type { AttachmentsService } from "@xwiki/cristal-attachments-api";
-import type { DocumentService } from "@xwiki/cristal-document-api";
-import type { LinkEditionContext } from "@xwiki/cristal-editors-blocknote-react";
-import type { LinkSuggestServiceProvider } from "@xwiki/cristal-link-suggest-api";
+import type { AttachmentsService } from "@xwiki/platform-attachments-api";
+import type { DocumentService } from "@xwiki/platform-document-api";
+import type { LinkEditionContext } from "@xwiki/platform-editors-blocknote-react";
+import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
-} from "@xwiki/cristal-model-reference-api";
+} from "@xwiki/platform-model-reference-api";
 import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
-} from "@xwiki/cristal-model-remote-url-api";
+} from "@xwiki/platform-model-remote-url-api";
 
 export function createLinkEditionContext(
   container: Container,

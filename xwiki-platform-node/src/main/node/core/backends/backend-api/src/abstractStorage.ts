@@ -26,7 +26,7 @@ import type {
   PageData,
   Storage,
   WikiConfig,
-} from "@xwiki/cristal-api";
+} from "@xwiki/platform-api";
 
 /**
  * @since 1.0

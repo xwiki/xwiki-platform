@@ -19,6 +19,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "less": "less/bootstrap.less",
     "autoprefixer": "^9.4.7",
     "btoa": "^1.2.1",
     "cross-env": "^7.0.0",
@@ -69,6 +70,5 @@
       "js"
     ]
   },
-  "less": "less/bootstrap.less",
   "style": "dist/css/bootstrap.css"
 }

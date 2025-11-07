@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/cristal-model-api",
+  "name": "@xwiki/platform-model-api",
   "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -30,7 +30,7 @@
   },
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "typescript": "catalog:",
     "vite": "catalog:"
   },

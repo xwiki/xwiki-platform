@@ -245,49 +245,49 @@ importers:
 
   xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/api
-      '@xwiki/cristal-attachments-default':
+      '@xwiki/platform-attachments-default':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/attachments/attachments-default
-      '@xwiki/cristal-authentication-api':
+      '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/authentication/authentication-api
-      '@xwiki/cristal-backend-api':
+      '@xwiki/platform-backend-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/backends/backend-api
-      '@xwiki/cristal-collaboration-api':
+      '@xwiki/platform-collaboration-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/collaboration/collaboration-api
-      '@xwiki/cristal-document-api':
+      '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/document/document-api
-      '@xwiki/cristal-dsapi':
+      '@xwiki/platform-dsapi':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/ds/api
-      '@xwiki/cristal-editors-blocknote-headless':
+      '@xwiki/platform-editors-blocknote-headless':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/editors/blocknote-headless
-      '@xwiki/cristal-editors-blocknote-react':
+      '@xwiki/platform-editors-blocknote-react':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/editors/blocknote-react
-      '@xwiki/cristal-link-suggest-api':
+      '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/model/model-api
-      '@xwiki/cristal-model-reference-api':
+      '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
-      '@xwiki/cristal-model-remote-url-api':
+      '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
-      '@xwiki/cristal-uniast-api':
+      '@xwiki/platform-uniast-api':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/uniast/uniast-api
-      '@xwiki/cristal-uniast-markdown':
+      '@xwiki/platform-uniast-markdown':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
       inversify:
@@ -547,17 +547,17 @@ importers:
 
   xwiki-platform-node/src/main/node/api:
     dependencies:
-      '@xwiki/cristal-authentication-api':
+      '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../core/authentication/authentication-api
-      '@xwiki/cristal-configuration-api':
+      '@xwiki/platform-configuration-api':
         specifier: workspace:*
         version: link:../core/configuration/configuration-api
       vue-router:
         specifier: 'catalog:'
         version: 4.5.1(vue@3.5.23(typescript@5.9.3))
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../dev/config
       inversify:
@@ -581,17 +581,17 @@ importers:
 
   xwiki-platform-node/src/main/node/core/attachments/attachments-api:
     dependencies:
-      '@xwiki/cristal-authentication-api':
+      '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
       reflect-metadata:
         specifier: 0.x
         version: 0.2.2
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       rimraf:
@@ -606,32 +606,32 @@ importers:
 
   xwiki-platform-node/src/main/node/core/attachments/attachments-default:
     dependencies:
-      '@xwiki/cristal-attachments-api':
+      '@xwiki/platform-attachments-api':
         specifier: workspace:*
         version: link:../attachments-api
-      '@xwiki/cristal-authentication-api':
+      '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
-      '@xwiki/cristal-backend-api':
+      '@xwiki/platform-backend-api':
         specifier: workspace:*
         version: link:../../backends/backend-api
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
-      '@xwiki/cristal-model-reference-api':
+      '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api
-      '@xwiki/cristal-model-remote-url-api':
+      '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       pinia:
         specifier: 'catalog:'
         version: 3.0.3(typescript@5.9.3)(vue@3.5.23(typescript@5.9.3))
     devDependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
@@ -658,7 +658,7 @@ importers:
 
   xwiki-platform-node/src/main/node/core/authentication/authentication-api:
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       reflect-metadata:
@@ -673,11 +673,11 @@ importers:
 
   xwiki-platform-node/src/main/node/core/backends/backend-api:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
@@ -695,14 +695,14 @@ importers:
 
   xwiki-platform-node/src/main/node/core/collaboration/collaboration-api:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
       yjs:
         specifier: 'catalog:'
         version: 13.6.27
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
@@ -727,7 +727,7 @@ importers:
         specifier: 'catalog:'
         version: 3.11.0
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       rimraf:
@@ -739,17 +739,17 @@ importers:
 
   xwiki-platform-node/src/main/node/core/document/document-api:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
       reflect-metadata:
         specifier: 0.x
         version: 0.2.2
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       typescript:
@@ -764,7 +764,7 @@ importers:
 
   xwiki-platform-node/src/main/node/core/fn-utils:
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       typescript:
@@ -786,7 +786,7 @@ importers:
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.4.6
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       typescript:
@@ -804,11 +804,11 @@ importers:
 
   xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       inversify:
@@ -826,7 +826,7 @@ importers:
 
   xwiki-platform-node/src/main/node/core/macros/macros-api:
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       typescript:
@@ -838,13 +838,13 @@ importers:
 
   xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx:
     dependencies:
-      '@xwiki/cristal-fn-utils':
+      '@xwiki/platform-fn-utils':
         specifier: workspace:*
         version: link:../../fn-utils
-      '@xwiki/cristal-macros-api':
+      '@xwiki/platform-macros-api':
         specifier: workspace:*
         version: link:../macros-api
-      '@xwiki/cristal-model-remote-url-api':
+      '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       inversify:
@@ -854,7 +854,7 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.2
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       react:
@@ -872,7 +872,7 @@ importers:
 
   xwiki-platform-node/src/main/node/core/model/model-api:
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       typescript:
@@ -884,14 +884,14 @@ importers:
 
   xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../../api
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model-api
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
@@ -909,14 +909,14 @@ importers:
 
   xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../../api
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model-api
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
       inversify:
@@ -934,14 +934,14 @@ importers:
 
   xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       typescript:
@@ -953,7 +953,7 @@ importers:
 
   xwiki-platform-node/src/main/node/core/uniast/uniast-api:
     dependencies:
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
     devDependencies:
@@ -966,19 +966,19 @@ importers:
 
   xwiki-platform-node/src/main/node/core/uniast/uniast-markdown:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/cristal-document-api':
+      '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../document/document-api
-      '@xwiki/cristal-fn-utils':
+      '@xwiki/platform-fn-utils':
         specifier: workspace:*
         version: link:../../fn-utils
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
-      '@xwiki/cristal-uniast-api':
+      '@xwiki/platform-uniast-api':
         specifier: workspace:*
         version: link:../uniast-api
       fast-xml-parser:
@@ -1012,13 +1012,13 @@ importers:
       '@types/mdast':
         specifier: 'catalog:'
         version: 4.0.4
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
-      '@xwiki/cristal-model-reference-api':
+      '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api
-      '@xwiki/cristal-model-remote-url-api':
+      '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       inversify:
@@ -1045,23 +1045,23 @@ importers:
 
   xwiki-platform-node/src/main/node/ds/api:
     dependencies:
-      '@xwiki/cristal-api':
+      '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../api
-      '@xwiki/cristal-fn-utils':
+      '@xwiki/platform-fn-utils':
         specifier: workspace:*
         version: link:../../core/fn-utils
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
-      '@xwiki/cristal-navigation-tree-api':
+      '@xwiki/platform-navigation-tree-api':
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-api
       reflect-metadata:
         specifier: 0.x
         version: 0.2.2
     devDependencies:
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       typescript:
@@ -1079,46 +1079,46 @@ importers:
       '@blocknote/core':
         specifier: 'catalog:'
         version: 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
-      '@xwiki/cristal-attachments-api':
+      '@xwiki/platform-attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api
-      '@xwiki/cristal-authentication-api':
+      '@xwiki/platform-authentication-api':
         specifier: workspace:*
         version: link:../../core/authentication/authentication-api
-      '@xwiki/cristal-collaboration-api':
+      '@xwiki/platform-collaboration-api':
         specifier: workspace:*
         version: link:../../core/collaboration/collaboration-api
-      '@xwiki/cristal-document-api':
+      '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
-      '@xwiki/cristal-dsapi':
+      '@xwiki/platform-dsapi':
         specifier: workspace:*
         version: link:../../ds/api
-      '@xwiki/cristal-editors-blocknote-react':
+      '@xwiki/platform-editors-blocknote-react':
         specifier: workspace:*
         version: link:../blocknote-react
-      '@xwiki/cristal-fn-utils':
+      '@xwiki/platform-fn-utils':
         specifier: workspace:*
         version: link:../../core/fn-utils
-      '@xwiki/cristal-icons':
+      '@xwiki/platform-icons':
         specifier: workspace:*
         version: link:../../core/icons
-      '@xwiki/cristal-link-suggest-api':
+      '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../../core/link-suggest/link-suggest-api
-      '@xwiki/cristal-macros-api':
+      '@xwiki/platform-macros-api':
         specifier: workspace:*
         version: link:../../core/macros/macros-api
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
-      '@xwiki/cristal-model-reference-api':
+      '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../core/model/model-reference/model-reference-api
-      '@xwiki/cristal-model-remote-url-api':
+      '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-api
-      '@xwiki/cristal-uniast-api':
+      '@xwiki/platform-uniast-api':
         specifier: workspace:*
         version: link:../../core/uniast/uniast-api
       eventemitter3:
@@ -1134,7 +1134,7 @@ importers:
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       inversify:
@@ -1173,37 +1173,37 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.2(@types/react@19.2.2)
-      '@xwiki/cristal-attachments-api':
+      '@xwiki/platform-attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api
-      '@xwiki/cristal-collaboration-api':
+      '@xwiki/platform-collaboration-api':
         specifier: workspace:*
         version: link:../../core/collaboration/collaboration-api
-      '@xwiki/cristal-document-api':
+      '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
-      '@xwiki/cristal-fn-utils':
+      '@xwiki/platform-fn-utils':
         specifier: workspace:*
         version: link:../../core/fn-utils
-      '@xwiki/cristal-link-suggest-api':
+      '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../../core/link-suggest/link-suggest-api
-      '@xwiki/cristal-macros-api':
+      '@xwiki/platform-macros-api':
         specifier: workspace:*
         version: link:../../core/macros/macros-api
-      '@xwiki/cristal-macros-ast-react-jsx':
+      '@xwiki/platform-macros-ast-react-jsx':
         specifier: workspace:*
         version: link:../../core/macros/macros-ast-react-jsx
-      '@xwiki/cristal-model-api':
+      '@xwiki/platform-model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
-      '@xwiki/cristal-model-reference-api':
+      '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../core/model/model-reference/model-reference-api
-      '@xwiki/cristal-model-remote-url-api':
+      '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-api
-      '@xwiki/cristal-uniast-markdown':
+      '@xwiki/platform-uniast-markdown':
         specifier: workspace:*
         version: link:../../core/uniast/uniast-markdown
       i18next:
@@ -1237,7 +1237,7 @@ importers:
       '@vitejs/plugin-react':
         specifier: 'catalog:'
         version: 5.1.0(vite@7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
-      '@xwiki/cristal-dev-config':
+      '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       postcss:

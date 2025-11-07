@@ -21,7 +21,7 @@
 import { JSONLDDocument } from "./JSONLDDocument";
 import type { PageData } from "../api/PageData";
 import type { Document } from "../api/document";
-import type { UserDetails } from "@xwiki/cristal-authentication-api";
+import type { UserDetails } from "@xwiki/platform-authentication-api";
 
 /**
  * @beta

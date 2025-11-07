@@ -1,4 +1,4 @@
-# @xwiki/cristal-model-api
+# @xwiki/platform-model-api
 
 ## 0.23.0
 

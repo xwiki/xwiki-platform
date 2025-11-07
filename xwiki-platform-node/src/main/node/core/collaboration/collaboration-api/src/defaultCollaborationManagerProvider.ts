@@ -22,7 +22,7 @@ import { collaborationManagerName } from "./collaborationManagerName";
 import { inject, injectable } from "inversify";
 import type { CollaborationManager } from "./collaborationManager";
 import type { CollaborationManagerProvider } from "./collaborationManagerProvider";
-import type { CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/platform-api";
 
 /**
  * @since 0.20

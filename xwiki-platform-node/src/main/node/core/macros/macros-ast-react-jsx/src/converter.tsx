@@ -17,18 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { assertUnreachable, tryFallibleOrError } from "@xwiki/cristal-fn-utils";
+import { assertUnreachable, tryFallibleOrError } from "@xwiki/platform-fn-utils";
 import React from "react";
 import type {
   MacroBlock,
   MacroBlockStyles,
   MacroInlineContent,
   MacroLinkTarget,
-} from "@xwiki/cristal-macros-api";
+} from "@xwiki/platform-macros-api";
 import type {
   RemoteURLParser,
   RemoteURLSerializer,
-} from "@xwiki/cristal-model-remote-url-api";
+} from "@xwiki/platform-model-remote-url-api";
 import type {
   CSSProperties,
   HTMLAttributes,

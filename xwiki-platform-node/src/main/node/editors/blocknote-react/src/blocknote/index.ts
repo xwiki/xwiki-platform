@@ -31,7 +31,7 @@ import {
 } from "@blocknote/core";
 import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
-import { filterMap } from "@xwiki/cristal-fn-utils";
+import { filterMap } from "@xwiki/platform-fn-utils";
 import type { BlockNoteConcreteMacro } from "./utils";
 import type { Block, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";

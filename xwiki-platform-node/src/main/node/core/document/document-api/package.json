@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/cristal-document-api",
+  "name": "@xwiki/platform-document-api",
   "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -30,15 +30,15 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-model-api": "workspace:*"
+    "@xwiki/platform-api": "workspace:*",
+    "@xwiki/platform-model-api": "workspace:*"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
-    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vue": "catalog:"

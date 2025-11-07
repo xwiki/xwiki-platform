@@ -21,7 +21,7 @@
 import { inject, injectable } from "inversify";
 import type { RemoteURLParser } from "./remoteURLParser";
 import type { RemoteURLParserProvider } from "./remoteURLParserProvider";
-import type { CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/platform-api";
 
 /**
  * @since 0.12

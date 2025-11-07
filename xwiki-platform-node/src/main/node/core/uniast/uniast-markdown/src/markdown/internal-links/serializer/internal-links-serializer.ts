@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type { UniAstToMarkdownConverter } from "../../uni-ast-to-markdown-converter";
-import type { Link, LinkTarget } from "@xwiki/cristal-uniast-api";
+import type { Link, LinkTarget } from "@xwiki/platform-uniast-api";
 
 /**
  * Serialize internal link and image for a specific backend.

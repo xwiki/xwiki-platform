@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { InternalLinksSerializerResolver } from "./internal-links/serializer/internal-links-serializer-resolver";
-import { tryFallibleOrError } from "@xwiki/cristal-fn-utils";
+import { tryFallibleOrError } from "@xwiki/platform-fn-utils";
 import { inject, injectable } from "inversify";
 import type { UniAstToMarkdownConverter } from "./uni-ast-to-markdown-converter";
 import type {
@@ -30,7 +30,7 @@ import type {
   TableCell,
   Text,
   UniAst,
-} from "@xwiki/cristal-uniast-api";
+} from "@xwiki/platform-uniast-api";
 
 /**
  * @since 0.22

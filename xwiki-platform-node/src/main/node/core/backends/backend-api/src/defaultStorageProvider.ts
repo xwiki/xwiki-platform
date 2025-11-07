@@ -20,7 +20,7 @@
 
 import { inject, injectable } from "inversify";
 import type { StorageProvider } from "./storageProvider";
-import type { CristalApp, Storage } from "@xwiki/cristal-api";
+import type { CristalApp, Storage } from "@xwiki/platform-api";
 
 /**
  * Provide the current storage.

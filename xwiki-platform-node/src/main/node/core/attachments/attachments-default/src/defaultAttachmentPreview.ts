@@ -18,16 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AttachmentReference } from "@xwiki/cristal-model-api";
+import { AttachmentReference } from "@xwiki/platform-model-api";
 import { inject, injectable } from "inversify";
 import { defineStore, storeToRefs } from "pinia";
 import type {
   Attachment,
   AttachmentPreview,
-} from "@xwiki/cristal-attachments-api";
-import type { UserDetails } from "@xwiki/cristal-authentication-api";
-import type { StorageProvider } from "@xwiki/cristal-backend-api";
-import type { ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";
+} from "@xwiki/platform-attachments-api";
+import type { UserDetails } from "@xwiki/platform-authentication-api";
+import type { StorageProvider } from "@xwiki/platform-backend-api";
+import type { ModelReferenceSerializerProvider } from "@xwiki/platform-model-reference-api";
 import type { Store, StoreDefinition } from "pinia";
 import type { Ref } from "vue";
 

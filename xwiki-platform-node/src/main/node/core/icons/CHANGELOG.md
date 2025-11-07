@@ -1,4 +1,4 @@
-# @xwiki/cristal-icons
+# @xwiki/platform-icons
 
 ## 0.23.0
 

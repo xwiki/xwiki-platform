@@ -1,4 +1,4 @@
-# @xwiki/cristal-macros-api
+# @xwiki/platform-macros-api
 
 ## 0.23.0
 

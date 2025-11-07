@@ -25,7 +25,7 @@ import {
   DocumentReference,
   EntityType,
   SpaceReference,
-} from "@xwiki/cristal-model-api";
+} from "@xwiki/platform-model-api";
 import { useMemo } from "react";
 
 export type BlockNoteForTestProps = {

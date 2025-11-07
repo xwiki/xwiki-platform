@@ -1,4 +1,4 @@
-# @xwiki/cristal-attachments-default
+# @xwiki/platform-attachments-default
 
 ## 0.23.0
 
@@ -9,12 +9,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.23.0
-  - @xwiki/cristal-authentication-api@0.23.0
-  - @xwiki/cristal-backend-api@0.23.0
-  - @xwiki/cristal-model-api@0.23.0
-  - @xwiki/cristal-model-reference-api@0.23.0
-  - @xwiki/cristal-model-remote-url-api@0.23.0
+  - @xwiki/platform-attachments-api@0.23.0
+  - @xwiki/platform-authentication-api@0.23.0
+  - @xwiki/platform-backend-api@0.23.0
+  - @xwiki/platform-model-api@0.23.0
+  - @xwiki/platform-model-reference-api@0.23.0
+  - @xwiki/platform-model-remote-url-api@0.23.0
 
 ## 0.22.0
 
@@ -25,12 +25,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.22.0
-  - @xwiki/cristal-authentication-api@0.22.0
-  - @xwiki/cristal-backend-api@0.22.0
-  - @xwiki/cristal-model-api@0.22.0
-  - @xwiki/cristal-model-reference-api@0.22.0
-  - @xwiki/cristal-model-remote-url-api@0.22.0
+  - @xwiki/platform-attachments-api@0.22.0
+  - @xwiki/platform-authentication-api@0.22.0
+  - @xwiki/platform-backend-api@0.22.0
+  - @xwiki/platform-model-api@0.22.0
+  - @xwiki/platform-model-reference-api@0.22.0
+  - @xwiki/platform-model-remote-url-api@0.22.0
 
 ## 0.21.0
 
@@ -41,12 +41,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.21.0
-  - @xwiki/cristal-authentication-api@0.21.0
-  - @xwiki/cristal-backend-api@0.21.0
-  - @xwiki/cristal-model-api@0.21.0
-  - @xwiki/cristal-model-reference-api@0.21.0
-  - @xwiki/cristal-model-remote-url-api@0.21.0
+  - @xwiki/platform-attachments-api@0.21.0
+  - @xwiki/platform-authentication-api@0.21.0
+  - @xwiki/platform-backend-api@0.21.0
+  - @xwiki/platform-model-api@0.21.0
+  - @xwiki/platform-model-reference-api@0.21.0
+  - @xwiki/platform-model-remote-url-api@0.21.0
 
 ## 0.20.0
 
@@ -57,12 +57,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.20.0
-  - @xwiki/cristal-authentication-api@0.20.0
-  - @xwiki/cristal-backend-api@0.20.0
-  - @xwiki/cristal-model-api@0.20.0
-  - @xwiki/cristal-model-reference-api@0.20.0
-  - @xwiki/cristal-model-remote-url-api@0.20.0
+  - @xwiki/platform-attachments-api@0.20.0
+  - @xwiki/platform-authentication-api@0.20.0
+  - @xwiki/platform-backend-api@0.20.0
+  - @xwiki/platform-model-api@0.20.0
+  - @xwiki/platform-model-reference-api@0.20.0
+  - @xwiki/platform-model-remote-url-api@0.20.0
 
 ## 0.20.0-rc.0
 
@@ -73,12 +73,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.20.0-rc.0
-  - @xwiki/cristal-authentication-api@0.20.0-rc.0
-  - @xwiki/cristal-backend-api@0.20.0-rc.0
-  - @xwiki/cristal-model-api@0.20.0-rc.0
-  - @xwiki/cristal-model-reference-api@0.20.0-rc.0
-  - @xwiki/cristal-model-remote-url-api@0.20.0-rc.0
+  - @xwiki/platform-attachments-api@0.20.0-rc.0
+  - @xwiki/platform-authentication-api@0.20.0-rc.0
+  - @xwiki/platform-backend-api@0.20.0-rc.0
+  - @xwiki/platform-model-api@0.20.0-rc.0
+  - @xwiki/platform-model-reference-api@0.20.0-rc.0
+  - @xwiki/platform-model-remote-url-api@0.20.0-rc.0
 
 ## 0.19.0
 
@@ -89,12 +89,12 @@
 ### Patch Changes
 
 - Updated dependencies [3eea53e]
-  - @xwiki/cristal-attachments-api@0.19.0
-  - @xwiki/cristal-authentication-api@0.19.0
-  - @xwiki/cristal-backend-api@0.19.0
-  - @xwiki/cristal-model-api@0.19.0
-  - @xwiki/cristal-model-reference-api@0.19.0
-  - @xwiki/cristal-model-remote-url-api@0.19.0
+  - @xwiki/platform-attachments-api@0.19.0
+  - @xwiki/platform-authentication-api@0.19.0
+  - @xwiki/platform-backend-api@0.19.0
+  - @xwiki/platform-model-api@0.19.0
+  - @xwiki/platform-model-reference-api@0.19.0
+  - @xwiki/platform-model-remote-url-api@0.19.0
 
 ## 0.18.0
 
@@ -105,12 +105,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.18.0
-  - @xwiki/cristal-authentication-api@0.18.0
-  - @xwiki/cristal-backend-api@0.18.0
-  - @xwiki/cristal-model-api@0.18.0
-  - @xwiki/cristal-model-reference-api@0.18.0
-  - @xwiki/cristal-model-remote-url-api@0.18.0
+  - @xwiki/platform-attachments-api@0.18.0
+  - @xwiki/platform-authentication-api@0.18.0
+  - @xwiki/platform-backend-api@0.18.0
+  - @xwiki/platform-model-api@0.18.0
+  - @xwiki/platform-model-reference-api@0.18.0
+  - @xwiki/platform-model-remote-url-api@0.18.0
 
 ## 0.17.0
 
@@ -121,12 +121,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.17.0
-  - @xwiki/cristal-authentication-api@0.17.0
-  - @xwiki/cristal-backend-api@0.17.0
-  - @xwiki/cristal-model-api@0.17.0
-  - @xwiki/cristal-model-reference-api@0.17.0
-  - @xwiki/cristal-model-remote-url-api@0.17.0
+  - @xwiki/platform-attachments-api@0.17.0
+  - @xwiki/platform-authentication-api@0.17.0
+  - @xwiki/platform-backend-api@0.17.0
+  - @xwiki/platform-model-api@0.17.0
+  - @xwiki/platform-model-reference-api@0.17.0
+  - @xwiki/platform-model-remote-url-api@0.17.0
 
 ## 0.16.0
 
@@ -137,12 +137,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.16.0
-  - @xwiki/cristal-authentication-api@0.16.0
-  - @xwiki/cristal-backend-api@0.16.0
-  - @xwiki/cristal-model-api@0.16.0
-  - @xwiki/cristal-model-reference-api@0.16.0
-  - @xwiki/cristal-model-remote-url-api@0.16.0
+  - @xwiki/platform-attachments-api@0.16.0
+  - @xwiki/platform-authentication-api@0.16.0
+  - @xwiki/platform-backend-api@0.16.0
+  - @xwiki/platform-model-api@0.16.0
+  - @xwiki/platform-model-reference-api@0.16.0
+  - @xwiki/platform-model-remote-url-api@0.16.0
 
 ## 0.15.0
 
@@ -153,12 +153,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-attachments-api@0.15.0
-  - @xwiki/cristal-authentication-api@0.15.0
-  - @xwiki/cristal-backend-api@0.15.0
-  - @xwiki/cristal-model-api@0.15.0
-  - @xwiki/cristal-model-reference-api@0.15.0
-  - @xwiki/cristal-model-remote-url-api@0.15.0
+  - @xwiki/platform-attachments-api@0.15.0
+  - @xwiki/platform-authentication-api@0.15.0
+  - @xwiki/platform-backend-api@0.15.0
+  - @xwiki/platform-model-api@0.15.0
+  - @xwiki/platform-model-reference-api@0.15.0
+  - @xwiki/platform-model-remote-url-api@0.15.0
 
 ## 0.14.0
 
@@ -169,12 +169,12 @@
 ### Patch Changes
 
 - Updated dependencies [3e5f853]
-  - @xwiki/cristal-attachments-api@0.14.0
-  - @xwiki/cristal-authentication-api@0.14.0
-  - @xwiki/cristal-backend-api@0.14.0
-  - @xwiki/cristal-model-api@0.14.0
-  - @xwiki/cristal-model-reference-api@0.14.0
-  - @xwiki/cristal-model-remote-url-api@0.14.0
+  - @xwiki/platform-attachments-api@0.14.0
+  - @xwiki/platform-authentication-api@0.14.0
+  - @xwiki/platform-backend-api@0.14.0
+  - @xwiki/platform-model-api@0.14.0
+  - @xwiki/platform-model-reference-api@0.14.0
+  - @xwiki/platform-model-remote-url-api@0.14.0
 
 ## 0.13.0
 
@@ -185,12 +185,12 @@
 ### Patch Changes
 
 - Updated dependencies [06a5d1b]
-  - @xwiki/cristal-attachments-api@0.13.0
-  - @xwiki/cristal-authentication-api@0.13.0
-  - @xwiki/cristal-backend-api@0.13.0
-  - @xwiki/cristal-model-api@0.13.0
-  - @xwiki/cristal-model-reference-api@0.13.0
-  - @xwiki/cristal-model-remote-url-api@0.13.0
+  - @xwiki/platform-attachments-api@0.13.0
+  - @xwiki/platform-authentication-api@0.13.0
+  - @xwiki/platform-backend-api@0.13.0
+  - @xwiki/platform-model-api@0.13.0
+  - @xwiki/platform-model-reference-api@0.13.0
+  - @xwiki/platform-model-remote-url-api@0.13.0
 
 ## 0.12.0
 
@@ -201,12 +201,12 @@
 ### Patch Changes
 
 - Updated dependencies [681a9b7]
-  - @xwiki/cristal-api@0.12.0
-  - @xwiki/cristal-attachments-api@0.12.0
-  - @xwiki/cristal-authentication-api@0.12.0
-  - @xwiki/cristal-model-api@0.12.0
-  - @xwiki/cristal-model-reference-api@0.12.0
-  - @xwiki/cristal-model-remote-url-api@0.12.0
+  - @xwiki/platform-api@0.12.0
+  - @xwiki/platform-attachments-api@0.12.0
+  - @xwiki/platform-authentication-api@0.12.0
+  - @xwiki/platform-model-api@0.12.0
+  - @xwiki/platform-model-reference-api@0.12.0
+  - @xwiki/platform-model-remote-url-api@0.12.0
 
 ## 0.11.0
 
@@ -217,8 +217,8 @@
 ### Patch Changes
 
 - Updated dependencies [d54422d]
-  - @xwiki/cristal-api@0.11.0
-  - @xwiki/cristal-attachments-api@0.11.0
+  - @xwiki/platform-api@0.11.0
+  - @xwiki/platform-attachments-api@0.11.0
 
 ## 0.10.0
 
@@ -229,8 +229,8 @@
 ### Patch Changes
 
 - Updated dependencies [fa7fe9f]
-  - @xwiki/cristal-api@0.10.0
-  - @xwiki/cristal-attachments-api@0.10.0
+  - @xwiki/platform-api@0.10.0
+  - @xwiki/platform-attachments-api@0.10.0
 
 ## 0.9.0
 
@@ -241,5 +241,5 @@
 ### Patch Changes
 
 - Updated dependencies [efbd020]
-  - @xwiki/cristal-api@0.9.0
-  - @xwiki/cristal-attachments-api@0.9.0
+  - @xwiki/platform-api@0.9.0
+  - @xwiki/platform-attachments-api@0.9.0

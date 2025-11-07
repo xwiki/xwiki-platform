@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { InlineContent, UniAst } from "@xwiki/cristal-uniast-api";
+import type { InlineContent, UniAst } from "@xwiki/platform-uniast-api";
 
 /**
  * Converts Universal AST trees to markdown.

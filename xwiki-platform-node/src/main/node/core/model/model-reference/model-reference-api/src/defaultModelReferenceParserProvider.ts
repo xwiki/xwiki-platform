@@ -21,7 +21,7 @@
 import { inject, injectable } from "inversify";
 import type { ModelReferenceParser } from "./modelReferenceParser";
 import type { ModelReferenceParserProvider } from "./modelReferenceParserProvider";
-import type { CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/platform-api";
 
 /**
  * @since 0.12

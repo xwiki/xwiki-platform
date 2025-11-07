@@ -22,11 +22,11 @@ import type {
   DocumentReference,
   EntityReference,
   SpaceReference,
-} from "@xwiki/cristal-model-api";
+} from "@xwiki/platform-model-api";
 
 /**
  * A ModelReferenceHandler can do backend-specific operations involving
- * {@link @xwiki/cristal-model-api#EntityReference | EntityReferences}.
+ * {@link @xwiki/platform-model-api#EntityReference | EntityReferences}.
  *
  * @since 0.13
  * @beta

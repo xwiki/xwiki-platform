@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
-import { ModelReferenceParser, ModelReferenceParserOptions } from "@xwiki/cristal-model-reference-api";
+import { EntityReference, EntityType } from "@xwiki/platform-model-api";
+import { ModelReferenceParser, ModelReferenceParserOptions } from "@xwiki/platform-model-reference-api";
 import { Container, injectable } from "inversify";
 import { toCristalEntityReference } from "./XWikiEntityReference";
 

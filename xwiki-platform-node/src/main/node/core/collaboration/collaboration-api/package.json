@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/cristal-collaboration-api",
+  "name": "@xwiki/platform-collaboration-api",
   "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -30,7 +30,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/platform-api": "workspace:*",
     "yjs": "catalog:"
   },
   "peerDependencies": {
@@ -39,7 +39,7 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",
     "typescript": "catalog:",

@@ -18,13 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { MACRO_NAME_PREFIX } from "@xwiki/cristal-editors-blocknote-react";
+import { MACRO_NAME_PREFIX } from "@xwiki/platform-editors-blocknote-react";
 import {
   assertUnreachable,
   provideTypeInference,
   tryFallible,
   tryFallibleOrError,
-} from "@xwiki/cristal-fn-utils";
+} from "@xwiki/platform-fn-utils";
 import type { Link, TableCell as BlockNoteTableCell } from "@blocknote/core";
 import type {
   BlockType,
@@ -32,9 +32,9 @@ import type {
   EditorLink,
   EditorStyleSchema,
   EditorStyledText,
-} from "@xwiki/cristal-editors-blocknote-react";
-import type { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
-import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
+} from "@xwiki/platform-editors-blocknote-react";
+import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
 import type {
   Block,
   BlockStyles,
@@ -43,7 +43,7 @@ import type {
   ListItem,
   TableCell,
   UniAst,
-} from "@xwiki/cristal-uniast-api";
+} from "@xwiki/platform-uniast-api";
 
 // TODO: escape characters that need it (e.g. '`', '\', '*', '_', etc.)
 

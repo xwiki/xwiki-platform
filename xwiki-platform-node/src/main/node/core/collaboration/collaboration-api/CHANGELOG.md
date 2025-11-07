@@ -1,4 +1,4 @@
-# @xwiki/cristal-collaboration-api
+# @xwiki/platform-collaboration-api
 
 ## 0.23.0
 
@@ -9,7 +9,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.23.0
+  - @xwiki/platform-api@0.23.0
 
 ## 0.22.0
 
@@ -20,7 +20,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.22.0
+  - @xwiki/platform-api@0.22.0
 
 ## 0.21.0
 
@@ -31,7 +31,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.21.0
+  - @xwiki/platform-api@0.21.0
 
 ## 0.20.0
 
@@ -42,7 +42,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.20.0
+  - @xwiki/platform-api@0.20.0
 
 ## 0.20.0-rc.0
 
@@ -53,4 +53,4 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.20.0-rc.0
+  - @xwiki/platform-api@0.20.0-rc.0

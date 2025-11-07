@@ -1,4 +1,4 @@
-# @xwiki/cristal-authentication-api
+# @xwiki/platform-authentication-api
 
 ## 0.23.0
 
@@ -81,7 +81,7 @@
 ### Patch Changes
 
 - Updated dependencies [681a9b7]
-  - @xwiki/cristal-api@0.12.0
+  - @xwiki/platform-api@0.12.0
 
 ## 0.11.0
 
@@ -92,4 +92,4 @@
 ### Patch Changes
 
 - Updated dependencies [d54422d]
-  - @xwiki/cristal-api@0.11.0
+  - @xwiki/platform-api@0.11.0

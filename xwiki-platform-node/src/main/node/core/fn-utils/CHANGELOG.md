@@ -1,4 +1,4 @@
-# @xwiki/cristal-fn-utils
+# @xwiki/platform-fn-utils
 
 ## 0.23.0
 

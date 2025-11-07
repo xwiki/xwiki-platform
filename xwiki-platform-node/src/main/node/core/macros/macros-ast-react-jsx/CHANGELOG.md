@@ -1,4 +1,4 @@
-# @xwiki/cristal-macros-ast-react-jsx
+# @xwiki/platform-macros-ast-react-jsx
 
 ## 0.23.0
 
@@ -9,6 +9,6 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-fn-utils@0.23.0
-  - @xwiki/cristal-macros-api@0.23.0
-  - @xwiki/cristal-model-remote-url-api@0.23.0
+  - @xwiki/platform-fn-utils@0.23.0
+  - @xwiki/platform-macros-api@0.23.0
+  - @xwiki/platform-model-remote-url-api@0.23.0

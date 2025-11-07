@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/cristal-attachments-api",
+  "name": "@xwiki/platform-attachments-api",
   "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -26,15 +26,15 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/cristal-authentication-api": "workspace:*",
-    "@xwiki/cristal-model-api": "workspace:*"
+    "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-model-api": "workspace:*"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
-    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "vue": "catalog:"

@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/cristal-fn-utils",
+  "name": "@xwiki/platform-fn-utils",
   "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -31,7 +31,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {},
   "devDependencies": {
-    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "typescript": "catalog:",
     "vite": "catalog:"
   },

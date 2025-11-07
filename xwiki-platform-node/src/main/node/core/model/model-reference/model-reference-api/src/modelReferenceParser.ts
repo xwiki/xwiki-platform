@@ -19,7 +19,7 @@
  */
 
 import type { ModelReferenceParserOptions } from "./modelReferenceParserOptions";
-import type { EntityReference } from "@xwiki/cristal-model-api";
+import type { EntityReference } from "@xwiki/platform-model-api";
 
 /**
  * @since 0.12

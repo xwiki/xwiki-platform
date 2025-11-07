@@ -17,15 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { EntityType } from "@xwiki/cristal-model-api";
+import { EntityType } from "@xwiki/platform-model-api";
 import { XMLParser } from "fast-xml-parser";
 import { inject, injectable } from "inversify";
 import type { InternalLinksSerializer } from "./internal-links-serializer";
 import type { UniAstToMarkdownConverter } from "../../uni-ast-to-markdown-converter";
-import type { CristalApp } from "@xwiki/cristal-api";
-import type { DocumentService } from "@xwiki/cristal-document-api";
-import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
-import type { Link, LinkTarget } from "@xwiki/cristal-uniast-api";
+import type { CristalApp } from "@xwiki/platform-api";
+import type { DocumentService } from "@xwiki/platform-document-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
+import type { Link, LinkTarget } from "@xwiki/platform-uniast-api";
 
 /**
  * @since 0.22

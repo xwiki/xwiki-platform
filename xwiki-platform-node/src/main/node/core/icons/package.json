@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/cristal-icons",
+  "name": "@xwiki/platform-icons",
   "version": "0.23.0",
   "description": "Provide UI components to display icons.",
   "license": "LGPL 2.1",
@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@vue/test-utils": "catalog:",
-    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vue": "catalog:",

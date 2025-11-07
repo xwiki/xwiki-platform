@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/cristal-authentication-api",
+  "name": "@xwiki/platform-authentication-api",
   "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -29,7 +29,7 @@
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
-    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "reflect-metadata": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:"

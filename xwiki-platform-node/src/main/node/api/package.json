@@ -1,5 +1,5 @@
 {
-  "name": "@xwiki/cristal-api",
+  "name": "@xwiki/platform-api",
   "version": "0.23.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -30,8 +30,8 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/cristal-authentication-api": "workspace:*",
-    "@xwiki/cristal-configuration-api": "workspace:*",
+    "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-configuration-api": "workspace:*",
     "vue-router": "catalog:"
   },
   "peerDependencies": {
@@ -40,7 +40,7 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",
     "typescript": "catalog:",

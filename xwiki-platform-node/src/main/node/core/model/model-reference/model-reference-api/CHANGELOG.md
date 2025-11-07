@@ -1,4 +1,4 @@
-# @xwiki/cristal-model-reference-api
+# @xwiki/platform-model-reference-api
 
 ## 0.23.0
 
@@ -9,8 +9,8 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.23.0
-  - @xwiki/cristal-model-api@0.23.0
+  - @xwiki/platform-api@0.23.0
+  - @xwiki/platform-model-api@0.23.0
 
 ## 0.22.0
 
@@ -21,8 +21,8 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.22.0
-  - @xwiki/cristal-model-api@0.22.0
+  - @xwiki/platform-api@0.22.0
+  - @xwiki/platform-model-api@0.22.0
 
 ## 0.21.0
 
@@ -33,8 +33,8 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.21.0
-  - @xwiki/cristal-model-api@0.21.0
+  - @xwiki/platform-api@0.21.0
+  - @xwiki/platform-model-api@0.21.0
 
 ## 0.20.0
 
@@ -45,8 +45,8 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.20.0
-  - @xwiki/cristal-model-api@0.20.0
+  - @xwiki/platform-api@0.20.0
+  - @xwiki/platform-model-api@0.20.0
 
 ## 0.20.0-rc.0
 
@@ -57,8 +57,8 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.20.0-rc.0
-  - @xwiki/cristal-model-api@0.20.0-rc.0
+  - @xwiki/platform-api@0.20.0-rc.0
+  - @xwiki/platform-model-api@0.20.0-rc.0
 
 ## 0.19.0
 
@@ -69,8 +69,8 @@
 ### Patch Changes
 
 - Updated dependencies [3eea53e]
-  - @xwiki/cristal-api@0.19.0
-  - @xwiki/cristal-model-api@0.19.0
+  - @xwiki/platform-api@0.19.0
+  - @xwiki/platform-model-api@0.19.0
 
 ## 0.18.0
 
@@ -81,8 +81,8 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.18.0
-  - @xwiki/cristal-model-api@0.18.0
+  - @xwiki/platform-api@0.18.0
+  - @xwiki/platform-model-api@0.18.0
 
 ## 0.17.0
 
@@ -93,8 +93,8 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.17.0
-  - @xwiki/cristal-model-api@0.17.0
+  - @xwiki/platform-api@0.17.0
+  - @xwiki/platform-model-api@0.17.0
 
 ## 0.16.0
 
@@ -105,8 +105,8 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.16.0
-  - @xwiki/cristal-model-api@0.16.0
+  - @xwiki/platform-api@0.16.0
+  - @xwiki/platform-model-api@0.16.0
 
 ## 0.15.0
 
@@ -117,8 +117,8 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @xwiki/cristal-api@0.15.0
-  - @xwiki/cristal-model-api@0.15.0
+  - @xwiki/platform-api@0.15.0
+  - @xwiki/platform-model-api@0.15.0
 
 ## 0.14.0
 
@@ -129,8 +129,8 @@
 ### Patch Changes
 
 - Updated dependencies [3e5f853]
-  - @xwiki/cristal-api@0.14.0
-  - @xwiki/cristal-model-api@0.14.0
+  - @xwiki/platform-api@0.14.0
+  - @xwiki/platform-model-api@0.14.0
 
 ## 0.13.0
 
@@ -141,8 +141,8 @@
 ### Patch Changes
 
 - Updated dependencies [06a5d1b]
-  - @xwiki/cristal-api@0.13.0
-  - @xwiki/cristal-model-api@0.13.0
+  - @xwiki/platform-api@0.13.0
+  - @xwiki/platform-model-api@0.13.0
 
 ## 0.12.0
 
@@ -153,5 +153,5 @@
 ### Patch Changes
 
 - Updated dependencies [681a9b7]
-  - @xwiki/cristal-api@0.12.0
-  - @xwiki/cristal-model-api@0.12.0
+  - @xwiki/platform-api@0.12.0
+  - @xwiki/platform-model-api@0.12.0

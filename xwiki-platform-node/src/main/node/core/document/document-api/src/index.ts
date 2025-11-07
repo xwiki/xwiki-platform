@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { PageData } from "@xwiki/cristal-api";
-import type { DocumentReference } from "@xwiki/cristal-model-api";
+import type { PageData } from "@xwiki/platform-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { Ref } from "vue";
 
 /**

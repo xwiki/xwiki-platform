@@ -29,13 +29,13 @@ import {
   Text,
   VisuallyHidden,
 } from "@mantine/core";
-import { tryFallible } from "@xwiki/cristal-fn-utils";
-import { LinkType } from "@xwiki/cristal-link-suggest-api";
+import { tryFallible } from "@xwiki/platform-fn-utils";
+import { LinkType } from "@xwiki/platform-link-suggest-api";
 import {
   AttachmentReference,
   DocumentReference,
   EntityType,
-} from "@xwiki/cristal-model-api";
+} from "@xwiki/platform-model-api";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";

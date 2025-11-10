@@ -127,8 +127,8 @@ catalogs:
       specifier: 8.0.4
       version: 8.0.4
     pinia:
-      specifier: 3.0.2
-      version: 3.0.2
+      specifier: 3.0.4
+      version: 3.0.4
     react:
       specifier: 19.2.0
       version: 19.2.0
@@ -231,7 +231,7 @@ importers:
         version: 7.5.2(reflect-metadata@0.2.2)
       pinia:
         specifier: 'catalog:'
-        version: 3.0.2(typescript@5.9.3)(vue@3.5.23(typescript@5.9.3))
+        version: 3.0.4(typescript@5.9.3)(vue@3.5.23(typescript@5.9.3))
       react:
         specifier: 'catalog:'
         version: 19.2.0
@@ -2599,6 +2599,15 @@ packages:
     peerDependencies:
       typescript: '>=4.4.4'
       vue: ^2.7.0 || ^3.5.11
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  pinia@3.0.4:
+    resolution: {integrity: sha512-l7pqLUFTI/+ESXn6k3nu30ZIzW5E2WZF/LaHJEpoq6ElcLD+wduZoB2kBN19du6K/4FDpPMazY2wJr+IndBtQw==}
+    peerDependencies:
+      typescript: '>=4.5.0'
+      vue: ^3.5.11
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -5984,6 +5993,13 @@ snapshots:
   pidtree@0.6.0: {}
 
   pinia@3.0.2(typescript@5.9.3)(vue@3.5.23(typescript@5.9.3)):
+    dependencies:
+      '@vue/devtools-api': 7.7.7
+      vue: 3.5.23(typescript@5.9.3)
+    optionalDependencies:
+      typescript: 5.9.3
+
+  pinia@3.0.4(typescript@5.9.3)(vue@3.5.23(typescript@5.9.3)):
     dependencies:
       '@vue/devtools-api': 7.7.7
       vue: 3.5.23(typescript@5.9.3)

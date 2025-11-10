@@ -47,7 +47,7 @@ catalog:
   lodash: 4.17.21
   lz-string: 1.5.0
   npm-run-all2: 8.0.4
-  pinia: 3.0.2
+  pinia: 3.0.4
   react: 19.2.0
   react-dom: 19.2.0
   sinon: 21.0.0

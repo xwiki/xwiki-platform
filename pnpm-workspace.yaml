@@ -40,7 +40,7 @@ catalog:
   eventemitter3: 5.0.1
   flush-promises: 1.0.2
   globals: 16.5.0
-  inversify: 7.5.2
+  inversify: 7.10.4
   jiti: 2.6.0
   jquery: 3.7.1
   jsdom: 27.0.0

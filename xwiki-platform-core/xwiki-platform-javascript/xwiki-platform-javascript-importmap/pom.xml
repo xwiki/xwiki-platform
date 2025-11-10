@@ -26,6 +26,9 @@
     <version>17.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-javascript-importmap</artifactId>
+  <name>XWiki Platform - Javascript - Importmap</name>
+  <packaging>jar</packaging>
+  <description>Scan extensions for importmap definition and inject them in the page html header.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.42</xwiki.jacoco.instructionRatio>
   </properties>

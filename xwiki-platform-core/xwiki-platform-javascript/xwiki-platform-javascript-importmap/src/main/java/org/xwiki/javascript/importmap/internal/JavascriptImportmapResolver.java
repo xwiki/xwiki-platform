@@ -20,10 +20,9 @@
 package org.xwiki.javascript.importmap.internal;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
@@ -34,6 +33,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapException;
+import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
@@ -65,6 +66,8 @@ public class JavascriptImportmapResolver
         .build();
 
     private static final String JAVASCRIPT_IMPORTMAP_PROPERTY = "xwiki.extension.javascript.modules.importmap";
+
+    private static final JavascriptImportmapParser JAVASCRIPT_IMPORTMAP_PARSER = new JavascriptImportmapParser();
 
     /**
      * Cache lock to prevent race conditions when retrieving cached values.
@@ -125,15 +128,14 @@ public class JavascriptImportmapResolver
                 String importMapJSON = accessProperty(extension);
                 Map<String, String> extensionImportMap;
                 try {
-                    Object parsedJSON = OBJECT_MAPPER.readValue(importMapJSON, Object.class);
-                    extensionImportMap = new LinkedHashMap<>();
-                    if (parsedJSON instanceof Map parsedJSONMap) {
-                        for (Map.Entry o : (Set<Map.Entry>) parsedJSONMap.entrySet()) {
-                            extensionImportMap.put(String.valueOf(o.getKey()),
-                                parseValue(String.valueOf(o.getValue())));
-                        }
-                    }
-                } catch (JsonProcessingException e) {
+                    extensionImportMap = JAVASCRIPT_IMPORTMAP_PARSER.parse(importMapJSON)
+                        .entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            e -> this.webJarsUrlFactory.url(e.getValue())
+                        ));
+                } catch (JavascriptImportmapException e) {
                     this.logger.warn("Unable to read property [{}] for extension [{}]. Cause: [{}]",
                         JAVASCRIPT_IMPORTMAP_PROPERTY, extension.getId(), getRootCauseMessage(e));
                     extensionImportMap = Map.of();
@@ -172,11 +174,5 @@ public class JavascriptImportmapResolver
     private static String accessProperty(Extension extension)
     {
         return extension.getProperty(JAVASCRIPT_IMPORTMAP_PROPERTY);
-    }
-
-    private String parseValue(String value)
-    {
-        var slashSplit = value.split("/", 2);
-        return this.webJarsUrlFactory.url(slashSplit[0], slashSplit[1]);
     }
 }

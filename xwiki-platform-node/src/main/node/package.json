@@ -5,7 +5,8 @@
   "scripts": {
     "build": "nx run-many -t build -p \"xwiki-platform-node/src/main/node/*/**\"",
     "lint": "nx run-many -t lint -p \"xwiki-platform-node/src/main/node/*/**\"",
-    "test:unit": "nx run-many -t test -p \"xwiki-platform-node/src/main/node/*/**\""
+    "test:unit": "nx run-many -t test -p \"xwiki-platform-node/src/main/node/*/**\"",
+    "deploy": "echo 'DEPLOY'"
   },
   "devDependencies": {
     "@eslint/config-helpers": "catalog:",

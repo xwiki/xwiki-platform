@@ -20,7 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
@@ -42,7 +43,7 @@
         <version>1.15.1</version>
         <executions>
           <execution>
-            <id>default-pnpm</id>
+            <id>pnpm-build</id>
             <phase>compile</phase>
             <goals>
               <goal>pnpm</goal>
@@ -54,7 +55,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>default-pnpm-1</id>
+            <id>pnpm-test</id>
             <phase>test</phase>
             <goals>
               <goal>pnpm</goal>
@@ -79,7 +80,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>default-pnpm-2</id>
+            <id>pnpm-install</id>
             <phase>process-resources</phase>
             <goals>
               <goal>pnpm</goal>
@@ -94,7 +95,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>default-pnpm-3</id>
+            <id>pnpm-lint</id>
             <phase>verify</phase>
             <goals>
               <goal>pnpm</goal>
@@ -105,7 +106,25 @@
               <installDirectory>${basedir}/target</installDirectory>
             </configuration>
           </execution>
+          <execution>
+            <phase>deploy</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run deploy</arguments>
+              <workingDirectory>${basedir}/src/main/node</workingDirectory>
+              <installDirectory>${basedir}/target</installDirectory>
+            </configuration>
+          </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
       </plugin>
     </plugins>
   </build>

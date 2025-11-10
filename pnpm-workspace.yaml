@@ -36,7 +36,7 @@ catalog:
   dompurify: 3.2.6
   eslint: 9.36.0
   eslint-config-prettier: 10.1.8
-  eslint-plugin-vue: 10.5.0
+  eslint-plugin-vue: 10.5.1
   eventemitter3: 5.0.1
   flush-promises: 1.0.2
   globals: 16.5.0

@@ -47,11 +47,12 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import static com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser.JAVASCRIPT_IMPORTMAP_PROPERTY;
 import static org.xwiki.rendering.syntax.Syntax.HTML_5_0;
 
 /**
- * Resolve the importmap from the webjar declarations, using the {@code "xwiki.extension.javascript.modules.importmap"}
- * pom property.
+ * Resolve the importmap from the webjar declarations, using the
+ * {@link JavascriptImportmapParser#JAVASCRIPT_IMPORTMAP_PROPERTY} pom property.
  *
  * @version $Id$
  * @since 17.10.0RC1
@@ -64,8 +65,6 @@ public class JavascriptImportmapResolver
         // Keeps the output deterministic.
         .configure(SORT_PROPERTIES_ALPHABETICALLY, true)
         .build();
-
-    private static final String JAVASCRIPT_IMPORTMAP_PROPERTY = "xwiki.extension.javascript.modules.importmap";
 
     private static final JavascriptImportmapParser JAVASCRIPT_IMPORTMAP_PARSER = new JavascriptImportmapParser();
 

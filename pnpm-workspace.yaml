@@ -17,7 +17,7 @@ catalog:
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.6.0
   "@vue/test-utils": 2.4.6
-  "@vue/tsconfig": 0.7.0
+  "@vue/tsconfig": 0.8.1
   "@xwiki/cristal-api": 0.23.1
   "@xwiki/cristal-attachments-default": 0.23.1
   "@xwiki/cristal-authentication-api": 0.23.1

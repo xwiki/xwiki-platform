@@ -35,7 +35,7 @@ import static org.openqa.selenium.By.cssSelector;
  */
 public class GroupedNotificationElementPage extends BaseElement
 {
-    protected static final String NOTIFICATION_EVENT_SELECTOR = "li.notification-event";
+    protected static final String NOTIFICATION_EVENT_SELECTOR = ".notification-event";
 
     protected static final String TEXT_SELECTOR = "tr td.description";
 

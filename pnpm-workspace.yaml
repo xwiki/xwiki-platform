@@ -34,7 +34,7 @@ catalog:
   "@xwiki/cristal-uniast-api": 0.23.1
   "@xwiki/cristal-uniast-markdown": 0.23.1
   dompurify: 3.2.6
-  eslint: 9.36.0
+  eslint: 9.39.1
   eslint-config-prettier: 10.1.8
   eslint-plugin-vue: 10.5.0
   eventemitter3: 5.0.1

@@ -74,7 +74,7 @@ search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
 search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
 search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
 
-search.solr.options.showHighlight=Display highlights of matches
+search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=Display an extract of what was matched in each result
 search.solr.options.showFacet=Show filters
 solr.options.facet.title=Allow extra filtering of the result

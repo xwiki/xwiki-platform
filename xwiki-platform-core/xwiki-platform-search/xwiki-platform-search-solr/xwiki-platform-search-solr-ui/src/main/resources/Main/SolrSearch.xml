@@ -685,13 +685,17 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   border-bottom: 1px solid var(--xwiki-border-color);
 }
 
+.search-facets-header strong {
+  font-size: 1.25em;
+}
+
 .search-facets-header,
 .search-facets-actions {
   padding: .5em 0;
 }
 
 .search-facet {
-  padding: .5em 0;
+  padding: .2em 0;
 }
 
 .search-facets-header &gt; p,
@@ -715,11 +719,14 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   margin: 0;
 }
 
-.search-facet-header {
-  background-color: var(--xwiki-background-secondary-color);
+.search-facet-header, .search-facet-body {
   padding-left: .5em;
   border: 1px solid var(--xwiki-border-color);
-  border-radius: var(--border-radius-base);
+  border-radius: var(--border-radius-small);
+}
+
+.search-facet-header {
+  background-color: var(--xwiki-background-secondary-color);
 }
 
 .search-facet-header label {
@@ -737,10 +744,7 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   position: absolute;
   transform: translateY(-10px); /* Start the animation slightly above */
   padding-top: .5em;
-  padding-left: .8em;
   
-  border: 1px solid var(--xwiki-border-color);
-  border-radius: var(--border-radius-base);
   border-top-width: 0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
@@ -754,7 +758,7 @@ dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
 .search-facet-body li {
   display: flex;
   flex-wrap: wrap;
-  padding: .1em .2em;
+  padding: .3em .5em;
 }
 
 .search-facet .search-facet-header  .facet-toggle, button.facet-value-toggle {

@@ -85,8 +85,8 @@ catalogs:
       specifier: 0.23.1
       version: 0.23.1
     dompurify:
-      specifier: 3.2.6
-      version: 3.2.6
+      specifier: 3.3.0
+      version: 3.3.0
     eslint:
       specifier: 9.36.0
       version: 9.36.0
@@ -310,7 +310,7 @@ importers:
     dependencies:
       dompurify:
         specifier: 'catalog:'
-        version: 3.2.6
+        version: 3.3.0
       eventemitter3:
         specifier: 'catalog:'
         version: 5.0.1
@@ -1833,8 +1833,8 @@ packages:
     resolution: {integrity: sha512-PJWHUb1RFevKCwaFA9RlG5tCd+FO5iRh9A8HEtkmBH2Li03iJriB6m6JIN4rGz3K3JLawI7/veA1xzRKP6ISBw==}
     engines: {node: '>=0.3.1'}
 
-  dompurify@3.2.6:
-    resolution: {integrity: sha512-/2GogDQlohXPZe6D6NOgQvXLPSYBqIWMnZ8zzOhn09REE4eyAzb+Hed3jhoM9OkuaJ8P6ZGTTVWQKAi8ieIzfQ==}
+  dompurify@3.3.0:
+    resolution: {integrity: sha512-r+f6MYR1gGN1eJv0TVQbhA7if/U7P87cdPl3HN5rikqaBSBxLiCb/b9O+2eG0cxz0ghyU+mU1QkbsOwERMYlWQ==}
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -4981,7 +4981,7 @@ snapshots:
 
   diff@7.0.0: {}
 
-  dompurify@3.2.6:
+  dompurify@3.3.0:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 

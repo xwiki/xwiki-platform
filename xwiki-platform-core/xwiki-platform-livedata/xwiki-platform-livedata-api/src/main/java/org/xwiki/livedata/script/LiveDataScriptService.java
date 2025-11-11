@@ -32,17 +32,22 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveData;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
+import org.xwiki.livedata.internal.LiveDataScriptServiceConfiguration;
 import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Scripting APIs for the Live Data component.
@@ -75,6 +80,9 @@ public class LiveDataScriptService implements ScriptService
     @Inject
     private LiveDataRenderer liveDataRenderer;
 
+    @Inject
+    private LiveDataScriptServiceConfiguration liveDataScriptServiceConfiguration;
+
     /**
      * Executes a live data query.
      *
@@ -84,7 +92,10 @@ public class LiveDataScriptService implements ScriptService
     public LiveData query(Map<String, Object> queryConfig)
     {
         try {
-            return query(this.configHelper.createQuery(queryConfig));
+            LiveDataRendererParameters liveDataRendererParameters = convertParams(queryConfig);
+            LiveDataConfiguration liveDataConfig =
+                this.liveDataScriptServiceConfiguration.getLiveDataConfiguration(liveDataRendererParameters);
+            return query(liveDataConfig.getQuery());
         } catch (Exception e) {
             this.logger.warn("Failed to create the live data query from [{}]. Root cause is [{}].", queryConfig,
                 ExceptionUtils.getRootCauseMessage(e));
@@ -101,10 +112,10 @@ public class LiveDataScriptService implements ScriptService
     public LiveData query(String queryConfigJSON)
     {
         try {
-            return query(this.configHelper.createQuery(queryConfigJSON));
-        } catch (Exception e) {
-            this.logger.warn("Failed to create the live data query from JSON [{}]. Root cause is [{}].",
-                queryConfigJSON, ExceptionUtils.getRootCauseMessage(e));
+            return query(new ObjectMapper().readValue(queryConfigJSON, Map.class));
+        } catch (JsonProcessingException e) {
+            this.logger.warn("Failed to convert the live data query parameters to a Map. Root cause is [{}].",
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }
@@ -232,16 +243,15 @@ public class LiveDataScriptService implements ScriptService
 
     private LiveDataRendererParameters convertParams(Map<String, Object> parameters) throws LiveDataException
     {
-        LiveDataRendererParameters liveDataRendererParameters = new LiveDataRendererParameters();
+        LiveDataRendererParameters liveDataParameters = new LiveDataRendererParameters();
         for (Map.Entry<String, Object> stringObjectEntry : parameters.entrySet()) {
             try {
-                PropertyUtils.setProperty(liveDataRendererParameters, stringObjectEntry.getKey(),
-                    stringObjectEntry.getValue());
+                PropertyUtils.setProperty(liveDataParameters, stringObjectEntry.getKey(), stringObjectEntry.getValue());
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new LiveDataException(String.format("Failed to set property [%s] with value [%s] in object [%s]",
-                    stringObjectEntry.getKey(), stringObjectEntry.getValue(), liveDataRendererParameters), e);
+                    stringObjectEntry.getKey(), stringObjectEntry.getValue(), liveDataParameters), e);
             }
         }
-        return liveDataRendererParameters;
+        return liveDataParameters;
     }
 }

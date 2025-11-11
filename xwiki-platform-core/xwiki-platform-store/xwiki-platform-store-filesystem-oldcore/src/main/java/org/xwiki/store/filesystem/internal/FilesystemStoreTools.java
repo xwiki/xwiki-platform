@@ -47,8 +47,7 @@ import org.xwiki.store.locks.LockProvider;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
- * Default tools for getting files to store data in the filesystem. This should be replaced by a module which provides a
- * secure extension of java.io.File.
+ * Default tools for getting blobs to store data in a blob store.
  *
  * @version $Id$
  * @since 3.0M2
@@ -113,24 +112,24 @@ public class FilesystemStoreTools implements Initializable
     private BlobStore store;
 
     /**
-     * Default constructor.
-     */
-    public FilesystemStoreTools()
-    {
-        // Nothing to do
-    }
-
-    /**
-     * Constructor used for testing.
+     * Testing Constructor.
      *
      * @param blobStore the blob store to use
      * @param lockProvider the lock provider to use
-     * @since 17.9.0RC1
+     * @since 17.10.0RC1
      */
     public FilesystemStoreTools(BlobStore blobStore, LockProvider lockProvider)
     {
         this.store = blobStore;
         this.lockProvider = lockProvider;
+    }
+
+    /**
+     * Constructor for component manager.
+     */
+    public FilesystemStoreTools()
+    {
+        // Nothing to do
     }
 
     @Override
@@ -145,7 +144,7 @@ public class FilesystemStoreTools implements Initializable
 
     /**
      * @return the store for file system attachment blobs
-     * @since 17.8.0RC1
+     * @since 17.10.0RC1
      */
     public BlobStore getStore()
     {
@@ -214,10 +213,10 @@ public class FilesystemStoreTools implements Initializable
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
      * @since 9.0RC1
      */
-    public DeletedDocumentContentFileProvider getDeletedDocumentFileProvider(DocumentReference documentReference,
+    public DeletedDocumentContentBlobProvider getDeletedDocumentFileProvider(DocumentReference documentReference,
         long index)
     {
-        return new DefaultDeletedDocumentContentFileProvider(getStore(), getDeletedDocumentContentDir(documentReference,
+        return new DefaultDeletedDocumentContentBlobProvider(getStore(), getDeletedDocumentContentDir(documentReference,
             index));
     }
 

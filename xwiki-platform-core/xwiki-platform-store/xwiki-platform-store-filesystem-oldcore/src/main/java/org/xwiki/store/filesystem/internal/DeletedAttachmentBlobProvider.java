@@ -26,7 +26,7 @@ import org.xwiki.store.blob.BlobStoreException;
  * A means of getting files for storing information about a given attachment.
  *
  * @version $Id$
- * @since 3.0M2
+ * @since 17.10.0RC1
  */
 public interface DeletedAttachmentBlobProvider extends AttachmentBlobProvider
 {

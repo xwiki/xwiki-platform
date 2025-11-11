@@ -114,7 +114,7 @@ public final class StoreFileUtils
     /**
      * @param originalfile the location for which to create a link
      * @return the File representing the link for the passed location
-     * @since 16.4.0RC1
+     * @since 17.10.0RC1
      */
     public static Blob getLinkBlob(Blob originalfile) throws BlobStoreException
     {

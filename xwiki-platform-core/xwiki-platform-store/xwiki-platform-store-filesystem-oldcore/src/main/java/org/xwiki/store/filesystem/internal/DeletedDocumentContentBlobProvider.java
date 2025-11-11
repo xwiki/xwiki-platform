@@ -26,9 +26,9 @@ import org.xwiki.store.blob.BlobStoreException;
  * A means of getting files for storing information about a given deleted document.
  *
  * @version $Id$
- * @since 9.0RC1
+ * @since 17.10.0RC1
  */
-public interface DeletedDocumentContentFileProvider
+public interface DeletedDocumentContentBlobProvider
 {
     /**
      * @return the Blob for storing the content of the deleted document.

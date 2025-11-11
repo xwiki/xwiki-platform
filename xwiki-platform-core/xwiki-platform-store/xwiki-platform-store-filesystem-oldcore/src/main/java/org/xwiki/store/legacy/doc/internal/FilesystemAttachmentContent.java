@@ -32,8 +32,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 
 /**
- * The content of an attachment. This implementation is based on a file on the filesystem. This implementation is
- * mutable but the underlying file is left alone.
+ * The content of an attachment. This implementation is based on a blob in a blob store. This implementation is
+ * mutable but the underlying blob is left alone.
  *
  * @version $Id$
  * @since 3.0M2

@@ -33,7 +33,7 @@ import org.xwiki.store.blob.BlobStoreException;
  * It is only final when the onComplete function is called.
  *
  * @version $Id$
- * @since 17.8.0RC1
+ * @since 17.10.0RC1
  */
 public class BlobDeleteTransactionRunnable extends StartableTransactionRunnable<TransactionRunnable<?>>
 {

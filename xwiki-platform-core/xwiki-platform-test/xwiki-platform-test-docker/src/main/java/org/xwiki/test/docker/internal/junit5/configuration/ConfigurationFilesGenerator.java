@@ -243,13 +243,13 @@ public class ConfigurationFilesGenerator
             // Configure S3 blob store using additional properties
             String additionalProperties =
                 """
-                    store.blobStoreHint=%s
+                    store.blobStoreType=%s
                     store.s3.bucketName=%s
                     store.s3.accessKey=%s
                     store.s3.secretKey=%s
                     store.s3.endpoint=%s
                     store.s3.pathStyleAccess=true""".formatted(
-                    blobStore.getHint(),
+                    blobStore.getType(),
                     BlobStoreContainerExecutor.getBucketName(),
                     BlobStoreContainerExecutor.getAccessKey(),
                     BlobStoreContainerExecutor.getSecretKey(),

@@ -205,7 +205,7 @@ class FilesystemStoreToolsTest
         DocumentReference docRef = new DocumentReference("wiki", "Space", "Page");
         long index = 54321L;
 
-        DeletedDocumentContentFileProvider provider =
+        DeletedDocumentContentBlobProvider provider =
             this.filesystemStoreTools.getDeletedDocumentFileProvider(docRef, index);
 
         assertNotNull(provider);
@@ -319,5 +319,3 @@ class FilesystemStoreToolsTest
         assertEquals("fv1.1.txt", linkContent);
     }
 }
-
-

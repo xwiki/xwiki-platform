@@ -26,7 +26,7 @@ import org.xwiki.store.blob.Blob;
  * An entity that serializes embedded data to a {@link Blob}.
  *
  * @version $Id$
- * @since 17.8.0RC1
+ * @since 17.10.0RC1
  */
 @Unstable
 public interface BlobSerializer

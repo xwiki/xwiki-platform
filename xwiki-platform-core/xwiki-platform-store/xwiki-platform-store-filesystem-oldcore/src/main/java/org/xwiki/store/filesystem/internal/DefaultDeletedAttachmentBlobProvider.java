@@ -24,13 +24,11 @@ import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.blob.BlobStore;
 import org.xwiki.store.blob.BlobStoreException;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-
 /**
  * A means of getting files for storing information about a given deleted attachment.
  *
  * @version $Id$
- * @since 3.0M2
+ * @since 17.10.0RC1
  */
 public class DefaultDeletedAttachmentBlobProvider extends DefaultAttachmentBlobProvider
     implements DeletedAttachmentBlobProvider
@@ -38,7 +36,7 @@ public class DefaultDeletedAttachmentBlobProvider extends DefaultAttachmentBlobP
     /**
      * This stores the metadata for the deleted attachment such as who deleted it.
      *
-     * @see #metaFileForDeletedAttachment(XWikiAttachment, Date)
+     * @see #getDeletedAttachmentMetaBlob()
      */
     private static final String DELETED_ATTACH_META_FILENAME = "~DELETED_ATTACH_METADATA.xml";
 

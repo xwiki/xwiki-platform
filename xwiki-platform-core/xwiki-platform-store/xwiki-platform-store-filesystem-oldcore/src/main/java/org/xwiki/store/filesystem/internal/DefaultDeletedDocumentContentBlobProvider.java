@@ -25,17 +25,17 @@ import org.xwiki.store.blob.BlobStore;
 import org.xwiki.store.blob.BlobStoreException;
 
 /**
- * A means of getting files for storing information about a given deleted document.
+ * A means of getting blobs for storing information about a given deleted document.
  *
  * @version $Id$
- * @since 9.0RC1
+ * @since 17.10.0RC1
  */
-public class DefaultDeletedDocumentContentFileProvider implements DeletedDocumentContentFileProvider
+public class DefaultDeletedDocumentContentBlobProvider implements DeletedDocumentContentBlobProvider
 {
     /**
-     * The file holding the content of the deleted document.
+     * The blob holding the content of the deleted document.
      */
-    private static final String DELETED_DOCUMENT_FILE_NAME = "content.xml";
+    private static final String DELETED_DOCUMENT_BLOB_NAME = "content.xml";
 
     /**
      * The blob store where the document information is stored.
@@ -51,7 +51,7 @@ public class DefaultDeletedDocumentContentFileProvider implements DeletedDocumen
      * @param store the blob store where the document information is stored.
      * @param deletedDocumentDir the location where the information about the deleted document will be stored.
      */
-    public DefaultDeletedDocumentContentFileProvider(BlobStore store, final BlobPath deletedDocumentDir)
+    public DefaultDeletedDocumentContentBlobProvider(BlobStore store, final BlobPath deletedDocumentDir)
     {
         this.store = store;
         this.deletedDocumentDir = deletedDocumentDir;
@@ -60,6 +60,6 @@ public class DefaultDeletedDocumentContentFileProvider implements DeletedDocumen
     @Override
     public Blob getDeletedDocumentContentBlob() throws BlobStoreException
     {
-        return this.store.getBlob(this.deletedDocumentDir.resolve(DELETED_DOCUMENT_FILE_NAME));
+        return this.store.getBlob(this.deletedDocumentDir.resolve(DELETED_DOCUMENT_BLOB_NAME));
     }
 }

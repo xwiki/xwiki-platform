@@ -868,7 +868,7 @@ public class TestConfiguration
 
     /**
      * @return the blob store to use
-     * @since 17.9.0RC1
+     * @since 17.10.0RC1
      */
     public BlobStore getBlobStore()
     {
@@ -877,7 +877,7 @@ public class TestConfiguration
 
     /**
      * @param blobStore see {@link #getBlobStore()}
-     * @since 17.9.0RC1
+     * @since 17.10.0RC1
      */
     public void setBlobStore(BlobStore blobStore)
     {
@@ -886,7 +886,7 @@ public class TestConfiguration
 
     /**
      * @return the docker image tag to use for the blob store container (if not specified, uses the "latest" tag)
-     * @since 17.9.0RC1
+     * @since 17.10.0RC1
      */
     public String getBlobStoreTag()
     {
@@ -895,7 +895,7 @@ public class TestConfiguration
 
     /**
      * @param blobStoreTag see {@link #getBlobStoreTag()}
-     * @since 17.9.0RC1
+     * @since 17.10.0RC1
      */
     public void setBlobStoreTag(String blobStoreTag)
     {

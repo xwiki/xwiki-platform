@@ -19,14 +19,16 @@
  */
 package org.xwiki.store;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.blob.Blob;
 
 /**
  * A {@link BlobSerializer} which uses a {@link StreamProvider} to get the stream to serialize.
  *
  * @version $Id$
- * @since 17.8.0RC1
+ * @since 17.10.0RC1
  */
+@Unstable
 public class StreamProviderBlobSerializer implements BlobSerializer
 {
     private final StreamProvider streamProvider;

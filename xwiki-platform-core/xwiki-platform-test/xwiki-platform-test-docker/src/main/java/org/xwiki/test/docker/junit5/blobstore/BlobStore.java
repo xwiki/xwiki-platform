@@ -23,7 +23,7 @@ package org.xwiki.test.docker.junit5.blobstore;
  * The blob store backend to use for the UI tests.
  *
  * @version $Id$
- * @since 16.9.0RC1
+ * @since 17.10.0RC1
  */
 public enum BlobStore
 {
@@ -39,14 +39,14 @@ public enum BlobStore
 
     private String endpoint;
 
-    private final String hint;
+    private final String type;
 
     /**
-     * @param hint the hint to use in xwiki.properties for store.blobStoreHint
+     * @param type the type to use in xwiki.properties for store.blobStoreType
      */
-    BlobStore(String hint)
+    BlobStore(String type)
     {
-        this.hint = hint;
+        this.type = type;
     }
 
     /**
@@ -66,10 +66,10 @@ public enum BlobStore
     }
 
     /**
-     * @return the hint to use in xwiki.properties for store.blobStoreHint
+     * @return the type to use in xwiki.properties for store.blobStoreType
      */
-    public String getHint()
+    public String getType()
     {
-        return this.hint;
+        return this.type;
     }
 }

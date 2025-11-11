@@ -237,13 +237,13 @@ public @interface UITest
 
     /**
      * @return the blob store backend to use, see {@link BlobStore}
-     * @since 17.9.0RC1
+     * @since 17.10.0RC1
      */
     BlobStore blobStore() default BlobStore.FILESYSTEM;
 
     /**
      * @return the docker image tag to use for the blob store (if not specified, uses the "latest" tag)
-     * @since 17.9.0RC1
+     * @since 17.10.0RC1
      */
     String blobStoreTag() default "";
 }

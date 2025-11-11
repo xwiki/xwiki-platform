@@ -161,7 +161,23 @@
                 </item>
               </differences>
             </revapi.differences>
-            
+            <revapi.differences>
+              <justification>Classes moved to xwiki-commons-store-api, available as transitive dependency</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.store.StoreException</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.store.StreamProvider</old>
+                </item>
+              </differences>
+            </revapi.differences>
+
           </analysisConfiguration>
         </configuration>
       </plugin>

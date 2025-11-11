@@ -20,59 +20,56 @@
 
 package org.xwiki.store.filesystem.internal.migration;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.filesystem.internal.DefaultAttachmentBlobProvider;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Migration for XWIKI-14697. Make sure all attachments have the right content store id.
+ * Migration for XWIKI-14697. Make sure all attachments have the right archive store id.
  *
  * @version $Id$
- * @since 9.10RC1
+ * @since 9.9RC1
  */
 @Component
-@Named("R910000XWIKI14697")
+@Named("R910001XWIKI14697")
 @Singleton
-public class R910000XWIKI14697DataMigration extends AbstractXWIKI14697DataMigration
+public class R910001XWIKI14697DataMigration extends AbstractXWIKI14697DataMigration
 {
     /**
      * The default constructor.
      */
-    public R910000XWIKI14697DataMigration()
+    public R910001XWIKI14697DataMigration()
     {
-        super("XWikiAttachmentContent", "contentStore");
+        super("XWikiAttachmentArchive", "archiveStore");
     }
 
     @Override
     public String getDescription()
     {
-        return "Make sure all attachments have the right content store id.";
+        return "Make sure all attachments have the right archive store id.";
     }
 
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(910000);
+        return new XWikiDBVersion(910001);
     }
 
     @Override
     protected boolean isFile(AttachmentReference attachmentReference)
     {
-        File attachmentFolder = getAttachmentDir(attachmentReference);
-
         try {
-            return new File(attachmentFolder, URLEncoder.encode(attachmentReference.getName(), "UTF8")).exists();
-        } catch (UnsupportedEncodingException e) {
-            throw new HibernateException("UTF8 is unknown", e);
+            return new DefaultAttachmentBlobProvider(this.pre11BlobStore, getAttachmentDir(attachmentReference),
+                attachmentReference.getName()).getAttachmentVersioningMetaBlob().exists();
+        } catch (BlobStoreException e) {
+            throw new HibernateException("Error checking if attachment versioning meta file exists.", e);
         }
     }
 }

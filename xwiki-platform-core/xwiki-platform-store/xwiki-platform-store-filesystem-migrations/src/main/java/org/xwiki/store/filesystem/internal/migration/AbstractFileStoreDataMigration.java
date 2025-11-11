@@ -35,6 +35,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStore;
+import org.xwiki.store.blob.FileSystemBlobStoreProperties;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
@@ -69,19 +73,26 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
     @Inject
     protected Logger logger;
 
+    protected FileSystemBlobStore pre11BlobStore;
+
     protected File pre11StoreRootDirectory;
 
-    protected File storeRootDirectory;
+    protected BlobStore blobStore;
 
     @Override
     public void initialize() throws InitializationException
     {
-        this.pre11StoreRootDirectory = new File(this.environment.getPermanentDirectory(), "storage");
+        String pre11StoreName = "storage";
+        this.pre11StoreRootDirectory = new File(this.environment.getPermanentDirectory(), pre11StoreName);
+
+        FileSystemBlobStoreProperties pre11Properties = new FileSystemBlobStoreProperties();
+        pre11Properties.setRootDirectory(this.pre11StoreRootDirectory.toPath());
+        this.pre11BlobStore = new FileSystemBlobStore(pre11StoreName, pre11Properties);
 
         if (getVersion().getVersion() < R1100000XWIKI15620DataMigration.VERSION) {
-            this.storeRootDirectory = this.pre11StoreRootDirectory;
+            this.blobStore = this.pre11BlobStore;
         } else {
-            this.storeRootDirectory = this.fstools.getStoreRootDirectory();
+            this.blobStore = this.fstools.getStore();
         }
     }
 
@@ -92,12 +103,21 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
 
     protected File getStoreRootDirectory()
     {
-        return this.storeRootDirectory;
+        if (this.blobStore instanceof FileSystemBlobStore fileSystemBlobStore) {
+            return fileSystemBlobStore.getBlobFilePath(BlobPath.root()).toFile();
+        } else {
+            throw new IllegalStateException("The current blob store is not a file system blob store");
+        }
     }
 
-    protected void setStoreRootDirectory(File storeRootDirectory)
+    protected BlobStore getBlobStore()
     {
-        this.storeRootDirectory = storeRootDirectory;
+        return this.blobStore;
+    }
+
+    protected void setBlobStore(BlobStore blobStore)
+    {
+        this.blobStore = blobStore;
     }
 
     protected File getPre11WikiDir(String wikiId)

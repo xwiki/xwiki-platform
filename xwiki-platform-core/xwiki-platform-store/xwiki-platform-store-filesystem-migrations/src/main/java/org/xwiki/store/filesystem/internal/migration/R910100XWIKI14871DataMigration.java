@@ -68,12 +68,18 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * @since 9.10.1
  * @since 9.11RC1
  */
+// Old migration code shouldn't be changed too much to avoid breakages.
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @Component
 @Named("R910100XWIKI14871")
 @Singleton
 public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigration
 {
     private static final Pattern STORAGE = Pattern.compile("/storage/");
+
+    private static final String FILENAME = "filename";
+
+    private static final String DATE = "date";
 
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
@@ -149,42 +155,46 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
                     // </entry>
                     xmlReader.nextTag();
 
-                    if (!this.migratedDeletedAttachment.contains(path)) {
-                        File directory = new File(path);
-                        if (!directory.getCanonicalPath().startsWith(getStoreRootDirectory().getCanonicalPath())) {
-                            this.logger.warn("[{}] is the wrong path, trying to find the new location", directory);
+                    maybeMigrateDeletedAttachment(session, path, storageLocationFile);
+                }
+            }
+        }
+    }
 
-                            directory = findNewPath(path);
+    private void maybeMigrateDeletedAttachment(Session session, String path, File storageLocationFile)
+        throws IOException, DataMigrationException, ParserConfigurationException, SAXException
+    {
+        if (!this.migratedDeletedAttachment.contains(path)) {
+            File directory = new File(path);
+            if (!directory.getCanonicalPath().startsWith(storageLocationFile.getCanonicalPath())) {
+                this.logger.warn("[{}] is the wrong path, trying to find the new location", directory);
 
-                            if (directory == null) {
-                                this.logger.warn("Could not find the deleted attachment in any other location");
+                directory = findNewPath(path);
 
-                                // Remember that this attachment could not be migrated
-                                this.migratedDeletedAttachment.add(path);
+                if (directory == null) {
+                    this.logger.warn("Could not find the deleted attachment in any other location");
 
-                                continue;
-                            } else {
-                                this.logger.info("Found deleted attachment on [{}]", directory);
-                            }
-                        }
+                    // Remember that this attachment could not be migrated
+                    this.migratedDeletedAttachment.add(path);
 
-                        if (!directory.isDirectory()) {
-                            this.logger.warn("[{}] is not a directory", directory);
+                    return;
+                } else {
+                    this.logger.info("Found deleted attachment on [{}]", directory);
+                }
+            }
 
-                            continue;
-                        }
+            if (!directory.isDirectory()) {
+                this.logger.warn("[{}] is not a directory", directory);
+            } else {
+                // Find document reference
+                File documentDirectory = directory.getParentFile().getParentFile().getParentFile();
+                DocumentReference documentReference = getPre11DocumentReference(documentDirectory);
 
-                        // Find document reference
-                        File documentDirectory = directory.getParentFile().getParentFile().getParentFile();
-                        DocumentReference documentReference = getPre11DocumentReference(documentDirectory);
+                if (getXWikiContext().getWikiReference().equals(documentReference.getWikiReference())) {
+                    storeDeletedAttachment(directory, documentReference, session);
 
-                        if (getXWikiContext().getWikiReference().equals(documentReference.getWikiReference())) {
-                            storeDeletedAttachment(directory, documentReference, session);
-
-                            // Remember which path we already migrated
-                            this.migratedDeletedAttachment.add(path);
-                        }
-                    }
+                    // Remember which path we already migrated
+                    this.migratedDeletedAttachment.add(path);
                 }
             }
         }
@@ -217,7 +227,7 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(file);
 
-        String filename = getElementText(doc, "filename", null);
+        String filename = getElementText(doc, FILENAME, null);
         String deleter = getElementText(doc, "deleter", null);
         Date deleteDate = new Date(Long.valueOf(getElementText(doc, "datedeleted", null)));
 
@@ -228,13 +238,13 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
         org.hibernate.query.Query<Long> selectQuery = session
             .createQuery("SELECT id FROM DeletedAttachment WHERE docId=:docId AND filename=:filename AND date=:date");
         selectQuery.setParameter("docId", docId);
-        selectQuery.setParameter("filename", filename);
-        selectQuery.setParameter("date", new java.sql.Timestamp(deleteDate.getTime()));
+        selectQuery.setParameter(FILENAME, filename);
+        selectQuery.setParameter(DATE, new java.sql.Timestamp(deleteDate.getTime()));
         Long databaseId = selectQuery.uniqueResult();
 
         if (databaseId == null) {
             // Try without the milliseconds since most versions of MySQL don't support them
-            selectQuery.setParameter("date", new java.sql.Timestamp(deleteDate.toInstant().getEpochSecond() * 1000));
+            selectQuery.setParameter(DATE, new java.sql.Timestamp(deleteDate.toInstant().getEpochSecond() * 1000));
             databaseId = selectQuery.uniqueResult();
         }
 

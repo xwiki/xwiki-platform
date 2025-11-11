@@ -19,21 +19,21 @@
  */
 package org.xwiki.store;
 
-import java.io.InputStream;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.blob.Blob;
 
 /**
- * A generic thing which provides access to an InputStream on demand.
+ * An entity that serializes embedded data to a {@link Blob}.
  *
  * @version $Id$
- * @since 3.0M2
+ * @since 17.10.0RC1
  */
-public interface StreamProvider
+@Unstable
+public interface BlobSerializer
 {
     /**
-     * Get the stream provided by this StreamProvider.
-     *
-     * @return the stream which this StreamProvider provides.
-     * @throws Exception if something goes wrong while trying to get the stream.
+     * @param blob the file to write to
+     * @throws Exception when failing to serialize the data to the passed blob
      */
-    InputStream getStream() throws Exception;
+    void serialize(Blob blob) throws Exception;
 }

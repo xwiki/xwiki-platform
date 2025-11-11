@@ -17,39 +17,59 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store.filesystem.internal;
-
-import java.io.File;
+package org.xwiki.test.docker.junit5.blobstore;
 
 /**
- * A means of getting files for storing information about a given deleted document.
+ * The blob store backend to use for the UI tests.
  *
  * @version $Id$
- * @since 9.0RC1
+ * @since 17.10.0RC1
  */
-public class DefaultDeletedDocumentContentFileProvider implements DeletedDocumentContentFileProvider
+public enum BlobStore
 {
     /**
-     * The file holding the content of the deleted document.
+     * Represents the filesystem blob store (default).
      */
-    private static final String DELETED_DOCUMENT_FILE_NAME = "content.xml";
+    FILESYSTEM("filesystem"),
 
     /**
-     * The directory where all information about this deleted document resides.
+     * Represents the S3 blob store using MinIO.
      */
-    private final File deletedDocumentDir;
+    S3("s3");
+
+    private String endpoint;
+
+    private final String type;
 
     /**
-     * @param deletedDocumentDir the location where the information about the deleted document will be stored.
+     * @param type the type to use in xwiki.properties for store.blobStoreType
      */
-    public DefaultDeletedDocumentContentFileProvider(final File deletedDocumentDir)
+    BlobStore(String type)
     {
-        this.deletedDocumentDir = deletedDocumentDir;
+        this.type = type;
     }
 
-    @Override
-    public File getDeletedDocumentContentFile()
+    /**
+     * @param endpoint see {@link #getEndpoint()}
+     */
+    public void setEndpoint(String endpoint)
     {
-        return new File(this.deletedDocumentDir, DELETED_DOCUMENT_FILE_NAME);
+        this.endpoint = endpoint;
+    }
+
+    /**
+     * @return the endpoint URL to use to connect to the blob store (only applicable for S3)
+     */
+    public String getEndpoint()
+    {
+        return this.endpoint;
+    }
+
+    /**
+     * @return the type to use in xwiki.properties for store.blobStoreType
+     */
+    public String getType()
+    {
+        return this.type;
     }
 }

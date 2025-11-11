@@ -680,5 +680,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+
+    <!-- Filesystem store migrations -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-filesystem-migrations</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

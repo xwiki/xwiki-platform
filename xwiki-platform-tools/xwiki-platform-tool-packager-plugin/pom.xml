@@ -136,6 +136,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-store-blob-filesystem</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-refactoring-default</artifactId>
       <version>${project.version}</version>

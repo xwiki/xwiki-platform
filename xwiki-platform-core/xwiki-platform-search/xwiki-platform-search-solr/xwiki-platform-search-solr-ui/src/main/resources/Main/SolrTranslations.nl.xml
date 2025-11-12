@@ -56,22 +56,22 @@
 ### Missing: solr.admin.indexing.wiki.select_farm=Entire farm
 ### Missing: solr.admin.indexing.query.label=Custom query
 ### Missing: solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
+### Missing: solr.admin.indexing.query.language.label=Language of the custom query
 ### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-solr.sortBy=Sorteren op:
-solr.sortBy.score=Relevantie
-solr.sortBy.title_sort=Titel
-solr.sortBy.date=Datum
-solr.sortBy.author_display_sort=Laatste auteur
-### Missing: solr.sortBy.filename_sort=File name
-### Missing: solr.sortBy.attsize_sort=File size
-### Missing: solr.sortBy.attdate_sort=Upload date
-### Missing: solr.sortBy.attauthor_display_sort=Uploaded by
-solr.sortOrder.asc=Oplopend
-solr.sortOrder.desc=Aflopend
-### Missing: solr.options=Show:
-### Missing: solr.options.highlight=Highlighting
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 ### Missing: solr.options.highlight.title=
-### Missing: solr.options.facet=Facets
+### Missing: search.solr.options.showFacet=Show filters
 ### Missing: solr.options.facet.title=Allow extra filtering of the result
 ### Missing: solr.result.language=Language
 solr.result.locatedIn=Gevestigd in
@@ -146,8 +146,8 @@ solr.filterBy.fileType.text=Tekst
 ### Missing: solr.field.creator_display=Creator
 ### Missing: solr.field.date=Last modification date
 ### Missing: solr.field.creationdate=Creation date
-### Missing: solr.field.doccontent=Rendered document content
-### Missing: solr.field.doccontentraw=Raw document content
+solr.field.doccontent=Rendered document content
+solr.field.doccontentraw=Raw document content
 ### Missing: solr.field.class=Object type
 ### Missing: solr.field.class.definedBy=Defined by {0} » {1}
 ### Missing: solr.field.propertyname=Property name
@@ -172,6 +172,18 @@ solr.result.location=Gelegen in {0} » {1} » {2}
 
 ## until 7.2RC1
 ### Missing: solr.field.space=Location
+solr.sortBy=Sorteren op:
+solr.sortBy.score=Relevantie
+solr.sortBy.title_sort=Titel
+solr.sortBy.date=Datum
+solr.sortBy.author_display_sort=Laatste auteur
+### Missing: solr.sortBy.filename_sort=File name
+### Missing: solr.sortBy.attsize_sort=File size
+### Missing: solr.sortBy.attdate_sort=Upload date
+### Missing: solr.sortBy.attauthor_display_sort=Uploaded by
+### Missing: solr.options=Show:
+### Missing: solr.options.highlight=Highlighting
+solr.options.facet=Facets
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

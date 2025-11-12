@@ -245,6 +245,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERED, true, document);
+        this.utils.set(Event.FIELD_PREFILTERING_DATE, new Date(), document);
 
         try {
             this.client.add(document);

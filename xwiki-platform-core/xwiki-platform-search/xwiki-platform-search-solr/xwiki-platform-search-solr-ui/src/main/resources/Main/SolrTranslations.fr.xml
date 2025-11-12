@@ -58,21 +58,20 @@ solr.admin.indexing.query.label=Recherche avancée
 solr.admin.indexing.query.hint=Requête optionnelle limitant les documents affectés par l'indexation.
 solr.admin.indexing.query.language.label=Langue de la requête personnalisée
 solr.admin.info.affectedDocuments=Documents concernés dans l'index :
-solr.sortBy=Trier par :
-solr.sortBy.score=Pertinence
-solr.sortBy.title_sort=Titre
-solr.sortBy.date=Date de dernière modification
-solr.sortBy.author_display_sort=Dernier auteur
-solr.sortBy.filename_sort=Nom de fichier
-solr.sortBy.attsize_sort=Taille de fichier
-solr.sortBy.attdate_sort=Date d'enregistrement
-solr.sortBy.attauthor_display_sort=Enregistré par
-solr.sortOrder.asc=Ascendant
-solr.sortOrder.desc=Descendant
-solr.options=Afficher :
-solr.options.highlight=Surligner
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=Afficher un extrait de ce qui a été trouvé dans chaque résultat
-solr.options.facet=Facettes
+### Missing: search.solr.options.showFacet=Show filters
 solr.options.facet.title=Autoriser le fitrage dans les résultats
 solr.result.language=Langue
 solr.result.locatedIn=Situé dans
@@ -173,6 +172,18 @@ solr.result.location=Situé dans {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Espace
+solr.sortBy=Trier par :
+solr.sortBy.score=Pertinence
+solr.sortBy.title_sort=Titre
+solr.sortBy.date=Date de dernière modification
+solr.sortBy.author_display_sort=Dernier auteur
+solr.sortBy.filename_sort=Nom de fichier
+solr.sortBy.attsize_sort=Taille de fichier
+solr.sortBy.attdate_sort=Date d'enregistrement
+solr.sortBy.attauthor_display_sort=Enregistré par
+solr.options=Afficher :
+solr.options.highlight=Surligner
+solr.options.facet=Facettes
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

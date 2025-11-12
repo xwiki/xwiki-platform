@@ -80,9 +80,19 @@
       <artifactId>xwiki-platform-user-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Old httpclient -->
+    <!-- TODO: remove it -->
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
+      <version>3.1</version>
+      <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>

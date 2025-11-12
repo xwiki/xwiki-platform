@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-captcha</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha-ui</artifactId>
   <packaging>xar</packaging>
@@ -40,8 +40,4 @@
         <version>${project.version}</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <tag>stable-17.10.x</tag>
-  </scm>
 </project>

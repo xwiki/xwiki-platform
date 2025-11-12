@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-model-validation</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-validation-ui</artifactId>
   <name>XWiki Platform - Model - Validation - UI</name>
@@ -35,8 +35,4 @@
     <!-- Category to display by the Extension Manager -->
     <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
-
-  <scm>
-    <tag>stable-17.10.x</tag>
-  </scm>
 </project>

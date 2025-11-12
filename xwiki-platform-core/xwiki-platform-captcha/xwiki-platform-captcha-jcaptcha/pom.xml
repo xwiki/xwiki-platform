@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-captcha</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha-jcaptcha</artifactId>
   <name>XWiki Platform - CAPTCHA - JCaptcha - Parent POM</name>
@@ -33,8 +33,4 @@
     <module>xwiki-platform-captcha-jcaptcha-ui</module>
     <module>xwiki-platform-captcha-jcaptcha-webjar</module>
   </modules>
-
-  <scm>
-    <tag>stable-17.10.x</tag>
-  </scm>
 </project>

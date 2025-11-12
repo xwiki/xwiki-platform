@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-default</artifactId>
   <name>XWiki Platform - User - Default</name>
@@ -111,8 +111,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <tag>stable-17.10.x</tag>
-  </scm>
 </project>

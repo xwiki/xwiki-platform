@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mentions-test</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mentions-test-docker</artifactId>
   <name>XWiki Platform - Mentions - Test - Functional Docker Tests</name>
@@ -101,8 +101,4 @@
       </build>
     </profile>
   </profiles>
-
-  <scm>
-    <tag>stable-17.10.x</tag>
-  </scm>
 </project>

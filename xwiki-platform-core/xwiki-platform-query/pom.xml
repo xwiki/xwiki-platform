@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-query</artifactId>
   <name>XWiki Platform - Query - Parent POM</name>
@@ -35,9 +35,5 @@
     <module>xwiki-platform-query-manager</module>
     <module>xwiki-platform-query-xwql</module>
   </modules>
-
-  <scm>
-    <tag>stable-17.10.x</tag>
-  </scm>
 </project>
 

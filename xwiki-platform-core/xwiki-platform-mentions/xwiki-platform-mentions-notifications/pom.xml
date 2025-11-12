@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mentions</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mentions-notifications</artifactId>
   <name>XWiki Platform - Mentions - Notifications</name>
@@ -112,8 +112,4 @@
       <type>test-jar</type>
     </dependency>
   </dependencies>
-
-  <scm>
-    <tag>stable-17.10.x</tag>
-  </scm>
 </project>

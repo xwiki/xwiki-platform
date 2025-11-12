@@ -151,35 +151,28 @@ class BlobDeleteTransactionRunnableTest
         this.location.getStore().deleteBlob(this.location.getPath());
         assertFalse(this.location.exists());
 
-        final TransactionRunnable failRunnable = new TransactionRunnable()
+        final TransactionRunnable<TransactionRunnable<?>> failRunnable = new TransactionRunnable<>()
         {
+            @Override
             public void onRun() throws Exception
             {
-                assertFalse(temp.exists());
-                assertFalse(location.exists());
+                assertFalse(BlobDeleteTransactionRunnableTest.this.temp.exists());
+                assertFalse(BlobDeleteTransactionRunnableTest.this.location.exists());
                 throw new Exception("Simulate something going wrong.");
             }
         };
 
-        assertThrows(Exception.class, () -> {
-            try {
-                final StartableTransactionRunnable str = new StartableTransactionRunnable();
-                runnable.runIn(str);
-                failRunnable.runIn(str);
-                str.start();
-            } catch (Exception e) {
-                assertFalse(this.location.exists());
-                assertFalse(this.temp.exists());
-                throw e;
-            }
-        });
+        final StartableTransactionRunnable<TransactionRunnable<?>> str = new StartableTransactionRunnable<>();
+        this.runnable.runIn(str);
+        failRunnable.runIn(str);
+        assertThrows(Exception.class, str::start);
+        assertFalse(this.location.exists());
+        assertFalse(this.temp.exists());
     }
 
-    private void validateRollback(final StartableTransactionRunnable str) throws BlobStoreException
+    private void validateRollback(final StartableTransactionRunnable<?> str) throws BlobStoreException
     {
-        assertThrows(Exception.class, () -> {
-            str.start();
-        });
+        assertThrows(Exception.class, str::start);
 
         assertTrue(this.location.exists());
         assertFalse(this.temp.exists());

@@ -1176,8 +1176,9 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #end
 
 #-# [Since 17.10.0RC1]
-#-# The blob store type that is used, e.g., for storing attachments and deleted documents. Included types are
-#-# "filesystem" and "s3".
+#-# The blob store type that is used, e.g., for storing attachments and deleted documents. XWiki provides "filesystem"
+#-# and "s3" blob stores, but only "filesystem" is bundled by default. The "s3" blob store can be installed as an
+#-# extension or bundled as part of a custom WAR.
 #-#
 #-# The default is "filesystem".
 # store.blobStoreType = filesystem

@@ -2,7 +2,7 @@
   background-color: black;
   max-width: 100%;
   padding: 10px;
-  border-radius: 7px; /* Same value as @border-radius-base from Flamingo. */
+  border-radius: var(--border-radius-base);
   /* Position relative is required because some of the inner elements have position absolute and the gallery container
   must be their offset parent. */
   position: relative;

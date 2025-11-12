@@ -111,6 +111,11 @@ public class QueryExpressionGenerator
                 new GreaterThanNode(new PropertyValueNode(EventProperty.DATE), new DateValueNode(parameters.fromDate));
         }
 
+        if (parameters.fromPrefilteringDate != null) {
+            topNode = new GreaterThanNode(new PropertyValueNode(EventProperty.PREFILTERING_DATE),
+                new DateValueNode(parameters.fromPrefilteringDate));
+        }
+
         // Condition 2: handle other preferences
         AbstractOperatorNode preferencesNode = handleEventPreferences(parameters);
 

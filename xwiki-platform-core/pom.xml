@@ -150,9 +150,6 @@
               </differences>
             </revapi.differences>
             -->
-
-            
-            
           </analysisConfiguration>
         </configuration>
       </plugin>

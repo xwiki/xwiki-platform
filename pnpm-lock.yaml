@@ -16,8 +16,8 @@ catalogs:
       specifier: 27.0.0
       version: 27.0.0
     '@types/node':
-      specifier: 22.18.8
-      version: 22.18.8
+      specifier: 22.19.1
+      version: 22.19.1
     '@vitejs/plugin-react':
       specifier: 5.0.1
       version: 5.0.1
@@ -253,13 +253,13 @@ importers:
         version: 27.0.0
       '@types/node':
         specifier: 'catalog:'
-        version: 22.18.8
+        version: 22.19.1
       '@vitejs/plugin-react':
         specifier: 'catalog:'
-        version: 5.0.1(vite@7.1.12(@types/node@22.18.8)(jiti@2.6.0))
+        version: 5.0.1(vite@7.1.12(@types/node@22.19.1)(jiti@2.6.0))
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
-        version: 6.0.1(vite@7.1.12(@types/node@22.18.8)(jiti@2.6.0))(vue@3.5.23(typescript@5.9.3))
+        version: 6.0.1(vite@7.1.12(@types/node@22.19.1)(jiti@2.6.0))(vue@3.5.23(typescript@5.9.3))
       '@vue/eslint-config-prettier':
         specifier: 'catalog:'
         version: 10.2.0(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
@@ -295,10 +295,10 @@ importers:
         version: 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@22.18.8)(jiti@2.6.0)
+        version: 7.1.12(@types/node@22.19.1)(jiti@2.6.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6))
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@22.19.1)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6))
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -344,13 +344,13 @@ importers:
         version: 27.0.0
       '@types/node':
         specifier: 'catalog:'
-        version: 22.18.8
+        version: 22.19.1
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
-        version: 6.0.1(vite@7.1.12(@types/node@22.18.8)(jiti@2.6.0))(vue@3.5.23(typescript@5.9.3))
+        version: 6.0.1(vite@7.1.12(@types/node@22.19.1)(jiti@2.6.0))(vue@3.5.23(typescript@5.9.3))
       '@vitest/eslint-plugin':
         specifier: 'catalog:'
-        version: 1.3.4(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6)))
+        version: 1.3.4(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@22.19.1)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6)))
       '@vue/eslint-config-prettier':
         specifier: 'catalog:'
         version: 10.2.0(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
@@ -395,10 +395,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@22.18.8)(jiti@2.6.0)
+        version: 7.1.12(@types/node@22.19.1)(jiti@2.6.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6))
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@22.19.1)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6))
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -416,13 +416,13 @@ importers:
         version: 27.0.0
       '@types/node':
         specifier: 'catalog:'
-        version: 22.18.8
+        version: 22.19.1
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
-        version: 6.0.1(vite@7.1.12(@types/node@22.18.8)(jiti@2.6.0))(vue@3.5.23(typescript@5.9.3))
+        version: 6.0.1(vite@7.1.12(@types/node@22.19.1)(jiti@2.6.0))(vue@3.5.23(typescript@5.9.3))
       '@vitest/eslint-plugin':
         specifier: 'catalog:'
-        version: 1.3.4(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6)))
+        version: 1.3.4(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@22.19.1)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6)))
       '@vue/eslint-config-prettier':
         specifier: 'catalog:'
         version: 10.2.0(eslint@9.36.0(jiti@2.6.0))(prettier@3.6.2)
@@ -455,10 +455,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@22.18.8)(jiti@2.6.0)
+        version: 7.1.12(@types/node@22.19.1)(jiti@2.6.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6))
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@22.19.1)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6))
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -1276,8 +1276,8 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
-  '@types/node@22.18.8':
-    resolution: {integrity: sha512-pAZSHMiagDR7cARo/cch1f3rXy0AEXwsVsVH09FcyeJVAzCnGgmYis7P3JidtTUjyadhTeSo8TgRPswstghDaw==}
+  '@types/node@22.19.1':
+    resolution: {integrity: sha512-LCCV0HdSZZZb34qifBsyWlUmok6W7ouER+oQIGBScS8EsZsQbrtFTUrDX4hOl+CS6p7cnNC4td+qrSVGSCTUfQ==}
 
   '@types/react-dom@19.2.0':
     resolution: {integrity: sha512-brtBs0MnE9SMx7px208g39lRmC5uHZs96caOJfTjFcYSLHNamvaSMfJNagChVNkup2SdtOxKX1FDBkRSJe1ZAg==}
@@ -4226,7 +4226,7 @@ snapshots:
 
   '@types/jsdom@27.0.0':
     dependencies:
-      '@types/node': 22.18.8
+      '@types/node': 22.19.1
       '@types/tough-cookie': 4.0.5
       parse5: 7.3.0
 
@@ -4247,7 +4247,7 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
-  '@types/node@22.18.8':
+  '@types/node@22.19.1':
     dependencies:
       undici-types: 6.21.0
 
@@ -4363,7 +4363,7 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@vitejs/plugin-react@5.0.1(vite@7.1.12(@types/node@22.18.8)(jiti@2.6.0))':
+  '@vitejs/plugin-react@5.0.1(vite@7.1.12(@types/node@22.19.1)(jiti@2.6.0))':
     dependencies:
       '@babel/core': 7.28.3
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.3)
@@ -4371,23 +4371,23 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.32
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 7.1.12(@types/node@22.18.8)(jiti@2.6.0)
+      vite: 7.1.12(@types/node@22.19.1)(jiti@2.6.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue@6.0.1(vite@7.1.12(@types/node@22.18.8)(jiti@2.6.0))(vue@3.5.23(typescript@5.9.3))':
+  '@vitejs/plugin-vue@6.0.1(vite@7.1.12(@types/node@22.19.1)(jiti@2.6.0))(vue@3.5.23(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-beta.29
-      vite: 7.1.12(@types/node@22.18.8)(jiti@2.6.0)
+      vite: 7.1.12(@types/node@22.19.1)(jiti@2.6.0)
       vue: 3.5.23(typescript@5.9.3)
 
-  '@vitest/eslint-plugin@1.3.4(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6)))':
+  '@vitest/eslint-plugin@1.3.4(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@22.19.1)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6)))':
     dependencies:
       '@typescript-eslint/utils': 8.45.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)
       eslint: 9.36.0(jiti@2.6.0)
     optionalDependencies:
       typescript: 5.9.3
-      vitest: 4.0.7(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6))
+      vitest: 4.0.7(@types/debug@4.1.12)(@types/node@22.19.1)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6))
     transitivePeerDependencies:
       - supports-color
 
@@ -4400,13 +4400,13 @@ snapshots:
       chai: 6.2.0
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.7(vite@7.1.12(@types/node@22.18.8)(jiti@2.6.0))':
+  '@vitest/mocker@4.0.7(vite@7.1.12(@types/node@22.19.1)(jiti@2.6.0))':
     dependencies:
       '@vitest/spy': 4.0.7
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.1.12(@types/node@22.18.8)(jiti@2.6.0)
+      vite: 7.1.12(@types/node@22.19.1)(jiti@2.6.0)
 
   '@vitest/pretty-format@4.0.7':
     dependencies:
@@ -6580,7 +6580,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vite@7.1.12(@types/node@22.18.8)(jiti@2.6.0):
+  vite@7.1.12(@types/node@22.19.1)(jiti@2.6.0):
     dependencies:
       esbuild: 0.25.6
       fdir: 6.5.0(picomatch@4.0.3)
@@ -6589,14 +6589,14 @@ snapshots:
       rollup: 4.44.2
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 22.18.8
+      '@types/node': 22.19.1
       fsevents: 2.3.3
       jiti: 2.6.0
 
-  vitest@4.0.7(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6)):
+  vitest@4.0.7(@types/debug@4.1.12)(@types/node@22.19.1)(jiti@2.6.0)(jsdom@27.0.0(postcss@8.5.6)):
     dependencies:
       '@vitest/expect': 4.0.7
-      '@vitest/mocker': 4.0.7(vite@7.1.12(@types/node@22.18.8)(jiti@2.6.0))
+      '@vitest/mocker': 4.0.7(vite@7.1.12(@types/node@22.19.1)(jiti@2.6.0))
       '@vitest/pretty-format': 4.0.7
       '@vitest/runner': 4.0.7
       '@vitest/snapshot': 4.0.7
@@ -6613,11 +6613,11 @@ snapshots:
       tinyexec: 0.3.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: 7.1.12(@types/node@22.18.8)(jiti@2.6.0)
+      vite: 7.1.12(@types/node@22.19.1)(jiti@2.6.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/debug': 4.1.12
-      '@types/node': 22.18.8
+      '@types/node': 22.19.1
       jsdom: 27.0.0(postcss@8.5.6)
     transitivePeerDependencies:
       - jiti

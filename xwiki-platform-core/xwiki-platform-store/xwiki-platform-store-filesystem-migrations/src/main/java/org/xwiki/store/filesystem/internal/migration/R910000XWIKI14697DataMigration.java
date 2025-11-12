@@ -20,30 +20,35 @@
 
 package org.xwiki.store.filesystem.internal.migration;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.store.filesystem.internal.DefaultAttachmentFileProvider;
+import org.xwiki.store.blob.BlobPath;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Migration for XWIKI-15249. Make sure all attachments have the right content store id.
+ * Migration for XWIKI-14697. Make sure all attachments have the right content store id.
  *
  * @version $Id$
- * @since 10.4RC1
+ * @since 9.10RC1
  */
 @Component
-@Named("R1004000XWIKI15249")
+@Named("R910000XWIKI14697")
 @Singleton
-public class R1004000XWIKI15249DataMigration extends AbstractXWIKI15249DataMigration
+public class R910000XWIKI14697DataMigration extends AbstractXWIKI14697DataMigration
 {
     /**
      * The default constructor.
      */
-    public R1004000XWIKI15249DataMigration()
+    public R910000XWIKI14697DataMigration()
     {
         super("XWikiAttachmentContent", "contentStore");
     }
@@ -57,13 +62,17 @@ public class R1004000XWIKI15249DataMigration extends AbstractXWIKI15249DataMigra
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(1004000);
+        return new XWikiDBVersion(910000);
     }
 
     @Override
     protected boolean isFile(AttachmentReference attachmentReference)
     {
-        return new DefaultAttachmentFileProvider(getAttachmentDir(attachmentReference), attachmentReference.getName())
-            .getAttachmentContentFile().exists();
+        BlobPath attachmentFolder = getAttachmentDir(attachmentReference);
+
+        Path attachmentFolderPath = this.pre11BlobStore.getBlobFilePath(attachmentFolder);
+
+        return Files.exists(attachmentFolderPath.resolve(URLEncoder.encode(attachmentReference.getName(),
+            StandardCharsets.UTF_8)));
     }
 }

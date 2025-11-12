@@ -19,15 +19,16 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
-import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.filesystem.internal.AttachmentBlobProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.internal.BlobDeleteTransactionRunnable;
 
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 
@@ -46,18 +47,19 @@ public class AttachmentArchiveDeleteRunnable extends StartableTransactionRunnabl
      * @param provider the file provider for gettign the files to delete.
      */
     public AttachmentArchiveDeleteRunnable(final XWikiAttachmentArchive archive, final FilesystemStoreTools fileTools,
-        final AttachmentFileProvider provider)
+        final AttachmentBlobProvider provider) throws BlobStoreException
     {
-        final List<File> toDelete = new ArrayList<>();
-        toDelete.add(provider.getAttachmentVersioningMetaFile());
+        final List<Blob> toDelete = new ArrayList<>();
+        toDelete.add(provider.getAttachmentVersioningMetaBlob());
 
         final Version[] versions = archive.getVersions();
         for (int i = 0; i < versions.length; i++) {
-            toDelete.add(provider.getAttachmentVersionContentFile(versions[i].toString()));
+            toDelete.add(provider.getAttachmentVersionContentBlob(versions[i].toString()));
         }
 
-        for (File file : toDelete) {
-            new FileDeleteTransactionRunnable(file, fileTools.getBackupFile(file), fileTools.getLockForFile(file))
+        for (Blob file : toDelete) {
+            new BlobDeleteTransactionRunnable(file, fileTools.getBackupFile(file),
+                fileTools.getLockForFile(file.getPath()))
                 .runIn(this);
         }
     }

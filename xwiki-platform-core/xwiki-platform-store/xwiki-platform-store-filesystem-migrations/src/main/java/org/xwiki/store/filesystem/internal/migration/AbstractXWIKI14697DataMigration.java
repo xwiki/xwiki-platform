@@ -20,21 +20,20 @@
 
 package org.xwiki.store.filesystem.internal.migration;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.store.blob.BlobPath;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
@@ -47,6 +46,8 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  */
 public abstract class AbstractXWIKI14697DataMigration extends AbstractStoreTypeDataMigration
 {
+    private static final String PATH_SEPARATOR = "/";
+
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
     protected ConfigurationSource configuration;
@@ -79,32 +80,29 @@ public abstract class AbstractXWIKI14697DataMigration extends AbstractStoreTypeD
         }
     }
 
-    protected File getDocumentDir(final DocumentReference docRef)
+    protected BlobPath getDocumentDir(final DocumentReference docRef)
     {
-        final File path = new File(getPre11StoreRootDirectory(), this.pathSerializer.serialize(docRef, false));
-        File docDir = new File(path, THIS_DIR_NAME);
+        String serialized = this.pathSerializer.serialize(docRef, false);
+        BlobPath path = BlobPath.parse(PATH_SEPARATOR + serialized);
+        BlobPath docDir = path.resolve(THIS_DIR_NAME);
 
         // Add the locale
         Locale docLocale = docRef.getLocale();
         if (docLocale != null) {
-            final File docLocalesDir = new File(docDir, FilesystemStoreTools.DOCUMENT_LOCALES_DIR_NAME);
-            final File docLocaleDir = new File(docLocalesDir,
+            final BlobPath docLocalesDir = docDir.resolve(FilesystemStoreTools.DOCUMENT_LOCALES_DIR_NAME);
+            final BlobPath docLocaleDir = docLocalesDir.resolve(
                 docLocale.equals(Locale.ROOT) ? DOCUMENT_LOCALE_ROOT_NAME : docLocale.toString());
-            docDir = new File(docLocaleDir, THIS_DIR_NAME);
+            docDir = docLocaleDir.resolve(THIS_DIR_NAME);
         }
 
         return docDir;
     }
 
-    protected File getAttachmentDir(final AttachmentReference attachmentReference)
+    protected BlobPath getAttachmentDir(final AttachmentReference attachmentReference)
     {
-        final File docDir = getDocumentDir(attachmentReference.getDocumentReference());
-        final File attachmentsDir = new File(docDir, FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
+        final BlobPath docDir = getDocumentDir(attachmentReference.getDocumentReference());
+        final BlobPath attachmentsDir = docDir.resolve(FilesystemStoreTools.ATTACHMENTS_DIR_NAME);
 
-        try {
-            return new File(attachmentsDir, URLEncoder.encode(attachmentReference.getName(), "UTF8"));
-        } catch (UnsupportedEncodingException e) {
-            throw new HibernateException("UTF8 is unknown", e);
-        }
+        return attachmentsDir.resolve(URLEncoder.encode(attachmentReference.getName(), StandardCharsets.UTF_8));
     }
 }

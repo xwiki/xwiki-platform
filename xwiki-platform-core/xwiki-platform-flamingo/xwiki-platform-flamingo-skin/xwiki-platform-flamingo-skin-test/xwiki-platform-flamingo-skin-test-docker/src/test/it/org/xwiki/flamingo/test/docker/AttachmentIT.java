@@ -502,7 +502,8 @@ class AttachmentIT
             StringUtils.substringAfterLast(setup.executeWikiPlain(
                 """
                     {{groovy}}
-                      println xwiki.getDocument('%s').document.getAttachment('%s').getAttachmentContent(xcontext.context).storageFile
+                      println(xwiki.getDocument('%s').document.getAttachment('%s')
+                        .getAttachmentContent(xcontext.context).storageBlob.getPath())
                     {{/groovy}}
                     """
                     .formatted(setup.serializeReference(testReference), FIRST_ATTACHMENT),

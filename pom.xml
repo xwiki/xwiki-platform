@@ -78,13 +78,12 @@
     <rssreader.version>3.11.0</rssreader.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.21.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>25.2.5</libreoffice.version>
+    <libreoffice.version>25.2.7</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>

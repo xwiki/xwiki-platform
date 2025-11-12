@@ -19,18 +19,19 @@
  */
 package org.xwiki.store.legacy.store.internal;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
-import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.StreamProvider;
 import org.xwiki.store.StringStreamProvider;
-import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobStoreException;
+import org.xwiki.store.filesystem.internal.DeletedAttachmentBlobProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
+import org.xwiki.store.internal.BlobSaveTransactionRunnable;
 import org.xwiki.store.serialization.SerializationStreamProvider;
 import org.xwiki.store.serialization.Serializer;
 
@@ -58,17 +59,17 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
      * @param context the legacy XWikiContext which might be needed to get the attachment archive.
      * @throws XWikiException if loading the attachment content or archive fails.
      */
-    SaveDeletedAttachmentContentRunnable(final XWikiAttachment attachment, final DeletedAttachmentFileProvider provider,
+    SaveDeletedAttachmentContentRunnable(final XWikiAttachment attachment, final DeletedAttachmentBlobProvider provider,
         final FilesystemStoreTools fileTools, final Serializer<XWikiAttachment, XWikiAttachment> metaSerializer,
         final Serializer<List<XWikiAttachment>, List<XWikiAttachment>> versionSerializer, final XWikiContext context)
-        throws XWikiException
+        throws XWikiException, BlobStoreException
     {
         //////////////////////////////////////////////
         // Save metadata about the deleted attachment.
 
         final StreamProvider metaProvider =
             new SerializationStreamProvider<XWikiAttachment>(metaSerializer, attachment);
-        addSaver(metaProvider, fileTools, provider.getDeletedAttachmentMetaFile());
+        addSaver(metaProvider, fileTools, provider.getDeletedAttachmentMetaBlob());
 
         //////////////////////////////////////////////
         // Save the archive for the deleted attachment.
@@ -82,8 +83,8 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
         //////////////////////////////////////////////
         // Save the attachment's content.
 
-        File attachFile = provider.getAttachmentContentFile();
-        File linkAttachFile = StoreFileUtils.getLinkFile(attachFile);
+        Blob attachBlob = provider.getAttachmentContentBlob();
+        Blob linkAttachBlob = StoreFileUtils.getLinkBlob(attachBlob);
 
         // If the last archive is identical to the current version (which is the case except in very rare
         // cases), don't duplicate content
@@ -91,16 +92,16 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
             archive.getRevision(attachment, attachment.getVersion(), context);
         // Really comparing the content could be very expensive so we assume comparing the size and date are
         // enough
-        File finalAttachFile;
+        Blob finalAttachFile;
         StreamProvider streamProvider;
         if (archiveAttachment != null && Objects.equals(archiveAttachment.getDate(), attachment.getDate())
             && archiveAttachment.getLongSize() == attachment.getLongSize()) {
             // Create a link to the current version
-            finalAttachFile = linkAttachFile;
+            finalAttachFile = linkAttachBlob;
             streamProvider = new StringStreamProvider(fileTools.getLinkContent(attachment), StandardCharsets.UTF_8);
         } else {
             // Save the content as is
-            finalAttachFile = attachFile;
+            finalAttachFile = attachBlob;
             streamProvider = new AttachmentContentStreamProvider(attachment, context);
         }
 
@@ -115,9 +116,10 @@ class SaveDeletedAttachmentContentRunnable extends StartableTransactionRunnable
      * @param fileTools the means to get the backup file, temporary file, and lock.
      * @param saveHere the location to save the data.
      */
-    private void addSaver(final StreamProvider provider, final FilesystemStoreTools fileTools, final File saveHere)
+    private void addSaver(final StreamProvider provider, final FilesystemStoreTools fileTools, final Blob saveHere)
+        throws BlobStoreException
     {
-        new FileSaveTransactionRunnable(saveHere, fileTools.getTempFile(saveHere), fileTools.getBackupFile(saveHere),
-            fileTools.getLockForFile(saveHere), provider).runIn(this);
+        new BlobSaveTransactionRunnable(saveHere, fileTools.getTempFile(saveHere), fileTools.getBackupFile(saveHere),
+            fileTools.getLockForFile(saveHere.getPath()), provider).runIn(this);
     }
 }

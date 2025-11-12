@@ -625,4 +625,8 @@
       </exclusions>
     </dependency>
   </dependencies>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

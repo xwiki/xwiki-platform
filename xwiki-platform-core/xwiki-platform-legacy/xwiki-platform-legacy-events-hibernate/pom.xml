@@ -35,5 +35,9 @@
     <module>xwiki-platform-legacy-events-hibernate-api</module>
     <module>xwiki-platform-legacy-events-hibernate-ui</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>
 

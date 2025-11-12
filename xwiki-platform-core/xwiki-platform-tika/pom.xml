@@ -35,4 +35,8 @@
     <module>xwiki-platform-tika-detect</module>
     <module>xwiki-platform-tika-parsers</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -37,4 +37,8 @@
     <module>xwiki-platform-security-requiredrights</module>
     <module>xwiki-platform-security-test</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

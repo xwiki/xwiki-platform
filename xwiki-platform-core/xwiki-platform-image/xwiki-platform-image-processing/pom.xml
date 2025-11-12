@@ -35,4 +35,8 @@
     <module>xwiki-platform-image-processing-api</module>
     <module>xwiki-platform-image-processing-plugin</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

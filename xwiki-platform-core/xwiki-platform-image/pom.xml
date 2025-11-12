@@ -36,4 +36,8 @@
     <module>xwiki-platform-image-processing</module>
     <module>xwiki-platform-image-style</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

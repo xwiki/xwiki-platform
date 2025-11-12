@@ -36,5 +36,9 @@
     <module>xwiki-platform-legacy-office-importer</module>
     <module>xwiki-platform-legacy-office-viewer</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>
 

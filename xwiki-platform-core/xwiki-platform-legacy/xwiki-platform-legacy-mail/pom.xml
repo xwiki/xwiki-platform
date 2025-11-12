@@ -35,5 +35,9 @@
     <!-- Ordered Alphabetically -->
     <module>xwiki-platform-legacy-mail-send</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>
 

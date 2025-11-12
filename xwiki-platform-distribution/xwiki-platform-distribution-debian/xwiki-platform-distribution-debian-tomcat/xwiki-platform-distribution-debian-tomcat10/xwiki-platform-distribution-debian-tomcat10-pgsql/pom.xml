@@ -34,4 +34,8 @@
   <properties>
     <debian.package>xwiki-tomcat${debian.tomcat.version}-pgsql</debian.package>
   </properties>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -34,4 +34,8 @@
     <module>xwiki-platform-distribution-ui-base</module>
     <module>xwiki-platform-distribution-ui-admin-user</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

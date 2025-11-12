@@ -39,4 +39,8 @@
     <debian.solr.var.oldsolr8core>${debian.solr.var.data}/xwiki</debian.solr.var.oldsolr8core>
     <debian.xwiki.var.oldsolr8core>${debian.xwiki.var}/solr-data</debian.xwiki.var.oldsolr8core>
   </properties>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

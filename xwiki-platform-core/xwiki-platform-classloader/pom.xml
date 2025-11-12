@@ -35,4 +35,8 @@
     <module>xwiki-platform-classloader-protocols</module>
     <module>xwiki-platform-classloader-xwiki</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -37,5 +37,9 @@
     <module>xwiki-platform-legacy-notifications-notifiers</module>
     <module>xwiki-platform-legacy-notifications-sources</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>
 

@@ -34,4 +34,8 @@
     <module>xwiki-platform-model-api</module>
     <module>xwiki-platform-model-validation</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

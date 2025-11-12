@@ -35,4 +35,8 @@
     <module>xwiki-platform-notifications-preferences-api</module>
     <module>xwiki-platform-notifications-preferences-default</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

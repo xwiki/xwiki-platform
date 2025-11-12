@@ -36,4 +36,8 @@
     <module>xwiki-platform-wiki-template-default</module>
     <module>xwiki-platform-wiki-template-script</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

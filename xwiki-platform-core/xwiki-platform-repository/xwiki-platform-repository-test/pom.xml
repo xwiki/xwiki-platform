@@ -42,4 +42,8 @@
     <module>xwiki-platform-repository-test-pageobjects</module>
     <module>xwiki-platform-repository-test-utils</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

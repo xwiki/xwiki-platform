@@ -292,4 +292,8 @@
   <modules>
     <module>xwiki-platform-distribution-flavor-data-hsqldb</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

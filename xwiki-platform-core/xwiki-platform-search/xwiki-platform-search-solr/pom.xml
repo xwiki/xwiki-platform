@@ -39,4 +39,8 @@
     <module>xwiki-platform-search-solr-rest</module>
     <module>xwiki-platform-search-solr-ui</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -38,4 +38,8 @@
     <module>xwiki-platform-url-default</module>
     <module>xwiki-platform-url-schemes</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

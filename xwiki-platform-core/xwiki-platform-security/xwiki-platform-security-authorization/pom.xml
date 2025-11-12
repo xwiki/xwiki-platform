@@ -35,4 +35,8 @@
     <module>xwiki-platform-security-authorization-bridge</module>
     <module>xwiki-platform-security-authorization-script</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

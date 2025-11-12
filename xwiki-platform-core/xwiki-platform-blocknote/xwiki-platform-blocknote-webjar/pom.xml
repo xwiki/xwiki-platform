@@ -80,4 +80,8 @@ For a complete list, including transitive dependencies, please check the META-IN
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -36,4 +36,8 @@
     <module>xwiki-platform-chart-macro</module>
     <module>xwiki-platform-chart-renderer</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

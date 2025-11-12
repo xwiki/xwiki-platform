@@ -35,4 +35,8 @@
     <module>xwiki-platform-distribution-debian-solr-cores</module>
     <module>xwiki-platform-distribution-debian-solr-all</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

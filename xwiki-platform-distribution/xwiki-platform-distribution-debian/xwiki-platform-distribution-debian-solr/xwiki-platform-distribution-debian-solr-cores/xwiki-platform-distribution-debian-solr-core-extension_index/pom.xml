@@ -36,4 +36,8 @@
     <!-- '_'' is forbidden in a Debian package name so we cannot reuse the core name as is -->
     <debian.package.core>extension-index</debian.package.core>
   </properties>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

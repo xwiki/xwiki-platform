@@ -34,4 +34,8 @@
   <modules>
     <module>xwiki-platform-classloader-protocol-attachmentjar</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

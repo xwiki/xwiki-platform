@@ -35,4 +35,8 @@
     <module>xwiki-platform-rendering-configuration-api</module>
     <module>xwiki-platform-rendering-configuration-default</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -36,4 +36,8 @@
     <module>xwiki-platform-notifications-filters-default</module>
     <module>xwiki-platform-notifications-filters-watch</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

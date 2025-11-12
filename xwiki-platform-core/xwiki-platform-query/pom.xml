@@ -35,5 +35,9 @@
     <module>xwiki-platform-query-manager</module>
     <module>xwiki-platform-query-xwql</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>
 

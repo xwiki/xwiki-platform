@@ -59,4 +59,8 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

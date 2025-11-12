@@ -39,4 +39,8 @@
     <module>xwiki-platform-localization-rest-api</module>
     <module>xwiki-platform-localization-rest-default</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

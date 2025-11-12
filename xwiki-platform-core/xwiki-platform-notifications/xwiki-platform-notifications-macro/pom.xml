@@ -33,4 +33,8 @@
   <modules>
     <module>xwiki-platform-notifications-macro-ui</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

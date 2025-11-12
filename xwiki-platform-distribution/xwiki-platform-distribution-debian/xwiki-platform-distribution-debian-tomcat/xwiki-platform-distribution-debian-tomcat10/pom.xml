@@ -40,4 +40,8 @@
     <module>xwiki-platform-distribution-debian-tomcat10-mysql</module>
     <module>xwiki-platform-distribution-debian-tomcat10-pgsql</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

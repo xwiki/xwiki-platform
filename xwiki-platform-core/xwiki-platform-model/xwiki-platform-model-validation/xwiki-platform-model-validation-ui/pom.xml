@@ -35,4 +35,8 @@
     <!-- Category to display by the Extension Manager -->
     <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

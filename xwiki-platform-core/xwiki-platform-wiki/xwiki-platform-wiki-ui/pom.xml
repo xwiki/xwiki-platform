@@ -36,4 +36,8 @@
     <module>xwiki-platform-wiki-ui-wiki</module>
     <module>xwiki-platform-wiki-ui-common</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

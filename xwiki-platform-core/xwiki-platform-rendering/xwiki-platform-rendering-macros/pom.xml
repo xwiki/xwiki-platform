@@ -118,4 +118,8 @@ Thus it is forbidden to depend on the HTML Macro.
     <module>xwiki-platform-rendering-macro-useravatar</module>
     <module>xwiki-platform-rendering-macro-velocity</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

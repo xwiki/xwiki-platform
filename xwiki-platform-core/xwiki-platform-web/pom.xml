@@ -36,4 +36,8 @@
     <module>xwiki-platform-web-templates</module>
     <module>xwiki-platform-web-war</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

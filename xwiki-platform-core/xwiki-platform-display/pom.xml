@@ -36,4 +36,8 @@
     <module>xwiki-platform-display-html</module>
     <module>xwiki-platform-display-macro</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -35,4 +35,8 @@
     <module>xwiki-platform-legacy-rendering-wikimacro-store</module>
     <module>xwiki-platform-legacy-rendering-wikimacro-api</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

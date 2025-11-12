@@ -35,4 +35,8 @@
     <module>xwiki-platform-netflux-api</module>
     <module>xwiki-platform-netflux-rest</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

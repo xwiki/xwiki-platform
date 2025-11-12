@@ -37,4 +37,8 @@
     <module>xwiki-platform-component-script</module>
     <module>xwiki-platform-component-wiki</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -35,4 +35,8 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Alerts Application</xwiki.extension.name>
   </properties>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

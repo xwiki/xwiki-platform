@@ -41,4 +41,8 @@
     <module>xwiki-platform-filter-test-pageobjects</module>
     <module>xwiki-platform-filter-test-tests</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -36,4 +36,8 @@
     <module>xwiki-platform-eventstream-default</module>
     <module>xwiki-platform-eventstream-stores</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

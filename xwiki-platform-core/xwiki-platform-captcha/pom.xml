@@ -37,4 +37,8 @@
     <module>xwiki-platform-captcha-jcaptcha</module>
   </modules>
   <description>Offers API and configuration to generate and validate CAPTCHAs.</description>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

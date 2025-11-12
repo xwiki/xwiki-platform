@@ -34,4 +34,8 @@
   <modules>
     <module>xwiki-platform-distribution-test-maven</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

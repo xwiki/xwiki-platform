@@ -34,4 +34,8 @@
   <modules>
     <module>xwiki-platform-template-api</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -34,4 +34,8 @@
     <module>xwiki-platform-ratings-api</module>
     <module>xwiki-platform-ratings-ui</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

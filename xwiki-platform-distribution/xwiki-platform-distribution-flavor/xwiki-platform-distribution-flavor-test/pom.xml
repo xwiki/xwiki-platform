@@ -506,4 +506,8 @@
     <module>xwiki-platform-distribution-flavor-test-storage</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

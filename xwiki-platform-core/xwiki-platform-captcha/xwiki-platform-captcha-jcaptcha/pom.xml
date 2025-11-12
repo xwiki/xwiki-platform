@@ -33,4 +33,8 @@
     <module>xwiki-platform-captcha-jcaptcha-ui</module>
     <module>xwiki-platform-captcha-jcaptcha-webjar</module>
   </modules>
+
+  <scm>
+    <tag>stable-17.10.x</tag>
+  </scm>
 </project>

@@ -157,6 +157,10 @@ log-out=user_go
 th=application_view_tile
 reposition=reposition
 
+## Since 17.10.0RC1
+sort-ascending = arrow_up
+sort-descending = arrow_down
+
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept
 add = add

@@ -46,6 +46,7 @@
       org.xwiki.contrib:authservice-backport-api,
       org.xwiki.contrib:authservice-backport-default
     </xwiki.platform.oldcore.extension.features>
+    <xwiki.enforcer.valid-importmap.skip>${xwiki.enforcer.skip}</xwiki.enforcer.valid-importmap.skip>
   </properties>
   <build>
     <pluginManagement>
@@ -180,6 +181,33 @@
 
           </analysisConfiguration>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-enforcer-importmap</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <!-- Make sure declared importmap are valid -->
+          <execution>
+            <id>enforce-valid-javascript-importmap</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.valid-importmap.skip}</skip>
+              <rules>
+                <javascriptImportMapCheck />
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

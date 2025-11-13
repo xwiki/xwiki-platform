@@ -10,8 +10,8 @@ catalogs:
       specifier: 9.34.0
       version: 9.34.0
     '@tsconfig/node24':
-      specifier: 24.0.1
-      version: 24.0.1
+      specifier: 24.0.2
+      version: 24.0.2
     '@types/jsdom':
       specifier: 27.0.0
       version: 27.0.0
@@ -247,7 +247,7 @@ importers:
         version: 9.34.0
       '@tsconfig/node24':
         specifier: 'catalog:'
-        version: 24.0.1
+        version: 24.0.2
       '@types/jsdom':
         specifier: 'catalog:'
         version: 27.0.0
@@ -338,7 +338,7 @@ importers:
     devDependencies:
       '@tsconfig/node24':
         specifier: 'catalog:'
-        version: 24.0.1
+        version: 24.0.2
       '@types/jsdom':
         specifier: 'catalog:'
         version: 27.0.0
@@ -410,7 +410,7 @@ importers:
     devDependencies:
       '@tsconfig/node24':
         specifier: 'catalog:'
-        version: 24.0.1
+        version: 24.0.2
       '@types/jsdom':
         specifier: 'catalog:'
         version: 27.0.0
@@ -1225,8 +1225,8 @@ packages:
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@tsconfig/node24@24.0.1':
-    resolution: {integrity: sha512-3+IXshza3bIrT0tbHBr9CixQDVf4iBf0HTR0hCYowhpLqkzJjswu3UY8aZWjRXZep31kYB+o2SQeD8KwIoUHYw==}
+  '@tsconfig/node24@24.0.2':
+    resolution: {integrity: sha512-CNeOLUPI9PjbBc1DSIqb3GF/u+3kX/TDe9DKCzoI62mYI4dEDrMQ0r/9+SfYACP4UNMbiTlz7n8H7Rx/xTisQg==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -4185,7 +4185,7 @@ snapshots:
       react-dom: 19.2.0(react@19.2.0)
       use-sync-external-store: 1.5.0(react@19.2.0)
 
-  '@tsconfig/node24@24.0.1': {}
+  '@tsconfig/node24@24.0.2': {}
 
   '@types/babel__core@7.20.5':
     dependencies:

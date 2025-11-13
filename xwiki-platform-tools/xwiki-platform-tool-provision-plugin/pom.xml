@@ -80,8 +80,10 @@
       <artifactId>xwiki-platform-user-default</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Old httpclient -->
-    <!-- TODO: remove it -->
+    <!--
+		TODO: remove it when the plugin does not use it anymore
+		See https://jira.xwiki.org/browse/XCOMMONS-3481 for the work left to be done.
+    -->
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>

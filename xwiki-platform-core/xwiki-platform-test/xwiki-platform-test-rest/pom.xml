@@ -36,7 +36,10 @@
       <artifactId>xwiki-platform-rest-model</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- TODO: remove it -->
+    <!--
+		TODO: remove it when no integration test uses it anymore
+		See https://jira.xwiki.org/browse/XCOMMONS-3481 for the work left to be done.
+    -->
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>

@@ -104,6 +104,7 @@
     <xwiki.enforcer.banneddependencytype-xar.skip>${xwiki.enforcer.skip}</xwiki.enforcer.banneddependencytype-xar.skip>
     <xwiki.enforcer.mysql-connector-id.skip>${xwiki.enforcer.skip}</xwiki.enforcer.mysql-connector-id.skip>
     <xwiki.enforcer.enforce-no-old-xwiki-platform.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-no-old-xwiki-platform.skip>
+    <xwiki.enforcer.valid-importmap.skip>${xwiki.enforcer.skip}</xwiki.enforcer.valid-importmap.skip>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
@@ -1826,6 +1827,19 @@
                     <exclude>org.xwiki.platform:xwiki-platform-distribution-flavor</exclude>
                   </excludes>
                 </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure declared importmap are valid -->
+          <execution>
+            <id>enforce-valid-javascript-importmap</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.valid-importmap.skip}</skip>
+              <rules>
+                <javascriptImportMapCheck />
               </rules>
             </configuration>
           </execution>

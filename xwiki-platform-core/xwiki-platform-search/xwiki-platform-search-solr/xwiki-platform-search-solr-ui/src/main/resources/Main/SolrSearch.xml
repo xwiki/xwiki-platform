@@ -468,7 +468,7 @@
       <code>#template('colorThemeInit.vm')
 
 /* Hide the 'Created by', 'Modified by' and 'Tags' document sections. */
-.xdocLastModification {
+.xdocLastModification, #xdocFooter {
   display: none;
 }
 #document-title &gt; h1 {

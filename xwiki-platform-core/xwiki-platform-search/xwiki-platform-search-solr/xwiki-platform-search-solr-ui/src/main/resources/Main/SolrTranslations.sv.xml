@@ -183,7 +183,7 @@ solr.sortBy.attdate_sort=Uppladdningsdatum
 solr.sortBy.attauthor_display_sort=Uppladdad av
 ### Missing: solr.options=Show:
 ### Missing: solr.options.highlight=Highlighting
-solr.options.facet=Facets
+### Missing: solr.options.facet=
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

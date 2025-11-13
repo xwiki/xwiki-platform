@@ -46,7 +46,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -556,7 +555,6 @@ public class CreateActionRequestHandler
      * @since 16.4.2
      * @since 15.10.12
      */
-    @Unstable
     public DocumentReference getDocumentReference()
     {
         if (StringUtils.isEmpty(name)) {
@@ -611,7 +609,6 @@ public class CreateActionRequestHandler
      * @since 16.4.1
      * @since 15.10.12
      */
-    @Unstable
     public boolean isTemplateInfoProvided()
     {
         return hasTemplate() || availableTemplateProviders.isEmpty();

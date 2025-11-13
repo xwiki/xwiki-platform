@@ -22,7 +22,6 @@ package org.xwiki.security.authorization;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Authorization manager that checks rights of document authors taking required rights into account.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 16.10.0RC1
  */
-@Unstable
 @Role
 public interface DocumentAuthorizationManager
 {

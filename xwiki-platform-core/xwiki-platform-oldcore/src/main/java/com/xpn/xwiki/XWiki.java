@@ -173,7 +173,6 @@ import org.xwiki.security.authservice.internal.AuthServiceManager;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
@@ -4271,7 +4270,6 @@ public class XWiki implements EventListener
      * @param xcontext the XWiki context
      * @since 16.7.0
      */
-    @Unstable
     public void setUserDefaultGroup(DocumentReference documentReference, XWikiContext xcontext)
     {
         WikiReference currentWikiReference = xcontext.getWikiReference();

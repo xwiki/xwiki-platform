@@ -19,8 +19,6 @@
  */
 package org.xwiki.xar.internal.model;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * @version $Id$
  * @since 5.4M1
@@ -68,7 +66,6 @@ public class XarDocumentModel
      *
      * @since 16.10.0RC1
      */
-    @Unstable
     public static final String VERSION_16 = "1.6";
 
     /**
@@ -176,7 +173,6 @@ public class XarDocumentModel
     /**
      * @since 16.10.0RC1
      */
-    @Unstable
     public static final String ELEMENT_ENFORCE_REQUIRED_RIGHTS = "enforceRequiredRights";
 
     public static final String ELEMENT_REVISION_COMMENT = "comment";

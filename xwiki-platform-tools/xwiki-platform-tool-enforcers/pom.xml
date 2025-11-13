@@ -33,7 +33,42 @@
   <name>XWiki Platform - Tools - XWiki Maven Enforcers</name>
   <packaging>pom</packaging>
   <description>Rule enforcers to verify Maven project validity</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.enforcer</groupId>
+      <artifactId>enforcer-api</artifactId>
+      <version>${maven-enforcer.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
   <modules>
     <module>xwiki-platform-tool-enforcer-importmap</module>
   </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- generate index of project components -->
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>sisu-maven-plugin</artifactId>
+        <version>${sisu.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>main-index</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

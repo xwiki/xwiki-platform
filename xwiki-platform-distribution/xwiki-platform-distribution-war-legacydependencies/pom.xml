@@ -34,6 +34,9 @@
   <properties>
     <!-- We depend on legacy artifacts on purpose -->
     <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
+
+    <!-- Make sure to not end up with Apache HttpClient 3 in the WAR -->
+    <xwiki.enforcer.enforce-apache-http5.searchTransitive>true</xwiki.enforcer.enforce-apache-http5.searchTransitive>
   </properties>
   <build>
     <plugins>

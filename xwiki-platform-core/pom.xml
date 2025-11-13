@@ -138,7 +138,17 @@
 
                  Single justification example:
             -->
-            
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.apache.commons.httpclient.HttpClient com.xpn.xwiki.XWiki::getHttpClient(int, java.lang.String)</old>
+                  <justification>Expose a vulnerable and long dead library, and should have never been public in the first place</justification>
+                  <criticality>highlight</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

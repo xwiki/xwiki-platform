@@ -35,7 +35,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.webjars.WebjarDescriptor;
+import org.xwiki.webjars.WebjarPathDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -210,6 +210,6 @@ class DefaultWebJarsUrlFactoryTest
         when(this.serializer.serialize(resourceReference))
             .thenReturn(new ExtendedURL(List.of("xwiki", "angular", "2.1.11", "angular.css")));
         assertEquals("/xwiki/angular/2.1.11/angular.css",
-            this.webJarsUrlFactory.url(new WebjarDescriptor("angular", "angular.css")));
+            this.webJarsUrlFactory.url(new WebjarPathDescriptor("angular", "angular.css")));
     }
 }

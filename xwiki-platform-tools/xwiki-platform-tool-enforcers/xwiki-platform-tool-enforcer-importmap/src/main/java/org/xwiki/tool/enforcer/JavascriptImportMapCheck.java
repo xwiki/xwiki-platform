@@ -11,7 +11,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapException;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser;
-import org.xwiki.webjars.WebjarDescriptor;
+import org.xwiki.webjars.WebjarPathDescriptor;
 
 import static org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser.JAVASCRIPT_IMPORTMAP_PROPERTY;
 
@@ -35,7 +35,7 @@ public class JavascriptImportMapCheck extends AbstractPomCheck
         try {
             var importMap = new JavascriptImportmapParser().parse(property);
             List<Dependency> dependencies = model.getDependencies();
-            for (Map.Entry<String, WebjarDescriptor> entry : importMap.entrySet()) {
+            for (Map.Entry<String, WebjarPathDescriptor> entry : importMap.entrySet()) {
                 var key = entry.getKey();
                 var value = entry.getValue();
                 var webjarId = value.webjarId().split(":", 2);

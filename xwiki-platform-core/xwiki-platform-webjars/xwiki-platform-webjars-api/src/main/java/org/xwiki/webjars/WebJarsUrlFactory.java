@@ -125,7 +125,7 @@ public interface WebJarsUrlFactory
      * @since 18.0.0RC1
      */
     @Unstable
-    default String url(WebjarDescriptor descriptor)
+    default String url(WebjarPathDescriptor descriptor)
     {
         return url(descriptor.webjarId(), descriptor.namespace(), descriptor.path(), descriptor.params());
     }

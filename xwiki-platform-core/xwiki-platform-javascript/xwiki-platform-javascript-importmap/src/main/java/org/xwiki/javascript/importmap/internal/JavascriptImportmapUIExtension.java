@@ -34,7 +34,7 @@ import org.xwiki.uiextension.UIExtension;
  * {@code "org.xwiki.platform.html.head"} extension point.
  *
  * @version $Id$
- * @since 17.10.0RC1
+ * @since 18.0.0RC1
  */
 @Component
 @Singleton

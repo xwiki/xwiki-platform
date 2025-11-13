@@ -122,8 +122,9 @@ public interface WebJarsUrlFactory
      *
      * @param descriptor an object containing all the information required to qualify a webjar
      * @return the resolved url for the given descriptor
-     * @since 17.10.0RC1
+     * @since 18.0.0RC1
      */
+    @Unstable
     default String url(WebjarDescriptor descriptor)
     {
         return url(descriptor.webjarId(), descriptor.namespace(), descriptor.path(), descriptor.params());

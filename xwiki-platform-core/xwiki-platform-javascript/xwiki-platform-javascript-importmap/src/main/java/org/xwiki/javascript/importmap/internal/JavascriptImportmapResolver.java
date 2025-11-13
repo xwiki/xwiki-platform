@@ -55,7 +55,7 @@ import static org.xwiki.rendering.syntax.Syntax.HTML_5_0;
  * {@link JavascriptImportmapParser#JAVASCRIPT_IMPORTMAP_PROPERTY} pom property.
  *
  * @version $Id$
- * @since 17.10.0RC1
+ * @since 18.0.0RC1
  */
 @Component(roles = JavascriptImportmapResolver.class)
 @Singleton

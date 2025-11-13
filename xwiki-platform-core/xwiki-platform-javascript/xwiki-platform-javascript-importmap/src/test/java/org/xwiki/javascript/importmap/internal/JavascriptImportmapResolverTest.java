@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * Test of {@link JavascriptImportmapResolver}.
  *
  * @version $Id$
- * @since 17.10.0RC1
+ * @since 18.0.0RC1
  */
 @ComponentTest
 class JavascriptImportmapResolverTest

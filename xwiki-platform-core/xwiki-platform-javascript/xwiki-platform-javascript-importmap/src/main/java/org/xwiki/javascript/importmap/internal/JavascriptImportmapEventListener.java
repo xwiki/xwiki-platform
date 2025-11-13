@@ -41,7 +41,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * cache when the events are received.
  *
  * @version $Id$
- * @since 17.10.0RC1
+ * @since 18.0.0RC1
  */
 @Component
 @Named(JavascriptImportmapEventListener.HINT)

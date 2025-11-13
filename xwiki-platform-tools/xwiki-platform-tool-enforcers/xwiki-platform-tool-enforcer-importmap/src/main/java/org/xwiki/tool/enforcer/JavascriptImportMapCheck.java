@@ -19,7 +19,7 @@ import static org.xwiki.javascript.importmap.internal.parser.JavascriptImportmap
  * Verify if the {@link JavascriptImportmapParser#JAVASCRIPT_IMPORTMAP_PROPERTY} property is well-formed.
  *
  * @version $Id$
- * @since 17.10.0RC1
+ * @since 18.0.0RC1
  */
 @Named("javascriptImportMapCheck")
 public class JavascriptImportMapCheck extends AbstractPomCheck

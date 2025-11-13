@@ -93,8 +93,9 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-http</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

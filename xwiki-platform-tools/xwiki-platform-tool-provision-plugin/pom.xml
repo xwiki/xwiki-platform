@@ -80,9 +80,21 @@
       <artifactId>xwiki-platform-user-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!--
+		TODO: remove it when the plugin does not use it anymore
+		See https://jira.xwiki.org/browse/XCOMMONS-3481 for the work left to be done.
+    -->
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
+      <version>3.1</version>
+      <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>

@@ -39,13 +39,13 @@
 </template>
 
 <script setup lang="ts">
-import { BlocknoteEditor } from "@xwiki/cristal-editors-blocknote-headless";
+import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { Container } from "inversify";
-import { EditorLanguage } from "@xwiki/cristal-editors-blocknote-react";
+import { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
 import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
-import type { MarkdownToUniAstConverter, UniAstToMarkdownConverter } from "@xwiki/cristal-uniast-markdown";
-import { markdownToUniAstConverterName, uniAstToMarkdownConverterName } from "@xwiki/cristal-uniast-markdown";
-import type { UniAst } from "@xwiki/cristal-uniast-api";
+import type { MarkdownToUniAstConverter, UniAstToMarkdownConverter } from "@xwiki/platform-uniast-markdown";
+import { markdownToUniAstConverterName, uniAstToMarkdownConverterName } from "@xwiki/platform-uniast-markdown";
+import type { UniAst } from "@xwiki/platform-uniast-api";
 
 //
 // Injected

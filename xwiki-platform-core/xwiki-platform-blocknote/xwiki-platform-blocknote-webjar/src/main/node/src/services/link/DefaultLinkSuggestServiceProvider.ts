@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { LinkSuggestService, LinkSuggestServiceProvider } from "@xwiki/cristal-link-suggest-api";
+import { LinkSuggestService, LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import { Container, inject, injectable } from "inversify";
 
 @injectable("Singleton")

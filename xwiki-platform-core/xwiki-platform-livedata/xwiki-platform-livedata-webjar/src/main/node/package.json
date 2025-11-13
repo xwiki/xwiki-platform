@@ -43,7 +43,7 @@
     "jiti": "catalog:",
     "jquery": "catalog:",
     "jsdom": "catalog:",
-    "lodash": "catalog:",
+    "lodash-es": "catalog:",
     "npm-run-all2": "catalog:",
     "sinon": "catalog:",
     "typescript": "catalog:",

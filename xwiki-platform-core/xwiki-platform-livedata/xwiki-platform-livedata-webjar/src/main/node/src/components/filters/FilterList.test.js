@@ -19,7 +19,7 @@
  */
 import FilterList from "./FilterList.vue";
 import { mount } from "@vue/test-utils";
-import _ from "lodash";
+import _ from "lodash-es";
 import $ from "jquery";
 import flushPromises from "flush-promises";
 import { describe, expect, it, vi } from "vitest";

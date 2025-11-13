@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { shallowMount } from "@vue/test-utils";
-import _ from "lodash";
+import _ from "lodash-es";
 import LayoutTable from "./LayoutTable.vue";
 import LayoutTableRow from "./LayoutTableRow.vue";
 import { nextTick } from "vue";

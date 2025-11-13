@@ -24,7 +24,7 @@ import {
   EntityType,
   SpaceReference,
   WikiReference,
-} from "@xwiki/cristal-model-api";
+} from "@xwiki/platform-model-api";
 
 type XWikiEntityReference = {
   name: string;

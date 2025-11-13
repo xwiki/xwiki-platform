@@ -19,7 +19,7 @@
  */
 import { config, mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
-import _ from "lodash";
+import _ from "lodash-es";
 import ActionFollowLink from "./ActionFollowLink.vue";
 import sinon from "sinon";
 

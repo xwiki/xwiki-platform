@@ -146,8 +146,8 @@ solr.filterBy.fileType.text=Tekst
 ### Missing: solr.field.creator_display=Creator
 ### Missing: solr.field.date=Last modification date
 ### Missing: solr.field.creationdate=Creation date
-solr.field.doccontent=Rendered document content
-solr.field.doccontentraw=Raw document content
+### Missing: solr.field.doccontent=
+### Missing: solr.field.doccontentraw=
 ### Missing: solr.field.class=Object type
 ### Missing: solr.field.class.definedBy=Defined by {0} » {1}
 ### Missing: solr.field.propertyname=Property name
@@ -183,7 +183,7 @@ solr.sortBy.author_display_sort=Laatste auteur
 ### Missing: solr.sortBy.attauthor_display_sort=Uploaded by
 ### Missing: solr.options=Show:
 ### Missing: solr.options.highlight=Highlighting
-solr.options.facet=Facets
+### Missing: solr.options.facet=
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

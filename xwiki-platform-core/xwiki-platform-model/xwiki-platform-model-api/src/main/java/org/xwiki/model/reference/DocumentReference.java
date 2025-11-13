@@ -34,7 +34,6 @@ import javax.inject.Provider;
 import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to a document (wiki, space and document names).
@@ -391,7 +390,6 @@ public class DocumentReference extends AbstractLocalizedEntityReference
      * @since 16.4.2
      * @since 15.10.12
      */
-    @Unstable
     public static Optional<DocumentReference> extractDocument(EntityReference entityReference)
     {
         Optional<DocumentReference> result = Optional.empty();

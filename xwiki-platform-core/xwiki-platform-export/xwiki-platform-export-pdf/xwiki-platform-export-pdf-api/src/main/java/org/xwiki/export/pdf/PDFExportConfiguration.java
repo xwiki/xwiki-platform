@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * PDF export configuration options.
@@ -126,7 +125,6 @@ public interface PDFExportConfiguration
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     default boolean isXWikiURISpecified()
     {
         try {

@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.observation.remote.NetworkMember;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 /**
@@ -44,6 +45,11 @@ public class DefaultRemoteObservationManagerContext implements RemoteObservation
     private static final String REMOTESTATE = "observation.remote.remotestate";
 
     /**
+     * The name of the properties containing the channel member which sent the message.
+     */
+    private static final String SENDER = "observation.remote.sender";
+
+    /**
      * Used to store remote observation manager context properties.
      */
     @Inject
@@ -58,9 +64,29 @@ public class DefaultRemoteObservationManagerContext implements RemoteObservation
     }
 
     @Override
+    public NetworkMember getSender()
+    {
+        ExecutionContext context = this.execution.getContext();
+
+        if (context != null) {
+            return (NetworkMember) context.getProperty(SENDER);
+        }
+
+        return null;
+    }
+
+    @Override
     public void pushRemoteState()
     {
         this.execution.getContext().setProperty(REMOTESTATE, Boolean.TRUE);
+    }
+
+    @Override
+    public void pushRemoteState(NetworkMember sender)
+    {
+        pushRemoteState();
+
+        this.execution.getContext().setProperty(SENDER, sender);
     }
 
     @Override

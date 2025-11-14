@@ -19,45 +19,44 @@
  */
 package org.xwiki.netflux.internal;
 
-import java.util.List;
-import java.util.Optional;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.netflux.EntityChannel;
-import org.xwiki.netflux.EntityChannelStore;
+import org.xwiki.netflux.internal.event.EntityChannelCreateEvent;
+import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.Event;
 
 /**
- * Default {@link EntityChannelStore} implementation.
+ * Update the script author for a specific {@link EntityChannel}.
  * 
  * @version $Id$
- * @since 13.9RC1
+ * @since 17.10.0RC1
  */
 @Component
+@Named(EntityChannelsListener.NAME)
 @Singleton
-public class DefaultEntityChannelStore implements EntityChannelStore
+public class EntityChannelsListener extends AbstractEventListener
 {
-    @Inject
-    private InternalEntityChannelStore store;
+    /**
+     * The name of this event listener (and its component hint at the same time).
+     */
+    public static final String NAME = "org.xwiki.netflux.internal.EntityChannelsListener";
 
-    @Override
-    public List<EntityChannel> getChannels(EntityReference entityReference)
+    /**
+     * Setup the listener.
+     */
+    public EntityChannelsListener()
     {
-        return store.getChannels(entityReference);
+        super(NAME, new EntityChannelCreateEvent());
     }
 
     @Override
-    public synchronized EntityChannel createChannel(EntityReference entityReference, List<String> path)
+    public void onEvent(Event event, Object source, Object data)
     {
-        return store.createChannel(entityReference, path);
-    }
-
-    @Override
-    public Optional<EntityChannel> getChannel(String key)
-    {
-        return store.getChannel(key);
+        if (event instanceof EntityChannelCreateEvent channelEvent) {
+            todo
+        }
     }
 }

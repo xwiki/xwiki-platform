@@ -36,6 +36,8 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.netflux.EntityChannel;
 import org.xwiki.netflux.EntityChannelStore;
 import org.xwiki.netflux.internal.EntityChange.ScriptLevel;
+import org.xwiki.netflux.internal.event.EntityChannelScriptAuthorChangeEvent;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
@@ -76,6 +78,9 @@ public class EntityChannelScriptAuthorTracker
     @Named("explicit")
     private EntityReferenceResolver<String> explicitEntityReferenceResolver;
 
+    @Inject
+    private ObservationManager observation;
+
     private final Map<String, EntityChange> scriptAuthors = new ConcurrentHashMap<>();
 
     /**
@@ -111,6 +116,17 @@ public class EntityChannelScriptAuthorTracker
         return returnValue;
     }
 
+    /**
+     * @since 17.10.0
+     */
+    void setScriptAuthor(EntityChannel entityChannel, EntityChange scriptAuthorChange)
+    {
+        this.scriptAuthors.put(entityChannel.getKey(), scriptAuthorChange);
+
+        this.logger.debug("Updated the script author associated with the entity channel [{}] to [{}].", entityChannel,
+            scriptAuthorChange);
+    }
+
     void maybeUpdateScriptAuthor(EntityChannel entityChannel, UserReference scriptAuthor)
     {
         EntityChange channelScriptAuthor = this.scriptAuthors.get(entityChannel.getKey());
@@ -120,9 +136,10 @@ public class EntityChannelScriptAuthorTracker
             // need to update the channel script level in order to prevent privilege escalation.
             EntityChange scriptAuthorChange =
                 new EntityChange(entityChannel.getEntityReference(), scriptAuthor, userScriptLevel);
-            this.scriptAuthors.put(entityChannel.getKey(), scriptAuthorChange);
-            this.logger.debug("Updated the script author associated with the entity channel [{}] to [{}].",
-                entityChannel, scriptAuthorChange);
+
+            // Modify the script author mapping through a listener to better cover clustering use case
+            this.observation.notify(new EntityChannelScriptAuthorChangeEvent(entityChannel.getKey()),
+                scriptAuthorChange);
         }
     }
 

@@ -97,7 +97,7 @@ class AnnotationsIT
         setup.createPage(referenceFR, "Un peu de contenu en français.", "Une page en français");
 
         AnnotatableViewPage viewPage = new AnnotatableViewPage(setup.gotoPage(referenceEN));
-        viewPage.addAnnotation("Some", "English word.");
+        viewPage.addAnnotation("Some", "Engliesh word.");
 
         viewPage = new AnnotatableViewPage(setup.gotoPage(referenceFR));
         // We cannot wait for success since the UI is in french...

@@ -19,45 +19,29 @@
  */
 package org.xwiki.netflux.internal;
 
-import java.util.List;
-import java.util.Optional;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.websocket.Session;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.netflux.EntityChannel;
-import org.xwiki.netflux.EntityChannelStore;
+import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 
 /**
- * Default {@link EntityChannelStore} implementation.
+ * An implementation of {@link LocalUserFactory} which avoid collision in a cluster use case.
  * 
  * @version $Id$
- * @since 13.9RC1
+ * @since 17.10.0RC1
  */
 @Component
 @Singleton
-public class DefaultEntityChannelStore implements EntityChannelStore
+public class RemoteLocalUserFactory extends DefaultLocalUserFactory
 {
     @Inject
-    private InternalEntityChannelStore store;
+    private RemoteObservationManagerConfiguration remoteConfiguation;
 
     @Override
-    public List<EntityChannel> getChannels(EntityReference entityReference)
+    protected String getId(Session session)
     {
-        return store.getChannels(entityReference);
-    }
-
-    @Override
-    public synchronized EntityChannel createChannel(EntityReference entityReference, List<String> path)
-    {
-        return store.createChannel(entityReference, path);
-    }
-
-    @Override
-    public Optional<EntityChannel> getChannel(String key)
-    {
-        return store.getChannel(key);
+        return this.remoteConfiguation.getId() + '-' + super.getId(session);
     }
 }

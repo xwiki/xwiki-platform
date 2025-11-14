@@ -25,7 +25,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.xwiki.container.Request;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**

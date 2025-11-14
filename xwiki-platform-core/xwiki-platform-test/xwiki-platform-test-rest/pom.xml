@@ -30,6 +30,10 @@
   <name>XWiki Platform - Test - Rest</name>
   <packaging>jar</packaging>
   <description>Helpers to interact with rest endpoint during tests.</description>
+  <properties>
+    <!-- TODO: removing when not using Apache HttpClient 3 anymore -->
+    <xwiki.enforcer.enforce-apache-http5.skip>true</xwiki.enforcer.enforce-apache-http5.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

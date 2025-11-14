@@ -70,7 +70,7 @@ class JobStatusRestURLGeneratorTest
     void getURL() throws Exception
     {
         List<String> stringList = Arrays.asList("flavor", "search", "wiki:xwiki");
-        URL expectedUrl = new URL("http://localhost/rest/jobstatus/flavor/search/wiki:xwiki");
+        URL expectedUrl = new URL("http://localhost/rest/jobstatus/flavor/search/wiki%3Asynchronizedxwiki");
         assertEquals(expectedUrl, this.jobStatusRestURLGenerator.getURL(stringList));
     }
 }

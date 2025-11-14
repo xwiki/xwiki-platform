@@ -39,7 +39,7 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
     <!-- TODO: removing when not using Apache HttpClient 3 anymore -->
-    <xwiki.enforcer.enforce-apache-http5.skip>${xwiki.enforcer.skip}</xwiki.enforcer.enforce-apache-http5.skip>
+    <xwiki.enforcer.enforce-apache-http5.skip>true</xwiki.enforcer.enforce-apache-http5.skip>
   </properties>
   <dependencies>
     <!-- Maven -->

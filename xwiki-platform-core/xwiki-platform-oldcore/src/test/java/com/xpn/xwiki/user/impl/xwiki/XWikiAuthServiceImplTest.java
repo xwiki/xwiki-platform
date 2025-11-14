@@ -130,6 +130,23 @@ class XWikiAuthServiceImplTest
     }
 
     /**
+     * Test the superadmin password can be hashed with bcrypt.
+     */
+    @Test
+    void authenticateWithSuperAdminWithBcryptPassword() throws Exception
+    {
+        // The password is "pass"
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.superadminpassword",
+            "$2y$08$2Mel30blRQ7E.XievLW00.AltivcBuU1HEl2mPG2qRGrd7FmWIwB6");
+
+        Principal principal = this.authService.authenticate(XWikiRightService.SUPERADMIN_USER, "pass",
+            this.oldcore.getXWikiContext());
+
+        assertNotNull(principal);
+        assertEquals(XWikiRightService.SUPERADMIN_USER_FULLNAME, principal.getName());
+    }
+
+    /**
      * Test that SomeUser is correctly authenticated as XWiki.SomeUser when xwiki:SomeUser is entered as username.
      */
     @Test

@@ -1,3 +1,4 @@
+org.xwiki.eventstream.store.solr.internal.migration.SolrDocumentMigration171000000
 org.xwiki.eventstream.store.solr.internal.EventsSolrCoreInitializer
 org.xwiki.eventstream.store.solr.internal.SolrEventStore
 org.xwiki.eventstream.store.solr.internal.WikiDeletedListener

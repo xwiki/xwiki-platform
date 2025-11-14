@@ -204,6 +204,13 @@ public interface Event
      */
     String FIELD_REMOTE_OBSERVATION_ID = "observationInstanceId";
 
+    /**
+     * Field storing the prefiltering date information.
+     *
+     * @since 17.10.0
+     */
+    String FIELD_PREFILTERING_DATE = "preFilteringDate";
+
     /** The importance of an event. */
     enum Importance
     {

@@ -30,6 +30,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -104,6 +105,14 @@ public class NotificationParameters
      * @since 15.5RC1
      */
     public String groupingEventTarget = "alert";
+
+    /**
+     * Don't get notifications filtered before that date.
+     *
+     * @since 17.10.0
+     */
+    @Unstable
+    public Date fromPrefilteringDate;
 
     @Override
     public boolean equals(Object o)

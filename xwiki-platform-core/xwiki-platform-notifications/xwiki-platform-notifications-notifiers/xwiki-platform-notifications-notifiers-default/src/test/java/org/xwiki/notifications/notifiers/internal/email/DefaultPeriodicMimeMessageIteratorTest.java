@@ -189,7 +189,7 @@ class DefaultPeriodicMimeMessageIteratorTest
         notificationParameters.user = userA;
         notificationParameters.format = NotificationFormat.EMAIL;
         notificationParameters.expectedCount = Integer.MAX_VALUE / 4;
-        notificationParameters.fromDate = new Date(0L);
+        notificationParameters.fromPrefilteringDate = new Date(0L);
         notificationParameters.endDateIncluded = false;
 
         when(this.notificationManager.getRawEvents(notificationParameters))
@@ -199,7 +199,7 @@ class DefaultPeriodicMimeMessageIteratorTest
         notificationParameters2.user = userC;
         notificationParameters2.format = NotificationFormat.EMAIL;
         notificationParameters2.expectedCount = Integer.MAX_VALUE / 4;
-        notificationParameters2.fromDate = new Date(0L);
+        notificationParameters2.fromPrefilteringDate = new Date(0L);
         notificationParameters2.endDateIncluded = false;
 
         when(this.notificationManager.getRawEvents(notificationParameters2))

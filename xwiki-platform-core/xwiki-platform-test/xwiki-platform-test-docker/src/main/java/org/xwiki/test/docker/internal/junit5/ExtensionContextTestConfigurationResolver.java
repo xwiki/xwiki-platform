@@ -70,7 +70,7 @@ public class ExtensionContextTestConfigurationResolver
             uiTest = current.getAnnotation(UITest.class);
             if (uiTest == null) {
                 // Look in parent
-                if (clazz.getSuperclass() != null) {
+                if (current.getSuperclass() != null) {
                     current = current.getSuperclass();
                 } else {
                     shouldStop = true;

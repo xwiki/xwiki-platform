@@ -115,4 +115,18 @@ public interface WebJarsUrlFactory
      * @return the URL to load the WebJar resource (relative to the context path of the web application)
      */
     String url(String webjarId, String namespace, String path, Map<String, ?> params);
+
+    /**
+     * Uses the information from the {@code descriptor} parameter to call {@link #url(String, String, String, Map)} and
+     * returns the result.
+     *
+     * @param descriptor an object containing all the information required to qualify a webjar
+     * @return the resolved url for the given descriptor
+     * @since 18.0.0RC1
+     */
+    @Unstable
+    default String url(WebjarPathDescriptor descriptor)
+    {
+        return url(descriptor.webjarId(), descriptor.namespace(), descriptor.path(), descriptor.params());
+    }
 }

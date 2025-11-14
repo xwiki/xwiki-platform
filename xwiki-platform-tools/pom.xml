@@ -34,6 +34,7 @@
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-tool-configuration-resources</module>
+    <module>xwiki-platform-tool-enforcers</module>
     <module>xwiki-platform-tool-jetty</module>
     <module>xwiki-platform-tool-packager-plugin</module>
     <module>xwiki-platform-tool-provision-plugin</module>

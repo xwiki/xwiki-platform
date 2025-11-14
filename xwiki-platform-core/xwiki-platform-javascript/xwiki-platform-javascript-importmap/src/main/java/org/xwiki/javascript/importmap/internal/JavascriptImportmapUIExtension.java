@@ -17,38 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.livedata.internal;
+package org.xwiki.javascript.importmap.internal;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.template.TemplateManager;
 import org.xwiki.uiextension.UIExtension;
 
 /**
- * Produces the import map for Live Data, allowing other modules to import the utility provided by Live Data using
- * JavaScript modules import syntax.
+ * Retrieve the resolved importmap from {@link JavascriptImportmapResolver} and inject it in the page headers with the
+ * {@code "org.xwiki.platform.html.head"} extension point.
  *
  * @version $Id$
- * @since 17.4.0RC1
+ * @since 18.0.0RC1
  */
 @Component
 @Singleton
-@Named("LiveDataImportmap")
-public class LiveDataImportmapUIExtension implements UIExtension
+@Named("JavascriptImportmap")
+public class JavascriptImportmapUIExtension implements UIExtension
 {
     @Inject
-    private TemplateManager templateManager;
+    private JavascriptImportmapResolver javascriptImportmapResolver;
 
     @Override
     public String getId()
     {
-        return "org.xwiki.platform.livedata.html.head";
+        return "org.xwiki.platform.javascript.importmap.html.head";
     }
 
     @Override
@@ -60,14 +59,12 @@ public class LiveDataImportmapUIExtension implements UIExtension
     @Override
     public Map<String, String> getParameters()
     {
-        return Map.of(
-            "order", "1000"
-        );
+        return Map.of("order", "1000");
     }
 
     @Override
     public Block execute()
     {
-        return this.templateManager.executeNoException("liveData/importmap.vm");
+        return this.javascriptImportmapResolver.getBlock();
     }
 }

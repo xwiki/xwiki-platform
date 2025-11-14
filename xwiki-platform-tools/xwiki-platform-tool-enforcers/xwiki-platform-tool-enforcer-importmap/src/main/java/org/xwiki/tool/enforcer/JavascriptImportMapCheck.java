@@ -19,15 +19,21 @@
  */
 package org.xwiki.tool.enforcer;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import javax.inject.Named;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.project.MavenProject;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapException;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser;
 import org.xwiki.webjars.WebjarPathDescriptor;
@@ -58,16 +64,25 @@ public class JavascriptImportMapCheck extends AbstractPomCheck
                 var key = entry.getKey();
                 var value = entry.getValue();
                 var webjarId = value.webjarId().split(":", 2);
+                var groupIdWebjar = webjarId[0];
+                var artifactIdWebjar = webjarId[1];
                 getLog().debug("Checking key [%s] for webjar reference [%s]".formatted(key, value));
-                var isSelf = areDependenciesEquals(model.getGroupId(), model.getArtifactId(), webjarId[0],
-                    webjarId[1]);
+                var isSelf =
+                    areDependenciesEquals(model.getGroupId(), model.getArtifactId(), groupIdWebjar, artifactIdWebjar);
                 if (isSelf) {
                     continue;
                 }
-                if (dependencies.stream().noneMatch(
-                    dependency -> areDependenciesEquals(dependency.getGroupId(), dependency.getArtifactId(),
-                        webjarId[0], webjarId[1])))
-                {
+                boolean dependencyNotFound = true;
+                for (Dependency dependency : dependencies) {
+                    if (areDependenciesEquals(dependency.getGroupId(), dependency.getArtifactId(),
+                        groupIdWebjar, artifactIdWebjar))
+                    {
+                        dependencyNotFound = false;
+                        checkIfPathExistsInDependency(dependency, artifactIdWebjar, value.path());
+                        break;
+                    }
+                }
+                if (dependencyNotFound) {
                     throw new EnforcerRuleException(
                         "Unable to find a declared dependency for [%s]".formatted(value.webjarId()));
                 }
@@ -82,5 +97,49 @@ public class JavascriptImportMapCheck extends AbstractPomCheck
         String artifactId1)
     {
         return Objects.equals(groupId0, groupId1) && Objects.equals(artifactId0, artifactId1);
+    }
+
+    private void checkIfPathExistsInDependency(Dependency dependency, String artifactId, String path)
+        throws EnforcerRuleException
+    {
+        var jar = resolveDependencyJar(dependency, this.project);
+        if (jar == null) {
+            throw new EnforcerRuleException("Unable to resolve jar for dependency [%s]".formatted(dependency));
+        }
+        try {
+            if (!checkPathInJar(jar, computeFullPathInJar(artifactId, dependency.getVersion(), path))) {
+                throw new EnforcerRuleException("Unable to find path [%s] in jar [%s]".formatted(path, jar));
+            }
+        } catch (IOException e) {
+            throw new EnforcerRuleException("Failed to open jar [%s] for dependency [%s]".formatted(path, dependency),
+                e);
+        }
+    }
+
+    private String computeFullPathInJar(String artifactId, String version, String path)
+    {
+        return "META-INF/resources/webjars/%s/%s/%s".formatted(artifactId, version, path);
+    }
+
+    private File resolveDependencyJar(Dependency dependency, MavenProject project)
+    {
+        // Loop over project artifacts.
+        for (Artifact artifact : project.getArtifacts()) {
+            if (Objects.equals(artifact.getGroupId(), dependency.getGroupId())
+                && Objects.equals(artifact.getArtifactId(), dependency.getArtifactId())
+                && Objects.equals(artifact.getVersion(), dependency.getVersion()))
+            {
+                return artifact.getFile();
+            }
+        }
+        return null;
+    }
+
+    private boolean checkPathInJar(File jarFile, String path) throws IOException
+    {
+        try (JarFile jar = new JarFile(jarFile)) {
+            ZipEntry entry = jar.getEntry(path);
+            return entry != null;
+        }
     }
 }

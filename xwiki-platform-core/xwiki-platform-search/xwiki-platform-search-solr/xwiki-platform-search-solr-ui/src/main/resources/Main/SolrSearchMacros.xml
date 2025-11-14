@@ -84,10 +84,13 @@
   #set($void = $services.progress.endStep())
 #end
 
+## We make sure the html block in this macro is not considered as inline to avoid generating extra `p` tags.
 #macro (_displaySearchFormEnd)
+
   {{html clean="false"}}
   &lt;/form&gt;
   {{/html}}
+
 #end
 
 #macro (displaySearchDebugInfo)

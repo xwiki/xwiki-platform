@@ -90,7 +90,7 @@
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
-      <version>3.1</version>
+      <version>3.1-jenkins-3</version>
       <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
       <exclusions>
         <exclusion>

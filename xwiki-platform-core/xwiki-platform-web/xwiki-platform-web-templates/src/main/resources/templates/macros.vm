@@ -2265,7 +2265,7 @@ $displayName##
       #set($contextFirstPage = $parameters.pageCount - $contextWidth)
     #end
   #end
-  <span class="pagination">$services.localization.render('platform.livetable.paginationPage')
+  <div class="pagination">$services.localization.render('platform.livetable.paginationPage')
   <ul class="pagination-list">
   #if($contextFirstPage != 0)
     #_paginationPageLink(0 $parameters)
@@ -2279,7 +2279,7 @@ $displayName##
     #_paginationPageLink($parameters.lastPage $parameters)
   #end
   </ul>
-  </span>
+  </div>
 #end
 #**
 * @since 17.10.0RC1

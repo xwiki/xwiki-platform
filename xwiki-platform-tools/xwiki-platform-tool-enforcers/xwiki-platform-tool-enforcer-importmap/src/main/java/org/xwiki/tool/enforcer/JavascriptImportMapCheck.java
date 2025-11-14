@@ -21,6 +21,8 @@ package org.xwiki.tool.enforcer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,10 +68,17 @@ public class JavascriptImportMapCheck extends AbstractPomCheck
                 var webjarId = value.webjarId().split(":", 2);
                 var groupIdWebjar = webjarId[0];
                 var artifactIdWebjar = webjarId[1];
+                var path = value.path();
                 getLog().debug("Checking key [%s] for webjar reference [%s]".formatted(key, value));
                 var isSelf =
                     areDependenciesEquals(model.getGroupId(), model.getArtifactId(), groupIdWebjar, artifactIdWebjar);
                 if (isSelf) {
+                    if (!checkPathInSelf(this.project, computeFullPathInJar(artifactIdWebjar,
+                        this.project.getVersion(), path)))
+                    {
+                        throw new EnforcerRuleException(
+                            "Unable to find path [%s] in the current module".formatted(path));
+                    }
                     continue;
                 }
                 boolean dependencyNotFound = true;
@@ -78,7 +87,7 @@ public class JavascriptImportMapCheck extends AbstractPomCheck
                         groupIdWebjar, artifactIdWebjar))
                     {
                         dependencyNotFound = false;
-                        checkIfPathExistsInDependency(dependency, artifactIdWebjar, value.path());
+                        checkIfPathExistsInDependency(dependency, artifactIdWebjar, path);
                         break;
                     }
                 }
@@ -141,5 +150,11 @@ public class JavascriptImportMapCheck extends AbstractPomCheck
             ZipEntry entry = jar.getEntry(path);
             return entry != null;
         }
+    }
+
+    private boolean checkPathInSelf(MavenProject project, String pathToCheck)
+    {
+        return Files.exists(
+            Paths.get(new File(project.getBuild().getOutputDirectory()).getAbsolutePath(), pathToCheck));
     }
 }

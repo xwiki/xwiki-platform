@@ -33,6 +33,9 @@
   <description>XWiki Platform - UI Tests Framework</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.05</xwiki.jacoco.instructionRatio>
+
+    <!-- TODO: removing when not using Apache HttpClient 3 anymore -->
+    <xwiki.enforcer.enforce-apache-http5.skip>true</xwiki.enforcer.enforce-apache-http5.skip>
   </properties>
   <dependencies>
     <dependency>

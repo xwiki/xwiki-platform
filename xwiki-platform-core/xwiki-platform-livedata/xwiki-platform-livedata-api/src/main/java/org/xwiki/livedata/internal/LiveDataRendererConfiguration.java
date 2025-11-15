@@ -211,6 +211,7 @@ public class LiveDataRendererConfiguration
     {
         LiveDataPaginationConfiguration pagination = new LiveDataPaginationConfiguration();
         pagination.setShowPageSizeDropdown(parameters.getShowPageSizeDropdown());
+        pagination.setShowPaginationOnSinglePage(parameters.getShowPaginationOnSinglePage());
         if (parameters.getPageSizes() != null) {
             pagination.setPageSizes(getSplitStringStream(parameters.getPageSizes())
                 .map(Integer::parseInt)

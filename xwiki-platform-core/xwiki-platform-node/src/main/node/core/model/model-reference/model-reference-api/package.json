@@ -1,0 +1,65 @@
+{
+  "name": "@xwiki/platform-model-reference-api",
+  "version": "17.10.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "xwiki-platform-node/src/main/node/core/core/model-remote-url/model-remote-url-api",
+    "url": "git+https://github.com/xwiki/xwiki-platform.git"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/XWIKI/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "api-extractor:local": "api-extractor run --local",
+    "build": "vite build",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run",
+    "typecheck": "tsc"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@xwiki/platform-api": "workspace:*",
+    "@xwiki/platform-model-api": "workspace:*"
+  },
+  "peerDependencies": {
+    "inversify": "7.x",
+    "reflect-metadata": "0.x"
+  },
+  "devDependencies": {
+    "@xwiki/platform-dev-config": "workspace:*",
+    "eslint": "catalog:",
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.es.js"
+        },
+        "require": {
+          "types": "./dist/index.d.cts",
+          "default": "./dist/index.umd.js"
+        }
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  }
+}

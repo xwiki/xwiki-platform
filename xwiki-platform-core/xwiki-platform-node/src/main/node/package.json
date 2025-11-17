@@ -1,0 +1,30 @@
+{
+  "private": true,
+  "name": "@xwiki/platform-node",
+  "type": "module",
+  "scripts": {
+    "build": "nx run-many -t build -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
+    "lint": "nx run-many -t lint -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
+    "test:unit": "nx run-many -t test -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\""
+  },
+  "devDependencies": {
+    "@eslint/config-helpers": "catalog:",
+    "@eslint/js": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "eslint": "catalog:",
+    "eslint-import-resolver-typescript": "catalog:",
+    "eslint-plugin-headers": "catalog:",
+    "eslint-plugin-import": "catalog:",
+    "eslint-plugin-prettier": "catalog:",
+    "eslint-plugin-promise": "catalog:",
+    "eslint-plugin-tsdoc": "catalog:",
+    "eslint-plugin-vue": "catalog:",
+    "globals": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-css-injected-by-js": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:",
+    "vue-eslint-parser": "catalog:"
+  }
+}

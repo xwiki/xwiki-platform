@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { SkinManager } from "@xwiki/cristal-api";
+import type { SkinManager } from "@xwiki/platform-api";
 import { createPinia } from "pinia";
 import { App, createApp, reactive } from "vue";
 import { createI18n, I18n } from "vue-i18n";

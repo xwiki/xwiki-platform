@@ -21,7 +21,7 @@ import { config, mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 import BaseAction from "./BaseAction.vue";
 import sinon from "sinon";
-import _ from "lodash";
+import _ from "lodash-es";
 
 config.global.mocks = {
   $t: tKey => tKey,

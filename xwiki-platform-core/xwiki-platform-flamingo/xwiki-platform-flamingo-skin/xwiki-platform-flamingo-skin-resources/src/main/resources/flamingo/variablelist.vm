@@ -225,6 +225,7 @@
     "font-size-base": "1rem",
     "grid-gutter-width": "30px",
     "input-bg" : "#fff",
+    "input-border-focus": "#66afe9",
     "legend-color" : "#333",
     "legend-border-color": "#e5e5e5",
     "list-group-hover-bg": "#f5f5f5",

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -93,8 +93,9 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-http</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -662,6 +663,13 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-filter-stream-xml</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
 

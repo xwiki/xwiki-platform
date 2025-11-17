@@ -110,7 +110,6 @@ public class InternalHtmlNotificationRenderer
     {
         Block renderedEvent = notificationRenderer.render(compositeEvent);
         GroupBlock parentDiv = new GroupBlock();
-        parentDiv.setParameter("role", "listitem");
         StringBuilder parentDivClass = new StringBuilder().append("notification-event");
 
         parentDiv.setParameter("data-eventtype", compositeEvent.getType());

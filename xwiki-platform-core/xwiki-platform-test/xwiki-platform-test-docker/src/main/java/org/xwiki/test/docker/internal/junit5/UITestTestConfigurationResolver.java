@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -67,6 +68,10 @@ public class UITestTestConfigurationResolver
     private static final String JDBCDRIVERVERSION_PROPERTY = "xwiki.test.ui.jdbcDriverVersion";
 
     private static final String BROWSERTAG_PROPERTY = "xwiki.test.ui.browserTag";
+
+    private static final String BLOBSTORE_PROPERTY = "xwiki.test.ui.blobStore";
+
+    private static final String BLOBSTORETAG_PROPERTY = "xwiki.test.ui.blobStoreTag";
 
     private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
 
@@ -120,6 +125,8 @@ public class UITestTestConfigurationResolver
             uiTestAnnotation.savePermanentDirectoryData()));
         configuration.setServletEngineNetworkAliases(resolveCommaSeparatedValues(
             uiTestAnnotation.servletEngineNetworkAliases(), SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY));
+        configuration.setBlobStore(resolveBlobStore(uiTestAnnotation.blobStore()));
+        configuration.setBlobStoreTag(resolveBlobStoreTag(uiTestAnnotation.blobStoreTag()));
         return configuration;
     }
 
@@ -354,5 +361,20 @@ public class UITestTestConfigurationResolver
     private boolean resolveSavePermanentDirectoryData(boolean savePermanentDirectoryData)
     {
         return resolve(savePermanentDirectoryData, SAVEPERMANENTDIRECTORY_PROPERTY);
+    }
+
+    private BlobStore resolveBlobStore(BlobStore blobStore)
+    {
+        BlobStore result = blobStore;
+        String propertyValue = System.getProperty(BLOBSTORE_PROPERTY);
+        if (propertyValue != null) {
+            result = BlobStore.valueOf(propertyValue.toUpperCase());
+        }
+        return result;
+    }
+
+    private String resolveBlobStoreTag(String blobStoreTag)
+    {
+        return resolve(blobStoreTag, BLOBSTORETAG_PROPERTY);
     }
 }

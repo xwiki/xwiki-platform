@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -159,9 +159,31 @@
                   <justification>Not a breakage, method was moved to legacy</justification>
                   <criticality>allowed</criticality>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.apache.commons.httpclient.HttpClient com.xpn.xwiki.XWiki::getHttpClient(int, java.lang.String)</old>
+                  <justification>Expose a vulnerable and long dead library, and should have never been public in the first place</justification>
+                  <criticality>highlight</criticality>
+                </item>
               </differences>
             </revapi.differences>
-            
+            <revapi.differences>
+              <justification>Classes moved to xwiki-commons-store-api, available as transitive dependency</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.store.StoreException</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>interface org.xwiki.store.StreamProvider</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

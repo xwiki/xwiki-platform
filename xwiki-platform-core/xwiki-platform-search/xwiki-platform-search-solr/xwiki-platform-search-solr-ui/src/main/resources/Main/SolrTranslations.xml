@@ -62,22 +62,21 @@ solr.admin.indexing.query.language.label=Language of the custom query
 
 solr.admin.info.affectedDocuments=Affected documents in the index:
 
-solr.sortBy=Sort by:
-solr.sortBy.score=Relevance
-solr.sortBy.title_sort=Title
-solr.sortBy.date=Last modification date
-solr.sortBy.author_display_sort=Last author
-solr.sortBy.filename_sort=File name
-solr.sortBy.attsize_sort=File size
-solr.sortBy.attdate_sort=Upload date
-solr.sortBy.attauthor_display_sort=Uploaded by
-solr.sortOrder.asc=Ascending
-solr.sortOrder.desc=Descending
+search.solr.sortBy.hint=Sort order rule
+search.solr.sortBy.field.score=Sort by relevance
+search.solr.sortBy.field.titleSort=Sort by title
+search.solr.sortBy.field.date=Sort by last edit date
+search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+search.solr.sortBy.field.filenameSort=Sort by file name
+search.solr.sortBy.field.attsizeSort=Sort by file size
+search.solr.sortBy.field.attdateSort=Sort by upload date
+search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
 
-solr.options=Show:
-solr.options.highlight=Highlighting
+search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=Display an extract of what was matched in each result
-solr.options.facet=Facets
+search.solr.options.showFacet=Show filters
 solr.options.facet.title=Allow extra filtering of the result
 
 solr.result.language=Language
@@ -87,8 +86,8 @@ solr.result.mediaType=File of type {0}
 solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
 solr.result.highlightAll=Highlight all matches
 
-solr.facets.title=Refine your search
-solr.facets.hint=Select a category and activate filters on the current results
+solr.facets.title=Filter your search
+solr.facets.hint=Select a category and filter the current results on different facets.
 solr.facets.resetAll=Reset all
 solr.facets.expandAll=Expand all
 solr.facets.collapseAll=Collapse all
@@ -159,8 +158,8 @@ solr.field.creator=Creator
 solr.field.creator_display=Creator
 solr.field.date=Last modification date
 solr.field.creationdate=Creation date
-solr.field.doccontent=Rendered document content
-solr.field.doccontentraw=Raw document content
+solr.field.doccontent=Document content
+solr.field.doccontentraw=Document source
 solr.field.class=Object type
 solr.field.class.definedBy=Defined by {0} » {1}
 solr.field.propertyname=Property name
@@ -186,6 +185,21 @@ solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
 
 ## until 7.2RC1
 solr.field.space=Location
+
+## until 17.10.0RC1
+## Those translations were composed together, they have been replaced with new keys that follow translation guidelines.
+solr.sortBy=Sort by:
+solr.sortBy.score=Relevance
+solr.sortBy.title_sort=Title
+solr.sortBy.date=Last edit date
+solr.sortBy.author_display_sort=Last author
+solr.sortBy.filename_sort=File name
+solr.sortBy.attsize_sort=File size
+solr.sortBy.attdate_sort=Upload date
+solr.sortBy.attauthor_display_sort=Uploaded by
+solr.options=Show:
+solr.options.highlight=Highlighting
+solr.options.facet=Filters
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>

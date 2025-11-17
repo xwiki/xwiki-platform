@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>17.10.0-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-include</artifactId>
   <name>XWiki Platform - Rendering - Macro - Include</name>
@@ -136,6 +136,6 @@
   </build>
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.0-rc-1</tag>
   </scm>
 </project>

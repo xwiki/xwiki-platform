@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-test</artifactId>
-    <version>17.10.0-SNAPSHOT</version>
+    <version>17.10.0-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-notifications-test-pageobjects</artifactId>
   <name>XWiki Platform - Notifications - Test - Page Objects</name>
@@ -58,6 +58,6 @@
   </dependencies>
 
   <scm>
-    <tag>stable-17.10.x</tag>
+    <tag>xwiki-platform-17.10.0-rc-1</tag>
   </scm>
 </project>

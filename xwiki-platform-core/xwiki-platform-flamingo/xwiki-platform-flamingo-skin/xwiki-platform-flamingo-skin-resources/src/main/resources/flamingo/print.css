@@ -103,6 +103,8 @@ html[data-xwiki-paged-media=paper] {
   }
 } /* XWiki: end paper paged media styles. */
 
+/*-------------------------------------------------------------------*/
+
 #body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent, #mainContentArea {
   background-color: #FFF !important;
   background-image: none !important;

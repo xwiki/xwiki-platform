@@ -2,30 +2,30 @@ packages:
   - xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node/
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
-  - xwiki-platform-node/src/main/node/api
-  - xwiki-platform-node/src/main/node/core/attachments/attachments-default
-  - xwiki-platform-node/src/main/node/core/authentication/authentication-api
-  - xwiki-platform-node/src/main/node/core/backends/backend-api
-  - xwiki-platform-node/src/main/node/core/document/document-api
-  - xwiki-platform-node/src/main/node/ds/api
-  - xwiki-platform-node/src/main/node/editors/blocknote-headless
-  - xwiki-platform-node/src/main/node/editors/blocknote-react
-  - xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
-  - xwiki-platform-node/src/main/node/dev/config
-  - xwiki-platform-node/src/main/node/core/configuration/configuration-api
-  - xwiki-platform-node/src/main/node/core/attachments/attachments-api
-  - xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api
-  - xwiki-platform-node/src/main/node/core/collaboration/collaboration-api
-  - xwiki-platform-node/src/main/node/core/icons
-  - xwiki-platform-node/src/main/node/core/uniast/uniast-api
-  - xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
-  - xwiki-platform-node/src/main/node/core/model/model-api
-  - xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
-  - xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
-  - xwiki-platform-node/src/main/node/core/fn-utils
-  - xwiki-platform-node/src/main/node/core/macros/macros-api
-  - xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx
-  - xwiki-platform-node/src/main/node
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/attachments/attachments-default
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/authentication/authentication-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/ds/api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/configuration/configuration-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/attachments/attachments-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/icons
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/fn-utils
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx
+  - xwiki-platform-core/xwiki-platform-node/src/main/node
 catalogMode: strict
 cleanupUnusedCatalogs: true
 ignoredBuiltDependencies:

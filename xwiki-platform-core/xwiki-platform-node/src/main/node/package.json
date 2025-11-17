@@ -3,10 +3,9 @@
   "name": "@xwiki/platform-node",
   "type": "module",
   "scripts": {
-    "build": "nx run-many -t build -p \"xwiki-platform-node/src/main/node/*/**\"",
-    "lint": "nx run-many -t lint -p \"xwiki-platform-node/src/main/node/*/**\"",
-    "test:unit": "nx run-many -t test -p \"xwiki-platform-node/src/main/node/*/**\"",
-    "deploy": "echo 'DEPLOY'"
+    "build": "nx run-many -t build -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
+    "lint": "nx run-many -t lint -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
+    "test:unit": "nx run-many -t test -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\""
   },
   "devDependencies": {
     "@eslint/config-helpers": "catalog:",

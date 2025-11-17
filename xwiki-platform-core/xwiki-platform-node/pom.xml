@@ -104,17 +104,6 @@
               <installDirectory>${basedir}/target</installDirectory>
             </configuration>
           </execution>
-          <execution>
-            <phase>deploy</phase>
-            <goals>
-              <goal>pnpm</goal>
-            </goals>
-            <configuration>
-              <arguments>run deploy</arguments>
-              <workingDirectory>${basedir}/src/main/node</workingDirectory>
-              <installDirectory>${basedir}/target</installDirectory>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>

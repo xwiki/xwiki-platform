@@ -66,7 +66,7 @@ public class LiveDataRenderer
     private LiveDataConfigurationResolver<LiveDataConfiguration> defaultLiveDataConfigResolver;
 
     @Inject
-    private LiveDataRendererConfiguration liveDataRendererConfiguration;
+    private LiveDataScriptServiceConfiguration liveDataScriptServiceConfiguration;
 
     @Inject
     private ContextualAuthorizationManager contextualAuthorizationManager;
@@ -133,7 +133,7 @@ public class LiveDataRenderer
         try {
             // Compute the live data configuration based on the macro parameters.
             LiveDataConfiguration liveDataConfig =
-                this.liveDataRendererConfiguration.getLiveDataConfiguration(advancedParameters, parameters);
+                this.liveDataScriptServiceConfiguration.getLiveDataConfiguration(advancedParameters, parameters);
             // Add the default values.
             liveDataConfig = this.defaultLiveDataConfigResolver.resolve(liveDataConfig);
             // Serialize as JSON.

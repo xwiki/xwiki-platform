@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>17.10.0-rc-1</version>
+    <version>17.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -976,6 +976,6 @@
   </build>
 
   <scm>
-    <tag>xwiki-platform-17.10.0-rc-1</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

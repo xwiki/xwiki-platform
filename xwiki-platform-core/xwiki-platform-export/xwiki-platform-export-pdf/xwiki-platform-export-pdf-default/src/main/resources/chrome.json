@@ -1537,57 +1537,17 @@
             "args": null
         },
         {
-            "name": "fsopen",
-            "action": "SCMP_ACT_ALLOW",
-            "args": null
-        },
-        {
-            "name": "fsconfig",
-            "action": "SCMP_ACT_ALLOW",
-            "args": null
-        },
-        {
-            "name": "fsmount",
-            "action": "SCMP_ACT_ALLOW",
-            "args": null
-        },
-        {
-            "name": "move_mount",
-            "action": "SCMP_ACT_ALLOW",
-            "args": null
-        },
-        {
-            "name": "fspick",
-            "action": "SCMP_ACT_ALLOW",
-            "args": null
-        },
-        {
             "name": "statx",
             "action": "SCMP_ACT_ALLOW",
             "args": null
         },
         {
-            "name": "pidfd_open",
+            "name": "clone3",
             "action": "SCMP_ACT_ALLOW",
             "args": null
         },
         {
-            "name": "pidfd_send_signal",
-            "action": "SCMP_ACT_ALLOW",
-            "args": null
-        },
-        {
-            "name": "pidfd_getfd",
-            "action": "SCMP_ACT_ALLOW",
-            "args": null
-        },
-        {
-            "name": "close_range",
-            "action": "SCMP_ACT_ALLOW",
-            "args": null
-        },
-        {
-            "name": "epoll_pwait2",
+            "name": "ptrace",
             "action": "SCMP_ACT_ALLOW",
             "args": null
         }

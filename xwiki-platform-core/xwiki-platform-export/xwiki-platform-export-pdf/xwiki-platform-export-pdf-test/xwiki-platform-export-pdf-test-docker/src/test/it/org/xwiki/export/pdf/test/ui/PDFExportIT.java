@@ -212,7 +212,7 @@ class PDFExportIT
                 Parent
                 Chapter 1
                 Content of first chapter. Current user is xwiki:XWiki.John.
-                Link to child page.
+                Link to the child page.
                 loaded!
                 """), "Parent document content missing: " + contentPageText);
 
@@ -692,6 +692,33 @@ class PDFExportIT
                 2.1.1.1.1.1\u00A0Heading 2-1-1-1-1-1
                 2.1.1.1.1.2\u00A0Heading 2-1-1-1-1-2
                 """, contentPageText);
+
+            // Verify the PDF outlines (bookmarks).
+            assertEquals("""
+                NumberedHeadings
+                Table of Contents
+                Heading 1
+                  Heading 1-1
+                    Heading without number
+                    Heading 1-1-1
+                    Heading 1-1-2
+                  Heading 1-2
+                    Heading 1-2-1
+                      Heading 1-2-1-1
+                      Heading 1-2-1-2
+                  Heading 1-7
+                    Heading 1-7-1
+                    Heading 1-7-5
+                    Heading 1-7-6
+                  Heading 1-8
+                Heading 2
+                  Heading 2-1
+                    Heading 2-1-1
+                      Heading 2-1-1-1
+                        Heading 2-1-1-1-1
+                          Heading 2-1-1-1-1-1
+                          Heading 2-1-1-1-1-2
+                """, pdf.getOutlineText());
         }
     }
 
@@ -1049,7 +1076,7 @@ class PDFExportIT
             text = pdf.getTextFromPage(5);
             // The content should start with this text normally, but due to our workaround some content from the
             // previous page is moved to this page.
-            assertTrue(text.contains("Nullam porta leo felis, ac viverra ante consectetur a."),
+            assertTrue(text.replace("\n", " ").contains("Nullam porta leo felis, ac viverra ante consectetur a."),
                 "Unexpected content: " + text);
         }
     }
@@ -1089,6 +1116,10 @@ class PDFExportIT
                 + thirdPageContent.substring(0, 40);
             fragment = fragment.replace("\n", " ");
             assertTrue(expectedContent.contains(fragment), "Missing content: " + fragment);
+
+            // Verify that the text from the second table cell is present on the last page (it's not nice but that's
+            // what paged.js is currently generating).
+            assertTrue(thirdPageContent.contains("test"), "Missing content: test");
         }
     }
 
@@ -1248,7 +1279,7 @@ class PDFExportIT
                 Content:
                 Chapter 1
                 Content of first chapter. Current user is xwiki:XWiki.John.
-                Link to child page.
+                Link to the child page.
                 loaded!
                 """, contentPageText);
 

@@ -22,7 +22,6 @@ package org.xwiki.export.pdf.internal.chrome;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -190,7 +189,7 @@ public class ChromeManagerManager implements Disposable
 
                 HostConfig hostConfig = containerManager.getHostConfig(network, remoteDebuggingPort);
                 // Set the secure computing profile in order to be able to run Chrome in sandbox mode.
-                // See https://github.com/Zenika/alpine-chrome/tree/master#-the-best-with-seccomp
+                // See https://hub.docker.com/r/femtopixel/google-chrome-headless#usage--improved
                 hostConfig =
                     hostConfig.withSecurityOpts(Collections.singletonList("seccomp=" + getSecureComputingProfile()));
 
@@ -208,39 +207,35 @@ public class ChromeManagerManager implements Disposable
                     chromeRemoteAllowOrigins = "http://localhost:" + remoteDebuggingPort;
                 }
 
-                // The default flags set by the zenika/alpine-chrome image are causing lots of
-                // net::ERR_INSUFFICIENT_RESOURCES errors that break the PDF export. See
-                // https://github.com/Zenika/alpine-chrome/issues/222 . We prefer to set the flags ourselves through the
-                // parameters (see below).
-                List<String> envVars = Arrays.asList("CHROMIUM_FLAGS=\"\"");
-
-                List<String> parameters = new ArrayList<>(Arrays.asList(
-                    // We don't know the IP address of the docker container at this point.
-                    "--remote-debugging-address=0.0.0.0",
-                    // Use the configured remote debugging port.
-                    "--remote-debugging-port=" + remoteDebuggingPort,
-                    // Older versions of Chrome (e.g. 102) worked fine without this but it seems newer versions require
-                    // us to specify explicitly how the remote debugging service can be accessed.
+                // Chrome remote debugging accepts connections only on localhost, which means we have to use a proxy to
+                // forward incoming requests to Chrome. For this we need two ports:
+                // * one exposed by the container (i.e. the port used to make the remote debugging requests)
+                // * one used by Chrome inside the Docker container to receive localhost requests
+                // For simplicity we use consecutive port numbers.
+                int localDebuggingPort = remoteDebuggingPort + 1;
+                List<String> envVars = List.of("CHROME_DEBUG_PORT=" + localDebuggingPort);
+                List<String> parameters = new ArrayList<>(List.of(
+                    // It's mandatory to specify who can connect to the Chrome remote debugging service (using the
+                    // WebSocket API).
                     "--remote-allow-origins=" + chromeRemoteAllowOrigins,
-                    // This seems to fix the net::ERR_INSUFFICIENT_RESOURCES error. Strangely, it doesn't have the same
-                    // effect if I put it in the CHROMIUM_FLAGS (environment variable).
-                    "--disable-dev-shm-usage",
-                    // This is only useful if you want to inspect the headless Chrome using chrome://inspect/#devices
-                    // (without this the headless Chrome is detected but I can't open a new tab).
-                    "about:blank"));
+                    // This seems to fix the net::ERR_INSUFFICIENT_RESOURCES error.
+                    "--disable-dev-shm-usage"));
 
                 if (inSandboxMode) {
                     this.logger.debug("Starting Chrome headless in sandbox mode.");
                 } else {
                     // Disable the sandbox mode.
                     this.logger.warn("Starting Chrome headless with sandbox mode disabled.");
-                    parameters.add(0, "--no-sandbox");
+                    parameters.add("--no-sandbox");
                 }
 
                 this.containerId =
                     containerManager.createContainer(imageName, containerName, parameters, envVars, hostConfig);
                 this.isContainerCreator = true;
                 containerManager.startContainer(this.containerId);
+
+                // Setup the proxy that must run in front on headless Chrome.
+                setupChromeProxy(containerManager, remoteDebuggingPort, localDebuggingPort);
             }
 
             // By default we assume XWiki is not running inside a Docker container (i.e. it runs on the same host as the
@@ -261,6 +256,57 @@ public class ChromeManagerManager implements Disposable
         } catch (Exception e) {
             throw new RuntimeException("Failed to prepare the Docker container for the PDF export.", e);
         }
+    }
+
+    /**
+     * Chrome accepts "remote" debugging connections only on localhost. But Chrome is running inside a Docker container
+     * that is not using the host network most of the time. In order to overcome this limitation we need to set up a
+     * proxy that runs inside the Chrome Docker container, forwarding external requests to Chrome. The proxy must
+     * properly handle the HTTP-to-WebSocket upgrade requests used by the Chrome DevTools Protocol and ensure requests
+     * appear to come from localhost to avoid Chrome's security restrictions.
+     *
+     * @param containerManager the container manager used to set up the proxy
+     * @param remoteDebuggingPort the port exposed externally by the container
+     * @param localDebuggingPort the port Chrome is listening on inside the container
+     */
+    private void setupChromeProxy(ContainerManager containerManager, int remoteDebuggingPort, int localDebuggingPort)
+    {
+        this.logger.debug("Setting up the proxy for Chrome remote debugging: {}:{} -> 127.0.0.1:{}",
+            remoteDebuggingPort, remoteDebuggingPort, localDebuggingPort);
+
+        // Install socat in the container (needs to be done as root).
+        this.logger.debug("Installing socat in the Chrome container...");
+        containerManager.execInContainer(this.containerId, true, bashCommand("apt update && apt install -y socat"));
+
+        // Wait for Chrome to listen on the local port.
+        String waitForChromeReady =
+            "timeout 30 bash -c 'until curl -s http://127.0.0.1:%s/json/version; do sleep 1; done'";
+        this.logger.debug("Waiting for Chrome to start on port {}...", localDebuggingPort);
+        containerManager.execInContainer(this.containerId,
+            bashCommand(waitForChromeReady.formatted(localDebuggingPort)));
+
+        // Start the socat proxy and leave it runnning in the background.
+        this.logger.debug("Starting socat proxy: 0.0.0.0:{} -> 127.0.0.1:{}", remoteDebuggingPort, localDebuggingPort);
+        String startSocat = "nohup socat TCP-LISTEN:%s,fork,reuseaddr TCP:127.0.0.1:%s > /dev/null 2>&1 &";
+        containerManager.execInContainer(this.containerId,
+            bashCommand(startSocat.formatted(remoteDebuggingPort, localDebuggingPort)));
+
+        // Wait for socat proxy to be ready by checking if it can forward requests to Chrome.
+        this.logger.debug("Waiting for socat proxy to be ready on port {}...", remoteDebuggingPort);
+        String response = containerManager.execInContainer(this.containerId,
+            bashCommand(waitForChromeReady.formatted(remoteDebuggingPort)));
+
+        // Verify the proxy is working by checking the JSON response.
+        if (response != null && response.contains("Browser")) {
+            this.logger.debug("Finished setting up the proxy for Chrome remote debugging.");
+        } else {
+            throw new RuntimeException("Failed to set up the proxy for Chrome remote debugging. Result: " + response);
+        }
+    }
+
+    private String[] bashCommand(String command)
+    {
+        return new String[] {"bash", "-c", command};
     }
 
     /**

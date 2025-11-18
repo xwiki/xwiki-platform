@@ -208,7 +208,8 @@ class ChromeTabTest
             /* disableBreaks */ true,
             /* replMode */ false,
             /* allowUnsafeEvalBlockedByCSP */ false,
-            /* uniqueContextId */ null
+            /* uniqueContextId */ null,
+            /* serializationOptions */ null
         )).thenReturn(rejectedEvaluate);
 
         Evaluate resolvedEvaluate = mock(Evaluate.class, "resolved");
@@ -232,7 +233,8 @@ class ChromeTabTest
             /* disableBreaks */ true,
             /* replMode */ false,
             /* allowUnsafeEvalBlockedByCSP */ false,
-            /* uniqueContextId */ null
+            /* uniqueContextId */ null,
+            /* serializationOptions */ null
         )).thenReturn(resolvedEvaluate);
 
         assertTrue(this.chromeTab.navigate(url, null, true, 25));
@@ -265,7 +267,8 @@ class ChromeTabTest
             /* disableBreaks */ true,
             /* replMode */ false,
             /* allowUnsafeEvalBlockedByCSP */ false,
-            /* uniqueContextId */ null
+            /* uniqueContextId */ null,
+            /* serializationOptions */ null
         )).thenReturn(evaluate);
 
         ExceptionDetails exceptionDetails = mock(ExceptionDetails.class);
@@ -298,7 +301,8 @@ class ChromeTabTest
             /* disableBreaks */ true,
             /* replMode */ false,
             /* allowUnsafeEvalBlockedByCSP */ false,
-            /* uniqueContextId */ null
+            /* uniqueContextId */ null,
+            /* serializationOptions */ null
         );
     }
 
@@ -324,8 +328,8 @@ class ChromeTabTest
     void printToPDF() throws Exception
     {
         PrintToPDF printToPDF = mock(PrintToPDF.class);
-        when(this.tabDevToolsService.getPage().printToPDF(false, false, false, 1d, 8.27d, 11.7d, 0d, 0d, 0d, 0d, "",
-            false, "", "", false, PrintToPDFTransferMode.RETURN_AS_STREAM)).thenReturn(printToPDF);
+        when(this.tabDevToolsService.getPage().printToPDF(false, false, false, 1d, 8.27d, 11.7d, 0d, 0d, 0d, 0d, "", "",
+            "", false, PrintToPDFTransferMode.RETURN_AS_STREAM, true, true)).thenReturn(printToPDF);
         when(printToPDF.getStream()).thenReturn("pdf-stream");
 
         IO io = mock(IO.class);

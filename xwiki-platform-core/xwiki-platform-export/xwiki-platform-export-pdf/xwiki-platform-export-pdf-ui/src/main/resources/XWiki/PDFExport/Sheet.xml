@@ -1123,12 +1123,6 @@ require([
     const usePagedPolyfill = $('body').children('.pdf-toc, .pdf-header, .pdf-footer').length;
     if (usePagedPolyfill) {
       return new Promise((resolve, reject) =&gt; {
-        let start;
-        window.PagedConfig = {after: (...args) =&gt; {
-          const duration = (new Date().getTime() - start) / 1000;
-          console.debug(`Print preview ready in ${duration}s`);
-          resolve(...args);
-        }};
         // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become
         // blank when they are moved around within the DOM tree.
         replaceCanvasesWithImages($('#xwikicontent')).catch((cause) =&gt; {
@@ -1140,9 +1134,21 @@ require([
           // triggered by paged.js should not lead to any new content changes.
           mutationObserverManager.disconnectAll();
 
+          // Recent versions of Paged.js fail if standard JavaScript types (e.g. Array) are overwritten by Prototype.js
+          restoreOriginalPrototypes();
+
           console.debug('Generating print preview...');
-          start = new Date().getTime();
-          require(['paged-polyfill'], function(PagedPolyfill) {});
+          const start = Date.now();
+          // Don't start generating the print preview automatically because we need to patch Paged.js before. See the
+          // paged-polyfill-patched module defined above.
+          window.PagedConfig = {auto: false};
+          require(['paged-polyfill'], previewer =&gt; {
+            previewer.preview().then((...args) =&gt; {
+              const duration = (Date.now() - start) / 1000;
+              console.debug(`Print preview ready in ${duration}s`);
+              resolve(...args);
+            }, reject);
+          }, reject);
         })
       });
     }
@@ -1163,6 +1169,35 @@ require([
     // PDF.
     $('&lt;base/&gt;').attr('href', pdfExportConfig.baseURL).prependTo('head');
   });
+
+  /**
+   * Prototype.js is modifying the prototype of standard JavaScript types (e.g. Array) and this breaks Paged.js . We
+   * cannot stop loading Prototype.js because we still have JavaScript code in XWiki Standard and in XWiki extensions
+   * that rely on it. Even if we render only the page content, the are rendering macros (e.g. Live Table) that are still
+   * using Prototype.js . We overcome this problem by restoring the original prototypes before running Paged.js .
+   */
+  function restoreOriginalPrototypes() {
+    restoreOriginalPrototype(Array);
+  }
+
+  function restoreOriginalPrototype(constructor) {
+    // Restore standard key values.
+    const iframe = document.createElement('iframe');
+    iframe.src = 'about:blank';
+    document.body.appendChild(iframe);
+    const originalConstructor = iframe.contentWindow[constructor.name];
+    document.body.removeChild(iframe);
+    Object.getOwnPropertyNames(originalConstructor.prototype).forEach(property =&gt; {
+      constructor.prototype[property] = originalConstructor.prototype[property];
+    });
+
+    // Delete custom keys.
+    const customKeys = [];
+    for (let key in constructor.prototype) {
+      customKeys.push(key)
+    };
+    customKeys.forEach(customKey =&gt; delete constructor.prototype[customKey]);
+  }
 });</code>
     </property>
     <property>

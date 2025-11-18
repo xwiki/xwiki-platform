@@ -31,6 +31,7 @@
   <artifactId>xwiki-platform-node</artifactId>
   <name>XWiki Platform - XWiki Platform Node</name>
   <description>Mono repo of all the node packages that are not directly distributed in webjars</description>
+  <packaging>pom</packaging>
   <properties>
     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
     <xwiki.minification.skip>true</xwiki.minification.skip>

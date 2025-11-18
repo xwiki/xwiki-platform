@@ -250,8 +250,8 @@ catalogs:
       specifier: 6.7.1
       version: 6.7.1
     vue-tsc:
-      specifier: 3.1.2
-      version: 3.1.2
+      specifier: 3.1.4
+      version: 3.1.4
     vue3-touch-events:
       specifier: 5.0.13
       version: 5.0.13
@@ -395,7 +395,7 @@ importers:
         version: 3.5.23(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.1.2(typescript@5.9.3)
+        version: 3.1.4(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-webjar/src/main/node:
     dependencies:
@@ -495,7 +495,7 @@ importers:
         version: 3.5.23(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.1.2(typescript@5.9.3)
+        version: 3.1.4(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node:
     devDependencies:
@@ -592,7 +592,7 @@ importers:
         version: 3.5.23(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.1.2(typescript@5.9.3)
+        version: 3.1.4(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/attachments/attachments-api:
     dependencies:
@@ -866,7 +866,7 @@ importers:
         version: 3.5.23(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.1.2(typescript@5.9.3)
+        version: 3.1.4(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api:
     dependencies:
@@ -1289,7 +1289,7 @@ importers:
         version: 3.5.23(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.1.2(typescript@5.9.3)
+        version: 3.1.4(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react:
     dependencies:
@@ -1401,7 +1401,7 @@ importers:
         version: 4.0.7(@types/debug@4.1.12)(@types/node@24.9.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.1.2(typescript@5.9.3)
+        version: 3.1.4(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node:
     devDependencies:
@@ -1461,7 +1461,7 @@ importers:
         version: 3.5.23(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.1.2(typescript@5.9.3)
+        version: 3.1.4(typescript@5.9.3)
 
 packages:
 
@@ -2814,8 +2814,8 @@ packages:
       typescript:
         optional: true
 
-  '@vue/language-core@3.1.2':
-    resolution: {integrity: sha512-PyFDCqpdfYUT+oMLqcc61oHfJlC6yjhybaefwQjRdkchIihToOEpJ2Wu/Ebq2yrnJdd1EsaAvZaXVAqcxtnDxQ==}
+  '@vue/language-core@3.1.4':
+    resolution: {integrity: sha512-n/58wm8SkmoxMWkUNUH/PwoovWe4hmdyPJU2ouldr3EPi1MLoS7iDN46je8CsP95SnVBs2axInzRglPNKvqMcg==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
@@ -5555,8 +5555,8 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  vue-tsc@3.1.2:
-    resolution: {integrity: sha512-3fd4DY0rFczs5f+VB3OhcLU83V6+3Puj2yLBe0Ak65k7ERk+STVNKaOAi0EBo6Lc15UiJB6LzU6Mxy4+h/pKew==}
+  vue-tsc@3.1.4:
+    resolution: {integrity: sha512-GsRJxttj4WkmXW/zDwYPGMJAN3np/4jTzoDFQTpTsI5Vg/JKMWamBwamlmLihgSVHO66y9P7GX+uoliYxeI4Hw==}
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
@@ -7246,7 +7246,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  '@vue/language-core@3.1.2(typescript@5.9.3)':
+  '@vue/language-core@3.1.4(typescript@5.9.3)':
     dependencies:
       '@volar/language-core': 2.4.23
       '@vue/compiler-dom': 3.5.23
@@ -10418,10 +10418,10 @@ snapshots:
       tippy.js: 6.3.7
       vue: 3.5.23(typescript@5.9.3)
 
-  vue-tsc@3.1.2(typescript@5.9.3):
+  vue-tsc@3.1.4(typescript@5.9.3):
     dependencies:
       '@volar/typescript': 2.4.23
-      '@vue/language-core': 3.1.2(typescript@5.9.3)
+      '@vue/language-core': 3.1.4(typescript@5.9.3)
       typescript: 5.9.3
 
   vue3-touch-events@5.0.13(vue@3.5.23(typescript@5.9.3)):

@@ -29,7 +29,7 @@
     "build": "vite build",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "test": "playwright test -c playwright-ct.config.ts",
+    "test": "playwright install; playwright test -c playwright-ct.config.ts",
     "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",

@@ -65,6 +65,19 @@
               <installDirectory>${basedir}/target</installDirectory>
             </configuration>
           </execution>
+          <!-- Some tools are still using npm, so it is important to also have it installed. -->
+          <execution>
+            <id>default-install-node-and-nnpm</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>${node.version}</nodeVersion>
+              <npmVersion>${npm.version}</npmVersion>
+              <installDirectory>${basedir}/target</installDirectory>
+            </configuration>
+          </execution>
           <execution>
             <id>default-install-node-and-pnpm</id>
             <phase>process-resources</phase>

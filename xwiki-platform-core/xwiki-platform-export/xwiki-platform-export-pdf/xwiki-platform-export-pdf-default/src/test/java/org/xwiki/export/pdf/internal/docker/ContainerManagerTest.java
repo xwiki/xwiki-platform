@@ -26,7 +26,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.async.ResultCallback;
+import com.github.dockerjava.api.async.ResultCallback.Adapter;
 import com.github.dockerjava.api.command.InspectImageCmd;
 import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
@@ -34,6 +34,7 @@ import com.github.dockerjava.api.model.PullResponseItem;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -81,8 +82,8 @@ class ContainerManagerTest
         PullImageCmd pullImagedCmd = mock(PullImageCmd.class);
         when(this.dockerClient.pullImageCmd("test/image")).thenReturn(pullImagedCmd);
 
-        ResultCallback.Adapter<PullResponseItem> pullImageCallback = mock(ResultCallback.Adapter.class);
-        when(pullImagedCmd.start()).thenReturn(pullImageCallback);
+        Adapter<PullResponseItem> pullImageCallback = mock(Adapter.class);
+        when(pullImagedCmd.exec(any(Adapter.class))).thenReturn(pullImageCallback);
 
         this.containerManager.pullImage("test/image");
 

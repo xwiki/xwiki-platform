@@ -19,20 +19,8 @@
  */
 package org.xwiki.export.pdf.internal.chrome;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Named;
@@ -50,6 +38,16 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.dockerjava.api.model.HostConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ChromeManagerManager}.
@@ -91,19 +89,22 @@ class ChromeManagerManagerTest
 
         mockNetwork("bridge");
 
-        List<String> envVars = Collections.singletonList("CHROMIUM_FLAGS=\"\"");
+        List<String> envVars = List.of("CHROME_DEBUG_PORT=" + (this.configuration.getChromeRemoteDebuggingPort() + 1));
 
         when(this.containerManager.createContainer(this.configuration.getChromeDockerImage(),
             this.configuration.getChromeDockerContainerName(), getChromeParams(), envVars, this.hostConfig))
-            .thenReturn(this.containerId);
+                .thenReturn(this.containerId);
+        when(
+            this.containerManager.execInContainer(this.containerId, "bash", "-c",
+                "timeout 30 bash -c 'until curl -s http://127.0.0.1:"
+                    + this.configuration.getChromeRemoteDebuggingPort() + "/json/version; do sleep 1; done'"))
+                        .thenReturn("{\"Browser\":\"142\"}");
     }
 
     private List<String> getChromeParams()
     {
-        return Arrays.asList("--remote-debugging-address=0.0.0.0",
-            "--remote-debugging-port=" + this.configuration.getChromeRemoteDebuggingPort(),
-            "--remote-allow-origins=http://localhost:" + this.configuration.getChromeRemoteDebuggingPort(),
-            "--disable-dev-shm-usage", "about:blank");
+        return List.of("--remote-allow-origins=http://localhost:" + this.configuration.getChromeRemoteDebuggingPort(),
+            "--disable-dev-shm-usage");
     }
 
     private void mockNetwork(String networkIdOrName)
@@ -115,8 +116,7 @@ class ChromeManagerManagerTest
         when(this.containerManager.getHostConfig(networkIdOrName, this.configuration.getChromeRemoteDebuggingPort()))
             .thenReturn(this.hostConfig);
         when(this.hostConfig.withSecurityOpts(any(List.class))).thenReturn(this.hostConfig);
-        when(this.hostConfig.withExtraHosts("xwiki-host:host-gateway"))
-            .thenReturn(this.hostConfig);
+        when(this.hostConfig.withExtraHosts("xwiki-host:host-gateway")).thenReturn(this.hostConfig);
     }
 
     @Test
@@ -130,6 +130,16 @@ class ChromeManagerManagerTest
 
         verify(this.containerManager).pullImage(this.configuration.getChromeDockerImage());
         verify(this.containerManager).startContainer(this.containerId);
+        // Verify that the proxy for Chrome remote debugging is set up.
+        verify(this.containerManager).execInContainer(this.containerId, true, "bash", "-c",
+            "apt update && apt install -y socat");
+        int localDebuggingPort = this.configuration.getChromeRemoteDebuggingPort() + 1;
+        verify(this.containerManager).execInContainer(this.containerId, "bash", "-c",
+            "timeout 30 bash -c 'until curl -s http://127.0.0.1:" + localDebuggingPort
+                + "/json/version; do sleep 1; done'");
+        verify(this.containerManager).execInContainer(this.containerId, "bash", "-c",
+            "nohup socat TCP-LISTEN:" + this.configuration.getChromeRemoteDebuggingPort()
+                + ",fork,reuseaddr TCP:127.0.0.1:" + localDebuggingPort + " > /dev/null 2>&1 &");
         verify(this.chromeManager).connect("localhost", this.configuration.getChromeRemoteDebuggingPort());
 
         this.chromeManagerManager.dispose();
@@ -225,13 +235,13 @@ class ChromeManagerManagerTest
         RuntimeException exception = new RuntimeException("Test exception");
         doThrow(exception).when(this.chromeManager).connect("localhost", port);
 
-        List<String> envVars = Collections.singletonList("CHROMIUM_FLAGS=\"\"");
+        List<String> envVars = List.of("CHROME_DEBUG_PORT=" + (port + 1));
         List<String> parameters = new ArrayList<>();
-        parameters.add("--no-sandbox");
         parameters.addAll(getChromeParams());
+        parameters.add("--no-sandbox");
         when(this.containerManager.createContainer(this.configuration.getChromeDockerImage(),
             this.configuration.getChromeDockerContainerName(), parameters, envVars, this.hostConfig))
-            .thenReturn(this.containerId);
+                .thenReturn(this.containerId);
 
         try {
             this.chromeManagerManager.get();

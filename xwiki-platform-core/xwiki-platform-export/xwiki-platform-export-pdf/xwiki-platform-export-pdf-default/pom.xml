@@ -92,7 +92,7 @@
     <dependency>
       <groupId>com.github.kklisura.cdt</groupId>
       <artifactId>cdt-java-client</artifactId>
-      <version>4.0.0</version>
+      <version>5.0.0-xwiki</version>
     </dependency>
 
     <!-- Test dependencies -->

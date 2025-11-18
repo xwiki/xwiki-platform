@@ -118,6 +118,21 @@
               <installDirectory>${basedir}/target</installDirectory>
             </configuration>
           </execution>
+          <execution>
+            <phase>deploy</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run deploy</arguments>
+              <workingDirectory>${basedir}/src/main/node</workingDirectory>
+              <installDirectory>${basedir}/target</installDirectory>
+              <environmentVariables>
+                <NPM_SNAPSHOT_REGISTRY>${xwiki.npm.snapshot.registry}</NPM_SNAPSHOT_REGISTRY>
+                <NPM_RELEASE_REGISTRY>${xwiki.npm.release.registry}</NPM_RELEASE_REGISTRY>
+              </environmentVariables>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>

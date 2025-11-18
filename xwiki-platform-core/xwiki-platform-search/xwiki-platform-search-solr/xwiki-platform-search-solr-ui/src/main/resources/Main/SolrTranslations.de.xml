@@ -58,21 +58,20 @@ solr.admin.indexing.query.label=Einschränkende Abfrage
 solr.admin.indexing.query.hint=Optionale Abfrage, welche die gewählte Aktion nur mit den Dokumenten ausführt, die auf die Abfrage passen.
 solr.admin.indexing.query.language.label=Sprache der einschränkenden Abfrage
 solr.admin.info.affectedDocuments=Betroffene Dokumente im Index:
-solr.sortBy=Sortierung:
-solr.sortBy.score=Relevanz
-solr.sortBy.title_sort=Titel
-solr.sortBy.date=Letztes Bearbeitungsdatum
-solr.sortBy.author_display_sort=Letzter Autor
-solr.sortBy.filename_sort=Dateiname
-solr.sortBy.attsize_sort=Dateigröße
-solr.sortBy.attdate_sort=Hochgeladen am
-solr.sortBy.attauthor_display_sort=Hochgeladen von
-solr.sortOrder.asc=Aufsteigend
-solr.sortOrder.desc=Absteigend
-solr.options=Anzeigen:
-solr.options.highlight=Hervorheben
+search.solr.sortBy.hint=Sortierungsregel
+search.solr.sortBy.field.score=Nach Relevanz sortieren
+search.solr.sortBy.field.titleSort=Nach Titel sortieren
+search.solr.sortBy.field.date=Nach dem Datum der letzten Bearbeitung sortieren
+search.solr.sortBy.field.authorDisplaySort=Nach Nachnamen des letzten Autors sortieren
+search.solr.sortBy.field.filenameSort=Nach Dateinamen sortieren
+search.solr.sortBy.field.attsizeSort=Nach Dateigröße sortieren
+search.solr.sortBy.field.attdateSort=Nach Upload-Datum sortieren
+search.solr.sortBy.field.attauthorDisplaySort=Nach Name des Uploaders sortieren
+search.solr.sortOrder.asc=Die Sortierreihenfolge umkehren. Die Einträge sind derzeit in aufsteigender Reihenfolge sortiert.
+search.solr.sortOrder.desc=Die Sortierreihenfolge umkehren. Die Einträge sind derzeit in absteigender Reihenfolge sortiert.
+search.solr.options.showHighlight=Treffer markieren
 solr.options.highlight.title=Einen Auszug dessen anzeigen, was mit den Suchergebnissen übereinstimmt
-solr.options.facet=Facetten
+search.solr.options.showFacet=Filter anzeigen
 solr.options.facet.title=Erlauben Sie die zusätzliche Filterung der Ergebnisse
 solr.result.language=Sprache
 solr.result.locatedIn=Speicherort
@@ -173,6 +172,18 @@ solr.result.location=Gefunden in {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Bereich
+solr.sortBy=Sortierung:
+solr.sortBy.score=Relevanz
+solr.sortBy.title_sort=Titel
+solr.sortBy.date=Letztes Bearbeitungsdatum
+solr.sortBy.author_display_sort=Letzter Autor
+solr.sortBy.filename_sort=Dateiname
+solr.sortBy.attsize_sort=Dateigröße
+solr.sortBy.attdate_sort=Hochgeladen am
+solr.sortBy.attauthor_display_sort=Hochgeladen von
+solr.options=Anzeigen:
+solr.options.highlight=Hervorheben
+solr.options.facet=Facetten
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

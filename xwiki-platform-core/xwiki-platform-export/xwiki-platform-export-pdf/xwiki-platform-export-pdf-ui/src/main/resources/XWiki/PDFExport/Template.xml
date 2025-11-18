@@ -325,6 +325,8 @@
     /* Start each XWiki document on a new print page. */
     &amp; ~ h1[data-xwiki-document-reference] {
       break-before: page;
+      /* Prevent floating to leak from one wiki page to the next. */
+      clear: both;
     }
   }
 }</code>

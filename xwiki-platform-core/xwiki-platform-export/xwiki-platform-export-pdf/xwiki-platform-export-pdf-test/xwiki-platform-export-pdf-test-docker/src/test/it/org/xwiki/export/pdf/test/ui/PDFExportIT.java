@@ -1109,10 +1109,15 @@ class PDFExportIT
 
         try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
             // Verify the number of pages.
-            assertEquals(39, pdf.getNumberOfPages());
+            assertEquals(37, pdf.getNumberOfPages());
+
+            // Verify the content of the page before last.
+            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 2).replace("\n", " ");
+            // Verify that the text from the last cell is present.
+            assertTrue(text.contains("977, 10"), "Unexpected content: " + text);
 
             // Verify the content of the last page.
-            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1).replace("\n", " ");
+            text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1).replace("\n", " ");
             // Verify that the text from the last cell is present.
             assertTrue(text.contains("1000, 10"), "Unexpected content: " + text);
         }
@@ -1131,16 +1136,22 @@ class PDFExportIT
 
         try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
             // Verify the number of pages.
-            assertEquals(55, pdf.getNumberOfPages());
+            assertEquals(110, pdf.getNumberOfPages());
 
             // Verify the content of the last page.
-            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1).replace("\n", " ");
-            // Verify that the text from the last table row is present.
-            assertTrue(text.contains("Reuters US Online Report - Technology end"), "Unexpected content: " + text);
-            assertTrue(text.contains("with a special focus on the US.end"), "Unexpected content: " + text);
-            assertTrue(text.contains("English end"), "Unexpected content: " + text);
-            assertTrue(text.contains("Pictures and graphics end"), "Unexpected content: " + text);
-            assertTrue(text.contains("delivered via the internet end"), "Unexpected content: " + text);
+            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1);
+            String textWithoutWhiteSpace = text.replaceAll("\\s+", "");
+            // Verify that the text from the last table row is present. We have to ignore white-spaces because words can
+            // be split in the middle, in order to fit multiple table columns on a print page.
+            assertTrue(textWithoutWhiteSpace.contains("Reuters US Online Report - Technology end".replace(" ", "")),
+                "Unexpected content: " + text);
+            assertTrue(textWithoutWhiteSpace.contains("with a special focus on the US.end".replace(" ", "")),
+                "Unexpected content: " + text);
+            assertTrue(textWithoutWhiteSpace.contains("English end".replace(" ", "")), "Unexpected content: " + text);
+            assertTrue(textWithoutWhiteSpace.contains("Pictures and graphics end".replace(" ", "")),
+                "Unexpected content: " + text);
+            assertTrue(textWithoutWhiteSpace.contains("delivered via the internet end".replace(" ", "")),
+                "Unexpected content: " + text);
         }
     }
 
@@ -1570,6 +1581,61 @@ class PDFExportIT
             List<PDFImage> images = pdf.getImagesFromPage(2);
             assertEquals(1, images.size());
             assertEquals(512, images.get(0).getRawWidth());
+        }
+    }
+
+    /**
+     * Verify the temporary workaround that replaces table cells spanning multiple columns and rows.
+     */
+    @Test
+    @Order(33)
+    void smallTableWithColAndRowSpan(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "SmallTableWithColAndRowSpan"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // Verify the number of pages.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            // Verify the content page.
+            assertEquals("""
+                SmallTableWithColAndRowSpan
+                2 / 2
+                One Two Three
+                Red Yellow Blue
+                Green
+                apple 3
+                cat dog tiger
+                After table.
+                """, pdf.getTextFromPage(1));
+        }
+    }
+
+    /**
+     * Verify that tables with many columns are auto-scaled to fit the page width (by reducing the font size and
+     * applying CSS transformation).
+     */
+    @Test
+    @Order(34)
+    void autoScaleTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "AutoScaleTable"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // Verify the number of pages.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            // Verify the content page.
+            assertEquals("""
+                AutoScaleTable
+                2 / 2
+                After table.
+                Red Orange Yellow Green Blue Indigo Violet Black White Carmine Chantilly Tangerine Daffodil Pistachio
+                  Sapphire Azure Mauve Palatinate Black Currant Lavender
+                one two three four five six seven eight nine ten
+                """.replaceAll("\\s+", ""), pdf.getTextFromPage(1).replaceAll("\\s+", ""));
         }
     }
 

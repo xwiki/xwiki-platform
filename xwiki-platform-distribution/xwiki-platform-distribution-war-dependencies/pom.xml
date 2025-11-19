@@ -31,10 +31,6 @@
   <name>XWiki Platform - Distribution - War - Dependencies</name>
   <packaging>pom</packaging>
   <description>The dependencies of the WAR as a separate pom to be reusable in other distributions.</description>
-  <properties>
-    <!-- Make sure to not end up with Apache HttpClient 3 in the WAR -->
-    <xwiki.enforcer.enforce-apache-http5.searchTransitive>true</xwiki.enforcer.enforce-apache-http5.searchTransitive>
-  </properties>
   <dependencies>
     <!-- ********************************************************************** -->
     <!-- Depend on the minimal WAR -->

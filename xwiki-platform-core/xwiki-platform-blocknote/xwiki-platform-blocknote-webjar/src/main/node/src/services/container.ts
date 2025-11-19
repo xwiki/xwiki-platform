@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DefaultLogger } from "@xwiki/platform-api";
-import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
+import { DefaultLogger } from "@manuelleducorg/api";
+import { ComponentInit as DefaultAttachmentsComponentInit } from "@manuelleducorg/attachments-default";
 import { Container, injectable } from "inversify";
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
@@ -39,7 +39,7 @@ import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { XWikiDesignSystemLoader } from "./skin/XWikiDesignSystemLoader";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { XWikiStorage } from "./storage/XWikiStorage";
-import { ComponentInit as UniastMarkdownComponentList } from "@xwiki/platform-uniast-markdown"
+import { ComponentInit as UniastMarkdownComponentList } from "@manuelleducorg/uniast-markdown"
 
 const container: Container = new Container();
 container.bind("Container").toConstantValue(container);

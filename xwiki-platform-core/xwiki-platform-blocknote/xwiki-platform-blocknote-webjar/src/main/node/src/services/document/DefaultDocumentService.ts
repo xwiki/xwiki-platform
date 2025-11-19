@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { PageData } from "@xwiki/platform-api";
-import { DocumentChange, DocumentService } from "@xwiki/platform-document-api";
-import type { DocumentReference } from "@xwiki/platform-model-api";
+import type { PageData } from "@manuelleducorg/api";
+import { DocumentChange, DocumentService } from "@manuelleducorg/document-api";
+import type { DocumentReference } from "@manuelleducorg/model-api";
 import { Container, injectable } from "inversify";
 import { type Ref, ref } from "vue";
 import { toCristalEntityReference } from "../model/reference/XWikiEntityReference";

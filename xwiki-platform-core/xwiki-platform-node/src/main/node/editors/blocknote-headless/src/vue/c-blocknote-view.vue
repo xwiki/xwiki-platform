@@ -18,7 +18,7 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import "@manuelleducorg/editors-blocknote-react/dist/platform-editors-blocknote-react.css";
+import "@manuelleducorg/editors-blocknote-react/dist/editors-blocknote-react.css";
 import { computeCurrentUser } from "../components/currentUser";
 import { createLinkEditionContext } from "../components/linkEditionContext";
 import messages from "../translations";

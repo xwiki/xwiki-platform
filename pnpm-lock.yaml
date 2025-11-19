@@ -272,49 +272,49 @@ importers:
 
   xwiki-platform-core/xwiki-platform-blocknote/xwiki-platform-blocknote-webjar/src/main/node:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/api
-      '@xwiki/platform-attachments-default':
+      '@manuelleducorg/attachments-default':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/attachments/attachments-default
-      '@xwiki/platform-authentication-api':
+      '@manuelleducorg/authentication-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/authentication/authentication-api
-      '@xwiki/platform-backend-api':
+      '@manuelleducorg/backend-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/backends/backend-api
-      '@xwiki/platform-collaboration-api':
+      '@manuelleducorg/collaboration-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/collaboration/collaboration-api
-      '@xwiki/platform-document-api':
+      '@manuelleducorg/document-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/document/document-api
-      '@xwiki/platform-dsapi':
+      '@manuelleducorg/dsapi':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/ds/api
-      '@xwiki/platform-editors-blocknote-headless':
+      '@manuelleducorg/editors-blocknote-headless':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/editors/blocknote-headless
-      '@xwiki/platform-editors-blocknote-react':
+      '@manuelleducorg/editors-blocknote-react':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/editors/blocknote-react
-      '@xwiki/platform-link-suggest-api':
+      '@manuelleducorg/link-suggest-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-api
-      '@xwiki/platform-model-reference-api':
+      '@manuelleducorg/model-reference-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
-      '@xwiki/platform-model-remote-url-api':
+      '@manuelleducorg/model-remote-url-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
-      '@xwiki/platform-uniast-api':
+      '@manuelleducorg/uniast-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/uniast/uniast-api
-      '@xwiki/platform-uniast-markdown':
+      '@manuelleducorg/uniast-markdown':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
       inversify:
@@ -556,17 +556,17 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/api:
     dependencies:
-      '@xwiki/platform-authentication-api':
+      '@manuelleducorg/authentication-api':
         specifier: workspace:*
         version: link:../core/authentication/authentication-api
-      '@xwiki/platform-configuration-api':
+      '@manuelleducorg/configuration-api':
         specifier: workspace:*
         version: link:../core/configuration/configuration-api
       vue-router:
         specifier: 'catalog:'
         version: 4.5.1(vue@3.5.23(typescript@5.9.3))
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../dev/config
       eslint:
@@ -596,17 +596,17 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/attachments/attachments-api:
     dependencies:
-      '@xwiki/platform-authentication-api':
+      '@manuelleducorg/authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../model/model-api
       reflect-metadata:
         specifier: 0.x
         version: 0.2.2
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -627,32 +627,32 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/attachments/attachments-default:
     dependencies:
-      '@xwiki/platform-attachments-api':
+      '@manuelleducorg/attachments-api':
         specifier: workspace:*
         version: link:../attachments-api
-      '@xwiki/platform-authentication-api':
+      '@manuelleducorg/authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
-      '@xwiki/platform-backend-api':
+      '@manuelleducorg/backend-api':
         specifier: workspace:*
         version: link:../../backends/backend-api
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../model/model-api
-      '@xwiki/platform-model-reference-api':
+      '@manuelleducorg/model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api
-      '@xwiki/platform-model-remote-url-api':
+      '@manuelleducorg/model-remote-url-api':
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       pinia:
         specifier: 'catalog:'
         version: 3.0.3(typescript@5.9.3)(vue@3.5.23(typescript@5.9.3))
     devDependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -682,7 +682,7 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/authentication/authentication-api:
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -703,11 +703,11 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-api:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../api
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -731,14 +731,14 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-api:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../api
       yjs:
         specifier: 'catalog:'
         version: 13.6.27
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -769,7 +769,7 @@ importers:
         specifier: 'catalog:'
         version: 3.11.0
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -787,17 +787,17 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-api:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../model/model-api
       reflect-metadata:
         specifier: 0.x
         version: 0.2.2
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -818,7 +818,7 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/fn-utils:
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       eslint:
@@ -846,7 +846,7 @@ importers:
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.4.6
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       eslint:
@@ -870,11 +870,11 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../api
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -898,7 +898,7 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-api:
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -916,13 +916,13 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx:
     dependencies:
-      '@xwiki/platform-fn-utils':
+      '@manuelleducorg/fn-utils':
         specifier: workspace:*
         version: link:../../fn-utils
-      '@xwiki/platform-macros-api':
+      '@manuelleducorg/macros-api':
         specifier: workspace:*
         version: link:../macros-api
-      '@xwiki/platform-model-remote-url-api':
+      '@manuelleducorg/model-remote-url-api':
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       inversify:
@@ -932,7 +932,7 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.2
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -956,7 +956,7 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api:
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -974,14 +974,14 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../../api
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../model-api
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
       eslint:
@@ -1005,14 +1005,14 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../../api
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../model-api
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
       eslint:
@@ -1036,14 +1036,14 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../model/model-api
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
       eslint:
@@ -1061,7 +1061,7 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api:
     dependencies:
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../model/model-api
     devDependencies:
@@ -1080,19 +1080,19 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/platform-document-api':
+      '@manuelleducorg/document-api':
         specifier: workspace:*
         version: link:../../document/document-api
-      '@xwiki/platform-fn-utils':
+      '@manuelleducorg/fn-utils':
         specifier: workspace:*
         version: link:../../fn-utils
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../model/model-api
-      '@xwiki/platform-uniast-api':
+      '@manuelleducorg/uniast-api':
         specifier: workspace:*
         version: link:../uniast-api
       fast-xml-parser:
@@ -1126,13 +1126,13 @@ importers:
       '@types/mdast':
         specifier: 'catalog:'
         version: 4.0.4
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
-      '@xwiki/platform-model-reference-api':
+      '@manuelleducorg/model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api
-      '@xwiki/platform-model-remote-url-api':
+      '@manuelleducorg/model-remote-url-api':
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       eslint:
@@ -1168,23 +1168,23 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/ds/api:
     dependencies:
-      '@xwiki/platform-api':
+      '@manuelleducorg/api':
         specifier: workspace:*
         version: link:../../api
-      '@xwiki/platform-fn-utils':
+      '@manuelleducorg/fn-utils':
         specifier: workspace:*
         version: link:../../core/fn-utils
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
-      '@xwiki/platform-navigation-tree-api':
+      '@manuelleducorg/navigation-tree-api':
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-api
       reflect-metadata:
         specifier: 0.x
         version: 0.2.2
     devDependencies:
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       eslint:
@@ -1211,46 +1211,46 @@ importers:
       '@blocknote/core':
         specifier: 'catalog:'
         version: 0.35.0(@hocuspocus/provider@2.15.2(y-protocols@1.0.6(yjs@13.6.27))(yjs@13.6.27))(@types/hast@3.0.4)
-      '@xwiki/platform-attachments-api':
+      '@manuelleducorg/attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api
-      '@xwiki/platform-authentication-api':
+      '@manuelleducorg/authentication-api':
         specifier: workspace:*
         version: link:../../core/authentication/authentication-api
-      '@xwiki/platform-collaboration-api':
+      '@manuelleducorg/collaboration-api':
         specifier: workspace:*
         version: link:../../core/collaboration/collaboration-api
-      '@xwiki/platform-document-api':
+      '@manuelleducorg/document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
-      '@xwiki/platform-dsapi':
+      '@manuelleducorg/dsapi':
         specifier: workspace:*
         version: link:../../ds/api
-      '@xwiki/platform-editors-blocknote-react':
+      '@manuelleducorg/editors-blocknote-react':
         specifier: workspace:*
         version: link:../blocknote-react
-      '@xwiki/platform-fn-utils':
+      '@manuelleducorg/fn-utils':
         specifier: workspace:*
         version: link:../../core/fn-utils
-      '@xwiki/platform-icons':
+      '@manuelleducorg/icons':
         specifier: workspace:*
         version: link:../../core/icons
-      '@xwiki/platform-link-suggest-api':
+      '@manuelleducorg/link-suggest-api':
         specifier: workspace:*
         version: link:../../core/link-suggest/link-suggest-api
-      '@xwiki/platform-macros-api':
+      '@manuelleducorg/macros-api':
         specifier: workspace:*
         version: link:../../core/macros/macros-api
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
-      '@xwiki/platform-model-reference-api':
+      '@manuelleducorg/model-reference-api':
         specifier: workspace:*
         version: link:../../core/model/model-reference/model-reference-api
-      '@xwiki/platform-model-remote-url-api':
+      '@manuelleducorg/model-remote-url-api':
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-api
-      '@xwiki/platform-uniast-api':
+      '@manuelleducorg/uniast-api':
         specifier: workspace:*
         version: link:../../core/uniast/uniast-api
       eventemitter3:
@@ -1266,7 +1266,7 @@ importers:
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       eslint:
@@ -1311,37 +1311,37 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.2(@types/react@19.2.2)
-      '@xwiki/platform-attachments-api':
+      '@manuelleducorg/attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api
-      '@xwiki/platform-collaboration-api':
+      '@manuelleducorg/collaboration-api':
         specifier: workspace:*
         version: link:../../core/collaboration/collaboration-api
-      '@xwiki/platform-document-api':
+      '@manuelleducorg/document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
-      '@xwiki/platform-fn-utils':
+      '@manuelleducorg/fn-utils':
         specifier: workspace:*
         version: link:../../core/fn-utils
-      '@xwiki/platform-link-suggest-api':
+      '@manuelleducorg/link-suggest-api':
         specifier: workspace:*
         version: link:../../core/link-suggest/link-suggest-api
-      '@xwiki/platform-macros-api':
+      '@manuelleducorg/macros-api':
         specifier: workspace:*
         version: link:../../core/macros/macros-api
-      '@xwiki/platform-macros-ast-react-jsx':
+      '@manuelleducorg/macros-ast-react-jsx':
         specifier: workspace:*
         version: link:../../core/macros/macros-ast-react-jsx
-      '@xwiki/platform-model-api':
+      '@manuelleducorg/model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
-      '@xwiki/platform-model-reference-api':
+      '@manuelleducorg/model-reference-api':
         specifier: workspace:*
         version: link:../../core/model/model-reference/model-reference-api
-      '@xwiki/platform-model-remote-url-api':
+      '@manuelleducorg/model-remote-url-api':
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-api
-      '@xwiki/platform-uniast-markdown':
+      '@manuelleducorg/uniast-markdown':
         specifier: workspace:*
         version: link:../../core/uniast/uniast-markdown
       i18next:
@@ -1375,7 +1375,7 @@ importers:
       '@vitejs/plugin-react':
         specifier: 'catalog:'
         version: 5.1.0(vite@7.1.12(@types/node@24.9.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
-      '@xwiki/platform-dev-config':
+      '@manuelleducorg/dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       eslint:

@@ -77,11 +77,9 @@ function updatePackageVersion(packageJsonPath, timestamp) {
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
       return { success: true, originalVersion, newVersion, packageName, isSnapshot: true };
     } catch (error) {
-      console.error(`Error writing ${packageJsonPath}: ${error.message}`);
       return { success: false };
     }
   } else {
-    console.log(`  • ${packageName}: ${originalVersion} (release version, no change)`);
     return { success: true, originalVersion, newVersion: originalVersion, packageName, isSnapshot: false };
   }
 }
@@ -91,35 +89,28 @@ function updatePackageVersion(packageJsonPath, timestamp) {
  * @param {Array} updates - Array of update results
  */
 function restoreVersions(updates) {
-  console.log('\nRestoring original versions...');
   updates.forEach(update => {
     if (update.success && update.isSnapshot && update.path) {
       try {
         const packageJson = JSON.parse(fs.readFileSync(update.path, 'utf8'));
         packageJson.version = update.originalVersion;
         fs.writeFileSync(update.path, JSON.stringify(packageJson, null, 2) + '\n');
-        console.log(`  ✓ Restored ${update.packageName} to ${update.originalVersion}`);
       } catch (error) {
-        console.error(`  ✗ Error restoring ${update.path}: ${error.message}`);
+        console.error(`Error restoring ${update.path}: ${error.message}`);
       }
     }
   });
 }
 
 // Main execution
-console.log(`Searching for package.json files in: ${baseDirectory}\n`);
 const packageJsonFiles = findPackageJsonFiles(baseDirectory);
 
-console.log(`Found ${packageJsonFiles.length} package.json file(s)\n`);
-
 if (packageJsonFiles.length === 0) {
-  console.error('No package.json files found!');
   process.exit(1);
 }
 
-// Generate single timestamp for all packages
+// Generate a common timestamp for all packages.
 const timestamp = Math.floor(Date.now() / 1000);
-console.log(`Using timestamp: ${timestamp}\n`);
 
 // Determine if we're dealing with SNAPSHOT or release versions
 // Check the first package.json to determine the mode
@@ -132,13 +123,8 @@ try {
   process.exit(1);
 }
 
-console.log(`Mode: ${isSnapshotMode ? 'SNAPSHOT' : 'RELEASE'}\n`);
 
 // Step 1: Update all package.json versions
-console.log('='.repeat(80));
-console.log('STEP 1: Updating package.json versions');
-console.log('='.repeat(80));
-
 const updates = packageJsonFiles.map(packageJsonPath => {
   const result = updatePackageVersion(packageJsonPath, timestamp.toString());
   return { ...result, path: packageJsonPath };
@@ -146,7 +132,8 @@ const updates = packageJsonFiles.map(packageJsonPath => {
 
 const failedUpdates = updates.filter(u => !u.success);
 if (failedUpdates.length > 0) {
-  console.error(`\n✗ Failed to update ${failedUpdates.length} package(s)`);
+  console.error(`Failed to update ${failedUpdates.length} package(s)`);
+  console.error('summary', updates);
   process.exit(1);
 }
 

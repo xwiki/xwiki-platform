@@ -148,8 +148,8 @@
       <code>define('xwiki-like-messages', {
   prefix: 'like.',
   keys: [
-    "button.title.unlike",
-    "button.title.like",
+    "toggle.hint.unlike",
+    "toggle.hint.like",
     "newlike.success",
     "newlike.error",
     "unlike.success",
@@ -189,7 +189,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
        likeButton.removeClass('btn-default');
        likeButton.addClass('btn-primary');
        likeButton.html(data.buttonhtml);
-       likeButton.attr('title', l10n.get('button.title.unlike'));
+       likeButton.attr('title', l10n.get('toggle.hint.unlike'));
        let likersLink = likeButton.siblings('.like-number').find('a');
        likersLink.text(getLikersLinkText(data.counter));
        likersLink.attr('title', l10n.get('likers.link.title', data.counter));
@@ -210,7 +210,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       unlikeButton.removeClass('btn-primary');
       unlikeButton.addClass('btn-default');
       unlikeButton.html(data.buttonhtml);
-      unlikeButton.attr('title', l10n.get('button.title.like'));
+      unlikeButton.attr('title', l10n.get('toggle.hint.like'));
       var likersLink = unlikeButton.siblings('.like-number').find('a');
       likersLink.text(getLikersLinkText(data.counter));
       likersLink.attr('title', l10n.get('likers.link.title', data.counter));
@@ -572,7 +572,15 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       #end
       &lt;button class="like-button btn $btnClass"
         #if($disabledButton) disabled #{end}
-        title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;$services.icon.renderHTML($heartIconName)&lt;/button&gt; &lt;span class="like-number"&gt;&lt;a href="$escapetool.xml($doc.getURL('view', 'viewer=likers'))" title="$escapetool.xml($services.localization.render('like.likers.link.title', [$likeCount]))"&gt;$escapetool.xml($likersText)&lt;/a&gt;&lt;/span&gt;
+        title="$escapetool.xml($services.localization.render($titleMessageTranslationKey))"&gt;
+          $services.icon.renderHTML($heartIconName)
+        &lt;/button&gt;
+        &lt;span class="like-number"&gt;
+          &lt;a href="$escapetool.xml($doc.getURL('view', 'viewer=likers'))" 
+            title="$escapetool.xml($services.localization.render('like.likers.link.title', [$likeCount]))"&gt;
+            $escapetool.xml($likersText)
+          &lt;/a&gt;
+        &lt;/span&gt;
     &lt;/div&gt;
   #end
 #end

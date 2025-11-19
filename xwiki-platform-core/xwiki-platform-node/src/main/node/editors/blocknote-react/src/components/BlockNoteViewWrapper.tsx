@@ -38,7 +38,7 @@ import {
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
-import { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
+import { MacrosAstToReactJsxConverter } from "@manuelleducorg/macros-ast-react-jsx";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type {
@@ -56,8 +56,8 @@ import type {
 } from "../blocknote/utils";
 import type { LinkEditionContext } from "../misc/linkSuggest";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
-import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
-import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type { CollaborationInitializer } from "@manuelleducorg/collaboration-api";
+import type { MacroWithUnknownParamsType } from "@manuelleducorg/macros-api";
 
 type DefaultEditorOptionsType = BlockNoteEditorOptions<
   EditorBlockSchema,

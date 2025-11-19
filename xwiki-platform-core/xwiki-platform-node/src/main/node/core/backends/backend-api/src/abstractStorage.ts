@@ -26,7 +26,7 @@ import type {
   PageData,
   Storage,
   WikiConfig,
-} from "@xwiki/platform-api";
+} from "@manuelleducorg/api";
 
 /**
  * @since 1.0

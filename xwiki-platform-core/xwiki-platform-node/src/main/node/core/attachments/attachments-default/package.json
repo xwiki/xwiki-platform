@@ -1,6 +1,6 @@
 {
-  "name": "@xwiki/platform-attachments-default",
-  "version": "18.0.0-SNAPSHOT",
+  "name": "@manuelleducorg/attachments-default",
+  "version": "0.0.1",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -30,12 +30,12 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-attachments-api": "workspace:*",
-    "@xwiki/platform-authentication-api": "workspace:*",
-    "@xwiki/platform-backend-api": "workspace:*",
-    "@xwiki/platform-model-api": "workspace:*",
-    "@xwiki/platform-model-reference-api": "workspace:*",
-    "@xwiki/platform-model-remote-url-api": "workspace:*",
+    "@manuelleducorg/attachments-api": "workspace:*",
+    "@manuelleducorg/authentication-api": "workspace:*",
+    "@manuelleducorg/backend-api": "workspace:*",
+    "@manuelleducorg/model-api": "workspace:*",
+    "@manuelleducorg/model-reference-api": "workspace:*",
+    "@manuelleducorg/model-remote-url-api": "workspace:*",
     "pinia": "catalog:"
   },
   "peerDependencies": {
@@ -44,8 +44,8 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@xwiki/platform-api": "workspace:*",
-    "@xwiki/platform-dev-config": "workspace:*",
+    "@manuelleducorg/api": "workspace:*",
+    "@manuelleducorg/dev-config": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",

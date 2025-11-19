@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { DocumentReference } from "@xwiki/platform-model-api";
-import type { NavigationTreeNode } from "@xwiki/platform-navigation-tree-api";
+import type { DocumentReference } from "@manuelleducorg/model-api";
+import type { NavigationTreeNode } from "@manuelleducorg/navigation-tree-api";
 
 /**
  * @since 0.15

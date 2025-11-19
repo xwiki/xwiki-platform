@@ -21,7 +21,7 @@ import BlocknoteEditor from "./vue/c-blocknote-view.vue";
 export type {
   ContextForMacros,
   EditorType,
-} from "@xwiki/platform-editors-blocknote-react";
+} from "@manuelleducorg/editors-blocknote-react";
 
 /**
  * @since 0.16

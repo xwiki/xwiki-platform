@@ -1,6 +1,6 @@
 {
-  "name": "@xwiki/platform-macros-api",
-  "version": "18.0.0-SNAPSHOT",
+  "name": "@manuelleducorg/macros-api",
+  "version": "0.0.1",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -30,7 +30,7 @@
   },
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@xwiki/platform-dev-config": "workspace:*",
+    "@manuelleducorg/dev-config": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

@@ -5,7 +5,7 @@
     "lib": ["dom", "ESNext"],
     "isolatedDeclarations": false,
     "jsx": "preserve",
-    "types": ["@xwiki/platform-dsapi"],
+    "types": ["@manuelleducorg/dsapi"],
   },
   "extends": "./../../tsconfig.json",
   "include": ["src"],

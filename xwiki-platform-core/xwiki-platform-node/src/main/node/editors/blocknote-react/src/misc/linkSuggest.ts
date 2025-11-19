@@ -18,27 +18,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { EntityType } from "@xwiki/platform-model-api";
-import type { AttachmentsService } from "@xwiki/platform-attachments-api";
-import type { DocumentService } from "@xwiki/platform-document-api";
+import { EntityType } from "@manuelleducorg/model-api";
+import type { AttachmentsService } from "@manuelleducorg/attachments-api";
+import type { DocumentService } from "@manuelleducorg/document-api";
 import type {
   Link,
   LinkSuggestService,
   LinkType,
-} from "@xwiki/platform-link-suggest-api";
+} from "@manuelleducorg/link-suggest-api";
 import type {
   AttachmentReference,
   DocumentReference,
-} from "@xwiki/platform-model-api";
+} from "@manuelleducorg/model-api";
 import type {
   ModelReferenceHandler,
   ModelReferenceParser,
   ModelReferenceSerializer,
-} from "@xwiki/platform-model-reference-api";
+} from "@manuelleducorg/model-reference-api";
 import type {
   RemoteURLParser,
   RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
+} from "@manuelleducorg/model-remote-url-api";
 
 /**
  * @since 0.19

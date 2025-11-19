@@ -23,7 +23,7 @@ import type { WikiConfig } from "./WikiConfig";
 import type { Logger } from "./logger";
 import type { LoggerConfig } from "./loggerConfig";
 import type { SkinManager } from "./skinManager";
-import type { Configurations } from "@xwiki/platform-configuration-api";
+import type { Configurations } from "@manuelleducorg/configuration-api";
 import type { Container } from "inversify";
 import type { App, Component, Ref } from "vue";
 import type { Router } from "vue-router";

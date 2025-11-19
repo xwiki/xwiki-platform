@@ -22,11 +22,11 @@ import type {
   DocumentReference,
   EntityReference,
   SpaceReference,
-} from "@xwiki/platform-model-api";
+} from "@manuelleducorg/model-api";
 
 /**
  * A ModelReferenceHandler can do backend-specific operations involving
- * {@link @xwiki/platform-model-api#EntityReference | EntityReferences}.
+ * {@link @manuelleducorg/model-api#EntityReference | EntityReferences}.
  *
  * @since 0.13
  * @beta

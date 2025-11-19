@@ -1,6 +1,6 @@
 {
-  "name": "@xwiki/platform-dsapi",
-  "version": "18.0.0-SNAPSHOT",
+  "name": "@manuelleducorg/dsapi",
+  "version": "0.0.1",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -30,17 +30,17 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-api": "workspace:*",
-    "@xwiki/platform-fn-utils": "workspace:*",
-    "@xwiki/platform-model-api": "workspace:*",
-    "@xwiki/platform-navigation-tree-api": "workspace:*"
+    "@manuelleducorg/api": "workspace:*",
+    "@manuelleducorg/fn-utils": "workspace:*",
+    "@manuelleducorg/model-api": "workspace:*",
+    "@manuelleducorg/navigation-tree-api": "workspace:*"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
-    "@xwiki/platform-dev-config": "workspace:*",
+    "@manuelleducorg/dev-config": "workspace:*",
     "eslint": "catalog:",
     "happy-dom": "catalog:",
     "typescript": "catalog:",

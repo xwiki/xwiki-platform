@@ -1,6 +1,6 @@
 {
-  "name": "@xwiki/platform-configuration-api",
-  "version": "18.0.0-SNAPSHOT",
+  "name": "@manuelleducorg/configuration-api",
+  "version": "0.0.1",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -29,7 +29,7 @@
     "utility-types": "catalog:"
   },
   "devDependencies": {
-    "@xwiki/platform-dev-config": "workspace:*",
+    "@manuelleducorg/dev-config": "workspace:*",
     "eslint": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",

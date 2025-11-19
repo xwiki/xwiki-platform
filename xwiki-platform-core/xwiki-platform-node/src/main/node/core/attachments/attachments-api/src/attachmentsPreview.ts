@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AttachmentReference } from "@xwiki/platform-model-api";
+import { AttachmentReference } from "@manuelleducorg/model-api";
 import type { Attachment } from "./attachment";
 import type { Ref } from "vue";
 

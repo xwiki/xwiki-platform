@@ -20,18 +20,18 @@
 import {
   assertUnreachable,
   tryFallibleOrError,
-} from "@xwiki/platform-fn-utils";
+} from "@manuelleducorg/fn-utils";
 import React from "react";
 import type {
   MacroBlock,
   MacroBlockStyles,
   MacroInlineContent,
   MacroLinkTarget,
-} from "@xwiki/platform-macros-api";
+} from "@manuelleducorg/macros-api";
 import type {
   RemoteURLParser,
   RemoteURLSerializer,
-} from "@xwiki/platform-model-remote-url-api";
+} from "@manuelleducorg/model-remote-url-api";
 import type {
   CSSProperties,
   HTMLAttributes,

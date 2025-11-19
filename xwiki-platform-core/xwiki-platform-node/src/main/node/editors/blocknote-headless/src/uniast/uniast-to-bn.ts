@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { MACRO_NAME_PREFIX } from "@xwiki/platform-editors-blocknote-react";
+import { MACRO_NAME_PREFIX } from "@manuelleducorg/editors-blocknote-react";
 import {
   assertUnreachable,
   tryFallibleOrError,
-} from "@xwiki/platform-fn-utils";
+} from "@manuelleducorg/fn-utils";
 import type { TableCell } from "@blocknote/core";
 import type {
   BlockType,
@@ -30,8 +30,8 @@ import type {
   EditorLink,
   EditorStyleSchema,
   EditorStyledText,
-} from "@xwiki/platform-editors-blocknote-react";
-import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
+} from "@manuelleducorg/editors-blocknote-react";
+import type { RemoteURLSerializer } from "@manuelleducorg/model-remote-url-api";
 import type {
   Block,
   BlockStyles,
@@ -39,7 +39,7 @@ import type {
   InlineContent,
   TableCell as TableCellUniast,
   UniAst,
-} from "@xwiki/platform-uniast-api";
+} from "@manuelleducorg/uniast-api";
 
 /**
  * Converts the Universal AS to the internal format of Blocknote.

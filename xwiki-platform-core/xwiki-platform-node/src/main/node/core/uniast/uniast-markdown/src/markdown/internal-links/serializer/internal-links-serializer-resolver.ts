@@ -19,7 +19,7 @@
  */
 import { inject, injectable } from "inversify";
 import type { InternalLinksSerializer } from "./internal-links-serializer";
-import type { CristalApp } from "@xwiki/platform-api";
+import type { CristalApp } from "@manuelleducorg/api";
 
 /**
  * @since 0.22

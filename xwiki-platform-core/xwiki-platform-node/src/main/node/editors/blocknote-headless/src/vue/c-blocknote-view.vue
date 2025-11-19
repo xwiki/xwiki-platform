@@ -18,13 +18,13 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
+import "@manuelleducorg/editors-blocknote-react/dist/platform-editors-blocknote-react.css";
 import { computeCurrentUser } from "../components/currentUser";
 import { createLinkEditionContext } from "../components/linkEditionContext";
 import messages from "../translations";
 import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
-import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
+import { mountBlockNote } from "@manuelleducorg/editors-blocknote-react";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
@@ -35,15 +35,15 @@ import {
   useTemplateRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import type { AuthenticationManagerProvider } from "@xwiki/platform-authentication-api";
-import type { CollaborationInitializer } from "@xwiki/platform-collaboration-api";
+import type { AuthenticationManagerProvider } from "@manuelleducorg/authentication-api";
+import type { CollaborationInitializer } from "@manuelleducorg/collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
   ContextForMacros,
   EditorType,
-} from "@xwiki/platform-editors-blocknote-react";
-import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type { UniAst } from "@xwiki/platform-uniast-api";
+} from "@manuelleducorg/editors-blocknote-react";
+import type { MacroWithUnknownParamsType } from "@manuelleducorg/macros-api";
+import type { UniAst } from "@manuelleducorg/uniast-api";
 
 type Props = {
   /** Main properties for the BlockNote editor */

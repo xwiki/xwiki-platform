@@ -19,19 +19,19 @@
  */
 
 import { Container } from "inversify";
-import type { AttachmentsService } from "@xwiki/platform-attachments-api";
-import type { DocumentService } from "@xwiki/platform-document-api";
-import type { LinkEditionContext } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
+import type { AttachmentsService } from "@manuelleducorg/attachments-api";
+import type { DocumentService } from "@manuelleducorg/document-api";
+import type { LinkEditionContext } from "@manuelleducorg/editors-blocknote-react";
+import type { LinkSuggestServiceProvider } from "@manuelleducorg/link-suggest-api";
 import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
-} from "@xwiki/platform-model-reference-api";
+} from "@manuelleducorg/model-reference-api";
 import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
+} from "@manuelleducorg/model-remote-url-api";
 
 export function createLinkEditionContext(
   container: Container,

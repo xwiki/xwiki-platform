@@ -19,7 +19,7 @@
  */
 
 import type { Document } from "./document";
-import type { UserDetails } from "@xwiki/platform-authentication-api";
+import type { UserDetails } from "@manuelleducorg/authentication-api";
 
 /**
  * @since 0.1

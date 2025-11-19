@@ -20,7 +20,7 @@
 import { injectable } from "inversify";
 import type { InternalLinksSerializer } from "./internal-links-serializer";
 import type { UniAstToMarkdownConverter } from "../../uni-ast-to-markdown-converter";
-import type { Link, LinkTarget } from "@xwiki/platform-uniast-api";
+import type { Link, LinkTarget } from "@manuelleducorg/uniast-api";
 
 /**
  * @since 0.22

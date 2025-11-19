@@ -27,8 +27,8 @@ import {
   Text,
   useCombobox,
 } from "@mantine/core";
-import { tryFallible } from "@xwiki/platform-fn-utils";
-import { LinkType } from "@xwiki/platform-link-suggest-api";
+import { tryFallible } from "@manuelleducorg/fn-utils";
+import { LinkType } from "@manuelleducorg/link-suggest-api";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiFileLine, RiText } from "react-icons/ri";

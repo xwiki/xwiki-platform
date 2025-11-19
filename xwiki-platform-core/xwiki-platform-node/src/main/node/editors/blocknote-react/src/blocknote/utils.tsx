@@ -23,7 +23,7 @@ import {
   createReactBlockSpec,
   createReactInlineContentSpec,
 } from "@blocknote/react";
-import { assertUnreachable, objectEntries } from "@xwiki/platform-fn-utils";
+import { assertUnreachable, objectEntries } from "@manuelleducorg/fn-utils";
 import type {
   CustomBlockConfig,
   CustomInlineContentConfig,
@@ -42,8 +42,8 @@ import type {
 import type {
   MacroWithUnknownParamsType,
   UnknownMacroParamsType,
-} from "@xwiki/platform-macros-api";
-import type { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
+} from "@manuelleducorg/macros-api";
+import type { MacrosAstToReactJsxConverter } from "@manuelleducorg/macros-ast-react-jsx";
 import type { ReactNode } from "react";
 
 /**

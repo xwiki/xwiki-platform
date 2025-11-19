@@ -19,7 +19,7 @@
  */
 
 import localConfig from "./vite.config";
-import { vitestVue as defaultConfig } from "@xwiki/platform-dev-config";
+import { vitestVue as defaultConfig } from "@manuelleducorg/dev-config";
 import { mergeConfig } from "vitest/config";
 
 export default mergeConfig(defaultConfig, localConfig);

@@ -25,7 +25,7 @@ import {
   DocumentReference,
   EntityType,
   SpaceReference,
-} from "@xwiki/platform-model-api";
+} from "@manuelleducorg/model-api";
 import { useMemo } from "react";
 
 export type BlockNoteForTestProps = {

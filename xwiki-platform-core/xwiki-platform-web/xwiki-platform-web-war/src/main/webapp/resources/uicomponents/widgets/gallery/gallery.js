@@ -19,7 +19,6 @@
  */
 /*!
 #set ($l10nKeys = [
- 'core.widgets.gallery.maximize',
  'core.widgets.gallery.previousImage',
  'core.widgets.gallery.currentImage',
  'core.widgets.gallery.nextImage',

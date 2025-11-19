@@ -406,7 +406,8 @@ return XWiki;
 require(['jquery', 'xwiki-events-bridge'], function ($) {
   $(document).on('xwiki:dom:updated', function (event, data) {
     $(data.elements).find('textarea,.maximizable').each(function () {
-      XWiki.widgets.__fullscreenInstance.initDom() && XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
+      XWiki.widgets.__fullscreenInstance.initDom();
+      XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
     });
   });
   let init = function () {

@@ -33,7 +33,7 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - nx
 catalog:
-  "@blocknote/core": 0.35.0
+  "@blocknote/core": 0.42.3
   "@blocknote/mantine": 0.35.0
   "@blocknote/react": 0.35.0
   "@eslint/config-helpers": 0.4.2

@@ -170,26 +170,33 @@
 #end
 
 #*
- * Augment the $adminMenu variable with all $nameOfThisDocument (i.e. XWiki.ConfigurableClass) xobjects found on this wiki.
+ * Utility for findCustomSectionsToConfigure to get an adminMenu.
+ * $appNames list of String name of applications
+ * $adminMenu the pre-filled content for the administration menu (macro is non-destructive on this parameter)
+ * $outputList
  *###
-#macro(findCustomSectionsToConfigure $adminMenu)
-  #set ($outputList = [])
-  #set ($global = ($editor == 'globaladmin'))
-  #findNamesOfAppsToConfigure('', $global, $currentSpace, $outputList)
-  #set ($sectionsByName = {})
+#macro(_buildAdminMenuFromNameOfApps, $appNames, $adminMenu, $outputList)
+  ## We start by copying what's already in the adminMenu.
+  ## We can't use addAll directly because we want to make a deep copy of the structure
+  #foreach ($entry in $adminMenu)
+    #set ($entryCopy = {})
+    #set ($discard = $entryCopy.putAll($entry))
+    #set ($entryChildrenCopy = [])
+    #set ($discard = $entryChildrenCopy.addAll($entry.children))
+    #set ($discard = $entryCopy.put('children',$entryChildrenCopy))
+    #set ($discard = $outputList.add($entryCopy))
+  #end
+  ## Reset the category and section helper lists.
+  ## We use them to update $outputList based on references, so we make sure they 
   #set ($categoriesByName = {})
-  #foreach ($category in $adminMenu)
+  #set ($sectionsByName = {})
+  #foreach ($category in $outputList)
     #set ($discard = $categoriesByName.put($category.id, $category))
     #foreach ($section in $category.children)
       #set ($discard = $sectionsByName.put($section.id, $section))
     #end
   #end
-  ##
-  #set ($query = "editor=$escapetool.url(${editor})")
-  #if ($editor != 'globaladmin')
-    #set ($query = $query + "&amp;space=$escapetool.url(${currentSpace})")
-  #end
-  #foreach ($appName in $outputList)
+  #foreach ($appName in $appNames)
     ##
     ## Get the configurable application
     #set ($app = $xwiki.getDocument($appName))
@@ -220,7 +227,7 @@
           })
           #set ($discard = $categoriesByName.put($displayInCategory, $appCategory))
           ## Insert the category at the end for now. We'll sort the categories after we add all of them.
-          #set ($discard = $adminMenu.add($appCategory))
+          #set ($discard = $outputList.add($appCategory))
         #end
         #set ($categoryIcon = $app.getValue('categoryIcon', $configurableObject))
         #if ("$!categoryIcon" != '')
@@ -290,15 +297,22 @@
       #end
     #end## Foreach configurable object in this app.
   #end## Foreach application which is configurable.
-  ##
-  ## Sort the categories
-  ##
-  #foreach ($category in $adminMenu)
+#end
+#* 
+ * Computes the scores of categories and sorts the list. 
+ * The first category will be the one with the highest score.
+ * $completeOrderMenu the list of categories, containing all of the necessary ordering information
+ * This macro is destructive on $completeOrderMenu.
+*###
+#macro(_computeScores, $completeOrderMenu)
+  ## Initialize scores
+  #foreach ($category in $completeOrderMenu)
     #set ($category.score = 0)
   #end
-  #foreach ($round in [1..$adminMenu.size()])
+  ## Compute scores
+  #foreach ($round in [1..$completeOrderMenu.size()])
     #set ($scoreChanged = false)
-    #foreach ($category in $adminMenu)
+    #foreach ($category in $completeOrderMenu)
       #if ($category.displayBeforeCategory)
         #set ($newScore = $categoriesByName.get($category.displayBeforeCategory).score + 1)
         #if ($newScore &amp;&amp; $newScore &gt; $category.score)
@@ -311,7 +325,67 @@
       #break
     #end
   #end
-  #set ($adminMenu = $collectiontool.sort($adminMenu, 'score:desc'))
+#end
+#* 
+ * Returns the full list of categories, in order.
+ * Even categories without any child will be returned.
+ * This is an util to compute the full order of categories, which is contained sparsely through xobjects
+ * that are not always retrieved when building the menu...
+ * $adminMenu the list of categories to use in the menu (macro is non-destructive on this parameter)
+ * $outputList
+*###
+#macro(_getCategoriesInOrder, $adminMenu, $outputList)
+  #set ($params = {'className' : $nameOfThisDocument})
+  #set ($discard = $params.put('global', ['WIKI','WIKI+ALL_SPACES']))
+  #set ($appNames = [])
+  #set ($discard = $appNames.addAll($services.query.hql($statement).bindValues($params).execute()))
+  ## $completeOrderMenu contains a menu that contains all the information needed for sorting, no matter what.
+  #set ($completeOrderMenu = [])
+  #_buildAdminMenuFromNameOfApps($appNames, $adminMenu, $completeOrderMenu)
+  ## We use $completeOrderMenu to set the score of each category. 
+  #_computeScores($completeOrderMenu)
+  #set ($completeOrderMenu = $collectiontool.sort($completeOrderMenu, 'score:desc'))
+  ## Write the now sorted $completeOrderMenu to the output variable.
+  #set ($discard = $outputList.addAll($completeOrderMenu))
+#end
+#*
+ * Augment the $adminMenu variable with all $nameOfThisDocument (i.e. XWiki.ConfigurableClass) xobjects found on this wiki.
+ *###
+#macro(findCustomSectionsToConfigure $adminMenu)
+  #set ($appNames = [])
+  #set ($global = ($editor == 'globaladmin'))
+  #findNamesOfAppsToConfigure('', $global, $currentSpace, $appNames)
+  ##
+  ## $completedAdminMenu contains most of the info needed to build the administration menu.
+  #set ($completedAdminMenu = [])
+  #_buildAdminMenuFromNameOfApps($appNames, $adminMenu, $completedAdminMenu)
+  #set ($adminMenu = [])
+  #set ($discard = $adminMenu.addAll($completedAdminMenu))
+  ## Sort the categories
+  ## The information in $adminMenu is sometimes not enough to create a full order
+  ## in those case we need to retrieve more information to build the full order.
+  ## $categoriesFullOrder contains all the categories and their associated ordering information
+  #if (!$global)
+    #set ($categoriesFullOrder = [])
+    #_getCategoriesInOrder($adminMenu, $categoriesFullOrder)
+    ## Once it's retrieved, we use this total order on the categories in contained $adminMenu.
+    #set ($sortedAdminMenu = [])
+    #foreach ($orderedCategory in $categoriesFullOrder)
+      #foreach ($menuCategory in $adminMenu)
+        #if ($orderedCategory.id == $menuCategory.id)
+          #set ($discard = $sortedAdminMenu.add($menuCategory))
+          #break
+        #end
+      #end
+    #end
+    #set ($adminMenu = [])
+    #set ($discard = $adminMenu.addAll($sortedAdminMenu))
+  #else
+    ## We're in the case where all the categories and sections are already in $adminMenu
+    ## We can easily figure out an order
+    #_computeScores($adminMenu)
+    #set ($adminMenu = $collectiontool.sort($adminMenu, 'score:desc'))
+  #end
 #end
 
 

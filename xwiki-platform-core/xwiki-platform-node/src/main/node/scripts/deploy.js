@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const { execSync } = require('child_process');
-const path = require('path');
+import fs from 'fs';
+import {execSync} from 'child_process';
+import path from 'path';
 
 /**
  * Script to conditionally publish npm packages based on version type (SNAPSHOT vs release)
@@ -51,19 +51,11 @@ function findPackageJsonFiles(dir, fileList = []) {
 /**
  * Update version in a package.json file
  * @param {string} packageJsonPath - Path to package.json
+ * @param {Object} packageJson - Parsed package.json content
  * @param {string} timestamp - Timestamp to replace SNAPSHOT with
  * @returns {Object} - {success, originalVersion, newVersion, packageName, isSnapshot}
  */
-function updatePackageVersion(packageJsonPath, timestamp) {
-  let packageJson;
-
-  try {
-    packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-  } catch (error) {
-    console.error(`Error reading ${packageJsonPath}: ${error.message}`);
-    return { success: false };
-  }
-
+function updatePackageVersion(packageJsonPath, packageJson, timestamp) {
   const originalVersion = packageJson.version;
   const packageName = packageJson.name;
   const isSnapshot = originalVersion.includes('SNAPSHOT');
@@ -110,24 +102,40 @@ if (packageJsonFiles.length === 0) {
 }
 
 // Generate a common timestamp for all packages.
-const timestamp = Math.floor(Date.now() / 1000);
+const timestamp = Math.floor(Date.now() / 1000).toString();
 
 // Determine if we're dealing with SNAPSHOT or release versions
 // Check the first package.json to determine the mode
 let isSnapshotMode = false;
 try {
-  const firstPackage = JSON.parse(fs.readFileSync(packageJsonFiles[0], 'utf8'));
-  isSnapshotMode = firstPackage.version.includes('SNAPSHOT');
+  // Look for the first package.json file with a version.
+  const firstVersion = packageJsonFiles.map(packageJsonPath => JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')))
+    .filter(packageJson => packageJson.version)
+    .map(packageJson => packageJson.version)[0];
+  isSnapshotMode = firstVersion.includes('SNAPSHOT');
 } catch (error) {
   console.error('Error determining version mode');
   process.exit(1);
 }
 
-
 // Step 1: Update all package.json versions
-const updates = packageJsonFiles.map(packageJsonPath => {
-  const result = updatePackageVersion(packageJsonPath, timestamp.toString());
-  return { ...result, path: packageJsonPath };
+const updates = packageJsonFiles
+  .map(packageJsonPath => {
+    let packageJson;
+
+    try {
+      packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    } catch (error) {
+      console.error(`Error reading ${packageJsonPath}: ${error.message}`);
+      return {success: false};
+    }
+
+    return {packageJsonPath, packageJson, success: true}
+  })
+  .filter(({packageJsonPath, packageJson, success}) => success && packageJson.version)
+  .map(({packageJsonPath, packageJson}) => {
+  const result = updatePackageVersion(packageJsonPath, packageJson, timestamp);
+  return {...result, path: packageJsonPath};
 });
 
 const failedUpdates = updates.filter(u => !u.success);
@@ -136,8 +144,6 @@ if (failedUpdates.length > 0) {
   console.error('summary', updates);
   process.exit(1);
 }
-
-
 
 try {
   if (isSnapshotMode) {

@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nx run-many -t build -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
-    "deploy": "node scripts/deploy.js $NPM_SNAPSHOT_REGISTRY $NPM_RELEASE_REGISTRY",
+    "deploy": "node scripts/deploy.js",
     "lint": "nx run-many -t lint -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\"",
     "test:unit": "nx run-many -t test -p \"xwiki-platform-core/xwiki-platform-node/src/main/node/*/**\""
   },

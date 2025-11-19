@@ -124,7 +124,7 @@
               <goal>pnpm</goal>
             </goals>
             <configuration>
-              <arguments>run deploy</arguments>
+              <arguments>run deploy -- ${xwiki.npm.snapshot.registry} ${xwiki.npm.release.registry} ${basedir}/src/main/node</arguments>
               <workingDirectory>${basedir}/src/main/node</workingDirectory>
               <installDirectory>${basedir}/target</installDirectory>
               <environmentVariables>
@@ -134,6 +134,13 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
       </plugin>
     </plugins>
   </build>

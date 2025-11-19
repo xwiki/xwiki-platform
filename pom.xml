@@ -126,7 +126,7 @@
     <oracle.version>21.20.0.0</oracle.version>
 
     <!-- npm registries configuration -->
-    <xwiki.npm.snapshot.registry>https://npm.snapshot.xwiki.org</xwiki.npm.snapshot.registry>
+    <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
     <xwiki.npm.release.registry>https://registry.npmjs.org</xwiki.npm.release.registry>
   </properties>
   <scm>

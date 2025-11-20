@@ -22,12 +22,10 @@ package org.xwiki.filter.xar;
 import java.io.File;
 import java.util.Date;
 
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 import org.xwiki.extension.test.ExtensionPackager;
+import org.xwiki.filter.test.integration.junit5.FilterTest;
+import org.xwiki.filter.test.integration.junit5.FilterTest.Scope;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.filter.test.integration.FilterTestSuite;
-import org.xwiki.filter.test.integration.FilterTestSuite.Scope;
 
 /**
  * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in
@@ -35,13 +33,12 @@ import org.xwiki.filter.test.integration.FilterTestSuite.Scope;
  * 
  * @version $Id$
  */
-@RunWith(FilterTestSuite.class)
 @AllComponents
 @Scope(value = "xar"/*, pattern = "test1-noforcedocument.input.test"*/)
-public class XARIntegrationTests
+public class XARIntegrationTests extends FilterTest
 {
-    @BeforeClass
-    public static void beforeClass() throws Exception
+    @Override
+    public void beforeTests() throws Exception
     {
         File folder = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
         ExtensionPackager extensionPackager = new ExtensionPackager(null, folder);

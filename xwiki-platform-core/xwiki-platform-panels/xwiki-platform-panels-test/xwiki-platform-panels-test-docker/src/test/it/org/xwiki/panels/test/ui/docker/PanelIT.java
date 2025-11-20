@@ -57,6 +57,12 @@ class PanelIT
 
     private static final String SPECIAL_TITLE = "Is # & \u0163 triky\"? c:windows /root $util";
 
+    private static final String PANELSIZE_SMALL = "Small";
+    private static final String PANELSIZE_MEDIUM = "Medium";
+    private static final String PANELSIZE_LARGE = "Large";
+    private static final String PANEL_FIELD_WIDTH_RIGHT = "rightPanelsWidth";
+    private static final String PANEL_FIELD_WIDTH_LEFT = "leftPanelsWidth";
+
     @BeforeEach
     void setUp(TestUtils testUtils)
     {
@@ -228,8 +234,8 @@ class PanelIT
         testUtils.setWikiPreference("leftPanels", "Panels.Welcome");
         testUtils.setWikiPreference("showRightPanels", "1");
         testUtils.setWikiPreference("showLeftPanels", "1");
-        testUtils.setWikiPreference("rightPanelsWidth", "Medium");
-        testUtils.setWikiPreference("leftPanelsWidth", "Medium");
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_MEDIUM);
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_MEDIUM);
         String testMethodName = testReference.getLastSpaceReference().getName();
         String testClassName = testReference.getSpaceReferences().get(0).getName();
         testUtils.gotoPage(testClassName, testMethodName);
@@ -237,15 +243,15 @@ class PanelIT
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.RIGHT));
         // Test that the defaults are respected.
-        testUtils.setWikiPreference("rightPanelsWidth", "Small");
-        testUtils.setWikiPreference("leftPanelsWidth", "Small");
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_SMALL);
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_SMALL);
         // Reload the page with the new preferences taken into account.
         testUtils.gotoPage(testClassName, testMethodName);
         panelPage = new PageWithPanels();
         assertAlmostEqualSize(100, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(100, panelPage.getPanelWidth(PageWithPanels.RIGHT));
-        testUtils.setWikiPreference("rightPanelsWidth", "Large");
-        testUtils.setWikiPreference("leftPanelsWidth", "Large");
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_LARGE);
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_LARGE);
         // Reload the page with the new preferences taken into account.
         testUtils.gotoPage(testClassName, testMethodName);
         panelPage = new PageWithPanels();
@@ -262,8 +268,8 @@ class PanelIT
         assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(330, panelPage.getPanelWidth(PageWithPanels.RIGHT));
         // Check if the user preferences are kept on page reload even when defaults have changed.
-        testUtils.setWikiPreference("rightPanelsWidth", "Medium");
-        testUtils.setWikiPreference("leftPanelsWidth", "Medium");
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_RIGHT, PANELSIZE_MEDIUM);
+        testUtils.setWikiPreference(PANEL_FIELD_WIDTH_LEFT, PANELSIZE_MEDIUM);
         testUtils.gotoPage(testClassName, testMethodName);
         panelPage = new PageWithPanels();
         assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.LEFT));
@@ -274,7 +280,12 @@ class PanelIT
         assertAlmostEqualSize(270, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.RIGHT));
         // Check that the values are set to default if close enough to the default.
+        // The value does not snap to the default, but when reloading, the default will be applied
         panelPage.resizePanel(PageWithPanels.LEFT, -60);
+        assertAlmostEqualSize(210, panelPage.getPanelWidth(PageWithPanels.LEFT));
+        assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.RIGHT));
+        testUtils.gotoPage(testClassName, testMethodName);
+        panelPage = new PageWithPanels();
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.LEFT));
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.RIGHT));
     }

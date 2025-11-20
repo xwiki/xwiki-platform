@@ -52,8 +52,8 @@ public class PageWithPanels extends BasePage
 
     @FindBy(css = "#leftPanels .ui-resizable-handle")
     private WebElement leftPanelsResizeHandle;
-    public static String RIGHT = "right";
-    public static String LEFT = "left";
+    public static constant String RIGHT = "right";
+    public static constant String LEFT = "left";
     
     /**
      * @param panelTitle the panel title
@@ -108,7 +108,7 @@ public class PageWithPanels extends BasePage
         // Define the drag and drop action
         Actions action = new Actions(this.getDriver().getWrappedDriver());
         action.clickAndHold(panelResizeHandle);
-        int panelSideInvert = Objects.equals(panelSide, RIGHT)? 1 : -1;
+        int panelSideInvert = Objects.equals(panelSide, RIGHT)? -1 : 1;
         // We need to correct a bit the shift induced by the exact place where the handled is taken.
         action.moveByOffset((panelSizeDiff + 6) * panelSideInvert, 0);
         action.release();

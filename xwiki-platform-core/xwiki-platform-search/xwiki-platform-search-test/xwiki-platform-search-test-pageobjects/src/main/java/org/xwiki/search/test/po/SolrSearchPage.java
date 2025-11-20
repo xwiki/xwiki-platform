@@ -53,10 +53,11 @@ public class SolrSearchPage extends ViewPage
         return new SolrSearchPage();
     }
 
-    public void search(String terms) {
+    public SolrSearchPage search(String terms) {
         this.searchInput.clear();
         this.searchInput.sendKeys(terms);
         this.searchButton.click();
+        return new SolrSearchPage();
     }
 
     public void toggleSpaceFaucet() {

@@ -46,6 +46,7 @@
       <artifactId>xwiki-platform-node</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
+      <type>pom</type>
     </dependency>
     <!-- Runtime webjar dependencies -->
     <dependency>

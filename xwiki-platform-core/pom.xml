@@ -18,8 +18,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
@@ -164,19 +163,14 @@
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.removed</code>
-                  <old>method org.apache.commons.httpclient.HttpClient com.xpn.xwiki.XWiki::getHttpClient(int,
-                    java.lang.String)
-                  </old>
-                  <justification>Expose a vulnerable and long dead library, and should have never been public in the
-                    first place
-                  </justification>
+                  <old>method org.apache.commons.httpclient.HttpClient com.xpn.xwiki.XWiki::getHttpClient(int, java.lang.String)</old>
+                  <justification>Expose a vulnerable and long dead library, and should have never been public in the first place</justification>
                   <criticality>highlight</criticality>
                 </item>
               </differences>
             </revapi.differences>
             <revapi.differences>
-              <justification>Classes moved to xwiki-commons-store-api, available as transitive dependency
-              </justification>
+              <justification>Classes moved to xwiki-commons-store-api, available as transitive dependency</justification>
               <criticality>allowed</criticality>
               <differences>
                 <item>
@@ -205,7 +199,7 @@
           </dependency>
         </dependencies>
         <executions>
-          <!-- Make sure declared importmap are valid -->
+          <!-- Make sure declared importmap are valid. -->
           <execution>
             <id>enforce-valid-javascript-importmap</id>
             <!-- Make sure the enforcer is performed after the artifacts for the current project are produced to be

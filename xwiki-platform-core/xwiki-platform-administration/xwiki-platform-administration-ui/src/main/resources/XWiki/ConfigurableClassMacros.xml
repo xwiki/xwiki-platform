@@ -289,11 +289,10 @@
   #end## Foreach application which is configurable.
 #end
 #**
- * Computes the scores of categories and sorts the list. 
- * The first category will be the one with the highest score.
+ * Computes the scores of categories and sorts the list. The first category will be the one with the highest score.
  *
- * @param completeOrderMenu the list of categories, containing all of the necessary ordering information
- * This macro is destructive on $completeOrderMenu.
+ * @param completeOrderMenu the list of categories, containing all of the necessary ordering information;
+ *        This macro is destructive on $completeOrderMenu.
 *#
 #macro(_computeScores, $completeOrderMenu)
   ## Initialize scores

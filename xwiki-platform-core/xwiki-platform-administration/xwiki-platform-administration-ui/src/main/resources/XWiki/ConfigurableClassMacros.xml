@@ -176,14 +176,7 @@
 #macro(_buildAdminMenuFromNameOfApps, $appNames, $adminMenu, $outputList)
   ## We start by copying what's already in the adminMenu.
   ## We can't use addAll directly because we want to make a deep copy of the structure
-  #foreach ($entry in $adminMenu)
-    #set ($entryCopy = {})
-    #set ($discard = $entryCopy.putAll($entry))
-    #set ($entryChildrenCopy = [])
-    #set ($discard = $entryChildrenCopy.addAll($entry.children))
-    #set ($discard = $entryCopy.put('children',$entryChildrenCopy))
-    #set ($discard = $outputList.add($entryCopy))
-  #end
+  #set ($discard = $outputList.addAll($jsontool.fromString($jsontool.serialize($adminMenu))))
   ## Reset the category and section helper lists.
   ## We use them to update $outputList based on references, so we make sure they 
   #set ($categoriesByName = {})

@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AttachmentsData, Document, PageAttachment, PageData, type Logger } from "@xwiki/cristal-api";
-import { AbstractStorage } from "@xwiki/cristal-backend-api";
+import { AttachmentsData, Document, PageAttachment, PageData, type Logger } from "@xwiki/platform-api";
+import { AbstractStorage } from "@xwiki/platform-backend-api";
 import { Container, inject, injectable } from "inversify";
 
 @injectable("Singleton")

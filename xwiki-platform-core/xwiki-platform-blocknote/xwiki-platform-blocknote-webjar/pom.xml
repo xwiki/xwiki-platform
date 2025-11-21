@@ -40,6 +40,15 @@
     <xwiki.minification.skip>true</xwiki.minification.skip>
   </properties>
   <dependencies>
+    <!-- Requires xwiki-platform-node to be built first to get access to the bundled javascript packages.  -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-node</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <type>pom</type>
+    </dependency>
+    <!-- Runtime webjar dependencies -->
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>

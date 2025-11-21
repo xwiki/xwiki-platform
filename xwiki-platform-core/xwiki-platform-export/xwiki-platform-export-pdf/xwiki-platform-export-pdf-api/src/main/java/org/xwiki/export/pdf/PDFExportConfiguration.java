@@ -49,7 +49,7 @@ public interface PDFExportConfiguration
 
     /**
      * @return the Docker image used to create the Docker container running the headless Chrome web browser; defaults to
-     *         "{@code zenika/alpine-chrome:latest}"
+     *         "{@code femtopixel/google-chrome-headless:latest}"
      */
     String getChromeDockerImage();
 

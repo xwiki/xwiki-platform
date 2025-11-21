@@ -19,7 +19,7 @@
  */
 import { shallowMount } from "@vue/test-utils";
 import LayoutCards from "./LayoutCards.vue";
-import _ from "lodash";
+import _ from "lodash-es";
 import LayoutCardsCard from "./LayoutCardsCard.vue";
 import { nextTick } from "vue";
 import { describe, expect, it } from "vitest";

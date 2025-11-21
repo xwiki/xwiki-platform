@@ -83,7 +83,7 @@ class SolrSearchIT
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
-        searchPage.search("\"Test Document\"");
+        searchPage = searchPage.search("\"Test Document\"");
         searchPage.toggleSpaceFaucet();
         assertEquals(testDocumentLocation + "\n1", searchPage.getSpaceFaucetContent());
     }
@@ -108,7 +108,7 @@ class SolrSearchIT
             new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
             SolrSearchPage searchPage = SolrSearchPage.gotoPage();
-            searchPage.search(testContent);
+            searchPage = searchPage.search(testContent);
             List<SolrSearchResult> searchResults = searchPage.getSearchResults();
             assertEquals(1, searchResults.size());
             SolrSearchResult searchResult = searchResults.get(0);
@@ -146,7 +146,7 @@ class SolrSearchIT
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
-        searchPage.search("Content of Page");
+        searchPage = searchPage.search("Content of Page");
         assertEquals(10, searchPage.getSearchResults().size(), "The search should return only 10 results by default.");
 
         searchPage = searchPage.setResultsPerPage(20, true);
@@ -224,7 +224,7 @@ class SolrSearchIT
 
         // Check the search results without search exclusions.
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
-        searchPage.search(matchedWord);
+        searchPage = searchPage.search(matchedWord);
         assertThat("All matched pages should appear in the search results before configuring search exclusions.",
             searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
             containsInAnyOrder("One", "Two", "Three", "Child of Three", "Four", "Child of Four"));
@@ -237,7 +237,7 @@ class SolrSearchIT
 
         // Check the search results after configuring search exclusions.
         searchPage = SolrSearchPage.gotoPage();
-        searchPage.search(matchedWord);
+        searchPage = searchPage.search(matchedWord);
         // Children of excluded pages should also be excluded.
         assertThat(searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
             containsInAnyOrder("One", "Four", "Child of Four"));
@@ -251,7 +251,7 @@ class SolrSearchIT
 
         // Check again the search results.
         searchPage = SolrSearchPage.gotoPage();
-        searchPage.search(matchedWord);
+        searchPage = searchPage.search(matchedWord);
         assertThat(searchPage.getSearchResults().stream().map(SolrSearchResult::getTitle).toList(),
             containsInAnyOrder("One", "Two", "Four", "Child of Four"));
     }

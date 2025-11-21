@@ -72,7 +72,7 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     {
         // We use a fixed version of Chrome, instead of latest, for which we know the tests are passing (reproducible
         // builds), because Chrome changes often lead to changes in the PDF export output.
-        return getProperty("chromeDockerImage", "zenika/alpine-chrome:124");
+        return getProperty("chromeDockerImage", "femtopixel/google-chrome-headless:144.0.7524.3");
     }
 
     @Override

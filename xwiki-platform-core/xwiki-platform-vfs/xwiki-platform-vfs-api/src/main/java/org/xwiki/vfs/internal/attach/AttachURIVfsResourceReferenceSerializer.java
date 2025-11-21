@@ -66,8 +66,8 @@ public class AttachURIVfsResourceReferenceSerializer implements ResourceReferenc
             this.attachmentResolver.resolve(reference.getReference());
         String scheme = reference.getScheme();
         String documentRefefenceString = this.documentSerializer.serialize(attachmentReference.getDocumentReference());
-        String attachmentName = URIUtils.encodePathSegment(attachmentReference.getName());
-        String referencePath = URIUtils.encodePathSegment(reference.getPath());
+        String attachmentName = URIUtils.encodePath(attachmentReference.getName());
+        String referencePath = URIUtils.encodePath(reference.getPath());
         return URI
             .create(String.format("%s://%s/%s/%s", scheme, documentRefefenceString, attachmentName, referencePath));
     }

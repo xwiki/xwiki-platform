@@ -36,4 +36,4 @@ function set_packages_version() {
   done
 }
 
-set_packages_version 0.0.1
+set_packages_version 0.0.2

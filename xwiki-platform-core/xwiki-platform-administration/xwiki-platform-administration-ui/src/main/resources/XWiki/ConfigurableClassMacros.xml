@@ -340,10 +340,10 @@
   #set ($discard = $outputList.addAll($completeOrderMenu))
 #end
 #**
- * Augment the $adminMenu variable with all 
- * $nameOfThisDocument (i.e. XWiki.ConfigurableClass) xobjects found on this wiki.
+ * Augment the $adminMenu variable with all $nameOfThisDocument (i.e. XWiki.ConfigurableClass)
+ * XObjects found on this wiki.
  *
- * @param adminMenu the basis of the menu on which to add on (the macro is destructive on $adminMenu)
+ * @param adminMenu the basis of the menu on which to add on (the macro makes hard to reverse changes on $adminMenu)
 *#
 #macro(findCustomSectionsToConfigure $adminMenu)
   #set ($appNames = [])

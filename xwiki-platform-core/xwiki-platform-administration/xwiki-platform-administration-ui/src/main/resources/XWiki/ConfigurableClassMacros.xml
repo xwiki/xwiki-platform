@@ -324,8 +324,10 @@
  * @param outputList the full list of categories, in order. Even categories without any child will be returned.
 *#
 #macro(_getCategoriesInOrder, $adminMenu, $outputList)
-  #set ($params = {'className' : $nameOfThisDocument})
-  #set ($discard = $params.put('global', ['WIKI','WIKI+ALL_SPACES']))
+  #set ($params = {
+    'className' : $nameOfThisDocument,
+    'global': ['WIKI','WIKI+ALL_SPACES']
+  })
   #set ($appNames = [])
   #set ($discard = $appNames.addAll($services.query.hql($statement).bindValues($params).execute()))
   ## $completeOrderMenu contains a menu that contains all the information needed for sorting, no matter what.

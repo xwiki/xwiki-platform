@@ -31,8 +31,8 @@ catalogs:
       specifier: 1.56.1
       version: 1.56.1
     '@tsconfig/node24':
-      specifier: 24.0.1
-      version: 24.0.1
+      specifier: 24.0.3
+      version: 24.0.3
     '@types/jsdom':
       specifier: 27.0.0
       version: 27.0.0
@@ -338,7 +338,7 @@ importers:
         version: 9.38.0
       '@tsconfig/node24':
         specifier: 'catalog:'
-        version: 24.0.1
+        version: 24.0.3
       '@types/jsdom':
         specifier: 'catalog:'
         version: 27.0.0
@@ -429,7 +429,7 @@ importers:
     devDependencies:
       '@tsconfig/node24':
         specifier: 'catalog:'
-        version: 24.0.1
+        version: 24.0.3
       '@types/jsdom':
         specifier: 'catalog:'
         version: 27.0.0
@@ -1407,7 +1407,7 @@ importers:
     devDependencies:
       '@tsconfig/node24':
         specifier: 'catalog:'
-        version: 24.0.1
+        version: 24.0.3
       '@types/jsdom':
         specifier: 'catalog:'
         version: 27.0.0
@@ -2363,8 +2363,8 @@ packages:
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@tsconfig/node24@24.0.1':
-    resolution: {integrity: sha512-3+IXshza3bIrT0tbHBr9CixQDVf4iBf0HTR0hCYowhpLqkzJjswu3UY8aZWjRXZep31kYB+o2SQeD8KwIoUHYw==}
+  '@tsconfig/node24@24.0.3':
+    resolution: {integrity: sha512-vcERKtKQKHgzt/vfS3Gjasd8SUI2a0WZXpgJURdJsMySpS5+ctgbPfuLj2z/W+w4lAfTWxoN4upKfu2WzIRYnw==}
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -6698,7 +6698,7 @@ snapshots:
       react-dom: 19.2.0(react@19.2.0)
       use-sync-external-store: 1.5.0(react@19.2.0)
 
-  '@tsconfig/node24@24.0.1': {}
+  '@tsconfig/node24@24.0.3': {}
 
   '@tybys/wasm-util@0.10.1':
     dependencies:

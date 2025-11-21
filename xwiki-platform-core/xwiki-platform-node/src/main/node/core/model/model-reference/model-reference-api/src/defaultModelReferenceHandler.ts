@@ -22,14 +22,14 @@ import {
   AttachmentReference,
   DocumentReference,
   EntityType,
-} from "@manuelleducorg/model-api";
+} from "@xwiki/platform-model-api";
 import { injectable } from "inversify";
 import type { ModelReferenceHandler } from "./modelReferenceHandler";
 import type {
   EntityReference,
   SpaceReference,
   WikiReference,
-} from "@manuelleducorg/model-api";
+} from "@xwiki/platform-model-api";
 
 /**
  * Default implementation for {@link ModelReferenceHandler}.

@@ -24,7 +24,7 @@ import { Container } from "inversify";
 import type {
   AttachmentPreview,
   AttachmentsService,
-} from "@manuelleducorg/attachments-api";
+} from "@xwiki/platform-attachments-api";
 
 /**
  * @since 0.9

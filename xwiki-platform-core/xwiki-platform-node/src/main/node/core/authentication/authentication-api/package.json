@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/authentication-api",
+  "name": "@xwiki/platform-authentication-api",
   "version": "0.0.2",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -29,7 +29,7 @@
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
-    "@manuelleducorg/dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "reflect-metadata": "catalog:",
     "rimraf": "catalog:",

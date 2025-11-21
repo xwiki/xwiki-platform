@@ -21,7 +21,7 @@
 import type {
   DocumentReference,
   SpaceReference,
-} from "@manuelleducorg/model-api";
+} from "@xwiki/platform-model-api";
 
 /**
  * @since 0.15

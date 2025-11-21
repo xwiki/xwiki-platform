@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/macros-ast-react-jsx",
+  "name": "@xwiki/platform-macros-ast-react-jsx",
   "version": "0.0.2",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -30,16 +30,16 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@manuelleducorg/fn-utils": "workspace:*",
-    "@manuelleducorg/macros-api": "workspace:*",
-    "@manuelleducorg/model-remote-url-api": "workspace:*"
+    "@xwiki/platform-fn-utils": "workspace:*",
+    "@xwiki/platform-macros-api": "workspace:*",
+    "@xwiki/platform-model-remote-url-api": "workspace:*"
   },
   "peerDependencies": {
     "inversify": "7.x"
   },
   "devDependencies": {
     "@types/react": "catalog:",
-    "@manuelleducorg/dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "react": "catalog:",
     "typescript": "catalog:",

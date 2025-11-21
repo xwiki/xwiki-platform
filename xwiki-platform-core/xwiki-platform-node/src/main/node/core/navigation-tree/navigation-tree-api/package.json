@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/navigation-tree-api",
+  "name": "@xwiki/platform-navigation-tree-api",
   "version": "0.0.2",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -30,11 +30,11 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@manuelleducorg/api": "workspace:*",
-    "@manuelleducorg/model-api": "workspace:*"
+    "@xwiki/platform-api": "workspace:*",
+    "@xwiki/platform-model-api": "workspace:*"
   },
   "devDependencies": {
-    "@manuelleducorg/dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

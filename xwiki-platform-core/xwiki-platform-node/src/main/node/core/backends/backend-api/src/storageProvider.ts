@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Storage } from "@manuelleducorg/api";
+import type { Storage } from "@xwiki/platform-api";
 
 /**
  * Resolves a {@link Storage} based on the current configuration.

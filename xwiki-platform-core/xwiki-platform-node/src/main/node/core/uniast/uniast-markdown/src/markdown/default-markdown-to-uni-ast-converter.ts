@@ -20,18 +20,18 @@
 import { findFirstMatchIn } from "./internal/find-first-match-in";
 import { remarkPartialGfm } from "./internal/remark-partial-gfm";
 import { ParserConfigurationResolver } from "./internal-links/parser/parser-configuration-resolver";
-import { assertInArray, assertUnreachable } from "@manuelleducorg/fn-utils";
-import { EntityType } from "@manuelleducorg/model-api";
+import { assertInArray, assertUnreachable } from "@xwiki/platform-fn-utils";
+import { EntityType } from "@xwiki/platform-model-api";
 import { inject, injectable } from "inversify";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 import type { MatchResult } from "./internal/find-first-match-in";
 import type { MarkdownToUniAstConverter } from "./markdown-to-uni-ast-converter";
-import type { EntityReference } from "@manuelleducorg/model-api";
+import type { EntityReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
-} from "@manuelleducorg/model-reference-api";
+} from "@xwiki/platform-model-reference-api";
 import type {
   Block,
   Image,
@@ -41,7 +41,7 @@ import type {
   TableColumn,
   TextStyles,
   UniAst,
-} from "@manuelleducorg/uniast-api";
+} from "@xwiki/platform-uniast-api";
 import type { Image as MdImage, PhrasingContent, RootContent } from "mdast";
 
 /**

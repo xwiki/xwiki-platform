@@ -19,7 +19,7 @@
  */
 import { inject, injectable } from "inversify";
 import type { MarkdownParserConfiguration } from "./markdown-parser-configuration";
-import type { CristalApp } from "@manuelleducorg/api";
+import type { CristalApp } from "@xwiki/platform-api";
 
 /**
  * @since 0.22

@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/uniast-api",
+  "name": "@xwiki/platform-uniast-api",
   "version": "0.0.2",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -26,7 +26,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@manuelleducorg/model-api": "workspace:*"
+    "@xwiki/platform-model-api": "workspace:*"
   },
   "devDependencies": {
     "eslint": "catalog:",

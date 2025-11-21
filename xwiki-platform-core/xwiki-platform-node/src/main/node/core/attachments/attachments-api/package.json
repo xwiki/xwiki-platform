@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/attachments-api",
+  "name": "@xwiki/platform-attachments-api",
   "version": "0.0.2",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -26,15 +26,15 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@manuelleducorg/authentication-api": "workspace:*",
-    "@manuelleducorg/model-api": "workspace:*"
+    "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-model-api": "workspace:*"
   },
   "peerDependencies": {
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
-    "@manuelleducorg/dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",

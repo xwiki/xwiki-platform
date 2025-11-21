@@ -23,8 +23,8 @@ import { defineStore, storeToRefs } from "pinia";
 import type {
   Attachment,
   AttachmentsService,
-} from "@manuelleducorg/attachments-api";
-import type { StorageProvider } from "@manuelleducorg/backend-api";
+} from "@xwiki/platform-attachments-api";
+import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type { Store, StoreDefinition } from "pinia";
 import type { Ref } from "vue";
 

@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/configuration-api",
+  "name": "@xwiki/platform-configuration-api",
   "version": "0.0.2",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -29,7 +29,7 @@
     "utility-types": "catalog:"
   },
   "devDependencies": {
-    "@manuelleducorg/dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",

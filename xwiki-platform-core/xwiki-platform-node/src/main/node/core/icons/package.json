@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/icons",
+  "name": "@xwiki/platform-icons",
   "version": "0.0.2",
   "description": "Provide UI components to display icons.",
   "license": "LGPL 2.1",
@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@vue/test-utils": "catalog:",
-    "@manuelleducorg/dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

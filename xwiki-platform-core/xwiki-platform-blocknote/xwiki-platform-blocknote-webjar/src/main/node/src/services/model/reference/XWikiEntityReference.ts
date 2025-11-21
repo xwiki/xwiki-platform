@@ -24,7 +24,7 @@ import {
   EntityType,
   SpaceReference,
   WikiReference,
-} from "@manuelleducorg/model-api";
+} from "@xwiki/platform-model-api";
 
 type XWikiEntityReference = {
   name: string;

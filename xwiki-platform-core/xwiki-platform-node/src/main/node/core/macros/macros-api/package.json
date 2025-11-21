@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/macros-api",
+  "name": "@xwiki/platform-macros-api",
   "version": "0.0.2",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -30,7 +30,7 @@
   },
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@manuelleducorg/dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/api",
+  "name": "@xwiki/platform-api",
   "version": "0.0.2",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -30,8 +30,8 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@manuelleducorg/authentication-api": "workspace:*",
-    "@manuelleducorg/configuration-api": "workspace:*",
+    "@xwiki/platform-authentication-api": "workspace:*",
+    "@xwiki/platform-configuration-api": "workspace:*",
     "vue-router": "catalog:"
   },
   "peerDependencies": {
@@ -40,7 +40,7 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@manuelleducorg/dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",

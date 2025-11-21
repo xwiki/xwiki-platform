@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AttachmentReference, EntityType } from "@manuelleducorg/model-api";
+import { AttachmentReference, EntityType } from "@xwiki/platform-model-api";
 import { inject, injectable } from "inversify";
 import type { InternalLinksSerializer } from "./internal-links-serializer";
 import type { UniAstToMarkdownConverter } from "../../uni-ast-to-markdown-converter";
-import type { DocumentService } from "@manuelleducorg/document-api";
-import type { EntityReference } from "@manuelleducorg/model-api";
-import type { Link, LinkTarget } from "@manuelleducorg/uniast-api";
+import type { DocumentService } from "@xwiki/platform-document-api";
+import type { EntityReference } from "@xwiki/platform-model-api";
+import type { Link, LinkTarget } from "@xwiki/platform-uniast-api";
 
 /**
  * @since 0.22

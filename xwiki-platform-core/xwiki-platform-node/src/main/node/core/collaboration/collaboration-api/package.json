@@ -1,5 +1,5 @@
 {
-  "name": "@manuelleducorg/collaboration-api",
+  "name": "@xwiki/platform-collaboration-api",
   "version": "0.0.2",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -30,7 +30,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@manuelleducorg/api": "workspace:*",
+    "@xwiki/platform-api": "workspace:*",
     "yjs": "catalog:"
   },
   "peerDependencies": {
@@ -39,7 +39,7 @@
     "vue": "3.x"
   },
   "devDependencies": {
-    "@manuelleducorg/dev-config": "workspace:*",
+    "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",

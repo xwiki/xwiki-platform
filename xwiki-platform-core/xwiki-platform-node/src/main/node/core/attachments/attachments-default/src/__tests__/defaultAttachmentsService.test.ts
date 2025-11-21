@@ -21,8 +21,8 @@ import { DefaultAttachmentsService } from "../defaultAttachmentsService";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 import { mock, mockReset } from "vitest-mock-extended";
-import type { Storage } from "@manuelleducorg/api";
-import type { StorageProvider } from "@manuelleducorg/backend-api";
+import type { Storage } from "@xwiki/platform-api";
+import type { StorageProvider } from "@xwiki/platform-backend-api";
 
 function initServiceWithMocks() {
   const storageProviderMock = mock<StorageProvider>();

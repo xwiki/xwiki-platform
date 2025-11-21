@@ -21,7 +21,7 @@
 import type {
   DocumentReference,
   SpaceReference,
-} from "@manuelleducorg/model-api";
+} from "@xwiki/platform-model-api";
 
 /**
  * Description of a navigation tree node.

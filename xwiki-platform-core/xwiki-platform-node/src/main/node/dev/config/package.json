@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@manuelleducorg/dev-config",
+  "name": "@xwiki/platform-dev-config",
   "version": "17.10.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",

@@ -177,8 +177,7 @@
   ## We start by copying what's already in the adminMenu.
   ## We can't use addAll directly because we want to make a deep copy of the structure
   #set ($discard = $outputList.addAll($jsontool.fromString($jsontool.serialize($adminMenu))))
-  ## Reset the category and section helper lists.
-  ## We use them to update $outputList based on references, so we make sure they 
+  ## Reset the category and section helper hashmaps so that they point to $outputlist and not $adminMenu anymore.
   #set ($categoriesByName = {})
   #set ($sectionsByName = {})
   #foreach ($category in $outputList)

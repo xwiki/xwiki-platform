@@ -19,6 +19,7 @@
  */
 package org.xwiki.netflux.internal;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -35,8 +36,10 @@ import org.xwiki.user.UserReference;
  * @since 16.4.1
  * @since 16.6.0RC1
  */
-public class EntityChange implements Comparable<EntityChange>
+public class EntityChange implements Serializable, Comparable<EntityChange>
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The script level for a given entity change.
      */
@@ -71,7 +74,7 @@ public class EntityChange implements Comparable<EntityChange>
     /**
      * The timestamp of the change.
      */
-    private final long timestamp = new Date().getTime();
+    private final long timestamp;
 
     /**
      * Creates a new entity change instance.
@@ -82,9 +85,23 @@ public class EntityChange implements Comparable<EntityChange>
      */
     public EntityChange(EntityReference entityReference, UserReference author, ScriptLevel scriptLevel)
     {
+        this(entityReference, author, scriptLevel, new Date().getTime());
+    }
+
+    /**
+     * Creates a new entity change instance.
+     *
+     * @param entityReference the changed entity
+     * @param author the author of the change
+     * @param scriptLevel the script level of the author of the change relative to the changed entity
+     * @param timestamp the timestamp of the change
+     */
+    public EntityChange(EntityReference entityReference, UserReference author, ScriptLevel scriptLevel, long timestamp)
+    {
         this.entityReference = entityReference;
         this.author = author;
         this.scriptLevel = scriptLevel;
+        this.timestamp = timestamp;
     }
 
     /**
@@ -109,6 +126,15 @@ public class EntityChange implements Comparable<EntityChange>
     public ScriptLevel getScriptLevel()
     {
         return scriptLevel;
+    }
+
+    /**
+     * @return the timestamp of the change
+     * @since 17.10.1
+     */
+    public long getTimestamp()
+    {
+        return timestamp;
     }
 
     @Override

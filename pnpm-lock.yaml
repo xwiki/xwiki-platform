@@ -109,8 +109,8 @@ catalogs:
       specifier: 5.0.1
       version: 5.0.1
     fast-xml-parser:
-      specifier: 5.3.0
-      version: 5.3.0
+      specifier: 5.3.2
+      version: 5.3.2
     flush-promises:
       specifier: 1.0.2
       version: 1.0.2
@@ -1097,7 +1097,7 @@ importers:
         version: link:../uniast-api
       fast-xml-parser:
         specifier: 'catalog:'
-        version: 5.3.0
+        version: 5.3.2
       mdast-util-gfm-strikethrough:
         specifier: 'catalog:'
         version: 2.0.0
@@ -3538,8 +3538,8 @@ packages:
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
-  fast-xml-parser@5.3.0:
-    resolution: {integrity: sha512-gkWGshjYcQCF+6qtlrqBqELqNqnt4CxruY6UVAWWnqb3DQ6qaNFEIKqzYep1XzHLM/QtrHVCxyPOtTk4LTQ7Aw==}
+  fast-xml-parser@5.3.2:
+    resolution: {integrity: sha512-n8v8b6p4Z1sMgqRmqLJm3awW4NX7NkaKPfb3uJIBTSH7Pdvufi3PQ3/lJLQrvxcMYl7JI2jnDO90siPEpD8JBA==}
     hasBin: true
 
   fastq@1.19.1:
@@ -8053,7 +8053,7 @@ snapshots:
 
   fast-levenshtein@2.0.6: {}
 
-  fast-xml-parser@5.3.0:
+  fast-xml-parser@5.3.2:
     dependencies:
       strnum: 2.1.1
 

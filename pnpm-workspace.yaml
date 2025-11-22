@@ -38,7 +38,7 @@ catalog:
   "@blocknote/react": 0.35.0
   "@eslint/config-helpers": 0.4.2
   "@eslint/js": 9.38.0
-  "@mantine/core": 8.3.6
+  "@mantine/core": 8.3.9
   "@mantine/hooks": 8.3.6
   "@playwright/experimental-ct-react": 1.56.1
   "@tsconfig/node24": 24.0.1

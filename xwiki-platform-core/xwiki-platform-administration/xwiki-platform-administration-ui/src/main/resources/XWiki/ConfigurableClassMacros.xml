@@ -288,6 +288,7 @@
     #end## Foreach configurable object in this app.
   #end## Foreach application which is configurable.
 #end
+
 #**
  * Computes the scores of categories and sorts the list. The first category will be the one with the highest score.
  *

@@ -317,6 +317,7 @@
     #end
   #end
 #end
+
 #**
  * Utility macro to compute the full order of categories, which is contained sparsely through xobjects
  * that are not always retrieved when building the menu.

@@ -54,6 +54,12 @@
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome-fetcher</artifactId>
+      <exclusions>
+      	<exclusion>
+      		<groupId>commons-httpclient</groupId>
+      		<artifactId>commons-httpclient</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
     <!-- Rome does not trigger version of jdom we want -->
     <dependency>

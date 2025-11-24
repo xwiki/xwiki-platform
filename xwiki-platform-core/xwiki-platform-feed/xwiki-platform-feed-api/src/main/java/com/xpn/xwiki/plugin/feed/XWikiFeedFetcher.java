@@ -24,15 +24,20 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.auth.Credentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.ProtocolException;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.fetcher.FetcherEvent;
@@ -116,88 +121,71 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
         if (feedUrl == null) {
             throw new IllegalArgumentException("null is not a valid URL");
         }
-        HttpClient client = new HttpClient();
+
+        HttpClientBuilder builder = HttpClients.custom().useSystemProperties();
         if (timeout != 0) {
-            client.getParams().setSoTimeout(timeout);
-            client.getParams().setParameter("http.connection.timeout", timeout);
-        }
+            ConnectionConfig.Builder configBuilder = ConnectionConfig.custom();
+            configBuilder.setConnectTimeout(timeout, TimeUnit.MILLISECONDS);
+            configBuilder.setSocketTimeout(timeout, TimeUnit.MILLISECONDS).build();
 
+            BasicHttpClientConnectionManager cm = new BasicHttpClientConnectionManager();
+            cm.setConnectionConfig(configBuilder.build());
+
+            builder.setConnectionManager(cm);
+        }
         System.setProperty("http.useragent", getUserAgent());
-        client.getParams().setParameter("httpclient.useragent", getUserAgent());
-
-        String proxyHost = System.getProperty("http.proxyHost");
-        String proxyPort = System.getProperty("http.proxyPort");
-        if ((proxyHost != null) && (!proxyHost.equals(""))) {
-            int port = 3128;
-            if ((proxyPort != null) && (!proxyPort.equals(""))) {
-                port = Integer.parseInt(proxyPort);
-            }
-            client.getHostConfiguration().setProxy(proxyHost, port);
-        }
-
-        String proxyUser = System.getProperty("http.proxyUser");
-        if ((proxyUser != null) && (!proxyUser.equals(""))) {
-            String proxyPassword = System.getProperty("http.proxyPassword");
-            Credentials defaultcreds = new UsernamePasswordCredentials(proxyUser, proxyPassword);
-            client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
-        }
+        builder.setUserAgent(getUserAgent());
 
         String urlStr = feedUrl.toString();
-        FeedFetcherCache cache = getFeedInfoCache();
-        if (cache != null) {
-            // retrieve feed
-            HttpMethod method = new GetMethod(urlStr);
-            method.addRequestHeader("Accept-Encoding", "gzip");
-            try {
+        try (CloseableHttpClient client = builder.build()) {
+            FeedFetcherCache cache = getFeedInfoCache();
+            HttpGet get = new HttpGet(urlStr);
+            if (cache != null) {
+                // retrieve feed
+                get.setHeader("Accept-Encoding", "gzip");
                 if (isUsingDeltaEncoding()) {
-                    method.setRequestHeader("A-IM", "feed");
+                    get.addHeader("Accept-Encoding", "gzip");
+                    get.setHeader("A-IM", "feed");
                 }
 
                 // get the feed info from the cache
                 // Note that syndFeedInfo will be null if it is not in the cache
                 SyndFeedInfo syndFeedInfo = cache.getFeedInfo(feedUrl);
                 if (syndFeedInfo != null) {
-                    method.setRequestHeader("If-None-Match", syndFeedInfo.getETag());
+                    get.setHeader("If-None-Match", syndFeedInfo.getETag());
 
-                    if (syndFeedInfo.getLastModified() instanceof String) {
-                        method.setRequestHeader("If-Modified-Since", (String) syndFeedInfo.getLastModified());
+                    if (syndFeedInfo.getLastModified() instanceof String lasModified) {
+                        get.setHeader("If-Modified-Since", lasModified);
                     }
                 }
 
-                method.setFollowRedirects(true);
+                try (CloseableHttpResponse response = client.execute(get)) {
+                    fireEvent(FetcherEvent.EVENT_TYPE_FEED_POLLED, urlStr);
+                    handleErrorCodes(response.getCode());
 
-                int statusCode = client.executeMethod(method);
-                fireEvent(FetcherEvent.EVENT_TYPE_FEED_POLLED, urlStr);
-                handleErrorCodes(statusCode);
+                    SyndFeed feed = getFeed(syndFeedInfo, urlStr, response);
 
-                SyndFeed feed = getFeed(syndFeedInfo, urlStr, method, statusCode);
+                    syndFeedInfo = buildSyndFeedInfo(feedUrl, urlStr, response, feed);
 
-                syndFeedInfo = buildSyndFeedInfo(feedUrl, urlStr, method, feed, statusCode);
+                    cache.setFeedInfo(new URL(urlStr), syndFeedInfo);
 
-                cache.setFeedInfo(new URL(urlStr), syndFeedInfo);
+                    // the feed may have been modified to pick up cached values
+                    // (eg - for delta encoding)
+                    feed = syndFeedInfo.getSyndFeed();
 
-                // the feed may have been modified to pick up cached values
-                // (eg - for delta encoding)
-                feed = syndFeedInfo.getSyndFeed();
+                    return feed;
+                }
+            } else {
+                // cache is not in use
+                try (CloseableHttpResponse response = client.execute(get)) {
+                    fireEvent(FetcherEvent.EVENT_TYPE_FEED_POLLED, urlStr);
+                    handleErrorCodes(response.getCode());
 
-                return feed;
-            } finally {
-                method.releaseConnection();
+                    return getFeed(null, urlStr, response);
+                }
             }
-        } else {
-            // cache is not in use
-            HttpMethod method = new GetMethod(urlStr);
-            try {
-                method.setFollowRedirects(true);
-
-                int statusCode = client.executeMethod(method);
-                fireEvent(FetcherEvent.EVENT_TYPE_FEED_POLLED, urlStr);
-                handleErrorCodes(statusCode);
-
-                return getFeed(null, urlStr, method, statusCode);
-            } finally {
-                method.releaseConnection();
-            }
+        } catch (ProtocolException fe) {
+            throw new FetcherException("Failed to get feed with URL [" + urlStr + "]");
         }
     }
 
@@ -208,9 +196,10 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
      * @param feed
      * @return
      * @throws MalformedURLException
+     * @throws ProtocolException
      */
-    private SyndFeedInfo buildSyndFeedInfo(URL feedUrl, String urlStr, HttpMethod method, SyndFeed feed, int statusCode)
-        throws MalformedURLException
+    private SyndFeedInfo buildSyndFeedInfo(URL feedUrl, String urlStr, ClassicHttpResponse response, SyndFeed feed)
+        throws MalformedURLException, ProtocolException
     {
         SyndFeedInfo syndFeedInfo;
         syndFeedInfo = new SyndFeedInfo();
@@ -219,10 +208,10 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
         syndFeedInfo.setUrl(new URL(urlStr));
         syndFeedInfo.setId(feedUrl.toString());
 
-        Header imHeader = method.getResponseHeader("IM");
+        Header imHeader = response.getHeader("IM");
         if (imHeader != null && imHeader.getValue().indexOf("feed") >= 0 && isUsingDeltaEncoding()) {
             FeedFetcherCache cache = getFeedInfoCache();
-            if (cache != null && statusCode == 226) {
+            if (cache != null && response.getCode() == 226) {
                 // client is setup to use http delta encoding and the server supports it and has returned a delta
                 // encoded response.
                 // This response only includes new items
@@ -236,12 +225,12 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
             }
         }
 
-        Header lastModifiedHeader = method.getResponseHeader("Last-Modified");
+        Header lastModifiedHeader = response.getHeader("Last-Modified");
         if (lastModifiedHeader != null) {
             syndFeedInfo.setLastModified(lastModifiedHeader.getValue());
         }
 
-        Header eTagHeader = method.getResponseHeader("ETag");
+        Header eTagHeader = response.getHeader("ETag");
         if (eTagHeader != null) {
             syndFeedInfo.setETag(eTagHeader.getValue());
         }
@@ -251,22 +240,20 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
         return syndFeedInfo;
     }
 
-    private static SyndFeed retrieveFeed(String urlStr, HttpMethod method)
-        throws IOException, FeedException
+    private static SyndFeed retrieveFeed(ClassicHttpResponse response)
+        throws IOException, FeedException, ProtocolException, UnsupportedOperationException
     {
-
         InputStream stream = null;
-        if ((method.getResponseHeader("Content-Encoding") != null) &&
-            ("gzip".equalsIgnoreCase(method.getResponseHeader("Content-Encoding").getValue())))
-        {
-            stream = new GZIPInputStream(method.getResponseBodyAsStream());
+        if ((response.getHeader("Content-Encoding") != null)
+            && ("gzip".equalsIgnoreCase(response.getHeader("Content-Encoding").getValue()))) {
+            stream = new GZIPInputStream(response.getEntity().getContent());
         } else {
-            stream = method.getResponseBodyAsStream();
+            stream = response.getEntity().getContent();
         }
         try {
             XmlReader reader = null;
-            if (method.getResponseHeader("Content-Type") != null) {
-                reader = new XmlReader(stream, method.getResponseHeader("Content-Type").getValue(), true);
+            if (response.getHeader("Content-Type") != null) {
+                reader = new XmlReader(stream, response.getHeader("Content-Type").getValue(), true);
             } else {
                 reader = new XmlReader(stream, true);
             }
@@ -278,16 +265,16 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher
         }
     }
 
-    private SyndFeed getFeed(SyndFeedInfo syndFeedInfo, String urlStr, HttpMethod method, int statusCode)
-        throws IOException, FeedException
+    private SyndFeed getFeed(SyndFeedInfo syndFeedInfo, String urlStr, ClassicHttpResponse response)
+        throws IOException, FeedException, ProtocolException, UnsupportedOperationException
     {
 
-        if (statusCode == HttpURLConnection.HTTP_NOT_MODIFIED && syndFeedInfo != null) {
+        if (response.getCode() == HttpURLConnection.HTTP_NOT_MODIFIED && syndFeedInfo != null) {
             fireEvent(FetcherEvent.EVENT_TYPE_FEED_UNCHANGED, urlStr);
             return syndFeedInfo.getSyndFeed();
         }
 
-        SyndFeed feed = retrieveFeed(urlStr, method);
+        SyndFeed feed = retrieveFeed(response);
         fireEvent(FetcherEvent.EVENT_TYPE_FEED_RETRIEVED, urlStr, feed);
         return feed;
     }

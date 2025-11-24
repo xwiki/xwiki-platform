@@ -223,7 +223,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public void waitForAnnotationsDisplayed()
     {
-        getDriver().waitUntilElementIsVisible(By.className("annotation-marker"));
+        getDriver().waitUntilElementIsVisible(By.className("annotation-highlight"));
     }
 
     // Un-checks the "Show Annotations" check box.
@@ -240,7 +240,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public int getAnnotationCount()
     {
-        return getDriver().findElementsWithoutWaiting(By.className("annotation-marker")).size();
+        return getDriver().findElementsWithoutWaiting(By.className("annotation-highlight")).size();
     }
 
     /**

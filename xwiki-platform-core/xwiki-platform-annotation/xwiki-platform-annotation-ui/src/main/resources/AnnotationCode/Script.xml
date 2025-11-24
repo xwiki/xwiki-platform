@@ -196,7 +196,10 @@ XWiki.Selection = Class.create({
       return;
     }
     // create an annotation highlight span around this content
-    var highlightWrapperTemplate = new Element('span', {'style': 'background-color: ' + color, 'class' : 'selection-highlight'});
+    var highlightWrapperTemplate = new Element('mark', {
+      'style': 'background-color: ' + color, 
+      'class': 'selection-highlight'
+    });
     // get all the text nodes of this range
     var rangeTextNodes = this.getRangeTextNodes();
     // and remove all the ranges in this selection, otherwise so messed up things will happen
@@ -810,8 +813,6 @@ XWiki.Annotation = Class.create({
     if (this.displayHighlight) {
       this.annotatedElement.select('.annotation').invoke('toggleClassName', 'annotation-highlight', !!visible);
     }
-    // Toggle all annotation markers.
-    this.annotatedElement.select('.annotation-marker').invoke('toggleClassName', 'hidden', !visible);
     this.setAnnotationVisibility(visible);
     if (!visible) {
       // Close all open bubbles.
@@ -908,7 +909,7 @@ XWiki.Annotation = Class.create({
           }
           // hide message at page bottom
           this._x_notification.hide();
-          // Load the received annotations, along with annotations markers.
+          // Load the received annotations, along with annotations highlights.
           this.loadAnnotations(response.responseJSON.annotatedContent, andShow, false, force);
           // store the state of the annotations
           this.fetchedAnnotations = true;
@@ -975,30 +976,33 @@ XWiki.Annotation = Class.create({
     // a new range is created to recalculate the new ends.
     var strictRange = this.fixRangeEndPoints(annDOMRange);
 
-    // Wrap each text node from this range inside an annotation markup SPAN.
+    // Wrap each text node from this range inside an annotation markup node.
     this.getTextNodesInRange(strictRange).forEach(textNode =&gt; this.markAnnotation(textNode, ann));
-
-    // Add the marker span after the last span of this annotation.
     var allSpans = this.annotatedElement.select('[class~=ID' + ann.annotationId + ']');
     if (!allSpans.length) {
       return;
     }
-    var lastSpan = allSpans[allSpans.length - 1];
-    // Create the annotation markers hidden by default, since annotations are added on the document hidden by default.
-    var markerSpan = new Element('span', {'id': 'ID' + ann.annotationId, 'class' : 'hidden annotation-marker ' + ann.state});
-    lastSpan.insert({after: markerSpan});
-    // Annotations are displayed on mouseover.
-    markerSpan.observe('click', this.onMarkerClick.bindAsEventListener(this, ann.annotationId));
+    // We nest the content of the first one in a button. 
+    // All the highlights elements fulfill the same role so there's little point extending every single one.
+    // It could be detrimental for the user experience to have to tab through all of the buttons.
+    let firstSpanContent = allSpans[0].innerHTML;
+    let toggleButton = document.createElement("button");
+    toggleButton.innerHTML = firstSpanContent
+    allSpans[0].innerHTML = '';
+    allSpans[0].append(toggleButton);
+    // Add the onclick listener on every span of this annotation.
+    allSpans.forEach(markNode =&gt; markNode.addEventListener('click', (event) =&gt;
+      this.onMarkerClick(event, ann.annotationId)));
   },
 
   /**
-   * Surround this node with a span corresponding to it's annotation.
+   * Surround this node with a span corresponding to its annotation.
    *
    * @param markedNode the node that corresponds to the current annotation
    * @param ann object holding information about the annotation
    */
   markAnnotation: function(markedNode, ann) {
-    var wrapper = document.createElement('span');
+    var wrapper = document.createElement('mark');
     wrapper.addClassName('annotation');
     wrapper.addClassName('ID' + ann.annotationId);
 
@@ -1157,13 +1161,12 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Remove the wrapper and marker of annotations. The selection highlight is also removed in case the new annotation
+   * Remove the wrapper for annotations. The selection highlight is also removed in case the new annotation
    * was deleted.
    */
   removeAnnotationsAndSelectionMarkups: function() {
-    document.querySelectorAll("span.annotation, span.selection-highlight")
+    document.querySelectorAll("mark.annotation, mark.selection-highlight")
       .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));
-    document.querySelectorAll("span.annotation-marker").forEach(marker =&gt; marker.remove());
     this.fetchedAnnotations = false;
   },
 
@@ -1315,8 +1318,7 @@ XWiki.Annotation = Class.create({
       }
     }.bindAsEventListener(this));
   },
-
-  // maybe this should be moved in a function to display a bubble from an address, to call for all dialogs for different parameters
+  
   onMarkerClick : function(event, id) {
     var bubbleId = 'annotation-bubble-' + id;
     var bubble = $(bubbleId);
@@ -1328,8 +1330,7 @@ XWiki.Annotation = Class.create({
       this.hideBubble(bubble);
     } else {
       // Show the bubble and fetch the annotation display in it.
-      var bubble = this.displayLoadingBubble(event.element().cumulativeOffset().top,
-        event.element().cumulativeOffset().left, true);
+      var bubble = this.displayLoadingBubble(event.pageX, event.pageY, true);
       bubble.writeAttribute('id', bubbleId);
       this.fetchAndShowAnnotationDetails(id, bubble);
     }
@@ -1362,7 +1363,7 @@ XWiki.Annotation = Class.create({
     }.bind(this));
   },
 
-  displayLoadingBubble : function(verticalCoordinate, horizontalCoordinate, hasMarker) {
+  displayLoadingBubble : function(horizontalCoordinate, verticalCoordinate) {
     // create a bubble element wrapping the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
     // Add a nice loading panel inside
@@ -1378,25 +1379,19 @@ XWiki.Annotation = Class.create({
     // By default, we position it to the right and under the coordinates
     // Position it horizontally.
     let bubbleStyles = getComputedStyle(bubble);
-    // The width in pixels of the annotation marker added in the text.
-    const markerWidth = 10;
-    let markerOffset = hasMarker ? -markerWidth : 0;
-    let bubbleWidth = bubble.offsetWidth 
+    let bubbleWidth = bubble.offsetWidth
       + parseInt(bubbleStyles.marginLeft)
       + parseInt(bubbleStyles.marginRight);
     if (horizontalCoordinate &lt; bubbleWidth 
-      || horizontalCoordinate + markerOffset + bubbleWidth &lt; window.innerWidth) {
+      || horizontalCoordinate + bubbleWidth &lt; window.innerWidth) {
       bubble.style.left = horizontalCoordinate + 'px';
     } else {
       // There isn't enough space on the right of the window to fit the modal, and there is enough on the left.
-      bubble.style.left = (horizontalCoordinate + markerOffset - bubbleWidth) + 'px';
+      bubble.style.left = (horizontalCoordinate - bubbleWidth) + 'px';
       bubble.toggleClassName('annotation-bubble-position-left');
     }
 
     return bubble;
-  },
-
-  displayAnnotationViewBubble : function(marker) {
   },
 
   /**

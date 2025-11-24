@@ -263,22 +263,20 @@
 }
 
 /* Annotations displayed in the text */
-.annotation-highlight {
-  background-color: #FE9;
+.annotation-highlight, .selection-highlight {
+  background-color: var(--btn-warning-bg);
+  /* Remove the default mark padding added in bootstrap. 
+    The highlights can happen in the middle of words, and it would look odd. */
+  padding: 0;
+  cursor: pointer;
 }
 
-.annotation-marker {
-  background: transparent #attImgURL('notesmall') no-repeat left top;
-  display: inline-block;
-  height: 10px;
-  overflow: hidden;
-  text-indent: -9999px;
-  width: 10px;
-  vertical-align: baseline;
-  margin: -15px -7px 5px -3px;
-  z-index: 1;
-  position: relative;
-  cursor: pointer;
+/* Reset the styles so that the button doesn't distract from the text. */
+.annotation-highlight > button {
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
 }
 
 /* Annotation boxes */
@@ -290,7 +288,7 @@
   z-index: 2;
   border-radius: 0 10px 10px 10px;
   box-shadow: 0 2px 4px -1px $theme.linkColor;
-  margin-left: 20px;
+  margin: 0 10px;
 }
 
 .annotation-bubble:before, .annotation-bubble:after {

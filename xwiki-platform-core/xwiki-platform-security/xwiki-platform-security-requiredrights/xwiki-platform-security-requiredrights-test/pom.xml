@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-requiredrights</artifactId>
-    <version>17.10.0</version>
+    <version>17.10.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-requiredrights-test</artifactId>
   <name>XWiki Platform - Security - Required Rights - Tests - Parent POM</name>
@@ -49,6 +49,6 @@
   </profiles>
 
   <scm>
-    <tag>xwiki-platform-17.10.0</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

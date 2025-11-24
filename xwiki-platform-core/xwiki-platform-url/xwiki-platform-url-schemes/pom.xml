@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url</artifactId>
-    <version>17.10.0</version>
+    <version>17.10.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url-schemes</artifactId>
   <name>XWiki Platform - URL - Schemes - Parent POM</name>
@@ -39,6 +39,6 @@
   </modules>
 
   <scm>
-    <tag>xwiki-platform-17.10.0</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

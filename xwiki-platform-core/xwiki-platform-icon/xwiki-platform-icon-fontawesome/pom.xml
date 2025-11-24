@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-icon</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>17.10.0</version>
+    <version>17.10.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon-fontawesome</artifactId>
   <packaging>xar</packaging>
@@ -65,6 +65,6 @@
   </dependencies>
 
   <scm>
-    <tag>xwiki-platform-17.10.0</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

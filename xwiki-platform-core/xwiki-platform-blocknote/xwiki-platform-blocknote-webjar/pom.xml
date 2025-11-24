@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-blocknote</artifactId>
-    <version>17.10.0</version>
+    <version>17.10.1-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-blocknote-webjar</artifactId>
@@ -82,6 +82,6 @@ For a complete list, including transitive dependencies, please check the META-IN
   </build>
 
   <scm>
-    <tag>xwiki-platform-17.10.0</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

@@ -341,6 +341,7 @@
   ## Write the now sorted $completeOrderMenu to the output variable.
   #set ($discard = $outputList.addAll($completeOrderMenu))
 #end
+
 #**
  * Augment the $adminMenu variable with all $nameOfThisDocument (i.e. XWiki.ConfigurableClass)
  * XObjects found on this wiki.

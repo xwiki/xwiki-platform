@@ -156,8 +156,9 @@ public class RealtimeEditToolbar extends BaseElement
     {
         By coeditorSelector = By.cssSelector(".realtime-edit-toolbar .realtime-user[data-id='" + coeditorId + "']");
         // The coeditor can be either displayed directly on the toolbar or hidden in the dropdown.
-        getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(coeditorSelector));
-        return new CoeditorElement(getDriver().findElement(coeditorSelector));
+        WebElement coeditorElement =
+            getDriver().waitUntilCondition(driver -> getDriver().findElementWithoutScrolling(coeditorSelector));
+        return new CoeditorElement(coeditorElement);
     }
 
     /**

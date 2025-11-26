@@ -1858,14 +1858,18 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.dropFile("/realtimeWysiwygEditor.png", false);
-        secondTextArea.sendKeys(Keys.RIGHT, " green");
+        // The caret is sometimes restored (placed) before the image (depending how local and remote changes are
+        // interleaved), instead of having the image selected. This happens for instance if a remote patch is applied
+        // when the upload widget is replaced by the actual image widget. We have to press the RIGHT arrow twice to be
+        // sure we end up after the image, because pressing once might simply select the image.
+        secondTextArea.sendKeys(Keys.RIGHT, Keys.RIGHT, " green");
 
         //
         // First Tab
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        firstTextArea.sendKeys(Keys.RIGHT, " yellow ");
+        firstTextArea.sendKeys(Keys.LEFT, Keys.chord(Keys.CONTROL, Keys.RIGHT), " yellow ");
 
         //
         // Second Tab

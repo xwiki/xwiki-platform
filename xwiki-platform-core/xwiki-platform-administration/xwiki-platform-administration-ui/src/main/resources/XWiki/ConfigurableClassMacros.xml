@@ -186,7 +186,7 @@
       #set ($discard = $sectionsByName.put($section.id, $section))
     #end
   #end
-  ## The $query variable is used as basis for setting the URL on sections. (search for ${query} )
+  ## The $query variable is used as a basis for the URL used in sections. (search for ${query} )
   #set ($query = "editor=$escapetool.url(${editor})")
   #if ($editor != 'globaladmin')
     #set ($query = $query + "&amp;space=$escapetool.url(${currentSpace})")

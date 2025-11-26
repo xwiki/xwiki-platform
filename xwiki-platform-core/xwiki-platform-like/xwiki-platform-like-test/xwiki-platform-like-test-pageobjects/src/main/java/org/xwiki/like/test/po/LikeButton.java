@@ -40,6 +40,11 @@ public class LikeButton extends BaseElement
         return this.getDriver().findElementWithoutWaiting(By.className(LIKE_BUTTON_CLASS));
     }
 
+    private WebElement getContainer()
+    {
+        return this.getDriver().findElementWithoutWaiting(By.className("like-container"));
+    }
+
     /**
      * @return {@code true} if the Like button is displayed.
      */
@@ -67,9 +72,8 @@ public class LikeButton extends BaseElement
      */
     public int getLikeNumber()
     {
-        WebElement button = getButton();
         WebElement numberElement =
-            getDriver().findElementWithoutWaiting(button, By.className(LIKE_NUMBER_CLASS));
+            getDriver().findElementWithoutWaiting(getContainer(), By.className(LIKE_NUMBER_CLASS));
         return Integer.parseInt(numberElement.getText());
     }
 

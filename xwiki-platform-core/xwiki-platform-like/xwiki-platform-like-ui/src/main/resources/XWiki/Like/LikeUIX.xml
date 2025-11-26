@@ -354,7 +354,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
     border-radius: @btn-border-radius-small;
     font-size: 1.33em;
     line-height: 1;
-    vertical-align: middle;
+    vertical-align: top;
     padding: 0;
     margin: 0;
     outline: none;

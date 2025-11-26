@@ -47,9 +47,6 @@ like.newlike.error=このページを「いいね」する際のエラー。
 like.unlike.success=このページから「いいね」を解除しました。
 like.unlike.error=このページから「いいね」を解除する際のエラー。
 like.userprofile.menu=「いいね」したページ
-like.button.title=このページの「いいね」の数：{0}
-like.button.title.like=クリックすると現在のページを「いいね」します。このページの「いいね」の数：{0}。
-like.button.title.unlike=クリックすると現在のページから「いいね」を解除します。このページの「いいね」の数：{0}。
 like.likers.empty=このページの「いいね」はまだありません。
 like.likers.number={0}人がこのページに「いいね」しました：
 like.likers.title={0}を「いいね」している人
@@ -63,5 +60,22 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity=キャッシュの大きさ
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=「いいね」の件数の情報はキャッシュに保存されています。このオプションの変更を有効にするにはXWikiを再起動する必要があります。
 XWiki.Like.LikeConfigurationClass_enabled=「いいね」の機能を有効にする
 XWiki.Like.LikeConfigurationClass_enabled.hint=チェックを解除すると「いいね」の機能が無効になり、「いいね」に関する情報を非表示とします。
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 18.0.0RC1
+#######################################
+like.button.title=このページの「いいね」の数：{0}
+like.button.title.like=クリックすると現在のページを「いいね」します。このページの「いいね」の数：{0}。
+like.button.title.unlike=クリックすると現在のページから「いいね」を解除します。このページの「いいね」の数：{0}。
+
+#@deprecatedend
 </content>
 </xwikidoc>

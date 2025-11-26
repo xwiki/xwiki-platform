@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Like.LikeUIX" locale="">
+<xwikidoc version="1.5" reference="XWiki.Like.LikeUIX" locale="">
   <web>XWiki.Like</web>
   <name>LikeUIX</name>
   <language/>
@@ -42,7 +42,8 @@
   #set ($newCounterOptional = $services.like.like($documentReference))
   #if ($newCounterOptional.isPresent())
     #jsonResponse({
-      'counter': $newCounterOptional.get()
+      'counter': $newCounterOptional.get(),
+      'buttonhtml' : "$services.icon.renderHTML('heart')"
     })
   #end
 #elseif ($request.xaction == "unlike" &amp;&amp; $services.csrf.isTokenValid($request.form_token))
@@ -50,7 +51,8 @@
     #set ($newCounterOptional = $services.like.unlike($documentReference))
     #if ($newCounterOptional.isPresent())
       #jsonResponse({
-        'counter': $newCounterOptional.get()
+        'counter': $newCounterOptional.get(),
+        'buttonhtml' : "$services.icon.renderHTML('heart_empty')"
       })
     #end
 #end
@@ -95,6 +97,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -143,16 +146,24 @@
     </property>
     <property>
       <code>define('xwiki-like-messages', {
-  prefix: 'like.button.title.',
+  prefix: 'like.',
   keys: [
-    "unlike",
-    "like"
+    "toggle.hint.unlike",
+    "toggle.hint.like",
+    "newlike.success",
+    "newlike.error",
+    "unlike.success",
+    "unlike.error",
+    "likers.link.zero",
+    "likers.link.one",
+    "likers.link.many",
+    "likers.link.title"
   ]
 });
 require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($, xm, l10n) {
   var likeUIXReference = XWiki.Model.resolve('XWiki.Like.LikeUIX', XWiki.EntityType.DOCUMENT);
   var likeUIXurl = new XWiki.Document(likeUIXReference).getURL('get');
-  
+
   var likeClick = function () {
     var isLiked = $('#is-liked').val() == "true";
     if (!isLiked) {
@@ -162,6 +173,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
     }
   };
 
+  var getLikersLinkText = function(nb) {
+    // conditional parametrized translation formatting seems to not work with the javascript l10n API,
+    // so we're using this fallback method with 3 keys
+    return l10n.get('likers.link.' + (nb == 0 ? 'zero' : (nb &lt;= 1 ? 'one' : 'many')), nb);
+  }
+
   var triggerLike = function () {
      var likeButton = $('.like-button').first();
      $.post(likeUIXurl, {
@@ -169,14 +186,18 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
         'form_token': xm.form_token,
         'document': XWiki.Model.serialize(xm.documentReference)
      }).then(data =&gt; {
-       likeButton.removeClass('btn-primary');
-       likeButton.addClass('btn-default');
-       likeButton.find('.like-number').text(data.counter);
-       likeButton.attr('title', l10n.get('unlike', data.counter));
+       likeButton.removeClass('btn-default');
+       likeButton.addClass('btn-primary');
+       likeButton.html(data.buttonhtml);
+       likeButton.attr('title', l10n.get('toggle.hint.unlike'));
+       let likersLink = likeButton.siblings('.like-number').find('a');
+       likeButton.siblings('.like-number').attr('data-like-count', data.counter);
+       likersLink.text(getLikersLinkText(data.counter));
+       likersLink.attr('title', l10n.get('likers.link.title', data.counter));
        $('#is-liked').val('true');
-       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.success'))", 'done');
+       new XWiki.widgets.Notification(l10n.get('newlike.success'), 'done');
      }).catch(() =&gt; {
-       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.error'))", 'error');
+       new XWiki.widgets.Notification(l10n.get('newlike.error'), 'error');
      });
   };
 
@@ -187,14 +208,18 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       'form_token': xm.form_token,
       'document': XWiki.Model.serialize(xm.documentReference)
     }).then(data =&gt; {
-      unlikeButton.removeClass('btn-default');
-      unlikeButton.addClass('btn-primary');
-      unlikeButton.find('.like-number').text(data.counter);
-      unlikeButton.attr('title', l10n.get('like', data.counter));
+      unlikeButton.removeClass('btn-primary');
+      unlikeButton.addClass('btn-default');
+      unlikeButton.html(data.buttonhtml);
+      unlikeButton.attr('title', l10n.get('toggle.hint.like'));
+      var likersLink = unlikeButton.siblings('.like-number').find('a');
+      unlikeButton.siblings('.like-number').attr('data-like-count', data.counter);
+      likersLink.text(getLikersLinkText(data.counter));
+      likersLink.attr('title', l10n.get('likers.link.title', data.counter));
       $('#is-liked').val('false');
-      new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.success'))", 'done');
+      new XWiki.widgets.Notification(l10n.get('unlike.success'), 'done');
     }).catch(() =&gt; {
-      new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.error'))", 'error');
+      new XWiki.widgets.Notification(l10n.get('unlike.error'), 'error');
     });
   };
   $('.like-button').on('click', likeClick);
@@ -204,7 +229,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -250,6 +275,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -321,7 +347,54 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
 }
 .like-container {
   /* Leave some space between the like button and the next footer item (e.g. the page tags). */
-  margin-right: 2em;
+  padding: 3px 2em 3px 0;
+
+  .like-button {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: @btn-border-radius-small;
+    font-size: 1.33em;
+    line-height: 1;
+    vertical-align: top;
+    padding: 0;
+    margin: 0;
+    outline: none;
+
+    &amp;:active, &amp;:focus, &amp;:active:focus {
+      outline: none;
+    }
+
+    &amp;.btn-primary {
+      color: @link-color;
+
+      &amp;:hover {
+        color: @text-color;
+        background-color: mix(@xwiki-page-content-bg, @text-color, 89%);
+        box-shadow: 0 0 0 0.2em mix(@xwiki-page-content-bg, @text-color, 89%);
+      }
+    }
+
+    &amp;.btn-default {
+      color: @text-color;
+
+      &amp;:hover {
+        color: @link-color;
+        background-color: mix(@xwiki-page-content-bg, @link-color, 89%);
+        box-shadow: 0 0 0 0.2em mix(@xwiki-page-content-bg, @link-color, 89%);
+      }
+    }
+
+    &amp;:hover {
+      background: transparent;
+      border: none;
+    }
+  }
+
+  .like-number {
+    display: inline-block;
+    padding-left: 0.2em;
+  }
 }</code>
     </property>
     <property>
@@ -366,6 +439,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
         <number>4</number>
@@ -375,7 +450,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -395,6 +470,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -425,6 +501,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -471,15 +548,17 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
   #set ($optLikeCount = $services.like.getLikes($doc))
   #if ($optLikeCount.isPresent())
     #set ($likeCount = $optLikeCount.get())
-    #set ($discard = $xwiki.ssx.use('XWiki.Like.LikeUIX'))
+    #set ($discard = $xwiki.ssx.use('XWiki.Like.LikeUIX', {'theme': $themeDocFullName}))
     #set ($discard = $xwiki.jsx.use('XWiki.Like.LikeUIX'))
     &lt;div class="like-container"&gt;
       &lt;input id="is-liked" type="hidden" value="$services.like.isLiked($doc)" /&gt;
       #if ($isGuest || $services.like.isLiked($doc))
-        #set ($btnClass = "btn-default")
+        #set ($btnClass = "btn-primary")
+        #set ($heartIconName = 'heart')
         #set ($titleMessageTranslationKey = "like.button.title.unlike")
       #elseif (!$isGuest)
-        #set ($btnClass = "btn-primary")
+        #set ($btnClass = "btn-default")
+        #set ($heartIconName = 'heart_empty')
         #set ($titleMessageTranslationKey = "like.button.title.like")
       #end
       #set ($disabledButton = false)
@@ -487,11 +566,23 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
         #set ($disabledButton = true)
         #set ($titleMessageTranslationKey = "like.button.title")
       #end
-      &lt;button class="like-button btn $btnClass badge"
+      #set($likersText = $services.localization.render("like.likers.link.many", [$likeCount]))
+      #if ($likeCount == 0)
+        #set($likersText = $services.localization.render("like.likers.link.zero", [$likeCount]))
+      #elseif ($likeCount == 1)
+        #set($likersText = $services.localization.render("like.likers.link.one", [$likeCount]))
+      #end
+      &lt;button class="like-button btn $btnClass"
         #if($disabledButton) disabled #{end}
-        title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;
-          $services.icon.renderHTML('heart') &lt;span class="like-number"&gt;$likeCount&lt;/span&gt;
-      &lt;/button&gt;
+        title="$escapetool.xml($services.localization.render($titleMessageTranslationKey))"&gt;
+          $services.icon.renderHTML($heartIconName)
+        &lt;/button&gt;
+        &lt;span class="like-number" data-like-count="$escapetool.xml($likeCount)"&gt;
+          &lt;a href="$escapetool.xml($doc.getURL('view', 'viewer=likers'))" 
+            title="$escapetool.xml($services.localization.render('like.likers.link.title', [$likeCount]))"&gt;
+            $escapetool.xml($likersText)
+          &lt;/a&gt;
+        &lt;/span&gt;
     &lt;/div&gt;
   #end
 #end

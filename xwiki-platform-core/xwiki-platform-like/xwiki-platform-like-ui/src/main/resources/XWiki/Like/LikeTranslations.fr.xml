@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Like.LikeTranslations" locale="fr">
+<xwikidoc version="1.5" reference="XWiki.Like.LikeTranslations" locale="fr">
   <web>XWiki.Like</web>
   <name>LikeTranslations</name>
   <language>fr</language>
@@ -50,6 +50,12 @@ like.userprofile.menu=Pages Aimées
 like.button.title=Nombre de J''aime pour cette page : {0}
 like.button.title.like=Cliquez pour Aimer cette page. Actuellement {0} "J''aime" pour cette page.
 like.button.title.unlike=Cliquez pour Ne plus aimer cette page. Actuellement {0} "J''aime" pour cette page.
+like.toggle.hint.like=Aimer cette page.
+like.toggle.hint.unlike=Ne plus aimer cette page.
+like.likers.link.zero={0} J''aime
+like.likers.link.one={0} J''aime
+like.likers.link.many={0} J''aime
+like.likers.link.title=Actuellement {0} "J''aime" pour cette page. Cliquez pour voir les personne(s) qui aime(nt) cette page.
 like.likers.empty=Personne n'aime encore cette page.
 like.likers.number={0} personne(s) aime(nt) cette page :
 like.likers.title=Personnes qui aiment {0}

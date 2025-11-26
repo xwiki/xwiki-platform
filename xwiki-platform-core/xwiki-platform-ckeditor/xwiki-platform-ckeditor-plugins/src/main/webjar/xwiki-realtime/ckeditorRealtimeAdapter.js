@@ -149,7 +149,10 @@ define('xwiki-ckeditor-realtime-adapter', [
     /** @inheritdoc */
     parseInputHTML(html) {
       const fixedHTML = this._ckeditor.dataProcessor.toHtml(html);
-      const doc = new DOMParser().parseFromString(fixedHTML, 'text/html');
+      // We use the DOMParser from the window where the content is being edited in order to make sure the created DOM
+      // nodes are using the same type definitions as the DOM nodes from the edited content (e.g. the same Element and
+      // Text types). This is important because DiffDOM relies on instanceof checks to determine the node types.
+      const doc = new this._ckeditor.window.$.DOMParser().parseFromString(fixedHTML, 'text/html');
       const widgets = this._initializeWidgets(doc.body);
       this._protectWidgets(widgets, doc.body);
       return this._ensureSameContentWrapper(doc.body);

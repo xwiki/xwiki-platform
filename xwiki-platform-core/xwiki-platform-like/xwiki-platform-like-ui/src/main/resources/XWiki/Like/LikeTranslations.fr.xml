@@ -69,5 +69,23 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity=Capacité du Cache
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Nombre d'information J'aime à conserver dans le cache. Notez que vous devrez redémarrer XWiki pour que cette option soit prise en compte.
 XWiki.Like.LikeConfigurationClass_enabled=Activer la fonctionnalité "J'aime"
 XWiki.Like.LikeConfigurationClass_enabled.hint=Décocher pour désactiver la fonctionnalité "J'aime" et masquer les informations liées.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 18.0.0RC1
+#######################################
+
+like.button.title=Nombre de J''aime sur cette page : {0}
+like.button.title.like=Cliquez pour aimer cette page. Actuellement {0} "J''aime" pour cette page.
+like.button.title.unlike=Cliquez pour ne plus aimer cette page. Actuellement {0} "J''aime" pour cette page.
+
+#@deprecatedend
 </content>
 </xwikidoc>

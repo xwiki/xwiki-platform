@@ -47,9 +47,6 @@ like.newlike.error=페이지에 좋아요를 누르는 중에 오류가 발생�
 like.unlike.success=페이지에 좋아요 표시가 취소되었습니다.
 like.unlike.error=페이지 좋아요 취소를 시도하는 중에 오류가 발생했습니다.
 like.userprofile.menu=좋아요를 누른 페이지
-like.button.title=이 페이지의 좋아요 수: {0}
-like.button.title.like=현재 페이지에 좋아요를 클릭하세요. 이 페이지의 좋아요 수: {0}.
-like.button.title.unlike=현재 페이지를 취소하려면 클릭하세요. 이 페이지의 좋아요 수: {0}.
 like.likers.empty=아직 이 페이지를 좋아하는 사람이 없습니다.
 like.likers.number={0}명이 이 페이지를 좋아합니다:
 like.likers.title={0}을(를) 좋아하는 사람들
@@ -63,5 +60,22 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity=캐시 용량
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=캐시에 보관된 좋아요 정보의 수입니다. 이 옵션 변경 사항을 적용하려면 XWiki를 다시 시작해야 합니다 .
 XWiki.Like.LikeConfigurationClass_enabled=좋아요 기능 활성화
 XWiki.Like.LikeConfigurationClass_enabled.hint=선택을 취소하면 좋아요 기능이 비활성화되고 좋아요와 관련된 정보가 숨겨집니다.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 18.0.0RC1
+#######################################
+like.button.title=이 페이지의 좋아요 수: {0}
+like.button.title.like=현재 페이지에 좋아요를 클릭하세요. 이 페이지의 좋아요 수: {0}.
+like.button.title.unlike=현재 페이지를 취소하려면 클릭하세요. 이 페이지의 좋아요 수: {0}.
+
+#@deprecatedend
 </content>
 </xwikidoc>

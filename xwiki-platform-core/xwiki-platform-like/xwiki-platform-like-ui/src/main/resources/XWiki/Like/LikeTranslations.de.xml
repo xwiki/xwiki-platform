@@ -47,9 +47,6 @@ like.newlike.error=Fehler beim setzen des "Gefällt mir".
 like.unlike.success=Die Seite gefällt Ihnen nun nicht mehr.
 like.unlike.error=Fehler beim Entfernen des "Gefällt mir".
 like.userprofile.menu="Gefällt mir" Seiten
-like.button.title=Anzahl der "Gefällt mir" auf der Seite: {0}
-like.button.title.like=Klicken Sie, um die aktuelle Seite zu "Liken". Anzahl der Likes auf dieser Seite: {0}.
-like.button.title.unlike=Klicken Sie, um die aktuelle Seite nicht mehr zu "Liken". Anzahl der Likes auf dieser Seite: {0}.
 like.likers.empty=Niemandem gefällt diese Seite bisher.
 like.likers.number={0} Personen gefällt die Seite:
 like.likers.title={0} Gefällt mir
@@ -63,5 +60,22 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache-Größe
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Anzahl der "Gefällt mir"-Informationen im Cache. Sie müssen XWiki neustarten, damit veränderte Einstellungen angewendet werden.
 XWiki.Like.LikeConfigurationClass_enabled=Aktivieren der Gefällt-mir-Funktion
 XWiki.Like.LikeConfigurationClass_enabled.hint=Wenn diese Option nicht aktiviert ist, wird die Funktion "Gefällt mir" deaktiviert und Informationen zu "Likes" werden ausgeblendet.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 18.0.0RC1
+#######################################
+like.button.title=Anzahl der "Gefällt mir" auf der Seite: {0}
+like.button.title.like=Klicken Sie, um die aktuelle Seite zu "Liken". Anzahl der Likes auf dieser Seite: {0}.
+like.button.title.unlike=Klicken Sie, um die aktuelle Seite nicht mehr zu "Liken". Anzahl der Likes auf dieser Seite: {0}.
+
+#@deprecatedend
 </content>
 </xwikidoc>

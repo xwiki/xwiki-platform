@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -260,7 +260,7 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return StringUtils.contains(getContent(), html);
+                return Strings.CS.contains(getContent(), html);
             } catch (StaleElementReferenceException e) {
                 // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
@@ -285,7 +285,7 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return StringUtils.contains(getText(), textFragment);
+                return Strings.CS.contains(getText(), textFragment);
             } catch (StaleElementReferenceException e) {
                 // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
@@ -365,8 +365,8 @@ public class RichTextAreaElement extends BaseElement
     {
         try {
             WebElement rootEditableElement = getRootEditableElement();
-            getDriver().waitUntilCondition(
-                driver -> Objects.equals(placeholder, rootEditableElement.getDomAttribute("data-cke-editorplaceholder")));
+            getDriver().waitUntilCondition(driver -> Objects.equals(placeholder,
+                rootEditableElement.getDomAttribute("data-cke-editorplaceholder")));
         } finally {
             maybeSwitchToDefaultContent();
         }
@@ -511,6 +511,7 @@ public class RichTextAreaElement extends BaseElement
             script.append("document.body.append(fileInput);\n");
             script.append("return fileInput;\n");
             WebElement fileInput = (WebElement) getDriver().executeScript(script.toString());
+            assert fileInput != null;
 
             // Set the file input value.
             String absolutePath = Paths.get(getClass().getResource(filePath).toURI()).toFile().getAbsolutePath();
@@ -635,7 +636,7 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().waitUntilCondition(driver -> {
             try {
-                return !StringUtils.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
+                return !Strings.CS.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
             } catch (StaleElementReferenceException e) {
                 // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
                 // waiting, for instance because a macro was inserted or updated as a result of a remote change.
@@ -708,11 +709,11 @@ public class RichTextAreaElement extends BaseElement
             // This doesn't seem to work in Firefox, at least not for the standalone WYSIWYG edit mode, where the rich
             // text area is implemented using an iframe. Here's what we tried:
             // * pausing after each action (e.g. hover the image, pause 2s, click and hold the drag handle, pause 2s,
-            //   and so on)
+            // and so on)
             // * clicking the image before dragging it
             // * clicking the rich text area before dragging the image
             // * use the root editable element as the drop target, and consider the offsets relative to the top left
-            //   corner of the rich text area
+            // corner of the rich text area
             // * calling perform() after each action
             // * switching to the top frame and dropping on the iframe element used by the rich text area
             getDriver().createActions()

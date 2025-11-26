@@ -66,6 +66,23 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache capacity
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.
 XWiki.Like.LikeConfigurationClass_enabled=Enable Like feature
 XWiki.Like.LikeConfigurationClass_enabled.hint=If unchecked this will disable the Like feature and hide information related to Likes.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 18.0.0RC1
+#######################################
+like.button.title=Number of likes on this page: {0}
+like.button.title.like=Click to like the current page. Number of likes on this page: {0}.
+like.button.title.unlike=Click to unlike the current page. Number of likes on this page: {0}.
+
+#@deprecatedend
   </content>
   <object>
     <name>XWiki.Like.LikeTranslations</name>

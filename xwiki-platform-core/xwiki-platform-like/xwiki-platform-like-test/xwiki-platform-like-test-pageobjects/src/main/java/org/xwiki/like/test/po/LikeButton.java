@@ -74,7 +74,7 @@ public class LikeButton extends BaseElement
     {
         WebElement numberElement =
             getDriver().findElementWithoutWaiting(getContainer(), By.className(LIKE_NUMBER_CLASS));
-        return Integer.parseInt(numberElement.getText());
+        return Integer.parseInt(numberElement.getAttribute("data-like-count"));
     }
 
     /**

@@ -32,17 +32,22 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveData;
+import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
+import org.xwiki.livedata.internal.LiveDataRendererConfiguration;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
 import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Scripting APIs for the Live Data component.
@@ -75,6 +80,9 @@ public class LiveDataScriptService implements ScriptService
     @Inject
     private LiveDataRenderer liveDataRenderer;
 
+    @Inject
+    private LiveDataRendererConfiguration liveDataRendererConfiguration;
+
     /**
      * Executes a live data query.
      *
@@ -84,7 +92,9 @@ public class LiveDataScriptService implements ScriptService
     public LiveData query(Map<String, Object> queryConfig)
     {
         try {
-            return query(this.configHelper.createQuery(queryConfig));
+            LiveDataConfiguration liveDataConfig =
+                this.liveDataRendererConfiguration.getLiveDataConfiguration(convertParams(queryConfig));
+            return query(liveDataConfig.getQuery());
         } catch (Exception e) {
             this.logger.warn("Failed to create the live data query from [{}]. Root cause is [{}].", queryConfig,
                 ExceptionUtils.getRootCauseMessage(e));
@@ -101,10 +111,10 @@ public class LiveDataScriptService implements ScriptService
     public LiveData query(String queryConfigJSON)
     {
         try {
-            return query(this.configHelper.createQuery(queryConfigJSON));
-        } catch (Exception e) {
-            this.logger.warn("Failed to create the live data query from JSON [{}]. Root cause is [{}].",
-                queryConfigJSON, ExceptionUtils.getRootCauseMessage(e));
+            return query(new ObjectMapper().readValue(queryConfigJSON, Map.class));
+        } catch (JsonProcessingException e) {
+            this.logger.warn("Failed to convert the live data query parameters to a Map. Root cause is [{}].",
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }
@@ -192,7 +202,7 @@ public class LiveDataScriptService implements ScriptService
 
     /**
      * Renders a Live Data.
-     * 
+     *
      * @param parameters the parameters to pass to the Live Data executor
      * @return the result of {@link #execute(Map)} in the current syntax
      * @throws LiveDataException in case of error when rendering the Live Data
@@ -206,7 +216,7 @@ public class LiveDataScriptService implements ScriptService
 
     /**
      * Renders a Live Data.
-     * 
+     *
      * @param parameters the parameters to pass to the Live Data executor
      * @param advancedParameters the advanced parameters to pass to the Live Data executor
      * @return the result of {@link #execute(Map, Map)} in the current syntax

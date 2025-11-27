@@ -302,7 +302,7 @@ platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
 platform.wiki.delete.confirmation.no=No, take me back!
 
 #######################################
-## until 17.10-rc-1
+## until 18.0.0RC1
 #######################################
 platform.wiki.browse=Browse Wikis
 

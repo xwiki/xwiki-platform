@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 
 import org.xwiki.livedata.internal.DefaultLiveDataConfigurationResolver;
 import org.xwiki.livedata.internal.LiveDataRenderer;
-import org.xwiki.livedata.internal.LiveDataScriptServiceConfiguration;
+import org.xwiki.livedata.internal.LiveDataRendererConfiguration;
 import org.xwiki.livedata.internal.StringLiveDataConfigurationResolver;
 import org.xwiki.skinx.internal.JsFileSkinExtension;
 import org.xwiki.test.annotation.ComponentList;
@@ -52,7 +52,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultLiveDataConfigurationResolver.class,
     StringLiveDataConfigurationResolver.class,
     JsFileSkinExtension.class,
-    LiveDataScriptServiceConfiguration.class,
+    LiveDataRendererConfiguration.class,
     LiveDataRenderer.class
 })
 @Inherited

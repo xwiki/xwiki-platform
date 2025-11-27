@@ -32,8 +32,8 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
+import org.xwiki.livedata.internal.LiveDataRendererConfiguration;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
-import org.xwiki.livedata.internal.LiveDataScriptServiceConfiguration;
 import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  * @since 16.0.0RC1
  */
 @ComponentTest
-@ComponentList({ LiveDataScriptServiceConfiguration.class })
+@ComponentList({ LiveDataRendererConfiguration.class })
 class LiveDataScriptServiceTest
 {
     @InjectMockComponents
@@ -117,7 +117,7 @@ class LiveDataScriptServiceTest
         when(queries.get(query)).thenReturn(liveData);
         when(this.sourceManager.get(source)).thenReturn(Optional.of(liveDataSource));
 
-        var result = this.scriptService.query(Map.of("id", "users",
+        LiveData result = this.scriptService.query(Map.of("id", "users",
             "properties", "_avatar,doc.name,first_name,last_name",
             "source", "liveTable",
             "sourceParameters", "className=XWiki.XWikiUsers&translationPrefix=xe.userdirectory."));

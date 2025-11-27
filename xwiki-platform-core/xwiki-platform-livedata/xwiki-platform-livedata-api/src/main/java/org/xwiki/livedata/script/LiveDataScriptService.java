@@ -38,8 +38,8 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
 import org.xwiki.livedata.internal.LiveDataRenderer;
+import org.xwiki.livedata.internal.LiveDataRendererConfiguration;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
-import org.xwiki.livedata.internal.LiveDataScriptServiceConfiguration;
 import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
@@ -80,7 +80,7 @@ public class LiveDataScriptService implements ScriptService
     private LiveDataRenderer liveDataRenderer;
 
     @Inject
-    private LiveDataScriptServiceConfiguration liveDataScriptServiceConfiguration;
+    private LiveDataRendererConfiguration liveDataRendererConfiguration;
 
     /**
      * Executes a live data query.
@@ -91,9 +91,8 @@ public class LiveDataScriptService implements ScriptService
     public LiveData query(Map<String, Object> queryConfig)
     {
         try {
-            LiveDataRendererParameters liveDataRendererParameters = convertParams(queryConfig);
             LiveDataConfiguration liveDataConfig =
-                this.liveDataScriptServiceConfiguration.getLiveDataConfiguration(liveDataRendererParameters);
+                this.liveDataRendererConfiguration.getLiveDataConfiguration(convertParams(queryConfig));
             return query(liveDataConfig.getQuery());
         } catch (Exception e) {
             this.logger.warn("Failed to create the live data query from [{}]. Root cause is [{}].", queryConfig,
@@ -200,7 +199,7 @@ public class LiveDataScriptService implements ScriptService
 
     /**
      * Renders a Live Data.
-     * 
+     *
      * @param parameters the parameters to pass to the Live Data executor
      * @return the result of {@link #execute(Map)} in the current syntax
      * @throws LiveDataException in case of error when rendering the Live Data
@@ -213,7 +212,7 @@ public class LiveDataScriptService implements ScriptService
 
     /**
      * Renders a Live Data.
-     * 
+     *
      * @param parameters the parameters to pass to the Live Data executor
      * @param advancedParameters the advanced parameters to pass to the Live Data executor
      * @return the result of {@link #execute(Map, Map)} in the current syntax
@@ -238,15 +237,16 @@ public class LiveDataScriptService implements ScriptService
 
     private LiveDataRendererParameters convertParams(Map<String, Object> parameters) throws LiveDataException
     {
-        LiveDataRendererParameters liveDataParameters = new LiveDataRendererParameters();
+        LiveDataRendererParameters liveDataRendererParameters = new LiveDataRendererParameters();
         for (Map.Entry<String, Object> stringObjectEntry : parameters.entrySet()) {
             try {
-                PropertyUtils.setProperty(liveDataParameters, stringObjectEntry.getKey(), stringObjectEntry.getValue());
+                PropertyUtils.setProperty(liveDataRendererParameters, stringObjectEntry.getKey(),
+                    stringObjectEntry.getValue());
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new LiveDataException(String.format("Failed to set property [%s] with value [%s] in object [%s]",
-                    stringObjectEntry.getKey(), stringObjectEntry.getValue(), liveDataParameters), e);
+                    stringObjectEntry.getKey(), stringObjectEntry.getValue(), liveDataRendererParameters), e);
             }
         }
-        return liveDataParameters;
+        return liveDataRendererParameters;
     }
 }

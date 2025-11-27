@@ -44,16 +44,16 @@ import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataQuery;
 
 /**
- * Provides services to manipulate configurations for the {@link LiveDataScriptServiceConfiguration}.
+ * Provides services to manipulate configurations for the {@link LiveDataRendererConfiguration}.
  *
  * @version $Id$
  * @since 14.9
  * @since 14.4.7
  * @since 13.10.10
  */
-@Component(roles = LiveDataScriptServiceConfiguration.class)
+@Component(roles = LiveDataRendererConfiguration.class)
 @Singleton
-public class LiveDataScriptServiceConfiguration
+public class LiveDataRendererConfiguration
 {
     private static final String UTF8 = "UTF-8";
 
@@ -74,7 +74,7 @@ public class LiveDataScriptServiceConfiguration
      * parameters.
      *
      * @param content the string representation of the json live data advanced configuration
-     * @param parameters the Live Data script service parameters
+     * @param parameters the Live Data macro parameters
      * @return the complete Live Data configuration
      * @throws Exception in case of error when resolving the configuration
      */
@@ -95,7 +95,10 @@ public class LiveDataScriptServiceConfiguration
      * @param parameters the Live Data script service parameters
      * @return the complete Live Data configuration
      * @throws Exception in case of error when resolving the configuration
-     * @since 17.0.0RC1
+     * @since 18.0.0RC1
+     * @since 17.10.1
+     * @since 17.4.8
+     * @since 16.10.16
      */
     public LiveDataConfiguration getLiveDataConfiguration(LiveDataRendererParameters parameters) throws Exception
     {

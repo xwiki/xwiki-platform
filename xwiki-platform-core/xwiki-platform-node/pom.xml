@@ -124,7 +124,7 @@
               <goal>pnpm</goal>
             </goals>
             <configuration>
-              <arguments>run deploy -- ${xwiki.npm.snapshot.registry} ${xwiki.npm.release.registry} ${basedir}/src/main/node</arguments>
+              <arguments>run deploy ${xwiki.npm.snapshot.registry} ${xwiki.npm.release.registry} ${basedir}/src/main/node</arguments>
               <workingDirectory>${basedir}/src/main/node</workingDirectory>
               <installDirectory>${basedir}/target</installDirectory>
             </configuration>

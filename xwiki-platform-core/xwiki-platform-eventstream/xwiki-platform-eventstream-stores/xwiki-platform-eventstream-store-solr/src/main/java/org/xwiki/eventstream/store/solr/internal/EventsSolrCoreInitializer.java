@@ -87,7 +87,7 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_14_7;
+        return SCHEMA_VERSION_17_10;
     }
 
     @Override

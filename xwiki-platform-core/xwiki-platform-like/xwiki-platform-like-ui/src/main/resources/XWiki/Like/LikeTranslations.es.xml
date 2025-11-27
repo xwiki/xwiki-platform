@@ -47,9 +47,12 @@ like.newlike.error=Error al intentar dar "me gusta" a la página.
 like.unlike.success=La página ha recibido algún "Ya no me gusta".
 like.unlike.error=Error al intentar dar "ya no me gusta" a la página.
 like.userprofile.menu=Páginas que me gustan
-like.button.title=Número de "Me gusta" de esta página: {0}
-like.button.title.like=Clica para activar "me gusta" para la página en curso. El número de "me gusta" en esta página es {0}.
-like.button.title.unlike=Clica para desactivar "me gusta" en la página en curso. El número de "me gusta" en esta página es {0}.
+### Missing: like.toggle.hint.like=Like this page.
+### Missing: like.toggle.hint.unlike=Unlike this page. You currently like this page.
+### Missing: like.likers.link.zero={0} Likes
+### Missing: like.likers.link.one={0} Like
+### Missing: like.likers.link.many={0} Likes
+### Missing: like.likers.link.title=Number of likes on this page: {0}. Click to see who liked this page.
 like.likers.empty=Todavía no le gusta a nadie esta página.
 like.likers.number={0} person(as) le gustas esta página:
 like.likers.title=Personas a las que les gusta {0}
@@ -63,5 +66,22 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity=Capacidad de la caché
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Número de información de "Me gusta" guardada en la caché. Ten en cuenta que tienes que reiniciar XWiki para que se activen los cambios de esta opción.
 XWiki.Like.LikeConfigurationClass_enabled=Activa la funcionalidad "Like"
 XWiki.Like.LikeConfigurationClass_enabled.hint=Si está desactivado, desabilitará la funcionalidad "Like" y ocultará la información relacionada con "Likes".
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 18.0.0RC1
+#######################################
+like.button.title=Número de "Me gusta" de esta página: {0}
+like.button.title.like=Clica para activar "me gusta" para la página en curso. El número de "me gusta" en esta página es {0}.
+like.button.title.unlike=Clica para desactivar "me gusta" en la página en curso. El número de "me gusta" en esta página es {0}.
+
+#@deprecatedend
 </content>
 </xwikidoc>

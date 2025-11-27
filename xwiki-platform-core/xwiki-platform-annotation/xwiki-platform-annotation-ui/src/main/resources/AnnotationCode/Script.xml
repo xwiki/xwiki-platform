@@ -985,11 +985,19 @@ XWiki.Annotation = Class.create({
     // We nest the content of the first one in a button. 
     // All the highlights elements fulfill the same role so there's little point extending every single one.
     // It could be detrimental for the user experience to have to tab through all of the buttons.
-    let firstSpanContent = allSpans[0].innerHTML;
-    let toggleButton = document.createElement("button");
-    toggleButton.innerHTML = firstSpanContent
+    let firstSpanContent = allSpans[0].textContent;
+    let toggleButton = document.createElement('button');
+    toggleButton.addClassName('annotation-toggle');
+    let toggleButtonDescription = document.createElement('span');
+    toggleButtonDescription.addClassName('hidden');
+    toggleButtonDescription.id = 'annotation-toggle-description-' + ann.annotationId;
+    toggleButtonDescription.textContent =
+      "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))";
+    toggleButton.setAttribute('aria-describedby', toggleButtonDescription.id);
+    toggleButton.textContent = firstSpanContent;
+    toggleButton.appendChild(toggleButtonDescription);
     allSpans[0].innerHTML = '';
-    allSpans[0].append(toggleButton);
+    allSpans[0].appendChild(toggleButton);
     // Add the onclick listener on every span of this annotation.
     allSpans.forEach(markNode =&gt; markNode.addEventListener('click', (event) =&gt;
       this.onMarkerClick(event, ann.annotationId)));
@@ -1161,11 +1169,11 @@ XWiki.Annotation = Class.create({
   },
 
   /**
-   * Remove the wrapper for annotations. The selection highlight is also removed in case the new annotation
+   * Remove the wrappers for annotations. The selection highlight is also removed in case the new annotation
    * was deleted.
    */
   removeAnnotationsAndSelectionMarkups: function() {
-    document.querySelectorAll("mark.annotation, mark.selection-highlight")
+    document.querySelectorAll("mark.annotation, button.annotation-toggle, mark.selection-highlight")
       .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));
     this.fetchedAnnotations = false;
   },
@@ -1330,8 +1338,23 @@ XWiki.Annotation = Class.create({
       this.hideBubble(bubble);
     } else {
       // Show the bubble and fetch the annotation display in it.
-      var bubble = this.displayLoadingBubble(event.pageX, event.pageY, true);
+      // If the event is triggered via keyboard, we use the annotation highlight position instead of the event position
+      let bubbleCoordX,bubbleCoordY ;
+      if (event.pageX === 0 &amp;&amp; event.pageY === 0) {
+        let highlight = event.target;
+        let rect = highlight.getBoundingClientRect();
+        bubbleCoordX = rect.left + window.scrollX + highlight.offsetWidth / 2;
+        bubbleCoordY = rect.top + window.scrollY + highlight.offsetHeight / 2;
+      }
+      else {
+        bubbleCoordX = event.pageX;
+        bubbleCoordY = event.pageY;
+      }
+      var bubble = this.displayLoadingBubble(bubbleCoordX, bubbleCoordY, true);
       bubble.writeAttribute('id', bubbleId);
+      // Link semantically the clicked mark to the generated bubble
+      // Adding this info earlier is useless since the element is not even loaded before the click.
+      event.target.writeAttribute('aria-details', bubbleId);
       this.fetchAndShowAnnotationDetails(id, bubble);
     }
   },

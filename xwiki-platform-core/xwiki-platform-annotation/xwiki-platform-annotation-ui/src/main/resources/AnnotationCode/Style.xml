@@ -272,11 +272,12 @@
 }
 
 /* Reset the styles so that the button doesn't distract from the text. */
-.annotation-highlight > button {
+.annotation-highlight &gt; button.annotation-toggle {
   background: none;
   border: none;
   padding: 0;
   text-align: left;
+  white-space-collapse: preserve;
 }
 
 /* Annotation boxes */

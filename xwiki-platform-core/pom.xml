@@ -151,40 +151,8 @@
             </revapi.differences>
             -->
 
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method boolean org.xwiki.bridge.DocumentAccessBridge::hasProgrammingRights()</old>
-                  <justification>Not a breakage, method was moved to legacy</justification>
-                  <criticality>allowed</criticality>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method org.apache.commons.httpclient.HttpClient com.xpn.xwiki.XWiki::getHttpClient(int, java.lang.String)</old>
-                  <justification>Expose a vulnerable and long dead library, and should have never been public in the first place</justification>
-                  <criticality>highlight</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Classes moved to xwiki-commons-store-api, available as transitive dependency</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class org.xwiki.store.StoreException</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>interface org.xwiki.store.StreamProvider</old>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

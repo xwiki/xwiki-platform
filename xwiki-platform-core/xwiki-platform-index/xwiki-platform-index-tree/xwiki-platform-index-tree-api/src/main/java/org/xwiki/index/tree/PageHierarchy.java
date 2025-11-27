@@ -26,7 +26,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Used to navigate the hierarchy of wiki pages (documents).
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 16.4.0RC1
  */
 @Role
-@Unstable
 public interface PageHierarchy
 {
     /**

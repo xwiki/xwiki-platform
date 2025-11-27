@@ -1533,7 +1533,6 @@ public class Document extends Api
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     public long getRevisionsCount(RevisionCriteria criteria) throws XWikiException
     {
         return this.doc.getRevisionsCount(criteria, getXWikiContext());
@@ -3533,7 +3532,6 @@ public class Document extends Api
      * use more rights than defined in the object, {@code false} otherwise. This property is ignored on translations.
      * @since 16.10.0RC1
      */
-    @Unstable
     public boolean isEnforceRequiredRights()
     {
         return this.doc.isEnforceRequiredRights();
@@ -3545,7 +3543,6 @@ public class Document extends Api
      * more rights than defined in the object. This property is ignored on translations.
      * @since 16.10.0RC1
      */
-    @Unstable
     public void setEnforceRequiredRights(boolean enforceRequiredRights)
     {
         getDoc().setEnforceRequiredRights(enforceRequiredRights);
@@ -3642,7 +3639,6 @@ public class Document extends Api
      * @throws AccessDeniedException when the current author is not allowed to use this API
      * @since 16.1.0RC1
      */
-    @Unstable
     public void setAuthor(UserReference userReference) throws AccessDeniedException
     {
         getContextualAuthorizationManager().checkAccess(Right.PROGRAM);

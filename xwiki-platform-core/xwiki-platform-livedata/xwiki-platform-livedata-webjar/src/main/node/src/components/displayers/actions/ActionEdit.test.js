@@ -21,7 +21,7 @@
 import { config, mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 import ActionEdit from "./ActionEdit.vue";
-import _ from "lodash";
+import _ from "lodash-es";
 import sinon from "sinon";
 
 config.global.mocks = {

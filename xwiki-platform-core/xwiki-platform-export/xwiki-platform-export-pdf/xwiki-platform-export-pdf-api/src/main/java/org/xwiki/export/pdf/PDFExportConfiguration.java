@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * PDF export configuration options.
@@ -50,7 +49,7 @@ public interface PDFExportConfiguration
 
     /**
      * @return the Docker image used to create the Docker container running the headless Chrome web browser; defaults to
-     *         "{@code zenika/alpine-chrome:latest}"
+     *         "{@code femtopixel/google-chrome-headless:latest}"
      */
     String getChromeDockerImage();
 
@@ -126,7 +125,6 @@ public interface PDFExportConfiguration
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     default boolean isXWikiURISpecified()
     {
         try {

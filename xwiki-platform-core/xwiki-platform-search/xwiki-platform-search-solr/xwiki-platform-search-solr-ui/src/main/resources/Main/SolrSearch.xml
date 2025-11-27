@@ -125,11 +125,7 @@
     <property>
       <code>require(['jquery', 'xwiki-events-bridge'], function($) {
   var enhanceSearchResultHighlights = function() {
-    var highlights = $(this).removeClass('hidden').parent().prev('.search-result-highlights').addClass('preview');
-
-    // Workaround for IE8 which doesn't support :first-of-type CSS selector.
-    highlights.find('.search-result-highlight').first().addClass('first').parent('dd').addClass('first')
-      .prev('dt').addClass('first');
+    const highlights = $(this).removeClass('hidden').prev('.search-result-highlights').addClass('preview');
 
     $(this).one('click', function(event) {
       event.preventDefault();
@@ -162,10 +158,16 @@
     }
   };
 
-  var addFacetValueCheckbox = function(index) {
+  var addFacetValueCheckbox = function() {
     // Create an id unique to the facet value.
     let facetContainer = $(this).parents('.search-facet').first();
-    $(this).attr('id', facetContainer.attr('data-name') + '-' + index.toString());
+    // We need the ids of the target facet elements to stay stable through the change, in order to refocus the item
+    // that was clicked and triggered the change.
+    // We use the JQuery index, so that id indexes are reset across facetContainers.
+    // This allows for stable indexes: when reloading the facets after changing the filter for the target facet X,
+    // the ids of all the checkbox for the target facet X will keep the same index.
+    // This property is lost if multiple facets are changed in the query at once.
+    $(this).attr('id', facetContainer.attr('data-name') + '-' + facetContainer.find('a.itemName').index($(this)));
     // Initialize the checkbox.
     let checkBox = $(document.createElement('input')).attr('type', 'checkbox');
     checkBox.attr('aria-labelledby', $(this).attr('id'));
@@ -193,7 +195,7 @@
     updateExpandCollapseAllFacetsState(facetsContainer);
 
     // Expand/Collapse toggle for each facet.
-    facetsContainer.find('.facet-toggler').on('click', function(event) {
+    facetsContainer.find('.facet-toggle').on('click', function(event) {
       $(event.target).parents('.search-facet').toggleClass('expanded');
       updateExpandCollapseAllFacetsState(facetsContainer);
     });
@@ -207,6 +209,11 @@
   var getQueryString = function(url) {
     var queryIndex = url.indexOf('?');
     return queryIndex &lt; 0 ? '' : url.substr(queryIndex + 1);
+  };
+  
+  let removeQueryString = function(url) {
+    let queryIndex = url.indexOf('?');
+    return queryIndex &lt; 0 ? url : url.substring(0, queryIndex);
   };
 
   var getSearchUIState = function() {
@@ -237,7 +244,9 @@
 
   var searchRequest = null;
 
-  var pushSearchUIState = function(viewURL) {
+  // changeTargetSelector is the CSS selector of the facet anchor that initiated this reload. '
+  // We expect the focus to go back to this place once the UI is reloaded.
+  var pushSearchUIState = function(viewURL, changeTargetSelector) {
     // If there is a request in progress, abort it to prevent its callback from being called.
     searchRequest &amp;&amp; searchRequest.abort();
     $('.search-ui').attr('aria-busy', true);
@@ -250,18 +259,19 @@
       window.history.replaceState &amp;&amp; window.history.replaceState(state, document.title);
       // Make sure the browser address bar reflects the new state (and thus the new state can be bookmarked).
       window.history.pushState &amp;&amp; window.history.pushState(state, document.title, viewURL);
+      document.querySelector(changeTargetSelector)?.focus();
     });
   };
 
   var reloadSearchUI = function(event) {
     event.preventDefault();
     var anchor = $(event.target).closest('a');
-    anchor.length &amp;&amp; $(document).trigger('xwiki:search:update', anchor.attr('href'));
+    anchor.length &amp;&amp; anchor.first().trigger('xwiki:search:update', anchor.attr('href'));
   };
 
   // Others (e.g. a custom facet) can trigger a search UI update by firing this event.
   $(document).on('xwiki:search:update', function(event, viewURL) {
-    pushSearchUIState(viewURL);
+    pushSearchUIState(viewURL, `[data-facetvalue='${CSS.escape(event.target.dataset.facetvalue)}']`);
   });
 
   $(window).on('popstate', function(event) {
@@ -301,10 +311,41 @@
   });
 
   var enhanceSearchUI = function() {
+    // Enhance search options 
+    document.querySelectorAll('input.options-item').forEach(function (option){
+      option.addEventListener('change', function() {
+        let queryFieldName = this.getAttribute('data-query-name');
+        let queryField = document.querySelector('input[name="' + queryFieldName + '"]');
+        queryField.value = this.checked ? 'true' : 'false';
+        // We want to build the URL the same way it's done in the velocimacro #extendQueryString
+        // We retrieve the search parameters of the latest request
+        let params = new URLSearchParams(window.location.search);
+        let formParams = new URLSearchParams(new FormData(this.form));
+        // We replace the existing parameters with their value from the form
+        for (let param of formParams.keys()) {
+          if (params.has(param)) params.delete(param);
+          for (let paramValue of formParams.getAll(param)) {
+            params.append(param,paramValue);
+          }
+        }
+        pushSearchUIState(window.location.pathname + '?' + params.toString(),
+          'input[data-query-name="' + queryFieldName + '"]');
+      });
+    });
+    // Enhance search result sorting
+    document.querySelectorAll('.search-results-sort select#sort-by-input, ' +
+     '.search-results-sort input#sort-order-input').forEach(function (sortInput){
+      sortInput.addEventListener('change', function() {
+        let baseURL = removeQueryString(this.form.getAttribute('action'));
+        pushSearchUIState(baseURL + "?" +
+          new URLSearchParams(new FormData(this.form)).toString(),
+          'input[data-query-name="' + this.getAttribute('name') + '"]');
+      });
+     });
+    
     $('.search-result-highlightAll').each(enhanceSearchResultHighlights);
     $('.search-facets').each(enhanceSearchFacets);
     $([
-      '.search-results-sort a.sort-item',
       '.search-options a.options-item',
       '.pagination a',
       '.controlPagination a',
@@ -427,7 +468,7 @@
       <code>#template('colorThemeInit.vm')
 
 /* Hide the 'Created by', 'Modified by' and 'Tags' document sections. */
-.xdocLastModification, .skin-colibri #document-info, #xdocFooter {
+.xdocLastModification, #xdocFooter {
   display: none;
 }
 #document-title &gt; h1 {
@@ -435,85 +476,98 @@
   margin-bottom: 0;
 }
 
-/**
- * Search form
+/** 
+ * Layout for the search bar 
  */
-
-.skin-colibri .search-form {
-  /* There is no space after the title in Colibri. */
-  margin-top: 1.5em;
+.search-bar {
+  margin: .5em 0;
 }
 
-.skin-colibri .search-form input[type="search"] {
-  /* Colibri doesn't have the grid system. */
-  width: 50%;
+@media (min-width: 768px) {
+  .search-bar {
+    max-width: 50%;
+  }
+}
+
+/**
+ * Layout for search controls (sort + options)
+ */
+
+.search-results-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  
+  &amp; label {
+    /* Reset the styles of the labels. */
+    margin: 0;
+    font-weight: unset;
+  }
+}
+
+.search-results-sort,
+.search-options, .search-options &gt; ul, .search-options &gt; ul &gt; li,
+.search-options &gt; ul &gt; li &gt; label {
+  display: flex;
+  gap: .4em;
+  align-items: center;
 }
 
 /**
  * Sort
  */
+/* This select should be especially lightweight on the UI. We're removing the default border and shadow. */
+#sort-by-input {
+  cursor: pointer;
 
-ul.search-results-sort {
-  color: $theme.textSecondaryColor;
-  font-size: .9em;
-  padding: 5px 0 2px 0;
+  &amp;:hover, &amp;:focus {
+      cursor: pointer;
+  }
+}
+
+/* This checkbox input should be styled as a switch between ascending and descending states. */
+.search-results-sort #sort-order-input {
+  /* Hide the default checkbox. We rely on the style of the icon in its label to make it work. */
+  appearance: none;
   margin: 0;
 }
-.search-results-sort li {
-  display: inline;
-  list-style-type: none;
-  padding-left: 1.5em;
+
+#sort-by-input, .search-results-sort label:has(&gt;#sort-order-input) {
+  /* We want most of the styles from "form-control", but not the shadow that comes from bootstrap. */
+  box-shadow: none;
+  &amp; :hover,&amp; :focus,&amp; :focus-within {
+    border-color: var(--input-border-focus);
+  }
 }
-.search-results-sort li:first-of-type {
-  padding: 0;
+
+/* Flip the second icon so that it's the arrow going up and down. */
+.search-results-sort label #sort-order-input + * + * {
+  transform: scaleY(-1);
 }
-a.sort-item {
-  color: inherit;
-  text-decoration: none;
-}
-a.sort-item:hover {
-  color: $theme.linkColor;
-  text-decoration: underline;
-}
-a.sort-item.active, a.sort-item.active:hover {
-  font-weight: bold;
-  color: $theme.textColor;
-  text-decoration: none;
-}
-.sort-item-order {
-  margin-left: .3em;
+
+/* When the box is checked, we want to hide the first icon. 
+When the box is not checked, we want to hide the second icon. */
+.search-results-sort label #sort-order-input:checked + *,
+.search-results-sort label #sort-order-input:not(:checked) + * + * {
+  display: none;
 }
 
 /**
  * Options
  */
 
-ul.search-options {
-  color: $theme.textSecondaryColor;
-  font-size: .9em;
-  padding: 5px 0 2px 0;
+.search-options ul {
   margin: 0;
-}
-.search-options li {
-  display: inline;
-  list-style-type: none;
-  padding-left: 1.5em;
-}
-.search-options li:first-of-type {
   padding: 0;
-}
-a.options-item {
-  color: inherit;
-  text-decoration: none;
-}
-a.options-item:hover {
-  color: $theme.linkColor;
-  text-decoration: underline;
-}
-a.options-item.active, a.options-item.active:hover{
-  font-weight: bold;
-  color: $theme.textColor;
-  text-decoration: none;
+  
+  &amp; input[type="checkbox"] {
+    position: unset;
+    margin: 0;
+  }
+
+  &amp; label {
+    margin-right: 1em;
+  }
 }
 
 /**
@@ -522,12 +576,6 @@ a.options-item.active, a.options-item.active:hover{
 
 .search-results-container {
   margin-top: 1em;
-}
-
-/* Colibri skin doesn't have the grid system. */
-.skin-colibri .search-results-left {
-  margin: 0.5em 20em 0.5em 0;
-  padding: 0.5em 0.5em 0.5em 0;
 }
 
 .search-results {
@@ -593,6 +641,8 @@ dl.search-result-highlights {
 
 dl.search-result-highlights &gt; dt {
   margin-top: .3em;
+  color: var(--text-muted);
+  font-weight: var(--font-weight-semibold);
 }
 
 blockquote.search-result-highlight {
@@ -613,26 +663,14 @@ blockquote.search-result-highlight {
   font-weight: bold;
 }
 
-dl.search-result-highlights &gt; dt {
-  color: $theme.textSecondaryColor;
-  font-weight: normal;
-}
-
 dl.search-result-highlights.preview dt,
 dl.search-result-highlights.preview dd &gt; * {
   display: none;
 }
 
 dl.search-result-highlights.preview dt:first-of-type,
-dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type,
-/* Workaround for IE8 which doesn't support :first-of-type CSS selector. */
-dl.search-result-highlights.preview dt.first,
-dl.search-result-highlights.preview dd.first blockquote.first {
+dl.search-result-highlights.preview dd:first-of-type blockquote:first-of-type {
   display: block;
-}
-
-a.search-result-highlightAll:after {
-  content: ' \bb';
 }
 
 .search-result-debug {
@@ -643,38 +681,21 @@ a.search-result-highlightAll:after {
  * Facets
  */
 
-.search-facets {
-  background-color: $theme.backgroundSecondaryColor;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-  /* Leave space for the bottom shadow. */
-  margin-bottom: 1em;
-  border-radius: 7px;
-}
-/* Colibri skin doesn't have the grid system. */
-.skin-colibri .search-facets {
-  float: right;
-  max-width: 19.5em;
-  width: 19.5em;
+.search-facets-header{
+  border-bottom: 1px solid var(--xwiki-border-color);
 }
 
-.search-facets-header,
-.search-facets-actions,
-.search-facet {
-  border-bottom: 1px solid $theme.borderColor;
-  border-top: 1px solid $theme.pageContentBackgroundColor;
-  position: relative;
+.search-facets-header strong {
+  font-size: 1.25em;
 }
 
 .search-facets-header,
 .search-facets-actions {
-  padding: 0.5em 1em;
-}
-.search-facet {
-  padding: 0.5em .8em;
+  padding: .5em 0;
 }
 
-.search-facets-header {
-  border-top: none;
+.search-facet {
+  padding: .2em 0;
 }
 
 .search-facets-header &gt; p,
@@ -685,16 +706,6 @@ a.search-result-highlightAll:after {
 
 .search-facets-actions &gt; p {
   font-size: .8em;
-}
-
-.search-facets-actions a {
-  color: $theme.textSecondaryColor;
-  text-decoration: none;
-}
-
-.search-facets-actions a:hover {
-  color: $theme.linkColor;
-  text-decoration: underline;
 }
 
 .search-facets-action-collapseAll,
@@ -708,33 +719,35 @@ a.search-result-highlightAll:after {
   margin: 0;
 }
 
-.search-facet:last-of-type {
-  border-bottom: none;
+.search-facet-header, .search-facet-body {
+  padding-left: .5em;
+  border: 1px solid var(--xwiki-border-color);
+  border-radius: var(--border-radius-small);
 }
 
 .search-facet-header {
+  background-color: var(--xwiki-background-secondary-color);
+}
+
+.search-facet-header label {
   color: $theme.titleColor;
   cursor: pointer;
-  line-height: 1.4em;
-  margin: 0 .2em;
   display: flex;
   justify-content: space-between;
-  position: relative;
-}
-
-.search-facet:last-of-type .search-facet-header:after {
-  border: medium none;
-}
-
-.search-facet.expanded:last-of-type .search-facet-header:after {
-  border-bottom: 1px dotted $theme.pageContentBackgroundColor;
-  border-top: 1px dotted $theme.borderColor;
+  align-items: center;
 }
 
 .search-facet-body {
-  overflow: hidden; /* required for effect */
-  display: none;
-  margin-top: .5em;
+  opacity: 0;
+  visibility: hidden; /* This makes sure the element is removed from the accessibility tree. */
+
+  position: absolute;
+  transform: translateY(-10px); /* Start the animation slightly above */
+  padding-top: .5em;
+  
+  border-top-width: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .search-facet-body ul,
@@ -745,37 +758,55 @@ a.search-result-highlightAll:after {
 .search-facet-body li {
   display: flex;
   flex-wrap: wrap;
-  padding: .1em .2em;
+  padding: .3em .5em;
 }
 
-.search-facet .search-facet-header .facet-toggler, button.facet-value-toggler {
+.search-facet .search-facet-header  .facet-toggle, button.facet-value-toggle {
   background: transparent;
   transition: background-color .2s ease-in-out;
 }
 
-.search-facet .search-facet-header .facet-toggler:active, button.facet-value-toggler:active {
+.search-facet .search-facet-header .facet-toggle:active, button.facet-value-toggle:active {
   box-shadow: unset;
 }
 
-.search-facet .search-facet-header .facet-toggler &gt; span, button.facet-value-toggler &gt; span,
-.search-facet .search-facet-header .facet-toggler &gt; img, button.facet-value-toggler &gt; img {
+.search-facet .search-facet-header .facet-toggle > span, button.facet-value-toggle > span,
+.search-facet .search-facet-header .facet-toggle > img, button.facet-value-toggle > img {
   transform: rotate(90deg);
 }
 
-.search-facet.expanded .search-facet-header .facet-toggler &gt; span, .expanded &gt; button.facet-value-toggler &gt; span,
-.search-facet.expanded .search-facet-header .facet-toggler &gt; img, .expanded &gt; button.facet-value-toggler &gt; img {
+.search-facet.expanded .search-facet-header .facet-toggle > span, .expanded > button.facet-value-toggle > span,
+.search-facet.expanded .search-facet-header .facet-toggle > img, .expanded > button.facet-value-toggle > img {
   transform: rotate(0deg);
 }
 
-@media not (prefers-reduced-motion) {
-  .search-facet .search-facet-header .facet-toggler &gt; span, button.facet-value-toggler &gt; span,
-  .search-facet .search-facet-header .facet-toggler &gt; img, button.facet-value-toggler &gt; img {
+@media (prefers-reduced-motion: no-preference) {
+  .search-facet .search-facet-header .facet-toggle > span, button.facet-value-toggle > span,
+  .search-facet .search-facet-header .facet-toggle > img, button.facet-value-toggle > img {
     transition: transform 0.2s ease;
+  }
+  
+  .search-facet-body {
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
 }
 
-.search-facet.expanded .search-facet-body {
-  display: block;
+.search-facet.expanded {
+  &amp; .search-facet-header {
+    border-bottom-width: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    
+    &amp; label {
+    font-weight: var(--font-weight-semibold);
+    }
+  }
+  &amp; .search-facet-body {
+    opacity: 1;
+    position: unset; /* This element should be positioned normally when shown. */
+    visibility: visible;
+    transform: translateY(0);
+  }
 }
 
 .search-facet-body ul, .search-facet-body ul.users {
@@ -784,10 +815,6 @@ a.search-result-highlightAll:after {
   display: block;
   padding: 0;
   margin: .5em 0;
-}
-
-.search-facet-body li:hover {
-  background-color: $theme.highlightColor;
 }
 
 .search-facet-body input[type="checkbox"] {
@@ -814,7 +841,8 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 }
 
 .search-facet-body .itemName,
-.search-facet-body .facet-value-toggler,
+.search-facet-body .itemNameempty,
+.search-facet-body .facet-value-toggle,
 .search-facet-body .more {
   /* Remove link styling */
   color: $theme.textColor;
@@ -832,8 +860,11 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 }
 
 .search-facet-body .itemCount {
-  padding: .1em 0;
+  padding: .1em .5em;
   margin-left: auto;
+  background-color: var(--nav-link-hover-bg);
+  /* We want those item count blocks to be pill shaped. */
+  border-radius: 1em / 50%;
 }
 
 @media (max-width: 768px) {
@@ -853,17 +884,6 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 }
 
 /**
- * Fix the breadcrumb in Colibri skin.
- */
-.skin-colibri .breadcrumb &gt; li {
-  display: inline;
-}
-.skin-colibri .breadcrumb &gt; li + li:before {
-  color: $theme.textSecondaryColor;
-  content: ' \00BB  ';
-}
-
-/**
  * Miscellaneous
  */
 
@@ -871,17 +891,7 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
   border-top: 1px solid $theme.borderColor;
   padding-left: 0;
 }
-
-.paginationFilter .resultsNo,
-.paginationFilter .controlPagination,
-.paginationFilter .pagination {
-  line-height: 22px;
-}
-
-.iconRSS {
-  background: url("$xwiki.getSkinFile('icons/silk/feed.png')") no-repeat scroll 0 0 transparent;
-  padding-left: 20px;
-}</code>
+</code>
     </property>
     <property>
       <contentType>CSS</contentType>

@@ -20,7 +20,7 @@
 
 import XWikiIcon from "./XWikiIcon.vue";
 import { mount } from "@vue/test-utils";
-import _ from "lodash";
+import _ from "lodash-es";
 import flushPromises from "flush-promises";
 import { beforeEach, describe, expect, it } from "vitest";
 import sinon from "sinon";

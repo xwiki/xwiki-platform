@@ -44,7 +44,6 @@ import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -180,7 +179,6 @@ public class LiveDataScriptService implements ScriptService
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
-    @Unstable
     public Block execute(Map<String, Object> parameters) throws LiveDataException
     {
         return execute(parameters, null);
@@ -195,7 +193,6 @@ public class LiveDataScriptService implements ScriptService
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
-    @Unstable
     public Block execute(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
     {
         return this.liveDataRenderer.execute(convertParams(parameters), advancedParameters, false);
@@ -209,7 +206,6 @@ public class LiveDataScriptService implements ScriptService
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
-    @Unstable
     public String render(Map<String, Object> parameters) throws LiveDataException
     {
         return render(parameters, null);
@@ -224,7 +220,6 @@ public class LiveDataScriptService implements ScriptService
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
-    @Unstable
     public String render(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
     {
         return this.liveDataRenderer.render(convertParams(parameters), advancedParameters, false);

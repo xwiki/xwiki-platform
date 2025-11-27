@@ -19,15 +19,12 @@
  */
 package org.xwiki.tree;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * A group of related tree nodes, similar to a document fragment in a DOM tree.
  * 
  * @version $Id$
  * @since 16.4.0RC1
  */
-@Unstable
 public interface TreeNodeGroup extends TreeNode
 {
     @Override

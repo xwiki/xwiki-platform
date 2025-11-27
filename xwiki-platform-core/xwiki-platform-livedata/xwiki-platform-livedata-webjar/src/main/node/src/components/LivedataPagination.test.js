@@ -20,7 +20,7 @@
 
 import LivedataPagination from "./LivedataPagination.vue";
 import { mount } from "@vue/test-utils";
-import _ from "lodash";
+import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
 
 /**

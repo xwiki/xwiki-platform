@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="PDFExportIT.FloatingImage" locale="">
+<xwikidoc version="1.6" reference="PDFExportIT.FloatingImage" locale="">
   <web>PDFExportIT</web>
   <name>FloatingImage</name>
   <language/>
@@ -56,7 +56,7 @@ Etiam luctus, tortor ultrices blandit pharetra, lacus purus posuere urna, id int
 
 Etiam sed justo vel enim gravida blandit. Duis feugiat, felis vitae dignissim malesuada, sem neque convallis mi, eget volutpat nunc dui nec mauris. Cras lectus magna, maximus ut vulputate non, tempor sed est. Ut maximus, nunc id dictum accumsan, dui urna interdum dolor, nec semper justo ex at nunc. Proin eget orci arcu. In rhoncus purus congue efficitur finibus. Nunc iaculis sodales nunc, vitae condimentum mi sollicitudin nec. Nunc suscipit imperdiet consequat. Etiam eu erat id nunc molestie tristique quis a orci. Donec tristique, velit nec semper porttitor, lacus enim congue mauris, sit amet gravida dolor neque nec nisl. Nulla pharetra ligula sit amet porttitor fringilla. Curabitur hendrerit ultrices tristique. Mauris eleifend erat commodo lacus ornare dapibus.
 
-Suspendisse magna leo, consequat sit amet lacus in, dignissim commodo est. Ut a nisi purus. Donec cursus neque purus, molestie posuere libero imperdiet et. Duis bibendum felis nec leo viverra pellentesque. Phasellus volutpat egestas finibus. Sed auctor turpis nec dapibus ultrices. Phasellus vehicula risus sed libero pellentesque, ut gravida odio accumsan. Nam sed tempor risus, vitae facilisis arcu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut sit amet viverra ipsum, quis feugiat nisi. Etiam eget nisi vitae nisl faucibus lacinia eget quis est. Suspendisse faucibus pellentesque sapien, sit amet commodo magna tempor at. Vestibulum mattis tortor eu egestas volutpat. Suspendisse laoreet, lorem a maximus mollis, dui enim pretium eros, non varius erat est sit amet augue. Sed hendrerit porta placerat. Vivamus eget ante vitae quam feugiat tristique vel et arcu.
+Nam sed tempor risus, vitae facilisis arcu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut sit amet viverra ipsum, quis feugiat nisi. Etiam eget nisi vitae nisl faucibus lacinia eget quis est. Suspendisse faucibus pellentesque sapien, sit amet commodo magna tempor at. Vestibulum mattis tortor eu egestas volutpat. Suspendisse laoreet, lorem a maximus mollis, dui enim pretium eros, non varius erat est sit amet augue. Sed hendrerit porta placerat. Vivamus eget ante vitae quam feugiat tristique vel et arcu.
 
 [[image:logo.png||data-xwiki-image-style-alignment="end" style="height:590px"]]
 

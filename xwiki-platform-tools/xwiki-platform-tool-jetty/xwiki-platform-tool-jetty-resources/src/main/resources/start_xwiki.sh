@@ -151,8 +151,7 @@ done
 
 # Enable debug
 if [ "$DEBUG" = true ] ; then
-  XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
-  XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=*:${JETTY_DEBUG_PORT}"
+  XWIKI_OPTS="$XWIKI_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=${SUSPEND},address=*:${JETTY_DEBUG_PORT}"
 fi
 
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running

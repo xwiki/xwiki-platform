@@ -1161,8 +1161,8 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# If active, the Filesystem Attachment Store will automatically clear empty directories on startup,
 #-# in some cases this may create undue load on the server and may need to be disabled. To do that,
 #-# set the following to false.
-#-# Note that if you disable this feature, empty directories will accumulate and you are responsible
-#-# for cleaning them up.
+#-# Empty parent directories are also cleaned up automatically when deleting files, since XWiki 17.10.0 this is
+#-# primarily a safeguard for rare cases where this automatic cleanup fails.
 # store.fsattach.cleanOnStartup=true
 
 #-# [Since 11.4RC1]
@@ -1174,6 +1174,115 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #else
 # store.file.directory=/var/lib/xwiki/data/store/file/
 #end
+
+#-# [Since 17.10.0RC1]
+#-# The blob store type that is used, e.g., for storing attachments and deleted documents. XWiki provides "filesystem"
+#-# and "s3" blob stores, but only "filesystem" is bundled by default. The "s3" blob store can be installed as an
+#-# extension or bundled as part of a custom WAR.
+#-#
+#-# The default is "filesystem".
+# store.blobStoreType = filesystem
+
+#-# [Since 17.10.0RC1]
+#-# The blob store type from which data should be migrated when there is no data in the current blob store. This can
+#-# be used, e.g., to migrate from the filesystem blob store to an S3 blob store.
+#-#
+#-# The default is "filesystem".
+# store.blobMigrationStoreType = filesystem
+
+#-------------------------------------------------------------------------------------
+# S3 Blob Store
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.10.0RC1]
+#-# The name of the S3 bucket where blobs will be stored.
+#-#
+#-# The default is unset, this needs to be set for using the S3 blob store.
+# store.s3.bucketName =
+
+#-# [Since 17.10.0RC1]
+#-# The AWS region where the S3 bucket is located.
+#-#
+#-# The default is "us-east-1".
+# store.s3.region = us-east-1
+
+#-# [Since 17.10.0RC1]
+#-# The AWS access key for authenticating with S3.
+#-#
+#-# The default is unset, this needs to be set for using the S3 blob store.
+# store.s3.accessKey =
+
+#-# [Since 17.10.0RC1]
+#-# The AWS secret key for authenticating with S3.
+#-#
+#-# The default is unset, this needs to be set for using the S3 blob store.
+# store.s3.secretKey =
+
+#-# [Since 17.10.0RC1]
+#-# The AWS endpoint URL when using a custom S3-compatible service.
+#-#
+#-# The default is unset.
+# store.s3.endpoint =
+
+#-# [Since 17.10.0RC1]
+#-# Whether to use path-style access for S3 URLs. For many S3-compatible services, this needs to be set to true.
+#-#
+#-# The default is false.
+# store.s3.pathStyleAccess = false
+
+#-# [Since 17.10.0RC1]
+#-# The maximum number of concurrent connections to S3 (defaults to 50).
+#-#
+#-# The default is 50.
+# store.s3.maxConnections = 50
+
+#-# [Since 17.10.0RC1]
+#-# The connection timeout for S3 requests in seconds (defaults to 10 seconds).
+#-#
+#-# The default is 10 seconds.
+# store.s3.connectionTimeout = 10
+
+#-# [Since 17.10.0RC1]
+#-# The socket timeout for S3 requests in seconds (defaults to 50 seconds).
+#-#
+#-# The default is 50 seconds.
+# store.s3.socketTimeout = 50
+
+#-# [Since 17.10.0RC1]
+#-# The request timeout for S3 requests in seconds (defaults to 300 seconds).
+#-#
+#-# The default is 300 seconds.
+# store.s3.requestTimeout = 300
+
+#-# [Since 17.10.0RC1]
+#-# The maximum number of retries for failed S3 requests (defaults to 3).
+#-#
+#-# The default is 3.
+# store.s3.maxRetries = 3
+
+#-# [Since 17.10.0RC1]
+#-# The key prefix to prepend to all S3 object keys (defaults to ""). This could be used, e.g., to store the data of
+#-# several XWiki instances in the same S3 bucket.
+#-#
+#-# The default is "".
+# store.s3.keyPrefix =
+
+#-# [Since 17.10.0RC1]
+#-# The multipart upload part size in MB (defaults to 5 MB). Uploads above this size will use multipart upload with
+#-# parts of this size. For each upload, a buffer of this size is kept in memory. Ensure that your XWiki instance has
+#-# enough memory. The size must be between 5 MB and 5 GB. As a blob cannot consist of more than 10,000 parts, this is
+#-# a compromise between maximum upload size and memory usage.
+#-#
+#-# The default is 5 MB.
+# store.s3.multipartPartUploadSizeMB = 5
+
+#-# [Since 17.10.0RC1]
+#-# The multipart copy size threshold in MB (defaults to 512 MB). Objects larger than this threshold will use multipart
+#-# copy operations with parts of this size. If the size is smaller than the multipart upload part size, it will be
+#-# increased to match it. The size must be between 5 MB and 5 GB.
+#-#
+#-# The default is 512 MB.
+# store.s3.multipartCopySizeMB = 512
 
 #-------------------------------------------------------------------------------------
 # Mail

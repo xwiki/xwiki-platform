@@ -52,6 +52,10 @@ define('xwiki-l10n', ['module', 'jquery'], function(module, $) {
   var getTranslation = function(key) {
     var translation = this[key];
     if (typeof translation === 'string') {
+      // If there's an argument, ensure to unescape doubled single quotes.
+      if (arguments.length > 1) {
+        translation = translation.replaceAll("''", "'");
+      }
       // Naive implementation for message parameter substitution that suits our current needs.
       for (var i = 1; i < arguments.length; i++) {
         translation = translation.replace(new RegExp('\\{' + (i - 1) + '\\}', 'g'), arguments[i]);

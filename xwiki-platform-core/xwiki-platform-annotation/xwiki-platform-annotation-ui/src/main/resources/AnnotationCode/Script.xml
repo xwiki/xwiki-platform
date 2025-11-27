@@ -963,6 +963,19 @@ XWiki.Annotation = Class.create({
     }.bind(this));
   },
 
+  addAnnotationToggleHint : function(annotations) {
+    annotations.forEach((ann) =&gt; {
+      let toggleButtonDescription = document.createElement('span');
+      toggleButtonDescription.addClassName('hidden');
+      toggleButtonDescription.id = 'annotation-toggle-description-' + ann.annotationId;
+      toggleButtonDescription.textContent =
+        "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))";
+      let toggleButton = document.getElementById('ID' + ann.annotationId);
+      toggleButton.setAttribute('aria-describedby', toggleButtonDescription.id);
+      toggleButton.appendChild(toggleButtonDescription);
+    })
+  },
+
   addAnnotationMarkup : function(ann) {
     // Check if the annotation was found.
     var plainTextStartOffset = ann.fields.find(field =&gt; field.name == 'plainTextStartOffset');
@@ -987,15 +1000,9 @@ XWiki.Annotation = Class.create({
     // It could be detrimental for the user experience to have to tab through all of the buttons.
     let firstSpanContent = allSpans[0].textContent;
     let toggleButton = document.createElement('button');
+    toggleButton.id = 'ID' + ann.annotationId;
     toggleButton.addClassName('annotation-toggle');
-    let toggleButtonDescription = document.createElement('span');
-    toggleButtonDescription.addClassName('hidden');
-    toggleButtonDescription.id = 'annotation-toggle-description-' + ann.annotationId;
-    toggleButtonDescription.textContent =
-      "$escapetool.xml($services.localization.render('annotations.annotated.highlight.toggle.hint'))";
-    toggleButton.setAttribute('aria-describedby', toggleButtonDescription.id);
     toggleButton.textContent = firstSpanContent;
-    toggleButton.appendChild(toggleButtonDescription);
     allSpans[0].innerHTML = '';
     allSpans[0].appendChild(toggleButton);
     // Add the onclick listener on every span of this annotation.
@@ -1175,6 +1182,7 @@ XWiki.Annotation = Class.create({
   removeAnnotationsAndSelectionMarkups: function() {
     document.querySelectorAll("mark.annotation, button.annotation-toggle, mark.selection-highlight")
       .forEach(annotationNode =&gt; annotationNode.replaceWith(...annotationNode.childNodes));
+    document.querySelectorAll("span[id^='annotation-toggle-description-']").forEach(description => description.remove());
     this.fetchedAnnotations = false;
   },
 
@@ -1931,6 +1939,8 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
         this.removeAnnotationsAndSelectionMarkups();
         this.updateAnnotationsOffsets(annotatedContent);
         this.addAnnotationsMarkup(annotatedContent.annotations);
+        // We add the hints afterwards because they shift the ranges in the text.
+        this.addAnnotationToggleHint(annotatedContent.annotations);
         // Notify the content change.
         $(document).trigger('xwiki:dom:updated', {'elements': [this.annotatedElement]});
         // Also handle the tab 'downstairs' when the annotations list changes.

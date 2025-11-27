@@ -22,7 +22,6 @@ package org.xwiki.like.test.ui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.like.test.po.LikeButton;
 import org.xwiki.like.test.po.LikersPage;
 import org.xwiki.like.test.po.UserProfileLikedPagesPage;
@@ -32,7 +31,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.EditRightsPane;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;

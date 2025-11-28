@@ -159,7 +159,7 @@
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
-    <!-- Replace the one from Hibernate and DBCP -->
+    <!-- Replace the one from DBCP -->
     <dependency>
       <groupId>javax.transaction</groupId>
       <artifactId>javax.transaction-api</artifactId>

@@ -840,6 +840,108 @@ class LiveTableResultsTest extends PageTest
         verify(this.query).bindValues(values);
     }
 
+    @Test
+    void filterDBStringListEmptyAndExactMatcherOr() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Space", "MyClass"));
+        StaticListClass list = document.getXClass().addStaticListField("dbList");
+        list.setValues("A|B|C");
+        list.setMultiSelect(true);
+        list.setRelationalStorage(true);
+        this.xwiki.saveDocument(document, "creates MyClass", true, this.context);
+
+        setColumns("dbList");
+        setClassName("Space.MyClass");
+
+        // First value: empty
+        setFilter("dbList_match", "empty");
+        setFilter("dbList", "-");
+        // Second value: exact 'A'
+        setFilter("dbList_match", "exact");
+        setFilter("dbList", "A");
+        // Join mode: OR
+        setJoinMode("dbList", "OR");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+
+        renderPage();
+
+        verify(this.queryService).hql(
+            ", BaseObject as obj , DBStringListProperty as prop_dbList  "
+                + "where obj.name=doc.fullName "
+                + "and obj.className = :className "
+                + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                + "and obj.id = prop_dbList.id.id and prop_dbList.id.name = :prop_dbList_id_name "
+                + "and ("
+                + ":prop_dbList_list_1 in elements(prop_dbList.list) "
+                + "OR not exists (select 1 from DBStringListProperty as prop_dbList_empty_property "
+                + "join prop_dbList_empty_property.list as prop_dbList_empty_item "
+                + "where prop_dbList_empty_property.id.id = obj.id "
+                + "and prop_dbList_empty_property.id.name = :prop_dbList_empty_id_name)"
+                + ") "
+        );
+
+        Map<String, Object> values = new HashMap<>();
+        values.put("className", "Space.MyClass");
+        values.put("classTemplate1", "Space.MyClassTemplate");
+        values.put("classTemplate2", "Space.MyTemplate");
+        values.put("prop_dbList_id_name", "dbList");
+        // For exact + isList, livetable_getFilterQuery generates "? in elements(prop_dbList.list)"
+        // and livetable_addFilterParam binds the plain filter value.
+        values.put("prop_dbList_list_1", "A");
+        values.put("prop_dbList_empty_id_name", "dbList");
+
+        verify(this.query).bindValues(values);
+    }
+
+    @Test
+    void filterDBStringWithPrefixMatcher() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "Space", "MyClass"));
+        StaticListClass list = document.getXClass().addStaticListField("dbList");
+        list.setValues("Apple|Banana|Cherry");
+        list.setMultiSelect(true);
+        list.setRelationalStorage(true);
+        this.xwiki.saveDocument(document, "creates MyClass", true, this.context);
+
+        setColumns("dbList");
+        setClassName("Space.MyClass");
+
+        setFilter("dbList_match", "prefix");
+        setFilter("dbList", "Ba");
+
+        when(this.queryService.hql(anyString())).thenReturn(this.query);
+        when(this.query.setLimit(anyInt())).thenReturn(this.query);
+        when(this.query.setOffset(anyInt())).thenReturn(this.query);
+        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
+        when(this.query.count()).thenReturn(1L);
+
+        renderPage();
+
+        verify(this.queryService).hql(
+            ", BaseObject as obj , DBStringListProperty as prop_dbList join prop_dbList.list as prop_dbList_item   "
+                + "where obj.name=doc.fullName "
+                + "and obj.className = :className "
+                + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                + "and obj.id = prop_dbList.id.id "
+                + "and prop_dbList.id.name = :prop_dbList_id_name "
+                + "and (upper(prop_dbList_item) like upper(:prop_dbList_item_1)"
+                + ") "
+        );
+
+        Map<String, Object> values = new HashMap<>();
+        values.put("className", "Space.MyClass");
+        values.put("classTemplate1", "Space.MyClassTemplate");
+        values.put("classTemplate2", "Space.MyTemplate");
+        values.put("prop_dbList_id_name", "dbList");
+        values.put("prop_dbList_item_1", "Ba%");
+        verify(this.query).bindValues(values);
+    }
+
     //
     // Helper methods
     //

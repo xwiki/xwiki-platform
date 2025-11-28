@@ -414,19 +414,6 @@ class LiveDataIT
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
 
-        // Create a separate XClass that we can use for testing the DBList property.
-        DocumentReference dbListClassReference =
-            new DocumentReference("DBListClass", testReference.getLastSpaceReference());
-        testUtils.addClassProperty(dbListClassReference, "string", "String");
-
-        // Create a few pages with that class to be used as DBList options.
-        for (int i = 1; i <= 3; i++) {
-            DocumentReference optionDocRef =
-                new DocumentReference("Option" + i, dbListClassReference.getLastSpaceReference());
-            testUtils.rest().addObject(optionDocRef, testUtils.serializeReference(dbListClassReference),
-                "string", "Option" + i);
-        }
-
         ViewPage viewPage = testUtils.createPage(testReference, "My Class", "My Class");
         ClassEditPage classEditPage = viewPage.editClass();
         classEditPage.addProperty("myList", "DBList");
@@ -435,9 +422,6 @@ class LiveDataIT
         dbListClassEditElement.setMultiSelect(true);
         dbListClassEditElement.setMetaProperty("relationalStorage", "true");
         dbListClassEditElement.setMetaProperty("displayType", "checkbox");
-        dbListClassEditElement.setMetaProperty("classname",
-            testUtils.serializeReference(dbListClassReference));
-        dbListClassEditElement.setMetaProperty("valueField", "string");
         classEditPage.clickSaveAndView();
 
         // Create a few XObjects with multiple selections and no selections.

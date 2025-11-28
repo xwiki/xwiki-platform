@@ -76,7 +76,7 @@ export class MacrosAstToReactJsxConverter {
     editableZoneRef: MacroEditableZoneRef,
   ): JSX.Element[] | Error {
     return tryFallibleOrError(() =>
-      this.convertBlocks(blocks, editableZoneRef, this.generateId()),
+      this.convertBlocks(blocks, editableZoneRef, this.generateId(blocks)),
     );
   }
 
@@ -99,45 +99,32 @@ export class MacrosAstToReactJsxConverter {
       this.convertInlineContents(
         inlineContents,
         editableZoneRef,
-        this.generateId(),
+        this.generateId(inlineContents),
       ),
     );
   }
 
-  private generateId(): string {
-    // So, this is a tough one
-    //
+  private generateId(root: MacroBlock[] | MacroInlineContent[]): string {
     // When mapping an array to React elements, each child needs a `key` identifying it based on its content.
     // This allows React to quickly check whether the child changed or not, and update / reorder the DOM accordingly.
     //
     // Because we are iterating over generic structures without identifiers (`MacroBlock` and `MacroInlineContent` don't have an ID),
-    // and adding an ID would pollute the object without any real benefit (it wouldn't be linked to the actual content), we have several options:
+    // and adding an ID would pollute the object without any real benefit (it wouldn't be linked to the actual content), we "hash" the root object here,
+    // and derive an ID from it. All sub-elements will use it.
     //
-    // # Option 1. Using array indexes as keys
-    //
-    // This is not a good idea as keys need to reflect the child's content. If the macro re-renders a new AST and inverses two children's positions,
-    // the keys would not reflect it and it could lead to bugs.
-    //
-    // # Option 2. Hashing each child's object and using it as a key
-    //
-    // This is not viable as it would be pretty costly. Performing a hash on an AST that may contain hundred of objects, all synchronously, would
-    // possibly block the main thread for too long, especially on weaker devices like entry-level smartphones or older computers.
-    //
-    // # Option 3. Hashing the root AST object and suffixing the result with children's indexes
-    //
-    // This would be a viable option *if* we didn't also have the editable zone React reference to account for. This may change between renders,
-    // and we have no means to derive a key from it, as it's a class instance without any identifiable property.
-    //
-    // # Option 4. Generating a random ID and suffixing the result with children's indexes
-    //
-    // This is the solution we use here and it's a big compromise. We are *not* considering the root AST object, simply generating a completely random
-    // value that we use throughout the converter. This means even providing the exact same root AST object will force a complete re-render of the entire
-    // React tree. This is desirable because again, the editable zone reference may change between two renders, and we have no mean to check that.
-    //
-    // So we use this trick which, while pretty costly for similar trees, ensures we have no bug in the render, and is an acceptable trade-off given that
-    // macros are not supposed to change their rendered output very often.
+    // This means any change to the VDOM will re-render everything, which is not desirable, so this is an improvement to do in the future.
+    // The tracking issue for this is: https://jira.xwiki.org/browse/CRISTAL-737
 
-    return Math.random().toString().substring(2);
+    // For now we use a super quick'n'dirty hash algorithm, with very bad collision resistance, but at least it's very quick, so it's good enough for now.
+    const s = JSON.stringify(root);
+
+    let h = 0;
+
+    for (let i = 0; i < s.length; i++) {
+      h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+    }
+
+    return h.toString();
   }
 
   private convertBlocks(
@@ -332,7 +319,11 @@ export class MacrosAstToReactJsxConverter {
           );
         }
 
-        return <div ref={editableZoneRef.ref} />;
+        return (
+          <div {...this.convertBlockStyles(block.styles)}>
+            <div ref={editableZoneRef.ref} />
+          </div>
+        );
 
       default:
         assertUnreachable(block);

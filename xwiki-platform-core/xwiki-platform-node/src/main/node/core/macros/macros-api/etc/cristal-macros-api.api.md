@@ -7,7 +7,7 @@
 // @beta
 export interface BlockMacro<Parameters extends Record<string, MacroParameterType>> {
     infos: MacroInfos<Parameters>;
-    render(params: GetConcreteMacroParametersType<Parameters>): MacroBlock[];
+    render(params: GetConcreteMacroParametersType<Parameters>, rawBody: string | null): MacroBlock[];
     renderAs: "block";
 }
 
@@ -30,7 +30,7 @@ export type GetConcreteMacroParameterType<T extends MacroParameterType> = (T["ty
 // @beta
 export interface InlineMacro<Parameters extends Record<string, MacroParameterType>> {
     infos: MacroInfos<Parameters>;
-    render(params: GetConcreteMacroParametersType<Parameters>): MacroInlineContent[];
+    render(params: GetConcreteMacroParametersType<Parameters>, rawBody: string | null): MacroInlineContent[];
     renderAs: "inline";
 }
 
@@ -79,6 +79,7 @@ export type MacroBlock = {
     html: string;
 } | {
     type: "macroBlockEditableArea";
+    styles: MacroBlockStyles;
 };
 
 // @beta
@@ -102,6 +103,7 @@ export type MacroImage = {
 
 // @beta
 export interface MacroInfos<Parameters extends Record<string, MacroParameterType>> {
+    bodyType: "none" | "wysiwyg" | "raw";
     defaultParameters: FilterUndefined<GetConcreteMacroParametersType<Parameters>> | false;
     description: string;
     id: string;

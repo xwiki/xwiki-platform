@@ -168,6 +168,7 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
 const blockNoteToUniAst = new BlockNoteToUniAstConverter(
   linkEditionCtx.remoteURLParser,
   linkEditionCtx.modelReferenceSerializer,
+  macros ? macros.list : [],
 );
 
 const uniAstToBlockNote = new UniAstToBlockNoteConverter(

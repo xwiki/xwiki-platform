@@ -37,7 +37,8 @@
   "peerDependencies": {
     "inversify": "7.x",
     "reflect-metadata": "0.x",
-    "vue": "3.x"
+    "vue": "3.x",
+    "vue-router": "4.x"
   },
   "devDependencies": {
     "@xwiki/platform-dev-config": "workspace:*",
@@ -48,6 +49,7 @@
     "vite": "catalog:",
     "vitest": "catalog:",
     "vue": "catalog:",
+    "vue-router": "catalog:",
     "vue-tsc": "catalog:"
   },
   "publishConfig": {

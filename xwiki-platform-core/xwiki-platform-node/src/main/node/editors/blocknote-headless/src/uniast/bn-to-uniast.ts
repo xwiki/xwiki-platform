@@ -18,7 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { MACRO_NAME_PREFIX } from "@xwiki/platform-editors-blocknote-react";
+import {
+  MACRO_NAME_PREFIX,
+  extractMacroRawContent,
+} from "@xwiki/platform-editors-blocknote-react";
 import {
   assertUnreachable,
   provideTypeInference,
@@ -33,6 +36,7 @@ import type {
   EditorStyleSchema,
   EditorStyledText,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
 import type {
@@ -45,8 +49,6 @@ import type {
   UniAst,
 } from "@xwiki/platform-uniast-api";
 
-// TODO: escape characters that need it (e.g. '`', '\', '*', '_', etc.)
-
 /**
  * Convert the internal format of Blocknote to the Universal AST.
  * @since 0.16
@@ -54,10 +56,17 @@ import type {
  */
 // TODO: convert to an actual inversify component
 export class BlockNoteToUniAstConverter {
+  private readonly macros: Record<string, MacroWithUnknownParamsType>;
+
   constructor(
     private readonly remoteURLParser: RemoteURLParser,
     private readonly modelReferenceSerializer: ModelReferenceSerializer,
-  ) {}
+    macros: MacroWithUnknownParamsType[],
+  ) {
+    this.macros = Object.fromEntries(
+      macros.map((macro) => [macro.infos.id, macro]),
+    );
+  }
 
   blocksToUniAst(blocks: BlockType[]): UniAst | Error {
     const uniAstBlocks = tryFallibleOrError(() => this.convertBlocks(blocks));
@@ -107,6 +116,7 @@ export class BlockNoteToUniAstConverter {
     return out;
   }
 
+  // eslint-disable-next-line max-statements
   private convertBlock(
     block: Exclude<
       BlockType,
@@ -118,18 +128,53 @@ export class BlockNoteToUniAstConverter {
   ): Block | Block[] | null {
     const dontExpectChildren = () => {
       if (block.children.length > 0) {
-        console.error({ unexpextedChildrenInBlock: block });
+        console.error({ unexpectedChildrenInBlock: block });
         throw new Error("Unexpected children in block type: " + block.type);
       }
     };
 
     // Convert macros
     if (block.type.startsWith(MACRO_NAME_PREFIX)) {
+      const id = block.type.substring(MACRO_NAME_PREFIX.length);
+
+      if (!Object.hasOwn(this.macros, id)) {
+        throw new Error(`Found unregistered macro: "${id}"`);
+      }
+
+      const {
+        infos: { bodyType },
+      } = this.macros[id];
+
+      if (block.content && !Array.isArray(block.content)) {
+        throw new Error(
+          "Macro block should have a list of contents, found: " +
+            block.content.type,
+        );
+      }
+
+      const content = block.content ?? [];
+
       return {
         type: "macroBlock",
-        name: block.type.substring(MACRO_NAME_PREFIX.length),
-        // Conversion is required as the AST is dynamically typed
-        params: block.props as Record<string, boolean | number | string>,
+        call: {
+          id,
+          // Conversion is required as the AST is dynamically typed
+          params: block.props as Record<string, boolean | number | string>,
+          body:
+            bodyType === "none"
+              ? { type: "none" }
+              : bodyType === "raw"
+                ? {
+                    type: "raw",
+                    content: extractMacroRawContent(content),
+                  }
+                : {
+                    type: "inlineContents",
+                    inlineContents: content.map((inline) =>
+                      this.convertInlineContent(inline),
+                    ),
+                  },
+        },
       };
     }
 
@@ -143,47 +188,33 @@ export class BlockNoteToUniAstConverter {
           styles: this.convertBlockStyles(block.props),
         };
 
-      case "heading":
+      case "heading": {
+        const { level } = block.props;
+
+        if (
+          level !== 1 &&
+          level !== 2 &&
+          level !== 3 &&
+          level !== 4 &&
+          level !== 5 &&
+          level !== 6
+        ) {
+          throw new Error(
+            "Unreachable error: heading level should be between 1 and 6",
+          );
+        }
+
         return [
           provideTypeInference<Block>({
             type: "heading",
-            level: block.props.level,
+            level,
             content: block.content.map((item) =>
               this.convertInlineContent(item),
             ),
             styles: this.convertBlockStyles(block.props),
           }),
         ].concat(this.convertBlocks(block.children));
-
-      case "Heading4":
-        dontExpectChildren();
-
-        return {
-          type: "heading",
-          level: 4,
-          content: block.content.map((item) => this.convertInlineContent(item)),
-          styles: {}, // TODO
-        };
-
-      case "Heading5":
-        dontExpectChildren();
-
-        return {
-          type: "heading",
-          level: 4,
-          content: block.content.map((item) => this.convertInlineContent(item)),
-          styles: {}, // TODO
-        };
-
-      case "Heading6":
-        dontExpectChildren();
-
-        return {
-          type: "heading",
-          level: 4,
-          content: block.content.map((item) => this.convertInlineContent(item)),
-          styles: {}, // TODO
-        };
+      }
 
       case "codeBlock":
         dontExpectChildren();
@@ -254,6 +285,11 @@ export class BlockNoteToUniAstConverter {
           styles: this.convertBlockStyles(block.props),
         };
       }
+
+      case "divider":
+        // TODO: support dividers
+        // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-756
+        throw new Error("TODO: add support for BlockNote dividers to UniAst");
 
       default:
         assertUnreachable(block);
@@ -359,15 +395,40 @@ export class BlockNoteToUniAstConverter {
   ): InlineContent {
     // Handle macros
     if (inlineContent.type.startsWith(MACRO_NAME_PREFIX)) {
+      const id = inlineContent.type.substring(MACRO_NAME_PREFIX.length);
+
+      if (!Object.hasOwn(this.macros, id)) {
+        throw new Error(`Found unregistered macro: "${id}"`);
+      }
+
+      const {
+        infos: { bodyType },
+      } = this.macros[id];
+
       return {
         type: "inlineMacro",
-        name: inlineContent.type.substring(MACRO_NAME_PREFIX.length),
-        // Conversion is required because the AST is dynamically typed
-        params: (
-          inlineContent as unknown as {
-            props: Record<string, boolean | number | string>;
-          }
-        ).props,
+        call: {
+          id,
+          // Conversion is required because the AST is dynamically typed
+          params: (
+            inlineContent as unknown as {
+              props: Record<string, boolean | number | string>;
+            }
+          ).props,
+          body:
+            bodyType === "none"
+              ? { type: "none" }
+              : bodyType === "raw"
+                ? {
+                    type: "raw",
+                    content: extractMacroRawContent([inlineContent]),
+                  }
+                : {
+                    type: "inlineContents",
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    inlineContents: [inlineContent as any],
+                  },
+        },
       };
     }
 

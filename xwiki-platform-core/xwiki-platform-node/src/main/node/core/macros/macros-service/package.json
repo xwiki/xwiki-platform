@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-uniast-markdown",
+  "name": "@xwiki/platform-macros-service",
   "version": "17.10.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/core/uniast/uniast-markdown",
+    "directory": "xwiki-platform-node/src/main/node/core/macros/macros-service",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -30,35 +30,16 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-api": "workspace:*",
-    "@xwiki/platform-document-api": "workspace:*",
-    "@xwiki/platform-fn-utils": "workspace:*",
-    "@xwiki/platform-macros-service": "workspace:*",
-    "@xwiki/platform-model-api": "workspace:*",
-    "@xwiki/platform-uniast-api": "workspace:*",
-    "fast-xml-parser": "catalog:",
-    "mdast-util-gfm-strikethrough": "catalog:",
-    "mdast-util-gfm-table": "catalog:",
-    "mdast-util-gfm-task-list-item": "catalog:",
-    "micromark-extension-gfm-strikethrough": "catalog:",
-    "micromark-extension-gfm-table": "catalog:",
-    "micromark-extension-gfm-task-list-item": "catalog:",
-    "remark-parse": "catalog:",
-    "unified": "catalog:"
+    "@xwiki/platform-macros-api": "workspace:*"
   },
   "peerDependencies": {
     "inversify": "7.x"
   },
   "devDependencies": {
-    "@types/mdast": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
-    "@xwiki/platform-model-reference-api": "workspace:*",
-    "@xwiki/platform-model-remote-url-api": "workspace:*",
-    "eslint": "catalog:",
     "inversify": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:",
     "vitest-mock-extended": "catalog:"
   },
   "publishConfig": {

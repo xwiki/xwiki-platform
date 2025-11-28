@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Heading4, Heading5, Heading6 } from "./blocks/Headings";
 import { MACRO_NAME_PREFIX } from "./utils";
 import translations from "../translations";
 import {
@@ -33,7 +32,7 @@ import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
 import type { BlockNoteConcreteMacro } from "./utils";
-import type { Block, Link, StyledText } from "@blocknote/core";
+import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 
 /**
@@ -61,16 +60,14 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
     blockSpecs: {
       ...remainingBlockSpecs,
 
-      // Custom blocks
-      Heading4: Heading4.block,
-      Heading5: Heading5.block,
-      Heading6: Heading6.block,
-
       // Macros
       ...Object.fromEntries(
         filterMap(macros, ({ macro, bnRendering }) =>
           bnRendering.type === "block"
-            ? [`${MACRO_NAME_PREFIX}${macro.infos.id}`, bnRendering.block.block]
+            ? [
+                `${MACRO_NAME_PREFIX}${macro.infos.id}`,
+                bnRendering.block.block(),
+              ]
             : null,
         ),
       ),
@@ -134,11 +131,6 @@ function querySuggestionsMenuItems(
     combineByGroup(
       getDefaultReactSlashMenuItems(editor),
 
-      // Custom blocks
-      filterMap([Heading4, Heading5, Heading6], (custom) =>
-        custom.slashMenuEntry ? custom.slashMenuEntry(editor) : null,
-      ),
-
       // Block macros
       filterMap(macros, ({ bnRendering }) =>
         bnRendering.type === "block" && bnRendering.block.slashMenuEntry
@@ -159,12 +151,16 @@ function querySuggestionsMenuItems(
 }
 
 /**
+ * Schema of the BlockNote editor
+ *
  * @since 0.16
  * @beta
  */
 type EditorSchema = ReturnType<typeof createBlockNoteSchema>;
 
 /**
+ * Block schema for BlockNote
+ *
  * @since 0.16
  * @beta
  */
@@ -180,6 +176,8 @@ type EditorBlockSchema =
     : never;
 
 /**
+ * Inline content schema for BlockNote
+ *
  * @since 0.16
  * @beta
  */
@@ -195,6 +193,8 @@ type EditorInlineContentSchema =
     : never;
 
 /**
+ * Style schema for BlockNote
+ *
  * @since 0.16
  * @beta
  */
@@ -210,6 +210,8 @@ type EditorStyleSchema =
     : never;
 
 /**
+ * Type of a BlockNote editor instance
+ *
  * @since 0.16
  * @beta
  */
@@ -220,18 +222,8 @@ type EditorType = BlockNoteEditor<
 >;
 
 /**
- * @since 0.16
- * @beta
- */
-type EditorStyledText = StyledText<EditorStyleSchema>;
-
-/**
- * @since 0.16
- * @beta
- */
-type EditorLink = Link<EditorStyleSchema>;
-
-/**
+ * Typesafe BlockNote type
+ *
  * @since 0.16
  * @beta
  */
@@ -242,10 +234,39 @@ type BlockType = Block<
 >;
 
 /**
+ * Typesafe BlockNote type of the a given kind
+ *
  * @since 0.16
  * @beta
  */
 type BlockOfType<B extends BlockType["type"]> = Extract<BlockType, { type: B }>;
+
+/**
+ * Typesafe BlockNote inline content
+ *
+ * @since 0.24-rc-1
+ * @beta
+ */
+type InlineContentType = InlineContent<
+  EditorInlineContentSchema,
+  EditorStyleSchema
+>;
+
+/**
+ * Typesafe BlockNote styled text
+ *
+ * @since 0.16
+ * @beta
+ */
+type EditorStyledText = StyledText<EditorStyleSchema>;
+
+/**
+ * Typesafe BlockNote link
+ *
+ * @since 0.16
+ * @beta
+ */
+type EditorLink = Link<EditorStyleSchema>;
 
 export type {
   BlockNoteConcreteMacro,
@@ -259,6 +280,7 @@ export type {
   EditorStyleSchema,
   EditorStyledText,
   EditorType,
+  InlineContentType,
 };
 
 export { createBlockNoteSchema, createDictionary, querySuggestionsMenuItems };

@@ -58,6 +58,7 @@ export type AlertProps = {
     actions?: AlertActions;
     closable?: boolean;
     details?: string;
+    flatCorners?: boolean;
 };
 
 // @beta (undocumented)

@@ -17,19 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export type {
-  Alignment,
-  Block,
-  BlockStyles,
-  Image,
-  InlineContent,
-  Link,
-  LinkTarget,
-  ListItem,
-  MacroInvocation,
-  TableCell,
-  TableColumn,
-  Text,
-  TextStyles,
-  UniAst,
-} from "./ast";
+
+import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+
+/**
+ * Service handling the registration and delivery of macros
+ *
+ * @since 0.23
+ * @beta
+ */
+export interface MacrosService {
+  /**
+   * List all registered macros
+   *
+   * @returns - All registered macros
+   */
+  list(): MacroWithUnknownParamsType[];
+
+  /**
+   * Get a macro by its ID
+   *
+   * @param id - The macro's ID
+   *
+   * @returns - The registered macro with the provided ID
+   */
+  get(id: string): MacroWithUnknownParamsType | null;
+}

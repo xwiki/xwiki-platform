@@ -17,19 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export type {
-  Alignment,
-  Block,
-  BlockStyles,
-  Image,
-  InlineContent,
-  Link,
-  LinkTarget,
-  ListItem,
-  MacroInvocation,
-  TableCell,
-  TableColumn,
-  Text,
-  TextStyles,
-  UniAst,
-} from "./ast";
+
+import { generateConfig } from "../../../vite.config";
+
+export default generateConfig(import.meta.url);

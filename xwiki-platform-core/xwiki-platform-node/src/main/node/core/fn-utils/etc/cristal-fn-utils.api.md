@@ -11,10 +11,16 @@ export function assertInArray<T, U extends T>(value: T, array: U[], message: str
 export function assertUnreachable(value: never): never;
 
 // @beta
+export function escapeHtml(str: string): string;
+
+// @beta
 export function filterMap<T, U>(array: T[], filterMap: (value: T, index: number) => U | null | undefined): U[];
 
 // @beta
 export function objectEntries<O extends Record<string, unknown>>(obj: O): Array<[keyof O & string, O[keyof O]]>;
+
+// @beta
+export function produceHtmlEl(tagName: string, attrs: Record<string, string | undefined>, innerHTML: string | false): string;
 
 // @beta
 export function provideTypeInference<T>(value: T): T;

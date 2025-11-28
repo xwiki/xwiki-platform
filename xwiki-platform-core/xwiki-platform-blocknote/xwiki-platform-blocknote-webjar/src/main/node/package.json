@@ -19,6 +19,7 @@
     "@xwiki/platform-editors-blocknote-headless": "workspace:*",
     "@xwiki/platform-editors-blocknote-react": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
+    "@xwiki/platform-macros-service": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",

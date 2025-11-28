@@ -48,6 +48,12 @@ type AlertProps = {
    * @beta
    */
   details?: string;
+  /**
+   * Render with flat corners to use as, e.g., a banner.
+   * @since 0.24-rc-1
+   * @beta
+   */
+  flatCorners?: boolean;
 };
 
 export type { AlertActions, AlertProps, AlterAction };

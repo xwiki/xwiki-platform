@@ -47,10 +47,24 @@ interface MacroInfos<Parameters extends Record<string, MacroParameterType>> {
    * Default parameters for the macro
    *
    * If `false` is provided, the macro will be hidden
+   *
+   * If the macro's `bodyType` is set to `raw`, a dialog box will be shown to insert the macro
    */
   defaultParameters:
     | FilterUndefined<GetConcreteMacroParametersType<Parameters>>
     | false;
+
+  /**
+   * Indicate if the macro has a body
+   *
+   * `none`: the macro has no body
+   * `wysiwyg`: the macro has a body that is user-editable in a WYSIWYG fashion
+   * `raw`: the macro has a body that is user-editable but not in a WYSIWYG fashion
+   *
+   * @since 0.24-rc-1
+   * @beta
+   */
+  bodyType: "none" | "wysiwyg" | "raw";
 }
 
 /**
@@ -70,11 +84,14 @@ interface BlockMacro<Parameters extends Record<string, MacroParameterType>> {
    * Render function
    *
    * @param params - The macro's parameters ; optional fields may be absent or equal to `undefined`
-   * @param openParamsEditor - Request the opening of an UI to edit the macro's parameters (e.g. a modal)
+   * @param rawBody - The macro's raw body string, if `bodyType` is set as raw
    *
    * @returns The AST to render the macro as
    */
-  render(params: GetConcreteMacroParametersType<Parameters>): MacroBlock[];
+  render(
+    params: GetConcreteMacroParametersType<Parameters>,
+    rawBody: string | null,
+  ): MacroBlock[];
 }
 
 /**
@@ -94,12 +111,13 @@ interface InlineMacro<Parameters extends Record<string, MacroParameterType>> {
    * Render function
    *
    * @param params - The macro's parameters ; optional fields may be absent or equal to `undefined`
-   * @param openParamsEditor - Request the opening of an UI to edit the macro's parameters (e.g. a modal)
+   * @param rawBody - The macro's raw body string, if `bodyType` is set as raw
    *
    * @returns The AST to render the macro as
    */
   render(
     params: GetConcreteMacroParametersType<Parameters>,
+    rawBody: string | null,
   ): MacroInlineContent[];
 }
 

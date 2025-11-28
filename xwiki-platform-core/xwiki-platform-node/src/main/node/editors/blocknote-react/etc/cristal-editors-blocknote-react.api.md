@@ -6,27 +6,33 @@
 
 import { AttachmentsService } from '@xwiki/platform-attachments-api';
 import { Block } from '@blocknote/core';
+import { BlockConfig } from '@blocknote/core';
 import { BlockNoteEditor } from '@blocknote/core';
 import { BlockNoteEditorOptions } from '@blocknote/core';
 import { BlockNoteSchema } from '@blocknote/core';
 import { BlockSchemaFromSpecs } from '@blocknote/core';
+import { BlockSpec } from '@blocknote/core';
 import { CollaborationInitializer } from '@xwiki/platform-collaboration-api';
-import { CustomBlockConfig } from '@blocknote/core';
 import { CustomInlineContentConfig } from '@blocknote/core';
+import { DefaultInlineContentSchema } from '@blocknote/core';
 import { DefaultReactSuggestionItem } from '@blocknote/react';
+import { DefaultStyleSchema } from '@blocknote/core';
 import { DocumentService } from '@xwiki/platform-document-api';
-import { InlineContentImplementation } from '@blocknote/core';
+import { InlineContent } from '@blocknote/core';
 import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';
+import { InlineContentSpec } from '@blocknote/core';
 import { Link } from '@blocknote/core';
 import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
 import * as locales from '@blocknote/core/locales';
+import { LooseBlockSpec } from '@blocknote/core';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
-import { PartialBlock } from '@blocknote/core';
+import { PartialBlockFromConfig } from '@blocknote/core';
 import { PartialInlineContent } from '@blocknote/core';
+import { PropSchema } from '@blocknote/core';
 import { ReactCustomBlockImplementation } from '@blocknote/react';
 import { ReactInlineContentImplementation } from '@blocknote/react';
 import { ReactNode } from 'react';
@@ -36,7 +42,7 @@ import { StyledText } from '@blocknote/core';
 import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
-import { TiptapBlockImplementation } from '@blocknote/core';
+import { StyleSpec } from '@blocknote/core';
 import { UnknownMacroParamsType } from '@xwiki/platform-macros-api';
 
 // Warning: (ae-internal-missing-underscore) The name "BlockNoteConcreteMacro" should be prefixed with an underscore because the declaration is marked as @internal
@@ -77,13 +83,16 @@ export type BlockNoteViewWrapperProps = {
     };
 };
 
-// @beta (undocumented)
+// @beta
 export type BlockOfType<B extends BlockType["type"]> = Extract<BlockType, {
     type: B;
 }>;
 
-// @beta (undocumented)
+// @beta
 export type BlockType = Block<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>;
+
+// @beta
+export function buildMacroRawContent(content: string): InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>;
 
 // @beta
 export type ContextForMacros = {
@@ -94,206 +103,62 @@ export type ContextForMacros = {
 //
 // @beta
 export function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]): BlockNoteSchema<BlockSchemaFromSpecs<    {
-Heading4: {
-config: {
-readonly type: "Heading4" | "Heading5" | "Heading6";
-readonly content: "inline";
-readonly propSchema: {};
-};
-implementation: TiptapBlockImplementation<    {
-readonly type: "Heading4" | "Heading5" | "Heading6";
-readonly content: "inline";
-readonly propSchema: {};
-}, any, InlineContentSchema, StyleSchema>;
-};
-Heading5: {
-config: {
-readonly type: "Heading4" | "Heading5" | "Heading6";
-readonly content: "inline";
-readonly propSchema: {};
-};
-implementation: TiptapBlockImplementation<    {
-readonly type: "Heading4" | "Heading5" | "Heading6";
-readonly content: "inline";
-readonly propSchema: {};
-}, any, InlineContentSchema, StyleSchema>;
-};
-Heading6: {
-config: {
-readonly type: "Heading4" | "Heading5" | "Heading6";
-readonly content: "inline";
-readonly propSchema: {};
-};
-implementation: TiptapBlockImplementation<    {
-readonly type: "Heading4" | "Heading5" | "Heading6";
-readonly content: "inline";
-readonly propSchema: {};
-}, any, InlineContentSchema, StyleSchema>;
-};
-paragraph: {
-config: {
-type: "paragraph";
-content: "inline";
-propSchema: {
-backgroundColor: {
+bulletListItem: BlockSpec<"bulletListItem", {
+readonly backgroundColor: {
 default: "default";
 };
-textColor: {
+readonly textColor: {
 default: "default";
 };
-textAlignment: {
+readonly textAlignment: {
 default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
+}, "inline">;
+checkListItem: BlockSpec<"checkListItem", {
+readonly checked: {
+readonly default: false;
+readonly type: "boolean";
 };
-};
-implementation: TiptapBlockImplementation<    {
-type: "paragraph";
-content: "inline";
-propSchema: {
-backgroundColor: {
+readonly backgroundColor: {
 default: "default";
 };
-textColor: {
+readonly textColor: {
 default: "default";
 };
-textAlignment: {
+readonly textAlignment: {
 default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
+}, "inline">;
+codeBlock: BlockSpec<"codeBlock", {
+readonly language: {
+readonly default: string;
 };
-}, any, InlineContentSchema, StyleSchema>;
+}, "inline">;
+divider: BlockSpec<"divider", {}, "none">;
+heading: BlockSpec<"heading", {
+readonly isToggleable?: {
+readonly default: false;
+readonly optional: true;
+} | undefined;
+readonly level: {
+readonly default: 1 | 4 | 2 | 3 | 5 | 6;
+readonly values: readonly number[];
 };
-heading: {
-config: {
-type: "heading";
-content: "inline";
-propSchema: {
-level: {
-default: number;
-values: readonly [1, 2, 3, 4, 5, 6];
-};
-isToggleable: {
-default: false;
-};
-backgroundColor: {
+readonly backgroundColor: {
 default: "default";
 };
-textColor: {
+readonly textColor: {
 default: "default";
 };
-textAlignment: {
+readonly textAlignment: {
 default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
-};
-};
-implementation: TiptapBlockImplementation<    {
-type: "heading";
-content: "inline";
-propSchema: {
-level: {
-default: number;
-values: readonly [1, 2, 3, 4, 5, 6];
-};
-isToggleable: {
-default: false;
-};
-backgroundColor: {
-default: "default";
-};
-textColor: {
-default: "default";
-};
-textAlignment: {
-default: "left";
-values: readonly ["left", "center", "right", "justify"];
-};
-};
-}, any, InlineContentSchema, StyleSchema>;
-};
-quote: {
-config: {
-type: "quote";
-content: "inline";
-propSchema: {
-backgroundColor: {
-default: "default";
-};
-textColor: {
-default: "default";
-};
-textAlignment: {
-default: "left";
-values: readonly ["left", "center", "right", "justify"];
-};
-};
-};
-implementation: TiptapBlockImplementation<    {
-type: "quote";
-content: "inline";
-propSchema: {
-backgroundColor: {
-default: "default";
-};
-textColor: {
-default: "default";
-};
-textAlignment: {
-default: "left";
-values: readonly ["left", "center", "right", "justify"];
-};
-};
-}, any, InlineContentSchema, StyleSchema>;
-};
-codeBlock: {
-config: {
-type: "codeBlock";
-content: "inline";
-propSchema: {
-language: {
-default: string;
-};
-};
-};
-implementation: TiptapBlockImplementation<    {
-type: "codeBlock";
-content: "inline";
-propSchema: {
-language: {
-default: string;
-};
-};
-}, any, InlineContentSchema, StyleSchema>;
-};
-bulletListItem: {
-config: {
-type: "bulletListItem";
-content: "inline";
-propSchema: {
-backgroundColor: {
-default: "default";
-};
-textColor: {
-default: "default";
-};
-textAlignment: {
-default: "left";
-values: readonly ["left", "center", "right", "justify"];
-};
-};
-};
-implementation: TiptapBlockImplementation<    {
-type: "bulletListItem";
-content: "inline";
-propSchema: {
-backgroundColor: {
-default: "default";
-};
-textColor: {
-default: "default";
-};
-textAlignment: {
+}, "inline">;
+image: BlockSpec<"image", {
+readonly textAlignment: {
 default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
@@ -312,23 +177,40 @@ type: "number";
 backgroundColor: {
 default: "default";
 };
-textColor: {
+readonly name: {
+readonly default: "";
+};
+readonly url: {
+readonly default: "";
+};
+readonly caption: {
+readonly default: "";
+};
+readonly showPreview: {
+readonly default: true;
+};
+readonly previewWidth: {
+readonly default: undefined;
+readonly type: "number";
+};
+}, "none">;
+numberedListItem: BlockSpec<"numberedListItem", {
+readonly start: {
+readonly default: undefined;
+readonly type: "number";
+};
+readonly backgroundColor: {
 default: "default";
 };
-textAlignment: {
+readonly textColor: {
+default: "default";
+};
+readonly textAlignment: {
 default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
-};
-};
-implementation: TiptapBlockImplementation<    {
-type: "numberedListItem";
-content: "inline";
-propSchema: {
-start: {
-default: undefined;
-type: "number";
-};
+}, "inline">;
+paragraph: BlockSpec<"paragraph", {
 backgroundColor: {
 default: "default";
 };
@@ -339,52 +221,15 @@ textAlignment: {
 default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
-};
-}, any, InlineContentSchema, StyleSchema>;
-};
-checkListItem: {
-config: {
-type: "checkListItem";
-content: "inline";
-propSchema: {
-checked: {
-default: false;
-};
-backgroundColor: {
+}, "inline">;
+quote: BlockSpec<"quote", {
+readonly backgroundColor: {
 default: "default";
 };
-textColor: {
+readonly textColor: {
 default: "default";
 };
-textAlignment: {
-default: "left";
-values: readonly ["left", "center", "right", "justify"];
-};
-};
-};
-implementation: TiptapBlockImplementation<    {
-type: "checkListItem";
-content: "inline";
-propSchema: {
-checked: {
-default: false;
-};
-backgroundColor: {
-default: "default";
-};
-textColor: {
-default: "default";
-};
-textAlignment: {
-default: "left";
-values: readonly ["left", "center", "right", "justify"];
-};
-};
-}, any, InlineContentSchema, StyleSchema>;
-};
-table: {
-config: {
-type: "table";
+}, "inline">;
 content: "table";
 propSchema: {
 textColor: {
@@ -394,78 +239,10 @@ default: "default";
 };
 implementation: TiptapBlockImplementation<    {
 type: "table";
-content: "table";
-propSchema: {
 textColor: {
 default: "default";
 };
-};
-}, any, InlineContentSchema, StyleSchema>;
-};
-image: {
-config: {
-type: "image";
-propSchema: {
-textAlignment: {
-default: "left";
-values: readonly ["left", "center", "right", "justify"];
-};
-backgroundColor: {
-default: "default";
-};
-name: {
-default: "";
-};
-url: {
-default: "";
-};
-caption: {
-default: "";
-};
-showPreview: {
-default: true;
-};
-previewWidth: {
-default: undefined;
-type: "number";
-};
-};
-content: "none";
-isFileBlock: true;
-fileBlockAccept: string[];
-};
-implementation: TiptapBlockImplementation<    {
-type: "image";
-propSchema: {
-textAlignment: {
-default: "left";
-values: readonly ["left", "center", "right", "justify"];
-};
-backgroundColor: {
-default: "default";
-};
-name: {
-default: "";
-};
-url: {
-default: "";
-};
-caption: {
-default: "";
-};
-showPreview: {
-default: true;
-};
-previewWidth: {
-default: undefined;
-type: "number";
-};
-};
-content: "none";
-isFileBlock: true;
-fileBlockAccept: string[];
-}, any, InlineContentSchema, StyleSchema>;
-};
+}, "table">;
 }>, InlineContentSchemaFromSpecs<    {
 text: {
 config: "text";
@@ -481,21 +258,30 @@ config: {
 type: string;
 propSchema: "boolean";
 };
-implementation: StyleImplementation;
+implementation: StyleImplementation<    {
+type: string;
+propSchema: "boolean";
+}>;
 };
 italic: {
 config: {
 type: string;
 propSchema: "boolean";
 };
-implementation: StyleImplementation;
+implementation: StyleImplementation<    {
+type: string;
+propSchema: "boolean";
+}>;
 };
 underline: {
 config: {
 type: string;
 propSchema: "boolean";
 };
-implementation: StyleImplementation;
+implementation: StyleImplementation<    {
+type: string;
+propSchema: "boolean";
+}>;
 };
 strike: {
 config: {
@@ -503,6 +289,9 @@ type: string;
 propSchema: "boolean";
 };
 implementation: StyleImplementation;
+type: string;
+propSchema: "boolean";
+}>;
 };
 code: {
 config: {
@@ -510,43 +299,37 @@ type: string;
 propSchema: "boolean";
 };
 implementation: StyleImplementation;
-};
-textColor: {
-config: {
 type: string;
-propSchema: "string";
+propSchema: "boolean";
+}>;
 };
-implementation: StyleImplementation;
-};
-backgroundColor: {
-config: {
-type: string;
-propSchema: "string";
-};
-implementation: StyleImplementation;
-};
+textColor: StyleSpec<    {
+readonly type: "textColor";
+readonly propSchema: "string";
+}>;
+backgroundColor: StyleSpec<    {
+readonly type: "backgroundColor";
+readonly propSchema: "string";
+}>;
 }>>;
 
 // Warning: (ae-internal-missing-underscore) The name "createCustomBlockSpec" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export function createCustomBlockSpec<const B extends CustomBlockConfig, const I extends InlineContentSchema, const S extends StyleSchema>({ config, implementation, slashMenu, customToolbar, }: {
-    config: B;
-    implementation: ReactCustomBlockImplementation<B, I, S>;
+export function createCustomBlockSpec<const Name extends string, const Props extends PropSchema, const InlineType extends "inline" | "none">({ config, implementation, slashMenu, customToolbar, }: {
+    config: BlockConfig<Name, Props, InlineType>;
+    implementation: ReactCustomBlockImplementation<Name, Props, InlineType>;
     slashMenu: false | {
         title: string;
         aliases?: string[];
         group: string;
         icon: ReactNode;
-        default: () => PartialBlock<Record<B["type"], B>>;
+        default: () => PartialBlockFromConfig<BlockConfig<Name, Props, InlineType>, InlineContentSchema, StyleSchema>;
     };
     customToolbar: (() => ReactNode) | null;
 }): {
-    block: {
-        config: B;
-        implementation: TiptapBlockImplementation<B, any, InlineContentSchema, StyleSchema>;
-    };
-    slashMenuEntry: false | ((editor: BlockNoteEditor<any>) => {
+    block: (options?: undefined) => BlockSpec<Name, Props, InlineType>;
+    slashMenuEntry: false | ((editor: BlockNoteEditor<any, any, any>) => {
         title: string;
         aliases: string[] | undefined;
         group: string;
@@ -573,8 +356,6 @@ export function createCustomInlineContentSpec<const I extends CustomInlineConten
 }): {
     inlineContent: {
         config: I;
-        implementation: InlineContentImplementation<I>;
-    };
     slashMenuEntry: false | ((editor: BlockNoteEditor<any>) => {
         title: string;
         aliases: string[] | undefined;
@@ -726,21 +507,19 @@ export function createDictionary(lang: EditorLanguage): {
             aliases: string[];
             group: string;
         };
+        divider: {
+            title: string;
+            subtext: string;
+            aliases: string[];
+            group: string;
+        };
     };
     placeholders: Record<string | "default" | "emptyDocument", string | undefined>;
     file_blocks: {
-        image: {
-            add_button_text: string;
-        };
-        video: {
-            add_button_text: string;
-        };
-        audio: {
-            add_button_text: string;
-        };
-        file: {
-            add_button_text: string;
-        };
+        add_button_text: Record<string, string>;
+    };
+    toggle_blocks: {
+        add_block_button: string;
     };
     side_menu: {
         add_block_label: string;
@@ -909,10 +688,10 @@ export function createDictionary(lang: EditorLanguage): {
     };
 };
 
-// @beta (undocumented)
+// @beta
 export type EditorBlockSchema = EditorSchema extends BlockNoteSchema<infer BlockSchema, infer _, infer __> ? BlockSchema : never;
 
-// @beta (undocumented)
+// @beta
 export type EditorInlineContentSchema = EditorSchema extends BlockNoteSchema<infer _, infer InlineContentSchema, infer __> ? InlineContentSchema : never;
 
 // Warning: (ae-forgotten-export) The symbol "_default" needs to be exported by the entry point index.d.ts
@@ -920,20 +699,26 @@ export type EditorInlineContentSchema = EditorSchema extends BlockNoteSchema<inf
 // @beta (undocumented)
 export type EditorLanguage = keyof typeof locales & keyof typeof _default;
 
-// @beta (undocumented)
+// @beta
 export type EditorLink = Link<EditorStyleSchema>;
 
-// @beta (undocumented)
+// @beta
 export type EditorSchema = ReturnType<typeof createBlockNoteSchema>;
 
-// @beta (undocumented)
+// @beta
 export type EditorStyledText = StyledText<EditorStyleSchema>;
 
-// @beta (undocumented)
+// @beta
 export type EditorStyleSchema = EditorSchema extends BlockNoteSchema<infer _, infer __, infer StyleSchema> ? StyleSchema : never;
 
-// @beta (undocumented)
+// @beta
 export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentSchema, EditorStyleSchema>;
+
+// @beta
+export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
+
+// @beta
+export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
 
 // @beta (undocumented)
 export type LinkEditionContext = {

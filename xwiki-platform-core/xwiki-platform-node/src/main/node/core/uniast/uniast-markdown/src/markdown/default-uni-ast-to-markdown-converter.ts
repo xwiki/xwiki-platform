@@ -27,6 +27,7 @@ import type {
   InlineContent,
   Link,
   ListItem,
+  MacroInvocation,
   TableCell,
   Text,
   UniAst,
@@ -111,7 +112,7 @@ export class DefaultUniAstToMarkdownConverter
         return "---";
 
       case "macroBlock":
-        return this.convertMacro(block.name, block.params);
+        return this.convertMacro(block.call);
     }
   }
 
@@ -194,7 +195,7 @@ export class DefaultUniAstToMarkdownConverter
       case "link":
         return this.convertLink(inlineContent);
       case "inlineMacro":
-        return this.convertMacro(inlineContent.name, inlineContent.params);
+        return this.convertMacro(inlineContent.call);
     }
   }
 
@@ -215,16 +216,37 @@ export class DefaultUniAstToMarkdownConverter
     }
   }
 
-  private convertMacro(
-    name: string,
-    parameters: Record<string, boolean | number | string>,
-  ): string {
-    return `{{${name}${Object.entries(parameters)
+  private async convertMacro(call: MacroInvocation): Promise<string> {
+    const opening = `${call.id}${Object.entries(call.params)
       .map(
         ([name, value]) =>
-          ` ${name}="${value.toString().replace(/\\/g, "\\\\\\").replace(/"/g, '\\\\"')}"`,
+          ` ${name}="${value.toString().replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`,
       )
-      .join("")} /}}`;
+      .join("")}`;
+
+    let body: string | null;
+
+    switch (call.body.type) {
+      case "none":
+        body = null;
+        break;
+
+      case "raw":
+        body = call.body.content;
+        break;
+
+      case "inlineContent":
+        body = await this.convertInlineContent(call.body.inlineContent);
+        break;
+
+      case "inlineContents":
+        body = await this.convertInlineContents(call.body.inlineContents);
+        break;
+    }
+
+    return body !== null
+      ? `{{${opening}}}${body}{{/${call.id}}}`
+      : `{{${opening} /}}`;
   }
 
   // eslint-disable-next-line max-statements

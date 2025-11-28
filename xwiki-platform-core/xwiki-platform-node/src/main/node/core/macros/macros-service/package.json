@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-macros-ast-react-jsx",
-  "version": "18.0.0-SNAPSHOT",
+  "name": "@xwiki/platform-macros-service",
+  "version": "17.10.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-node/src/main/node/core/core/macros/macros-ast-react-jsx",
+    "directory": "xwiki-platform-node/src/main/node/core/macros/macros-service",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -30,22 +30,16 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-fn-utils": "workspace:*",
-    "@xwiki/platform-macros-api": "workspace:*",
-    "@xwiki/platform-model-remote-url-api": "workspace:*"
+    "@xwiki/platform-macros-api": "workspace:*"
   },
   "peerDependencies": {
     "inversify": "7.x"
   },
   "devDependencies": {
-    "@types/react": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
-    "eslint": "catalog:",
     "inversify": "catalog:",
-    "react": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:",
     "vitest-mock-extended": "catalog:"
   },
   "publishConfig": {

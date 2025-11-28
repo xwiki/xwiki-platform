@@ -18,7 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { MACRO_NAME_PREFIX } from "@xwiki/platform-editors-blocknote-react";
+import {
+  MACRO_NAME_PREFIX,
+  buildMacroRawContent,
+} from "@xwiki/platform-editors-blocknote-react";
 import {
   assertUnreachable,
   tryFallibleOrError,
@@ -30,6 +33,7 @@ import type {
   EditorLink,
   EditorStyleSchema,
   EditorStyledText,
+  InlineContentType,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 import type {
@@ -57,6 +61,7 @@ export class UniAstToBlockNoteConverter {
     );
   }
 
+  // eslint-disable-next-line max-statements
   private convertBlock(block: Block): BlockType | BlockType[] {
     switch (block.type) {
       case "paragraph":
@@ -73,59 +78,17 @@ export class UniAstToBlockNoteConverter {
         };
 
       case "heading":
-        switch (block.level) {
-          case 1:
-          case 2:
-          case 3:
-            return {
-              type: "heading",
-              id: genId(),
-              children: [],
-              content: block.content.map((item) =>
-                this.convertInlineContent(item),
-              ),
-              props: {
-                ...this.convertBlockStyles(block.styles),
-                level: block.level,
-                isToggleable: false,
-              },
-            };
-
-          case 4:
-            return {
-              type: "Heading4",
-              id: genId(),
-              children: [],
-              content: block.content.map((item) =>
-                this.convertInlineContent(item),
-              ),
-              props: this.convertBlockStyles(block.styles),
-            };
-
-          case 5:
-            return {
-              type: "Heading5",
-              id: genId(),
-              children: [],
-              content: block.content.map((item) =>
-                this.convertInlineContent(item),
-              ),
-              props: this.convertBlockStyles(block.styles),
-            };
-
-          case 6:
-            return {
-              type: "Heading6",
-              id: genId(),
-              children: [],
-              content: block.content.map((item) =>
-                this.convertInlineContent(item),
-              ),
-              props: this.convertBlockStyles(block.styles),
-            };
-        }
-
-        break;
+        return {
+          type: "heading",
+          id: genId(),
+          children: [],
+          content: block.content.map((item) => this.convertInlineContent(item)),
+          props: {
+            ...this.convertBlockStyles(block.styles),
+            level: block.level,
+            isToggleable: false,
+          },
+        };
 
       case "quote":
         return {
@@ -193,14 +156,46 @@ export class UniAstToBlockNoteConverter {
       case "break":
         throw new Error("TODO: handle block of type " + block.type);
 
-      case "macroBlock":
-        return {
-          // @ts-expect-error: macros are dynamically added to the AST
-          type: `${MACRO_NAME_PREFIX}${block.name}`,
+      case "macroBlock": {
+        let content: InlineContentType[] | null = null;
+
+        const { body } = block.call;
+
+        switch (body.type) {
+          case "none":
+            content = null;
+            break;
+
+          case "raw":
+            content = [buildMacroRawContent(body.content)];
+            break;
+
+          case "inlineContent":
+            throw new Error(
+              "Unexpectedly found inlineContent as body for block macro (expected a list of inline contents)",
+            );
+
+          case "inlineContents":
+            content = body.inlineContents.map((inline) =>
+              this.convertInlineContent(inline),
+            );
+            break;
+        }
+
+        const out: BlockType = {
+          // @ts-expect-error: AST is dynamically typed
+          type: `${MACRO_NAME_PREFIX}${block.call.id}`,
           id: genId(),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          props: block.params as any,
+          props: block.call.params as any,
         };
+
+        if (content) {
+          out.content = content;
+        }
+
+        return out;
+      }
 
       default:
         assertUnreachable(block);
@@ -333,9 +328,10 @@ export class UniAstToBlockNoteConverter {
     };
   }
 
+  // eslint-disable-next-line max-statements
   private convertInlineContent(
     inlineContent: InlineContent,
-  ): EditorStyledText | EditorLink {
+  ): InlineContentType {
     switch (inlineContent.type) {
       case "text": {
         const {
@@ -394,12 +390,44 @@ export class UniAstToBlockNoteConverter {
       case "image":
         throw new Error("Inline images are currently unsupported in blocknote");
 
-      case "inlineMacro":
-        return {
+      case "inlineMacro": {
+        let content: InlineContent | null = null;
+
+        const { body } = inlineContent.call;
+
+        switch (body.type) {
+          case "none":
+            content = null;
+            break;
+
+          case "raw":
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            content = buildMacroRawContent(body.content) as any;
+            break;
+
+          case "inlineContent":
+            content = body.inlineContent;
+            break;
+
+          case "inlineContents":
+            throw new Error(
+              "Unexpectedly found inlineContents as body for inline macro (expected one single inline content at most)",
+            );
+        }
+
+        const out: InlineContentType = {
           // @ts-expect-error: macros are dynamically added to the AST
-          type: `${MACRO_NAME_PREFIX}${inlineContent.name}`,
-          props: inlineContent.params,
+          type: `${MACRO_NAME_PREFIX}${inlineContent.call.id}`,
+          props: inlineContent.call.params,
         };
+
+        if (content) {
+          // @ts-expect-error: AST is dynamically typed
+          out.content = content;
+        }
+
+        return out;
+      }
     }
   }
 }

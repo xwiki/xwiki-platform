@@ -17,19 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-export type {
-  Alignment,
-  Block,
-  BlockStyles,
-  Image,
-  InlineContent,
-  Link,
-  LinkTarget,
-  ListItem,
-  MacroInvocation,
-  TableCell,
-  TableColumn,
-  Text,
-  TextStyles,
-  UniAst,
-} from "./ast";
+
+import { injectable, multiInject } from "inversify";
+import type { MacrosService } from "./macros-service";
+import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+
+@injectable()
+export class DefaultMacrosService implements MacrosService {
+  private readonly macrosById: Map<string, MacroWithUnknownParamsType>;
+
+  constructor(
+    @multiInject("Macro")
+    private readonly macros: MacroWithUnknownParamsType[],
+  ) {
+    this.macrosById = new Map(macros.map((macro) => [macro.infos.id, macro]));
+  }
+
+  list(): MacroWithUnknownParamsType[] {
+    // Clone the array to prevent modifications
+    return this.macros.slice();
+  }
+
+  get(name: string): MacroWithUnknownParamsType | null {
+    return this.macrosById.get(name) ?? null;
+  }
+}

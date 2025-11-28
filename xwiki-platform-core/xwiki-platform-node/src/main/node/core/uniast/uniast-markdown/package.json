@@ -33,6 +33,7 @@
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-fn-utils": "workspace:*",
+    "@xwiki/platform-macros-service": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-uniast-api": "workspace:*",
     "fast-xml-parser": "catalog:",

@@ -39,7 +39,6 @@ define('xwiki-realtime-wysiwyg-patches', [
      */
     constructor(editor) {
       this._editor = editor;
-      this._diffDOM = this._createDiffDOM();
       this._filters = [
         change => {
           // Reject any change made directly to the root node (i.e. the editor content wrapper) because it may break the
@@ -55,7 +54,7 @@ define('xwiki-realtime-wysiwyg-patches', [
       ];
     }
 
-    _createDiffDOM() {
+    _createDiffDOM(options) {
       const diffDOM = new DiffDOM.DiffDOM({
         // We need fine grained diff (at attribute level) even for large content, in order to be able to properly patch
         // widgets (images, rendering macro calls).
@@ -90,7 +89,9 @@ define('xwiki-realtime-wysiwyg-patches', [
           if (['addTextElement', 'addElement', 'replaceElement'].includes(change.diff.action)) {
             diffDOM._updatedNodes.add(change.newNode);
           }
-        }
+        },
+
+        ...options
       });
 
       const originalApply = DiffDOM.DiffDOM.prototype.apply;
@@ -234,14 +235,18 @@ define('xwiki-realtime-wysiwyg-patches', [
       const selection = this._saveSelection();
 
       await this._editor.updateContent(oldContent => {
-        // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
-        const patch = this._diffDOM.diff(DiffDOM.nodeToObj(oldContent), DiffDOM.nodeToObj(newContent));
-        this._diffDOM.apply(oldContent, patch, {
+        const diffDOM = this._createDiffDOM({
           // New (added) nodes must be created using the current DOM document, where they will be inserted.
           document: oldContent.ownerDocument
         });
+        // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
+        const patch = diffDOM.diff(
+          DiffDOM.nodeToObj(oldContent, diffDOM.options),
+          DiffDOM.nodeToObj(newContent, diffDOM.options)
+        );
+        diffDOM.apply(oldContent, patch);
 
-        const updatedNodes = this._diffDOM._updatedNodes;
+        const updatedNodes = diffDOM._updatedNodes;
         this._maybeInvalidateSavedSelection(selection, updatedNodes);
 
         return updatedNodes;

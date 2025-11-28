@@ -31,15 +31,33 @@ export interface UniAstToMarkdownConverter {
    *
    * @param uniAst - the AST to convert to markdown
    *
-   * understand the impacts
+   * @returns The converted AST
    */
   toMarkdown(uniAst: UniAst): Promise<string | Error>;
 
   /**
-   * @since 0.22
-   * @internal
-   * @param inlineContents - the inline contents to convert to markdown
-   * @returns the markdown representation of the inline content
+   * Converts blocks to Markdown.
+   *
+   * @param uniAst - the blocks to convert to markdown
+   *
+   * @returns The converted blocks
+   *
+   * @since 0.24-rc-1
+   * @beta
    */
-  convertInlineContents(inlineContents: InlineContent[]): Promise<string>;
+  toMarkdown(uniAst: UniAst): Promise<string | Error>;
+
+  /**
+   * Convert inline contents to Markdown.
+   *
+   * @param inlineContents - the inline contents to convert to markdown
+   *
+   * @returns the markdown representation of the inline content
+   *
+   * @since 0.24-rc-1
+   * @beta
+   */
+  convertInlineContents(
+    inlineContents: InlineContent[],
+  ): Promise<string | Error>;
 }

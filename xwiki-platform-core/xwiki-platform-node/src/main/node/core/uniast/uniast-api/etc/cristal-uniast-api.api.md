@@ -42,8 +42,7 @@ export type Block = {
     type: "break";
 } | {
     type: "macroBlock";
-    name: string;
-    params: Record<string, boolean | number | string>;
+    call: MacroInvocation;
 };
 
 // @beta (undocumented)
@@ -75,8 +74,7 @@ export type InlineContent = ({
     type: "link";
 } & Link) | {
     type: "inlineMacro";
-    name: string;
-    params: Record<string, boolean | number | string>;
+    call: MacroInvocation;
 };
 
 // @beta (undocumented)
@@ -103,6 +101,24 @@ export type ListItem = {
     checked?: boolean;
     content: Block[];
     styles: BlockStyles;
+};
+
+// @beta (undocumented)
+export type MacroInvocation = {
+    id: string;
+    params: Record<string, boolean | number | string>;
+    body: {
+        type: "none";
+    } | {
+        type: "raw";
+        content: string;
+    } | {
+        type: "inlineContents";
+        inlineContents: InlineContent[];
+    } | {
+        type: "inlineContent";
+        inlineContent: InlineContent;
+    };
 };
 
 // @beta (undocumented)

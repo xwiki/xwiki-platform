@@ -53,7 +53,7 @@ public class SolrDocumentMigration171000000
     /**
      * Number of documents to consider at once for migration.
      */
-    private static final int BATCH_MIGRATION_SIZE = 100;
+    private static final int BATCH_MIGRATION_SIZE = 1000;
 
     @Inject
     private SolrUtils solrUtils;
@@ -74,10 +74,12 @@ public class SolrDocumentMigration171000000
         int totalMigrated = 0;
         long totalNumber = 0;
         do {
-            SolrQuery solrQuery = new SolrQuery("*:*")
+            SolrQuery solrQuery = new SolrQuery()
+                .setQuery(Event.FIELD_PREFILTERED + ":true")
+                .setFields(Event.FIELD_ID, Event.FIELD_DATE, Event.FIELD_PREFILTERING_DATE)
                 .setStart(startIndex)
                 .setRows(BATCH_MIGRATION_SIZE)
-                .setSort(Event.FIELD_DATE, SolrQuery.ORDER.desc);
+                .setSort(Event.FIELD_ID, SolrQuery.ORDER.desc);
             try {
                 QueryResponse queryResponse = core.getClient().query(solrQuery);
                 documentList = queryResponse.getResults();

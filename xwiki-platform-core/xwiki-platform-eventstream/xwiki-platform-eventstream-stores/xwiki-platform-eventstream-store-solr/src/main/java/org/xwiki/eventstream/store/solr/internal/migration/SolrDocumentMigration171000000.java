@@ -33,6 +33,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.store.solr.internal.EventsSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.XWikiSolrCore;
@@ -87,8 +88,9 @@ public class SolrDocumentMigration171000000
                         Date date = this.solrUtils.get(Event.FIELD_DATE, solrDocument);
 
                         SolrInputDocument solrInputDocument = new SolrInputDocument();
-                        this.solrUtils.setId(id, solrInputDocument);
-                        this.solrUtils.set(Event.FIELD_PREFILTERING_DATE, date, solrInputDocument);
+                        this.solrUtils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, id, solrInputDocument);
+                        this.solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERING_DATE,
+                            date, solrInputDocument);
                         core.getClient().add(solrInputDocument);
                     }
                     startIndex += BATCH_MIGRATION_SIZE;

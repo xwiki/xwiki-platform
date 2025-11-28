@@ -53,7 +53,13 @@ class StandardHQLCompleteStatementValidatorTest
         "select count(*) from XWikiAttachment",
         "select name from XWikiDocument where lower(name)='name'",
         "select name from XWikiDocument where LOWER(name)='name'",
-        "select doc.fullName from XWikiDocument doc where doc.name = :name"
+        "select doc.fullName from XWikiDocument doc where doc.name = :name",
+        // Test different plain values.
+        "select 1 from OtherTable",
+        "select 1.0 from OtherTable",
+        "select 'test' from OtherTable",
+        "select null from OtherTable",
+        "select x'1A' from OtherTable"
     })
     void safe(String statement)
     {

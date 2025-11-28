@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.xwiki.query.hql.internal;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,8 +33,17 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 
+import net.sf.jsqlparser.expression.AllValue;
+import net.sf.jsqlparser.expression.DateValue;
+import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.HexValue;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.TimeValue;
+import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.parser.Node;
 import net.sf.jsqlparser.parser.SimpleNode;
@@ -209,6 +219,19 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
 
     }
 
+    // Allow all simple value expressions.
+    private static final Set<Class<? extends Expression>> ALLOWED_VALUE_CLASSES = Set.of(
+        AllValue.class,
+        DateValue.class,
+        DoubleValue.class,
+        HexValue.class,
+        LongValue.class,
+        NullValue.class,
+        StringValue.class,
+        TimestampValue.class,
+        TimeValue.class
+    );
+
     @Override
     public Optional<Boolean> isSafe(String statementString)
     {
@@ -368,6 +391,8 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
             }
         } else if (expression instanceof Function) {
             safe = isSelectFunctionSafe(((Function) expression), tables);
+        } else if (ALLOWED_VALUE_CLASSES.contains(expression.getClass())) {
+            safe = true;
         }
 
         return safe;

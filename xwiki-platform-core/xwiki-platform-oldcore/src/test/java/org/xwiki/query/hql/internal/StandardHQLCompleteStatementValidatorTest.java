@@ -19,7 +19,8 @@
  */
 package org.xwiki.query.hql.internal;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
@@ -32,64 +33,54 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  */
 @ComponentTest
-public class StandardHQLCompleteStatementValidatorTest
+class StandardHQLCompleteStatementValidatorTest
 {
     @InjectMockComponents
     private StandardHQLCompleteStatementValidator validator;
 
-    private void assertSafe(String statement)
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "select name from XWikiDocument",
+        "select doc.name, space.name from XWikiDocument doc, XWikiSpace space",
+        "select doc.name, space.name from XWikiDocument doc, XWikiSpace space, OtherTable as ot",
+        "select count(name) from XWikiDocument",
+        "select count(doc.name) from XWikiDocument doc",
+        "select doc.fullName from XWikiDocument as doc, com.xpn.xwiki.objects.StringProperty as str",
+        "select count(*) from XWikiSpace",
+        "select COUNT(*) from XWikiSpace",
+        "select count(space.*) from XWikiSpace space",
+        "select attachment.filename from XWikiAttachment attachment",
+        "select count(*) from XWikiAttachment",
+        "select name from XWikiDocument where lower(name)='name'",
+        "select name from XWikiDocument where LOWER(name)='name'",
+        "select doc.fullName from XWikiDocument doc where doc.name = :name"
+    })
+    void safe(String statement)
     {
-        assertTrue(this.validator.isSafe(statement).get());
+        assertTrue(this.validator.isSafe(statement).orElseThrow());
     }
 
-    private void assertNotSafe(String statement)
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "select name from OtherTable",
+        "select doc.* from XWikiDocument doc, XWikiSpace space",
+        "select * from XWikiDocument doc",
+        "select * from XWikiAttachment",
+        "select attachment.mimeType from XWikiAttachment attachment",
+        "select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot",
+        "select count(*) from OtherTable",
+        "select count(other.*) from OtherTable other",
+        "select name from XWikiDocument where notsafe(name)='name'",
+        "select doc.fullName from XWikiDocument doc union all select name from OtherTable",
+        "select doc.fullName from XWikiDocument doc where 1<>'1\\'' union select name from OtherTable #'",
+        "select doc.fullName from XWikiDocument doc where $$='$$=concat( chr( 61 ),(chr( 39 )) ) ;select 1 -- comment'",
+        "select doc.fullName from XWikiDocument doc where NVL(TO_CHAR(DBMS_XMLGEN.getxml('select 1 where "
+            + "1337>1')),'1')!='1'",
+        "select name from OtherTable",
+        "from OtherTable"
+    })
+    void notSafe(String statement)
     {
-        assertFalse(this.validator.isSafe(statement).get());
-    }
-
-    @Test
-    void safe()
-    {
-        assertSafe("select name from XWikiDocument");
-        assertSafe("select doc.name, space.name from XWikiDocument doc, XWikiSpace space");
-        assertSafe("select doc.name, space.name from XWikiDocument doc, XWikiSpace space, OtherTable as ot");
-        assertSafe("select count(name) from XWikiDocument");
-        assertSafe("select count(doc.name) from XWikiDocument doc");
-        assertSafe("select doc.fullName from XWikiDocument as doc, com.xpn.xwiki.objects.StringProperty as str");
-
-        assertSafe("select count(*) from XWikiSpace");
-        assertSafe("select COUNT(*) from XWikiSpace");
-        assertSafe("select count(space.*) from XWikiSpace space");
-
-        assertSafe("select attachment.filename from XWikiAttachment attachment");
-        assertSafe("select count(*) from XWikiAttachment");
-
-        assertSafe("select name from XWikiDocument where lower(name)='name'");
-        assertSafe("select name from XWikiDocument where LOWER(name)='name'");
-
-        assertSafe("select doc.fullName from XWikiDocument doc where doc.name = :name");
-    }
-
-    @Test
-    void notSafe()
-    {
-        assertNotSafe("select name from OtherTable");
-        assertNotSafe("select doc.* from XWikiDocument doc, XWikiSpace space");
-        assertNotSafe("select * from XWikiDocument doc");
-        assertNotSafe("select * from XWikiAttachment");
-        assertNotSafe("select attachment.mimeType from XWikiAttachment attachment");
-        assertNotSafe("select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot");
-        assertNotSafe("select count(*) from OtherTable");
-        assertNotSafe("select count(other.*) from OtherTable other");
-        assertNotSafe("select name from XWikiDocument where notsafe(name)='name'");
-        assertNotSafe("select doc.fullName from XWikiDocument doc union all select name from OtherTable");
-        assertNotSafe(
-            "select doc.fullName from XWikiDocument doc where 1<>'1\\'' union select name from OtherTable #'");
-        assertNotSafe(
-            "select doc.fullName from XWikiDocument doc where $$='$$=concat( chr( 61 ),(chr( 39 )) ) ;select 1 -- comment'");
-        assertNotSafe(
-            "select doc.fullName from XWikiDocument doc where NVL(TO_CHAR(DBMS_XMLGEN.getxml('select 1 where 1337>1')),'1')!='1'");
-        assertNotSafe("select name from OtherTable");
-        assertNotSafe("from OtherTable");
+        assertFalse(this.validator.isSafe(statement).orElseThrow());
     }
 }

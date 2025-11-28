@@ -921,30 +921,48 @@
   ## Note that for DBStringList properties we take into account only the first match type, even if multiple filter
   ## values are specified. Basically the first match type is used for all filter values.
   #livetable_getMatchTypes($colname $filterValues.size() 'exact')
-  #if ($matchType == 'partial' || $matchType == 'prefix')
-    ## We need to join with the list of values in order to be able to use the LIKE operator.
-    #set ($matchTarget = "${safe_tableAlias}_item")
+  #if ($matchType == 'empty')
+    ## "empty" means that there is no list item stored for this property on the filtered object.
+    ## We express this using a NOT EXISTS subquery on DBStringListProperty / its list of values.
+    #set ($propertyAlias = "${safe_tableAlias}_empty_property")
+    #set ($listAlias = "${safe_tableAlias}_empty_item")
     #if ($whereParams.entrySet())
-      #set ($paramPrefix = "${safe_tableAlias}_item_")
+      #set ($whereSql = "${whereSql} and not exists (select 1 from DBStringListProperty as ${propertyAlias} "
+        + "join ${propertyAlias}.list as ${listAlias} where ${propertyAlias}.id.id = ${filterObjectAlias}.id "
+        + "and ${propertyAlias}.id.name = :${safe_tableAlias}_empty_id_name)")
+      #set ($discard = $whereParams.put("${safe_tableAlias}_empty_id_name", $colname))
     #else
-      #set ($paramPrefix = $NULL)
+      #set ($whereSql = "${whereSql} and not exists (select 1 from DBStringListProperty as ${propertyAlias} "
+        + "join ${propertyAlias}.list as ${listAlias} where ${propertyAlias}.id.id = ${filterObjectAlias}.id "
+        + "and ${propertyAlias}.id.name = ?)")
+      #set ($discard = $whereParams.add($colname))
     #end
-    #set ($joinPos = $mathtool.add($fromSql.lastIndexOf(" $safe_tableAlias"), $mathtool.add($safe_tableAlias.length(), 1)))
-    #set ($fromSql = "$fromSql.substring(0, $joinPos) join ${safe_tableAlias}.list as $matchTarget $fromSql.substring($joinPos)")
   #else
-    ## Fall-back on exact matching even if the match type is specified, when its value is not supported.
-    #set ($matchType = 'exact')
-    #set ($matchTarget = "${safe_tableAlias}.list")
-    #if ($whereParams.entrySet())
-      #set ($paramPrefix = "${safe_tableAlias}_list_")
+    #if ($matchType == 'partial' || $matchType == 'prefix')
+      ## We need to join with the list of values in order to be able to use the LIKE operator.
+      #set ($matchTarget = "${safe_tableAlias}_item")
+      #if ($whereParams.entrySet())
+        #set ($paramPrefix = "${safe_tableAlias}_item_")
+      #else
+        #set ($paramPrefix = $NULL)
+      #end
+      #set ($joinPos = $mathtool.add($fromSql.lastIndexOf(" $safe_tableAlias"), $mathtool.add($safe_tableAlias.length(), 1)))
+      #set ($fromSql = "$fromSql.substring(0, $joinPos) join ${safe_tableAlias}.list as $matchTarget $fromSql.substring($joinPos)")
     #else
-      #set ($paramPrefix = $NULL)
+      ## Fall-back on exact matching even if the match type is specified, when its value is not supported.
+      #set ($matchType = 'exact')
+      #set ($matchTarget = "${safe_tableAlias}.list")
+      #if ($whereParams.entrySet())
+        #set ($paramPrefix = "${safe_tableAlias}_list_")
+      #else
+        #set ($paramPrefix = $NULL)
+      #end
     #end
-  #end
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix $NULL)")
-  #set ($whereSql = "$whereSql and ($filterQuery.trim())")
-  #foreach ($filterValue in $filterValues)
-    #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
+    #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix $NULL)")
+    #set ($whereSql = "$whereSql and ($filterQuery.trim())")
+    #foreach ($filterValue in $filterValues)
+      #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
+    #end
   #end
 #end
 

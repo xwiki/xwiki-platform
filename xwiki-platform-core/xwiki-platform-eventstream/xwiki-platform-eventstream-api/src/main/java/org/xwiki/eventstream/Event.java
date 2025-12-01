@@ -207,7 +207,7 @@ public interface Event
     /**
      * Field storing the prefiltering date information.
      *
-     * @since 17.10.0
+     * @since 17.10.1
      */
     String FIELD_PREFILTERING_DATE = "preFilteringDate";
 

@@ -55,7 +55,7 @@ import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
-import org.xwiki.eventstream.store.solr.internal.migration.SolrDocumentMigration171000000;
+import org.xwiki.eventstream.store.solr.internal.migration.SolrDocumentMigration171001000;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.internal.reference.converter.WikiReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
@@ -167,7 +167,7 @@ public class EventStoreTest
     private WikiDescriptorManager wikis;
 
     @MockComponent
-    private SolrDocumentMigration171000000 migration171000000;
+    private SolrDocumentMigration171001000 migration171000000;
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;

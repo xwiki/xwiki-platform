@@ -47,11 +47,11 @@ import jakarta.inject.Singleton;
  * Migration of documents after introducing {@link Event#FIELD_PREFILTERING_DATE}.
  *
  * @version $Id$
- * @since 17.10.0
+ * @since 17.10.1
  */
-@Component(roles = SolrDocumentMigration171000000.class)
+@Component(roles = SolrDocumentMigration171001000.class)
 @Singleton
-public class SolrDocumentMigration171000000
+public class SolrDocumentMigration171001000
 {
     /**
      * Number of documents to consider at once for migration.
@@ -73,7 +73,6 @@ public class SolrDocumentMigration171000000
     public void migrateAllDocuments(XWikiSolrCore core) throws SolrException
     {
         SolrDocumentList documentList;
-        int startIndex = 0;
         int totalMigrated = 0;
         long totalNumber = 0;
 
@@ -84,7 +83,6 @@ public class SolrDocumentMigration171000000
                     this.solrUtils.toFilterQueryString(true))
             )
             .setFields(Event.FIELD_ID, Event.FIELD_DATE, Event.FIELD_PREFILTERING_DATE)
-            .setStart(startIndex)
             .setRows(BATCH_MIGRATION_SIZE)
             .setSort(Event.FIELD_ID, SolrQuery.ORDER.desc);
         // use cursor-based pagination
@@ -99,10 +97,9 @@ public class SolrDocumentMigration171000000
                 if (!documentList.isEmpty()) {
                     documentsToUpdate = this.updateDocuments(documentList);
                     core.getClient().add(documentsToUpdate);
-                    startIndex += BATCH_MIGRATION_SIZE;
                     totalMigrated += documentsToUpdate.size();
                     solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, queryResponse.getNextCursorMark());
-                    logger.info("[{}] Solr events information migrated on [{}].", totalMigrated, totalNumber);
+                    logger.info("[{}] Solr events information migrated in [{}].", totalMigrated, totalNumber);
                 }
             } catch (SolrServerException | IOException e) {
                 throw new SolrException("Error when performing 171000000 Solr events documents migration", e);

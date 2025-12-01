@@ -109,7 +109,7 @@ public class NotificationParameters
     /**
      * Don't get notifications filtered before that date.
      *
-     * @since 17.10.0
+     * @since 17.10.1
      */
     @Unstable
     public Date fromPrefilteringDate;
@@ -140,6 +140,7 @@ public class NotificationParameters
             .append(filterPreferences, that.filterPreferences)
             .append(filters, that.filters)
             .append(groupingEventTarget, that.groupingEventTarget)
+            .append(fromPrefilteringDate, that.fromPrefilteringDate)
             .isEquals();
     }
 
@@ -159,6 +160,7 @@ public class NotificationParameters
             .append(filterPreferences)
             .append(filters)
             .append(groupingEventTarget)
+            .append(fromPrefilteringDate)
             .toHashCode();
     }
 
@@ -178,6 +180,7 @@ public class NotificationParameters
             .append("filterPreferences", filterPreferences)
             .append("filters", filters)
             .append("notificationGroupingStrategyHint", groupingEventTarget)
+            .append("fromPrefilteringDate", fromPrefilteringDate)
             .toString();
     }
 }

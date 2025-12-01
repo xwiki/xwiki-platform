@@ -102,7 +102,7 @@ public enum EventProperty
     /**
      * The date of the prefiltering of the event.
      *
-     * @since 17.10.0
+     * @since 17.10.1
      */
     @Unstable
     PREFILTERING_DATE

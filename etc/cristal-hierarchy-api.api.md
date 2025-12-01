@@ -4,8 +4,8 @@
 
 ```ts
 
-import { DocumentReference } from '@xwiki/cristal-model-api';
-import { SpaceReference } from '@xwiki/cristal-model-api';
+import { DocumentReference } from '@xwiki/platform-model-api';
+import { SpaceReference } from '@xwiki/platform-model-api';
 
 // @beta
 const name_2 = "PageHierarchyResolver";

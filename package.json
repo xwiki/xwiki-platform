@@ -30,13 +30,13 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-authentication-api": "workspace:*",
-    "@xwiki/cristal-backend-api": "workspace:*",
+    "@xwiki/platform-api": "catalog:",
+    "@xwiki/platform-authentication-api": "catalog:",
+    "@xwiki/platform-backend-api": "catalog:",
     "@xwiki/cristal-hierarchy-api": "workspace:*",
-    "@xwiki/cristal-model-api": "workspace:*",
-    "@xwiki/cristal-model-reference-api": "workspace:*",
-    "@xwiki/cristal-model-remote-url-api": "workspace:*",
+    "@xwiki/platform-model-api": "catalog:",
+    "@xwiki/platform-model-reference-api": "catalog:",
+    "@xwiki/platform-model-remote-url-api": "catalog:",
     "@xwiki/cristal-xwiki-utils": "workspace:*"
   },
   "peerDependencies": {

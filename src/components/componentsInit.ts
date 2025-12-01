@@ -19,22 +19,22 @@
  */
 
 import { name } from "@xwiki/cristal-hierarchy-api";
-import { EntityType } from "@xwiki/cristal-model-api";
 import { getRestSpacesApiUrl } from "@xwiki/cristal-xwiki-utils";
+import { EntityType } from "@xwiki/platform-model-api";
 import { Container, inject, injectable, named } from "inversify";
-import type { CristalApp, Logger } from "@xwiki/cristal-api";
-import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
-import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolver,
 } from "@xwiki/cristal-hierarchy-api";
+import type { CristalApp, Logger } from "@xwiki/platform-api";
+import type { AuthenticationManagerProvider } from "@xwiki/platform-authentication-api";
+import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type {
   DocumentReference,
   SpaceReference,
-} from "@xwiki/cristal-model-api";
-import type { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
-import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
+} from "@xwiki/platform-model-api";
+import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
 
 /**
  * Implementation of PageHierarchyResolver for the XWiki backend.

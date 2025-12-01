@@ -125,6 +125,10 @@
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.20.0.0</oracle.version>
+
+    <!-- npm registries configuration -->
+    <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
+    <xwiki.npm.release.registry>https://registry.npmjs.org</xwiki.npm.release.registry>
   </properties>
   <scm>
     <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>

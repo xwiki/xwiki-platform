@@ -831,12 +831,13 @@ class LiveTableResultsTest extends PageTest
                 + "join prop_dbList_empty_property.list as prop_dbList_empty_item "
                 + "where prop_dbList_empty_property.id.id = obj.id "
                 + "and prop_dbList_empty_property.id.name = :prop_dbList_empty_id_name) ");
-        Map<String, Object> values = new HashMap<>();
-        values.put("className", "Space.MyClass");
-        values.put("classTemplate1", "Space.MyClassTemplate");
-        values.put("classTemplate2", "Space.MyTemplate");
-        values.put("prop_dbList_id_name", "dbList");
-        values.put("prop_dbList_empty_id_name", "dbList");
+        Map<String, Object> values = Map.of(
+            "className", "Space.MyClass",
+            "classTemplate1", "Space.MyClassTemplate",
+            "classTemplate2", "Space.MyTemplate",
+            "prop_dbList_id_name", "dbList",
+            "prop_dbList_empty_id_name", "dbList"
+        );
         verify(this.query).bindValues(values);
     }
 

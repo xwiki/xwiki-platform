@@ -533,9 +533,9 @@
               $.post(ref).done(function(data) {
                 $('#xclassContent').append(data);
                 let insertedPropertyElt = $('#xclassContent > div.xproperty:last-child');
-                // Expand the newly inserted property, since the user will probably want to edit it once it was added
-                self.expandCollapseMetaProperty(insertedPropertyElt);
-                // Make teh newly added property sortable
+                // Make the newly added property collapsable since the user will probably want to edit it
+                self.expandCollapseMetaProperty(insertedPropertyElt, true);
+                // Make the newly added property sortable
                 self.makeSortable(insertedPropertyElt);
                 self.ajaxPropertyDeletion(insertedPropertyElt);
                 self.makeDisableVisible(insertedPropertyElt);
@@ -683,15 +683,18 @@
 
       // ------------------------------------
       // Class editor: expand-collapse meta properties
-      expandCollapseMetaProperty(property) {
+      expandCollapseMetaProperty(property, startExpanded = false) {
         let propertyTitle = property.find('.xproperty-title');
         if (!propertyTitle) {
           // No such object...
           return;
         }
         property.addClass('collapsable');
-        property.addClass('collapsed');
-        propertyTitle.on('click', function() {
+        // By default, the property is collapsed when made collapsable.
+        if(!startExpanded) {
+          property.addClass('collapsed');
+        }
+        propertyTitle.find('.toggle-collapsable, h2').on('click', function() {
           propertyTitle.parent().toggleClass('collapsed');
         });
       }

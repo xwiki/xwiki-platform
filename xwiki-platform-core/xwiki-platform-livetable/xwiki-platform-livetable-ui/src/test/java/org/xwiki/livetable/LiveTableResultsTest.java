@@ -885,15 +885,14 @@ class LiveTableResultsTest extends PageTest
                 + ") "
         );
 
-        Map<String, Object> values = new HashMap<>();
-        values.put("className", "Space.MyClass");
-        values.put("classTemplate1", "Space.MyClassTemplate");
-        values.put("classTemplate2", "Space.MyTemplate");
-        values.put("prop_dbList_id_name", "dbList");
-        // For exact + isList, livetable_getFilterQuery generates "? in elements(prop_dbList.list)"
-        // and livetable_addFilterParam binds the plain filter value.
-        values.put("prop_dbList_list_1", "A");
-        values.put("prop_dbList_empty_id_name", "dbList");
+        Map<String, Object> values = Map.of(
+            "className", "Space.MyClass",
+            "classTemplate1", "Space.MyClassTemplate",
+            "classTemplate2", "Space.MyTemplate",
+            "prop_dbList_id_name", "dbList",
+            "prop_dbList_list_1", "A",
+            "prop_dbList_empty_id_name", "dbList"
+        );
 
         verify(this.query).bindValues(values);
     }
@@ -933,12 +932,13 @@ class LiveTableResultsTest extends PageTest
                 + ") "
         );
 
-        Map<String, Object> values = new HashMap<>();
-        values.put("className", "Space.MyClass");
-        values.put("classTemplate1", "Space.MyClassTemplate");
-        values.put("classTemplate2", "Space.MyTemplate");
-        values.put("prop_dbList_id_name", "dbList");
-        values.put("prop_dbList_item_1", "Ba%");
+        Map<String, Object> values = Map.of(
+            "className", "Space.MyClass",
+            "classTemplate1", "Space.MyClassTemplate",
+            "classTemplate2", "Space.MyTemplate",
+            "prop_dbList_id_name", "dbList",
+            "prop_dbList_item_1", "Ba%"
+        );
         verify(this.query).bindValues(values);
     }
 

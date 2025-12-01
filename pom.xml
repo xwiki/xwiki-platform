@@ -60,7 +60,7 @@
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.9.4</tika.version>
     <pdfbox.version>2.0.35</pdfbox.version>
-    <poi.version>5.5.0</poi.version>
+    <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.server.version>12.1.4</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
@@ -76,7 +76,7 @@
     <jersey.version>2.47</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.4</zookeeper.version>
-    <rssreader.version>3.11.0</rssreader.version>
+    <rssreader.version>3.12.0</rssreader.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make

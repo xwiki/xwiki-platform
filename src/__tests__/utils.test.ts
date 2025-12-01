@@ -20,7 +20,7 @@
 
 import { getRestSpacesApiUrl } from "..";
 import { describe, expect, it } from "vitest";
-import type { WikiConfig } from "@xwiki/cristal-api";
+import type { WikiConfig } from "@xwiki/platform-api";
 
 describe("getRestSpacesApiUrl", () => {
   const wikiConfig: WikiConfig = {

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { WikiConfig } from "@xwiki/cristal-api";
+import type { WikiConfig } from "@xwiki/platform-api";
 
 /**
  * Returns URL to XWiki spaces rest API for a given document.

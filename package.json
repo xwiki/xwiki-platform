@@ -30,7 +30,7 @@
   },
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/platform-api": "catalog:",
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "catalog:",
     "vite": "catalog:"

@@ -633,7 +633,7 @@ XWiki.Annotation = Class.create({
     require(['jquery'], ($) =&gt; {
       $(document).on('click', 'blockquote.annotatedText', (event) =&gt; {
         if(this.fetchedAnnotations) {
-          // In this case the annotations are just made visible (if need be). This is synchrnous and
+          // In this case the annotations are just made visible (if need be). This is synchronous and
           // we can just let the click event bubble up.
           this.setAnnotationVisibility(true);
           this.toggleAnnotations(this.displayingAnnotations);
@@ -973,7 +973,7 @@ XWiki.Annotation = Class.create({
       let toggleButton = document.getElementById('ID' + ann.annotationId);
       toggleButton.setAttribute('aria-describedby', toggleButtonDescription.id);
       toggleButton.appendChild(toggleButtonDescription);
-    })
+    });
   },
 
   addAnnotationMarkup : function(ann) {
@@ -1017,12 +1017,18 @@ XWiki.Annotation = Class.create({
    * @param ann object holding information about the annotation
    */
   markAnnotation: function(markedNode, ann) {
-    var wrapper = document.createElement('mark');
-    wrapper.addClassName('annotation');
-    wrapper.addClassName('ID' + ann.annotationId);
-
-    var parentNode = markedNode.parentElement;
-    parentNode.replaceChild(wrapper, markedNode);
+    let wrapper;
+    let parentNode = markedNode.parentElement;
+    let wrapperQuery = document.querySelectorAll('.ID' + ann.annotationId);
+    if(wrapperQuery.length === 0) {
+      wrapper = document.createElement('mark');
+      wrapper.addClassName('annotation');
+      wrapper.addClassName('ID' + ann.annotationId);
+      parentNode.replaceChild(wrapper, markedNode);
+    } else {
+      wrapper=wrapperQuery[0];
+      parentNode.removeChild(markedNode);
+    }
     wrapper.appendChild(markedNode);
   },
 
@@ -1746,7 +1752,7 @@ XWiki.Annotation = Class.create({
     this.selectionService.highlightSelection('#FFEE99');
     // get the position and build the loading bubble
     var position = this.selectionService.getPositionNextToSelection();
-    this.createPanel = this.displayLoadingBubble(position.top, position.left, false);
+    this.createPanel = this.displayLoadingBubble(position.left, position.top, false);
     // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
     this.unregisterAddAnnotationShortcut();
   },

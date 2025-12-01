@@ -264,11 +264,16 @@
 
 /* Annotations displayed in the text */
 .annotation-highlight, .selection-highlight {
-  background-color: var(--btn-warning-bg);
+  background-color: var(--mark-bg);
   /* Remove the default mark padding added in bootstrap. 
-    The highlights can happen in the middle of words, and it would look odd. */
+     The highlights can happen in the middle of words, and it would look odd. */
   padding: 0;
   cursor: pointer;
+  &amp;:hover, &amp;:focus {
+    /* We want to increase the accent on the element when hovered. 
+       The btn warning background color does that without reducing contrast with the default text color too much. */
+    background-color: var(--btn-warning-bg);
+  }
 }
 
 /* Reset the styles so that the button doesn't distract from the text. */

@@ -20,7 +20,9 @@
 package org.xwiki.eventstream.store.solr.internal.migration;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -30,6 +32,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
@@ -73,36 +76,38 @@ public class SolrDocumentMigration171000000
         int startIndex = 0;
         int totalMigrated = 0;
         long totalNumber = 0;
+
+        SolrQuery solrQuery = new SolrQuery()
+            .setFilterQueries(
+                String.format("%s:%s",
+                    Event.FIELD_PREFILTERED,
+                    this.solrUtils.toFilterQueryString(true))
+            )
+            .setFields(Event.FIELD_ID, Event.FIELD_DATE, Event.FIELD_PREFILTERING_DATE)
+            .setStart(startIndex)
+            .setRows(BATCH_MIGRATION_SIZE)
+            .setSort(Event.FIELD_ID, SolrQuery.ORDER.desc);
+        // use cursor-based pagination
+        solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
+        QueryResponse queryResponse;
+        List<SolrInputDocument> documentsToUpdate;
         do {
-            SolrQuery solrQuery = new SolrQuery()
-                .setQuery(Event.FIELD_PREFILTERED + ":true")
-                .setFields(Event.FIELD_ID, Event.FIELD_DATE, Event.FIELD_PREFILTERING_DATE)
-                .setStart(startIndex)
-                .setRows(BATCH_MIGRATION_SIZE)
-                .setSort(Event.FIELD_ID, SolrQuery.ORDER.desc);
             try {
-                QueryResponse queryResponse = core.getClient().query(solrQuery);
+                queryResponse = core.getClient().query(solrQuery);
                 documentList = queryResponse.getResults();
                 totalNumber = queryResponse.getResults().getNumFound();
                 if (!documentList.isEmpty()) {
-                    for (SolrDocument solrDocument : documentList) {
-                        String id = this.solrUtils.getId(solrDocument);
-                        Date date = this.solrUtils.get(Event.FIELD_DATE, solrDocument);
-
-                        SolrInputDocument solrInputDocument = new SolrInputDocument();
-                        this.solrUtils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, id, solrInputDocument);
-                        this.solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERING_DATE,
-                            date, solrInputDocument);
-                        core.getClient().add(solrInputDocument);
-                    }
+                    documentsToUpdate = this.updateDocuments(documentList);
+                    core.getClient().add(documentsToUpdate);
                     startIndex += BATCH_MIGRATION_SIZE;
-                    totalMigrated += documentList.size();
+                    totalMigrated += documentsToUpdate.size();
+                    solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, queryResponse.getNextCursorMark());
                     logger.info("[{}] Solr events information migrated on [{}].", totalMigrated, totalNumber);
                 }
             } catch (SolrServerException | IOException e) {
                 throw new SolrException("Error when performing 171000000 Solr events documents migration", e);
             }
-        } while (!documentList.isEmpty() && totalMigrated < totalNumber);
+        } while (queryResponse.getResults().size() == BATCH_MIGRATION_SIZE);
 
         if (totalMigrated > 0) {
             // We commit when all documents are migrated.
@@ -114,5 +119,21 @@ public class SolrDocumentMigration171000000
                     e);
             }
         }
+    }
+
+    private List<SolrInputDocument> updateDocuments(SolrDocumentList documentList)
+    {
+        List<SolrInputDocument> documentsToUpdate = new ArrayList<>(documentList.size());
+        for (SolrDocument solrDocument : documentList) {
+            String id = this.solrUtils.getId(solrDocument);
+            Date date = this.solrUtils.get(Event.FIELD_DATE, solrDocument);
+
+            SolrInputDocument solrInputDocument = new SolrInputDocument();
+            this.solrUtils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, id, solrInputDocument);
+            this.solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERING_DATE,
+                date, solrInputDocument);
+            documentsToUpdate.add(solrInputDocument);
+        }
+        return documentsToUpdate;
     }
 }

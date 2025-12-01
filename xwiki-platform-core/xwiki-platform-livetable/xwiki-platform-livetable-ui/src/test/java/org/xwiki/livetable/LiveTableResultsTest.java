@@ -827,16 +827,12 @@ class LiveTableResultsTest extends PageTest
                 + "and doc.fullName not in (:classTemplate1, :classTemplate2)  "
                 + "and obj.id = prop_dbList.id.id "
                 + "and prop_dbList.id.name = :prop_dbList_id_name "
-                + "and not exists (select 1 from DBStringListProperty as prop_dbList_empty_property "
-                + "join prop_dbList_empty_property.list as prop_dbList_empty_item "
-                + "where prop_dbList_empty_property.id.id = obj.id "
-                + "and prop_dbList_empty_property.id.name = :prop_dbList_empty_id_name) ");
+                + "and size(prop_dbList.list) = 0 ");
         Map<String, Object> values = Map.of(
             "className", "Space.MyClass",
             "classTemplate1", "Space.MyClassTemplate",
             "classTemplate2", "Space.MyTemplate",
-            "prop_dbList_id_name", "dbList",
-            "prop_dbList_empty_id_name", "dbList"
+            "prop_dbList_id_name", "dbList"
         );
         verify(this.query).bindValues(values);
     }
@@ -879,10 +875,7 @@ class LiveTableResultsTest extends PageTest
                 + "and obj.id = prop_dbList.id.id and prop_dbList.id.name = :prop_dbList_id_name "
                 + "and ("
                 + ":prop_dbList_list_1 in elements(prop_dbList.list) "
-                + "OR not exists (select 1 from DBStringListProperty as prop_dbList_empty_property "
-                + "join prop_dbList_empty_property.list as prop_dbList_empty_item "
-                + "where prop_dbList_empty_property.id.id = obj.id "
-                + "and prop_dbList_empty_property.id.name = :prop_dbList_empty_id_name)"
+                + "OR size(prop_dbList.list) = 0"
                 + ") "
         );
 
@@ -891,8 +884,7 @@ class LiveTableResultsTest extends PageTest
             "classTemplate1", "Space.MyClassTemplate",
             "classTemplate2", "Space.MyTemplate",
             "prop_dbList_id_name", "dbList",
-            "prop_dbList_list_1", "A",
-            "prop_dbList_empty_id_name", "dbList"
+            "prop_dbList_list_1", "A"
         );
 
         verify(this.query).bindValues(values);

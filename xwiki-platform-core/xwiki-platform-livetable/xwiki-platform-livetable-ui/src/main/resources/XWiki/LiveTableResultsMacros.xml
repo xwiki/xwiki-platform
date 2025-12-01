@@ -977,30 +977,17 @@
     #end
   #end
 
-  ## 2) Optionally add a single NOT EXISTS constraint if any match type is 'empty'.
+  ## 2) Optionally add a single constraint if any match type is 'empty'.
   #if ($hasEmpty)
     ## "empty" means that there is no list item stored for this property on the filtered object.
-    ## We express this using a NOT EXISTS subquery on DBStringListProperty / its list of values.
-    #set ($propertyAlias = "${safe_tableAlias}_empty_property")
-    #set ($listAlias = "${safe_tableAlias}_empty_item")
-    #if ($whereParams.entrySet())
-      #set ($emptyConstraint = "not exists (select 1 from DBStringListProperty as ${propertyAlias} "
-      + "join ${propertyAlias}.list as ${listAlias} where ${propertyAlias}.id.id = ${filterObjectAlias}.id "
-      + "and ${propertyAlias}.id.name = :${safe_tableAlias}_empty_id_name)")
-      #set ($discard = $whereParams.put("${safe_tableAlias}_empty_id_name", $colname))
-    #else
-      #set ($emptyConstraint = "not exists (select 1 from DBStringListProperty as ${propertyAlias} "
-      + "join ${propertyAlias}.list as ${listAlias} where ${propertyAlias}.id.id = ${filterObjectAlias}.id "
-      + "and ${propertyAlias}.id.name = ?)")
-      #set ($discard = $whereParams.add($colname))
-    #end
-
+    ## The proper way to check for that would be "${safe_tableAlias}.list IS EMPTY", but JSQL cannot parse "IS EMPTY"
+    ## which means that we cannot use it without programming right.
+    #set ($emptyConstraint = "size(${safe_tableAlias}.list) = 0")
     #if ($nonEmptyValues.isEmpty())
       ## Only 'empty' is used, combine with the existing constraints.
       #set ($whereSql = "${whereSql} and ${emptyConstraint}")
     #else
       ## Combine non-empty group and empty condition using the join operator.
-      ## We wrap the empty constraint in parentheses to mirror how other grouped conditions are built.
       #set ($whereSql = "${whereSql} and ($filterQuery.trim() ${joinOperator} ${emptyConstraint})")
     #end
   #end

@@ -421,19 +421,19 @@ class LiveDataIT
             classEditPage.getDatabaseListClassEditElement("myList");
         dbListClassEditElement.setMultiSelect(true);
         dbListClassEditElement.setMetaProperty("relationalStorage", "true");
-        dbListClassEditElement.setMetaProperty("displayType", "checkbox");
+        dbListClassEditElement.setMetaProperty("displayType", "input");
         classEditPage.clickSaveAndView();
 
         // Create a few XObjects with multiple selections and no selections.
         // First, first two options selected.
         DocumentReference doc1Ref = new DocumentReference("Doc1", testReference.getLastSpaceReference());
-        testUtils.rest().addObject(doc1Ref, testUtils.serializeReference(testReference), "myList", "Option1||Option2");
+        testUtils.rest().addObject(doc1Ref, testUtils.serializeReference(testReference), "myList", "Option1|Option2");
         // Second, third option selected.
         DocumentReference doc2Ref = new DocumentReference("Doc2", testReference.getLastSpaceReference());
         testUtils.rest().addObject(doc2Ref, testUtils.serializeReference(testReference), "myList", "Option3");
         // Third, no option selected.
         DocumentReference doc3Ref = new DocumentReference("Doc3", testReference.getLastSpaceReference());
-        testUtils.rest().addObject(doc3Ref, testUtils.serializeReference(testReference), "myList", "");
+        testUtils.rest().addObject(doc3Ref, testUtils.serializeReference(testReference));
 
         // Create a Live Data page to list those objects.
         List<String> properties = List.of("doc.name", "myList");

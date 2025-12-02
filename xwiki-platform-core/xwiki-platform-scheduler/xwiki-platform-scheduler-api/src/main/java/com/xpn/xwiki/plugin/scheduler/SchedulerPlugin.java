@@ -21,7 +21,6 @@ package com.xpn.xwiki.plugin.scheduler;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -48,6 +47,8 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.classloader.NamespaceURLClassLoader;
+import org.xwiki.classloader.internal.ClassLoaderResetedEvent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.model.reference.DocumentReference;
@@ -68,6 +69,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitializer;
 import com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobsInitializedEvent;
 import com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobsInitializingEvent;
+import com.xpn.xwiki.plugin.scheduler.internal.SchedulersClassLoaderManager;
 import com.xpn.xwiki.plugin.scheduler.internal.StatusListener;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -102,8 +104,13 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     public static final EntityReference XWIKI_JOB_CLASSREFERENCE =
         SchedulerJobClassDocumentInitializer.XWIKI_JOB_CLASSREFERENCE;
 
-    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentCreatedEvent(),
-        new DocumentDeletedEvent(), new DocumentUpdatedEvent(), new WikiDeletedEvent());
+    private static final List<Event> EVENTS = List.of(
+        new DocumentCreatedEvent(),
+        new DocumentDeletedEvent(),
+        new DocumentUpdatedEvent(),
+        new WikiDeletedEvent(),
+        new ClassLoaderResetedEvent()
+    );
 
     /**
      * Default Quartz scheduler instance.
@@ -111,6 +118,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     private Scheduler scheduler;
 
     private boolean enabled;
+
+    private SchedulersClassLoaderManager schedulersClassLoaderManager;
 
     /**
      * Default plugin constructor.
@@ -128,6 +137,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         // Check if the Scheduler plugin is enabled
         this.enabled =
             Utils.getComponent(ConfigurationSource.class, "xwikiproperties").getProperty("scheduler.enabled", true);
+        this.schedulersClassLoaderManager = Utils.getComponent(SchedulersClassLoaderManager.class);
+        this.schedulersClassLoaderManager.setSchedulerPlugin(this);
 
         if (this.enabled) {
             Thread thread = new Thread(new ExecutionContextRunnable(new Runnable()
@@ -397,13 +408,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         try {
             // compute the job unique Id
             String xjob = getObjectUniqueId(object);
-
-            // Load the job class.
-            // Note: Remember to always use the current thread's class loader and not the container's
-            // (Class.forName(...)) since otherwise we will not be able to load classes installed with EM.
-            ClassLoader currentThreadClassLoader = Thread.currentThread().getContextClassLoader();
-            String jobClassName = object.getStringValue("jobClass");
-            Class<Job> jobClass = (Class<Job>) Class.forName(jobClassName, true, currentThreadClassLoader);
+            String jobClassName = object.getStringValue(SchedulerJobClassDocumentInitializer.FIELD_JOBCLASS);
+            Class<Job> jobClass = (Class<Job>) this.schedulersClassLoaderManager
+                .loadClassAndRegister(jobClassName, object.getReference());
 
             // Build the new job.
             JobBuilder jobBuilder = JobBuilder.newJob(jobClass);
@@ -570,6 +577,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
                 "Error occured while trying to pause job " + object.getStringValue("jobName"), e);
         }
+        this.schedulersClassLoaderManager.removeScheduler(object.getReference());
     }
 
     /**
@@ -733,13 +741,17 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent) {
-            String wikiId = ((WikiDeletedEvent) event).getWikiId();
+        if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            String wikiId = wikiDeletedEvent.getWikiId();
             try {
                 onWikiDeletedEvent(wikiId);
             } catch (SchedulerException e) {
                 LOGGER.error("Failed to remove schedulers for wiki [{}]", wikiId, e);
             }
+            this.schedulersClassLoaderManager.removeSchedulers(wikiId);
+        } else if (event instanceof ClassLoaderResetedEvent classLoaderResetedEvent) {
+            String namespace = (String) source;
+            this.schedulersClassLoaderManager.onClassLoaderReset(namespace);
         } else {
             onDocumentEvent(source, data);
         }

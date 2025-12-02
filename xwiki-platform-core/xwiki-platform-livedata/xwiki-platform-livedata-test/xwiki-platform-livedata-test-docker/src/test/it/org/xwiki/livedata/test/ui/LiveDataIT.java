@@ -49,6 +49,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.DatabaseListClassEditElement;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
 import org.xwiki.text.StringUtils;
 
@@ -59,6 +60,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.livedata.test.po.TableLayoutElement.FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS;
 
 /**
  * Tests of the Live Data macro, in view and edit modes.
@@ -403,6 +405,61 @@ class LiveDataIT
         viewPage.waitForNotificationSuccessMessage("Delete Success");
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
+    }
+
+    @Test
+    @Order(4)
+    void filterWithRelationalDBList(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        ViewPage viewPage = testUtils.createPage(testReference, "My Class", "My Class");
+        ClassEditPage classEditPage = viewPage.editClass();
+        classEditPage.addProperty("myList", "DBList");
+        DatabaseListClassEditElement dbListClassEditElement =
+            classEditPage.getDatabaseListClassEditElement("myList");
+        dbListClassEditElement.setMultiSelect(true);
+        dbListClassEditElement.setMetaProperty("relationalStorage", "true");
+        dbListClassEditElement.setMetaProperty("displayType", "input");
+        classEditPage.clickSaveAndView();
+
+        // Create a few XObjects with multiple selections and no selections.
+        // First, first two options selected.
+        DocumentReference doc1Ref = new DocumentReference("Doc1", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc1Ref, testUtils.serializeReference(testReference), "myList", "Option1|Option2");
+        // Second, third option selected.
+        DocumentReference doc2Ref = new DocumentReference("Doc2", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc2Ref, testUtils.serializeReference(testReference), "myList", "Option3");
+        // Third, no option selected.
+        DocumentReference doc3Ref = new DocumentReference("Doc3", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc3Ref, testUtils.serializeReference(testReference));
+
+        // Create a Live Data page to list those objects.
+        List<String> properties = List.of("doc.name", "myList");
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(3);
+
+        // Filter by Option1 should return only Doc1.
+        tableLayout.filterColumn("myList", "Option1", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("myList", "Option1 Option2");
+        // Filter by Option3 should return only Doc2.
+        tableLayout.filterColumn("myList", "Option3", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("myList", "Option3");
+        // Filter by (empty) should return only Doc3.
+        // Note: we must explicitly use the suggestion as otherwise this would be treated as a text filter as it would
+        // select the typed value and not the suggestion that contains the special treatment of this filter.
+        tableLayout.filterColumn("myList", CHOICE_EMPTY, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc3");
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

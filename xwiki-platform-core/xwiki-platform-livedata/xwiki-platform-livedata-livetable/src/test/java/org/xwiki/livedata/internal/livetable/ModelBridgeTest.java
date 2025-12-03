@@ -232,6 +232,26 @@ class ModelBridgeTest
     }
 
     @Test
+    void updateDocumentEnforceRequiredRightsField() throws Exception
+    {
+        String property = "doc.enforceRequiredRights";
+        Object value = "true";
+        DocumentReference documentReference = new DocumentReference("xwiki", "MyApp", "mydoc");
+
+        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(this.document);
+
+        when(this.document.isContentDirty()).thenReturn(true);
+        when(this.document.isEnforceRequiredRights()).thenReturn(false);
+        when(this.document.validate(this.xcontext)).thenReturn(true);
+
+        Optional<Object> update = this.modelBridge.update(property, value, documentReference, null);
+        assertEquals(false, update.get());
+
+        verify(this.document).setEnforceRequiredRights(true);
+        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, this.xcontext);
+    }
+
+    @Test
     void updateDocumentTitleFieldButNotValid() throws Exception
     {
         String property = "doc.title";

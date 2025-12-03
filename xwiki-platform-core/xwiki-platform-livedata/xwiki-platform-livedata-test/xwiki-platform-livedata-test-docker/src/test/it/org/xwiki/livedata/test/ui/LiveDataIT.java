@@ -130,6 +130,12 @@ class LiveDataIT
 
     public static final String ACTIONS_COLUMN = "_actions";
 
+    private static final String ENFORCE_REQUIRED_RIGHTS_COLUMN = "doc.enforceRequiredRights";
+
+    private static final String FALSE = "False";
+
+    private static final String TRUE = "True";
+
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
      * and two XObjects, then edit the XObjects properties from the live data.
@@ -737,6 +743,55 @@ class LiveDataIT
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow(NAME_COLUMN, newName);
         tableLayout.assertRow(DOC_TITLE_COLUMN, "No XObject");
+    }
+
+    @Test
+    @Order(8)
+    void enforceRequiredRights(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // Create a test page.
+        DocumentReference testPageDocumentReference =
+            new DocumentReference("TestPage", testReference.getLastSpaceReference());
+        testUtils.rest().savePage(testPageDocumentReference, "", "Test Page");
+        String content = """
+            {{liveData
+                id="test"
+                properties="doc.title,doc.enforceRequiredRights"
+                source="liveTable"
+                sourceParameters="translationPrefix=&space=%s"
+            }}{{/liveData}}
+            """.formatted(
+                testUtils.serializeReference(testReference.getLocalDocumentReference().getParent()));
+        testUtils.createPage(testReference, content, "Live Data Test");
+
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        assertEquals(2, tableLayout.countRows());
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "Live Data Test");
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "Test Page");
+        tableLayout.filterColumn(DOC_TITLE_COLUMN, "Test Page");
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE);
+
+        // Test the filter on the enforceRequiredRights column.
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(0);
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, FALSE, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+
+        // Edit the enforceRequiredRights column.
+        tableLayout.editCell(ENFORCE_REQUIRED_RIGHTS_COLUMN, 1, ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE);
+        tableLayout.waitUntilRowCountEqualsTo(0);
+
+        // Change the filter to see the updated value.
+        tableLayout.filterColumn(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(DOC_TITLE_COLUMN, "Test Page");
+        tableLayout.assertRow(ENFORCE_REQUIRED_RIGHTS_COLUMN, TRUE);
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

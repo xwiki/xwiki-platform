@@ -119,6 +119,30 @@
             </configuration>
           </execution>
           <execution>
+            <id>pnpm-api-extractor</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run api-extractor:ci</arguments>
+              <workingDirectory>${basedir}/src/main/node</workingDirectory>
+              <installDirectory>${basedir}/target</installDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>pnpm-publint</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>pnpm</goal>
+            </goals>
+            <configuration>
+              <arguments>run publint</arguments>
+              <workingDirectory>${basedir}/src/main/node</workingDirectory>
+              <installDirectory>${basedir}/target</installDirectory>
+            </configuration>
+          </execution>
+          <execution>
             <phase>deploy</phase>
             <goals>
               <goal>pnpm</goal>

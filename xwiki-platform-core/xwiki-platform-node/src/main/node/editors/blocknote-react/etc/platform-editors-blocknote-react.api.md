@@ -162,19 +162,7 @@ readonly textAlignment: {
 default: "left";
 values: readonly ["left", "center", "right", "justify"];
 };
-};
-}, any, InlineContentSchema, StyleSchema>;
-};
-numberedListItem: {
-config: {
-type: "numberedListItem";
-content: "inline";
-propSchema: {
-start: {
-default: undefined;
-type: "number";
-};
-backgroundColor: {
+readonly backgroundColor: {
 default: "default";
 };
 readonly name: {
@@ -230,15 +218,7 @@ readonly textColor: {
 default: "default";
 };
 }, "inline">;
-content: "table";
-propSchema: {
-textColor: {
-default: "default";
-};
-};
-};
-implementation: TiptapBlockImplementation<    {
-type: "table";
+table: LooseBlockSpec<"table", {
 textColor: {
 default: "default";
 };
@@ -288,7 +268,7 @@ config: {
 type: string;
 propSchema: "boolean";
 };
-implementation: StyleImplementation;
+implementation: StyleImplementation<    {
 type: string;
 propSchema: "boolean";
 }>;
@@ -298,7 +278,7 @@ config: {
 type: string;
 propSchema: "boolean";
 };
-implementation: StyleImplementation;
+implementation: StyleImplementation<    {
 type: string;
 propSchema: "boolean";
 }>;
@@ -354,8 +334,7 @@ export function createCustomInlineContentSpec<const I extends CustomInlineConten
     };
     customToolbar: (() => ReactNode) | null;
 }): {
-    inlineContent: {
-        config: I;
+    inlineContent: InlineContentSpec<I>;
     slashMenuEntry: false | ((editor: BlockNoteEditor<any>) => {
         title: string;
         aliases: string[] | undefined;

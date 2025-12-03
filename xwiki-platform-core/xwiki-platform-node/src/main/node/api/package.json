@@ -21,6 +21,7 @@
   },
   "main": "./src/index.ts",
   "scripts": {
+    "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
@@ -41,6 +42,7 @@
     "vue-router": "4.x"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",

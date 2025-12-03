@@ -22,6 +22,7 @@
   },
   "main": "./src/index.ts",
   "scripts": {
+    "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
     "build": "vite build",
     "clean": "rimraf dist",
@@ -38,6 +39,7 @@
     "vue": "3.x"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
     "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",

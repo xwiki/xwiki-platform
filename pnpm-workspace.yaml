@@ -41,6 +41,7 @@ catalog:
   "@eslint/js": 9.38.0
   "@mantine/core": 8.3.6
   "@mantine/hooks": 8.3.6
+  "@microsoft/api-extractor": 7.55.1
   "@playwright/experimental-ct-react": 1.56.1
   "@tsconfig/node24": 24.0.1
   "@types/jsdom": 27.0.0
@@ -91,6 +92,7 @@ catalog:
   postcss: 8.5.6
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
+  publint: 0.3.15
   react: 19.2.0
   react-dom: 19.2.0
   react-i18next: 16.0.0

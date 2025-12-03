@@ -19,6 +19,7 @@
     }
   },
   "scripts": {
+    "api-extractor:ci": "api-extractor run",
     "api-extractor:local": "api-extractor run --local",
     "build": "rimraf dist && tsc",
     "clean": "rimraf dist",
@@ -29,6 +30,7 @@
     "reflect-metadata": "0.x"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "eslint": "catalog:",
     "reflect-metadata": "catalog:",

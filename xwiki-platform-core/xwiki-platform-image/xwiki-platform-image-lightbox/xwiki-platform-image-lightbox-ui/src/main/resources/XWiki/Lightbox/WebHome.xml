@@ -513,7 +513,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.contrib:webjar-blueimp-gallery',
     'css/blueimp-gallery.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-image-lightbox-webjar',
-    'lightbox.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+    'lightbox.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.jsx.use('XWiki.Lightbox.WebHome'))
   #set ($config = {})
   #set ($discard = $config.put('HTMLTemplate', "#lightboxHTMLTemplate"))

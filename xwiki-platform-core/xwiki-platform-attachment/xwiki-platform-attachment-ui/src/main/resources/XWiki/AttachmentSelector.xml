@@ -789,7 +789,13 @@ $xwiki.jsx.use($attachmentPickerDocName)
     $$('.attachment-picker-start').invoke('observe', 'click', function(event) {
       event.stop();
       var targetElement = event.element();
-      var url = targetElement.href;
+      let url = null;
+      if (targetElement.tagName === "a") {
+        url = targetElement.href;
+      }
+      else {
+        url = targetElement.dataset.modalUrl;
+      }
       if (url.indexOf('?') &lt; 0) {
         url += '?';
       }
@@ -1611,9 +1617,15 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #if ($hasTargetDoc)
       #set ($queryString.targetdocname = $targetdoc.fullName)
     #end
-    #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
-    (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
-      class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
+    #set ($linkLabel = $escapetool.xml($buttontext))
+    #set ($modalUrl = $escapetool.xml("$xcontext.macro.doc.URL?$escapetool.url($queryString)"))
+    (% class="buttonwrapper" %)##
+      {{html clean="false"}}
+        &lt;button class="attachment-picker-start button" 
+        title="$!{linkLabel}" 
+        data-modal-url="${modalUrl}"&gt;$!linkLabel
+        &lt;/button&gt;
+      {{/html}}(%%)##
   #end
 #end
 {{/velocity}}

@@ -38,7 +38,7 @@ catalog:
   "@blocknote/mantine": 0.42.3
   "@blocknote/react": 0.42.3
   "@eslint/config-helpers": 0.4.2
-  "@eslint/js": 9.38.0
+  "@eslint/js": 9.39.1
   "@mantine/core": 8.3.6
   "@mantine/hooks": 8.3.6
   "@microsoft/api-extractor": 7.55.1

@@ -238,7 +238,7 @@ admin.wikis.description=위키 관리.
 admin.wikis.templates=위키 템플릿
 admin.wikis.templates.description=위키 템플릿 관리
 admin.wikis.templates.hint=템플릿은 새 위키를 생성하기 위한 모델로 간주되는 위키입니다. 사용자가 새 Wiki를 만들기 위해 템플릿을 선택하면 템플릿의 모든 콘텐츠가 새 Wiki에 복사됩니다.
-admin.wikis.rights=창조권
+admin.wikis.rights=생성 권한
 
 ## XWikiServer Sheet
 platform.wiki.sheet.title=위키 "{0}"의 설명자

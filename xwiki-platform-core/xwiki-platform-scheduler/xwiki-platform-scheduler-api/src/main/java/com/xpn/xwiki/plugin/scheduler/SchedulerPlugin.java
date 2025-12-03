@@ -47,8 +47,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
-import org.xwiki.classloader.NamespaceURLClassLoader;
-import org.xwiki.classloader.internal.ClassLoaderResetedEvent;
+import org.xwiki.classloader.internal.ClassLoaderResetEvent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.model.reference.DocumentReference;
@@ -109,7 +108,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         new DocumentDeletedEvent(),
         new DocumentUpdatedEvent(),
         new WikiDeletedEvent(),
-        new ClassLoaderResetedEvent()
+        new ClassLoaderResetEvent()
     );
 
     /**
@@ -748,9 +747,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             } catch (SchedulerException e) {
                 LOGGER.error("Failed to remove schedulers for wiki [{}]", wikiId, e);
             }
-            this.schedulersClassLoaderManager.removeSchedulers(wikiId);
-        } else if (event instanceof ClassLoaderResetedEvent classLoaderResetedEvent) {
-            String namespace = (String) source;
+            this.schedulersClassLoaderManager.removeSchedulers(String.format("wiki:%s", wikiId));
+        } else if (event instanceof ClassLoaderResetEvent classLoaderResetEvent) {
+            String namespace = classLoaderResetEvent.getNamespace();
             this.schedulersClassLoaderManager.onClassLoaderReset(namespace);
         } else {
             onDocumentEvent(source, data);

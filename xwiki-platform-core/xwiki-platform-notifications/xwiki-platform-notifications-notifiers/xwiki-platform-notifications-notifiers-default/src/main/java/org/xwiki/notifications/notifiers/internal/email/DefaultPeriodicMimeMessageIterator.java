@@ -83,7 +83,7 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
         notificationParameters.user = user;
         notificationParameters.format = NotificationFormat.EMAIL;
         notificationParameters.expectedCount = Integer.MAX_VALUE / 4;
-        notificationParameters.fromDate = this.lastTrigger;
+        notificationParameters.fromPrefilteringDate = this.lastTrigger;
         notificationParameters.endDateIncluded = false;
         notificationParametersFactory.useUserPreferences(notificationParameters);
         UserReference userReference = this.userReferenceResolver.resolve(user);

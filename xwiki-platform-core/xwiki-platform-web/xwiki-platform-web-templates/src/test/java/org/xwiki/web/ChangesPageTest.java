@@ -120,8 +120,8 @@ class ChangesPageTest extends PageTest
     @Test
     void renderChangesTemplateWithBasicParameters() throws Exception
     {
-        this.stubRequest.put("rev1", "1.1");
-        this.stubRequest.put("rev2", "2.1");
+        this.request.put("rev1", "1.1");
+        this.request.put("rev2", "2.1");
 
         String result = this.templateManager.render(CHANGES_VM);
 
@@ -133,8 +133,8 @@ class ChangesPageTest extends PageTest
     void renderChangesTemplateWithInvalidRev2Parameters() throws Exception
     {
         // Set up request parameters for changes view with invalid revision numbers
-        this.stubRequest.put("rev1", "2.1");
-        this.stubRequest.put("rev2", INVALID_REVISION);
+        this.request.put("rev1", "2.1");
+        this.request.put("rev2", INVALID_REVISION);
 
         String result = this.templateManager.render(CHANGES_VM);
 
@@ -148,8 +148,8 @@ class ChangesPageTest extends PageTest
     void renderChangesTemplateWithInvalidRev1Parameters() throws Exception
     {
         // Set up request parameters for changes view with invalid revision numbers
-        this.stubRequest.put("rev1", INVALID_REVISION);
-        this.stubRequest.put("rev2", "3.1");
+        this.request.put("rev1", INVALID_REVISION);
+        this.request.put("rev2", "3.1");
 
         String result = this.templateManager.render(CHANGES_VM);
 

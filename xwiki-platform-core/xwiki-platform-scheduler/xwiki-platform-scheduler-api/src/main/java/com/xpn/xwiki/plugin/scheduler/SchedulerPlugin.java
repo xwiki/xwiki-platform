@@ -50,6 +50,7 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.classloader.internal.ClassLoaderResetEvent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
@@ -747,7 +748,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             } catch (SchedulerException e) {
                 LOGGER.error("Failed to remove schedulers for wiki [{}]", wikiId, e);
             }
-            this.schedulersClassLoaderManager.removeSchedulers(String.format("wiki:%s", wikiId));
+            this.schedulersClassLoaderManager.removeSchedulers(new WikiNamespace(wikiId).serialize());
         } else if (event instanceof ClassLoaderResetEvent classLoaderResetEvent) {
             String namespace = classLoaderResetEvent.getNamespace();
             this.schedulersClassLoaderManager.onClassLoaderReset(namespace);

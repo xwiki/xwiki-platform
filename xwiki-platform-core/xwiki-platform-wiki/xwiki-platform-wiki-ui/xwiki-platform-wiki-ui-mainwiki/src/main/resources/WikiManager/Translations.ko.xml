@@ -163,9 +163,6 @@ rendering.macro.wikis.description=모든 위키 나열
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=작업공간(기존)
 rendering.macro.workspaces.description=호환성 문제로 인해 여기서는 사용하면 안 되는 매크로입니다. 대신 "위키" 매크로를 사용하세요.
-
-## Browse
-platform.wiki.browse=위키 찾아보기
 platform.wiki.browse.emptyvalue=해당 없음
 platform.wiki.browse.wikiprettyname=이름
 platform.wiki.browse.description=설명
@@ -238,7 +235,7 @@ admin.wikis.description=위키 관리.
 admin.wikis.templates=위키 템플릿
 admin.wikis.templates.description=위키 템플릿 관리
 admin.wikis.templates.hint=템플릿은 새 위키를 생성하기 위한 모델로 간주되는 위키입니다. 사용자가 새 Wiki를 만들기 위해 템플릿을 선택하면 템플릿의 모든 콘텐츠가 새 Wiki에 복사됩니다.
-admin.wikis.rights=창조권
+admin.wikis.rights=생성 권한
 
 ## XWikiServer Sheet
 platform.wiki.sheet.title=위키 "{0}"의 설명자
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=마무리
 #######################################
 platform.wiki.delete.confirmation.yes=네, 이 위키를 삭제해주세요!
 platform.wiki.delete.confirmation.no=아니, 날 다시 데려가 주세요!
+
+## Browse
+platform.wiki.browse=위키 찾아보기
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

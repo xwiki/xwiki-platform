@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Order;
@@ -60,6 +62,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.openqa.selenium.Keys.BACK_SPACE;
+import static org.openqa.selenium.Keys.CONTROL;
+import static org.openqa.selenium.Keys.chord;
 import static org.xwiki.livedata.test.po.TableLayoutElement.FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS;
 
 /**
@@ -242,13 +247,28 @@ class LiveDataIT
         assertEquals(1, liveDataElement.countFootnotes());
         assertThat(liveDataElement.getFootnotesText(), containsInAnyOrder(FOOTNOTE_COMPUTED_TITLE));
 
+        // Test text filters. Verify that all keystrokes are preserved when typing a value (non-regression test for
+        // XWIKI-23789).
+        WebElement nameFilter = tableLayout.getFilter(NAME_COLUMN);
+        String longstring = "0123456789012345678901234567890123456789";
+        // Simulate a human-like keyboard input since selenium setting the value all at once, which does not make the
+        // potential problem visible. With a long enough input string, the change of losing char are very high when
+        // the issue exists.
+        longstring.chars().forEach(c -> {
+            nameFilter.sendKeys(Character.toString((char) c));
+            try {
+                TimeUnit.MILLISECONDS.sleep(ThreadLocalRandom.current().nextInt(0, 300));
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        });
+        assertEquals(0, tableLayout.countRows());
+        assertEquals(longstring, nameFilter.getAttribute("value"));
+        nameFilter.sendKeys(chord(CONTROL, "a", BACK_SPACE));
+
         // Testing the selectize filters
-        SuggestInputElement suggestInputElement = new SuggestInputElement(tableLayout.getFilter(CHOICE_COLUMN));
-
-        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
-        suggestInputElement.click().waitForSuggestions();
-
         // Test filtering by label
+        SuggestInputElement suggestInputElement = new SuggestInputElement(tableLayout.getFilter(CHOICE_COLUMN));
         suggestInputElement.sendKeys(CHOICE_L_LABEL);
         suggestInputElement.waitForNonTypedSuggestions();
         List<SuggestInputElement.SuggestionElement> suggestionElements = suggestInputElement.getSuggestions();

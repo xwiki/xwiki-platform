@@ -1154,23 +1154,23 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
 
 #set ($parameters = {
-  "userId": "$!escapetool.xml($services.model.serialize($xcontext.userReference, 'default'))",
-  "maxCount": "$!escapetool.xml($xcontext.macro.params.count)",
-  "useUserPreferences": "$!escapetool.xml($xcontext.macro.params.useUserPreferences)",
-  "displayOwnEvents": "$!escapetool.xml($xcontext.macro.params.displayOwnEvents)",
-  "displayMinorEvents": "$!escapetool.xml($xcontext.macro.params.displayMinorEvents)",
-  "displaySystemEvents": "$!escapetool.xml($xcontext.macro.params.displaySystemEvents)",
-  "displayReadEvents": "$!escapetool.xml($xcontext.macro.params.displayReadEvents)",
-  "wikis": "$!escapetool.xml($xcontext.macro.params.wikis)",
-  "spaces": "$!escapetool.xml($xcontext.macro.params.spaces)",
-  "pages": "$!escapetool.xml($xcontext.macro.params.pages)",
-  "users": "$!escapetool.xml($users)",
-  "currentWiki": "$!escapetool.xml($services.wiki.currentWikiId)",
-  "tags": "$!escapetool.xml($xcontext.macro.params.tags)"
+  "userId": "$!services.model.serialize($xcontext.userReference, 'default')",
+  "maxCount": "$!xcontext.macro.params.count",
+  "useUserPreferences": "$!xcontext.macro.params.useUserPreferences",
+  "displayOwnEvents": "$!xcontext.macro.params.displayOwnEvents",
+  "displayMinorEvents": "$!xcontext.macro.params.displayMinorEvents",
+  "displaySystemEvents": "$!xcontext.macro.params.displaySystemEvents",
+  "displayReadEvents": "$!xcontext.macro.params.displayReadEvents",
+  "wikis": "$!xcontext.macro.params.wikis",
+  "spaces": "$!xcontext.macro.params.spaces",
+  "pages": "$!xcontext.macro.params.pages",
+  "users": "$!users",
+  "currentWiki": "$!services.wiki.currentWikiId",
+  "tags": "$!xcontext.macro.params.tags"
 })
 #set ($dataParameters = [])
 #foreach($key in $parameters.keySet())
-  #set($discard = $dataParameters.add("data-$key=""$parameters.get($key)"""))
+  #set($discard = $dataParameters.add("data-$key=""$!escapetool.xml($parameters.get($key))"""))
 #end
 #set($notifParameters = $services.notification.sources.getNotificationParameters($parameters))
 #set($notifs = $services.notification.notifiers.getNotifications($notifParameters, true))

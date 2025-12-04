@@ -179,32 +179,27 @@ public class RichTextAreaElement extends BaseElement
         if (keysToSend.length > 0) {
             try {
                 getActiveElement().sendKeys(keysToSend);
-                maybeForceSelectionChange();
             } finally {
                 maybeSwitchToDefaultContent();
+                forceSelectionChange();
             }
         }
     }
 
-    private void maybeForceSelectionChange()
+    /**
+     * CKEditor updates its internal selection state asynchronously (with a delay) after a change occurs in the editing
+     * area. This means the selection returned by CKEditor is not always up-to-date right after typing. This is
+     * especially problematic during test execution when keyboard events are simulated in quick succession. We have code
+     * both on the test framework side and on the CKEditor side that relies on the selection. When this code is executed
+     * right after sending keys to the editing area the outcome is not always the same, leading to test instability. We
+     * prevent this by forcing CKEditor to update its selection state.
+     */
+    private void forceSelectionChange()
     {
-        String browserName = getDriver().getCapabilities().getBrowserName().toLowerCase();
-        if (!this.isFrame && browserName.contains("firefox")) {
-            // When editing in-place in Firefox, the selection (caret position) is not updated if the editor is losing
-            // focus immediately after some text has been typed. This happens for instance if you type and then quickly
-            // switch to a different browser tab. When you get back the caret is before the newly typed text instead of
-            // after it. Same happens if you type and then quickly focus another element on the same page (e.g. another
-            // form field). This is a CKEditor bug, which you can reproduce using the CKEditor 4 demo, after selecting
-            // the "Inline" mode. The workaround we found is to force CKEditor to acknowledge the selection change right
-            // after typing, before the editor loses focus. Note that we could have waited for the "selectionChange"
-            // event to be fired after typing, but its documentation says: "this event is fired only when selection's
-            // start element (container of a selecion start) changes, not on every possible selection change", which
-            // means this event is not triggered when we type.
-            getDriver().executeScript("""
-                const name = arguments[0];
-                const editor = CKEDITOR.instances[name];
-                editor.selectionChange(true);""", this.editor.getName());
-        }
+        getDriver().executeScript("""
+            const name = arguments[0];
+            const editor = CKEDITOR.instances[name];
+            editor.selectionChange(true);""", this.editor.getName());
     }
 
     /**
@@ -300,22 +295,18 @@ public class RichTextAreaElement extends BaseElement
     private WebElement getActiveElement()
     {
         WebElement rootEditableElement = getRootEditableElement();
-        String browserName = getDriver().getCapabilities().getBrowserName().toLowerCase();
-        if (browserName.contains("firefox")) {
-            // Firefox works best if we send the keys to the root editable element, but we need to focus it first,
-            // otherwise the keys are ignored. If we send the keys to a nested editable then we can't navigate outside
-            // of it using the arrow keys (as if the editing scope is set to that nested editable).
-            focus(rootEditableElement);
-            return rootEditableElement;
-        } else {
-            // Chrome expects us to send the keys directly to the nested editable where we want to type. If we send the
-            // keys to the root editable then they are inserted directly in the root editable (e.g. when editing a macro
-            // inline the characters we type will be inserted outside the macro content nested editable).
-            WebElement activeElement = getDriver().switchTo().activeElement();
-            boolean rootEditableElementIsOrContainsActiveElement = (boolean) getDriver()
-                .executeScript("return arguments[0].contains(arguments[1])", rootEditableElement, activeElement);
-            return rootEditableElementIsOrContainsActiveElement ? activeElement : rootEditableElement;
+        // Chrome expects us to send the keys directly to the nested editable where we want to type. If we send the
+        // keys to the root editable then they are inserted directly in the root editable (e.g. when editing a macro
+        // inline the characters we type will be inserted outside the macro content nested editable).
+        WebElement activeElement = getDriver().switchTo().activeElement();
+        boolean rootEditableElementIsOrContainsActiveElement = (boolean) getDriver()
+            .executeScript("return arguments[0].contains(arguments[1])", rootEditableElement, activeElement);
+        if (!rootEditableElementIsOrContainsActiveElement) {
+            activeElement = rootEditableElement;
         }
+        // Firefox ignores the sent keys if the target element is not focused.
+        focus(activeElement);
+        return activeElement;
     }
 
     /**

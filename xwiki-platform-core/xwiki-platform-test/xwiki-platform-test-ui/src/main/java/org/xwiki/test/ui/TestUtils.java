@@ -78,6 +78,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.opentest4j.AssertionFailedError;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -1615,10 +1616,16 @@ public class TestUtils
         // doesn't reload the page on cancel. We can only rely on the fact that the URL will change (even for the
         // in-place editor where the '#edit' URL fragment is removed).
         String editURL = getDriver().getCurrentUrl();
+        WebElement cancelButton =
+            getDriver().findElementWithoutWaitingWithoutScrolling(By.cssSelector("input[name='action_cancel']"));
+        // The cancel button can be temporarily disabled, e.g. while the content is being (auto)saved.
+        getDriver().waitUntilElementIsEnabled(cancelButton);
+        // We use the shortcut key instead of clicking because the cancel button might not be visible (e.g. when doing
+        // realtime collaboration).
         getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
         getDriver().waitUntilCondition(driver -> {
             String viewURL = driver.getCurrentUrl();
-            return !viewURL.equals(editURL);
+            return !Objects.equals(viewURL, editURL);
         });
     }
 

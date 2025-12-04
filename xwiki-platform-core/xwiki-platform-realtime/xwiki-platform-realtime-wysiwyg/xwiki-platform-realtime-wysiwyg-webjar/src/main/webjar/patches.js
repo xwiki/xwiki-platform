@@ -77,13 +77,15 @@ define('xwiki-realtime-wysiwyg-patches', [
               'relocateGroup', 'replaceElement', 'removeElement', 'removeTextElement'].includes(change.diff.action)) {
             diffDOM._updatedNodes.add(change.node);
           }
+
+          this._updateSelection(options.selection, change);
         },
 
         postDiffApply: (change) => {
           if (!change.newNode && ['addElement', 'replaceElement'].includes(change.diff.action)) {
             // Unfortunately DiffDOM doesn't set the new node when an element is added or replaced so we have to find it
             // ourselves.
-            change.newNode = this._getFromRoute(change.diff.route);
+            change.newNode = this._getNodeByPath(change.diff.route);
           }
 
           if (['addTextElement', 'addElement', 'replaceElement'].includes(change.diff.action)) {
@@ -111,16 +113,137 @@ define('xwiki-realtime-wysiwyg-patches', [
       return diffDOM;
     }
 
+    _updateSelection(selection, change) {
+      const validSelection = selection.every(savedRange => savedRange.start && savedRange.end);
+      if (!validSelection) {
+        // The selection has been invalidated by a previous change.
+        return;
+      }
+      for (const range of selection) {
+        range.start = this._updateRangeBoundary(range.start, change.diff);
+        if (range.collapsed) {
+          range.end = range.start;
+        } else {
+          range.end = this._updateRangeBoundary(range.end, change.diff);
+        }
+      }
+    }
+
+    _updateRangeBoundary(boundary, diff) {
+      switch (diff.action) {
+        case 'addElement':
+        case 'addTextElement':
+          return this._updateRangeBoundaryOnNodeAdded(boundary, diff);
+
+        case 'removeElement':
+        case 'removeTextElement':
+          return this._updateRangeBoundaryOnNodeRemoved(boundary, diff);
+
+        case 'modifyTextElement':
+        case 'replaceElement':
+          return this._updateRangeBoundaryOnNodeReplaced(boundary, diff);
+
+        case 'relocateGroup':
+          return this._updateRangeBoundaryOnGroupRelocated(boundary, diff);
+      }
+    }
+
+    _updateRangeBoundaryOnNodeAdded(boundary, diff) {
+      const boundaryParentPath = boundary.slice(0, -1).join('/');
+      const changeParentPath = diff.route.slice(0, -1);
+      // Check if the change parent is an ancestor of the boundary.
+      if (boundaryParentPath.startsWith(changeParentPath.join('/')) &&
+          // And if the node is added before the boundary.
+          diff.route.at(-1) <= boundary[changeParentPath.length]) {
+        // Increment the boundary offset to account for the added node.
+        boundary[changeParentPath.length]++;
+      }
+      return boundary;
+    }
+
+    _updateRangeBoundaryOnNodeRemoved(boundary, diff) {
+      const boundaryParentPath = boundary.slice(0, -1).join('/');
+      const changeParentPath = diff.route.slice(0, -1);
+      // Check if the change parent is an ancestor of the boundary.
+      if (boundaryParentPath.startsWith(changeParentPath.join('/'))) {
+        const changeIndex = diff.route.at(-1);
+        const boundaryIndex = boundary[changeParentPath.length];
+        if (changeIndex < boundaryIndex) {
+          // Decrement the boundary offset to account for the removed node.
+          boundary[changeParentPath.length]--;
+        } else if (changeIndex === boundaryIndex) {
+          // The boundary is inside the removed node, so we can't restore it anymore. We can't simply place the
+          // boundary before the removed node because that might not be a valid caret position (even if we can
+          // technically place the caret there, the browser might not display the caret and might ignore the typed
+          // text until the user clicks somewhere else in the content).
+          return null;
+        }
+      }
+      return boundary;
+    }
+
+    _updateRangeBoundaryOnNodeReplaced(boundary, diff) {
+      const boundaryParentPath = boundary.slice(0, -1).join('/');
+      // Check if the change target is an ancestor of the boundary.
+      if (boundaryParentPath.startsWith(diff.route.join('/'))) {
+        if (diff.action === 'modifyTextElement') {
+          // The boundary is inside the modified text node. We have to invalidate the selection if there are changes
+          // before the boundary offset because those changes can be the result of splitting the text node (e.g. in
+          // order to apply formatting to a part of the text), in which case we can't preserve the selection by using
+          // the diff (the result wouldn't preserve the user intent).
+          const ops = ChainPad.Diff.diff(diff.oldValue, diff.newValue);
+          const minOffset = Math.min(...ops.map(op => op.offset));
+          if (boundary.at(-1) > minOffset) {
+            return null;
+          }
+        } else {
+          // The boundary is inside the replaced node, so we invalidate the selection. We can't simply place the
+          // boundary before the replaced node because that might not be a valid caret position (even if we can
+          // technically place the caret there, the browser might not display the caret and might ignore the typed
+          // text until the user clicks somewhere else in the content).
+          return null;
+        }
+      }
+      return boundary;
+    }
+
+    _updateRangeBoundaryOnGroupRelocated(boundary, diff) {
+      const boundaryParentPath = boundary.slice(0, -1).join('/');
+      const changePath = diff.route;
+      // Check if the change target is an ancestor of the boundary.
+      if (boundaryParentPath.startsWith(changePath.join('/'))) {
+        const boundaryIndex = boundary[changePath.length];
+        if (diff.from <= boundaryIndex && boundaryIndex < (diff.from + diff.groupLength)) {
+          // The boundary is inside the relocated group, so we have to update its offset.
+          if (diff.from < diff.to) {
+            // Nodes are moved, along with the boundary, to the right, so we have to increment the boundary offset.
+            boundary[changePath.length] += diff.to - (diff.from + diff.groupLength);
+          } else {
+            // Nodes are moved, along with the boundary, to the left, so we have to decrement the boundary offset.
+            boundary[changePath.length] -= diff.from - diff.to;
+          }
+          boundary[changePath.length] += diff.to - (diff.from + diff.groupLength);
+        } else if (diff.from < boundaryIndex && boundaryIndex < diff.to) {
+          // Nodes are relocated from before the boundary to after it, so we have to decrement the boundary offset.
+          boundary[changePath.length] -= diff.groupLength;
+        } else if (diff.to <= boundaryIndex && boundaryIndex < diff.from) {
+          // Nodes are relocated from after the boundary to before it, so we have to increment the boundary offset.
+          boundary[changePath.length] += diff.groupLength;
+        }
+      }
+      return boundary;
+    }
+
     /**
-     * Retrieve a node from the edited content, by its route.
+     * Retrieve a node from the edited content, by its path.
      *
-     * @param {Array[Number]} route a path in the content tree, where each step represents the index of a child of the
+     * @param {Array[Number]} path a path in the content tree, where each step represents the index of a child of the
      *   previous node
-     * @returns the node at the given route in the content tree
+     * @returns the node with the given path in the content tree
      */
-    _getFromRoute(route) {
+    _getNodeByPath(path) {
       let node = this._editor.getContentWrapper();
-      for (const index of route) {
+      for (const index of path) {
         node = node.childNodes[index];
       }
       return node;
@@ -194,11 +317,11 @@ define('xwiki-realtime-wysiwyg-patches', [
       while (treeWalker.nextNode()) {
         comments.push(treeWalker.currentNode);
       }
-      comments.forEach(comment => {
+      for (const comment of comments) {
         const commentElement = root.ownerDocument.createElement('xwiki-comment');
         commentElement.setAttribute('value', comment.data);
         comment.replaceWith(commentElement);
-      });
+      }
       return root;
     }
 
@@ -209,10 +332,10 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @returns {Node} the given root node with the protected comments restored (replaced by a actual comment node)
      */
     _restoreComments(root) {
-      root.querySelectorAll('xwiki-comment').forEach(commentElement => {
+      for (const commentElement of root.querySelectorAll('xwiki-comment')) {
         const comment = root.ownerDocument.createComment(commentElement.getAttribute('value'));
         commentElement.replaceWith(comment);
-      });
+      }
       return root;
     }
 
@@ -232,34 +355,37 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
     async _updateContent(newContent, propagate) {
-      const selection = this._saveSelection();
+      let selection = this._saveSelection();
 
       await this._editor.updateContent(oldContent => {
+        selection = this._savePathBasedSelection(selection);
+
         const diffDOM = this._createDiffDOM({
           // New (added) nodes must be created using the current DOM document, where they will be inserted.
-          document: oldContent.ownerDocument
+          document: oldContent.ownerDocument,
+          // Update or invalidate the selection while applying the patch.
+          selection
         });
+
         // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
         const patch = diffDOM.diff(
           DiffDOM.nodeToObj(oldContent, diffDOM.options),
           DiffDOM.nodeToObj(newContent, diffDOM.options)
         );
+
         diffDOM.apply(oldContent, patch);
+        selection = this._restorePathBasedSelection(selection);
 
-        const updatedNodes = diffDOM._updatedNodes;
-        this._maybeInvalidateSavedSelection(selection, updatedNodes);
-
-        return updatedNodes;
+        return diffDOM._updatedNodes;
       }, propagate);
 
-      await this._restoreSelection(selection);
+      this._restoreSelection(selection);
     }
 
     /**
-     * Saves the current selection both as a text selection (to be used in case the selected nodes are replaced or
-     * removed) and as an array of relative ranges (to be used in case the selected nodes are only moved around).
+     * Creates a non-live version of the current selection, that later can be used to save the path-based selection.
      *
-     * @returns {Array[Object]} an array of objects (relative ranges) that could be used to restore the selection
+     * @returns {Array[Object]} an array of objects (ranges) that represent the current selection in the edited content
      */
     _saveSelection() {
       if (this._editor.isReadOnly()) {
@@ -267,140 +393,181 @@ define('xwiki-realtime-wysiwyg-patches', [
         return [];
       }
 
-      // Save the selection as a text selection.
+      // We also save the selection relative to the text content (ignoring the HTML structure), as a backup in case the
+      // remote patch invalidates the saved selection paths.
       this._editor.saveSelection();
-      // Save the selection as an array of relative ranges.
-      return this._editor.getSelection().map(range => {
-        // Remember also the selection direction.
-        const savedRange = {reversed: range.reversed};
-        if (range.startContainer.childNodes.length) {
-          // We can't simply store a reference to the DOM node before / after the selection boundary because when
-          // applying a remote patch, diffDOM can reuse a DOM node for a different purpose (e.g. replacing its content
-          // and its attributes). So the fact that a node is still attached to the DOM after the remote patch is applied
-          // doesn't mean it has the same meaning as before. At the same time, the fact that a node has been modified by
-          // a remote patch (e.g. by changing the value of an attribute) doesn't necessarily mean it's meaning has
-          // changed. Saving a relative selection is important to avoid restoring the text selection which is slow
-          // because it relies on diffing the text content. But we should restore the relative selection only if the
-          // boundary nodes preserve their meaning afte the remote patch is applied. The ensure this we save the left
-          // and right path from the root of the edited content to the selection boundary nodes, and invalidate the
-          // saved selection if both change after the remote patch is applied.
-          savedRange.startAfter = this._getNodePath(range.startContainer.childNodes[range.startOffset - 1]);
-          savedRange.startBefore = this._getNodePath(range.startContainer.childNodes[range.startOffset]);
-        } else {
-          savedRange.startContainer = range.startContainer;
-          savedRange.startOffset = range.startOffset;
-        }
-        if (range.endContainer.childNodes.length) {
-          savedRange.endAfter = this._getNodePath(range.endContainer.childNodes[range.endOffset - 1]);
-          savedRange.endBefore = this._getNodePath(range.endContainer.childNodes[range.endOffset]);
-        } else {
-          savedRange.endContainer = range.endContainer;
-          savedRange.endOffset = range.endOffset;
-        }
-        return savedRange;
-      });
+
+      // The DOM Selection / Range objects are live (they get updated when the DOM is modified, but the outcome is not
+      // always what the user expects) so there's no point in keeping references to them. Instead we extract the
+      // information we need.
+      return this._editor.getSelection().map(range => ({
+        collapsed: range.collapsed,
+        reversed: range.reversed,
+        startContainer: range.startContainer,
+        startOffset: range.startOffset,
+        startBefore: this._getNodeAfter(range.startContainer, range.startOffset),
+        startAfter: this._getNodeBefore(range.startContainer, range.startOffset),
+        endContainer: range.endContainer,
+        endOffset: range.endOffset,
+        endBefore: this._getNodeAfter(range.endContainer, range.endOffset),
+        endAfter: this._getNodeBefore(range.endContainer, range.endOffset),
+      }));
+    }
+
+    _getNodeBefore(container, offset) {
+      // This returns null if the container is a text node.
+      return container?.childNodes[offset - 1];
+    }
+
+    _getNodeAfter(container, offset) {
+      // This returns null if the container is a text node.
+      return container?.childNodes[offset];
+    }
+
+    /**
+     * Saves the current selection, before applying a remote patch, in order to be able to restore it afterwards. We
+     * can't save it as is because it relies on node references which may become stale after the remote patch is applied
+     * (nodes can be removed or repurposed by DiffDOM). Instead we save the path from the root of the edited content to
+     * the node holding the selection boundary, identifying each ancestor by its node index.
+     *
+     * @returns {Array[Object]} an array of objects (ranges) that could be used to restore the selection
+     */
+    _savePathBasedSelection(selection) {
+      selection = selection.map(this._savePathBasedRange.bind(this));
+      console.debug('Saved path-based selection: ', JSON.stringify(selection));
+      return selection;
+    }
+
+    _savePathBasedRange(range) {
+      const savedRange = {
+        collapsed: range.collapsed,
+        reversed: range.reversed,
+        start: this._getRangeBoundaryPath(range.startContainer, range.startOffset, range.startBefore, range.startAfter)
+      };
+      if (range.collapsed) {
+        savedRange.end = savedRange.start;
+      } else {
+        savedRange.end = this._getRangeBoundaryPath(range.endContainer, range.endOffset, range.endBefore,
+          range.endAfter);
+      }
+      return savedRange;
+    }
+
+    _getRangeBoundaryPath(container, offset, beforeNode, afterNode) {
+      if (container.isConnected) {
+        // Fallthrough: the container is still in the DOM, we can use it to compute the path.
+      } else if (beforeNode?.isConnected) {
+        // The original container was removed but the node before the boundary is still in the DOM.
+        container = beforeNode.parentNode;
+        offset = this._getNodeIndex(beforeNode);
+      } else if (afterNode?.isConnected) {
+        // The original container and the node before the boundary were removed but the node after the boundary is still
+        // available.
+        container = afterNode.parentNode;
+        offset = this._getNodeIndex(afterNode) + 1;
+      } else {
+        // The range boundary is not in the DOM anymore, so we can't compute its path.
+        return null;
+      }
+
+      const path = this._getNodePath(container);
+      return path && [...path, offset];
     }
 
     /**
      * Compute the path of the given DOM node within the edited content.
      *
      * @param {Node} node the node for which to compute the path
-     * @returns {Object} the path of the given node in the DOM tree, each path item representing the child index at that
-     *   level
+     * @returns {Array[Number]} the path of the given node in the DOM tree, each path item representing the node index
+     *   at that level
      */
     _getNodePath(node) {
-      const path = {
-        // The node the path was computed for.
-        node,
-        // The child index for this node and all its ancestors, counting from the left.
-        left: [],
-        // The child index for this node and all its ancestors, counting from the right.
-        right: []
-      };
+      const path = [];
       while (node?.parentNode && node !== this._editor.getContentWrapper()) {
-        const nodeIndex = Array.from(node.parentNode.childNodes).indexOf(node);
-        path.left.push(nodeIndex);
-        path.right.push(node.parentNode.childNodes.length - nodeIndex);
+        path.push(this._getNodeIndex(node));
         node = node.parentNode;
       }
       // We return the computed path only if the node is part of the edited content.
       if (node === this._editor.getContentWrapper()) {
         // Reverse the path because we built it starting from the node and going up to the content wrapper.
-        path.left.reverse();
-        path.right.reverse();
-        path.left = path.left.join('/');
-        path.right = path.right.join('/');
-        return path;
+        return path.reverse();
       }
     }
 
-    /**
-     * Invalidates the saved selection if it is affected by the updated nodes.
-     *
-     * @param {Array[Object]} selection an array of objects (relative ranges) that can be used to restore the selection
-     * @param {Set[Node]} updatedNodes the set of updated nodes (as a result of applying remote changes to the content)
-     */
-    _maybeInvalidateSavedSelection(selection, updatedNodes) {
-      selection.forEach(range => {
-        // The saved selection is relative if the original selection had its boundaries between DOM nodes. In that case
-        // we remember the DOM node before and after the selection boundaries. This allows us to restore the selection
-        // properly even when DOM nodes are added or removed, as long as either the node before or after remains in the
-        // DOM. The saved selection in not relative if the original selection had its boundaries inside a text node. In
-        // this case, we have to restore the text selection (diff-based) because we need to take into account how many
-        // characters where added or removed before the selection boundary (offset).
-        if (range.startContainer?.nodeType === Node.TEXT_NODE && updatedNodes.has(range.startContainer)) {
-          delete range.startContainer;
+    _getNodeIndex(node) {
+      return Array.from(node.parentNode.childNodes).indexOf(node);
+    }
+
+    _restorePathBasedSelection(selection) {
+      console.debug('Restoring path-based selection: ', JSON.stringify(selection));
+      return selection.map(this._restorePathBasedRange.bind(this));
+    }
+
+    _restorePathBasedRange(savedRange) {
+      const range = {reversed: savedRange.reversed};
+      if (savedRange.start && savedRange.end) {
+        range.collapsed = savedRange.start.join('/') === savedRange.end.join('/');
+        range.startContainer = this._getNodeByPath(savedRange.start.slice(0, -1));
+        range.startOffset = savedRange.start.at(-1);
+        range.startBefore = this._getNodeAfter(range.startContainer, range.startOffset);
+        range.startAfter = this._getNodeBefore(range.startContainer, range.startOffset);
+        if (range.collapsed) {
+          range.endContainer = range.startContainer;
+          range.endOffset = range.startOffset;
+          range.endBefore = range.startBefore;
+          range.endAfter = range.startAfter;
+        } else {
+          range.endContainer = this._getNodeByPath(savedRange.end.slice(0, -1));
+          range.endOffset = savedRange.end.at(-1);
+          range.endBefore = this._getNodeAfter(range.endContainer, range.endOffset);
+          range.endAfter = this._getNodeBefore(range.endContainer, range.endOffset);
         }
-        if (range.endContainer?.nodeType === Node.TEXT_NODE && updatedNodes.has(range.endContainer)) {
-          delete range.endContainer;
-        }
-        // Invalidate the selection boundaries for which both the left and the right path have changed.
-        [range.startAfter, range.startBefore, range.endAfter, range.endBefore].forEach(oldPath => {
-          const newPath = this._getNodePath(oldPath?.node);
-          if (newPath?.left !== oldPath?.left && newPath?.right !== oldPath?.right) {
-            delete oldPath.node;
-          }
-        });
-      });
+      }
+      return range;
     }
 
     /**
-     * Tries to restore the selection first using the relative ranges, if the selected nodes are still in the DOM, and
-     * then using the text selection, if the selected nodes have been replaced or removed.
+     * Tries to restore the given selection, if it wasn't invalidated by the remote patch, or the text-based
+     * selection otherwise.
      *
-     * @param {Array[Object]} selection an array of objects (relative ranges) that can be used to restore the selection
+     * @param {Array[Object]} selection an array of objects (ranges) that can be used to restore the selection
      */
-    async _restoreSelection(selection) {
-      const invalidRange = selection.find(savedRange =>
-        [savedRange.startContainer, savedRange.startAfter?.node, savedRange.startBefore?.node]
-          .every(node => !node?.isConnected) ||
-        [savedRange.endContainer, savedRange.endAfter?.node, savedRange.endBefore?.node]
-          .every(node => !node?.isConnected));
-      if (invalidRange) {
-        // Some of the selected nodes were removed from the DOM or the selection was in a text node that was modified.
-        // Restore the text selection.
-        await this._editor.restoreSelection();
-      } else if (selection.length) {
-        // The selected nodes are still in the DOM so we can restore the selection using the relative ranges.
-        await this._editor.restoreSelection(selection.map(savedRange => {
-          const range = this._editor.getContentWrapper().ownerDocument.createRange();
-          range.reversed = savedRange.reversed;
-          if (savedRange.startContainer?.isConnected) {
-            range.setStart(savedRange.startContainer, savedRange.startOffset);
-          } else if (savedRange.startBefore?.node?.isConnected) {
-            range.setStartBefore(savedRange.startBefore.node);
-          } else {
-            range.setStartAfter(savedRange.startAfter.node);
-          }
-          if (savedRange.endContainer?.isConnected) {
-            range.setEnd(savedRange.endContainer, savedRange.endOffset);
-          } else if (savedRange.endAfter?.node?.isConnected) {
-            range.setEndAfter(savedRange.endAfter.node);
-          } else {
-            range.setEndBefore(savedRange.endBefore.node);
-          }
-          return range;
-        }));
+    _restoreSelection(selection) {
+      if (!selection?.length) {
+        // The selection was not saved (e.g. because the editor was read-only), so we don't try to restore it.
+        return;
+      }
+      let ranges = selection.map(this._restoreRange.bind(this));
+      if (ranges.includes(undefined)) {
+        // Some of the selection ranges have been invalidated by the remote patch. We invalidate the entire selection
+        // and restore the text-based selection instead.
+        ranges = null;
+        console.debug('Restoring the text-based selection.');
+      }
+      this._editor.restoreSelection(ranges);
+    }
+
+    _restoreRange(savedRange) {
+      const start = this._getRangeBoundary(savedRange.startContainer, savedRange.startOffset, savedRange.startBefore,
+        savedRange.startAfter);
+      const end = savedRange.collapsed ? start : this._getRangeBoundary(savedRange.endContainer, savedRange.endOffset,
+        savedRange.endBefore, savedRange.endAfter);
+      if (start && end) {
+        const range = this._editor.getContentWrapper().ownerDocument.createRange();
+        range.reversed = savedRange.reversed;
+        range.setStart(...start);
+        range.setEnd(...end);
+        return range;
+      }
+    }
+
+    _getRangeBoundary(container, offset, beforeNode, afterNode) {
+      if (container?.isConnected) {
+        return [container, offset];
+      } else if (beforeNode?.isConnected) {
+        return [beforeNode.parentNode, this._getNodeIndex(beforeNode)];
+      } else if (afterNode?.isConnected) {
+        return [afterNode.parentNode, this._getNodeIndex(afterNode) + 1];
       }
     }
 

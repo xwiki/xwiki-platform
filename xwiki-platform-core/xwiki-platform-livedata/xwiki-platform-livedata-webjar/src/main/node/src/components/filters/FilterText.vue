@@ -30,8 +30,8 @@
     type="text"
     size="1"
     :aria-label="$t('livedata.filter.text.label')"
-    :value="fieldValue"
-    @input="updateFieldValue"
+    :value="filterEntry.value"
+    @input="applyFilterWithDelay($event.target.value)"
   />
 </template>
 
@@ -45,24 +45,7 @@ export default {
 
   // Add the filterMixin to get access to all the filters methods and computed properties inside this component
   mixins: [filterMixin],
-
-  data() {
-    return {
-      fieldValue: undefined,
-    }
-  },
-
-  methods: {
-    updateFieldValue(event) {
-      this.fieldValue = event.target.value
-      this.applyFilterWithDelay(this.fieldValue)
-    }
-  },
-
-  mounted() {
-    this.fieldValue = this.filterEntry.value
-  }
-};
+}
 </script>
 
 

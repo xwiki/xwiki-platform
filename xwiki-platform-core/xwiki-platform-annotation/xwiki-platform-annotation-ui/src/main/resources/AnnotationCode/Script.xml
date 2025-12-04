@@ -1793,16 +1793,6 @@ require.config({
   }
 })
 
-define('node-module', ['jquery'], function($) {
-  return {
-    load: function(name, req, onLoad, config) {
-      $.get(req.toUrl(name + '.js'), function(text) {
-        onLoad.fromText(`define(function(require, exports, module) {${text}});`);
-      }, 'text');
-    }
-  }
-});
-
 define('xwiki-text-offset-updater', ['jquery', 'node-module!fast-diff'], function($, diff) {
   /**
    * Compute the changes between different versions of a text.

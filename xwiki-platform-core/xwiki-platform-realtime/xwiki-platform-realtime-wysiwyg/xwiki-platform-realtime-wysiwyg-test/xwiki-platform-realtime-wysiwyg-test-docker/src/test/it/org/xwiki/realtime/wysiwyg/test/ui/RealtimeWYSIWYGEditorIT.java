@@ -391,8 +391,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitForContentRefresh();
 
         // Replace the default message text.
-        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
-        secondTextArea.sendKeys("my info");
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        secondTextArea.sendKeys(Keys.BACK_SPACE, "my info");
 
         //
         // First Tab
@@ -763,8 +763,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitForContentRefresh();
 
         // Replace the default message text.
-        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
-        firstTextArea.sendKeys("one");
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        firstTextArea.sendKeys(Keys.BACK_SPACE, "one");
 
         MacroDialogEditModal firstMacroEditModal = firstEditor.getBalloonToolBar().editMacro();
         firstMacroEditModal.setMacroParameter("title", "Some");
@@ -1040,7 +1040,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitForContentRefresh();
 
         // Select the default information message and delete it.
-        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        firstTextArea.sendKeys(Keys.BACK_SPACE);
 
         // Insert a nested error box.
         firstTextArea.sendKeys("inside", Keys.ENTER, "/err");
@@ -1051,8 +1052,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitForContentRefresh();
 
         // Replace the default error message.
-        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
-        firstTextArea.sendKeys("nested");
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        firstTextArea.sendKeys(Keys.BACK_SPACE, "nested");
 
         // Type some text after the information box.
         firstTextArea.sendKeys(Keys.ARROW_DOWN, "after");
@@ -1847,18 +1848,14 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.dropFile("/realtimeWysiwygEditor.png", false);
-        // The caret is sometimes restored (placed) before the image (depending how local and remote changes are
-        // interleaved), instead of having the image selected. This happens for instance if a remote patch is applied
-        // when the upload widget is replaced by the actual image widget. We have to press the RIGHT arrow twice to be
-        // sure we end up after the image, because pressing once might simply select the image.
-        secondTextArea.sendKeys(Keys.RIGHT, Keys.RIGHT, " green");
+        secondTextArea.sendKeys(Keys.RIGHT, " green");
 
         //
         // First Tab
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        firstTextArea.sendKeys(Keys.LEFT, Keys.chord(Keys.CONTROL, Keys.RIGHT), " yellow ");
+        firstTextArea.sendKeys(Keys.RIGHT, " yellow ");
 
         //
         // Second Tab

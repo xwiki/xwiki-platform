@@ -138,8 +138,8 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    async restoreSelection(ranges) {
-      await this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, {ranges});
+    restoreSelection(ranges) {
+      this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, {ranges, async: false});
 
       // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
       // selection is restored.

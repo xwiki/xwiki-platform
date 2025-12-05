@@ -42,7 +42,7 @@ catalog:
   "@mantine/core": 8.3.6
   "@mantine/hooks": 8.3.6
   "@microsoft/api-extractor": 7.55.1
-  "@playwright/experimental-ct-react": 1.56.1
+  "@playwright/experimental-ct-react": 1.57.0
   "@tsconfig/node24": 24.0.1
   "@types/jsdom": 27.0.0
   "@types/lodash-es": 4.17.12

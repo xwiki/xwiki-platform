@@ -49,6 +49,47 @@
           <skip>true</skip>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Copy the remaining less file. Can be removed once XWIKI-23080 is done. -->
+            <id>copy-less-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>
+                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/less
+              </outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/src/main/node/less</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Copy the remaining less file. Can be removed once XWIKI-23080 is done. -->
+            <id>copy-font-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>
+                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/fonts
+              </outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/src/main/node/fonts</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -99,17 +99,17 @@ public class PageResourceIT extends AbstractHttpIT
         this.childReference = new DocumentReference(this.wikiName, this.spaces, this.childPageName);
 
         // Create a clean test page.
-        this.testUtils.rest().delete(this.reference);
-        Page page = this.testUtils.rest().page(this.reference);
+        getUtil().rest().delete(this.reference);
+        Page page = getUtil().rest().page(this.reference);
         page.setComment("Test page");
-        this.testUtils.rest().save(page);
+        getUtil().rest().save(page);
 
         // Create a clean test page child.
-        this.testUtils.rest().delete(this.childReference);
-        Page childPage = this.testUtils.rest().page(this.childReference);
+        getUtil().rest().delete(this.childReference);
+        Page childPage = getUtil().rest().page(this.childReference);
         childPage.setComment("Test page child");
         childPage.setParent(this.space + '.' + this.pageName);
-        this.testUtils.rest().save(childPage);
+        getUtil().rest().save(childPage);
     }
 
     private Page getFirstPage() throws Exception
@@ -181,19 +181,19 @@ public class PageResourceIT extends AbstractHttpIT
     {
         LocalDocumentReference localDocumentReference = new LocalDocumentReference("Space", "Page with space");
 
-        this.testUtils.rest().savePage(localDocumentReference);
-        Page page = this.testUtils.rest().get(localDocumentReference);
+        getUtil().rest().savePage(localDocumentReference);
+        Page page = getUtil().rest().get(localDocumentReference);
 
         assertEquals("Page with space", page.getName());
 
         // Make sure that the page can be accessed with the white space characters encoded as +
         URI uri = new URI(getBaseURL() + "/wikis/xwiki/spaces/Space/pages/Page+with+space");
-        GetMethod getMethod = this.testUtils.rest().executeGet(uri);
+        GetMethod getMethod = getUtil().rest().executeGet(uri);
 
         assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
 
         try (InputStream stream = getMethod.getResponseBodyAsStream()) {
-            page = this.testUtils.rest().toResource(stream);
+            page = getUtil().rest().toResource(stream);
 
             assertEquals("Page with space", page.getName());
         }
@@ -666,20 +666,20 @@ public class PageResourceIT extends AbstractHttpIT
         DocumentReference childRef1 = new DocumentReference(getWiki(), spaceName, child1);
         DocumentReference childRef2 = new DocumentReference(getWiki(), spaceName, child2);
         try {
-            this.testUtils.rest().delete(parentRef);
-            this.testUtils.rest().delete(childRef1);
-            this.testUtils.rest().delete(childRef2);
-            this.testUtils.rest().savePage(parentRef, "parent content", "parent title");
-            Page childPageObj1 = this.testUtils.rest().page(childRef1);
+            getUtil().rest().delete(parentRef);
+            getUtil().rest().delete(childRef1);
+            getUtil().rest().delete(childRef2);
+            getUtil().rest().savePage(parentRef, "parent content", "parent title");
+            Page childPageObj1 = getUtil().rest().page(childRef1);
             childPageObj1.setParent(spaceName + "." + parentPage);
             childPageObj1.setContent("child1 content");
             childPageObj1.setTitle("child1 title");
-            this.testUtils.rest().save(childPageObj1);
-            Page childPageObj2 = this.testUtils.rest().page(childRef2);
+            getUtil().rest().save(childPageObj1);
+            Page childPageObj2 = getUtil().rest().page(childRef2);
             childPageObj2.setParent(spaceName + "." + parentPage);
             childPageObj2.setContent("child2 content");
             childPageObj2.setTitle("child2 title");
-            this.testUtils.rest().save(childPageObj2);
+            getUtil().rest().save(childPageObj2);
 
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
@@ -710,9 +710,9 @@ public class PageResourceIT extends AbstractHttpIT
             Assert.assertEquals(1, pages.getPageSummaries().size());
             Assert.assertNotEquals(firstName, pages.getPageSummaries().get(0).getName());
         } finally {
-            this.testUtils.rest().delete(parentRef);
-            this.testUtils.rest().delete(childRef1);
-            this.testUtils.rest().delete(childRef2);
+            getUtil().rest().delete(parentRef);
+            getUtil().rest().delete(childRef1);
+            getUtil().rest().delete(childRef2);
         }
     }
 
@@ -721,10 +721,10 @@ public class PageResourceIT extends AbstractHttpIT
     {
         // Setup: Create a page and several versions
         try {
-            this.testUtils.rest().delete(this.reference);
-            this.testUtils.rest().savePage(this.reference, "v1", "title1");
-            this.testUtils.rest().savePage(this.reference, "v2", "title2");
-            this.testUtils.rest().savePage(this.reference, "v3", "title3");
+            getUtil().rest().delete(this.reference);
+            getUtil().rest().savePage(this.reference, "v1", "title1");
+            getUtil().rest().savePage(this.reference, "v2", "title2");
+            getUtil().rest().savePage(this.reference, "v3", "title3");
 
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
@@ -755,7 +755,7 @@ public class PageResourceIT extends AbstractHttpIT
             Assert.assertEquals(1, history.getHistorySummaries().size());
             Assert.assertNotEquals(firstVersion, history.getHistorySummaries().get(0).getVersion());
         } finally {
-            this.testUtils.rest().delete(this.reference);
+            getUtil().rest().delete(this.reference);
         }
     }
 }

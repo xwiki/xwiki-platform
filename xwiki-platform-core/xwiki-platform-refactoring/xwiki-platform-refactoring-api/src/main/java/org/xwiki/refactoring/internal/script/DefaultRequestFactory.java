@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -93,7 +93,7 @@ public class DefaultRequestFactory implements RequestFactory
     private List<String> getJobId(String type, String suffix)
     {
         return Arrays
-            .asList(RefactoringJobs.GROUP, StringUtils.removeStart(type, RefactoringJobs.GROUP_PREFIX), suffix);
+            .asList(RefactoringJobs.GROUP, Strings.CS.removeStart(type, RefactoringJobs.GROUP_PREFIX), suffix);
     }
 
     private void setRightsProperties(AbstractCheckRightsRequest request)
@@ -187,12 +187,18 @@ public class DefaultRequestFactory implements RequestFactory
         return request;
     }
 
-    private void initEntityRequest(EntityRequest request, String type, Collection<EntityReference> entityReferences)
+    private void initRequest(AbstractCheckRightsRequest request, String type)
     {
         request.setId(generateJobId(type));
-        request.setJobType(type);
-        request.setEntityReferences(entityReferences);
+
         setRightsProperties(request);
+    }
+
+    private void initEntityRequest(EntityRequest request, String type, Collection<EntityReference> entityReferences)
+    {
+        initRequest(request, type);
+
+        request.setEntityReferences(entityReferences);
     }
 
     private MoveRequest createMoveRequest(String type, Collection<EntityReference> sources, EntityReference destination)
@@ -226,9 +232,8 @@ public class DefaultRequestFactory implements RequestFactory
     {
         PermanentlyDeleteRequest request = new PermanentlyDeleteRequest();
 
-        request.setId(generateJobId(RefactoringJobs.PERMANENTLY_DELETE));
-        request.setCheckRights(true);
-        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
+        initRequest(request, RefactoringJobs.PERMANENTLY_DELETE);
+
         request.setWikiReference(getCurrentWikiReference());
 
         return request;
@@ -254,9 +259,8 @@ public class DefaultRequestFactory implements RequestFactory
     {
         RestoreRequest request = new RestoreRequest();
 
-        request.setId(generateJobId(RefactoringJobs.RESTORE));
-        request.setCheckRights(true);
-        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
+        initRequest(request, RefactoringJobs.RESTORE);
+
         request.setWikiReference(getCurrentWikiReference());
 
         return request;
@@ -273,10 +277,11 @@ public class DefaultRequestFactory implements RequestFactory
         DocumentReference newUserReference)
     {
         ReplaceUserRequest request = new ReplaceUserRequest();
-        request.setId(generateJobId(RefactoringJobs.REPLACE_USER));
+
+        initRequest(request, RefactoringJobs.REPLACE_USER);
+
         request.setOldUserReference(oldUserReference);
         request.setNewUserReference(newUserReference);
-        setRightsProperties(request);
 
         Collection<String> targetWikis = null;
         if (oldUserReference != null) {

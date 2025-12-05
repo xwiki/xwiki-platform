@@ -19,7 +19,7 @@
  */
 package org.xwiki.export.pdf.internal.chrome;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import javax.inject.Provider;
@@ -36,6 +36,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.github.kklisura.cdt.protocol.commands.Browser;
 import com.github.kklisura.cdt.protocol.commands.Target;
 import com.github.kklisura.cdt.protocol.types.browser.Version;
+import com.github.kklisura.cdt.protocol.types.target.WindowState;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
 import com.github.kklisura.cdt.services.config.ChromeDevToolsServiceConfiguration;
@@ -141,8 +142,9 @@ class ChromeManagerTest
 
         Target browserTarget = mock(Target.class, "browser");
         when(this.browserDevToolsService.getTarget()).thenReturn(browserTarget);
-        when(browserTarget.createBrowserContext(true, null, null)).thenReturn("browserContextId");
-        when(browserTarget.createTarget("", null, null, "browserContextId", false, false, false)).thenReturn("second");
+        when(browserTarget.createBrowserContext(true, null, null, List.of())).thenReturn("browserContextId");
+        when(browserTarget.createTarget("", null, null, null, null, WindowState.NORMAL, "browserContextId", false,
+            null, false, false, false)).thenReturn("second");
 
         ChromeTab firstTab = new ChromeTab();
         ReflectionUtils.setFieldValue(firstTab, "id", "first");
@@ -150,7 +152,7 @@ class ChromeManagerTest
         ChromeTab secondTab = new ChromeTab();
         ReflectionUtils.setFieldValue(firstTab, "id", "second");
 
-        when(this.chromeService.getTabs()).thenReturn(Arrays.asList(firstTab, secondTab));
+        when(this.chromeService.getTabs()).thenReturn(List.of(firstTab, secondTab));
 
         assertNotNull(this.chromeManager.createIncognitoTab());
     }
@@ -190,8 +192,10 @@ class ChromeManagerTest
             this.chromeManager.connect("localhost", 9222);
             fail("We shouldn't be able to connect if we can't get the browser version.");
         } catch (TimeoutException e) {
-            assertEquals("Timeout waiting for Chrome remote debugging to become available."
-                + " Waited [4] seconds. Root cause: [ChromeServiceException: Remote Chrome is not available.]", e.getMessage());
+            assertEquals(
+                "Timeout waiting for Chrome remote debugging to become available."
+                    + " Waited [4] seconds. Root cause: [ChromeServiceException: Remote Chrome is not available.]",
+                e.getMessage());
         }
 
         // It should have tried twice to get the version.
@@ -199,7 +203,8 @@ class ChromeManagerTest
     }
 
     @Test
-    void isConnectedWithTimeout() throws Exception {
+    void isConnectedWithTimeout() throws Exception
+    {
         // First we connect to the Chrome remote debugging and then we simulate that it doesn't respond before the
         // configured timeout.
         when(this.chromeServiceFactory.createChromeService("localhost", 9222)).thenReturn(this.chromeService);

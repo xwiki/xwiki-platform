@@ -25,11 +25,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-like</artifactId>
-    <version>17.5.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-like-ui</artifactId>
   <name>XWiki Platform - Like - UI</name>
-  <description>Like and unlike XWiki entities.</description>
+  <description>Like and unlike pages</description>
   <packaging>xar</packaging>
   <properties>
     <!-- Name to display by the Extension Manager -->

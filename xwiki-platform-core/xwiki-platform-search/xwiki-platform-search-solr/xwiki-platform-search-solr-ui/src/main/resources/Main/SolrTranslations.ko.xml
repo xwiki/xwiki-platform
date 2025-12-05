@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=모든 문서가 선택한 작업의 영향을 받
 solr.admin.indexing.wiki.select_farm=농장 전체
 solr.admin.indexing.query.label=맞춤 쿼리
 solr.admin.indexing.query.hint=인덱스에서 선택한 작업의 영향을 받는 문서를 제한하는 선택적 쿼리입니다.
+### Missing: solr.admin.indexing.query.language.label=Language of the custom query
 solr.admin.info.affectedDocuments=인덱스에서 영향을 받는 문서:
-solr.sortBy=정렬 기준:
-solr.sortBy.score=관련성
-solr.sortBy.title_sort=제목
-solr.sortBy.date=마지막 수정 날짜
-solr.sortBy.author_display_sort=마지막 저자
-solr.sortBy.filename_sort=파일 이름
-solr.sortBy.attsize_sort=파일 크기
-solr.sortBy.attdate_sort=업로드 날짜
-solr.sortBy.attauthor_display_sort=업로드한 사람
-solr.sortOrder.asc=오름차순
-solr.sortOrder.desc=내림차순
-solr.options=보여주다:
-solr.options.highlight=강조
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=각 결과에서 일치된 내용을 추출하여 표시합니다
-solr.options.facet=패싯
+### Missing: search.solr.options.showFacet=Show filters
 solr.options.facet.title=결과의 추가 필터링 허용
 solr.result.language=다음 픽스업이 번역에 적용되었습니다: 너비가 0인 공간
 solr.result.locatedIn=에 위치한
@@ -172,8 +172,20 @@ solr.result.location=0} » {1} » {2}에 위치
 
 ## until 7.2RC1
 solr.field.space=위치
+solr.sortBy=정렬 기준:
+solr.sortBy.score=관련성
+solr.sortBy.title_sort=제목
+solr.sortBy.date=마지막 수정 날짜
+solr.sortBy.author_display_sort=마지막 저자
+solr.sortBy.filename_sort=파일 이름
+solr.sortBy.attsize_sort=파일 크기
+solr.sortBy.attdate_sort=업로드 날짜
+solr.sortBy.attauthor_display_sort=업로드한 사람
+solr.options=보여주다:
+solr.options.highlight=강조
+solr.options.facet=패싯
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend
 </content>
-  </xwikidoc>
+</xwikidoc>

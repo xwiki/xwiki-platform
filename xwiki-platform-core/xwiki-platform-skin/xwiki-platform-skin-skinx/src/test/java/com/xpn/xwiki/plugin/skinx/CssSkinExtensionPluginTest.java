@@ -205,9 +205,10 @@ class CssSkinExtensionPluginTest
         when(ext2.getAuthorReference()).thenReturn(author);
         when(ext3.getAuthorReference()).thenReturn(author);
 
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, author, referenceExt1)).thenReturn(true);
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, author, referenceExt2)).thenReturn(false);
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, author, referenceExt3)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, EntityType.WIKI, author, referenceExt1)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, EntityType.WIKI, author, referenceExt2))
+            .thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, EntityType.WIKI, author, referenceExt3)).thenReturn(true);
 
         when(this.entityReferenceSerializer.serialize(referenceExt1)).thenReturn("extension1");
         when(this.entityReferenceSerializer.serialize(referenceExt3)).thenReturn("extension3");

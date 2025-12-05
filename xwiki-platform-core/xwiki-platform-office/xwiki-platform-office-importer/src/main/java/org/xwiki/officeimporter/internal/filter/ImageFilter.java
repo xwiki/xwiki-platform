@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -214,8 +215,8 @@ public class ImageFilter extends AbstractHTMLFilter
     {
         String result = fileName;
 
-        if (StringUtils.startsWith(fileName, replacePrefix) && replacementPrefix != null) {
-            result = replacementPrefix + StringUtils.removeStart(fileName, replacePrefix);
+        if (Strings.CS.startsWith(fileName, replacePrefix) && replacementPrefix != null) {
+            result = replacementPrefix + Strings.CS.removeStart(fileName, replacePrefix);
         }
 
         return result;

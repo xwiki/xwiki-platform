@@ -23,7 +23,6 @@ import java.util.function.Supplier;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides a block supplier for a given object and (optionally) parameters. This is used to get a {@link Block} for
@@ -42,7 +41,6 @@ import org.xwiki.stability.Unstable;
  * @since 16.3.0RC1
  */
 @Role
-@Unstable
 public interface BlockSupplierProvider<T>
 {
     /**

@@ -19,22 +19,22 @@
  */
 package com.xpn.xwiki.util;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.util.TOCGenerator}.
  * 
  * @version $Id$
  */
-public class TOCGeneratorTest
+class TOCGeneratorTest
 {
     @Test
-    public void testMakeHeadingID()
+    void makeHeadingID()
     {
-        Assert.assertEquals("Hheader", TOCGenerator.makeHeadingID("header", 0, null));
-        Assert.assertEquals("Hheaderwithspace", TOCGenerator.makeHeadingID("header with space", 0, null));
-        Assert.assertEquals("Hheader-1", TOCGenerator.makeHeadingID("header", 1, null));
+        assertEquals("Hheader", TOCGenerator.makeHeadingID("header", 0, null));
+        assertEquals("Hheaderwithspace", TOCGenerator.makeHeadingID("header with space", 0, null));
+        assertEquals("Hheader-1", TOCGenerator.makeHeadingID("header", 1, null));
     }
 }

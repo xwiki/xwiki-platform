@@ -76,7 +76,9 @@
   ],
   'paths': {
     'bootstrap': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-bootstrap', ""js/xwiki-bootstrap${jsExtension}""))",
+    'css': $xwiki.getSkinFile('uicomponents/require/css.js'),
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
+    'node-module': $xwiki.getSkinFile('uicomponents/require/node-module.js'),
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url($jqueryMigrateId, ""dist/jquery-migrate${jsExtension}""))",
@@ -174,6 +176,21 @@ require.config($jsontool.serialize($requireConfig));
 define('jQueryNoConflict', ['jquery'], function($) {
   return $.noConflict();
 });
+##
+## Add support for loading ECMAScript modules with RequireJS.
+##
+(function () {
+  const originalCreateNode = require.createNode;
+  require.createNode = function(config, moduleName, stringURL) {
+    const scriptElement = originalCreateNode.apply(this, arguments);
+    const url = new URL(stringURL, window.location.href);
+    if (url.pathname.endsWith('.es.js')) {
+      scriptElement.type = 'module';
+    }
+    return scriptElement;
+  };
+}());
+##
 if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
   require(['jquery', 'bootstrap'], function ($) {
     // Fix incompatibilities between BootStrap and Prototype
@@ -282,6 +299,17 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
     'forceSkinAction': true,
     'wysiwyg': true
   })##
+#end
+#if ("$!services.security.url.getFrontendUrlCheckPolicy()" != '' &&
+    "$!services.security.url.getFrontendUrlCheckPolicy()" != 'DISABLED')
+<script type="application/json" id="trusted-domains-configuration">
+{
+  "trustedDomains": $jsontool.serialize($services.security.url.getTrustedDomains()),
+  "allowedUrls": $jsontool.serialize($services.security.url.getAllowedFrontendUrls()),
+  "frontendUrlCheckPolicy": $jsontool.serialize($!services.security.url.getFrontendUrlCheckPolicy())
+}
+</script>
+  $xwiki.jsfx.use('uicomponents/link/link-protection.js')##
 #end
 ##
 ## Hooks for inserting JavaScript skin extensions

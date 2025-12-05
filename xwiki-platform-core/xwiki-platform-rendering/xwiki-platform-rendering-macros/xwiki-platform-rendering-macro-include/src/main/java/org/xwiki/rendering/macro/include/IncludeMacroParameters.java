@@ -114,7 +114,7 @@ public class IncludeMacroParameters
      */
     @PropertyDescription("the reference of the resource to display")
     @PropertyDisplayType(EntityReferenceString.class)
-    @PropertyFeature("reference")
+    @PropertyFeature(value = "reference", mandatory = true)
     @PropertyGroup("stringReference")
     public void setReference(String reference)
     {
@@ -223,7 +223,7 @@ public class IncludeMacroParameters
      */
     @PropertyDescription("The reference of the page to include")
     @PropertyDisplayType(PageReference.class)
-    @PropertyFeature("reference")
+    @PropertyFeature(value = "reference", mandatory = true)
     // Display hidden because we don't want to confuse our users by proposing two ways to enter the reference to
     // include and ATM we don't have a picker for PageReference types and we do have a picker for EntityReference string
     // one so we choose to keep the other one visible and hide this one. We're keeping the property so that we don't

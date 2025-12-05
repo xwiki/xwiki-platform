@@ -22,6 +22,7 @@ package org.xwiki.index.tree.internal;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -42,7 +43,7 @@ public class TranslationTreeNode extends AbstractTreeNode
     @Override
     public String getParent(String nodeId)
     {
-        if (StringUtils.startsWith(nodeId, "translation:")) {
+        if (Strings.CS.startsWith(nodeId, "translation:")) {
             String reference = StringUtils.substringBeforeLast(nodeId.substring(12), "/");
             return "translations:" + reference;
         }

@@ -32,6 +32,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -46,8 +47,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -98,9 +97,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
-
-    @Inject
-    private Provider<ContextualAuthorizationManager> authorizationProvider;
 
     @Inject
     private Logger logger;
@@ -885,12 +881,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
-    public boolean hasProgrammingRights()
-    {
-        return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
-    }
-
-    @Override
     @Deprecated
     public String getCurrentUser()
     {
@@ -930,7 +920,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 try {
                     XWikiDocument userDocument = xcontext.getWiki().getDocument(userReference, xcontext);
                     advanced =
-                        StringUtils.equals(userDocument.getStringValue(USERCLASS_REFERENCE, "usertype"), "Advanced");
+                        Strings.CS.equals(userDocument.getStringValue(USERCLASS_REFERENCE, "usertype"), "Advanced");
                 } catch (XWikiException e) {
                     this.logger.error("Failed to get document", e);
                 }

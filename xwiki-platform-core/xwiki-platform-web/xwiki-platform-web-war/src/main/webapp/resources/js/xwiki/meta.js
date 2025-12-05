@@ -60,6 +60,7 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
         // Since 12.3RC1
         // Note that the 'data-xwiki-locale' attribute is set since XWiki 10.4RC1 but it hasn't been exposed here.
         this.locale = html.dataset.xwikiLocale;
+        this.action = html.dataset.xwikiAction;
       } else {
         // Case 2: meta information are stored in deprecated <meta> tags
         // (in colibri)
@@ -73,11 +74,13 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
     }
 
     setVersion(newVersion) {
-      this.version = newVersion;
-      $(document).trigger('xwiki:document:changeVersion', {
-        'version': this.version,
-        'documentReference': this.documentReference
-      });
+      if (newVersion !== this.version) {
+        this.version = newVersion;
+        $(document).trigger('xwiki:document:changeVersion', {
+          'version': this.version,
+          'documentReference': this.documentReference
+        });
+      }
     }
 
     /**

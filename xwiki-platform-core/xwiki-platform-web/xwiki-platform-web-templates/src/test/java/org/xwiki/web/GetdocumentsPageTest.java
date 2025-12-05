@@ -33,9 +33,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.security.SecurityConfiguration;
-import org.xwiki.security.internal.DefaultSecurityConfiguration;
-import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -53,6 +51,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -65,9 +64,8 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     XWikiDateTool.class,
     ModelScriptService.class,
-    SecurityScriptService.class,
-    DefaultSecurityConfiguration.class
 })
+@SecurityScriptServiceComponentList
 class GetdocumentsPageTest extends PageTest
 {
     private static final String GETDOCUMENTS = "getdocuments.vm";
@@ -197,25 +195,13 @@ class GetdocumentsPageTest extends PageTest
     @Test
     void preventDOSAttackOnQueryItemsReturned() throws Exception
     {
-        this.request.put("limit", "101");
-        when(this.queryService.hql(anyString())).thenReturn(this.query);
-        when(this.query.setLimit(anyInt())).thenReturn(this.query);
-        when(this.query.setOffset(anyInt())).thenReturn(this.query);
-        when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
-        when(this.query.bindValues(any(List.class))).thenReturn(this.query);
-
-        // Simulate the query limit
-        SecurityConfiguration securityConfiguration =
-            this.oldcore.getMocker().registerMockComponent(SecurityConfiguration.class);
-        when(securityConfiguration.getQueryItemsLimit()).thenReturn(100);
+        this.request.put("limit", "2000");
 
         this.templateManager.render(GETDOCUMENTS);
 
-        ArgumentCaptor<Integer> argument = ArgumentCaptor.forClass(Integer.class);
-        verify(this.query).setLimit(argument.capture());
-
-        // Verify that even though the guest user is asking for 101 items, we only return 100.
-        assertEquals(100, argument.getValue());
+        // Unfortunately, we cannot verify that an error was sent as the request in the test doesn't store it.
+        // So we can just verify that no query was performed.
+        verifyNoInteractions(this.queryService);
     }
 
     /**

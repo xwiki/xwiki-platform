@@ -19,6 +19,7 @@
  */
 package org.xwiki.container.script;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import jakarta.inject.Inject;
@@ -31,19 +32,24 @@ import org.xwiki.container.Session;
 import org.xwiki.container.internal.script.ScriptRequest;
 import org.xwiki.container.internal.script.ScriptResponse;
 import org.xwiki.container.internal.script.ScriptSession;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.stability.Unstable;
 
 /**
  * The main entry point for a script to manipulate {@link Container} related APIs.
+ * <p>
+ * While this was was introduced in 17.0.0RC1, it became usable only in 17.8.0RC1 and 17.4.5.
  * 
  * @version $Id$
- * @since 17.0.0RC1
+ * @since 17.8.0RC1
+ * @since 17.4.5
  */
 @Unstable
 @Component
+@Named("container")
 @Singleton
-public class ContainerScriptService
+public class ContainerScriptService implements ScriptService
 {
     @Inject
     private Container container;

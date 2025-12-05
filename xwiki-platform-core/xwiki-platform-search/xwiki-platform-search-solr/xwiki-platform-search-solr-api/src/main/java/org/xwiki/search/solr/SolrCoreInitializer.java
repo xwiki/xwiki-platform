@@ -21,7 +21,7 @@ package org.xwiki.search.solr;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
 
 /**
  * An extension point used to inject mandatory Solr cores.
@@ -45,7 +45,10 @@ public interface SolrCoreInitializer
      * @deprecated use {@link #initialize(XWikiSolrCore)} instead
      */
     @Deprecated(since = "16.1.0RC1")
-    void initialize(SolrClient client) throws SolrException;
+    default void initialize(SolrClient client) throws SolrException
+    {
+        initialize(new DefaultXWikiSolrCore(getCoreName(), getCoreName(), client));
+    }
 
     /**
      * Initialize the client after its creation.
@@ -78,7 +81,6 @@ public interface SolrCoreInitializer
      * @throws SolrException when failing to migrate the core
      * @since 16.2.0RC1
      */
-    @Unstable
     default void migrate(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
         // Do nothing by default

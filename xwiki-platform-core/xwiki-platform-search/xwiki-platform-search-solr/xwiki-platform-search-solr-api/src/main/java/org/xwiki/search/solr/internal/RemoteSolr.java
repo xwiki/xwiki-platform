@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -203,7 +204,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     {
         String prefixedCoreName = super.toXWikiCoreName(solrCoreName);
 
-        return StringUtils.removeStart(prefixedCoreName, getCorePrefix());
+        return Strings.CS.removeStart(prefixedCoreName, getCorePrefix());
     }
 
     @Override

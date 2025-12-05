@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-blocknote</artifactId>
+    <version>18.0.0-SNAPSHOT</version>
+  </parent>
+  <packaging>webjar-node</packaging>
+  <artifactId>xwiki-platform-blocknote-webjar</artifactId>
+  <name>XWiki Platform - BlockNote Integration - WebJar</name>
+  <description>The front-end resources (JavaScript, CSS) required by the BlockNote integration in XWiki.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>BlockNote Integration WebJar (Experimental)</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
+     <!-- Vite is already taking care of minification and bundling in an efficient way. -->
+    <xwiki.minification.skip>true</xwiki.minification.skip>
+    <xwiki.extension.javascript.modules.importmap>
+    {
+      "vue": "org.webjars.npm:vue/dist/vue.runtime.esm-browser.prod.js",
+      "vue-i18n": "org.webjars.npm:vue-i18n/dist/vue-i18n.esm-browser.prod.js"
+    }
+    </xwiki.extension.javascript.modules.importmap>
+  </properties>
+  <dependencies>
+    <!-- Requires xwiki-platform-node to be built first to get access to the bundled javascript packages.  -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-node</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <type>pom</type>
+    </dependency>
+    <!-- Runtime webjar dependencies -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>vue</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>vue-i18n</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-remote-resource-plugin</artifactId>
+        <configuration>
+          <properties>
+            <preProjectText>This product includes software that was not developed by 'XWiki' (https://www.xwiki.org) and which has a different license than the XWiki code (LGPL 2.1):
+
+  - BlockNote (https://github.com/TypeCellOS/BlockNote), MPL-2.0 license
+  - Inversify (https://github.com/inversify/monorepo), MIT license
+  - Mantine (https://github.com/mantinedev/mantine), MIT license
+  - Pinia (https://github.com/vuejs/pinia), MIT license
+  - React (https://github.com/facebook/react), MIT license
+
+For a complete list, including transitive dependencies, please check the META-INF/node/pnpm-lock.yaml file included in this JAR.</preProjectText>
+          </properties>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

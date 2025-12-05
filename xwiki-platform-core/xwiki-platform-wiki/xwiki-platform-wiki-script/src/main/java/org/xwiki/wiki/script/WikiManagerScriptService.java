@@ -27,7 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -465,7 +465,7 @@ public class WikiManagerScriptService implements ScriptService
                     String newOwner = descriptor.getOwnerId();
                     isAllowed =
                         authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(), wikiReference)
-                            && StringUtils.equals(newOwner, currentOwner);
+                            && Strings.CS.equals(newOwner, currentOwner);
                 }
             } else {
                 // Saving a descriptor that did not already exist should be reserved to global admins

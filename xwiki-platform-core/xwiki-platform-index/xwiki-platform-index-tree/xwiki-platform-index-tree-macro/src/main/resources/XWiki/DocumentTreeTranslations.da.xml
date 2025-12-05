@@ -57,7 +57,7 @@ rendering.macro.documentTree.parameter.showObjects.description=Om dokument-objek
 rendering.macro.documentTree.parameter.showClassProperties.name=Vis klasse-egenskaber
 rendering.macro.documentTree.parameter.showClassProperties.description=Om klasse-egenskaber skal vises for dokumenter, som definerer klasser.
 rendering.macro.documentTree.parameter.root.name=Rod-ID
-rendering.macro.documentTree.parameter.root.description=Rodens ID Anvendes, hvis du kun vil vise undertræet for en given gren (som så er roden). Træet vises med undertræets gren på først niveau, så roden vises ikke. Hele træet vises, hvis rod-ID ikke angives. Formatet for rod-ID er entitetstype:entitetsreference, hvor entitetstype kan f.eks. være wiki, område, dokument, dvs.: wiki:xwiki, space:xwiki:Main eller document:xwiki:WebHome
+rendering.macro.documentTree.parameter.root.description=Rodens ID Anvendes, hvis du kun vil vise undertræet for en given gren (som så er roden). Træet vises med undertræets gren på først niveau, så roden vises ikke. Hele træet vises, hvis rod-ID ikke angives.
 rendering.macro.documentTree.parameter.showRoot.name=Vis roden
 rendering.macro.documentTree.parameter.showRoot.description=Om roden skal vises eller ej. Roden vises ikke som standard, fordi det som regel er givet ud fra dokument-træets visning (f.eks. en etiket foran træet). Der er dog situationer hvor du har brug for at oprette en ny knude direkte under roden.
 rendering.macro.documentTree.parameter.compact.name=Komprimér
@@ -67,7 +67,7 @@ rendering.macro.documentTree.parameter.links.description=Angiver om grenene i tr
 rendering.macro.documentTree.parameter.checkboxes.name=Check-bokse
 rendering.macro.documentTree.parameter.checkboxes.description=Om der skal sættes en check-boks ved gren i træet så man kan vælge flere dokumenter samtidig.
 rendering.macro.documentTree.parameter.openTo.name=Åben
-rendering.macro.documentTree.parameter.openTo.description=ID for grenen, som træet skal åbnes med. Alle grene op til roden af grenen åbes også. Gren-formatet er den som er angivet for roden.
+rendering.macro.documentTree.parameter.openTo.description=ID for grenen, som træet skal åbnes med. Alle grene op til roden af grenen åbes også.
 rendering.macro.documentTree.parameter.showOnlyViewable.name=Vis kun læsbare
 rendering.macro.documentTree.parameter.showOnlyViewable.description=Vis kun wiki, området og dokumenter i træet, som bruger har rettigheder til at se. Hvis ikke sat, vil bruger kunne se dokumenternes navne, men vil ikke være i stand til at se indhold. (Dog vil bruger så vide, at de eksisterer).
 rendering.macro.documentTree.parameter.filterByClass.name=Filtrér efter klasse
@@ -82,13 +82,36 @@ rendering.macro.documentTree.parameter.limit.name=Grænse
 rendering.macro.documentTree.parameter.limit.description=Grænsen for antal delknuder der vises, når en knude udvides for første gang. Resten af delknuderne findes under en "Mere..." henvisning. Grænsen bruges til at opdele delknuderne og hjælper når træet vokser og antallet af delknuder er højt.
 rendering.macro.documentTree.parameter.exclusions.name=Ekskluderinger
 rendering.macro.documentTree.parameter.exclusions.description=Liste af knuder, der er udelukket fra træet. Knuderne angives med deres id, adskildt af komma.
-
+### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.name=Sort pages by
+### Missing: rendering.macro.documentTree.parameter.sortDocumentsBy.description=The page field used to sort the child pages, followed by the sort order.
+### Missing: rendering.macro.documentTree.parameter.expandToLevel.name=Expand to level
+### Missing: rendering.macro.documentTree.parameter.expandToLevel.description=Define the depth of the tree to expand automatically. Default is 0 and means that only top level nodes are displayed. A level of 1 opens those, a level of 2 also opens the children below the newly displayed nodes, etc. Note that a high value can make the macro expansive to display for the browser.
+### Missing: rendering.macro.children.name=Children
+### Missing: rendering.macro.children.description=Displays a tree of children pages of the current page
+### Missing: rendering.macro.children.parameter.sort.name=Sort by
+### Missing: rendering.macro.children.parameter.sort.description=The page field used to sort the child pages, followed by the sort order.
+### Missing: rendering.macro.children.parameter.root.name=Root
+### Missing: rendering.macro.children.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified.
+### Missing: rendering.macro.documentTree.group.show.name=Elements to show
+### Missing: rendering.macro.documentTree.group.filters.name=Filters
+### Missing: rendering.macro.documentTree.group.style.name=Display options
 index.documentTree.empty=Ingen sider fundet
 index.documentTree.more=[0] mere ...
+### Missing: index.documentTree.addDocument=New page...
+### Missing: index.documentTree.documentSortDisplayer.field=Sort field
+### Missing: index.documentTree.documentSortDisplayer.field.default=---
+### Missing: index.documentTree.documentSortDisplayer.field.title=Title
+### Missing: index.documentTree.documentSortDisplayer.field.date=Last modification date
+### Missing: index.documentTree.documentSortDisplayer.field.creationDate=Creation date
+### Missing: index.documentTree.documentSortDisplayer.order=Sort order
+### Missing: index.documentTree.documentSortDisplayer.order.default=---
+### Missing: index.documentTree.documentSortDisplayer.order.asc=Ascending
+### Missing: index.documentTree.documentSortDisplayer.order.desc=Descending
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Vis underdokumenter
-rendering.macro.documentTree.parameter.showChildDocuments.description=Om underdokumenter ("child") skal vises, baseret på dokumentets "parent"-felt.</content>
+rendering.macro.documentTree.parameter.showChildDocuments.description=Om underdokumenter ("child") skal vises, baseret på dokumentets "parent"-felt.
+</content>
 </xwikidoc>

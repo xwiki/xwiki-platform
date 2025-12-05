@@ -171,4 +171,16 @@ export default {
   text-align: center;
 }
 
+.livedata-dropdown-menu .dropdown-menu {
+  /* Dividers within the dropdown with an improved semantic representation */
+  li:has(> ul) + li:has(> ul) {
+    padding-top: calc(.5lh - 1px);
+    border-top: solid 1px var(--dropdown-divider-bg);
+  }
+
+  li:has(> ul):has(+ li > ul) {
+    margin-bottom: calc(.5lh - 1px);
+  }
+}
+
 </style>

@@ -57,7 +57,7 @@ import static java.util.Map.entry;
 import static java.util.Map.ofEntries;
 import static java.util.stream.Collectors.joining;
 import static javax.script.ScriptContext.ENGINE_SCOPE;
-import static org.apache.commons.lang.StringEscapeUtils.escapeXml;
+import static org.apache.commons.text.StringEscapeUtils.escapeXml11;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_REVIEWED_SAFE;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_SAFE_EXPLANATIONS;
@@ -227,7 +227,11 @@ public class SolrToLiveDataEntryMapper
 
     private Double buildMaxCVSS(SolrDocument doc)
     {
-        return this.solrUtils.get(SECURITY_MAX_CVSS, doc);
+        Double result = this.solrUtils.get(SECURITY_MAX_CVSS, doc);
+        if (result == null) {
+            result = 0.0;
+        }
+        return result;
     }
 
     private String buildExtensionId(SolrDocument doc)
@@ -250,10 +254,10 @@ public class SolrToLiveDataEntryMapper
         }
         String url = getExtensionManagerLink(extensionId);
 
-        String extensionNameEscaped = escapeXml(String.valueOf(extensionName));
-        String extensionIdEscaped = escapeXml(buildExtensionId(doc));
+        String extensionNameEscaped = escapeXml11(String.valueOf(extensionName));
+        String extensionIdEscaped = escapeXml11(buildExtensionId(doc));
         return String.format("<a href='%s' title='%s'>%s</a><br/><span class='xHint' title='%s'>%s</span>",
-            escapeXml(url),
+            escapeXml11(url),
             extensionNameEscaped,
             extensionNameEscaped,
             extensionIdEscaped,

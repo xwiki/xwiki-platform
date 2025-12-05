@@ -19,9 +19,8 @@
  */
 package org.xwiki.filter.xar;
 
-import org.junit.runner.RunWith;
-import org.xwiki.filter.test.integration.FilterTestSuite;
-import org.xwiki.filter.test.integration.FilterTestSuite.Scope;
+import org.xwiki.filter.test.integration.junit5.FilterTest;
+import org.xwiki.filter.test.integration.junit5.FilterTest.Scope;
 import org.xwiki.test.annotation.AllComponents;
 
 /**
@@ -30,9 +29,8 @@ import org.xwiki.test.annotation.AllComponents;
  * 
  * @version $Id$
  */
-@RunWith(FilterTestSuite.class)
 @AllComponents
 @Scope(value = "document"/*, pattern = "new1.test"*/)
-public class DocumentIntegrationTests
+public class DocumentIntegrationTests extends FilterTest
 {
 }

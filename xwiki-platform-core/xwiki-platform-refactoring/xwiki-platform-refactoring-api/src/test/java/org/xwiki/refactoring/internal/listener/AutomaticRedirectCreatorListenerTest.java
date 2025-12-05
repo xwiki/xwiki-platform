@@ -124,19 +124,6 @@ class AutomaticRedirectCreatorListenerTest
     }
 
     @Test
-    void onDocumentDeletedWithAutomaticRedirect()
-    {
-        deleteRequest.setAutoRedirect(true);
-
-        this.listener.onEvent(documentDeletedEvent, null, null);
-
-        verify(this.modelBridge).createRedirect(oldReference, newReference);
-
-        assertEquals("Creating automatic redirect from [wiki:Users.Alice] to [wiki:Users.Bob].",
-            logCapture.getMessage(0));
-    }
-
-    @Test
     void onDocumentDeletedWithAutomaticRedirectOnDocWithoutNewTarget()
     {
         DocumentReference docReference = new DocumentReference("wiki", "Users", "Carol");

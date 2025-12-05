@@ -37,10 +37,10 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>captcha.jcaptcha=JCaptcha
-captcha.jcaptcha.displayer.image.alt=CAPTCHA d'image
+captcha.jcaptcha.displayer.image.alt=CAPTCHA image
 captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=Votre navigateur ne supporte pas l'élément audio.
 captcha.jcaptcha.displayer.audio.play=Écouter
-captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha n'est pas correctement configuré.
+captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha n'est pas correctement configuré
 captcha.jcaptcha.displayer.refresh=Actualiser
 captcha.jcaptcha.displayer.answer.placeholder=Réponse
 XWiki.Captcha.JCaptcha.ConfigurationClass_type=Type
@@ -50,16 +50,16 @@ XWiki.Captcha.JCaptcha.ConfigurationClass_type_sound=Son
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_text=Texte
 XWiki.Captcha.JCaptcha.ConfigurationClass_engine=Moteur
 XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=Le type de moteur à utiliser pour afficher un CAPTCHA.
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=Default Gimpy (Gmail)
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Simple List
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Non Linear Text Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=Moteur de CAPTCHA (Gimpy) par défaut (Gmail)
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Liste simple
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Texte non linéaire Gimpy
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=Hotmail
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Deformed Baffle List Gimpy
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Baffle List Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Liste Gimpy avec perturbations et déformations
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Liste Gimpy avec perturbations
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
-captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
-captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Simple List
-captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simple Math
+captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Epeleur audio
+captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Liste simple
+captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Opération simple
 captcha.jcaptcha.engine.custom=Personnalisé :
 </content>
 </xwikidoc>

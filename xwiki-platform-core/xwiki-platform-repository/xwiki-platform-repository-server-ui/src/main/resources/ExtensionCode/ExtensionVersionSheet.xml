@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.ExtensionVersionSheet" locale="">
+<xwikidoc version="1.6" reference="ExtensionCode.ExtensionVersionSheet" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionVersionSheet</name>
   <language/>
@@ -31,19 +31,151 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>ExtensionVersion Sheet</title>
+  <title>#if($doc.getObject('ExtensionCode.ExtensionVersionClass'))$doc.getObject('ExtensionCode.ExtensionVersionClass').getProperty('name').value $doc.getObject('ExtensionCode.ExtensionVersionClass').getProperty('version').value#{else}Extension version sheet#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-## You can modify this page to customize the presentation of your object.
-## At first you should keep the default presentation and just save the document.
+  <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
-#set($class = $doc.getObject('ExtensionCode.ExtensionVersionClass').xWikiClass)
-#foreach($prop in $class.properties)
-  ; $prop.prettyName
-  : $doc.display($prop.getName())
+{{template name="extension.vm"/}}
+
+{{velocity output="false"}}
+#if ($xcontext.action == 'edit')
+  #set($isEditMode = true)
+#else
+  #set($isViewMode = true)
+#end
+
+#set($extension = $doc.getObject("ExtensionCode.ExtensionClass"))
+#set($extensionVersion = $doc.getObject("ExtensionCode.ExtensionVersionClass"))
+{{/velocity}}
+
+{{velocity}}
+#if ($extensionVersion &amp;&amp; !$extension)
+  #set($type = $extensionVersion.getProperty('type').value)
+  #set ($extensionTypeDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionTypeClass) as type where type.id = :id').bindValue("id", $type).execute())
+  #if ($extensionTypeDocumentNames.size() &gt; 0)
+    #set ($extensionTypeDocumentName = $extensionTypeDocumentNames.get(0))
+    #set($extensionTypeObject = $xwiki.getDocument($extensionTypeDocumentName).getObject("ExtensionCode.ExtensionTypeClass"))
+  #end
+  
+  $doc.use("ExtensionCode.ExtensionVersionClass")
+  ##------- Back button ----------------
+  [[$services.icon.render('left')  Extension page&gt;&gt;$services.model.serialize($doc.getDocumentReference().getParent().getParent().getParent())||class="btn btn-primary"]]##
+
+  #if ($isViewMode)
+    ##------- Icon &amp; Summary -----------------
+    (% class="extensionSummary" %)
+    **${services.rendering.escape($doc.getValue('summary'), 'xwiki/2.1')}**
+
+    ## Viewing
+    ##
+    {{box cssClass="floatinginfobox col-xs-12 col-sm-6 pull-right"}}
+      (% class="extensionInfo" %)
+      ##------- Type --------------
+      #set($typeDisplay = $extensionTypeObject.getProperty('name').value)
+      #if ("$!typeDisplay" == '')
+        #set($typeDisplay = $type)
+      #end
+      |(% class="label" width='30%' %)Type(%%)|$services.rendering.escape($typeDisplay, 'xwiki/2.1')
+      ##------- Category --------------
+      #set($categoryDisplay = $extensionVersion.getProperty('category').value)
+      #if ("$!categoryDisplay" == '')
+        #set($categoryDisplay = $category)
+      #end
+      #if ($categoryDisplay)
+      |(% class="label" width='30%' %)Category(%%)|$services.rendering.escape($categoryDisplay, 'xwiki/2.1')
+      #end
+      ##------- Developed By --------
+      #set($authors = $doc.getValue("authors"))
+      |(% class="label" %)Developed by(%%)|#if ($authors.isEmpty())
+          Unknown
+        #else
+          $doc.display('authors')
+        #end
+      ##------- Website --------------
+      #set($website = $extensionVersion.getProperty("website").value)
+      #if ("$!website" != '')
+        |(% class="label" %)Website(%%)|#if ($website.length() &gt; 40)
+                                          [[$services.rendering.escape($services.rendering.escape($website.substring(0, 40), 'xwiki/2.1'), 'xwiki/2.1')...&gt;&gt;$services.rendering.escape($website, 'xwiki/2.1')]]
+                                        #else
+                                          [[$services.rendering.escape($website, 'xwiki/2.1')]]
+                                        #end
+      #end
+      ##------- License --------
+      #set($licenseName = $doc.getValue("licenseName"))
+      #if ("$!licenseName" != "")
+        |(% class="label" %)License(%%)|$services.rendering.escape($licenseName, 'xwiki/2.1')
+      #else
+        |(% class="label" %)License(%%)|Unknown
+      #end
+      ##---------------------------------
+      ##------- Sheet extensions --------
+      #if (!$sheetExtensions.isEmpty())
+
+        #foreach($sheetExtension in $sheetExtensions)
+          $doc.display('view_info', 'view', $sheetExtension)
+        #end
+      #end
+      ##-------------------------------------------
+      ##------- Extension Manager -----------------
+      #if ($doc.getValue('validExtension') == 1)
+
+        {{success}}**Installable with the Extension Manager**{{/success}}
+      #end
+      ##------------------------
+      (%class="btn-group pull-right"%)(((
+        ##------- Download button ------
+        #set ($version = $extensionVersion.getProperty('version').value)
+        #set ($download = $extensionVersion.getProperty('download').value)
+        #if ("$!download" == '')
+        #if ($doc.getAttachment("${id}-${version}.${type}"))
+        [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape("attach:${id}-${version}.${type}")||class="btn btn-primary"]]##
+        #end
+        #else
+        [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($download, 'xwiki/2.1')||class="btn btn-primary"]]##
+        #end
+        ##------- Source --------
+        #set($source = $extensionVersion.getProperty("source").value)
+        #if ("$!source" != "")
+          [[Sources&gt;&gt;$services.rendering.escape($source, 'xwiki/2.1')||class="btn btn-default"]]##
+        #end
+      )))
+    {{/box}}
+
+    {{box cssClass="toc col-xs-12 col-sm-6"}}(% class="label" %)Table of contents(%%)((({{toc/}}))){{/box}}
+    (%class="clearfix"%)((()))
+  #end
+
+    ## Release notes
+    = Release Notes =
+    #set($releaseNotes = $doc.getValue("notes"))
+    $doc.display('notes')
+
+  #if ($isViewMode)
+    #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $version))
+    #if ($extensionDependencies.size() &gt; 0)
+      = Dependencies =
+
+       Dependencies for this extension ($services.rendering.escape("${extensionVersion.getValue('id')} ${version}", 'xwiki/2.1')):
+       #foreach($extensionDependency in $extensionDependencies)
+        #set($dependencyDocumentName = $null)
+        #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
+        #if (!$dependencyDocumentNames.isEmpty())
+          #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
+        #end
+        #if ($dependencyDocumentName)
+          * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
+        #else
+          * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
+        #end
+      #end
+    #end
+  #end
+
+#else
+  This class sheet must be applied on a document containing an ExtensionCode.ExtensionVersionClass object
 #end
 {{/velocity}}</content>
   <object>
@@ -63,6 +195,311 @@
     </class>
     <property>
       <defaultEditMode/>
+    </property>
+  </object>
+  <object>
+    <name>ExtensionCode.ExtensionVersionSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>6a915691-5ff6-4850-98ab-917595c2fc10</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.extensionSummary {
+  background-color: $theme.backgroundSecondaryColor;
+  border: 1px dotted $theme.borderColor;
+  padding: 5px;
+  display: block;
+}
+
+.main .extensionInfo {
+  margin: 0;
+}
+
+.extensionInfo .label {
+  font-size: 0.85em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/*Rating*/
+.extensionInfo .rating-wrapper {
+  float: left;
+}
+
+.extensionInfo .rating-container &gt; div {
+  float: left;
+  margin-right: 10px
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Extension CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>ExtensionCode.ExtensionVersionSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>ac3e481a-5ec9-41eb-9a4d-9b109bcae4be</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.extensionSummary td, /* PROBLEM: General styling reset */
+.extensionInfo td {
+  border: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@media (min-width: 768px) {
+  .box.floatinginfobox, .box.toc {
+    max-width: 49%;
+  }
+}
+
+.box .label {  /* PROBLEM: Usage of a class with meaning inside Bootstrap */
+  color: inherit;
+  text-align: inherit;
+  display: table-cell;
+}
+
+.toc .label {
+  margin: 0;
+}
+
+/* Download and Source button alignment */
+.box &gt; p {
+  margin-bottom: 0;
+}
+
+/* Spacing for repository info message */
+.box .extensionInfo {
+  margin-top: 10px;
+}
+
+/* XINFRA-134: Aligning table cell text */
+.floatinginfobox td {
+  vertical-align: baseline;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Junco</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>currentPage</use>
     </property>
   </object>
 </xwikidoc>

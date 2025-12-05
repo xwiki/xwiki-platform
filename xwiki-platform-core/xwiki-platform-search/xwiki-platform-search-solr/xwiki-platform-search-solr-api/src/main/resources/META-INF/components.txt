@@ -4,7 +4,6 @@ org.xwiki.search.solr.internal.DefaultSolrFieldNameEncoder
 org.xwiki.search.solr.internal.DefaultSolrIndexer
 org.xwiki.search.solr.internal.DefaultIndexingUserConfig
 org.xwiki.search.solr.internal.DefaultSolrUtils
-org.xwiki.search.solr.internal.EmbeddedSolr
 org.xwiki.search.solr.internal.IndexingUserClassInitializer
 org.xwiki.search.solr.internal.IndexingUserConfigurationInitializer
 org.xwiki.search.solr.internal.RemoteSolr
@@ -38,4 +37,7 @@ org.xwiki.search.solr.internal.reference.SolrDocumentReferenceResolver
 org.xwiki.search.solr.internal.reference.SolrEntityReferenceResolver
 org.xwiki.search.solr.internal.reference.SpaceSolrReferenceResolver
 org.xwiki.search.solr.internal.reference.WikiSolrReferenceResolver
+org.xwiki.search.solr.internal.search.SearchCoreInitializer
+org.xwiki.search.solr.internal.search.SearchCoreMigrationManager
+org.xwiki.search.solr.internal.search.V170700000SearchCoreMigration
 org.xwiki.search.solr.script.SolrIndexScriptService

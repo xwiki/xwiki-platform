@@ -36,6 +36,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class CKEditorToolBar extends BaseElement
 {
+    private static final String SOURCE = "source";
+
     protected final WebElement container;
 
     /**
@@ -129,7 +131,7 @@ public class CKEditorToolBar extends BaseElement
      */
     public void toggleSourceMode()
     {
-        clickButton("source");
+        clickButton(SOURCE);
         // Wait for the conversion between HTML and wiki syntax (source) to be done.
         getDriver().waitUntilElementDisappears(this.container, By.cssSelector(".cke_button__source_icon.loading"));
     }
@@ -139,7 +141,31 @@ public class CKEditorToolBar extends BaseElement
      */
     public boolean canToggleSourceMode()
     {
-        return hasButton("source", sourceButton -> sourceButton.isDisplayed() && sourceButton.isEnabled());
+        return hasButton(SOURCE, sourceButton -> sourceButton.isDisplayed() && sourceButton.isEnabled());
+    }
+
+    /**
+     * @return {@code true} if the editor is currently in Source mode, {@code false} otherwise
+     * @since 16.10.12
+     * @since 17.4.5
+     * @since 17.8.0
+     */
+    public boolean isInSourceMode()
+    {
+        return hasButton(SOURCE,
+            sourceButton -> sourceButton.isDisplayed() && sourceButton.getAttribute("class").contains("cke_button_on"));
+    }
+
+    /**
+     * Toggle the full screen mode by clicking the dedicated tool bar button.
+     *
+     * @since 16.10.12
+     * @since 17.4.5
+     * @since 17.8.0
+     */
+    public void toggleFullScreenMode()
+    {
+        clickButton("maximize");
     }
 
     /**

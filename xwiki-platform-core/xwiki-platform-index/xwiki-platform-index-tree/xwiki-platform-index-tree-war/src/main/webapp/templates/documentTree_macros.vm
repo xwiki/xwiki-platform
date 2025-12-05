@@ -106,10 +106,8 @@
   ##   used; the icon theme API is currently only able to render an icon but there's no way to get the icon configuration
   ##   as jsTree expects it. The alternative is to use the HTML source to feed the tree but then the tree definition and
   ##   configuration becomes complex.
-  ## We don't load the FontAwesome CSS directly from its WebJar because it contains some relative paths that currently are
-  ## not handled correctly by the WebJar action. This has been fixed in the FontAwesome icon theme so we load the theme
-  ## SSX instead.
-  #set ($discard = $xwiki.ssx.use('IconThemes.FontAwesome'))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.webjars:font-awesome', 'css/font-awesome.min.css'), {
+    'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($_options = $macro.options)
   #tree($_options)
 #end

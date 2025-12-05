@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="ExtensionCode.ExtensionSheet" locale="">
+<xwikidoc version="1.6" reference="ExtensionCode.ExtensionSheet" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionSheet</name>
   <language/>
@@ -141,15 +141,6 @@
       #end
       ##------- Rating --------
       |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference)
-      ##------- Website --------------
-      #set($website = $extension.getProperty("website").value)
-      #if ("$!website" != '')
-        |(% class="label" %)Website(%%)|#if ($website.length() &gt; 40)
-                                          [[$services.rendering.escape($services.rendering.escape($website.substring(0, 40), 'xwiki/2.1'), 'xwiki/2.1')...&gt;&gt;$services.rendering.escape($website, 'xwiki/2.1')]]
-                                        #else
-                                          [[$services.rendering.escape($website, 'xwiki/2.1')]]
-                                        #end
-      #end
       ##------- License --------
       #set($licenseName = $doc.getValue("licenseName"))
       #if ("$!licenseName" != "")
@@ -173,29 +164,34 @@
       #end
       ##------------------------
       (%class="btn-group pull-right"%)(((
-        ##------- Download button ------
-        #set($lastVersion = $doc.getValue("lastVersion"))
-        #if ("$!lastVersion" != '')
-          #set ($lastVersionObject = $doc.getObject("ExtensionCode.ExtensionVersionClass", 'version', $lastVersion))
-          #set ($version = $lastVersionObject.getProperty('version').value)
-          #set ($download = $lastVersionObject.getProperty("download").value)
-          #if ("$!download" == '')
-            #if ($doc.getAttachment("${id}-${version}.${type}"))
-              [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape("attach:${id}-${version}.${type}")||class="btn btn-primary"]]##
-            #end
-          #else
-            [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($download, 'xwiki/2.1')||class="btn btn-primary"]]##
-          #end
+        ##------- Website button --------------
+        #set($website = $extension.getProperty("website").value)
+        #if ("$!website" != '')
+          [[$services.icon.render('book') Documentation>>$services.rendering.escape($website, 'xwiki/2.1')||class="btn btn-primary"]]##
         #end
         ##------- Source --------
         #set($source = $doc.getValue("source"))
         #if ("$!source" != "")
-          [[Sources&gt;&gt;$services.rendering.escape($source, 'xwiki/2.1')||class="btn btn-default"]]##
+          [[$services.icon.render('file-text') Sources&gt;&gt;$services.rendering.escape($source, 'xwiki/2.1')||class="btn btn-default"]]##
         #end
         ##------- Issues --------
         #set($issues = $doc.getValue("issueManagementURL"))
         #if ("$!issues" != "")
-          [[Issues&gt;&gt;$services.rendering.escape($issues, 'xwiki/2.1')||class="btn btn-default"]]##
+          [[$services.icon.render('bug') Issues&gt;&gt;$services.rendering.escape($issues, 'xwiki/2.1')||class="btn btn-default"]]##
+        #end
+        ##------- Download button ------
+        #set($lastVersion = $doc.getValue("lastVersion"))
+        #if ("$!lastVersion" != '')
+          #set ($lastVersionObject = $services.repository.getVersionObject($extension.getProperty('id').value, $lastVersion))
+          #set ($version = $lastVersionObject.getProperty('version').value)
+          #set ($download = $lastVersionObject.getProperty("download").value)
+          #if ("$!download" == '')
+            #if ($doc.getAttachment("${id}-${version}.${type}"))
+              [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape("attach:${id}-${version}.${type}")||class="btn btn-default"]]##
+            #end
+          #else
+            [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($download, 'xwiki/2.1')||class="btn btn-default"]]##
+          #end
         #end
       )))
     {{/box}}
@@ -256,14 +252,19 @@
     #end
   #end
 
-    = Description =
-    #if ($isViewMode)
+    ## If there's a website specified, then don't display the Description (since Description is a local documentation).
+    #if (($isViewMode &amp;&amp; "$!website" == '') || !$isViewMode)
+      = Description =
+    #end
+    #if ($isViewMode &amp;&amp; "$!website" == '')
       ## Make sure to resolve reference based on the right document
       {{context transformationContext="document" restricted=true}}
         $doc.getValue('description')
       {{/context}}
-    #else
+    #elseif (!$isViewMode)
+      (((
       $doc.display('description')
+      )))
     #end
 
     #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
@@ -294,7 +295,9 @@
       #if ($isEditMode)
         == Custom installation instructions
 
+        (((
         $extension.display('installation', 'edit')
+        )))
       #elseif ($extraInstallation != '')
         {{context transformationContext="document" restricted=true}}
           $extraInstallation
@@ -303,7 +306,12 @@
     #end
 
     ## Only display release notes if there are downloads and release notes
-    #if ($lastVersionObject)
+    #if ($doc.getValue('versionPage') == 1)
+      #set ($versionPageRef = $services.model.createEntityReference('Versions', 'page', $doc.pageReference))
+      = Versions =
+
+      {{include page="$services.rendering.escape($services.model.serialize($versionPageRef), 'xwiki/2.1')"/}}
+    #elseif ($lastVersionObject)
       #set ($releaseNotes = [])
       #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
       #foreach ($versionObject in $versions)
@@ -322,23 +330,23 @@
           $entry.get(1)
         #end
       #end
+    #end
 
-      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
-      #if ($extensionDependencies.size() &gt; 0)
-        = Dependencies =
+    #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
+    #if ($extensionDependencies.size() &gt; 0)
+      = Dependencies =
 
-         Dependencies for this extension ($services.rendering.escape("${extension.getValue('id')} ${doc.getValue('lastVersion')}", 'xwiki/2.1')):
-         #foreach($extensionDependency in $extensionDependencies)
-          #set($dependencyDocumentName = $null)
-          #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
-          #if (!$dependencyDocumentNames.isEmpty())
-            #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
-          #end
-          #if ($dependencyDocumentName)
-            * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
-          #else
-            * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
-          #end
+       Dependencies for this extension ($services.rendering.escape("${extension.getValue('id')} ${doc.getValue('lastVersion')}", 'xwiki/2.1')):
+       #foreach($extensionDependency in $extensionDependencies)
+        #set($dependencyDocumentName = $null)
+        #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
+        #if (!$dependencyDocumentNames.isEmpty())
+          #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
+        #end
+        #if ($dependencyDocumentName)
+          * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
+        #else
+          * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
         #end
       #end
     #end
@@ -405,8 +413,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -426,6 +437,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -435,6 +447,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -470,6 +484,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -494,6 +510,11 @@
   border: 1px dotted $theme.borderColor;
   padding: 5px;
   display: block;
+}
+
+.floatinginfobox .wikiexternallink {
+  background: none;
+  padding: 0;
 }
 
 .main .extensionInfo {
@@ -545,8 +566,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -566,6 +590,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -575,6 +600,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -610,6 +637,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

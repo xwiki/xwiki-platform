@@ -53,5 +53,27 @@
   &lt;/dl&gt;
 &lt;/div&gt;
 {{/html}}
+
+=={{translation key="repository.supportplan.sheet.supportedExtensions"/}}==
+
+{{liveData
+  id="supportedExtensions"
+  source="liveTable"
+  properties="name,summary,category,authors,doc.creationDate,doc.date,supportPlans"
+  sourceParameters="translationPrefix=extension.repository.&amp;className=ExtensionCode.ExtensionClass&amp;supportPlans=${escapetool.url($doc.fullName)}"
+  sort="name:asc"
+}}
+{
+  "meta": {
+    "propertyDescriptors": [
+      {
+        "id": "supportPlans",
+        "type": "hidden",
+        "visible": false
+      }
+    ]
+  }
+}
+{{/liveData}}
 {{/velocity}}</content>
 </xwikidoc>

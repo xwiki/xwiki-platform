@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="AnnotationCode.Script" locale="">
+<xwikidoc version="1.6" reference="AnnotationCode.Script" locale="">
   <web>AnnotationCode</web>
   <name>Script</name>
   <language/>
@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>
 </content>
   <object>
@@ -1328,7 +1329,7 @@ XWiki.Annotation = Class.create({
     } else {
       // Show the bubble and fetch the annotation display in it.
       var bubble = this.displayLoadingBubble(event.element().cumulativeOffset().top,
-        event.element().cumulativeOffset().left);
+        event.element().cumulativeOffset().left, true);
       bubble.writeAttribute('id', bubbleId);
       this.fetchAndShowAnnotationDetails(id, bubble);
     }
@@ -1361,22 +1362,36 @@ XWiki.Annotation = Class.create({
     }.bind(this));
   },
 
-  displayLoadingBubble : function(top, left) {
-    // create an element with the form
+  displayLoadingBubble : function(verticalCoordinate, horizontalCoordinate, hasMarker) {
+    // create a bubble element wrapping the form
     var bubble = new Element('div', {'class' : 'annotation-bubble'});
-    // and a nice loading panel inside
+    // Add a nice loading panel inside
     bubble.insert({top : new Element('div', {'class' : 'loading'})});
-    // and put it in the content
+    // Position it off-screen at first, before we measure it and compute its final position
+    bubble.style.top = verticalCoordinate + 'px';
+    bubble.style.left = '-100%';
+    // and insert the bubble in the content
     document.body.insert({bottom : bubble});
-    // make it hidden for the moment
-    bubble.toggleClassName('hidden');
-    // position it
-    bubble.style.left = left + 'px';
-    bubble.style.top = top + 'px';
-    // make it visible
-    bubble.toggleClassName('hidden');
     // put this bubble in the bubbles stack
     this.bubbles.push(bubble);
+    // position the bubble
+    // By default, we position it to the right and under the coordinates
+    // Position it horizontally.
+    let bubbleStyles = getComputedStyle(bubble);
+    // The width in pixels of the annotation marker added in the text.
+    const markerWidth = 10;
+    let markerOffset = hasMarker ? -markerWidth : 0;
+    let bubbleWidth = bubble.offsetWidth 
+      + parseInt(bubbleStyles.marginLeft)
+      + parseInt(bubbleStyles.marginRight);
+    if (horizontalCoordinate &lt; bubbleWidth 
+      || horizontalCoordinate + markerOffset + bubbleWidth &lt; window.innerWidth) {
+      bubble.style.left = horizontalCoordinate + 'px';
+    } else {
+      // There isn't enough space on the right of the window to fit the modal, and there is enough on the left.
+      bubble.style.left = (horizontalCoordinate + markerOffset - bubbleWidth) + 'px';
+      bubble.toggleClassName('annotation-bubble-position-left');
+    }
 
     return bubble;
   },
@@ -1700,7 +1715,7 @@ XWiki.Annotation = Class.create({
     this.selectionService.highlightSelection('#FFEE99');
     // get the position and build the loading bubble
     var position = this.selectionService.getPositionNextToSelection();
-    this.createPanel = this.displayLoadingBubble(position.top, position.left);
+    this.createPanel = this.displayLoadingBubble(position.top, position.left, false);
     // remove the ctrl + M listeners, so that only one dialog is displayed at one moment
     this.unregisterAddAnnotationShortcut();
   },
@@ -1792,16 +1807,6 @@ require.config({
     'fast-diff': $jsontool.serialize($services.webjars.url('org.webjars.npm:fast-diff', 'diff'))
   }
 })
-
-define('node-module', ['jquery'], function($) {
-  return {
-    load: function(name, req, onLoad, config) {
-      $.get(req.toUrl(name + '.js'), function(text) {
-        onLoad.fromText(`define(function(require, exports, module) {${text}});`);
-      }, 'text');
-    }
-  }
-});
 
 define('xwiki-text-offset-updater', ['jquery', 'node-module!fast-diff'], function($, diff) {
   /**
@@ -1968,25 +1973,23 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>level</name>
         <number>1</number>
-        <picker>0</picker>
-        <prettyName>level</prettyName>
+        <prettyName>Level</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators> ,|</separators>
         <size>1</size>
-        <sort>none</sort>
         <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>edit|programming</values>
+        <values>edit|script|wiki_admin|programming</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
     <property>
-      <level>programming</level>
+      <level>wiki_admin</level>
     </property>
   </object>
 </xwikidoc>

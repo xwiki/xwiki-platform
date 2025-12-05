@@ -30,7 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -170,16 +170,20 @@ public class UserEventDispatcher
 
                 // Pre-filter all the found events
                 Iterable<Event> it = () -> result.stream().iterator();
+                List<CompletableFuture<?>> completableFutures = new ArrayList<>((int) result.getSize());
                 for (Event event : it) {
                     try {
-                        CompletableFuture<?> completableFuture = prefilterEvent(event, types);
-                        completableFuture.join();
+                        completableFutures.add(prefilterEvent(event, types));
                     } catch (Exception e) {
                         this.logger.warn("Failed to pre filter event with id [{}]: {}", event.getId(),
                             ExceptionUtils.getRootCauseMessage(e));
                         // Remember the failed event to not query it again
                         failedEvents.add(event.getId());
                     }
+                }
+                // Wait for all events to be written before performing a new search.
+                for (CompletableFuture<?> completableFuture : completableFutures) {
+                    completableFuture.join();
                 }
             }
         } while (true);
@@ -213,8 +217,12 @@ public class UserEventDispatcher
         }
 
         try {
+            this.logger.debug("Start dispatching event with id [{}]", event.getId());
+
             return dispatchInContext(event);
         } finally {
+            this.logger.debug("Done dispatching event with id [{}]", event.getId());
+
             // Get rid of current context
             this.ecm.popContext();
         }
@@ -222,7 +230,6 @@ public class UserEventDispatcher
 
     private CompletableFuture<?> dispatchInContext(Event event)
     {
-        CompletableFuture<?> result = new CompletableFuture<>();
         WikiReference eventWiki = event.getWiki();
 
         if (CollectionUtils.isNotEmpty(event.getTarget())) {
@@ -249,77 +256,67 @@ public class UserEventDispatcher
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
-
-            // Remember we are done pre filtering this event
-            result = this.events.prefilterEvent(event);
         } else {
             // Try to find users listening to this event
 
             // Associated event with event's wiki users
-            result = dispatch(event, this.userCache.getUsers(eventWiki, true));
+            dispatch(event, this.userCache.getUsers(eventWiki, true));
 
             // Also take into account global users (main wiki users) if the event is on a subwiki
             if (!this.wikiManager.isMainWiki(eventWiki.getName())) {
                 List<DocumentReference> userList =
                     this.userCache.getUsers(new WikiReference(this.wikiManager.getMainWikiId()), true);
-                result = dispatch(event, userList);
+                dispatch(event, userList);
             }
         }
-        return result;
+
+        // Remember we are done pre-filtering this event
+        return this.events.prefilterEvent(event);
     }
 
-    private CompletableFuture<?> dispatch(Event event, DocumentReference user, boolean mailEnabled)
+    private void dispatch(Event event, DocumentReference user, boolean mailEnabled)
     {
         // Get the entity id
         String entityId = this.entityReferenceSerializer.serialize(user);
-        CompletableFuture<?> result = new CompletableFuture<>();
 
         // Make sure the event is not already pre filtered
         // Make sure the user asked to be alerted about this event
-        if (!isStatusPrefiltered(event, entityId)
-            && this.userEventManager.isListening(event, user, NotificationFormat.ALERT)) {
+        if (this.userEventManager.isListening(event, user, NotificationFormat.ALERT)
+            // The only case where this would prevent saving the status is when an event is pre-filtered again (e.g.,
+            // due to a restart in the middle of pre-filtering) and the event was already marked as read by the user.
+            // If the event hasn't been marked as read by the user, the atomic operation would already prevent saving
+            // the status again. It also only prevents saving again if the marking as read was already committed to
+            // the store.
+            && !isStatusPrefiltered(event, entityId)) {
             // Associate the event with the user
-            result = saveEventStatus(event, entityId);
+            saveEventStatus(event, entityId);
         }
 
         // Make sure the notification module is allowed to send mails
-        // Make sure the event is not already pre filtered
         // Make sure the user asked to receive mails about this event
-        if (mailEnabled && !isMailPrefiltered(event, entityId)
-            && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
+        // TODO: when the event is pre-filtered again and the email was already sent, we're currently sending it again.
+        // We could avoid this by:
+        // - only sending the email for fully pre-filtered events
+        // - adding a list of users for which the email was already sent
+        // - only saving the mail entity event at the end of the pre-filtering, making sure that the status isn't
+        // committed before the event is marked as pre-filtered
+        if (mailEnabled && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
             // Associate the event with the user
-            result = saveMailEntityEvent(event, entityId);
+            saveMailEntityEvent(event, entityId);
         }
 
         // FIXME: reuse constant from EventType once it's moved (see https://jira.xwiki.org/browse/XWIKI-21669)
-        if (StringUtils.equals(event.getType(), "delete")) {
+        if (Strings.CS.equals(event.getType(), "delete")) {
             this.cleanUpFilterProcessingQueue.addCleanUpTask(user, event.getDocument());
         }
-
-        return result;
     }
 
     private boolean isStatusPrefiltered(Event event, String entityId)
     {
-        return isPrefiltered(event, entityId, false);
-    }
-
-    private boolean isMailPrefiltered(Event event, String entityId)
-    {
-        return isPrefiltered(event, entityId, true);
-    }
-
-    private boolean isPrefiltered(Event event, String entityId, boolean mail)
-    {
         SimpleEventQuery eventQuery = new SimpleEventQuery(0, 0);
 
         eventQuery.eq(Event.FIELD_ID, event.getId());
-
-        if (mail) {
-            eventQuery.withMail(entityId);
-        } else {
-            eventQuery.withStatus(entityId);
-        }
+        eventQuery.withStatus(entityId);
 
         try (EventSearchResult result = this.events.search(eventQuery)) {
             return result.getTotalHits() > 0;
@@ -330,25 +327,22 @@ public class UserEventDispatcher
         }
     }
 
-    private CompletableFuture<?> dispatch(Event event, List<DocumentReference> users)
+    private void dispatch(Event event, List<DocumentReference> users)
     {
         boolean mailEnabled = this.notificationConfiguration.areEmailsEnabled();
 
         for (DocumentReference user : users) {
             dispatch(event, user, mailEnabled);
         }
-
-        // Remember we are done pre filtering this event
-        return this.events.prefilterEvent(event);
     }
 
-    private CompletableFuture<?> saveEventStatus(Event event, String entityId)
+    private void saveEventStatus(Event event, String entityId)
     {
-        return this.events.saveEventStatus(new DefaultEventStatus(event, entityId, false));
+        this.events.saveEventStatus(new DefaultEventStatus(event, entityId, false));
     }
 
-    private CompletableFuture<?> saveMailEntityEvent(Event event, String entityId)
+    private void saveMailEntityEvent(Event event, String entityId)
     {
-        return this.events.saveMailEntityEvent(new DefaultEntityEvent(event, entityId));
+        this.events.saveMailEntityEvent(new DefaultEntityEvent(event, entityId));
     }
 }

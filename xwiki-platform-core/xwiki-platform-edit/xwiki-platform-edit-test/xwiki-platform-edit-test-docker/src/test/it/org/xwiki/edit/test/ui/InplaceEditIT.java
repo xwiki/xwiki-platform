@@ -39,6 +39,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
@@ -349,6 +350,9 @@ class InplaceEditIT
         qa.waitForItemSubmitted();
         richTextArea.waitForContentRefresh();
 
+        // Wait until the children macro has loaded the tree content.
+        richTextArea.waitUntilTextContains("No pages found");
+
         assertEquals("a first line\nNo pages found\nmacro:id", richTextArea.getText());
         viewPage.cancel();
     }
@@ -365,6 +369,9 @@ class InplaceEditIT
         CKEditor ckeditor = new CKEditor("content");
         RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
         richTextArea.clear();
+
+        // Hide the expected error message because it can interfere with the test.
+        viewPage.waitForNotificationErrorMessage("Failed to join the realtime collaboration.");
 
         // Insert some long text (vertically).
         for (int i = 1; i < 50; i++) {
@@ -385,7 +392,8 @@ class InplaceEditIT
         assertEquals("4", sourceTextArea.getDomProperty("selectionEnd"));
 
         // Verify that the top left corner of the Source text area is visible (inside the viewport).
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 0));
+        // The toolbar is overlapping the text area so we need to add some offset.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 3));
 
         // Select something from the middle of the edited content.
         for (int i = 0; i < 46; i++) {
@@ -438,8 +446,8 @@ class InplaceEditIT
         assertEquals("50", sourceTextArea.getDomProperty("value").substring(selectionStart, selectionEnd));
 
         // Verify that the restored selection is visible (inside the viewport).
-        // Note that we have to subtract 1 from the height because the floating toolbar is overlapping the text area.
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 1));
+        // Note that we have to subtract 4 from the height because the floating toolbar is overlapping the text area.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 4));
 
         viewPage.cancel();
     }
@@ -462,12 +470,18 @@ class InplaceEditIT
         richTextArea.clear();
 
         // Insert the Velocity macro. The macro placeholder should be displayed.
-        richTextArea.sendKeys(Keys.ENTER, "/velocity");
+        richTextArea.sendKeys("/velocity");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/velocity", "Velocity");
         richTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
+        // check the behaviour of boolean parameters of macro.
+        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
+        assertTrue(macroEditModal.getMacroParameterInput("wiki").isSelected());
+        macroEditModal.setMacroContent("#set($discard = $NULL)");
+        macroEditModal.setMacroParameterCheckbox("wiki", false);
+        macroEditModal.clickSubmit();
         richTextArea.waitForContentRefresh();
 
         assertEquals("macro:velocity", richTextArea.getText());
@@ -497,5 +511,11 @@ class InplaceEditIT
         setup.getDriver().waitUntilCondition(driver -> !viewPage.hasRequiredRightsWarning(false));
 
         viewPage.cancel();
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
+        String content = wikiEditPage.getContent();
+        assertEquals("{{velocity wiki=\"false\"}}\n"
+            + "#set($discard = $NULL)\n"
+            + "{{/velocity}}", content);
+        wikiEditPage.clickCancel();
     }
 }

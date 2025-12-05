@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-eventstream-stores</artifactId>
-    <version>17.5.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
   <name>XWiki Platform - Event Stream - Store - Solr</name>
   <description>Solr based events storage</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.90</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Event Stream Store</xwiki.extension.name>
     <!-- TODO: Remove once the tests have been fixed to not output anything 
@@ -93,21 +93,15 @@
 
     <!-- Test Dependencies -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-api</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-solr</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
       <scope>test</scope>

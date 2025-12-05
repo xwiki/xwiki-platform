@@ -43,9 +43,9 @@ public class DefaultSecurityConfiguration extends AbstractSecurityConfiguration 
     private static final String QUERY_ITEMS_LIMIT = AbstractSecurityConfiguration.SECURITY + ".queryItemsLimit";
 
     /**
-     * Default query items limit is set to 100 because it corresponds to the LiveTable/LiveData max items view limit.
+     * Default query items limit.
      */
-    private static final int DEFAULT_QUERY_ITEMS_LIMIT = 100;
+    private static final int DEFAULT_QUERY_ITEMS_LIMIT = 1000;
 
     /**
      * Obtain configuration from the {@code xwiki.properties} file. We currently consider that this is a technical

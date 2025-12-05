@@ -8,3 +8,4 @@ org.xwiki.icon.internal.IconSetRequiredRightsAnalyzer
 org.xwiki.icon.internal.VelocityRenderer
 org.xwiki.icon.internal.context.IconContextStore
 org.xwiki.icon.internal.context.IconSetContext
+org.xwiki.icon.internal.IconTemplateRendererManager

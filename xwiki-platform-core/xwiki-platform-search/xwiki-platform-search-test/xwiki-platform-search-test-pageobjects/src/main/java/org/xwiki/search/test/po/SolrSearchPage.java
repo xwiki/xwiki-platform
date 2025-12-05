@@ -21,12 +21,17 @@ package org.xwiki.search.test.po;
 
 import java.util.List;
 
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 public class SolrSearchPage extends ViewPage
 {
+    private static final String ROWS_PARAM = "rows=";
+
     @FindBy(id = "search-page-bar-input")
     private WebElement searchInput;
 
@@ -48,10 +53,11 @@ public class SolrSearchPage extends ViewPage
         return new SolrSearchPage();
     }
 
-    public void search(String terms) {
+    public SolrSearchPage search(String terms) {
         this.searchInput.clear();
         this.searchInput.sendKeys(terms);
         this.searchButton.click();
+        return new SolrSearchPage();
     }
 
     public void toggleSpaceFaucet() {
@@ -70,5 +76,38 @@ public class SolrSearchPage extends ViewPage
         return this.searchResultElements.stream()
             .map(SolrSearchResult::new)
             .toList();
+    }
+
+    /**
+     * Sets the number of results to display per page by directly modifying the URL.
+     *
+     * @param resultsPerPage the number of results to display per page
+     * @param wait if true, waits for the page to reload after setting the results per page
+     * @return the reloaded page, or the current page if wait is false
+     * @since 17.7.0RC1
+     * @since 17.4.4
+     * @since 16.10.11
+     */
+    public SolrSearchPage setResultsPerPage(int resultsPerPage, boolean wait)
+    {
+        String currentUrl = getDriver().getCurrentUrl();
+        // Setting the number of results per page isn't supported in the UI, so we modify the URL directly.
+        // The results per page parameter is called "rows" in Solr.
+        String url;
+        if (Strings.CS.contains(currentUrl, ROWS_PARAM)) {
+            url = RegExUtils.replaceAll(currentUrl, "rows=\\d+", ROWS_PARAM + resultsPerPage);
+        } else {
+            url = currentUrl + (StringUtils.contains(currentUrl, '?') ? "&" : "?") + ROWS_PARAM + resultsPerPage;
+        }
+
+        getUtil().gotoPage(url);
+
+        // Construct a new page to wait for the page to load.
+        if (wait) {
+            return new SolrSearchPage();
+        } else {
+            // Return the current page without waiting.
+            return this;
+        }
     }
 }

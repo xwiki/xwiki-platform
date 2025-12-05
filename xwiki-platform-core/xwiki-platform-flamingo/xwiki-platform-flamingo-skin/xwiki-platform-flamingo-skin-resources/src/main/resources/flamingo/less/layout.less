@@ -8,7 +8,6 @@
 #menuview, #headerglobal, #xwikieditor, #footerglobal {
   .make-row();
 }
-@main-padding: @grid-gutter-width * 2;
 
 @property ~"--panel-column-left-width" {
   syntax: "<length>";
@@ -36,13 +35,11 @@
   & #leftPanels {
     order: 1;
     width: ~"var(--panel-column-left-width)";
-    padding-right: ~"calc(var(--grid-gutter-width) / 2)";
   }
 
-  & #rightPanels, & #editPanels {
+  & #rightPanels {
     order: 3;
     width: ~"var(--panel-column-right-width)";
-    padding-left: ~"calc(var(--grid-gutter-width) / 2)";
   }
   
   /* Depending on the admin parameters, we want to change the default size. */
@@ -50,13 +47,6 @@
      doesn't interpret the double dash as the start of a HTML comment close.
      We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
      Once this file is migrated to native CSS, this hack can be removed. */
-  &.hideleft {
-    -/**/-panel-column-left-width: 0;
-    
-    & #leftPanels {
-      display: none;
-    }
-  }
 
   &.panel-left-width-Small {
     -/**/-panel-column-left-width: 8vw;
@@ -66,11 +56,18 @@
     -/**/-panel-column-left-width: 24vw;
   }
 
-  &.hideright {
-    -/**/-panel-column-right-width: 0;
+  /* The functionality to hide the panel takes precedence over the panel size defaults. 
+    This ruleset should come after the rules for .panel-left-width-<WIDTH> */
+  &.hideleft {
+    /* When the screen is small enough, we keep panels shown.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
+      ie. this media query does not short-circuit the admin preference. */
+    @media (min-width: @screen-md-min) {
+      -/**/-panel-column-left-width: 0;
 
-    & #rightPanels {
-      display: none;
+      & #leftPanels {
+        display: none;
+      }
     }
   }
 
@@ -82,12 +79,32 @@
     -/**/-panel-column-right-width: 24vw;
   }
 
-  &.hidelefthideright {
-    -/**/-panel-column-left-width: 0;
-    -/**/-panel-column-right-width: 0;
+  /* The functionality to hide the panel takes precedence over the panel size defaults. 
+    This ruleset should come after the rules for .panel-right-width-<WIDTH> */
+  &.hideright {
+    /* When the screen is small enough, we keep panels shown.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
+      ie. this media query does not short-circuit the admin preference. */
+    @media (min-width: @screen-md-min) {
+      -/**/-panel-column-right-width: 0;
 
-    & #leftPanels, & #rightPanels {
-      display: none;
+      & #rightPanels {
+        display: none;
+      }
+    }
+  }
+
+  &.hidelefthideright {
+    /* When the screen is small enough, we keep panels shown.
+      Note that templates to generate panel columns only generate them if the panels are not hidden by admin choice. 
+      ie. this media query does not short-circuit the admin preference. */
+    @media (min-width: @screen-md-min) {
+      -/**/-panel-column-left-width: 0;
+      -/**/-panel-column-right-width: 0;
+  
+      & #leftPanels, & #rightPanels {
+        display: none;
+      }
     }
   }
 
@@ -157,8 +174,7 @@
   resize: vertical;
 }
 
-.main, #editcolumn,
-#leftPanels, #rightPanels, #editPanels {
+.main, #editcolumn, #leftPanels, #rightPanels {
   position: relative;
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
@@ -207,6 +223,15 @@ again or the page is reloaded (because the toggler is hidden until then). */
   #rightPanelsToggle:has(+ #rightPanels:focus-within),
   #rightPanelsToggle:hover, #rightPanelsToggle:focus {
     opacity: 1;
+  }
+  
+  /* When the display is large enough, we add padding on the outer sides of the panel columns. */
+  #leftPanels {
+    padding-right: ~"calc(var(--grid-gutter-width) / 2)";
+  }
+  
+  #rightPanels {
+    padding-left: ~"calc(var(--grid-gutter-width) / 2)";
   }
 }
 
@@ -285,7 +310,8 @@ body#body #leftPanelsToggle {
 #leftPanels > .ui-resizable-e:hover,
 #leftPanels > .ui-resizable-e:active,
 #leftPanels.ui-resizable-resizing > .ui-resizable-e {
-  opacity: 1
+  opacity: 1;
+  transition: opacity .3s ease .1s;
 }
 
 #xwikicontent {

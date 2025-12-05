@@ -26,7 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.phase.Initializable;
@@ -178,7 +178,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
                 // The list of XWiki objects can contain null values due to a design flaw in the old XWiki core.
                 if (sheetBindingObject != null) {
                     String boundSheetStringRef = sheetBindingObject.getStringValue(SHEET_PROPERTY);
-                    if (StringUtils.equals(boundSheetStringRef, sheetReferenceString)) {
+                    if (Strings.CS.equals(boundSheetStringRef, sheetReferenceString)) {
                         return false;
                     }
                 }

@@ -32,7 +32,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
+import org.xwiki.store.blob.FileSystemBlobStoreProperties;
+import org.xwiki.store.blob.internal.FileSystemBlobStore;
+import org.xwiki.store.filesystem.internal.AttachmentBlobProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.locks.dummy.internal.DummyLockProvider;
 import org.xwiki.store.serialization.xml.internal.AttachmentListMetadataSerializer;
@@ -60,7 +62,7 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
 
     private XWikiAttachmentArchive archive;
 
-    private AttachmentFileProvider provider;
+    private AttachmentBlobProvider provider;
 
     private File storageLocation;
 
@@ -74,7 +76,11 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         this.storageLocation = new File(tmpDir, "test-storage-location");
 
-        this.fileTools = new FilesystemStoreTools(storageLocation, new DummyLockProvider());
+        FileSystemBlobStoreProperties properties = new FileSystemBlobStoreProperties();
+        properties.setRootDirectory(this.storageLocation.toPath());
+        FileSystemBlobStore blobStore = new FileSystemBlobStore("Test", properties);
+
+        this.fileTools = new FilesystemStoreTools(blobStore, new DummyLockProvider());
         final AttachmentListMetadataSerializer serializer =
             new AttachmentListMetadataSerializer(new AttachmentMetadataSerializer());
         this.versionStore = new FilesystemAttachmentVersioningStore();
@@ -125,25 +131,25 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
         final XWikiAttachmentContent content = this.archive.getAttachment().getAttachment_content();
         final XWikiAttachment attach = this.archive.getAttachment();
 
-        Assert.assertFalse(this.provider.getAttachmentVersioningMetaFile().exists());
-        Assert.assertFalse(this.provider.getAttachmentVersionContentFile("1.1").exists());
-        Assert.assertFalse(this.provider.getAttachmentVersionContentFile("1.2").exists());
-        Assert.assertFalse(this.provider.getAttachmentVersionContentFile("1.3").exists());
+        Assert.assertFalse(this.provider.getAttachmentVersioningMetaBlob().exists());
+        Assert.assertFalse(this.provider.getAttachmentVersionContentBlob("1.1").exists());
+        Assert.assertFalse(this.provider.getAttachmentVersionContentBlob("1.2").exists());
+        Assert.assertFalse(this.provider.getAttachmentVersionContentBlob("1.3").exists());
 
         // Because the context is only used by the legacy implementation, it is safe to pass null.
         this.versionStore.saveArchive(this.archive, null, false);
 
-        Assert.assertTrue(this.provider.getAttachmentVersioningMetaFile().exists());
+        Assert.assertTrue(this.provider.getAttachmentVersioningMetaBlob().exists());
 
         // Make sure it's not just:
         // <?xml version="1.0" encoding="UTF-8"?>
         // <attachment-list serializer="attachment-list-meta/1.0">
         // </attachment-list>
-        Assert.assertTrue(this.provider.getAttachmentVersioningMetaFile().length() > 120);
+        Assert.assertTrue(this.provider.getAttachmentVersioningMetaBlob().getSize() > 120);
 
-        Assert.assertTrue(this.provider.getAttachmentVersionContentFile("1.1").exists());
-        Assert.assertTrue(this.provider.getAttachmentVersionContentFile("1.2").exists());
-        Assert.assertTrue(this.provider.getAttachmentVersionContentFile("1.3").exists());
+        Assert.assertTrue(this.provider.getAttachmentVersionContentBlob("1.1").exists());
+        Assert.assertTrue(this.provider.getAttachmentVersionContentBlob("1.2").exists());
+        Assert.assertTrue(this.provider.getAttachmentVersionContentBlob("1.3").exists());
 
         // Prove that the attachment and attachment content are the same after saving.
         Assert.assertSame(attach, this.archive.getAttachment());
@@ -181,17 +187,17 @@ public class FilesystemAttachmentVersioningStoreTest extends AbstractFilesystemA
     {
         this.versionStore.saveArchive(this.archive, null, false);
 
-        Assert.assertTrue(this.provider.getAttachmentVersioningMetaFile().exists());
-        Assert.assertTrue(this.provider.getAttachmentVersionContentFile("1.1").exists());
-        Assert.assertTrue(this.provider.getAttachmentVersionContentFile("1.2").exists());
-        Assert.assertTrue(this.provider.getAttachmentVersionContentFile("1.3").exists());
+        Assert.assertTrue(this.provider.getAttachmentVersioningMetaBlob().exists());
+        Assert.assertTrue(this.provider.getAttachmentVersionContentBlob("1.1").exists());
+        Assert.assertTrue(this.provider.getAttachmentVersionContentBlob("1.2").exists());
+        Assert.assertTrue(this.provider.getAttachmentVersionContentBlob("1.3").exists());
 
         this.versionStore.deleteArchive(this.archive.getAttachment(), null, false);
 
-        Assert.assertFalse(this.provider.getAttachmentVersioningMetaFile().exists());
-        Assert.assertFalse(this.provider.getAttachmentVersionContentFile("1.1").exists());
-        Assert.assertFalse(this.provider.getAttachmentVersionContentFile("1.2").exists());
-        Assert.assertFalse(this.provider.getAttachmentVersionContentFile("1.3").exists());
+        Assert.assertFalse(this.provider.getAttachmentVersioningMetaBlob().exists());
+        Assert.assertFalse(this.provider.getAttachmentVersionContentBlob("1.1").exists());
+        Assert.assertFalse(this.provider.getAttachmentVersionContentBlob("1.2").exists());
+        Assert.assertFalse(this.provider.getAttachmentVersionContentBlob("1.3").exists());
     }
 
     /* -------------------- Helpers -------------------- */

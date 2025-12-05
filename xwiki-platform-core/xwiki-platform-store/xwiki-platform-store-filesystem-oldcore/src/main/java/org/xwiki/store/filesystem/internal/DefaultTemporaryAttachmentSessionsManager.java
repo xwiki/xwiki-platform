@@ -21,6 +21,7 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,10 +33,12 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
+import org.xwiki.container.Session;
 import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
@@ -68,21 +71,30 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     @Inject
     private Provider<Container> container;
 
-    private HttpSession getSession()
+    @Inject
+    private Logger logger;
+
+    private HttpSession getHttpSession()
     {
-        return ((ServletSession) this.container.get().getSession()).getSession();
+        Session session = this.container.get().getSession();
+
+        return session != null ? ((ServletSession) session).getSession() : null;
     }
 
-    private TemporaryAttachmentSession getOrCreateSession()
+    private Optional<TemporaryAttachmentSession> getOrCreateSession()
     {
-        TemporaryAttachmentSession temporaryAttachmentSession;
-        HttpSession session = this.getSession();
-        temporaryAttachmentSession = (TemporaryAttachmentSession) session.getAttribute(ATTRIBUTE_KEY);
-        if (temporaryAttachmentSession == null) {
-            temporaryAttachmentSession = new TemporaryAttachmentSession(session.getId());
-            session.setAttribute(ATTRIBUTE_KEY, temporaryAttachmentSession);
+        Optional<TemporaryAttachmentSession> result = Optional.empty();
+        HttpSession session = this.getHttpSession();
+        if (session != null) {
+            TemporaryAttachmentSession temporaryAttachmentSession =
+                (TemporaryAttachmentSession) session.getAttribute(ATTRIBUTE_KEY);
+            if (temporaryAttachmentSession == null) {
+                temporaryAttachmentSession = new TemporaryAttachmentSession(session.getId());
+                session.setAttribute(ATTRIBUTE_KEY, temporaryAttachmentSession);
+            }
+            result = Optional.of(temporaryAttachmentSession);
         }
-        return temporaryAttachmentSession;
+        return result;
     }
 
     @Override
@@ -104,7 +116,11 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException
     {
-        TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
+        Optional<TemporaryAttachmentSession> optionalSession = getOrCreateSession();
+        if (optionalSession.isEmpty()) {
+            throw new TemporaryAttachmentException("Cannot find a user http session.");
+        }
+        TemporaryAttachmentSession temporaryAttachmentSession = optionalSession.get();
         XWikiContext context = this.contextProvider.get();
         try {
             XWikiAttachment xWikiAttachment = new XWikiAttachment();
@@ -134,36 +150,64 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     @Override
     public void temporarilyAttach(XWikiAttachment attachment, DocumentReference documentReference)
     {
-        TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
-        temporaryAttachmentSession.addAttachment(documentReference, attachment);
+        Optional<TemporaryAttachmentSession> optionalSession = getOrCreateSession();
+        if (optionalSession.isPresent()) {
+            TemporaryAttachmentSession temporaryAttachmentSession = optionalSession.get();
+            temporaryAttachmentSession.addAttachment(documentReference, attachment);
+        } else {
+            this.logger.error("Cannot find a user http session to attach [{}] to [{}].", attachment, documentReference);
+        }
     }
 
     @Override
     public Collection<XWikiAttachment> getUploadedAttachments(DocumentReference documentReference)
     {
-        TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
-        return temporaryAttachmentSession.getAttachments(documentReference);
+        Optional<TemporaryAttachmentSession> optionalSession = getOrCreateSession();
+        if (optionalSession.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            TemporaryAttachmentSession temporaryAttachmentSession = optionalSession.get();
+            return temporaryAttachmentSession.getAttachments(documentReference);
+        }
     }
 
     @Override
     public Optional<XWikiAttachment> getUploadedAttachment(DocumentReference documentReference, String filename)
     {
-        TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
-        return temporaryAttachmentSession.getAttachment(documentReference, filename);
+        Optional<TemporaryAttachmentSession> optionalSession = getOrCreateSession();
+        if (optionalSession.isPresent()) {
+            TemporaryAttachmentSession temporaryAttachmentSession = optionalSession.get();
+            return temporaryAttachmentSession.getAttachment(documentReference, filename);
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
     public boolean removeUploadedAttachment(DocumentReference documentReference, String filename)
     {
-        TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
-        return temporaryAttachmentSession.removeAttachment(documentReference, filename);
+        Optional<TemporaryAttachmentSession> optionalSession = getOrCreateSession();
+        if (optionalSession.isPresent()) {
+            TemporaryAttachmentSession temporaryAttachmentSession = optionalSession.get();
+            return temporaryAttachmentSession.removeAttachment(documentReference, filename);
+        } else {
+            this.logger.warn("Cannot find a user http session to remove attachment [{}] from [{}].", filename,
+                documentReference);
+            return false;
+        }
     }
 
     @Override
     public boolean removeUploadedAttachments(DocumentReference documentReference)
     {
-        TemporaryAttachmentSession temporaryAttachmentSession = getOrCreateSession();
-        return temporaryAttachmentSession.removeAttachments(documentReference);
+        Optional<TemporaryAttachmentSession> optionalSession = getOrCreateSession();
+        if (optionalSession.isPresent()) {
+            TemporaryAttachmentSession temporaryAttachmentSession = optionalSession.get();
+            return temporaryAttachmentSession.removeAttachments(documentReference);
+        } else {
+            this.logger.warn("Cannot find a user http session to remove attachments from [{}].", documentReference);
+            return false;
+        }
     }
 
     @Override

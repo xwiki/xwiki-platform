@@ -32,6 +32,7 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.Tika;
@@ -1299,7 +1300,7 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException
     {
-        if (StringUtils.equals(rev, this.getVersion())) {
+        if (Strings.CS.equals(rev, this.getVersion())) {
             return this;
         }
 
@@ -1323,7 +1324,7 @@ public class XWikiAttachment implements Cloneable
             modified = true;
         }
 
-        if (StringUtils.equals(getMimeType(), attachment.getMimeType())) {
+        if (Strings.CS.equals(getMimeType(), attachment.getMimeType())) {
             setMimeType(attachment.getMimeType());
             modified = true;
         }

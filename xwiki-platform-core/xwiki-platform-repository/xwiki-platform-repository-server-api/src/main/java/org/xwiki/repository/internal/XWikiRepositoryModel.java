@@ -51,6 +51,11 @@ public class XWikiRepositoryModel
      */
     public static final String EXTENSION_SPACENAME = "ExtensionCode";
 
+    /**
+     * @since 17.9.0RC1
+     */
+    public static final String EXTENSIONVERSIONS_SPACENAME = "Versions";
+
     public static final String EXTENSION_CLASSNAME = EXTENSION_SPACENAME + ".ExtensionClass";
 
     public static final String AVERAGERATING_CLASSNAME = "XWiki.AverageRatingsClass";
@@ -187,6 +192,11 @@ public class XWikiRepositoryModel
 
     public static final String PROP_EXTENSION_PROPERTIES = "properties";
 
+    /**
+     * @since 17.9.0RC1
+     */
+    public static final String PROP_EXTENSION_VERSIONPAGE = "versionPage";
+
     public static final String PROP_VERSION_ID = "id";
 
     public static final String PROP_VERSION_VERSION = "version";
@@ -197,6 +207,11 @@ public class XWikiRepositoryModel
      * @since 7.3M1
      */
     public static final String PROP_VERSION_FEATURES = "features";
+
+    /**
+     * @since 17.9.0RC1
+     */
+    public static final String PROP_VERSION_INDEX = "index";
 
     /**
      * @since 7.3M1

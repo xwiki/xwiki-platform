@@ -29,7 +29,8 @@
   'dashboard.gadgetEditor.title',
   'dashboard.gadgetEditor.changeGadget.label',
   'dashboard.gadgetEditor.gadgetTitle.label',
-  'dashboard.gadgetEditor.gadgetTitle.hint'
+  'dashboard.gadgetEditor.gadgetTitle.hint',
+  'macroEditor.required'
 ])
 #set ($l10n = {})
 #foreach ($key in $l10nKeys)
@@ -42,14 +43,20 @@
 
 define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   var gadgetTitleTemplate = $(
-    '<li class="macro-parameter" data-id="$gadgetTitle">' +
-      '<div class="macro-parameter-name"></div>' +
-      '<div class="macro-parameter-description"></div>' +
-      '<input type="text" class="macro-parameter-field" name="$gadgetTitle"/>' +
-    '</li>'
+    `<div class="macro-parameter" data-id="$gadgetTitle" data-type="java.lang.String">
+       <div class="macro-parameter-name-container">
+         <label class="macro-parameter-name" for="parameter-$gadgetTitle"></label>
+         <span class="mandatory"></span>
+       </div>
+       <div class="macro-parameter-description"></div>
+       <div class="macro-parameter-field">
+         <input type="text" class="macro-parameter-field" name="$gadgetTitle"/>
+       </div>
+    </div>`
   );
   gadgetTitleTemplate.find('.macro-parameter-name').text(l10n['dashboard.gadgetEditor.gadgetTitle.label']);
   gadgetTitleTemplate.find('.macro-parameter-description').text(l10n['dashboard.gadgetEditor.gadgetTitle.hint']);
+  gadgetTitleTemplate.find('.mandatory').text('(' + l10n['macroEditor.required'] + ')');
 
   $('head').append($('<link type="text/css" rel="stylesheet"/>').attr('href', paths.css.macroWizard));
 
@@ -68,7 +75,14 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   };
 
   var getDefaultGadgetTitle = function(macroEditor) {
-    var gadgetName = macroEditor.attr('data-macroid').split('/')[0];
+    const parts = macroEditor.attr('data-macroid').split('/');
+    const gadgetName = parts[0];
+    if (parts.length > 2 && parts[1] === 'xwiki' && parts[2].startsWith('2.')) {
+      // The second and third parts are the syntax and the syntax version. For XWiki syntax version 2.x, use the
+      // translation macro.
+      return '{{translation key="rendering.macro.' +
+          gadgetName.replace('~', '~~').replace('"', '~"').replace('}', '~}') + '.name"/}}';
+    }
     return "$services.localization.render('rendering.macro." + gadgetName + ".name')";
   };
 
@@ -123,10 +137,10 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
     changeMacroButton.text(changeMacroButton.prop('oldText'));
   };
 
-  var runGadgetWizard = function(gadget, ckeditor, macroWizard) {
+  var runGadgetWizard = function(gadget, syntaxId, ckeditor, macroWizard) {
     currentGadget = gadget || {};
     // The macro wizard is returning a jQuery.Deferred() object that we convert to a standard Promise.
-    return Promise.resolve(macroWizard(getMacroCall(gadget, ckeditor))).then(function(macroCall) {
+    return Promise.resolve(macroWizard(getMacroCall(gadget, ckeditor), syntaxId)).then(function (macroCall) {
       return {
         title: $('.macro-editor input[name="$gadgetTitle"]').val(),
         content: ckeditor.plugins.registered['xwiki-macro'].serializeMacroCall(macroCall)
@@ -138,11 +152,11 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
     });
   };
 
-  return function(gadget) {
+  return function(gadget, syntaxId) {
     // xwiki-ckeditor module is still using jQuery.Deferred() because it needs to support older versions of XWiki that
     // have to work with obsolete browsers, but we can convert it easily to a standard Promise.
     return Promise.resolve(ckeditorPromise).then(getMacroWizard)
-      .then(data => runGadgetWizard(gadget, data.ckeditor, data.macroWizard));
+      .then(data => runGadgetWizard(gadget, syntaxId, data.ckeditor, data.macroWizard));
   };
 });
 

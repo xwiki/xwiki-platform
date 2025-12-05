@@ -28,7 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -156,7 +156,7 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
                 this.notificationFilterPreferenceManager.getFilterPreferences(user)
                     // We only clean up the filters matching exactly the page reference
                     // we never clean up filters for space / wiki there
-                    .stream().filter(pref -> StringUtils.equals(pref.getPageOnly(), serializedReference))
+                    .stream().filter(pref -> Strings.CS.equals(pref.getPageOnly(), serializedReference))
                     .collect(Collectors.toSet());
             if (!matchingPreferences.isEmpty()) {
                 CleaningFilterEvent cleaningFilterEvent = new CleaningFilterEvent();

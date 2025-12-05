@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -534,7 +534,7 @@ public class CreateActionRequestHandler
     private boolean matchesRestriction(String spaceStringReferenceToTest, String allowedSpaceRestriction)
     {
         return allowedSpaceRestriction.equals(spaceStringReferenceToTest)
-            || StringUtils.startsWith(spaceStringReferenceToTest, String.format("%s.", allowedSpaceRestriction));
+            || Strings.CS.startsWith(spaceStringReferenceToTest, String.format("%s.", allowedSpaceRestriction));
     }
 
     private List<String> getTemplateProviderRestrictions(BaseObject templateObject, String restrictionsProperty)
@@ -555,7 +555,6 @@ public class CreateActionRequestHandler
      * @since 16.4.2
      * @since 15.10.12
      */
-    @Unstable
     public DocumentReference getDocumentReference()
     {
         if (StringUtils.isEmpty(name)) {
@@ -610,7 +609,6 @@ public class CreateActionRequestHandler
      * @since 16.4.1
      * @since 15.10.12
      */
-    @Unstable
     public boolean isTemplateInfoProvided()
     {
         return hasTemplate() || availableTemplateProviders.isEmpty();

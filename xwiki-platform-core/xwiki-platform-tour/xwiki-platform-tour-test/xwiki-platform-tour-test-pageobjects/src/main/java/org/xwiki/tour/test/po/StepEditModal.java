@@ -21,6 +21,7 @@ package org.xwiki.tour.test.po;
 
 import java.util.List;
 
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -102,7 +103,7 @@ public class StepEditModal extends EditPage
     {
         List<WebElement> options = placementField.findElements(By.tagName("option"));
         for (WebElement option : options) {
-            if (StringUtils.equals(option.getAttribute("value"), placement)) {
+            if (Strings.CS.equals(option.getAttribute("value"), placement)) {
                 option.click();
             }
         }
@@ -118,7 +119,7 @@ public class StepEditModal extends EditPage
         String orderInString = String.valueOf(order - 1);
         List<WebElement> options = orderField.findElements(By.tagName("option"));
         for (WebElement option : options) {
-            if (StringUtils.equals(option.getAttribute("value"), orderInString)) {
+            if (Strings.CS.equals(option.getAttribute("value"), orderInString)) {
                 option.click();
             }
         }

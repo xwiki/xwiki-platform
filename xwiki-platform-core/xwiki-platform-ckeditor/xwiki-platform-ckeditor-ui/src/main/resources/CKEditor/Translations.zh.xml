@@ -60,9 +60,6 @@ ckeditor.admin.reset.confirmation=您确定要恢复默认配置吗？您的所�
 ckeditor.plugin.link.openInNewTab=在新选项卡中打开链接
 ckeditor.plugin.link.upload=上传附件
 ckeditor.plugin.link.uploadHint=链接到新上传的附件。
-ckeditor.plugin.link.uploadProgress=正在上传{0}...
-ckeditor.plugin.link.uploadSuccess=已成功上传 {0}
-ckeditor.plugin.link.uploadError=上传{0}失败
 ckeditor.plugin.list.listType.none=没有
 ckeditor.plugin.macro.placeholder=宏：{0}
 ckeditor.plugin.macro.buttonHint=XWiki 宏
@@ -87,11 +84,12 @@ ckeditor.plugin.office.importer.fail=Office 导入失败。
 ckeditor.plugin.office.importer.noUploadURL=未配置文件上传 URL。
 ckeditor.plugin.office.importer.failedToLoadForm=加载表单失败。
 ### Missing: ckeditor.plugin.resource.notSpecified=The {0} is not specified.
-ckeditor.plugin.resource.selectValue=请选择链接位置的值。
+ckeditor.plugin.resource.selectValue=请为链接位置选择一个值。
 ckeditor.plugin.save.leaveConfirmationMessage=有未保存的更改。你想丢弃它们吗？
 ckeditor.plugin.save.failed=由于 CKEditor 内部错误，无法保存内容。您应该尝试复制重要的更改并重新加载编辑器。
 ### Missing: ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
 ckeditor.plugin.selection.restoring=正在恢复选择内容...
+ckeditor.plugin.table.header.accessibilityWarning=使用表头标题会让你的表格更容易理解。
 ### Missing: ckeditor.plugin.toolbar.basicStyles=Basic Styles
 ### Missing: ckeditor.plugin.toolbar.lists=Lists
 ### Missing: ckeditor.plugin.toolbar.bulletedlist=Bulleted List
@@ -153,9 +151,6 @@ ckeditor.plugin.image.slash.currentPageBadge=此页面
 ckeditor.plugin.image.slash.externalBadge=外部
 ckeditor.plugin.image.slash.loading=载入中...
 ckeditor.plugin.image.slash.upload=上传图片
-ckeditor.plugin.image.slash.uploadProgress=正在上传{0}...
-ckeditor.plugin.image.slash.uploadSuccess=已成功上传 {0}
-ckeditor.plugin.image.slash.uploadError=上传{0}失败
 ckeditor.plugin.slash.group.Layout=布局
 ckeditor.plugin.slash.group.Content=内容
 ckeditor.plugin.slash.group.Formatting=格式
@@ -305,12 +300,15 @@ macroSelector.install.notAllowed=不允许您安装这个扩展
 macroSelector.filter.category.placeholder=选择一个类别…
 ### Missing: macroEditor.title=Edit Macro
 ### Missing: macroEditor.more=More
+macroEditor.required=要求
 ### Missing: macroEditor.changeMacro=Change Macro
 ### Missing: macroEditor.submit=Submit
 ### Missing: macroEditor.content=Content
 ### Missing: macroEditor.noParameters=This macro has no parameters.
 ### Missing: macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+macroEditor.parametersRequestFailed=未能检索到{0}的参数。
 macroEditor.installRequestFailed=安装宏 {0} 失败。
+macroEditor.selectFeature=选择参数{0}
 
 
 imageEditor.modal.changeImage.button=改变图片
@@ -334,6 +332,12 @@ imageSelector.modal.initialization.fail=检索图像选择表单失败。
 ## Deprecated since 14.10
 imageEditor.modal.backToEditor.button=返回
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=文档树
+ckeditor.plugin.link.uploadProgress=正在上传{0}...
+ckeditor.plugin.link.uploadSuccess=已成功上传 {0}
+ckeditor.plugin.link.uploadError=上传{0}失败
+ckeditor.plugin.image.slash.uploadProgress=正在上传{0}...
+ckeditor.plugin.image.slash.uploadSuccess=已成功上传 {0}
+ckeditor.plugin.image.slash.uploadError=上传{0}失败
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

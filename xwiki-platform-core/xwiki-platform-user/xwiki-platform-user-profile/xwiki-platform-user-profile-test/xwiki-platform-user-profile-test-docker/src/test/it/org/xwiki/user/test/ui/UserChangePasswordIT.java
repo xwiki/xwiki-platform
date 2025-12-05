@@ -161,7 +161,7 @@ class UserChangePasswordIT
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
         changePasswordPage.changePassword("badPassword", PASSWORD_1, PASSWORD_1);
         changePasswordPage = changePasswordPage.submit();
-        changePasswordPage.assertErrorMessage("Current password is invalid.");
+        changePasswordPage.assertErrorMessage("Error\nThe field \"Current password\" was incorrect.");
     }
 
     @Test

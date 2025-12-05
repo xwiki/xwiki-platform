@@ -19,9 +19,11 @@
  */
 package org.xwiki.rest.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -42,6 +44,7 @@ import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Wikis;
 import org.xwiki.rest.resources.spaces.SpaceAttachmentsResource;
 import org.xwiki.rest.resources.spaces.SpaceSearchResource;
+import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
 
@@ -101,6 +104,8 @@ public class SpacesResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(reference);
         this.testUtils.rest().savePage(reference, "content " + getTestMethodName(), "title " + getTestMethodName());
 
+        this.solrUtils.waitEmptyQueue();
+
         GetMethod getMethod = executeGet(String.format("%s?q=somethingthatcannotpossiblyexist",
             buildURI(SpaceSearchResource.class, getWiki(), Arrays.asList(getTestClassName()))));
         Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
@@ -144,6 +149,150 @@ public class SpacesResourceIT extends AbstractHttpIT
         for (Attachment attachment : attachments.getAttachments()) {
             checkLinks(attachment);
         }
+    }
 
+    @Test
+    public void testSpacesNumberParameter() throws Exception
+    {
+        // Setup: Ensure at least 2 spaces exist
+        DocumentReference ref1 = new DocumentReference(getWiki(), getTestClassName() + "A", "WebHome");
+        DocumentReference ref2 = new DocumentReference(getWiki(), getTestClassName() + "B", "WebHome");
+        try {
+            this.testUtils.rest().delete(ref1);
+            this.testUtils.rest().delete(ref2);
+            this.testUtils.rest().savePage(ref1, "content1", "title1");
+            this.testUtils.rest().savePage(ref2, "content2", "title2");
+
+            // Test: number=-1 should return error
+            GetMethod getMethod = executeGet("%s?number=-1".formatted(buildURI(SpacesResource.class, getWiki())));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+
+            // Test: number=1001 should return error
+            getMethod = executeGet("%s?number=1001".formatted(buildURI(SpacesResource.class, getWiki())));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+
+            // Test: pagination with number=1
+            getMethod = executeGet("%s?number=1".formatted(buildURI(SpacesResource.class, getWiki())));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            Spaces spaces = (Spaces) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, spaces.getSpaces().size());
+
+            String firstName = spaces.getSpaces().get(0).getName();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet("%s?number=1&start=1".formatted(buildURI(SpacesResource.class, getWiki())));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            spaces = (Spaces) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, spaces.getSpaces().size());
+            Assert.assertNotEquals(firstName, spaces.getSpaces().get(0).getName());
+        } finally {
+            this.testUtils.rest().delete(ref1);
+            this.testUtils.rest().delete(ref2);
+        }
+    }
+
+    @Test
+    public void testSpaceSearchNumberParameter() throws Exception
+    {
+        // Setup: Ensure at least 2 pages exist for search
+        String spaceName = getTestClassName();
+        DocumentReference ref1 = new DocumentReference(getWiki(), spaceName, getTestMethodName() + "A");
+        DocumentReference ref2 = new DocumentReference(getWiki(), spaceName, getTestMethodName() + "B");
+        try {
+            this.testUtils.rest().delete(ref1);
+            this.testUtils.rest().delete(ref2);
+            this.testUtils.rest().savePage(ref1, "searchcontent", "searchtitleA");
+            this.testUtils.rest().savePage(ref2, "searchcontent", "searchtitleB");
+
+            this.solrUtils.waitEmptyQueue();
+
+            // Test: number=-1 should return error
+            GetMethod getMethod = executeGet(
+                "%s?q=searchcontent&number=-1".formatted(buildURI(SpaceSearchResource.class, getWiki(),
+                    List.of(spaceName))));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+
+            // Test: number=1001 should return error
+            getMethod = executeGet(
+                "%s?q=searchcontent&number=1001".formatted(
+                    buildURI(SpaceSearchResource.class, getWiki(), List.of(spaceName))));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+
+            // Test: pagination with number=1
+            getMethod = executeGet(
+                "%s?q=searchcontent&number=1".formatted(
+                    buildURI(SpaceSearchResource.class, getWiki(), List.of(spaceName))));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            SearchResults results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, results.getSearchResults().size());
+
+            String firstName = results.getSearchResults().get(0).getPageName();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(
+                "%s?q=searchcontent&number=1&start=1".formatted(
+                    buildURI(SpaceSearchResource.class, getWiki(), List.of(spaceName))));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            results = (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, results.getSearchResults().size());
+            Assert.assertNotEquals(firstName, results.getSearchResults().get(0).getPageName());
+        } finally {
+            this.testUtils.rest().delete(ref1);
+            this.testUtils.rest().delete(ref2);
+        }
+    }
+
+    @Test
+    public void testSpaceAttachmentsNumberParameter() throws Exception
+    {
+        // Setup: Ensure at least 2 attachments exist in the space
+        String spaceName = getTestClassName();
+        DocumentReference ref = new DocumentReference(getWiki(), spaceName, getTestMethodName());
+        this.testUtils.rest().delete(ref);
+        this.testUtils.rest().savePage(ref);
+
+        try {
+            this.testUtils.rest().attachFile(new AttachmentReference("att1.txt", ref),
+                new ByteArrayInputStream("content1".getBytes(StandardCharsets.UTF_8)), true);
+            this.testUtils.rest().attachFile(new AttachmentReference("att2.txt", ref),
+                new ByteArrayInputStream("content2".getBytes(StandardCharsets.UTF_8)), true);
+            // Test: number=-1 should return error
+            GetMethod getMethod = executeGet(
+                "%s?number=-1".formatted(buildURI(SpaceAttachmentsResource.class, getWiki(), List.of(spaceName))));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+
+            // Test: number=1001 should return error
+            getMethod = executeGet(
+                "%s?number=1001".formatted(buildURI(SpaceAttachmentsResource.class, getWiki(),
+                    List.of(spaceName))));
+            Assert.assertEquals(400, getMethod.getStatusCode());
+            Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
+
+            // Test: pagination with number=1
+            getMethod = executeGet(
+                "%s?number=1".formatted(buildURI(SpaceAttachmentsResource.class, getWiki(), List.of(spaceName))));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, attachments.getAttachments().size());
+
+            String firstName = attachments.getAttachments().get(0).getName();
+
+            // Test: pagination with number=1 and start=1
+            getMethod = executeGet(
+                "%s?number=1&start=1".formatted(buildURI(SpaceAttachmentsResource.class, getWiki(),
+                    List.of(spaceName))));
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode());
+            attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+            Assert.assertEquals(1, attachments.getAttachments().size());
+            Assert.assertNotEquals(firstName, attachments.getAttachments().get(0).getName());
+        } finally {
+            // Clean up
+            this.testUtils.rest().delete(ref);
+        }
     }
 }

@@ -66,21 +66,40 @@
       });
 
       editor.addCommand('source', {
-        modes: {wysiwyg: 1, source: 1},
+        // Switching between WYSIWYG and Source modes is asynchronous because the conversion is done server-side.
+        async: true,
+        canUndo: false,
+        contextSensitive: false,
         editorFocus: false,
-        readOnly: 1,
-        exec: function(editor) {
+        // Technically, we don't need the content to be editable in order to switch the edit mode (we just need to be
+        // able to get the data from the editor in order to perform the syntax conversion), but in practice the editor
+        // is put in read-only mode when:
+        // * the editor is loading (i.e. some asynchronous task is being performed, so we should wait for it to finish
+        //   before switching the edit mode)
+        // * the editor can't connect to the server (in which case switching the edit mode would fail anyway because we
+        //   can't perform the syntax conversion)
+        // The alternative is to override the checkAllowed method of the command to perform additional checks, but let's
+        // keep it simple for now.
+        // See CKEDITOR-66: Switch to source corrupt page when connection lost or when connection is very slow
+        // See XWIKI-23489: The button to toggle the Source mode is enabled while the content is being reloaded after a
+        // macro is inserted or updated
+        readOnly: false,
+        modes: {wysiwyg: 1, source: 1},
+        exec: async function(editor) {
           if (editor.mode === 'wysiwyg') {
             editor.fire('saveSnapshot');
           }
-          editor.getCommand('source').setState(CKEDITOR.TRISTATE_DISABLED);
+          // Disable the command while switching between editing modes.
+          this.disable();
           editor.setMode(editor.mode === 'source' ? 'wysiwyg' : 'source');
-        },
-        canUndo: false
-      });
-
-      editor.on('mode', function() {
-        editor.getCommand('source').setState(editor.mode === 'source' ? CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF);
+          try {
+            await editor.toBeReady();
+          } finally {
+            // Re-enable the command with the proper toggle state.
+            this.setState(editor.mode === 'source' ? CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF);
+            editor.fire('afterCommandExec', {name: this.name, command: this});
+          }
+        }
       });
 
       if (editor.ui.addButton) {
@@ -99,12 +118,13 @@
           }
         });
 
-        // Update the source text area height after the HTML to Wiki Syntax conversion is done.
-        editor.on('modeReady', function() {
+        // Update the source text area height after the HTML to Wiki Syntax conversion is done, but before restoring the
+        // selection because scrolling the selection into view depends on the text area height.
+        CKEDITOR.plugins.xwikiSource.addModeChangeHandler(editor, () => {
           if (editor.mode === 'source') {
             updateSourceAreaHeight(editor);
           }
-        });
+        }, 7);
       }
     }
   });

@@ -19,7 +19,6 @@
  */
 package org.xwiki.livedata.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -34,7 +33,6 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    @DisplayName("Live Data Tests")
     class NestedLiveDataIT extends LiveDataIT
     {
     }

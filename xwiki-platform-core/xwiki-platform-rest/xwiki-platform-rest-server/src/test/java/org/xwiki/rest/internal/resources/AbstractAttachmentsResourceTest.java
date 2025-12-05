@@ -34,6 +34,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.ModelFactory;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
@@ -62,6 +63,9 @@ public abstract class AbstractAttachmentsResourceTest
     @Named("local")
     protected EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
+    @MockComponent
+    protected SecurityConfiguration securityConfiguration;
+
     @InjectMockitoOldcore
     protected MockitoOldcore oldCore;
 
@@ -79,6 +83,8 @@ public abstract class AbstractAttachmentsResourceTest
 
         this.xcontext = this.oldCore.getXWikiContext();
         this.xwiki = this.oldCore.getSpyXWiki();
+
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
 
     protected void setUriInfo(XWikiResource resource) throws Exception

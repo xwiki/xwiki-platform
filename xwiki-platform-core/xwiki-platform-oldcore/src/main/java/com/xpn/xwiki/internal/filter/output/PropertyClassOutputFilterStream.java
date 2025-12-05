@@ -128,23 +128,37 @@ public class PropertyClassOutputFilterStream extends AbstractEntityOutputFilterS
         throws FilterException
     {
         if (this.entity != null) {
+            Object classReference = this.entity.getObject().getName();
+            if (classReference == null) {
+                classReference = this.entity.getObject().getDocumentReference();
+            }
+
             PropertyClass propertyClass;
             try {
                 propertyClass = (PropertyClass) this.currentClassPropertyMeta.get(name);
             } catch (XWikiException e) {
-                throw new FilterException(String.format("Failed to get definition of field [%s] for property type [%s]",
-                    name, this.entity.getClassType()), e);
+                throw new FilterException(
+                    String.format("Failed to get definition of field [%s] for property type [%s] in class [%s]", name,
+                        this.entity.getClassType(), classReference),
+                    e);
             }
 
             // Make sure the property is known
             if (propertyClass == null) {
-                this.logger.warn("Unknown property meta class field [{}] for property type [{}]", name,
-                    this.entity.getClassType());
+                this.logger.warn("{} - Unknown property meta class field [{}] for property type [{}] in class [{}]",
+                    this.currentEntityReference, name, this.entity.getClassType(), classReference);
 
                 return;
             }
 
-            BaseProperty<?> field = propertyClass.fromString(value);
+            BaseProperty<?> field = null;
+            try {
+                field = propertyClass.fromString(value);
+            } catch (XWikiException e) {
+                throw new FilterException(
+                    String.format("Failed to parse value [%s] for field [%s] in class reference [%s]",
+                    value, name, classReference), e);
+            }
 
             this.entity.safeput(name, field);
         }

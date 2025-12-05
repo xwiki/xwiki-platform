@@ -25,8 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.stability.Unstable;
 
 import static com.xpn.xwiki.doc.XWikiDocument.DB_SPACE_SEP;
 
@@ -52,7 +52,6 @@ public interface NotificationFilterPreference
      * Prefix to be used for the ID only when the preference is stored in database.
      * @since 16.5.0RC1
      */
-    @Unstable
     String DB_ID_FILTER_PREFIX = "NFP_";
     
     /**
@@ -168,9 +167,9 @@ public interface NotificationFilterPreference
     {
         String wikiIdWithPrefix = wikiId + DB_SPACE_SEP;
         return Objects.equals(getWiki(), wikiId)
-            || StringUtils.startsWith(getPage(), wikiIdWithPrefix)
-            || StringUtils.startsWith(getPageOnly(), wikiIdWithPrefix)
-            || StringUtils.startsWith(getUser(), wikiIdWithPrefix);
+            || Strings.CS.startsWith(getPage(), wikiIdWithPrefix)
+            || Strings.CS.startsWith(getPageOnly(), wikiIdWithPrefix)
+            || Strings.CS.startsWith(getUser(), wikiIdWithPrefix);
     }
 
     /**

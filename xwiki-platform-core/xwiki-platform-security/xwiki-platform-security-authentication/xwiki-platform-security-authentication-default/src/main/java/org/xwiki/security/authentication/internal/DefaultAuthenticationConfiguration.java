@@ -33,8 +33,6 @@ import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
 
-import static java.util.stream.Collectors.toList;
-
 /**
  * Default implementation for {@link AuthenticationConfiguration}.
  *
@@ -45,8 +43,6 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class DefaultAuthenticationConfiguration implements AuthenticationConfiguration
 {
-    private static final String COOKIE_PREFIX = ".";
-
     /**
      * Defines from where to read the Resource configuration data.
      */
@@ -101,12 +97,8 @@ public class DefaultAuthenticationConfiguration implements AuthenticationConfigu
     @Override
     public List<String> getCookieDomains()
     {
-        List<?> rawValues = this.xwikiCfgConfiguration.getProperty("xwiki.authentication.cookiedomains", List.class,
-            List.of());
-        return rawValues.stream()
-            .map(Object::toString)
-            .map(cookie -> StringUtils.startsWith(cookie, COOKIE_PREFIX) ? cookie : COOKIE_PREFIX + cookie)
-            .collect(toList());
+        return this.xwikiCfgConfiguration.getProperty("xwiki.authentication.cookiedomains", List.class,
+            List.<String>of());
     }
 
     @Override

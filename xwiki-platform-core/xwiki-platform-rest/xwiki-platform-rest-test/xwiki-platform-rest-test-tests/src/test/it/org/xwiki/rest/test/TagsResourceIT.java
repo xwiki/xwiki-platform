@@ -19,7 +19,10 @@
  */
 package org.xwiki.rest.test;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
 
@@ -199,5 +202,87 @@ public class TagsResourceIT extends AbstractHttpIT
             }
         }
         Assert.assertTrue(found);
+    }
+
+    @Test
+    public void testPagesForTagsMultipleTagsAndPagination() throws Exception
+    {
+        // Setup: create three pages with different tags
+        String tagA = "TagA_" + UUID.randomUUID();
+        String tagB = "TagB_" + UUID.randomUUID();
+
+        String[] pages = { "PageForTagA", "PageForTagB", "PageForTagAB" };
+
+        // Create test pages
+        for (String page : pages) {
+            createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, page, "Test");
+        }
+
+        // Add tags to pages
+        Tags tags1 = this.objectFactory.createTags();
+        tags1.getTags().add(this.objectFactory.createTag().withName(tagA));
+
+        // Add tagA to page1
+        executePutXml(
+            buildURI(PageTagsResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, pages[0]),
+            tags1, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+
+        // Add tagB to page2
+        Tags tags2 = this.objectFactory.createTags();
+        tags2.getTags().add(this.objectFactory.createTag().withName(tagB));
+        executePutXml(
+            buildURI(PageTagsResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, pages[1]),
+            tags2, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+
+        // Add both tags to page3
+        Tags tags3 = this.objectFactory.createTags();
+        for (String tagName : new String[] { tagA, tagB }) {
+            tags3.getTags().add(this.objectFactory.createTag().withName(tagName));
+        }
+        executePutXml(
+            buildURI(PageTagsResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, pages[2]),
+            tags3, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+
+        // Query for both tags
+        String tagQuery = tagA + "," + tagB;
+        GetMethod getMethod = executeGet(
+            buildURI(PagesForTagsResource.class, getWiki(), tagQuery));
+        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Pages returnedPages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+        // Verify all pages are returned in alphabetical order
+        List<String> expectedOrder = Arrays.stream(pages).sorted().collect(Collectors.toList());
+        List<String> actualOrder = returnedPages.getPageSummaries().stream()
+            .map(PageSummary::getName)
+            .toList();
+        Assert.assertEquals(expectedOrder, actualOrder);
+
+        // Test pagination: number=1
+        getMethod = executeGet(
+            buildURI(PagesForTagsResource.class, getWiki(), tagQuery) + "?number=1");
+        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        returnedPages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Assert.assertEquals(1, returnedPages.getPageSummaries().size());
+        Assert.assertEquals(expectedOrder.get(0), returnedPages.getPageSummaries().get(0).getName());
+
+        // Test pagination: number=1, start=1
+        getMethod = executeGet(
+            buildURI(PagesForTagsResource.class, getWiki(), tagQuery) + "?number=1&start=1");
+        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        returnedPages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Assert.assertEquals(1, returnedPages.getPageSummaries().size());
+        Assert.assertEquals(expectedOrder.get(1), returnedPages.getPageSummaries().get(0).getName());
+
+        // Test error: number=-1
+        getMethod = executeGet(
+            buildURI(PagesForTagsResource.class, getWiki(), tagQuery) + "?number=-1");
+        Assert.assertEquals(400, getMethod.getStatusCode());
+        Assert.assertEquals(INVALID_LIMIT_MINUS_1, getMethod.getResponseBodyAsString());
+
+        // Test error: number=1001
+        getMethod = executeGet(
+            buildURI(PagesForTagsResource.class, getWiki(), tagQuery) + "?number=1001");
+        Assert.assertEquals(400, getMethod.getStatusCode());
+        Assert.assertEquals(INVALID_LIMIT_1001, getMethod.getResponseBodyAsString());
     }
 }

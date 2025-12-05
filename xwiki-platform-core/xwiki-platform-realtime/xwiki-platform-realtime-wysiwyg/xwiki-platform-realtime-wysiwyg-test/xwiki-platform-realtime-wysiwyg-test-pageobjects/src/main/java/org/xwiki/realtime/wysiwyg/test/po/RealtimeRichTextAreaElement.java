@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntConsumer;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -65,7 +65,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
         public String getCoeditorId()
         {
-            return StringUtils.removeStart(id, "rt-user-");
+            return Strings.CS.removeStart(id, "rt-user-");
         }
 
         public String getAvatarURL()
@@ -160,6 +160,27 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     public void waitUntilContentContains(String html)
     {
         repeatedWait(timeout -> waitUntilContentContains(html, timeout));
+    }
+
+    /**
+     * Wait for local changes to be pushed to the server. This only guarantees that the server has aknowledged receiving
+     * the changes, not that other users have received them. Use this in tests when you need to force a specific order
+     * of changes.
+     *
+     * @since 17.8.0
+     * @since 17.4.5
+     * @since 16.10.12
+     */
+    public void waitUntilLocalChangesArePushed()
+    {
+        StringBuilder script = new StringBuilder();
+        script.append("const name = arguments[0];\n");
+        script.append("const callback = arguments[1];\n");
+        script.append("const editor = CKEDITOR.instances[name]._realtime.editor;\n");
+        // Commit local changes, push to the server and wait for aknowledgement.
+        script.append("editor._flushUncommittedWork().finally(callback);\n");
+
+        getDriver().executeAsyncScript(script.toString(), this.editor.getName());
     }
 
     /**

@@ -73,8 +73,11 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     {
         this.contextInitializer.initialize(namespace);
 
-        LiveDataConfiguration config = initConfig(sourceId, properties, matchAll, sort, descending, offset, limit);
-        return getEntries(namespace, offset, limit, config);
+        int validatedLimit = validateAndGetLimit(limit);
+
+        LiveDataConfiguration config =
+            initConfig(sourceId, properties, matchAll, sort, descending, offset, validatedLimit);
+        return getEntries(namespace, offset, validatedLimit, config);
     }
 
     @Override

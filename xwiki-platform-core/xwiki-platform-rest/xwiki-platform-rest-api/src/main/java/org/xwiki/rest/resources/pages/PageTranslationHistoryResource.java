@@ -41,7 +41,7 @@ public interface PageTranslationHistoryResource
             @PathParam("pageName") String pageName,
             @PathParam("language") String language,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("order") @DefaultValue("desc") String order,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;

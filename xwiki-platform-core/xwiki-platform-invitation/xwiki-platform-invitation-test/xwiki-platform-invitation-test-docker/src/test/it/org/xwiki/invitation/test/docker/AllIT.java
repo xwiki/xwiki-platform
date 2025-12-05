@@ -19,7 +19,6 @@
  */
 package org.xwiki.invitation.test.docker;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -34,7 +33,6 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Invitation tests")
     class NestedInvitationIT extends InvitationIT
     {
     }

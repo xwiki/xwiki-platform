@@ -21,7 +21,9 @@ package org.xwiki.security.test.ui;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,8 +35,9 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.ClassPropertyEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
-import org.xwiki.text.StringUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -97,7 +100,7 @@ class RequiredRightsIT
 
         // Wait for the required rights information to reload.
         setup.getDriver()
-            .waitUntilCondition(driver -> StringUtils.contains(informationPane.getRequiredRightsStatusMessage(),
+            .waitUntilCondition(driver -> Strings.CS.contains(informationPane.getRequiredRightsStatusMessage(),
                 "This page is enforcing required rights but no rights"));
         assertEquals(List.of(), informationPane.getRequiredRights());
         assertFalse(informationPane.getRequiredRightsModificationMessage().isPresent());
@@ -279,6 +282,152 @@ class RequiredRightsIT
         assertEquals("Content", viewPage.getContent());
     }
 
+    @ParameterizedTest
+    @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-security-requiredrights-ui")
+    @Order(6)
+    void testRequiredRightsAreEnforced(WikiReference wiki, TestLocalReference testLocalReference, TestUtils setup)
+        throws Exception
+    {
+        DocumentReference testReference = new DocumentReference(testLocalReference, wiki);
+
+        setup.rest().delete(testReference);
+
+        // Create two users, one with script right on the test page.
+        String scriptUser = "RequiredRightsScriptUser";
+        String noScriptUser = "RequiredRightsNoScriptUser";
+        // Make both users advanced so we can use the edit menu to access the wiki editor.
+        setup.createUser(scriptUser, scriptUser, "", "usertype", "Advanced");
+        setup.createUser(noScriptUser, noScriptUser, "", "usertype", "Advanced");
+        setup.loginAsSuperAdmin();
+        setup.setRights(testReference, null, "xwiki:XWiki." + scriptUser, "script", true);
+
+        // Create the page with a script macro and enforce required rights.
+        setup.login(scriptUser, scriptUser);
+        ViewPage viewPage = setup.createPage(testReference, "{{velocity}}Script{{/velocity}}");
+        assertEquals("Script", viewPage.getContent());
+        InformationPane informationPane = viewPage.openInformationDocExtraPane();
+        RequiredRightsModal requiredRightsModal = informationPane.openRequiredRightsModal();
+        requiredRightsModal.setEnforceRequiredRights(true);
+        assertEquals("script", requiredRightsModal.setEnforcedRequiredRight("script"));
+        // Assert that only the empty and the script right are available.
+        assertAvailableRights(requiredRightsModal, List.of("", "script"));
+        requiredRightsModal.clickSave(true);
+        setup.getDriver().waitUntilCondition(driver -> informationPane.getRequiredRights().contains("Script right"));
+        assertEquals(List.of("Script right"), informationPane.getRequiredRights());
+        assertEquals("Script", viewPage.getContent());
+
+        // Verify that the user without script right cannot edit the page.
+        setup.login(noScriptUser, noScriptUser);
+        viewPage = setup.gotoPage(testReference);
+        assertEquals("Script", viewPage.getContent());
+        assertFalse(viewPage.isEditAvailable());
+        viewPage.openInformationDocExtraPane();
+        assertFalse(informationPane.canReviewRequiredRights());
+
+        // Verify that the user with script right can edit the page.
+        setup.login(scriptUser, scriptUser);
+        viewPage = setup.gotoPage(testReference);
+        assertTrue(viewPage.isEditAvailable());
+        WikiEditPage editPage = viewPage.editWiki();
+        editPage.setContent("No Script");
+        viewPage = editPage.clickSaveAndView();
+
+        // Disable enforcing script right.
+        viewPage.openInformationDocExtraPane();
+        requiredRightsModal = informationPane.openRequiredRightsModal();
+        requiredRightsModal.setEnforcedRequiredRight("");
+        requiredRightsModal.clickSave(true);
+        setup.getDriver().waitUntilCondition(driver -> informationPane.getRequiredRights().isEmpty());
+        assertEquals("No Script", viewPage.getContent());
+
+        // Verify that the user without script right can edit the page again but that a script macro added by that
+        // user isn't executed.
+        setup.login(noScriptUser, noScriptUser);
+        viewPage = setup.gotoPage(testReference);
+        assertEquals("No Script", viewPage.getContent());
+        viewPage.editWiki();
+        editPage.setContent("{{velocity}}Script{{/velocity}}");
+        viewPage = editPage.clickSaveAndView();
+        assertTrue(viewPage.hasRenderingError());
+        viewPage.openInformationDocExtraPane();
+        // The user is advanced, so reviewing required rights should be available.
+        assertTrue(informationPane.canReviewRequiredRights());
+        // As the user cannot grant script right, the user shouldn't be prompted to enable script right.
+        assertEquals(Optional.empty(), informationPane.getRequiredRightsModificationMessage());
+        assertFalse(viewPage.hasRequiredRightsWarning(false));
+        // While the user can open the modal, the only option should be no enforced right.
+        requiredRightsModal = informationPane.openRequiredRightsModal();
+        assertAvailableRights(requiredRightsModal, List.of(""));
+        requiredRightsModal.clickCancel();
+
+        // Verify that the user with script right can still edit the page but that a script macro added by that
+        // user still isn't executed, even when the user with script right edits the page.
+        setup.login(scriptUser, scriptUser);
+        viewPage = setup.gotoPage(testReference);
+        assertTrue(viewPage.hasRenderingError());
+        // The user with script right should have a warning about the missing script right.
+        assertTrue(viewPage.hasRequiredRightsWarning(true));
+        viewPage.openInformationDocExtraPane();
+        // The user with script right should have a prompt to increase rights.
+        assertTrue(informationPane.canReviewRequiredRights());
+        assertTrue(informationPane.getRequiredRightsModificationMessage().isPresent());
+        viewPage.editWiki();
+        editPage.setTitle("Required Rights IT");
+        editPage.clickSaveAndView();
+        assertTrue(viewPage.hasRenderingError());
+    }
+
+    @ParameterizedTest
+    @WikisSource(extensions = "org.xwiki.platform:xwiki-platform-security-requiredrights-ui")
+    @Order(7)
+    void testWithXClassWithCustomDisplay(WikiReference wiki, TestLocalReference testLocalReference, TestUtils setup)
+        throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        DocumentReference testReference = new DocumentReference(testLocalReference, wiki);
+
+        setup.rest().delete(testReference);
+
+        ViewPage viewPage = setup.createPage(testReference, "Content");
+        enabledRequiredRights(viewPage, setup);
+
+        ClassEditPage classEditPage = viewPage.editClass();
+        classEditPage.addProperty("custom", "String");
+        ClassPropertyEditPane customPropertyEditPane = classEditPage.getPropertyEditPane("custom");
+        customPropertyEditPane.expand();
+        customPropertyEditPane.setMetaProperty("customDisplay", "{{velocity}}Custom{{/velocity}}");
+        viewPage = classEditPage.clickSaveAndView();
+
+        // There should be a warning now that the custom property might be missing a required right.
+        assertTrue(viewPage.hasRequiredRightsWarning(true));
+        RequiredRightsModal requiredRightsModal = viewPage.openRequiredRightsModal();
+        assertTrue(requiredRightsModal.isDisplayed());
+        assertTrue(requiredRightsModal.isEnforceRequiredRights());
+        List<RequiredRightsModal.RequiredRight> requiredRights = requiredRightsModal.getRequiredRights();
+        // Ensure that script right is marked as required.
+        RequiredRightsModal.RequiredRight scriptRight = requiredRights.stream()
+            .filter(requiredRight -> "script".equals(requiredRight.name()))
+            .findFirst()
+            .orElseThrow();
+        assertEquals("required", scriptRight.suggestionClass());
+
+        // Assert that there are analysis details.
+        assertTrue(requiredRightsModal.hasAnalysisDetails());
+        assertFalse(requiredRightsModal.isAnalysisDetailsDisplayed());
+        requiredRightsModal.toggleAnalysisDetails();
+        assertTrue(requiredRightsModal.isAnalysisDetailsDisplayed());
+    }
+
+    private static void assertAvailableRights(RequiredRightsModal requiredRightsModal, List<String> expectedRights)
+    {
+        List<String> availableRights = requiredRightsModal.getRequiredRights().stream()
+            .filter(RequiredRightsModal.RequiredRight::enabled)
+            .map(RequiredRightsModal.RequiredRight::name)
+            .toList();
+        assertEquals(expectedRights, availableRights);
+    }
+
     private static void enabledRequiredRights(ViewPage viewPage, TestUtils setup)
     {
         InformationPane informationPane = viewPage.openInformationDocExtraPane();
@@ -287,7 +436,7 @@ class RequiredRightsIT
         requiredRightsModal.setEnforcedRequiredRight("");
         requiredRightsModal.clickSave(true);
         setup.getDriver()
-            .waitUntilCondition(driver -> StringUtils.contains(informationPane.getRequiredRightsStatusMessage(),
+            .waitUntilCondition(driver -> Strings.CS.contains(informationPane.getRequiredRightsStatusMessage(),
                 "This page is enforcing required rights but no rights"));
     }
 }

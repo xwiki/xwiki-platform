@@ -17,18 +17,52 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+/*!
+#set ($l10nKeys = [
+ 'core.widgets.gallery.previousImage',
+ 'core.widgets.gallery.currentImage',
+ 'core.widgets.gallery.nextImage',
+ 'core.widgets.gallery.index.description',
+ 'core.widgets.gallery.maximize',
+ 'core.widgets.gallery.minimize'
+])
+#set ($l10n = {})
+#foreach ($key in $l10nKeys)
+  #set ($discard = $l10n.put($key, $services.localization.render($key)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(l10n) {
+  "use strict";
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 XWiki.Gallery = Class.create({
   initialize : function(container) {
     this.images = this._collectImages(container);
-    this.container = container.update(
-      '<button class="maximize" title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}"></button>' +
-      '<button class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</button>' +
-      '<img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/>' +
-      '<button class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</button>' +
-      '<div class="index" tabindex="0" title="${escapetool.xml($services.localization.render("core.widgets.gallery.index.description"))}" aria-description="${escapetool.xml($services.localization.render("core.widgets.gallery.index.description"))}">0 / 0</div>'
-    );
+    // Generate the different parts of the gallery
+    let maximizeButton = new Element('button', {
+      'class': 'maximize', 'title': l10n['core.widgets.gallery.maximize']});
+    let previousButton = new Element('button', {
+      'class': 'previous', 'title': l10n['core.widgets.gallery.previousImage']});
+    previousButton.insert("&lt;");
+    let currentImage = new Element('img',
+      {'class': 'currentImage', 'title': l10n['core.widgets.gallery.currentImage']});
+    let nextButton = new Element('button',
+      {'class': 'next', 'title': l10n['core.widgets.gallery.nextImage']});
+    nextButton.insert("&gt;");
+    let imageIndex = new Element('div', {
+      'class': 'index', 'tabindex': 0, 'title': l10n['core.widgets.gallery.index.description'],
+      'aria-description': l10n['core.widgets.gallery.index.description']});
+    imageIndex.insert("0 / 0");
+    // Remove the content that's left in the container
+    container.update("");
+    // Add the gallery parts in the container, in the correct order.
+    container.insert(maximizeButton);
+    container.insert(previousButton);
+    container.insert(currentImage);
+    container.insert(nextButton);
+    container.insert(imageIndex);
+    this.container = container;
     this.container.addClassName('xGallery');    
     
     // Instead of an arbitrary element to catch focus, we use the index.
@@ -63,7 +97,7 @@ XWiki.Gallery = Class.create({
     var imageElements = container.select('img');
     for(var i = 0; i < imageElements.length; i++) {
       var imageElement = imageElements[i];
-      images.push({url: imageElement.getAttribute('src'), title: imageElement.title});
+      images.push({url: imageElement.getAttribute('src'), title: imageElement.title, alt: imageElement.alt});
       imageElement.removeAttribute('src');
     }
     return images;
@@ -117,8 +151,7 @@ XWiki.Gallery = Class.create({
     this.maximizeToggle.toggleClassName('maximize');
     this.maximizeToggle.toggleClassName('minimize');
     this.maximizeToggle.title = this.maximizeToggle.hasClassName('maximize') ?
-      "${escapetool.javascript($services.localization.render('core.widgets.gallery.maximize'))}" :
-      "${escapetool.javascript($services.localization.render('core.widgets.gallery.minimize'))}";
+      l10n['core.widgets.gallery.maximize'] : l10n['core.widgets.gallery.minimize'];
     this.container.toggleClassName('maximized');
     $(document.documentElement).toggleClassName('maximized');
     // When a keyboard shortcut is used, the gallery is not focused by default. In order to keep the screen at the
@@ -133,11 +166,19 @@ XWiki.Gallery = Class.create({
     }
     // Update only if it's a different image. Some browsers, e.g. Chrome, don't fire the load event if the image URL
     // doesn't change. Another trick would be to reset the src attribute before setting the actual URL (set to '').
-    if (this.currentImage.src != this.images[index].url) {
+    const imageData = this.images[index];
+    if (this.currentImage.src !== imageData.url) {
       this.currentImage.style.visibility = 'hidden';
       Element.addClassName(this.currentImage.parentNode, 'loading');
-      this.currentImage.title = this.images[index].title;
-      this.currentImage.src = this.images[index].url;
+      this.currentImage.title = imageData.title;
+      const filename = decodeURI(imageData.url.split('/').pop().split('?')[0]);
+      // If the alt is just the name of the file, we instead fall back on the human-readable currentImage translation.
+      if (filename !== imageData.alt) {
+        this.currentImage.alt = imageData.alt;
+      } else {
+        this.currentImage.alt = l10n['core.widgets.gallery.currentImage'];
+      }
+      this.currentImage.src = imageData.url;
     }
     this.index = index;
     this.indexDisplay.update((index + 1) + ' / ' + this.images.length);
@@ -167,3 +208,5 @@ if (XWiki.contextaction !== 'export') {
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
+// End JavaScript-only code.
+}).apply(']]#', $jsontool.serialize([$l10n]));

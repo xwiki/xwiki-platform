@@ -39,12 +39,12 @@
 -->
 <Context path="/xwiki" docBase="/usr/lib/xwiki" containerSciFilter="org.apache.jasper.servlet.JasperInitializer">
 
-  <!-- Make symlinks work in Tomcat, and fix problem described in
-       XWIKI-16236 & XWIKI-15756 causing catalina.out warnings on "evicting
-       expired cache entries", which is solved by increasing the cache
-       size. 
+  <!-- 
+       Until implementation XCOMMONS-2369 in order to make symlinks work in Tomcat, 
+       we have to manually increase the cache size value to higher value 
+       that stop causing catalina.out warnings on "evicting expired cache entries". 
   -->
-  <Resources allowLinking="true" cachingAllowed="true" cacheMaxSize="50176"/>
+  <Resources allowLinking="true" cachingAllowed="true" cacheMaxSize="100176"/>
 
   <!-- Disable JAR scanning since XWiki does not need that -->
   <JarScanner scanClassPath="false">

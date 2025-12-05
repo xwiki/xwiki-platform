@@ -36,6 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @UITest
 class RequiredRightsIT
 {
+    private static final String VELOCITY_MACRO_REQUIREMENTS_MESSAGE =
+        "A [velocity] scripting macro requires script rights "
+            + "and might require programming right depending on the called methods.";
+
     @Test
     void checkTitleWithVelocityCode(TestUtils setup, TestReference testReference)
     {
@@ -82,15 +86,13 @@ class RequiredRightsIT
         RequiredRightsPreEditCheckElement requiredRightsPreEditCheckElement = new RequiredRightsPreEditCheckElement()
             .toggleDetails();
         assertEquals(2, requiredRightsPreEditCheckElement.count());
-        assertEquals("A [velocity] scripting macro requires script rights.",
-            requiredRightsPreEditCheckElement.getSummary(0));
+        assertEquals(VELOCITY_MACRO_REQUIREMENTS_MESSAGE, requiredRightsPreEditCheckElement.getSummary(0));
         requiredRightsPreEditCheckElement.toggleDetailedMessage(0);
         requiredRightsPreEditCheckElement.waitForDetailedMessage(0, "Content\n"
             + "the velocity script to execute\n"
             + "macro1");
 
-        assertEquals("A [velocity] scripting macro requires script rights.",
-            requiredRightsPreEditCheckElement.getSummary(1));
+        assertEquals(VELOCITY_MACRO_REQUIREMENTS_MESSAGE, requiredRightsPreEditCheckElement.getSummary(1));
         requiredRightsPreEditCheckElement.toggleDetailedMessage(1);
         requiredRightsPreEditCheckElement.waitForDetailedMessage(1, "Content\n"
             + "the velocity script to execute\n"

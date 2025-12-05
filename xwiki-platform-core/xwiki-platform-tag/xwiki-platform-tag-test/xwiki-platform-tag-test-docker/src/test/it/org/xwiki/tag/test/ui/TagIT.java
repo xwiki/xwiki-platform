@@ -47,7 +47,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.tag.TagPlugin",
-})
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+},
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class TagIT
 {
     private TagPage tagPage;

@@ -27,7 +27,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Pages;
-import org.xwiki.stability.Unstable;
 
 /**
  * The top level pages in the page hierarchy of a given wiki.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 16.4.0RC1
  */
 @Path("/wikis/{wikiName}/children")
-@Unstable
 public interface WikiChildrenResource
 {
     /**
@@ -52,7 +50,7 @@ public interface WikiChildrenResource
     @GET Pages getChildren(
         @PathParam("wikiName") String wikiName,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("limit") @DefaultValue("-1") Integer limit,
+        @QueryParam("limit") Integer limit,
         @QueryParam("search") @DefaultValue("") String search
     ) throws XWikiRestException;
 }

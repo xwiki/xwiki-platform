@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>17.5.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data</name>
@@ -75,19 +75,28 @@
             </disabledComponents>
           </configuration>
           <dependencies>
-            <!-- Since we're building XWiki Standard, we need to add the Event Stream Store as a dependency,
-                 which has its own mapping and migrators. -->
+            <!-- Dependencies required at runtime -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
+              <artifactId>xwiki-platform-search-solr-embedded</artifactId>
               <version>${project.version}</version>
             </dependency>
-            <!-- Annotation has it own migrator that we need to execute to set the rigth version to the DB. -->
+            <dependency>
+              <groupId>org.glassfish.expressly</groupId>
+              <artifactId>expressly</artifactId>
+              <version>${expressly.version}</version>
+            </dependency>
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-annotation-io</artifactId>
+              <artifactId>xwiki-platform-url-default</artifactId>
               <version>${project.version}</version>
             </dependency>
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+
             <!-- Modules containing mandatory document initializers -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
@@ -149,6 +158,20 @@
               <artifactId>xwiki-platform-security-authentication-default</artifactId>
               <version>${project.version}</version>
             </dependency>
+
+            <!-- Since we're building XWiki Standard, we need to add the Event Stream Store as a dependency,
+                 which has its own mapping and migrators. -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Annotation has it own migrator that we need to execute to set the rigth version to the DB. -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-annotation-io</artifactId>
+              <version>${project.version}</version>
+            </dependency>
             <!-- Instance module has its own Hibernate mapping file -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
@@ -201,12 +224,6 @@
             <dependency>
               <groupId>org.xwiki.platform</groupId>
               <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-            <!--  Required for UserEventDispatcherListener. -->
-            <dependency>
-              <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
               <version>${project.version}</version>
             </dependency>
             <!-- Ratings API has a migrator to migrate old Ratings xobjects to the new store -->

@@ -31,118 +31,22 @@
 #set ($themeDoc = $xwiki.getDocument($themeDocFullName))
 #set ($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
 
-## List of Bootstrap variables we need to give default values for XWiki standard variables
-## We make sure font-size-base is set in em since it's a more powerful and reliable unit for font sizes
-## The key is their name and the value is the string representing the value in CSS syntax.
-## The equivalent LESS variables are available in: xwiki-platform-bootstrap-->variables.less
-## The font-size-base unit should be discussed, whether we settle on a rem or em unit.
-#set($bootstrapVariables = {
-"btn-danger-color" : "#fff",
-"btn-default-border" : "#ccc",
-"btn-font-weight" : "normal",
-"btn-info-color" : "#fff",
-"btn-info-bg" : "var(--brand-info)",
-"btn-warning-bg" : "var(--brand-warning)",
-"breadcrumb-bg": "#f5f5f5",
-"breadcrumb-link-color": "var(--link-color)",
-"breadcrumb-separator": "/",
-"component-active-color": "#fff",
-"component-active-bg":"var(--brand-primary)",
-"dropdown-border" : "rgba(0, 0, 0, .15)",
-"dropdown-divider-bg" : "#e5e5e5",
-"font-family-base": "var(--font-family-sans-serif)",
-"font-family-sans-serif": '"Helvetica Neue", Helvetica, Arial, sans-serif',
-"font-family-serif": 'Georgia, "Times New Roman", Times, serif',
-"font-family-monospace": 'Georgia, "Times New Roman", Times, serif',
-"font-size-base": "1rem",
-"grid-gutter-width": "30px",
-"input-bg" : "#fff",
-"legend-color" : "#333",
-"legend-border-color": "#e5e5e5",
-"list-group-hover-bg": "#f5f5f5",
-"list-group-link-color": "#555",
-"list-group-link-hover-color": "var(--list-group-link-color)",
-"navbar-height" : "50px",
-"table-bg-hover": "#f5f5f5",
-"table-border-color": "#ddd"
-})
-
-## List of all the variables set in XWiki standard for various purposes.
-## Those should all be defined in variables.less and variablesInit.vm
-## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
-## The key is their name and the value is the string representing the value in CSS syntax.
-## The equivalent LESS variables should be available in: xwiki-platform-flamingo-skin-resources-->variables.less
-#set($xsVariables = {
-"figure-caption-font-size": "90%",
-"figure-caption-color": "var(--text-muted)",
-"login-form-max-width": "450px",
-"target-size-minimum": "24px",
-"target-size-recommended": "44px",
-"border-width": "1px",
-"headings-font-weight": "400",
-"nav-tabs-active-link-hover-bg": "var(--xwiki-page-content-bg)",
-"border-radius-base": "7px",
-"border-radius-large": "10px",
-"border-radius-small": "5px",
-"button-spacing": "2px",
-"button-border-width": "1px",
-"edit-section-relative-height": ".7",
-"main-padding": "calc(var(--grid-gutter-width) * 2)",
-"font-size-headings-scale": "1.190",
-"font-size-headings-scale-min": "1.125",
-"min-screen-size": "768",
-"max-screen-size": "1200",
-"min-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 4))",
-"max-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 4))",
-"min-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 3))",
-"max-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 3))",
-"min-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 2))",
-"max-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 2))",
-"min-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 1))",
-"max-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))",
-"min-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), -1))",
-"max-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))",
-"min-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))",
-"max-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 5))",
-"font-size-document-title": "calc(max(var(--min-document-title-font-size) * 1px, min(var(--max-document-title-font-size) * 1px, var(--min-document-title-font-size) * 1px + (var(--max-document-title-font-size) - var(--min-document-title-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"font-size-h1": "calc(max(var(--min-h1-font-size), min(var(--max-h1-font-size), var(--min-h1-font-size) + (var(--max-h1-font-size) - var(--min-h1-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"font-size-h2": "calc(max(var(--min-h2-font-size), min(var(--max-h2-font-size), var(--min-h2-font-size) + (var(--max-h2-font-size) - var(--min-h2-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"font-size-h3": "calc(max(var(--min-h3-font-size), min(var(--max-h3-font-size), var(--min-h3-font-size) + (var(--max-h3-font-size) - var(--min-h3-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"font-size-h4": "calc(max(var(--min-h4-font-size), min(var(--max-h4-font-size), var(--min-h4-font-size) + (var(--max-h4-font-size) - var(--min-h4-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"font-size-h5": "var(--font-size-base)",
-"font-size-h6": "calc(max(var(--min-h6-font-size), min(var(--max-h6-font-size), var(--min-h6-font-size) + (var(--max-h6-font-size) - var(--min-h6-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"navbar-default-link-color": "#727272",
-"navbar-default-color": "#727272",
-"input-color-placeholder": "#727272",
-"breadcrumb-active-color": "#707070",
-"breadcrumb-color": "#707070",
-"text-muted": "#555",
-"brand-primary": "#2f70a7",
-"text-color": "#222222",
-"btn-primary-bg": "#386da7",
-"btn-danger-bg": "#ca302c",
-"brand-success": "#077537",
-"btn-warning-color": "#000",
-"alert-danger-bg": "#f8ecec",
-"alert-success-bg": "#e5f3df",
-"alert-info-bg": "#e1f1f9",
-"brand-danger": "#cc3333"
-})
-
-## List of all the new variables added to the CSS property set.
+## List of all the new variables added to the CSS property set (from oldest to latest).
 ## Those variables do not have a LESS variable equivalent in previous systems. They were introduced mostly to replace
 ## whole mixins. There should be no overlap between this category of variables and the others.
 ## List of versions where variables were introduced:
 ## * 17.3.0RC1: 100vw, int-viewport-width, font-weight-regular, font-weight-semibold, font-weight-bold
+## * 17.9.0RC1: login-form-max-width
 #set($newVariables = {
 "100vw": "100vw",
 "int-viewport-width": "calc(10000 * tan(atan2(var(--100vw), 10000px)))",
+"login-form-max-width": "450px",
 "font-weight-regular": 400,
 "font-weight-semibold": 700,
 "font-weight-bold": "900"
 })
 
-## Retrieve the lists of variables for the old ColorTheme and Flamingo ColorTheme
+## Retrieve the lists of variables
 #template('variablelist.vm')
 ## If you want to update the values set for the old colortheme, see colorThemeInit.vm, a source of truth shared
 ## with LESS variables defined in xwiki-platform-flamingo-skin-resources -> variablesInit.vm -> initFromOldColorTheme
@@ -152,12 +56,6 @@
   #set($discard = $oldColorThemeVariables.remove($excludedVariable))
 #end
 
-## We merge the three maps into one list.
-## We allow different values from different maps for the same variable. This is an extra fallback in case the first
-## doesn't work. This could be the case for defaults that rely on other variables.
-## Values follow CSS cascading order (last one wins).
-#set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariables, $newVariables])
-
 ## $flamingoColorThemeVariables is the list of all the variables available to customize directly in the Flamingo
 ## theme editor. These mappings will not always end up in the initialization of a CSS variable.
 ## If you want to update the values set for the flamingo colortheme, see the colortheme xml,
@@ -165,6 +63,24 @@
 ## To make sure all of those variables are still available even when not set in the colortheme,
 ## we make sure that they all appear in another mapping above.
 ## The key is the name and the value is a type for the variable.
+
+## $xsVariablesValuesCSS is the list of all the variables set in XWiki standard for various purposes.
+## Those should all be defined in variables.less and variablesInit.vm
+## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
+## The key is their name and the value is the string representing the value in CSS syntax.
+## The equivalent LESS variables should be available in: xwiki-platform-flamingo-skin-resources-->variables.less
+
+
+## $bootstrapVariables is the list of Bootstrap variables we need to give default values for XWiki standard variables
+## The key is their name and the value is the string representing the value in CSS syntax.
+## The equivalent LESS variables are available in: xwiki-platform-bootstrap-->variables.less
+
+## We merge the four maps into one list.
+## We allow different values from different maps for the same variable. This is an extra fallback in case the first one
+## doesn't work. This could be the case for defaults that rely on other variables.
+## Values follow CSS cascading order (last one wins).
+#set($variableValueSets = [$oldColorThemeVariables, $bootstrapVariables, $xsVariablesValuesCSS, $newVariables])
+
 ######################
 ## Generation
 ######################

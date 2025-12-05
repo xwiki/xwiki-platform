@@ -1,39 +1,40 @@
 {
+  "private": true,
   "name": "xwiki-platform-notifications-webjar",
   "version": "0.0.0",
-  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
+    "build-only": "vite build",
+    "dev": "vite",
+    "format": "prettier --write src/",
+    "lint": "eslint .",
     "preview": "vite preview",
     "test:unit": "vitest --run --passWithNoTests",
-    "build-only": "vite build",
-    "type-check": "vue-tsc --build",
-    "lint": "eslint . --fix",
-    "format": "prettier --write src/"
+    "type-check": "vue-tsc --build"
   },
-  "dependencies": {
-    "vue": "3.5.14"
+  "peerDependencies": {
+    "vue": "3.x"
   },
   "devDependencies": {
-    "@tsconfig/node22": "22.0.1",
-    "@types/jsdom": "21.1.7",
-    "@types/node": "22.14.0",
-    "@vitejs/plugin-vue": "5.2.3",
-    "@vitest/eslint-plugin": "1.1.39",
-    "@vue/eslint-config-prettier": "10.2.0",
-    "@vue/eslint-config-typescript": "14.5.0",
-    "@vue/test-utils": "2.4.6",
-    "@vue/tsconfig": "0.7.0",
-    "eslint": "9.23.0",
-    "eslint-plugin-vue": "10.0.0",
-    "jiti": "2.4.2",
-    "jsdom": "26.0.0",
-    "npm-run-all2": "7.0.2",
-    "typescript": "5.8.2",
-    "vite": "6.3.5",
-    "vitest": "3.1.4",
-    "vue-tsc": "2.2.8"
+    "@tsconfig/node24": "catalog:",
+    "@types/jsdom": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitest/eslint-plugin": "catalog:",
+    "@vue/eslint-config-prettier": "catalog:",
+    "@vue/eslint-config-typescript": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "@vue/tsconfig": "catalog:",
+    "eslint": "catalog:",
+    "eslint-plugin-vue": "catalog:",
+    "jiti": "catalog:",
+    "jsdom": "catalog:",
+    "npm-run-all2": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   }
 }

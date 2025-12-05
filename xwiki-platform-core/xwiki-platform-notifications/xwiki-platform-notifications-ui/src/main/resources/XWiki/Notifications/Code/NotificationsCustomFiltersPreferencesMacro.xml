@@ -780,7 +780,7 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
       #set($discard = $xwiki.linkx.use(
         $services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webjar',
-          'xwiki-platform-notifications.css'), { 'type': 'text/css', 'rel': 'stylesheet' }))
+          'xwiki-platform-notifications-webjar.css'), { 'type': 'text/css', 'rel': 'stylesheet' }))
 ######################################################
 ### MACRO CONTENT
 ######################################################

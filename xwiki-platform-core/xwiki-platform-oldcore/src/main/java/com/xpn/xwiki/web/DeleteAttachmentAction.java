@@ -132,9 +132,9 @@ public class DeleteAttachmentAction extends XWikiAction
         // Set "deleted attachment" as the version comment.
         String comment;
         if (attachment.isImage(context)) {
-            comment = localizePlainOrKey("core.comment.deleteImageComment", filename);
+            comment = localizePlainOrReturnKey("core.comment.deleteImageComment", filename);
         } else {
-            comment = localizePlainOrKey("core.comment.deleteAttachmentComment", filename);
+            comment = localizePlainOrReturnKey("core.comment.deleteAttachmentComment", filename);
         }
 
         try {

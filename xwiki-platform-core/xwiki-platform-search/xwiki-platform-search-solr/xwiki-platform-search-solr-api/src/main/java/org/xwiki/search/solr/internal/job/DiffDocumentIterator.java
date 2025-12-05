@@ -20,24 +20,19 @@
 package org.xwiki.search.solr.internal.job;
 
 import java.util.Comparator;
-import java.util.Objects;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.xwiki.model.internal.reference.DefaultSymbolScheme;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Compares the list of document references from two document iterators.
  * 
- * @param <T> the type of data used to determine if a document is up to date
  * @version $Id$
  * @since 5.4.5
  */
-public class DiffDocumentIterator<T> extends AbstractDocumentIterator<DiffDocumentIterator.Action>
+public class DiffDocumentIterator extends AbstractDocumentIterator<DiffDocumentIterator.Action>
 {
     /**
      * The action that must be taken in order to move from the previous version to the next version.
@@ -60,27 +55,27 @@ public class DiffDocumentIterator<T> extends AbstractDocumentIterator<DiffDocume
     /**
      * The document iterator that corresponds to the previous state (the store that needs to be updated).
      */
-    private final DocumentIterator<T> previous;
+    private final DocumentIterator<DocumentIteratorEntry> previous;
 
     /**
      * The document iterator that corresponds to the next state (the store that is used as a reference point).
      */
-    private final DocumentIterator<T> next;
+    private final DocumentIterator<DocumentIteratorEntry> next;
 
     /**
      * Used to compare document references.
      */
-    private final Comparator<DocumentReference> documentReferenceComparator = getComparator();
+    private final Comparator<DocumentIteratorEntry> entryComparator = getComparator();
 
     /**
      * The last entry taken from the {@link #previous} iterator.
      */
-    private Pair<DocumentReference, T> previousEntry;
+    private Pair<DocumentReference, DocumentIteratorEntry> previousEntry;
 
     /**
      * The last entry taken from the {@link #next} iterator.
      */
-    private Pair<DocumentReference, T> nextEntry;
+    private Pair<DocumentReference, DocumentIteratorEntry> nextEntry;
 
     /**
      * The last compare result between {@link #previousEntry} and {@link #nextEntry}.
@@ -94,7 +89,8 @@ public class DiffDocumentIterator<T> extends AbstractDocumentIterator<DiffDocume
      * @param next the document iterator that corresponds to the next state (the store that is used as a reference
      *            point)
      */
-    public DiffDocumentIterator(DocumentIterator<T> previous, DocumentIterator<T> next)
+    public DiffDocumentIterator(DocumentIterator<DocumentIteratorEntry> previous,
+        DocumentIterator<DocumentIteratorEntry> next)
     {
         this.previous = previous;
         this.next = next;
@@ -125,7 +121,7 @@ public class DiffDocumentIterator<T> extends AbstractDocumentIterator<DiffDocume
             if (diff <= 0) {
                 previousEntry = previous.next();
             }
-            diff = documentReferenceComparator.compare(previousEntry.getKey(), nextEntry.getKey());
+            diff = entryComparator.compare(previousEntry.getValue(), nextEntry.getValue());
             if (diff == 0) {
                 documentReference = nextEntry.getKey();
                 // Compare the document version.
@@ -157,15 +153,9 @@ public class DiffDocumentIterator<T> extends AbstractDocumentIterator<DiffDocume
      *
      * @return the comparator for comparing document references
      */
-    public static Comparator<DocumentReference> getComparator()
+    public static Comparator<DocumentIteratorEntry> getComparator()
     {
-        EntityReferenceSerializer<String> localEntityReferenceSerializer =
-            new LocalStringEntityReferenceSerializer(new DefaultSymbolScheme());
-        return Comparator.comparing(DocumentReference::getWikiReference)
-            // Compare by the whole space as string as this is also what we compare in the database and in Solr.
-            .thenComparing(documentReference -> localEntityReferenceSerializer.serialize(documentReference.getParent()))
-            .thenComparing(DocumentReference::getName)
-            .thenComparing(documentReference -> Objects.toString(documentReference.getLocale(), ""));
+        return Comparator.comparing(DocumentIteratorEntry::getWiki).thenComparing(DocumentIteratorEntry::getDocId);
     }
 
     @Override

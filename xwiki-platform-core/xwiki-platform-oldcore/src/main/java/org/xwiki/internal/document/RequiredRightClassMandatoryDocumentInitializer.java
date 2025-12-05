@@ -23,7 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
@@ -35,7 +34,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @version $Id$
  * @since 16.10.0RC1
  */
-@Unstable
 @Component
 @Singleton
 @Named("XWiki.RequiredRightClass")

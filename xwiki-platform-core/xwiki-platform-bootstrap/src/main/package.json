@@ -1,15 +1,22 @@
 {
   "name": "xwiki-bootstrap",
-  "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
   "version": "3.4.1.1-xwiki",
-  "style": "dist/css/bootstrap.css",
-  "less": "less/bootstrap.less",
-  "main": "./dist/js/npm",
+  "private": true,
+  "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
   "license": "MIT",
+  "main": "./dist/js/npm",
+  "files": [
+    "Gruntfile.js",
+    "dist",
+    "fonts",
+    "grunt",
+    "js/*.js",
+    "less/**/*.less"
+  ],
   "scripts": {
     "build": "grunt dist",
-    "test": "grunt test",
-    "lint": "grunt lint"
+    "lint": "grunt lint",
+    "test": "grunt test"
   },
   "dependencies": {},
   "devDependencies": {
@@ -49,15 +56,6 @@
   "engines": {
     "node": ">=6"
   },
-  "files": [
-    "dist",
-    "fonts",
-    "grunt",
-    "js/*.js",
-    "less/**/*.less",
-    "Gruntfile.js",
-    "LICENSE"
-  ],
   "jspm": {
     "main": "js/bootstrap",
     "shim": {
@@ -71,5 +69,7 @@
       "fonts",
       "js"
     ]
-  }
+  },
+  "less": "less/bootstrap.less",
+  "style": "dist/css/bootstrap.css"
 }

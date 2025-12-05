@@ -21,9 +21,9 @@ package com.xpn.xwiki.objects;
 
 import java.util.Objects;
 
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.web.Utils;
 
@@ -57,7 +57,7 @@ public class BaseStringProperty extends BaseProperty
             stringValue = getConverterManager().convert(String.class, value);
         }
 
-        if (!isValueDirty() && !StringUtils.equals(stringValue, getValue())) {
+        if (!isValueDirty() && !Strings.CS.equals(stringValue, getValue())) {
             setValueDirty(true);
         }
 

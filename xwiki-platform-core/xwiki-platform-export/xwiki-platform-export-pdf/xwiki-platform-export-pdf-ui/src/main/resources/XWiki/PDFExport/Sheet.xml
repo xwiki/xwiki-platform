@@ -364,6 +364,63 @@ define('paged-polyfill-patched', [
   }
 
   /**
+   * Paged.js doesn't handle very well tables with cells that span multiple rows or columns. You either end up with
+   * duplicated rows (best case) or with a partial export (worst case). As a temporary workaround, until paged.js
+   * improves table rendering, we replace the usage of colspan and rowspan with actual cells. If a cell spans 3 columns,
+   * we insert two empty cells after it and remove the colspan attribute. If a cell span 2 rows, we insert an empty cell
+   * below it and remove the rowspan attribute. This changes the table layout for sure, but at least the generated PDF
+   * doesn't lose content.
+   */
+  class ReplaceColAndRowSpan extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    beforeParsed(content) {
+      for (const table of content.querySelectorAll('table')) {
+        this._handleTable(table);
+      }
+    }
+
+    _handleTable(table) {
+      this._replaceColSpan(table);
+      this._replaceRowSpan(table);
+    }
+
+    _replaceColSpan(table) {
+      for (const row of table.rows) {
+        for (const cell of [...row.cells]) {
+          const colSpan = parseInt(cell.getAttribute('colspan') || '1');
+          cell.removeAttribute('colspan');
+          for (let i = 1; i &lt; colSpan; i++) {
+            const clone = cell.cloneNode(false);
+            clone.removeAttribute('id');
+            cell.after(clone);
+          }
+        }
+      }
+    }
+
+    _replaceRowSpan(table) {
+      for (let rowIndex = 0; rowIndex &lt; table.rows.length; rowIndex++) {
+        const row = table.rows.item(rowIndex);
+        for (let cellIndex = 0; cellIndex &lt; row.cells.length; cellIndex++) {
+          const cell = row.cells.item(cellIndex);
+          const rowSpan = parseInt(cell.getAttribute('rowspan') || '1');
+          cell.removeAttribute('rowspan');
+          for (let i = 1; i &lt; rowSpan; i++) {
+            const followingRow = table.rows.item(rowIndex + i);
+            const nextCell = followingRow?.cells.item(cellIndex);
+            const clone = cell.cloneNode(false);
+            clone.removeAttribute('id');
+            followingRow?.insertBefore(clone, nextCell);
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Make sure the table rows are complete before determining the overflow otherwise the table layout is different than
    * in view mode. See XWIKI-21043 (The last lines of text from a print page are not always visible when they are inside
    * a table cell that is split between print pages).
@@ -539,12 +596,107 @@ define('paged-polyfill-patched', [
     }
   }
 
-  Paged.registerHandlers(
+  /**
+   * Tables can overflow the print page width when their cells have a minimum width set. To overcome this we first try
+   * to reduce the font size, and then scale down the table using CSS transformations.
+   */
+  class AutoScaleTables extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+
+      // Keep track of the tables that are planned to be added to the current print page. We reset this for each print
+      // page. We keep a reference to the source table, its clone and the observer used to detect overflow.
+      this._entries = [];
+    }
+
+    renderNode(clone, source) {
+      // We're interested only in table elements. The source table is not added to the print page. Instead, partial
+      // clones are made (e.g. if the table doesn't fit a single print page). We want to scale only the first clone and
+      // then reuse the same styles for the next clones, in order to have a consistent style across print pages.
+      if (clone?.nodeName?.toLowerCase() !== 'table' || source.__scaled) {
+        return;
+      }
+
+      // Paged.js doesn't add the full table to the print page in one step. Instead it adds rows one by one, until the
+      // print page is full or there are no rows left. This means we can't detect the overflow now. We have to wait for
+      // rows to be added to the table.
+      const observer = new MutationObserver(this._checkOverflow.bind(this, clone));
+      this._entries.push({clone, source, observer});
+      observer.observe(clone, {
+        childList: true,
+        subtree: true
+      });
+    }
+
+    afterPageLayout() {
+      for (const entry of this._entries) {
+        entry.observer.disconnect();
+        // The clone is not always added to the print page, e.g. if a page break was forced before the table.
+        if (entry.clone.isConnected) {
+          // The clone has been added to the print page. Update the original table so that the next print pages use the
+          // same styles, in case the table is long and needs to be split on multiple print pages.
+          entry.source.setAttribute('style', entry.clone.getAttribute('style'));
+          entry.source.__scaled = true;
+        }
+      }
+      this._entries = [];
+    }
+
+    _checkOverflow(table) {
+      const initialScale = this._getScale(table);
+      if (initialScale &lt; 1) {
+        // The table overflows horizontally so we need to scale it down, otherwise parts of its content might be cut
+        // from the print page. We first try to reduce the font-size.
+        const initialFontSize = table.style.fontSize;
+        // Reducing the font size more then 70% can make the text hard to read.
+        table.style.fontSize = (Math.max(initialScale, 0.7) * 100) + '%';
+        const scaleAfterFontSize = this._getScale(table);
+        if (scaleAfterFontSize &lt;= initialScale) {
+          // Rollback the font size change because it didn't increase the scale.
+          table.style.fontSize = initialFontSize;
+        } else if (scaleAfterFontSize &lt; 1) {
+          // There is still some overflow, possibly becuse the table contains images which are not affected by font
+          // size. Apply a CSS transformation.
+          const initialTransform = table.style.transform;
+          const initialTransformOrigin = table.style.transformOrigin;
+          table.style.transform = `scale(${scaleAfterFontSize})`;
+          table.style.transformOrigin = 'top left';
+          const scaleAfterTransform = this._getScale(table);
+          if (scaleAfterTransform &lt;= scaleAfterFontSize) {
+            // We didn't win anything by scaling down the table. Revert.
+            table.style.transform = initialTransform;
+            table.style.transform = initialTransformOrigin;
+          }
+        }
+      }
+    }
+
+    _getScale(table) {
+      let element = table;
+      // Look for a parent node that overflows, without getting out of the print page.
+      while (element &amp;&amp; !element.classList.contains('pagedjs_page_content')
+          &amp;&amp; element.clientWidth &gt;= element.scrollWidth) {
+        element = element.parentElement;
+      }
+      return element ? element.clientWidth / element.scrollWidth : 1;
+    }
+  }
+
+  const handlers = [
     ShowInvisibleRowsOnPageBreaks,
     FixFloatingImages,
     FixTableLayout,
     FixMaxChars
-  );
+  ];
+  // The following handlers are more opionated, so we provide a way to disable them.
+  const config = new URLSearchParams(window.location.search);
+  if (config.get('export.pdf.replaceColAndRowSpan') !== 'false') {
+    handlers.push(ReplaceColAndRowSpan);
+  }
+  if (config.get('export.pdf.autoScaleTables') !== 'false') {
+    handlers.push(AutoScaleTables);
+  }
+  Paged.registerHandlers(...handlers);
 
   return PagedPolyfill;
 });
@@ -907,6 +1059,18 @@ require([
   };
 
   /**
+   * Lazy image loading (when the image is scrolled into view port) doesn't make sense for PDF export (printing).
+   * Paged.js needs to wait for all images to be loaded (even if they are not in the view port) in order to know how to
+   * split the content into print pages (e.g. to know if an image fits on the current print page or has to be moved to
+   * the next one).
+   */
+  function preventLazyImageLoading() {
+    document.querySelectorAll('#xwikicontent img[loading="lazy"]').forEach(image =&gt; {
+      image.removeAttribute('loading');
+    });
+  }
+
+  /**
    * Removes the image size (width and height) from the image URL query string in order to prevent the server-side
    * resize of the image, thus allowing the full size image to be included in the generated PDF.
    */
@@ -947,6 +1111,7 @@ require([
     storeFormFieldValues();
     makeTableCellWidthRelative();
     preserveWhiteSpaceInCodeBlocks();
+    preventLazyImageLoading();
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
@@ -958,12 +1123,6 @@ require([
     const usePagedPolyfill = $('body').children('.pdf-toc, .pdf-header, .pdf-footer').length;
     if (usePagedPolyfill) {
       return new Promise((resolve, reject) =&gt; {
-        let start;
-        window.PagedConfig = {after: (...args) =&gt; {
-          const duration = (new Date().getTime() - start) / 1000;
-          console.debug(`Print preview ready in ${duration}s`);
-          resolve(...args);
-        }};
         // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become
         // blank when they are moved around within the DOM tree.
         replaceCanvasesWithImages($('#xwikicontent')).catch((cause) =&gt; {
@@ -975,9 +1134,21 @@ require([
           // triggered by paged.js should not lead to any new content changes.
           mutationObserverManager.disconnectAll();
 
+          // Recent versions of Paged.js fail if standard JavaScript types (e.g. Array) are overwritten by Prototype.js
+          restoreOriginalPrototypes();
+
           console.debug('Generating print preview...');
-          start = new Date().getTime();
-          require(['paged-polyfill'], function(PagedPolyfill) {});
+          const start = Date.now();
+          // Don't start generating the print preview automatically because we need to patch Paged.js before. See the
+          // paged-polyfill-patched module defined above.
+          window.PagedConfig = {auto: false};
+          require(['paged-polyfill'], previewer =&gt; {
+            previewer.preview().then((...args) =&gt; {
+              const duration = (Date.now() - start) / 1000;
+              console.debug(`Print preview ready in ${duration}s`);
+              resolve(...args);
+            }, reject);
+          }, reject);
         })
       });
     }
@@ -998,6 +1169,35 @@ require([
     // PDF.
     $('&lt;base/&gt;').attr('href', pdfExportConfig.baseURL).prependTo('head');
   });
+
+  /**
+   * Prototype.js is modifying the prototype of standard JavaScript types (e.g. Array) and this breaks Paged.js . We
+   * cannot stop loading Prototype.js because we still have JavaScript code in XWiki Standard and in XWiki extensions
+   * that rely on it. Even if we render only the page content, the are rendering macros (e.g. Live Table) that are still
+   * using Prototype.js . We overcome this problem by restoring the original prototypes before running Paged.js .
+   */
+  function restoreOriginalPrototypes() {
+    restoreOriginalPrototype(Array);
+  }
+
+  function restoreOriginalPrototype(constructor) {
+    // Restore standard key values.
+    const iframe = document.createElement('iframe');
+    iframe.src = 'about:blank';
+    document.body.appendChild(iframe);
+    const originalConstructor = iframe.contentWindow[constructor.name];
+    document.body.removeChild(iframe);
+    Object.getOwnPropertyNames(originalConstructor.prototype).forEach(property =&gt; {
+      constructor.prototype[property] = originalConstructor.prototype[property];
+    });
+
+    // Delete custom keys.
+    const customKeys = [];
+    for (let key in constructor.prototype) {
+      customKeys.push(key)
+    };
+    customKeys.forEach(customKey =&gt; delete constructor.prototype[customKey]);
+  }
 });</code>
     </property>
     <property>
@@ -1305,6 +1505,17 @@ require([
       choose is to make sure that the table text can always be split (hyphenate) on multiple lines. This is not a
       complete solution but it should cover most of the large tables. */
     .hyphenate();
+    /* The table layout needs to be auto in order to be able to enforce the minimum width on table cells, see below. */
+    table-layout: auto !important;
+  }
+  /* Table cell widths are made relative (a percentage of the row width) before the content is printed to PDF, but this
+    can lead to very narrow columns because the same value, say 5%, can be more than enough on a large screen but
+    insufficient on a printed page. For this reason we put a lower limit to the column width, of about 8 characters.
+    which can be overwritten from the PDF template. Note that this can make the table overflow the print page. We
+    overcome this by reducing the font size and scaling down the table, if needed, just before printing, using a
+    paged.js handler. */
+  th, td {
+    min-width: 8ch;
   }
 
   // Make sure the content of the code macro is not cut when it exceeds the print page width by:
@@ -1318,6 +1529,11 @@ require([
   }
   div.box &gt; div.code &gt; pre {
     margin: 0;
+  }
+
+  /* Make sure small code snippets are not cut when exceeding the print page width. */
+  .code, .code pre, .code *, .monospace, pre {
+    white-space: pre-wrap;
   }
 }</code>
     </property>

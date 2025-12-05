@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.security.internal;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -74,9 +76,9 @@ class ExtensionSecuritySchedulerTest
     @Test
     void start() throws Exception
     {
-        assertFalse(this.scheduler.start().get());
+        assertFalse(this.scheduler.start().get(20, TimeUnit.SECONDS));
         verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
-        assertFalse(this.scheduler.start().get());
+        assertFalse(this.scheduler.start().get(20, TimeUnit.SECONDS));
         verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
         assertEquals("Extension security scan disabled.", this.logCapture.getMessage(0));
     }
@@ -85,10 +87,10 @@ class ExtensionSecuritySchedulerTest
     void startEnabled() throws Exception
     {
         when(this.extensionSecurityConfiguration.isSecurityScanEnabled()).thenReturn(true);
-        assertTrue(this.scheduler.start().get());
+        assertTrue(this.scheduler.start().get(20, TimeUnit.SECONDS));
         verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
         verify(this.jobExecutor).execute(ExtensionSecurityJob.JOBTYPE, new ExtensionSecurityRequest());
-        assertTrue(this.scheduler.start().get());
+        assertTrue(this.scheduler.start().get(20, TimeUnit.SECONDS));
         verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
         verify(this.jobExecutor).execute(ExtensionSecurityJob.JOBTYPE, new ExtensionSecurityRequest());
     }
@@ -96,9 +98,9 @@ class ExtensionSecuritySchedulerTest
     @Test
     void restart() throws Exception
     {
-        assertFalse(this.scheduler.start().get());
+        assertFalse(this.scheduler.start().get(20, TimeUnit.SECONDS));
         verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
-        assertFalse(this.scheduler.restart().get());
+        assertFalse(this.scheduler.restart().get(20, TimeUnit.SECONDS));
         verify(this.extensionSecurityConfiguration, times(2)).isSecurityScanEnabled();
         assertEquals("Extension security scan disabled.", this.logCapture.getMessage(0));
         assertEquals("Extension security scan disabled.", this.logCapture.getMessage(1));

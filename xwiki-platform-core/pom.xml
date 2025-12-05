@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>17.5.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -46,6 +46,7 @@
       org.xwiki.contrib:authservice-backport-api,
       org.xwiki.contrib:authservice-backport-default
     </xwiki.platform.oldcore.extension.features>
+    <xwiki.enforcer.valid-importmap.skip>${xwiki.enforcer.skip}</xwiki.enforcer.valid-importmap.skip>
   </properties>
   <build>
     <pluginManagement>
@@ -149,24 +150,41 @@
               </differences>
             </revapi.differences>
             -->
-            <revapi.differences>
-              <justification>Long voted removal for a plugin which hasn't been used in a very long time</justification>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.plugin.mail.MailPlugin</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.plugin.mail.MailPluginApi</old>
-                </item>
-              </differences>
-            </revapi.differences>
+
+            
+            
           </analysisConfiguration>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-tool-enforcer-importmap</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <!-- Make sure declared importmap are valid. -->
+          <execution>
+            <id>enforce-valid-javascript-importmap</id>
+            <!-- Make sure the enforcer is performed after the artifacts for the current project are produced to be
+            able to check for the validity of path the the module itself.
+             -->
+            <phase>verify</phase>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <skip>${xwiki.enforcer.valid-importmap.skip}</skip>
+              <rules>
+                <javascriptImportMapCheck/>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -179,6 +197,7 @@
     <module>xwiki-platform-application</module>
     <module>xwiki-platform-appwithinminutes</module>
     <module>xwiki-platform-attachment</module>
+    <module>xwiki-platform-blocknote</module>
     <module>xwiki-platform-bootstrap</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-captcha</module>
@@ -209,6 +228,7 @@
     <module>xwiki-platform-index</module>
     <module>xwiki-platform-instance</module>
     <module>xwiki-platform-invitation</module>
+    <module>xwiki-platform-javascript</module>
     <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-lesscss</module>
@@ -226,6 +246,7 @@
     <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-netflux</module>
+    <module>xwiki-platform-node</module>
     <module>xwiki-platform-notifications</module>
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
@@ -269,6 +290,7 @@
     <module>xwiki-platform-xar</module>
     <module>xwiki-platform-xclass</module>
     <module>xwiki-platform-xml</module>
+    <module>xwiki-platform-yjs</module>
     <module>xwiki-platform-zipexplorer</module>
   </modules>
   <profiles>

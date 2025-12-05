@@ -85,26 +85,26 @@ public class DefaultWikiManager implements WikiManager
     {
         // Check that the wiki Id is available.
         if (failOnExist && !idAvailable(wikiId)) {
-            throw new WikiManagerException(
-                String.format("wiki id [%s] is already used and is thus not available", wikiId));
+            throw new WikiManagerException(String.format(
+                "The wiki id [%s] is already used or is a reserved id, and thus is not available.", wikiId));
         }
 
-        XWikiContext context = xcontextProvider.get();
+        XWikiContext context = this.xcontextProvider.get();
         WikiDescriptor descriptor;
 
         try {
             // Send the begin event
-            observationManager.notify(new WikiCreatingEvent(wikiId), wikiId, context);
+            this.observationManager.notify(new WikiCreatingEvent(wikiId), wikiId, context);
 
             // Create the wiki
-            descriptor = wikiCreator.create(wikiId, wikiAlias, ownerId);
+            descriptor = this.wikiCreator.create(wikiId, wikiAlias, ownerId);
 
             // Send the end event
-            observationManager.notify(new WikiCreatedEvent(wikiId), wikiId, context);
+            this.observationManager.notify(new WikiCreatedEvent(wikiId), wikiId, context);
 
         } catch (WikiManagerException e) {
             // Send the failed event
-            observationManager.notify(new WikiCreateFailedEvent(wikiId), wikiId, context);
+            this.observationManager.notify(new WikiCreateFailedEvent(wikiId), wikiId, context);
 
             // Throw the exception
             throw e;
@@ -117,12 +117,20 @@ public class DefaultWikiManager implements WikiManager
     public WikiDescriptor copy(String fromWikiId, String newWikiId, String newWikiAlias, boolean copyHistory,
         boolean copyRecycleBin, boolean failOnExist) throws WikiManagerException
     {
-        WikiDescriptor newWiki = create(newWikiId, newWikiAlias, failOnExist);
-        wikiCopier.copyDocuments(fromWikiId, newWikiId, copyHistory);
-        if (copyRecycleBin) {
-            wikiCopier.copyDeletedDocuments(fromWikiId, newWikiId);
+        WikiDescriptor newWiki;
+        try {
+            newWiki = create(newWikiId, newWikiAlias, failOnExist);
+        } catch (WikiManagerException e) {
+            throw new WikiManagerException(String.format("Failed to create the new wiki [%s] when copying [%s].",
+                newWikiId, fromWikiId), e);
         }
-        observationManager.notify(new WikiCopiedEvent(fromWikiId, newWikiId), fromWikiId, xcontextProvider.get());
+
+        this.wikiCopier.copyDocuments(fromWikiId, newWikiId, copyHistory);
+        if (copyRecycleBin) {
+            this.wikiCopier.copyDeletedDocuments(fromWikiId, newWikiId);
+        }
+        this.observationManager.notify(new WikiCopiedEvent(fromWikiId, newWikiId), fromWikiId,
+            this.xcontextProvider.get());
         return newWiki;
     }
 
@@ -136,24 +144,24 @@ public class DefaultWikiManager implements WikiManager
     public void delete(String wikiId) throws WikiManagerException
     {
         // Delete the wiki
-        wikiDeleter.delete(wikiId);
+        this.wikiDeleter.delete(wikiId);
 
         // Send an event
-        observationManager.notify(new WikiDeletedEvent(wikiId), wikiId);
+        this.observationManager.notify(new WikiDeletedEvent(wikiId), wikiId);
     }
 
     @Override
     public boolean idAvailable(String wikiId) throws WikiManagerException
     {
         // Get the store
-        XWikiContext xcontext = xcontextProvider.get();
+        XWikiContext xcontext = this.xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
         // Get the forbidden list
-        String wikiForbiddenList = xcontextProvider.get().getWiki().Param("xwiki.virtual.reserved_wikis");
+        String wikiForbiddenList = this.xcontextProvider.get().getWiki().Param("xwiki.virtual.reserved_wikis");
         try {
             // If the DB creation is delegated to a DBA, don't fail on the existence of the DB/schema/user since the
             // DBA is supposed to have created that prior to this code being called.
-            return !wikiDescriptorManager.exists(wikiId) && !Util.contains(wikiId, wikiForbiddenList, ", ")
+            return !this.wikiDescriptorManager.exists(wikiId) && !Util.contains(wikiId, wikiForbiddenList, ", ")
                 && (!this.wikiConfiguration.shouldCreateDatabase()
                     || xwiki.getStore().isWikiNameAvailable(wikiId, xcontext));
         } catch (XWikiException e) {

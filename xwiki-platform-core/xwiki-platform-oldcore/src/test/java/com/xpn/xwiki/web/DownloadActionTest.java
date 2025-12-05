@@ -66,7 +66,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -129,7 +129,7 @@ class DownloadActionTest
     }
 
     @BeforeEach
-    public void before() throws Exception
+    void before() throws Exception
     {
         this.oldcore.getXWikiContext().setRequest(this.request);
         this.oldcore.getXWikiContext().setResponse(this.response);
@@ -186,7 +186,7 @@ class DownloadActionTest
         if (length > -1) {
             verify(this.response).setContentLengthLong(length);
         } else {
-            verify(this.response, times(0)).setContentLengthLong(length);
+            verify(this.response, never()).setContentLengthLong(length);
         }
     }
 
@@ -237,7 +237,7 @@ class DownloadActionTest
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         // Make sure we set the right content length
-        verify(this.response, times(1)).setContentLengthLong(Long.MAX_VALUE);
+        verify(this.response).setContentLengthLong(Long.MAX_VALUE);
     }
 
     @Test

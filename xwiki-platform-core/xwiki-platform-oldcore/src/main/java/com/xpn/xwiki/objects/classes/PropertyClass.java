@@ -191,12 +191,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         return null;
     }
 
-    public BaseProperty newPropertyfromXML(Element ppcel)
+    public BaseProperty newPropertyfromXML(Element ppcel) throws XWikiException
     {
         String value = ppcel.getText();
         return fromString(value);
@@ -429,6 +429,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public void setName(String name)
     {
+        // Empty property name is forbidden because it will cause problem (impossible to create an EntityReference for
+        // it and it's not supported by the XML format)
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("A property name cannot be null or empty");
+        }
+
         setStringValue("name", name);
         this.referenceCache = null;
     }
@@ -696,7 +702,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         }
     }
 
-    public BaseProperty fromStringArray(String[] strings)
+    public BaseProperty fromStringArray(String[] strings) throws XWikiException
     {
         return fromString(strings[0]);
     }

@@ -326,7 +326,8 @@ ${escapetool.xml($name)}##
 #end
 
 #macro (displayExtensionRating $extension)
-  #set ($rating = $extension.getRating())
+  #set ($ratingExtension = $services.extension.index.getRatingExtension($extension))
+  #set ($rating = $ratingExtension.getRating())
   #if ($rating != $NULL)
     #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
     <div class="extension-rating">
@@ -1112,14 +1113,15 @@ $namespace##
       #if ("$!extension.summary" != '')
         <div class="extension-summary">$escapetool.xml($extension.summary)</div>
       #end
-      #set ($extensionSupportPlans = $extension.supportPlans)
+      #set ($remoteExtension = $services.extension.index.getRemoteExtension($extension))
+      #set ($extensionSupportPlans = $remoteExtension.supportPlans)
       #set ($extensionSupporters = $extensionSupportPlans.supporters)
       #if ($extensionSupportPlans && !$extensionSupporters.isEmpty())
         <div class="supported-by">
           <h3>$escapetool.xml($services.localization.render('extensions.info.support.supportedBy'))</h3>
           #displayExtensionSupportPlans($extensionSupportPlans)
         </div>
-      #elseif ($extension.isRecommended())
+      #elseif ($remoteExtension.isRecommended())
         <div class="extension-recommended">$escapetool.xml($services.localization.render('extensions.info.recommended'))</div>
       #end
 

@@ -30,10 +30,12 @@ import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditorDialog;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
@@ -278,7 +280,7 @@ class QuickActionsIT extends AbstractCKEditorIT
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        assertSourceEquals("|" + TEST_TEXT + "| \n| | \n| | \n\n ");
+        assertSourceEquals("|=" + TEST_TEXT + "|= \n| | \n| | \n\n ");
     }
 
     @Test
@@ -456,20 +458,27 @@ class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(20)
-    void include()
+    void include(TestUtils testUtils) throws Exception
     {
+        testUtils.rest().savePage(new DocumentReference("xwiki", "QuickActionsIT", "TestInclude"), "Test include",
+            "Test include");
         textArea.sendKeys("/inc");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/inc", "Include Page");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        // Empty form
-        new MacroDialogEditModal().waitUntilReady().clickSubmit();
+        MacroDialogEditModal macroDialogEditModal = new MacroDialogEditModal().waitUntilReady();
+        SuggestInputElement reference =
+            new SuggestInputElement(macroDialogEditModal.getMacroParameterInput("reference"));
+        reference.sendKeys("TestInclude")
+            .waitForNonTypedSuggestions()
+            .selectByIndex(0);
+        macroDialogEditModal.clickSubmit();
 
         textArea = editor.getRichTextArea();
 
-        assertSourceEquals("{{include/}}");
+        assertSourceEquals("{{include reference=\"QuickActionsIT.TestInclude\"/}}");
     }
 
     @Test
@@ -598,10 +607,14 @@ class QuickActionsIT extends AbstractCKEditorIT
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
+        // Close the macro dialog.
+        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
+        macroEditModal.setMacroContent("test");
+        macroEditModal.clickSubmit();
+
         // The content is reloaded after a macro is inserted.
         textArea = editor.getRichTextArea();
 
-        // Note that we didn't modify the default info message because inline macros are not editable in-place.
-        assertSourceEquals("one {{velocity}} {{/velocity}} two");
+        assertSourceEquals("one {{velocity}}test{{/velocity}} two");
     }
 }

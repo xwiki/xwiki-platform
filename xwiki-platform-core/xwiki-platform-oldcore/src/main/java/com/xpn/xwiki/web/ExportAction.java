@@ -131,10 +131,10 @@ public class ExportAction extends XWikiAction
         return
             // either the Sec-Fetch-Dest header is missing, which is a sign that the request was made by a non-browser
             // user agent (e.g. curl, wget),
-            secFetchDest == null ||
+            secFetchDest == null
             // or the Sec-Fetch-Dest header is set to "document", which is a sign that the export request is the result
             // of a user navigating to an export URL (e.g. by clicking on a link or submitting a form).
-            "document".equals(secFetchDest);
+            || "document".equals(secFetchDest);
     }
 
     /**

@@ -27,8 +27,8 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>18.0.0-SNAPSHOT</version>
   </parent>
-  <packaging>webjar</packaging>
-  <artifactId>xwiki-platform-bootstrap</artifactId>
+  <packaging>webjar-node</packaging>
+  <artifactId>xwiki-platform-bootstrap-vite</artifactId>
   <name>XWiki Platform - Bootstrap</name>
   <properties>
     <!-- Name to display by the Extension Manager -->
@@ -40,142 +40,6 @@
   </properties>
   <build>
     <plugins>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-bootstrap-resources</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/bootstrap</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/main/</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-bootstrap-tests-resources</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/bootstrap/js/tests</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/tests/</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Copy the generated bootstrap components to the WebJar folder. -->
-            <id>copy-bootstrap-components</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/bootstrap/dist</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Copy the less bootstrap components to the WebJar folder. -->
-            <id>copy-bootstrap-less-components</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/less</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/bootstrap/less</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- We're disabling the JSHint check associated with the WebJar packaging because we use frontend-maven-plugin
-      below to perform linting. -->
-      <plugin>
-        <groupId>org.xwiki.contrib</groupId>
-        <artifactId>jshint-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-lint</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.github.eirslett</groupId>
-        <artifactId>frontend-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>install-node-and-npm</id>
-            <goals>
-              <goal>install-node-and-npm</goal>
-            </goals>
-            <configuration>
-              <nodeVersion>${node.version}</nodeVersion>
-              <npmVersion>${npm.version}</npmVersion>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-install</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>ci</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-run-build</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run build</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-run-test</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run test</arguments>
-            </configuration>
-            <phase>test</phase>
-          </execution>
-          <execution>
-            <id>npm-run-lint</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run lint</arguments>
-            </configuration>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-        <configuration>
-          <workingDirectory>${project.build.directory}/bootstrap/</workingDirectory>
-        </configuration>
-      </plugin>
       <!-- We're skipping the license check because we put the actual original license in bootstrap file and not the
       XWiki license -->
       <plugin>
@@ -184,6 +48,47 @@
         <configuration>
           <skip>true</skip>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Copy the remaining less file. Can be removed once XWIKI-23080 is done. -->
+            <id>copy-less-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>
+                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/less
+              </outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/src/main/node/less</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Copy the remaining less file. Can be removed once XWIKI-23080 is done. -->
+            <id>copy-font-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>
+                ${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/fonts
+              </outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/src/main/node/fonts</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

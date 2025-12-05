@@ -27,6 +27,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-service
   - xwiki-platform-core/xwiki-platform-node/src/main/node
+  - xwiki-platform-core/xwiki-platform-bootstrap-vite
 catalogMode: strict
 cleanupUnusedCatalogs: true
 ignoredBuiltDependencies:

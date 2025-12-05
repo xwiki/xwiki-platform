@@ -277,27 +277,22 @@ public class ModelBridge
     private Object updateDocument(String property, Object value, XWikiDocument document)
     {
         Object changedValue = null;
-        switch (property) {
-            case "hidden" -> {
-                changedValue = document.isHidden();
-                document.setHidden(Boolean.valueOf(String.valueOf(value)));
-            }
-            case "title" -> {
-                changedValue = document.getTitle();
-                document.setTitle(String.valueOf(value));
-            }
-            case "content" -> {
-                changedValue = document.getContent();
-                document.setContent((String) value);
-            }
-            case null, default -> {
-                // Some property such as fullName as simply ignored and are not editable.
-                if (!Objects.equals(property, "fullName")) {
-                    this.logger
-                        .warn("Unknown property [{}]. Document [{}] will not be updated with value [{}].", property,
-                            document,
-                            value);
-                }
+        if (Objects.equals(property, "hidden")) {
+            changedValue = document.isHidden();
+            document.setHidden(Boolean.valueOf(String.valueOf(value)));
+        } else if (Objects.equals(property, "title")) {
+            changedValue = document.getTitle();
+            document.setTitle(String.valueOf(value));
+        } else if (Objects.equals(property, "content")) {
+            changedValue = document.getContent();
+            document.setContent((String) value);
+        } else {
+            // Some property such as fullName as simply ignored and are not editable.
+            if (!Objects.equals(property, "fullName")) {
+                this.logger
+                    .warn("Unknown property [{}]. Document [{}] will not be updated with value [{}].", property,
+                        document,
+                        value);
             }
         }
         return changedValue;

@@ -22,7 +22,6 @@ package org.xwiki.flamingo.test.docker;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.repository.test.SolrTestUtils;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -38,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BacklinksIT
 {
     @Test
-    void backlinks(TestUtils setup, TestReference reference, TestConfiguration testConfiguration) throws Exception
+    void backlinks(TestUtils setup, TestReference reference) throws Exception
     {
         setup.loginAsSuperAdmin();
         DocumentReference targetDocumentReference =
@@ -72,7 +71,7 @@ class BacklinksIT
             null);
 
         // Wait for the solr indexing to be completed before checking the backlinks of the target.
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         vp = setup.gotoPage(targetDocumentReference);
 

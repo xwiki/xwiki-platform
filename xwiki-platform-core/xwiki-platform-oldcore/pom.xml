@@ -156,8 +156,8 @@
     </dependency>
     <!-- Replace the one from Hibernate -->
     <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
     </dependency>
     <!-- Replace the one from DBCP -->
     <dependency>

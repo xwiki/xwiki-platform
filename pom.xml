@@ -157,18 +157,14 @@
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.version}</version>
         <exclusions>
-          <!-- Use javax.transaction:javax.transaction-api instead to not have duplicate JARs in generated WARs -->
+          <!-- Wrong ids -->
           <exclusion>
             <groupId>org.jboss.spec.javax.transaction</groupId>
             <artifactId>jboss-transaction-api_1.2_spec</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>javax.activation-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -902,6 +898,18 @@
       <!-- Solr -->
       <dependency>
         <groupId>org.apache.solr</groupId>
+        <artifactId>solr-api</artifactId>
+        <version>${solr.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
         <version>${solr.version}</version>
       </dependency>
@@ -914,6 +922,10 @@
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
           </exclusion>
           <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
           <exclusion>
@@ -1018,6 +1030,10 @@
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>jakarta.inject</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -1035,6 +1051,22 @@
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>jakarta.inject</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-client</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -1050,6 +1082,10 @@
           <exclusion>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1074,6 +1110,13 @@
         <groupId>org.glassfish.jersey.media</groupId>
         <artifactId>jersey-media-json-jackson</artifactId>
         <version>${jersey.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.glassfish.jersey.media</groupId>
@@ -1327,10 +1370,10 @@
                 <features>dom4j:dom4j</features>
               </extensionOverride>
               <extensionOverride>
-                <!-- Right id of the JAXB API -->
-                <id>jakarta.xml.bind:jakarta.xml.bind-api</id>
+                <!-- Right id of the javax JAXB API -->
+                <id>javax.xml.bind:jaxb-api</id>
                 <features>
-                  javax.xml.bind:jaxb-api
+                  org.jboss.spec.javax.xml.bind:jboss-jaxb-api_2.3_spec
                 </features>
               </extensionOverride>
               <extensionOverride>
@@ -1340,6 +1383,13 @@
                   com.sun.xml.bind:jaxb-impl,
                   org.glassfish.jaxb:jaxb-core,
                   com.sun.xml.bind:jaxb-core
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>javax.ws.rs:javax.ws.rs-api</id>
+                <features>
+                    javax.ws.rs:jsr311-api,
+                    org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec
                 </features>
               </extensionOverride>
               <extensionOverride>
@@ -1535,13 +1585,6 @@
               <extensionOverride>
                 <id>aopalliance:aopalliance</id>
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
-              </extensionOverride>
-              <extensionOverride>
-                <id>jakarta.ws.rs:jakarta.ws.rs-api</id>
-                <features>
-                    javax.ws.rs:jsr311-api,
-                    org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec
-                </features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

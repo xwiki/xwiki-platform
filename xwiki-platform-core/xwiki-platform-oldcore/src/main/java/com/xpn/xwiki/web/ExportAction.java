@@ -22,7 +22,7 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
@@ -89,7 +89,9 @@ public class ExportAction extends XWikiAction
             XWikiRequest request = context.getRequest();
             String format = request.get("format");
 
-            if ((format == null) || (format.equals("xar"))) {
+            if (!isExportRequest(format, request)) {
+                return "docdoesnotexist";
+            } else if (format == null || format.equals("xar")) {
                 defaultPage = exportXAR(context);
             } else if (format.equals("html")) {
                 defaultPage = exportHTML(context);
@@ -102,6 +104,31 @@ public class ExportAction extends XWikiAction
         }
 
         return defaultPage;
+    }
+
+    private boolean isExportRequest(String format, XWikiRequest request)
+    {
+        // We used to consider all requests to the /export/ action as export requests but this was causing problems with
+        // the PDF export where resources loaded by the print preview page using relative URLs ended up targeting the
+        // export action and thus triggering a backup XAR export. See XWIKI-23768: Missing RequireJS module can slow
+        // down or even block the PDF export
+        //
+        // We have to restrict the definition of an export request without breaking backwards compatibility. The problem
+        // is when the format parameter is missing: we can't ask for a confirmation parameter or for the CSRF token
+        // because it would break existing code. Unfortunately the Accept HTTP header is not reliably set by browsers
+        // when resources (JavaScript, CSS, images, etc.) are loaded. The best option seems to be to rely on the
+        // Sec-Fetch-Dest header which is set by modern browsers to indicate the context in which the request is made.
+        // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest
+        //
+        // As such, an export request should:
+        String secFetchDest = request.getHeader("Sec-Fetch-Dest");
+        return
+            // either specify the export format
+            format != null ||
+            // or be send by a non-browser user client (e.g. curl, wget)
+            secFetchDest == null ||
+            // or be the result of web browser navigation, as indicated by the Sec-Fetch-Dest header
+            "document".equals(secFetchDest);
     }
 
     /**
@@ -119,7 +146,7 @@ public class ExportAction extends XWikiAction
         // Fallback on the current document if there's no selection specified on the request.
         Collection<DocumentReference> pageList =
             documentSelectionResolver.isSelectionSpecified() ? documentSelectionResolver.getSelectedDocuments()
-                : Collections.singleton(context.getDoc().getDocumentReference());
+                : List.of(context.getDoc().getDocumentReference());
 
         // HTML export can be done by simple users so we need to check view right.
         ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);

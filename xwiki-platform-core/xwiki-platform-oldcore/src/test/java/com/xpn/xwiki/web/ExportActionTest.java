@@ -112,7 +112,7 @@ class ExportActionTest
     }
 
     @Test
-    void unexpectedXARExport() throws Exception
+    void exportXARInvalid() throws Exception
     {
         // A request originating from a script tag in an HTML page.
         when(this.request.getHeader("Sec-Fetch-Dest")).thenReturn("script");

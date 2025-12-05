@@ -369,16 +369,16 @@
       </selfMentionsColor>
     </class>
     <property>
-      <mentionsColor>@breadcrumb-bg</mentionsColor>
+      <mentionsColor>var(--breadcrumb-bg)</mentionsColor>
     </property>
     <property>
       <quoteActivated>1</quoteActivated>
     </property>
     <property>
-      <selfMentionsForeground>@btn-danger-color</selfMentionsForeground>
+      <selfMentionsForeground>var(--btn-danger-color)</selfMentionsForeground>
     </property>
     <property>
-      <selfMentionsColor>@btn-danger-bg</selfMentionsColor>
+      <selfMentionsColor>var(--btn-danger-bg)</selfMentionsColor>
     </property>
   </object>
 </xwikidoc>

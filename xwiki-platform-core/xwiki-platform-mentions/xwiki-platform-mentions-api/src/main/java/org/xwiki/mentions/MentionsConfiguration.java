@@ -62,10 +62,11 @@ public interface MentionsConfiguration
      * The default value is white (@btn-danger-color value from the Iceberg FlamingoTheme)
      * that is meant to have enough contrast on the saturated red of the background.
      * @return the foreground color for the mentions to the current user.
-     * @since 17.5.0RC1
+     * @since 18.0.0RC1
      */
     @Unstable
-    default String getSelfMentionsForeground() {
+    default String getSelfMentionsForeground()
+    {
         return "#ffffff";
     }
 

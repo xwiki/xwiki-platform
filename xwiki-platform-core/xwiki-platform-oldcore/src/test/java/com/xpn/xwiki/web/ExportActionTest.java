@@ -112,6 +112,14 @@ public class ExportActionTest
     }
 
     @Test
+    void exportXARInvalid() throws Exception
+    {
+        // A request originating from a script tag in an HTML page.
+        when(this.request.getHeader("Sec-Fetch-Dest")).thenReturn("script");
+        assertEquals("docdoesnotexist", this.action.render(this.oldcore.getXWikiContext()));
+    }
+
+    @Test
     @SuppressWarnings("deprecation")
     public void exportPartialXAR() throws Exception
     {

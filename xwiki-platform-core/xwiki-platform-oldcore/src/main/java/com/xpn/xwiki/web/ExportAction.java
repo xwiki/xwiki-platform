@@ -22,7 +22,7 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
@@ -89,7 +89,9 @@ public class ExportAction extends XWikiAction
             XWikiRequest request = context.getRequest();
             String format = request.get("format");
 
-            if ((format == null) || (format.equals("xar"))) {
+            if (!validateExportRequest(request)) {
+                return "docdoesnotexist";
+            } else if (format == null || format.equals("xar")) {
                 defaultPage = exportXAR(context);
             } else if (format.equals("html")) {
                 defaultPage = exportHTML(context);
@@ -102,6 +104,37 @@ public class ExportAction extends XWikiAction
         }
 
         return defaultPage;
+    }
+
+    /**
+     * Checks if the given request is intended to perform an export. We need this check because large exports require
+     * many resources and we want to allocate those resources only when there is a clear intent.
+     *
+     * @param request the export request to validate
+     * @return {@code true} if the request is a valid (e.g. the user intended to perform an export), {@code false} otherwise
+     */
+    private boolean validateExportRequest(XWikiRequest request)
+    {
+        // We used to consider all requests to the /export/ action as export requests but this was causing problems with
+        // the PDF export where resources loaded by the print preview page using relative URLs ended up targeting the
+        // export action and thus triggering a backup XAR export. See XWIKI-23768: Missing RequireJS module can slow
+        // down or even block the PDF export
+        //
+        // Ideally we should ask for a CSRF token, but this would break backwards compatibility. We can't rely on the
+        // Accept HTTP header either becuse it includes */* most of the time, even when the request originates from a
+        // script or image HTML tag. The best option seems to be to rely on the Sec-Fetch-Dest header which is set by
+        // modern browsers to indicate the context in which the request is made.
+        // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest
+        //
+        // As such, we validate the export request if:
+        String secFetchDest = request.getHeader("Sec-Fetch-Dest");
+        return
+            // either the Sec-Fetch-Dest header is missing, which is a sign that the request was made by a non-browser
+            // user agent (e.g. curl, wget),
+            secFetchDest == null
+            // or the Sec-Fetch-Dest header is set to "document", which is a sign that the export request is the result
+            // of a user navigating to an export URL (e.g. by clicking on a link or submitting a form).
+            || "document".equals(secFetchDest);
     }
 
     /**
@@ -119,7 +152,7 @@ public class ExportAction extends XWikiAction
         // Fallback on the current document if there's no selection specified on the request.
         Collection<DocumentReference> pageList =
             documentSelectionResolver.isSelectionSpecified() ? documentSelectionResolver.getSelectedDocuments()
-                : Collections.singleton(context.getDoc().getDocumentReference());
+                : List.of(context.getDoc().getDocumentReference());
 
         // HTML export can be done by simple users so we need to check view right.
         ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);

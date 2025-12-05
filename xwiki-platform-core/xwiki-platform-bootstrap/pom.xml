@@ -28,7 +28,7 @@
     <version>18.0.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar-node</packaging>
-  <artifactId>xwiki-platform-bootstrap-vite</artifactId>
+  <artifactId>xwiki-platform-bootstrap</artifactId>
   <name>XWiki Platform - Bootstrap</name>
   <properties>
     <!-- Name to display by the Extension Manager -->

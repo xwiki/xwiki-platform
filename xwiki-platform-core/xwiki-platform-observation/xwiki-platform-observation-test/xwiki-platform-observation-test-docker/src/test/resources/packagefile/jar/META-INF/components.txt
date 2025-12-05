@@ -1,0 +1,2 @@
+packagefile.jar.scriptServiceJarExtension.internal.DefaultGreeter
+packagefile.jar.scriptServiceJarExtension.script.GreeterScriptService

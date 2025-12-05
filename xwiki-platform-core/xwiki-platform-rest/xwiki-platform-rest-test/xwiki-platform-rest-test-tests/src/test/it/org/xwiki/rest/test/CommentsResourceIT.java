@@ -66,8 +66,8 @@ public class CommentsResourceIT extends AbstractHttpIT
         this.reference = new DocumentReference(this.wikiName, this.spaces, this.pageName);
 
         // Create a clean test page.
-        this.testUtils.rest().delete(this.reference);
-        this.testUtils.rest().savePage(this.reference);
+        getUtil().rest().delete(this.reference);
+        getUtil().rest().savePage(this.reference);
     }
 
     @Override

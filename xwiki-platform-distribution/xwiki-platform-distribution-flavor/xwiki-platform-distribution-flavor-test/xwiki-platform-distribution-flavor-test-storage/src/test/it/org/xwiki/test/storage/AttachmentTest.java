@@ -22,7 +22,6 @@ package org.xwiki.test.storage;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 
-import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;

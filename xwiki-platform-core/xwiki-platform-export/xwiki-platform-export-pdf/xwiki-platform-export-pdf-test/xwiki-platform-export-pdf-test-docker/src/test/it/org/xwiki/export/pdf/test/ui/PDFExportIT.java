@@ -79,8 +79,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-image-processing-plugin"
     },
     resolveExtraJARs = true,
-    // We need the Office server because we want to be able to test how the Office macro is exported to PDF.
-    office = true,
     properties = {
         // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference).
         // Enabling debug logs also requires PR.

@@ -79,10 +79,10 @@ public class PagesResourceIT extends AbstractHttpIT
         DocumentReference ref1 = new DocumentReference(getWiki(), spaceName, page1);
         DocumentReference ref2 = new DocumentReference(getWiki(), spaceName, page2);
         try {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
-            this.testUtils.rest().savePage(ref1, "content1", "title1");
-            this.testUtils.rest().savePage(ref2, "content2", "title2");
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "content1", "title1");
+            getUtil().rest().savePage(ref2, "content2", "title2");
 
             // Test: number=-1 should return error
             GetMethod getMethod = executeGet(
@@ -113,8 +113,8 @@ public class PagesResourceIT extends AbstractHttpIT
             Assert.assertEquals(1, pages.getPageSummaries().size());
             Assert.assertNotEquals(firstName, pages.getPageSummaries().get(0).getName());
         } finally {
-            this.testUtils.rest().delete(ref1);
-            this.testUtils.rest().delete(ref2);
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
         }
     }
 }

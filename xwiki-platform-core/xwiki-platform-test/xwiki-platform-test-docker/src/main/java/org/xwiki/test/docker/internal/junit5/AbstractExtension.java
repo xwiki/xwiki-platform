@@ -20,7 +20,9 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -31,6 +33,8 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.VncRecordingContainer;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.extension.test.junit5.ExtensionTestUtils;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -78,20 +82,10 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
         store.put(BrowserWebDriverContainer.class, container);
     }
 
-    protected void saveXWikiURL(ExtensionContext context, String xwikiURL)
-    {
-        DockerTestUtils.setXWikiURL(context, xwikiURL);
-    }
-
     protected BrowserWebDriverContainer loadBrowserWebDriverContainer(ExtensionContext context)
     {
         ExtensionContext.Store store = DockerTestUtils.getStore(context);
         return store.get(BrowserWebDriverContainer.class, BrowserWebDriverContainer.class);
-    }
-
-    protected String loadXWikiURL(ExtensionContext context)
-    {
-        return DockerTestUtils.getXWikiURL(context);
     }
 
     protected void savePersistentTestContext(ExtensionContext context, PersistentTestContext testContext)
@@ -116,16 +110,65 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
         return DockerTestUtils.getTestConfiguration(context);
     }
 
-    protected void saveServletContainerExecutor(ExtensionContext context, ServletContainerExecutor executor)
+    /**
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    protected ComponentManager loadComponentManager(ExtensionContext context)
     {
-        ExtensionContext.Store store = DockerTestUtils.getStore(context);
-        store.put(ServletContainerExecutor.class, executor);
+        return DockerTestUtils.getComponentManager(context);
     }
 
-    protected ServletContainerExecutor loadServletContainerExecutor(ExtensionContext context)
+    /**
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    protected ExtensionTestUtils loadExtensionTestUtils(ExtensionContext context)
+    {
+        return DockerTestUtils.getExtensionTestUtils(context);
+    }
+
+    /**
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    protected void addServletContainerExecutor(ExtensionContext context, ServletContainerExecutor executor)
+    {
+        List<ServletContainerExecutor> executors = loadServletContainerExecutors(context);
+
+        if (executors == null) {
+            executors = new java.util.ArrayList<>();
+
+            ExtensionContext.Store store = DockerTestUtils.getStore(context);
+            store.put(ServletContainerExecutor.class, executors);
+        }
+
+        executors.add(executor);
+    }
+
+    /**
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    protected List<ServletContainerExecutor> loadServletContainerExecutors(ExtensionContext context)
     {
         ExtensionContext.Store store = DockerTestUtils.getStore(context);
-        return store.get(ServletContainerExecutor.class, ServletContainerExecutor.class);
+        return store.get(ServletContainerExecutor.class, List.class);
+    }
+
+    /**
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     */
+    protected ServletContainerExecutor loadServletContainerExecutor(int index, ExtensionContext context)
+    {
+        List<ServletContainerExecutor> executors = loadServletContainerExecutors(context);
+
+        if (CollectionUtils.isNotEmpty(executors)) {
+            return executors.get(index);
+        }
+
+        return null;
     }
 
     protected PersistentTestContext initializePersistentTestContext(XWikiWebDriver driver)

@@ -38,11 +38,9 @@ public class MultiUserTestUtils
 {
     private final TestUtils setup;
 
-    private final TestConfiguration testConfiguration;
-
     private final String firstTabHandle;
 
-    private final Map<String, String> baseURLByTab = new HashMap<>();
+    private final Map<String, String> hostByTab = new HashMap<>();
 
     private final Map<String, String> secretTokenByTab = new HashMap<>();
 
@@ -50,12 +48,12 @@ public class MultiUserTestUtils
      * Creates a new instance wrapping the given test configuration and test setup.
      * 
      * @param setup the test setup
-     * @param testConfiguration the test configuration
+     * @since 18.0.0RC1
+     * @since 17.10.1
      */
-    public MultiUserTestUtils(TestUtils setup, TestConfiguration testConfiguration)
+    public MultiUserTestUtils(TestUtils setup)
     {
         this.setup = setup;
-        this.testConfiguration = testConfiguration;
 
         // Store the ID of the current browser tab because we're going to open new tabs which will have to be closed
         // after each test, and we need this to avoid closing all tabs.
@@ -74,19 +72,17 @@ public class MultiUserTestUtils
      * Open a new browser tab and associate a base URL with it. By using different base URLs on different browser tabs
      * we can authenticate multiple XWiki users at the same time (in different tabs).
      *
-     * @param xwikiDomain the domain used to access XWiki on the newly created tab
+     * @param host the host used to access XWiki on the newly created tab
      * @return the handle of the new tab
      * @see TestConfiguration#getServletEngineNetworkAliases()
      */
-    public String openNewBrowserTab(String xwikiDomain)
+    public String openNewBrowserTab(String host)
     {
         beforeTabSwitch();
 
         String tabHandle = this.setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
 
-        String baseURL = String.format("http://%s:%s/xwiki", xwikiDomain,
-            this.testConfiguration.getServletEngine().getInternalPort());
-        this.baseURLByTab.put(tabHandle, baseURL);
+        this.hostByTab.put(tabHandle, host);
         afterTabSwitch();
 
         return tabHandle;
@@ -119,7 +115,7 @@ public class MultiUserTestUtils
             .forEach(handle -> {
                 this.setup.getDriver().switchTo().window(handle).close();
                 // Clean up the state associated with the closed tab.
-                this.baseURLByTab.remove(handle);
+                this.hostByTab.remove(handle);
                 this.secretTokenByTab.remove(handle);
             });
 
@@ -128,7 +124,7 @@ public class MultiUserTestUtils
         afterTabSwitch();
 
         // Clean up the state associated with the first tab.
-        this.baseURLByTab.remove(this.firstTabHandle);
+        this.hostByTab.remove(this.firstTabHandle);
         this.secretTokenByTab.remove(this.firstTabHandle);
     }
 
@@ -136,7 +132,7 @@ public class MultiUserTestUtils
     {
         WebDriver driver = this.setup.getDriver();
         String currentTabHandle = driver.getWindowHandle();
-        this.baseURLByTab.put(currentTabHandle, this.setup.getBaseURL());
+        this.hostByTab.put(currentTabHandle, this.setup.getBaseURL());
         this.secretTokenByTab.put(currentTabHandle, this.setup.getSecretToken());
     }
 
@@ -144,8 +140,8 @@ public class MultiUserTestUtils
     {
         WebDriver driver = this.setup.getDriver();
         String currentTabHandle = driver.getWindowHandle();
-        if (this.baseURLByTab.containsKey(currentTabHandle)) {
-            TestUtils.setURLPrefix(this.baseURLByTab.get(currentTabHandle));
+        if (this.hostByTab.containsKey(currentTabHandle)) {
+            this.setup.getCurrentExecutor().setBrowserHost(this.hostByTab.get(currentTabHandle));
             // The secret token is cached in the test setup so we need to make sure the new tab (that uses a different
             // domain to access XWiki) doesn't use the secret token that was cached for the previous tab.
             if (this.secretTokenByTab.containsKey(currentTabHandle)) {

@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -104,7 +106,19 @@ public class XWikiExecutor
 
     private static final int DEBUG_PORT = 5005;
 
-    private int port;
+    private final int index;
+
+    private final String internalHost;
+
+    private final int internalPort;
+
+    private String browserHost;
+
+    private int browserPort;
+
+    private String httpClientHost;
+
+    private int httpClientPort;
 
     private int stopPort;
 
@@ -136,9 +150,22 @@ public class XWikiExecutor
 
     public XWikiExecutor(int index)
     {
-        // resolve ports
+        this.index = index;
+
+        // Resolve hosts
+        try {
+            this.browserHost = new URI(URL).getHost();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Invalid URL set in property \"xwiki.test.baseURL\": [%s]".formatted(URL), e);
+        }
+        this.httpClientHost = this.browserHost;
+        this.internalHost = this.browserHost;
+
+        // Resolve ports
         String portString = System.getProperty("xwikiPort" + index);
-        this.port = portString != null ? Integer.valueOf(portString) : (Integer.valueOf(DEFAULT_PORT) + index);
+        this.browserPort = portString != null ? Integer.valueOf(portString) : (Integer.valueOf(DEFAULT_PORT) + index);
+        this.httpClientPort = this.browserPort;
+        this.internalPort = this.browserPort;
         String stopPortString = System.getProperty("xwikiStopPort" + index);
         this.stopPort =
             stopPortString != null ? Integer.valueOf(stopPortString) : (Integer.valueOf(DEFAULT_STOPPORT) - index);
@@ -172,9 +199,142 @@ public class XWikiExecutor
         }
     }
 
-    public int getPort()
+    /**
+     * @param index the index of this executor
+     * @param browserHost the host to use to access XWiki with Selenium
+     * @param browserPort the port to use to access XWiki with Selenium
+     * @param httpClientHost the host to use for direct HTTP requests
+     * @param httpClientPort the port to use for direct HTTP requests
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public XWikiExecutor(int index, String internalHost, int internalPort, String browserHost,
+        int browserPort, String httpClientHost, int httpClientPort)
     {
-        return this.port;
+        this.index = index;
+
+        this.internalHost = internalHost;
+        this.internalPort = internalPort;
+        this.browserHost = browserHost;
+        this.browserPort = browserPort;
+        this.httpClientHost = httpClientHost;
+        this.httpClientPort = httpClientPort;
+    }
+
+    /**
+     * @return the index of the executor
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public int getIndex()
+    {
+        return this.index;
+    }
+
+    /**
+     * @return the internalHost
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public String getInternalHost()
+    {
+        return this.internalHost;
+    }
+
+    /**
+     * @return the internalPort
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public int getInternalPort()
+    {
+        return this.internalPort;
+    }
+
+    /**
+     * @param browserHost the host to use to access XWiki with Selenium
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public void setBrowserHost(String browserHost)
+    {
+        this.browserHost = browserHost;
+    }
+
+    /**
+     * @return the host to use to access XWiki with Selenium
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public String getBrowserHost()
+    {
+        return this.browserHost;
+    }
+
+    /**
+     * @return the host to use for direct HTTP requests
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public int getBrowserPort()
+    {
+        return this.browserPort;
+    }
+
+    /**
+     * @return the host to use for direct HTTP requests
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public String getHttpClientHost()
+    {
+        return this.httpClientHost;
+    }
+
+    /**
+     * @return the port to use for direct HTTP requests
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public int getHttpClientPort()
+    {
+        return this.httpClientPort;
+    }
+
+    /**
+     * @return the base URL used of the XWiki instance ({@code http://host:port/xwiki/}) with the Selenium
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public String getBrowserBaseURL()
+    {
+        return "http://%s:%s%s/".formatted(this.browserHost, this.browserPort, XWikiExecutor.DEFAULT_CONTEXT);
+    }
+
+    /**
+     * @return the base URL of the XWiki instance ({@code http://host:port/xwiki/}) for direct HTTP requests
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public String getHttpClientBaseURL()
+    {
+        return getHttpClientBaseURL(true);
+    }
+
+    /**
+     * @param withContext true to include the context path in the returned URL
+     * @return the base URL of the XWiki instance ({@code http://host:port/xwiki/} or {@code http://host:port/},
+     *         depending on {@code withContext} for direct HTTP requests
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    public String getHttpClientBaseURL(boolean withContext)
+    {
+        if (withContext) {
+            return "http://%s:%s%s/".formatted(this.httpClientHost, this.httpClientPort, XWikiExecutor.DEFAULT_CONTEXT);
+        } else {
+            return "http://%s:%s/".formatted(this.httpClientHost, this.httpClientPort);
+        }
     }
 
     public int getStopPort()
@@ -312,7 +472,7 @@ public class XWikiExecutor
     {
         File dir = new File(getExecutionDirectory());
         if (dir.exists()) {
-            String startCommand = getDefaultStartCommand(getPort(), getStopPort(), getRMIPort(), getDebugPort());
+            String startCommand = getDefaultStartCommand(getHttpClientPort(), getStopPort(), getRMIPort(), getDebugPort());
             LOGGER.debug("Executing command: [{}]", startCommand);
             this.startedProcessHandler = executeCommand(startCommand);
         } else {
@@ -377,7 +537,7 @@ public class XWikiExecutor
 
     private void stopInternal() throws Exception
     {
-        String stopCommand = getDefaultStopCommand(getPort(), getStopPort());
+        String stopCommand = getDefaultStopCommand(getHttpClientPort(), getStopPort());
         LOGGER.debug("Executing command: [{}]", stopCommand);
         DefaultExecuteResultHandler stopProcessHandler = executeCommand(stopCommand);
 
@@ -513,7 +673,7 @@ public class XWikiExecutor
         // We use "get" action for 2 reasons:
         // 1) the page loads faster since it doesn't need to display the skin
         // 2) if the page doesn't exist it won't return a 404 HTTP Response code
-        return URL + ":" + getPort() + DEFAULT_CONTEXT + "/bin/get/Main/";
+        return getHttpClientBaseURL() + "/bin/get/Main/";
     }
 
     private String getDefaultStartCommand(int port, int stopPort, int rmiPort, int debugPort)

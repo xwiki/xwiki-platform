@@ -90,9 +90,12 @@ public class JettyStandaloneExecutor
     /**
      * Create a Jetty Standalone packaging on the file system and start Jetty.
      *
+     * @return the executor used to start Jetty
      * @throws Exception when an error occurs
+     * @since 18.0.0RC1
+     * @since 17.10.2
      */
-    public void start() throws Exception
+    public XWikiExecutor start() throws Exception
     {
         // For performance reason, skip creating the jetty packaging if it already exists
         File jettyDirectory = new File(getJettyDirectory());
@@ -136,6 +139,8 @@ public class JettyStandaloneExecutor
         }
 
         getExecutor().start();
+
+        return this.executor;
     }
 
     /**

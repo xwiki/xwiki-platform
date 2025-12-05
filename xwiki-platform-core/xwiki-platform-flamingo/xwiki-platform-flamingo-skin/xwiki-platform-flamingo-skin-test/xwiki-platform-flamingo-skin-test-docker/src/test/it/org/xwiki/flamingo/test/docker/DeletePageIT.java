@@ -41,7 +41,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.rest.model.jaxb.Page;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -744,8 +743,7 @@ class DeletePageIT
      */
     @Test
     @Order(13)
-    void deleteWithUpdateLinksAndAutoRedirect(TestUtils testUtils, TestReference reference,
-        TestConfiguration testConfiguration) throws Exception
+    void deleteWithUpdateLinksAndAutoRedirect(TestUtils testUtils, TestReference reference) throws Exception
     {
         DocumentReference backlinkDocumentReference = new DocumentReference("xwiki", "Backlink", "WebHome");
         DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
@@ -757,7 +755,7 @@ class DeletePageIT
         testUtils.createPage(newTargetReference, "", "New target");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -785,7 +783,7 @@ class DeletePageIT
      */
     @Test
     @Order(14)
-    void deleteWithoutNewTarget(TestUtils testUtils, TestReference reference, TestConfiguration testConfiguration)
+    void deleteWithoutNewTarget(TestUtils testUtils, TestReference reference)
         throws Exception
     {
         DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
@@ -796,7 +794,7 @@ class DeletePageIT
         testUtils.createPage(backlinkDocReference, backlinkDocContent, "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         // Delete page without specifying a new target.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -822,8 +820,7 @@ class DeletePageIT
      */
     @Test
     @Order(15)
-    void deleteWithAffectChildrenAndNewTarget(TestUtils testUtils, TestReference parentReference,
-        TestConfiguration testConfiguration) throws Exception
+    void deleteWithAffectChildrenAndNewTarget(TestUtils testUtils, TestReference parentReference) throws Exception
     {
         DocumentReference childReference = new DocumentReference("Child", parentReference.getLastSpaceReference());
         String childFullName = testUtils.serializeLocalReference(childReference);
@@ -839,7 +836,7 @@ class DeletePageIT
             String.format(format, testUtils.serializeLocalReference(parentReference), childFullName), "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         // Delete parent page with affectChildren and newTarget (updateLinks and autoRedirect enabled).
         ViewPage parentPage = testUtils.gotoPage(parentReference);

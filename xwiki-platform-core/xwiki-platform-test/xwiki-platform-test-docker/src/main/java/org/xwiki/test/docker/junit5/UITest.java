@@ -246,4 +246,11 @@ public @interface UITest
      * @since 17.10.0RC1
      */
     String blobStoreTag() default "";
+
+    /**
+     * @return the number of instances to run during tests.
+     * @since 18.0.0RC1
+     * @since 17.10.2
+     */
+    Instances instances() default @Instances;
 }

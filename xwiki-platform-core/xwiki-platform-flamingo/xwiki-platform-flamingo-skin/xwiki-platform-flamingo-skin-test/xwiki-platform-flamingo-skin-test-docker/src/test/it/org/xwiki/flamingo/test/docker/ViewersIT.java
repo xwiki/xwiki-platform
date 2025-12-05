@@ -29,7 +29,6 @@ import org.xwiki.flamingo.skin.test.po.SiblingsPage;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.repository.test.SolrTestUtils;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -110,8 +109,7 @@ class ViewersIT
      */
     @Test
     @Order(2)
-    void children(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
-        throws Exception
+    void children(TestUtils testUtils, TestReference testReference) throws Exception
     {
         DocumentReference childADocumentReference =
             new DocumentReference("ChildA", testReference.getLastSpaceReference());
@@ -202,7 +200,7 @@ class ViewersIT
         pinnedChildPagesTab.save();
 
         testUtils.loginAsSuperAdmin();
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
         childrenPage = ChildrenPage.goToPage(testReference);
         pinnedChildPagesTab = childrenPage.openPinnedChildPagesTab();
         assertEquals(List.of("ChildA", "ChildB", "WebPreferences"),

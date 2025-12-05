@@ -40,7 +40,6 @@ import org.xwiki.test.integration.maven.MavenResolver;
 
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getComponentManager;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getTestConfiguration;
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getXWikiURL;
 
 /**
  * Finds all the extensions in the current pom (i.e. in the {@code ./pom.xml} in the current directory) that are not
@@ -210,7 +209,8 @@ public class ExtensionInstaller
     public void installExtensions(Collection<ExtensionId> extensions, UsernamePasswordCredentials credentials,
         String installUserReference, List<String> namespaces, boolean failOnExist) throws Exception
     {
-        this.restExtensionInstaller.installExtensions(getXWikiURL(this.context), extensions, credentials,
+        this.restExtensionInstaller.installExtensions(
+            DockerTestUtils.getXWikiExecutor(this.context).getHttpClientBaseURL(), extensions, credentials,
             installUserReference, namespaces, failOnExist);
     }
 }

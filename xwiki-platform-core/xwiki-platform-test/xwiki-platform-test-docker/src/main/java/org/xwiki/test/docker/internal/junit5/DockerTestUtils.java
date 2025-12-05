@@ -47,6 +47,7 @@ import org.testcontainers.utility.ResourceReaper;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.integration.XWikiExecutor;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.LogContainerCmd;
@@ -358,24 +359,26 @@ public final class DockerTestUtils
 
     /**
      * @param context the context where to find the store
-     * @return the XWiki URL
-     * @since 14.5
+     * @param xwikiExecutor the current {@link XWikiExecutor}
+     * @since 18.0.0RC1
+     * @since 17.10.1
      */
-    public static String getXWikiURL(ExtensionContext context)
+    public static void setXWikiExecutor(ExtensionContext context, XWikiExecutor xwikiExecutor)
     {
         ExtensionContext.Store store = DockerTestUtils.getStore(context);
-        return store.get(String.class, String.class);
+        store.put(XWikiExecutor.class, xwikiExecutor);
     }
 
     /**
      * @param context the context where to find the store
-     * @param xwikiURL the XWiki URL
-     * @since 14.5
+     * @return the current {@link XWikiExecutor}
+     * @since 18.0.0RC1
+     * @since 17.10.1
      */
-    public static void setXWikiURL(ExtensionContext context, String xwikiURL)
+    public static XWikiExecutor getXWikiExecutor(ExtensionContext context)
     {
         ExtensionContext.Store store = DockerTestUtils.getStore(context);
-        store.put(String.class, xwikiURL);
+        return store.get(XWikiExecutor.class, XWikiExecutor.class);
     }
 
     /**

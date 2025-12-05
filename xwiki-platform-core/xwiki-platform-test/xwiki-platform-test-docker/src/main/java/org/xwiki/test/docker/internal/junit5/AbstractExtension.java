@@ -78,20 +78,10 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
         store.put(BrowserWebDriverContainer.class, container);
     }
 
-    protected void saveXWikiURL(ExtensionContext context, String xwikiURL)
-    {
-        DockerTestUtils.setXWikiURL(context, xwikiURL);
-    }
-
     protected BrowserWebDriverContainer loadBrowserWebDriverContainer(ExtensionContext context)
     {
         ExtensionContext.Store store = DockerTestUtils.getStore(context);
         return store.get(BrowserWebDriverContainer.class, BrowserWebDriverContainer.class);
-    }
-
-    protected String loadXWikiURL(ExtensionContext context)
-    {
-        return DockerTestUtils.getXWikiURL(context);
     }
 
     protected void savePersistentTestContext(ExtensionContext context, PersistentTestContext testContext)

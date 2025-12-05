@@ -86,7 +86,7 @@ public class ExtensionTestUtils
 
     private void checkinit() throws Exception
     {
-        int port = this.utils.getCurrentExecutor().getPort();
+        int port = this.utils.getCurrentExecutor().getHttpPort();
 
         if (!this.initialized.containsKey(port)) {
             // Create the service page if it does not exist

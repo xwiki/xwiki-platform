@@ -219,8 +219,6 @@ public class TestUtils
      */
     private static Unmarshaller unmarshaller;
 
-    private static String urlPrefix = XWikiExecutor.URL;
-
     /**
      * Cached secret token. TODO cache for each user.
      */
@@ -1336,31 +1334,12 @@ public class TestUtils
      */
     public String getBaseURL()
     {
-        String baseURL;
-
-        // If the URL has the port specified then consider it's a full URL and use it, otherwise add the port and the
-        // webapp context
-        if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
-            baseURL = TestUtils.urlPrefix;
-        } else {
-            baseURL = TestUtils.urlPrefix + ":"
-                + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT)
-                + XWikiExecutor.DEFAULT_CONTEXT;
+        XWikiExecutor executor = getCurrentExecutor();
+        if (executor != null) {
+            return executor.getBrowserBaseURL();
         }
 
-        if (!baseURL.endsWith("/")) {
-            baseURL = baseURL + "/";
-        }
-
-        return baseURL;
-    }
-
-    /**
-     * @since 10.6RC1
-     */
-    public static void setURLPrefix(String urlPrefix)
-    {
-        TestUtils.urlPrefix = urlPrefix;
+        return XWikiExecutor.URL + ':' + XWikiExecutor.DEFAULT_PORT + XWikiExecutor.DEFAULT_CONTEXT + '/';
     }
 
     /**
@@ -2516,8 +2495,6 @@ public class TestUtils
 
         public static final Map<EntityType, ResourceAPI> RESOURCES_MAP = new IdentityHashMap<>();
 
-        public static String urlPrefix;
-
         public static class ResourceAPI
         {
             public Class<?> api;
@@ -2616,29 +2593,7 @@ public class TestUtils
 
         public String getBaseURL()
         {
-            String prefix;
-            if (RestTestUtils.urlPrefix != null) {
-                prefix = RestTestUtils.urlPrefix;
-            } else {
-                prefix = this.testUtils.getBaseURL();
-            }
-            if (!prefix.endsWith("/")) {
-                prefix = prefix + "/";
-            }
-            return prefix + "rest";
-        }
-
-        /**
-         * Used when running in a docker container for example and thus when we need a REST URL pointing to a host
-         * different than the TestUTils baseURL which is used inside the Selenium docker container and is thus
-         * different from a REST URL used outside of any container and that needs to call XWiki running inside a
-         * container... ;)
-         *
-         * @since 10.9
-         */
-        public void setURLPrefix(String newURLPrefix)
-        {
-            RestTestUtils.urlPrefix = newURLPrefix;
+            return this.testUtils.getCurrentExecutor().getHttpBaseURL() + "rest";
         }
 
         protected Object[] toElements(Page page)

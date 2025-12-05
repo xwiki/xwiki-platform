@@ -20,7 +20,7 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -32,8 +32,8 @@ import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.utility.DockerLoggerFactory;
 import org.testcontainers.utility.TestcontainersConfiguration;
-import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -165,6 +165,13 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
             startServletEngine(targetWARDirectory, testConfiguration, artifactResolver, mavenResolver,
                 repositoryResolver, extensionContext);
 
+            // Create the XWikiExecutor
+            XWikiExecutor executor = new XWikiExecutor(0, testConfiguration.getServletEngine().getInternalIP(),
+                testConfiguration.getServletEngine().getInternalPort(), testConfiguration.getServletEngine().getIP(),
+                testConfiguration.getServletEngine().getPort());
+            // Store the XWikiExecutor in the context
+            DockerTestUtils.setXWikiExecutor(extensionContext, executor);
+
             // Provision XWiki by installing all required extensions.
             LOGGER.info("(*) Provision extensions for test...");
             provisionExtensions(artifactResolver, mavenResolver, extensionContext);
@@ -172,10 +179,16 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
             // Set the IP/port for the container since startServletEngine() wasn't called and it's set there normally.
             testConfiguration.getServletEngine().setIP("localhost");
             testConfiguration.getServletEngine().setPort(8080);
-            setXWikiURL(testConfiguration, extensionContext);
+
+            // Create the XWikiExecutor
+            XWikiExecutor executor = new XWikiExecutor(0, testConfiguration.getServletEngine().getInternalIP(),
+                testConfiguration.getServletEngine().getInternalPort(), testConfiguration.getServletEngine().getIP(),
+                testConfiguration.getServletEngine().getPort());
+            // Store the XWikiExecutor in the context
+            DockerTestUtils.setXWikiExecutor(extensionContext, executor);
 
             LOGGER.info("XWiki is already started, using running instance at [{}] to execute the tests...",
-                loadXWikiURL(extensionContext));
+                executor.getHttpBaseURL());
 
             // Note: Provisioning is not done in this case, you're supposed to have an XWiki instance that contains
             // what's needed for the tests.
@@ -376,25 +389,15 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         // Initialize the test context
         LOGGER.info("(*) Initialize Test Context...");
         PersistentTestContext testContext =
-            new PersistentTestContext(Arrays.asList(new XWikiExecutor(0)), xwikiWebDriver);
+            new PersistentTestContext(List.of(DockerTestUtils.getXWikiExecutor(extensionContext)), xwikiWebDriver);
         AbstractTest.initializeSystem(testContext);
         savePersistentTestContext(extensionContext, testContext);
-
-        // Set the URLs to access XWiki:
-        // - the one used inside the Selenium container
-        testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
-            testConfiguration.getServletEngine().getInternalIP(),
-            testConfiguration.getServletEngine().getInternalPort()));
 
         // Setup the wcag validation context.
         testContext.getUtil().getWCAGUtils().setupWCAGValidation(
             testConfiguration.isWCAG(),
             extensionContext.getTestClass().get().getName(),
             testConfiguration.shouldWCAGStopOnError());
-
-
-        // - the one used by RestTestUtils, i.e. outside of any container
-        testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));
 
         // Display logs after the container has been started so that we can see problems happening in the containers
         followOutput(webDriverContainer, getClass());
@@ -451,19 +454,6 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         ServletContainerExecutor executor = getServletContainerExecutor(testConfiguration, artifactResolver,
             mavenResolver, repositoryResolver, extensionContext);
         executor.start(sourceWARDirectory);
-        setXWikiURL(testConfiguration, extensionContext);
-    }
-
-    private void setXWikiURL(TestConfiguration testConfiguration, ExtensionContext extensionContext)
-    {
-        // URL to access XWiki from the host.
-        String xwikiURL = computeXWikiURLPrefix(testConfiguration.getServletEngine().getIP(),
-            testConfiguration.getServletEngine().getPort());
-        saveXWikiURL(extensionContext, xwikiURL);
-
-        if (testConfiguration.isVerbose()) {
-            LOGGER.info("XWiki ping URL = {}", xwikiURL);
-        }
     }
 
     private void stopServletEngine(ExtensionContext extensionContext) throws Exception
@@ -483,11 +473,6 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
 
         // Install extensions in the running XWiki
         extensionInstaller.installExtensions(SUPERADMIN, "pass", SUPERADMIN);
-    }
-
-    private String computeXWikiURLPrefix(String ip, int port)
-    {
-        return String.format("http://%s:%s/xwiki", ip, port);
     }
 
     private void saveScreenshotAndVideo(ExtensionContext extensionContext)

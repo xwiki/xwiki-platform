@@ -53,6 +53,10 @@
       <groupId>com.sun.mail</groupId>
       <artifactId>jakarta.mail</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.sun.activation</groupId>
+      <artifactId>javax.activation</artifactId>
+    </dependency>
   </dependencies>
 
   <scm>

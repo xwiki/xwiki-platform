@@ -90,8 +90,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>javax.activation-api</artifactId>
+      <groupId>com.sun.activation</groupId>
+      <artifactId>javax.activation</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

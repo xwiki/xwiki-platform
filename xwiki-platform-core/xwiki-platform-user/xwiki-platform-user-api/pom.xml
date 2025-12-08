@@ -55,9 +55,8 @@
       <artifactId>jakarta.mail</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>javax.activation-api</artifactId>
-      <scope>provided</scope>
+      <groupId>com.sun.activation</groupId>
+      <artifactId>javax.activation</artifactId>
     </dependency>
 
     <!-- Test Dependencies -->

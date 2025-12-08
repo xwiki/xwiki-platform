@@ -167,10 +167,6 @@
             <groupId>org.jboss.spec.javax.transaction</groupId>
             <artifactId>jboss-transaction-api_1.2_spec</artifactId>
           </exclusion>
-          <exclusion>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-          </exclusion>
         </exclusions>
       </dependency>
       <!-- Liquibase -->
@@ -178,13 +174,6 @@
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
         <version>4.33.0</version>
-        <exclusions>
-          <!-- Not the right id -->
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- Jython engine -->

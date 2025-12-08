@@ -44,6 +44,11 @@
       <artifactId>jakarta.mail</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>javax.activation-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>

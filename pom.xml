@@ -204,11 +204,6 @@
         <artifactId>tika-parser-advancedmedia-module</artifactId>
         <version>${tika.version}</version>
         <exclusions>
-          <!-- XWiki does not support JAX-RC 2 for now -->
-          <exclusion>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-          </exclusion>
           <!-- Remove when https://issues.apache.org/jira/browse/TIKA-3537 is fixed -->
           <exclusion>
             <groupId>junit</groupId>

@@ -59,6 +59,10 @@
       <artifactId>validation-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-analysis-extras</artifactId>
     </dependency>

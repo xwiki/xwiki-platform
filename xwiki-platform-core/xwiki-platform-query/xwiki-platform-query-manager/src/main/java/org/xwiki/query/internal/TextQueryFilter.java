@@ -29,11 +29,17 @@ import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 
 /**
  * Enables text filtering on the selected columns. Don't forget to bind the value of the {@code text} query parameter.
- * 
+ * <p>
+ * Columns aliased with an alias starting with {@code unfilterable} won't be considered for text filtering. Columns
+ * of type CLOB should be aliased with an alias starting with {@code clob} to avoid casting them to string which would
+ * result in an error on Oracle when the CLOB is larger than 4000 characters.
+ * </p>
+ *
  * @version $Id$
  * @since 9.8RC1
  */
@@ -52,11 +58,22 @@ public class TextQueryFilter extends AbstractWhereQueryFilter
 
     private static final Pattern COLUMN_SEPARATOR = Pattern.compile("\\s*,\\s*");
 
+    private record ColumnAlias(String column, String alias)
+    {
+    }
+
     @Override
     public String filterStatement(String statement, String language)
     {
-        String constraint = getFilterableColumns(statement).stream()
-            .map(column -> "lower(str(" + column + ")) like lower(:text)").collect(Collectors.joining(" or "));
+        String constraint = getFilterableColumnsAndAliases(statement).stream()
+            .map(column -> {
+                if (Strings.CS.startsWith(column.alias(), "clob")) {
+                    // Don't cast CLOB columns to string as this will result in an error on Oracle when the CLOB is
+                    // larger than 4000 characters.
+                    return "lower(" + column.column() + ") like lower(:text)";
+                }
+                return "lower(str(" + column.column() + ")) like lower(:text)";
+            }).collect(Collectors.joining(" or "));
         if (constraint.isEmpty()) {
             return statement;
         } else {
@@ -77,7 +94,7 @@ public class TextQueryFilter extends AbstractWhereQueryFilter
         return true;
     }
 
-    private List<String> getFilterableColumns(String statement)
+    private List<ColumnAlias> getFilterableColumnsAndAliases(String statement)
     {
         Matcher selectMatcher = SELECT.matcher(statement);
         Matcher fromMatcher = FROM.matcher(statement);
@@ -86,7 +103,7 @@ public class TextQueryFilter extends AbstractWhereQueryFilter
             return Collections.emptyList();
         }
 
-        List<String> columns = new ArrayList<>();
+        List<ColumnAlias> columns = new ArrayList<>();
         String selectClause = statement.substring(selectMatcher.end(), fromMatcher.start());
         // Skip 'distinct' in the select clause.
         selectClause = DISTINCT.matcher(selectClause).replaceFirst("");
@@ -100,8 +117,10 @@ public class TextQueryFilter extends AbstractWhereQueryFilter
                 if (alias.startsWith("unfilterable")) {
                     continue;
                 }
+                columns.add(new ColumnAlias(columnWithoutAlias, alias));
+            } else {
+                columns.add(new ColumnAlias(columnWithoutAlias, null));
             }
-            columns.add(columnWithoutAlias);
         }
         return columns;
     }

@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -40,9 +41,12 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.store.DatabaseProduct;
 
@@ -111,19 +115,44 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
     {
         String statement;
 
-        if (hibernateStore.getDatabaseProductName() == DatabaseProduct.ORACLE) {
-            statement = String.format("select %1$s, str(%1$s) as unfilterable1 "
-                + "from BaseObject as obj, %2$s "
-                + "where obj.className = :className and obj.name <> :templateName"
-                + " and prop.id.id = obj.id and prop.id.name = :propertyName "
-                + "order by unfilterable1 desc", getSelectColumnAndFromTable(listClass));
+        // On Oracle, StringListProperty uses a CLOB column which cannot be used in GROUP BY.
+        // We need a special query that doesn't use GROUP BY for this case.
+        boolean usesClobColumn = usesClobColumn(listClass);
+
+        String[] selectAndFrom = getSelectColumnAndFromTable(listClass);
+        if (usesClobColumn) {
+            // For CLOB columns on Oracle, we cannot use GROUP BY or DISTINCT on CLOB columns.
+            // Unfortunately, we also cannot use subqueries in select clauses in HQL in Hibernate < 6 - otherwise, we
+            // could possibly have used a partitioned ROW_NUMBER() over (PARTITION BY ...) approach.
+            // We use a "not exists" subquery to get distinct values instead by selecting only the first occurrence of
+            // each value by ordering by id and ensuring no prior id has the same value.
+            String selectColumn = selectAndFrom[0];
+            String fromTable = selectAndFrom[1];
+            String fromTableProp2 = fromTable.replace(" as prop", " as prop2");
+            String selectColumnProp2 = selectColumn.replace("prop.", "prop2.");
+
+            statement = String.format(
+                "select %1$s as clobValue, 1L as unfilterable0 "
+                    + "from BaseObject as obj, %2$s "
+                    + "where obj.className = :className "
+                    + "  and obj.name <> :templateName "
+                    + "  and prop.id.id = obj.id "
+                    + "  and prop.id.name = :propertyName "
+                    + "  and not exists ("
+                    + "    select 1 from %3$s "
+                    + "    where prop2.id.name = :propertyName "
+                    + "      and prop2.id.id < prop.id.id "
+                    + "      and FUNCTION('DBMS_LOB.COMPARE', %4$s, %1$s) = 0"
+                    + "  ) "
+                    + "order by obj.id",
+                selectColumn, fromTable, fromTableProp2, selectColumnProp2);
         } else {
             statement = String.format("select %1$s, count(*) as unfilterable0 "
                 + "from BaseObject as obj, %2$s "
                 + "where obj.className = :className and obj.name <> :templateName"
                 + " and prop.id.id = obj.id and prop.id.name = :propertyName "
                 + "group by %1$s "
-                + "order by unfilterable0 desc", getSelectColumnAndFromTable(listClass));
+                + "order by unfilterable0 desc", selectAndFrom[0], selectAndFrom[1]);
         }
         Query query = this.queryManager.createQuery(statement, Query.HQL);
         bindParameterValues(query, listClass);
@@ -132,18 +161,38 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
         return query;
     }
 
-    private Object[] getSelectColumnAndFromTable(ListClass listClass)
+    private boolean usesClobColumn(ListClass listClass)
     {
-        String selectColumn = "prop.textValue";
-        String fromTable = "StringListProperty as prop";
-        if (!listClass.isMultiSelect()) {
-            selectColumn = "prop.value";
-            fromTable = "StringProperty as prop";
-        } else if (listClass.isRelationalStorage()) {
+        if (this.hibernateStore.getDatabaseProductName() != DatabaseProduct.ORACLE) {
+            return false;
+        }
+
+        BaseProperty<?> property = listClass.newProperty();
+        return property instanceof StringListProperty || property instanceof LargeStringProperty;
+    }
+
+    private String[] getSelectColumnAndFromTable(ListClass listClass)
+    {
+        // Base the selection on the actual type of a property as different classes like UsersClass and GroupsClass
+        // don't respect the configured storage type.
+        BaseProperty<?> property = listClass.newProperty();
+        String selectColumn;
+        String fromTable;
+        if (property instanceof StringListProperty) {
+            selectColumn = "prop.textValue";
+            fromTable = "StringListProperty as prop";
+        } else if (property instanceof DBStringListProperty) {
             selectColumn = "listItem";
             fromTable = "DBStringListProperty as prop join prop.list listItem";
+        } else {
+            selectColumn = "prop.value";
+            if (property instanceof LargeStringProperty) {
+                fromTable = "LargeStringProperty as prop";
+            } else {
+                fromTable = "StringProperty as prop";
+            }
         }
-        return new Object[] {selectColumn, fromTable};
+        return new String[] {selectColumn, fromTable};
     }
 
     private void bindParameterValues(Query query, ListClass listClass)
@@ -156,18 +205,29 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
 
     private String getTemplateName(String className)
     {
-        return StringUtils.removeEnd(className, "Class") + "Template";
+        return Strings.CS.removeEnd(className, "Class") + "Template";
     }
 
     private boolean canView(ListClass listClass, String value, long count)
     {
         // We can't check all the documents where this value occurs so we check just one of them, chosen randomly.
         long offset = ThreadLocalRandom.current().nextLong(count);
+        String[] selectAndFrom = getSelectColumnAndFromTable(listClass);
+        String selectColumn = selectAndFrom[0];
+
+        // For CLOB columns on Oracle, we need to use DBMS_LOB.COMPARE to compare the values.
+        String comparison;
+        if (usesClobColumn(listClass)) {
+            comparison = String.format("FUNCTION('DBMS_LOB.COMPARE', %s, :propertyValue) = 0", selectColumn);
+        } else {
+            comparison = String.format("%s = :propertyValue", selectColumn);
+        }
+
         String statement = String.format(
-            "select obj.name from BaseObject as obj, %2$s "
+            "select obj.name from BaseObject as obj, %s "
                 + "where obj.className = :className and obj.name <> :templateName "
-                + "and prop.id.id = obj.id and prop.id.name = :propertyName and %1$s = :propertyValue",
-            getSelectColumnAndFromTable(listClass));
+                + "and prop.id.id = obj.id and prop.id.name = :propertyName and %s",
+            selectAndFrom[1], comparison);
         try {
             Query query = this.queryManager.createQuery(statement, Query.HQL);
             bindParameterValues(query, listClass);
@@ -175,7 +235,7 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
             query.setWiki(listClass.getReference().extractReference(EntityType.WIKI).getName());
             query.setOffset((int) offset).setLimit(1);
             List<?> results = query.execute();
-            if (results.size() > 0) {
+            if (!results.isEmpty()) {
                 DocumentReference documentReference = this.documentReferenceResolver.resolve((String) results.get(0));
                 if (this.authorization.hasAccess(Right.VIEW, documentReference)) {
                     return true;

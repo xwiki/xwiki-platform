@@ -19,10 +19,14 @@
  */
 package com.xpn.xwiki.internal.objects.classes;
 
+import java.util.stream.Stream;
+
 import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -56,6 +60,7 @@ import static org.mockito.Mockito.when;
  * @since 9.8RC1
  */
 @ComponentTest
+@SuppressWarnings("checkstyle:MultipleStringLiterals")
 class UsedValuesListQueryBuilderTest
 {
     @MockComponent
@@ -70,7 +75,7 @@ class UsedValuesListQueryBuilderTest
 
     @MockComponent
     @Named("local")
-    EntityReferenceSerializer<String> localEntityReferenceSerializer;
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     @MockComponent
     private HibernateStore hibernateStore;
@@ -103,13 +108,26 @@ class UsedValuesListQueryBuilderTest
         this.listClass.setObject(xclass);
     }
 
-    @Test
-    void buildForStringProperty() throws Exception
+    /**
+     * Argument provider for cases where the query is unchanged for different database products.
+     *
+     * @return MySQL and Oracle database products
+     */
+    static Stream<DatabaseProduct> getDatabaseProducts()
+    {
+        return Stream.of(DatabaseProduct.MYSQL, DatabaseProduct.ORACLE);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getDatabaseProducts")
+    void buildForStringProperty(DatabaseProduct databaseProduct) throws Exception
     {
         listClass.setMultiSelect(false);
 
         Query query = mock(Query.class);
         when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+        when(this.hibernateStore.getDatabaseProductName()).thenReturn(databaseProduct);
+
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
 
         verify(this.queryManager).createQuery("select prop.value, count(*) as unfilterable0 "
@@ -124,36 +142,16 @@ class UsedValuesListQueryBuilderTest
         verify(query).setWiki("apps");
     }
 
-    @Test
-    void buildForStringPropertyWithOracle() throws Exception
-    {
-        listClass.setMultiSelect(false);
-
-        Query query = mock(Query.class);
-        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
-        when(this.hibernateStore.getDatabaseProductName()).thenReturn(DatabaseProduct.ORACLE);
-
-        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
-
-        verify(this.queryManager).createQuery("select prop.value, str(prop.value) as unfilterable1 "
-            + "from BaseObject as obj, StringProperty as prop "
-            + "where obj.className = :className and obj.name <> :templateName and "
-            + "prop.id.id = obj.id and prop.id.name = :propertyName "
-            + "order by unfilterable1 desc", Query.HQL);
-        verify(query).bindValue("className", "Blog.BlogPostClass");
-        verify(query).bindValue("propertyName", "category");
-        verify(query).bindValue("templateName", "Blog.BlogPostTemplate");
-        verify(query).setWiki("apps");
-    }
-
-    @Test
-    void buildForDBStringListProperty() throws Exception
+    @ParameterizedTest
+    @MethodSource("getDatabaseProducts")
+    void buildForDBStringListProperty(DatabaseProduct databaseProduct) throws Exception
     {
         listClass.setMultiSelect(true);
         listClass.setRelationalStorage(true);
 
         Query query = mock(Query.class);
         when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+        when(this.hibernateStore.getDatabaseProductName()).thenReturn(databaseProduct);
 
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
         verify(this.queryManager).createQuery("select listItem, count(*) as unfilterable0 "
@@ -162,24 +160,6 @@ class UsedValuesListQueryBuilderTest
             + "prop.id.id = obj.id and prop.id.name = :propertyName "
             + "group by listItem "
             + "order by unfilterable0 desc", Query.HQL);
-    }
-
-    @Test
-    void buildForDBStringListPropertyWithOracle() throws Exception
-    {
-        listClass.setMultiSelect(true);
-        listClass.setRelationalStorage(true);
-
-        Query query = mock(Query.class);
-        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
-        when(this.hibernateStore.getDatabaseProductName()).thenReturn(DatabaseProduct.ORACLE);
-
-        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
-        verify(this.queryManager).createQuery("select listItem, str(listItem) as unfilterable1 "
-            + "from BaseObject as obj, DBStringListProperty as prop join prop.list listItem "
-            + "where obj.className = :className and obj.name <> :templateName and "
-            + "prop.id.id = obj.id and prop.id.name = :propertyName "
-            + "order by unfilterable1 desc", Query.HQL);
     }
 
     @Test
@@ -211,10 +191,74 @@ class UsedValuesListQueryBuilderTest
         when(this.hibernateStore.getDatabaseProductName()).thenReturn(DatabaseProduct.ORACLE);
 
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
-        verify(this.queryManager).createQuery("select prop.textValue, str(prop.textValue) as unfilterable1 "
+        // StringListProperty uses CLOB on Oracle, so we need a special query without GROUP BY.
+        verify(this.queryManager).createQuery("select prop.textValue as clobValue, 1L as unfilterable0 "
             + "from BaseObject as obj, StringListProperty as prop "
+                + "where obj.className = :className "
+                + "  and obj.name <> :templateName "
+                + "  and prop.id.id = obj.id "
+                + "  and prop.id.name = :propertyName "
+                + "  and not exists ("
+                + "    select 1 from StringListProperty as prop2 "
+                + "    where prop2.id.name = :propertyName "
+                + "      and prop2.id.id < prop.id.id "
+                + "      and FUNCTION('DBMS_LOB.COMPARE', prop2.textValue, prop.textValue) = 0"
+                + "  ) "
+                + "order by obj.id", Query.HQL);
+    }
+
+    @Test
+    void buildForLargeStringProperty() throws Exception
+    {
+        listClass.setMultiSelect(false);
+        listClass.setLargeStorage(true);
+
+        Query query = mock(Query.class);
+        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+
+        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
+
+        verify(this.queryManager).createQuery("select prop.value, count(*) as unfilterable0 "
+            + "from BaseObject as obj, LargeStringProperty as prop "
             + "where obj.className = :className and obj.name <> :templateName and "
             + "prop.id.id = obj.id and prop.id.name = :propertyName "
-            + "order by unfilterable1 desc", Query.HQL);
+            + "group by prop.value "
+            + "order by unfilterable0 desc", Query.HQL);
+        verify(query).bindValue("className", "Blog.BlogPostClass");
+        verify(query).bindValue("propertyName", "category");
+        verify(query).bindValue("templateName", "Blog.BlogPostTemplate");
+        verify(query).setWiki("apps");
+    }
+
+    @Test
+    void buildForLargeStringPropertyWithOracle() throws Exception
+    {
+        listClass.setMultiSelect(false);
+        listClass.setLargeStorage(true);
+
+        Query query = mock();
+        when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
+        when(this.hibernateStore.getDatabaseProductName()).thenReturn(DatabaseProduct.ORACLE);
+
+        assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
+
+        // LargeStringProperty uses CLOB on Oracle, so we need a special query without GROUP BY.
+        verify(this.queryManager).createQuery("select prop.value as clobValue, 1L as unfilterable0 "
+                + "from BaseObject as obj, LargeStringProperty as prop "
+                + "where obj.className = :className "
+                + "  and obj.name <> :templateName "
+                + "  and prop.id.id = obj.id "
+                + "  and prop.id.name = :propertyName "
+                + "  and not exists ("
+                + "    select 1 from LargeStringProperty as prop2 "
+                + "    where prop2.id.name = :propertyName "
+                + "      and prop2.id.id < prop.id.id "
+                + "      and FUNCTION('DBMS_LOB.COMPARE', prop2.value, prop.value) = 0"
+                + "  ) "
+                + "order by obj.id", Query.HQL);
+        verify(query).bindValue("className", "Blog.BlogPostClass");
+        verify(query).bindValue("propertyName", "category");
+        verify(query).bindValue("templateName", "Blog.BlogPostTemplate");
+        verify(query).setWiki("apps");
     }
 }

@@ -1444,8 +1444,7 @@
                 <features>
                   javax.mail:mail,
                   javax.mail:mailapi,
-                  com.sun.mail:javax.mail,
-                  jakarta.mail:jakarta.mail-api
+                  com.sun.mail:javax.mail
                 </features>
               </extensionOverride>
               <extensionOverride>

@@ -18,7 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { BlockNoteEditor, insertOrUpdateBlock } from "@blocknote/core";
+import { BlockNoteEditor } from "@blocknote/core";
+import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core/extensions";
 import {
   createReactBlockSpec,
   createReactInlineContentSpec,
@@ -98,7 +99,7 @@ function createCustomBlockSpec<
           group: slashMenu.group,
           icon: slashMenu.icon,
           onItemClick: () => {
-            insertOrUpdateBlock(editor, slashMenu.default());
+            insertOrUpdateBlockForSlashMenu(editor, slashMenu.default());
           },
         }),
 

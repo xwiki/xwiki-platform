@@ -694,6 +694,8 @@
         if(!startExpanded) {
           property.addClass('collapsed');
         }
+        // The click event is catched only on the icon and title to avoid breaking behaviour when using actions, 
+        // especially the move action which is dragAndDrop.
         propertyTitle.find('.toggle-collapsable, h2').on('click', function() {
           propertyTitle.parent().toggleClass('collapsed');
         });

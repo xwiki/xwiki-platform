@@ -140,7 +140,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
       </select>
     </div>
     <span class="buttonwrapper">
-      <input type="button" class="button" value="$services.localization.render('core.editors.class.addProperty.submit')" name="action_propadd"/>
+      <input type="submit" class="button" value="$services.localization.render('core.editors.class.addProperty.submit')" name="action_propadd"/>
     </span>
   </div>
 #end

@@ -259,8 +259,8 @@ catalogs:
       specifier: 3.1.8
       version: 3.1.8
     vue3-touch-events:
-      specifier: 5.0.13
-      version: 5.0.13
+      specifier: 5.0.15
+      version: 5.0.15
     vuedraggable:
       specifier: 4.1.0
       version: 4.1.0
@@ -431,7 +431,7 @@ importers:
         version: 6.7.1(vue@3.5.23(typescript@5.9.3))
       vue3-touch-events:
         specifier: 'catalog:'
-        version: 5.0.13(vue@3.5.23(typescript@5.9.3))
+        version: 5.0.15(vue@3.5.23(typescript@5.9.3))
       vuedraggable:
         specifier: 'catalog:'
         version: 4.1.0(vue@3.5.23(typescript@5.9.3))
@@ -5678,8 +5678,8 @@ packages:
     peerDependencies:
       typescript: '>=5.0.0'
 
-  vue3-touch-events@5.0.13:
-    resolution: {integrity: sha512-VOprVhKsL5DaistDFU0+oLJz/LaFzVENeUzs4Hp3PeD0TVx1vNEgNgS/9WehUHlUIUuCdnmLm0TkmITjwVmUBQ==}
+  vue3-touch-events@5.0.15:
+    resolution: {integrity: sha512-K5rE56ZZcX9BqdBTcDNNR1Fd5K4ES1udJjByVzn8JU7H0EI2m4fc7dY3EIoC8Fge2uV1yesjNbCR7VX28gHHHg==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -10582,7 +10582,7 @@ snapshots:
       '@vue/language-core': 3.1.8(typescript@5.9.3)
       typescript: 5.9.3
 
-  vue3-touch-events@5.0.13(vue@3.5.23(typescript@5.9.3)):
+  vue3-touch-events@5.0.15(vue@3.5.23(typescript@5.9.3)):
     dependencies:
       vue: 3.5.23(typescript@5.9.3)
 

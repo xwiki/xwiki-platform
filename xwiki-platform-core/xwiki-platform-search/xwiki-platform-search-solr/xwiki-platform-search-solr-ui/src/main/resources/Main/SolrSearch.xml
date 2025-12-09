@@ -843,6 +843,8 @@ body.preference-underlining-only-inline-links #xwikicontent .search-facet-body .
 }
 
 .search-facet-body .itemCount {
+  /* The YUI CSS compressor removes spaces incorrectly in this operator. We use a workaround to still make it work. */
+  max-height: calc(1lh - -.2em);
   padding: .1em .5em;
   margin-left: auto;
   background-color: var(--nav-link-hover-bg);

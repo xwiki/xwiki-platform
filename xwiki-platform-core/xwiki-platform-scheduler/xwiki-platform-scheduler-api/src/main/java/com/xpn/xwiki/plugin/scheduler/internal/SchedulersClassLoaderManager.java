@@ -109,10 +109,11 @@ public class SchedulersClassLoaderManager
      */
     public void onClassLoaderReset(String namespace)
     {
-        schedulersMapPerNamespace
-            .getOrDefault(namespace, Set.of())
-            .parallelStream()
-            .forEach(this::reloadScheduler);
+        Set<BaseObjectReference> objectReferences =
+            new HashSet<>(schedulersMapPerNamespace.getOrDefault(namespace, Set.of()));
+        for (BaseObjectReference objectReference : objectReferences) {
+            this.reloadScheduler(objectReference);
+        }
     }
 
     private void reloadScheduler(BaseObjectReference objectReference)

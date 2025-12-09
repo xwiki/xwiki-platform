@@ -118,6 +118,6 @@ catalog:
   vue-router: 4.5.1
   vue-tippy: 6.7.1
   vue-tsc: 3.1.8
-  vue3-touch-events: 5.0.13
+  vue3-touch-events: 5.0.15
   vuedraggable: 4.1.0
   yjs: 13.6.27

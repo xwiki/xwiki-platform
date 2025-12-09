@@ -107,7 +107,7 @@ catalog:
   u-node: 0.0.2
   unified: 11.0.5
   utility-types: 3.11.0
-  vite: 7.1.12
+  vite: 7.2.7
   vite-plugin-css-injected-by-js: 3.5.2
   vite-plugin-dts: 4.5.4
   vitest: 4.0.15

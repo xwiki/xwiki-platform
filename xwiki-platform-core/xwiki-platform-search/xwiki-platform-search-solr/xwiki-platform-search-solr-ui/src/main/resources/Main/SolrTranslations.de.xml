@@ -80,7 +80,7 @@ solr.result.mediaType=Dateityp {0}
 solr.result.uploadedBy=Hochgeladen von {0} am {1} ({2})
 solr.result.highlightAll=Alle Vorkommen anzeigen
 solr.facets.title=Suche verfeinern
-solr.facets.hint=Wählen Sie eine Kategorie aus und aktivieren Sie die Filter, um die aktuellen Suchergebnisse einzugrenzen
+solr.facets.hint=Wählen Sie eine Kategorie aus und aktivieren Sie die Filter, um die aktuellen Suchergebnisse einzugrenzen.
 solr.facets.resetAll=Zurücksetzen
 solr.facets.expandAll=Alles aufklappen
 solr.facets.collapseAll=Alles zuklappen
@@ -183,7 +183,7 @@ solr.sortBy.attdate_sort=Hochgeladen am
 solr.sortBy.attauthor_display_sort=Hochgeladen von
 solr.options=Anzeigen:
 solr.options.highlight=Hervorheben
-solr.options.facet=Facetten
+solr.options.facet=Filter
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

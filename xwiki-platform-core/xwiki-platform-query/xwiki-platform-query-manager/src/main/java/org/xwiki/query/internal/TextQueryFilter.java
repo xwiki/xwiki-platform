@@ -35,9 +35,9 @@ import org.xwiki.component.annotation.Component;
 /**
  * Enables text filtering on the selected columns. Don't forget to bind the value of the {@code text} query parameter.
  * <p>
- * Columns aliased with an alias starting with {@code unfilterable} won't be considered for text filtering. Columns
- * of type CLOB should be aliased with an alias starting with {@code clob} to avoid casting them to string which would
- * result in an error on Oracle when the CLOB is larger than 4000 characters.
+ * Columns aliased with an alias starting with {@code unfilterable} won't be considered for text filtering. String
+ * and clob columns should be aliased with an alias starting with {@code string} to avoid casting them to string which
+ * can lead to issues on some databases.
  * </p>
  *
  * @version $Id$
@@ -67,9 +67,9 @@ public class TextQueryFilter extends AbstractWhereQueryFilter
     {
         String constraint = getFilterableColumnsAndAliases(statement).stream()
             .map(column -> {
-                if (Strings.CS.startsWith(column.alias(), "clob")) {
-                    // Don't cast CLOB columns to string as this will result in an error on Oracle when the CLOB is
-                    // larger than 4000 characters.
+                if (Strings.CS.startsWith(column.alias(), "string")) {
+                    // Don't cast string columns to string as this will result in problems on some databases that
+                    // don't support casting clob values to strings - this cast is only needed for non-string columns.
                     return "lower(" + column.column() + ") like lower(:text)";
                 }
                 return "lower(str(" + column.column() + ")) like lower(:text)";

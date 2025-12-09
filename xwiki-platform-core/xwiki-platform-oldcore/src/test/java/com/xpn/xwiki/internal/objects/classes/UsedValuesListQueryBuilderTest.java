@@ -130,7 +130,7 @@ class UsedValuesListQueryBuilderTest
 
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
 
-        verify(this.queryManager).createQuery("select prop.value, count(*) as unfilterable0 "
+        verify(this.queryManager).createQuery("select prop.value as stringValue, count(*) as unfilterable0 "
             + "from BaseObject as obj, StringProperty as prop "
             + "where obj.className = :className and obj.name <> :templateName and "
             + "prop.id.id = obj.id and prop.id.name = :propertyName "
@@ -154,7 +154,7 @@ class UsedValuesListQueryBuilderTest
         when(this.hibernateStore.getDatabaseProductName()).thenReturn(databaseProduct);
 
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
-        verify(this.queryManager).createQuery("select listItem, count(*) as unfilterable0 "
+        verify(this.queryManager).createQuery("select listItem as stringValue, count(*) as unfilterable0 "
             + "from BaseObject as obj, DBStringListProperty as prop join prop.list listItem "
             + "where obj.className = :className and obj.name <> :templateName and "
             + "prop.id.id = obj.id and prop.id.name = :propertyName "
@@ -172,7 +172,7 @@ class UsedValuesListQueryBuilderTest
         when(this.queryManager.createQuery(any(), eq(Query.HQL))).thenReturn(query);
 
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
-        verify(this.queryManager).createQuery("select prop.textValue, count(*) as unfilterable0 "
+        verify(this.queryManager).createQuery("select prop.textValue as stringValue, count(*) as unfilterable0 "
             + "from BaseObject as obj, StringListProperty as prop "
             + "where obj.className = :className and obj.name <> :templateName and "
             + "prop.id.id = obj.id and prop.id.name = :propertyName "
@@ -192,7 +192,7 @@ class UsedValuesListQueryBuilderTest
 
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
         // StringListProperty uses CLOB on Oracle, so we need a special query without GROUP BY.
-        verify(this.queryManager).createQuery("select prop.textValue as clobValue, 1L as unfilterable0 "
+        verify(this.queryManager).createQuery("select prop.textValue as stringValue, 1L as unfilterable0 "
             + "from BaseObject as obj, StringListProperty as prop "
                 + "where obj.className = :className "
                 + "  and obj.name <> :templateName "
@@ -218,7 +218,7 @@ class UsedValuesListQueryBuilderTest
 
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
 
-        verify(this.queryManager).createQuery("select prop.value, count(*) as unfilterable0 "
+        verify(this.queryManager).createQuery("select prop.value as stringValue, count(*) as unfilterable0 "
             + "from BaseObject as obj, LargeStringProperty as prop "
             + "where obj.className = :className and obj.name <> :templateName and "
             + "prop.id.id = obj.id and prop.id.name = :propertyName "
@@ -243,7 +243,7 @@ class UsedValuesListQueryBuilderTest
         assertSame(query, this.usedValuesListQueryBuilder.build(listClass));
 
         // LargeStringProperty uses CLOB on Oracle, so we need a special query without GROUP BY.
-        verify(this.queryManager).createQuery("select prop.value as clobValue, 1L as unfilterable0 "
+        verify(this.queryManager).createQuery("select prop.value as stringValue, 1L as unfilterable0 "
                 + "from BaseObject as obj, LargeStringProperty as prop "
                 + "where obj.className = :className "
                 + "  and obj.name <> :templateName "

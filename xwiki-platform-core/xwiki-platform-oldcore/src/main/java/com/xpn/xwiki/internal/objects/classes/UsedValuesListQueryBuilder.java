@@ -132,7 +132,7 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
             String selectColumnProp2 = selectColumn.replace("prop.", "prop2.");
 
             statement = String.format(
-                "select %1$s as clobValue, 1L as unfilterable0 "
+                "select %1$s as stringValue, 1L as unfilterable0 "
                     + "from BaseObject as obj, %2$s "
                     + "where obj.className = :className "
                     + "  and obj.name <> :templateName "
@@ -147,7 +147,7 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
                     + "order by obj.id",
                 selectColumn, fromTable, fromTableProp2, selectColumnProp2);
         } else {
-            statement = String.format("select %1$s, count(*) as unfilterable0 "
+            statement = String.format("select %1$s as stringValue, count(*) as unfilterable0 "
                 + "from BaseObject as obj, %2$s "
                 + "where obj.className = :className and obj.name <> :templateName"
                 + " and prop.id.id = obj.id and prop.id.name = :propertyName "

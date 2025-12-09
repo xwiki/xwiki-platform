@@ -62,7 +62,7 @@ class TextQueryFilterTest
     @Test
     void filterStatementWithClob()
     {
-        String statement = "select prop.textValue as clobValue, 1 as unfilterable0 "
+        String statement = "select prop.textValue as stringValue, 1 as unfilterable0 "
             + "from BaseObject as obj, StringListProperty as prop "
             + "where obj.className = :className "
             + "  and obj.name <> :templateName "
@@ -76,7 +76,7 @@ class TextQueryFilterTest
             + "  ) "
             + "order by obj.id";
         String result = this.filter.filterStatement(statement, Query.HQL);
-        assertEquals("select prop.textValue as clobValue, 1 as unfilterable0 "
+        assertEquals("select prop.textValue as stringValue, 1 as unfilterable0 "
             + "from BaseObject as obj, StringListProperty as prop "
             + "where (lower(prop.textValue) like lower(:text)) "
             + "and (obj.className = :className "

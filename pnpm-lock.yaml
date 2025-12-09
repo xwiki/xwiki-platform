@@ -46,8 +46,8 @@ catalogs:
       specifier: 4.0.4
       version: 4.0.4
     '@types/node':
-      specifier: 24.10.1
-      version: 24.10.1
+      specifier: 24.10.2
+      version: 24.10.2
     '@types/react':
       specifier: 19.2.2
       version: 19.2.2
@@ -353,13 +353,13 @@ importers:
         version: 27.0.0
       '@types/node':
         specifier: 'catalog:'
-        version: 24.10.1
+        version: 24.10.2
       '@vitejs/plugin-react':
         specifier: 'catalog:'
-        version: 5.1.0(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 5.1.0(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
-        version: 6.0.2(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
+        version: 6.0.2(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
       '@vue/eslint-config-prettier':
         specifier: 'catalog:'
         version: 10.2.0(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)
@@ -395,10 +395,10 @@ importers:
         version: 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -444,13 +444,13 @@ importers:
         version: 27.0.0
       '@types/node':
         specifier: 'catalog:'
-        version: 24.10.1
+        version: 24.10.2
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
-        version: 6.0.2(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
+        version: 6.0.2(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
       '@vitest/eslint-plugin':
         specifier: 'catalog:'
-        version: 1.5.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 1.5.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
       '@vue/eslint-config-prettier':
         specifier: 'catalog:'
         version: 10.2.0(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)
@@ -495,10 +495,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -516,10 +516,10 @@ importers:
         version: 9.39.1
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
-        version: 6.0.2(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
+        version: 6.0.2(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 9.39.1(jiti@2.6.1)
@@ -555,16 +555,16 @@ importers:
         version: 8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vite-plugin-css-injected-by-js:
         specifier: 'catalog:'
-        version: 3.5.2(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 3.5.2(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
       vite-plugin-dts:
         specifier: 'catalog:'
-        version: 4.5.4(@types/node@24.10.1)(rollup@4.44.2)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 4.5.4(@types/node@24.10.2)(rollup@4.44.2)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue-eslint-parser:
         specifier: 'catalog:'
         version: 10.2.0(eslint@9.39.1(jiti@2.6.1))
@@ -583,7 +583,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../dev/config
@@ -601,10 +601,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -626,7 +626,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -641,7 +641,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -669,7 +669,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
@@ -693,13 +693,13 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -708,7 +708,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -726,7 +726,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-api:
     dependencies:
@@ -736,7 +736,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -754,10 +754,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-api:
     dependencies:
@@ -770,7 +770,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -788,10 +788,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -804,7 +804,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -819,7 +819,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-api:
     dependencies:
@@ -835,7 +835,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -847,10 +847,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -859,7 +859,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -871,10 +871,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/icons:
     dependencies:
@@ -887,7 +887,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.4.6
@@ -902,10 +902,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -921,7 +921,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -939,16 +939,16 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-api:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -960,10 +960,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx:
     dependencies:
@@ -979,7 +979,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.2
@@ -1000,13 +1000,13 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-service:
     dependencies:
@@ -1016,7 +1016,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1028,16 +1028,16 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1049,10 +1049,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api:
     dependencies:
@@ -1065,7 +1065,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1083,10 +1083,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api:
     dependencies:
@@ -1099,7 +1099,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1117,10 +1117,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api:
     dependencies:
@@ -1133,7 +1133,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1145,10 +1145,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api:
     dependencies:
@@ -1158,7 +1158,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       eslint:
         specifier: 'catalog:'
         version: 9.39.1(jiti@2.6.1)
@@ -1170,7 +1170,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown:
     dependencies:
@@ -1222,7 +1222,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@types/mdast':
         specifier: 'catalog:'
         version: 4.0.4
@@ -1246,19 +1246,19 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       eslint:
         specifier: 'catalog:'
         version: 9.39.1(jiti@2.6.1)
@@ -1267,7 +1267,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/ds/api:
     dependencies:
@@ -1289,7 +1289,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -1304,10 +1304,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -1371,7 +1371,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
@@ -1389,10 +1389,10 @@ importers:
         version: 0.2.2
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -1474,10 +1474,10 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.55.1(@types/node@24.10.1)
+        version: 7.55.1(@types/node@24.10.2)
       '@playwright/experimental-ct-react':
         specifier: 'catalog:'
-        version: 1.56.1(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(yaml@2.8.1)
+        version: 1.56.1(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(yaml@2.8.1)
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
@@ -1486,7 +1486,7 @@ importers:
         version: 19.2.2
       '@vitejs/plugin-react':
         specifier: 'catalog:'
-        version: 5.1.0(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 5.1.0(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -1507,10 +1507,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue-tsc:
         specifier: 'catalog:'
         version: 3.1.5(typescript@5.9.3)
@@ -1525,13 +1525,13 @@ importers:
         version: 27.0.0
       '@types/node':
         specifier: 'catalog:'
-        version: 24.10.1
+        version: 24.10.2
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
-        version: 6.0.2(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
+        version: 6.0.2(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))
       '@vitest/eslint-plugin':
         specifier: 'catalog:'
-        version: 1.5.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+        version: 1.5.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
       '@vue/eslint-config-prettier':
         specifier: 'catalog:'
         version: 10.2.0(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)
@@ -1564,10 +1564,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: 'catalog:'
-        version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
-        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+        version: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue:
         specifier: 'catalog:'
         version: 3.5.23(typescript@5.9.3)
@@ -2535,8 +2535,8 @@ packages:
   '@types/node@20.19.24':
     resolution: {integrity: sha512-FE5u0ezmi6y9OZEzlJfg37mqqf6ZDSF2V/NLjUyGrR9uTZ7Sb9F7bLNZ03S4XVUNRWGA7Ck4c1kK+YnuWjl+DA==}
 
-  '@types/node@24.10.1':
-    resolution: {integrity: sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ==}
+  '@types/node@24.10.2':
+    resolution: {integrity: sha512-WOhQTZ4G8xZ1tjJTvKOpyEVSGgOTvJAfDK3FNFgELyaTpzhdgHVHeqW8V+UJvzF5BT+/B54T/1S2K6gd9c7bbA==}
 
   '@types/react-dom@19.2.2':
     resolution: {integrity: sha512-9KQPoO6mZCi7jcIStSnlOWn2nEF3mNmyr3rIAsGnAbQKYbRLyqmeSc39EVgtxXVia+LMT8j3knZLAZAh+xLmrw==}
@@ -6371,23 +6371,23 @@ snapshots:
     dependencies:
       react: 19.2.0
 
-  '@microsoft/api-extractor-model@7.32.1(@types/node@24.10.1)':
+  '@microsoft/api-extractor-model@7.32.1(@types/node@24.10.2)':
     dependencies:
       '@microsoft/tsdoc': 0.16.0
       '@microsoft/tsdoc-config': 0.18.0
-      '@rushstack/node-core-library': 5.19.0(@types/node@24.10.1)
+      '@rushstack/node-core-library': 5.19.0(@types/node@24.10.2)
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/api-extractor@7.55.1(@types/node@24.10.1)':
+  '@microsoft/api-extractor@7.55.1(@types/node@24.10.2)':
     dependencies:
-      '@microsoft/api-extractor-model': 7.32.1(@types/node@24.10.1)
+      '@microsoft/api-extractor-model': 7.32.1(@types/node@24.10.2)
       '@microsoft/tsdoc': 0.16.0
       '@microsoft/tsdoc-config': 0.18.0
-      '@rushstack/node-core-library': 5.19.0(@types/node@24.10.1)
+      '@rushstack/node-core-library': 5.19.0(@types/node@24.10.2)
       '@rushstack/rig-package': 0.6.0
-      '@rushstack/terminal': 0.19.4(@types/node@24.10.1)
-      '@rushstack/ts-command-line': 5.1.4(@types/node@24.10.1)
+      '@rushstack/terminal': 0.19.4(@types/node@24.10.2)
+      '@rushstack/ts-command-line': 5.1.4(@types/node@24.10.2)
       diff: 8.0.2
       lodash: 4.17.21
       minimatch: 10.0.3
@@ -6478,11 +6478,11 @@ snapshots:
 
   '@pkgr/core@0.2.7': {}
 
-  '@playwright/experimental-ct-core@1.56.1(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)':
+  '@playwright/experimental-ct-core@1.56.1(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)':
     dependencies:
       playwright: 1.56.1
       playwright-core: 1.56.1
-      vite: 6.4.1(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vite: 6.4.1(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -6496,10 +6496,10 @@ snapshots:
       - tsx
       - yaml
 
-  '@playwright/experimental-ct-react@1.56.1(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(yaml@2.8.1)':
+  '@playwright/experimental-ct-react@1.56.1(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(yaml@2.8.1)':
     dependencies:
-      '@playwright/experimental-ct-core': 1.56.1(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
-      '@vitejs/plugin-react': 4.7.0(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+      '@playwright/experimental-ct-core': 1.56.1(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      '@vitejs/plugin-react': 4.7.0(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -6597,7 +6597,7 @@ snapshots:
 
   '@rtsao/scc@1.1.0': {}
 
-  '@rushstack/node-core-library@5.19.0(@types/node@24.10.1)':
+  '@rushstack/node-core-library@5.19.0(@types/node@24.10.2)':
     dependencies:
       ajv: 8.13.0
       ajv-draft-04: 1.0.0(ajv@8.13.0)
@@ -6608,28 +6608,28 @@ snapshots:
       resolve: 1.22.11
       semver: 7.5.4
     optionalDependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.2
 
-  '@rushstack/problem-matcher@0.1.1(@types/node@24.10.1)':
+  '@rushstack/problem-matcher@0.1.1(@types/node@24.10.2)':
     optionalDependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.2
 
   '@rushstack/rig-package@0.6.0':
     dependencies:
       resolve: 1.22.11
       strip-json-comments: 3.1.1
 
-  '@rushstack/terminal@0.19.4(@types/node@24.10.1)':
+  '@rushstack/terminal@0.19.4(@types/node@24.10.2)':
     dependencies:
-      '@rushstack/node-core-library': 5.19.0(@types/node@24.10.1)
-      '@rushstack/problem-matcher': 0.1.1(@types/node@24.10.1)
+      '@rushstack/node-core-library': 5.19.0(@types/node@24.10.2)
+      '@rushstack/problem-matcher': 0.1.1(@types/node@24.10.2)
       supports-color: 8.1.1
     optionalDependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.2
 
-  '@rushstack/ts-command-line@5.1.4(@types/node@24.10.1)':
+  '@rushstack/ts-command-line@5.1.4(@types/node@24.10.2)':
     dependencies:
-      '@rushstack/terminal': 0.19.4(@types/node@24.10.1)
+      '@rushstack/terminal': 0.19.4(@types/node@24.10.2)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -6820,7 +6820,7 @@ snapshots:
 
   '@types/jsdom@27.0.0':
     dependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.2
       '@types/tough-cookie': 4.0.5
       parse5: 7.3.0
 
@@ -6853,7 +6853,7 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/node@24.10.1':
+  '@types/node@24.10.2':
     dependencies:
       undici-types: 7.16.0
 
@@ -7081,7 +7081,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vitejs/plugin-react@4.7.0(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))':
+  '@vitejs/plugin-react@4.7.0(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
@@ -7089,11 +7089,11 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vite: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@5.1.0(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))':
+  '@vitejs/plugin-react@5.1.0(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
@@ -7101,24 +7101,24 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.43
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vite: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue@6.0.2(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))':
+  '@vitejs/plugin-vue@6.0.2(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))(vue@3.5.23(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-beta.50
-      vite: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vite: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       vue: 3.5.23(typescript@5.9.3)
 
-  '@vitest/eslint-plugin@1.5.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))':
+  '@vitest/eslint-plugin@1.5.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))':
     dependencies:
       '@typescript-eslint/scope-manager': 8.46.3
       '@typescript-eslint/utils': 8.46.3(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.1(jiti@2.6.1)
     optionalDependencies:
       typescript: 5.9.3
-      vitest: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vitest: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -7131,13 +7131,13 @@ snapshots:
       chai: 6.2.0
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.7(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))':
+  '@vitest/mocker@4.0.7(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))':
     dependencies:
       '@vitest/spy': 4.0.7
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vite: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
   '@vitest/pretty-format@4.0.7':
     dependencies:
@@ -10315,13 +10315,13 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vite-plugin-css-injected-by-js@3.5.2(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)):
+  vite-plugin-css-injected-by-js@3.5.2(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)):
     dependencies:
-      vite: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vite: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
-  vite-plugin-dts@4.5.4(@types/node@24.10.1)(rollup@4.44.2)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)):
+  vite-plugin-dts@4.5.4(@types/node@24.10.2)(rollup@4.44.2)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)):
     dependencies:
-      '@microsoft/api-extractor': 7.55.1(@types/node@24.10.1)
+      '@microsoft/api-extractor': 7.55.1(@types/node@24.10.2)
       '@rollup/pluginutils': 5.3.0(rollup@4.44.2)
       '@volar/typescript': 2.4.23
       '@vue/language-core': 2.2.0(typescript@5.9.3)
@@ -10332,13 +10332,13 @@ snapshots:
       magic-string: 0.30.21
       typescript: 5.9.3
     optionalDependencies:
-      vite: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vite: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
       - supports-color
 
-  vite@6.4.1(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1):
+  vite@6.4.1(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.6
       fdir: 6.5.0(picomatch@4.0.3)
@@ -10347,13 +10347,13 @@ snapshots:
       rollup: 4.44.2
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.2
       fsevents: 2.3.3
       jiti: 2.6.1
       sugarss: 5.0.1(postcss@8.5.6)
       yaml: 2.8.1
 
-  vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1):
+  vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.6
       fdir: 6.5.0(picomatch@4.0.3)
@@ -10362,22 +10362,22 @@ snapshots:
       rollup: 4.44.2
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 24.10.1
+      '@types/node': 24.10.2
       fsevents: 2.3.3
       jiti: 2.6.1
       sugarss: 5.0.1(postcss@8.5.6)
       yaml: 2.8.1
 
-  vitest-mock-extended@3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)):
+  vitest-mock-extended@3.1.0(typescript@5.9.3)(vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)):
     dependencies:
       ts-essentials: 10.1.1(typescript@5.9.3)
       typescript: 5.9.3
-      vitest: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vitest: 4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
 
-  vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.1)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1):
+  vitest@4.0.7(@types/debug@4.1.12)(@types/node@24.10.2)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1):
     dependencies:
       '@vitest/expect': 4.0.7
-      '@vitest/mocker': 4.0.7(vite@7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
+      '@vitest/mocker': 4.0.7(vite@7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1))
       '@vitest/pretty-format': 4.0.7
       '@vitest/runner': 4.0.7
       '@vitest/snapshot': 4.0.7
@@ -10394,11 +10394,11 @@ snapshots:
       tinyexec: 0.3.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
+      vite: 7.1.12(@types/node@24.10.2)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(yaml@2.8.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/debug': 4.1.12
-      '@types/node': 24.10.1
+      '@types/node': 24.10.2
       happy-dom: 20.0.10
       jsdom: 27.0.1(postcss@8.5.6)
     transitivePeerDependencies:

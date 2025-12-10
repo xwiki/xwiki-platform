@@ -61,7 +61,7 @@
     <tika.version>3.2.3</tika.version>
     <pdfbox.version>3.0.6</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.4</jetty.server.version>
+    <jetty.server.version>12.1.5</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <netty.version>4.2.7.Final</netty.version>

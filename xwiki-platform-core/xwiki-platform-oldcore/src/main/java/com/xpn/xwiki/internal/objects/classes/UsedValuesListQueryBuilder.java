@@ -93,6 +93,10 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
         }
     }
 
+    private record SelectColumnAndFromTable(String selectColumn, String fromTable)
+    {
+    }
+
     @Inject
     private Logger logger;
 
@@ -119,18 +123,21 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
         // We need a special query that doesn't use GROUP BY for this case.
         boolean usesClobColumn = usesClobColumn(listClass);
 
-        String[] selectAndFrom = getSelectColumnAndFromTable(listClass);
+        SelectColumnAndFromTable selectAndFrom = getSelectColumnAndFromTable(listClass);
         if (usesClobColumn) {
             // For CLOB columns on Oracle, we cannot use GROUP BY or DISTINCT on CLOB columns.
             // Unfortunately, we also cannot use subqueries in select clauses in HQL in Hibernate < 6 - otherwise, we
             // could possibly have used a partitioned ROW_NUMBER() over (PARTITION BY ...) approach.
             // We use a "not exists" subquery to get distinct values instead by selecting only the first occurrence of
             // each value by ordering by id and ensuring no prior id has the same value.
-            String selectColumn = selectAndFrom[0];
-            String fromTable = selectAndFrom[1];
+            String selectColumn = selectAndFrom.selectColumn();
+            String fromTable = selectAndFrom.fromTable();
+            // Add an alias to the second instance of the table to avoid conflicts.
             String fromTableProp2 = fromTable.replace(" as prop", " as prop2");
             String selectColumnProp2 = selectColumn.replace("prop.", "prop2.");
 
+            // The aliases are used in TextQueryFilter to avoid casting CLOB columns to string and to avoid filtering
+            // on the count.
             statement = String.format(
                 "select %1$s as stringValue, 1L as unfilterable0 "
                     + "from BaseObject as obj, %2$s "
@@ -147,12 +154,16 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
                     + "order by obj.id",
                 selectColumn, fromTable, fromTableProp2, selectColumnProp2);
         } else {
+            // We also need to avoid casting the first column to string as this could also be a CLOB column in other
+            // databases (depending on the table). As we're dealing with a text value in all cases, there is no need
+            // for the cast. We alias the column with "stringValue" so that TextQueryFilter knows it doesn't need to
+            // cast it. Also, we alias the count column with "unfilterable0" so that TextQueryFilter ignores it.
             statement = String.format("select %1$s as stringValue, count(*) as unfilterable0 "
                 + "from BaseObject as obj, %2$s "
                 + "where obj.className = :className and obj.name <> :templateName"
                 + " and prop.id.id = obj.id and prop.id.name = :propertyName "
                 + "group by %1$s "
-                + "order by unfilterable0 desc", selectAndFrom[0], selectAndFrom[1]);
+                + "order by unfilterable0 desc", selectAndFrom.selectColumn(), selectAndFrom.fromTable());
         }
         Query query = this.queryManager.createQuery(statement, Query.HQL);
         bindParameterValues(query, listClass);
@@ -171,7 +182,7 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
         return property instanceof StringListProperty || property instanceof LargeStringProperty;
     }
 
-    private String[] getSelectColumnAndFromTable(ListClass listClass)
+    private SelectColumnAndFromTable getSelectColumnAndFromTable(ListClass listClass)
     {
         // Base the selection on the actual type of a property as different classes like UsersClass and GroupsClass
         // don't respect the configured storage type.
@@ -192,7 +203,7 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
                 fromTable = "StringProperty as prop";
             }
         }
-        return new String[] {selectColumn, fromTable};
+        return new SelectColumnAndFromTable(selectColumn, fromTable);
     }
 
     private void bindParameterValues(Query query, ListClass listClass)
@@ -212,8 +223,8 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
     {
         // We can't check all the documents where this value occurs so we check just one of them, chosen randomly.
         long offset = ThreadLocalRandom.current().nextLong(count);
-        String[] selectAndFrom = getSelectColumnAndFromTable(listClass);
-        String selectColumn = selectAndFrom[0];
+        SelectColumnAndFromTable selectAndFrom = getSelectColumnAndFromTable(listClass);
+        String selectColumn = selectAndFrom.selectColumn();
 
         // For CLOB columns on Oracle, we need to use DBMS_LOB.COMPARE to compare the values.
         String comparison;
@@ -227,7 +238,7 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
             "select obj.name from BaseObject as obj, %s "
                 + "where obj.className = :className and obj.name <> :templateName "
                 + "and prop.id.id = obj.id and prop.id.name = :propertyName and %s",
-            selectAndFrom[1], comparison);
+            selectAndFrom.fromTable(), comparison);
         try {
             Query query = this.queryManager.createQuery(statement, Query.HQL);
             bindParameterValues(query, listClass);

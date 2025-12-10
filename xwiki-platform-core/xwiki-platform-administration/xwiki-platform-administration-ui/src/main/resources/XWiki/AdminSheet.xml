@@ -83,6 +83,12 @@
     ]
   },
   {
+    'id' : 'network',
+    'icon': 'cloud',
+    'displayBeforeCategory': 'other',
+    'children': []
+  },
+  {
     'id' : 'other',
     'icon': 'wrench',
     'children' : []

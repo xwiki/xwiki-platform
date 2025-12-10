@@ -407,4 +407,41 @@ class EntityReferenceSetTest
 
         assertMatches(new DocumentReference("wiki", "space", "document", Locale.ROOT));
     }
+
+    @Test
+    void includeDocumentInDeeplyNestedSpaceFiltersSiblingSpaces() throws Exception
+    {
+        // Include a single document in a deeply nested space
+        includesDocument("wiki:A.B.C.D.document");
+
+        // Ancestor spaces should match (needed to traverse the hierarchy)
+        assertMatchesSpace("wiki:A");
+        assertMatchesSpace("wiki:A.B");
+        assertMatchesSpace("wiki:A.B.C");
+        assertMatchesSpace("wiki:A.B.C.D");
+
+        // The document itself should match
+        assertMatchesDocument("wiki:A.B.C.D.document");
+
+        // Sibling spaces at each level should NOT match - this is the critical test case
+        // These are spaces that share a common ancestor but are not part of the path to the document
+        assertNotMatchesSpace("wiki:A.X");
+        assertNotMatchesSpace("wiki:A.B.X");
+        assertNotMatchesSpace("wiki:A.B.C.X");
+        assertNotMatchesSpace("wiki:A.B.C.D.X");
+
+        // Deeper nested siblings should NOT match
+        assertNotMatchesSpace("wiki:A.X.Y");
+        assertNotMatchesSpace("wiki:A.B.X.Y");
+
+        // Documents in sibling spaces should NOT match
+        assertNotMatchesDocument("wiki:A.X.document");
+        assertNotMatchesDocument("wiki:A.B.X.document");
+        assertNotMatchesDocument("wiki:A.B.C.X.document");
+
+        // Documents in ancestor spaces should NOT match (they have no document child in the include set)
+        assertNotMatchesDocument("wiki:A.document");
+        assertNotMatchesDocument("wiki:A.B.document");
+        assertNotMatchesDocument("wiki:A.B.C.document");
+    }
 }

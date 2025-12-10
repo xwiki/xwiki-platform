@@ -233,6 +233,7 @@ public class MacroDescriptorUIFactory
             }
             if (!children.isEmpty()) {
                 groupNode.setChildren(children.stream().map(AbstractMacroUINode::getKey).toList());
+                children.forEach(child -> child.setParent(groupNode.getKey()));
                 parametersMap.put(groupNode.getKey(), groupNode);
             }
         }

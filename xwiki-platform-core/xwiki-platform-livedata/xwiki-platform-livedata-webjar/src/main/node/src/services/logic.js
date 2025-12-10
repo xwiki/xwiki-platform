@@ -1228,56 +1228,58 @@ export class Logic {
    * @param {String} filterEntry.operator The operator of the filter.
    *  Should match the filter descriptor of the filter property
    * @param {String} filterEntry.value Value for the new filter entry
+   * @param {String} filterOperator the operat to appliy, when undefined the default filter of the entry is applied
+   * @param {String} skipFetch when true, no fetch is triggered and only the reactive variables are updated, this is
+   *  useful in case of asynchronous operations that need to update the UI without triggering a fetch straight away.
    * @returns {Promise}
    */
-  filter(property, index, filterEntry, { filterOperator } = {}) {
-    const err = new Error("Property `" + property + "` is not filterable");
-    return new Promise((resolve, reject) => {
-      const filterEntries = this._computeFilterEntries(property, index, filterEntry,
-        { filterOperator });
-      if (!filterEntries) {
-        return void reject(err);
-      }
-      const oldEntry = filterEntries.oldEntry;
-      const newEntry = filterEntries.newEntry;
-      const filteringType = this._getFilteringType(oldEntry, newEntry);
-      // remove filter at current property and index
-      if (oldEntry.index !== -1) {
-        this.getQueryFilters(oldEntry.property).splice(index, 1);
-      }
-      // add filter at new property and index
-      if (newEntry.index !== -1) {
-        // create filterGroup if not exists
-        if (!this.getQueryFilterGroup(newEntry.property)) {
-          this.data.query.filters.push({
-            property: newEntry.property,
-            // We use by default AND between filter groups (different properties) and OR inside a
-            // filter group (same property)
-            matchAll: false,
-            constraints: [],
-          });
-        }
-        // add entry
-        this.getQueryFilterGroup(newEntry.property).constraints.splice(newEntry.index, 0, {
-          operator: newEntry.operator,
-          value: newEntry.value,
+  async filter(property, index, filterEntry, {filterOperator, skipFetch} = {}) {
+    const filterEntries = this._computeFilterEntries(property, index, filterEntry,
+      {filterOperator});
+    if (!filterEntries) {
+      throw new Error("Property `" + property + "` is not filterable");
+    }
+    const oldEntry = filterEntries.oldEntry;
+    const newEntry = filterEntries.newEntry;
+    const filteringType = this._getFilteringType(oldEntry, newEntry);
+    // remove filter at current property and index
+    if (oldEntry.index !== -1) {
+      this.getQueryFilters(oldEntry.property).splice(index, 1);
+    }
+    // add filter at new property and index
+    if (newEntry.index !== -1) {
+      // create filterGroup if not exists
+      if (!this.getQueryFilterGroup(newEntry.property)) {
+        this.data.query.filters.push({
+          property: newEntry.property,
+          // We use by default AND between filter groups (different properties) and OR inside a
+          // filter group (same property)
+          matchAll: false,
+          constraints: [],
         });
       }
-      // remove filter group if empty
-      if (this.getQueryFilters(oldEntry.property).length === 0) {
-        this.removeAllFilters(oldEntry.property);
-      }
-      // Reset the offset whenever the filters are updated.
-      this.data.query.offset = 0;
-      // dispatch events
-      this.triggerEvent("filter", {
-        type: filteringType,
-        oldEntry: oldEntry,
-        newEntry: newEntry,
+      // add entry
+      this.getQueryFilterGroup(newEntry.property).constraints.splice(newEntry.index, 0, {
+        operator: newEntry.operator,
+        value: newEntry.value,
       });
-
-      this.updateEntries().then(resolve, reject);
+    }
+    // remove filter group if empty
+    if (this.getQueryFilters(oldEntry.property).length === 0) {
+      await this.removeAllFilters(oldEntry.property);
+    }
+    // Reset the offset whenever the filters are updated.
+    this.data.query.offset = 0;
+    // dispatch events
+    this.triggerEvent("filter", {
+      type: filteringType,
+      oldEntry: oldEntry,
+      newEntry: newEntry,
     });
+
+    if (skipFetch !== true) {
+      await this.updateEntries();
+    }
   }
 
   /**

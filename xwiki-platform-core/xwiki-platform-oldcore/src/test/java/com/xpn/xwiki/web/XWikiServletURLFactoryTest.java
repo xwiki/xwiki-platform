@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -230,8 +230,8 @@ class XWikiServletURLFactoryTest
             this.oldcore.getXWikiContext());
         assertEquals("http://127.0.0.1/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", url.toString());
 
-        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL("wiki1", this.oldcore.getXWikiContext());
-        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL(this.oldcore.getXWikiContext().getMainXWiki(),
+        verify(this.oldcore.getSpyXWiki(), never()).getServerURL("wiki1", this.oldcore.getXWikiContext());
+        verify(this.oldcore.getSpyXWiki(), never()).getServerURL(this.oldcore.getXWikiContext().getMainXWiki(),
             this.oldcore.getXWikiContext());
     }
 
@@ -262,8 +262,8 @@ class XWikiServletURLFactoryTest
             this.oldcore.getXWikiContext());
         assertEquals("http://origin:42/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", url.toString());
 
-        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL("wiki1", this.oldcore.getXWikiContext());
-        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL(this.oldcore.getXWikiContext().getMainXWiki(),
+        verify(this.oldcore.getSpyXWiki(), never()).getServerURL("wiki1", this.oldcore.getXWikiContext());
+        verify(this.oldcore.getSpyXWiki(), never()).getServerURL(this.oldcore.getXWikiContext().getMainXWiki(),
             this.oldcore.getXWikiContext());
     }
 

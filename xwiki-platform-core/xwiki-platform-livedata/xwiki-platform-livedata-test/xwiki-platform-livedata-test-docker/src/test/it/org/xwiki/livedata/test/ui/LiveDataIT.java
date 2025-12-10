@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Order;
@@ -49,6 +51,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.DatabaseListClassEditElement;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
 import org.xwiki.text.StringUtils;
 
@@ -59,6 +62,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.openqa.selenium.Keys.BACK_SPACE;
+import static org.openqa.selenium.Keys.CONTROL;
+import static org.openqa.selenium.Keys.chord;
+import static org.xwiki.livedata.test.po.TableLayoutElement.FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS;
 
 /**
  * Tests of the Live Data macro, in view and edit modes.
@@ -240,15 +247,30 @@ class LiveDataIT
         assertEquals(1, liveDataElement.countFootnotes());
         assertThat(liveDataElement.getFootnotesText(), containsInAnyOrder(FOOTNOTE_COMPUTED_TITLE));
 
+        // Test text filters. Verify that all keystrokes are preserved when typing a value (non-regression test for
+        // XWIKI-23789).
+        WebElement nameFilter = tableLayout.getFilter(NAME_COLUMN);
+        String longstring = "0123456789012345678901234567890123456789";
+        // Simulate a human-like keyboard input since selenium setting the value all at once, which does not make the
+        // potential problem visible. With a long enough input string, the change of losing char are very high when
+        // the issue exists.
+        longstring.chars().forEach(c -> {
+            nameFilter.sendKeys(Character.toString((char) c));
+            try {
+                TimeUnit.MILLISECONDS.sleep(ThreadLocalRandom.current().nextInt(0, 300));
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        });
+        assertEquals(0, tableLayout.countRows());
+        assertEquals(longstring, nameFilter.getAttribute("value"));
+        nameFilter.sendKeys(chord(CONTROL, "a", BACK_SPACE));
+
         // Testing the selectize filters
-        SuggestInputElement suggestInputElement = new SuggestInputElement(tableLayout.getFilter(CHOICE_COLUMN));
-
-        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
-        suggestInputElement.click().waitForSuggestions();
-
         // Test filtering by label
+        SuggestInputElement suggestInputElement = new SuggestInputElement(tableLayout.getFilter(CHOICE_COLUMN));
         suggestInputElement.sendKeys(CHOICE_L_LABEL);
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         List<SuggestInputElement.SuggestionElement> suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         assertEquals(CHOICE_L, suggestionElements.get(0).getValue());
@@ -257,7 +279,7 @@ class LiveDataIT
         // Test filtering by translation
         suggestInputElement.clear();
         suggestInputElement.sendKeys(CHOICE_T_TRANSLATION);
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         assertEquals(CHOICE_T, suggestionElements.get(0).getValue());
@@ -272,7 +294,7 @@ class LiveDataIT
         // Take the focus on the is active filter.
         suggestInputElement = new SuggestInputElement(tableLayout.getFilter(IS_ACTIVE_COLUMN));
         suggestInputElement.sendKeys(Boolean.TRUE.toString());
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
@@ -294,7 +316,7 @@ class LiveDataIT
         suggestInputElement = new SuggestInputElement(isActiveFilter);
         suggestInputElement.clear();
         suggestInputElement.sendKeys(Boolean.FALSE.toString());
-        suggestInputElement.waitForSuggestions();
+        suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
@@ -385,7 +407,7 @@ class LiveDataIT
                       "loadingMessage": "Loading",
                       "successMessage": "Delete Success",
                       "failureMessage": "Failed",
-                      "body": "newBacklinkTarget=&updateLinks=false&autoRedirect=false&form_token=${services.csrf.token}&confirm=1&async=true",
+                      "body": "newBacklinkTarget=&updateLinks=false&autoRedirect=false&form_token=${services.csrf.token}&confirm=1&async=false",
                       "headers": {
                         "Content-Type": "application/x-www-form-urlencoded"
                       }
@@ -403,6 +425,61 @@ class LiveDataIT
         viewPage.waitForNotificationSuccessMessage("Delete Success");
         tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
+    }
+
+    @Test
+    @Order(4)
+    void filterWithRelationalDBList(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        ViewPage viewPage = testUtils.createPage(testReference, "My Class", "My Class");
+        ClassEditPage classEditPage = viewPage.editClass();
+        classEditPage.addProperty("myList", "DBList");
+        DatabaseListClassEditElement dbListClassEditElement =
+            classEditPage.getDatabaseListClassEditElement("myList");
+        dbListClassEditElement.setMultiSelect(true);
+        dbListClassEditElement.setMetaProperty("relationalStorage", "true");
+        dbListClassEditElement.setMetaProperty("displayType", "input");
+        classEditPage.clickSaveAndView();
+
+        // Create a few XObjects with multiple selections and no selections.
+        // First, first two options selected.
+        DocumentReference doc1Ref = new DocumentReference("Doc1", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc1Ref, testUtils.serializeReference(testReference), "myList", "Option1|Option2");
+        // Second, third option selected.
+        DocumentReference doc2Ref = new DocumentReference("Doc2", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc2Ref, testUtils.serializeReference(testReference), "myList", "Option3");
+        // Third, no option selected.
+        DocumentReference doc3Ref = new DocumentReference("Doc3", testReference.getLastSpaceReference());
+        testUtils.rest().addObject(doc3Ref, testUtils.serializeReference(testReference));
+
+        // Create a Live Data page to list those objects.
+        List<String> properties = List.of("doc.name", "myList");
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
+
+        testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(3);
+
+        // Filter by Option1 should return only Doc1.
+        tableLayout.filterColumn("myList", "Option1", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("myList", "Option1 Option2");
+        // Filter by Option3 should return only Doc2.
+        tableLayout.filterColumn("myList", "Option3", true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("myList", "Option3");
+        // Filter by (empty) should return only Doc3.
+        // Note: we must explicitly use the suggestion as otherwise this would be treated as a text filter as it would
+        // select the typed value and not the suggestion that contains the special treatment of this filter.
+        tableLayout.filterColumn("myList", CHOICE_EMPTY, true,
+            Map.of(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS, true));
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow("doc.name", "Doc3");
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

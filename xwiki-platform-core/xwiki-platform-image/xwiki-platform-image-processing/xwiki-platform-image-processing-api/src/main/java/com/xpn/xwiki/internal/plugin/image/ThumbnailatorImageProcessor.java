@@ -34,6 +34,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
+import net.coobird.thumbnailator.ThumbnailParameter;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.resizers.Resizers;
 
@@ -57,6 +58,10 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
             .scale(1)
             // Ensure that nothing is actually resized and there is thus no quality loss.
             .resizer(Resizers.NULL)
+            // Set the image type to the default one (ARGB) as Thumbnailator doesn't properly handle indexed PNG
+            // images, see https://github.com/coobird/thumbnailator/issues/41. This cannot be done later after
+            // analyzing the read image, as otherwise the colors would already be wrong.
+            .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE)
             .asBufferedImage();
     }
 

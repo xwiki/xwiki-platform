@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.internal.search.SearchCoreInitializer;
 
 /**
  * A wrapper around the new {@link Solr} API for the search core.
@@ -40,7 +41,7 @@ public class SolrClientInstance extends AbstractSolrInstance
     /**
      * The name of the core containing the XWiki search index.
      */
-    public static final String CORE_NAME = "search";
+    public static final String CORE_NAME = SearchCoreInitializer.CORE_NAME;
 
     @Inject
     private Solr solr;
@@ -49,13 +50,14 @@ public class SolrClientInstance extends AbstractSolrInstance
     public void initialize() throws InitializationException
     {
         try {
-            this.server = this.solr.getCore(CORE_NAME);
+            this.server = this.solr.getCore(SearchCoreInitializer.CORE_NAME);
         } catch (SolrException e) {
             throw new InitializationException("Failed to create the solr client for core [search]", e);
         }
 
         if (this.server == null) {
-            throw new InitializationException("No core with name [" + CORE_NAME + "] could be found");
+            throw new InitializationException(
+                "No core with name [" + SearchCoreInitializer.CORE_NAME + "] could be found");
         }
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade-1610</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</name>
@@ -33,11 +33,16 @@
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</description>
   <properties>
     <upgradetest.previousflavor.version>16.10.0</upgradetest.previousflavor.version>
+    <!--
+      * custom-0: complete solr search and extensions index (it's empty with the standard build) 
+     -->
+    <upgradetest.previousdata.classifier>custom-0</upgradetest.previousdata.classifier>
   </properties>
   <dependencies>
     <dependency>
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
+      <classifier>${upgradetest.previousdata.classifier}</classifier>
       <!-- Using a fixed version instead of ${upgradetest.previousflavor.version} because of
            https://issues.apache.org/jira/browse/MRELEASE-799, causing "The artifact (...) requires a different
            version (...) than what is found (...) for the expression (upgradetest.previousflavor.version) in the

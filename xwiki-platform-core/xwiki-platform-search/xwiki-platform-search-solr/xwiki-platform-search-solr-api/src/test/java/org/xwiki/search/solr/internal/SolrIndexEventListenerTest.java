@@ -23,6 +23,9 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.mail.GeneralMailConfigurationUpdatedEvent;
@@ -60,15 +63,20 @@ class SolrIndexEventListenerTest
     @Test
     void onDocumentDeleted()
     {
-        DocumentReference documentReference = new DocumentReference("aWiki", "aSpace", "aPage");
+        DocumentReference documentReference = new DocumentReference("aWiki", "aSpace", "aPage", Locale.ROOT);
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getOriginalDocument()).thenReturn(document);
-        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getDocumentReferenceWithLocale()).thenReturn(documentReference);
         when(document.getRealLocale()).thenReturn(Locale.FRENCH);
 
         this.listener.onEvent(new DocumentDeletedEvent(), document, null);
 
-        verify(this.indexer).delete(new DocumentReference(documentReference, Locale.FRENCH), false);
+        verify(this.indexer).delete(documentReference, false);
+
+        documentReference = new DocumentReference("aWiki", "aSpace", "aPage", Locale.GERMAN);
+        when(document.getDocumentReferenceWithLocale()).thenReturn(documentReference);
+
+        this.listener.onEvent(new DocumentDeletedEvent(), document, null);
     }
 
     @Test
@@ -81,7 +89,7 @@ class SolrIndexEventListenerTest
         this.listener.onEvent(new DocumentUpdatedEvent(), translation, null);
 
         verify(this.indexer).index(translationReference, false);
-        verify(this.indexer, times(1)).index(any(EntityReference.class), any(Boolean.class));
+        verify(this.indexer).index(any(EntityReference.class), any(Boolean.class));
     }
 
     @Test
@@ -97,6 +105,32 @@ class SolrIndexEventListenerTest
         when(document.getDocumentReference()).thenReturn(documentReference);
 
         this.listener.onEvent(new DocumentUpdatedEvent(), document, xcontext);
+
+        verify(this.indexer, times(3)).index(any(EntityReference.class), any(Boolean.class));
+        verify(this.indexer).index(documentReference, false);
+        verify(this.indexer).index(new DocumentReference(documentReference, Locale.FRENCH), false);
+        verify(this.indexer).index(new DocumentReference(documentReference, Locale.GERMAN), false);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void onDocumentCreated(boolean isDefaultTranslation) throws Exception
+    {
+        XWikiContext xcontext = mock();
+
+        XWikiDocument document = mock();
+        if (isDefaultTranslation) {
+            when(document.getLocale()).thenReturn(Locale.ROOT);
+        } else {
+            when(document.getLocale()).thenReturn(Locale.FRENCH);
+        }
+
+        when(document.getTranslationLocales(xcontext)).thenReturn(Arrays.asList(Locale.FRENCH, Locale.GERMAN));
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Path", "Page");
+        when(document.getDocumentReference()).thenReturn(documentReference);
+
+        this.listener.onEvent(new DocumentCreatedEvent(), document, xcontext);
 
         verify(this.indexer, times(3)).index(any(EntityReference.class), any(Boolean.class));
         verify(this.indexer).index(documentReference, false);

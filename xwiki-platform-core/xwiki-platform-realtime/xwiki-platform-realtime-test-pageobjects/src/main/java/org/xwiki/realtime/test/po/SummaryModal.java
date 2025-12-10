@@ -20,7 +20,9 @@
 package org.xwiki.realtime.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseModal;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Modal displayed when clicking on "Summarize and Done" button in realtime edition.
@@ -35,16 +37,20 @@ public class SummaryModal extends BaseModal
     public SummaryModal()
     {
         super(By.id("realtime-changeSummaryModal"));
+        getDriver().waitUntilCondition(driver -> this.isDisplayed());
     }
 
     /**
      * Fill the summary textarea with the given content.
+     * 
      * @param summary the text to put in the summary textarea
      */
     public void setSummary(String summary)
     {
-        getDriver().findElementWithoutWaiting(this.container, By.id("realtime-changeSummaryModal-summary"))
-            .sendKeys(summary);
+        WebElement textarea =
+            getDriver().findElementWithoutWaiting(this.container, By.id("realtime-changeSummaryModal-summary"));
+        textarea.clear();
+        textarea.sendKeys(summary);
     }
 
     /**
@@ -52,19 +58,49 @@ public class SummaryModal extends BaseModal
      */
     public void toggleMinorEdit()
     {
-        getDriver().findElementWithoutWaiting(this.container,
-            By.cssSelector("input[type='checkbox'][name='minorChange']")).click();
+        getDriver()
+            .findElementWithoutWaiting(this.container, By.cssSelector("input[type='checkbox'][name='minorChange']"))
+            .click();
     }
 
     /**
      * Click on the save button and eventually wait for the saved success message.
+     * 
      * @param waitSuccess if {@code true} wait for the "Saved" success message
      */
     public void clickSave(boolean waitSuccess)
     {
+        boolean continueEditing = isContinueEditing();
+        boolean editingInplace = isEditingInplace();
+        if (waitSuccess && !continueEditing && !editingInplace) {
+            getDriver().addPageNotYetReloadedMarker();
+        }
         getDriver().findElementWithoutWaiting(this.container, By.cssSelector(".btn-primary")).click();
         if (waitSuccess) {
-            waitForNotificationSuccessMessage("Saved");
+            if (continueEditing) {
+                waitForNotificationSuccessMessage("Saved");
+            } else if (editingInplace) {
+                new RealtimeInplaceEditablePage().waitForView();
+            } else {
+                getDriver().waitUntilPageIsReloaded();
+                new ViewPage();
+            }
         }
+    }
+
+    /**
+     * @return whether the user continues editing after submitting the summary
+     */
+    public boolean isContinueEditing()
+    {
+        return "true".equals(this.container.getDomAttribute("data-continue"));
+    }
+
+    /**
+     * @return whether this modal was opened from the inplace editing mode or standalone editing mode
+     */
+    public boolean isEditingInplace()
+    {
+        return !getDriver().findElementsWithoutWaiting(By.cssSelector(".xcontent.form")).isEmpty();
     }
 }

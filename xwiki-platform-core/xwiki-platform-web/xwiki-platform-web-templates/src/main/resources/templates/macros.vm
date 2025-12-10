@@ -2070,13 +2070,14 @@ $displayName##
  * @since 16.10.11
  *#
 #macro(validateQueryLimit $limit $parameterName)
-  #set ($configuredLimit = $services.security.getQueryItemsLimit())
-  #if ($configuredLimit > 0 && ($limit < 0 || $limit > $configuredLimit))
-    #set($discard =
-      $response.sendError(400,
-        "Invalid parameter value $limit for $parameterName: Must be a positive integer and less than or equal to $configuredLimit"))
-    #stop
-  #end
+## This macro is used in places that are sensitive to whitespace - don't indent.
+#set ($configuredLimit = $services.security.getQueryItemsLimit())
+#if ($configuredLimit > 0 && ($limit < 0 || $limit > $configuredLimit))
+#set($discard =
+  $response.sendError(400,
+    "Invalid parameter value $limit for $parameterName: Must be a positive integer and less than or equal to $configuredLimit"))
+#stop
+#end
 #end
 ##
 ##
@@ -2091,14 +2092,15 @@ $displayName##
  * @since 16.10.11
  *#
 #macro(getAndValidateQueryLimitFromRequest $parameterName $defaultValue $_limit)
-  #set ($return = $numbertool.toNumber("$!{request.get($parameterName)}").intValue())
-  #if (!$return)
-    #set ($return = $defaultValue)
-  #else
-    #validateQueryLimit($return $parameterName)
-  #end
-  #set ($_limit = $NULL)
-  #setVariable("$_limit" $return)
+## This macro is used in places that are sensitive to whitespace - don't indent.
+#set ($return = $numbertool.toNumber("$!{request.get($parameterName)}").intValue())
+#if (!$return)
+#set ($return = $defaultValue)
+#else
+#validateQueryLimit($return $parameterName)
+#end
+#set ($_limit = $NULL)
+#setVariable("$_limit" $return)
 #end
 ##
 ##
@@ -2152,7 +2154,7 @@ $displayName##
     #set($parameters.position = 'top')
   #end
   #paginationPrepareParams($parameters)
-  #paginationDisplay($parameters)
+  #_paginationDisplay($parameters)
 #end
 #**
  * Pagination : request parameters preparation
@@ -2200,9 +2202,10 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
+ * @since 17.10.0RC1
  * @internal
  *#
-#macro(paginationDisplay $parameters)
+#macro(_paginationDisplay $parameters)
   #set($parameters.pageCount = ($parameters.totalItems + $parameters.itemsPerPage - 1) / $parameters.itemsPerPage)
   #if($parameters.firstItem >= $parameters.totalItems)
     #set($parameters.firstItem = ($parameters.pageCount - 1) * $parameters.itemsPerPage)
@@ -2214,18 +2217,18 @@ $displayName##
   #set($parameters.firstItem = $parameters.crtPage * $parameters.itemsPerPage)
   #set($parameters.lastPage = $parameters.pageCount - 1)
   <div class="paginationFilter">
-    #if($parameters.position == 'top')
-      #paginationResultsRange($parameters)
-    #end
     #if($parameters.totalItems > 0)
       #if($parameters.controlsAround == true)
-        #paginationControlLeft($parameters)
-        #paginationPages($parameters)
-        #paginationControlRight($parameters)
+        #_paginationControlLeft($parameters)
+        #_paginationPages($parameters)
+        #_paginationControlRight($parameters)
       #else
-        #paginationControl($parameters)
-        #paginationPages($parameters)
+        #_paginationPages($parameters)
+        #_paginationControl($parameters)
       #end
+    #end
+    #if($parameters.position == 'top')
+      #_paginationResultsRange($parameters)
     #end
   </div>
 #end
@@ -2235,9 +2238,10 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
+ * @since 17.10.0RC1
  * @internal
  *#
-#macro(paginationPages $parameters)
+#macro(_paginationPages $parameters)
 ## $url $crtPage $itemsPerPage $lastPage $pageCount $itemParamName $itemsPerPageParamName)
   #set($contextLeft  = 4)
   #set($contextRight = 4)
@@ -2261,36 +2265,52 @@ $displayName##
       #set($contextFirstPage = $parameters.pageCount - $contextWidth)
     #end
   #end
-  <span class="pagination">$services.localization.render('platform.livetable.paginationPage')
+  <div class="pagination">$services.localization.render('platform.livetable.paginationPage')
+  <ul class="pagination-list">
   #if($contextFirstPage != 0)
-    #paginationPageLink(0 $parameters)
+    #_paginationPageLink(0 $parameters)
   #end
-  #if($contextFirstPage > 1) ... #end
+  #if($contextFirstPage > 1) <li aria-hidden="true">...</li> #end
   #foreach ($i in [$contextFirstPage .. $contextLastPage])
-    #paginationPageLink($i $parameters)
+    #_paginationPageLink($i $parameters)
   #end
-  #if($parameters.lastPage - $contextLastPage > 1) ... #end
+  #if($parameters.lastPage - $contextLastPage > 1) <li aria-hidden="true">...</li> #end
   #if($contextLastPage != $parameters.lastPage)
-    #paginationPageLink($parameters.lastPage $parameters)
+    #_paginationPageLink($parameters.lastPage $parameters)
   #end
-  </span>
+  </ul>
+  </div>
 #end
+#**
+* @since 17.10.0RC1
+* @internal
+*#
+#macro (_paginationPageURL $firstItem $params)
+  ${params.url}&amp;${params.itemParamName}=${firstItem}##
+  #if($params.itemsPerPage != $params.defaultItemsPerPage)&amp;${params.itemsPerPageParamName}=${params.itemsPerPage}#end$!{params.hash}
+#end
+
 #**
  * Pagination : display the link to a certain page (indicated by $pageNumber)
  *
  * Used internally by the pagination macro.
  *
  * @see #pagination
+ * @since 17.10.0RC1
  * @internal
  *#
-#macro(paginationPageLink $pageNumber $parameters)
+#macro(_paginationPageLink $pageNumber $parameters)
   #set($firstItem = $pageNumber * $parameters.itemsPerPage)
   #set($displayedPageNumber = $pageNumber + 1)
+  <li class="pagination-item">
   #if($pageNumber == $parameters.crtPage)
-  <span class="currentPage">$displayedPageNumber</span>
+    <span class="currentPage btn btn-primary btn-xs">$displayedPageNumber</span>
   #else
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPageTitle', [$displayedPageNumber])">$displayedPageNumber</a>
+    <a href="#_paginationPageURL($firstItem, $parameters)"
+      class="btn btn-default btn-xs"
+      title="$escapetool.xml($services.localization.render('platform.livetable.paginationPageTitle', [$displayedPageNumber]))">$displayedPageNumber</a>
   #end
+  </li>
 #end
 #**
  * Pagination : display prev / next links
@@ -2298,12 +2318,13 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
+ * @since 17.10.0RC1
  * @internal
  *#
-#macro(paginationControl $parameters)
+#macro(_paginationControl $parameters)
   <span class="controlPagination">
-  #paginationControlLeft($parameters)
-  #paginationControlRight($parameters)
+  #_paginationControlLeft($parameters)
+  #_paginationControlRight($parameters)
   </span>
 #end
 #**
@@ -2312,15 +2333,22 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
+ * @since 17.10.0RC1
  * @internal
  *#
-#macro(paginationControlLeft $parameters)
+#macro(_paginationControlLeft $parameters)
   #if($parameters.crtPage > 0)
     #set($prevPage = $parameters.crtPage - 1)
     #set($firstItem = $prevPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination">$services.localization.render('platform.livetable.paginationPagePrevious')</a>
+    <a href="#_paginationPageURL($firstItem, $parameters)"##
+      title="$escapetool.xml($services.localization.render('platform.livetable.paginationPagePrevTitle'))" class="prevPagination btn btn-xs btn-default">##
+      <span class="sr-only">$escapetool.xml($services.localization.render('platform.livetable.paginationPagePrevious'))</span>##
+      $services.icon.renderHTML('caret-right')##
+    </a>
   #else
-    <span class="noPrevPagination"> </span>
+    <span class="noPrevPagination btn btn-xs btn-default disabled">
+      $services.icon.renderHTML('caret-right')##
+    </span>
   #end
 #end
 #**
@@ -2329,15 +2357,22 @@ $displayName##
  * Used internally by the pagination macro.
  *
  * @see #pagination
+ * @since 17.10.0RC1
  * @internal
  *#
-#macro(paginationControlRight $parameters)
+#macro(_paginationControlRight $parameters)
   #if($parameters.crtPage < $parameters.lastPage)
     #set($nextPage = $parameters.crtPage + 1)
     #set($firstItem = $nextPage * $parameters.itemsPerPage)
-    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination">$services.localization.render('platform.livetable.paginationPageNext')</a>
+    <a href="#_paginationPageURL($firstItem, $parameters)" 
+      title="$escapetool.xml($services.localization.render('platform.livetable.paginationPageNextTitle'))" class="nextPagination btn btn-xs btn-default">##
+      <span class="sr-only">$escapetool.xml($services.localization.render('platform.livetable.paginationPageNext'))</span>##
+      $services.icon.renderHTML('caret-right')##
+    </a>
   #else
-    <span class="noNextPagination"> </span>
+    <span class="noNextPagination btn btn-xs btn-default disabled">
+      $services.icon.renderHTML('caret-right')##
+    </span>
   #end
 #end
 #**
@@ -2348,7 +2383,7 @@ $displayName##
  * @see #pagination
  * @internal
  *#
-#macro(paginationResultsRange $parameters)
+#macro(_paginationResultsRange $parameters)
   #set($from = $parameters.firstItem + 1)
   #set($to =   $parameters.firstItem + $parameters.itemsPerPage)
   #if ($to > $parameters.totalItems)

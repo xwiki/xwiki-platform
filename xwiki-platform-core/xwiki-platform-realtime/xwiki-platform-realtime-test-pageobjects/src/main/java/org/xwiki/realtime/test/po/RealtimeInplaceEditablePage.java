@@ -20,6 +20,7 @@
 package org.xwiki.realtime.test.po;
 
 import org.xwiki.edit.test.po.InplaceEditablePage;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Represents the Inplace Edit Mode with realtime enabled.
@@ -31,6 +32,21 @@ import org.xwiki.edit.test.po.InplaceEditablePage;
 public class RealtimeInplaceEditablePage extends InplaceEditablePage
 {
     private RealtimeEditToolbar toolbar;
+
+    /**
+     * Navigate to the specified in-place editable page.
+     *
+     * @param reference the reference of the page to navigate to
+     * @return the in-place editable page
+     * @since 16.10.12
+     * @since 17.4.5
+     * @since 17.8.0
+     */
+    public static RealtimeInplaceEditablePage gotoPage(EntityReference reference)
+    {
+        getUtil().gotoPage(reference);
+        return new RealtimeInplaceEditablePage();
+    }
 
     /**
      * @return the edit mode toolbar, holding the button to save the changes

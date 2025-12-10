@@ -66,6 +66,7 @@
           deletedXObjects: {} // objects deleted but not removed yet
         };
         this.editedDocument = XWiki.currentDocument;
+        this.unsavedChanges = false;
 
         $('.xclass').each(function() {
           self.enhanceClassUX($(this), true);
@@ -104,6 +105,7 @@
           }
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.unsavedChanges = false;
         });
 
         // in case of cancel we just clean everything so that we don't get any warnings for leaving the page without saving.
@@ -113,6 +115,21 @@
           $('input[name=addedObjects]').remove();
           self.editorStatus.addedXObjects = {};
           self.editorStatus.deletedXObjects = {};
+          self.unsavedChanges = false;
+        });
+        // We want to listen on inputs related to an xclass or an xobject, but not the actual inputs allowing
+        // to create a property or an object.
+        let filterInputs = function () {
+            return $(this).parents('#add_xproperty,#add_xobject').length === 0
+                && $(this).parents('.xclass').length > 0;
+        };
+        $('input,textarea').filter(filterInputs).on('change', function(e) {
+          self.unsavedChanges = true;
+        });
+        $(document).on('xwiki:dom:updated', function (event, data) {
+          $(data.elements).find('input,textarea').filter(filterInputs).on('change', function (e) {
+            self.unsavedChanges = true;
+          });
         });
 
         // We want to the user to be prevented if he tries to leave the editor before saving.
@@ -120,7 +137,8 @@
         // See: https://stackoverflow.com/questions/4376596/jquery-unload-or-beforeunload
         window.onbeforeunload = function(event) {
           if (Object.keys(self.editorStatus.addedXObjects).length > 0
-            || Object.keys(self.editorStatus.deletedXObjects).length > 0) {
+            || Object.keys(self.editorStatus.deletedXObjects).length > 0
+            || self.unsavedChanges) {
             event.preventDefault();
             event.returnValue = "";
           } else {
@@ -515,9 +533,9 @@
               $.post(ref).done(function(data) {
                 $('#xclassContent').append(data);
                 let insertedPropertyElt = $('#xclassContent > div.xproperty:last-child');
-                // Expand the newly inserted property, since the user will probably want to edit it once it was added
-                self.expandCollapseMetaProperty(insertedPropertyElt);
-                // Make teh newly added property sortable
+                // Make the newly added property collapsable since the user will probably want to edit it
+                self.expandCollapseMetaProperty(insertedPropertyElt, true);
+                // Make the newly added property sortable
                 self.makeSortable(insertedPropertyElt);
                 self.ajaxPropertyDeletion(insertedPropertyElt);
                 self.makeDisableVisible(insertedPropertyElt);
@@ -665,15 +683,20 @@
 
       // ------------------------------------
       // Class editor: expand-collapse meta properties
-      expandCollapseMetaProperty(property) {
+      expandCollapseMetaProperty(property, startExpanded = false) {
         let propertyTitle = property.find('.xproperty-title');
         if (!propertyTitle) {
           // No such object...
           return;
         }
         property.addClass('collapsable');
-        property.addClass('collapsed');
-        propertyTitle.on('click', function() {
+        // By default, the property is collapsed when made collapsable.
+        if(!startExpanded) {
+          property.addClass('collapsed');
+        }
+        // The click event is catched only on the icon and title to avoid breaking behaviour when using actions, 
+        // especially the move action which is dragAndDrop.
+        propertyTitle.find('.toggle-collapsable, h2').on('click', function() {
           propertyTitle.parent().toggleClass('collapsed');
         });
       }
@@ -722,8 +745,10 @@
 
       updateOrder() {
         let i = 1;
-        $(this).find(".xproperty-content").data('numberProperty').val(function() {
-          return i++;
+        $(this).find(".xproperty-content").each(function () {
+          let item = $(this);
+          // the numberProperty data is actually a reference to an input.
+          item.data('numberProperty').val(i++);
         });
       }
 

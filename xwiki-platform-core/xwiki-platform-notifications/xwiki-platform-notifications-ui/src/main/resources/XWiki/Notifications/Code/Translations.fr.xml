@@ -89,7 +89,7 @@ notifications.filters.preferences.allEvents=Tous les événements (y compris les
 
 ## System Filter preferences settings
 notifications.settings.filters.preferences.system.title=Filtres système
-notifications.settings.filters.preferences.system.hint=Les filtres du système que vous pouvez activer pour avoir un contrôle plus précis des notifications que vous souhaitez recevoir.
+notifications.settings.filters.preferences.system.hint=Filtres systèmes que vous pouvez activer pour avoir un contrôle plus précis des notifications que vous souhaitez recevoir.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=Nom
 notifications.settings.filters.preferences.system.table.filterDescription=Description
@@ -158,7 +158,7 @@ notifications.settings.watch.autowatchmode=Surveillance automatique de pages
 notifications.settings.watch.autowatchmode.hint=Indiquez si vous souhaitez surveiller les pages que vous avez modifiées
 notifications.settings.watch.forGuest=Connectez-vous ou inscrivez-vous pour gérer vos paramètres de notification.
 notifications.settings.watch.disabled=Les entités surveillées sont désactivées. Merci de contacter l'administrateur.
-notifications.events.by=Par {0}.
+notifications.events.by=modifié par {0}.
 notifications.events.lastChange=Dernière modification : {0}.
 notifications.events.lastComment=Dernier commentaire : {0}.
 notifications.preferences.scope.table.scope=Portée
@@ -254,6 +254,7 @@ notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS
 notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Vous ignorez cette page et ses enfants : vous ne recevrez pas de notifications pour celles-ci.
 notifications.watch.modal.title.CUSTOM=Paramètres de suivi personnalisés
 notifications.watch.modal.description.CUSTOM=Vous utilisez des paramètres de notification personnalisés pour cette page : il se peut que vous suiviez ou bloquiez des événements spécifiques pour la page ou que vous ne cibliez que des canaux spécifiques pour les notifications. Nous vous invitons à revoir vos paramètres de notification à partir de votre profil.
+notifications.watch.modal.option.hint.toggle=Affiche / Masque les détails de cette option
 notifications.watch.modal.option.watchpage.title=Suivre la page courante
 notifications.watch.modal.option.watchpage.hint=Vous recevrez des notifications uniquement pour cette page.
 notifications.watch.modal.option.watchspace.title=Suivre la page actuelle et ses enfants

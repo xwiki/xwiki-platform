@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
 
 @OldcoreTest
 @ReferenceComponentList
-public class XWikiGroupServiceImplTest
+class XWikiGroupServiceImplTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -65,7 +65,7 @@ public class XWikiGroupServiceImplTest
     private BaseObject groupObject;
 
     @BeforeEach
-    public void before() throws Exception
+    void before() throws Exception
     {
         this.groupService = new XWikiGroupServiceImpl();
 
@@ -91,7 +91,7 @@ public class XWikiGroupServiceImplTest
     }
 
     @Test
-    public void testListMemberForGroup() throws XWikiException
+    void listMemberForGroup() throws XWikiException
     {
         assertEquals(
             new HashSet<String>(Arrays.asList(this.user.getFullName())),
@@ -106,7 +106,7 @@ public class XWikiGroupServiceImplTest
     }
 
     @Test
-    public void getAllMatchedMembersNamesForGroup() throws Exception
+    void getAllMatchedMembersNamesForGroup() throws Exception
     {
         Query query = mock(Query.class);
         when(this.oldcore.getQueryManager().createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
@@ -125,7 +125,7 @@ public class XWikiGroupServiceImplTest
     }
 
     @Test
-    public void countAllMatchedMembersNamesForGroup() throws Exception
+    void countAllMatchedMembersNamesForGroup() throws Exception
     {
         Query query = mock(Query.class);
         when(this.oldcore.getQueryManager().createQuery(anyString(), eq(Query.HQL))).thenReturn(query);

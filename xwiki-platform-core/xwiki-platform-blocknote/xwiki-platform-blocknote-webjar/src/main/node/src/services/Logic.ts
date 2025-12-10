@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { SkinManager } from "@xwiki/cristal-api";
+import type { SkinManager } from "@xwiki/platform-api";
 import { createPinia } from "pinia";
 import { App, createApp, reactive } from "vue";
 import { createI18n, I18n } from "vue-i18n";
@@ -96,8 +96,8 @@ export class Logic {
   /**
    * @returns {Data} the data managed by this BlockNote instance
    */
-  get data(): Data {
-    this._data.value = this._root.updateValue();
+  async data(): Promise<Data> {
+    this._data.value = await this._root.updateValue();
     return this._data;
   }
 

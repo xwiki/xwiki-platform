@@ -48,7 +48,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -143,7 +142,7 @@ public class DocumentContentDisplayerTest
         assertSame(content, this.documentDisplayer.display(document, parameters));
 
         // Make sure the transformations are executed exactly once, and on the right content.
-        verify(this.transformationManager, times(1)).performTransformations(same(content),
+        verify(this.transformationManager).performTransformations(same(content),
             any(TransformationContext.class));
     }
 }

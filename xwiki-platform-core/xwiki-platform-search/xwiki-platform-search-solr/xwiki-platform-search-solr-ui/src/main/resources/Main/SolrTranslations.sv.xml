@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=Winin för vilket vald operation skall genomföras
 solr.admin.indexing.wiki.select_farm=Hela farmen
 solr.admin.indexing.query.label=Anpassat sökutryck
 solr.admin.indexing.query.hint=Sökutryck för att begränsa de dokument i indexet som påverkas av vald operation.  Detta kan utelämnas.
+### Missing: solr.admin.indexing.query.language.label=Language of the custom query
 ### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-solr.sortBy=Sortera efter\:
-solr.sortBy.score=Relevans
-solr.sortBy.title_sort=Titel
-solr.sortBy.date=Datum
-solr.sortBy.author_display_sort=Senaste författare
-solr.sortBy.filename_sort=Filnamn
-solr.sortBy.attsize_sort=Filstorlek
-solr.sortBy.attdate_sort=Uppladdningsdatum
-solr.sortBy.attauthor_display_sort=Uppladdad av
-solr.sortOrder.asc=Stigande
-solr.sortOrder.desc=Fallande
-### Missing: solr.options=Show:
-### Missing: solr.options.highlight=Highlighting
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 ### Missing: solr.options.highlight.title=
-### Missing: solr.options.facet=Facets
+### Missing: search.solr.options.showFacet=Show filters
 ### Missing: solr.options.facet.title=Allow extra filtering of the result
 solr.result.language=Språk
 ### Missing: solr.result.locatedIn=Located in
@@ -172,6 +172,18 @@ solr.result.location=Hittat i {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Rum
+solr.sortBy=Sortera efter\:
+solr.sortBy.score=Relevans
+solr.sortBy.title_sort=Titel
+solr.sortBy.date=Datum
+solr.sortBy.author_display_sort=Senaste författare
+solr.sortBy.filename_sort=Filnamn
+solr.sortBy.attsize_sort=Filstorlek
+solr.sortBy.attdate_sort=Uppladdningsdatum
+solr.sortBy.attauthor_display_sort=Uppladdad av
+### Missing: solr.options=Show:
+### Missing: solr.options.highlight=Highlighting
+### Missing: solr.options.facet=
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

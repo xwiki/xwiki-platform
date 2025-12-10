@@ -43,8 +43,9 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Same as {@link com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase} but for JUnit 4.x and JMock 2.x.
- * 
+ * Extension of {@link AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution Context and the
+ * old XWikiContext. This allows code that uses XWikiContext to be tested using this Test Case class.
+ *
  * @version $Id$
  * @since 2.2M2
  * @deprecated sine 5.2M1 use {@link MockitoOldcoreRule} instead

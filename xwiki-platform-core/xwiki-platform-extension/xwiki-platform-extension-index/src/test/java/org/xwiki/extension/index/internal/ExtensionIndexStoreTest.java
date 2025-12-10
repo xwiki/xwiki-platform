@@ -54,7 +54,7 @@ import org.xwiki.extension.repository.search.ExtensionQuery.COMPARISON;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.rendering.macro.Macro;
-import org.xwiki.search.solr.test.SolrComponentList;
+import org.xwiki.search.solr.test.EmbeddedSolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -81,7 +81,7 @@ import static org.mockito.Mockito.when;
 @ComponentList({ ExtensionIndexStore.class, ExtensionIndexSolrCoreInitializer.class, ExtensionIdConverter.class,
     ExtensionAuthorConverter.class, ExtensionFactory.class, ExtensionComponentConverter.class })
 @ReferenceComponentList
-@SolrComponentList
+@EmbeddedSolrComponentList
 class ExtensionIndexStoreTest
 {
     public static class TestExtension extends AbstractRemoteExtension

@@ -94,7 +94,7 @@ class CreateActionTest
     Query mockTemplateProvidersQuery;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.context = this.oldcore.getXWikiContext();
 

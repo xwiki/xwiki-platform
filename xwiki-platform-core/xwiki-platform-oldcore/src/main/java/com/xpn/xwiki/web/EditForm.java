@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -366,7 +365,6 @@ public class EditForm extends XWikiForm
      * @return the enforce required rights flag, see {@link XWikiDocument#isEnforceRequiredRights()}
      * @since 16.10.0RC1
      */
-    @Unstable
     public String getEnforceRequiredRights()
     {
         return this.enforceRequiredRights;
@@ -376,7 +374,6 @@ public class EditForm extends XWikiForm
      * @param enforceRequiredRights the enforce required rights flag, see {@link XWikiDocument#isEnforceRequiredRights()}
      * @since 16.10.0RC1
      */
-    @Unstable
     public void setEnforceRequiredRights(String enforceRequiredRights)
     {
         this.enforceRequiredRights = enforceRequiredRights;

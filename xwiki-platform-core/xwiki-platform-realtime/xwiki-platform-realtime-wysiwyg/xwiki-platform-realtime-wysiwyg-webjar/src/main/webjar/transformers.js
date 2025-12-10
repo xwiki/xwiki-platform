@@ -34,6 +34,9 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
    * @returns {Array<Operation>} the transformed (rebased) local operations
    */
   function RebaseNaiveJSONTransformer(localOperations, remoteOperations, text) {
+    // We follow the implementation of NaiveJSONTransformer which doesn't throw an exception when the outcome is not a
+    // valid JSON, but instead it logs the error and saves it in a global variable for debugging purposes. We use the
+    // same global variable and the same error keys to be consistent.
     const DEBUG = ChainPad.Common.global.REALTIME_DEBUG = ChainPad.Common.global.REALTIME_DEBUG || {};
 
     let rebasedLocalOperations, textAfterRemoteOperations, textAfterRebase, error, errorType;

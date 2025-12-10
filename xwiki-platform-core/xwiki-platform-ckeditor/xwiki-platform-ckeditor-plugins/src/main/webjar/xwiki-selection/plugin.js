@@ -55,7 +55,10 @@
       var editable = editor.editable();
       if (editable) {
         const domRanges = this.getSelection(editor);
-        editor._.textSelection = (editor._.textSelection || this.textSelection).from(editable.$, domRanges);
+        if (!editor._.textSelection) {
+          editor._.textSelection = new CKEDITOR.plugins.xwikiSelection.TextSelection();
+        }
+        editor._.textSelection.update(editable.$, domRanges);
         // Remember to also restore the focus when restoring the selection. In order to know if we have to restore the
         // focus we need to check the active element on the top level window. We can't rely on the focus state of the
         // editable area because the focus is lost when the user switches to a different browser tab or a different
@@ -70,47 +73,59 @@
     restoreSelection: async function(editor, options) {
       const editable = editor.editable();
       let textSelection = editor._.textSelection;
-      let {ranges, beforeApply} = options || {};
-      if (editable && textSelection) {
-        const notification = this._showRestoringSelectionNotification(editor);
-        try {
-          if (!ranges) {
-            textSelection = await textSelection.transform(editable.$);
-          }
-
-          beforeApply?.();
-          beforeApply = () => {};
-
-          const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
-          if (focus) {
-            // This is mostly needed for the Source mode. For the WYSIWYG mode we take care of focusing the editable
-            // area that contains the selection when we apply it.
-            editable.$.focus(focus);
-          }
-
-          if (ranges) {
-            // Apply the provided selection.
-            this.setSelection(editor, ranges, focus);
-          } else {
-            // Apply the transformed saved text selection.
-            textSelection.applyTo(editable.$, {
-              // Scroll the restored selection into view if the editor content was overwritten since we saved the
-              // selection and the editing area had the focus when the selection was saved.
-              scrollIntoView: focus && !focus.preventScroll,
-              applyDOMRange: domRange => {
-                maybeOptimizeRange(editor, domRange, !focus.preventScroll);
-                this.setSelection(editor, [domRange], focus);
-              }
-            });
-          }
-        } catch (e) {
-          console.error("Failed to restore selection: ", e);
-          beforeApply?.();
-        } finally {
-          notification.hide();
-        }
-      } else {
+      let {ranges, beforeApply, async = true} = options || {};
+      if (!editable || !textSelection) {
         beforeApply?.();
+        return;
+      }
+
+      const notification = this._showRestoringSelectionNotification(editor);
+      try {
+        if (!ranges) {
+          // Transform the saved text selection to reflect the changes made to the edited content since the selection
+          // was saved.
+          const maybePromise = textSelection.transform(editable.$, async);
+          if (async) {
+            // Wait for the transformation to complete in a different (WebWorker) thread.
+            await maybePromise;
+          }
+        }
+
+        beforeApply?.();
+        beforeApply = () => {};
+
+        // Apply the transformed text selection or the provided selection ranges.
+        this._applySelection({editor, editable, textSelection, ranges});
+      } catch (e) {
+        console.error("Failed to restore selection: ", e);
+        beforeApply?.();
+      } finally {
+        notification.hide();
+      }
+    },
+
+    _applySelection: function({editor, editable, textSelection, ranges}) {
+      const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
+      if (focus) {
+        // This is mostly needed for the Source mode. For the WYSIWYG mode we take care of focusing the editable area
+        // that contains the selection when we apply it.
+        editable.$.focus(focus);
+      }
+
+      if (ranges) {
+        // Apply the provided selection.
+        this.setSelection(editor, ranges, focus);
+      } else {
+        // Apply the transformed saved text selection.
+        textSelection.applyTo(editable.$, {
+          // Scroll the restored selection into view if the editor content was overwritten since we saved the
+          // selection and the editing area had the focus when the selection was saved.
+          scrollIntoView: focus && !focus.preventScroll,
+          applyDOMRange: domRange => {
+            maybeOptimizeRange(editor, domRange, !focus.preventScroll);
+            this.setSelection(editor, [domRange], focus);
+          }
+        });
       }
     },
 
@@ -257,8 +272,8 @@
   CKEDITOR.plugins.add('xwiki-selection', {
     requires: 'notification',
     onLoad: function() {
-      require(['textSelection'], function(textSelection) {
-        CKEDITOR.plugins.xwikiSelection.textSelection = textSelection;
+      require(['textSelection'], function(TextSelection) {
+        CKEDITOR.plugins.xwikiSelection.TextSelection = TextSelection;
       });
 
       // Make sure the ContextManager used by the balloon toolbar doesn't shrink the selection when it's fake.
@@ -327,9 +342,6 @@
               // The caret is inside a nested editable area. Some browsers (e.g. Chrome) don't show the caret if the
               // nested editable area is not focused.
               CKEDITOR.plugins.widget.getNestedEditable(widget.wrapper, container)?.focus();
-              // In Firefox, if we focus the nested editable area then the user can't move the caret outside of it using
-              // the keyboard. We need to focus again the root editable area to fix this...
-              editor.editable().focus();
             }
           }
         }
@@ -347,13 +359,17 @@
   }
   const diffWorkerURL = new URL(diffWorkerPath, currentScript).href;
 
-  define('xwiki-diff-service', [], function() {
+  define('xwiki-diff-service', ['node-module!fast-diff'], function(diff) {
     class DiffService {
       constructor() {
         // Reuse the same worker to serve a queue of diff computation requests.
         this._queue = [];
         // Have the worker ready before the first diff computation is requested (because worker creation is costly).
         this._recreateWorker();
+      }
+
+      diff(previous, next) {
+        return diff(previous, next);
       }
 
       /**
@@ -364,7 +380,7 @@
        * @returns {object} an object like {cancel: function, promise: Promise} that allows to cancel the diff
        *   computation or to wait for the computed diff
        */
-      diff(previous, next) {
+      diffAsync(previous, next) {
         const entry = {previous, next};
         this._queue.push(entry);
         if (this._queue.length === 1) {
@@ -437,99 +453,6 @@
 define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], function($, DiffService, scrollUtils) {
   const diffService = new DiffService();
 
-  function isTextInput(element) {
-    return typeof element?.setSelectionRange === 'function';
-  }
-
-  function getTextSelection(root, ranges) {
-    if (isTextInput(root)) {
-      return {
-        text: root.value,
-        startOffset: root.selectionStart,
-        endOffset: root.selectionEnd
-      };
-    } else {
-      // We currently support only one range.
-      const range = ranges?.[0];
-      if (range && root.contains(range.commonAncestorContainer)) {
-        return getTextSelectionFromRange(root, range);
-      }
-      return {
-        text: getVisibleText(root),
-        startOffset: 0,
-        endOffset: 0
-      };
-    }
-  }
-
-  function getTextSelectionFromRange(root, range) {
-    const beforeRange = root.ownerDocument.createRange();
-    beforeRange.setStart(root, 0);
-    beforeRange.setEnd(range.startContainer, range.startOffset);
-    const beforeText = getVisibleTextInRange(beforeRange);
-
-    const selectionRange = root.ownerDocument.createRange();
-    selectionRange.setStart(range.startContainer, range.startOffset);
-    selectionRange.setEnd(range.endContainer, range.endOffset);
-    const lastSelectedNode = range.endContainer.childNodes[range.endOffset - 1];
-    if (!range.collapsed && lastSelectedNode?.nodeType === Node.ELEMENT_NODE) {
-      // Place the selection range end inside the last selected element, after its last child node, in order to exclude
-      // the end separator associated with the last selected node from the selected text. We need this to be able to
-      // represent the fact that the selection ends after the last selected element (if that element is focusable) and
-      // not at the start of the next focusable element or visible text node.
-      selectionRange.setEnd(lastSelectedNode, lastSelectedNode.childNodes.length);
-    }
-    const selectedText = getVisibleTextInRange(selectionRange);
-
-    const afterRange = root.ownerDocument.createRange();
-    afterRange.setStart(selectionRange.endContainer, selectionRange.endOffset);
-    afterRange.setEnd(root, root.childNodes.length);
-    const afterText = getVisibleTextInRange(afterRange);
-
-    const startOffset = beforeText.length;
-    return {
-      text: beforeText + selectedText + afterText,
-      startOffset,
-      endOffset: startOffset + selectedText.length,
-      // Remember the text selection direction. This is especially important when editing in realtime because the user
-      // might be selecting text backwards (e.g. using Shift + Left Arrow) when a remove change is applied.
-      reversed: range.reversed
-    };
-  }
-
-  function getVisibleText(node) {
-    const range = node.ownerDocument.createRange();
-    range.selectNodeContents(node);
-    return getVisibleTextInRange(range);
-  }
-
-  function getVisibleTextInRange(range) {
-    // Partial text nodes are included in the iteration so we have to remember to remove the text before the start
-    // offset and after the end offset.
-    let visibleText = '', removeStart = 0, removeEnd = 0;
-    iterateRangeWithCaret(range, {
-      before: node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-          visibleText += node.nodeValue;
-          if (node === range.startContainer) {
-            removeStart = range.startOffset;
-          }
-        } else {
-          visibleText += '\n';
-        }
-      },
-      after: node => {
-        visibleText += '\n';
-        if (node.nodeType === Node.TEXT_NODE && node === range.endContainer) {
-          // Note that we add 1 to take into account the separator (new line) added after each text fragment.
-          removeEnd = node.length - range.endOffset + 1;
-        }
-      }
-    });
-
-    return visibleText.substring(removeStart, visibleText.length - removeEnd);
-  }
-
   function iterateRangeWithCaret(range, visitor) {
     // We're going to iterate the given range using a clone, by moving the start until the clone collapses.
     const caret = range.cloneRange();
@@ -595,18 +518,6 @@ define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], functio
     return isNodeVisible(element) && element.hasAttribute('tabindex');
   }
 
-  function getRangeFromTextSelection(root, textSelection) {
-    const start = findTextOffsetInDOM(root, textSelection.startOffset);
-    const end = textSelection.endOffset === textSelection.startOffset ? start :
-      findTextOffsetInDOM(root, textSelection.endOffset);
-    const range = root.ownerDocument.createRange();
-    range.setStart(start.node, start.offset);
-    range.setEnd(end.node, end.offset);
-    // Preserve the text selection direction.
-    range.reversed = textSelection.reversed;
-    return range;
-  }
-
   function findTextOffsetInDOM(root, offset) {
     // We use a range to iterate the caret positions inside the DOM subtree with the given root.
     const range = root.ownerDocument.createRange();
@@ -655,20 +566,6 @@ define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], functio
     };
   }
 
-  async function changeText(textSelection, newText) {
-    const {promise, cancel} = diffService.diff(textSelection.text, newText);
-    textSelection.abortApplyTo = cancel;
-    const changes = await promise;
-    const startOffset = findTextOffsetInChanges(changes, textSelection.startOffset);
-    const endOffset = textSelection.endOffset === textSelection.startOffset ? startOffset :
-      findTextOffsetInChanges(changes, textSelection.endOffset);
-    return {
-      text: newText,
-      startOffset,
-      endOffset
-    };
-  }
-
   function findTextOffsetInChanges(changes, oldOffset) {
     let count = 0, newOffset = oldOffset;
     for (let i = 0; i < changes.length && count < oldOffset; i++) {
@@ -694,12 +591,110 @@ define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], functio
     return newOffset;
   }
 
-  return {
-    from: function(root, ranges) {
-      return $.extend({}, this, getTextSelection(root, ranges));
-    },
+  class TextSelection {
+    /**
+     * Update the text selection from the given root editable (and selection ranges) or text area.
+     *
+     * @param {Element} root the root editable element or the text area
+     * @param {Array[Range]} ranges the selection ranges
+     * @returns {TextSelection} this text selection
+     */
+    update(root, ranges) {
+      if (this._isTextInput(root)) {
+        this.text = root.value;
+        this.startOffset = root.selectionStart;
+        this.endOffset = root.selectionEnd;
+      } else {
+        // We currently support only one range.
+        const range = ranges?.[0];
+        if (range && root.contains(range.commonAncestorContainer)) {
+          this._updateFromRange(root, range);
+        } else {
+          this.text = this._getVisibleText(root);
+          this.startOffset = 0;
+          this.endOffset = 0;
+        }
+      }
 
-    applyTo: function(element, options) {
+      return this;
+    }
+
+    _isTextInput(element) {
+      return typeof element?.setSelectionRange === 'function';
+    }
+
+    _updateFromRange(root, range) {
+      const beforeRange = root.ownerDocument.createRange();
+      beforeRange.setStart(root, 0);
+      beforeRange.setEnd(range.startContainer, range.startOffset);
+      const beforeText = this._getVisibleTextInRange(beforeRange);
+
+      const selectionRange = root.ownerDocument.createRange();
+      selectionRange.setStart(range.startContainer, range.startOffset);
+      selectionRange.setEnd(range.endContainer, range.endOffset);
+      const lastSelectedNode = range.endContainer.childNodes[range.endOffset - 1];
+      if (!range.collapsed && lastSelectedNode?.nodeType === Node.ELEMENT_NODE) {
+        // Place the selection range end inside the last selected element, after its last child node, in order to
+        // exclude the end separator associated with the last selected node from the selected text. We need this to be
+        // able to represent the fact that the selection ends after the last selected element (if that element is
+        // focusable) and not at the start of the next focusable element or visible text node.
+        selectionRange.setEnd(lastSelectedNode, lastSelectedNode.childNodes.length);
+      }
+      const selectedText = this._getVisibleTextInRange(selectionRange);
+
+      const afterRange = root.ownerDocument.createRange();
+      afterRange.setStart(selectionRange.endContainer, selectionRange.endOffset);
+      afterRange.setEnd(root, root.childNodes.length);
+      const afterText = this._getVisibleTextInRange(afterRange);
+
+      this.text = beforeText + selectedText + afterText;
+      this.startOffset = beforeText.length;
+      this.endOffset = this.startOffset + selectedText.length;
+      // Remember the text selection direction. This is especially important when editing in realtime because the user
+      // might be selecting text backwards (e.g. using Shift + Left Arrow) when a remove change is applied.
+      this.reversed = range.reversed;
+    }
+
+    _getVisibleText(node) {
+      const range = node.ownerDocument.createRange();
+      range.selectNodeContents(node);
+      return this._getVisibleTextInRange(range);
+    }
+
+    _getVisibleTextInRange(range) {
+      // Partial text nodes are included in the iteration so we have to remember to remove the text before the start
+      // offset and after the end offset.
+      let visibleText = '', removeStart = 0, removeEnd = 0;
+      iterateRangeWithCaret(range, {
+        before: node => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            visibleText += node.nodeValue;
+            if (node === range.startContainer) {
+              removeStart = range.startOffset;
+            }
+          } else {
+            visibleText += '\n';
+          }
+        },
+        after: node => {
+          visibleText += '\n';
+          if (node.nodeType === Node.TEXT_NODE && node === range.endContainer) {
+            // Note that we add 1 to take into account the separator (new line) added after each text fragment.
+            removeEnd = node.length - range.endOffset + 1;
+          }
+        }
+      });
+
+      return visibleText.substring(removeStart, visibleText.length - removeEnd);
+    }
+
+    /**
+     * Apply this text selection to the given root editable or text area.
+     *
+     * @param {Element} element the root editable element or a text area element
+     * @param {Object} options configure how the text selection is applied
+     */
+    applyTo(element, options) {
       options = Object.assign({
         scrollIntoView: true,
         applyDOMRange: range => {
@@ -712,36 +707,82 @@ define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], functio
         }
       }, options);
 
-      const range = isTextInput(element) ? this : this.asRange(element);
+      const range = this._isTextInput(element) ? this : this.asRange(element);
       if (options.scrollIntoView) {
         scrollUtils.scrollSelectionIntoView(element, range);
       }
 
-      if (isTextInput(element)) {
+      if (this._isTextInput(element)) {
         element.setSelectionRange(range.startOffset, range.endOffset);
       } else {
         options.applyDOMRange(range);
       }
-    },
-
-    transform: async function(textOrElement) {
-      const text = isTextInput(textOrElement) ? textOrElement.value :
-        (textOrElement?.nodeType === Node.ELEMENT_NODE ? getVisibleText(textOrElement) : textOrElement);
-      if (typeof text === 'string' && text !== this.text) {
-        // Text selection transformation is asynchronous which means the text can change while we are waiting for the
-        // Web Worker to compute the diff. This means we need to trigger a new transformation until the text doesn't
-        // change.
-        return await $.extend({}, this, await changeText(this, text)).transform(textOrElement);
-      } else {
-        // No change or unknown input type. Text selection remains the same.
-        return this;
-      }
-    },
-
-    asRange: function(root) {
-      return getRangeFromTextSelection(root, this);
     }
-  };
+
+    /**
+     * Transform this text selection to reflect the changes made to the text, that is either given directly or extracted
+     * from the given root editable or text area.
+     *
+     * @param {string | Element} textOrElement the new text or the root editable element or the text area
+     * @param {boolean} async whether to perform the transformation asynchronously or not
+     * @returns a promise that resolves to this text selection after the transformation is complete
+     */
+    async transform(textOrElement, async = true) {
+      const text = this._isTextInput(textOrElement) ? textOrElement.value :
+        (textOrElement?.nodeType === Node.ELEMENT_NODE ? this._getVisibleText(textOrElement) : textOrElement);
+      if (typeof text === 'string' && text !== this.text) {
+        const promise = this._changeText(text, async);
+        if (async) {
+          await promise;
+
+          // If text selection transformation is asynchronous then the text can change while we are waiting for the Web
+          // Worker to compute the diff. This means we need to trigger a new transformation until the text doesn't
+          // change.
+          await this.transform(textOrElement);
+        }
+      }
+
+      return this;
+    }
+
+    async _changeText(newText, async = true) {
+      let changes;
+      if (async) {
+        const {promise, cancel} = diffService.diffAsync(this.text, newText);
+        this.abortApplyTo = cancel;
+        changes = await promise;
+      } else {
+        changes = diffService.diff(this.text, newText);
+      }
+
+      const startOffset = findTextOffsetInChanges(changes, this.startOffset);
+      const endOffset = this.endOffset === this.startOffset ? startOffset :
+        findTextOffsetInChanges(changes, this.endOffset);
+      this.text = newText;
+      this.startOffset = startOffset;
+      this.endOffset = endOffset;
+    }
+
+    /**
+     * Converts this text selection to a DOM Range inside the given root editable element.
+     *
+     * @param {Element} root the root editable element
+     * @returns a DOM Range that corresponds to this text selection
+     */
+    asRange(root) {
+      const start = findTextOffsetInDOM(root, this.startOffset);
+      const end = this.endOffset === this.startOffset ? start :
+        findTextOffsetInDOM(root, this.endOffset);
+      const range = root.ownerDocument.createRange();
+      range.setStart(start.node, start.offset);
+      range.setEnd(end.node, end.offset);
+      // Preserve the text selection direction.
+      range.reversed = this.reversed;
+      return range;
+    }
+  }
+
+  return TextSelection;
 });
 
 define('scrollUtils', ['jquery'], function($) {

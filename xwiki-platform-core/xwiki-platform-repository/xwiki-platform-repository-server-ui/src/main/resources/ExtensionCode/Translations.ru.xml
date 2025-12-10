@@ -52,12 +52,12 @@ extension.repository.installedCount=Количество установок
 admin.repository=Репозиторий расширений
 
 ## Support
-### Missing: repository.support.createsupporter=Register
+repository.support.createsupporter=Регистрация
 
 ## Supporters
 repository.supporter.sheet.description=Эта страница управляет отображением страниц ExtensionSupporter в режимах просмотра и редактирования.
 repository.supporter.sheet.noObject=На текущей странице отсутствует ожидаемый объект ExtensionSupporter.
-### Missing: repository.supporter.sheet.createplan=Add
+repository.supporter.sheet.createplan=Добавить
 repository.supporter.sheet.plans=Планы
 ### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
 ExtensionCode.ExtensionSupporterClass_doc.title=Название
@@ -70,6 +70,7 @@ ExtensionCode.ExtensionSupporterClass_active=Активный
 ## Support plans
 repository.supportplan.sheet.description=Эта страница управляет отображением страниц ExtensionSupportPlan в режимах просмотра и редактирования.
 repository.supportplan.sheet.noObject=На текущей странице отсутствует ожидаемый объект ExtensionSupportPlan.
+repository.supportplan.sheet.supportedExtensions=Поддерживаемые расширения
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Название
 ExtensionCode.ExtensionSupportPlanClass_supporter=Поставщик

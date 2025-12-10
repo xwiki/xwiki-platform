@@ -207,7 +207,7 @@ public class DocumentMergeImporterTest
         this.documentMergeImporter.importDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
-        verify(this.xcontext, times(1)).getUserReference();
+        verify(this.xcontext).getUserReference();
         verifyNoMoreInteractions(this.xcontext);
         verifyNoInteractions(this.xwiki);
     }
@@ -274,7 +274,7 @@ public class DocumentMergeImporterTest
         this.documentMergeImporter.importDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
-        verify(this.jobStatus, times(1)).ask(any());
+        verify(this.jobStatus).ask(any());
         verify(this.xwiki).saveDocument(same(this.mergedDocument), eq("comment"), eq(false), same(this.xcontext));
     }
 
@@ -437,7 +437,7 @@ public class DocumentMergeImporterTest
             this.nextDocument, this.configuration);
 
         // Make sure we don't ask the job status this time
-        verify(this.jobStatus, times(1)).ask(any());
+        verify(this.jobStatus).ask(any());
         verify(this.xwiki, times(2)).saveDocument(same(this.previousDocument), eq("comment"), eq(false),
             same(this.xcontext));
     }

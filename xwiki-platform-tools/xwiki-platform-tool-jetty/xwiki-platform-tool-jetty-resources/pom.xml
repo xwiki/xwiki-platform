@@ -25,20 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>
   <packaging>pom</packaging>
   <description>Packages a Jetty installation</description>
-  <properties>
-    <!-- Use a different version of Jetty the one used for the Jetty client JARs packaged inside the XWiki WAR.
-         The reason is that our dependencies (mainly Solr) are not necessarily compatibles with this version of Jetty.
-
-         Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
-    -->
-    <jetty.version>${jetty.server.version}</jetty.version>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -90,12 +82,14 @@
                     <!-- We don't need demo packages -->
                     **/*demo*,
                     **/*demo*/,
-                    <!-- Remove any ee8 or ee9 libraries since we want to focus on the latest standard compatible 
-                         with the same minimum Java version XWiki supports -->
+                    <!-- Remove any ee8, ee9 or ee10 libraries since we want to focus
+                         on the latest standard supported by Jetty which is compatible with XWiki -->
                     **/*ee8*,
                     **/*ee8*/,
                     **/*ee9*,
                     **/*ee9*/,
+                    **/*ee10*,
+                    **/*ee10*/,
                     <!-- We don't need http2 support -->
                     **/*http2*,
                     **/*http2*/,

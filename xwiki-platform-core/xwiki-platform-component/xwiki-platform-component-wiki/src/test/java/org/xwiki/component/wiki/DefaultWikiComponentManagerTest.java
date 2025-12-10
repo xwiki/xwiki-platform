@@ -75,7 +75,7 @@ class DefaultWikiComponentManagerTest
 
         // Test 1: we verify that the component has been registered against the CM
         ArgumentCaptor<ComponentDescriptor> componentCaoptor = ArgumentCaptor.forClass(ComponentDescriptor.class);
-        verify(this.wikiComponentManager, times(1)).registerComponent(componentCaoptor.capture(), eq(component));
+        verify(this.wikiComponentManager).registerComponent(componentCaoptor.capture(), eq(component));
         assertEquals(TestRole.class, componentCaoptor.getValue().getRoleType());
         assertEquals("roleHint", componentCaoptor.getValue().getRoleHint());
         assertEquals(42, componentCaoptor.getValue().getRoleTypePriority());
@@ -94,13 +94,13 @@ class DefaultWikiComponentManagerTest
         // Test 3: we verify that the component has been unregistered from the CM
         // Note that indirectly this tests that the wiki component has been added to the wiki component cache during
         // the call to registerWikiComponent()
-        verify(this.wikiComponentManager, times(1)).unregisterComponent(TestRole.class, "roleHint");
+        verify(this.wikiComponentManager).unregisterComponent(TestRole.class, "roleHint");
 
         // Try to unregister the wiki component again
         this.manager.unregisterWikiComponents(DOC_REFERENCE);
 
         // Test 4: We verify that nothing happens on the CM since the wiki component is not in the wiki cache.
         // Note: the times(1) comes from the previous call in test 2 above.
-        verify(this.wikiComponentManager, times(1)).unregisterComponent(TestRole.class, "roleHint");
+        verify(this.wikiComponentManager).unregisterComponent(TestRole.class, "roleHint");
     }
 }

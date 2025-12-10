@@ -1693,7 +1693,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
-     * @param isolated true of the content should be executed in this document's context
+     * @param isolated true if the content should be executed in this document's context
      * @param context the XWiki context
      * @return the given text rendered in the context of this document using the passed Syntax
      * @since 14.10
@@ -2805,7 +2805,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     public long getRevisionsCount(RevisionCriteria criteria, XWikiContext context) throws XWikiException
     {
         return getVersioningStore(context).getXWikiDocVersionsCount(this, criteria, context);
@@ -4270,7 +4269,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @return true if this {@link XWikiDocument} is in the document cache
      * @since 16.10.0RC1
      */
-    @Unstable
     public boolean isCached()
     {
         return this.cached;
@@ -4280,7 +4278,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param cached true if this {@link XWikiDocument} is in the document cache
      * @since 16.10.0RC1
      */
-    @Unstable
     public void setCached(boolean cached)
     {
         this.cached = cached;
@@ -7891,7 +7888,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * use more rights than defined in the object, {@code false} otherwise
      * @since 16.10.0RC1
      */
-    @Unstable
     public boolean isEnforceRequiredRights()
     {
         return this.enforceRequiredRights;
@@ -7903,7 +7899,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * more rights than defined in the object
      * @since 16.10.0RC1
      */
-    @Unstable
     public void setEnforceRequiredRights(boolean enforceRequiredRights)
     {
         this.enforceRequiredRights = enforceRequiredRights;
@@ -9713,7 +9708,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param userReference the reference of the new author of the document
      * @since 16.1.0RC1
      */
-    @Unstable
     public void setAuthor(UserReference userReference)
     {
         getAuthors().setEffectiveMetadataAuthor(userReference);

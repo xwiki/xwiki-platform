@@ -19,11 +19,11 @@
  */
 package org.xwiki.mail;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link org.xwiki.mail.MailState}.
@@ -31,63 +31,62 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 6.4
  */
-public class MailStateTest
+@ComponentTest
+class MailStateTest
 {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
-    public void parseWhenUnknownStateString()
+    void parseWhenUnknownStateString()
     {
-        this.thrown.expect(IllegalArgumentException.class);
-        this.thrown.expectMessage("Invalid mail state [unknown]");
-        MailState.parse("unknown");
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
+            MailState.parse("unknown");
+        });
+        assertEquals("Invalid mail state [unknown]", exception.getMessage());
     }
 
     @Test
-    public void parseWhenOldFailedState()
+    void parseWhenOldFailedState()
     {
         MailState state = MailState.parse("failed");
         assertEquals(MailState.SEND_ERROR, state);
     }
 
     @Test
-    public void parseWhenPrepareSuccessState()
+    void parseWhenPrepareSuccessState()
     {
         MailState state = MailState.parse("prepare_success");
         assertEquals(MailState.PREPARE_SUCCESS, state);
     }
 
     @Test
-    public void parseWhenPrepareErrorsState()
+    void parseWhenPrepareErrorsState()
     {
         MailState state = MailState.parse("prepare_error");
         assertEquals(MailState.PREPARE_ERROR, state);
     }
 
     @Test
-    public void parseWhenSendSuccessState()
+    void parseWhenSendSuccessState()
     {
         MailState state = MailState.parse("send_success");
         assertEquals(MailState.SEND_SUCCESS, state);
     }
 
     @Test
-    public void parseWhenSendErrorLowercase()
+    void parseWhenSendErrorLowercase()
     {
         MailState state = MailState.parse("send_error");
         assertEquals(MailState.SEND_ERROR, state);
     }
 
     @Test
-    public void parseWhenSendErrorStateUppercase()
+    void parseWhenSendErrorStateUppercase()
     {
         MailState state = MailState.parse("SEND_ERROR");
         assertEquals(MailState.SEND_ERROR, state);
     }
 
     @Test
-    public void parseWhenSendFatalErrorState()
+    void parseWhenSendFatalErrorState()
     {
         MailState state = MailState.parse("send_fatal_error");
         assertEquals(MailState.SEND_FATAL_ERROR, state);

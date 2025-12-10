@@ -39,7 +39,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -95,7 +94,7 @@ public class PrefilteringLiveNotificationEmailManagerTest
 
         Thread.sleep(100);
 
-        verify(this.dispatcher, times(1)).addEvent(event, userReference);
+        verify(this.dispatcher).addEvent(event, userReference);
 
         when(this.intervals.getInterval(userReference)).thenReturn(NotificationEmailInterval.DAILY);
 
@@ -103,6 +102,6 @@ public class PrefilteringLiveNotificationEmailManagerTest
 
         Thread.sleep(100);
 
-        verify(this.dispatcher, times(1)).addEvent(event, userReference);
+        verify(this.dispatcher).addEvent(event, userReference);
     }
 }

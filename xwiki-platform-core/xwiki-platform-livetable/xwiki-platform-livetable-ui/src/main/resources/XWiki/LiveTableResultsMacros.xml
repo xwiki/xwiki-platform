@@ -918,33 +918,78 @@
  *#
 #macro (livetable_filterDBStringListProperty)
   ## Perform exact matching by default if no match type is specified.
-  ## Note that for DBStringList properties we take into account only the first match type, even if multiple filter
-  ## values are specified. Basically the first match type is used for all filter values.
+  ## For DBStringList properties we still apply a single match type to all non-empty values, but we also allow
+  ## combining the special "empty" match type with other match types.
   #livetable_getMatchTypes($colname $filterValues.size() 'exact')
-  #if ($matchType == 'partial' || $matchType == 'prefix')
-    ## We need to join with the list of values in order to be able to use the LIKE operator.
-    #set ($matchTarget = "${safe_tableAlias}_item")
-    #if ($whereParams.entrySet())
-      #set ($paramPrefix = "${safe_tableAlias}_item_")
-    #else
-      #set ($paramPrefix = $NULL)
-    #end
-    #set ($joinPos = $mathtool.add($fromSql.lastIndexOf(" $safe_tableAlias"), $mathtool.add($safe_tableAlias.length(), 1)))
-    #set ($fromSql = "$fromSql.substring(0, $joinPos) join ${safe_tableAlias}.list as $matchTarget $fromSql.substring($joinPos)")
-  #else
-    ## Fall-back on exact matching even if the match type is specified, when its value is not supported.
-    #set ($matchType = 'exact')
-    #set ($matchTarget = "${safe_tableAlias}.list")
-    #if ($whereParams.entrySet())
-      #set ($paramPrefix = "${safe_tableAlias}_list_")
-    #else
-      #set ($paramPrefix = $NULL)
+  #livetable_getJoinOperator($colname)
+
+  ## Collect non-empty filter values (those whose match type is not 'empty').
+  #set ($nonEmptyValues = [])
+  #set ($hasEmpty = false)
+  #set ($matchType = 'invalid')
+  #foreach ($filterValue in $filterValues)
+    #if ($matchTypes.get($foreach.index) == 'empty')
+      #set ($hasEmpty = true)
+      ## When we want to match empty values, we can't have other match types than exact for non-empty values as for
+      ## other match types, we need to join with the list of values, which is not compatible with checking for
+      ## emptiness.
+      #set ($matchType = 'exact')
+    #elseif ("$!filterValue" != '')
+      #set ($discard = $nonEmptyValues.add($filterValue))
+      ## Store the first non-empty match type.
+      #if ($matchType == 'invalid')
+        #set ($matchType = $matchTypes.get($foreach.index))
+      #end
     #end
   #end
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix $NULL)")
-  #set ($whereSql = "$whereSql and ($filterQuery.trim())")
-  #foreach ($filterValue in $filterValues)
-    #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
+
+  ## 1) Apply the non-empty constraints.
+  #if (!$nonEmptyValues.isEmpty())
+    #if ($matchType == 'partial' || $matchType == 'prefix')
+      ## We need to join with the list of values in order to be able to use the LIKE operator.
+      #set ($matchTarget = "${safe_tableAlias}_item")
+      #if ($whereParams.entrySet())
+        #set ($paramPrefix = "${safe_tableAlias}_item_")
+      #else
+        #set ($paramPrefix = $NULL)
+      #end
+      #set ($joinPos = $mathtool.add($fromSql.lastIndexOf(" $safe_tableAlias"), $mathtool.add($safe_tableAlias.length(), 1)))
+      #set ($fromSql = "$fromSql.substring(0, $joinPos) join ${safe_tableAlias}.list as $matchTarget $fromSql.substring($joinPos)")
+    #else
+      ## Fall-back on exact matching even if the match type is specified, when its value is not supported.
+      #set ($matchType = 'exact')
+      #set ($matchTarget = "${safe_tableAlias}.list")
+      #if ($whereParams.entrySet())
+        #set ($paramPrefix = "${safe_tableAlias}_list_")
+      #else
+        #set ($paramPrefix = $NULL)
+      #end
+    #end
+
+    #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $nonEmptyValues.size() $paramPrefix $NULL)")
+    #if (!$hasEmpty)
+      ## Only non-empty values are used, combine directly with the existing constraints, otherwise, they will be
+      ## combined later together with the empty constraint.
+      #set ($whereSql = "$whereSql and ($filterQuery.trim())")
+    #end
+    #foreach ($filterValue in $nonEmptyValues)
+      #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
+    #end
+  #end
+
+  ## 2) Optionally add a single constraint if any match type is 'empty'.
+  #if ($hasEmpty)
+    ## "empty" means that there is no list item stored for this property on the filtered object.
+    ## The proper way to check for that would be "${safe_tableAlias}.list IS EMPTY", but JSQL cannot parse "IS EMPTY"
+    ## which means that we cannot use it without programming right.
+    #set ($emptyConstraint = "size(${safe_tableAlias}.list) = 0")
+    #if ($nonEmptyValues.isEmpty())
+      ## Only 'empty' is used, combine with the existing constraints.
+      #set ($whereSql = "${whereSql} and ${emptyConstraint}")
+    #else
+      ## Combine non-empty group and empty condition using the join operator.
+      #set ($whereSql = "${whereSql} and ($filterQuery.trim() ${joinOperator} ${emptyConstraint})")
+    #end
   #end
 #end
 
@@ -1040,9 +1085,9 @@
   #if ($matchType == 'partial' || $matchType == 'prefix')
     #livetable_repeatParams("upper($column) like upper(?)", " $joinOperator ", $valueCount, $paramPrefix, $paramOffset)
   #elseif($matchType == 'empty')
-    ## Check if the value of the column is like the empty parameter (which is often the empty string), or if the value 
+    ## Check if the value of the column is like the empty parameter (which is often the empty string), or if the value
     ## of the column is null (to be compliant with Oracle which stores the empty string as a NULL value).
-    #livetable_repeatParams("($column like ? or $column is null)", " $joinOperator ", $valueCount, $paramPrefix, 
+    #livetable_repeatParams("($column like ? or $column is null)", " $joinOperator ", $valueCount, $paramPrefix,
     $paramOffset)
   #elseif ($isList)
     #livetable_repeatParams("? in elements($column)", " $joinOperator ", $valueCount, $paramPrefix, $paramOffset)

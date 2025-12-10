@@ -248,7 +248,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractSystem
     }
 
     protected void setBaseProperty(String propertyName, Object propertyValue, BaseObject baseObject,
-        BaseClass baseClass)
+        BaseClass baseClass) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 

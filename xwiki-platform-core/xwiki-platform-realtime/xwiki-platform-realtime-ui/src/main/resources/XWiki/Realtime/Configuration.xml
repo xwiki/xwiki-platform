@@ -321,6 +321,11 @@ ul.realtime-users {
   overflow: auto;
 }
 
+/* Hide the divider when the summarize action is not available. */
+ul.realtime-versions &gt; li.divider:last-child {
+  display: none;
+}
+
 /**
  * Spinner
  */
@@ -374,6 +379,20 @@ ul.realtime-users {
 
 :host(realtime-status[value="clean"])::after {
   content: attr(data-status-clean);
+}
+
+/**
+ * Concurrent editing warning
+ */
+
+.realtime-warning {
+  padding: 6px;
+  border: 0;
+  margin: 0 0 0 .5em;
+}
+
+.buttons:not(.realtime-edit-toolbar) &gt; .realtime-warning &gt; * {
+  vertical-align: baseline;
 }</code>
     </property>
     <property>
@@ -546,6 +565,7 @@ ul.realtime-users {
 &lt;template id="realtime-edit-toolbar"&gt;
   &lt;div class="realtime-edit-toolbar" data-user-id=""&gt;
     &lt;div class="realtime-edit-toolbar-left"&gt;
+      &lt;input type="hidden" name="preventEmptyRevision" value="true" /&gt;
       &lt;div class="btn-group dropup"&gt;
         &lt;button
           type="button"
@@ -566,16 +586,18 @@ ul.realtime-users {
           &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('core.menu.toggleDropdown'))&lt;/span&gt;
         &lt;/button&gt;
         &lt;ul class="dropdown-menu"&gt;
-          &lt;li&gt;
-            &lt;a
-              href="#"
-              class="realtime-action-summarize"
-              title="$escapetool.xml($services.localization.render('realtime.summarizeAndDone.hint'))"
-              data-continue="false"
-              data-toggle="modal"
-              data-target="#realtime-changeSummaryModal"
-            &gt;$escapetool.xml($services.localization.render('realtime.summarizeAndDone'))&lt;/a&gt;
-          &lt;/li&gt;
+          #if ($xwiki.hasEditComment())
+            &lt;li&gt;
+              &lt;a
+                href="#"
+                class="realtime-action-summarize"
+                title="$escapetool.xml($services.localization.render('realtime.summarizeAndDone.hint'))"
+                data-continue="false"
+                data-toggle="modal"
+                data-target="#realtime-changeSummaryModal"
+              &gt;$escapetool.xml($services.localization.render('realtime.summarizeAndDone'))&lt;/a&gt;
+            &lt;/li&gt;
+          #end
           &lt;li&gt;
             &lt;a
               href="#"
@@ -635,23 +657,25 @@ ul.realtime-users {
           &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('realtime.history'))&lt;/span&gt;
         &lt;/button&gt;
         &lt;ul
-          class="dropdown-menu realtime-versions"
+          class="dropdown-menu dropdown-menu-right realtime-versions"
           data-limit="5"
         &gt;
           &lt;li class="dropdown-header"&gt;
             $escapetool.xml($services.localization.render('realtime.history.hint'))
           &lt;/li&gt;
           &lt;li role="separator" class="divider"&gt;&lt;/li&gt;
-          &lt;li&gt;
-            &lt;a
-              href="#"
-              class="realtime-action-summarize"
-              title="$escapetool.xml($services.localization.render('realtime.summarize.hint'))"
-              data-continue="true"
-              data-toggle="modal"
-              data-target="#realtime-changeSummaryModal"
-            &gt;$escapetool.xml($services.localization.render('realtime.summarize'))&lt;/a&gt;
-          &lt;/li&gt;
+          #if ($xwiki.hasEditComment())
+            &lt;li&gt;
+              &lt;a
+                href="#"
+                class="realtime-action-summarize"
+                title="$escapetool.xml($services.localization.render('realtime.summarize.hint'))"
+                data-continue="true"
+                data-toggle="modal"
+                data-target="#realtime-changeSummaryModal"
+              &gt;$escapetool.xml($services.localization.render('realtime.summarize'))&lt;/a&gt;
+            &lt;/li&gt;
+          #end
         &lt;/ul&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -765,18 +789,20 @@ ul.realtime-users {
                     title="$escapetool.xml($services.localization.render('realtime.summary'))"
                   &gt;&lt;/textarea&gt;
                 &lt;/dd&gt;
-                ## Save &amp; Continue always creates a minor change so we show the minor change checkbox only when the
-                ## action is Save &amp; View
-                &lt;dt id="realtime-changeSummaryModal-minorChange" data-continue="false"&gt;
-                  &lt;label&gt;
-                    &lt;input type="checkbox" name="minorChange" /&gt;
-                    $escapetool.xml($services.localization.render('realtime.minorChange'))
-                  &lt;/label&gt;
-                  &lt;span class="xHint"&gt;
-                    $escapetool.xml($services.localization.render('realtime.minorChange.hint'))
-                  &lt;/span&gt;
-                &lt;/dt&gt;
-                &lt;dd&gt;&lt;/dd&gt;
+                #if ($xwiki.hasMinorEdit())
+                  ## Save &amp; Continue always creates a minor change so we show the minor change checkbox only when the
+                  ## action is Save &amp; View
+                  &lt;dt id="realtime-changeSummaryModal-minorChange" data-continue="false"&gt;
+                    &lt;label&gt;
+                      &lt;input type="checkbox" name="minorChange" /&gt;
+                      $escapetool.xml($services.localization.render('realtime.minorChange'))
+                    &lt;/label&gt;
+                    &lt;span class="xHint"&gt;
+                      $escapetool.xml($services.localization.render('realtime.minorChange.hint'))
+                    &lt;/span&gt;
+                  &lt;/dt&gt;
+                  &lt;dd&gt;&lt;/dd&gt;
+                #end
               &lt;/dl&gt;
             &lt;/div&gt;
             &lt;div
@@ -879,6 +905,29 @@ ul.realtime-users {
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;template id="realtime-warning"&gt;
+  &lt;button
+    type="button"
+    class="btn btn-link realtime-warning realtime-warning-connected"
+    data-toggle="popover"
+    data-placement="top"
+    title="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning'))"
+    data-content="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning.connected'))"
+  &gt;
+    $services.icon.renderHTML('warning')
+  &lt;/button&gt;
+  &lt;button
+    type="button"
+    class="btn btn-link realtime-warning realtime-warning-disconnected"
+    data-toggle="popover"
+    data-placement="top"
+    title="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning'))"
+    data-content="$escapetool.xml($services.localization.render('realtime.concurrentEditingWarning.disconnected'))"
+  &gt;
+    $services.icon.renderHTML('warning')
+  &lt;/button&gt;
 &lt;/template&gt;
 {{/html}}
 {{/velocity}}</content>
@@ -1316,7 +1365,7 @@ path=$services.webjars.url('org.xwiki.contrib:chainpad-netflux-webjar', 'chainpa
     </property>
     <property>
       <parameters>id=netflux-client
-path=$services.webjars.url('org.xwiki.contrib:netflux-websocket-webjar', 'netflux-client.min.js')</parameters>
+path=$services.webjars.url('org.webjars.npm:netflux-websocket', 'netflux-client.js')</parameters>
     </property>
     <property>
       <scope>wiki</scope>
@@ -1602,6 +1651,290 @@ bundles=xwiki-realtime-config,xwiki-realtime-crypto,xwiki-realtime-document,xwik
     <property>
       <parameters>id=json.sortify
 path=$services.webjars.url('org.webjars.npm:json.sortify', 'dist/JSON.sortify.js')</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Realtime.Configuration</name>
+    <number>11</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>10cf0e46-e50b-447e-a7a7-489f3671a8f8</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.nacl-fast</name>
+    </property>
+    <property>
+      <parameters>id=nacl-fast
+path=$services.webjars.url('org.webjars.npm:tweetnacl', 'nacl-fast.min.js')</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Realtime.Configuration</name>
+    <number>12</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>500c5aec-ecf3-4096-9047-11116e186d47</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.nacl-util</name>
+    </property>
+    <property>
+      <parameters>id=nacl-util
+path=$services.webjars.url('org.webjars.npm:tweetnacl-util', 'nacl-util.min.js')</parameters>
     </property>
     <property>
       <scope>wiki</scope>

@@ -57,7 +57,7 @@ rendering.macro.documentTree.parameter.showObjects.description=Si mostrar arxius
 rendering.macro.documentTree.parameter.showClassProperties.name=Mostra les propietats de la Classe
 rendering.macro.documentTree.parameter.showClassProperties.description=Si mostrar les propietats de la classe als documents que defineixen classes.
 rendering.macro.documentTree.parameter.root.name=Arrel
-### Missing: rendering.macro.documentTree.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified. The format of a node identifier is entityType:entityReference, where the entity type can be for instance wiki, space, document. E.g.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
+### Missing: rendering.macro.documentTree.parameter.root.description=
 rendering.macro.documentTree.parameter.showRoot.name=Mostra l'arrel
 ### Missing: rendering.macro.documentTree.parameter.showRoot.description=Whether to show the root node or not. The root node is not shown by default because it is usually implied from the context where the tree is displayed (e.g. a label before the tree). There are some cases though when you may want to display the root node: to be able to create a new node under the root.
 rendering.macro.documentTree.parameter.compact.name=Compacte
@@ -67,7 +67,7 @@ rendering.macro.documentTree.parameter.links.name=Enllaços
 ### Missing: rendering.macro.documentTree.parameter.checkboxes.name=Checkboxes
 ### Missing: rendering.macro.documentTree.parameter.checkboxes.description=Whether to display a checkbox in front of each tree node to allow the user to select multiple tree nodes.
 ### Missing: rendering.macro.documentTree.parameter.openTo.name=Open to
-### Missing: rendering.macro.documentTree.parameter.openTo.description=The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also. The format of the node id is the one used for the root parameter.
+### Missing: rendering.macro.documentTree.parameter.openTo.description=
 rendering.macro.documentTree.parameter.showOnlyViewable.name=Mostra només el que és visible
 ### Missing: rendering.macro.documentTree.parameter.showOnlyViewable.description=Show only the wiki, space and page nodes for which the current user has view right. If this is set to false then the wiki, space and page nodes that are not viewable by the current user are listed in the tree using their names. The user won't be able to see their content by following their links though (the user will just be aware of their existence).
 rendering.macro.documentTree.parameter.filterByClass.name=Filtra per Classe
@@ -82,13 +82,36 @@ rendering.macro.documentTree.parameter.limit.name=Límit
 ### Missing: rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
 rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 ### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
-
+rendering.macro.documentTree.parameter.sortDocumentsBy.name=Ordena les pàgines per
+rendering.macro.documentTree.parameter.sortDocumentsBy.description=El camp de pàgina utilitzat per ordenar les pàgines filles, seguit de l'ordre d'ordenació.
+rendering.macro.documentTree.parameter.expandToLevel.name=Expandeix al nivell
+rendering.macro.documentTree.parameter.expandToLevel.description=Defineix la profunditat de l'arbre a expandir automàticament. Per defecte és 0 i significa que només es mostren els nodes de nivell superior. Un nivell d'1 els obre, un nivell de 2 també obre els nens per sota dels nodes recentment mostrats, etc. Tingueu en compte que un valor alt pot fer que la macro expansiva es mostri per al navegador.
+rendering.macro.children.name=Filles
+rendering.macro.children.description=Mostra un arbre de pàgines filles de la pàgina actual
+rendering.macro.children.parameter.sort.name=Ordena per
+rendering.macro.children.parameter.sort.description=El camp de pàgina utilitzat per ordenar les pàgines filles, seguit de l'ordre d'ordenació.
+rendering.macro.children.parameter.root.name=Arrel
+rendering.macro.children.parameter.root.description=L'identificador del node arrel. Això és útil si voleu mostrar només els descendents d'un determinat node (que és l'arrel especificada). L'arbre mostra els fills del node arrel en el primer nivell, de manera que el node arrel no es mostra realment. Es mostra tot l'arbre si no s'especifica el node arrel.
+### Missing: rendering.macro.documentTree.group.show.name=Elements to show
+### Missing: rendering.macro.documentTree.group.filters.name=Filters
+### Missing: rendering.macro.documentTree.group.style.name=Display options
 index.documentTree.empty=No s'han trobat pàgines
 index.documentTree.more={0} més ...
+index.documentTree.addDocument=Nova pàgina...
+index.documentTree.documentSortDisplayer.field=Camp d'ordenació
+index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.title=Títol
+index.documentTree.documentSortDisplayer.field.date=Data de la darrera modificació
+index.documentTree.documentSortDisplayer.field.creationDate=Data de creació
+index.documentTree.documentSortDisplayer.order=Ordre d'ordenació
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=Ascendent
+index.documentTree.documentSortDisplayer.order.desc=Descendent
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Mostra els documents fills
-### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.</content>
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.
+</content>
 </xwikidoc>

@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-requiredrights</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-requiredrights-rest</artifactId>
   <name>XWiki Platform - Security - Required Rights - REST</name>
@@ -33,6 +33,7 @@
     <!-- Category to display in the Extension Manager. -->
     <xwiki.extension.category>api</xwiki.extension.category>
     <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>

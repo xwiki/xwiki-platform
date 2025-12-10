@@ -121,7 +121,6 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     void setup(MockitoComponentManager mockitoComponentManager) throws Exception
     {
         when(this.contextProvider.get()).thenReturn(this.context);
-        when(this.container.getSession()).thenReturn(this.servletSession);
         Utils.setComponentManager(mockitoComponentManager);
 
         when(this.attachmentValidatorProvider.get()).thenReturn(this.attachmentValidator);
@@ -129,6 +128,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
 
     private void setupSession()
     {
+        when(this.container.getSession()).thenReturn(this.servletSession);
         when(this.servletSession.getSession()).thenReturn(this.httpSession);
     }
 

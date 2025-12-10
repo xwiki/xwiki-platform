@@ -32,7 +32,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
-import org.apache.solr.schema.FieldType;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -198,8 +197,8 @@ public abstract class AbstractSolr implements Solr, Disposable
     protected void setSVersion(XWikiSolrCore core, long version, boolean add) throws SolrException
     {
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put(FieldType.TYPE_NAME, SOLR_TYPENAME_SVERSION);
-        attributes.put(FieldType.CLASS_NAME, "solr.ExternalFileField");
+        attributes.put(SolrSchemaUtils.SOLR_FIELD_NAME, SOLR_TYPENAME_SVERSION);
+        attributes.put(SolrSchemaUtils.SOLR_FIELD_CLASS, "solr.ExternalFileField");
         attributes.put(SOLR_VERSIONFIELDTYPE_VALUE, String.valueOf(version));
 
         FieldTypeDefinition definition = new FieldTypeDefinition();

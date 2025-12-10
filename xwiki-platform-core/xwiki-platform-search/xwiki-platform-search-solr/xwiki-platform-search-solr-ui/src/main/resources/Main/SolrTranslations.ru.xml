@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=Вики, для которой все ее док
 solr.admin.indexing.wiki.select_farm=Везде
 solr.admin.indexing.query.label=Произвольный запрос
 solr.admin.indexing.query.hint=Необязательный запрос для ограничения документов, которые будут затронуты выбранным действием в индексе.
+solr.admin.indexing.query.language.label=Язык произвольных запросов
 solr.admin.info.affectedDocuments=Затронутых документов в индексе:
-solr.sortBy=Сортировать:
-solr.sortBy.score=Значимость
-solr.sortBy.title_sort=Заголовок страницы
-solr.sortBy.date=Дата последнего изменения
-solr.sortBy.author_display_sort=Последний редактор
-solr.sortBy.filename_sort=Имя файла
-solr.sortBy.attsize_sort=Размер файла
-solr.sortBy.attdate_sort=Дата загрузки
-solr.sortBy.attauthor_display_sort=Загружено
-solr.sortOrder.asc=По возрастанию
-solr.sortOrder.desc=По убыванию
-solr.options=Показать:
-solr.options.highlight=Подсветка
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=Показать выдержку из того, что было найдено в каждом результате
-solr.options.facet=Фасеты
+### Missing: search.solr.options.showFacet=Show filters
 solr.options.facet.title=Разрешить дополнительную фильтрацию результата
 solr.result.language=Язык
 solr.result.locatedIn=Расположен в
@@ -172,6 +172,18 @@ solr.result.location=Находится в {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Расположение
+solr.sortBy=Сортировать:
+solr.sortBy.score=Значимость
+solr.sortBy.title_sort=Заголовок страницы
+solr.sortBy.date=Дата последнего изменения
+solr.sortBy.author_display_sort=Последний редактор
+solr.sortBy.filename_sort=Имя файла
+solr.sortBy.attsize_sort=Размер файла
+solr.sortBy.attdate_sort=Дата загрузки
+solr.sortBy.attauthor_display_sort=Загружено
+solr.options=Показать:
+solr.options.highlight=Подсветка
+solr.options.facet=Фасеты
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

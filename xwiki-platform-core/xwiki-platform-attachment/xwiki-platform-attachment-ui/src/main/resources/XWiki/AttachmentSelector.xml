@@ -637,7 +637,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     /** AJAX deletion of attachments. */
     onDelete : function(event) {
       event.stop();
-      deleteTool = event.element();
+      const deleteTool = event.target.closest('.btn');
       if (!deleteTool.disabled) {
         new XWiki.widgets.ConfirmedAjaxRequest(
           deleteTool.readAttribute('href'),
@@ -680,7 +680,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     /** Update the property with the selected value without reloading the page. */
     onSelect : function(event) {
       event.stop();
-      var targetElement = event.element();
+      const targetElement = event.target.closest('.btn');
       var attachmentName = targetElement.up('.gallery_attachmentbox').down('.gallery_attachmenttitle').title;
       var imageSource = targetElement.up('.gallery_attachmentbox.gallery_image');
       if (imageSource) {
@@ -695,7 +695,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       if (this.directSave) {
         // save via ajax
         if (!targetElement.disabled) {
-          new Ajax.Request(event.element().href, {
+          new Ajax.Request(targetElement.href, {
             onCreate : function() {
               targetElement.disabled = true;
               targetElement._x_notif = new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.inProgress')", 'inprogress');

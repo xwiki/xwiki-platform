@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class SearchSuggestSourceObjectEvaluatorTest
+class SearchSuggestSourceObjectEvaluatorTest
 {
     @InjectMockComponents
     private SearchSuggestSourceObjectEvaluator searchSuggestSourceObjectEvaluator;

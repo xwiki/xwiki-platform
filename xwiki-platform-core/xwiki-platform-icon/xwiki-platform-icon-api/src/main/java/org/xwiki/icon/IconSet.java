@@ -105,7 +105,8 @@ public class IconSet
     }
 
     /**
-     * @return the URL of a CSS file to enable to display this icon set properly, or null if it is not necessary
+     * @return the comma-separated list of URLs of CSS files to enable to display this icon set properly, or null if
+     * none is necessary
      */
     public String getCss()
     {
@@ -113,9 +114,9 @@ public class IconSet
     }
 
     /**
-     * Set the URL of a CSS file to enable to display this icon set properly.
+     * Set the comma-separated list of URLs of CSS files to enable to display this icon set properly.
      *
-     * @param css URL of the CSS file (it can contains velocity code).
+     * @param css URLs of the CSS files (can contain velocity code).
      */
     public void setCss(String css)
     {

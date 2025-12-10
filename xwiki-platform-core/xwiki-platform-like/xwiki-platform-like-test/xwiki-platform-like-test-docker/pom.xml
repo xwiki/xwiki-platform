@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-like-test</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-like-test-docker</artifactId>
   <name>XWiki Platform - Like - Test - Functional Docker Tests</name>
@@ -54,6 +54,13 @@
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
+    <!-- Administration application is needed to configure the like right for the test user -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
         Test only dependencies
         ================================ -->
@@ -73,6 +80,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -115,5 +128,4 @@
       </build>
     </profile>
   </profiles>
-
 </project>

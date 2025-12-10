@@ -39,7 +39,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -105,9 +104,9 @@ public class DefaultDocumentRestorerFromAttachedXARTest
 
         // Verify the document to restore has been restored from the xar
         verify(docToRestore1).fromXML(any(InputStream.class));
-        verify(xwiki, times(1)).saveDocument(docToRestore1, xcontext);
+        verify(xwiki).saveDocument(docToRestore1, xcontext);
         verify(docToRestore2).fromXML(any(InputStream.class));
-        verify(xwiki, times(1)).saveDocument(docToRestore2, xcontext);
+        verify(xwiki).saveDocument(docToRestore2, xcontext);
     }
 
     @Test

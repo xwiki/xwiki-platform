@@ -32,7 +32,9 @@ import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.AuthorExecutor;
 
 import com.xpn.xwiki.XWiki;
@@ -118,13 +120,20 @@ public class DBListClass extends ListClass
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
             try {
+                SecurityConfiguration securityConfiguration = Utils.getComponent(SecurityConfiguration.class);
                 DefaultParameterizedType dbListQueryBuilderType =
                     new DefaultParameterizedType(null, QueryBuilder.class, DBListClass.class);
                 QueryBuilder<DBListClass> dbListQueryBuilder = Utils.getComponent(dbListQueryBuilderType);
                 // Execute the query with the rights of the class last author.
                 AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
                 list = makeList(authorExecutor.call(() -> {
-                    return dbListQueryBuilder.build(this).execute();
+                    Query query = dbListQueryBuilder.build(this);
+                    int configuredLimit = securityConfiguration.getQueryItemsLimit();
+                    // Limit unlimited queries or queries with a high limit to the configured limit.
+                    if (configuredLimit > 0 && (query.getLimit() <= 0 || query.getLimit() > configuredLimit)) {
+                        query.setLimit(configuredLimit);
+                    }
+                    return query.execute();
                 }, getOwnerDocument().getAuthorReference(), getDocumentReference()));
             } catch (Exception e) {
                 LOGGER.warn("Failed to get the Database List values. Root cause is [{}].",

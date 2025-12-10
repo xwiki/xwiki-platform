@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.text.CaseUtils;
 import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -34,6 +33,9 @@ import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.officeimporter.server.OfficeServerException;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+
+import static org.xwiki.security.authorization.Right.PROGRAM;
 
 /**
  * Exposes the office manager APIs to server-side scripts.
@@ -97,16 +99,13 @@ public class OfficeServerScriptService implements ScriptService
     private OfficeServer officeServer;
 
     /**
-     * The {@link DocumentAccessBridge} component.
-     */
-    @Inject
-    private DocumentAccessBridge docBridge;
-
-    /**
      * The office server configuration.
      */
     @Inject
     private OfficeServerConfiguration officeServerConfig;
+
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     /**
      * Tries to start the office server process.
@@ -117,7 +116,7 @@ public class OfficeServerScriptService implements ScriptService
     {
         if (!isMainXWiki()) {
             setErrorMessage(ERROR_FORBIDDEN);
-        } else if (!this.docBridge.hasProgrammingRights()) {
+        } else if (!this.contextualAuthorizationManager.hasAccess(PROGRAM)) {
             setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {
@@ -140,7 +139,7 @@ public class OfficeServerScriptService implements ScriptService
     {
         if (!isMainXWiki()) {
             setErrorMessage(ERROR_FORBIDDEN);
-        } else if (!this.docBridge.hasProgrammingRights()) {
+        } else if (!this.contextualAuthorizationManager.hasAccess(PROGRAM)) {
             setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {

@@ -25,12 +25,18 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty</artifactId>
   <name>XWiki Platform - Tools - Jetty - Parent POM</name>
   <packaging>pom</packaging>
   <description>Tools for packaging a Jetty installation</description>
+  <properties>
+    <!--
+        Those modules a only used in the context of Jetty Serer so make sure to use the right Jetty Client version.
+    -->
+    <jetty.version>${jetty.server.version}</jetty.version>
+  </properties>
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-tool-jetty-listener</module>

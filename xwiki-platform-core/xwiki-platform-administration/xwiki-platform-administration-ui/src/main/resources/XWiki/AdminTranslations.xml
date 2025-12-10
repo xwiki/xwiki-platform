@@ -156,6 +156,10 @@ administration.section.analytics.status.hint=Determine if the tracking in Google
 admin.social=Social
 admin.social.description=Configuration for social features.
 
+# Network category
+admin.network=Network
+admin.network.description=Network related features.
+
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=Display in section
 XWiki.ConfigurableClass_heading=Heading

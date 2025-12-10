@@ -56,22 +56,22 @@ solr.admin.indexing.wiki.hint=Wiki în care acțiunea selectată va viza toate d
 solr.admin.indexing.wiki.select_farm=Întreaga fermă
 solr.admin.indexing.query.label=Interogare personalizată
 solr.admin.indexing.query.hint=Interogare opțională pentru a limita documentele care vor fi vizate de acțiunea selectată în index.
+solr.admin.indexing.query.language.label=Limba interogării personalizate
 solr.admin.info.affectedDocuments=Documentele vizate din index:
-solr.sortBy=Sortează după:
-solr.sortBy.score=Relevanță
-solr.sortBy.title_sort=Titlu
-solr.sortBy.date=Data ultimei modificări
-solr.sortBy.author_display_sort=Ultimul autor
-solr.sortBy.filename_sort=Numele fișierului
-solr.sortBy.attsize_sort=Dimensiunea fișierului
-solr.sortBy.attdate_sort=Data adăugării
-solr.sortBy.attauthor_display_sort=Adăugat de
-solr.sortOrder.asc=Ascendentă
-solr.sortOrder.desc=Descendentă
-solr.options=Afișează:
-solr.options.highlight=Evidențiază
+### Missing: search.solr.sortBy.hint=Sort order rule
+### Missing: search.solr.sortBy.field.score=Sort by relevance
+### Missing: search.solr.sortBy.field.titleSort=Sort by title
+### Missing: search.solr.sortBy.field.date=Sort by last edit date
+### Missing: search.solr.sortBy.field.authorDisplaySort=Sort by last author name
+### Missing: search.solr.sortBy.field.filenameSort=Sort by file name
+### Missing: search.solr.sortBy.field.attsizeSort=Sort by file size
+### Missing: search.solr.sortBy.field.attdateSort=Sort by upload date
+### Missing: search.solr.sortBy.field.attauthorDisplaySort=Sort by uploader name
+### Missing: search.solr.sortOrder.asc=Swap the sort order. The entries are currently sorted by ascending order.
+### Missing: search.solr.sortOrder.desc=Swap the sort order. The entries are currently sorted by descending order.
+### Missing: search.solr.options.showHighlight=Show highlights of matches
 solr.options.highlight.title=Afișează un extras din ceea ce corespunde în fiecare rezultat
-solr.options.facet=Fațete
+### Missing: search.solr.options.showFacet=Show filters
 solr.options.facet.title=Permite filtrarea suplimentară a rezultatului
 solr.result.language=Limbă
 solr.result.locatedIn=Localizat în
@@ -172,6 +172,18 @@ solr.result.location=Localizat în {0} » {1} » {2}
 
 ## until 7.2RC1
 solr.field.space=Locație
+solr.sortBy=Sortează după:
+solr.sortBy.score=Relevanță
+solr.sortBy.title_sort=Titlu
+solr.sortBy.date=Data ultimei modificări
+solr.sortBy.author_display_sort=Ultimul autor
+solr.sortBy.filename_sort=Numele fișierului
+solr.sortBy.attsize_sort=Dimensiunea fișierului
+solr.sortBy.attdate_sort=Data adăugării
+solr.sortBy.attauthor_display_sort=Adăugat de
+solr.options=Afișează:
+solr.options.highlight=Evidențiază
+solr.options.facet=Fațete
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

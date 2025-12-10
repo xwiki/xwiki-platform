@@ -142,8 +142,8 @@ admin.usersgroups.extensionrights=Droits des extensions
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Membre en cours de suppression du groupe
-administration.section.groups.deleteUserFromGroup.success=Membre supprimé avec du succès du groupe
-administration.section.groups.deleteUserFromGroup.failure=Impossible de supprimer le membre du groupe
+administration.section.groups.deleteUserFromGroup.success=Le membre a été supprimé du groupe avec succès
+administration.section.groups.deleteUserFromGroup.failure=Échec de suppression du membre du groupe
 
 # Other Category
 admin.other=Divers
@@ -154,6 +154,10 @@ administration.section.analytics.status.hint=Définit si le suivi Google Analyti
 # Social category
 admin.social=Social
 admin.social.description=Paramétrage des fonctionnalités sociales.
+
+# Network category
+admin.network=Réseau
+admin.network.description=Fonctionnalités liées au réseau.
 
 # Configurable Class
 XWiki.ConfigurableClass_displayInSection=Afficher dans la section

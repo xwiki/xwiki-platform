@@ -125,7 +125,7 @@
   <!-- This filter is used to initialize the XWiki context before processing a REST request. -->
   <filter>
     <filter-name>XWikiRESTContextInitializationFilter</filter-name>
-    <filter-class>com.xpn.xwiki.web.XWikiContextInitializationFilter</filter-class>
+    <filter-class>org.xwiki.rest.internal.XWikiRESTContextInitializationFilter</filter-class>
     <!-- A parameter used to identify the request as a an XML-RPC/REST call -->
     <init-param>
       <param-name>mode</param-name>

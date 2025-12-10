@@ -31,7 +31,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -40,7 +39,6 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 16.5.0RC1
  */
-@Unstable
 @Path("/wikis/{wikiName}{spaceName : (/spaces/[^/]+)*}{pageName : (/pages/[^/]+)?}/notificationsWatches")
 public interface NotificationsWatchResource
 {

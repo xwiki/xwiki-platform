@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -93,8 +93,9 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-http</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -155,13 +156,13 @@
     </dependency>
     <!-- Replace the one from Hibernate -->
     <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
     </dependency>
-    <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
+    <!-- Replace the one from DBCP -->
     <dependency>
-      <groupId>jakarta.transaction</groupId>
-      <artifactId>jakarta.transaction-api</artifactId>
+      <groupId>javax.transaction</groupId>
+      <artifactId>javax.transaction-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -457,6 +458,11 @@
       <artifactId>xwiki-platform-edit-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed by FileUploadPlugin -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+    </dependency>
 
     <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
@@ -658,6 +664,13 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -708,7 +721,6 @@
                 **/api/CriteriaService.java,
                 **/api/Document.java,
                 **/api/DocumentSection.java,
-                **/api/Object.java,
                 **/api/XWiki.java,
                 **/content/parsers/RenamePageReplaceLinkHandler.java,
                 **/criteria/api/XWikiCriteriaService.java,
@@ -778,7 +790,6 @@
                 **/monitor/api/MonitorTimerSummary.java,
                 **/objects/BaseCollection.java,
                 **/objects/BaseElement.java,
-                **/objects/BaseObject.java,
                 **/objects/BaseProperty.java,
                 **/objects/BaseStringProperty.java,
                 **/objects/classes/BaseClass.java,
@@ -791,7 +802,6 @@
                 **/objects/classes/ListItem.java,
                 **/objects/classes/NumberClass.java,
                 **/objects/classes/PasswordClass.java,
-                **/objects/classes/PropertyClassInterface.java,
                 **/objects/classes/PropertyClass.java,
                 **/objects/classes/StaticListClass.java,
                 **/objects/classes/StringClass.java,

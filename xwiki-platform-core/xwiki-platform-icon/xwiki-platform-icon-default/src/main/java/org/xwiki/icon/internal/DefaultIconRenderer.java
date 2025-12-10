@@ -115,9 +115,14 @@ public class DefaultIconRenderer implements IconRenderer
     {
         String url = this.iconTemplateRendererManager.getRenderer(iconSet.getCss())
             .render(null, iconSet.getSourceDocumentReference());
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("rel", "stylesheet");
-        this.linkExtension.use(url, parameters);
+        // Split URL at "," to support multiple CSS files.
+        // Commas in URLs are not that common, and if needed they can be encoded as %2C.
+        String[] urls = StringUtils.split(url, ',');
+        for (String cssUrl : urls) {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("rel", "stylesheet");
+            this.linkExtension.use(cssUrl, parameters);
+        }
     }
 
     private void activeSSX(IconSet iconSet)

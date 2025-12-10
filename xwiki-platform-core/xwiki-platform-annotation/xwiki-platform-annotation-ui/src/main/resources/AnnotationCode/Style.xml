@@ -264,21 +264,17 @@
 
 /* Annotations displayed in the text */
 .annotation-highlight {
-  background-color: #FE9; ## $theme.highlightColor;
+  background-color: #FE9;
 }
-## In velocity comment: settings for using the larger images from silk
+
 .annotation-marker {
-  ##background: transparent #imgURL('note') no-repeat left top;
   background: transparent #attImgURL('notesmall') no-repeat left top;
   display: inline-block;
-  ##height: 16px;
   height: 10px;
   overflow: hidden;
   text-indent: -9999px;
-  ##width: 16px;
   width: 10px;
   vertical-align: baseline;
-  ##margin: -19px -14px 3px -2px;
   margin: -15px -7px 5px -3px;
   z-index: 1;
   position: relative;
@@ -314,6 +310,28 @@
   top: 0;
   left: -10px;
   border-right-color: $theme.backgroundSecondaryColor;
+}
+
+.annotation-bubble.annotation-bubble-position-left {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 0;
+  
+  &amp;:before, &amp;:after {
+    border-right: none;
+    left: unset;
+    border-left: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+
+  &amp;:before {
+    right: -11px;
+    border-left-color: $theme.borderColor;
+  }
+
+  &amp;:after {
+    right: -10px;
+    border-left-color: $theme.backgroundSecondaryColor;
+  }
 }
 
 .annotation-box {

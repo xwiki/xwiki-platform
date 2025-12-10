@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { AttachmentsData, Document, PageAttachment, PageData, type Logger } from "@xwiki/cristal-api";
-import { AbstractStorage } from "@xwiki/cristal-backend-api";
+import { AttachmentsData, Document, PageAttachment, PageData, type Logger } from "@xwiki/platform-api";
+import { AbstractStorage } from "@xwiki/platform-backend-api";
 import { Container, inject, injectable } from "inversify";
 
 @injectable("Singleton")
@@ -90,8 +90,9 @@ export class XWikiStorage extends AbstractStorage {
     throw new Error("Method not implemented.");
   }
 
-  public async saveAttachments(page: string, files: File[]): Promise<unknown> {
-    return Promise.all(files.map((file) => this.saveAttachment(page, file)));
+  public async saveAttachments(page: string, files: File[]): Promise<undefined | (undefined | string)[]> {
+    await Promise.all(files.map((file) => this.saveAttachment(page, file)));
+    return undefined;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -106,7 +107,6 @@ export class XWikiStorage extends AbstractStorage {
     throw new Error("Method not implemented.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async move(): Promise<{ success: boolean; error?: string }> {
     // TODO
     throw new Error("Method not implemented.");

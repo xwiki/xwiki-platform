@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>17.7.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>17.7.0-SNAPSHOT</version>
+  <version>18.0.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -58,31 +58,33 @@
     <!-- Dependencies versions -->
     <batik.version>1.19</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.9.4</tika.version>
-    <pdfbox.version>2.0.34</pdfbox.version>
+    <tika.version>3.2.3</tika.version>
+    <pdfbox.version>3.0.6</pdfbox.version>
+    <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.23</jetty.server.version>
-    <jetty.client.version>10.0.25</jetty.client.version>
+    <jetty.server.version>12.1.5</jetty.server.version>
+    <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.2.Final</netty.version>
+    <netty.version>4.2.7.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.5.3</dockerJava.version>
-    <cvssCalculator.version>1.4.3</cvssCalculator.version>
+    <dockerJava.version>3.7.0</dockerJava.version>
+    <!-- Used for CVSS score calculation -->
+    <metaeffekt.version>0.149.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
     <jersey.version>2.47</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.3</zookeeper.version>
+    <zookeeper.version>3.9.4</zookeeper.version>
+    <rssreader.version>3.12.0</rssreader.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.21.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>25.2.5</libreoffice.version>
+    <libreoffice.version>25.2.7</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -110,26 +112,26 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.4.0</mysql.version>
+    <mysql.version>9.5.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.4</mariadb.version>
+    <mariadb.version>3.5.6</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.7</pgsql.version>
+    <pgsql.version>42.7.8</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.19.0.0</oracle.version>
+    <oracle.version>21.20.0.0</oracle.version>
 
-    <!-- Versions of Node related tools -->
-    <node.version>v22.16.0</node.version>
-    <npm.version>11.4.1</npm.version>
-    <pnpm.version>10.11.0</pnpm.version>
+    <!-- npm registries configuration -->
+    <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
+    <xwiki.npm.release.registry>https://registry.npmjs.org</xwiki.npm.release.registry>
   </properties>
   <scm>
+    <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
@@ -160,18 +162,10 @@
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.version}</version>
         <exclusions>
-          <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
+          <!-- Wrong ids -->
           <exclusion>
             <groupId>org.jboss.spec.javax.transaction</groupId>
             <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>javax.activation-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -180,13 +174,6 @@
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
         <version>4.33.0</version>
-        <exclusions>
-          <!-- Not the right id -->
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- Jython engine -->
@@ -216,27 +203,6 @@
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-advancedmedia-module</artifactId>
         <version>${tika.version}</version>
-        <exclusions>
-          <!-- XWiki does not support JAX-RC 2 for now -->
-          <exclusion>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-          </exclusion>
-          <!-- Remove when https://issues.apache.org/jira/browse/TIKA-3537 is fixed -->
-          <exclusion>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-          </exclusion>
-          <!-- Wrong ids -->
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15on</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
@@ -252,17 +218,6 @@
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-crypto-module</artifactId>
         <version>${tika.version}</version>
-        <exclusions>
-          <!-- Wrong ids -->
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15on</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
@@ -273,6 +228,13 @@
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parser-miscoffice-module</artifactId>
         <version>${tika.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- We cannot use JAX-B 4 yet -->
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
@@ -299,14 +261,10 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
-          <!-- Wrong ids -->
           <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15on</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
+            <!-- We cannot use JAX-B 4 yet -->
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -324,15 +282,6 @@
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <!-- Wrong ids -->
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15on</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -498,6 +447,23 @@
         </exclusions>
       </dependency>
 
+      <!-- Apache POI -->
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi</artifactId>
+        <version>${poi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-scratchpad</artifactId>
+        <version>${poi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml</artifactId>
+        <version>${poi.version}</version>
+      </dependency>
+
       <!-- All Batik artifacts should be in sync -->
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
@@ -584,7 +550,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.21.1</version>
+        <version>1.21.2</version>
       </dependency>
 
       <!-- PDF -->
@@ -682,7 +648,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.3.13</version>
+        <version>1.3.14</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -692,7 +658,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.17</version>
+        <version>2.2.18</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -702,7 +668,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.20</version>
+        <version>3.1.21</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -714,7 +680,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>6.1</version>
+        <version>6.2</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -905,6 +871,18 @@
       <!-- Solr -->
       <dependency>
         <groupId>org.apache.solr</groupId>
+        <artifactId>solr-api</artifactId>
+        <version>${solr.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
         <version>${solr.version}</version>
       </dependency>
@@ -917,6 +895,10 @@
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
           </exclusion>
           <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
           <exclusion>
@@ -969,6 +951,11 @@
         <version>${lucene.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-core</artifactId>
+        <version>${lucene.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
         <version>1.1.10.8</version>
@@ -976,17 +963,17 @@
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-core</artifactId>
-        <version>1.40.0</version>
+        <version>1.41.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-linq4j</artifactId>
-        <version>1.40.0</version>
+        <version>1.41.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
-        <version>1.26.0</version>
+        <version>1.27.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.zookeeper</groupId>
@@ -1016,6 +1003,10 @@
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>jakarta.inject</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -1033,6 +1024,22 @@
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>jakarta.inject</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-client</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -1048,6 +1055,10 @@
           <exclusion>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1072,6 +1083,13 @@
         <groupId>org.glassfish.jersey.media</groupId>
         <artifactId>jersey-media-json-jackson</artifactId>
         <version>${jersey.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.glassfish.jersey.media</groupId>
@@ -1126,6 +1144,11 @@
         <groupId>aopalliance</groupId>
         <artifactId>aopalliance</artifactId>
         <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.jayway.jsonpath</groupId>
+        <artifactId>json-path</artifactId>
+        <version>2.10.0</version>
       </dependency>
 
       <!-- Database connectors -->
@@ -1188,12 +1211,12 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.18</version>
+        <version>3.5.23</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue-i18n</artifactId>
-        <version>11.1.11</version>
+        <version>11.1.12</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1320,10 +1343,10 @@
                 <features>dom4j:dom4j</features>
               </extensionOverride>
               <extensionOverride>
-                <!-- Right id of the JAXB API -->
-                <id>jakarta.xml.bind:jakarta.xml.bind-api</id>
+                <!-- Right id of the javax JAXB API -->
+                <id>javax.xml.bind:jaxb-api</id>
                 <features>
-                  javax.xml.bind:jaxb-api
+                  org.jboss.spec.javax.xml.bind:jboss-jaxb-api_2.3_spec
                 </features>
               </extensionOverride>
               <extensionOverride>
@@ -1333,6 +1356,13 @@
                   com.sun.xml.bind:jaxb-impl,
                   org.glassfish.jaxb:jaxb-core,
                   com.sun.xml.bind:jaxb-core
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>javax.ws.rs:javax.ws.rs-api</id>
+                <features>
+                    javax.ws.rs:jsr311-api,
+                    org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec
                 </features>
               </extensionOverride>
               <extensionOverride>
@@ -1414,8 +1444,7 @@
                 <features>
                   javax.mail:mail,
                   javax.mail:mailapi,
-                  com.sun.mail:javax.mail,
-                  jakarta.mail:jakarta.mail-api
+                  com.sun.mail:javax.mail
                 </features>
               </extensionOverride>
               <extensionOverride>
@@ -1434,22 +1463,16 @@
                 <features>com.google.inject:guice</features>
               </extensionOverride>
               <extensionOverride>
-                <id>com.sun.activation:jakarta.activation</id>
-                <features>
-                  javax.activation:activation,
-                  javax.activation:javax.activation-api,
-                  com.sun.activation:javax.activation,
-                  jakarta.activation:jakarta.activation-api
-                </features>
+                <id>com.sun.activation:javax.activation</id>
+                <features>javax.activation:activation</features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.google.code.findbugs:jsr305</id>
                 <features>com.google.code.findbugs:annotations</features>
               </extensionOverride>
               <extensionOverride>
-                <id>jakarta.transaction:jakarta.transaction-api</id>
+                <id>javax.transaction:javax.transaction-api</id>
                 <features>
-                  javax.transaction:javax.transaction-api,
                   javax.transaction:jta,
                   org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec
                 </features>
@@ -1529,13 +1552,6 @@
               <extensionOverride>
                 <id>aopalliance:aopalliance</id>
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
-              </extensionOverride>
-              <extensionOverride>
-                <id>jakarta.ws.rs:jakarta.ws.rs-api</id>
-                <features>
-                    javax.ws.rs:jsr311-api,
-                    org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec
-                </features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

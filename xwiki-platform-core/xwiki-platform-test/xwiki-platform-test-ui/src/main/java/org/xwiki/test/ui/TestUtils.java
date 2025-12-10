@@ -104,6 +104,7 @@ import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
+import org.xwiki.rest.resources.pages.PagesResource;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -1595,7 +1596,9 @@ public class TestUtils
      */
     public void maybeLeaveEditMode()
     {
-        if (StringUtils.isNotEmpty(getEditMode())) {
+        String editMode = getEditMode();
+        List<String> adminModes = List.of("globaladmin", "spaceadmin");
+        if (StringUtils.isNotEmpty(editMode) && !adminModes.contains(editMode)) {
             leaveEditMode();
         }
     }
@@ -1613,10 +1616,16 @@ public class TestUtils
         // doesn't reload the page on cancel. We can only rely on the fact that the URL will change (even for the
         // in-place editor where the '#edit' URL fragment is removed).
         String editURL = getDriver().getCurrentUrl();
+        WebElement cancelButton =
+            getDriver().findElementWithoutWaitingWithoutScrolling(By.cssSelector("input[name='action_cancel']"));
+        // The cancel button can be temporarily disabled, e.g. while the content is being (auto)saved.
+        getDriver().waitUntilElementIsEnabled(cancelButton);
+        // We use the shortcut key instead of clicking because the cancel button might not be visible (e.g. when doing
+        // realtime collaboration).
         getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
         getDriver().waitUntilCondition(driver -> {
             String viewURL = driver.getCurrentUrl();
-            return !viewURL.equals(editURL);
+            return !Objects.equals(viewURL, editURL);
         });
     }
 
@@ -2537,6 +2546,7 @@ public class TestUtils
                 throw new RuntimeException(e);
             }
 
+            RESOURCES_MAP.put(EntityType.SPACE, new ResourceAPI(PagesResource.class, null));
             RESOURCES_MAP.put(EntityType.DOCUMENT, new ResourceAPI(PageResource.class, PageTranslationResource.class));
             RESOURCES_MAP.put(EntityType.OBJECT, new ResourceAPI(ObjectResource.class, null));
             RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, new ResourceAPI(ObjectPropertyResource.class, null));
@@ -2914,11 +2924,15 @@ public class TestUtils
         }
 
         /**
-         * @since 15.2RC1
-         * @since 15.1
-         * @since 14.10.6
+         * Add a new object to an existing or new page.
+         *
+         * @param documentReference the document where to add the object
+         * @param className the class name of the object to add
+         * @param properties the properties of the object to add (name1, value1, name2, value2, ...)
+         * @since 17.10.1
+         * @since 18.0.0RC1
          */
-        private void addObject(EntityReference documentReference, String rightClassName, Object... properties)
+        public void addObject(EntityReference documentReference, String className, Object... properties)
             throws Exception
         {
             // Make sure the page exist (object add fail otherwise)
@@ -2929,16 +2943,16 @@ public class TestUtils
             }
 
             // Create the object
-            org.xwiki.rest.model.jaxb.Object rightsObject = object(documentReference, rightClassName);
+            org.xwiki.rest.model.jaxb.Object jaxbObject = object(documentReference, className);
             for (int i = 0; i < properties.length; i += 2) {
                 String name = (String) properties[i + 0];
                 Object value = properties[i + 1];
 
-                rightsObject.withProperties(RestTestUtils.property(name, value));
+                jaxbObject.withProperties(RestTestUtils.property(name, value));
             }
 
             // Add the object
-            add(rightsObject);
+            add(jaxbObject);
         }
 
         /**

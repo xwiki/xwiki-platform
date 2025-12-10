@@ -255,6 +255,7 @@ notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=您忽�
 notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=您忽略了此页面及其子页面：您不会收到任何通知。
 notifications.watch.modal.title.CUSTOM=自定义监视设置
 notifications.watch.modal.description.CUSTOM=您正在使用此页面的自定义通知设置：您可能正在关注或阻止页面的特定事件，或者您可能仅针对通知的特定渠道。我们邀请您查看个人资料中的通知设置。
+notifications.watch.modal.option.hint.toggle=收起/展开关于此选项的详细信息
 notifications.watch.modal.option.watchpage.title=关注当前页面
 notifications.watch.modal.option.watchpage.hint=您将仅收到该页面的通知。
 notifications.watch.modal.option.watchspace.title=关注当前页面及其子页面

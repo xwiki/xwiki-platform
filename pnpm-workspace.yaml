@@ -39,7 +39,7 @@ catalog:
   "@blocknote/react": 0.42.3
   "@eslint/config-helpers": 0.4.2
   "@eslint/js": 9.39.1
-  "@mantine/core": 8.3.6
+  "@mantine/core": 8.3.10
   "@mantine/hooks": 8.3.6
   "@microsoft/api-extractor": 7.55.1
   "@playwright/experimental-ct-react": 1.56.1

@@ -138,8 +138,10 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
             String fromTableProp2 = fromTable.replace(" as prop", " as prop2");
             String selectColumnProp2 = selectColumn.replace("prop.", "prop2.");
 
-            // The aliases are used in TextQueryFilter to avoid casting CLOB columns to string and to avoid filtering
-            // on the count.
+            // TextQueryFilter modifies the following query to filter results based on the text typed by the user. It
+            // uses aliases to determine the column type. By using an alias with the prefix "string" we avoid casting
+            // CLOB columns to string which fails when the value is longer than 4000 characters and by using an alias
+            // with the prefix "unfilterable" we avoid filtering on the count.
             statement = String.format(
                 "select %1$s as stringValue, 1L as unfilterable0 "
                     + "from BaseObject as obj, %2$s "
@@ -156,10 +158,11 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
                     + "order by obj.id",
                 selectColumn, fromTable, fromTableProp2, selectColumnProp2);
         } else {
-            // We also need to avoid casting the first column to string as this could also be a CLOB column in other
-            // databases (depending on the table). As we're dealing with a text value in all cases, there is no need
-            // for the cast. We alias the column with "stringValue" so that TextQueryFilter knows it doesn't need to
-            // cast it. Also, we alias the count column with "unfilterable0" so that TextQueryFilter ignores it.
+            // As in the query above, TextQueryFilter modifies the query and can be influenced with aliases. The first
+            // column could be a CLOB column in some databases. As the cast to string fails for long values, for
+            // example, in HSQLDB, we prevent TextQueryFilter from casting it to string by using an alias with the
+            // prefix "string". As we're dealing with a text value in all cases, there is no need for the cast. We also
+            // avoid filtering on the count again by using an alias with the prefix "unfilterable".
             statement = String.format("select %1$s as stringValue, count(*) as unfilterable0 "
                 + "from BaseObject as obj, %2$s "
                 + "where obj.className = :className and obj.name <> :templateName"

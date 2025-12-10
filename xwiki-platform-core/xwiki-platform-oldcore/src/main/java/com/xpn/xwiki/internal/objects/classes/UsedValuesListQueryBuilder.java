@@ -61,6 +61,8 @@ import com.xpn.xwiki.store.DatabaseProduct;
 @Singleton
 public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
 {
+    private static final String PROP_VALUE = "prop.value";
+
     private class ViewableValueFilter implements QueryFilter
     {
         private final ListClass listClass;
@@ -185,25 +187,20 @@ public class UsedValuesListQueryBuilder implements QueryBuilder<ListClass>
     private SelectColumnAndFromTable getSelectColumnAndFromTable(ListClass listClass)
     {
         // Base the selection on the actual type of a property as different classes like UsersClass and GroupsClass
-        // don't respect the configured storage type.
+        // don't respect the configured storage type. Further, this avoids duplicating the logic for selecting the
+        // property type.
         BaseProperty<?> property = listClass.newProperty();
-        String selectColumn;
-        String fromTable;
+        SelectColumnAndFromTable result;
         if (property instanceof StringListProperty) {
-            selectColumn = "prop.textValue";
-            fromTable = "StringListProperty as prop";
+            result = new SelectColumnAndFromTable("prop.textValue", "StringListProperty as prop");
         } else if (property instanceof DBStringListProperty) {
-            selectColumn = "listItem";
-            fromTable = "DBStringListProperty as prop join prop.list listItem";
+            result = new SelectColumnAndFromTable("listItem", "DBStringListProperty as prop join prop.list listItem");
+        } else if (property instanceof LargeStringProperty) {
+            result = new SelectColumnAndFromTable(PROP_VALUE, "LargeStringProperty as prop");
         } else {
-            selectColumn = "prop.value";
-            if (property instanceof LargeStringProperty) {
-                fromTable = "LargeStringProperty as prop";
-            } else {
-                fromTable = "StringProperty as prop";
-            }
+            result = new SelectColumnAndFromTable(PROP_VALUE, "StringProperty as prop");
         }
-        return new SelectColumnAndFromTable(selectColumn, fromTable);
+        return result;
     }
 
     private void bindParameterValues(Query query, ListClass listClass)

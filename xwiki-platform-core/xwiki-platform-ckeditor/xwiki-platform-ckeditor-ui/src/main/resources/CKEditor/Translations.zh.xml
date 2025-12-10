@@ -244,10 +244,8 @@ ckeditor.plugin.focusedplaceholder.placeholder.pre=预格式化
 ckeditor.plugin.focusedplaceholder.placeholder.caption=标题
 ckeditor.plugin.focusedplaceholder.placeholder.th=页眉
 ckeditor.plugin.focusedplaceholder.placeholder.td=单元格
-ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=暂时离开实时会话。
-ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=未进行任何更改。重新加入实时会话。
-ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=有未保存的更改，但没有其他人在实时会话中。重新加入。
-ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=无法重新加入实时会话，因为有未保存的更改。
+ckeditor.plugin.realtime.leavingCollaboration=离开实时协作
+ckeditor.plugin.realtime.joiningCollaboration=加入实时协作
 ckeditor.plugin.upload.downloadingPastedImages=正在下载粘贴的图片：{0} / {1}
 ckeditor.plugin.upload.imageDownloadFailed=未能下载 {0} 张中的 {1} 张粘贴的图片
 ckeditor.plugin.upload.starting=将在 {0} 秒后开始上传
@@ -301,6 +299,8 @@ macroSelector.filter.category.placeholder=选择一个类别…
 ### Missing: macroEditor.title=Edit Macro
 ### Missing: macroEditor.more=More
 macroEditor.required=要求
+macroEditor.deprecated=反对
+macroEditor.advanced=高级
 ### Missing: macroEditor.changeMacro=Change Macro
 ### Missing: macroEditor.submit=Submit
 ### Missing: macroEditor.content=Content
@@ -338,6 +338,10 @@ ckeditor.plugin.link.uploadError=上传{0}失败
 ckeditor.plugin.image.slash.uploadProgress=正在上传{0}...
 ckeditor.plugin.image.slash.uploadSuccess=已成功上传 {0}
 ckeditor.plugin.image.slash.uploadError=上传{0}失败
+ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=暂时离开实时会话。
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=未进行任何更改。重新加入实时会话。
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=有未保存的更改，但没有其他人在实时会话中。重新加入。
+ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=无法重新加入实时会话，因为有未保存的更改。
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend
